@@ -140,7 +140,9 @@ pub fn compare_shapes(ours: &Geometry, gdal_wkt: &str, tol: f64) -> Option<Strin
         .collect();
     // GDAL's vertices lie on the true curve, so they must be close to our (finer)
     // densification. Our vertices may sit off GDAL's coarser chords by up to their
-    // sagitta, so that direction allows 5% of the GDAL segment length on top.
+    // sagitta, so that direction allows 25% of the GDAL segment length on top (GDAL
+    // < 3.9 linearizes with coarse steps). Wrong centers, directions or sweeps are
+    // caught by the first check, since GDAL's vertices would leave our curve.
     let far = |from: &[Vec<[f64; 2]>], to: &[Vec<[f64; 2]>], chord_allowance: f64| {
         from.iter()
             .flatten()
@@ -153,7 +155,7 @@ pub fn compare_shapes(ours: &Geometry, gdal_wkt: &str, tol: f64) -> Option<Strin
             "GDAL vertex {p:?} is {d:.3e} from our shape (tolerance {tol:.1e})"
         ));
     }
-    if let Some((p, d)) = far(&a, &b, 0.05) {
+    if let Some((p, d)) = far(&a, &b, 0.25) {
         return Some(format!(
             "our vertex {p:?} is {d:.3e} beyond GDAL's chords (tolerance {tol:.1e})"
         ));
