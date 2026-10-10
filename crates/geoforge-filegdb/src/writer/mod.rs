@@ -667,8 +667,13 @@ pub fn validate_table_name(name: &str) -> Result<()> {
 /// (with origin far below any coordinate) for projected or unknown ones.
 fn default_geometry_def(srs_wkt: Option<&str>, has_z: bool, has_m: bool) -> GeometryDef {
     let geographic = srs_wkt.is_some_and(|w| w.trim_start().starts_with("GEOGCS"));
+    // Unknown coordinate system: ArcGIS Pro 3.7 uses origin -450359962737.0495.
+    // Projected systems get a domain derived from the projection (Phase 4); until
+    // then they share a generous fixed origin.
     let (origin, scale, tol) = if geographic {
         (-400.0, 1e9, 8.983152841195215e-9)
+    } else if srs_wkt.is_none() {
+        (-450359962737.0495, 10000.0, 0.001)
     } else {
         (-2147483647.0, 10000.0, 0.001)
     };

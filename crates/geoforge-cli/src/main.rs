@@ -289,12 +289,24 @@ fn esri_type_name(t: FieldType) -> &'static str {
     }
 }
 
-/// Field types a shapefile cannot hold; ArcGIS drops these on export with a warning.
-fn shapefile_can_store(t: FieldType) -> bool {
-    !matches!(
-        t,
-        FieldType::Blob | FieldType::Raster | FieldType::TimeOnly | FieldType::TimestampOffset
-    )
+/// What ArcGIS Copy Features does with a field when writing a shapefile
+/// (observed in ArcGIS Pro 3.7): store it, drop it with WARNING 000592, or fail the
+/// tool with ERROR 000308.
+enum ShapefileField {
+    Store,
+    Drop,
+    Fail,
+}
+
+fn shapefile_field(t: FieldType) -> ShapefileField {
+    match t {
+        FieldType::Blob | FieldType::Raster => ShapefileField::Drop,
+        FieldType::BigInteger
+        | FieldType::Xml
+        | FieldType::TimeOnly
+        | FieldType::TimestampOffset => ShapefileField::Fail,
+        _ => ShapefileField::Store,
+    }
 }
 
 /// ArcGIS `ValidateFieldName` for file geodatabases: invalid characters become
@@ -403,20 +415,23 @@ fn copy_features(input: &Path, output: &Path) -> Result<()> {
         return copy_to_geodatabase(fc.as_ref(), source_gdb.as_deref(), kind, &gdb, &item);
     }
 
-    let keep: Vec<usize> = (0..fc.fields().len())
-        .filter(|&i| {
-            let f = &fc.fields()[i];
-            let ok = shapefile_can_store(f.field_type);
-            if !ok {
-                eprintln!(
-                    "WARNING: field {} ({}) is not supported by shapefiles and was dropped",
+    let mut keep = Vec::new();
+    for (i, f) in fc.fields().iter().enumerate() {
+        match shapefile_field(f.field_type) {
+            ShapefileField::Store => keep.push(i),
+            ShapefileField::Drop => eprintln!(
+                "WARNING 000592: Output format does not support BLOB, Raster, or GUID fields. Field(s) {} will not be converted to output.",
+                f.name
+            ),
+            ShapefileField::Fail => {
+                return Err(Error::Unsupported(format!(
+                    "ERROR 000308: Invalid field type: field {} ({}) cannot be stored in a shapefile",
                     f.name,
                     esri_type_name(f.field_type)
-                );
+                )));
             }
-            ok
-        })
-        .collect();
+        }
+    }
     let fields: Vec<Field> = keep.iter().map(|&i| fc.fields()[i].clone()).collect();
     let mut w = ShapefileWriter::create(
         output,
@@ -426,16 +441,33 @@ fn copy_features(input: &Path, output: &Path) -> Result<()> {
         &fields,
         fc.spatial_reference_wkt(),
     )?;
-    let mut n = 0;
+    let (mut n, mut skipped) = (0, Vec::new());
     for feature in fc.features() {
         let f = feature?;
         let attributes = keep.iter().map(|&i| f.attributes[i].clone()).collect();
-        w.write(&Feature {
+        match w.write(&Feature {
             oid: f.oid,
             geometry: f.geometry,
             attributes,
-        })?;
-        n += 1;
+        }) {
+            Ok(()) => n += 1,
+            // ArcGIS skips rows whose values cannot be stored and carries on.
+            Err(Error::BadValue(why)) => {
+                eprintln!(
+                    "WARNING 160277: The row contains a bad value. ({} {}: {why})",
+                    fc.oid_field_name(),
+                    f.oid
+                );
+                skipped.push(f.oid);
+            }
+            Err(e) => return Err(e),
+        }
+    }
+    if !skipped.is_empty() {
+        eprintln!(
+            "WARNING 000595: {} records could not be processed: {skipped:?}",
+            skipped.len()
+        );
     }
     w.finish()?;
     println!("Copied {n} features to {}", output.display());

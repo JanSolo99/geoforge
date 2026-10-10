@@ -19,7 +19,12 @@ sys.stdout = io.TextIOWrapper(io.BytesIO(), encoding="utf-8")  # stray prints go
 
 import arcpy  # noqa: E402  (after redirecting stdout: arcpy may print on import)
 
-NAMESPACE = {"arcpy": arcpy}
+def P(path):
+    """Linux path -> Wine path, for use in arcgis_python code: P('/mnt/data/x.shp')."""
+    return "Z:" + path.replace("/", "\\") if path.startswith("/") else path
+
+
+NAMESPACE = {"arcpy": arcpy, "P": P}
 
 
 def send(msg):

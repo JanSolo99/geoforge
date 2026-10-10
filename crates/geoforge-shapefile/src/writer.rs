@@ -98,6 +98,9 @@ impl ShapefileWriter {
 
     /// Appends a feature. `feature.attributes` follow the field order given to `create`.
     pub fn write(&mut self, feature: &Feature) -> Result<()> {
+        // Encode the attributes first: a value that does not fit means the row is
+        // skipped entirely (ArcGIS WARNING 160277), so nothing may be written yet.
+        self.dbf.encode(&feature.attributes)?;
         let geometry = match &feature.geometry {
             Some(g) => Some(self.conform(g)?),
             None => None,
@@ -122,7 +125,7 @@ impl ShapefileWriter {
             .map_err(io)?;
         self.shp.write_all(&words(content_len)).map_err(io)?;
         self.shp.write_all(&self.record).map_err(io)?;
-        self.dbf.push(&feature.attributes)?;
+        self.dbf.write_encoded()?;
 
         if let Some(g) = &geometry {
             self.extent.union(&g.envelope());

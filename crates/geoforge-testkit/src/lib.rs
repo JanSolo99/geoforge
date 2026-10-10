@@ -511,6 +511,19 @@ pub fn compare_value(ours: &Value, gdal: &Json) -> Option<String> {
     };
     let ok = match (ours, gdal) {
         (Value::Null, Json::Null) => true,
+        // Shapefiles cannot store nulls: ArcGIS (and we) read them as " " and 0,
+        // GDAL as null. dBASE logicals read as 1/0 in ArcGIS, true/false in GDAL.
+        (Value::String(s), Json::Null) if s == " " => true,
+        (Value::SmallInteger(0) | Value::Integer(0), Json::Null) => true,
+        (Value::Single(v), Json::Null) if *v == 0.0 => true,
+        (Value::Double(v), Json::Null) if *v == 0.0 => true,
+        (Value::SmallInteger(v), Json::Bool(b)) => (*v != 0) == *b,
+        (Value::SmallInteger(v), Json::String(g))
+            if matches!(g.as_str(), "T" | "Y" | "F" | "N" | "?") =>
+        {
+            (*v != 0) == matches!(g.as_str(), "T" | "Y")
+        }
+        (Value::String(s), Json::String(g)) if s == " " && g.trim().is_empty() => true,
         // dBASE "unset" logical; GDAL < 3.9 reports it raw instead of null.
         (Value::Null, Json::String(g)) => g == "?",
         (Value::String(s), Json::Null) => s.is_empty(),
@@ -523,7 +536,10 @@ pub fn compare_value(ours: &Value, gdal: &Json) -> Option<String> {
         (Value::Integer(v), _) => num(f64::from(*v)),
         (Value::BigInteger(v), _) => num(*v as f64),
         (Value::Double(v), _) => num(*v),
-        (Value::Single(v), _) => num(f64::from(*v)),
+        // Single values carry float32 precision.
+        (Value::Single(v), Json::Number(n)) => n
+            .as_f64()
+            .is_some_and(|g| (f64::from(*v) - g).abs() <= 1e-6 * g.abs().max(1.0)),
         (Value::Date(d), Json::String(g)) => {
             // Shapefile dates are date-only; FileGDB ones carry a time (and GDAL may
             // append a UTC offset such as "+00").

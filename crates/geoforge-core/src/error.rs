@@ -17,6 +17,10 @@ pub enum Error {
     Unsupported(String),
     #[error("limit exceeded: {0}")]
     Limit(String),
+    /// A value cannot be stored in the target (e.g. too wide for a dBASE column).
+    /// ArcGIS skips such rows with WARNING 160277 "The row contains a bad value".
+    #[error("the row contains a bad value: {0}")]
+    BadValue(String),
 }
 
 impl Error {

@@ -6,7 +6,7 @@ use std::f64::consts::{PI, TAU};
 use crate::geometry::{
     ARC_CCW, ARC_EMPTY, ARC_INTERIOR_POINT, ARC_LINE, ARC_POINT, Geometry, SegmentKind,
 };
-use crate::{Error, Result};
+use crate::{Envelope, Error, Result};
 
 /// Elliptic-arc flag bits (Esri extended shape buffer format).
 pub const ELLIPSE_EMPTY: u32 = 0x1;
@@ -82,6 +82,225 @@ impl Geometry {
     }
 }
 
+/// A curve segment in parametric form, `t` in `[0, 1]` from start to end.
+enum Curve {
+    Line,
+    /// Circle (radius interpolated from `r0` to `r1` for inconsistent centers).
+    Arc {
+        center: [f64; 2],
+        r0: f64,
+        r1: f64,
+        a0: f64,
+        sweep: f64,
+    },
+    Bezier([[f64; 2]; 4]),
+    Ellipse {
+        center: [f64; 2],
+        a: f64,
+        b: f64,
+        sin_r: f64,
+        cos_r: f64,
+        t0: f64,
+        sweep: f64,
+    },
+}
+
+impl Curve {
+    fn new(p0: [f64; 2], p1: [f64; 2], kind: &SegmentKind) -> Result<Self> {
+        Ok(match *kind {
+            SegmentKind::CircularArc { point, bits } => {
+                if bits & (ARC_LINE | ARC_POINT | ARC_EMPTY) != 0 {
+                    return Ok(Curve::Line);
+                }
+                let closed = same_point(p0, p1);
+                let (center, sweep) = if bits & ARC_INTERIOR_POINT != 0 {
+                    if closed {
+                        // A full circle stores the point opposite the start.
+                        let c = [(p0[0] + point[0]) / 2.0, (p0[1] + point[1]) / 2.0];
+                        (c, if bits & ARC_CCW != 0 { TAU } else { -TAU })
+                    } else {
+                        let Some(c) = circumcenter(p0, point, p1) else {
+                            return Ok(Curve::Line); // collinear
+                        };
+                        let ccw = cross(p0, point, p1) > 0.0;
+                        (c, sweep_between(angle(c, p0), angle(c, p1), ccw))
+                    }
+                } else {
+                    let ccw = bits & ARC_CCW != 0;
+                    let sweep = if closed {
+                        if ccw { TAU } else { -TAU }
+                    } else {
+                        sweep_between(angle(point, p0), angle(point, p1), ccw)
+                    };
+                    (point, sweep)
+                };
+                Curve::Arc {
+                    center,
+                    r0: dist(center, p0),
+                    r1: dist(center, p1),
+                    a0: angle(center, p0),
+                    sweep,
+                }
+            }
+            SegmentKind::Bezier { controls: [c1, c2] } => Curve::Bezier([p0, c1, c2, p1]),
+            SegmentKind::EllipticArc {
+                center,
+                rotation,
+                semi_major,
+                minor_major_ratio,
+                bits,
+            } => {
+                if bits & (ELLIPSE_LINE | ELLIPSE_POINT | ELLIPSE_EMPTY) != 0 {
+                    return Ok(Curve::Line);
+                }
+                if bits & (ELLIPSE_CENTER_TO | ELLIPSE_CENTER_FROM) != 0 {
+                    return Err(Error::Unsupported(
+                        "elliptic arcs defined by center-to/from angles".into(),
+                    ));
+                }
+                let a = semi_major;
+                let b = if bits & ELLIPSE_CIRCULAR != 0 {
+                    a
+                } else {
+                    a * minor_major_ratio
+                };
+                let (sin_r, cos_r) = rotation.sin_cos();
+                // Parametric angle of a point on the (rotated) ellipse.
+                let param = |p: [f64; 2]| {
+                    let (dx, dy) = (p[0] - center[0], p[1] - center[1]);
+                    let (u, v) = (dx * cos_r + dy * sin_r, -dx * sin_r + dy * cos_r);
+                    (v / b).atan2(u / a)
+                };
+                let ccw = bits & ELLIPSE_CCW != 0;
+                let sweep = if bits & ELLIPSE_COMPLETE != 0 || same_point(p0, p1) {
+                    if ccw { TAU } else { -TAU }
+                } else {
+                    sweep_between(param(p0), param(p1), ccw)
+                };
+                Curve::Ellipse {
+                    center,
+                    a,
+                    b,
+                    sin_r,
+                    cos_r,
+                    t0: param(p0),
+                    sweep,
+                }
+            }
+        })
+    }
+
+    fn at(&self, t: f64) -> [f64; 2] {
+        match *self {
+            Curve::Line => [f64::NAN; 2],
+            Curve::Arc {
+                center,
+                r0,
+                r1,
+                a0,
+                sweep,
+            } => {
+                let a = a0 + sweep * t;
+                let r = r0 + (r1 - r0) * t;
+                [center[0] + r * a.cos(), center[1] + r * a.sin()]
+            }
+            Curve::Bezier([p0, c1, c2, p1]) => {
+                let u = 1.0 - t;
+                let b = |i: usize| {
+                    u * u * u * p0[i]
+                        + 3.0 * u * u * t * c1[i]
+                        + 3.0 * u * t * t * c2[i]
+                        + t * t * t * p1[i]
+                };
+                [b(0), b(1)]
+            }
+            Curve::Ellipse {
+                center,
+                a,
+                b,
+                sin_r,
+                cos_r,
+                t0,
+                sweep,
+            } => {
+                let th = t0 + sweep * t;
+                let (u, v) = (a * th.cos(), b * th.sin());
+                [
+                    center[0] + u * cos_r - v * sin_r,
+                    center[1] + u * sin_r + v * cos_r,
+                ]
+            }
+        }
+    }
+
+    /// Parameters in (0, 1) where x or y reaches an extreme.
+    fn extremes(&self) -> Vec<f64> {
+        // Map angle `target` to t for a sweep starting at `start`.
+        let angle_t = |start: f64, sweep: f64, target: f64| {
+            let delta = if sweep >= 0.0 {
+                (target - start).rem_euclid(TAU)
+            } else {
+                (start - target).rem_euclid(TAU)
+            };
+            delta / sweep.abs()
+        };
+        let mut ts = Vec::new();
+        match *self {
+            Curve::Line => {}
+            Curve::Arc { a0, sweep, .. } => {
+                for k in 0..4 {
+                    ts.push(angle_t(a0, sweep, f64::from(k) * PI / 2.0));
+                }
+            }
+            Curve::Ellipse {
+                a,
+                b,
+                sin_r,
+                cos_r,
+                t0,
+                sweep,
+                ..
+            } => {
+                let tx = (-b * sin_r).atan2(a * cos_r);
+                let ty = (b * cos_r).atan2(a * sin_r);
+                for th in [tx, tx + PI, ty, ty + PI] {
+                    ts.push(angle_t(t0, sweep, th));
+                }
+            }
+            Curve::Bezier([p0, c1, c2, p1]) => {
+                for i in 0..2 {
+                    let (d0, d1, d2) = (c1[i] - p0[i], c2[i] - c1[i], p1[i] - c2[i]);
+                    let (qa, qb, qc) = (d0 - 2.0 * d1 + d2, 2.0 * (d1 - d0), d0);
+                    if qa.abs() < 1e-15 {
+                        if qb.abs() > 1e-15 {
+                            ts.push(-qc / qb);
+                        }
+                    } else {
+                        let disc = qb * qb - 4.0 * qa * qc;
+                        if disc >= 0.0 {
+                            ts.push((-qb + disc.sqrt()) / (2.0 * qa));
+                            ts.push((-qb - disc.sqrt()) / (2.0 * qa));
+                        }
+                    }
+                }
+            }
+        }
+        ts.retain(|t| *t > 0.0 && *t < 1.0);
+        ts
+    }
+
+    /// Steps needed so consecutive samples are at most `step` radians of arc apart.
+    fn steps(&self, step: f64) -> usize {
+        match *self {
+            Curve::Line => 1,
+            Curve::Arc { sweep, .. } | Curve::Ellipse { sweep, .. } => {
+                ((sweep.abs() / step).ceil() as usize).max(1)
+            }
+            Curve::Bezier(p) => ((turning(&p) / step).ceil() as usize).clamp(8, 1024),
+        }
+    }
+}
+
 /// Points strictly between `p0` and `p1` along the segment, each with its fraction
 /// (0..1) of the way along.
 fn interior_points(
@@ -90,115 +309,37 @@ fn interior_points(
     kind: &SegmentKind,
     step: f64,
 ) -> Result<Vec<([f64; 2], f64)>> {
-    match *kind {
-        SegmentKind::CircularArc { point, bits } => {
-            if bits & (ARC_LINE | ARC_POINT | ARC_EMPTY) != 0 {
-                return Ok(Vec::new());
-            }
-            let closed = same_point(p0, p1);
-            let (center, sweep) = if bits & ARC_INTERIOR_POINT != 0 {
-                if closed {
-                    // A full circle stores the point opposite the start.
-                    let c = [(p0[0] + point[0]) / 2.0, (p0[1] + point[1]) / 2.0];
-                    (c, if bits & ARC_CCW != 0 { TAU } else { -TAU })
-                } else {
-                    let Some(c) = circumcenter(p0, point, p1) else {
-                        return Ok(Vec::new()); // collinear: a straight line
-                    };
-                    let ccw = cross(p0, point, p1) > 0.0;
-                    (c, sweep_between(angle(c, p0), angle(c, p1), ccw))
-                }
-            } else {
-                let ccw = bits & ARC_CCW != 0;
-                let sweep = if closed {
-                    if ccw { TAU } else { -TAU }
-                } else {
-                    sweep_between(angle(point, p0), angle(point, p1), ccw)
-                };
-                (point, sweep)
-            };
-            // The radius is interpolated from start to end so that an inconsistent
-            // center (unequal distances to the endpoints) still meets both ends.
-            let (r0, r1) = (dist(center, p0), dist(center, p1));
-            let a0 = angle(center, p0);
-            Ok(sample(sweep, step, |t| {
-                let a = a0 + sweep * t;
-                let r = r0 + (r1 - r0) * t;
-                [center[0] + r * a.cos(), center[1] + r * a.sin()]
-            }))
-        }
-        SegmentKind::Bezier { controls: [c1, c2] } => {
-            // Enough steps that the control polygon turns at most `step` per step.
-            let turn = turning(&[p0, c1, c2, p1]);
-            let n = ((turn / step).ceil() as usize).clamp(8, 1024);
-            Ok((1..n)
-                .map(|k| {
-                    let t = k as f64 / n as f64;
-                    let u = 1.0 - t;
-                    let b = |i: usize| {
-                        u * u * u * p0[i]
-                            + 3.0 * u * u * t * c1[i]
-                            + 3.0 * u * t * t * c2[i]
-                            + t * t * t * p1[i]
-                    };
-                    ([b(0), b(1)], t)
-                })
-                .collect())
-        }
-        SegmentKind::EllipticArc {
-            center,
-            rotation,
-            semi_major,
-            minor_major_ratio,
-            bits,
-        } => {
-            if bits & (ELLIPSE_LINE | ELLIPSE_POINT | ELLIPSE_EMPTY) != 0 {
-                return Ok(Vec::new());
-            }
-            if bits & (ELLIPSE_CENTER_TO | ELLIPSE_CENTER_FROM) != 0 {
-                return Err(Error::Unsupported(
-                    "elliptic arcs defined by center-to/from angles".into(),
-                ));
-            }
-            let a = semi_major;
-            let b = if bits & ELLIPSE_CIRCULAR != 0 {
-                a
-            } else {
-                a * minor_major_ratio
-            };
-            let (sin_r, cos_r) = rotation.sin_cos();
-            // Parametric angle of a point on the (rotated) ellipse.
-            let param = |p: [f64; 2]| {
-                let (dx, dy) = (p[0] - center[0], p[1] - center[1]);
-                let (u, v) = (dx * cos_r + dy * sin_r, -dx * sin_r + dy * cos_r);
-                (v / b).atan2(u / a)
-            };
-            let ccw = bits & ELLIPSE_CCW != 0;
-            let sweep = if bits & ELLIPSE_COMPLETE != 0 || same_point(p0, p1) {
-                if ccw { TAU } else { -TAU }
-            } else {
-                sweep_between(param(p0), param(p1), ccw)
-            };
-            let t0 = param(p0);
-            Ok(sample(sweep, step, |t| {
-                let th = t0 + sweep * t;
-                let (u, v) = (a * th.cos(), b * th.sin());
-                [
-                    center[0] + u * cos_r - v * sin_r,
-                    center[1] + u * sin_r + v * cos_r,
-                ]
-            }))
-        }
+    let curve = Curve::new(p0, p1, kind)?;
+    if matches!(curve, Curve::Line) {
+        return Ok(Vec::new());
     }
+    let n = curve.steps(step);
+    Ok((1..n)
+        .map(|k| k as f64 / n as f64)
+        .map(|t| (curve.at(t), t))
+        .collect())
 }
 
-/// `n - 1` interior samples of a sweep, `n = ceil(|sweep| / step)`.
-fn sample(sweep: f64, step: f64, at: impl Fn(f64) -> [f64; 2]) -> Vec<([f64; 2], f64)> {
-    let n = ((sweep.abs() / step).ceil() as usize).max(1);
-    (1..n)
-        .map(|k| k as f64 / n as f64)
-        .map(|t| (at(t), t))
-        .collect()
+impl Geometry {
+    /// The exact XY bounding box, including the bulge of curve segments beyond
+    /// their endpoints (the extent ArcGIS stores and indexes).
+    pub fn curve_envelope(&self) -> Envelope {
+        let mut env = self.envelope();
+        for s in &self.curves {
+            let i = s.start as usize;
+            let (Some(&p0), Some(&p1)) = (self.xy.get(i), self.xy.get(i + 1)) else {
+                continue;
+            };
+            let Ok(curve) = Curve::new(p0, p1, &s.kind) else {
+                continue;
+            };
+            for t in curve.extremes() {
+                let [x, y] = curve.at(t);
+                env.expand_xy(x, y);
+            }
+        }
+        env
+    }
 }
 
 /// Signed sweep from angle `a0` to `a1`: positive in (0, 2π] if counter-clockwise.
@@ -310,6 +451,34 @@ mod tests {
         );
         let d = g.densify_curves(DEFAULT_MAX_ANGLE_STEP).unwrap();
         assert!(d.xy[90][1] < -0.999, "clockwise through (0,-1)");
+    }
+
+    #[test]
+    fn curve_envelope_includes_the_bulge() {
+        // Half circle from (1,0) to (-1,0) counter-clockwise: reaches y = 1.
+        let g = line(
+            vec![[1.0, 0.0], [-1.0, 0.0]],
+            vec![Segment {
+                start: 0,
+                kind: SegmentKind::CircularArc {
+                    point: [0.0, 0.0],
+                    bits: ARC_CCW,
+                },
+            }],
+        );
+        let e = g.curve_envelope();
+        assert!((e.ymax - 1.0).abs() < 1e-12 && e.ymin == 0.0);
+        // Cubic Bézier bulging to y = 0.75.
+        let b = line(
+            vec![[0.0, 0.0], [3.0, 0.0]],
+            vec![Segment {
+                start: 0,
+                kind: SegmentKind::Bezier {
+                    controls: [[1.0, 1.0], [2.0, 1.0]],
+                },
+            }],
+        );
+        assert!((b.curve_envelope().ymax - 0.75).abs() < 1e-12);
     }
 
     #[test]

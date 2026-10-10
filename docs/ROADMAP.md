@@ -16,8 +16,8 @@ and verified against GDAL/OGR output on real data.
 - [x] `.prj` WKT1 passthrough
 - [x] Writer: ArcGIS field-name rules, null substitution, clockwise shells, 2 GB limit
 - [x] `gf describe` (arcpy.Describe) and `gf copy-features` (Copy Features)
-- [ ] Verify N/F width → Short/Long/Double mapping against ArcGIS Pro output (writer uses
-      lossless widths: Short N(6), Long N(11), Double N(19,11) with exponent fallback)
+- [x] Field mapping, null handling and value formatting verified against ArcGIS Pro 3.7
+      through the ArcGIS bridge; `.dbf` output is byte-identical to ArcGIS's for the same input
 - [ ] `.sbn/.sbx` spatial index, `.shp.xml` metadata
 - [ ] DOS code pages (437/850/852) in `.dbf`; memo `.dbt` files
 
@@ -49,7 +49,9 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
 - [ ] Write: add to an existing geodatabase (system tables must be rewritten with their indexes)
 - [ ] Write: per-vertex missing M values mixed with present ones (encoding unknown)
 - [ ] Write: attribute indexes, subtypes, relationship classes, feature datasets
-- [ ] Verify written geodatabases open in ArcGIS Pro (structure mirrors GDAL's, which does)
+- [x] Written geodatabases open in ArcGIS Pro 3.7: Describe, counts, domains, Check Geometry
+      (no problems beyond those already in the source data), Copy Features out of them
+- [ ] Projected coordinate systems: use ArcGIS's projection-derived XY domain origin (needs Phase 4)
 
 ## Phase 4 — CRS
 - [ ] PROJ binding (`proj` crate / `proj-sys`) for 1000+ CRSs; EPSG lookup; WKT1/WKT2/PROJJSON

@@ -33,56 +33,64 @@ pub struct DbfField {
 }
 
 impl DbfField {
-    /// The ArcGIS field type for this dBASE field.
+    /// The ArcGIS field type for this dBASE field, as ArcGIS Pro 3.7 reports it
+    /// (verified field by field through the ArcGIS bridge).
     pub fn field_type(&self) -> FieldType {
-        match self.kind {
-            b'N' | b'F' if self.decimals == 0 => match self.width {
+        match (self.kind, self.decimals) {
+            (b'N', 0) => match self.width {
                 0..=4 => FieldType::SmallInteger,
-                5..=11 => FieldType::Integer,
+                5..=10 => FieldType::Integer,
                 _ => FieldType::Double,
             },
-            b'N' | b'F' => FieldType::Double,
-            b'D' => FieldType::Date,
+            (b'N', _) if self.width <= 8 => FieldType::Single,
+            (b'N', _) => FieldType::Double,
+            (b'F', _) if self.width <= 13 => FieldType::Single,
+            (b'F', _) => FieldType::Double,
+            (b'L', _) => FieldType::SmallInteger,
+            (b'D', _) => FieldType::Date,
             _ => FieldType::String,
         }
     }
 
+    /// ArcGIS reports precision = width (minus one when there are decimals) and
+    /// scale = decimals for `N` fields, and 0/0 for `F` and `L` fields.
     pub fn to_field(&self) -> Field {
         let mut f = Field::new(&self.name, self.field_type());
         f.length = u32::from(self.width);
-        if matches!(self.kind, b'N' | b'F') {
-            f.precision = u32::from(self.width);
+        if self.kind == b'N' {
+            f.precision =
+                u32::from(self.width) - u32::from(self.decimals > 0).min(u32::from(self.width));
             f.scale = u32::from(self.decimals);
         }
         f
     }
 
-    /// The dBASE field ArcGIS writes for `field` (name already made valid).
+    /// The dBASE field ArcGIS Pro writes for `field` (name already made valid).
+    /// Defaults: Short N(5), Long N(10), Float F(13,11), Double F(19,11), Text C,
+    /// GUID C(38), Date D(8). A field with an explicit precision keeps it as `N`.
     pub fn from_field(name: String, field: &Field) -> Result<Self> {
-        let explicit = |default_w: u8, default_d: u8| {
-            if field.precision > 0 {
-                (field.precision.min(254) as u8, field.scale.min(15) as u8)
-            } else {
-                (default_w, default_d)
-            }
+        let explicit = || {
+            (field.precision > 0).then(|| {
+                let width = field.precision + u32::from(field.scale > 0);
+                (b'N', width.min(254) as u8, field.scale.min(15) as u8)
+            })
         };
-        let (kind, (width, decimals)) = match field.field_type {
-            // Wide enough for the full i16 range (Esri documents 4, which cannot hold -32768).
-            FieldType::SmallInteger => (b'N', explicit(6, 0)),
-            // 11 holds the full i32 range including the sign.
-            FieldType::Integer | FieldType::ObjectId => (b'N', explicit(11, 0)),
-            FieldType::BigInteger => (b'N', explicit(19, 0)),
-            FieldType::Single => (b'N', explicit(13, 6)),
-            FieldType::Double => (b'N', explicit(19, 11)),
-            FieldType::String | FieldType::Guid | FieldType::GlobalId | FieldType::Xml => {
+        let (kind, width, decimals) = match field.field_type {
+            FieldType::SmallInteger => explicit().unwrap_or((b'N', 5, 0)),
+            FieldType::Integer | FieldType::ObjectId => explicit().unwrap_or((b'N', 10, 0)),
+            FieldType::Single => explicit().unwrap_or((b'F', 13, 11)),
+            FieldType::Double => explicit().unwrap_or((b'F', 19, 11)),
+            FieldType::String | FieldType::Guid | FieldType::GlobalId => {
                 let len = if field.length == 0 {
                     MAX_TEXT_WIDTH
                 } else {
                     field.length
                 };
-                (b'C', (len.min(MAX_TEXT_WIDTH) as u8, 0))
+                (b'C', len.min(MAX_TEXT_WIDTH) as u8, 0)
             }
-            FieldType::Date | FieldType::DateOnly => (b'D', (8, 0)),
+            FieldType::Date | FieldType::DateOnly => (b'D', 8, 0),
+            // ArcGIS fails with ERROR 000308 for these (BigInteger, XML, TimeOnly,
+            // TimestampOffset) and drops Blob/Raster with WARNING 000592.
             other => {
                 return Err(Error::Unsupported(format!(
                     "field `{}` of type {other:?} cannot be stored in a shapefile",
@@ -220,6 +228,9 @@ impl DbfReader {
         Ok((values, deleted))
     }
 
+    /// Values as ArcGIS reads them. Shapefiles cannot store nulls, so ArcGIS reads
+    /// blank or unparseable numbers as 0, blank text as a single space, `?` logicals
+    /// as 0; only empty dates read as null.
     fn parse_value(&self, field: &DbfField, raw: &[u8]) -> Value {
         match field.kind {
             b'C' | b'M' => {
@@ -227,12 +238,16 @@ impl DbfReader {
                     .iter()
                     .rposition(|&b| b != b' ' && b != 0)
                     .map_or(0, |p| p + 1);
+                if end == 0 {
+                    return Value::String(" ".into());
+                }
                 Value::String(self.encoding.decode(&raw[..end]))
             }
-            b'L' => match raw.first().map(u8::to_ascii_uppercase) {
-                Some(b @ (b'T' | b'Y' | b'F' | b'N')) => Value::String((b as char).to_string()),
-                _ => Value::Null,
-            },
+            b'L' => Value::SmallInteger(i16::from(matches!(
+                raw.first().map(u8::to_ascii_uppercase),
+                Some(b'T' | b'Y')
+            ))),
+            b'D' => parse_date(String::from_utf8_lossy(raw).trim()),
             _ => {
                 let s = String::from_utf8_lossy(raw);
                 let s = s.trim_matches(|c: char| c == ' ' || c == '\0');
@@ -240,9 +255,8 @@ impl DbfReader {
                     FieldType::SmallInteger | FieldType::Integer => {
                         parse_int(s, field.field_type())
                     }
-                    FieldType::Double => s.parse::<f64>().map_or(Value::Null, Value::Double),
-                    FieldType::Date => parse_date(s),
-                    _ => Value::String(s.to_owned()),
+                    FieldType::Single => Value::Single(s.parse::<f32>().unwrap_or(0.0)),
+                    _ => Value::Double(s.parse::<f64>().unwrap_or(0.0)),
                 }
             }
         }
@@ -255,11 +269,11 @@ fn parse_int(s: &str, ty: FieldType) -> Value {
         // Non-conformant writers put decimals in integer fields.
         Err(_) => match s.parse::<f64>() {
             Ok(f) if f.is_finite() => f as i64,
-            _ => return Value::Null,
+            _ => 0,
         },
     };
     match ty {
-        // Values too wide for the column's integer type fall back to Double rather than null.
+        // Values too wide for the column's integer type fall back to Double rather than wrap.
         FieldType::SmallInteger => {
             i16::try_from(v).map_or(Value::Double(v as f64), Value::SmallInteger)
         }
@@ -354,7 +368,10 @@ impl DbfWriter {
         1 + self.fields.iter().map(|f| u64::from(f.width)).sum::<u64>()
     }
 
-    pub fn push(&mut self, values: &[Value]) -> Result<()> {
+    /// Encodes a record the way ArcGIS writes it, without writing it. Fails with
+    /// [`Error::BadValue`] when a number does not fit its column; ArcGIS then skips
+    /// the whole row.
+    pub fn encode(&mut self, values: &[Value]) -> Result<()> {
         let rec = &mut self.record;
         rec.clear();
         rec.push(b' ');
@@ -373,32 +390,52 @@ impl DbfWriter {
                     }
                     rec.extend_from_slice(&bytes[..end]);
                 }
-                b'D' => {
-                    let s = match v {
-                        Value::Date(dt) => ymd(dt.date()),
-                        Value::DateOnly(d) => ymd(*d),
-                        _ => "00000000".into(),
-                    };
-                    rec.extend_from_slice(s.as_bytes());
-                }
-                _ => {
-                    let s = fit_number(format_number(v, f.decimals), width);
-                    if s.len() > width {
-                        rec.extend(std::iter::repeat_n(b'*', width));
+                b'D' => match v {
+                    Value::Date(dt) => rec.extend_from_slice(ymd(dt.date()).as_bytes()),
+                    Value::DateOnly(d) => rec.extend_from_slice(ymd(*d).as_bytes()),
+                    _ => {} // null: blank, as ArcGIS writes it
+                },
+                kind => {
+                    let n = number(v).ok_or_else(|| {
+                        Error::BadValue(format!("{v:?} in numeric field {}", f.name))
+                    })?;
+                    let s = if kind == b'F' {
+                        scientific(n, width)
                     } else {
-                        rec.extend(std::iter::repeat_n(b' ', width - s.len()));
-                        rec.extend_from_slice(s.as_bytes());
+                        Some(fixed(n, f.decimals))
+                    };
+                    match s.filter(|s| s.len() <= width) {
+                        Some(s) => {
+                            rec.extend(std::iter::repeat_n(b' ', width - s.len()));
+                            rec.extend_from_slice(s.as_bytes());
+                        }
+                        None => {
+                            return Err(Error::BadValue(format!(
+                                "{n} does not fit field {} ({}{width})",
+                                f.name, kind as char
+                            )));
+                        }
                     }
                 }
             }
             rec.resize(start + width, b' ');
         }
+        Ok(())
+    }
+
+    /// Writes the record last prepared by [`DbfWriter::encode`].
+    pub fn write_encoded(&mut self) -> Result<()> {
         self.out
-            .write_all(rec)
+            .write_all(&self.record)
             .map_err(|e| Error::io(&self.path, e))?;
         self.num_records += 1;
-        self.len += rec.len() as u64;
+        self.len += self.record.len() as u64;
         Ok(())
+    }
+
+    pub fn push(&mut self, values: &[Value]) -> Result<()> {
+        self.encode(values)?;
+        self.write_encoded()
     }
 
     pub fn finish(mut self) -> Result<()> {
@@ -416,9 +453,10 @@ fn ymd(d: NaiveDate) -> String {
     format!("{:04}{:02}{:02}", d.year(), d.month(), d.day())
 }
 
+/// Text as ArcGIS writes it: nulls and empty strings become blanks.
 fn value_text(v: &Value) -> String {
     match v {
-        Value::Null => String::new(),
+        Value::Null | Value::Blob(_) => String::new(),
         Value::String(s) | Value::Guid(s) | Value::Xml(s) => s.clone(),
         Value::SmallInteger(n) => n.to_string(),
         Value::Integer(n) => n.to_string(),
@@ -429,42 +467,53 @@ fn value_text(v: &Value) -> String {
         Value::DateOnly(d) => d.to_string(),
         Value::TimeOnly(t) => t.to_string(),
         Value::TimestampOffset(t) => t.to_rfc3339(),
-        Value::Blob(_) => String::new(),
     }
 }
 
-/// Falls back to scientific notation when fixed-point does not fit the width
-/// (e.g. 1.79e308 in an N(19,11) field). Integers that do not fit stay too long.
-fn fit_number(fixed: String, width: usize) -> String {
-    if fixed.len() <= width || !fixed.contains('.') {
-        return fixed;
-    }
-    let Ok(v) = fixed.parse::<f64>() else {
-        return fixed;
-    };
-    (0..=15)
-        .rev()
-        .map(|d| format!("{v:.d$e}"))
-        .find(|s| s.len() <= width)
-        .unwrap_or(fixed)
-}
-
-fn format_number(v: &Value, decimals: u8) -> String {
-    let d = usize::from(decimals);
-    let f = match v {
+/// Numeric value to store; nulls are written as 0 (ArcGIS null substitution).
+fn number(v: &Value) -> Option<f64> {
+    Some(match v {
+        Value::Null => 0.0,
         Value::SmallInteger(n) => f64::from(*n),
         Value::Integer(n) => f64::from(*n),
-        Value::BigInteger(n) if d == 0 => return n.to_string(),
         Value::BigInteger(n) => *n as f64,
         Value::Single(n) => f64::from(*n),
-        Value::Double(n) => *n,
-        Value::String(s) => s.trim().parse().unwrap_or(0.0),
-        _ => 0.0,
-    };
-    if !f.is_finite() {
-        return format!("{:.d$}", 0.0);
+        Value::Double(n) if n.is_finite() => *n,
+        Value::Double(_) => 0.0,
+        Value::String(s) => s.trim().parse().ok()?,
+        _ => return None,
+    })
+}
+
+/// `N` fields: fixed-point with the column's decimals.
+fn fixed(n: f64, decimals: u8) -> String {
+    let d = usize::from(decimals);
+    if d == 0 {
+        format!("{:.0}", n.round())
+    } else {
+        format!("{n:.d$}")
     }
-    format!("{f:.d$}")
+}
+
+/// `F` fields, as ArcGIS writes them: C-style scientific notation with `width - 8`
+/// mantissa decimals (`1.23457e+04` in F(13), `1.79769313486e+308` in F(19)).
+fn scientific(n: f64, width: usize) -> Option<String> {
+    let mut decimals = width.checked_sub(8)?;
+    loop {
+        let s = format!("{n:.decimals$e}");
+        let (mantissa, exp) = s.split_once('e')?;
+        let exp: i32 = exp.parse().ok()?;
+        let out = format!(
+            "{mantissa}e{}{:02}",
+            if exp < 0 { '-' } else { '+' },
+            exp.abs()
+        );
+        // A 3-digit exponent or sign can need more room: drop mantissa digits.
+        if out.len() <= width || decimals == 0 {
+            return Some(out);
+        }
+        decimals -= 1;
+    }
 }
 
 #[cfg(test)]
@@ -513,7 +562,7 @@ mod tests {
         assert_eq!(
             rows[1],
             vec![
-                Value::String(String::new()),
+                Value::String(" ".into()),
                 Value::Integer(0),
                 Value::Double(0.0),
                 Value::Null
@@ -521,21 +570,55 @@ mod tests {
         );
     }
 
+    /// ArcGIS writes Short as N(5): -32768 does not fit, so the row is a bad value
+    /// (ArcGIS skips it); f64::MAX fits F(19,11) in scientific notation.
     #[test]
-    fn extreme_values_survive() {
-        let fields = vec![
-            DbfField::from_field("s".into(), &Field::new("s", FieldType::SmallInteger)).unwrap(),
-            DbfField::from_field("d".into(), &Field::new("d", FieldType::Double)).unwrap(),
-        ];
-        let rows = roundtrip(
-            fields,
-            &[vec![Value::SmallInteger(-32768), Value::Double(f64::MAX)]],
+    fn values_that_do_not_fit_are_bad_values() {
+        let short =
+            DbfField::from_field("s".into(), &Field::new("s", FieldType::SmallInteger)).unwrap();
+        let double = DbfField::from_field("d".into(), &Field::new("d", FieldType::Double)).unwrap();
+        assert_eq!(
+            (
+                short.kind,
+                short.width,
+                double.kind,
+                double.width,
+                double.decimals
+            ),
+            (b'N', 5, b'F', 19, 11)
         );
-        assert_eq!(rows[0][0], Value::Integer(-32768));
+        let dir = std::env::temp_dir().join(format!("gf-dbf-bad-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let mut w = DbfWriter::create(
+            &dir.join("t.dbf"),
+            vec![short.clone(), double.clone()],
+            NaiveDate::from_ymd_opt(2026, 1, 2).unwrap(),
+        )
+        .unwrap();
+        assert!(matches!(
+            w.encode(&[Value::SmallInteger(-32768), Value::Null]),
+            Err(Error::BadValue(_))
+        ));
+        let rows = roundtrip(
+            vec![short, double],
+            &[vec![Value::SmallInteger(-9999), Value::Double(f64::MAX)]],
+        );
+        assert_eq!(rows[0][0], Value::Integer(-9999)); // N(5) reads back as Long, as in ArcGIS
         let Value::Double(d) = rows[0][1] else {
             panic!()
         };
-        assert!((d - f64::MAX).abs() / f64::MAX < 1e-10);
+        assert!((d - f64::MAX).abs() / f64::MAX < 1e-11);
+    }
+
+    #[test]
+    fn scientific_matches_arcgis() {
+        assert_eq!(scientific(12345.678, 13).as_deref(), Some("1.23457e+04"));
+        assert_eq!(scientific(0.0, 13).as_deref(), Some("0.00000e+00"));
+        assert_eq!(
+            scientific(f64::MAX, 19).as_deref(),
+            Some("1.79769313486e+308")
+        );
+        assert_eq!(scientific(0.0, 19).as_deref(), Some("0.00000000000e+00"));
     }
 
     #[test]

@@ -27,14 +27,27 @@ fn copy(src: &ShapefileReader, dst: &Path) -> geoforge_core::Result<()> {
     w.finish()
 }
 
-/// Equal, allowing for ArcGIS null substitution (numbers 0, text blank, dates zero).
+/// Equal as ArcGIS would read the copy back: numbers compare by value across
+/// integer/float types (a `L` field becomes `N(5)`, read as Long — ArcGIS's own
+/// Copy Features does the same), `F` columns keep 6 or 12 significant digits.
 fn values_match(orig: &Value, copy: &Value) -> bool {
-    match (orig.clone(), copy) {
-        (Value::Null, Value::SmallInteger(0) | Value::Integer(0) | Value::Null) => true,
-        (Value::Null, Value::Double(d)) => *d == 0.0,
-        (Value::Null, Value::String(s)) => s.is_empty(),
-        (Value::Double(a), Value::Double(b)) => a == *b || (a - b).abs() <= 1e-9 * a.abs().max(1.0),
-        (a, b) => a == *b,
+    let num = |v: &Value| match v {
+        Value::SmallInteger(n) => Some(f64::from(*n)),
+        Value::Integer(n) => Some(f64::from(*n)),
+        Value::Single(n) => Some(f64::from(*n)),
+        Value::Double(n) => Some(*n),
+        _ => None,
+    };
+    match (num(orig), num(copy)) {
+        (Some(a), Some(b)) => {
+            let rel = if matches!(orig, Value::Single(_)) {
+                1e-5
+            } else {
+                1e-11
+            };
+            a == b || (a - b).abs() <= rel * a.abs().max(1.0)
+        }
+        _ => orig == copy,
     }
 }
 

@@ -167,8 +167,9 @@ def arcgis_describe(path: str) -> str:
 def arcgis_python(code: str, timeout_s: float | None = None) -> str:
     """Execute Python in the persistent arcpy session (arcpy is imported; variables
     persist between calls). Printed output is returned, plus the value of a variable
-    named `result` if the code sets one. Linux paths in the code are NOT translated:
-    use "Z:\\\\mnt\\\\..." or the helper-free form r"Z:\\mnt\\...".
+    named `result` if the code sets one. Linux paths inside code are not translated
+    automatically: wrap them with the helper `P('/mnt/data/x.shp')`. Paths in the
+    returned output are translated back to Linux form.
     """
     return _format(worker.call("python", timeout=timeout_s, code=code))
 

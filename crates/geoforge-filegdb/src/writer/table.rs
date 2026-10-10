@@ -187,7 +187,7 @@ impl TableWriter {
                         put_varuint(row, blob.len() as u64);
                         row.extend_from_slice(&blob);
                         // Index the coordinates as stored (snapped to the resolution).
-                        let mut e = g.envelope();
+                        let mut e = g.curve_envelope();
                         let snap =
                             |v: f64, o: f64| ((v - o) * def.xy_scale).round() / def.xy_scale + o;
                         e.xmin = snap(e.xmin, def.x_origin);

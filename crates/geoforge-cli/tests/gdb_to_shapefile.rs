@@ -23,19 +23,23 @@ fn geodatabases(dir: &Path) -> Vec<PathBuf> {
     out
 }
 
-/// Source value as it should read back from the shapefile.
+/// Source value as it should read back from the shapefile (as ArcGIS reads it).
 fn expected(v: &Value) -> Value {
     match v {
-        Value::Single(f) => Value::Double(f64::from(*f)),
-        Value::BigInteger(n) => Value::Double(*n as f64),
         Value::Date(d) => Value::Date(d.date().and_hms_opt(0, 0, 0).unwrap()),
         Value::DateOnly(d) => Value::Date(d.and_hms_opt(0, 0, 0).unwrap()),
-        Value::Guid(s) | Value::Xml(s) | Value::String(s) => {
+        Value::Guid(s) | Value::String(s) => {
             let mut end = s.len().min(254);
             while !s.is_char_boundary(end) {
                 end -= 1;
             }
-            Value::String(s[..end].trim_end().to_owned())
+            let t = s[..end].trim_end();
+            // Empty text reads back as a single space (ArcGIS null substitution).
+            Value::String(if t.is_empty() {
+                " ".into()
+            } else {
+                t.to_owned()
+            })
         }
         other => other.clone(),
     }
@@ -45,23 +49,42 @@ fn matches(src: &Value, out: &Value) -> bool {
     let num = |v: &Value| match v {
         Value::SmallInteger(n) => Some(f64::from(*n)),
         Value::Integer(n) => Some(f64::from(*n)),
+        Value::Single(n) => Some(f64::from(*n)),
         Value::Double(n) => Some(*n),
         _ => None,
     };
+    // F(13,11) keeps 6 significant digits, F(19,11) 12 (ArcGIS's formatting).
+    let rel = if matches!(src, Value::Single(_)) {
+        1e-5
+    } else {
+        1e-11
+    };
     match (expected(src), out) {
-        // ArcGIS null substitution: numbers 0, text blank; dates stay null.
+        // ArcGIS null substitution: numbers 0, text " ", dates stay null.
         (Value::Null, Value::Null) => true,
-        (Value::Null, o) => num(o) == Some(0.0) || *o == Value::String(String::new()),
+        (Value::Null, o) => num(o) == Some(0.0) || *o == Value::String(" ".into()),
         (e, o) => match (num(&e), num(o)) {
-            (Some(a), Some(b)) => {
-                a == b || (a - b).abs() <= 1e-9 * a.abs().max(1.0) || {
-                    // Written with a fixed number of decimals (N(13,6) / N(19,11)).
-                    (a - b).abs() <= 1e-6 * a.abs().max(1.0)
-                }
-            }
+            (Some(a), Some(b)) => a == b || (a - b).abs() <= rel * a.abs().max(1.0),
             _ => e == *o,
         },
     }
+}
+
+/// OBJECTIDs the CLI reported as skipped (WARNING 000595 [..]).
+fn skipped_oids(stderr: &str) -> Vec<i64> {
+    stderr
+        .lines()
+        .filter(|l| l.starts_with("WARNING 000595"))
+        .filter_map(|l| {
+            l.split_once('[')
+                .map(|(_, r)| r.trim_end_matches(']').to_owned())
+        })
+        .flat_map(|list| {
+            list.split(',')
+                .filter_map(|n| n.trim().parse().ok())
+                .collect::<Vec<i64>>()
+        })
+        .collect()
 }
 
 #[test]
@@ -73,7 +96,7 @@ fn geodatabase_feature_classes_export_to_shapefile() {
     }
     let out_dir = std::env::temp_dir().join(format!("gf-gdb2shp-{}", std::process::id()));
     std::fs::create_dir_all(&out_dir).unwrap();
-    let (mut exported, mut failures) = (0, 0);
+    let (mut exported, mut failures, mut rejected) = (0, 0, 0);
     for gdb_path in geodatabases(&root) {
         let Ok(gdb) = Geodatabase::open(&gdb_path) else {
             continue;
@@ -99,21 +122,32 @@ fn geodatabase_feature_classes_export_to_shapefile() {
                 .unwrap();
             let stderr = String::from_utf8_lossy(&run.stderr);
             if !run.status.success() {
-                failures += 1;
-                eprintln!("✗ {label}: {}", stderr.trim());
+                if stderr.contains("ERROR 000308") {
+                    rejected += 1; // ArcGIS refuses these field types too
+                } else {
+                    failures += 1;
+                    eprintln!("✗ {label}: {}", stderr.trim());
+                }
                 continue;
             }
             exported += 1;
 
             let mut diffs = Vec::new();
             let shp = ShapefileReader::open(&out).unwrap();
-            let src: Vec<_> = table.features().map(Result::unwrap).collect();
+            let skipped = skipped_oids(&stderr);
+            let src: Vec<_> = table
+                .features()
+                .map(Result::unwrap)
+                .filter(|f| !skipped.contains(&f.oid))
+                .collect();
             let dst: Vec<_> = shp.features().map(Result::unwrap).collect();
             if src.len() != dst.len() {
                 diffs.push(format!("count {} -> {}", src.len(), dst.len()));
             }
             let kept: Vec<usize> = (0..table.fields().len())
-                .filter(|&i| !stderr.contains(&format!("field {} (", table.fields()[i].name)))
+                .filter(|&i| {
+                    !stderr.contains(&format!("Field(s) {} will not", table.fields()[i].name))
+                })
                 .collect();
             for (a, b) in src.iter().zip(&dst) {
                 let mut oriented = a.geometry.as_ref().map(|g| {
@@ -165,7 +199,9 @@ fn geodatabase_feature_classes_export_to_shapefile() {
             }
         }
     }
-    eprintln!("{exported} exported, {failures} with differences");
+    eprintln!(
+        "{exported} exported, {rejected} rejected like ArcGIS (ERROR 000308), {failures} with differences"
+    );
     std::fs::remove_dir_all(&out_dir).ok();
     assert_eq!(failures, 0);
 }
