@@ -151,7 +151,7 @@ pub(crate) fn spatial_candidates(
     }
     let mut oids = Vec::new();
     for (g, &size) in grid_sizes.iter().enumerate() {
-        if !(size > 0.0) {
+        if size.is_nan() || size <= 0.0 {
             continue;
         }
         let cell = |v: f64| (v / size).floor() as i64;
