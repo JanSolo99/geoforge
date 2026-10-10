@@ -525,7 +525,8 @@ pub fn compare_value(ours: &Value, gdal: &Json) -> Option<String> {
         }
         (Value::String(s), Json::String(g)) if s == " " && g.trim().is_empty() => true,
         // dBASE "unset" logical; GDAL < 3.9 reports it raw instead of null.
-        (Value::Null, Json::String(g)) => g == "?",
+        // GDAL < 3.9 reports unset logicals as "?" and blank dates as "0000/00/00".
+        (Value::Null, Json::String(g)) => g == "?" || g == "0000/00/00",
         (Value::String(s), Json::Null) => s.is_empty(),
         (Value::String(s), Json::String(g)) => s == g,
         (Value::String(s), Json::Bool(b)) => {
