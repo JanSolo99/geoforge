@@ -5,13 +5,20 @@ and verified against GDAL/OGR output on real data.
 
 ## Phase 0 — Foundations
 - [x] Cargo workspace, crate layout
-- [ ] CI (fmt, clippy, test) on GitHub Actions
-- [ ] Test-data corpus (`testdata/`) + GDAL-based oracle tests (compare our reads to `ogrinfo`/`gdalinfo`)
+- [x] CI (fmt, clippy, test) on GitHub Actions
+- [x] Test-data corpus: `testdata/shp` (committed, `scripts/make-testdata.sh`) + `testdata/large` (`scripts/fetch-testdata.sh`)
+- [x] `geoforge-testkit`: oracle tests comparing our reads with `ogrinfo` (JSON attributes + ISO WKT geometry)
 
 ## Phase 1 — Shapefile (complete spec)
-- [ ] `.shp/.shx` all 14 shape types incl. Z/M and MultiPatch
-- [ ] `.dbf` (dBASE III/IV, field types C/N/F/L/D/M), `.cpg` encodings
-- [ ] `.prj` WKT1 passthrough; write support; `gf info` / `gf convert`
+- [x] Esri-layout geometry model in `geoforge-core` (flat coords + part offsets, Z/M, MultiPatch part types)
+- [x] `.shp/.shx` all 14 shape types incl. Z/M and MultiPatch; empty points; missing/corrupt `.shx` recovery
+- [x] `.dbf` (dBASE III/IV, field types C/N/F/L/D/M), `.cpg` / LDID encodings
+- [x] `.prj` WKT1 passthrough
+- [x] Writer: ArcGIS field-name rules, null substitution, clockwise shells, 2 GB limit
+- [x] `gf describe` (arcpy.Describe) and `gf copy-features` (Copy Features)
+- [ ] Verify N/F width → Short/Long/Double mapping and writer widths against ArcGIS Pro output
+- [ ] `.sbn/.sbx` spatial index, `.shp.xml` metadata
+- [ ] DOS code pages (437/850/852) in `.dbf`; memo `.dbt` files
 
 ## Phase 2 — Geometry engine
 - [ ] Evaluate `geo` / `geos` crates vs native implementation per operation

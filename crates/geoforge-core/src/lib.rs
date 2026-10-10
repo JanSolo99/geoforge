@@ -1,25 +1,16 @@
 //! Core types shared by every GeoForge crate.
+//!
+//! The geometry model mirrors Esri's internal layout (flat coordinate arrays plus
+//! part offsets), which is what both Shapefile and File Geodatabase store on disk.
 
+pub mod envelope;
+pub mod error;
+pub mod feature;
+pub mod field;
 pub mod geometry;
 
-/// Esri field types, as stored in File Geodatabases and mapped from DBF.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FieldType {
-    SmallInteger,
-    Integer,
-    BigInteger,
-    Single,
-    Double,
-    String,
-    Date,
-    DateOnly,
-    TimeOnly,
-    TimestampOffset,
-    ObjectId,
-    Geometry,
-    Blob,
-    Raster,
-    Guid,
-    GlobalId,
-    Xml,
-}
+pub use envelope::Envelope;
+pub use error::{Error, Result};
+pub use feature::{Feature, Value};
+pub use field::{Field, FieldType};
+pub use geometry::{Geometry, GeometryKind, PartType};

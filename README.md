@@ -17,6 +17,7 @@ phased plan and [`docs/SPEC.md`](docs/SPEC.md) for the full target scope.
 | `geoforge-proj` | CRS + transformations |
 | `geoforge-raster` | Raster model, GeoTIFF, map algebra |
 | `geoforge-cli` | `gf` command-line tool |
+| `geoforge-testkit` | Test helpers: compare our readers with GDAL |
 
 ## Build
 
@@ -25,4 +26,10 @@ cargo build --workspace
 cargo test --workspace
 ```
 
-Requires Rust ≥ 1.85 (install via `rustup`).
+Requires Rust ≥ 1.85. Tests use GDAL's `ogrinfo` as an oracle when it is installed;
+run `scripts/fetch-testdata.sh` for the larger third-party corpora.
+
+```sh
+gf describe data/roads.shp
+gf copy-features data/roads.shp out/roads_copy.shp
+```

@@ -14,7 +14,13 @@ geoforge-shapefile = { path = "crates/geoforge-shapefile" }
 geoforge-filegdb = { path = "crates/geoforge-filegdb" }
 geoforge-proj = { path = "crates/geoforge-proj" }
 geoforge-raster = { path = "crates/geoforge-raster" }
+geoforge-testkit = { path = "crates/geoforge-testkit" }
 thiserror = "2"
+chrono = { version = "0.4", default-features = false, features = ["std", "clock"] }
+encoding_rs = "0.8"
+clap = { version = "4", features = ["derive"] }
+serde_json = "1"
+approx = "0.5"
 
 [workspace.lints.rust]
 unsafe_op_in_unsafe_fn = "deny"
