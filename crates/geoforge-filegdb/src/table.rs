@@ -139,6 +139,8 @@ pub struct Table {
     file: File,
     path: PathBuf,
     pub(crate) utf8: bool,
+    /// Uses ArcGIS Pro 3.2 extensions (64-bit OBJECTIDs or new field types).
+    pro_3_2: bool,
     valid_rows: u64,
     geometry_type: u8,
     has_z: bool,
@@ -189,7 +191,7 @@ impl Table {
         file.read_exact_at(&mut section, field_offset + 4)
             .map_err(io)?;
         let mut r = Reader::new(&section);
-        let _field_version = r.i32()?;
+        let field_version = r.i32()?;
         let flags = r.u32()?;
         let n = r.i16()?;
         let geometry_type = (flags & 0xff) as u8;
@@ -224,6 +226,7 @@ impl Table {
             file,
             path,
             utf8,
+            pro_3_2: version == 4 || field_version >= 6,
             valid_rows,
             geometry_type,
             has_z,
@@ -240,6 +243,12 @@ impl Table {
     /// All fields, including OBJECTID and the geometry field.
     pub fn all_fields(&self) -> &[GdbField] {
         &self.fields
+    }
+
+    /// Whether the table uses ArcGIS Pro 3.2 format extensions (64-bit OBJECTIDs,
+    /// BigInteger/DateOnly/TimeOnly/TimestampOffset fields). Older software can't read it.
+    pub fn requires_pro_3_2(&self) -> bool {
+        self.pro_3_2
     }
 
     /// Marks date fields as high precision (from the item definition XML).

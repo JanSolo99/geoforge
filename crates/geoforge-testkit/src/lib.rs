@@ -100,6 +100,15 @@ pub fn ogr_layer(path: &Path, layer: Option<&str>) -> Result<OgrLayer, String> {
     Ok(OgrLayer { fields, features })
 }
 
+/// GDAL's version as (major, minor), e.g. (3, 13).
+pub fn gdal_version() -> Option<(u32, u32)> {
+    let out = Command::new("ogrinfo").arg("--version").output().ok()?;
+    let text = String::from_utf8_lossy(&out.stdout);
+    let v = text.split_whitespace().nth(1)?.trim_end_matches(',');
+    let mut parts = v.split('.').map(|p| p.parse().ok());
+    Some((parts.next()??, parts.next()??))
+}
+
 /// Names of all layers GDAL lists in a dataset.
 pub fn ogr_layer_names(path: &Path) -> Result<Vec<String>, String> {
     let json = run(Command::new("ogrinfo")

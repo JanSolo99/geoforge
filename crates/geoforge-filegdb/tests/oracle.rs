@@ -4,7 +4,9 @@
 use std::path::{Path, PathBuf};
 
 use geoforge_filegdb::{Geodatabase, Table};
-use geoforge_testkit::{compare_feature, ogr_layer, ogr_layer_names, ogrinfo_available};
+use geoforge_testkit::{
+    compare_feature, gdal_version, ogr_layer, ogr_layer_names, ogrinfo_available,
+};
 
 fn geodatabases(dir: &Path) -> Vec<PathBuf> {
     let mut out = Vec::new();
@@ -82,6 +84,8 @@ fn filegdb_matches_gdal() {
     }
     let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../testdata/large/filegdb");
     let gdbs = geodatabases(&root);
+    // ArcGIS Pro 3.2 tables (64-bit OIDs, new field types) need GDAL >= 3.9.
+    let gdal_reads_pro_3_2 = gdal_version().is_some_and(|v| v >= (3, 9));
     let (mut tables, mut failures) = (0, 0);
     for path in &gdbs {
         let label = path
@@ -115,6 +119,13 @@ fn filegdb_matches_gdal() {
                 continue;
             }
             let diffs = match gdb.open_table(&entry.name) {
+                Ok(t) if t.requires_pro_3_2() && !gdal_reads_pro_3_2 => {
+                    eprintln!(
+                        "~ {label} / {}: skipped (GDAL too old for Pro 3.2 tables)",
+                        entry.name
+                    );
+                    continue;
+                }
                 Ok(t) => diff_table(path, &entry.name, &t).unwrap_or_else(|e| vec![e]),
                 Err(e) => vec![format!("cannot open: {e}")],
             };
