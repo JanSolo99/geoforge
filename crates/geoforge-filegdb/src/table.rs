@@ -226,7 +226,12 @@ impl Table {
             file,
             path,
             utf8,
-            pro_3_2: version == 4 || field_version >= 6,
+            pro_3_2: version == 4
+                || field_version >= 6
+                || fields.iter().any(|f| {
+                    use GdbFieldType::*;
+                    matches!(f.field_type, Int64 | DateOnly | TimeOnly | DateTimeOffset)
+                }),
             valid_rows,
             geometry_type,
             has_z,
