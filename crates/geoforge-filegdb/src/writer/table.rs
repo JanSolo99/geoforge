@@ -79,7 +79,18 @@ impl TableWriter {
         let mut out = BufWriter::new(file);
 
         let mut sec = Vec::new();
-        sec.extend_from_slice(&4i32.to_le_bytes()); // FileGDB 10
+        // 4 = FileGDB 10; 6 = ArcGIS Pro 3.2 extensions (BigInteger, DateOnly, TimeOnly,
+        // TimestampOffset fields), which older readers must not misinterpret.
+        let pro_3_2 = fields.iter().any(|f| {
+            matches!(
+                f.field_type,
+                GdbFieldType::Int64
+                    | GdbFieldType::DateOnly
+                    | GdbFieldType::TimeOnly
+                    | GdbFieldType::DateTimeOffset
+            )
+        });
+        sec.extend_from_slice(&(if pro_3_2 { 6i32 } else { 4 }).to_le_bytes());
         sec.extend_from_slice(&layer_flags(geometry_kind, has_z, has_m).to_le_bytes());
         sec.extend_from_slice(&(fields.len() as i16).to_le_bytes());
         let (mut extent_in_sec, mut grid_in_sec) = (None, None);

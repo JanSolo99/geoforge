@@ -8,7 +8,9 @@ use std::process::Command;
 use geoforge_core::{Envelope, Feature, FeatureClass, GeometryKind, Value};
 use geoforge_filegdb::{Geodatabase, Table};
 use geoforge_shapefile::ShapefileReader;
-use geoforge_testkit::{compare_feature_tol, compare_geometries_tol, ogr_layer, ogrinfo_available};
+use geoforge_testkit::{
+    compare_feature_tol, compare_geometries_tol, gdal_version, ogr_layer, ogrinfo_available,
+};
 
 fn inputs(dir: &Path, out: &mut Vec<PathBuf>) {
     let mut entries: Vec<_> = std::fs::read_dir(dir)
@@ -140,8 +142,9 @@ fn copies_into_new_geodatabases() {
         // GDAL must read the copy as we do. Exception: GDAL repairs this polygon (drops
         // repeated vertices and splits rings); we, like ArcGIS, keep what is stored.
         let gdal_repairs = src_path.ends_with("issue_14385.shp");
+        let gdal_too_old = out.requires_pro_3_2() && !gdal_version().is_some_and(|v| v >= (3, 9));
         match ogr_layer(&gdb, Some("copy")) {
-            _ if gdal_repairs => {}
+            _ if gdal_repairs || gdal_too_old => {}
             Ok(gdal) => {
                 let names: Vec<&str> = out.fields().iter().map(|f| f.name.as_str()).collect();
                 for f in &dst {
