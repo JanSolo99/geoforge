@@ -290,6 +290,8 @@ pub fn compare_value(ours: &Value, gdal: &Json) -> Option<String> {
     };
     let ok = match (ours, gdal) {
         (Value::Null, Json::Null) => true,
+        // dBASE "unset" logical; GDAL < 3.9 reports it raw instead of null.
+        (Value::Null, Json::String(g)) => g == "?",
         (Value::String(s), Json::Null) => s.is_empty(),
         (Value::String(s), Json::String(g)) => s == g,
         (Value::String(s), Json::Bool(b)) => {
