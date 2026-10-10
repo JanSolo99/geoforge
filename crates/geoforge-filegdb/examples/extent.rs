@@ -1,12 +1,18 @@
-//! Times an extent query with and without the spatial index.
+//! `extent <table> [xmin ymin xmax ymax]`: indexed vs full-scan extent query.
 fn main() {
     let a: Vec<String> = std::env::args().collect();
     let t = geoforge_filegdb::Table::open(&a[1]).unwrap();
+    let v: Vec<f64> = a[2..].iter().map(|s| s.parse().unwrap()).collect();
+    let (xmin, ymin, xmax, ymax) = if v.len() == 4 {
+        (v[0], v[1], v[2], v[3])
+    } else {
+        (500100.0, 4500100.0, 500400.0, 4500400.0)
+    };
     let env = geoforge_core::Envelope {
-        xmin: 500100.0,
-        ymin: 4500100.0,
-        xmax: 500400.0,
-        ymax: 4500400.0,
+        xmin,
+        ymin,
+        xmax,
+        ymax,
         z: None,
         m: None,
     };

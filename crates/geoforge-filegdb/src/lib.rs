@@ -7,6 +7,7 @@ pub mod geometry;
 pub mod index;
 pub mod schema;
 pub mod table;
+pub mod writer;
 
 pub use gdb::{CatalogEntry, Geodatabase};
 pub use index::IndexDef;
@@ -15,3 +16,4 @@ pub use schema::{
     SubtypeField, Subtypes,
 };
 pub use table::{GdbField, GdbFieldType, GeometryDef, Table, compare_values};
+pub use writer::{GeodatabaseWriter, TableBuilder};

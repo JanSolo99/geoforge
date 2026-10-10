@@ -404,6 +404,30 @@ pub fn compare_geometry(ours: Option<&Geometry>, gdal_wkt: Option<&str>) -> Opti
     })
 }
 
+/// XY within `xy_tol`; Z and M within the default Z/M resolution (1e-4) or both
+/// missing.
+fn near_coord(p: &Coord, q: &Coord, xy_tol: f64) -> bool {
+    let missing = |v: f64| v.is_nan() || v <= -1e38;
+    let zm = |a: f64, b: f64| (missing(a) && missing(b)) || (a - b).abs() <= 1e-4 || close(a, b);
+    let z_ok = zm(p[2], q[2]) || (p[2].is_nan() && q[2] == 0.0) || (q[2].is_nan() && p[2] == 0.0);
+    (p[0] - q[0]).abs() <= xy_tol && (p[1] - q[1]).abs() <= xy_tol && z_ok && zm(p[3], q[3])
+}
+
+/// Matches sequences one-to-one within tolerance, regardless of order (snapping
+/// can change how sequences sort).
+fn sequences_match_tol(a: &[Vec<Coord>], b: &[Vec<Coord>], tol: f64) -> bool {
+    if a.len() != b.len() {
+        return false;
+    }
+    let mut used = vec![false; b.len()];
+    a.iter().all(|x| {
+        let hit = b.iter().enumerate().position(|(i, y)| {
+            !used[i] && x.len() == y.len() && x.iter().zip(y).all(|(p, q)| near_coord(p, q, tol))
+        });
+        hit.map(|i| used[i] = true).is_some()
+    })
+}
+
 fn sequences_equal(a: &[Vec<Coord>], b: &[Vec<Coord>]) -> bool {
     a.len() == b.len()
         && a.iter()
@@ -429,6 +453,29 @@ fn split_self_touching(ring: &[Coord]) -> Vec<Vec<Coord>> {
     stack.push(stack[0]);
     out.push(stack);
     out
+}
+
+/// Like [`compare_geometries`], but XY may differ by up to `xy_tol` (e.g. the
+/// storage resolution of a geodatabase that snapped the coordinates).
+pub fn compare_geometries_tol(
+    a: Option<&Geometry>,
+    b: Option<&Geometry>,
+    xy_tol: f64,
+) -> Option<String> {
+    let normalize = a.is_some_and(|g| g.kind == GeometryKind::MultiPatch);
+    let seqs =
+        |g: Option<&Geometry>| canonical(g.map(geometry_sequences).unwrap_or_default(), normalize);
+    let (x, y) = (seqs(a), seqs(b));
+    let equal = sequences_match_tol(&x, &y, xy_tol);
+    (!equal).then(|| {
+        format!(
+            "geometry differs beyond {xy_tol:e}: {} vs {} sequences; first {:?} vs {:?}",
+            x.len(),
+            y.len(),
+            x.first().map(|s| &s[..s.len().min(3)]),
+            y.first().map(|s| &s[..s.len().min(3)])
+        )
+    })
 }
 
 /// Compares two of our geometries (vertex order matters except within MultiPatch
@@ -519,8 +566,53 @@ fn parse_gdal_datetime(s: &str) -> Option<(chrono::NaiveDateTime, Option<i32>)> 
 
 /// Compares a whole feature; returns all differences found.
 pub fn compare_feature(ours: &Feature, field_names: &[&str], gdal: &OgrFeature) -> Vec<String> {
+    compare_feature_tol(ours, field_names, gdal, None)
+}
+
+/// Like [`compare_feature`]; with `xy_tol`, coordinates may differ by that much
+/// (GDAL prints geodatabase coordinates rounded to the storage resolution).
+pub fn compare_feature_tol(
+    ours: &Feature,
+    field_names: &[&str],
+    gdal: &OgrFeature,
+    xy_tol: Option<f64>,
+) -> Vec<String> {
     let mut diffs = Vec::new();
-    if let Some(d) = compare_geometry(ours.geometry.as_ref(), gdal.wkt.as_deref()) {
+    let geometry_diff = match xy_tol {
+        None => compare_geometry(ours.geometry.as_ref(), gdal.wkt.as_deref()),
+        Some(tol) => {
+            let a = canonical(
+                ours.geometry
+                    .as_ref()
+                    .map(geometry_sequences)
+                    .unwrap_or_default(),
+                false,
+            );
+            let b = canonical(
+                gdal.wkt.as_deref().map(wkt_sequences).unwrap_or_default(),
+                false,
+            );
+            let split: Vec<Vec<Coord>> = a.iter().flat_map(|r| split_self_touching(r)).collect();
+            let ok = sequences_match_tol(&a, &b, tol)
+                || (ours
+                    .geometry
+                    .as_ref()
+                    .is_some_and(|g| g.kind == GeometryKind::Polygon)
+                    && sequences_match_tol(&split, &b, tol));
+            (!ok && !ours.geometry.as_ref().is_some_and(Geometry::has_curves)).then(|| {
+                format!(
+                    "geometry differs beyond {tol:e}: GDAL `{}`",
+                    gdal.wkt
+                        .as_deref()
+                        .unwrap_or("<null>")
+                        .chars()
+                        .take(150)
+                        .collect::<String>()
+                )
+            })
+        }
+    };
+    if let Some(d) = geometry_diff {
         diffs.push(format!("FID {}: {d}", ours.oid));
     }
     for (name, value) in field_names.iter().zip(&ours.attributes) {

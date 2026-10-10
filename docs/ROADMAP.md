@@ -41,7 +41,15 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
       subtypes parsed from the documented XML (no sample data to verify against yet)
 - [x] Spatial (`.spx`) and attribute (`.atx`) index queries (`features_in_extent`,
       `search_attribute`): 109 + 31 indexes never miss vs. full scans; ~18× faster extent query
-- [ ] Write: tables + feature classes, then indexes, then domains/subtypes
+- [x] Write new geodatabases: feature classes and tables (all field types except raster),
+      all geometry types incl. Z/M, MultiPatch and curves, spatial index (.spx), domains;
+      ArcGIS default resolutions (coordinates snap like ArcGIS); high-precision dates only
+      when needed. 203 inputs round-trip; GDAL reads every output and its spatial filter
+      matches ours on the written index.
+- [ ] Write: add to an existing geodatabase (system tables must be rewritten with their indexes)
+- [ ] Write: per-vertex missing M values mixed with present ones (encoding unknown)
+- [ ] Write: attribute indexes, subtypes, relationship classes, feature datasets
+- [ ] Verify written geodatabases open in ArcGIS Pro (structure mirrors GDAL's, which does)
 
 ## Phase 4 — CRS
 - [ ] PROJ binding (`proj` crate / `proj-sys`) for 1000+ CRSs; EPSG lookup; WKT1/WKT2/PROJJSON

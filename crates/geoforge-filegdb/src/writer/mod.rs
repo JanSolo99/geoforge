@@ -1,0 +1,960 @@
+//! Creating File Geodatabases.
+//!
+//! The on-disk structure mirrors what GDAL's OpenFileGDB driver writes (which
+//! ArcGIS opens): system tables `a00000001`–`a00000007`, `gdb` and `timestamps`
+//! files, user tables from `a00000009` with an OBJECTID and spatial index.
+
+mod btree;
+mod geometry;
+mod system_rows;
+mod table;
+
+use std::path::{Path, PathBuf};
+use std::time::{SystemTime, UNIX_EPOCH};
+
+use geoforge_core::{Envelope, Error, Feature, Field, FieldType, GeometryKind, Result, Value};
+
+use crate::schema::{Domain, DomainKind, MergePolicy, SplitPolicy};
+use crate::table::{GdbField, GdbFieldType, GeometryDef};
+use btree::{spatial_entries, write_index};
+use table::TableWriter;
+
+const TYPE_FOLDER: &str = "{F3783E6F-65CA-4514-8315-CE3985DAD3B1}";
+const TYPE_WORKSPACE: &str = "{C673FE0F-7280-404F-8532-20755DD8FC06}";
+const TYPE_FEATURE_CLASS: &str = "{70737809-852C-4A03-9E22-2CECEA5B9BFA}";
+const TYPE_TABLE: &str = "{CD06BC3B-789D-4C51-AAFA-A467912B8965}";
+const REL_DATASET_IN_FOLDER: &str = "{DC78F1AB-34E4-43AC-BA47-1C4EABD0E7C7}";
+const REL_DOMAIN_IN_DATASET: &str = "{17E08ADB-2B31-4DCD-8FDD-DF529E88F843}";
+const TYPE_CODED_DOMAIN: &str = "{8C368B12-A12E-4C7E-9638-C9C64E69E98F}";
+const TYPE_RANGE_DOMAIN: &str = "{C29DA988-8C3E-45F7-8B5C-18E51EE7BEB4}";
+
+/// Items registered in GDB_Items (beyond the root and workspace).
+struct Item {
+    uuid: String,
+    name: String,
+    kind: Option<GeometryKind>,
+    definition: String,
+    /// Domains referenced by this table's fields.
+    domains: Vec<String>,
+}
+
+struct DomainItem {
+    uuid: String,
+    domain: Domain,
+}
+
+/// A new geodatabase being written. Call [`GeodatabaseWriter::finish`] at the end.
+pub struct GeodatabaseWriter {
+    dir: PathBuf,
+    next_table: u64,
+    tables: Vec<(String, u64)>,
+    items: Vec<Item>,
+    spatial_refs: Vec<GeometryDef>,
+    domains: Vec<DomainItem>,
+    rng: u64,
+}
+
+/// A table or feature class being filled. Hand it back to
+/// [`GeodatabaseWriter::finish_table`] when done.
+pub struct TableBuilder {
+    name: String,
+    id: u64,
+    writer: TableWriter,
+    kind: Option<GeometryKind>,
+    has_z: bool,
+    has_m: bool,
+    def: Option<GeometryDef>,
+    fields: Vec<GdbField>,
+}
+
+impl TableBuilder {
+    /// Appends a feature (its `oid` is ignored; OBJECTIDs are assigned 1, 2, ...).
+    pub fn write(&mut self, feature: &Feature) -> Result<u64> {
+        if self.kind.is_none() && feature.geometry.is_some() {
+            return Err(Error::Unsupported(
+                "geometry in a table without a geometry field".into(),
+            ));
+        }
+        self.writer
+            .push(feature.geometry.as_ref(), &feature.attributes)
+    }
+}
+
+impl GeodatabaseWriter {
+    /// Creates a new, empty `.gdb` directory. Fails if `dir` already exists.
+    pub fn create(dir: impl AsRef<Path>) -> Result<Self> {
+        let dir = dir.as_ref().to_path_buf();
+        if dir.exists() {
+            return Err(Error::io(&dir, std::io::ErrorKind::AlreadyExists.into()));
+        }
+        std::fs::create_dir_all(&dir).map_err(|e| Error::io(&dir, e))?;
+        let seed = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map_or(0, |d| d.as_nanos() as u64)
+            ^ (u64::from(std::process::id()) << 32);
+        Ok(Self {
+            dir,
+            next_table: 9,
+            tables: Vec::new(),
+            items: Vec::new(),
+            spatial_refs: Vec::new(),
+            domains: Vec::new(),
+            rng: seed | 1,
+        })
+    }
+
+    /// Adds an attribute domain (`arcpy.management.CreateDomain`). Fields refer to
+    /// it through `Field::domain`.
+    pub fn add_domain(&mut self, domain: &Domain) -> Result<()> {
+        if self
+            .domains
+            .iter()
+            .any(|d| d.domain.name.eq_ignore_ascii_case(&domain.name))
+        {
+            return Err(Error::Unsupported(format!(
+                "domain {} already exists",
+                domain.name
+            )));
+        }
+        let uuid = self.uuid();
+        self.domains.push(DomainItem {
+            uuid,
+            domain: domain.clone(),
+        });
+        Ok(())
+    }
+
+    /// Starts a feature class (`kind = Some(..)`) or table (`None`). `fields` are the
+    /// attribute fields; OBJECTID and SHAPE are added. Field names must be valid
+    /// (see [`validate_field_name`]).
+    pub fn create_table(
+        &mut self,
+        name: &str,
+        kind: Option<GeometryKind>,
+        has_z: bool,
+        has_m: bool,
+        fields: &[Field],
+        srs_wkt: Option<&str>,
+    ) -> Result<TableBuilder> {
+        validate_table_name(name)?;
+        if self
+            .tables
+            .iter()
+            .any(|(n, _)| n.eq_ignore_ascii_case(name))
+        {
+            return Err(Error::Unsupported(format!(
+                "a table named {name} already exists"
+            )));
+        }
+        let mut gdb_fields = vec![field("OBJECTID", GdbFieldType::ObjectId, false, 4)];
+        let def = kind.map(|_| default_geometry_def(srs_wkt, has_z, has_m));
+        if let Some(def) = &def {
+            let mut f = field("SHAPE", GdbFieldType::Geometry, true, 0);
+            f.geometry = Some(def.clone());
+            gdb_fields.push(f);
+        }
+        for f in fields {
+            validate_field_name(&f.name)?;
+            if gdb_fields
+                .iter()
+                .any(|g| g.name.eq_ignore_ascii_case(&f.name))
+            {
+                return Err(Error::Unsupported(format!(
+                    "duplicate field name {}",
+                    f.name
+                )));
+            }
+            gdb_fields.push(to_gdb_field(f)?);
+        }
+        let id = self.next_table;
+        self.next_table += 1;
+        let writer =
+            TableWriter::create(&self.table_path(id), gdb_fields.clone(), kind, has_z, has_m)?;
+        Ok(TableBuilder {
+            name: name.to_owned(),
+            id,
+            writer,
+            kind,
+            has_z,
+            has_m,
+            def,
+            fields: gdb_fields,
+        })
+    }
+
+    /// Completes a table: writes its index files and registers it in the catalog.
+    pub fn finish_table(&mut self, t: TableBuilder) -> Result<()> {
+        let base = self.table_path(t.id);
+        let table::Finished {
+            envelopes,
+            extent,
+            grid,
+            subsecond,
+        } = t.writer.finish()?;
+        let mut fields = t.fields.clone();
+        for f in &mut fields {
+            f.high_precision = subsecond.contains(&f.name);
+        }
+        let mut def = t.def.clone();
+        if let Some(d) = &mut def {
+            d.extent = extent;
+        }
+        match (grid, &mut def) {
+            (Some(grid), Some(d)) => {
+                d.grid_sizes = vec![grid];
+                write_index(
+                    &base.with_extension("spx"),
+                    8,
+                    0x40,
+                    &spatial_entries(&envelopes, grid),
+                )?;
+                write_gdbindexes(&base.with_extension("gdbindexes"), true)?;
+                if !self.spatial_refs.iter().any(|s| same_sr(s, d)) {
+                    self.spatial_refs.push(d.clone());
+                }
+            }
+            _ => write_gdbindexes(&base.with_extension("gdbindexes"), false)?,
+        }
+
+        let uuid = self.uuid();
+        let definition = item_definition(
+            &t.name,
+            self.items.len() + 3,
+            t.kind,
+            t.has_z,
+            t.has_m,
+            def.as_ref(),
+            &fields,
+        );
+        let domains = fields.iter().filter_map(|f| f.domain.clone()).collect();
+        self.items.push(Item {
+            uuid,
+            name: t.name.clone(),
+            kind: t.kind,
+            definition,
+            domains,
+        });
+        self.tables.push((t.name, t.id));
+        Ok(())
+    }
+
+    /// Writes the system tables. The geodatabase is complete afterwards.
+    pub fn finish(mut self) -> Result<()> {
+        let s = |v: &str| Value::String(v.to_owned());
+        let g = |v: &str| Value::Guid(v.to_owned());
+
+        // a00000001 GDB_SystemCatalog
+        let mut t = self.system(
+            1,
+            vec![
+                field("ID", GdbFieldType::ObjectId, false, 4),
+                field("Name", GdbFieldType::String, false, 160),
+                field("FileFormat", GdbFieldType::Int32, false, 4),
+            ],
+        )?;
+        let system = [
+            "GDB_SystemCatalog",
+            "GDB_DBTune",
+            "GDB_SpatialRefs",
+            "GDB_Items",
+            "GDB_ItemTypes",
+            "GDB_ItemRelationships",
+            "GDB_ItemRelationshipTypes",
+        ];
+        for name in system {
+            t.push(None, &[s(name), Value::Integer(0)])?;
+        }
+        t.push(None, &[s("GDB_ReplicaLog"), Value::Integer(2)])?;
+        for (name, id) in &self.tables {
+            while t.row_count() + 1 < *id {
+                // Keep OBJECTIDs aligned with file numbers (none skipped today).
+                t.push(None, &[s(""), Value::Integer(0)])?;
+            }
+            t.push(None, &[s(name), Value::Integer(0)])?;
+        }
+        t.finish()?;
+
+        // a00000002 GDB_DBTune
+        let mut t = self.system(
+            2,
+            vec![
+                field("Keyword", GdbFieldType::String, false, 32),
+                field("ParameterName", GdbFieldType::String, false, 32),
+                field("ConfigString", GdbFieldType::String, true, 2048),
+            ],
+        )?;
+        for (k, p, c) in system_rows::DBTUNE {
+            t.push(None, &[s(k), s(p), s(c)])?;
+        }
+        t.finish()?;
+
+        // a00000003 GDB_SpatialRefs
+        let mut fields = vec![
+            field("ID", GdbFieldType::ObjectId, false, 4),
+            field("SRTEXT", GdbFieldType::String, false, 2048),
+        ];
+        for n in [
+            "FalseX",
+            "FalseY",
+            "XYUnits",
+            "FalseZ",
+            "ZUnits",
+            "FalseM",
+            "MUnits",
+            "XYTolerance",
+            "ZTolerance",
+            "MTolerance",
+        ] {
+            fields.push(field(n, GdbFieldType::Float64, true, 8));
+        }
+        let mut t = self.system(3, fields)?;
+        for d in std::mem::take(&mut self.spatial_refs) {
+            let wkt = d
+                .srs_wkt
+                .clone()
+                .unwrap_or_else(|| "{B286C06B-0879-11D2-AACA-00C04FA33C20}".into());
+            let v = Value::Double;
+            t.push(
+                None,
+                &[
+                    s(&wkt),
+                    v(d.x_origin),
+                    v(d.y_origin),
+                    v(d.xy_scale),
+                    v(d.z_origin),
+                    v(d.z_scale),
+                    v(d.m_origin),
+                    v(d.m_scale),
+                    v(d.xy_tolerance),
+                    v(d.z_tolerance),
+                    v(d.m_tolerance),
+                ],
+            )?;
+        }
+        t.finish()?;
+
+        // a00000004 GDB_Items
+        let mut item_fields = vec![
+            field("ObjectID", GdbFieldType::ObjectId, false, 4),
+            field("UUID", GdbFieldType::GlobalId, false, 38),
+            field("Type", GdbFieldType::Guid, false, 38),
+            field("Name", GdbFieldType::String, true, 160),
+            field("PhysicalName", GdbFieldType::String, true, 160),
+            field("Path", GdbFieldType::String, true, 260),
+            field("DatasetSubtype1", GdbFieldType::Int32, true, 4),
+            field("DatasetSubtype2", GdbFieldType::Int32, true, 4),
+            field("DatasetInfo1", GdbFieldType::String, true, 255),
+            field("DatasetInfo2", GdbFieldType::String, true, 255),
+            field("URL", GdbFieldType::String, true, 255),
+            field("Definition", GdbFieldType::Xml, true, 0),
+            field("Documentation", GdbFieldType::Xml, true, 0),
+            field("ItemInfo", GdbFieldType::Xml, true, 0),
+            field("Properties", GdbFieldType::Int32, true, 4),
+            field("Defaults", GdbFieldType::Binary, true, 0),
+        ];
+        let mut shape = field("Shape", GdbFieldType::Geometry, true, 0);
+        shape.geometry = Some(items_shape_def());
+        item_fields.push(shape);
+        let mut t = TableWriter::create(
+            &self.table_path(4),
+            item_fields,
+            Some(GeometryKind::Polygon),
+            true,
+            true,
+        )?;
+        let root_uuid = self.uuid();
+        let null = Value::Null;
+        t.push(
+            None,
+            &[
+                g(&root_uuid),
+                g(TYPE_FOLDER),
+                s(""),
+                s(""),
+                s("\\"),
+                null.clone(),
+                null.clone(),
+                null.clone(),
+                null.clone(),
+                s(""),
+                null.clone(),
+                null.clone(),
+                null.clone(),
+                Value::Integer(1),
+                null.clone(),
+            ],
+        )?;
+        let ws_uuid = self.uuid();
+        t.push(
+            None,
+            &[
+                g(&ws_uuid),
+                g(TYPE_WORKSPACE),
+                s("Workspace"),
+                s("WORKSPACE"),
+                s(""),
+                null.clone(),
+                null.clone(),
+                null.clone(),
+                null.clone(),
+                s(""),
+                Value::Xml(WORKSPACE_XML.into()),
+                null.clone(),
+                null.clone(),
+                Value::Integer(0),
+                null.clone(),
+            ],
+        )?;
+        for item in &self.items {
+            let (ty, sub2, info1) = match item.kind {
+                Some(k) => (
+                    TYPE_FEATURE_CLASS,
+                    Value::Integer(geometry_code(k)),
+                    s("SHAPE"),
+                ),
+                None => (TYPE_TABLE, Value::Null, Value::Null),
+            };
+            t.push(
+                None,
+                &[
+                    g(&item.uuid),
+                    g(ty),
+                    s(&item.name),
+                    s(&item.name.to_uppercase()),
+                    s(&format!("\\{}", item.name)),
+                    Value::Integer(1),
+                    sub2,
+                    info1,
+                    null.clone(),
+                    s(""),
+                    Value::Xml(item.definition.clone()),
+                    null.clone(),
+                    null.clone(),
+                    Value::Integer(1),
+                    null.clone(),
+                ],
+            )?;
+        }
+        for d in &self.domains {
+            let ty = match d.domain.kind {
+                DomainKind::Coded(_) => TYPE_CODED_DOMAIN,
+                DomainKind::Range { .. } => TYPE_RANGE_DOMAIN,
+            };
+            t.push(
+                None,
+                &[
+                    g(&d.uuid),
+                    g(ty),
+                    s(&d.domain.name),
+                    s(&d.domain.name.to_uppercase()),
+                    s(""),
+                    null.clone(),
+                    null.clone(),
+                    null.clone(),
+                    null.clone(),
+                    s(""),
+                    Value::Xml(domain_xml(&d.domain)),
+                    null.clone(),
+                    null.clone(),
+                    Value::Integer(1),
+                    null.clone(),
+                ],
+            )?;
+        }
+        t.finish()?;
+
+        // a00000005 GDB_ItemTypes
+        let mut t = self.system(
+            5,
+            vec![
+                field("ObjectID", GdbFieldType::ObjectId, false, 4),
+                field("UUID", GdbFieldType::Guid, false, 38),
+                field("ParentTypeID", GdbFieldType::Guid, false, 38),
+                field("Name", GdbFieldType::String, false, 160),
+            ],
+        )?;
+        for (u, p, n) in system_rows::ITEM_TYPES {
+            t.push(None, &[g(u), g(p), s(n)])?;
+        }
+        t.finish()?;
+
+        // a00000006 GDB_ItemRelationships: each dataset is in the root folder.
+        let mut t = self.system(
+            6,
+            vec![
+                field("ObjectID", GdbFieldType::ObjectId, false, 4),
+                field("UUID", GdbFieldType::GlobalId, false, 38),
+                field("OriginID", GdbFieldType::Guid, false, 38),
+                field("DestID", GdbFieldType::Guid, false, 38),
+                field("Type", GdbFieldType::Guid, false, 38),
+                field("Attributes", GdbFieldType::Xml, true, 0),
+                field("Properties", GdbFieldType::Int32, true, 4),
+            ],
+        )?;
+        let mut links: Vec<(String, String, &str)> = self
+            .items
+            .iter()
+            .map(|i| (root_uuid.clone(), i.uuid.clone(), REL_DATASET_IN_FOLDER))
+            .collect();
+        for item in &self.items {
+            for name in &item.domains {
+                if let Some(d) = self
+                    .domains
+                    .iter()
+                    .find(|d| d.domain.name.eq_ignore_ascii_case(name))
+                {
+                    links.push((item.uuid.clone(), d.uuid.clone(), REL_DOMAIN_IN_DATASET));
+                }
+            }
+        }
+        for (origin, dest, ty) in links {
+            let uuid = self.uuid();
+            t.push(
+                None,
+                &[
+                    g(&uuid),
+                    g(&origin),
+                    g(&dest),
+                    g(ty),
+                    Value::Null,
+                    Value::Integer(1),
+                ],
+            )?;
+        }
+        t.finish()?;
+
+        // a00000007 GDB_ItemRelationshipTypes
+        let mut t = self.system(
+            7,
+            vec![
+                field("ObjectID", GdbFieldType::ObjectId, false, 4),
+                field("UUID", GdbFieldType::Guid, false, 38),
+                field("OrigItemTypeID", GdbFieldType::Guid, false, 38),
+                field("DestItemTypeID", GdbFieldType::Guid, false, 38),
+                field("Name", GdbFieldType::String, true, 160),
+                field("ForwardLabel", GdbFieldType::String, true, 255),
+                field("BackwardLabel", GdbFieldType::String, true, 255),
+                field("IsContainment", GdbFieldType::Int16, true, 2),
+            ],
+        )?;
+        for (u, o, d, n, f, b, c) in system_rows::RELATIONSHIP_TYPES {
+            t.push(
+                None,
+                &[g(u), g(o), g(d), s(n), s(f), s(b), Value::SmallInteger(*c)],
+            )?;
+        }
+        t.finish()?;
+
+        let write = |name: &str, bytes: &[u8]| {
+            let p = self.dir.join(name);
+            std::fs::write(&p, bytes).map_err(|e| Error::io(&p, e))
+        };
+        write("gdb", &[0x05, 0, 0, 0, 0xDE, 0xAD, 0xBE, 0xEF])?;
+        write("timestamps", &[0xFF; 400])?;
+        Ok(())
+    }
+
+    fn table_path(&self, id: u64) -> PathBuf {
+        self.dir.join(format!("a{id:08x}"))
+    }
+
+    fn system(&self, id: u64, fields: Vec<GdbField>) -> Result<TableWriter> {
+        TableWriter::create(&self.table_path(id), fields, None, false, false)
+    }
+
+    /// A random (version 4) UUID in `{...}` form.
+    fn uuid(&mut self) -> String {
+        let mut next = || {
+            self.rng ^= self.rng << 13;
+            self.rng ^= self.rng >> 7;
+            self.rng ^= self.rng << 17;
+            self.rng
+        };
+        let (a, b) = (next(), next());
+        let mut bytes = [0u8; 16];
+        bytes[..8].copy_from_slice(&a.to_le_bytes());
+        bytes[8..].copy_from_slice(&b.to_le_bytes());
+        bytes[6] = (bytes[6] & 0x0F) | 0x40;
+        bytes[8] = (bytes[8] & 0x3F) | 0x80;
+        let h: Vec<String> = bytes.iter().map(|b| format!("{b:02X}")).collect();
+        format!(
+            "{{{}-{}-{}-{}-{}}}",
+            h[..4].concat(),
+            h[4..6].concat(),
+            h[6..8].concat(),
+            h[8..10].concat(),
+            h[10..].concat()
+        )
+    }
+}
+
+fn field(name: &str, field_type: GdbFieldType, nullable: bool, length: u32) -> GdbField {
+    GdbField {
+        name: name.to_owned(),
+        alias: None,
+        field_type,
+        nullable,
+        length,
+        default: None,
+        geometry: None,
+        raster_type: None,
+        high_precision: false,
+        domain: None,
+    }
+}
+
+fn to_gdb_field(f: &Field) -> Result<GdbField> {
+    use GdbFieldType as G;
+    let (t, len) = match f.field_type {
+        FieldType::SmallInteger => (G::Int16, 2),
+        FieldType::Integer => (G::Int32, 4),
+        FieldType::BigInteger => (G::Int64, 8),
+        FieldType::Single => (G::Float32, 4),
+        FieldType::Double => (G::Float64, 8),
+        FieldType::String => (G::String, if f.length == 0 { 255 } else { f.length }),
+        FieldType::Date => (G::DateTime, 8),
+        FieldType::DateOnly => (G::DateOnly, 8),
+        FieldType::TimeOnly => (G::TimeOnly, 8),
+        FieldType::TimestampOffset => (G::DateTimeOffset, 10),
+        FieldType::Blob => (G::Binary, 0),
+        FieldType::Guid => (G::Guid, 38),
+        FieldType::GlobalId => (G::GlobalId, 38),
+        FieldType::Xml => (G::Xml, 0),
+        other => {
+            return Err(Error::Unsupported(format!(
+                "field {} of type {other:?}",
+                f.name
+            )));
+        }
+    };
+    let mut g = field(&f.name, t, f.nullable, len);
+    g.alias = f.alias.clone().filter(|a| *a != f.name);
+    g.domain = f.domain.clone();
+    Ok(g)
+}
+
+/// ArcGIS rules: starts with a letter, letters/digits/underscore, at most 64 chars.
+pub fn validate_field_name(name: &str) -> Result<()> {
+    let ok = name.chars().next().is_some_and(char::is_alphabetic)
+        && name.chars().all(|c| c.is_alphanumeric() || c == '_')
+        && name.chars().count() <= 64;
+    if ok {
+        Ok(())
+    } else {
+        Err(Error::Unsupported(format!(
+            "invalid geodatabase field name `{name}`"
+        )))
+    }
+}
+
+/// ArcGIS rules: starts with a letter, letters/digits/underscore, at most 160 chars,
+/// and not a reserved `GDB_` name.
+pub fn validate_table_name(name: &str) -> Result<()> {
+    let ok = name.chars().next().is_some_and(char::is_alphabetic)
+        && name.chars().all(|c| c.is_alphanumeric() || c == '_')
+        && name.chars().count() <= 160
+        && !name.to_ascii_uppercase().starts_with("GDB_");
+    if ok {
+        Ok(())
+    } else {
+        Err(Error::Unsupported(format!(
+            "invalid geodatabase table name `{name}`"
+        )))
+    }
+}
+
+/// ArcGIS's default precision: 1e-9 degrees for geographic systems, 0.0001 units
+/// (with origin far below any coordinate) for projected or unknown ones.
+fn default_geometry_def(srs_wkt: Option<&str>, has_z: bool, has_m: bool) -> GeometryDef {
+    let geographic = srs_wkt.is_some_and(|w| w.trim_start().starts_with("GEOGCS"));
+    let (origin, scale, tol) = if geographic {
+        (-400.0, 1e9, 8.983152841195215e-9)
+    } else {
+        (-2147483647.0, 10000.0, 0.001)
+    };
+    GeometryDef {
+        srs_wkt: srs_wkt.map(str::to_owned),
+        has_z,
+        has_m,
+        x_origin: origin,
+        y_origin: origin,
+        xy_scale: scale,
+        m_origin: -100000.0,
+        m_scale: 10000.0,
+        z_origin: -100000.0,
+        z_scale: 10000.0,
+        xy_tolerance: tol,
+        m_tolerance: 0.001,
+        z_tolerance: 0.001,
+        extent: Envelope::EMPTY,
+        grid_sizes: vec![0.0],
+    }
+}
+
+/// GDB_Items.Shape storage, as ArcGIS defines it (WGS84, 1e-6 degree resolution).
+fn items_shape_def() -> GeometryDef {
+    GeometryDef {
+        srs_wkt: Some(WGS84.into()),
+        has_z: true,
+        has_m: true,
+        x_origin: -180.0,
+        y_origin: -90.0,
+        xy_scale: 1e6,
+        m_origin: -100000.0,
+        m_scale: 10000.0,
+        z_origin: -100000.0,
+        z_scale: 10000.0,
+        xy_tolerance: 2e-6,
+        m_tolerance: 0.001,
+        z_tolerance: 0.001,
+        extent: Envelope::EMPTY,
+        grid_sizes: vec![0.012, 0.4, 12.0],
+    }
+}
+
+fn same_sr(a: &GeometryDef, b: &GeometryDef) -> bool {
+    a.srs_wkt == b.srs_wkt
+        && a.x_origin == b.x_origin
+        && a.xy_scale == b.xy_scale
+        && a.z_tolerance == b.z_tolerance
+}
+
+fn geometry_code(k: GeometryKind) -> i32 {
+    match k {
+        GeometryKind::Point => 1,
+        GeometryKind::Multipoint => 2,
+        GeometryKind::Polyline => 3,
+        GeometryKind::Polygon => 4,
+        GeometryKind::MultiPatch => 9,
+    }
+}
+
+fn write_gdbindexes(path: &Path, spatial: bool) -> Result<()> {
+    let mut out = Vec::new();
+    let entry = |out: &mut Vec<u8>, name: &str, magic2: i32, magic3: i16, expr: &str| {
+        out.extend_from_slice(&(name.encode_utf16().count() as u32).to_le_bytes());
+        name.encode_utf16()
+            .for_each(|u| out.extend_from_slice(&u.to_le_bytes()));
+        out.extend_from_slice(&0i16.to_le_bytes());
+        out.extend_from_slice(&magic2.to_le_bytes());
+        out.extend_from_slice(&magic3.to_le_bytes());
+        out.extend_from_slice(&1i32.to_le_bytes());
+        out.extend_from_slice(&(expr.encode_utf16().count() as u32).to_le_bytes());
+        expr.encode_utf16()
+            .for_each(|u| out.extend_from_slice(&u.to_le_bytes()));
+        out.extend_from_slice(&0i16.to_le_bytes());
+    };
+    out.extend_from_slice(&(1 + u32::from(spatial)).to_le_bytes());
+    entry(&mut out, "FDO_OBJECTID", 16, -1, "OBJECTID");
+    if spatial {
+        entry(&mut out, "FDO_SHAPE", 4, 0, "SHAPE");
+    }
+    std::fs::write(path, out).map_err(|e| Error::io(path, e))
+}
+
+const WGS84: &str = r#"GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137.0,298.257223563]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]]"#;
+
+const WORKSPACE_XML: &str = r#"<?xml version="1.0" encoding="UTF-8"?>
+<DEWorkspace xmlns:typens="http://www.esri.com/schemas/ArcGIS/10.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="typens:DEWorkspace">
+  <CatalogPath>\</CatalogPath>
+  <Name/>
+  <ChildrenExpanded>false</ChildrenExpanded>
+  <WorkspaceType>esriLocalDatabaseWorkspace</WorkspaceType>
+  <WorkspaceFactoryProgID/>
+  <ConnectionString/>
+  <ConnectionInfo xsi:nil="true"/>
+  <Domains xsi:type="typens:ArrayOfDomain"/>
+  <MajorVersion>3</MajorVersion>
+  <MinorVersion>0</MinorVersion>
+  <BugfixVersion>0</BugfixVersion>
+</DEWorkspace>"#;
+
+fn xml_escape(s: &str) -> String {
+    s.replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;")
+        .replace('"', "&quot;")
+}
+
+fn esri_type_name(t: GdbFieldType) -> &'static str {
+    use GdbFieldType as G;
+    match t {
+        G::Int16 => "esriFieldTypeSmallInteger",
+        G::Int32 => "esriFieldTypeInteger",
+        G::Int64 => "esriFieldTypeBigInteger",
+        G::Float32 => "esriFieldTypeSingle",
+        G::Float64 => "esriFieldTypeDouble",
+        G::String => "esriFieldTypeString",
+        G::DateTime => "esriFieldTypeDate",
+        G::DateOnly => "esriFieldTypeDateOnly",
+        G::TimeOnly => "esriFieldTypeTimeOnly",
+        G::DateTimeOffset => "esriFieldTypeTimestampOffset",
+        G::ObjectId => "esriFieldTypeOID",
+        G::Geometry => "esriFieldTypeGeometry",
+        G::Binary => "esriFieldTypeBlob",
+        G::Raster => "esriFieldTypeRaster",
+        G::Guid => "esriFieldTypeGUID",
+        G::GlobalId => "esriFieldTypeGlobalID",
+        G::Xml => "esriFieldTypeXML",
+    }
+}
+
+/// `DEFeatureClassInfo` / `DETableInfo` XML for GDB_Items.Definition, in the shape
+/// GDAL and ArcGIS write.
+fn item_definition(
+    name: &str,
+    dsid: usize,
+    kind: Option<GeometryKind>,
+    has_z: bool,
+    has_m: bool,
+    def: Option<&GeometryDef>,
+    fields: &[GdbField],
+) -> String {
+    let root = if kind.is_some() {
+        "DEFeatureClassInfo"
+    } else {
+        "DETableInfo"
+    };
+    let mut x = format!(
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<typens:{root} xmlns:typens=\"http://www.esri.com/schemas/ArcGIS/10.3\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xsi:type=\"typens:{root}\">\n  <CatalogPath>\\{n}</CatalogPath>\n  <Name>{n}</Name>\n  <ChildrenExpanded>false</ChildrenExpanded>\n  <DatasetType>{dt}</DatasetType>\n  <DSID>{dsid}</DSID>\n  <Versioned>false</Versioned>\n  <CanVersion>false</CanVersion>\n  <HasOID>true</HasOID>\n  <OIDFieldName>OBJECTID</OIDFieldName>\n  <GPFieldInfoExs xsi:type=\"typens:ArrayOfGPFieldInfoEx\">\n",
+        n = xml_escape(name),
+        dt = if kind.is_some() {
+            "esriDTFeatureClass"
+        } else {
+            "esriDTTable"
+        },
+    );
+    for f in fields {
+        x += &format!(
+            "    <GPFieldInfoEx xsi:type=\"typens:GPFieldInfoEx\">\n      <Name>{}</Name>\n{}{}      <FieldType>{}</FieldType>\n      <IsNullable>{}</IsNullable>\n      <Length>{}</Length>\n      <Precision>0</Precision>\n      <Scale>0</Scale>\n{}    </GPFieldInfoEx>\n",
+            xml_escape(&f.name),
+            f.alias
+                .as_deref()
+                .map(|a| format!("      <AliasName>{}</AliasName>\n", xml_escape(a)))
+                .unwrap_or_default(),
+            f.domain
+                .as_deref()
+                .map(|d| format!("      <DomainName>{}</DomainName>\n", xml_escape(d)))
+                .unwrap_or_default(),
+            esri_type_name(f.field_type),
+            f.nullable,
+            f.length,
+            match f.field_type {
+                GdbFieldType::ObjectId | GdbFieldType::Geometry =>
+                    "      <Required>true</Required>\n",
+                // Pro 3.2+: millisecond dates. Only set when the data needs it, so older
+                // ArcGIS versions can still open the table otherwise.
+                GdbFieldType::DateTime if f.high_precision =>
+                    "      <HighPrecision>true</HighPrecision>\n",
+                _ => "",
+            },
+        );
+    }
+    x += "  </GPFieldInfoExs>\n";
+    match (kind, def) {
+        (Some(k), Some(d)) => {
+            let shape = match k {
+                GeometryKind::Point => "esriGeometryPoint",
+                GeometryKind::Multipoint => "esriGeometryMultipoint",
+                GeometryKind::Polyline => "esriGeometryPolyline",
+                GeometryKind::Polygon => "esriGeometryPolygon",
+                GeometryKind::MultiPatch => "esriGeometryMultiPatch",
+            };
+            let sr_type = match &d.srs_wkt {
+                Some(w) if w.trim_start().starts_with("GEOGCS") => {
+                    "typens:GeographicCoordinateSystem"
+                }
+                Some(_) => "typens:ProjectedCoordinateSystem",
+                None => "typens:UnknownCoordinateSystem",
+            };
+            x += &format!(
+                "  <CLSID>{{52353152-891A-11D0-BEC6-00805F7C4268}}</CLSID>\n  <EXTCLSID></EXTCLSID>\n  <IsTimeInUTC>true</IsTimeInUTC>\n  <FeatureType>{}</FeatureType>\n  <ShapeType>{shape}</ShapeType>\n  <ShapeFieldName>SHAPE</ShapeFieldName>\n  <HasM>{has_m}</HasM>\n  <HasZ>{has_z}</HasZ>\n  <HasSpatialIndex>true</HasSpatialIndex>\n  <AreaFieldName></AreaFieldName>\n  <LengthFieldName></LengthFieldName>\n  <Extent xsi:nil=\"true\"></Extent>\n  <SpatialReference xsi:type=\"{sr_type}\">\n{}    <XOrigin>{}</XOrigin>\n    <YOrigin>{}</YOrigin>\n    <XYScale>{}</XYScale>\n    <ZOrigin>{}</ZOrigin>\n    <ZScale>{}</ZScale>\n    <MOrigin>{}</MOrigin>\n    <MScale>{}</MScale>\n    <XYTolerance>{}</XYTolerance>\n    <ZTolerance>{}</ZTolerance>\n    <MTolerance>{}</MTolerance>\n    <HighPrecision>true</HighPrecision>\n  </SpatialReference>\n",
+                "esriFTSimple",
+                d.srs_wkt
+                    .as_deref()
+                    .map(|w| format!("    <WKT>{}</WKT>\n", xml_escape(w)))
+                    .unwrap_or_default(),
+                d.x_origin,
+                d.y_origin,
+                d.xy_scale,
+                d.z_origin,
+                d.z_scale,
+                d.m_origin,
+                d.m_scale,
+                d.xy_tolerance,
+                d.z_tolerance,
+                d.m_tolerance,
+            );
+        }
+        _ => {
+            x +=
+                "  <CLSID>{7A566981-C114-11D2-8A28-006097AFF44E}</CLSID>\n  <EXTCLSID></EXTCLSID>\n"
+        }
+    }
+    x += &format!("</typens:{root}>\n");
+    x
+}
+
+/// `GPCodedValueDomain2` / `GPRangeDomain2` XML, as ArcGIS writes it.
+fn domain_xml(d: &Domain) -> String {
+    let (xs, esri) = match d.field_type {
+        FieldType::SmallInteger => ("xs:short", "esriFieldTypeSmallInteger"),
+        FieldType::Integer => ("xs:int", "esriFieldTypeInteger"),
+        FieldType::BigInteger => ("xs:long", "esriFieldTypeBigInteger"),
+        FieldType::Single => ("xs:float", "esriFieldTypeSingle"),
+        FieldType::Double => ("xs:double", "esriFieldTypeDouble"),
+        FieldType::Date => ("xs:dateTime", "esriFieldTypeDate"),
+        _ => ("xs:string", "esriFieldTypeString"),
+    };
+    let text = |v: &Value| match v {
+        Value::SmallInteger(n) => n.to_string(),
+        Value::Integer(n) => n.to_string(),
+        Value::BigInteger(n) => n.to_string(),
+        Value::Single(n) => n.to_string(),
+        Value::Double(n) => n.to_string(),
+        Value::Date(t) => t.format("%Y-%m-%dT%H:%M:%S").to_string(),
+        Value::String(s) => s.clone(),
+        other => format!("{other:?}"),
+    };
+    let split = match d.split_policy {
+        SplitPolicy::DefaultValue => "esriSPTDefaultValue",
+        SplitPolicy::Duplicate => "esriSPTDuplicate",
+        SplitPolicy::GeometryRatio => "esriSPTGeometryRatio",
+    };
+    let merge = match d.merge_policy {
+        MergePolicy::DefaultValue => "esriMPTDefaultValue",
+        MergePolicy::SumValues => "esriMPTSumValues",
+        MergePolicy::AreaWeighted => "esriMPTAreaWeighted",
+    };
+    let root = match d.kind {
+        DomainKind::Coded(_) => "GPCodedValueDomain2",
+        DomainKind::Range { .. } => "GPRangeDomain2",
+    };
+    let mut x = format!(
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<typens:{root} xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xmlns:typens=\"http://www.esri.com/schemas/ArcGIS/10.3\" xsi:type=\"typens:{root}\">\n  <DomainName>{}</DomainName>\n  <FieldType>{esri}</FieldType>\n  <MergePolicy>{merge}</MergePolicy>\n  <SplitPolicy>{split}</SplitPolicy>\n  <Description>{}</Description>\n  <Owner></Owner>\n",
+        xml_escape(&d.name),
+        xml_escape(&d.description),
+    );
+    match &d.kind {
+        DomainKind::Coded(values) => {
+            x += "  <CodedValues xsi:type=\"typens:ArrayOfCodedValue\">\n";
+            for (code, name) in values {
+                x += &format!(
+                    "    <CodedValue xsi:type=\"typens:CodedValue\">\n      <Name>{}</Name>\n      <Code xsi:type=\"{xs}\">{}</Code>\n    </CodedValue>\n",
+                    xml_escape(name),
+                    xml_escape(&text(code))
+                );
+            }
+            x += "  </CodedValues>\n";
+        }
+        DomainKind::Range { min, max } => {
+            x += &format!(
+                "  <MaxValue xsi:type=\"{xs}\">{}</MaxValue>\n  <MinValue xsi:type=\"{xs}\">{}</MinValue>\n",
+                xml_escape(&text(max)),
+                xml_escape(&text(min))
+            );
+        }
+    }
+    x += &format!("</typens:{root}>\n");
+    x
+}

@@ -112,6 +112,18 @@ pub fn decode_record(content: &[u8]) -> Result<Option<Geometry>> {
     } else {
         (c.count()?, c.count()?)
     };
+    // Points without parts cannot form a path or ring: read as empty (as GDAL does).
+    if kind != GeometryKind::Multipoint && num_parts == 0 {
+        return Ok(Some(Geometry {
+            kind,
+            parts: Vec::new(),
+            part_types: (kind == GeometryKind::MultiPatch).then(Vec::new),
+            xy: Vec::new(),
+            z: has_z.then(Vec::new),
+            m: has_m.then(Vec::new),
+            curves: Vec::new(),
+        }));
+    }
     // Each part needs 4 bytes (+4 type for MultiPatch), each point 16.
     if num_parts * 4 + num_points * 16 > c.remaining() {
         return Err(err(format!(

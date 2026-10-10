@@ -297,6 +297,94 @@ fn shapefile_can_store(t: FieldType) -> bool {
     )
 }
 
+/// ArcGIS `ValidateFieldName` for file geodatabases: invalid characters become
+/// `_`, names must start with a letter, at most 64 characters, unique.
+fn geodatabase_field_names(fields: &[Field]) -> Vec<String> {
+    let mut seen: Vec<String> = vec!["OBJECTID".into(), "SHAPE".into()];
+    fields
+        .iter()
+        .map(|f| {
+            let mut n: String = f
+                .name
+                .chars()
+                .map(|c| {
+                    if c.is_alphanumeric() || c == '_' {
+                        c
+                    } else {
+                        '_'
+                    }
+                })
+                .collect();
+            if !n.chars().next().is_some_and(char::is_alphabetic) {
+                n.insert(0, 'F');
+            }
+            n = n.chars().take(64).collect();
+            let base = n.clone();
+            let mut i = 1;
+            while seen.iter().any(|s| s.eq_ignore_ascii_case(&n)) {
+                n = format!("{base}_{i}");
+                i += 1;
+            }
+            seen.push(n.clone());
+            n
+        })
+        .collect()
+}
+
+fn copy_to_geodatabase(
+    fc: &dyn FeatureClass,
+    source_gdb: Option<&Path>,
+    kind: geoforge_core::GeometryKind,
+    gdb: &Path,
+    name: &str,
+) -> Result<()> {
+    if gdb.exists() {
+        return Err(Error::Unsupported(format!(
+            "{} exists; adding to an existing geodatabase is not implemented yet",
+            gdb.display()
+        )));
+    }
+    let names = geodatabase_field_names(fc.fields());
+    let fields: Vec<Field> = fc
+        .fields()
+        .iter()
+        .zip(&names)
+        .map(|(f, n)| Field {
+            name: n.clone(),
+            ..f.clone()
+        })
+        .collect();
+    let mut w = geoforge_filegdb::GeodatabaseWriter::create(gdb)?;
+    // Like ArcGIS, carry over the attribute domains the copied fields use.
+    if let Some(source) = source_gdb {
+        let src = Geodatabase::open(source)?;
+        let mut added: Vec<&str> = Vec::new();
+        for name in fields.iter().filter_map(|f| f.domain.as_deref()) {
+            if let Some(d) = src.domain(name).filter(|_| !added.contains(&name)) {
+                w.add_domain(d)?;
+                added.push(name);
+            }
+        }
+    }
+    let mut t = w.create_table(
+        name,
+        Some(kind),
+        fc.has_z(),
+        fc.has_m(),
+        &fields,
+        fc.spatial_reference_wkt(),
+    )?;
+    let mut n = 0;
+    for feature in fc.features() {
+        t.write(&feature?)?;
+        n += 1;
+    }
+    w.finish_table(t)?;
+    w.finish()?;
+    println!("Copied {n} features to {}", gdb.join(name).display());
+    Ok(())
+}
+
 fn copy_features(input: &Path, output: &Path) -> Result<()> {
     let (fc, _) = open_feature_class(input)?;
     let Some(kind) = fc.geometry_kind() else {
@@ -304,10 +392,15 @@ fn copy_features(input: &Path, output: &Path) -> Result<()> {
             "input has no geometry; use Copy Rows for tables".into(),
         ));
     };
-    if !matches!(locate(output), Location::Shapefile(_)) {
-        return Err(Error::Unsupported(
-            "writing file geodatabases is not implemented yet".into(),
-        ));
+    if let Location::Geodatabase { gdb, item } = locate(output) {
+        let item = item.ok_or_else(|| {
+            Error::Unsupported("name the output feature class inside the .gdb".into())
+        })?;
+        let source_gdb = match locate(input) {
+            Location::Geodatabase { gdb, .. } => Some(gdb),
+            Location::Shapefile(_) => None,
+        };
+        return copy_to_geodatabase(fc.as_ref(), source_gdb.as_deref(), kind, &gdb, &item);
     }
 
     let keep: Vec<usize> = (0..fc.fields().len())

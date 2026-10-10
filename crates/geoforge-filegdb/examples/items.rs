@@ -20,7 +20,7 @@ fn main() {
         }
         println!("== {name} type={:?} path={:?}", get("Type"), get("Path"));
         if let Value::Xml(x) = get("Definition") {
-            println!("{}", &x[..x.len().min(3000)]);
+            println!("{}", &x[..]);
         }
     }
 }

@@ -102,3 +102,11 @@ Verified against brute-force scans of every index in the GDAL test data.
 - Spatial key: `grid << 62 | (floor(x / gridSize) + 2^29) << 31 | (floor(y / gridSize) + 2^29)`,
   sorted as signed i64; a feature has one entry per cell its envelope covers, per
   level it is indexed at. A grid size of 0 means the index is unusable (all keys 0).
+
+## Writing (what GeoForge produces)
+Mirrors GDAL's OpenFileGDB writer, which ArcGIS opens: system tables a1–a7 with the
+fixed rows in `src/writer/system_rows.rs`, `gdb` = `05 00 00 00 DE AD BE EF`,
+`timestamps` = 400 × `FF`, field section at offset 40, layer flags `0x100 | 0x200 |
+geomType | M<<30 | Z<<31`, dense `.gdbtablx` v3, `.gdbindexes` with FDO_OBJECTID
+(and FDO_SHAPE + single-level `.spx`). XY resolution: 1e-9 for geographic, 1e-4 with
+origin -2147483647 otherwise (ArcGIS defaults); Z/M origin -100000, scale 10000.
