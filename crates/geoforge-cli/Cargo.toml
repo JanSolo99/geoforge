@@ -1,0 +1,19 @@
+[package]
+name = "geoforge-cli"
+description = "Command-line front end (gf)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[dependencies]
+geoforge-core.workspace = true
+geoforge-shapefile.workspace = true
+geoforge-filegdb.workspace = true
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "gf"
+path = "src/main.rs"

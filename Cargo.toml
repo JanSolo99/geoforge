@@ -1,0 +1,23 @@
+[workspace]
+resolver = "3"
+members = ["crates/*"]
+
+[workspace.package]
+version = "0.0.1"
+edition = "2024"
+rust-version = "1.85"
+publish = false
+
+[workspace.dependencies]
+geoforge-core = { path = "crates/geoforge-core" }
+geoforge-shapefile = { path = "crates/geoforge-shapefile" }
+geoforge-filegdb = { path = "crates/geoforge-filegdb" }
+geoforge-proj = { path = "crates/geoforge-proj" }
+geoforge-raster = { path = "crates/geoforge-raster" }
+thiserror = "2"
+
+[workspace.lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
