@@ -1,5 +1,6 @@
 //! `.gdbtable` / `.gdbtablx`: one table or feature class.
 
+use std::cmp::Ordering;
 use std::fs::File;
 use std::os::unix::fs::FileExt;
 use std::path::{Path, PathBuf};
@@ -11,6 +12,7 @@ use geoforge_core::{
 
 use crate::bytes::{Reader, err};
 use crate::geometry;
+use crate::index::{BTree, IndexDef, read_gdbindexes, spatial_candidates};
 use crate::schema::{Subtypes, TableDefinition};
 
 /// The CLSID written instead of WKT when a layer has no spatial reference.
@@ -156,6 +158,7 @@ pub struct Table {
     nullable_count: usize,
     tablx: Tablx,
     subtypes: Option<Subtypes>,
+    indexes: Vec<IndexDef>,
 }
 
 impl Table {
@@ -226,6 +229,7 @@ impl Table {
             .collect();
         let nullable_count = fields.iter().filter(|f| f.nullable).count();
         let tablx = Tablx::open(&path.with_extension("gdbtablx"))?;
+        let indexes = read_gdbindexes(&path.with_extension("gdbindexes")).unwrap_or_default();
 
         Ok(Self {
             file,
@@ -248,6 +252,7 @@ impl Table {
             nullable_count,
             tablx,
             subtypes: None,
+            indexes,
         })
     }
 
@@ -287,6 +292,164 @@ impl Table {
             .map(GdbField::to_field)
             .collect();
         self.subtypes = def.subtypes.clone();
+    }
+
+    /// Indexes listed in `.gdbindexes` (attribute and spatial).
+    pub fn indexes(&self) -> &[IndexDef] {
+        &self.indexes
+    }
+
+    /// OBJECTIDs the spatial index (`.spx`) lists for cells touching `env`, or
+    /// `None` when the table has no usable spatial index. May include features that
+    /// do not intersect `env`; never misses one.
+    pub fn spatial_index_candidates(&self, env: &Envelope) -> Result<Option<Vec<u64>>> {
+        let spx = self.path.with_extension("spx");
+        // A grid size of 0 means every key is 0: the index carries no location.
+        let Some(def) = self
+            .geometry_def()
+            .filter(|d| d.grid_sizes.iter().any(|&g| g > 0.0))
+        else {
+            return Ok(None);
+        };
+        if !spx.is_file() {
+            return Ok(None);
+        }
+        spatial_candidates(&BTree::open(&spx)?, &def.grid_sizes, env).map(Some)
+    }
+
+    /// Features whose geometry envelope intersects `env` (ArcGIS "select by
+    /// location" prefilter). Uses the spatial index when present and readable.
+    pub fn features_in_extent(&self, env: &Envelope) -> Result<Vec<Feature>> {
+        let intersects = |f: &Feature| {
+            f.geometry.as_ref().is_some_and(|g| {
+                let e = g.envelope();
+                !e.is_empty()
+                    && e.xmin <= env.xmax
+                    && e.xmax >= env.xmin
+                    && e.ymin <= env.ymax
+                    && e.ymax >= env.ymin
+            })
+        };
+        let candidates = self.spatial_index_candidates(env).ok().flatten();
+        let mut out = Vec::new();
+        match candidates {
+            Some(oids) => {
+                for oid in oids {
+                    if let Some(f) = self.get(oid)? {
+                        if intersects(&f) {
+                            out.push(f);
+                        }
+                    }
+                }
+            }
+            None => {
+                for f in self.features() {
+                    let f = f?;
+                    if intersects(&f) {
+                        out.push(f);
+                    }
+                }
+            }
+        }
+        Ok(out)
+    }
+
+    /// OBJECTIDs whose attribute-index key for `field` lies in `[lo, hi]`, or `None`
+    /// when no plain-field attribute index exists. Keys may be truncated (strings
+    /// over 80 characters), so callers re-check row values.
+    pub fn attribute_index_candidates(
+        &self,
+        field: &str,
+        lo: &Value,
+        hi: &Value,
+    ) -> Result<Option<Vec<u64>>> {
+        let Some(def) = self
+            .indexes
+            .iter()
+            .find(|d| d.expression.eq_ignore_ascii_case(field))
+        else {
+            return Ok(None);
+        };
+        let Some(f) = self
+            .fields
+            .iter()
+            .find(|f| f.name.eq_ignore_ascii_case(field))
+        else {
+            return Ok(None);
+        };
+        let atx = self.path.with_extension(format!("{}.atx", def.name));
+        if !atx.is_file() {
+            return Ok(None);
+        }
+        let tree = BTree::open(&atx)?;
+        let (Some(lo), Some(hi)) = (
+            index_key(f.field_type, lo, tree.key_size),
+            index_key(f.field_type, hi, tree.key_size),
+        ) else {
+            return Ok(None);
+        };
+        let ty = f.field_type;
+        // Legacy dates are read rounded to the second; the index holds raw values, so
+        // widen the range by half a second to find everything that rounds into it.
+        let (lo, hi) = if ty == GdbFieldType::DateTime && !f.high_precision {
+            let shift = |k: &[u8], d: f64| {
+                (f64::from_le_bytes(k.try_into().unwrap()) + d / 86_400.0)
+                    .to_le_bytes()
+                    .to_vec()
+            };
+            (shift(&lo, -0.5), shift(&hi, 0.5))
+        } else {
+            (lo, hi)
+        };
+        let mut oids = Vec::new();
+        tree.scan(
+            &|k| cmp_keys(ty, k, &lo),
+            &|k| cmp_keys(ty, k, &hi),
+            &mut |oid, _| oids.push(oid),
+        )?;
+        oids.sort_unstable();
+        oids.dedup();
+        Ok(Some(oids))
+    }
+
+    /// Rows whose `field` value lies in `[lo, hi]` (pass the same value twice for
+    /// equality). Uses an attribute index when present, else scans.
+    pub fn search_attribute(&self, field: &str, lo: &Value, hi: &Value) -> Result<Vec<Feature>> {
+        let i = self
+            .attribute_fields
+            .iter()
+            .position(|f| f.name.eq_ignore_ascii_case(field))
+            .ok_or_else(|| err(format!("no field {field}")))?;
+        let in_range = |f: &Feature| {
+            let v = &f.attributes[i];
+            compare_values(v, lo).is_some_and(Ordering::is_ge)
+                && compare_values(v, hi).is_some_and(Ordering::is_le)
+        };
+        let mut out = Vec::new();
+        match self
+            .attribute_index_candidates(field, lo, hi)
+            .ok()
+            .flatten()
+        {
+            Some(oids) => {
+                for oid in oids {
+                    if let Some(f) = self.get(oid)? {
+                        if in_range(&f) {
+                            out.push(f);
+                        }
+                    }
+                }
+            }
+            None => {
+                for f in self.features() {
+                    let f = f?;
+                    if in_range(&f) {
+                        out.push(f);
+                    }
+                }
+            }
+        }
+        Ok(out)
     }
 
     /// Subtypes, if the table defines any.
@@ -492,6 +655,121 @@ fn datetime(days: f64) -> Option<NaiveDateTime> {
         return None;
     }
     epoch.checked_add_signed(Duration::milliseconds(ms as i64))
+}
+
+/// Encodes a search value as an index key of `size` bytes.
+fn index_key(ty: GdbFieldType, v: &Value, size: usize) -> Option<Vec<u8>> {
+    use GdbFieldType as G;
+    let num = || -> Option<f64> {
+        Some(match v {
+            Value::SmallInteger(n) => f64::from(*n),
+            Value::Integer(n) => f64::from(*n),
+            Value::BigInteger(n) => *n as f64,
+            Value::Single(n) => f64::from(*n),
+            Value::Double(n) => *n,
+            _ => return None,
+        })
+    };
+    let key = match ty {
+        G::Int16 => (num()?.clamp(f64::from(i16::MIN), f64::from(i16::MAX)) as i16)
+            .to_le_bytes()
+            .to_vec(),
+        G::Int32 => (num()?.clamp(f64::from(i32::MIN), f64::from(i32::MAX)) as i32)
+            .to_le_bytes()
+            .to_vec(),
+        G::Int64 => match v {
+            Value::BigInteger(n) => n.to_le_bytes().to_vec(),
+            _ => (num()? as i64).to_le_bytes().to_vec(),
+        },
+        G::Float32 => (num()? as f32).to_le_bytes().to_vec(),
+        G::Float64 => num()?.to_le_bytes().to_vec(),
+        G::DateTime | G::DateOnly | G::DateTimeOffset => {
+            let epoch = NaiveDate::from_ymd_opt(1899, 12, 30)?.and_hms_opt(0, 0, 0)?;
+            let t = match v {
+                Value::Date(t) => *t,
+                Value::DateOnly(d) => d.and_hms_opt(0, 0, 0)?,
+                // Indexed in UTC.
+                Value::TimestampOffset(t) => t.naive_utc(),
+                _ => return None,
+            };
+            ((t - epoch).num_milliseconds() as f64 / 86_400_000.0)
+                .to_le_bytes()
+                .to_vec()
+        }
+        G::TimeOnly => match v {
+            Value::TimeOnly(t) => {
+                let ms = (*t - NaiveTime::MIN).num_milliseconds();
+                (ms as f64 / 86_400_000.0).to_le_bytes().to_vec()
+            }
+            _ => return None,
+        },
+        // GUID keys are the 38-character "{...}" form in ASCII.
+        G::Guid | G::GlobalId => match v {
+            Value::String(s) | Value::Guid(s) => s.to_ascii_uppercase().into_bytes(),
+            _ => return None,
+        },
+        G::String => {
+            let s = match v {
+                Value::String(s) | Value::Guid(s) => s,
+                _ => return None,
+            };
+            let mut units: Vec<u16> = s.encode_utf16().take(size / 2).collect();
+            units.resize(size / 2, u16::from(b' '));
+            units.iter().flat_map(|u| u.to_le_bytes()).collect()
+        }
+        _ => return None,
+    };
+    (key.len() == size).then_some(key)
+}
+
+/// Orders two index keys of the given field type.
+fn cmp_keys(ty: GdbFieldType, a: &[u8], b: &[u8]) -> Ordering {
+    use GdbFieldType as G;
+    let f = |k: &[u8]| -> f64 {
+        match ty {
+            G::Int16 => f64::from(i16::from_le_bytes(k.try_into().unwrap())),
+            G::Int32 => f64::from(i32::from_le_bytes(k.try_into().unwrap())),
+            G::Int64 => i64::from_le_bytes(k.try_into().unwrap()) as f64,
+            G::Float32 => f64::from(f32::from_le_bytes(k.try_into().unwrap())),
+            _ => f64::from_le_bytes(k.try_into().unwrap()),
+        }
+    };
+    match ty {
+        G::Guid | G::GlobalId => a.cmp(b),
+        G::String => {
+            let units = |k: &[u8]| {
+                k.chunks_exact(2)
+                    .map(|c| u16::from_le_bytes([c[0], c[1]]))
+                    .collect::<Vec<_>>()
+            };
+            units(a).cmp(&units(b))
+        }
+        G::Int64 => i64::from_le_bytes(a.try_into().unwrap())
+            .cmp(&i64::from_le_bytes(b.try_into().unwrap())),
+        _ => f(a).total_cmp(&f(b)),
+    }
+}
+
+/// Orders two attribute values of compatible types (`None` if incomparable or null).
+pub fn compare_values(a: &Value, b: &Value) -> Option<Ordering> {
+    let num = |v: &Value| -> Option<f64> {
+        Some(match v {
+            Value::SmallInteger(n) => f64::from(*n),
+            Value::Integer(n) => f64::from(*n),
+            Value::BigInteger(n) => *n as f64,
+            Value::Single(n) => f64::from(*n),
+            Value::Double(n) => *n,
+            _ => return None,
+        })
+    };
+    match (a, b) {
+        (Value::String(x) | Value::Guid(x), Value::String(y) | Value::Guid(y)) => Some(x.cmp(y)),
+        (Value::Date(x), Value::Date(y)) => Some(x.cmp(y)),
+        (Value::DateOnly(x), Value::DateOnly(y)) => Some(x.cmp(y)),
+        (Value::TimeOnly(x), Value::TimeOnly(y)) => Some(x.cmp(y)),
+        (Value::TimestampOffset(x), Value::TimestampOffset(y)) => Some(x.cmp(y)),
+        _ => num(a)?.partial_cmp(&num(b)?),
+    }
 }
 
 /// Legacy (second-precision) date: round away float noise to the nearest second.

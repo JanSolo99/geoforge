@@ -39,7 +39,8 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
 - [ ] Compressed (`.cdf`) tables
 - [x] Domains (214 checked against GDAL), field domains, relationship classes (16 checked);
       subtypes parsed from the documented XML (no sample data to verify against yet)
-- [ ] Spatial (`.spx`) and attribute (`.atx`) index use for queries
+- [x] Spatial (`.spx`) and attribute (`.atx`) index queries (`features_in_extent`,
+      `search_attribute`): 109 + 31 indexes never miss vs. full scans; ~18× faster extent query
 - [ ] Write: tables + feature classes, then indexes, then domains/subtypes
 
 ## Phase 4 — CRS

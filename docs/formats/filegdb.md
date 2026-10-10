@@ -82,3 +82,23 @@ integers: `x = v / xyscale + xorigin`.
   bits & 0x80); bezier `4 × f64`; elliptic `5 × f64, i32 bits`. (Verified on data; the
   start/type are *not* int32 as in the extended shape buffer.)
 - Polygon rings: clockwise = outer, counter-clockwise = inner, holes follow their shell.
+
+## Indexes (.atx attribute, .spx spatial)
+Verified against brute-force scans of every index in the GDAL test data.
+- `.gdbindexes`: `u32 n`, then per index `u32 len, utf16 name, i16, i32, i16, i32,
+  u32 len, utf16 expression, i16`. Attribute index file: `aXXXXXXXX.<name>.atx`.
+- Trailer (last 22 bytes v1 / 30 bytes v2): `u8 keySize, u8, i32, u32 depth,
+  u32|i64 count, i32|i64, i32 version`. Pages: 4096 (v1) / 65536 (v2) bytes,
+  numbered from 1. **Page 1 is the root.**
+- Internal page: `next, u32 n`, then `n + 1` child page ids, values at
+  `valuesOffset` = max key under each of the first `n` children.
+  Leaf page: `next, u32 n, unknown`, OBJECTIDs, values at `valuesOffset`.
+  `valuesOffset = header + maxPerPage × oidSize`, `maxPerPage = (pageSize - header) /
+  (oidSize + keySize)`; header 12/20 (leaf), 8/12 (internal).
+- Keys: integers/floats native; dates/DateOnly f64 days (legacy dates keep their
+  sub-second part even though ArcGIS shows whole seconds); TimeOnly f64 day
+  fraction; DateTimeWithOffset f64 days in **UTC**; strings UTF-16 padded with
+  spaces to the key size (max 80 chars); GUID/GlobalID **ASCII** `{...}` (38 bytes).
+- Spatial key: `grid << 62 | (floor(x / gridSize) + 2^29) << 31 | (floor(y / gridSize) + 2^29)`,
+  sorted as signed i64; a feature has one entry per cell its envelope covers, per
+  level it is indexed at. A grid size of 0 means the index is unusable (all keys 0).
