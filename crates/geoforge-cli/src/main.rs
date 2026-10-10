@@ -8,9 +8,10 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 use clap::{Parser, Subcommand};
-use geoforge_core::{Error, Feature, FeatureClass, Field, FieldType, Result};
+use geoforge_core::{Error, Feature, FeatureClass, Field, FieldType, Result, Value};
 use geoforge_filegdb::Geodatabase;
 use geoforge_shapefile::{ShapefileReader, ShapefileWriter};
+use geoforge_tools::{Dissolve, ToolOutput};
 
 #[derive(Parser)]
 #[command(name = "gf", version, about = "GeoForge geoprocessing tools")]
@@ -28,6 +29,26 @@ enum Tool {
         in_features: PathBuf,
         out_feature_class: PathBuf,
     },
+    /// Extract the parts of input features inside clip polygons (ArcGIS "Clip").
+    Clip {
+        in_features: PathBuf,
+        clip_features: PathBuf,
+        out_feature_class: PathBuf,
+    },
+    /// Buffer features by a distance (ArcGIS "Buffer", planar).
+    Buffer {
+        in_features: PathBuf,
+        out_feature_class: PathBuf,
+        /// Linear distance, e.g. "25 Meters" (negative shrinks polygons).
+        #[arg(allow_hyphen_values = true)]
+        buffer_distance: String,
+        /// ROUND or FLAT ends for lines.
+        #[arg(long, default_value = "ROUND")]
+        line_end_type: String,
+        /// NONE (one buffer per feature) or ALL (dissolve into one).
+        #[arg(long, default_value = "NONE")]
+        dissolve_option: String,
+    },
 }
 
 fn main() -> ExitCode {
@@ -37,6 +58,24 @@ fn main() -> ExitCode {
             in_features,
             out_feature_class,
         } => copy_features(&in_features, &out_feature_class),
+        Tool::Clip {
+            in_features,
+            clip_features,
+            out_feature_class,
+        } => clip_tool(&in_features, &clip_features, &out_feature_class),
+        Tool::Buffer {
+            in_features,
+            out_feature_class,
+            buffer_distance,
+            line_end_type,
+            dissolve_option,
+        } => buffer_tool(
+            &in_features,
+            &out_feature_class,
+            &buffer_distance,
+            &line_end_type,
+            &dissolve_option,
+        ),
     };
     match result {
         Ok(()) => ExitCode::SUCCESS,
@@ -343,12 +382,28 @@ fn geodatabase_field_names(fields: &[Field]) -> Vec<String> {
         .collect()
 }
 
-fn copy_to_geodatabase(
-    fc: &dyn FeatureClass,
-    source_gdb: Option<&Path>,
-    kind: geoforge_core::GeometryKind,
+/// Writes a tool's output to a shapefile or `path.gdb/name`, applying the target
+/// format's ArcGIS rules.
+fn write_output(out: ToolOutput, output: &Path, source_gdb: Option<&Path>) -> Result<()> {
+    for m in &out.messages {
+        eprintln!("{m}");
+    }
+    match locate(output) {
+        Location::Geodatabase { gdb, item } => {
+            let item = item.ok_or_else(|| {
+                Error::Unsupported("name the output feature class inside the .gdb".into())
+            })?;
+            write_geodatabase(out, &gdb, &item, source_gdb)
+        }
+        Location::Shapefile(path) => write_shapefile(out, &path),
+    }
+}
+
+fn write_geodatabase(
+    out: ToolOutput,
     gdb: &Path,
     name: &str,
+    source_gdb: Option<&Path>,
 ) -> Result<()> {
     if gdb.exists() {
         return Err(Error::Unsupported(format!(
@@ -356,9 +411,9 @@ fn copy_to_geodatabase(
             gdb.display()
         )));
     }
-    let names = geodatabase_field_names(fc.fields());
-    let fields: Vec<Field> = fc
-        .fields()
+    let names = geodatabase_field_names(&out.fields);
+    let fields: Vec<Field> = out
+        .fields
         .iter()
         .zip(&names)
         .map(|(f, n)| Field {
@@ -380,43 +435,25 @@ fn copy_to_geodatabase(
     }
     let mut t = w.create_table(
         name,
-        Some(kind),
-        fc.has_z(),
-        fc.has_m(),
+        Some(out.kind),
+        out.has_z,
+        out.has_m,
         &fields,
-        fc.spatial_reference_wkt(),
+        out.spatial_reference_wkt.as_deref(),
     )?;
-    let mut n = 0;
-    for feature in fc.features() {
-        t.write(&feature?)?;
-        n += 1;
+    let n = out.features.len();
+    for f in &out.features {
+        t.write(f)?;
     }
     w.finish_table(t)?;
     w.finish()?;
-    println!("Copied {n} features to {}", gdb.join(name).display());
+    println!("Wrote {n} features to {}", gdb.join(name).display());
     Ok(())
 }
 
-fn copy_features(input: &Path, output: &Path) -> Result<()> {
-    let (fc, _) = open_feature_class(input)?;
-    let Some(kind) = fc.geometry_kind() else {
-        return Err(Error::Unsupported(
-            "input has no geometry; use Copy Rows for tables".into(),
-        ));
-    };
-    if let Location::Geodatabase { gdb, item } = locate(output) {
-        let item = item.ok_or_else(|| {
-            Error::Unsupported("name the output feature class inside the .gdb".into())
-        })?;
-        let source_gdb = match locate(input) {
-            Location::Geodatabase { gdb, .. } => Some(gdb),
-            Location::Shapefile(_) => None,
-        };
-        return copy_to_geodatabase(fc.as_ref(), source_gdb.as_deref(), kind, &gdb, &item);
-    }
-
+fn write_shapefile(out: ToolOutput, path: &Path) -> Result<()> {
     let mut keep = Vec::new();
-    for (i, f) in fc.fields().iter().enumerate() {
+    for (i, f) in out.fields.iter().enumerate() {
         match shapefile_field(f.field_type) {
             ShapefileField::Store => keep.push(i),
             ShapefileField::Drop => eprintln!(
@@ -432,19 +469,29 @@ fn copy_features(input: &Path, output: &Path) -> Result<()> {
             }
         }
     }
-    let fields: Vec<Field> = keep.iter().map(|&i| fc.fields()[i].clone()).collect();
+    let mut fields: Vec<Field> = keep.iter().map(|&i| out.fields[i].clone()).collect();
+    // A .dbf needs a field; ArcGIS's default for a new shapefile is "Id" N(6).
+    let default_id = fields.is_empty();
+    if default_id {
+        let mut id = Field::new("Id", FieldType::Integer);
+        id.precision = 6;
+        fields.push(id);
+    }
     let mut w = ShapefileWriter::create(
-        output,
-        kind,
-        fc.has_z(),
-        fc.has_m(),
+        path,
+        out.kind,
+        out.has_z,
+        out.has_m,
         &fields,
-        fc.spatial_reference_wkt(),
+        out.spatial_reference_wkt.as_deref(),
     )?;
     let (mut n, mut skipped) = (0, Vec::new());
-    for feature in fc.features() {
-        let f = feature?;
-        let attributes = keep.iter().map(|&i| f.attributes[i].clone()).collect();
+    for f in out.features {
+        let attributes = if default_id {
+            vec![Value::Integer(0)]
+        } else {
+            keep.iter().map(|&i| f.attributes[i].clone()).collect()
+        };
         match w.write(&Feature {
             oid: f.oid,
             geometry: f.geometry,
@@ -454,8 +501,7 @@ fn copy_features(input: &Path, output: &Path) -> Result<()> {
             // ArcGIS skips rows whose values cannot be stored and carries on.
             Err(Error::BadValue(why)) => {
                 eprintln!(
-                    "WARNING 160277: The row contains a bad value. ({} {}: {why})",
-                    fc.oid_field_name(),
+                    "WARNING 160277: The row contains a bad value. (OID {}: {why})",
                     f.oid
                 );
                 skipped.push(f.oid);
@@ -470,6 +516,101 @@ fn copy_features(input: &Path, output: &Path) -> Result<()> {
         );
     }
     w.finish()?;
-    println!("Copied {n} features to {}", output.display());
+    println!("Wrote {n} features to {}", path.display());
     Ok(())
+}
+
+fn source_gdb(input: &Path) -> Option<PathBuf> {
+    match locate(input) {
+        Location::Geodatabase { gdb, .. } => Some(gdb),
+        Location::Shapefile(_) => None,
+    }
+}
+
+/// Copy Features: the input unchanged, written to the output format.
+fn copy_features(input: &Path, output: &Path) -> Result<()> {
+    let (fc, _) = open_feature_class(input)?;
+    let kind = fc.geometry_kind().ok_or_else(|| {
+        Error::Unsupported("input has no geometry; use Copy Rows for tables".into())
+    })?;
+    let out = ToolOutput {
+        kind,
+        has_z: fc.has_z(),
+        has_m: fc.has_m(),
+        fields: fc.fields().to_vec(),
+        spatial_reference_wkt: fc.spatial_reference_wkt().map(str::to_owned),
+        features: fc.features().collect::<Result<_>>()?,
+        messages: Vec::new(),
+    };
+    write_output(out, output, source_gdb(input).as_deref())
+}
+
+fn clip_tool(input: &Path, clip_features: &Path, output: &Path) -> Result<()> {
+    let (fc, _) = open_feature_class(input)?;
+    let (clip, _) = open_feature_class(clip_features)?;
+    let out = geoforge_tools::clip(fc.as_ref(), clip.as_ref())?;
+    write_output(out, output, source_gdb(input).as_deref())
+}
+
+/// Parses an ArcGIS linear distance ("25", "25 Meters", "0.5 Kilometers") into the
+/// units of `wkt` (the last `UNIT[...]` of a projected system).
+fn parse_distance(text: &str, wkt: Option<&str>) -> Result<f64> {
+    let mut words = text.split_whitespace();
+    let value: f64 = words
+        .next()
+        .and_then(|v| v.parse().ok())
+        .ok_or_else(|| Error::Unsupported(format!("invalid distance `{text}`")))?;
+    let Some(unit) = words.next() else {
+        return Ok(value);
+    };
+    let meters_per = |u: &str| -> Option<f64> {
+        Some(match u.to_ascii_lowercase().trim_end_matches('s') {
+            "meter" | "metre" => 1.0,
+            "kilometer" | "kilometre" => 1000.0,
+            "centimeter" => 0.01,
+            "millimeter" => 0.001,
+            "feet" | "foot" | "feetint" => 0.3048,
+            "ussurveyfeet" | "foot_us" => 1200.0 / 3937.0,
+            "yard" => 0.9144,
+            "mile" | "milesint" => 1609.344,
+            "nauticalmile" => 1852.0,
+            _ => return None,
+        })
+    };
+    let from = meters_per(unit)
+        .ok_or_else(|| Error::Unsupported(format!("unknown distance unit `{unit}`")))?;
+    // The data's linear unit: UNIT["Meter",1.0] at the end of a PROJCS.
+    let data = wkt
+        .and_then(|w| w.rsplit("UNIT[").next())
+        .and_then(|u| u.split(',').nth(1))
+        .and_then(|f| f.trim_end_matches([']', ' ']).parse::<f64>().ok())
+        .unwrap_or(1.0);
+    Ok(value * from / data)
+}
+
+fn buffer_tool(
+    input: &Path,
+    output: &Path,
+    distance: &str,
+    line_end: &str,
+    dissolve: &str,
+) -> Result<()> {
+    let (fc, _) = open_feature_class(input)?;
+    let d = parse_distance(distance, fc.spatial_reference_wkt())?;
+    let line_end = match line_end.to_ascii_uppercase().as_str() {
+        "ROUND" => geoforge_geometry::LineEnd::Round,
+        "FLAT" => geoforge_geometry::LineEnd::Flat,
+        other => return Err(Error::Unsupported(format!("line_end_type {other}"))),
+    };
+    let dissolve = match dissolve.to_ascii_uppercase().as_str() {
+        "NONE" => Dissolve::None,
+        "ALL" => Dissolve::All,
+        other => {
+            return Err(Error::Unsupported(format!(
+                "dissolve_option {other} (LIST comes next)"
+            )));
+        }
+    };
+    let out = geoforge_tools::buffer(fc.as_ref(), d, line_end, dissolve)?;
+    write_output(out, output, source_gdb(input).as_deref())
 }

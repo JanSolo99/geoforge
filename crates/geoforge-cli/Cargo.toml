@@ -14,6 +14,8 @@ path = "src/main.rs"
 geoforge-core.workspace = true
 geoforge-shapefile.workspace = true
 geoforge-filegdb.workspace = true
+geoforge-geometry.workspace = true
+geoforge-tools.workspace = true
 clap.workspace = true
 
 [lints]
@@ -21,3 +23,4 @@ workspace = true
 
 [dev-dependencies]
 geoforge-testkit.workspace = true
+serde_json.workspace = true

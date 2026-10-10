@@ -22,9 +22,19 @@ and verified against GDAL/OGR output on real data.
 - [ ] DOS code pages (437/850/852) in `.dbf`; memo `.dbt` files
 
 ## Phase 2 — Geometry engine
-- [ ] Evaluate `geo` / `geos` crates vs native implementation per operation
-- [ ] Buffer, clip, intersect, union, dissolve, erase, split, merge, append
-- [ ] Validation + repair (`MakeValid` semantics), spatial index (R-tree)
+Overlay is delegated to `geo` (i_overlay); `geoforge-geometry` adds Esri semantics and
+`geoforge-tools` the ArcGIS tools. Each tool is checked against ArcGIS Pro output stored
+in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`).
+- [x] Clip (points, lines, polygons; clip features dissolved; Z/M restored) — matches
+      ArcGIS within its 0.001 m XY tolerance
+- [x] Buffer, planar: round/flat ends, dissolve NONE/ALL, negative polygon buffers;
+      `BUFF_DIST`/`ORIG_FID` — matches ArcGIS shape within 0.2 m, area within 0.01%,
+      point buffers exactly (ArcGIS arc densification rule reproduced)
+- [ ] Buffer: true arcs in geodatabase output (ArcGIS stores buffers as circular arcs),
+      dissolve LIST, line_side LEFT/RIGHT/OUTSIDE_ONLY, geodesic for geographic data
+- [ ] Intersect, Union, Erase, Dissolve, Identity, Split, Merge, Append
+- [ ] Validation + repair (Check/Repair Geometry), spatial index (R-tree) for overlays
+- [ ] Shapefile writer: `.sbn/.sbx` and `.shp.xml` (ArcGIS writes both for tool outputs)
 
 ## Phase 3 — File Geodatabase
 Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Esri SDK.

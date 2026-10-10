@@ -46,29 +46,28 @@ impl Geodatabase {
         let mut definitions = HashMap::new();
         let mut domains = Vec::new();
         let mut relationships = Vec::new();
-        if let Some((_, id)) = all.iter().find(|(n, _)| n == "GDB_Items") {
-            if let Ok(items) = Table::open(table_path(&dir, *id)) {
-                let def_i = field_index(&items, "Definition").ok();
-                if let (Ok(ni), Ok(pi)) = (field_index(&items, "Name"), field_index(&items, "Path"))
-                {
-                    for row in items.features().flatten() {
-                        let (Value::String(n), Value::String(p)) =
-                            (&row.attributes[ni], &row.attributes[pi])
-                        else {
-                            continue;
-                        };
-                        paths.push((n.clone(), p.clone()));
-                        let Some(Value::Xml(xml)) = def_i.map(|i| &row.attributes[i]) else {
-                            continue;
-                        };
-                        match parse_definition(xml) {
-                            ItemDefinition::Domain(d) => domains.push(d),
-                            ItemDefinition::Relationship(r) => relationships.push(r),
-                            ItemDefinition::Table(t) => {
-                                definitions.insert(n.to_lowercase(), t);
-                            }
-                            ItemDefinition::Other => {}
+        if let Some((_, id)) = all.iter().find(|(n, _)| n == "GDB_Items")
+            && let Ok(items) = Table::open(table_path(&dir, *id))
+        {
+            let def_i = field_index(&items, "Definition").ok();
+            if let (Ok(ni), Ok(pi)) = (field_index(&items, "Name"), field_index(&items, "Path")) {
+                for row in items.features().flatten() {
+                    let (Value::String(n), Value::String(p)) =
+                        (&row.attributes[ni], &row.attributes[pi])
+                    else {
+                        continue;
+                    };
+                    paths.push((n.clone(), p.clone()));
+                    let Some(Value::Xml(xml)) = def_i.map(|i| &row.attributes[i]) else {
+                        continue;
+                    };
+                    match parse_definition(xml) {
+                        ItemDefinition::Domain(d) => domains.push(d),
+                        ItemDefinition::Relationship(r) => relationships.push(r),
+                        ItemDefinition::Table(t) => {
+                            definitions.insert(n.to_lowercase(), t);
                         }
+                        ItemDefinition::Other => {}
                     }
                 }
             }

@@ -1,0 +1,62 @@
+"""Regenerates testdata/arcgis-reference/ by running ArcGIS Pro tools through the
+ArcGIS bridge (tools/arcgis-bridge). Needs ArcGIS Pro on this machine:
+
+    uv run --with "mcp>=2" python scripts/make-arcgis-reference.py
+
+Each case writes a shapefile and records ArcGIS's messages and output schema in
+manifest.json, which the Rust tests compare GeoForge against.
+"""
+
+import json
+import shutil
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "tools" / "arcgis-bridge"))
+import server  # noqa: E402
+
+DATA = ROOT / "testdata" / "geoproc"
+OUT = ROOT / "testdata" / "arcgis-reference"
+
+CASES = {
+    # name: (tool, args before the output, args after the output)
+    "clip_parcels": ("analysis.Clip", [DATA / "parcels.shp", DATA / "clip_areas.shp"], []),
+    "clip_roads": ("analysis.Clip", [DATA / "roads.shp", DATA / "clip_areas.shp"], []),
+    "clip_wells": ("analysis.Clip", [DATA / "wells.shp", DATA / "clip_areas.shp"], []),
+    "buffer_roads_25": ("analysis.Buffer", [DATA / "roads.shp"], ["25 Meters"]),
+    "buffer_roads_25_flat": ("analysis.Buffer", [DATA / "roads.shp"], ["25 Meters", "FULL", "FLAT"]),
+    "buffer_roads_25_all": ("analysis.Buffer", [DATA / "roads.shp"], ["25 Meters", "FULL", "ROUND", "ALL"]),
+    "buffer_wells_30": ("analysis.Buffer", [DATA / "wells.shp"], ["30 Meters"]),
+    "buffer_parcels_10": ("analysis.Buffer", [DATA / "parcels.shp"], ["10 Meters"]),
+    "buffer_parcels_neg10": ("analysis.Buffer", [DATA / "parcels.shp"], ["-10 Meters"]),
+}
+
+
+def main():
+    if OUT.exists():
+        shutil.rmtree(OUT)
+    OUT.mkdir(parents=True)
+    w = server.worker
+    info = w.call("info")
+    manifest = {"arcgis": {k: info.get(k) for k in ("product", "version", "build", "license")}, "cases": {}}
+    for name, (tool, before, after) in CASES.items():
+        out = OUT / f"{name}.shp"
+        r = w.call("run_tool", tool=tool, args=[str(a) for a in before] + [str(out)] + after,
+                   env={"overwriteOutput": True})
+        d = w.call("describe", path=str(out)) if r.get("status") == "succeeded" else {}
+        manifest["cases"][name] = {
+            "tool": tool,
+            "args": [str(Path(a).relative_to(ROOT)) if isinstance(a, Path) else a for a in before] + ["<out>"] + after,
+            "status": r.get("status"),
+            "messages": [m["text"] for m in r.get("messages", []) if m["severity"] > 0],
+            "fields": [[f["name"], f["type"], f["length"], f["precision"], f["scale"]] for f in d.get("fields", [])],
+            "shapeType": d.get("shapeType"),
+        }
+        print(f"{name}: {r.get('status')} {manifest['cases'][name]['messages']}")
+    (OUT / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
+    w.stop()
+
+
+if __name__ == "__main__":
+    main()

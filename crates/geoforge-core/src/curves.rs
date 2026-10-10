@@ -22,15 +22,56 @@ pub const ELLIPSE_COMPLETE: u32 = 0x2000;
 /// Default angular step when densifying: one vertex per degree of arc.
 pub const DEFAULT_MAX_ANGLE_STEP: f64 = PI / 180.0;
 
+/// Number of straight segments ArcGIS uses for an arc of `sweep` radians and
+/// `radius`: at most 10° per segment, and no point of the chord more than
+/// `max_deviation` from the arc. Observed in ArcGIS Pro 3.7 shapefile output
+/// (36 segments up to r = 10 m, then 39, 71, 223, 703, 2222 for 30 m … 100 km
+/// with a deviation of 0.1 m).
+pub fn arcgis_arc_segments(sweep: f64, radius: f64, max_deviation: f64) -> usize {
+    let by_angle = (sweep.abs() / (PI / 18.0) - 1e-9).ceil();
+    let by_deviation = if radius > max_deviation && max_deviation > 0.0 {
+        (sweep.abs() / (2.0 * (1.0 - max_deviation / radius).acos()) - 1e-9).ceil()
+    } else {
+        0.0
+    };
+    (by_angle.max(by_deviation) as usize).max(1)
+}
+
+/// The deviation ArcGIS uses when densifying for shapefile output: 100 × the
+/// default XY tolerance (0.001 m projected → 0.1 m; 8.98e-9° geographic).
+pub fn arcgis_densify_deviation(geographic: bool) -> f64 {
+    if geographic {
+        100.0 * 8.983152841195215e-9
+    } else {
+        0.1
+    }
+}
+
+/// How finely curves are replaced by straight segments.
+#[derive(Debug, Clone, Copy)]
+enum Density {
+    AngleStep(f64),
+    ArcGis { max_deviation: f64 },
+}
+
 impl Geometry {
     /// A copy with every curve segment replaced by straight segments, at most
     /// `max_angle_step` radians of arc apart. Z and M are interpolated linearly along
     /// each segment.
     pub fn densify_curves(&self, max_angle_step: f64) -> Result<Geometry> {
+        self.densify_with(Density::AngleStep(max_angle_step.clamp(1e-4, PI / 4.0)))
+    }
+
+    /// Densifies curves the way ArcGIS does for shapefile output (see
+    /// [`arcgis_arc_segments`]).
+    pub fn densify_curves_arcgis(&self, max_deviation: f64) -> Result<Geometry> {
+        self.densify_with(Density::ArcGis { max_deviation })
+    }
+
+    fn densify_with(&self, density: Density) -> Result<Geometry> {
         if self.curves.is_empty() {
             return Ok(self.clone());
         }
-        let step = max_angle_step.clamp(1e-4, PI / 4.0);
         let mut out = Geometry {
             kind: self.kind,
             parts: Vec::with_capacity(self.parts.len()),
@@ -63,7 +104,7 @@ impl Geometry {
                     continue;
                 };
                 let (p0, p1) = (self.xy[i], self.xy[i + 1]);
-                for (p, t) in interior_points(p0, p1, &seg.kind, step)? {
+                for (p, t) in interior_points(p0, p1, &seg.kind, density)? {
                     let lerp =
                         |a: Option<f64>, b: Option<f64>| a.zip(b).map(|(a, b)| a + (b - a) * t);
                     push(
@@ -289,6 +330,18 @@ impl Curve {
         ts
     }
 
+    /// Steps with ArcGIS's rule (≤ 10° and ≤ `max_deviation` per chord).
+    fn steps_arcgis(&self, max_deviation: f64) -> usize {
+        match *self {
+            Curve::Line => 1,
+            Curve::Arc { r0, r1, sweep, .. } => {
+                arcgis_arc_segments(sweep, r0.max(r1), max_deviation)
+            }
+            Curve::Ellipse { a, sweep, .. } => arcgis_arc_segments(sweep, a, max_deviation),
+            Curve::Bezier(p) => ((turning(&p) / (PI / 18.0)).ceil() as usize).clamp(8, 1024),
+        }
+    }
+
     /// Steps needed so consecutive samples are at most `step` radians of arc apart.
     fn steps(&self, step: f64) -> usize {
         match *self {
@@ -307,13 +360,16 @@ fn interior_points(
     p0: [f64; 2],
     p1: [f64; 2],
     kind: &SegmentKind,
-    step: f64,
+    density: Density,
 ) -> Result<Vec<([f64; 2], f64)>> {
     let curve = Curve::new(p0, p1, kind)?;
     if matches!(curve, Curve::Line) {
         return Ok(Vec::new());
     }
-    let n = curve.steps(step);
+    let n = match density {
+        Density::AngleStep(step) => curve.steps(step),
+        Density::ArcGis { max_deviation } => curve.steps_arcgis(max_deviation),
+    };
     Ok((1..n)
         .map(|k| k as f64 / n as f64)
         .map(|t| (curve.at(t), t))
@@ -451,6 +507,15 @@ mod tests {
         );
         let d = g.densify_curves(DEFAULT_MAX_ANGLE_STEP).unwrap();
         assert!(d.xy[90][1] < -0.999, "clockwise through (0,-1)");
+    }
+
+    #[test]
+    fn arcgis_segment_counts() {
+        let full = |r: f64| arcgis_arc_segments(TAU, r, 0.1);
+        let counts: Vec<usize> = [5.0, 10.0, 30.0, 100.0, 1000.0, 10000.0, 100000.0]
+            .map(full)
+            .to_vec();
+        assert_eq!(counts, [36, 36, 39, 71, 223, 703, 2222]);
     }
 
     #[test]

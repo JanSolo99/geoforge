@@ -36,3 +36,15 @@ blank or zero dates read as null.
 Null numbers are written as 0. A row with a value that does not fit its column is
 skipped: WARNING 160277 "The row contains a bad value", WARNING 000595 lists them.
 `.dbf` language driver ID 0; `.cpg` contains `UTF-8`.
+
+## Arc densification in shapefile output (Buffer)
+Inside geodatabases ArcGIS keeps true circular arcs (a buffered point is 2 vertices +
+one full-circle arc). Writing a shapefile densifies them:
+- full circles: `max(36, ceil(π / acos(1 − 0.1/r)))` segments, starting due north,
+  clockwise (exact match: 36 up to r = 10 m, 39 at 30 m, 71, 223, 703, 2222 at 100 m–100 km);
+- partial arcs (bends, corners, caps) follow a rule we have not pinned down: a 90°
+  polygon corner gets 10 segments, a 90° line bend 9, a 180° cap 18, a 170° bend 6
+  (r = 10 m). GeoForge spaces partial arcs evenly with the circle rule; shapes agree
+  within 0.2 m.
+- FLAT line ends are the ROUND buffer minus the end half-discs, even where other
+  parts of the line's buffer reach into them.

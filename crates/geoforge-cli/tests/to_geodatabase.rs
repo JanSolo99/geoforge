@@ -121,10 +121,11 @@ fn copies_into_new_geodatabases() {
         }
         for (a, b) in src_features.iter().zip(&dst) {
             let mut g = a.geometry.clone();
-            if let Some(g) = &mut g {
-                if g.kind == GeometryKind::Polygon && g.curves.is_empty() {
-                    g.orient_rings_esri();
-                }
+            if let Some(g) = &mut g
+                && g.kind == GeometryKind::Polygon
+                && g.curves.is_empty()
+            {
+                g.orient_rings_esri();
             }
             if let Some(d) = compare_geometries_tol(g.as_ref(), b.geometry.as_ref(), tol) {
                 diffs.push(format!("OID {}: {d}", a.oid));

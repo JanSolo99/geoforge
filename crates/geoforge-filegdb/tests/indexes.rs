@@ -27,17 +27,17 @@ fn tables(root: &Path) -> Vec<(String, Table)> {
             continue;
         };
         for e in gdb.entries() {
-            if let Ok(t) = gdb.open_table(&e.name) {
-                if t.features().all(|f| f.is_ok()) {
-                    out.push((
-                        format!(
-                            "{}/{}",
-                            gdb_path.file_name().unwrap().to_string_lossy(),
-                            e.name
-                        ),
-                        t,
-                    ));
-                }
+            if let Ok(t) = gdb.open_table(&e.name)
+                && t.features().all(|f| f.is_ok())
+            {
+                out.push((
+                    format!(
+                        "{}/{}",
+                        gdb_path.file_name().unwrap().to_string_lossy(),
+                        e.name
+                    ),
+                    t,
+                ));
             }
         }
     }

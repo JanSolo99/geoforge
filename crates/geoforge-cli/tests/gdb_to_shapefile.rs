@@ -150,10 +150,16 @@ fn geodatabase_feature_classes_export_to_shapefile() {
                 })
                 .collect();
             for (a, b) in src.iter().zip(&dst) {
-                let mut oriented = a.geometry.as_ref().map(|g| {
-                    g.densify_curves(geoforge_core::curves::DEFAULT_MAX_ANGLE_STEP)
-                        .unwrap()
-                });
+                // The shapefile writer densifies curves with ArcGIS's rule.
+                let geographic = table
+                    .geometry_def()
+                    .and_then(|d| d.srs_wkt.as_deref())
+                    .is_some_and(|w| w.starts_with("GEOGCS"));
+                let deviation = geoforge_core::curves::arcgis_densify_deviation(geographic);
+                let mut oriented = a
+                    .geometry
+                    .as_ref()
+                    .map(|g| g.densify_curves_arcgis(deviation).unwrap());
                 if let Some(g) = &mut oriented {
                     g.orient_rings_esri();
                 }

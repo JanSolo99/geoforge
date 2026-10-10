@@ -139,7 +139,9 @@ fn read_shx(path: &Path, shp_len: u64) -> Result<Vec<(u64, u32)>> {
     let bytes = std::fs::read(path).map_err(|e| Error::io(path, e))?;
     Header::parse(&bytes)?;
     bytes[HEADER_LEN..]
-        .chunks_exact(8)
+        .as_chunks::<8>()
+        .0
+        .iter()
         .map(|e| {
             let offset = u64::from(u32::from_be_bytes(e[..4].try_into().unwrap())) * 2;
             let len = u32::from_be_bytes(e[4..].try_into().unwrap()).saturating_mul(2);

@@ -152,7 +152,7 @@ impl DbfReader {
         let mut fields = Vec::new();
         let mut offsets = Vec::new();
         let mut offset = 1; // deletion flag
-        for d in desc.chunks_exact(FIELD_DESCRIPTOR_LEN) {
+        for d in desc.as_chunks::<FIELD_DESCRIPTOR_LEN>().0 {
             if d[0] == HEADER_TERMINATOR {
                 break;
             }

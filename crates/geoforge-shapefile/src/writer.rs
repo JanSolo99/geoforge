@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 
 use geoforge_core::{Envelope, Error, Feature, Field, Geometry, GeometryKind, PartType, Result};
 
-use geoforge_core::curves::DEFAULT_MAX_ANGLE_STEP;
+use geoforge_core::curves::arcgis_densify_deviation;
 
 use crate::ShapeType;
 use crate::dbf::{DbfField, DbfWriter, MAX_FIELD_NAME_LEN};
@@ -27,6 +27,7 @@ pub struct ShapefileWriter {
     count: u32,
     field_names: Vec<String>,
     record: Vec<u8>,
+    densify_deviation: f64,
 }
 
 impl ShapefileWriter {
@@ -84,6 +85,9 @@ impl ShapefileWriter {
             count: 0,
             field_names,
             record: Vec::new(),
+            densify_deviation: arcgis_densify_deviation(
+                spatial_reference_wkt.is_some_and(|w| w.trim_start().starts_with("GEOGCS")),
+            ),
         })
     }
 
@@ -146,7 +150,7 @@ impl ShapefileWriter {
             )));
         }
         // Shapefiles cannot store true curves; ArcGIS densifies them on export.
-        let mut g = g.densify_curves(DEFAULT_MAX_ANGLE_STEP)?;
+        let mut g = g.densify_curves_arcgis(self.densify_deviation)?;
         let n = g.xy.len();
         if !st.has_z() {
             g.z = None;

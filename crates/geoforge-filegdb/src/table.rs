@@ -335,10 +335,10 @@ impl Table {
         match candidates {
             Some(oids) => {
                 for oid in oids {
-                    if let Some(f) = self.get(oid)? {
-                        if intersects(&f) {
-                            out.push(f);
-                        }
+                    if let Some(f) = self.get(oid)?
+                        && intersects(&f)
+                    {
+                        out.push(f);
                     }
                 }
             }
@@ -433,10 +433,10 @@ impl Table {
         {
             Some(oids) => {
                 for oid in oids {
-                    if let Some(f) = self.get(oid)? {
-                        if in_range(&f) {
-                            out.push(f);
-                        }
+                    if let Some(f) = self.get(oid)?
+                        && in_range(&f)
+                    {
+                        out.push(f);
                     }
                 }
             }
@@ -636,7 +636,9 @@ impl Table {
             String::from_utf8_lossy(bytes).into_owned()
         } else {
             let units: Vec<u16> = bytes
-                .chunks_exact(2)
+                .as_chunks::<2>()
+                .0
+                .iter()
                 .map(|c| u16::from_le_bytes([c[0], c[1]]))
                 .collect();
             String::from_utf16_lossy(&units)
@@ -738,7 +740,9 @@ fn cmp_keys(ty: GdbFieldType, a: &[u8], b: &[u8]) -> Ordering {
         G::Guid | G::GlobalId => a.cmp(b),
         G::String => {
             let units = |k: &[u8]| {
-                k.chunks_exact(2)
+                k.as_chunks::<2>()
+                    .0
+                    .iter()
                     .map(|c| u16::from_le_bytes([c[0], c[1]]))
                     .collect::<Vec<_>>()
             };

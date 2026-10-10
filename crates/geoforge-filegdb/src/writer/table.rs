@@ -209,12 +209,11 @@ impl TableWriter {
                 } else {
                     write_value(row, f, v)
                         .map_err(|e| err(format!("OBJECTID {oid}, field {}: {e}", f.name)))?;
-                    if let (GdbFieldType::DateTime, Value::Date(t)) = (f.field_type, v) {
-                        if t.and_utc().timestamp_subsec_millis() != 0
-                            && !self.subsecond.contains(&f.name)
-                        {
-                            self.subsecond.push(f.name.clone());
-                        }
+                    if let (GdbFieldType::DateTime, Value::Date(t)) = (f.field_type, v)
+                        && t.and_utc().timestamp_subsec_millis() != 0
+                        && !self.subsecond.contains(&f.name)
+                    {
+                        self.subsecond.push(f.name.clone());
                     }
                     true
                 }

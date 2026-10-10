@@ -91,10 +91,10 @@ pub fn ogr_layer(path: &Path, layer: Option<&str>) -> Result<OgrLayer, String> {
             current = rest
                 .split_once("):")
                 .and_then(|(_, fid)| fid.trim().parse::<i64>().ok());
-        } else if let (Some(fid), Some(wkt)) = (current, line.strip_prefix("  ")) {
-            if let Some(f) = features.get_mut(&fid) {
-                f.wkt = Some(wkt.trim().to_owned());
-            }
+        } else if let (Some(fid), Some(wkt)) = (current, line.strip_prefix("  "))
+            && let Some(f) = features.get_mut(&fid)
+        {
+            f.wkt = Some(wkt.trim().to_owned());
         }
     }
     Ok(OgrLayer { fields, features })
@@ -186,6 +186,50 @@ fn dist_to_paths(p: [f64; 2], paths: &[Vec<[f64; 2]>], chord_allowance: f64) -> 
             }
         })
         .fold(f64::INFINITY, f64::min)
+}
+
+/// Area of an Esri polygon (clockwise shells positive, holes subtracted).
+pub fn esri_area(g: &Geometry) -> f64 {
+    g.part_ranges()
+        .map(|r| {
+            // Relative to the first vertex: large absolute coordinates lose precision.
+            let ring = &g.xy[r];
+            let o = ring[0];
+            -ring
+                .windows(2)
+                .map(|w| (w[0][0] - o[0]) * (w[1][1] - o[1]) - (w[1][0] - o[0]) * (w[0][1] - o[1]))
+                .sum::<f64>()
+                / 2.0
+        })
+        .sum()
+}
+
+/// Total length of all paths/rings.
+pub fn esri_length(g: &Geometry) -> f64 {
+    g.part_ranges()
+        .map(|r| {
+            g.xy[r]
+                .windows(2)
+                .map(|w| (w[1][0] - w[0][0]).hypot(w[1][1] - w[0][1]))
+                .sum::<f64>()
+        })
+        .sum()
+}
+
+/// Two-sided Hausdorff distance (XY) between the outlines/paths of two geometries,
+/// measured from every vertex to the other's segments.
+pub fn hausdorff(a: &Geometry, b: &Geometry) -> f64 {
+    let paths = |g: &Geometry| -> Vec<Vec<[f64; 2]>> {
+        g.part_ranges().map(|r| g.xy[r].to_vec()).collect()
+    };
+    let (pa, pb) = (paths(a), paths(b));
+    let one_way = |from: &[Vec<[f64; 2]>], to: &[Vec<[f64; 2]>]| {
+        from.iter()
+            .flatten()
+            .map(|&p| dist_to_paths(p, to, 0.0))
+            .fold(0.0f64, f64::max)
+    };
+    one_way(&pa, &pb).max(one_way(&pb, &pa))
 }
 
 /// GDAL's version as (major, minor), e.g. (3, 13).
@@ -303,7 +347,12 @@ pub fn geometry_sequences(g: &Geometry) -> Vec<Vec<Coord>> {
                         out.extend((1..p.len() - 1).map(|i| vec![p[0], p[i], p[i + 1], p[0]]));
                     }
                     PartType::Triangles => {
-                        out.extend(p.chunks_exact(3).map(|t| vec![t[0], t[1], t[2], t[0]]));
+                        out.extend(
+                            p.as_chunks::<3>()
+                                .0
+                                .iter()
+                                .map(|t| vec![t[0], t[1], t[2], t[0]]),
+                        );
                     }
                     _ => out.push(p),
                 }
