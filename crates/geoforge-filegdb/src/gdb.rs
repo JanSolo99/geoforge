@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 
 use geoforge_core::{Error, Result, Value};
 
+use crate::schema::{Domain, ItemDefinition, RelationshipClass, TableDefinition, parse_definition};
 use crate::table::Table;
 
 /// One user table or feature class listed in the system catalog.
@@ -21,8 +22,10 @@ pub struct Geodatabase {
     dir: PathBuf,
     entries: Vec<CatalogEntry>,
     feature_datasets: Vec<String>,
-    /// Lower-case table name → its high-precision date fields.
-    high_precision: HashMap<String, Vec<String>>,
+    /// Lower-case table name → schema from its item definition.
+    definitions: HashMap<String, TableDefinition>,
+    domains: Vec<Domain>,
+    relationships: Vec<RelationshipClass>,
 }
 
 impl Geodatabase {
@@ -40,28 +43,38 @@ impl Geodatabase {
 
         // Item paths (`\Dataset\Name`) live in GDB_Items, located through the catalog.
         let mut paths = Vec::new();
-        let mut high_precision = HashMap::new();
+        let mut definitions = HashMap::new();
+        let mut domains = Vec::new();
+        let mut relationships = Vec::new();
         if let Some((_, id)) = all.iter().find(|(n, _)| n == "GDB_Items") {
             if let Ok(items) = Table::open(table_path(&dir, *id)) {
                 let def_i = field_index(&items, "Definition").ok();
                 if let (Ok(ni), Ok(pi)) = (field_index(&items, "Name"), field_index(&items, "Path"))
                 {
                     for row in items.features().flatten() {
-                        if let (Value::String(n), Value::String(p)) =
+                        let (Value::String(n), Value::String(p)) =
                             (&row.attributes[ni], &row.attributes[pi])
-                        {
-                            paths.push((n.clone(), p.clone()));
-                            if let Some(Value::Xml(xml)) = def_i.map(|i| &row.attributes[i]) {
-                                let hp = high_precision_fields(xml);
-                                if !hp.is_empty() {
-                                    high_precision.insert(n.to_lowercase(), hp);
-                                }
+                        else {
+                            continue;
+                        };
+                        paths.push((n.clone(), p.clone()));
+                        let Some(Value::Xml(xml)) = def_i.map(|i| &row.attributes[i]) else {
+                            continue;
+                        };
+                        match parse_definition(xml) {
+                            ItemDefinition::Domain(d) => domains.push(d),
+                            ItemDefinition::Relationship(r) => relationships.push(r),
+                            ItemDefinition::Table(t) => {
+                                definitions.insert(n.to_lowercase(), t);
                             }
+                            ItemDefinition::Other => {}
                         }
                     }
                 }
             }
         }
+        domains.sort_by(|a, b| a.name.cmp(&b.name));
+        relationships.sort_by(|a, b| a.name.cmp(&b.name));
         let dataset_of = |name: &str| {
             let (_, path) = paths.iter().find(|(n, _)| n.eq_ignore_ascii_case(name))?;
             let mut parts = path.trim_start_matches('\\').split('\\');
@@ -105,7 +118,9 @@ impl Geodatabase {
             dir,
             entries,
             feature_datasets,
-            high_precision,
+            definitions,
+            domains,
+            relationships,
         })
     }
 
@@ -122,6 +137,22 @@ impl Geodatabase {
         &self.feature_datasets
     }
 
+    /// Attribute domains, sorted by name (`arcpy.da.ListDomains`).
+    pub fn domains(&self) -> &[Domain] {
+        &self.domains
+    }
+
+    pub fn domain(&self, name: &str) -> Option<&Domain> {
+        self.domains
+            .iter()
+            .find(|d| d.name.eq_ignore_ascii_case(name))
+    }
+
+    /// Relationship classes, sorted by name.
+    pub fn relationship_classes(&self) -> &[RelationshipClass] {
+        &self.relationships
+    }
+
     /// Opens a table or feature class by name (case-insensitive, as in ArcGIS).
     pub fn open_table(&self, name: &str) -> Result<Table> {
         let entry = self
@@ -130,26 +161,11 @@ impl Geodatabase {
             .find(|e| e.name.eq_ignore_ascii_case(name))
             .ok_or_else(|| Error::io(self.dir.join(name), std::io::ErrorKind::NotFound.into()))?;
         let mut table = Table::open(table_path(&self.dir, entry.table_id))?;
-        if let Some(hp) = self.high_precision.get(&entry.name.to_lowercase()) {
-            table.set_high_precision(hp);
+        if let Some(def) = self.definitions.get(&entry.name.to_lowercase()) {
+            table.apply_definition(def);
         }
         Ok(table)
     }
-}
-
-/// Names of `<GPFieldInfoEx>` fields marked `<HighPrecision>true</HighPrecision>`.
-fn high_precision_fields(xml: &str) -> Vec<String> {
-    xml.split("<GPFieldInfoEx")
-        .skip(1)
-        .filter_map(|chunk| {
-            let chunk = chunk.split("</GPFieldInfoEx>").next()?;
-            if !chunk.contains("<HighPrecision>true</HighPrecision>") {
-                return None;
-            }
-            let name = chunk.split("<Name>").nth(1)?.split("</Name>").next()?;
-            Some(name.to_owned())
-        })
-        .collect()
 }
 
 fn table_path(dir: &Path, id: u64) -> PathBuf {

@@ -35,9 +35,10 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
 - [x] Read: geometry blobs for all types incl. Z/M, MultiPatch (incl. Triangles), true curves
       (circular arc, Bézier, elliptic arc kept as Esri segments)
 - [x] Oracle: 137 of 145 test tables match GDAL; `gf describe` / `gf copy-features` from `.gdb`
-- [ ] Curve densification (needed to export curves to shapefile and to compare with GDAL)
+- [x] Curve densification (`Geometry::densify_curves`); shapefile export densifies like ArcGIS
 - [ ] Compressed (`.cdf`) tables
-- [ ] Domains, subtypes, relationship classes (from `GDB_Items` XML)
+- [x] Domains (214 checked against GDAL), field domains, relationship classes (16 checked);
+      subtypes parsed from the documented XML (no sample data to verify against yet)
 - [ ] Spatial (`.spx`) and attribute (`.atx`) index use for queries
 - [ ] Write: tables + feature classes, then indexes, then domains/subtypes
 

@@ -157,11 +157,50 @@ fn describe(path: &Path) -> Result<()> {
             .as_deref()
             .map(|a| format!(" alias \"{a}\""))
             .unwrap_or_default();
+        let domain = f
+            .domain
+            .as_deref()
+            .map(|d| format!(" domain \"{d}\""))
+            .unwrap_or_default();
         println!(
-            "  {:<16} {:<15} {detail}{alias}",
+            "  {:<16} {:<15} {detail}{alias}{domain}",
             f.name,
             esri_type_name(f.field_type)
         );
+    }
+    describe_subtypes(path)
+}
+
+fn describe_subtypes(path: &Path) -> Result<()> {
+    let Location::Geodatabase {
+        gdb,
+        item: Some(item),
+    } = locate(path)
+    else {
+        return Ok(());
+    };
+    let table = Geodatabase::open(&gdb)?.open_table(&item)?;
+    if let Some(st) = table.subtypes() {
+        println!(
+            "subtypeFieldName: {} (default {})",
+            st.field, st.default_code
+        );
+        for s in &st.subtypes {
+            println!("  {:<6} {}", s.code, s.name);
+            for f in &s.fields {
+                let domain = f
+                    .domain
+                    .as_deref()
+                    .map(|d| format!(" domain \"{d}\""))
+                    .unwrap_or_default();
+                let default = f
+                    .default
+                    .as_ref()
+                    .map(|v| format!(" default {v:?}"))
+                    .unwrap_or_default();
+                println!("         {}{domain}{default}", f.field);
+            }
+        }
     }
     Ok(())
 }
@@ -173,6 +212,37 @@ fn describe_workspace(gdb: &Path) -> Result<()> {
     println!("workspaceFactoryProgID: esriDataSourcesGDB.FileGDBWorkspaceFactory");
     if !ws.feature_datasets().is_empty() {
         println!("feature datasets: {}", ws.feature_datasets().join(", "));
+    }
+    if !ws.domains().is_empty() {
+        println!("domains:");
+        for d in ws.domains() {
+            let kind = match &d.kind {
+                geoforge_filegdb::DomainKind::Coded(v) => format!("coded, {} values", v.len()),
+                geoforge_filegdb::DomainKind::Range { min, max } => {
+                    format!("range {min:?} .. {max:?}")
+                }
+            };
+            println!(
+                "  {:<40} {:<13} {kind}",
+                d.name,
+                esri_type_name(d.field_type)
+            );
+        }
+    }
+    if !ws.relationship_classes().is_empty() {
+        println!("relationship classes:");
+        for r in ws.relationship_classes() {
+            println!(
+                "  {:<32} {:?}{} {} -> {} ({} = {})",
+                r.name,
+                r.cardinality,
+                if r.is_composite { " composite" } else { "" },
+                r.origin,
+                r.destination,
+                r.origin_primary_key,
+                r.origin_foreign_key
+            );
+        }
     }
     println!("children:");
     for e in ws.entries() {

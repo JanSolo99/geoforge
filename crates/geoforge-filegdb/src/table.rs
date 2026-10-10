@@ -11,6 +11,7 @@ use geoforge_core::{
 
 use crate::bytes::{Reader, err};
 use crate::geometry;
+use crate::schema::{Subtypes, TableDefinition};
 
 /// The CLSID written instead of WKT when a layer has no spatial reference.
 const UNKNOWN_SRS: &str = "{B286C06B-0879-11D2-AACA-00C04FA33C20}";
@@ -122,12 +123,15 @@ pub struct GdbField {
     /// Date fields: millisecond precision (ArcGIS Pro 3.2+). Legacy date fields hold
     /// whole seconds. Known only from the geodatabase's item definitions.
     pub high_precision: bool,
+    /// Attribute domain name, from the item definition.
+    pub domain: Option<String>,
 }
 
 impl GdbField {
     pub fn to_field(&self) -> Field {
         let mut f = Field::new(&self.name, self.field_type.esri());
         f.alias = self.alias.clone();
+        f.domain = self.domain.clone();
         f.nullable = self.nullable;
         f.length = self.length;
         f
@@ -151,6 +155,7 @@ pub struct Table {
     attribute_fields: Vec<Field>,
     nullable_count: usize,
     tablx: Tablx,
+    subtypes: Option<Subtypes>,
 }
 
 impl Table {
@@ -242,6 +247,7 @@ impl Table {
             attribute_fields,
             nullable_count,
             tablx,
+            subtypes: None,
         })
     }
 
@@ -256,11 +262,36 @@ impl Table {
         self.pro_3_2
     }
 
-    /// Marks date fields as high precision (from the item definition XML).
-    pub fn set_high_precision(&mut self, field_names: &[String]) {
+    /// Applies schema from the geodatabase's item definition: field domains,
+    /// high-precision dates and subtypes.
+    pub fn apply_definition(&mut self, def: &TableDefinition) {
         for f in &mut self.fields {
-            f.high_precision = field_names.iter().any(|n| n.eq_ignore_ascii_case(&f.name));
+            if let Some(info) = def
+                .fields
+                .iter()
+                .find(|i| i.name.eq_ignore_ascii_case(&f.name))
+            {
+                f.high_precision = info.high_precision;
+                f.domain = info.domain.clone();
+            }
         }
+        self.attribute_fields = self
+            .fields
+            .iter()
+            .filter(|f| {
+                !matches!(
+                    f.field_type,
+                    GdbFieldType::ObjectId | GdbFieldType::Geometry
+                )
+            })
+            .map(GdbField::to_field)
+            .collect();
+        self.subtypes = def.subtypes.clone();
+    }
+
+    /// Subtypes, if the table defines any.
+    pub fn subtypes(&self) -> Option<&Subtypes> {
+        self.subtypes.as_ref()
     }
 
     /// Attribute fields: everything except OBJECTID and the geometry field.
@@ -512,6 +543,7 @@ fn read_field(r: &mut Reader, layer_z: bool, layer_m: bool) -> Result<GdbField> 
         geometry: None,
         raster_type: None,
         high_precision: false,
+        domain: None,
     };
     use GdbFieldType as G;
     match field_type {

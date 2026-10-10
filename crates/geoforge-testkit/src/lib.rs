@@ -195,6 +195,14 @@ pub fn gdal_version() -> Option<(u32, u32)> {
     Some((parts.next()??, parts.next()??))
 }
 
+/// `ogrinfo -json -so` for a whole dataset (layers, domains, relationships).
+pub fn ogr_dataset_json(path: &Path) -> Result<Json, String> {
+    let json = run(Command::new("ogrinfo")
+        .args(["-json", "-so", "-nomd"])
+        .arg(path))?;
+    serde_json::from_str(&json).map_err(|e| format!("ogrinfo JSON: {e}"))
+}
+
 /// Names of all layers GDAL lists in a dataset.
 pub fn ogr_layer_names(path: &Path) -> Result<Vec<String>, String> {
     let json = run(Command::new("ogrinfo")

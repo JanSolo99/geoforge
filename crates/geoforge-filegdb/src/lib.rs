@@ -4,7 +4,12 @@
 mod bytes;
 pub mod gdb;
 pub mod geometry;
+pub mod schema;
 pub mod table;
 
 pub use gdb::{CatalogEntry, Geodatabase};
+pub use schema::{
+    Cardinality, Domain, DomainKind, MergePolicy, RelationshipClass, SplitPolicy, Subtype,
+    SubtypeField, Subtypes,
+};
 pub use table::{GdbField, GdbFieldType, GeometryDef, Table};

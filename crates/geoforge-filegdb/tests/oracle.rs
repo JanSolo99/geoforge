@@ -4,11 +4,13 @@
 use std::path::{Path, PathBuf};
 
 use geoforge_core::curves::DEFAULT_MAX_ANGLE_STEP;
-use geoforge_filegdb::{Geodatabase, Table};
+use geoforge_core::{FieldType, Value};
+use geoforge_filegdb::{Cardinality, DomainKind, Geodatabase, MergePolicy, SplitPolicy, Table};
 use geoforge_testkit::{
-    compare_feature, compare_shapes, gdal_version, ogr_layer, ogr_layer_names, ogr_linearized,
-    ogrinfo_available,
+    compare_feature, compare_shapes, gdal_version, ogr_dataset_json, ogr_layer, ogr_layer_names,
+    ogr_linearized, ogrinfo_available,
 };
+use serde_json::Value as Json;
 
 fn geodatabases(dir: &Path) -> Vec<PathBuf> {
     let mut out = Vec::new();
@@ -197,5 +199,247 @@ fn sparse_64bit_objectids_are_exact() {
     assert_eq!(
         oids("with_holes_8_f"),
         [123456, 1234567, 12345678, 123456789, 1234567890]
+    );
+}
+
+fn value_text(v: &Value) -> String {
+    match v {
+        Value::SmallInteger(n) => n.to_string(),
+        Value::Integer(n) => n.to_string(),
+        Value::BigInteger(n) => n.to_string(),
+        Value::Single(n) => n.to_string(),
+        Value::Double(n) => n.to_string(),
+        Value::String(s) => s.clone(),
+        other => format!("{other:?}"),
+    }
+}
+
+fn json_text(j: &Json) -> String {
+    match j {
+        Json::String(s) => s.clone(),
+        Json::Number(n) => n.as_f64().map_or(n.to_string(), |f| f.to_string()),
+        other => other.to_string(),
+    }
+}
+
+/// GDAL's (fieldType, fieldSubType) for an ArcGIS field type.
+fn gdal_type(t: FieldType) -> (&'static str, Option<&'static str>) {
+    match t {
+        FieldType::SmallInteger => ("Integer", Some("Int16")),
+        FieldType::Integer => ("Integer", None),
+        FieldType::BigInteger => ("Integer64", None),
+        FieldType::Single => ("Real", Some("Float32")),
+        FieldType::Double => ("Real", None),
+        FieldType::Date => ("DateTime", None),
+        _ => ("String", None),
+    }
+}
+
+#[test]
+fn schema_matches_gdal() {
+    if !ogrinfo_available() || !gdal_version().is_some_and(|v| v >= (3, 6)) {
+        eprintln!("skipping: needs GDAL >= 3.6 for domains and relationships");
+        return;
+    }
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../testdata/large/filegdb");
+    let (mut domains, mut rels, mut field_domains, mut diffs) = (0, 0, 0, Vec::new());
+    for path in geodatabases(&root) {
+        let label = path
+            .strip_prefix(&root)
+            .unwrap_or(&path)
+            .display()
+            .to_string();
+        let (Ok(gdb), Ok(json)) = (Geodatabase::open(&path), ogr_dataset_json(&path)) else {
+            continue;
+        };
+
+        let empty = serde_json::Map::new();
+        let gdal_domains = json["domains"].as_object().unwrap_or(&empty);
+        // GDAL cuts domain names at the first '/'; ArcGIS (and we) keep them whole.
+        let gdal_name = |n: &str| n.split('/').next().unwrap_or(n).to_owned();
+        let ours: Vec<String> = gdb.domains().iter().map(|d| gdal_name(&d.name)).collect();
+        let theirs: Vec<String> = gdal_domains.keys().cloned().collect();
+        let only_ours: Vec<_> = ours.iter().filter(|n| !theirs.contains(n)).collect();
+        let only_gdal: Vec<_> = theirs.iter().filter(|n| !ours.contains(n)).collect();
+        if !only_ours.is_empty() || !only_gdal.is_empty() {
+            diffs.push(format!(
+                "{label}: domains only ours {only_ours:?}, only GDAL {only_gdal:?}"
+            ));
+        }
+        for d in gdb.domains() {
+            domains += 1;
+            if d.name.contains('/') {
+                continue; // several of ours collapse onto one truncated GDAL name
+            }
+            let Some(g) = gdal_domains.get(&d.name) else {
+                continue;
+            };
+            let mut check = |what: &str, ok: bool| {
+                if !ok {
+                    diffs.push(format!("{label}: domain {} {what}: GDAL {g}", d.name));
+                }
+            };
+            check(
+                "description",
+                g["description"].as_str().unwrap_or("") == d.description,
+            );
+            let (t, sub) = gdal_type(d.field_type);
+            check(
+                "field type",
+                g["fieldType"] == t && g["fieldSubType"].as_str() == sub,
+            );
+            let split = match d.split_policy {
+                SplitPolicy::DefaultValue => "default value",
+                SplitPolicy::Duplicate => "duplicate",
+                SplitPolicy::GeometryRatio => "geometry ratio",
+            };
+            let merge = match d.merge_policy {
+                MergePolicy::DefaultValue => "default value",
+                MergePolicy::SumValues => "sum",
+                MergePolicy::AreaWeighted => "geometry weighted",
+            };
+            check("split policy", g["splitPolicy"] == split);
+            check("merge policy", g["mergePolicy"] == merge);
+            match &d.kind {
+                DomainKind::Coded(values) => {
+                    let ours: Vec<(String, String)> = values
+                        .iter()
+                        .map(|(c, n)| (value_text(c), n.clone()))
+                        .collect();
+                    let mut theirs: Vec<(String, String)> = g["codedValues"]
+                        .as_object()
+                        .map(|m| m.iter().map(|(k, v)| (k.clone(), json_text(v))).collect())
+                        .unwrap_or_default();
+                    let mut ours_sorted = ours.clone();
+                    ours_sorted.sort();
+                    theirs.sort();
+                    check("coded values", ours_sorted == theirs);
+                }
+                DomainKind::Range { min, max } => {
+                    let num = |j: &Json| {
+                        j.as_f64()
+                            .map(|f| f.to_string())
+                            .unwrap_or_else(|| json_text(j))
+                    };
+                    let ours_min = value_text(min)
+                        .parse::<f64>()
+                        .map(|f| f.to_string())
+                        .unwrap_or(value_text(min));
+                    let ours_max = value_text(max)
+                        .parse::<f64>()
+                        .map(|f| f.to_string())
+                        .unwrap_or(value_text(max));
+                    check(
+                        "range",
+                        num(&g["minValue"]) == ours_min && num(&g["maxValue"]) == ours_max,
+                    );
+                }
+            }
+        }
+
+        // Field → domain assignments.
+        for layer in json["layers"].as_array().into_iter().flatten() {
+            let name = layer["name"].as_str().unwrap_or_default();
+            let Ok(table) = gdb.open_table(name) else {
+                continue;
+            };
+            for f in layer["fields"].as_array().into_iter().flatten() {
+                let fname = f["name"].as_str().unwrap_or_default();
+                let ours = table
+                    .fields()
+                    .iter()
+                    .find(|x| x.name == fname)
+                    .and_then(|x| x.domain.as_deref());
+                if ours.is_some() {
+                    field_domains += 1;
+                }
+                if ours != f["domainName"].as_str() {
+                    diffs.push(format!(
+                        "{label}/{name}.{fname}: domain ours {ours:?}, GDAL {}",
+                        f["domainName"]
+                    ));
+                }
+            }
+        }
+
+        // Relationship classes.
+        let gdal_rels = json["relationships"].as_object().unwrap_or(&empty);
+        let ours: Vec<&str> = gdb
+            .relationship_classes()
+            .iter()
+            .map(|r| r.name.as_str())
+            .collect();
+        let theirs: Vec<&str> = gdal_rels.keys().map(String::as_str).collect();
+        if ours != theirs {
+            diffs.push(format!(
+                "{label}: relationships ours {ours:?}, GDAL {theirs:?}"
+            ));
+        }
+        for r in gdb.relationship_classes() {
+            rels += 1;
+            let Some(g) = gdal_rels.get(&r.name) else {
+                continue;
+            };
+            let strs = |k: &str| -> Vec<String> {
+                g[k].as_array()
+                    .into_iter()
+                    .flatten()
+                    .filter_map(|v| v.as_str().map(str::to_owned))
+                    .collect()
+            };
+            let cardinality = match r.cardinality {
+                Cardinality::OneToOne => "OneToOne",
+                Cardinality::OneToMany => "OneToMany",
+                Cardinality::ManyToMany => "ManyToMany",
+            };
+            // GDAL's convention: many-to-many uses a mapping table; an attributed
+            // one-to-one/many lists the origin foreign key and destination primary key
+            // together as the right table's fields.
+            let mapped = r.cardinality == Cardinality::ManyToMany;
+            let expected_right: Vec<String> = if mapped {
+                r.destination_primary_key.clone().into_iter().collect()
+            } else if r.is_attributed {
+                std::iter::once(r.origin_foreign_key.clone())
+                    .chain(r.destination_primary_key.clone())
+                    .collect()
+            } else {
+                vec![r.origin_foreign_key.clone()]
+            };
+            let ok = g["cardinality"] == cardinality
+                && g["type"]
+                    == if r.is_composite {
+                        "Composite"
+                    } else {
+                        "Association"
+                    }
+                && g["left_table_name"] == r.origin.as_str()
+                && g["right_table_name"] == r.destination.as_str()
+                && strs("left_table_fields") == [r.origin_primary_key.clone()]
+                && strs("right_table_fields") == expected_right
+                && (!mapped
+                    || (strs("left_mapping_table_fields") == [r.origin_foreign_key.clone()]
+                        && strs("right_mapping_table_fields")
+                            == r.destination_foreign_key
+                                .clone()
+                                .into_iter()
+                                .collect::<Vec<_>>()))
+                && g["forward_path_label"] == r.forward_label.as_str()
+                && g["backward_path_label"] == r.backward_label.as_str();
+            if !ok {
+                diffs.push(format!(
+                    "{label}: relationship {}: ours {r:?}, GDAL {g}",
+                    r.name
+                ));
+            }
+        }
+    }
+    eprintln!(
+        "{domains} domains, {field_domains} field domain assignments, {rels} relationship classes"
+    );
+    diffs.iter().for_each(|d| eprintln!("✗ {d}"));
+    assert!(diffs.is_empty());
+    assert!(
+        domains > 0 && rels > 0,
+        "test data has domains and relationships"
     );
 }

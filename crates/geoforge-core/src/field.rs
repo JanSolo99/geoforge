@@ -30,6 +30,8 @@ pub struct Field {
     pub precision: u32,
     pub scale: u32,
     pub nullable: bool,
+    /// Name of the attribute domain constraining this field, if any.
+    pub domain: Option<String>,
 }
 
 impl Field {
@@ -42,6 +44,7 @@ impl Field {
             precision: 0,
             scale: 0,
             nullable: true,
+            domain: None,
         }
     }
 }
