@@ -1,0 +1,84 @@
+# File Geodatabase format notes
+
+Working notes for `geoforge-filegdb`. Derived from Even Rouault's reverse-engineered
+specification, https://github.com/rouault/dump_gdbtable/wiki/FGDB-Spec (CC-BY-SA 3.0),
+and checked against GDAL's OpenFileGDB driver output. Clean-room: no Esri SDK code.
+
+All integers little-endian. `varuint`: 7 bits per byte, msb = continuation.
+`varint`: same, but bit 0x40 of the first byte is the sign (first byte carries 6 bits).
+
+## Files
+`aXXXXXXXX.gdbtable` (rows), `.gdbtablx` (row offsets), `.gdbindexes`, `.atx`
+(attribute index), `.spx` (spatial index), `.freelist`. Hex number = FID of the table
+in the system catalog `a00000001` (fields `Name`, `FileFormat`). v10: a1..a8 reserved
+(a4 = GDB_Items with XML `Definition`, `Path` like `\FeatureDataset\Name`).
+
+## .gdbtable header (40 bytes)
+| off | v3 (32-bit OID) | v4 (64-bit OID, Pro 3.2) |
+|---|---|---|
+| 0 | i32 version = 3 | i32 version = 4 |
+| 4 | i32 valid rows | i32 "has deleted" flag |
+| 8 | i32 max row size | i32 max row size |
+| 12 | i32 = 5 | i32 = 5 |
+| 16 | 8 bytes unknown | i64 valid rows |
+| 24 | i64 file size | i64 file size |
+| 32 | i64 offset of field section | same |
+
+## Field section
+`i32 size, i32 version (3=9.x, 4=10.x, 6=Pro 3.2 ext), u32 layer flags, i16 nfields`.
+Layer flags: `& 0xff` geometry type (0 none, 1 point, 2 multipoint, 3 polyline,
+4 polygon, 9 multipatch); bit 8 = strings UTF-8 (else UTF-16); bit 30 = has M;
+bit 31 = has Z.
+
+Per field: `u8 nameLen (UTF-16 units), utf16 name, u8 aliasLen, utf16 alias, u8 type`.
+Types: 0 i16, 1 i32, 2 f32, 3 f64, 4 string, 5 datetime, 6 objectid, 7 geometry,
+8 binary, 9 raster, 10 GUID, 11 GlobalID, 12 XML, 13 i64, 14 DateOnly, 15 TimeOnly,
+16 DateTimeWithOffset. Field flag bits: 0 nullable, 1 required, 2 editable /
+"has default".
+
+- string: `i32 maxlen, u8 flag, varuint len + default bytes` (the length is always
+  present, contrary to the spec's "if flag & 4"; verified on ArcGIS-written files)
+- objectid: `u8 width (4|8), u8 flag`
+- geometry: `u8 0, u8 flag, i16 wktLen (bytes), wkt (UTF-16LE), u8 flags (bit1 Z, bit2 M)`,
+  `f64 xorig, yorig, xyscale, [morig, mscale], [zorig, zscale], xytol, [mtol], [ztol]`,
+  `f64 xmin ymin xmax ymax, [zmin zmax if layer Z], [mmin mmax if layer M]`,
+  `u8 0, u32 ngrid, f64 × ngrid`. Note M before Z in origins, Z before M in extent.
+- binary: `u8, u8 flag`; GUID/GlobalID: `u8 38, u8 flag`; XML: `u8 0, u8 flag`
+- raster: `u8, u8 flag, u8 len, utf16 name, i16 wktLen, wkt, u8 flags` then (unless
+  flags = 0) origins/scales/tolerances as geometry, then `u8 raster_type`
+- others: `u8 width, u8 flag, u8 len + default bytes` (length always present)
+
+## Rows
+At the offset from `.gdbtablx`: `i32 blob size`, null bitmap `ceil(nNullable/8)` bytes
+(bit set = null, one bit per nullable field in field order, LSB first; absent if
+none nullable), then values of present fields. OBJECTID is not stored.
+String/XML/binary: `varuint len + bytes`. GUID: 16 bytes, printed
+`{b3b2b1b0-b5b4-b7b6-b8b9-b10..b15}`. Datetime/DateOnly: f64 days since
+1899-12-30. TimeOnly: f64 day fraction. DateTimeWithOffset: f64 days + i16 offset
+minutes. Geometry: `varuint len + blob`.
+
+## .gdbtablx
+`i32 version, i32 n1024BlocksPresent, i32 nRows (v3) | 0 (v4), i32 offsetSize (4/5/6)`,
+then `offsetSize × 1024 × n1024BlocksPresent` offsets (0 = deleted). Trailer (v3) at
+the end of offsets: `i32 nBitmapWords, i32 n1024BlocksTotal, i32 nPresent, i32 nUseful`
++ bitmap (bit set = block present). FID = row index + 1; with a bitmap, a row's slot
+is `blocksPresentBefore × 1024 + row % 1024`. v4 trailer: `i64 nRows, i32 size,…`
+(sparse map not understood; treat size 0 as dense).
+
+## Geometry blob
+`varuint geomType` (low byte = shape type, as in shapefiles; general types 50–54 with
+flags 0x80000000 Z, 0x40000000 M, 0x20000000 curves). Coordinates are scaled
+integers: `x = v / xyscale + xorigin`.
+- Point: `varuint x, y, [z], [m]`, each `(v - 1) / scale + origin`; 0 = empty / NaN.
+- Multipoint: `varuint npts`, bbox (4 varuint, max relative to min), then varint
+  deltas for x/y (running across all points), then Z deltas, then M deltas.
+- Polyline/Polygon: `varuint npts, nparts, [ncurves if curves]`, bbox, `nparts-1`
+  part point counts, XY deltas (not reset per part), Z deltas, M deltas (a single
+  `0x42` byte instead means all M are NaN), then curve segments.
+- MultiPatch (54): `varuint npts, extended-buffer size, nparts`, bbox, part counts,
+  `nparts` part types (low 4 bits), XY deltas, Z deltas, [M].
+- Curve segment: `varuint startVertex, varuint type` (1 arc, 4 bezier, 5 elliptic),
+  then raw little-endian: arc `f64 x, f64 y, i32 bits` (center, or interior point if
+  bits & 0x80); bezier `4 × f64`; elliptic `5 × f64, i32 bits`. (Verified on data; the
+  start/type are *not* int32 as in the extended shape buffer.)
+- Polygon rings: clockwise = outer, counter-clockwise = inner, holes follow their shell.

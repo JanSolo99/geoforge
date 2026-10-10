@@ -29,7 +29,7 @@ pub fn shapefiles(dir: &Path) -> Vec<PathBuf> {
 
 /// Differences between our reader and GDAL for one file.
 pub fn diff_file(path: &Path) -> Result<Vec<String>, String> {
-    let gdal = ogr_layer(path)?;
+    let gdal = ogr_layer(path, None)?;
     let reader = ShapefileReader::open(path).map_err(|e| format!("we failed to open: {e}"))?;
     let names: Vec<&str> = reader.fields().iter().map(|f| f.name.as_str()).collect();
     let mut diffs = Vec::new();

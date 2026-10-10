@@ -3,7 +3,7 @@ use std::fs::File;
 use std::io::{BufWriter, Seek, SeekFrom, Write};
 use std::path::{Path, PathBuf};
 
-use geoforge_core::{Envelope, Error, Feature, Field, Geometry, GeometryKind, Result};
+use geoforge_core::{Envelope, Error, Feature, Field, Geometry, GeometryKind, PartType, Result};
 
 use crate::ShapeType;
 use crate::dbf::{DbfField, DbfWriter, MAX_FIELD_NAME_LEN};
@@ -140,6 +140,12 @@ impl ShapefileWriter {
                 st.esri_name()
             )));
         }
+        if g.has_curves() {
+            // ArcGIS densifies curves for shapefiles; needs the geometry engine.
+            return Err(Error::Unsupported(
+                "curved segments cannot be written to a shapefile yet".into(),
+            ));
+        }
         let mut g = g.clone();
         let n = g.xy.len();
         if !st.has_z() {
@@ -153,6 +159,7 @@ impl ShapefileWriter {
             g.m = Some(vec![f64::NAN; n]);
         }
         g.orient_rings_esri();
+        split_triangles(&mut g);
         Ok(g)
     }
 
@@ -193,6 +200,31 @@ impl ShapefileWriter {
         }
         self.dbf.finish()
     }
+}
+
+/// Shapefiles have no `Triangles` MultiPatch part (FileGDB only); each triangle
+/// becomes its own three-point triangle strip, which describes the same surface.
+fn split_triangles(g: &mut Geometry) {
+    let Some(types) = &g.part_types else { return };
+    if !types.contains(&PartType::Triangles) {
+        return;
+    }
+    let ranges: Vec<_> = g.part_ranges().collect();
+    let mut parts = Vec::new();
+    let mut new_types = Vec::new();
+    for (r, &t) in ranges.into_iter().zip(types) {
+        if t == PartType::Triangles {
+            for start in r.step_by(3) {
+                parts.push(start as u32);
+                new_types.push(PartType::TriangleStrip);
+            }
+        } else {
+            parts.push(r.start as u32);
+            new_types.push(t);
+        }
+    }
+    g.parts = parts;
+    g.part_types = Some(new_types);
 }
 
 /// ArcGIS field-name rules for shapefiles: ASCII letters, digits and `_`; must not

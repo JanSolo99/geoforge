@@ -197,7 +197,9 @@ version = "0.0.1"
 dependencies = [
  "clap",
  "geoforge-core",
+ "geoforge-filegdb",
  "geoforge-shapefile",
+ "geoforge-testkit",
 ]
 
 [[package]]
@@ -212,7 +214,9 @@ dependencies = [
 name = "geoforge-filegdb"
 version = "0.0.1"
 dependencies = [
+ "chrono",
  "geoforge-core",
+ "geoforge-testkit",
  "thiserror",
 ]
 

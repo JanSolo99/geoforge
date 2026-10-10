@@ -38,7 +38,7 @@ impl DbfField {
         match self.kind {
             b'N' | b'F' if self.decimals == 0 => match self.width {
                 0..=4 => FieldType::SmallInteger,
-                5..=10 => FieldType::Integer,
+                5..=11 => FieldType::Integer,
                 _ => FieldType::Double,
             },
             b'N' | b'F' => FieldType::Double,
@@ -67,8 +67,10 @@ impl DbfField {
             }
         };
         let (kind, (width, decimals)) = match field.field_type {
-            FieldType::SmallInteger => (b'N', explicit(4, 0)),
-            FieldType::Integer | FieldType::ObjectId => (b'N', explicit(10, 0)),
+            // Wide enough for the full i16 range (Esri documents 4, which cannot hold -32768).
+            FieldType::SmallInteger => (b'N', explicit(6, 0)),
+            // 11 holds the full i32 range including the sign.
+            FieldType::Integer | FieldType::ObjectId => (b'N', explicit(11, 0)),
             FieldType::BigInteger => (b'N', explicit(19, 0)),
             FieldType::Single => (b'N', explicit(13, 6)),
             FieldType::Double => (b'N', explicit(19, 11)),
@@ -380,7 +382,7 @@ impl DbfWriter {
                     rec.extend_from_slice(s.as_bytes());
                 }
                 _ => {
-                    let s = format_number(v, f.decimals);
+                    let s = fit_number(format_number(v, f.decimals), width);
                     if s.len() > width {
                         rec.extend(std::iter::repeat_n(b'*', width));
                     } else {
@@ -431,6 +433,22 @@ fn value_text(v: &Value) -> String {
     }
 }
 
+/// Falls back to scientific notation when fixed-point does not fit the width
+/// (e.g. 1.79e308 in an N(19,11) field). Integers that do not fit stay too long.
+fn fit_number(fixed: String, width: usize) -> String {
+    if fixed.len() <= width || !fixed.contains('.') {
+        return fixed;
+    }
+    let Ok(v) = fixed.parse::<f64>() else {
+        return fixed;
+    };
+    (0..=15)
+        .rev()
+        .map(|d| format!("{v:.d$e}"))
+        .find(|s| s.len() <= width)
+        .unwrap_or(fixed)
+}
+
 fn format_number(v: &Value, decimals: u8) -> String {
     let d = usize::from(decimals);
     let f = match v {
@@ -454,8 +472,9 @@ mod tests {
     use super::*;
 
     fn roundtrip(fields: Vec<DbfField>, rows: &[Vec<Value>]) -> Vec<Vec<Value>> {
-        let dir =
-            std::env::temp_dir().join(format!("gf-dbf-{}-{}", std::process::id(), rows.len()));
+        static NEXT: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+        let n = NEXT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+        let dir = std::env::temp_dir().join(format!("gf-dbf-{}-{n}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         let path = dir.join("t.dbf");
         let mut w =
@@ -500,6 +519,23 @@ mod tests {
                 Value::Null
             ]
         );
+    }
+
+    #[test]
+    fn extreme_values_survive() {
+        let fields = vec![
+            DbfField::from_field("s".into(), &Field::new("s", FieldType::SmallInteger)).unwrap(),
+            DbfField::from_field("d".into(), &Field::new("d", FieldType::Double)).unwrap(),
+        ];
+        let rows = roundtrip(
+            fields,
+            &[vec![Value::SmallInteger(-32768), Value::Double(f64::MAX)]],
+        );
+        assert_eq!(rows[0][0], Value::Integer(-32768));
+        let Value::Double(d) = rows[0][1] else {
+            panic!()
+        };
+        assert!((d - f64::MAX).abs() / f64::MAX < 1e-10);
     }
 
     #[test]

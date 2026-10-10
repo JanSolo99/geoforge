@@ -16,7 +16,8 @@ and verified against GDAL/OGR output on real data.
 - [x] `.prj` WKT1 passthrough
 - [x] Writer: ArcGIS field-name rules, null substitution, clockwise shells, 2 GB limit
 - [x] `gf describe` (arcpy.Describe) and `gf copy-features` (Copy Features)
-- [ ] Verify N/F width → Short/Long/Double mapping and writer widths against ArcGIS Pro output
+- [ ] Verify N/F width → Short/Long/Double mapping against ArcGIS Pro output (writer uses
+      lossless widths: Short N(6), Long N(11), Double N(19,11) with exponent fallback)
 - [ ] `.sbn/.sbx` spatial index, `.shp.xml` metadata
 - [ ] DOS code pages (437/850/852) in `.dbf`; memo `.dbt` files
 
@@ -26,11 +27,19 @@ and verified against GDAL/OGR output on real data.
 - [ ] Validation + repair (`MakeValid` semantics), spatial index (R-tree)
 
 ## Phase 3 — File Geodatabase
-- [ ] Read: `.gdbtable` / `.gdbtablx`, system catalog (`a00000001`), all field types
-- [ ] Read: geometry blobs (all shape types + curves), `.spx` spatial index
+Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Esri SDK.
+- [x] Read: `.gdbtable` / `.gdbtablx` v3 and v4 (64-bit OBJECTIDs), incl. sparse v4 tables
+      (page map worked out beyond the public spec; OBJECTIDs exact where GDAL's are not)
+- [x] Read: system catalog, feature datasets (`GDB_Items` paths), all field types incl.
+      Pro 3.2 BigInteger/DateOnly/TimeOnly/TimestampOffset, high-precision dates, UTF-8/16
+- [x] Read: geometry blobs for all types incl. Z/M, MultiPatch (incl. Triangles), true curves
+      (circular arc, Bézier, elliptic arc kept as Esri segments)
+- [x] Oracle: 137 of 145 test tables match GDAL; `gf describe` / `gf copy-features` from `.gdb`
+- [ ] Curve densification (needed to export curves to shapefile and to compare with GDAL)
+- [ ] Compressed (`.cdf`) tables
 - [ ] Domains, subtypes, relationship classes (from `GDB_Items` XML)
+- [ ] Spatial (`.spx`) and attribute (`.atx`) index use for queries
 - [ ] Write: tables + feature classes, then indexes, then domains/subtypes
-- Reference: the OpenFileGDB reverse-engineered spec (GDAL) — clean-room, no Esri SDK
 
 ## Phase 4 — CRS
 - [ ] PROJ binding (`proj` crate / `proj-sys`) for 1000+ CRSs; EPSG lookup; WKT1/WKT2/PROJJSON

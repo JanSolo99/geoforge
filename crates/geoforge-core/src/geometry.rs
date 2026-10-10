@@ -55,7 +55,42 @@ pub struct Geometry {
     pub xy: Vec<[f64; 2]>,
     pub z: Option<Vec<f64>>,
     pub m: Option<Vec<f64>>,
+    /// Non-linear segments of a Polyline or Polygon, in vertex order. Any segment not
+    /// listed is a straight line between consecutive vertices.
+    pub curves: Vec<Segment>,
 }
+
+/// A non-linear segment starting at vertex `start` and ending at vertex `start + 1`.
+/// Stored as Esri defines them (extended shape buffer format).
+#[derive(Debug, Clone, PartialEq)]
+pub struct Segment {
+    pub start: u32,
+    pub kind: SegmentKind,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum SegmentKind {
+    /// `point` is the arc's center, or an interior point when `bits & ARC_INTERIOR_POINT`.
+    CircularArc { point: [f64; 2], bits: u32 },
+    /// Cubic Bézier with two control points.
+    Bezier { controls: [[f64; 2]; 2] },
+    EllipticArc {
+        /// Center, or start/central angles depending on `bits`.
+        center: [f64; 2],
+        rotation: f64,
+        semi_major: f64,
+        minor_major_ratio: f64,
+        bits: u32,
+    },
+}
+
+/// Circular-arc flag bits.
+pub const ARC_EMPTY: u32 = 0x1;
+pub const ARC_CCW: u32 = 0x8;
+pub const ARC_MINOR: u32 = 0x10;
+pub const ARC_LINE: u32 = 0x20;
+pub const ARC_POINT: u32 = 0x40;
+pub const ARC_INTERIOR_POINT: u32 = 0x80;
 
 impl Geometry {
     pub fn point(x: f64, y: f64) -> Self {
@@ -66,7 +101,12 @@ impl Geometry {
             xy: vec![[x, y]],
             z: None,
             m: None,
+            curves: Vec::new(),
         }
+    }
+
+    pub fn has_curves(&self) -> bool {
+        !self.curves.is_empty()
     }
 
     pub fn has_z(&self) -> bool {
@@ -196,6 +236,7 @@ mod tests {
             xy: vec![[0.0, 0.0], [1.0, 1.0], [2.0, 2.0], [3.0, 3.0], [4.0, 4.0]],
             z: None,
             m: None,
+            curves: Vec::new(),
         };
         assert_eq!(g.part_ranges().collect::<Vec<_>>(), vec![0..2, 2..5]);
     }
@@ -227,6 +268,7 @@ mod tests {
             ],
             z: None,
             m: Some((0..10).map(f64::from).collect()),
+            curves: Vec::new(),
         };
         g.orient_rings_esri();
         let rings: Vec<_> = g.part_ranges().collect();

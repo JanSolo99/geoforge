@@ -181,6 +181,7 @@ pub fn decode_record(content: &[u8]) -> Result<Option<Geometry>> {
         xy,
         z,
         m,
+        curves: Vec::new(),
     }))
 }
 
@@ -367,6 +368,7 @@ mod tests {
             ],
             z: Some(vec![0.0, 1.0, 2.0, 3.0, 4.0, 5.0]),
             m: Some(vec![1.0; 6]),
+            curves: Vec::new(),
         };
         assert_eq!(roundtrip(ShapeType::MultiPatch, &g), g);
     }
@@ -380,6 +382,7 @@ mod tests {
             xy: vec![[0.0, 0.0], [1.0, 1.0]],
             z: None,
             m: None,
+            curves: Vec::new(),
         };
         let mut buf = Vec::new();
         encode_record(ShapeType::PolyLine, Some(&g), &mut buf);

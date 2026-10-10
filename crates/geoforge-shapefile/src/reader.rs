@@ -2,7 +2,7 @@ use std::fs::File;
 use std::os::unix::fs::FileExt;
 use std::path::{Path, PathBuf};
 
-use geoforge_core::{Envelope, Error, Feature, Field, Result, Value};
+use geoforge_core::{Envelope, Error, Feature, FeatureClass, Field, GeometryKind, Result, Value};
 
 use crate::dbf::DbfReader;
 use crate::shp::{self, HEADER_LEN, Header};
@@ -170,4 +170,42 @@ fn scan_shp(shp: &File, path: &Path, shp_len: u64) -> Result<Vec<(u64, u32)>> {
         offset += 8 + u64::from(len);
     }
     Ok(index)
+}
+
+impl FeatureClass for ShapefileReader {
+    fn geometry_kind(&self) -> Option<GeometryKind> {
+        self.shape_type().kind()
+    }
+
+    fn has_z(&self) -> bool {
+        self.shape_type().has_z()
+    }
+
+    fn has_m(&self) -> bool {
+        self.shape_type().has_m()
+    }
+
+    fn fields(&self) -> &[Field] {
+        ShapefileReader::fields(self)
+    }
+
+    fn oid_field_name(&self) -> &str {
+        "FID"
+    }
+
+    fn shape_field_name(&self) -> &str {
+        "Shape"
+    }
+
+    fn spatial_reference_wkt(&self) -> Option<&str> {
+        ShapefileReader::spatial_reference_wkt(self)
+    }
+
+    fn stored_extent(&self) -> Option<Envelope> {
+        Some(self.extent())
+    }
+
+    fn features(&self) -> Box<dyn Iterator<Item = Result<Feature>> + '_> {
+        Box::new(ShapefileReader::features(self))
+    }
 }

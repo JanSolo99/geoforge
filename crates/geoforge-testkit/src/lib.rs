@@ -44,14 +44,15 @@ pub struct OgrLayer {
     pub features: BTreeMap<i64, OgrFeature>,
 }
 
-/// Runs `ogrinfo` on `path` and returns its single layer.
-pub fn ogr_layer(path: &Path) -> Result<OgrLayer, String> {
+/// Runs `ogrinfo` on `path` and returns `layer` (or the first layer).
+pub fn ogr_layer(path: &Path, layer: Option<&str>) -> Result<OgrLayer, String> {
     let json = run(Command::new("ogrinfo")
         .args(["-json", "-features", "-nomd"])
-        .arg(path))?;
+        .arg(path)
+        .args(layer))?;
     let json: Json = serde_json::from_str(&json).map_err(|e| format!("ogrinfo JSON: {e}"))?;
-    let layer = &json["layers"][0];
-    let fields = layer["fields"]
+    let first = &json["layers"][0];
+    let fields = first["fields"]
         .as_array()
         .into_iter()
         .flatten()
@@ -63,7 +64,7 @@ pub fn ogr_layer(path: &Path) -> Result<OgrLayer, String> {
         })
         .collect();
     let mut features: BTreeMap<i64, OgrFeature> = BTreeMap::new();
-    for f in layer["features"].as_array().into_iter().flatten() {
+    for f in first["features"].as_array().into_iter().flatten() {
         let fid = f["fid"].as_i64().ok_or("feature without fid")?;
         let properties = f["properties"].as_object().cloned().unwrap_or_default();
         features.insert(
@@ -75,9 +76,15 @@ pub fn ogr_layer(path: &Path) -> Result<OgrLayer, String> {
         );
     }
 
-    let text = run(Command::new("ogrinfo")
-        .args(["-al", "-q", "-nomd", "-fields=NO", "-geom=ISO_WKT"])
-        .arg(path))?;
+    let mut text_cmd = Command::new("ogrinfo");
+    text_cmd
+        .args(["-q", "-nomd", "-fields=NO", "-geom=ISO_WKT"])
+        .arg(path);
+    match layer {
+        Some(l) => text_cmd.arg(l),
+        None => text_cmd.arg("-al"),
+    };
+    let text = run(&mut text_cmd)?;
     let mut current = None;
     for line in text.lines() {
         if let Some(rest) = line.strip_prefix("OGRFeature(") {
@@ -91,6 +98,20 @@ pub fn ogr_layer(path: &Path) -> Result<OgrLayer, String> {
         }
     }
     Ok(OgrLayer { fields, features })
+}
+
+/// Names of all layers GDAL lists in a dataset.
+pub fn ogr_layer_names(path: &Path) -> Result<Vec<String>, String> {
+    let json = run(Command::new("ogrinfo")
+        .args(["-json", "-so", "-nomd"])
+        .arg(path))?;
+    let json: Json = serde_json::from_str(&json).map_err(|e| format!("ogrinfo JSON: {e}"))?;
+    Ok(json["layers"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(|l| l["name"].as_str().map(str::to_owned))
+        .collect())
 }
 
 fn run(cmd: &mut Command) -> Result<String, String> {
@@ -176,6 +197,9 @@ pub fn geometry_sequences(g: &Geometry) -> Vec<Vec<Coord>> {
                     PartType::TriangleFan if p.len() >= 3 => {
                         out.extend((1..p.len() - 1).map(|i| vec![p[0], p[i], p[i + 1], p[0]]));
                     }
+                    PartType::Triangles => {
+                        out.extend(p.chunks_exact(3).map(|t| vec![t[0], t[1], t[2], t[0]]));
+                    }
                     _ => out.push(p),
                 }
             }
@@ -229,6 +253,11 @@ fn same(a: &Coord, b: &Coord) -> bool {
 /// Compares our feature's geometry to GDAL's WKT. Returns a description of the
 /// first difference, if any.
 pub fn compare_geometry(ours: Option<&Geometry>, gdal_wkt: Option<&str>) -> Option<String> {
+    // GDAL renders true curves as CIRCULARSTRING etc. with different vertices; those
+    // are compared once we can densify curves.
+    if ours.is_some_and(Geometry::has_curves) {
+        return None;
+    }
     let gdal_seqs = gdal_wkt.map(wkt_sequences).unwrap_or_default();
     let mut our_seqs = ours.map(geometry_sequences).unwrap_or_default();
     // GDAL decides per layer whether M exists (e.g. drops it when the header M range
@@ -302,10 +331,47 @@ pub fn compare_value(ours: &Value, gdal: &Json) -> Option<String> {
         (Value::Integer(v), _) => num(f64::from(*v)),
         (Value::BigInteger(v), _) => num(*v as f64),
         (Value::Double(v), _) => num(*v),
-        (Value::Date(d), Json::String(g)) => d.format("%Y/%m/%d").to_string() == *g,
+        (Value::Single(v), _) => num(f64::from(*v)),
+        (Value::Date(d), Json::String(g)) => {
+            // Shapefile dates are date-only; FileGDB ones carry a time (and GDAL may
+            // append a UTC offset such as "+00").
+            *g == d.format("%Y/%m/%d").to_string()
+                || parse_gdal_datetime(g)
+                    .is_some_and(|(t, _)| (t - *d).num_milliseconds().abs() <= 1)
+        }
+        (Value::DateOnly(d), Json::String(g)) => *g == d.format("%Y/%m/%d").to_string(),
+        // GDAL drops sub-second precision for time-only values.
+        (Value::TimeOnly(t), Json::String(g)) => *g == t.format("%H:%M:%S").to_string(),
+        (Value::TimestampOffset(t), Json::String(g)) => {
+            parse_gdal_datetime(g).is_some_and(|(local, off)| {
+                (local - t.naive_local()).num_milliseconds().abs() <= 1
+                    && off.is_none_or(|o| o == t.offset().local_minus_utc() / 60)
+            })
+        }
+        (Value::Guid(s) | Value::Xml(s), Json::String(g)) => s == g,
+        // GDAL leaves binary fields out of its JSON.
+        (Value::Blob(_), _) => true,
         _ => false,
     };
     (!ok).then(|| format!("ours {ours:?}, GDAL {gdal}"))
+}
+
+/// Parses GDAL's `YYYY/MM/DD HH:MM:SS[.sss][±HH[MM]]` into local time and the
+/// offset in minutes, if any.
+fn parse_gdal_datetime(s: &str) -> Option<(chrono::NaiveDateTime, Option<i32>)> {
+    let (body, offset) = match s.rfind(['+', '-']) {
+        Some(i) if i > 10 => {
+            let (b, o) = s.split_at(i);
+            let sign = if o.starts_with('-') { -1 } else { 1 };
+            let digits: String = o[1..].chars().filter(char::is_ascii_digit).collect();
+            let h: i32 = digits.get(..2)?.parse().ok()?;
+            let m: i32 = digits.get(2..4).and_then(|m| m.parse().ok()).unwrap_or(0);
+            (b, Some(sign * (h * 60 + m)))
+        }
+        _ => (s, None),
+    };
+    let t = chrono::NaiveDateTime::parse_from_str(body, "%Y/%m/%d %H:%M:%S%.f").ok()?;
+    Some((t, offset))
 }
 
 /// Compares a whole feature; returns all differences found.
