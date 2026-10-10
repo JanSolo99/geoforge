@@ -3,9 +3,11 @@
 
 use std::path::{Path, PathBuf};
 
+use geoforge_core::curves::DEFAULT_MAX_ANGLE_STEP;
 use geoforge_filegdb::{Geodatabase, Table};
 use geoforge_testkit::{
-    compare_feature, gdal_version, ogr_layer, ogr_layer_names, ogrinfo_available,
+    compare_feature, compare_shapes, gdal_version, ogr_layer, ogr_layer_names, ogr_linearized,
+    ogrinfo_available,
 };
 
 fn geodatabases(dir: &Path) -> Vec<PathBuf> {
@@ -32,6 +34,10 @@ fn geodatabases(dir: &Path) -> Vec<PathBuf> {
 /// Tables we deliberately do not read yet.
 const UNSUPPORTED: &[(&str, &str)] = &[("Lake_labels", "compressed .cdf table")];
 
+/// Curves whose stored definition is inconsistent, where GDAL and we each improvise
+/// (here: a circular arc whose center is 1 unit from the start but 2 from the end).
+const MALFORMED_CURVES: &[(&str, i64)] = &[("test", 6)];
+
 /// Sparse 64-bit OBJECTID tables: GDAL warns that its ObjectIDs "will not be
 /// accurate", so features are matched in order instead of by OBJECTID.
 fn gdal_oids_unreliable(gdb: &Path) -> bool {
@@ -48,6 +54,7 @@ fn diff_table(gdb: &Path, name: &str, table: &Table) -> Result<Vec<String>, Stri
     }
     let mut count = 0;
     let by_order: Vec<_> = gdal.features.values().collect();
+    let mut linearized = None;
     for feature in table.features() {
         let feature = match feature {
             Ok(f) => f,
@@ -62,6 +69,32 @@ fn diff_table(gdb: &Path, name: &str, table: &Table) -> Result<Vec<String>, Stri
         } else {
             gdal.features.get(&feature.oid)
         };
+        // Curves: compare our densified shape with GDAL's linearization.
+        let malformed = MALFORMED_CURVES.contains(&(name, feature.oid));
+        if let Some(g) = feature
+            .geometry
+            .as_ref()
+            .filter(|g| g.has_curves() && !malformed)
+        {
+            let linear =
+                linearized.get_or_insert_with(|| ogr_linearized(gdb, name).unwrap_or_default());
+            let ours = g
+                .densify_curves(DEFAULT_MAX_ANGLE_STEP)
+                .map_err(|e| e.to_string())?;
+            let env = ours.envelope();
+            let tol = 1e-3 * (env.xmax - env.xmin).hypot(env.ymax - env.ymin).max(1e-9);
+            match linear.get(&feature.oid).cloned().flatten() {
+                Some(wkt) => {
+                    if let Some(d) = compare_shapes(&ours, &wkt, tol) {
+                        diffs.push(format!("OBJECTID {} curve: {d}", feature.oid));
+                    }
+                }
+                None => diffs.push(format!(
+                    "OBJECTID {}: GDAL has no linearized geometry",
+                    feature.oid
+                )),
+            }
+        }
         match gdal_feature {
             Some(g) => diffs.extend(compare_feature(&feature, &names, g)),
             None => diffs.push(format!("OBJECTID {} not reported by GDAL", feature.oid)),

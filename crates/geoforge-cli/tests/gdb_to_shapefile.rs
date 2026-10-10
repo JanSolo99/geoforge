@@ -73,7 +73,7 @@ fn geodatabase_feature_classes_export_to_shapefile() {
     }
     let out_dir = std::env::temp_dir().join(format!("gf-gdb2shp-{}", std::process::id()));
     std::fs::create_dir_all(&out_dir).unwrap();
-    let (mut exported, mut skipped, mut failures) = (0, 0, 0);
+    let (mut exported, mut failures) = (0, 0);
     for gdb_path in geodatabases(&root) {
         let Ok(gdb) = Geodatabase::open(&gdb_path) else {
             continue;
@@ -90,7 +90,7 @@ fn geodatabase_feature_classes_export_to_shapefile() {
                 gdb_path.file_name().unwrap().to_string_lossy(),
                 entry.name
             );
-            let out = out_dir.join(format!("{exported}_{skipped}.shp"));
+            let out = out_dir.join(format!("{exported}_{failures}.shp"));
             let run = Command::new(env!("CARGO_BIN_EXE_gf"))
                 .arg("copy-features")
                 .arg(gdb_path.join(&entry.name))
@@ -99,12 +99,8 @@ fn geodatabase_feature_classes_export_to_shapefile() {
                 .unwrap();
             let stderr = String::from_utf8_lossy(&run.stderr);
             if !run.status.success() {
-                if stderr.contains("curved segments") {
-                    skipped += 1; // needs curve densification
-                } else {
-                    failures += 1;
-                    eprintln!("✗ {label}: {}", stderr.trim());
-                }
+                failures += 1;
+                eprintln!("✗ {label}: {}", stderr.trim());
                 continue;
             }
             exported += 1;
@@ -120,7 +116,10 @@ fn geodatabase_feature_classes_export_to_shapefile() {
                 .filter(|&i| !stderr.contains(&format!("field {} (", table.fields()[i].name)))
                 .collect();
             for (a, b) in src.iter().zip(&dst) {
-                let mut oriented = a.geometry.clone();
+                let mut oriented = a.geometry.as_ref().map(|g| {
+                    g.densify_curves(geoforge_core::curves::DEFAULT_MAX_ANGLE_STEP)
+                        .unwrap()
+                });
                 if let Some(g) = &mut oriented {
                     g.orient_rings_esri();
                 }
@@ -166,7 +165,7 @@ fn geodatabase_feature_classes_export_to_shapefile() {
             }
         }
     }
-    eprintln!("{exported} exported, {skipped} skipped (curves), {failures} with differences");
+    eprintln!("{exported} exported, {failures} with differences");
     std::fs::remove_dir_all(&out_dir).ok();
     assert_eq!(failures, 0);
 }

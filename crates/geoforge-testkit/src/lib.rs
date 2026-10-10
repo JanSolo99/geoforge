@@ -100,6 +100,92 @@ pub fn ogr_layer(path: &Path, layer: Option<&str>) -> Result<OgrLayer, String> {
     Ok(OgrLayer { fields, features })
 }
 
+/// GDAL's straight-line approximation of every feature in `layer` (curves
+/// linearized), keyed by FID. `None` for null/empty geometries.
+pub fn ogr_linearized(path: &Path, layer: &str) -> Result<BTreeMap<i64, Option<String>>, String> {
+    let csv = run(Command::new("ogr2ogr")
+        .args(["-f", "CSV", "/vsistdout/"])
+        .arg(path)
+        .args(["-sql", &format!("SELECT FID AS gf_fid FROM \"{layer}\"")])
+        .args(["-nlt", "CONVERT_TO_LINEAR", "-lco", "GEOMETRY=AS_WKT"]))?;
+    let mut out = BTreeMap::new();
+    for line in csv.lines().skip(1) {
+        let (wkt, fid) = match line.strip_prefix('"') {
+            Some(rest) => {
+                let end = rest.find('"').ok_or("unterminated WKT")?;
+                (
+                    Some(rest[..end].to_owned()),
+                    rest[end + 1..].trim_start_matches(','),
+                )
+            }
+            None => (None, line.trim_start_matches(',')),
+        };
+        let fid: i64 = fid
+            .trim()
+            .parse()
+            .map_err(|_| format!("bad fid in `{line}`"))?;
+        out.insert(fid, wkt.filter(|w| !w.is_empty()));
+    }
+    Ok(out)
+}
+
+/// Compares the shapes of two linear geometries loosely: every vertex of each must
+/// lie within `tol` of the other's segments (a two-sided Hausdorff check on XY).
+/// Used for curves, which GDAL and we densify with different step sizes.
+pub fn compare_shapes(ours: &Geometry, gdal_wkt: &str, tol: f64) -> Option<String> {
+    let a: Vec<Vec<[f64; 2]>> = ours.part_ranges().map(|r| ours.xy[r].to_vec()).collect();
+    let b: Vec<Vec<[f64; 2]>> = wkt_sequences(gdal_wkt)
+        .into_iter()
+        .map(|s| s.into_iter().map(|c| [c[0], c[1]]).collect())
+        .collect();
+    // GDAL's vertices lie on the true curve, so they must be close to our (finer)
+    // densification. Our vertices may sit off GDAL's coarser chords by up to their
+    // sagitta, so that direction allows 5% of the GDAL segment length on top.
+    let far = |from: &[Vec<[f64; 2]>], to: &[Vec<[f64; 2]>], chord_allowance: f64| {
+        from.iter()
+            .flatten()
+            .copied()
+            .map(|p| (p, dist_to_paths(p, to, chord_allowance)))
+            .find(|&(_, d)| d > tol)
+    };
+    if let Some((p, d)) = far(&b, &a, 0.0) {
+        return Some(format!(
+            "GDAL vertex {p:?} is {d:.3e} from our shape (tolerance {tol:.1e})"
+        ));
+    }
+    if let Some((p, d)) = far(&a, &b, 0.05) {
+        return Some(format!(
+            "our vertex {p:?} is {d:.3e} beyond GDAL's chords (tolerance {tol:.1e})"
+        ));
+    }
+    None
+}
+
+/// Distance from `p` to the nearest segment, less `chord_allowance` × that
+/// segment's length.
+fn dist_to_paths(p: [f64; 2], paths: &[Vec<[f64; 2]>], chord_allowance: f64) -> f64 {
+    let seg = |a: [f64; 2], b: [f64; 2]| {
+        let (dx, dy) = (b[0] - a[0], b[1] - a[1]);
+        let len2 = dx * dx + dy * dy;
+        let t = if len2 == 0.0 {
+            0.0
+        } else {
+            (((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / len2).clamp(0.0, 1.0)
+        };
+        (p[0] - a[0] - t * dx).hypot(p[1] - a[1] - t * dy) - chord_allowance * len2.sqrt()
+    };
+    paths
+        .iter()
+        .flat_map(|path| {
+            if path.len() == 1 {
+                vec![seg(path[0], path[0])]
+            } else {
+                path.windows(2).map(|w| seg(w[0], w[1])).collect()
+            }
+        })
+        .fold(f64::INFINITY, f64::min)
+}
+
 /// GDAL's version as (major, minor), e.g. (3, 13).
 pub fn gdal_version() -> Option<(u32, u32)> {
     let out = Command::new("ogrinfo").arg("--version").output().ok()?;
@@ -262,8 +348,8 @@ fn same(a: &Coord, b: &Coord) -> bool {
 /// Compares our feature's geometry to GDAL's WKT. Returns a description of the
 /// first difference, if any.
 pub fn compare_geometry(ours: Option<&Geometry>, gdal_wkt: Option<&str>) -> Option<String> {
-    // GDAL renders true curves as CIRCULARSTRING etc. with different vertices; those
-    // are compared once we can densify curves.
+    // GDAL renders true curves as CIRCULARSTRING etc.; callers compare those with
+    // `compare_shapes` against GDAL's linearization.
     if ours.is_some_and(Geometry::has_curves) {
         return None;
     }
@@ -278,15 +364,28 @@ pub fn compare_geometry(ours: Option<&Geometry>, gdal_wkt: Option<&str>) -> Opti
     if !gdal_has_m {
         our_seqs.iter_mut().flatten().for_each(|c| c[3] = f64::NAN);
     }
+    // GDAL's shapefile reader splits self-touching rings at the repeated vertex;
+    // ArcGIS (and we) keep them whole. Accept either form.
+    if ours.is_some_and(|g| g.kind == GeometryKind::Polygon) {
+        let split: Vec<Vec<Coord>> = our_seqs
+            .iter()
+            .flat_map(|r| split_self_touching(r))
+            .collect();
+        if split.len() != our_seqs.len()
+            && sequences_equal(
+                &canonical(split, false),
+                &canonical(gdal_seqs.clone(), false),
+            )
+        {
+            return None;
+        }
+    }
     let normalize = ours.is_some_and(|g| g.kind == GeometryKind::MultiPatch);
     let (a, b) = (
         canonical(our_seqs, normalize),
         canonical(gdal_seqs, normalize),
     );
-    let equal = a.len() == b.len()
-        && a.iter()
-            .zip(&b)
-            .all(|(x, y)| x.len() == y.len() && x.iter().zip(y).all(|(p, q)| same(p, q)));
+    let equal = sequences_equal(&a, &b);
     (!equal).then(|| {
         format!(
             "geometry differs: ours {} sequences {:?}..., GDAL `{}`",
@@ -295,6 +394,33 @@ pub fn compare_geometry(ours: Option<&Geometry>, gdal_wkt: Option<&str>) -> Opti
             gdal_wkt.map_or("<null>".into(), |w| w.chars().take(200).collect::<String>())
         )
     })
+}
+
+fn sequences_equal(a: &[Vec<Coord>], b: &[Vec<Coord>]) -> bool {
+    a.len() == b.len()
+        && a.iter()
+            .zip(b)
+            .all(|(x, y)| x.len() == y.len() && x.iter().zip(y).all(|(p, q)| same(p, q)))
+}
+
+/// Splits a closed ring wherever a vertex repeats, into simple closed rings.
+fn split_self_touching(ring: &[Coord]) -> Vec<Vec<Coord>> {
+    if ring.len() < 4 || !same(&ring[0], &ring[ring.len() - 1]) {
+        return vec![ring.to_vec()];
+    }
+    let mut out = Vec::new();
+    let mut stack: Vec<Coord> = Vec::new();
+    for &p in &ring[..ring.len() - 1] {
+        if let Some(i) = stack.iter().position(|q| same(q, &p)) {
+            let mut loop_ring = stack.split_off(i);
+            loop_ring.push(p);
+            out.push(loop_ring);
+        }
+        stack.push(p);
+    }
+    stack.push(stack[0]);
+    out.push(stack);
+    out
 }
 
 /// Compares two of our geometries (vertex order matters except within MultiPatch

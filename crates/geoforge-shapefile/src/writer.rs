@@ -5,6 +5,8 @@ use std::path::{Path, PathBuf};
 
 use geoforge_core::{Envelope, Error, Feature, Field, Geometry, GeometryKind, PartType, Result};
 
+use geoforge_core::curves::DEFAULT_MAX_ANGLE_STEP;
+
 use crate::ShapeType;
 use crate::dbf::{DbfField, DbfWriter, MAX_FIELD_NAME_LEN};
 use crate::shp::{self, HEADER_LEN, Header};
@@ -140,13 +142,8 @@ impl ShapefileWriter {
                 st.esri_name()
             )));
         }
-        if g.has_curves() {
-            // ArcGIS densifies curves for shapefiles; needs the geometry engine.
-            return Err(Error::Unsupported(
-                "curved segments cannot be written to a shapefile yet".into(),
-            ));
-        }
-        let mut g = g.clone();
+        // Shapefiles cannot store true curves; ArcGIS densifies them on export.
+        let mut g = g.densify_curves(DEFAULT_MAX_ANGLE_STEP)?;
         let n = g.xy.len();
         if !st.has_z() {
             g.z = None;

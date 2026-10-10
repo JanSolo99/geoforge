@@ -3,6 +3,7 @@
 //! The geometry model mirrors Esri's internal layout (flat coordinate arrays plus
 //! part offsets), which is what both Shapefile and File Geodatabase store on disk.
 
+pub mod curves;
 pub mod dataset;
 pub mod envelope;
 pub mod error;
