@@ -656,10 +656,20 @@ pub fn compare_feature_tol(
                     .unwrap_or_default(),
                 false,
             );
-            let b = canonical(
+            let mut b = canonical(
                 gdal.wkt.as_deref().map(wkt_sequences).unwrap_or_default(),
                 false,
             );
+            // A geodatabase marks "all M missing" with byte 0x42, also for a
+            // one-vertex shape (ArcGIS writes it so); GDAL then reads that byte as an
+            // M value. Compare such a vertex without its M.
+            let one_nan_m = ours
+                .geometry
+                .as_ref()
+                .is_some_and(|g| g.xy.len() == 1 && g.m.as_ref().is_some_and(|m| m[0].is_nan()));
+            if one_nan_m {
+                b.iter_mut().flatten().for_each(|c| c[3] = f64::NAN);
+            }
             let split: Vec<Vec<Coord>> = a.iter().flat_map(|r| split_self_touching(r)).collect();
             let ok = sequences_match_tol(&a, &b, tol)
                 || (ours

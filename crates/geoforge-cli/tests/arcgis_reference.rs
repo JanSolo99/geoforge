@@ -557,6 +557,60 @@ fn gf_args(case: &str) -> Vec<&'static str> {
             "--relationship",
             "KEEP_RELATIONSHIPS",
         ],
+        "clip_roads_zm" => vec![
+            "clip",
+            "testdata/geoproc/roads_zm.shp",
+            "testdata/geoproc/clip_areas.shp",
+        ],
+        "erase_roads_zm" => vec![
+            "erase",
+            "testdata/geoproc/roads_zm.shp",
+            "testdata/geoproc/clip_areas.shp",
+        ],
+        "clip_parcels_z" => vec![
+            "clip",
+            "testdata/geoproc/parcels_z.shp",
+            "testdata/geoproc/clip_areas.shp",
+        ],
+        "intersect_roads_zm_parcels" => vec![
+            "intersect",
+            "testdata/geoproc/roads_zm.shp",
+            "testdata/geoproc/parcels.shp",
+        ],
+        "intersect_roads_zm_parcels_z" => vec![
+            "intersect",
+            "testdata/geoproc/roads_zm.shp",
+            "testdata/geoproc/parcels_z.shp",
+        ],
+        "intersect_parcels_z_clip" => vec![
+            "intersect",
+            "testdata/geoproc/parcels_z.shp",
+            "testdata/geoproc/clip_areas.shp",
+        ],
+        "intersect_roads_zm_parcels_point" => vec![
+            "intersect",
+            "testdata/geoproc/roads_zm.shp",
+            "testdata/geoproc/parcels_z.shp",
+            "<out>",
+            "--output-type",
+            "POINT",
+        ],
+        "identity_roads_zm_parcels" => vec![
+            "identity",
+            "testdata/geoproc/roads_zm.shp",
+            "testdata/geoproc/parcels.shp",
+        ],
+        "union_parcels_z_clip" => vec![
+            "union",
+            "testdata/geoproc/parcels_z.shp",
+            "testdata/geoproc/clip_areas.shp",
+        ],
+        "split_roads_zm_parcels_name" => vec![
+            "split",
+            "testdata/geoproc/roads_zm.shp",
+            "testdata/geoproc/parcels.shp",
+            "NAME",
+        ],
         "identity_parcels_clip_no_fid" => vec![
             "identity",
             "testdata/geoproc/parcels.shp",
@@ -617,6 +671,52 @@ fn gf_args(case: &str) -> Vec<&'static str> {
         "union_clip_gaps" => vec!["union", "testdata/geoproc/clip_areas.shp"],
         other => panic!("no gf command for case {other}"),
     }
+}
+
+/// Z/M values ArcGIS computes in a way we have not worked out.
+/// intersect_roads_zm_parcels_point 15: road 3 crosses parcel 15's hole at two
+/// hole corners; ArcGIS gives them Z interpolated between the outer-ring crossings
+/// (15.2917, 15.6042) instead of the corners' own Z (15, 16), although on a plain
+/// square with a hole it does use the hole corners' Z.
+const KNOWN_ZM_DIFFERENCES: &[(&str, usize)] = &[("intersect_roads_zm_parcels_point", 15)];
+
+/// Z/M awareness and values: each of our vertices against ArcGIS's vertex at the
+/// same place (within 0.001 m). Missing measures (NaN) must match.
+fn zm_diff(a: &geoforge_core::Geometry, b: &geoforge_core::Geometry) -> Option<String> {
+    if a.z.is_some() != b.z.is_some() {
+        return Some(format!(
+            "Z: ours {}, ArcGIS {}",
+            a.z.is_some(),
+            b.z.is_some()
+        ));
+    }
+    // ArcGIS rounds Z and M to its 0.0001 grid as it splits lines, so values may
+    // land one grid step from the exact interpolation.
+    let same = |x: f64, y: f64| (x.is_nan() && y.is_nan()) || (x - y).abs() <= 1.5e-4;
+    for (i, p) in a.xy.iter().enumerate() {
+        let Some(j) = (0..b.xy.len())
+            .filter(|&j| (b.xy[j][0] - p[0]).hypot(b.xy[j][1] - p[1]) <= 0.001)
+            .min_by(|&j, &k| {
+                let d = |j: usize| (b.xy[j][0] - p[0]).hypot(b.xy[j][1] - p[1]);
+                d(j).total_cmp(&d(k))
+            })
+        else {
+            continue;
+        };
+        if let (Some(za), Some(zb)) = (&a.z, &b.z)
+            && !same(za[i], zb[j])
+        {
+            return Some(format!("Z at {p:?}: ours {}, ArcGIS {}", za[i], zb[j]));
+        }
+        let (ma, mb) = (
+            a.m.as_ref().map_or(f64::NAN, |m| m[i]),
+            b.m.as_ref().map_or(f64::NAN, |m| m[j]),
+        );
+        if !same(ma, mb) {
+            return Some(format!("M at {p:?}: ours {ma}, ArcGIS {mb}"));
+        }
+    }
+    None
 }
 
 /// Rows of a .dbf table, with paths (CLASS) reduced to the file name: ArcGIS
@@ -764,6 +864,11 @@ fn compare(case: &str, ours: &Path, theirs: &Path, fields: &serde_json::Value) -
                 ga.num_parts(),
                 gb.num_parts()
             ));
+        }
+        if let Some(d) = zm_diff(ga, gb)
+            && !KNOWN_ZM_DIFFERENCES.contains(&(case, i))
+        {
+            diffs.push(format!("feature {i}: {d}"));
         }
         let h = hausdorff(ga, gb);
         if h > shape_tol {

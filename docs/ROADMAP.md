@@ -66,7 +66,16 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       (uncovered, outer edges, inside/shared edges, overlaps) — match ArcGIS
 - [ ] Line Identity/Intersect where input lines overlap each other (ArcGIS writes the shared
       stretch once per line in a late pass, in the first line's direction)
-- [ ] Overlay Z/M, `cluster_tolerance`; POINT/LINE output for 3+ inputs
+- [x] Overlay Z/M: Clip, Erase, Intersect (incl. POINT/LINE), Union, Identity and Split
+      carry Z and M (output Z/M-aware if any input is): each vertex takes them from the
+      first input that has them and whose outline passes there (POINT output: polygon
+      input first), interpolated along the segment, else Z 0 / no M; rounded to ArcGIS's
+      0.0001 Z/M grid (not Split). M-aware lines in Clip get a vertex at every crossing
+      with another input line, and the last feature is written first — match ArcGIS
+      (within one grid step: ArcGIS rounds as it splits)
+- [ ] Z of POINT output where a line crosses a hole at its corners (one case: ArcGIS
+      interpolates between the outer-ring crossings; on a plain square it does not)
+- [ ] `cluster_tolerance`; POINT/LINE output for 3+ inputs
 - [x] Spatial index: R-tree over envelopes (`EnvelopeIndex`) in Near, Spatial Join,
       Select By Location, Identity and Intersect; nearest search stops once no envelope
       can be closer. 10k parcels × 20k wells: Spatial Join 45 s → 0.06 s, Near 1.9 s → 0.09 s

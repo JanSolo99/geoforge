@@ -99,6 +99,16 @@ CASES = {
     "repair_bad_polygons_ogc_keep": ("management.RepairGeometry", [DATA / "bad_polygons.shp"], ["KEEP_NULL", "OGC"]),
     "repair_bad_lines_esri_keep": ("management.RepairGeometry", [DATA / "bad_lines.shp"], ["KEEP_NULL", "ESRI"]),
     "repair_bad_lines_ogc": ("management.RepairGeometry", [DATA / "bad_lines.shp"], ["DELETE_NULL", "OGC"]),
+    "clip_roads_zm": ("analysis.Clip", [DATA / "roads_zm.shp", DATA / "clip_areas.shp"], []),
+    "erase_roads_zm": ("analysis.Erase", [DATA / "roads_zm.shp", DATA / "clip_areas.shp"], []),
+    "clip_parcels_z": ("analysis.Clip", [DATA / "parcels_z.shp", DATA / "clip_areas.shp"], []),
+    "intersect_roads_zm_parcels": ("analysis.Intersect", [f"{DATA / 'roads_zm.shp'};{DATA / 'parcels.shp'}"], []),
+    "intersect_roads_zm_parcels_z": ("analysis.Intersect", [f"{DATA / 'roads_zm.shp'};{DATA / 'parcels_z.shp'}"], []),
+    "intersect_parcels_z_clip": ("analysis.Intersect", [f"{DATA / 'parcels_z.shp'};{DATA / 'clip_areas.shp'}"], []),
+    "intersect_roads_zm_parcels_point": ("analysis.Intersect", [f"{DATA / 'roads_zm.shp'};{DATA / 'parcels_z.shp'}"], ["ALL", "", "POINT"]),
+    "identity_roads_zm_parcels": ("analysis.Identity", [DATA / "roads_zm.shp", DATA / "parcels.shp"], []),
+    "union_parcels_z_clip": ("analysis.Union", [f"{DATA / 'parcels_z.shp'};{DATA / 'clip_areas.shp'}"], []),
+    "split_roads_zm_parcels_name": ("analysis.Split", [DATA / "roads_zm.shp", DATA / "parcels.shp", "NAME"], []),
 }
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools whose output is a table, written as <name>.dbf.

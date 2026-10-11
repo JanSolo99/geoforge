@@ -8548,6 +8548,1294 @@
         ]
       ],
       "shapeType": "Polyline"
+    },
+    "clip_roads_zm": {
+      "tool": "analysis.Clip",
+      "args": [
+        "testdata/geoproc/roads_zm.shp",
+        "testdata/geoproc/clip_areas.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          9,
+          9,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "erase_roads_zm": {
+      "tool": "analysis.Erase",
+      "args": [
+        "testdata/geoproc/roads_zm.shp",
+        "testdata/geoproc/clip_areas.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          9,
+          9,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "clip_parcels_z": {
+      "tool": "analysis.Clip",
+      "args": [
+        "testdata/geoproc/parcels_z.shp",
+        "testdata/geoproc/clip_areas.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          80,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "intersect_roads_zm_parcels": {
+      "tool": "analysis.Intersect",
+      "args": [
+        "testdata/geoproc/roads_zm.shp;testdata/geoproc/parcels.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_roads_",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "FID_parcel",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "intersect_roads_zm_parcels_z": {
+      "tool": "analysis.Intersect",
+      "args": [
+        "testdata/geoproc/roads_zm.shp;testdata/geoproc/parcels_z.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_roads_",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "FID_parcel",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          80,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "intersect_parcels_z_clip": {
+      "tool": "analysis.Intersect",
+      "args": [
+        "testdata/geoproc/parcels_z.shp;testdata/geoproc/clip_areas.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_parcel",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "FID_clip_a",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "intersect_roads_zm_parcels_point": {
+      "tool": "analysis.Intersect",
+      "args": [
+        "testdata/geoproc/roads_zm.shp;testdata/geoproc/parcels_z.shp",
+        "<out>",
+        "ALL",
+        "",
+        "POINT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_roads_",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "FID_parcel",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          80,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Multipoint"
+    },
+    "identity_roads_zm_parcels": {
+      "tool": "analysis.Identity",
+      "args": [
+        "testdata/geoproc/roads_zm.shp",
+        "testdata/geoproc/parcels.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_roads_",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "FID_parcel",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "union_parcels_z_clip": {
+      "tool": "analysis.Union",
+      "args": [
+        "testdata/geoproc/parcels_z.shp;testdata/geoproc/clip_areas.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_parcel",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "FID_clip_a",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "split_roads_zm_parcels_name": {
+      "tool": "analysis.Split",
+      "args": [
+        "testdata/geoproc/roads_zm.shp",
+        "testdata/geoproc/parcels.shp",
+        "NAME",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "outputs": {
+        "Lot 1.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "ROAD_ID",
+              "Integer",
+              9,
+              9,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              9,
+              9,
+              0
+            ]
+          ],
+          "shapeType": "Polyline"
+        },
+        "Lot 10.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "ROAD_ID",
+              "Integer",
+              9,
+              9,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              9,
+              9,
+              0
+            ]
+          ],
+          "shapeType": "Polyline"
+        },
+        "Lot 11.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "ROAD_ID",
+              "Integer",
+              9,
+              9,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              9,
+              9,
+              0
+            ]
+          ],
+          "shapeType": "Polyline"
+        },
+        "Lot 13.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "ROAD_ID",
+              "Integer",
+              9,
+              9,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              9,
+              9,
+              0
+            ]
+          ],
+          "shapeType": "Polyline"
+        },
+        "Lot 14.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "ROAD_ID",
+              "Integer",
+              9,
+              9,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              9,
+              9,
+              0
+            ]
+          ],
+          "shapeType": "Polyline"
+        },
+        "Lot 15.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "ROAD_ID",
+              "Integer",
+              9,
+              9,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              9,
+              9,
+              0
+            ]
+          ],
+          "shapeType": "Polyline"
+        },
+        "Lot 16.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "ROAD_ID",
+              "Integer",
+              9,
+              9,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              9,
+              9,
+              0
+            ]
+          ],
+          "shapeType": "Polyline"
+        },
+        "Lot 17.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "ROAD_ID",
+              "Integer",
+              9,
+              9,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              9,
+              9,
+              0
+            ]
+          ],
+          "shapeType": "Polyline"
+        },
+        "Lot 18.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "ROAD_ID",
+              "Integer",
+              9,
+              9,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              9,
+              9,
+              0
+            ]
+          ],
+          "shapeType": "Polyline"
+        },
+        "Lot 2.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "ROAD_ID",
+              "Integer",
+              9,
+              9,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              9,
+              9,
+              0
+            ]
+          ],
+          "shapeType": "Polyline"
+        },
+        "Lot 22.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "ROAD_ID",
+              "Integer",
+              9,
+              9,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              9,
+              9,
+              0
+            ]
+          ],
+          "shapeType": "Polyline"
+        },
+        "Lot 26.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "ROAD_ID",
+              "Integer",
+              9,
+              9,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              9,
+              9,
+              0
+            ]
+          ],
+          "shapeType": "Polyline"
+        },
+        "Lot 28.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "ROAD_ID",
+              "Integer",
+              9,
+              9,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              9,
+              9,
+              0
+            ]
+          ],
+          "shapeType": "Polyline"
+        },
+        "Lot 29.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "ROAD_ID",
+              "Integer",
+              9,
+              9,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              9,
+              9,
+              0
+            ]
+          ],
+          "shapeType": "Polyline"
+        },
+        "Lot 3.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "ROAD_ID",
+              "Integer",
+              9,
+              9,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              9,
+              9,
+              0
+            ]
+          ],
+          "shapeType": "Polyline"
+        },
+        "Lot 31.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "ROAD_ID",
+              "Integer",
+              9,
+              9,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              9,
+              9,
+              0
+            ]
+          ],
+          "shapeType": "Polyline"
+        },
+        "Lot 34.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "ROAD_ID",
+              "Integer",
+              9,
+              9,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              9,
+              9,
+              0
+            ]
+          ],
+          "shapeType": "Polyline"
+        },
+        "Lot 36.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "ROAD_ID",
+              "Integer",
+              9,
+              9,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              9,
+              9,
+              0
+            ]
+          ],
+          "shapeType": "Polyline"
+        },
+        "Lot 4.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "ROAD_ID",
+              "Integer",
+              9,
+              9,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              9,
+              9,
+              0
+            ]
+          ],
+          "shapeType": "Polyline"
+        },
+        "Lot 5.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "ROAD_ID",
+              "Integer",
+              9,
+              9,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              9,
+              9,
+              0
+            ]
+          ],
+          "shapeType": "Polyline"
+        },
+        "Lot 8.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "ROAD_ID",
+              "Integer",
+              9,
+              9,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              9,
+              9,
+              0
+            ]
+          ],
+          "shapeType": "Polyline"
+        },
+        "Lot 9.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "ROAD_ID",
+              "Integer",
+              9,
+              9,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              9,
+              9,
+              0
+            ]
+          ],
+          "shapeType": "Polyline"
+        }
+      }
     }
   }
 }

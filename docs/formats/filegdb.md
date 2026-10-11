@@ -74,7 +74,10 @@ integers: `x = v / xyscale + xorigin`.
   deltas for x/y (running across all points), then Z deltas, then M deltas.
 - Polyline/Polygon: `varuint npts, nparts, [ncurves if curves]`, bbox, `nparts-1`
   part point counts, XY deltas (not reset per part), Z deltas, M deltas (a single
-  `0x42` byte instead means all M are NaN), then curve segments.
+  `0x42` byte instead means all M are NaN; also in multipoints), then curve segments.
+  ArcGIS writes the marker even for a one-vertex shape, where it is ambiguous with
+  a one-byte M delta: GDAL (3.x) reads it as M = origin − 2 × resolution
+  (−100000.0002 by default), ArcGIS as NaN.
 - MultiPatch (54): `varuint npts, extended-buffer size, nparts`, bbox, part counts,
   `nparts` part types (low 4 bits), XY deltas, Z deltas, [M].
 - Curve segment: `varuint startVertex, varuint type` (1 arc, 4 bezier, 5 elliptic),

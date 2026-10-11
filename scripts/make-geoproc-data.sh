@@ -41,3 +41,45 @@ rm -f edges.*
 ogr2ogr -f "ESRI Shapefile" edges.shp /tmp/gf-edges.csv -oo GEOM_POSSIBLE_NAMES=WKT \
   -oo KEEP_GEOM_COLUMNS=NO -oo AUTODETECT_TYPE=YES -nlt LINESTRING -a_srs roads.prj -lco ENCODING=UTF-8
 rm /tmp/gf-edges.csv
+
+# Z/M copies: roads_zm (PolylineZM: Z = 100 + 10 × vertex number + ROAD_ID, M = distance
+# along the road) and parcels_z (PolygonZ: Z = PARCEL_ID + 0.5 × vertex number).
+python3 - <<'PY'
+import json, math, subprocess
+def features(name):
+    out = subprocess.run(["ogr2ogr", "-f", "GeoJSON", "/vsistdout/", f"{name}.shp"],
+                         capture_output=True, text=True, check=True).stdout
+    return json.loads(out)["features"]
+with open("/tmp/gf-roads-zm.csv", "w") as f:
+    f.write("WKT,ROAD_ID,CLASS\n")
+    for ft in features("roads"):
+        p = ft["properties"]
+        g = ft["geometry"]
+        paths = [g["coordinates"]] if g["type"] == "LineString" else g["coordinates"]
+        out, m = [], 0.0
+        for path in paths:
+            pts = []
+            for i, (x, y) in enumerate(path):
+                if i:
+                    m += math.dist(path[i - 1], (x, y))
+                pts.append(f"{x} {y} {100 + 10 * i + p['ROAD_ID']} {round(m, 3)}")
+            out.append("(" + ",".join(pts) + ")")
+        f.write(f"\"MULTILINESTRING ZM ({','.join(out)})\",{p['ROAD_ID']},{p['CLASS']}\n")
+with open("/tmp/gf-parcels-z.csv", "w") as f:
+    f.write("WKT,PARCEL_ID,NAME\n")
+    for ft in features("parcels"):
+        p = ft["properties"]
+        g = ft["geometry"]
+        rings = g["coordinates"] if g["type"] == "Polygon" else g["coordinates"][0]
+        out = []
+        for ring in rings:
+            out.append("(" + ",".join(f"{x} {y} {p['PARCEL_ID'] + 0.5 * (i % (len(ring) - 1))}"
+                                      for i, (x, y) in enumerate(ring)) + ")")
+        f.write(f"\"POLYGON Z ({','.join(out)})\",{p['PARCEL_ID']},{p['NAME']}\n")
+PY
+rm -f roads_zm.* parcels_z.*
+ogr2ogr -f "ESRI Shapefile" roads_zm.shp /tmp/gf-roads-zm.csv -oo GEOM_POSSIBLE_NAMES=WKT \
+  -oo KEEP_GEOM_COLUMNS=NO -oo AUTODETECT_TYPE=YES -nlt MULTILINESTRINGZM -a_srs roads.prj -lco ENCODING=UTF-8
+ogr2ogr -f "ESRI Shapefile" parcels_z.shp /tmp/gf-parcels-z.csv -oo GEOM_POSSIBLE_NAMES=WKT \
+  -oo KEEP_GEOM_COLUMNS=NO -oo AUTODETECT_TYPE=YES -nlt POLYGONZ -a_srs roads.prj -lco ENCODING=UTF-8
+rm /tmp/gf-roads-zm.csv /tmp/gf-parcels-z.csv

@@ -283,6 +283,28 @@ impl LineNodes {
         with_paths(g, merged)
     }
 
+    /// Adds a vertex at each node inside a path, without splitting it.
+    pub fn densify(&self, g: &Geometry) -> Geometry {
+        if g.kind != GeometryKind::Polyline || g.has_curves() {
+            return g.clone();
+        }
+        let paths = g
+            .part_ranges()
+            .map(|r| {
+                let mut part = g.clone();
+                part.parts = vec![0];
+                part.xy = g.xy[r].to_vec();
+                let mut path: Vec<[f64; 2]> = Vec::new();
+                for piece in self.pieces(&part) {
+                    let skip = usize::from(path.last() == piece.first());
+                    path.extend_from_slice(&piece[skip..]);
+                }
+                path
+            })
+            .collect();
+        with_paths(g, paths)
+    }
+
     /// Splits each path of a line at the nodes inside it (nothing is joined).
     pub fn split(&self, g: &Geometry) -> Geometry {
         if g.kind != GeometryKind::Polyline || g.has_curves() {

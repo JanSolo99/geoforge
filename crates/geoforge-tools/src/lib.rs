@@ -49,19 +49,40 @@ fn clip_to_area(
     let kind = input
         .geometry_kind()
         .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
+    // Clip (not Split) of M-aware lines goes through another ArcGIS code path.
+    let measured_lines = nodes.is_none() && kind == GeometryKind::Polyline && input.has_m();
+    let measured = if measured_lines {
+        let lines = load(input)?;
+        Some(geoforge_geometry::LineNodes::new(
+            lines.iter().filter_map(|f| f.geometry.as_ref()),
+            tol,
+        )?)
+    } else {
+        None
+    };
     let mut features = Vec::new();
     for f in input.features() {
         let f = f?;
         let Some(g) = &f.geometry else { continue };
         if let Some(mut out) = geoforge_geometry::clip(g, area)? {
             if kind == GeometryKind::Polyline {
-                out = match nodes {
-                    Some(n) => n.crack(&out),
-                    None => geoforge_geometry::LineNodes::new([g], tol)?.crack(&out),
+                out = match (nodes, &measured) {
+                    (Some(n), _) => n.crack(&out),
+                    // M-aware lines get a vertex where other input lines cross.
+                    (None, Some(all)) => {
+                        all.densify(&geoforge_geometry::LineNodes::new([g], tol)?.crack(&out))
+                    }
+                    (None, None) => geoforge_geometry::LineNodes::new([g], tol)?.crack(&out),
                 };
             }
             if kind != GeometryKind::Point && kind != GeometryKind::Multipoint {
-                zm::restore(&mut out, g, input.has_z(), input.has_m());
+                zm::restore_from(
+                    &mut out,
+                    &[g],
+                    input.has_z(),
+                    input.has_m(),
+                    nodes.is_none(),
+                );
             }
             features.push(Feature {
                 oid: f.oid,
@@ -69,6 +90,10 @@ fn clip_to_area(
                 attributes: f.attributes,
             });
         }
+    }
+    // That path writes the last feature first.
+    if measured_lines {
+        features.rotate_right(1);
     }
     let mut messages = Vec::new();
     if features.is_empty() {
@@ -195,6 +220,14 @@ fn overlay_fields(inputs: &[NamedInput]) -> Vec<Field> {
         }
     }
     fields
+}
+
+/// An overlay's output is Z- and M-aware if any input is.
+fn zm_of(inputs: &[NamedInput]) -> (bool, bool) {
+    (
+        inputs.iter().any(|i| i.features.has_z()),
+        inputs.iter().any(|i| i.features.has_m()),
+    )
 }
 
 /// Every input's features, loaded once.
@@ -396,6 +429,26 @@ fn intersect_outlines(inputs: &[NamedInput], points: bool) -> Result<ToolOutput>
             rows.push((1, key(fa.oid, fb.oid), multipoint(late), attrs(fa, fb)));
         }
     }
+    // Z and M from the two features, in input order.
+    let (has_z, has_m) = zm_of(inputs);
+    if has_z || has_m {
+        let geom = |data: &[Feature], oid: i64| {
+            data.iter()
+                .find(|f| f.oid == oid)
+                .and_then(|f| f.geometry.clone())
+        };
+        for r in &mut rows {
+            let (oa, ob) = if polygon_first { (r.1.1, r.1.0) } else { r.1 };
+            let (ga, gb) = (geom(&a_data, oa), geom(&b_data, ob));
+            // POINT output takes Z from the polygon input first (its row order too).
+            let sources: Vec<&geoforge_core::Geometry> = if points && polygon_first {
+                gb.iter().chain(ga.iter()).collect()
+            } else {
+                ga.iter().chain(gb.iter()).collect()
+            };
+            zm::restore_from(&mut r.2, &sources, has_z, has_m, true);
+        }
+    }
     rows.sort_by_key(|r| (r.0, r.1));
     let features: Vec<Feature> = rows
         .into_iter()
@@ -412,8 +465,8 @@ fn intersect_outlines(inputs: &[NamedInput], points: bool) -> Result<ToolOutput>
         } else {
             GeometryKind::Polyline
         },
-        has_z: false,
-        has_m: false,
+        has_z,
+        has_m,
         fields: overlay_fields(inputs),
         spatial_reference_wkt: a_in.features.spatial_reference_wkt().map(str::to_owned),
         messages: if features.is_empty() {
@@ -581,11 +634,32 @@ fn intersect_input(inputs: &[NamedInput]) -> Result<ToolOutput> {
     } else {
         None
     };
+    let (has_z, has_m) = zm_of(inputs);
+    let by_oid: Vec<std::collections::HashMap<i64, usize>> = data
+        .iter()
+        .map(|fs| fs.iter().enumerate().map(|(k, f)| (f.oid, k)).collect())
+        .collect();
     let partial: Vec<(geoforge_core::Geometry, Vec<Value>)> = rows
         .into_iter()
         .map(|(_, fids, g)| {
             (
-                nodes.as_ref().map_or(g.clone(), |n| n.crack(&g)),
+                {
+                    let mut g = nodes.as_ref().map_or(g.clone(), |n| n.crack(&g));
+                    if has_z || has_m {
+                        // Z and M from the features combined, in input order.
+                        let sources: Vec<&geoforge_core::Geometry> = fids
+                            .iter()
+                            .enumerate()
+                            .filter_map(|(i, &fid)| {
+                                by_oid[i]
+                                    .get(&fid)
+                                    .and_then(|&k| data[i][k].geometry.as_ref())
+                            })
+                            .collect();
+                        zm::restore_from(&mut g, &sources, has_z, has_m, true);
+                    }
+                    g
+                },
                 fids.iter()
                     .enumerate()
                     .flat_map(|(i, &fid)| attrs_of(i, fid))
@@ -604,8 +678,8 @@ fn intersect_input(inputs: &[NamedInput]) -> Result<ToolOutput> {
         .collect();
     Ok(ToolOutput {
         kind,
-        has_z: false,
-        has_m: false,
+        has_z,
+        has_m,
         fields: overlay_fields(inputs),
         spatial_reference_wkt: inputs[0]
             .features
@@ -643,6 +717,7 @@ pub fn erase(input: &dyn FeatureClass, erase_features: &dyn FeatureClass) -> Res
             if kind == GeometryKind::Polyline {
                 out = geoforge_geometry::LineNodes::new([g], tol)?.crack(&out);
             }
+            zm::restore_from(&mut out, &[g], input.has_z(), input.has_m(), true);
             features.push(Feature {
                 oid: f.oid,
                 geometry: Some(out),
@@ -652,8 +727,8 @@ pub fn erase(input: &dyn FeatureClass, erase_features: &dyn FeatureClass) -> Res
     }
     Ok(ToolOutput {
         kind,
-        has_z: false,
-        has_m: false,
+        has_z: input.has_z(),
+        has_m: input.has_m(),
         fields: input.fields().to_vec(),
         spatial_reference_wkt: input.spatial_reference_wkt().map(str::to_owned),
         messages: if features.is_empty() {
@@ -769,6 +844,33 @@ fn union_all(inputs: &[NamedInput]) -> Result<ToolOutput> {
         }
     }
     rows.sort_by(|a, b| a.0.cmp(&b.0).then(a.1.cmp(&b.1)).then(a.2.cmp(&b.2)));
+    let (has_z, has_m) = zm_of(inputs);
+    if has_z || has_m {
+        // Z and M from the covering features in input order, then from any
+        // other feature whose outline passes there (a cell's edge can be an
+        // uncovering neighbour's).
+        let indexes: Vec<geoforge_geometry::EnvelopeIndex> = data
+            .iter()
+            .map(|fs| geoforge_geometry::EnvelopeIndex::new(fs.iter().map(|f| Some(&f.1))))
+            .collect();
+        for r in &mut rows {
+            let env = r.3.envelope();
+            let mut sources: Vec<&geoforge_core::Geometry> = r
+                .2
+                .iter()
+                .enumerate()
+                .filter_map(|(i, &fid)| data[i].iter().find(|(o, _, _)| *o == fid).map(|f| &f.1))
+                .collect();
+            for (i, index) in indexes.iter().enumerate() {
+                for k in index.candidates(&env, 0.0) {
+                    if data[i][k].0 != r.2[i] {
+                        sources.push(&data[i][k].1);
+                    }
+                }
+            }
+            zm::restore_from(&mut r.3, &sources, has_z, has_m, true);
+        }
+    }
     let features = rows
         .into_iter()
         .enumerate()
@@ -780,8 +882,8 @@ fn union_all(inputs: &[NamedInput]) -> Result<ToolOutput> {
         .collect();
     Ok(ToolOutput {
         kind: GeometryKind::Polygon,
-        has_z: false,
-        has_m: false,
+        has_z,
+        has_m,
         fields: overlay_fields(inputs),
         spatial_reference_wkt: inputs[0]
             .features
@@ -1393,6 +1495,10 @@ fn identity_all(
         a
     };
     let lines = load(input.features)?;
+    let input_geoms: std::collections::HashMap<i64, geoforge_core::Geometry> = lines
+        .iter()
+        .filter_map(|f| Some((f.oid, f.geometry.clone()?)))
+        .collect();
     // ArcGIS cracks lines wherever two input lines meet.
     let nodes = geoforge_geometry::LineNodes::new(
         lines.iter().filter_map(|f| f.geometry.as_ref()),
@@ -1486,6 +1592,25 @@ fn identity_all(
         // Stable: a feature's rows keep their (L, R) order within a pass.
         rows.sort_by_key(|a| (a.0, a.1));
     }
+    let (has_z, has_m) = (
+        input.features.has_z() || identity_features.features.has_z(),
+        input.features.has_m() || identity_features.features.has_m(),
+    );
+    if has_z || has_m {
+        // Z and M from the input feature, then the identity polygon.
+        for r in &mut rows {
+            let sources: Vec<&geoforge_core::Geometry> = [
+                input_geoms.get(&r.1),
+                by_oid
+                    .get(&r.2)
+                    .and_then(|&k| polys.features[k].geometry.as_ref()),
+            ]
+            .into_iter()
+            .flatten()
+            .collect();
+            zm::restore_from(&mut r.4, &sources, has_z, has_m, true);
+        }
+    }
     let features: Vec<Feature> = rows
         .into_iter()
         .enumerate()
@@ -1497,8 +1622,8 @@ fn identity_all(
         .collect();
     Ok(ToolOutput {
         kind,
-        has_z: false,
-        has_m: false,
+        has_z,
+        has_m,
         fields,
         spatial_reference_wkt: input.features.spatial_reference_wkt().map(str::to_owned),
         messages: if features.is_empty() {
