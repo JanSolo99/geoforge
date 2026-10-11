@@ -19,6 +19,7 @@ sys.path.insert(0, str(ROOT / "tools" / "arcgis-bridge"))
 import server  # noqa: E402
 
 DATA = ROOT / "testdata" / "geoproc"
+RASTER = ROOT / "testdata" / "raster"
 OUT = ROOT / "testdata" / "arcgis-reference"
 
 def win(path):
@@ -228,7 +229,19 @@ CASES = {
     "csv_stations_back": ("conversion.ExportTable", [DATA / "stations.csv"], []),
     "xy_stations": ("management.XYTableToPoint", [DATA / "stations.csv"], ["X", "Y", "", 32633]),
     "xy_stations_z": ("management.XYTableToPoint", [DATA / "stations.csv"], ["X", "Y", "ELEV", 32633]),
+    "slope_dem": ("gp.Slope_sa", [RASTER / "dem.tif"], ["DEGREE", 1, "PLANAR", "METER"]),
+    "slope_dem_percent_z": ("gp.Slope_sa", [RASTER / "dem.tif"], ["PERCENT_RISE", 2.5, "PLANAR", "METER"]),
+    "slope_dem_nodata": ("gp.Slope_sa", [RASTER / "dem_nodata.tif"], ["DEGREE", 1, "PLANAR", "METER"]),
+    "slope_dem_int16": ("gp.Slope_sa", [RASTER / "dem_int16_packbits.tif"], ["DEGREE", 1, "PLANAR", "METER"]),
+    "aspect_dem": ("gp.Aspect_sa", [RASTER / "dem.tif"], ["PLANAR", "METER"]),
+    "aspect_dem_nodata": ("gp.Aspect_sa", [RASTER / "dem_nodata.tif"], ["PLANAR", "METER"]),
+    "aspect_landuse": ("gp.Aspect_sa", [RASTER / "landuse_u8.tif"], ["PLANAR", "METER"]),
+    "hillshade_dem": ("gp.HillShade_sa", [RASTER / "dem.tif"], [315, 45, "NO_SHADOWS", 1]),
+    "hillshade_dem_nodata": ("gp.HillShade_sa", [RASTER / "dem_nodata.tif"], [200, 30, "NO_SHADOWS", 1]),
+    "hillshade_dem_z3": ("gp.HillShade_sa", [RASTER / "dem.tif"], [315, 45, "NO_SHADOWS", 3]),
 }
+# Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
+RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa"}
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable"}
@@ -270,6 +283,7 @@ def main():
         sys.exit(f"unknown cases: {sorted(unknown)}")
     w = server.worker
     info = w.call("info")
+    w.call("python", code="arcpy.CheckOutExtension('Spatial')")
     manifest = {"arcgis": {k: info.get(k) for k in ("product", "version", "build", "license")}, "cases": {}}
     if only:
         old = json.loads((OUT / "manifest.json").read_text())
@@ -287,6 +301,8 @@ def main():
         if only and name not in only:
             continue
         out = OUT / (f"{name}.dbf" if tool in TABLE_OUT else f"{name}.shp")
+        if tool in RASTER_OUT:
+            out = OUT / f"{name}.tif"
         if tool in TEXT_OUT:
             out = OUT / (f"{name}.geojson" if "GEOJSON" in after else f"{name}.json")
             if tool == "conversion.ExportTable":
@@ -320,7 +336,7 @@ def main():
             }
             print(f"{name}: {r.get('status')} {sorted(outputs)} {manifest['cases'][name]['messages']}")
             continue
-        d = w.call("describe", path=str(out)) if r.get("status") == "succeeded" and tool not in TEXT_OUT else {}
+        d = w.call("describe", path=str(out)) if r.get("status") == "succeeded" and tool not in TEXT_OUT | RASTER_OUT else {}
         manifest["cases"][name] = {
             "tool": tool,
             "args": [str(Path(a).relative_to(ROOT)) if isinstance(a, Path) else a.replace(str(ROOT) + "/", "") for a in before] + ["<out>"] + after,

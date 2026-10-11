@@ -121,7 +121,14 @@ pub fn read_geotiff(path: &Path) -> Result<Raster> {
         .map(u32::from);
 
     let nodata = match dec.find_tag(Tag::GdalNodata).map_err(err)? {
-        Some(v) => parse_nodata(&v.into_string().map_err(err)?),
+        // Compared against cells of the stored type, so round it to that type.
+        Some(v) => parse_nodata(&v.into_string().map_err(err)?).map(|nd| {
+            if data_type == DataType::F32 {
+                nd as f32 as f64
+            } else {
+                nd
+            }
+        }),
         None => None,
     };
 
@@ -556,12 +563,8 @@ fn format_nodata(v: f64, data_type: DataType) -> String {
     if v.is_nan() {
         "nan".into()
     } else if data_type.is_float() {
-        // Shortest text that reads back as the stored value.
-        if data_type == DataType::F32 {
-            format!("{}", v as f32)
-        } else {
-            format!("{v}")
-        }
+        // Shortest text of the stored value, read back exactly.
+        format!("{}", data_type.store(v))
     } else {
         format!("{}", v as i64)
     }

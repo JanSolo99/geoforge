@@ -171,6 +171,12 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
   - [ ] Tiled writer, overviews, COG layout, user-defined CRS GeoKeys
 - [ ] Map algebra (local/focal/zonal/global), reclass, resample
 - [ ] Hillshade, slope, aspect, curvature, contours, viewshed, hydrology (fill/flow dir/accumulation/watershed)
+  - [x] Slope (degree/percent rise, z-factor), Aspect, Hillshade (no shadows), planar, matching
+        ArcGIS cell for cell: Horn's gradient; border cells and cells with a NoData edge neighbor
+        are NoData; a NoData corner drops out of its row/column weighted mean (Hillshade instead
+        needs all 8); Hillshade truncates to 0–254 with NoData 255; float output NoData is −FLT_MAX,
+        or 3.4e38 when the input has NoData; Aspect −1 on flat cells
+  - [ ] Geodesic method, Hillshade shadows, tiled output with statistics (.aux.xml) like ArcGIS
 
 ## Phase 6 — Toolbox framework
 - [ ] Tool trait: typed parameters, validation, progress, cancellation, geoprocessing history

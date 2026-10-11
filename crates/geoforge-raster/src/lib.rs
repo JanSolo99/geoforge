@@ -6,6 +6,7 @@
 //! the NoData value and the coordinate system code.
 
 mod geotiff;
+pub mod surface;
 
 pub use geotiff::{Compression, read_geotiff, write_geotiff};
 

@@ -335,6 +335,7 @@ dependencies = [
  "geoforge-geometry",
  "geoforge-json",
  "geoforge-proj",
+ "geoforge-raster",
  "geoforge-shapefile",
  "geoforge-testkit",
  "geoforge-tools",

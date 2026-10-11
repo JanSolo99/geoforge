@@ -354,6 +354,32 @@ enum Tool {
     /// Write the `.sbn`/`.sbx` spatial index of a shapefile (ArcGIS "Add Spatial
     /// Index"); gf writes one with every shapefile anyway.
     AddSpatialIndex { in_features: PathBuf },
+    /// Spatial Analyst "Slope" (planar) of a GeoTIFF elevation raster.
+    Slope {
+        in_raster: PathBuf,
+        out_raster: PathBuf,
+        /// DEGREE or PERCENT_RISE.
+        #[arg(long, default_value = "DEGREE")]
+        output_measurement: String,
+        #[arg(long, default_value_t = 1.0)]
+        z_factor: f64,
+    },
+    /// Spatial Analyst "Aspect" (planar): downslope direction, −1 on flat cells.
+    Aspect {
+        in_raster: PathBuf,
+        out_raster: PathBuf,
+    },
+    /// Spatial Analyst "Hillshade" without shadows.
+    Hillshade {
+        in_raster: PathBuf,
+        out_raster: PathBuf,
+        #[arg(long, default_value_t = 315.0)]
+        azimuth: f64,
+        #[arg(long, default_value_t = 45.0)]
+        altitude: f64,
+        #[arg(long, default_value_t = 1.0)]
+        z_factor: f64,
+    },
     /// List geometry problems (ArcGIS "Check Geometry") into a .dbf table:
     /// CLASS, FEATURE_ID, PROBLEM.
     CheckGeometry {
@@ -1039,6 +1065,39 @@ fn main() -> ExitCode {
             geoforge_shapefile::sbn::write(&shp, records, extent, &entries)?;
             println!("Indexed {} ({} shapes)", shp.display(), entries.len());
             Ok(())
+        })(),
+        Tool::Slope {
+            in_raster,
+            out_raster,
+            output_measurement,
+            z_factor,
+        } => (|| {
+            let unit = match output_measurement.to_ascii_uppercase().as_str() {
+                "DEGREE" => geoforge_raster::surface::SlopeUnit::Degree,
+                "PERCENT_RISE" => geoforge_raster::surface::SlopeUnit::PercentRise,
+                other => return Err(Error::Unsupported(format!("output measurement {other}"))),
+            };
+            let dem = geoforge_raster::read_geotiff(&in_raster)?;
+            let out = geoforge_raster::surface::slope(&dem, unit, z_factor);
+            write_raster(&out_raster, &out)
+        })(),
+        Tool::Aspect {
+            in_raster,
+            out_raster,
+        } => (|| {
+            let dem = geoforge_raster::read_geotiff(&in_raster)?;
+            write_raster(&out_raster, &geoforge_raster::surface::aspect(&dem))
+        })(),
+        Tool::Hillshade {
+            in_raster,
+            out_raster,
+            azimuth,
+            altitude,
+            z_factor,
+        } => (|| {
+            let dem = geoforge_raster::read_geotiff(&in_raster)?;
+            let out = geoforge_raster::surface::hillshade(&dem, azimuth, altitude, z_factor);
+            write_raster(&out_raster, &out)
         })(),
         Tool::CheckGeometry {
             in_features,
@@ -1977,4 +2036,22 @@ fn buffer_tool(
     };
     let out = geoforge_tools::buffer(fc.as_ref(), distance, line_end, side, dissolve)?;
     write_output(out, output, source_gdb(input).as_deref())
+}
+
+/// Writes a raster result as GeoTIFF: LZW for integer cells, uncompressed floats,
+/// as ArcGIS writes Spatial Analyst output.
+fn write_raster(path: &Path, raster: &geoforge_raster::Raster) -> Result<()> {
+    let compression = if raster.data_type.is_float() {
+        geoforge_raster::Compression::None
+    } else {
+        geoforge_raster::Compression::Lzw
+    };
+    geoforge_raster::write_geotiff(path, raster, compression)?;
+    println!(
+        "Wrote {} ({}x{})",
+        path.display(),
+        raster.width,
+        raster.height
+    );
+    Ok(())
 }

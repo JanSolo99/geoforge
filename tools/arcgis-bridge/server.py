@@ -83,7 +83,9 @@ class Worker:
             [WINE, PYTHON, "-u", to_windows(str(WORKER))],
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, env=env,
         )
-        ready = self._read(timeout=300)
+        ready = None
+        while ready is None:
+            ready = self._read(timeout=300)
         if not ready.get("ready"):
             raise RuntimeError(f"arcpy worker failed to start: {ready}")
 
@@ -104,7 +106,11 @@ class Worker:
         if not line:
             self.stop()
             raise RuntimeError("arcpy worker exited unexpectedly")
-        return json.loads(line.decode("utf-8"))
+        try:
+            return json.loads(line.decode("utf-8", "replace"))
+        except json.JSONDecodeError:
+            # Some tools print straight to the process's stdout; skip such lines.
+            return None
 
     def stop(self):
         if self.proc and self.proc.poll() is None:
@@ -119,8 +125,10 @@ class Worker:
             self.next_id += 1
             self.proc.stdin.write(json.dumps(req).encode("utf-8") + b"\n")
             self.proc.stdin.flush()
-            resp = self._read(timeout or TIMEOUT)
-            return to_linux(resp)
+            while True:
+                resp = self._read(timeout or TIMEOUT)
+                if isinstance(resp, dict) and resp.get("id") == req["id"]:
+                    return to_linux(resp)
 
 
 worker = Worker()

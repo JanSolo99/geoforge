@@ -14467,6 +14467,150 @@
         ]
       ],
       "shapeType": "Point"
+    },
+    "slope_dem": {
+      "tool": "gp.Slope_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "DEGREE",
+        1,
+        "PLANAR",
+        "METER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "slope_dem_percent_z": {
+      "tool": "gp.Slope_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "PERCENT_RISE",
+        2.5,
+        "PLANAR",
+        "METER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "slope_dem_nodata": {
+      "tool": "gp.Slope_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "DEGREE",
+        1,
+        "PLANAR",
+        "METER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "slope_dem_int16": {
+      "tool": "gp.Slope_sa",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>",
+        "DEGREE",
+        1,
+        "PLANAR",
+        "METER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "aspect_dem": {
+      "tool": "gp.Aspect_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "PLANAR",
+        "METER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "aspect_dem_nodata": {
+      "tool": "gp.Aspect_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "PLANAR",
+        "METER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "aspect_landuse": {
+      "tool": "gp.Aspect_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "PLANAR",
+        "METER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "hillshade_dem": {
+      "tool": "gp.HillShade_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        315,
+        45,
+        "NO_SHADOWS",
+        1
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "hillshade_dem_nodata": {
+      "tool": "gp.HillShade_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        200,
+        30,
+        "NO_SHADOWS",
+        1
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "hillshade_dem_z3": {
+      "tool": "gp.HillShade_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        315,
+        45,
+        "NO_SHADOWS",
+        3
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

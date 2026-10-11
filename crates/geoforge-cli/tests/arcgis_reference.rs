@@ -1231,6 +1231,38 @@ fn gf_args(case: &str) -> Vec<&'static str> {
             "--geometry-type",
             "POLYLINE",
         ],
+        "slope_dem" => vec!["slope", "testdata/raster/dem.tif"],
+        "slope_dem_percent_z" => vec![
+            "slope",
+            "testdata/raster/dem.tif",
+            "<out>",
+            "--output-measurement",
+            "PERCENT_RISE",
+            "--z-factor",
+            "2.5",
+        ],
+        "slope_dem_nodata" => vec!["slope", "testdata/raster/dem_nodata.tif"],
+        "slope_dem_int16" => vec!["slope", "testdata/raster/dem_int16_packbits.tif"],
+        "aspect_dem" => vec!["aspect", "testdata/raster/dem.tif"],
+        "aspect_dem_nodata" => vec!["aspect", "testdata/raster/dem_nodata.tif"],
+        "aspect_landuse" => vec!["aspect", "testdata/raster/landuse_u8.tif"],
+        "hillshade_dem" => vec!["hillshade", "testdata/raster/dem.tif"],
+        "hillshade_dem_nodata" => vec![
+            "hillshade",
+            "testdata/raster/dem_nodata.tif",
+            "<out>",
+            "--azimuth",
+            "200",
+            "--altitude",
+            "30",
+        ],
+        "hillshade_dem_z3" => vec![
+            "hillshade",
+            "testdata/raster/dem.tif",
+            "<out>",
+            "--z-factor",
+            "3",
+        ],
         "csv_parcels" => vec!["export-table", "testdata/geoproc/parcels.shp"],
         "csv_wells" => vec!["export-table", "testdata/geoproc/wells.shp"],
         "csv_bad_lines" => vec!["export-table", "testdata/geoproc/bad_lines.shp"],
@@ -1560,6 +1592,73 @@ fn compare(case: &str, ours: &Path, theirs: &Path, fields: &serde_json::Value) -
     diffs
 }
 
+/// Grid, cell type, NoData, coordinate system and every cell; float cells within
+/// 1e-5 relative (ArcGIS computes in single precision in places).
+fn compare_rasters(ours: &Path, arcgis: &Path) -> Vec<String> {
+    let (a, b) = match (
+        geoforge_raster::read_geotiff(ours),
+        geoforge_raster::read_geotiff(arcgis),
+    ) {
+        (Ok(a), Ok(b)) => (a, b),
+        (a, b) => return vec![format!("read: ours {:?}, ArcGIS {:?}", a.err(), b.err())],
+    };
+    let mut diffs = Vec::new();
+    if (a.width, a.height) != (b.width, b.height) {
+        return vec![format!(
+            "size: ours {}x{}, ArcGIS {}x{}",
+            a.width, a.height, b.width, b.height
+        )];
+    }
+    if a.transform != b.transform {
+        diffs.push(format!(
+            "transform: ours {:?}, ArcGIS {:?}",
+            a.transform, b.transform
+        ));
+    }
+    if a.data_type != b.data_type {
+        diffs.push(format!(
+            "type: ours {:?}, ArcGIS {:?}",
+            a.data_type, b.data_type
+        ));
+    }
+    if a.nodata.map(f64::to_bits) != b.nodata.map(f64::to_bits) {
+        diffs.push(format!(
+            "nodata: ours {:?}, ArcGIS {:?}",
+            a.nodata, b.nodata
+        ));
+    }
+    if a.epsg != b.epsg {
+        diffs.push(format!("epsg: ours {:?}, ArcGIS {:?}", a.epsg, b.epsg));
+    }
+    let mut bad = 0;
+    for row in 0..a.height {
+        for col in 0..a.width {
+            let (x, y) = (a.get(col, row), b.get(col, row));
+            let same = match (x, y) {
+                (Some(x), Some(y)) => {
+                    if b.data_type.is_float() {
+                        (x - y).abs() <= 1e-5 * y.abs().max(1.0)
+                    } else {
+                        x == y
+                    }
+                }
+                (None, None) => true,
+                _ => false,
+            };
+            if !same {
+                bad += 1;
+                if bad <= 4 {
+                    diffs.push(format!("cell ({col}, {row}): ours {x:?}, ArcGIS {y:?}"));
+                }
+            }
+        }
+    }
+    if bad > 4 {
+        diffs.push(format!("{bad} cells differ"));
+    }
+    diffs
+}
+
 #[test]
 fn tools_match_arcgis_output() {
     let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
@@ -1579,8 +1678,12 @@ fn tools_match_arcgis_output() {
         let text_ext = ["json", "geojson", "csv"]
             .into_iter()
             .find(|e| reference.join(format!("{case}.{e}")).exists());
+        // Spatial Analyst outputs are GeoTIFFs, compared cell by cell.
+        let raster = reference.join(format!("{case}.tif")).exists();
         let out = if let Some(ext) = text_ext {
             out_dir.join(format!("{case}.{ext}"))
+        } else if raster {
+            out_dir.join(format!("{case}.tif"))
         } else if info.get("outputs").is_some() {
             let dir = out_dir.join(case);
             std::fs::create_dir_all(&dir).unwrap();
@@ -1651,6 +1754,8 @@ fn tools_match_arcgis_output() {
                 "gf failed: {}",
                 String::from_utf8_lossy(&run.stderr)
             ));
+        } else if raster {
+            diffs = compare_rasters(&out, &reference.join(format!("{case}.tif")));
         } else if let Some(ext) = text_ext {
             let (ours, theirs) = (
                 std::fs::read_to_string(&out).unwrap_or_default(),
