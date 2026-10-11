@@ -2233,9 +2233,7 @@ fn compare(case: &str, ours: &Path, theirs: &Path, fields: &serde_json::Value) -
 }
 
 /// Vector cases with known differences: the features that differ, or an empty list
-/// when the whole case does. Contour: two lines along NoData differ slightly, and
-/// contours through cells exactly at a contour value (integer DEMs) are not yet
-/// traced as ArcGIS does.
+/// when the whole case does. None at the moment.
 const KNOWN_FEATURE_DIFFERENCES: &[(&str, &[usize])] = &[];
 
 /// Raster cases where some cells are known to differ from ArcGIS, with the most
