@@ -168,6 +168,9 @@ enum Tool {
         /// A folder; outputs are `<value>.shp`.
         out_workspace: PathBuf,
     },
+    /// Write the `.sbn`/`.sbx` spatial index of a shapefile (ArcGIS "Add Spatial
+    /// Index"); gf writes one with every shapefile anyway.
+    AddSpatialIndex { in_features: PathBuf },
     /// List geometry problems (ArcGIS "Check Geometry") into a .dbf table:
     /// CLASS, FEATURE_ID, PROBLEM.
     CheckGeometry {
@@ -424,6 +427,18 @@ fn main() -> ExitCode {
             split_field,
             out_workspace,
         } => split_tool(&in_features, &split_features, &split_field, &out_workspace),
+        Tool::AddSpatialIndex { in_features } => (|| {
+            let Location::Shapefile(shp) = locate(&in_features) else {
+                return Err(Error::Unsupported(
+                    "geodatabase feature classes always have a spatial index".into(),
+                ));
+            };
+            let bytes = std::fs::read(&shp).map_err(|e| Error::io(&shp, e))?;
+            let (records, extent, entries) = geoforge_shapefile::sbn::entries_from_shp(&bytes)?;
+            geoforge_shapefile::sbn::write(&shp, records, extent, &entries)?;
+            println!("Indexed {} ({} shapes)", shp.display(), entries.len());
+            Ok(())
+        })(),
         Tool::CheckGeometry {
             in_features,
             out_table,
@@ -1053,15 +1068,12 @@ fn update_in_place(out: ToolOutput, dataset: &Path) -> Result<()> {
         eprintln!("{m}");
     }
     let n = write_shapefile(out, &tmp)?;
-    for ext in ["shp", "shx", "dbf", "prj", "cpg"] {
+    // The new spatial index replaces the old one with the rest.
+    for ext in ["shp", "shx", "dbf", "prj", "cpg", "sbn", "sbx"] {
         let from = tmp.with_extension(ext);
         if from.exists() {
             std::fs::rename(&from, shp.with_extension(ext)).map_err(|e| Error::io(&from, e))?;
         }
-    }
-    // The spatial index no longer matches the rewritten file.
-    for ext in ["sbn", "sbx"] {
-        std::fs::remove_file(shp.with_extension(ext)).ok();
     }
     println!("Updated {} ({n} features)", shp.display());
     Ok(())

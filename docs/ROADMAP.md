@@ -18,7 +18,9 @@ and verified against GDAL/OGR output on real data.
 - [x] `gf describe` (arcpy.Describe) and `gf copy-features` (Copy Features)
 - [x] Field mapping, null handling and value formatting verified against ArcGIS Pro 3.7
       through the ArcGIS bridge; `.dbf` output is byte-identical to ArcGIS's for the same input
-- [ ] `.sbn/.sbx` spatial index, `.shp.xml` metadata
+- [x] `.sbn/.sbx` spatial index: written with every shapefile and by `gf add-spatial-index`,
+      byte-identical to ArcGIS's on all reference outputs (format in docs/formats)
+- [ ] `.shp.xml` metadata
 - [x] DOS and Mac code pages in `.dbf` by language driver ID (437, 737, 850, 852, 857,
       860, 861, 863, 865, 866, 10000, 10007, 10029; GDAL's LDID table, as ArcGIS reads
       them); memo fields read as GDAL does (block number) — ArcGIS cannot open such files
@@ -95,7 +97,7 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
 - [x] Clip/Erase against many polygons: each feature is clipped by the union of only the
       clip polygons whose envelopes reach it (unions cached per candidate set). 10k parcels
       by 10k parcels: 34 s → 0.05 s; by 300 road buffers: 30 s → 1.6 s; 20k wells: 1.6 s → 0.05 s
-- [ ] Shapefile writer: `.sbn/.sbx` and `.shp.xml` (ArcGIS writes both for tool outputs)
+- [ ] Shapefile writer: `.shp.xml` (ArcGIS writes it for tool outputs; `.sbn/.sbx` done)
 
 ## Phase 3 — File Geodatabase
 Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Esri SDK.

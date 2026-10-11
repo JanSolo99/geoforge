@@ -9,6 +9,7 @@ use geoforge_core::curves::arcgis_densify_deviation;
 
 use crate::ShapeType;
 use crate::dbf::{DbfField, DbfWriter, MAX_FIELD_NAME_LEN};
+use crate::sbn;
 use crate::shp::{self, HEADER_LEN, Header};
 
 /// ArcGIS's limit for any shapefile component file.
@@ -28,6 +29,8 @@ pub struct ShapefileWriter {
     field_names: Vec<String>,
     record: Vec<u8>,
     densify_deviation: f64,
+    /// Boxes of the shapes written, for the `.sbn` spatial index.
+    index: Vec<sbn::IndexEntry>,
 }
 
 impl ShapefileWriter {
@@ -85,6 +88,7 @@ impl ShapefileWriter {
             count: 0,
             field_names,
             record: Vec::new(),
+            index: Vec::new(),
             densify_deviation: arcgis_densify_deviation(
                 spatial_reference_wkt.is_some_and(|w| w.trim_start().starts_with("GEOGCS")),
             ),
@@ -132,7 +136,14 @@ impl ShapefileWriter {
         self.dbf.write_encoded()?;
 
         if let Some(g) = &geometry {
-            self.extent.union(&g.envelope());
+            let env = g.envelope();
+            self.extent.union(&env);
+            if !env.is_empty() {
+                self.index.push(sbn::IndexEntry {
+                    record: self.count + 1,
+                    bbox: [env.xmin, env.ymin, env.xmax, env.ymax],
+                });
+            }
         }
         self.shp_len = new_shp_len;
         self.count += 1;
@@ -167,14 +178,17 @@ impl ShapefileWriter {
         Ok(g)
     }
 
-    /// Writes the headers. Must be called; dropping the writer leaves invalid files.
+    /// Writes the headers and the `.sbn`/`.sbx` spatial index (as ArcGIS does for
+    /// every shapefile it writes). Must be called; dropping the writer leaves
+    /// invalid files.
     pub fn finish(mut self) -> Result<()> {
+        // ArcGIS gives a shapefile without shapes the box (0, 0, -1, -1).
         let mut extent = if self.extent.is_empty() {
             Envelope {
                 xmin: 0.0,
                 ymin: 0.0,
-                xmax: 0.0,
-                ymax: 0.0,
+                xmax: -1.0,
+                ymax: -1.0,
                 z: None,
                 m: None,
             }
@@ -202,6 +216,12 @@ impl ShapefileWriter {
             f.write_all(&h).map_err(io)?;
             f.flush().map_err(io)?;
         }
+        sbn::write(
+            &self.shp_path,
+            self.count as usize,
+            [extent.xmin, extent.ymin, extent.xmax, extent.ymax],
+            &self.index,
+        )?;
         self.dbf.finish()
     }
 }

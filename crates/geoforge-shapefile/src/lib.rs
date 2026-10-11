@@ -5,6 +5,7 @@ pub mod dbf;
 mod dos;
 pub mod encoding;
 mod reader;
+pub mod sbn;
 pub mod shape_type;
 pub mod shp;
 mod writer;
