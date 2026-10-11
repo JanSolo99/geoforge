@@ -140,6 +140,9 @@ fn reads_like_gdal() {
         "dem_point.tif",
         "rgb_planar_u16.tif",
         "rgb_pixel_u8.tif",
+        // Written by ArcGIS with 4-bit samples.
+        "../arcgis-reference/f2r_roads.tif",
+        "../arcgis-reference/f2r_parcels_zone.tif",
     ] {
         compare(&testdata(name), &dir);
     }

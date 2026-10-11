@@ -15825,6 +15825,118 @@
         ]
       ],
       "shapeType": "Polygon"
+    },
+    "f2r_parcels_zone": {
+      "tool": "conversion.FeatureToRaster",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "ZONE",
+        "<out>",
+        5
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "f2r_parcels_fid": {
+      "tool": "conversion.FeatureToRaster",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "FID",
+        "<out>",
+        7
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "f2r_wells_depth": {
+      "tool": "conversion.FeatureToRaster",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "DEPTH",
+        "<out>",
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "f2r_roads": {
+      "tool": "conversion.FeatureToRaster",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "FID",
+        "<out>",
+        4
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "p2r_parcels_center": {
+      "tool": "conversion.PolygonToRaster",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "FID",
+        "<out>",
+        "CELL_CENTER",
+        "",
+        5
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "p2r_parcels_maxarea": {
+      "tool": "conversion.PolygonToRaster",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "FID",
+        "<out>",
+        "MAXIMUM_AREA",
+        "",
+        5
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "pt2r_wells_most": {
+      "tool": "conversion.PointToRaster",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "DEPTH",
+        "<out>",
+        "MOST_FREQUENT",
+        "",
+        20
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "pt2r_wells_sum": {
+      "tool": "conversion.PointToRaster",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "DEPTH",
+        "<out>",
+        "SUM",
+        "",
+        20
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

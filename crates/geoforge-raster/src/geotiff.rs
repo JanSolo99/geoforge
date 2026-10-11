@@ -80,7 +80,7 @@ pub fn read_geotiff(path: &Path) -> Result<Raster> {
         (Some(SampleFormat::Int), 8) => DataType::I8,
         (Some(SampleFormat::Int), 16) => DataType::I16,
         (Some(SampleFormat::Int), 32) => DataType::I32,
-        (_, 8) => DataType::U8,
+        (_, 1 | 2 | 4 | 8) => DataType::U8,
         (_, 16) => DataType::U16,
         (_, 32) => DataType::U32,
         _ => {
@@ -201,6 +201,8 @@ struct Layout {
     samples: usize,
     planar: bool,
     bytes_per_sample: usize,
+    /// Bits per sample when below 8 (packed, most significant bits first).
+    sub_byte_bits: usize,
     chunk_width: usize,
     chunk_height: usize,
     offsets: Vec<u64>,
@@ -238,7 +240,8 @@ impl Layout {
             height,
             samples,
             planar,
-            bytes_per_sample: bits as usize / 8,
+            bytes_per_sample: (bits as usize / 8).max(1),
+            sub_byte_bits: if bits < 8 { bits as usize } else { 0 },
             chunk_width,
             chunk_height,
             offsets,
@@ -262,7 +265,11 @@ fn read_chunks<R: std::io::Read + std::io::Seek>(
     let per_band = across * down;
     let chunk_samples = if l.planar { 1 } else { l.samples };
     let bps = l.bytes_per_sample;
-    let row_bytes = l.chunk_width * chunk_samples * bps;
+    let row_bytes = if l.sub_byte_bits > 0 {
+        (l.chunk_width * chunk_samples * l.sub_byte_bits).div_ceil(8)
+    } else {
+        l.chunk_width * chunk_samples * bps
+    };
     let mut bands = vec![vec![0.0; l.width * l.height]; l.samples];
     let chunk_count = if l.planar {
         per_band * l.samples
@@ -311,8 +318,16 @@ fn read_chunks<R: std::io::Read + std::io::Seek>(
             let row = &bytes[r * row_bytes..(r + 1) * row_bytes];
             for x in cx..(cx + l.chunk_width).min(l.width) {
                 for s in 0..chunk_samples {
-                    let at = ((x - cx) * chunk_samples + s) * bps;
-                    let v = sample(&row[at..at + bps], data_type, big_endian || float_planes);
+                    let k = (x - cx) * chunk_samples + s;
+                    let v = if l.sub_byte_bits > 0 {
+                        let bit = k * l.sub_byte_bits;
+                        let byte = row[bit / 8];
+                        let shift = 8 - l.sub_byte_bits - bit % 8;
+                        ((byte >> shift) & ((1u8 << l.sub_byte_bits) - 1)) as f64
+                    } else {
+                        let at = k * bps;
+                        sample(&row[at..at + bps], data_type, big_endian || float_planes)
+                    };
                     let band = if l.planar { band0 } else { s };
                     bands[band][y * l.width + x] = v;
                 }

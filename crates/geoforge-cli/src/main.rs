@@ -549,6 +549,36 @@ enum Tool {
         #[arg(long, default_value = "NO_SIMPLIFY")]
         simplify: String,
     },
+    /// Conversion "Feature To Raster": polygons by cell center, lines by the cells
+    /// they cross, points by the most frequent value.
+    FeatureToRaster {
+        in_features: PathBuf,
+        field: String,
+        out_raster: PathBuf,
+        cell_size: f64,
+    },
+    /// Conversion "Polygon To Raster".
+    PolygonToRaster {
+        in_features: PathBuf,
+        value_field: String,
+        out_raster: PathBuf,
+        /// CELL_CENTER or MAXIMUM_AREA.
+        #[arg(long, default_value = "CELL_CENTER")]
+        cell_assignment: String,
+        #[arg(long)]
+        cellsize: f64,
+    },
+    /// Conversion "Point To Raster".
+    PointToRaster {
+        in_features: PathBuf,
+        value_field: String,
+        out_raster: PathBuf,
+        /// MOST_FREQUENT, SUM, MEAN, MAXIMUM, MINIMUM or COUNT.
+        #[arg(long, default_value = "MOST_FREQUENT")]
+        cell_assignment: String,
+        #[arg(long)]
+        cellsize: f64,
+    },
     /// Spatial Analyst "Aspect" (planar): downslope direction, −1 on flat cells.
     Aspect {
         in_raster: PathBuf,
@@ -1678,6 +1708,69 @@ fn main() -> ExitCode {
             };
             write_output(out, &out_polygon_features, None)
         })(),
+        Tool::FeatureToRaster {
+            in_features,
+            field,
+            out_raster,
+            cell_size,
+        } => (|| {
+            use geoforge_raster::rasterize::*;
+            let (features, kind, epsg, geometry) = rasterize_input(&in_features, &field)?;
+            let r = match geometry {
+                Some(geoforge_core::GeometryKind::Polygon) => {
+                    polygons_to_raster(&features, cell_size, PolygonAssignment::CellCenter, kind)
+                }
+                Some(geoforge_core::GeometryKind::Polyline) => {
+                    lines_to_raster(&features, cell_size, kind)
+                }
+                _ => points_to_raster(&features, cell_size, PointAssignment::MostFrequent, kind),
+            };
+            let mut r = r.ok_or_else(|| Error::Unsupported("no features to rasterize".into()))?;
+            r.epsg = epsg;
+            write_raster(&out_raster, &r)
+        })(),
+        Tool::PolygonToRaster {
+            in_features,
+            value_field,
+            out_raster,
+            cell_assignment,
+            cellsize,
+        } => (|| {
+            use geoforge_raster::rasterize::*;
+            let assignment = match cell_assignment.to_ascii_uppercase().as_str() {
+                "CELL_CENTER" => PolygonAssignment::CellCenter,
+                "MAXIMUM_AREA" => PolygonAssignment::MaximumArea,
+                other => return Err(Error::Unsupported(format!("cell assignment {other}"))),
+            };
+            let (features, kind, epsg, _) = rasterize_input(&in_features, &value_field)?;
+            let mut r = polygons_to_raster(&features, cellsize, assignment, kind)
+                .ok_or_else(|| Error::Unsupported("no features to rasterize".into()))?;
+            r.epsg = epsg;
+            write_raster(&out_raster, &r)
+        })(),
+        Tool::PointToRaster {
+            in_features,
+            value_field,
+            out_raster,
+            cell_assignment,
+            cellsize,
+        } => (|| {
+            use geoforge_raster::rasterize::*;
+            let assignment = match cell_assignment.to_ascii_uppercase().as_str() {
+                "MOST_FREQUENT" => PointAssignment::MostFrequent,
+                "SUM" => PointAssignment::Sum,
+                "MEAN" => PointAssignment::Mean,
+                "MAXIMUM" => PointAssignment::Maximum,
+                "MINIMUM" => PointAssignment::Minimum,
+                "COUNT" => PointAssignment::Count,
+                other => return Err(Error::Unsupported(format!("cell assignment {other}"))),
+            };
+            let (features, kind, epsg, _) = rasterize_input(&in_features, &value_field)?;
+            let mut r = points_to_raster(&features, cellsize, assignment, kind)
+                .ok_or_else(|| Error::Unsupported("no features to rasterize".into()))?;
+            r.epsg = epsg;
+            write_raster(&out_raster, &r)
+        })(),
         Tool::Aspect {
             in_raster,
             out_raster,
@@ -2684,4 +2777,67 @@ fn raster_wkt(r: &geoforge_raster::Raster) -> Result<Option<String>> {
     r.epsg
         .map(|code| geoforge_proj::Crs::parse(&code.to_string()).map(|c| c.arcgis_wkt()))
         .transpose()
+}
+
+type RasterizeInput = (
+    Vec<(geoforge_core::Geometry, f64)>,
+    geoforge_raster::rasterize::ValueKind,
+    Option<u32>,
+    Option<geoforge_core::GeometryKind>,
+);
+
+/// Shapes with the numeric value of `field` (the OID field included), the kind
+/// of that value, and the EPSG code of the features' coordinate system.
+fn rasterize_input(path: &Path, field: &str) -> Result<RasterizeInput> {
+    use geoforge_raster::rasterize::ValueKind;
+    let (fc, _) = open_feature_class(path)?;
+    let oid = fc.oid_field_name().eq_ignore_ascii_case(field);
+    let index = fc
+        .fields()
+        .iter()
+        .position(|f| f.name.eq_ignore_ascii_case(field));
+    let kind = if oid {
+        ValueKind::Integer
+    } else {
+        match index.map(|i| fc.fields()[i].field_type) {
+            Some(FieldType::Double) => ValueKind::Double,
+            Some(FieldType::Single) => ValueKind::Single,
+            Some(
+                FieldType::SmallInteger
+                | FieldType::Integer
+                | FieldType::BigInteger
+                | FieldType::ObjectId,
+            ) => ValueKind::Integer,
+            _ => {
+                return Err(Error::Unsupported(format!(
+                    "field {field} is missing or not numeric"
+                )));
+            }
+        }
+    };
+    let mut features = Vec::new();
+    for f in fc.features() {
+        let f = f?;
+        let value = if oid {
+            Some(f.oid as f64)
+        } else {
+            match &f.attributes[index.unwrap_or(0)] {
+                Value::SmallInteger(v) => Some(*v as f64),
+                Value::Integer(v) => Some(*v as f64),
+                Value::BigInteger(v) => Some(*v as f64),
+                Value::Single(v) => Some(*v as f64),
+                Value::Double(v) => Some(*v),
+                _ => None,
+            }
+        };
+        if let (Some(g), Some(v)) = (f.geometry, value) {
+            features.push((g, v));
+        }
+    }
+    let epsg = fc
+        .spatial_reference_wkt()
+        .and_then(|w| geoforge_proj::Crs::from_wkt(w).ok())
+        .and_then(|c| c.wkid())
+        .map(|(_, latest)| latest);
+    Ok((features, kind, epsg, fc.geometry_kind()))
 }

@@ -208,7 +208,14 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         Order (Strahler, Shreve) and unweighted Flow Length (downstream/upstream), matching ArcGIS
   - [x] Raster To Point and Raster To Polygon (NO_SIMPLIFY; 4-connected regions in raster order of
         their first cell) matching ArcGIS
-  - [ ] Raster To Polygon SIMPLIFY; Feature/Polygon/Point To Raster
+  - [x] Feature To Raster, Polygon To Raster (CELL_CENTER, MAXIMUM_AREA) and Point To Raster
+        matching ArcGIS: grid anchored at the extent's lower-left corner (points and lines widened
+        by half a cell), round(extent / cell) cells; points on a cell edge go left/up; lines mark
+        cells whose interior they cross, most length wins; MAXIMUM_AREA leaves cells NoData when
+        the uncovered part is larger; integer fields use ArcGIS's sub-byte/8-bit type choice
+  - [x] GeoTIFF reader: 1/2/4-bit samples (ArcGIS writes them)
+  - [ ] Raster To Polygon SIMPLIFY; Polyline To Raster options; most-frequent ties (first
+        feature assumed)
   - [ ] Flow Direction on flats: ArcGIS's flat resolution is approximated (5×5 look-ahead, then
         Jenson–Domingue passes preferring edge neighbors); a few cells differ on float DEMs and
         about 12% on an integer DEM's large flats

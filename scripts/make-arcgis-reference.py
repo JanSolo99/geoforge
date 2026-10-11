@@ -315,6 +315,14 @@ CASES = {
     "r2pt_dem_nodata": ("conversion.RasterToPoint", [RASTER / "dem_nodata.tif"], ["Value"]),
     "r2poly_zones": ("conversion.RasterToPolygon", [RASTER / "zones.tif"], ["NO_SIMPLIFY", "Value"]),
     "r2poly_landuse": ("conversion.RasterToPolygon", [RASTER / "landuse_u8.tif"], ["NO_SIMPLIFY", "Value"]),
+    "f2r_parcels_zone": ("conversion.FeatureToRaster", [DATA / "parcels.shp", "ZONE"], [5]),
+    "f2r_parcels_fid": ("conversion.FeatureToRaster", [DATA / "parcels.shp", "FID"], [7]),
+    "f2r_wells_depth": ("conversion.FeatureToRaster", [DATA / "wells.shp", "DEPTH"], [10]),
+    "f2r_roads": ("conversion.FeatureToRaster", [DATA / "roads.shp", "FID"], [4]),
+    "p2r_parcels_center": ("conversion.PolygonToRaster", [DATA / "parcels.shp", "FID"], ["CELL_CENTER", "", 5]),
+    "p2r_parcels_maxarea": ("conversion.PolygonToRaster", [DATA / "parcels.shp", "FID"], ["MAXIMUM_AREA", "", 5]),
+    "pt2r_wells_most": ("conversion.PointToRaster", [DATA / "wells.shp", "DEPTH"], ["MOST_FREQUENT", "", 20]),
+    "pt2r_wells_sum": ("conversion.PointToRaster", [DATA / "wells.shp", "DEPTH"], ["SUM", "", 20]),
     "zonal_mean": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_nodata.tif"], ["MEAN", "DATA"]),
     "zonal_max_strict": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_nodata.tif"], ["MAXIMUM", "NODATA"]),
     "zonal_range_int": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_int16_packbits.tif"], ["RANGE", "DATA"]),
@@ -330,7 +338,8 @@ RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatist
               "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa",
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",
-              "gp.StreamOrder_sa", "gp.FlowLength_sa", "gp.Watershed_sa"}
+              "gp.StreamOrder_sa", "gp.FlowLength_sa", "gp.Watershed_sa", "conversion.FeatureToRaster",
+              "conversion.PolygonToRaster", "conversion.PointToRaster"}
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable"}
