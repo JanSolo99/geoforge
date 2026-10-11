@@ -17279,6 +17279,200 @@
       "messages": [],
       "fields": [],
       "shapeType": null
+    },
+    "zst_classes_all": {
+      "tool": "gp.ZonalStatisticsAsTable_sa",
+      "args": [
+        "testdata/raster/zones_25m.tif",
+        "Value",
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "DATA",
+        "ALL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COUNT",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "AREA",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "MIN",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MAX",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "RANGE",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MEAN",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "STD",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "SUM",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "VARIETY",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MAJORITY",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MAJORITY_C",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MAJORITY_P",
+          "Single",
+          13,
+          0,
+          0
+        ],
+        [
+          "MINORITY",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MINORITY_C",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MINORITY_P",
+          "Single",
+          13,
+          0,
+          0
+        ],
+        [
+          "MEDIAN",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "PCT90",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": null
+    },
+    "zonal_majority_classes": {
+      "tool": "gp.ZonalStatistics_sa",
+      "args": [
+        "testdata/raster/zones_25m.tif",
+        "Value",
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "MAJORITY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "zonal_minority_classes": {
+      "tool": "gp.ZonalStatistics_sa",
+      "args": [
+        "testdata/raster/zones_25m.tif",
+        "Value",
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "MINORITY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "zonal_median_classes": {
+      "tool": "gp.ZonalStatistics_sa",
+      "args": [
+        "testdata/raster/zones_25m.tif",
+        "Value",
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "MEDIAN",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }
