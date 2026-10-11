@@ -156,6 +156,30 @@ enum Tool {
         /// A folder; outputs are `<value>.shp`.
         out_workspace: PathBuf,
     },
+    /// List geometry problems (ArcGIS "Check Geometry") into a .dbf table:
+    /// CLASS, FEATURE_ID, PROBLEM.
+    CheckGeometry {
+        /// One feature class, or several joined with ';'.
+        in_features: String,
+        out_table: PathBuf,
+        /// ESRI or OGC.
+        #[arg(long, default_value = "ESRI")]
+        validation_method: String,
+    },
+    /// Repair geometry problems (ArcGIS "Repair Geometry"). Updates the input
+    /// shapefile in place, as ArcGIS does, unless an output is given.
+    RepairGeometry {
+        in_features: PathBuf,
+        /// DELETE_NULL or KEEP_NULL.
+        #[arg(long, default_value = "DELETE_NULL")]
+        delete_null: String,
+        /// ESRI or OGC.
+        #[arg(long, default_value = "ESRI")]
+        validation_method: String,
+        /// Write the result here instead of updating the input.
+        #[arg(long)]
+        output: Option<PathBuf>,
+    },
     /// Merge features by attribute values (ArcGIS "Dissolve").
     Dissolve {
         in_features: PathBuf,
@@ -370,6 +394,31 @@ fn main() -> ExitCode {
             split_field,
             out_workspace,
         } => split_tool(&in_features, &split_features, &split_field, &out_workspace),
+        Tool::CheckGeometry {
+            in_features,
+            out_table,
+            validation_method,
+        } => check_geometry_tool(&in_features, &out_table, &validation_method),
+        Tool::RepairGeometry {
+            in_features,
+            delete_null,
+            validation_method,
+            output,
+        } => (|| {
+            let delete_null = match delete_null.to_ascii_uppercase().as_str() {
+                "DELETE_NULL" => true,
+                "KEEP_NULL" => false,
+                other => return Err(Error::Unsupported(format!("delete_null {other}"))),
+            };
+            let method = validation_method_arg(&validation_method)?;
+            let (fc, _) = open_feature_class(&in_features)?;
+            let out = geoforge_tools::repair_geometry(fc.as_ref(), delete_null, method)?;
+            drop(fc);
+            match output {
+                Some(o) => write_output(out, &o, source_gdb(&in_features).as_deref()),
+                None => update_in_place(out, &in_features),
+            }
+        })(),
         Tool::Dissolve {
             in_features,
             out_feature_class,
@@ -994,6 +1043,74 @@ fn catalog_path(p: &Path) -> String {
         .unwrap_or_else(|_| p.to_path_buf())
         .display()
         .to_string()
+}
+
+fn validation_method_arg(s: &str) -> Result<geoforge_geometry::ValidationMethod> {
+    match s.to_ascii_uppercase().as_str() {
+        "ESRI" => Ok(geoforge_geometry::ValidationMethod::Esri),
+        "OGC" => Ok(geoforge_geometry::ValidationMethod::Ogc),
+        other => Err(Error::Unsupported(format!("validation_method {other}"))),
+    }
+}
+
+fn check_geometry_tool(in_features: &str, out_table: &Path, method: &str) -> Result<()> {
+    let method = validation_method_arg(method)?;
+    let paths: Vec<PathBuf> = in_features
+        .split(';')
+        .map(str::trim)
+        .filter(|p| !p.is_empty())
+        .map(PathBuf::from)
+        .collect();
+    let opened: Vec<Box<dyn FeatureClass>> = paths
+        .iter()
+        .map(|p| open_feature_class(p).map(|(f, _)| f))
+        .collect::<Result<_>>()?;
+    let inputs: Vec<geoforge_tools::CheckInput> = paths
+        .iter()
+        .zip(&opened)
+        .map(|(p, f)| geoforge_tools::CheckInput {
+            source: catalog_path(p),
+            features: f.as_ref(),
+            has_spatial_index: match locate(p) {
+                Location::Shapefile(shp) => shp.with_extension("sbn").exists(),
+                Location::Geodatabase { .. } => true,
+            },
+        })
+        .collect();
+    let (rows, messages) = geoforge_tools::check_geometry(&inputs, method)?;
+    for m in &messages {
+        eprintln!("{m}");
+    }
+    if out_table
+        .extension()
+        .is_none_or(|e| !e.eq_ignore_ascii_case("dbf"))
+    {
+        return Err(Error::Unsupported(
+            "Check Geometry writes a .dbf table; geodatabase tables are not implemented yet".into(),
+        ));
+    }
+    let fields = geoforge_tools::check_geometry_fields();
+    let dbf_fields = fields
+        .iter()
+        .map(|f| geoforge_shapefile::dbf::DbfField::from_field(f.name.clone(), f))
+        .collect::<Result<Vec<_>>>()?;
+    let mut w = geoforge_shapefile::dbf::DbfWriter::create(
+        out_table,
+        dbf_fields,
+        chrono::Local::now().date_naive(),
+    )?;
+    for r in &rows {
+        w.push(&[
+            Value::String(r.class.clone()),
+            Value::Integer(r.feature_id as i32),
+            Value::String(r.problem.clone()),
+        ])?;
+    }
+    w.finish()?;
+    let cpg = out_table.with_extension("cpg");
+    std::fs::write(&cpg, "UTF-8").map_err(|e| Error::io(&cpg, e))?;
+    println!("Wrote {} ({} problems)", out_table.display(), rows.len());
+    Ok(())
 }
 
 fn split_tool(

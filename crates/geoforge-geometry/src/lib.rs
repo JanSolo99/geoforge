@@ -9,6 +9,7 @@ pub mod index;
 pub mod linework;
 pub mod overlay;
 pub mod proximity;
+pub mod validate;
 
 pub use buffer::{BufferOptions, LineEnd, buffer, buffer_union};
 pub use clip::{ClipArea, clip};
@@ -19,3 +20,4 @@ pub use overlay::{
     polygon_overlay,
 };
 pub use proximity::{Nearest, center, completely_within, nearest, outline, relate_matches, within};
+pub use validate::{Problem, ValidationMethod, check, repair};

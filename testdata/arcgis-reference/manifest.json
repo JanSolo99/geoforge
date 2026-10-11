@@ -6230,6 +6230,420 @@
       ],
       "shapeType": "Polygon"
     },
+    "check_bad_esri": {
+      "tool": "management.CheckGeometry",
+      "args": [
+        "testdata/geoproc/bad_polygons.shp;testdata/geoproc/bad_lines.shp",
+        "<out>",
+        "ESRI"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000442: could not find spatial index at -1 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: incorrect ring ordering at 1 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: self intersections at 2 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: unclosed rings at 3 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: null geometry at 4 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: short segments at 5 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: self intersections at 6 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: self intersections at 7 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: self intersections at 8 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: incorrect ring ordering at 9 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: incorrect ring ordering at 10 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: self intersections at 11 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: self intersections at 12 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: self intersections at 15 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: self intersections at 16 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: incorrect ring ordering at 17 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: incorrect ring ordering at 18 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: self intersections at 19 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: self intersections at 20 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: could not find spatial index at -1 in \\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\bad_lines.shp",
+        "WARNING 000442: short segments at 1 in \\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\bad_lines.shp",
+        "WARNING 000442: empty parts at 2 in \\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\bad_lines.shp",
+        "WARNING 000442: short segments at 3 in \\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\bad_lines.shp",
+        "WARNING 000442: null geometry at 4 in \\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\bad_lines.shp"
+      ],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "CLASS",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "FEATURE_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "PROBLEM",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null
+    },
+    "check_bad_ogc": {
+      "tool": "management.CheckGeometry",
+      "args": [
+        "testdata/geoproc/bad_polygons.shp;testdata/geoproc/bad_lines.shp",
+        "<out>",
+        "OGC"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000442: could not find spatial index at -1 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: incorrect ring ordering at 1 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: self intersections at 2 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: unclosed rings at 3 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: null geometry at 4 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: short segments at 5 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: short segments at 6 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: non simple at 7 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: self intersections at 8 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: incorrect ring ordering at 9 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: incorrect ring ordering at 10 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: self intersections at 11 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: self intersections at 12 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: non simple at 13 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: Duplicate vertex at 15 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: self intersections at 16 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: incorrect ring ordering at 17 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: incorrect ring ordering at 18 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: self intersections at 19 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: self intersections at 20 in /mnt/media/ArcGIS_Linux/testdata/geoproc/bad_polygons.shp",
+        "WARNING 000442: could not find spatial index at -1 in \\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\bad_lines.shp",
+        "WARNING 000442: short segments at 1 in \\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\bad_lines.shp",
+        "WARNING 000442: non simple at 2 in \\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\bad_lines.shp",
+        "WARNING 000442: short segments at 3 in \\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\bad_lines.shp",
+        "WARNING 000442: null geometry at 4 in \\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\bad_lines.shp",
+        "WARNING 000442: short segments at 5 in \\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\bad_lines.shp",
+        "WARNING 000442: self intersections at 6 in \\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\bad_lines.shp",
+        "WARNING 000442: self intersections at 7 in \\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\bad_lines.shp",
+        "WARNING 000442: self intersections at 9 in \\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\bad_lines.shp",
+        "WARNING 000442: self intersections at 10 in \\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\bad_lines.shp",
+        "WARNING 000442: self intersections at 11 in \\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\bad_lines.shp",
+        "WARNING 000442: self intersections at 12 in \\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\bad_lines.shp",
+        "WARNING 000442: Duplicate vertex at 13 in \\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\bad_lines.shp"
+      ],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "CLASS",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "FEATURE_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "PROBLEM",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null
+    },
+    "check_parcels": {
+      "tool": "management.CheckGeometry",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000442: could not find spatial index at -1 in /mnt/media/ArcGIS_Linux/testdata/geoproc/parcels.shp"
+      ],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "CLASS",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "FEATURE_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "PROBLEM",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null
+    },
+    "repair_bad_polygons_esri": {
+      "tool": "management.RepairGeometry",
+      "args": [
+        "testdata/geoproc/bad_polygons.shp",
+        "<out>",
+        "DELETE_NULL",
+        "ESRI"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000986: C:\\users\\jansolo\\AppData\\Local\\Temp\\repair_bad_polygons_esri0.txt contains the full list of non simple features.",
+        "WARNING 000461: Repaired feature 1 because of incorrect ring ordering",
+        "WARNING 000461: Repaired feature 2 because of self intersections",
+        "WARNING 000461: Repaired feature 3 because of unclosed rings",
+        "WARNING 000107: Deleted feature 4 because of empty geometry",
+        "WARNING 000461: Repaired feature 5 because of short segments",
+        "WARNING 000461: Repaired feature 6 because of self intersections",
+        "WARNING 000461: Repaired feature 7 because of self intersections",
+        "WARNING 000461: Repaired feature 8 because of self intersections",
+        "WARNING 000461: Repaired feature 9 because of incorrect ring ordering",
+        "WARNING 000461: Repaired feature 10 because of incorrect ring ordering",
+        "WARNING 000461: Repaired feature 11 because of self intersections",
+        "WARNING 000461: Repaired feature 12 because of self intersections",
+        "WARNING 000461: Repaired feature 15 because of self intersections",
+        "WARNING 000461: Repaired feature 16 because of self intersections",
+        "WARNING 000461: Repaired feature 17 because of incorrect ring ordering",
+        "WARNING 000461: Repaired feature 18 because of incorrect ring ordering",
+        "WARNING 000461: Repaired feature 19 because of self intersections",
+        "WARNING 000461: Repaired feature 20 because of self intersections",
+        "WARNING 003598: Updated feature class extent."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DESCR",
+          "String",
+          40,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "repair_bad_polygons_ogc_keep": {
+      "tool": "management.RepairGeometry",
+      "args": [
+        "testdata/geoproc/bad_polygons.shp",
+        "<out>",
+        "KEEP_NULL",
+        "OGC"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000986: C:\\users\\jansolo\\AppData\\Local\\Temp\\repair_bad_polygons_ogc_keep0.txt contains the full list of non simple features.",
+        "WARNING 000461: Repaired feature 1 because of incorrect ring ordering",
+        "WARNING 000461: Repaired feature 2 because of self intersections",
+        "WARNING 000461: Repaired feature 3 because of unclosed rings",
+        "WARNING 000461: Repaired feature 5 because of short segments",
+        "WARNING 000461: Repaired feature 6 because of short segments",
+        "WARNING 000461: Repaired feature 7 because of Non simple.",
+        "WARNING 000461: Repaired feature 8 because of self intersections",
+        "WARNING 000461: Repaired feature 9 because of incorrect ring ordering",
+        "WARNING 000461: Repaired feature 10 because of incorrect ring ordering",
+        "WARNING 000461: Repaired feature 11 because of self intersections",
+        "WARNING 000461: Repaired feature 12 because of self intersections",
+        "WARNING 000461: Repaired feature 13 because of Non simple.",
+        "WARNING 000461: Repaired feature 15 because of Duplicate vertex.",
+        "WARNING 000461: Repaired feature 16 because of self intersections",
+        "WARNING 000461: Repaired feature 17 because of incorrect ring ordering",
+        "WARNING 000461: Repaired feature 18 because of incorrect ring ordering",
+        "WARNING 000461: Repaired feature 19 because of self intersections",
+        "WARNING 000461: Repaired feature 20 because of self intersections",
+        "WARNING 003598: Updated feature class extent."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DESCR",
+          "String",
+          40,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "repair_bad_lines_esri_keep": {
+      "tool": "management.RepairGeometry",
+      "args": [
+        "testdata/geoproc/bad_lines.shp",
+        "<out>",
+        "KEEP_NULL",
+        "ESRI"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000986: C:\\users\\jansolo\\AppData\\Local\\Temp\\repair_bad_lines_esri_keep0.txt contains the full list of non simple features.",
+        "WARNING 000461: Repaired feature 1 because of short segments",
+        "WARNING 000461: Repaired feature 2 because of empty parts",
+        "WARNING 000461: Repaired feature 3 because of short segments",
+        "WARNING 003598: Updated feature class extent."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DESCR",
+          "String",
+          40,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "repair_bad_lines_ogc": {
+      "tool": "management.RepairGeometry",
+      "args": [
+        "testdata/geoproc/bad_lines.shp",
+        "<out>",
+        "DELETE_NULL",
+        "OGC"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000986: C:\\users\\jansolo\\AppData\\Local\\Temp\\repair_bad_lines_ogc0.txt contains the full list of non simple features.",
+        "WARNING 000461: Repaired feature 1 because of short segments",
+        "WARNING 000461: Repaired feature 2 because of Non simple.",
+        "WARNING 000461: Repaired feature 3 because of short segments",
+        "WARNING 000107: Deleted feature 4 because of empty geometry",
+        "WARNING 000461: Repaired feature 5 because of short segments",
+        "WARNING 000461: Repaired feature 6 because of self intersections",
+        "WARNING 000461: Repaired feature 7 because of self intersections",
+        "WARNING 000461: Repaired feature 9 because of self intersections",
+        "WARNING 000461: Repaired feature 10 because of self intersections",
+        "WARNING 000461: Repaired feature 11 because of self intersections",
+        "WARNING 000461: Repaired feature 12 because of self intersections",
+        "WARNING 000461: Repaired feature 13 because of Duplicate vertex.",
+        "WARNING 003598: Updated feature class extent."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DESCR",
+          "String",
+          40,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
     "sel_parcels_intersect_clip": {
       "tool": "management.SelectLayerByLocation",
       "args": [

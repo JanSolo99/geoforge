@@ -59,7 +59,12 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
 - [x] Spatial index: R-tree over envelopes (`EnvelopeIndex`) in Near, Spatial Join,
       Select By Location, Identity and Intersect; nearest search stops once no envelope
       can be closer. 10k parcels × 20k wells: Spatial Join 45 s → 0.06 s, Near 1.9 s → 0.09 s
-- [ ] Validation + repair (Check/Repair Geometry)
+- [x] Check Geometry and Repair Geometry (ESRI and OGC rules; one problem per feature
+      in ArcGIS's order; tolerance cells: segments ≤ 2√2·tol, vertex-to-segment ≤ √2·tol;
+      even-odd rebuild of polygons, OGC lines split where they meet; DELETE/KEEP_NULL;
+      `.dbf` table output) — match ArcGIS on 34 broken shapes
+- [ ] Check/Repair Geometry: geodatabase output tables, curves, multipoint and Z/M
+      problems ("empty Z values", "bad envelope", ...)
 - [ ] Clip/Erase against many polygons: dissolving all clip features up front dominates
       (Clip of 20k points by 10k parcels: 1.5 s)
 - [ ] Shapefile writer: `.sbn/.sbx` and `.shp.xml` (ArcGIS writes both for tool outputs)

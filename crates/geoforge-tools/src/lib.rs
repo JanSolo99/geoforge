@@ -1719,3 +1719,152 @@ pub fn split(
     }
     Ok(outputs)
 }
+
+/// ArcGIS's default XY tolerance for a coordinate system: 0.001 m in the
+/// projection's linear unit, 8.983e-9 degrees for geographic coordinates.
+pub fn default_xy_tolerance(spatial_reference_wkt: Option<&str>) -> f64 {
+    let Some(wkt) = spatial_reference_wkt.map(str::trim_start) else {
+        return geoforge_geometry::XY_TOLERANCE;
+    };
+    if wkt.starts_with("GEOGCS") {
+        return 8.983152841195215e-9;
+    }
+    // The last UNIT is the projection's linear unit: UNIT["Foot_US",0.3048006096012192]
+    wkt.rfind("UNIT[")
+        .and_then(|i| wkt[i..].split(',').nth(1))
+        .and_then(|f| f.trim_end_matches([']', ' ']).trim().parse::<f64>().ok())
+        .filter(|&f| f > 0.0)
+        .map_or(geoforge_geometry::XY_TOLERANCE, |f| {
+            geoforge_geometry::XY_TOLERANCE / f
+        })
+}
+
+/// One input of Check Geometry.
+pub struct CheckInput<'a> {
+    /// The path ArcGIS writes to the CLASS field.
+    pub source: String,
+    pub features: &'a dyn FeatureClass,
+    /// False for a shapefile without a `.sbn` spatial index: ArcGIS reports
+    /// that first, with FEATURE_ID -1.
+    pub has_spatial_index: bool,
+}
+
+/// One row of Check Geometry's output table.
+#[derive(Debug, Clone, PartialEq)]
+pub struct GeometryProblem {
+    pub class: String,
+    pub feature_id: i64,
+    pub problem: String,
+}
+
+/// `arcpy.management.CheckGeometry(in_features, out_table, validation_method)`:
+/// one row per problem feature (CLASS, FEATURE_ID, PROBLEM), each also reported
+/// as WARNING 000442. The rows and the messages are returned.
+pub fn check_geometry(
+    inputs: &[CheckInput],
+    method: geoforge_geometry::ValidationMethod,
+) -> Result<(Vec<GeometryProblem>, Vec<String>)> {
+    let mut rows = Vec::new();
+    for input in inputs {
+        let mut push = |feature_id: i64, problem: &str| {
+            rows.push(GeometryProblem {
+                class: input.source.clone(),
+                feature_id,
+                problem: problem.to_owned(),
+            });
+        };
+        if !input.has_spatial_index {
+            push(-1, "could not find spatial index");
+        }
+        if input.features.geometry_kind().is_none() {
+            continue;
+        }
+        let tol = default_xy_tolerance(input.features.spatial_reference_wkt());
+        for f in input.features.features() {
+            let f = f?;
+            if let Some(p) = geoforge_geometry::check(f.geometry.as_ref(), method, tol) {
+                push(f.oid, p.description());
+            }
+        }
+    }
+    let messages = rows
+        .iter()
+        .map(|r| {
+            format!(
+                "WARNING 000442: {} at {} in {}",
+                r.problem, r.feature_id, r.class
+            )
+        })
+        .collect();
+    Ok((rows, messages))
+}
+
+/// The fields of Check Geometry's output table.
+pub fn check_geometry_fields() -> Vec<Field> {
+    let mut class = Field::new("CLASS", FieldType::String);
+    class.length = 254;
+    let mut id = Field::new("FEATURE_ID", FieldType::Integer);
+    id.precision = 10;
+    let mut problem = Field::new("PROBLEM", FieldType::String);
+    problem.length = 254;
+    vec![class, id, problem]
+}
+
+/// `arcpy.management.RepairGeometry(in_features, delete_null, validation_method)`:
+/// the input with each problem feature repaired (WARNING 000461). Null shapes
+/// are deleted with `delete_null` (WARNING 000107), as are features nothing is
+/// left of after repair; otherwise they stay with a null shape.
+pub fn repair_geometry(
+    input: &dyn FeatureClass,
+    delete_null: bool,
+    method: geoforge_geometry::ValidationMethod,
+) -> Result<ToolOutput> {
+    let kind = input
+        .geometry_kind()
+        .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
+    let tol = default_xy_tolerance(input.spatial_reference_wkt());
+    let mut features = Vec::new();
+    let mut messages = Vec::new();
+    for f in input.features() {
+        let mut f = f?;
+        let problem = geoforge_geometry::check(f.geometry.as_ref(), method, tol);
+        match problem {
+            None => {}
+            // Also a line with only one-point parts: it becomes null, unreported.
+            Some(geoforge_geometry::Problem::NullGeometry) => {
+                f.geometry = None;
+                if delete_null {
+                    messages.push(format!(
+                        "WARNING 000107: Deleted feature {} because of empty geometry",
+                        f.oid
+                    ));
+                    continue;
+                }
+            }
+            Some(p) => {
+                messages.push(format!(
+                    "WARNING 000461: Repaired feature {} because of {}",
+                    f.oid,
+                    p.repair_reason()
+                ));
+                f.geometry = match &f.geometry {
+                    Some(g) => geoforge_geometry::repair(g, method, tol)?,
+                    None => None,
+                };
+                if f.geometry.is_none() && delete_null {
+                    continue;
+                }
+            }
+        }
+        features.push(f);
+    }
+    Ok(ToolOutput {
+        kind,
+        has_z: input.has_z(),
+        has_m: input.has_m(),
+        fields: input.fields().to_vec(),
+        spatial_reference_wkt: input.spatial_reference_wkt().map(str::to_owned),
+        features,
+        messages,
+    })
+}

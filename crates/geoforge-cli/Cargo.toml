@@ -17,6 +17,7 @@ geoforge-filegdb.workspace = true
 geoforge-geometry.workspace = true
 geoforge-tools.workspace = true
 clap.workspace = true
+chrono.workspace = true
 
 [lints]
 workspace = true

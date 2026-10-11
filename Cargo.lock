@@ -248,6 +248,7 @@ dependencies = [
 name = "geoforge-cli"
 version = "0.0.1"
 dependencies = [
+ "chrono",
  "clap",
  "geoforge-core",
  "geoforge-filegdb",
@@ -284,6 +285,7 @@ version = "0.0.1"
 dependencies = [
  "geo",
  "geoforge-core",
+ "i_overlay",
  "rstar",
 ]
 

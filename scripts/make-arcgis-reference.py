@@ -77,11 +77,20 @@ CASES = {
     "intersect_parcels_clip_fid_only": ("analysis.Intersect", [f"{DATA / 'parcels.shp'};{DATA / 'clip_areas.shp'}"], ["ONLY_FID"]),
     "intersect_parcels_clip_no_fid": ("analysis.Intersect", [f"{DATA / 'parcels.shp'};{DATA / 'clip_areas.shp'}"], ["NO_FID"]),
     "merge_parcels_clip_source": ("management.Merge", [f"{DATA / 'parcels.shp'};{DATA / 'clip_areas.shp'}"], ["", "ADD_SOURCE_INFO"]),
+    "check_bad_esri": ("management.CheckGeometry", [f"{DATA / 'bad_polygons.shp'};{DATA / 'bad_lines.shp'}"], ["ESRI"]),
+    "check_bad_ogc": ("management.CheckGeometry", [f"{DATA / 'bad_polygons.shp'};{DATA / 'bad_lines.shp'}"], ["OGC"]),
+    "check_parcels": ("management.CheckGeometry", [DATA / "parcels.shp"], []),
+    "repair_bad_polygons_esri": ("management.RepairGeometry", [DATA / "bad_polygons.shp"], ["DELETE_NULL", "ESRI"]),
+    "repair_bad_polygons_ogc_keep": ("management.RepairGeometry", [DATA / "bad_polygons.shp"], ["KEEP_NULL", "OGC"]),
+    "repair_bad_lines_esri_keep": ("management.RepairGeometry", [DATA / "bad_lines.shp"], ["KEEP_NULL", "ESRI"]),
+    "repair_bad_lines_ogc": ("management.RepairGeometry", [DATA / "bad_lines.shp"], ["DELETE_NULL", "OGC"]),
 }
 WORKSPACE_OUT = {"analysis.Split"}
+# Tools whose output is a table, written as <name>.dbf.
+TABLE_OUT = {"management.CheckGeometry"}
 
 # In-place tools: the index of the input they edit (run on a copy written as the output).
-IN_PLACE = {"analysis.Near": 0, "management.Append": 1}
+IN_PLACE = {"analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0}
 
 # Select Layer By Location cases, saved with Copy Features:
 # name: (in_layer, overlap_type, select_features, search_distance, invert)
@@ -116,7 +125,7 @@ def main():
     info = w.call("info")
     manifest = {"arcgis": {k: info.get(k) for k in ("product", "version", "build", "license")}, "cases": {}}
     for name, (tool, before, after) in CASES.items():
-        out = OUT / f"{name}.shp"
+        out = OUT / (f"{name}.dbf" if tool in TABLE_OUT else f"{name}.shp")
         if tool in WORKSPACE_OUT:
             out = OUT / name
             out.mkdir()

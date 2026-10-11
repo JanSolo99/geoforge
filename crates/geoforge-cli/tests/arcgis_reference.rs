@@ -481,8 +481,95 @@ fn gf_args(case: &str) -> Vec<&'static str> {
             "--join-attributes",
             "NO_FID",
         ],
+        "check_bad_esri" => vec![
+            "check-geometry",
+            "testdata/geoproc/bad_polygons.shp;testdata/geoproc/bad_lines.shp",
+        ],
+        "check_bad_ogc" => vec![
+            "check-geometry",
+            "testdata/geoproc/bad_polygons.shp;testdata/geoproc/bad_lines.shp",
+            "<out>",
+            "--validation-method",
+            "OGC",
+        ],
+        "check_parcels" => vec!["check-geometry", "testdata/geoproc/parcels.shp"],
+        "repair_bad_polygons_esri" => vec![
+            "repair-geometry",
+            "testdata/geoproc/bad_polygons.shp",
+            "--output",
+        ],
+        "repair_bad_polygons_ogc_keep" => vec![
+            "repair-geometry",
+            "testdata/geoproc/bad_polygons.shp",
+            "--delete-null",
+            "KEEP_NULL",
+            "--validation-method",
+            "OGC",
+            "--output",
+        ],
+        "repair_bad_lines_esri_keep" => vec![
+            "repair-geometry",
+            "testdata/geoproc/bad_lines.shp",
+            "--delete-null",
+            "KEEP_NULL",
+            "--output",
+        ],
+        "repair_bad_lines_ogc" => vec![
+            "repair-geometry",
+            "testdata/geoproc/bad_lines.shp",
+            "--validation-method",
+            "OGC",
+            "--output",
+        ],
         other => panic!("no gf command for case {other}"),
     }
+}
+
+/// Rows of a .dbf table, with paths (CLASS) reduced to the file name: ArcGIS
+/// writes its own Windows form of the path.
+fn table_rows(path: &Path) -> Vec<Vec<String>> {
+    let dbf = geoforge_shapefile::dbf::DbfReader::open(path, Some("UTF-8")).unwrap();
+    (0..dbf.num_records())
+        .map(|i| {
+            dbf.read(i)
+                .unwrap()
+                .0
+                .iter()
+                .map(|v| match v {
+                    Value::String(s) => s.rsplit(['/', '\\']).next().unwrap().to_owned(),
+                    other => format!("{other:?}"),
+                })
+                .collect()
+        })
+        .collect()
+}
+
+fn compare_tables(ours: &Path, theirs: &Path, fields: &serde_json::Value) -> Vec<String> {
+    let mut diffs = Vec::new();
+    let expected: Vec<(String, u64)> = fields.as_array().unwrap()[1..]
+        .iter()
+        .map(|f| (f[0].as_str().unwrap().to_owned(), f[2].as_u64().unwrap()))
+        .collect();
+    let dbf = geoforge_shapefile::dbf::DbfReader::open(ours, Some("UTF-8")).unwrap();
+    let got: Vec<(String, u64)> = dbf
+        .header()
+        .fields
+        .iter()
+        .map(|f| (f.name.clone(), u64::from(f.width)))
+        .collect();
+    if got != expected {
+        diffs.push(format!("schema: ours {got:?}, ArcGIS {expected:?}"));
+    }
+    let (a, b) = (table_rows(ours), table_rows(theirs));
+    if a.len() != b.len() {
+        diffs.push(format!("count: ours {}, ArcGIS {}", a.len(), b.len()));
+    }
+    for (i, (ra, rb)) in a.iter().zip(&b).enumerate() {
+        if ra != rb {
+            diffs.push(format!("row {i}: ours {ra:?}, ArcGIS {rb:?}"));
+        }
+    }
+    diffs
 }
 
 fn type_name(t: FieldType) -> &'static str {
@@ -569,8 +656,10 @@ fn compare(case: &str, ours: &Path, theirs: &Path, fields: &serde_json::Value) -
                 diffs.push(format!("feature {i} field {k}: ours {va:?}, ArcGIS {vb:?}"));
             }
         }
-        let (Some(ga), Some(gb)) = (&fa.geometry, &fb.geometry) else {
-            if fa.geometry.is_some() != fb.geometry.is_some() {
+        // ArcGIS writes null shapes as empty records; both are "no shape".
+        let shape = |g: &Option<geoforge_core::Geometry>| g.clone().filter(|g| !g.xy.is_empty());
+        let (Some(ga), Some(gb)) = (&shape(&fa.geometry), &shape(&fb.geometry)) else {
+            if shape(&fa.geometry).is_some() != shape(&fb.geometry).is_some() {
                 diffs.push(format!("feature {i}: null geometry mismatch"));
             }
             continue;
@@ -614,10 +703,15 @@ fn tools_match_arcgis_output() {
     let mut failures = Vec::new();
     for (case, info) in manifest["cases"].as_object().unwrap() {
         // Workspace tools (Split) write into a folder.
+        // Table tools (Check Geometry) write a .dbf.
+        let table = reference.join(format!("{case}.dbf")).exists()
+            && !reference.join(format!("{case}.shp")).exists();
         let out = if info.get("outputs").is_some() {
             let dir = out_dir.join(case);
             std::fs::create_dir_all(&dir).unwrap();
             dir
+        } else if table {
+            out_dir.join(format!("{case}.dbf"))
         } else {
             out_dir.join(format!("{case}.shp"))
         };
@@ -682,6 +776,12 @@ fn tools_match_arcgis_output() {
                 "gf failed: {}",
                 String::from_utf8_lossy(&run.stderr)
             ));
+        } else if table {
+            diffs = compare_tables(
+                &out,
+                &reference.join(format!("{case}.dbf")),
+                &info["fields"],
+            );
         } else {
             diffs = compare(
                 case,

@@ -48,3 +48,10 @@ one full-circle arc). Writing a shapefile densifies them:
   within 0.2 m.
 - FLAT line ends are the ROUND buffer minus the end half-discs, even where other
   parts of the line's buffer reach into them.
+
+## Null shapes
+ArcGIS writes a feature without a shape (Copy Features, Repair Geometry's KEEP_NULL)
+not as a type-0 null record but as an empty record of the layer's type: for a
+polyline or polygon, the type, a NaN bounding box and zero parts and points (44
+bytes). arcpy reads both as `None`. GeoForge reads such a record as an empty
+geometry and still writes nulls as type 0.
