@@ -381,14 +381,14 @@ fn intersect_outlines(inputs: &[NamedInput], points: bool) -> Result<ToolOutput>
             }
         }
     }
-    for i in 2..inputs.len() {
+    for (i, index) in indexes.iter().enumerate().skip(2) {
         let mut next = Vec::new();
         for (ks, m) in &combos {
             let mut env = geoforge_core::Envelope::EMPTY;
             for p in m.points.iter().chain(m.shared.iter().flatten()) {
                 env.expand_xy(p[0], p[1]);
             }
-            for k in indexes[i].candidates(&env, TOL) {
+            for k in index.candidates(&env, TOL) {
                 let narrowed = narrow_meeting(m, geom(i, k), TOL)?;
                 if !narrowed.points.is_empty() || !narrowed.shared.is_empty() {
                     let mut ks = ks.clone();
