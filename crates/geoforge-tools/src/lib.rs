@@ -2814,3 +2814,491 @@ pub fn project(input: &dyn FeatureClass, target: &geoforge_proj::Crs) -> Result<
         messages: Vec::new(),
     })
 }
+
+/// The input's fields plus `ORIG_FID`.
+fn with_orig_fid(input: &dyn FeatureClass) -> Vec<Field> {
+    let mut fields = input.fields().to_vec();
+    fields.push(Field::new("ORIG_FID", FieldType::Integer));
+    fields
+}
+
+fn with_value(attrs: &[Value], extra: impl IntoIterator<Item = Value>) -> Vec<Value> {
+    attrs.iter().cloned().chain(extra).collect()
+}
+
+fn point_geometry(p: [f64; 2], z: Option<f64>, m: Option<f64>) -> geoforge_core::Geometry {
+    let mut g = geoforge_core::Geometry::point(p[0], p[1]);
+    g.z = z.map(|z| vec![z]);
+    g.m = m.map(|m| vec![m]);
+    g
+}
+
+/// `arcpy.management.MultipartToSinglepart(in, out)`: one feature per part (a
+/// polygon part is an exterior ring with its holes), with `ORIG_FID`.
+pub fn multipart_to_singlepart(input: &dyn FeatureClass) -> Result<ToolOutput> {
+    let kind = input
+        .geometry_kind()
+        .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
+    let out_kind = if kind == GeometryKind::Multipoint {
+        GeometryKind::Point
+    } else {
+        kind
+    };
+    let mut features = Vec::new();
+    for f in input.features() {
+        let f = f?;
+        let Some(g) = &f.geometry else { continue };
+        let parts: Vec<geoforge_core::Geometry> = match kind {
+            GeometryKind::Multipoint => (0..g.xy.len())
+                .map(|i| {
+                    point_geometry(
+                        g.xy[i],
+                        g.z.as_ref().map(|z| z[i]),
+                        g.m.as_ref().map(|m| m[i]),
+                    )
+                })
+                .collect(),
+            GeometryKind::Point => vec![g.clone()],
+            _ => geoforge_geometry::explode(g),
+        };
+        for part in parts {
+            features.push(Feature {
+                oid: features.len() as i64,
+                geometry: Some(part),
+                attributes: with_value(&f.attributes, [Value::Integer(f.oid as i32)]),
+            });
+        }
+    }
+    Ok(ToolOutput {
+        kind: out_kind,
+        has_z: input.has_z(),
+        has_m: input.has_m(),
+        fields: with_orig_fid(input),
+        spatial_reference_wkt: input.spatial_reference_wkt().map(str::to_owned),
+        features,
+        messages: Vec::new(),
+    })
+}
+
+/// `arcpy.management.FeatureToPoint(in, out, point_location)`: the centroid, or
+/// with `inside` a point inside the polygon / on the line.
+pub fn feature_to_point(input: &dyn FeatureClass, inside: bool) -> Result<ToolOutput> {
+    input
+        .geometry_kind()
+        .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
+    let mut features = Vec::new();
+    for f in input.features() {
+        let f = f?;
+        let Some(g) = &f.geometry else { continue };
+        let p = if inside {
+            geoforge_geometry::inside_point(g)?
+        } else {
+            geoforge_geometry::centroid(g)?
+        };
+        let Some(p) = p else { continue };
+        features.push(Feature {
+            oid: features.len() as i64,
+            geometry: Some(geoforge_core::Geometry::point(p[0], p[1])),
+            attributes: with_value(&f.attributes, [Value::Integer(f.oid as i32)]),
+        });
+    }
+    Ok(ToolOutput {
+        kind: GeometryKind::Point,
+        has_z: false,
+        has_m: false,
+        fields: with_orig_fid(input),
+        spatial_reference_wkt: input.spatial_reference_wkt().map(str::to_owned),
+        features,
+        messages: Vec::new(),
+    })
+}
+
+/// Feature Vertices To Points `point_location`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VertexLocation {
+    All,
+    Start,
+    End,
+    BothEnds,
+    Mid,
+    Dangle,
+}
+
+impl VertexLocation {
+    pub fn parse(s: &str) -> Option<Self> {
+        Some(match s.to_ascii_uppercase().as_str() {
+            "ALL" => Self::All,
+            "START" => Self::Start,
+            "END" => Self::End,
+            "BOTH_ENDS" => Self::BothEnds,
+            "MID" => Self::Mid,
+            "DANGLE" => Self::Dangle,
+            _ => return None,
+        })
+    }
+}
+
+/// `arcpy.management.FeatureVerticesToPoints(in, out, point_location)`: points
+/// at every vertex, at each part's start/end, halfway along each feature, or at
+/// dangling part ends (not touching any other line) with `DANGLE_LEN`, the
+/// distance along the part to the nearest place another line meets it.
+pub fn feature_vertices_to_points(
+    input: &dyn FeatureClass,
+    location: VertexLocation,
+) -> Result<ToolOutput> {
+    let kind = input
+        .geometry_kind()
+        .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
+    let lines = load(input)?;
+    let tol = default_xy_tolerance(input.spatial_reference_wkt());
+    let mut fields = with_orig_fid(input);
+    let dangle = location == VertexLocation::Dangle;
+    if dangle {
+        if kind != GeometryKind::Polyline {
+            return Err(Error::Unsupported("DANGLE needs line input".into()));
+        }
+        fields.push(Field::new("DANGLE_LEN", FieldType::Double));
+    }
+    // Every part as its own line, to find where other lines meet each one.
+    let parts: Vec<(usize, geoforge_core::Geometry)> = lines
+        .iter()
+        .enumerate()
+        .flat_map(|(i, f)| {
+            f.geometry
+                .iter()
+                .flat_map(geoforge_geometry::explode)
+                .map(move |p| (i, p))
+                .collect::<Vec<_>>()
+        })
+        .collect();
+    let index = geoforge_geometry::EnvelopeIndex::new(parts.iter().map(|(_, p)| Some(p)));
+    let mut features = Vec::new();
+    for f in &lines {
+        let g = geoforge_geometry::explode(f.geometry.as_ref().unwrap())
+            .into_iter()
+            .collect::<Vec<_>>();
+        let whole = f.geometry.as_ref().unwrap();
+        let mut push =
+            |p: [f64; 2], src: Option<(&geoforge_core::Geometry, usize)>, extra: Option<f64>| {
+                let (z, m) = src.map_or((None, None), |(s, i)| {
+                    (s.z.as_ref().map(|z| z[i]), s.m.as_ref().map(|m| m[i]))
+                });
+                let mut attrs = with_value(&f.attributes, [Value::Integer(f.oid as i32)]);
+                if let Some(d) = extra {
+                    attrs.push(Value::Double(d));
+                }
+                features.push(Feature {
+                    oid: features.len() as i64,
+                    geometry: Some(point_geometry(p, z, m)),
+                    attributes: attrs,
+                });
+            };
+        match location {
+            VertexLocation::All => {
+                for (i, &p) in whole.xy.iter().enumerate() {
+                    push(p, Some((whole, i)), None);
+                }
+            }
+            VertexLocation::Mid => {
+                for part in &g {
+                    if let Some(p) = geoforge_geometry::center(&geoforge_geometry::outline(part))? {
+                        push(p, None, None);
+                    }
+                }
+            }
+            VertexLocation::Start | VertexLocation::End | VertexLocation::BothEnds => {
+                for r in whole.part_ranges().filter(|r| !r.is_empty()) {
+                    if location != VertexLocation::End {
+                        push(whole.xy[r.start], Some((whole, r.start)), None);
+                    }
+                    if location != VertexLocation::Start {
+                        push(whole.xy[r.end - 1], Some((whole, r.end - 1)), None);
+                    }
+                }
+            }
+            VertexLocation::Dangle => {
+                // A feature's dangles come sorted by x, then y.
+                let mut dangles: Vec<([f64; 2], usize, usize, f64)> = Vec::new();
+                for (pi, part) in g.iter().enumerate() {
+                    let path = &part.xy;
+                    if path.len() < 2 {
+                        continue;
+                    }
+                    // Where any other part meets this one: (distance along, point).
+                    let mut meets: Vec<f64> = Vec::new();
+                    let others: Vec<&geoforge_core::Geometry> = index
+                        .candidates(&part.envelope(), tol)
+                        .into_iter()
+                        .map(|k| &parts[k].1)
+                        .filter(|o| o.xy != part.xy)
+                        .collect();
+                    for o in &others {
+                        let m = geoforge_geometry::meeting(part, o, tol)?;
+                        for p in m.points.iter().chain(m.shared.iter().flatten()) {
+                            meets.push(along(path, *p));
+                        }
+                    }
+                    let total = along(path, path[path.len() - 1]);
+                    let ends = [(path[0], 0usize), (path[path.len() - 1], path.len() - 1)];
+                    for (end, at) in ends {
+                        let s = along(path, end);
+                        let touched = others.iter().any(|o| {
+                            geoforge_geometry::nearest(
+                                o,
+                                &geoforge_core::Geometry::point(end[0], end[1]),
+                            )
+                            .ok()
+                            .flatten()
+                            .is_some_and(|n| n.distance <= tol)
+                        });
+                        if touched {
+                            continue;
+                        }
+                        let len = meets
+                            .iter()
+                            .map(|&d| (d - s).abs())
+                            .fold(f64::INFINITY, f64::min);
+                        let len = if len.is_finite() { len } else { total };
+                        dangles.push((end, pi, at, len));
+                    }
+                }
+                dangles.sort_by(|a, b| a.0[0].total_cmp(&b.0[0]).then(a.0[1].total_cmp(&b.0[1])));
+                for (end, pi, at, len) in dangles {
+                    push(end, Some((&g[pi], at)), Some(len));
+                }
+            }
+        }
+    }
+    Ok(ToolOutput {
+        kind: GeometryKind::Point,
+        has_z: input.has_z(),
+        has_m: input.has_m(),
+        fields,
+        spatial_reference_wkt: input.spatial_reference_wkt().map(str::to_owned),
+        features,
+        messages: Vec::new(),
+    })
+}
+
+/// Distance along a path to the point on it nearest `p`.
+fn along(path: &[[f64; 2]], p: [f64; 2]) -> f64 {
+    let mut walked = 0.0;
+    let mut best = (f64::INFINITY, 0.0);
+    for w in path.windows(2) {
+        let (a, b) = (w[0], w[1]);
+        let (dx, dy) = (b[0] - a[0], b[1] - a[1]);
+        let len = dx.hypot(dy);
+        let t = if len == 0.0 {
+            0.0
+        } else {
+            (((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / (len * len)).clamp(0.0, 1.0)
+        };
+        let d = (p[0] - a[0] - t * dx).hypot(p[1] - a[1] - t * dy);
+        if d < best.0 {
+            best = (d, walked + t * len);
+        }
+        walked += len;
+    }
+    best.1
+}
+
+/// Minimum Bounding Geometry `group_option`.
+#[derive(Debug, Clone, PartialEq)]
+pub enum BoundingGroup {
+    None,
+    All,
+    List(Vec<String>),
+}
+
+/// `arcpy.management.MinimumBoundingGeometry(in, out, geometry_type, group_option,
+/// group_field, mbg_fields_option)`.
+pub fn minimum_bounding_geometry(
+    input: &dyn FeatureClass,
+    kind: geoforge_geometry::BoundingKind,
+    group: &BoundingGroup,
+    mbg_fields: bool,
+) -> Result<ToolOutput> {
+    use geoforge_geometry::BoundingKind as K;
+    input
+        .geometry_kind()
+        .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
+    let deviation = geoforge_core::curves::arcgis_densify_deviation(
+        input
+            .spatial_reference_wkt()
+            .is_some_and(|w| w.trim_start().starts_with("GEOGCS")),
+    );
+    let features: Vec<Feature> = load(input)?;
+    // (attributes, members)
+    let mut groups: Vec<(Vec<Value>, Vec<&Feature>)> = Vec::new();
+    let mut fields: Vec<Field> = Vec::new();
+    match group {
+        BoundingGroup::None => {
+            fields = with_orig_fid(input);
+            for f in &features {
+                groups.push((
+                    with_value(&f.attributes, [Value::Integer(f.oid as i32)]),
+                    vec![f],
+                ));
+            }
+        }
+        BoundingGroup::All => groups.push((Vec::new(), features.iter().collect())),
+        BoundingGroup::List(names) => {
+            let keys: Vec<usize> = names
+                .iter()
+                .map(|n| {
+                    input
+                        .fields()
+                        .iter()
+                        .position(|f| f.name.eq_ignore_ascii_case(n))
+                        .ok_or_else(|| {
+                            Error::Unsupported(format!(
+                                "ERROR 000728: Field {n} does not exist within table"
+                            ))
+                        })
+                })
+                .collect::<Result<_>>()?;
+            fields = keys.iter().map(|&i| input.fields()[i].clone()).collect();
+            for f in &features {
+                let key: Vec<Value> = keys.iter().map(|&i| f.attributes[i].clone()).collect();
+                match groups.iter_mut().find(|(k, _)| k == &key) {
+                    Some((_, m)) => m.push(f),
+                    None => groups.push((key, vec![f])),
+                }
+            }
+            groups.sort_by(|a, b| {
+                a.0.iter()
+                    .zip(&b.0)
+                    .map(|(x, y)| compare(x, y))
+                    .find(|o| o.is_ne())
+                    .unwrap_or(std::cmp::Ordering::Equal)
+            });
+        }
+    }
+    let measure = |name: &str| {
+        let mut f = Field::new(name, FieldType::Double);
+        f.precision = 9;
+        f.scale = 3;
+        f
+    };
+    if mbg_fields {
+        match kind {
+            K::Circle => fields.push(measure("MBG_Diameter")),
+            K::Envelope => {
+                fields.push(measure("MBG_Width"));
+                fields.push(measure("MBG_Length"));
+            }
+            _ => {
+                fields.push(measure("MBG_Width"));
+                fields.push(measure("MBG_Length"));
+                fields.push(measure("MBG_Orientation"));
+            }
+        }
+    }
+    let mut out = Vec::new();
+    for (attrs, members) in groups {
+        let Some(b) = geoforge_geometry::bounding(
+            members.iter().filter_map(|f| f.geometry.as_ref()),
+            kind,
+            deviation,
+        )?
+        else {
+            continue;
+        };
+        let mut attrs = attrs;
+        if mbg_fields {
+            match kind {
+                K::Circle => attrs.push(Value::Double(b.diameter)),
+                K::Envelope => {
+                    attrs.push(Value::Double(b.width));
+                    attrs.push(Value::Double(b.length));
+                }
+                _ => {
+                    attrs.push(Value::Double(b.width));
+                    attrs.push(Value::Double(b.length));
+                    attrs.push(Value::Double(b.orientation));
+                }
+            }
+        }
+        out.push(Feature {
+            oid: out.len() as i64,
+            geometry: Some(b.geometry),
+            attributes: attrs,
+        });
+    }
+    Ok(ToolOutput {
+        kind: GeometryKind::Polygon,
+        has_z: false,
+        has_m: false,
+        fields,
+        spatial_reference_wkt: input.spatial_reference_wkt().map(str::to_owned),
+        features: out,
+        messages: Vec::new(),
+    })
+}
+
+/// `arcpy.management.AddXY(in_features)`: `POINT_X`, `POINT_Y` (and `POINT_Z`,
+/// `POINT_M` for Z/M-aware data) added to point features (updated in place).
+pub fn add_xy(input: &dyn FeatureClass) -> Result<ToolOutput> {
+    let kind = input
+        .geometry_kind()
+        .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
+    if kind != GeometryKind::Point {
+        return Err(Error::Unsupported(
+            "ERROR 000187: Only supports Geometry type Point.".into(),
+        ));
+    }
+    let mut fields = input.fields().to_vec();
+    let mut names = vec!["POINT_X", "POINT_Y"];
+    if input.has_z() {
+        names.push("POINT_Z");
+    }
+    if input.has_m() {
+        names.push("POINT_M");
+    }
+    for n in &names {
+        if !fields.iter().any(|f| f.name.eq_ignore_ascii_case(n)) {
+            fields.push(Field::new(*n, FieldType::Double));
+        }
+    }
+    let pos: Vec<usize> = names
+        .iter()
+        .map(|n| {
+            fields
+                .iter()
+                .position(|f| f.name.eq_ignore_ascii_case(n))
+                .unwrap()
+        })
+        .collect();
+    let mut features = Vec::new();
+    for f in input.features() {
+        let mut f = f?;
+        f.attributes.resize(fields.len(), Value::Null);
+        if let Some(g) = f.geometry.as_ref().filter(|g| !g.xy.is_empty()) {
+            let values = [
+                Some(g.xy[0][0]),
+                Some(g.xy[0][1]),
+                g.z.as_ref().map(|z| z[0]),
+                g.m.as_ref().map(|m| m[0]),
+            ];
+            let values: Vec<Option<f64>> = values
+                .into_iter()
+                .enumerate()
+                .filter(|(i, _)| *i < 2 || (*i == 2 && input.has_z()) || (*i == 3 && input.has_m()))
+                .map(|(_, v)| v)
+                .collect();
+            for (k, v) in pos.iter().zip(values) {
+                f.attributes[*k] = v.map_or(Value::Null, Value::Double);
+            }
+        }
+        features.push(f);
+    }
+    Ok(ToolOutput {
+        kind,
+        has_z: input.has_z(),
+        has_m: input.has_m(),
+        fields,
+        spatial_reference_wkt: input.spatial_reference_wkt().map(str::to_owned),
+        features,
+        messages: Vec::new(),
+    })
+}

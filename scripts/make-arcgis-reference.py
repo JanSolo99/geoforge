@@ -157,13 +157,34 @@ CASES = {
     "project_roads_32634": ("management.Project", [DATA / "roads.shp"], [32634]),
     "project_wells_wgs84_32633": ("management.Project", [DATA / "wells_wgs84.shp"], [32633]),
     "project_parcels_z_4326": ("management.Project", [DATA / "parcels_z.shp"], [4326]),
+    "m2s_roads": ("management.MultipartToSinglepart", [DATA / "roads.shp"], []),
+    "m2s_parcels_clip": ("management.MultipartToSinglepart", [OUT / "clip_parcels.shp"], []),
+    "f2p_parcels_centroid": ("management.FeatureToPoint", [DATA / "parcels.shp"], ["CENTROID"]),
+    "f2p_parcels_inside": ("management.FeatureToPoint", [DATA / "parcels.shp"], ["INSIDE"]),
+    "f2p_roads_centroid": ("management.FeatureToPoint", [DATA / "roads.shp"], ["CENTROID"]),
+    "f2p_roads_inside": ("management.FeatureToPoint", [DATA / "roads.shp"], ["INSIDE"]),
+    "fv2p_roads_all": ("management.FeatureVerticesToPoints", [DATA / "roads.shp"], ["ALL"]),
+    "fv2p_roads_start": ("management.FeatureVerticesToPoints", [DATA / "roads.shp"], ["START"]),
+    "fv2p_roads_end": ("management.FeatureVerticesToPoints", [DATA / "roads.shp"], ["END"]),
+    "fv2p_roads_both": ("management.FeatureVerticesToPoints", [DATA / "roads.shp"], ["BOTH_ENDS"]),
+    "fv2p_roads_mid": ("management.FeatureVerticesToPoints", [DATA / "roads.shp"], ["MID"]),
+    "fv2p_roads_dangle": ("management.FeatureVerticesToPoints", [DATA / "roads.shp"], ["DANGLE"]),
+    "fv2p_parcels_all": ("management.FeatureVerticesToPoints", [DATA / "parcels.shp"], ["ALL"]),
+    "mbg_parcels_envelope": ("management.MinimumBoundingGeometry", [DATA / "parcels.shp"], ["ENVELOPE"]),
+    "mbg_roads_hull": ("management.MinimumBoundingGeometry", [DATA / "roads.shp"], ["CONVEX_HULL"]),
+    "mbg_roads_rect_area": ("management.MinimumBoundingGeometry", [DATA / "roads.shp"], ["RECTANGLE_BY_AREA"]),
+    "mbg_roads_rect_width": ("management.MinimumBoundingGeometry", [DATA / "roads.shp"], ["RECTANGLE_BY_WIDTH"]),
+    "mbg_roads_circle": ("management.MinimumBoundingGeometry", [DATA / "roads.shp"], ["CIRCLE"]),
+    "mbg_wells_hull_all": ("management.MinimumBoundingGeometry", [DATA / "wells.shp"], ["CONVEX_HULL", "ALL"]),
+    "mbg_parcels_env_zone_mbg": ("management.MinimumBoundingGeometry", [DATA / "parcels.shp"], ["ENVELOPE", "LIST", "ZONE", "MBG_FIELDS"]),
+    "addxy_wells": ("management.AddXY", [DATA / "wells.shp"], []),
 }
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools whose output is a table, written as <name>.dbf.
 TABLE_OUT = {"management.CheckGeometry"}
 
 # In-place tools: the index of the input they edit (run on a copy written as the output).
-IN_PLACE = {"analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0}
+IN_PLACE = {"analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0}
 
 # Select Layer By Location cases, saved with Copy Features:
 # name: (in_layer, overlap_type, select_features, search_distance, invert)

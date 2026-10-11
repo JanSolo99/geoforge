@@ -172,6 +172,50 @@ enum Tool {
         /// A folder; outputs are `<value>.shp`.
         out_workspace: PathBuf,
     },
+    /// One feature per part (ArcGIS "Multipart To Singlepart").
+    MultipartToSinglepart {
+        in_features: PathBuf,
+        out_feature_class: PathBuf,
+    },
+    /// A point per feature (ArcGIS "Feature To Point").
+    FeatureToPoint {
+        in_features: PathBuf,
+        out_feature_class: PathBuf,
+        /// CENTROID or INSIDE.
+        #[arg(long, default_value = "CENTROID")]
+        point_location: String,
+    },
+    /// Points at vertices of lines or polygons (ArcGIS "Feature Vertices To Points").
+    FeatureVerticesToPoints {
+        in_features: PathBuf,
+        out_feature_class: PathBuf,
+        /// ALL, START, END, BOTH_ENDS, MID or DANGLE.
+        #[arg(long, default_value = "ALL")]
+        point_location: String,
+    },
+    /// Bounding polygons (ArcGIS "Minimum Bounding Geometry").
+    MinimumBoundingGeometry {
+        in_features: PathBuf,
+        out_feature_class: PathBuf,
+        /// RECTANGLE_BY_AREA, RECTANGLE_BY_WIDTH, CONVEX_HULL, CIRCLE or ENVELOPE.
+        #[arg(long, default_value = "RECTANGLE_BY_AREA")]
+        geometry_type: String,
+        /// NONE, ALL or LIST (with --group-field).
+        #[arg(long, default_value = "NONE")]
+        group_option: String,
+        #[arg(long = "group-field")]
+        group_fields: Vec<String>,
+        /// NO_MBG_FIELDS or MBG_FIELDS.
+        #[arg(long, default_value = "NO_MBG_FIELDS")]
+        mbg_fields_option: String,
+    },
+    /// Add POINT_X/POINT_Y (and Z/M) to point features (ArcGIS "Add XY
+    /// Coordinates"). Updates the input in place unless an output is given.
+    AddXy {
+        in_features: PathBuf,
+        #[arg(long)]
+        output: Option<PathBuf>,
+    },
     /// Transform features to another coordinate system (ArcGIS "Project").
     Project {
         in_dataset: PathBuf,
@@ -463,6 +507,85 @@ fn main() -> ExitCode {
             split_field,
             out_workspace,
         } => split_tool(&in_features, &split_features, &split_field, &out_workspace),
+        Tool::MultipartToSinglepart {
+            in_features,
+            out_feature_class,
+        } => (|| {
+            let (fc, _) = open_feature_class(&in_features)?;
+            let out = geoforge_tools::multipart_to_singlepart(fc.as_ref())?;
+            write_output(out, &out_feature_class, source_gdb(&in_features).as_deref())
+        })(),
+        Tool::FeatureToPoint {
+            in_features,
+            out_feature_class,
+            point_location,
+        } => (|| {
+            let inside = match point_location.to_ascii_uppercase().as_str() {
+                "CENTROID" => false,
+                "INSIDE" => true,
+                other => return Err(Error::Unsupported(format!("point_location {other}"))),
+            };
+            let (fc, _) = open_feature_class(&in_features)?;
+            let out = geoforge_tools::feature_to_point(fc.as_ref(), inside)?;
+            write_output(out, &out_feature_class, source_gdb(&in_features).as_deref())
+        })(),
+        Tool::FeatureVerticesToPoints {
+            in_features,
+            out_feature_class,
+            point_location,
+        } => (|| {
+            let location = geoforge_tools::VertexLocation::parse(&point_location)
+                .ok_or_else(|| Error::Unsupported(format!("point_location {point_location}")))?;
+            let (fc, _) = open_feature_class(&in_features)?;
+            let out = geoforge_tools::feature_vertices_to_points(fc.as_ref(), location)?;
+            write_output(out, &out_feature_class, source_gdb(&in_features).as_deref())
+        })(),
+        Tool::MinimumBoundingGeometry {
+            in_features,
+            out_feature_class,
+            geometry_type,
+            group_option,
+            group_fields,
+            mbg_fields_option,
+        } => (|| {
+            use geoforge_geometry::BoundingKind as K;
+            let kind = match geometry_type.to_ascii_uppercase().as_str() {
+                "RECTANGLE_BY_AREA" => K::RectangleByArea,
+                "RECTANGLE_BY_WIDTH" => K::RectangleByWidth,
+                "CONVEX_HULL" => K::ConvexHull,
+                "CIRCLE" => K::Circle,
+                "ENVELOPE" => K::Envelope,
+                other => return Err(Error::Unsupported(format!("geometry_type {other}"))),
+            };
+            let group = match group_option.to_ascii_uppercase().as_str() {
+                "NONE" => geoforge_tools::BoundingGroup::None,
+                "ALL" => geoforge_tools::BoundingGroup::All,
+                "LIST" if !group_fields.is_empty() => {
+                    geoforge_tools::BoundingGroup::List(group_fields)
+                }
+                other => return Err(Error::Unsupported(format!("group_option {other}"))),
+            };
+            let mbg = match mbg_fields_option.to_ascii_uppercase().as_str() {
+                "NO_MBG_FIELDS" => false,
+                "MBG_FIELDS" => true,
+                other => return Err(Error::Unsupported(format!("mbg_fields_option {other}"))),
+            };
+            let (fc, _) = open_feature_class(&in_features)?;
+            let out = geoforge_tools::minimum_bounding_geometry(fc.as_ref(), kind, &group, mbg)?;
+            write_output(out, &out_feature_class, source_gdb(&in_features).as_deref())
+        })(),
+        Tool::AddXy {
+            in_features,
+            output,
+        } => (|| {
+            let (fc, _) = open_feature_class(&in_features)?;
+            let out = geoforge_tools::add_xy(fc.as_ref())?;
+            drop(fc);
+            match output {
+                Some(o) => write_output(out, &o, source_gdb(&in_features).as_deref()),
+                None => update_in_place(out, &in_features),
+            }
+        })(),
         Tool::Project {
             in_dataset,
             out_dataset,

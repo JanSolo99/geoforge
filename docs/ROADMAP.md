@@ -102,6 +102,14 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       in ArcGIS's order; tolerance cells: segments ≤ 2√2·tol, vertex-to-segment ≤ √2·tol;
       even-odd rebuild of polygons, OGC lines split where they meet; DELETE/KEEP_NULL;
       `.dbf` table output) — match ArcGIS on 34 broken shapes
+- [x] Multipart To Singlepart, Feature To Point (CENTROID; INSIDE = arcpy's label point:
+      lines nearest the envelope center, polygons the centroid or a horizontal-split fallback),
+      Feature Vertices To Points (ALL, START/END/BOTH_ENDS and MID per part, DANGLE with
+      DANGLE_LEN), Minimum Bounding Geometry (envelope, convex hull, rectangles by area/width,
+      circle; NONE/ALL/LIST; MBG_FIELDS; straight lines widened 1 unit each side), Add XY
+      Coordinates — match ArcGIS
+- [ ] Feature To Point INSIDE for U/L-shaped polygons whose centroid lies outside (ArcGIS
+      also searches vertically)
 - [ ] Check/Repair Geometry: geodatabase output tables, curves, multipoint and Z/M
       problems ("empty Z values", "bad envelope", ...)
 - [x] Clip/Erase against many polygons: each feature is clipped by the union of only the

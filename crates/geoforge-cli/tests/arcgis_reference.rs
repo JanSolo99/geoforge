@@ -777,6 +777,146 @@ fn gf_args(case: &str) -> Vec<&'static str> {
         "project_parcels_z_4326" => {
             vec!["project", "testdata/geoproc/parcels_z.shp", "<out>", "4326"]
         }
+        "m2s_roads" => vec!["multipart-to-singlepart", "testdata/geoproc/roads.shp"],
+        "m2s_parcels_clip" => vec![
+            "multipart-to-singlepart",
+            "testdata/arcgis-reference/clip_parcels.shp",
+        ],
+        "f2p_parcels_centroid" => vec![
+            "feature-to-point",
+            "testdata/geoproc/parcels.shp",
+            "<out>",
+            "--point-location",
+            "CENTROID",
+        ],
+        "f2p_roads_centroid" => vec![
+            "feature-to-point",
+            "testdata/geoproc/roads.shp",
+            "<out>",
+            "--point-location",
+            "CENTROID",
+        ],
+        "f2p_parcels_inside" => vec![
+            "feature-to-point",
+            "testdata/geoproc/parcels.shp",
+            "<out>",
+            "--point-location",
+            "INSIDE",
+        ],
+        "f2p_roads_inside" => vec![
+            "feature-to-point",
+            "testdata/geoproc/roads.shp",
+            "<out>",
+            "--point-location",
+            "INSIDE",
+        ],
+        "fv2p_roads_all" => vec![
+            "feature-vertices-to-points",
+            "testdata/geoproc/roads.shp",
+            "<out>",
+            "--point-location",
+            "ALL",
+        ],
+        "fv2p_roads_start" => vec![
+            "feature-vertices-to-points",
+            "testdata/geoproc/roads.shp",
+            "<out>",
+            "--point-location",
+            "START",
+        ],
+        "fv2p_roads_end" => vec![
+            "feature-vertices-to-points",
+            "testdata/geoproc/roads.shp",
+            "<out>",
+            "--point-location",
+            "END",
+        ],
+        "fv2p_roads_both" => vec![
+            "feature-vertices-to-points",
+            "testdata/geoproc/roads.shp",
+            "<out>",
+            "--point-location",
+            "BOTH_ENDS",
+        ],
+        "fv2p_roads_mid" => vec![
+            "feature-vertices-to-points",
+            "testdata/geoproc/roads.shp",
+            "<out>",
+            "--point-location",
+            "MID",
+        ],
+        "fv2p_roads_dangle" => vec![
+            "feature-vertices-to-points",
+            "testdata/geoproc/roads.shp",
+            "<out>",
+            "--point-location",
+            "DANGLE",
+        ],
+        "fv2p_parcels_all" => vec![
+            "feature-vertices-to-points",
+            "testdata/geoproc/parcels.shp",
+            "<out>",
+            "--point-location",
+            "ALL",
+        ],
+        "mbg_parcels_envelope" => vec![
+            "minimum-bounding-geometry",
+            "testdata/geoproc/parcels.shp",
+            "<out>",
+            "--geometry-type",
+            "ENVELOPE",
+        ],
+        "mbg_roads_hull" => vec![
+            "minimum-bounding-geometry",
+            "testdata/geoproc/roads.shp",
+            "<out>",
+            "--geometry-type",
+            "CONVEX_HULL",
+        ],
+        "mbg_roads_rect_area" => vec![
+            "minimum-bounding-geometry",
+            "testdata/geoproc/roads.shp",
+            "<out>",
+            "--geometry-type",
+            "RECTANGLE_BY_AREA",
+        ],
+        "mbg_roads_rect_width" => vec![
+            "minimum-bounding-geometry",
+            "testdata/geoproc/roads.shp",
+            "<out>",
+            "--geometry-type",
+            "RECTANGLE_BY_WIDTH",
+        ],
+        "mbg_roads_circle" => vec![
+            "minimum-bounding-geometry",
+            "testdata/geoproc/roads.shp",
+            "<out>",
+            "--geometry-type",
+            "CIRCLE",
+        ],
+        "mbg_wells_hull_all" => vec![
+            "minimum-bounding-geometry",
+            "testdata/geoproc/wells.shp",
+            "<out>",
+            "--geometry-type",
+            "CONVEX_HULL",
+            "--group-option",
+            "ALL",
+        ],
+        "mbg_parcels_env_zone_mbg" => vec![
+            "minimum-bounding-geometry",
+            "testdata/geoproc/parcels.shp",
+            "<out>",
+            "--geometry-type",
+            "ENVELOPE",
+            "--group-option",
+            "LIST",
+            "--group-field",
+            "ZONE",
+            "--mbg-fields-option",
+            "MBG_FIELDS",
+        ],
+        "addxy_wells" => vec!["add-xy", "testdata/geoproc/wells.shp", "--output"],
         "identity_parcels_clip_no_fid" => vec![
             "identity",
             "testdata/geoproc/parcels.shp",
@@ -1009,7 +1149,8 @@ fn compare(case: &str, ours: &Path, theirs: &Path, fields: &serde_json::Value) -
     // Clip agrees within ArcGIS's own XY tolerance (0.001 m: coordinates closer
     // than that are the same point to ArcGIS). Buffers are densified differently
     // (vertex placement on arcs), so compare shape within 2 × the 0.1 m deviation.
-    let is_buffer = case.starts_with("buffer");
+    // Circles are densified arcs, like buffers.
+    let is_buffer = case.starts_with("buffer") || case.ends_with("_circle");
     // Intersect of three or more inputs runs as a cascade of overlays, each of
     // which may move a vertex within the tolerance: allow two steps.
     let cascade = case.starts_with("intersect_tri") || case.starts_with("intersect_3");
@@ -1033,7 +1174,14 @@ fn compare(case: &str, ours: &Path, theirs: &Path, fields: &serde_json::Value) -
     };
     for (i, (fa, fb)) in a.iter().zip(&b).enumerate() {
         for (k, (va, vb)) in fa.attributes.iter().zip(&fb.attributes).enumerate() {
-            if !same_value(va, vb) {
+            // DANGLE_LEN runs to where ArcGIS's own planarization put a crossing,
+            // which can be up to the 0.001 m XY tolerance from the exact one.
+            let measured = expected.get(k).is_some_and(|(n, _)| n == "DANGLE_LEN");
+            let near = |a: &Value, b: &Value| match (a, b) {
+                (Value::Double(x), Value::Double(y)) => (x - y).abs() <= 0.001,
+                _ => false,
+            };
+            if !same_value(va, vb) && !(measured && near(va, vb)) {
                 diffs.push(format!("feature {i} field {k}: ours {va:?}, ArcGIS {vb:?}"));
             }
         }

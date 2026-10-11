@@ -40,7 +40,7 @@ pub struct BufferOptions {
 }
 
 /// Circle with ArcGIS's vertex placement: starts due north, runs clockwise.
-fn circle(c: [f64; 2], r: f64, max_deviation: f64) -> Polygon<f64> {
+pub(crate) fn circle(c: [f64; 2], r: f64, max_deviation: f64) -> Polygon<f64> {
     let n = arcgis_arc_segments(TAU, r, max_deviation);
     let mut pts: Vec<Coord<f64>> = (0..n)
         .map(|k| {

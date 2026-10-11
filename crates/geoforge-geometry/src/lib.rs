@@ -2,6 +2,7 @@
 //! this crate supplies Esri semantics on top: ring rules, multipart results, and
 //! buffers densified exactly the way ArcGIS densifies arcs.
 
+pub mod bounding;
 pub mod buffer;
 pub mod clip;
 pub mod convert;
@@ -11,6 +12,7 @@ pub mod overlay;
 pub mod proximity;
 pub mod validate;
 
+pub use bounding::{Bounding, BoundingKind, bounding, centroid, inside_point};
 pub use buffer::{BufferOptions, LineEnd, LineSide, buffer, buffer_union};
 pub use clip::{ClipArea, clip};
 pub use index::EnvelopeIndex;
