@@ -189,6 +189,8 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         needs all 8); Hillshade truncates to 0–254 with NoData 255; float output NoData is −FLT_MAX,
         or 3.4e38 when the input has NoData; Aspect −1 on flat cells
   - [ ] Geodesic method, Hillshade shadows, tiled output with statistics (.aux.xml) like ArcGIS
+  - [x] Curvature (with profile and plan outputs), identical to ArcGIS: Zevenbergen–Thorne with
+        NoData and off-edge neighbors taking the center value
   - [x] Fill (priority flood from the edge and NoData, z-limit per sink) and Flow Accumulation
         (D8, FLOAT/INTEGER, weights) matching ArcGIS exactly
   - [x] Flow Direction D8 (NORMAL/FORCE): steepest descent, single-cell pits raised first, ties

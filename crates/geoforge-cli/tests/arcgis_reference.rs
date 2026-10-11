@@ -1574,6 +1574,15 @@ fn gf_args(case: &str) -> Vec<&'static str> {
             "testdata/raster/dem.tif",
             "180 250 -5;250 340 5",
         ],
+        "curvature_dem" => vec!["curvature", "testdata/raster/dem.tif"],
+        "curvature_dem_nodata" => vec!["curvature", "testdata/raster/dem_nodata.tif"],
+        "curvature_dem_z2" => vec![
+            "curvature",
+            "testdata/raster/dem_int16_packbits.tif",
+            "<out>",
+            "--z-factor",
+            "2",
+        ],
         "slope_dem" => vec!["slope", "testdata/raster/dem.tif"],
         "slope_dem_percent_z" => vec![
             "slope",

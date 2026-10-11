@@ -273,6 +273,9 @@ CASES = {
     "reclass_landuse_4bit": ("gp.Reclassify_sa", [RASTER / "landuse_u8.tif", "Value", "0 1;1 2;2 3;3 4;4 4"], ["DATA"]),
     "reclass_landuse_200": ("gp.Reclassify_sa", [RASTER / "landuse_u8.tif", "Value", "0 200;1 200;2 200;3 200;4 200"], ["DATA"]),
     "reclass_dem_signed": ("gp.Reclassify_sa", [RASTER / "dem.tif", "Value", "180 250 -5;250 340 5"], ["DATA"]),
+    "curvature_dem": ("gp.Curvature_sa", [RASTER / "dem.tif"], [1]),
+    "curvature_dem_nodata": ("gp.Curvature_sa", [RASTER / "dem_nodata.tif"], [1]),
+    "curvature_dem_z2": ("gp.Curvature_sa", [RASTER / "dem_int16_packbits.tif"], [2]),
     "zonal_mean": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_nodata.tif"], ["MEAN", "DATA"]),
     "zonal_max_strict": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_nodata.tif"], ["MAXIMUM", "NODATA"]),
     "zonal_range_int": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_int16_packbits.tif"], ["RANGE", "DATA"]),
@@ -285,7 +288,8 @@ CASES = {
 }
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
 RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
-              "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa"}
+              "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa",
+              "gp.Curvature_sa"}
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable"}

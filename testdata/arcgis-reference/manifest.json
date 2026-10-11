@@ -15215,6 +15215,42 @@
       "messages": [],
       "fields": [],
       "shapeType": null
+    },
+    "curvature_dem": {
+      "tool": "gp.Curvature_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        1
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "curvature_dem_nodata": {
+      "tool": "gp.Curvature_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        1
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "curvature_dem_z2": {
+      "tool": "gp.Curvature_sa",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>",
+        2
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

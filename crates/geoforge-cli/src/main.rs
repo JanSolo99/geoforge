@@ -425,6 +425,17 @@ enum Tool {
         #[arg(long, default_value = "DATA")]
         ignore_nodata: String,
     },
+    /// Spatial Analyst "Curvature".
+    Curvature {
+        in_raster: PathBuf,
+        out_curvature_raster: PathBuf,
+        #[arg(long, default_value_t = 1.0)]
+        z_factor: f64,
+        #[arg(long)]
+        out_profile_curve_raster: Option<PathBuf>,
+        #[arg(long)]
+        out_plan_curve_raster: Option<PathBuf>,
+    },
     /// Spatial Analyst "Aspect" (planar): downslope direction, −1 on flat cells.
     Aspect {
         in_raster: PathBuf,
@@ -1257,6 +1268,24 @@ fn main() -> ExitCode {
                 &out_raster,
                 &geoforge_raster::zonal::zonal_statistics(&zones, &values, stat, ignore),
             )
+        })(),
+        Tool::Curvature {
+            in_raster,
+            out_curvature_raster,
+            z_factor,
+            out_profile_curve_raster,
+            out_plan_curve_raster,
+        } => (|| {
+            let dem = geoforge_raster::read_geotiff(&in_raster)?;
+            let (curv, profile, plan) = geoforge_raster::surface::curvature(&dem, z_factor);
+            write_raster(&out_curvature_raster, &curv)?;
+            if let Some(p) = out_profile_curve_raster {
+                write_raster(&p, &profile)?;
+            }
+            if let Some(p) = out_plan_curve_raster {
+                write_raster(&p, &plan)?;
+            }
+            Ok(())
         })(),
         Tool::Aspect {
             in_raster,

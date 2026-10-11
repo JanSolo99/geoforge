@@ -122,3 +122,65 @@ pub fn hillshade(dem: &Raster, azimuth: f64, altitude: f64, z_factor: f64) -> Ra
         v.floor().clamp(0.0, 254.0)
     })
 }
+
+/// Spatial Analyst Curvature (Zevenbergen and Thorne): (curvature, profile, plan),
+/// each in hundredths of a z-unit per square cell unit. Neighbors that are NoData
+/// or beyond the edge take the center value, so only NoData cells are NoData.
+pub fn curvature(dem: &Raster, z_factor: f64) -> (Raster, Raster, Raster) {
+    // Observed: −FLT_MAX for float input without NoData, otherwise 3.4e38.
+    let nodata = if dem.data_type.is_float() && dem.nodata.is_none() {
+        f32::MIN as f64
+    } else {
+        3.4e38_f32 as f64
+    };
+    let mut outs = [
+        dem.like(DataType::F32),
+        dem.like(DataType::F32),
+        dem.like(DataType::F32),
+    ];
+    for o in &mut outs {
+        o.nodata = Some(nodata);
+    }
+    let (l, w, h) = (dem.cell_width(), dem.width as isize, dem.height as isize);
+    for row in 0..dem.height {
+        for col in 0..dem.width {
+            let i = row * dem.width + col;
+            let Some(z5) = dem.get(col, row) else {
+                for o in &mut outs {
+                    o.bands[0][i] = nodata;
+                }
+                continue;
+            };
+            let at = |dx: isize, dy: isize| {
+                let (x, y) = (col as isize + dx, row as isize + dy);
+                if x < 0 || y < 0 || x >= w || y >= h {
+                    return z5 * z_factor;
+                }
+                dem.get(x as usize, y as usize).unwrap_or(z5) * z_factor
+            };
+            let z5 = z5 * z_factor;
+            let (z1, z2, z3) = (at(-1, -1), at(0, -1), at(1, -1));
+            let (z4, z6) = (at(-1, 0), at(1, 0));
+            let (z7, z8, z9) = (at(-1, 1), at(0, 1), at(1, 1));
+            let d = ((z4 + z6) / 2.0 - z5) / (l * l);
+            let e = ((z2 + z8) / 2.0 - z5) / (l * l);
+            let f = (-z1 + z3 + z7 - z9) / (4.0 * l * l);
+            let g = (-z4 + z6) / (2.0 * l);
+            let hh = (z2 - z8) / (2.0 * l);
+            let s = g * g + hh * hh;
+            let (profile, plan) = if s == 0.0 {
+                (0.0, 0.0)
+            } else {
+                (
+                    2.0 * (d * g * g + e * hh * hh + f * g * hh) / s * 100.0,
+                    -2.0 * (d * hh * hh + e * g * g - f * g * hh) / s * 100.0,
+                )
+            };
+            for (o, v) in outs.iter_mut().zip([-2.0 * (d + e) * 100.0, profile, plan]) {
+                o.bands[0][i] = DataType::F32.store(v);
+            }
+        }
+    }
+    let [c, p, q] = outs;
+    (c, p, q)
+}
