@@ -2,6 +2,7 @@
 //! *ESRI Shapefile Technical Description* (July 1998).
 
 pub mod dbf;
+mod dos;
 pub mod encoding;
 mod reader;
 pub mod shape_type;

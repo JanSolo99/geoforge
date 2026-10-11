@@ -19,7 +19,9 @@ and verified against GDAL/OGR output on real data.
 - [x] Field mapping, null handling and value formatting verified against ArcGIS Pro 3.7
       through the ArcGIS bridge; `.dbf` output is byte-identical to ArcGIS's for the same input
 - [ ] `.sbn/.sbx` spatial index, `.shp.xml` metadata
-- [ ] DOS code pages (437/850/852) in `.dbf`; memo `.dbt` files
+- [x] DOS and Mac code pages in `.dbf` by language driver ID (437, 737, 850, 852, 857,
+      860, 861, 863, 865, 866, 10000, 10007, 10029; GDAL's LDID table, as ArcGIS reads
+      them); memo fields read as GDAL does (block number) — ArcGIS cannot open such files
 
 ## Phase 2 — Geometry engine
 Overlay is delegated to `geo` (i_overlay); `geoforge-geometry` adds Esri semantics and

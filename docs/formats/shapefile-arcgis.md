@@ -55,3 +55,11 @@ not as a type-0 null record but as an empty record of the layer's type: for a
 polyline or polygon, the type, a NaN bounding box and zero parts and points (44
 bytes). arcpy reads both as `None`. GeoForge reads such a record as an empty
 geometry and still writes nulls as type 0.
+
+## Code pages and memo fields
+Without a `.cpg`, ArcGIS decodes `.dbf` text by the language driver ID (byte 29),
+including DOS code pages (437, 850, 852, 865, 866 checked); GeoForge uses GDAL's
+LDID table (`ENCODING_FROM_LDID`), which agrees. A `.cpg` takes precedence.
+ArcGIS cannot open a shapefile whose `.dbf` has a memo (`M`) field, whatever the
+version byte (0x03 or 0x83): "cannot open". GDAL and GeoForge read the field as
+text holding the `.dbt` block number; the memo text itself is not read.

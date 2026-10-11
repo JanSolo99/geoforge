@@ -136,13 +136,10 @@ impl DbfReader {
         let record_len = u16::from_le_bytes([fixed[10], fixed[11]]);
         let ldid = fixed[29];
 
-        let encoding = match cpg
+        let encoding = cpg
             .and_then(encoding::from_cpg)
             .or_else(|| encoding::from_ldid(ldid))
-        {
-            Some(enc) => DbfEncoding::Known(enc),
-            None => DbfEncoding::Sniff,
-        };
+            .unwrap_or(DbfEncoding::Sniff);
 
         // Descriptors run until 0x0D; trust that over header_len, which some writers get wrong.
         let desc_end = (header_len as u64).max(32).min(file_len) as usize;
