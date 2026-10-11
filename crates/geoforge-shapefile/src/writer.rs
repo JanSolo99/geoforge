@@ -272,6 +272,10 @@ pub fn validate_field_names<'a>(names: impl IntoIterator<Item = &'a str>) -> Vec
             if base.is_empty() || base.starts_with(|c: char| c.is_ascii_digit()) {
                 base.insert(0, 'F');
             }
+            // The OID column is FID: a field of that name becomes FID_.
+            if base.eq_ignore_ascii_case("FID") {
+                base.push('_');
+            }
             base.truncate(MAX_FIELD_NAME_LEN);
             let mut candidate = base.clone();
             let mut n = 1;

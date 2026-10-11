@@ -1198,6 +1198,39 @@ fn gf_args(case: &str) -> Vec<&'static str> {
             "--geojson",
             "NO_GEOJSON",
         ],
+        "j2f_parcels" => vec![
+            "json-to-features",
+            "testdata/arcgis-reference/json_parcels.json",
+        ],
+        "j2f_roads_zm" => vec![
+            "json-to-features",
+            "testdata/arcgis-reference/json_roads_zm.json",
+        ],
+        "j2f_bad_lines" => vec![
+            "json-to-features",
+            "testdata/arcgis-reference/json_bad_lines.json",
+        ],
+        "j2f_geojson_parcels" => vec![
+            "json-to-features",
+            "testdata/arcgis-reference/geojson_parcels.geojson",
+            "<out>",
+            "--geometry-type",
+            "POLYGON",
+        ],
+        "j2f_geojson_wells" => vec![
+            "json-to-features",
+            "testdata/arcgis-reference/geojson_wells.geojson",
+            "<out>",
+            "--geometry-type",
+            "POINT",
+        ],
+        "j2f_geojson_roads" => vec![
+            "json-to-features",
+            "testdata/arcgis-reference/geojson_roads.geojson",
+            "<out>",
+            "--geometry-type",
+            "POLYLINE",
+        ],
         "identity_parcels_clip_no_fid" => vec![
             "identity",
             "testdata/geoproc/parcels.shp",

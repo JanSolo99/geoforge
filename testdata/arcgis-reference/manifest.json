@@ -13936,6 +13936,347 @@
       "messages": [],
       "fields": [],
       "shapeType": null
+    },
+    "j2f_parcels": {
+      "tool": "conversion.JSONToFeatures",
+      "args": [
+        "testdata/arcgis-reference/json_parcels.json",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Shape_Leng",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Shape_Area",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "j2f_roads_zm": {
+      "tool": "conversion.JSONToFeatures",
+      "args": [
+        "testdata/arcgis-reference/json_roads_zm.json",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Shape_Leng",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "j2f_bad_lines": {
+      "tool": "conversion.JSONToFeatures",
+      "args": [
+        "testdata/arcgis-reference/json_bad_lines.json",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DESCR",
+          "String",
+          40,
+          0,
+          0
+        ],
+        [
+          "Shape_Leng",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "j2f_geojson_parcels": {
+      "tool": "conversion.JSONToFeatures",
+      "args": [
+        "testdata/arcgis-reference/geojson_parcels.geojson",
+        "<out>",
+        "POLYGON"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "j2f_geojson_wells": {
+      "tool": "conversion.JSONToFeatures",
+      "args": [
+        "testdata/arcgis-reference/geojson_wells.geojson",
+        "<out>",
+        "POINT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "j2f_geojson_roads": {
+      "tool": "conversion.JSONToFeatures",
+      "args": [
+        "testdata/arcgis-reference/geojson_roads.geojson",
+        "<out>",
+        "POLYLINE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "CLASS",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
     }
   }
 }

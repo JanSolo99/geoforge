@@ -175,7 +175,10 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
 - [x] Features To JSON: Esri JSON and GeoJSON written byte for byte as ArcGIS writes them
       (`geoforge-json`: `%.17g` coordinates, field-scale-dependent number forms, formatted
       header with a one-line features array, wkid/latestWkid through PROJ's identify)
-- [ ] JSON To Features; GeoPackage / SpatiaLite, PostGIS, KML, GML, DXF, E00, ERDAS IMG, JPEG2000
+- [x] JSON To Features: Esri JSON (field types kept, the OID becomes an empty field,
+      Shape_Length/Shape_Area added at 0 as ArcGIS's geodatabase detour leaves them) and GeoJSON
+      (one geometry type, numbers as doubles, text(254), always 3D) — match ArcGIS
+- [ ] GeoPackage / SpatiaLite, PostGIS, KML, GML, DXF, E00, ERDAS IMG, JPEG2000
 
 ## Phase 8 — Rendering & UI
 - [ ] wgpu-based 2D map renderer (symbology, labeling, raster stretch)

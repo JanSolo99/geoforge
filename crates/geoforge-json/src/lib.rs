@@ -477,3 +477,360 @@ mod tests {
         assert_eq!(shortest(68.1), "68.1");
     }
 }
+
+/// Features read from Esri JSON or GeoJSON (ArcGIS JSON To Features).
+#[derive(Debug, Clone)]
+pub struct Imported {
+    pub kind: GeometryKind,
+    pub has_z: bool,
+    pub has_m: bool,
+    pub fields: Vec<Field>,
+    pub features: Vec<Feature>,
+    /// The coordinate system's code (latest wkid / EPSG), or its WKT.
+    pub wkid: Option<u32>,
+    pub wkt: Option<String>,
+}
+
+fn bad(msg: &str) -> geoforge_core::Error {
+    geoforge_core::Error::format("JSON", msg)
+}
+
+type Json = serde_json::Value;
+
+fn coords(v: &Json, z: bool, m: bool) -> Option<([f64; 2], f64, f64)> {
+    let a = v.as_array()?;
+    let n = |i: usize| a.get(i).and_then(Json::as_f64);
+    let x = n(0)?;
+    let y = n(1)?;
+    let mut k = 2;
+    let zv = if z {
+        k += 1;
+        n(2).unwrap_or(0.0)
+    } else {
+        0.0
+    };
+    let mv = if m {
+        n(k).unwrap_or(f64::NAN)
+    } else {
+        f64::NAN
+    };
+    Some(([x, y], zv, mv))
+}
+
+fn build(
+    kind: GeometryKind,
+    parts: Vec<Vec<([f64; 2], f64, f64)>>,
+    z: bool,
+    m: bool,
+) -> Option<Geometry> {
+    let parts: Vec<_> = parts.into_iter().filter(|p| !p.is_empty()).collect();
+    if parts.is_empty() {
+        return None;
+    }
+    let mut g = Geometry {
+        kind,
+        parts: Vec::new(),
+        part_types: None,
+        xy: Vec::new(),
+        z: z.then(Vec::new),
+        m: m.then(Vec::new),
+        curves: Vec::new(),
+    };
+    for p in parts {
+        if !matches!(kind, GeometryKind::Point | GeometryKind::Multipoint) {
+            g.parts.push(g.xy.len() as u32);
+        }
+        for (xy, zv, mv) in p {
+            g.xy.push(xy);
+            if let Some(zs) = &mut g.z {
+                zs.push(zv);
+            }
+            if let Some(ms) = &mut g.m {
+                ms.push(mv);
+            }
+        }
+    }
+    Some(g)
+}
+
+fn esri_field(f: &Json) -> Option<Field> {
+    let name = f.get("name")?.as_str()?;
+    let t = f.get("type")?.as_str()?;
+    let field_type = match t {
+        "esriFieldTypeOID" | "esriFieldTypeInteger" => FieldType::Integer,
+        "esriFieldTypeSmallInteger" => FieldType::SmallInteger,
+        "esriFieldTypeBigInteger" => FieldType::BigInteger,
+        "esriFieldTypeDouble" => FieldType::Double,
+        "esriFieldTypeSingle" => FieldType::Single,
+        "esriFieldTypeString" => FieldType::String,
+        "esriFieldTypeDate" => FieldType::Date,
+        "esriFieldTypeGUID" | "esriFieldTypeGlobalID" => FieldType::Guid,
+        _ => return None,
+    };
+    let mut field = Field::new(name, field_type);
+    if field_type == FieldType::String {
+        field.length = f.get("length").and_then(Json::as_u64).unwrap_or(255) as u32;
+    }
+    if field_type == FieldType::Integer {
+        field.precision = 10;
+    }
+    if let Some(a) = f.get("alias").and_then(Json::as_str).filter(|a| *a != name) {
+        field.alias = Some(a.to_owned());
+    }
+    Some(field)
+}
+
+fn attribute(v: Option<&Json>, f: &Field) -> Value {
+    let Some(v) = v.filter(|v| !v.is_null()) else {
+        return Value::Null;
+    };
+    match f.field_type {
+        FieldType::String | FieldType::Guid => match v {
+            Json::String(s) => Value::String(s.clone()),
+            other => Value::String(other.to_string()),
+        },
+        FieldType::SmallInteger => v
+            .as_f64()
+            .map_or(Value::Null, |n| Value::SmallInteger(n as i16)),
+        FieldType::Integer => v.as_f64().map_or(Value::Null, |n| Value::Integer(n as i32)),
+        FieldType::BigInteger => v
+            .as_f64()
+            .map_or(Value::Null, |n| Value::BigInteger(n as i64)),
+        FieldType::Single => v.as_f64().map_or(Value::Null, |n| Value::Single(n as f32)),
+        FieldType::Date => v
+            .as_i64()
+            .and_then(chrono_ms)
+            .map_or(Value::Null, Value::Date),
+        _ => v.as_f64().map_or(Value::Null, Value::Double),
+    }
+}
+
+fn chrono_ms(ms: i64) -> Option<chrono::NaiveDateTime> {
+    chrono::DateTime::from_timestamp_millis(ms).map(|d| d.naive_utc())
+}
+
+/// Reads Esri JSON (a feature set) or GeoJSON (a FeatureCollection; only the
+/// features of `geojson_kind` are taken, made 3D as ArcGIS does).
+pub fn read(text: &str, geojson_kind: Option<GeometryKind>) -> geoforge_core::Result<Imported> {
+    let doc: Json = serde_json::from_str(text).map_err(|e| bad(&e.to_string()))?;
+    if doc.get("type").and_then(Json::as_str) == Some("FeatureCollection") {
+        return read_geojson(&doc, geojson_kind);
+    }
+    let kind = match doc.get("geometryType").and_then(Json::as_str) {
+        Some("esriGeometryPoint") => GeometryKind::Point,
+        Some("esriGeometryMultipoint") => GeometryKind::Multipoint,
+        Some("esriGeometryPolyline") => GeometryKind::Polyline,
+        Some("esriGeometryPolygon") => GeometryKind::Polygon,
+        other => return Err(bad(&format!("geometryType {other:?}"))),
+    };
+    let flag = |k: &str| doc.get(k).and_then(Json::as_bool).unwrap_or(false);
+    let (has_z, has_m) = (flag("hasZ"), flag("hasM"));
+    let sr = doc.get("spatialReference");
+    let wkid = sr
+        .and_then(|s| s.get("latestWkid").or_else(|| s.get("wkid")))
+        .and_then(Json::as_u64)
+        .map(|c| c as u32);
+    let wkt = sr
+        .and_then(|s| s.get("wkt"))
+        .and_then(Json::as_str)
+        .map(str::to_owned);
+    let declared: Vec<&Json> = doc
+        .get("fields")
+        .and_then(Json::as_array)
+        .map(|fs| fs.iter().collect())
+        .unwrap_or_default();
+    let mut fields: Vec<Field> = declared.iter().filter_map(|f| esri_field(f)).collect();
+    // The OID becomes an ordinary field whose values are not carried over.
+    let oid_names: Vec<&str> = declared
+        .iter()
+        .filter(|f| f.get("type").and_then(Json::as_str) == Some("esriFieldTypeOID"))
+        .filter_map(|f| f.get("name").and_then(Json::as_str))
+        .collect();
+    // Through a geodatabase: lines and polygons gain these (left at 0).
+    let shape_fields: &[&str] = match kind {
+        GeometryKind::Polyline => &["Shape_Length"],
+        GeometryKind::Polygon => &["Shape_Length", "Shape_Area"],
+        _ => &[],
+    };
+    let attr_count = fields.len();
+    fields.extend(
+        shape_fields
+            .iter()
+            .map(|n| Field::new(*n, FieldType::Double)),
+    );
+    let mut features = Vec::new();
+    for (i, f) in doc
+        .get("features")
+        .and_then(Json::as_array)
+        .into_iter()
+        .flatten()
+        .enumerate()
+    {
+        let attrs = f.get("attributes");
+        let mut values: Vec<Value> = fields[..attr_count]
+            .iter()
+            .map(|fd| {
+                if oid_names.contains(&fd.name.as_str()) {
+                    Value::Null
+                } else {
+                    attribute(attrs.and_then(|a| a.get(&fd.name)), fd)
+                }
+            })
+            .collect();
+        values.extend(shape_fields.iter().map(|_| Value::Double(0.0)));
+        let g = f.get("geometry").filter(|g| !g.is_null());
+        let geometry = g.and_then(|g| esri_geometry_in(g, kind, has_z, has_m));
+        features.push(Feature {
+            oid: i as i64,
+            geometry,
+            attributes: values,
+        });
+    }
+    Ok(Imported {
+        kind,
+        has_z,
+        has_m,
+        fields,
+        features,
+        wkid,
+        wkt,
+    })
+}
+
+fn esri_geometry_in(g: &Json, kind: GeometryKind, z: bool, m: bool) -> Option<Geometry> {
+    let list = |key: &str| -> Vec<Vec<([f64; 2], f64, f64)>> {
+        g.get(key)
+            .and_then(Json::as_array)
+            .into_iter()
+            .flatten()
+            .map(|part| {
+                part.as_array()
+                    .into_iter()
+                    .flatten()
+                    .filter_map(|c| coords(c, z, m))
+                    .collect()
+            })
+            .collect()
+    };
+    match kind {
+        GeometryKind::Point => {
+            let x = g.get("x")?.as_f64()?;
+            let y = g.get("y")?.as_f64()?;
+            let zv = g.get("z").and_then(Json::as_f64).unwrap_or(0.0);
+            let mv = g.get("m").and_then(Json::as_f64).unwrap_or(f64::NAN);
+            build(kind, vec![vec![([x, y], zv, mv)]], z, m)
+        }
+        GeometryKind::Multipoint => {
+            let pts: Vec<_> = g
+                .get("points")
+                .and_then(Json::as_array)
+                .into_iter()
+                .flatten()
+                .filter_map(|c| coords(c, z, m))
+                .collect();
+            build(kind, vec![pts], z, m)
+        }
+        GeometryKind::Polyline => build(kind, list("paths"), z, m),
+        _ => build(kind, list("rings"), z, m),
+    }
+}
+
+fn read_geojson(doc: &Json, kind: Option<GeometryKind>) -> geoforge_core::Result<Imported> {
+    let kind = kind.ok_or_else(|| bad("GeoJSON needs a geometry type"))?;
+    let wanted = |t: &str| match kind {
+        GeometryKind::Point => t == "Point",
+        GeometryKind::Multipoint => t == "MultiPoint",
+        GeometryKind::Polyline => t == "LineString" || t == "MultiLineString",
+        GeometryKind::Polygon => t == "Polygon" || t == "MultiPolygon",
+        GeometryKind::MultiPatch => false,
+    };
+    let feats: Vec<&Json> = doc
+        .get("features")
+        .and_then(Json::as_array)
+        .into_iter()
+        .flatten()
+        .filter(|f| {
+            f.get("geometry")
+                .and_then(|g| g.get("type"))
+                .and_then(Json::as_str)
+                .is_some_and(wanted)
+        })
+        .collect();
+    // Fields in order of first appearance: numbers are doubles, the rest text(254).
+    let mut fields: Vec<Field> = Vec::new();
+    for f in &feats {
+        if let Some(props) = f.get("properties").and_then(Json::as_object) {
+            for (k, v) in props {
+                if fields.iter().any(|fd| fd.name == *k) || v.is_null() {
+                    continue;
+                }
+                let mut fd = Field::new(
+                    k,
+                    if v.is_number() {
+                        FieldType::Double
+                    } else {
+                        FieldType::String
+                    },
+                );
+                if fd.field_type == FieldType::String {
+                    fd.length = 254;
+                }
+                fields.push(fd);
+            }
+        }
+    }
+    let mut features = Vec::new();
+    for (i, f) in feats.iter().enumerate() {
+        let props = f.get("properties");
+        let attributes = fields
+            .iter()
+            .map(|fd| attribute(props.and_then(|p| p.get(&fd.name)), fd))
+            .collect();
+        let g = &f["geometry"];
+        let c = &g["coordinates"];
+        let path = |v: &Json| -> Vec<([f64; 2], f64, f64)> {
+            v.as_array()
+                .into_iter()
+                .flatten()
+                .filter_map(|p| coords(p, true, false))
+                .collect()
+        };
+        let mut parts: Vec<Vec<([f64; 2], f64, f64)>> = Vec::new();
+        match g["type"].as_str().unwrap_or("") {
+            "Point" => parts.push(coords(c, true, false).into_iter().collect()),
+            "MultiPoint" => parts.push(path(c)),
+            "LineString" => parts.push(path(c)),
+            "MultiLineString" | "Polygon" => {
+                parts.extend(c.as_array().into_iter().flatten().map(path))
+            }
+            "MultiPolygon" => {
+                for poly in c.as_array().into_iter().flatten() {
+                    parts.extend(poly.as_array().into_iter().flatten().map(path));
+                }
+            }
+            _ => {}
+        }
+        features.push(Feature {
+            oid: i as i64,
+            geometry: build(kind, parts, true, false),
+            attributes,
+        });
+    }
+    let wkid = doc
+        .get("crs")
+        .and_then(|c| c.get("properties"))
+        .and_then(|p| p.get("name"))
+        .and_then(Json::as_str)
+        .and_then(|n| n.rsplit(':').next())
+        .and_then(|c| c.parse::<u32>().ok())
+        .or(Some(4326));
+    Ok(Imported {
+        kind,
+        has_z: true,
+        has_m: false,
+        fields,
+        features,
+        wkid,
+        wkt: None,
+    })
+}

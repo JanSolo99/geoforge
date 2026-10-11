@@ -319,6 +319,14 @@ enum Tool {
         #[arg(long, default_value = "NO_GEOJSON")]
         geojson: String,
     },
+    /// Features from an Esri JSON or GeoJSON file (ArcGIS "JSON To Features").
+    JsonToFeatures {
+        in_json_file: PathBuf,
+        out_features: PathBuf,
+        /// For GeoJSON: POINT, MULTIPOINT, POLYLINE or POLYGON.
+        #[arg(long)]
+        geometry_type: Option<String>,
+    },
     /// Transform features to another coordinate system (ArcGIS "Project").
     Project {
         in_dataset: PathBuf,
@@ -914,6 +922,44 @@ fn main() -> ExitCode {
                 features.len()
             );
             Ok(())
+        })(),
+        Tool::JsonToFeatures {
+            in_json_file,
+            out_features,
+            geometry_type,
+        } => (|| {
+            let kind = match geometry_type
+                .as_deref()
+                .map(str::to_ascii_uppercase)
+                .as_deref()
+            {
+                None => None,
+                Some("POINT") => Some(geoforge_core::GeometryKind::Point),
+                Some("MULTIPOINT") => Some(geoforge_core::GeometryKind::Multipoint),
+                Some("POLYLINE") => Some(geoforge_core::GeometryKind::Polyline),
+                Some("POLYGON") => Some(geoforge_core::GeometryKind::Polygon),
+                Some(other) => return Err(Error::Unsupported(format!("geometry_type {other}"))),
+            };
+            let text =
+                std::fs::read_to_string(&in_json_file).map_err(|e| Error::io(&in_json_file, e))?;
+            let imported = geoforge_json::read(&text, kind)?;
+            let wkt = match (&imported.wkt, imported.wkid) {
+                (Some(w), _) => Some(w.clone()),
+                (None, Some(code)) => geoforge_proj::Crs::parse(&code.to_string())
+                    .ok()
+                    .map(|c| c.esri_wkt().to_owned()),
+                _ => None,
+            };
+            let out = ToolOutput {
+                kind: imported.kind,
+                has_z: imported.has_z,
+                has_m: imported.has_m,
+                fields: imported.fields,
+                spatial_reference_wkt: wkt,
+                features: imported.features,
+                messages: Vec::new(),
+            };
+            write_output(out, &out_features, None)
         })(),
         Tool::Project {
             in_dataset,

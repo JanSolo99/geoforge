@@ -216,6 +216,12 @@ CASES = {
     "geojson_wells": ("conversion.FeaturesToJSON", [DATA / "wells.shp"], ["NOT_FORMATTED", "NO_Z_VALUES", "NO_M_VALUES", "GEOJSON"]),
     "json_roads_zm": ("conversion.FeaturesToJSON", [DATA / "roads_zm.shp"], ["NOT_FORMATTED", "Z_VALUES", "M_VALUES", "NO_GEOJSON"]),
     "json_bad_lines": ("conversion.FeaturesToJSON", [DATA / "bad_lines.shp"], ["NOT_FORMATTED", "NO_Z_VALUES", "NO_M_VALUES", "NO_GEOJSON"]),
+    "j2f_parcels": ("conversion.JSONToFeatures", [OUT / "json_parcels.json"], []),
+    "j2f_roads_zm": ("conversion.JSONToFeatures", [OUT / "json_roads_zm.json"], []),
+    "j2f_bad_lines": ("conversion.JSONToFeatures", [OUT / "json_bad_lines.json"], []),
+    "j2f_geojson_parcels": ("conversion.JSONToFeatures", [OUT / "geojson_parcels.geojson"], ["POLYGON"]),
+    "j2f_geojson_wells": ("conversion.JSONToFeatures", [OUT / "geojson_wells.geojson"], ["POINT"]),
+    "j2f_geojson_roads": ("conversion.JSONToFeatures", [OUT / "geojson_roads.geojson"], ["POLYLINE"]),
 }
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.
