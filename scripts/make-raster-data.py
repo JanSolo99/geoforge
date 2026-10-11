@@ -118,3 +118,24 @@ for name, points in [("observer_hill", [(500405.0, 5000895.0)]), ("observers", [
         f.SetGeometry(ogr.CreateGeometryFromWkt(f"POINT ({x} {y})"))
         lyr.CreateFeature(f)
     ds = None
+
+# Points for Point To Raster tie rules: several points per 10 m cell whose
+# values tie in different orders, inside a frame of two single points.
+path = OUT / "tie_points.shp"
+drv = ogr.GetDriverByName("ESRI Shapefile")
+if path.exists():
+    drv.DeleteDataSource(str(path))
+ds = drv.CreateDataSource(str(path))
+lyr = ds.CreateLayer("tie_points", srs, ogr.wkbPoint)
+lyr.CreateField(ogr.FieldDefn("CLASS", ogr.OFTInteger))
+cells = [((0, 0), [0]), ((8, 4), [0]), ((1, 1), [3, 1]), ((3, 1), [1, 3]), ((5, 1), [2, 5, 5, 2]), ((7, 1), [7, 4, 4]),
+         ((1, 3), [4, 9, 9, 4]), ((3, 3), [9, 4, 4, 9]), ((5, 3), [6, 2, 8]), ((7, 3), [8, 2, 6])]
+offsets = [(-2.5, -2.5), (2.5, 2.5), (-2.5, 2.5), (2.5, -2.5)]
+for (cx, cy), values in cells:
+    for (dx, dy), v in zip(offsets, values):
+        f = ogr.Feature(lyr.GetLayerDefn())
+        f.SetField("CLASS", v)
+        x, y = 500000.0 + cx * 10 + (dx if len(values) > 1 else 0), 5000000.0 + cy * 10 + (dy if len(values) > 1 else 0)
+        f.SetGeometry(ogr.CreateGeometryFromWkt(f"POINT ({x} {y})"))
+        lyr.CreateFeature(f)
+ds = None

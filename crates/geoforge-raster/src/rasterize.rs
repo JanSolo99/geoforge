@@ -270,6 +270,33 @@ pub fn points_to_raster(
             }
         };
     }
+    // Points keep a 32-bit integer field type (polygons and lines narrow it);
+    // counts are signed 8-bit or wider, and means of integers single (observed).
+    if kind == ValueKind::Integer {
+        let filled = r.bands[0].iter().filter(|v| !v.is_nan());
+        let max = filled.copied().fold(0.0, f64::max);
+        let data_type = match assignment {
+            PointAssignment::Mean => return Some(finish(r, ValueKind::Single)),
+            PointAssignment::Count if max <= i8::MAX as f64 => DataType::I8,
+            PointAssignment::Count if max <= i16::MAX as f64 => DataType::I16,
+            _ => DataType::I32,
+        };
+        let nodata = match data_type {
+            DataType::I8 => i8::MIN as f64,
+            DataType::I16 => i16::MIN as f64,
+            _ => i32::MIN as f64,
+        };
+        r.data_type = data_type;
+        r.nodata = Some(nodata);
+        for v in &mut r.bands[0] {
+            *v = if v.is_nan() {
+                nodata
+            } else {
+                data_type.store(*v)
+            };
+        }
+        return Some(r);
+    }
     Some(finish(r, kind))
 }
 

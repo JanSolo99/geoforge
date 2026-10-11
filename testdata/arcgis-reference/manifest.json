@@ -17512,6 +17512,79 @@
       "messages": [],
       "fields": [],
       "shapeType": null
+    },
+    "pt2r_ties_most": {
+      "tool": "conversion.PointToRaster",
+      "args": [
+        "testdata/raster/tie_points.shp",
+        "CLASS",
+        "<out>",
+        "MOST_FREQUENT",
+        "",
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "pt2r_ties_count": {
+      "tool": "conversion.PointToRaster",
+      "args": [
+        "testdata/raster/tie_points.shp",
+        "CLASS",
+        "<out>",
+        "COUNT",
+        "",
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "pt2r_ties_mean": {
+      "tool": "conversion.PointToRaster",
+      "args": [
+        "testdata/raster/tie_points.shp",
+        "CLASS",
+        "<out>",
+        "MEAN",
+        "",
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "pt2r_ties_max": {
+      "tool": "conversion.PointToRaster",
+      "args": [
+        "testdata/raster/tie_points.shp",
+        "CLASS",
+        "<out>",
+        "MAXIMUM",
+        "",
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "f2r_ties": {
+      "tool": "conversion.FeatureToRaster",
+      "args": [
+        "testdata/raster/tie_points.shp",
+        "CLASS",
+        "<out>",
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }
