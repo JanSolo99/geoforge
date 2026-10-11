@@ -380,6 +380,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "geoforge-gpkg"
+version = "0.0.1"
+dependencies = [
+ "geoforge-core",
+ "geoforge-testkit",
+ "serde_json",
+]
+
+[[package]]
 name = "geoforge-json"
 version = "0.0.1"
 dependencies = [

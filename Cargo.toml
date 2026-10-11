@@ -19,6 +19,7 @@ geoforge-geometry = { path = "crates/geoforge-geometry" }
 geoforge-tools = { path = "crates/geoforge-tools" }
 geoforge-json = { path = "crates/geoforge-json" }
 geoforge-csv = { path = "crates/geoforge-csv" }
+geoforge-gpkg = { path = "crates/geoforge-gpkg" }
 thiserror = "2"
 chrono = { version = "0.4", default-features = false, features = ["std", "clock"] }
 encoding_rs = "0.8"

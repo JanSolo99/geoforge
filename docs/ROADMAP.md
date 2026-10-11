@@ -288,6 +288,10 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
       Text(254), usable by every tool), Export Table to `.csv` byte-identical to ArcGIS's (BOM,
       CRLF, `%.15f` doubles, RFC 4180 quoting), XY Table To Point (Z field, coordinate system)
 - [ ] GeoPackage / SpatiaLite, PostGIS, KML, GML, DXF, E00, ERDAS IMG, JPEG2000
+  - [x] Own read-only SQLite reader (`geoforge-gpkg::sqlite`): header, table b-trees, overflow
+        pages, records with type affinity, CREATE TABLE columns and rowid aliases; checked row
+        for row against Python's sqlite3 at page sizes 512, 4096 and 65536
+  - [ ] GeoPackage feature tables (geometry blobs, gpkg_contents, spatial reference systems)
 
 ## Phase 8 — Rendering & UI
 - [ ] wgpu-based 2D map renderer (symbology, labeling, raster stretch)
