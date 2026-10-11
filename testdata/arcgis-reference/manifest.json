@@ -17585,6 +17585,66 @@
       "messages": [],
       "fields": [],
       "shapeType": null
+    },
+    "pt2r_ties_range": {
+      "tool": "conversion.PointToRaster",
+      "args": [
+        "testdata/raster/tie_points.shp",
+        "CLASS",
+        "<out>",
+        "RANGE",
+        "",
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "pt2r_ties_std": {
+      "tool": "conversion.PointToRaster",
+      "args": [
+        "testdata/raster/tie_points.shp",
+        "CLASS",
+        "<out>",
+        "STANDARD_DEVIATION",
+        "",
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "pt2r_wells_std": {
+      "tool": "conversion.PointToRaster",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "DEPTH",
+        "<out>",
+        "STANDARD_DEVIATION",
+        "",
+        20
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "pt2r_wells_range": {
+      "tool": "conversion.PointToRaster",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "DEPTH",
+        "<out>",
+        "RANGE",
+        "",
+        20
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

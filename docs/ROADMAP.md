@@ -258,9 +258,9 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         and Extract by Mask, matching ArcGIS
   - [x] Point To Raster / Feature To Raster on points: MOST_FREQUENT ties go to the first
         feature; integer fields stay 32-bit (polygons and lines narrow them), COUNT is signed
-        8-bit, MEAN of integers single, matching ArcGIS
-  - [ ] Raster To Polygon SIMPLIFY; Polyline To Raster options; Point To Raster RANGE and
-        STANDARD_DEVIATION. SIMPLIFY is not vertex weeding: a 7-step 30 m staircase from (210, 0)
+        8-bit, MEAN of integers single; RANGE and STANDARD_DEVIATION (sample, single, NoData for
+        one point), matching ArcGIS
+  - [ ] Raster To Polygon SIMPLIFY; Polyline To Raster options. SIMPLIFY is not vertex weeding: a 7-step 30 m staircase from (210, 0)
         to (0, 210) becomes (210, 0) → (118.519, 118.519) → (0, 210), bulging off the cell
         corners (longer staircases: 221.812 for 14 steps, 327.009 for 21, 428.4 for 28); shared
         edges stay identical between neighbors

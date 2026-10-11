@@ -583,7 +583,7 @@ enum Tool {
         in_features: PathBuf,
         value_field: String,
         out_raster: PathBuf,
-        /// MOST_FREQUENT, SUM, MEAN, MAXIMUM, MINIMUM or COUNT.
+        /// MOST_FREQUENT, SUM, MEAN, STANDARD_DEVIATION, MAXIMUM, MINIMUM, RANGE or COUNT.
         #[arg(long, default_value = "MOST_FREQUENT")]
         cell_assignment: String,
         #[arg(long)]
@@ -1814,6 +1814,8 @@ fn main() -> ExitCode {
                 "MAXIMUM" => PointAssignment::Maximum,
                 "MINIMUM" => PointAssignment::Minimum,
                 "COUNT" => PointAssignment::Count,
+                "RANGE" => PointAssignment::Range,
+                "STANDARD_DEVIATION" => PointAssignment::StandardDeviation,
                 other => return Err(Error::Unsupported(format!("cell assignment {other}"))),
             };
             let (features, kind, epsg, _) = rasterize_input(&in_features, &value_field)?;

@@ -27,6 +27,9 @@ pub enum PointAssignment {
     Maximum,
     Minimum,
     Count,
+    Range,
+    /// Sample standard deviation (NoData for a single point).
+    StandardDeviation,
 }
 
 /// The value type of the source field.
@@ -257,6 +260,15 @@ pub fn points_to_raster(
             PointAssignment::Maximum => vals.iter().copied().fold(f64::MIN, f64::max),
             PointAssignment::Minimum => vals.iter().copied().fold(f64::MAX, f64::min),
             PointAssignment::Count => n,
+            PointAssignment::Range => {
+                let max = vals.iter().copied().fold(f64::MIN, f64::max);
+                max - vals.iter().copied().fold(f64::MAX, f64::min)
+            }
+            PointAssignment::StandardDeviation if vals.len() < 2 => f64::NAN,
+            PointAssignment::StandardDeviation => {
+                let mean = vals.iter().sum::<f64>() / n;
+                (vals.iter().map(|v| (v - mean) * (v - mean)).sum::<f64>() / (n - 1.0)).sqrt()
+            }
             PointAssignment::MostFrequent => {
                 // Ties go to the value seen first in feature order.
                 let mut best = (vals[0], 0usize);
@@ -269,6 +281,9 @@ pub fn points_to_raster(
                 best.0
             }
         };
+    }
+    if assignment == PointAssignment::StandardDeviation {
+        return Some(finish(r, ValueKind::Single));
     }
     // Points keep a 32-bit integer field type (polygons and lines narrow it);
     // counts are signed 8-bit or wider, and means of integers single (observed).
