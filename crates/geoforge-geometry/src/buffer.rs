@@ -17,6 +17,18 @@ pub enum LineEnd {
     Flat,
 }
 
+/// ArcGIS `line_side`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum LineSide {
+    #[default]
+    Full,
+    /// Lines: only the side left of the line's direction.
+    Left,
+    Right,
+    /// Polygons: the buffer without the polygon itself.
+    OutsideOnly,
+}
+
 #[derive(Debug, Clone, Copy)]
 pub struct BufferOptions {
     /// Negative distances shrink polygons; they are ignored for points and lines.
@@ -24,6 +36,7 @@ pub struct BufferOptions {
     pub line_end: LineEnd,
     /// Maximum distance between an arc and its chords (ArcGIS: 0.1 m projected).
     pub max_deviation: f64,
+    pub side: LineSide,
 }
 
 /// Circle with ArcGIS's vertex placement: starts due north, runs clockwise.
@@ -205,6 +218,94 @@ fn end_cap(end: [f64; 2], dir: [f64; 2], r: f64, dev: f64, overlap: bool) -> Pol
     )
 }
 
+/// One side of a path's buffer (`side` +1 left, -1 right of its direction): a
+/// half-rectangle per segment, an arc wedge where a bend opens on that side, and
+/// with `round` a quarter disc at each end. Neighbouring pieces share their corner
+/// points exactly, so the union closes without slivers.
+fn one_side_pieces(
+    path: &[[f64; 2]],
+    r: f64,
+    side: f64,
+    round: bool,
+    dev: f64,
+) -> Vec<Polygon<f64>> {
+    let mut pts: Vec<[f64; 2]> = Vec::with_capacity(path.len());
+    for p in path {
+        if pts.last() != Some(p) {
+            pts.push(*p);
+        }
+    }
+    let mut out = Vec::new();
+    if pts.len() < 2 {
+        return out;
+    }
+    let c = |p: [f64; 2]| Coord { x: p[0], y: p[1] };
+    let dirs: Vec<[f64; 2]> = pts.windows(2).map(|w| unit(w[0], w[1]).unwrap()).collect();
+    let normal = |d: [f64; 2]| [-d[1] * side, d[0] * side];
+    let off = |p: [f64; 2], n: [f64; 2]| [p[0] + n[0] * r, p[1] + n[1] * r];
+    // A ring of `ring` points, oriented clockwise for the union.
+    let polygon = |mut ring: Vec<[f64; 2]>| {
+        ring.push(ring[0]);
+        let area: f64 = ring
+            .windows(2)
+            .map(|w| w[0][0] * w[1][1] - w[1][0] * w[0][1])
+            .sum();
+        if area > 0.0 {
+            ring.reverse();
+        }
+        Polygon::new(LineString::new(ring.into_iter().map(c).collect()), vec![])
+    };
+    // Arc points from angle a0 sweeping `sweep`, without its ends.
+    let arc = |center: [f64; 2], a0: f64, sweep: f64| -> Vec<[f64; 2]> {
+        let n = arcgis_arc_segments(sweep.abs(), r, dev);
+        (1..n)
+            .map(|k| {
+                let a = a0 + sweep * k as f64 / n as f64;
+                [center[0] + r * a.cos(), center[1] + r * a.sin()]
+            })
+            .collect()
+    };
+    for (k, w) in pts.windows(2).enumerate() {
+        let n = normal(dirs[k]);
+        out.push(polygon(vec![w[0], w[1], off(w[1], n), off(w[0], n)]));
+    }
+    for k in 1..dirs.len() {
+        let (a, b) = (dirs[k - 1], dirs[k]);
+        let cross = a[0] * b[1] - a[1] * b[0];
+        // The bend opens on this side when it turns away from it.
+        if cross * side >= -1e-12 {
+            continue;
+        }
+        let (na, nb) = (normal(a), normal(b));
+        let a0 = na[1].atan2(na[0]);
+        let sweep = (na[0] * nb[1] - na[1] * nb[0]).atan2(na[0] * nb[0] + na[1] * nb[1]);
+        let mut ring = vec![pts[k], off(pts[k], na)];
+        ring.extend(arc(pts[k], a0, sweep));
+        ring.push(off(pts[k], nb));
+        out.push(polygon(ring));
+    }
+    if round {
+        // Quarter discs: at the start from the backward direction to the normal,
+        // at the end from the normal to the forward direction.
+        let (d0, d1) = (dirs[0], dirs[dirs.len() - 1]);
+        let (start, end) = (pts[0], pts[pts.len() - 1]);
+        let n0 = normal(d0);
+        let back = [-d0[0], -d0[1]];
+        let a0 = back[1].atan2(back[0]);
+        let mut ring = vec![start, off(start, back)];
+        ring.extend(arc(start, a0, -side * std::f64::consts::FRAC_PI_2));
+        ring.push(off(start, n0));
+        out.push(polygon(ring));
+        let n1 = normal(d1);
+        let a1 = n1[1].atan2(n1[0]);
+        let mut ring = vec![end, off(end, n1)];
+        ring.extend(arc(end, a1, -side * std::f64::consts::FRAC_PI_2));
+        ring.push(off(end, d1));
+        out.push(polygon(ring));
+    }
+    out
+}
+
 /// Buffers one geometry, returning polygons (Z/M dropped). `None` when the result
 /// is empty (e.g. a polygon shrunk away by a negative distance).
 pub fn buffer(g: &Geometry, opts: &BufferOptions) -> Result<Option<Geometry>> {
@@ -246,6 +347,19 @@ fn buffer_mp(g: &Geometry, opts: &BufferOptions) -> Result<MultiPolygon<f64>> {
             if d <= 0.0 {
                 return Ok(MultiPolygon(vec![]));
             }
+            if let LineSide::Left | LineSide::Right = opts.side {
+                let side = if opts.side == LineSide::Left {
+                    1.0
+                } else {
+                    -1.0
+                };
+                let round = opts.line_end == LineEnd::Round;
+                let pieces: Vec<Polygon<f64>> = paths
+                    .iter()
+                    .flat_map(|p| one_side_pieces(p, d, side, round, dev))
+                    .collect();
+                return Ok(unary_union(pieces.iter()));
+            }
             let (mut pieces, mut caps) = (Vec::new(), Vec::new());
             path_pieces(&paths, d, dev, &mut pieces, &mut caps);
             match opts.line_end {
@@ -272,7 +386,9 @@ fn buffer_mp(g: &Geometry, opts: &BufferOptions) -> Result<MultiPolygon<f64>> {
             path_pieces(&paths, d.abs(), dev, &mut pieces, &mut caps);
             pieces.extend(caps.into_iter().map(|c| c.0));
             let band = unary_union(pieces.iter());
-            if d > 0.0 {
+            if d > 0.0 && opts.side == LineSide::OutsideOnly {
+                poly.union(&band).difference(&poly)
+            } else if d > 0.0 {
                 poly.union(&band)
             } else {
                 poly.difference(&band)
@@ -306,8 +422,38 @@ mod tests {
             distance: d,
             line_end: end,
             max_deviation: 1e-6,
+            side: LineSide::Full,
         };
         buffer_mp(g, &opts).unwrap().unsigned_area()
+    }
+
+    #[test]
+    fn one_sided_buffers() {
+        let side_area = |g: &Geometry, side: LineSide, end: LineEnd| {
+            let opts = BufferOptions {
+                distance: 1.0,
+                line_end: end,
+                max_deviation: 1e-6,
+                side,
+            };
+            let mp = buffer_mp(g, &opts).unwrap();
+            (mp.unsigned_area(), mp)
+        };
+        let pi = std::f64::consts::PI;
+        let g = line(vec![[0.0, 0.0], [10.0, 0.0]]);
+        let (a, mp) = side_area(&g, LineSide::Left, LineEnd::Flat);
+        assert!((a - 10.0).abs() < 1e-9, "{a}");
+        // Left of an eastward line is north.
+        assert!(mp.0[0].exterior().0.iter().all(|c| c.y >= 0.0));
+        let (a, _) = side_area(&g, LineSide::Right, LineEnd::Round);
+        assert!((a - (10.0 + pi / 2.0)).abs() < 1e-3, "{a}");
+        // A right-angle bend to the right: the left side gains a quarter disc.
+        let bend = line(vec![[0.0, 0.0], [10.0, 0.0], [10.0, -10.0]]);
+        let (a, _) = side_area(&bend, LineSide::Left, LineEnd::Flat);
+        assert!((a - (20.0 + pi / 4.0)).abs() < 1e-3, "{a}");
+        // On the inside of the bend the two strips overlap in a unit square.
+        let (a, _) = side_area(&bend, LineSide::Right, LineEnd::Flat);
+        assert!((a - 19.0).abs() < 1e-9, "{a}");
     }
 
     #[test]

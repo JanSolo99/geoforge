@@ -11,7 +11,7 @@ pub mod overlay;
 pub mod proximity;
 pub mod validate;
 
-pub use buffer::{BufferOptions, LineEnd, buffer, buffer_union};
+pub use buffer::{BufferOptions, LineEnd, LineSide, buffer, buffer_union};
 pub use clip::{ClipArea, clip};
 pub use index::EnvelopeIndex;
 pub use linework::{LineNodes, Meeting, XY_TOLERANCE, meeting, on_path};

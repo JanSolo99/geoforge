@@ -213,15 +213,23 @@ enum Tool {
     Buffer {
         in_features: PathBuf,
         out_feature_class: PathBuf,
-        /// Linear distance, e.g. "25 Meters" (negative shrinks polygons).
+        /// Linear distance, e.g. "25 Meters" (negative shrinks polygons), or the
+        /// name of a numeric field holding each feature's distance.
         #[arg(allow_hyphen_values = true)]
         buffer_distance: String,
+        /// FULL, LEFT or RIGHT (lines), OUTSIDE_ONLY (polygons).
+        #[arg(long, default_value = "FULL")]
+        line_side: String,
         /// ROUND or FLAT ends for lines.
         #[arg(long, default_value = "ROUND")]
         line_end_type: String,
-        /// NONE (one buffer per feature) or ALL (dissolve into one).
+        /// NONE (one buffer per feature), ALL (dissolve into one) or LIST (one per
+        /// combination of the --dissolve-field values).
         #[arg(long, default_value = "NONE")]
         dissolve_option: String,
+        /// Fields for dissolve_option LIST (repeatable).
+        #[arg(long = "dissolve-field")]
+        dissolve_fields: Vec<String>,
     },
 }
 
@@ -481,14 +489,18 @@ fn main() -> ExitCode {
             in_features,
             out_feature_class,
             buffer_distance,
+            line_side,
             line_end_type,
             dissolve_option,
+            dissolve_fields,
         } => buffer_tool(
             &in_features,
             &out_feature_class,
             &buffer_distance,
+            &line_side,
             &line_end_type,
             &dissolve_option,
+            dissolve_fields,
         ),
     };
     match result {
@@ -1285,11 +1297,32 @@ fn buffer_tool(
     input: &Path,
     output: &Path,
     distance: &str,
+    line_side: &str,
     line_end: &str,
     dissolve: &str,
+    dissolve_fields: Vec<String>,
 ) -> Result<()> {
     let (fc, _) = open_feature_class(input)?;
-    let d = parse_distance(distance, fc.spatial_reference_wkt())?;
+    // A number (with or without a unit) is a distance; anything else a field name.
+    let distance = if distance
+        .split_whitespace()
+        .next()
+        .is_some_and(|v| v.parse::<f64>().is_ok())
+    {
+        geoforge_tools::BufferDistance::Linear(parse_distance(
+            distance,
+            fc.spatial_reference_wkt(),
+        )?)
+    } else {
+        geoforge_tools::BufferDistance::Field(distance.trim().to_owned())
+    };
+    let side = match line_side.to_ascii_uppercase().as_str() {
+        "FULL" => geoforge_geometry::LineSide::Full,
+        "LEFT" => geoforge_geometry::LineSide::Left,
+        "RIGHT" => geoforge_geometry::LineSide::Right,
+        "OUTSIDE_ONLY" => geoforge_geometry::LineSide::OutsideOnly,
+        other => return Err(Error::Unsupported(format!("line_side {other}"))),
+    };
     let line_end = match line_end.to_ascii_uppercase().as_str() {
         "ROUND" => geoforge_geometry::LineEnd::Round,
         "FLAT" => geoforge_geometry::LineEnd::Flat,
@@ -1298,12 +1331,14 @@ fn buffer_tool(
     let dissolve = match dissolve.to_ascii_uppercase().as_str() {
         "NONE" => Dissolve::None,
         "ALL" => Dissolve::All,
-        other => {
-            return Err(Error::Unsupported(format!(
-                "dissolve_option {other} (LIST comes next)"
-            )));
+        "LIST" if !dissolve_fields.is_empty() => Dissolve::List(dissolve_fields),
+        "LIST" => {
+            return Err(Error::Unsupported(
+                "dissolve_option LIST needs --dissolve-field".into(),
+            ));
         }
+        other => return Err(Error::Unsupported(format!("dissolve_option {other}"))),
     };
-    let out = geoforge_tools::buffer(fc.as_ref(), d, line_end, dissolve)?;
+    let out = geoforge_tools::buffer(fc.as_ref(), distance, line_end, side, dissolve)?;
     write_output(out, output, source_gdb(input).as_deref())
 }

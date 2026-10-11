@@ -34,8 +34,13 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
 - [x] Buffer, planar: round/flat ends, dissolve NONE/ALL, negative polygon buffers;
       `BUFF_DIST`/`ORIG_FID` — matches ArcGIS shape within 0.2 m, area within 0.01%,
       point buffers exactly (ArcGIS arc densification rule reproduced)
+- [x] Buffer `line_side` LEFT/RIGHT (one-sided strips, wedges where a bend opens on that
+      side, quarter discs for ROUND ends) and OUTSIDE_ONLY (buffer minus the polygon),
+      `dissolve_option` LIST (one multipart buffer per value combination, sorted), distance
+      from a field — match ArcGIS (one-sided ROUND ends within 0.02% of area: ArcGIS's
+      quarter arcs stop a fraction of a degree short of the line's axis)
 - [ ] Buffer: true arcs in geodatabase output (ArcGIS stores buffers as circular arcs),
-      dissolve LIST, line_side LEFT/RIGHT/OUTSIDE_ONLY, geodesic for geographic data
+      geodesic for geographic data
 - [x] Intersect (polygon/line/point inputs; overlapping features of one input split
       into regions output once per feature, as ArcGIS does), Erase, Union (planar
       overlay, ArcGIS row order), Dissolve (fields, statistics SUM/MEAN/MIN/MAX/RANGE/

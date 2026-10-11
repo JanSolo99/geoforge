@@ -111,10 +111,12 @@ fn clip_to_area(
 }
 
 /// ArcGIS `dissolve_option`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Dissolve {
     None,
     All,
+    /// One (multipart) buffer per combination of these fields' values.
+    List(Vec<String>),
 }
 
 /// `arcpy.analysis.Buffer(in, out, distance, "FULL", line_end, dissolve)`, planar.
@@ -122,12 +124,22 @@ pub enum Dissolve {
 /// `distance` is in the input's linear unit. Without dissolving, the output has the
 /// input fields plus `BUFF_DIST` and `ORIG_FID`, one feature per input feature
 /// (in input order); with `Dissolve::All` it is a single feature with no fields.
+/// `buffer_distance_or_field`: a linear distance or a numeric field holding one
+/// per feature (in the coordinate system's unit).
+#[derive(Debug, Clone)]
+pub enum BufferDistance {
+    Linear(f64),
+    Field(String),
+}
+
 pub fn buffer(
     input: &dyn FeatureClass,
-    distance: f64,
+    distance: BufferDistance,
     line_end: LineEnd,
+    side: geoforge_geometry::LineSide,
     dissolve: Dissolve,
 ) -> Result<ToolOutput> {
+    use geoforge_geometry::LineSide;
     let kind = input
         .geometry_kind()
         .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
@@ -138,11 +150,54 @@ pub fn buffer(
                 .into(),
         ));
     }
-    let opts = BufferOptions {
-        distance,
+    match (side, kind) {
+        (LineSide::Left | LineSide::Right, GeometryKind::Polyline)
+        | (LineSide::OutsideOnly, GeometryKind::Polygon)
+        | (LineSide::Full, _) => {}
+        _ => {
+            return Err(Error::Unsupported(format!(
+                "line_side {side:?} does not apply to {kind:?} input"
+            )));
+        }
+    }
+    let field_index = |name: &str| {
+        input
+            .fields()
+            .iter()
+            .position(|f| f.name.eq_ignore_ascii_case(name))
+            .ok_or_else(|| {
+                Error::Unsupported(format!(
+                    "ERROR 000728: Field {name} does not exist within table"
+                ))
+            })
+    };
+    let distance_field = match &distance {
+        BufferDistance::Field(name) => Some(field_index(name)?),
+        BufferDistance::Linear(_) => None,
+    };
+    let options = |d: f64| BufferOptions {
+        distance: d,
         line_end,
         max_deviation: geoforge_core::curves::arcgis_densify_deviation(false),
+        side,
     };
+    // Each feature with its distance (features without one are left out).
+    let mut buffered: Vec<(Feature, f64, geoforge_core::Geometry)> = Vec::new();
+    for f in input.features() {
+        let f = f?;
+        let Some(g) = &f.geometry else { continue };
+        let d = match (&distance, distance_field) {
+            (BufferDistance::Linear(d), _) => *d,
+            (_, Some(i)) => match number(&f.attributes[i]) {
+                Some(d) => d,
+                None => continue,
+            },
+            _ => unreachable!(),
+        };
+        if let Some(b) = geoforge_geometry::buffer(g, &options(d))? {
+            buffered.push((f, d, b));
+        }
+    }
     let mut out = ToolOutput {
         kind: GeometryKind::Polygon,
         has_z: false,
@@ -154,11 +209,8 @@ pub fn buffer(
     };
     match dissolve {
         Dissolve::All => {
-            let geoms: Vec<_> = input
-                .features()
-                .filter_map(|f| f.map(|f| f.geometry).transpose())
-                .collect::<Result<_>>()?;
-            if let Some(g) = geoforge_geometry::buffer_union(geoms.iter(), &opts)? {
+            let union = geoforge_geometry::dissolve(buffered.iter().map(|b| &b.2))?;
+            if let Some(g) = union {
                 out.features.push(Feature {
                     oid: 1,
                     geometry: Some(g),
@@ -166,18 +218,44 @@ pub fn buffer(
                 });
             }
         }
+        Dissolve::List(names) => {
+            let keys: Vec<usize> = names
+                .iter()
+                .map(|n| field_index(n))
+                .collect::<Result<_>>()?;
+            out.fields = keys.iter().map(|&i| input.fields()[i].clone()).collect();
+            let mut groups: Vec<(Vec<Value>, Vec<geoforge_core::Geometry>)> = Vec::new();
+            for (f, _, b) in buffered {
+                let key: Vec<Value> = keys.iter().map(|&i| f.attributes[i].clone()).collect();
+                match groups.iter_mut().find(|(k, _)| k == &key) {
+                    Some((_, members)) => members.push(b),
+                    None => groups.push((key, vec![b])),
+                }
+            }
+            groups.sort_by(|a, b| {
+                a.0.iter()
+                    .zip(&b.0)
+                    .map(|(x, y)| compare(x, y))
+                    .find(|o| o.is_ne())
+                    .unwrap_or(std::cmp::Ordering::Equal)
+            });
+            for (key, members) in groups {
+                if let Some(g) = geoforge_geometry::dissolve(members.iter())? {
+                    out.features.push(Feature {
+                        oid: out.features.len() as i64,
+                        geometry: Some(g),
+                        attributes: key,
+                    });
+                }
+            }
+        }
         Dissolve::None => {
             out.fields = input.fields().to_vec();
             out.fields.push(Field::new("BUFF_DIST", FieldType::Double));
             out.fields.push(Field::new("ORIG_FID", FieldType::Integer));
-            for f in input.features() {
-                let f = f?;
-                let Some(g) = &f.geometry else { continue };
-                let Some(b) = geoforge_geometry::buffer(g, &opts)? else {
-                    continue;
-                };
+            for (f, d, b) in buffered {
                 let mut attributes = f.attributes;
-                attributes.push(Value::Double(distance));
+                attributes.push(Value::Double(d));
                 attributes.push(Value::Integer(f.oid as i32));
                 out.features.push(Feature {
                     oid: f.oid,
@@ -187,7 +265,6 @@ pub fn buffer(
             }
         }
     }
-    let _ = kind;
     Ok(out)
 }
 

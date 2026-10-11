@@ -114,6 +114,12 @@ CASES = {
     "intersect_tri_polys_line": ("analysis.Intersect", [f"{DATA / 'tri_p.shp'};{DATA / 'tri_q.shp'};{DATA / 'tri_r.shp'}"], ["ALL", "", "LINE"]),
     "intersect_tri_polys_point": ("analysis.Intersect", [f"{DATA / 'tri_p.shp'};{DATA / 'tri_q.shp'};{DATA / 'tri_r.shp'}"], ["ALL", "", "POINT"]),
     "intersect_tri_mixed_point": ("analysis.Intersect", [f"{DATA / 'tri_p.shp'};{DATA / 'tri_a.shp'};{DATA / 'tri_c.shp'}"], ["ALL", "", "POINT"]),
+    "buffer_roads_25_left": ("analysis.Buffer", [DATA / "roads.shp"], ["25 Meters", "LEFT"]),
+    "buffer_roads_25_right_flat": ("analysis.Buffer", [DATA / "roads.shp"], ["25 Meters", "RIGHT", "FLAT"]),
+    "buffer_parcels_10_outside": ("analysis.Buffer", [DATA / "parcels.shp"], ["10 Meters", "OUTSIDE_ONLY"]),
+    "buffer_parcels_10_list_zone": ("analysis.Buffer", [DATA / "parcels.shp"], ["10 Meters", "FULL", "ROUND", "LIST", "ZONE"]),
+    "buffer_roads_20_list_class": ("analysis.Buffer", [DATA / "roads.shp"], ["20 Meters", "FULL", "ROUND", "LIST", "CLASS"]),
+    "buffer_wells_depth_field": ("analysis.Buffer", [DATA / "wells.shp"], ["DEPTH"]),
 }
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools whose output is a table, written as <name>.dbf.

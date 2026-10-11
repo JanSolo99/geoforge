@@ -10303,6 +10303,320 @@
         ]
       ],
       "shapeType": "Multipoint"
+    },
+    "buffer_roads_25_left": {
+      "tool": "analysis.Buffer",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "25 Meters",
+        "LEFT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "buffer_roads_25_right_flat": {
+      "tool": "analysis.Buffer",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "25 Meters",
+        "RIGHT",
+        "FLAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "buffer_parcels_10_outside": {
+      "tool": "analysis.Buffer",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "10 Meters",
+        "OUTSIDE_ONLY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "buffer_parcels_10_list_zone": {
+      "tool": "analysis.Buffer",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "10 Meters",
+        "FULL",
+        "ROUND",
+        "LIST",
+        "ZONE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "buffer_roads_20_list_class": {
+      "tool": "analysis.Buffer",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "20 Meters",
+        "FULL",
+        "ROUND",
+        "LIST",
+        "CLASS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "buffer_wells_depth_field": {
+      "tool": "analysis.Buffer",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "DEPTH"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
     }
   }
 }
