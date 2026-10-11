@@ -16419,6 +16419,43 @@
       "messages": [],
       "fields": [],
       "shapeType": null
+    },
+    "viewshed_hill": {
+      "tool": "gp.Viewshed_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/observer_hill.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "viewshed_two": {
+      "tool": "gp.Viewshed_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/observers.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "viewshed_hill_z2": {
+      "tool": "gp.Viewshed_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/observer_hill.shp",
+        "<out>",
+        2
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

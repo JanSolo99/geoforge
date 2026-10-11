@@ -246,3 +246,82 @@ pub fn curvature(dem: &Raster, z_factor: f64) -> (Raster, Raster, Raster) {
     let [c, p, q] = outs;
     (c, p, q)
 }
+
+/// An observer for [`viewshed`]: map position and height above the surface
+/// (ArcGIS's OFFSETA, 1 by default; scaled by the z-factor like the surface).
+#[derive(Debug, Clone, Copy)]
+pub struct Observer {
+    pub x: f64,
+    pub y: f64,
+    pub offset: f64,
+}
+
+/// Spatial Analyst Viewshed: how many observers see each cell center. The line
+/// of sight is sampled one cell at a time along its major axis, interpolating
+/// linearly between the two cells it passes between (approximates ArcGIS, which
+/// differs on about 1% of cells where sight lines graze the terrain).
+pub fn viewshed(dem: &Raster, observers: &[Observer], z_factor: f64) -> Raster {
+    let (w, h) = (dem.width, dem.height);
+    let t = &dem.transform;
+    let mut counts: Vec<Option<f64>> = (0..w * h)
+        .map(|i| (!dem.is_nodata(dem.bands[0][i])).then_some(0.0))
+        .collect();
+    let z = |x: usize, y: usize| dem.get(x, y).map(|v| v * z_factor);
+    for o in observers {
+        let ox = (o.x - t[0]) / t[1];
+        let oy = (o.y - t[3]) / t[5];
+        let (oc, orow) = (ox.floor(), oy.floor());
+        if oc < 0.0 || orow < 0.0 || oc >= w as f64 || orow >= h as f64 {
+            continue;
+        }
+        let Some(z0) = z(oc as usize, orow as usize) else {
+            continue;
+        };
+        let z0 = z0 + o.offset * z_factor;
+        for row in 0..h {
+            for col in 0..w {
+                let i = row * w + col;
+                let Some(tz) = z(col, row) else { continue };
+                let (dx, dy) = (col as f64 + 0.5 - ox, row as f64 + 0.5 - oy);
+                let steps = dx.abs().max(dy.abs()).round() as usize;
+                let mut visible = true;
+                for k in 1..steps {
+                    let f = k as f64 / steps as f64;
+                    let (px, py) = (ox + dx * f - 0.5, oy + dy * f - 0.5);
+                    let e = if dx.abs() >= dy.abs() {
+                        let x = px.round().clamp(0.0, (w - 1) as f64) as usize;
+                        let y0 = py.floor().clamp(0.0, (h - 1) as f64) as usize;
+                        let y1 = (y0 + 1).min(h - 1);
+                        let fy = (py - y0 as f64).clamp(0.0, 1.0);
+                        match (z(x, y0), z(x, y1)) {
+                            (Some(a), Some(b)) => a * (1.0 - fy) + b * fy,
+                            _ => continue,
+                        }
+                    } else {
+                        let y = py.round().clamp(0.0, (h - 1) as f64) as usize;
+                        let x0 = px.floor().clamp(0.0, (w - 1) as f64) as usize;
+                        let x1 = (x0 + 1).min(w - 1);
+                        let fx = (px - x0 as f64).clamp(0.0, 1.0);
+                        match (z(x0, y), z(x1, y)) {
+                            (Some(a), Some(b)) => a * (1.0 - fx) + b * fx,
+                            _ => continue,
+                        }
+                    };
+                    if e > z0 + (tz - z0) * f + 1e-9 {
+                        visible = false;
+                        break;
+                    }
+                }
+                if visible && let Some(c) = counts[i].as_mut() {
+                    *c += 1.0;
+                }
+            }
+        }
+    }
+    let max = counts.iter().flatten().copied().fold(0.0, f64::max);
+    let (data_type, nodata) = crate::zonal::integer_output(0.0, max, true);
+    let mut out = dem.like(data_type);
+    out.nodata = Some(nodata);
+    out.bands[0] = counts.into_iter().map(|c| c.unwrap_or(nodata)).collect();
+    out
+}

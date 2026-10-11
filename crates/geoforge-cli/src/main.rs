@@ -613,6 +613,15 @@ enum Tool {
         #[arg(long, default_value = "ALL")]
         statistics_type: String,
     },
+    /// Spatial Analyst "Viewshed" (approximate): how many observer points see
+    /// each cell; observers' OFFSETA field (default 1) is their height.
+    Viewshed {
+        in_raster: PathBuf,
+        in_observer_features: PathBuf,
+        out_raster: PathBuf,
+        #[arg(long, default_value_t = 1.0)]
+        z_factor: f64,
+    },
     /// Spatial Analyst "Aspect" (planar): downslope direction, −1 on flat cells.
     Aspect {
         in_raster: PathBuf,
@@ -1880,6 +1889,41 @@ fn main() -> ExitCode {
             let (fields, rows) =
                 geoforge_raster::zonal::zonal_table(&zones, &values, &stats, ignore);
             write_table(&geoforge_tools::TableOutput { fields, rows }, &out_table)
+        })(),
+        Tool::Viewshed {
+            in_raster,
+            in_observer_features,
+            out_raster,
+            z_factor,
+        } => (|| {
+            let dem = geoforge_raster::read_geotiff(&in_raster)?;
+            let (fc, _) = open_feature_class(&in_observer_features)?;
+            let offset_field = fc
+                .fields()
+                .iter()
+                .position(|f| f.name.eq_ignore_ascii_case("OFFSETA"));
+            let mut observers = Vec::new();
+            for f in fc.features() {
+                let f = f?;
+                let offset = match offset_field.map(|i| &f.attributes[i]) {
+                    Some(Value::Double(v)) => *v,
+                    Some(Value::Single(v)) => *v as f64,
+                    Some(Value::Integer(v)) => *v as f64,
+                    Some(Value::SmallInteger(v)) => *v as f64,
+                    _ => 1.0,
+                };
+                for p in f.geometry.iter().flat_map(|g| g.xy.iter()) {
+                    observers.push(geoforge_raster::surface::Observer {
+                        x: p[0],
+                        y: p[1],
+                        offset,
+                    });
+                }
+            }
+            write_raster(
+                &out_raster,
+                &geoforge_raster::surface::viewshed(&dem, &observers, z_factor),
+            )
         })(),
         Tool::Aspect {
             in_raster,

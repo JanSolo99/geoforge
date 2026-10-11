@@ -85,3 +85,22 @@ zones = ((xx // 50) + 3 * (yy // 60)).astype(np.uint8)
 zones[(xx - 75) ** 2 + (yy - 60) ** 2 < 15 ** 2] = 7
 zones[100:, 130:] = 255
 write("zones.tif", zones, gdal.GDT_Byte, nodata=255)
+# Observer points for Viewshed (UTM 33N): one on the main hill, one in a valley.
+from osgeo import ogr  # noqa: E402
+
+srs = osr.SpatialReference()
+srs.ImportFromEPSG(32633)
+for name, points in [("observer_hill", [(500405.0, 5000895.0)]), ("observers", [(500405.0, 5000895.0), (500155.0, 5000305.0)])]:
+    path = OUT / f"{name}.shp"
+    drv = ogr.GetDriverByName("ESRI Shapefile")
+    if path.exists():
+        drv.DeleteDataSource(str(path))
+    ds = drv.CreateDataSource(str(path))
+    lyr = ds.CreateLayer(name, srs, ogr.wkbPoint)
+    lyr.CreateField(ogr.FieldDefn("ID", ogr.OFTInteger))
+    for i, (x, y) in enumerate(points):
+        f = ogr.Feature(lyr.GetLayerDefn())
+        f.SetField("ID", i + 1)
+        f.SetGeometry(ogr.CreateGeometryFromWkt(f"POINT ({x} {y})"))
+        lyr.CreateFeature(f)
+    ds = None

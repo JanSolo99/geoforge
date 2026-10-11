@@ -1871,6 +1871,24 @@ fn gf_args(case: &str) -> Vec<&'static str> {
             "--z-factor",
             "2",
         ],
+        "viewshed_hill" => vec![
+            "viewshed",
+            "testdata/raster/dem.tif",
+            "testdata/raster/observer_hill.shp",
+        ],
+        "viewshed_two" => vec![
+            "viewshed",
+            "testdata/raster/dem.tif",
+            "testdata/raster/observers.shp",
+        ],
+        "viewshed_hill_z2" => vec![
+            "viewshed",
+            "testdata/raster/dem.tif",
+            "testdata/raster/observer_hill.shp",
+            "<out>",
+            "--z-factor",
+            "2",
+        ],
         "slope_dem" => vec!["slope", "testdata/raster/dem.tif"],
         "slope_dem_percent_z" => vec![
             "slope",
@@ -2238,8 +2256,12 @@ const KNOWN_FEATURE_DIFFERENCES: &[(&str, &[usize])] = &[];
 
 /// Raster cases where some cells are known to differ from ArcGIS, with the most
 /// differing cells allowed: Flow Direction resolves flats differently in places,
-/// and Hillshade shadows differ for cells within centimeters of the horizon.
+/// Hillshade shadows differ for cells within centimeters of the horizon, and
+/// Viewshed where sight lines graze the terrain (about 1% of cells).
 const KNOWN_RASTER_DIFFERENCES: &[(&str, usize)] = &[
+    ("viewshed_hill", 199),
+    ("viewshed_two", 309),
+    ("viewshed_hill_z2", 199),
     ("hillshade_shadows_315_15", 3),
     ("hillshade_shadows_200_25", 29),
     ("flowdir_hydro_filled", 5),

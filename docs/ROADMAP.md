@@ -199,6 +199,11 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         needs all 8); Hillshade truncates to 0–254 with NoData 255; float output NoData is −FLT_MAX,
         or 3.4e38 when the input has NoData; Aspect −1 on flat cells
   - [x] Hillshade shadows: ray toward the sun sampled bilinearly cell by cell, past NoData
+  - [x] Viewshed (approximate): observer counts per cell, OFFSETA default 1 scaled by the z-factor,
+        sight lines sampled cell by cell along the major axis; about 1% of cells differ from
+        ArcGIS where sight lines graze the terrain (no exact model found: tried boundary and
+        center-line crossings, bilinear sampling, Earth curvature)
+  - [ ] Viewshed exactly as ArcGIS; OFFSETB, RADIUS and other observer fields
   - [ ] Hillshade shadows exactly as ArcGIS (3 and 29 cells near the horizon differ in the tests)
   - [ ] Geodesic method, tiled output with statistics (.aux.xml) like ArcGIS
   - [x] Curvature (with profile and plan outputs), identical to ArcGIS: Zevenbergen–Thorne with

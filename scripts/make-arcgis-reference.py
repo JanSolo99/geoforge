@@ -336,6 +336,9 @@ CASES = {
     "zst_min_max": ("gp.ZonalStatisticsAsTable_sa", [RASTER / "zones.tif", "Value", RASTER / "dem.tif"], ["DATA", "MIN_MAX_MEAN"]),
     "hillshade_shadows_315_15": ("gp.HillShade_sa", [RASTER / "dem.tif"], [315, 15, "SHADOWS", 3]),
     "hillshade_shadows_200_25": ("gp.HillShade_sa", [RASTER / "dem_nodata.tif"], [200, 25, "SHADOWS", 2]),
+    "viewshed_hill": ("gp.Viewshed_sa", [RASTER / "dem.tif", RASTER / "observer_hill.shp"], []),
+    "viewshed_two": ("gp.Viewshed_sa", [RASTER / "dem.tif", RASTER / "observers.shp"], []),
+    "viewshed_hill_z2": ("gp.Viewshed_sa", [RASTER / "dem.tif", RASTER / "observer_hill.shp"], [2]),
     "zonal_mean": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_nodata.tif"], ["MEAN", "DATA"]),
     "zonal_max_strict": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_nodata.tif"], ["MAXIMUM", "NODATA"]),
     "zonal_range_int": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_int16_packbits.tif"], ["RANGE", "DATA"]),
@@ -353,7 +356,7 @@ RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatist
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",
               "gp.StreamOrder_sa", "gp.FlowLength_sa", "gp.Watershed_sa", "conversion.FeatureToRaster",
               "conversion.PolygonToRaster", "conversion.PointToRaster", "gp.EucDistance_sa", "gp.ExtractByMask_sa",
-              "management.Resample"}
+              "management.Resample", "gp.Viewshed_sa"}
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable"}
