@@ -152,6 +152,11 @@ CASES = {
         field_mapping(DATA / "clip_areas.shp", DATA / "parcels.shp", {"PARCEL_ID": "Max", "VALUE": "Min", "ZONE": "Count", "NAME": "Join"}), "INTERSECT"]),
     "sj_rules_d": ("analysis.SpatialJoin", [DATA / "clip_areas.shp", DATA / "parcels.shp"], ["JOIN_ONE_TO_ONE", "KEEP_ALL",
         field_mapping(DATA / "clip_areas.shp", DATA / "parcels.shp", {"PARCEL_ID": "Range", "VALUE": "Mean", "ZONE": "Median", "NAME": "First"}), "WITHIN_A_DISTANCE", "60 Meters"]),
+    "project_wells_4326": ("management.Project", [DATA / "wells.shp"], [4326]),
+    "project_parcels_3857": ("management.Project", [DATA / "parcels.shp"], [3857]),
+    "project_roads_32634": ("management.Project", [DATA / "roads.shp"], [32634]),
+    "project_wells_wgs84_32633": ("management.Project", [DATA / "wells_wgs84.shp"], [32633]),
+    "project_parcels_z_4326": ("management.Project", [DATA / "parcels_z.shp"], [4326]),
 }
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools whose output is a table, written as <name>.dbf.

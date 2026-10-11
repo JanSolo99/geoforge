@@ -765,6 +765,18 @@ fn gf_args(case: &str) -> Vec<&'static str> {
             "--search-radius",
             "60 Meters",
         ],
+        "project_wells_4326" => vec!["project", "testdata/geoproc/wells.shp", "<out>", "4326"],
+        "project_parcels_3857" => vec!["project", "testdata/geoproc/parcels.shp", "<out>", "3857"],
+        "project_roads_32634" => vec!["project", "testdata/geoproc/roads.shp", "<out>", "32634"],
+        "project_wells_wgs84_32633" => vec![
+            "project",
+            "testdata/geoproc/wells_wgs84.shp",
+            "<out>",
+            "32633",
+        ],
+        "project_parcels_z_4326" => {
+            vec!["project", "testdata/geoproc/parcels_z.shp", "<out>", "4326"]
+        }
         "identity_parcels_clip_no_fid" => vec![
             "identity",
             "testdata/geoproc/parcels.shp",
@@ -961,9 +973,14 @@ fn same_value(a: &Value, b: &Value) -> bool {
 
 /// Differences between our output and ArcGIS's for one output file.
 fn compare(case: &str, ours: &Path, theirs: &Path, fields: &serde_json::Value) -> Vec<String> {
+    let theirs_path = theirs.to_path_buf();
+    // The coordinate system written: ArcGIS's exact Esri WKT.
+    let prj = |p: &Path| std::fs::read_to_string(p.with_extension("prj")).ok();
+    let prj_diff = (prj(ours) != prj(theirs))
+        .then(|| format!("prj: ours {:?}, ArcGIS {:?}", prj(ours), prj(theirs)));
     let ours = ShapefileReader::open(ours).unwrap();
     let theirs = ShapefileReader::open(theirs).unwrap();
-    let mut diffs = Vec::new();
+    let mut diffs: Vec<String> = prj_diff.into_iter().collect();
 
     // Schema: names and types as ArcGIS reports them (FID and Shape excluded).
     let expected: Vec<(String, String)> = fields.as_array().unwrap()[2..]
@@ -1000,7 +1017,12 @@ fn compare(case: &str, ours: &Path, theirs: &Path, fields: &serde_json::Value) -
     // degree short of the line's axis (0.4° at the start, 0.3° at the end for a
     // 25 m buffer), which we do not reproduce: 0.013% of a short road's area.
     let one_sided = case.contains("_left") || case.contains("_right");
-    let (shape_tol, area_tol) = if is_buffer && one_sided {
+    // Geographic output: ArcGIS's 0.001 m tolerance is ~1e-8 degrees.
+    let geographic = std::fs::read_to_string(theirs_path.with_extension("prj"))
+        .is_ok_and(|p| p.trim_start().starts_with("GEOGCS"));
+    let (shape_tol, area_tol) = if geographic {
+        (1e-8, 1e-7)
+    } else if is_buffer && one_sided {
         (0.2, 2e-4)
     } else if is_buffer {
         (0.2, 1e-4)

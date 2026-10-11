@@ -16,6 +16,7 @@ geoforge-shapefile.workspace = true
 geoforge-filegdb.workspace = true
 geoforge-geometry.workspace = true
 geoforge-tools.workspace = true
+geoforge-proj.workspace = true
 clap.workspace = true
 chrono.workspace = true
 

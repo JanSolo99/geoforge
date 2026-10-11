@@ -137,7 +137,12 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
 - [ ] Projected coordinate systems: use ArcGIS's projection-derived XY domain origin (needs Phase 4)
 
 ## Phase 4 — CRS
-- [ ] PROJ binding (`proj` crate / `proj-sys`) for 1000+ CRSs; EPSG lookup; WKT1/WKT2/PROJJSON
+- [x] PROJ binding (`geoforge-proj` on the `proj` crate, system PROJ >= 9.6.2 or built from
+      source): CRSs from factory codes (EPSG, then Esri), `.prj` files or WKT; Esri WKT out
+- [x] Project tool (`gf project in out 4326`): vertices transformed by PROJ, Z/M kept — matches
+      ArcGIS to ~1e-13° / sub-mm on WGS 84 ↔ UTM / Web Mercator; output `.prj` is ArcGIS's
+      regenerated WKT, which every tool now writes (ArcGIS does not copy the input's text)
+- [ ] Project: geographic transformations between datums (`transform_method`), vertical CS
 - [ ] Datum transforms with grid shifts
 
 ## Phase 5 — Raster

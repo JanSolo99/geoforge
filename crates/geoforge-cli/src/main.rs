@@ -172,6 +172,13 @@ enum Tool {
         /// A folder; outputs are `<value>.shp`.
         out_workspace: PathBuf,
     },
+    /// Transform features to another coordinate system (ArcGIS "Project").
+    Project {
+        in_dataset: PathBuf,
+        out_dataset: PathBuf,
+        /// A factory code (4326, 32633, 3857, ...), a .prj file or WKT.
+        out_coor_system: String,
+    },
     /// Write the `.sbn`/`.sbx` spatial index of a shapefile (ArcGIS "Add Spatial
     /// Index"); gf writes one with every shapefile anyway.
     AddSpatialIndex { in_features: PathBuf },
@@ -456,6 +463,16 @@ fn main() -> ExitCode {
             split_field,
             out_workspace,
         } => split_tool(&in_features, &split_features, &split_field, &out_workspace),
+        Tool::Project {
+            in_dataset,
+            out_dataset,
+            out_coor_system,
+        } => (|| {
+            let target = geoforge_proj::Crs::parse(&out_coor_system)?;
+            let (fc, _) = open_feature_class(&in_dataset)?;
+            let out = geoforge_tools::project(fc.as_ref(), &target)?;
+            write_output(out, &out_dataset, source_gdb(&in_dataset).as_deref())
+        })(),
         Tool::AddSpatialIndex { in_features } => (|| {
             let Location::Shapefile(shp) = locate(&in_features) else {
                 return Err(Error::Unsupported(
@@ -831,10 +848,14 @@ fn geodatabase_field_names(fields: &[Field]) -> Vec<String> {
 
 /// Writes a tool's output to a shapefile or `path.gdb/name`, applying the target
 /// format's ArcGIS rules.
-fn write_output(out: ToolOutput, output: &Path, source_gdb: Option<&Path>) -> Result<()> {
+fn write_output(mut out: ToolOutput, output: &Path, source_gdb: Option<&Path>) -> Result<()> {
     for m in &out.messages {
         eprintln!("{m}");
     }
+    // ArcGIS writes its own WKT of the coordinate system, not the input's text.
+    out.spatial_reference_wkt = out
+        .spatial_reference_wkt
+        .map(|w| geoforge_proj::Crs::from_wkt(&w).map_or(w, |crs| crs.arcgis_wkt()));
     match locate(output) {
         Location::Geodatabase { gdb, item } => {
             let item = item.ok_or_else(|| {

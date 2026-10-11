@@ -2777,3 +2777,40 @@ pub fn repair_geometry(
         messages,
     })
 }
+
+/// `arcpy.management.Project(in_dataset, out_dataset, out_coor_system)`: every
+/// vertex transformed to `target` (PROJ chooses the operation; datum grid shifts
+/// are not configured). Z and M are kept; true curves are densified first.
+pub fn project(input: &dyn FeatureClass, target: &geoforge_proj::Crs) -> Result<ToolOutput> {
+    let kind = input
+        .geometry_kind()
+        .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
+    let source = input.spatial_reference_wkt().ok_or_else(|| {
+        Error::Unsupported(
+            "ERROR 000622: the input has an unknown coordinate system; define it first".into(),
+        )
+    })?;
+    let source = geoforge_proj::Crs::from_wkt(source)?;
+    let transform = geoforge_proj::Transform::new(&source, target)?;
+    let deviation = geoforge_core::curves::arcgis_densify_deviation(source.is_geographic());
+    let mut features = Vec::new();
+    for f in input.features() {
+        let mut f = f?;
+        if let Some(g) = &mut f.geometry {
+            if g.has_curves() {
+                *g = g.densify_curves_arcgis(deviation)?;
+            }
+            transform.apply(&mut g.xy)?;
+        }
+        features.push(f);
+    }
+    Ok(ToolOutput {
+        kind,
+        has_z: input.has_z(),
+        has_m: input.has_m(),
+        fields: input.fields().to_vec(),
+        spatial_reference_wkt: Some(target.esri_wkt().to_owned()),
+        features,
+        messages: Vec::new(),
+    })
+}

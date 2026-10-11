@@ -18,7 +18,7 @@ jobs:
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
       - name: Install GDAL (test oracle)
-        run: sudo apt-get update && sudo apt-get install -y gdal-bin
+        run: sudo apt-get update && sudo apt-get install -y gdal-bin libsqlite3-dev sqlite3 cmake  # cmake + sqlite: proj-sys builds PROJ >= 9.6.2 from source when the system one is older
       - name: Fetch test corpora
         run: scripts/fetch-testdata.sh
       - run: cargo fmt --all --check

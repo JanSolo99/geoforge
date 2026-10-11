@@ -1,6 +1,6 @@
 [package]
 name = "geoforge-proj"
-description = "Coordinate reference systems and transformations"
+description = "Coordinate reference systems and transformations (PROJ)"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -8,7 +8,7 @@ publish.workspace = true
 
 [dependencies]
 geoforge-core.workspace = true
-thiserror.workspace = true
+proj.workspace = true
 
 [lints]
 workspace = true
