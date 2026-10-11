@@ -206,6 +206,9 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
   - [x] Basin (touching outlets form one basin, numbered in raster order), Watershed (raster
         pour points), Stream Link (stretches numbered in raster order of their heads), Stream
         Order (Strahler, Shreve) and unweighted Flow Length (downstream/upstream), matching ArcGIS
+  - [x] Raster To Point and Raster To Polygon (NO_SIMPLIFY; 4-connected regions in raster order of
+        their first cell) matching ArcGIS
+  - [ ] Raster To Polygon SIMPLIFY; Feature/Polygon/Point To Raster
   - [ ] Flow Direction on flats: ArcGIS's flat resolution is approximated (5×5 look-ahead, then
         Jenson–Domingue passes preferring edge neighbors); a few cells differ on float DEMs and
         about 12% on an integer DEM's large flats

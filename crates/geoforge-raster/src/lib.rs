@@ -6,6 +6,7 @@
 //! the NoData value and the coordinate system code.
 
 pub mod contour;
+pub mod conversion;
 pub mod focal;
 mod geotiff;
 pub mod hydro;

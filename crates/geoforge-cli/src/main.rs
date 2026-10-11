@@ -536,6 +536,19 @@ enum Tool {
         #[arg(long, default_value = "DOWNSTREAM")]
         direction_measurement: String,
     },
+    /// Conversion "Raster To Point": cell centers with pointid and grid_code.
+    RasterToPoint {
+        in_raster: PathBuf,
+        out_point_features: PathBuf,
+    },
+    /// Conversion "Raster To Polygon" (NO_SIMPLIFY): Id and gridcode.
+    RasterToPolygon {
+        in_raster: PathBuf,
+        out_polygon_features: PathBuf,
+        /// Only NO_SIMPLIFY is supported.
+        #[arg(long, default_value = "NO_SIMPLIFY")]
+        simplify: String,
+    },
     /// Spatial Analyst "Aspect" (planar): downslope direction, −1 on flat cells.
     Aspect {
         in_raster: PathBuf,
@@ -1499,10 +1512,7 @@ fn main() -> ExitCode {
                     }
                 })
                 .collect();
-            let wkt = r
-                .epsg
-                .map(|code| geoforge_proj::Crs::parse(&code.to_string()).map(|c| c.arcgis_wkt()))
-                .transpose()?;
+            let wkt = raster_wkt(&r)?;
             let out = ToolOutput {
                 kind: geoforge_core::GeometryKind::Polyline,
                 has_z: false,
@@ -1574,6 +1584,99 @@ fn main() -> ExitCode {
                 &out_raster,
                 &geoforge_raster::hydro::flow_length(&d, upstream),
             )
+        })(),
+        Tool::RasterToPoint {
+            in_raster,
+            out_point_features,
+        } => (|| {
+            let r = geoforge_raster::read_geotiff(&in_raster)?;
+            let float = r.data_type.is_float();
+            let features = geoforge_raster::conversion::raster_to_points(&r)
+                .into_iter()
+                .enumerate()
+                .map(|(i, (p, v))| Feature {
+                    oid: i as i64,
+                    geometry: Some(geoforge_core::Geometry::point(p[0], p[1])),
+                    attributes: vec![
+                        Value::Integer(i as i32 + 1),
+                        if float {
+                            Value::Single(v as f32)
+                        } else {
+                            Value::Integer(v as i32)
+                        },
+                    ],
+                })
+                .collect();
+            let out = ToolOutput {
+                kind: geoforge_core::GeometryKind::Point,
+                has_z: false,
+                has_m: false,
+                fields: vec![
+                    Field::new("pointid", FieldType::Integer),
+                    Field::new(
+                        "grid_code",
+                        if float {
+                            FieldType::Single
+                        } else {
+                            FieldType::Integer
+                        },
+                    ),
+                ],
+                spatial_reference_wkt: raster_wkt(&r)?,
+                features,
+                messages: Vec::new(),
+            };
+            write_output(out, &out_point_features, None)
+        })(),
+        Tool::RasterToPolygon {
+            in_raster,
+            out_polygon_features,
+            simplify,
+        } => (|| {
+            if !simplify.eq_ignore_ascii_case("NO_SIMPLIFY") {
+                return Err(Error::Unsupported(format!("simplify {simplify}")));
+            }
+            let r = geoforge_raster::read_geotiff(&in_raster)?;
+            if r.data_type.is_float() {
+                return Err(Error::Unsupported(
+                    "ERROR 010247: The input raster must be integer".into(),
+                ));
+            }
+            let features = geoforge_raster::conversion::raster_to_polygons(&r)
+                .into_iter()
+                .enumerate()
+                .map(|(i, poly)| {
+                    let mut g = geoforge_core::Geometry::point(0.0, 0.0);
+                    g.kind = geoforge_core::GeometryKind::Polygon;
+                    g.xy.clear();
+                    g.parts.clear();
+                    for ring in poly.rings {
+                        g.parts.push(g.xy.len() as u32);
+                        g.xy.extend(ring);
+                    }
+                    Feature {
+                        oid: i as i64,
+                        geometry: Some(g),
+                        attributes: vec![
+                            Value::Integer(i as i32 + 1),
+                            Value::Integer(poly.value as i32),
+                        ],
+                    }
+                })
+                .collect();
+            let out = ToolOutput {
+                kind: geoforge_core::GeometryKind::Polygon,
+                has_z: false,
+                has_m: false,
+                fields: vec![
+                    Field::new("Id", FieldType::Integer),
+                    Field::new("gridcode", FieldType::Integer),
+                ],
+                spatial_reference_wkt: raster_wkt(&r)?,
+                features,
+                messages: Vec::new(),
+            };
+            write_output(out, &out_polygon_features, None)
         })(),
         Tool::Aspect {
             in_raster,
@@ -2574,4 +2677,11 @@ fn math_tool(op: geoforge_raster::local::MathOp, a: &str, b: &str, out: &Path) -
     let result = geoforge_raster::local::math(op, &a, &b)
         .ok_or_else(|| Error::Unsupported("at least one input must be a raster".into()))?;
     write_raster(out, &result)
+}
+
+/// The ArcGIS WKT of a raster's EPSG coordinate system, if it has one.
+fn raster_wkt(r: &geoforge_raster::Raster) -> Result<Option<String>> {
+    r.epsg
+        .map(|code| geoforge_proj::Crs::parse(&code.to_string()).map(|c| c.arcgis_wkt()))
+        .transpose()
 }

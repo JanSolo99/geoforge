@@ -15659,6 +15659,172 @@
       "messages": [],
       "fields": [],
       "shapeType": null
+    },
+    "r2pt_landuse": {
+      "tool": "conversion.RasterToPoint",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Value"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "pointid",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "grid_code",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "r2pt_dem_nodata": {
+      "tool": "conversion.RasterToPoint",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "Value"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "pointid",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "grid_code",
+          "Single",
+          13,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "r2poly_zones": {
+      "tool": "conversion.RasterToPolygon",
+      "args": [
+        "testdata/raster/zones.tif",
+        "<out>",
+        "NO_SIMPLIFY",
+        "Value"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "gridcode",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "r2poly_landuse": {
+      "tool": "conversion.RasterToPolygon",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "NO_SIMPLIFY",
+        "Value"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "gridcode",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
     }
   }
 }

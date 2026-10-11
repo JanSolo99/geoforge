@@ -1710,6 +1710,10 @@ fn gf_args(case: &str) -> Vec<&'static str> {
             "testdata/arcgis-reference/flowdir_hydro_filled.tif",
             "testdata/arcgis-reference/streamlink_hydro.tif",
         ],
+        "r2pt_landuse" => vec!["raster-to-point", "testdata/raster/landuse_u8.tif"],
+        "r2pt_dem_nodata" => vec!["raster-to-point", "testdata/raster/dem_nodata.tif"],
+        "r2poly_zones" => vec!["raster-to-polygon", "testdata/raster/zones.tif"],
+        "r2poly_landuse" => vec!["raster-to-polygon", "testdata/raster/landuse_u8.tif"],
         "slope_dem" => vec!["slope", "testdata/raster/dem.tif"],
         "slope_dem_percent_z" => vec![
             "slope",
