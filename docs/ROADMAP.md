@@ -171,8 +171,12 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         packed separately), horizontal and floating-point predictors (LZW/Deflate only, as
         libtiff), internal overviews (nearest/average), BigTIFF, EPSG GeoKeys and GDAL_NODATA;
         checked with GDAL and read by ArcGIS; tool output uses ArcGIS's 128×128 tiles
+  - [x] Reader keeps stored statistics (GDAL_METADATA tag, .aux.xml) — ArcGIS's local tools
+        choose output types from them
   - [ ] COG layout (overviews before the full image, ghost area), user-defined CRS GeoKeys,
-        .aux.xml statistics like ArcGIS
+        .aux.xml statistics like ArcGIS (varies by tool: most write min/max/mean/stddev with a
+        histogram of one bucket per integer value or 256 for floats; hydrology and zonal tools
+        write only a histogram with half-integer bounds; some integer outputs use 256 buckets)
 - [ ] Map algebra (local/focal/zonal/global), reclass, resample
   - [x] Focal Statistics (rectangle/circle/annulus in cells; mean, majority, maximum, median,
         minimum, minority, range, std, sum, variety; DATA/NODATA) matching ArcGIS: radii truncate
@@ -251,7 +255,10 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         smaller value), Euclidean Distance (exact, max distance) and Extract by Mask (same grid),
         matching ArcGIS
   - [ ] Raster To Polygon SIMPLIFY; Polyline To Raster options; most-frequent ties (first
-        feature assumed)
+        feature assumed). SIMPLIFY is not vertex weeding: a 7-step 30 m staircase from (210, 0)
+        to (0, 210) becomes (210, 0) → (118.519, 118.519) → (0, 210), bulging off the cell
+        corners (longer staircases: 221.812 for 14 steps, 327.009 for 21, 428.4 for 28); shared
+        edges stay identical between neighbors
   - [ ] Flow Direction on flats: ArcGIS's flat resolution is approximated (5×5 look-ahead, then
         Jenson–Domingue passes preferring edge neighbors); a few cells differ on float DEMs and
         about 12% on an integer DEM's large flats
