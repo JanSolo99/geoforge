@@ -17219,6 +17219,66 @@
       "messages": [],
       "fields": [],
       "shapeType": null
+    },
+    "focal_majority_classes": {
+      "tool": "gp.FocalStatistics_sa",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "Rectangle 3 3 CELL",
+        "MAJORITY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010666: Some majority or minority statistics type results are not unique."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "focal_minority_classes": {
+      "tool": "gp.FocalStatistics_sa",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "Rectangle 3 3 CELL",
+        "MINORITY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "focal_majority_classes_c2": {
+      "tool": "gp.FocalStatistics_sa",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "Circle 2 CELL",
+        "MAJORITY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010666: Some majority or minority statistics type results are not unique."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "focal_majority_classes_nodata": {
+      "tool": "gp.FocalStatistics_sa",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "Rectangle 5 5 CELL",
+        "MAJORITY",
+        "NODATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

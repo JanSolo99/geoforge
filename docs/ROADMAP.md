@@ -183,7 +183,8 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         to whole cells, the annulus is inclusive at both ends, NODATA treats cells beyond the edge
         as NoData, majority/minority ties go to the center value, NoData is the output type's
         maximum, Variety writes a 4-bit raster (NoData 15) for 3×3, integer Sum is 32-bit
-  - [ ] Majority ties not involving the center (smallest value assumed, unverified)
+  - [x] Majority/minority ties not involving the center go to the smallest value (checked on
+        random classes, rectangle and circle, DATA and NODATA)
   - [x] Reclassify (values and inclusive ranges, NODATA, DATA/NODATA for missing values) and
         Zonal Statistics as a raster (zones on the value grid; ten statistics; DATA/NODATA)
         matching ArcGIS, including its integer output type choice: from 8-bit input a 1/2/4-bit

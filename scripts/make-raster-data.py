@@ -56,6 +56,10 @@ write("dem_nodata.tif", holes, gdal.GDT_Float32, nodata=-9999.0)
 write("dem_int16_packbits.tif", np.round(z).astype(np.int16), gdal.GDT_Int16, options=["COMPRESS=PACKBITS"])
 landuse = ((np.indices((40, 50)).sum(axis=0) // 7) % 5).astype(np.uint8)
 write("landuse_u8.tif", landuse, gdal.GDT_Byte, nodata=255, options=["TILED=YES", "BLOCKXSIZE=16", "BLOCKYSIZE=16", "COMPRESS=LZW"], cell=30.0)
+# Random classes 0-5 for tie rules: many neighborhoods with tied counts.
+classes = np.random.default_rng(7).integers(0, 6, size=(25, 30)).astype(np.uint8)
+classes[10:13, 10:13] = 255
+write("classes_u8.tif", classes, gdal.GDT_Byte, nodata=255, cell=30.0)
 write("dem_f64.tif", z, gdal.GDT_Float64)
 write("dem_bigendian.tif", z32, gdal.GDT_Float32, options=["ENDIANNESS=BIG", "TILED=YES", "COMPRESS=DEFLATE", "PREDICTOR=3"])
 write("dem_bigtiff_i32.tif", np.round(z * 100).astype(np.int32), gdal.GDT_Int32, options=["BIGTIFF=YES", "COMPRESS=LZW", "PREDICTOR=2", "ENDIANNESS=BIG"])
