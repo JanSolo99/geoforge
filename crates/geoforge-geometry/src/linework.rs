@@ -252,6 +252,11 @@ impl LineNodes {
             .copied()
     }
 
+    /// The XY tolerance the nodes were found with.
+    pub fn tolerance(&self) -> f64 {
+        self.tol
+    }
+
     fn is_node(&self, p: [f64; 2]) -> bool {
         self.near(p, p)
             .any(|q| (p[0] - q[0]).hypot(p[1] - q[1]) <= self.tol)
@@ -264,6 +269,29 @@ impl LineNodes {
         if g.kind != GeometryKind::Polyline || g.has_curves() {
             return g.clone();
         }
+        let mut merged: Vec<Vec<[f64; 2]>> = Vec::new();
+        for p in self.pieces(g) {
+            if let Some(last) = merged.last_mut()
+                && last.last() == p.first()
+                && !self.is_node(p[0])
+            {
+                last.extend_from_slice(&p[1..]);
+                continue;
+            }
+            merged.push(p);
+        }
+        with_paths(g, merged)
+    }
+
+    /// Splits each path of a line at the nodes inside it (nothing is joined).
+    pub fn split(&self, g: &Geometry) -> Geometry {
+        if g.kind != GeometryKind::Polyline || g.has_curves() {
+            return g.clone();
+        }
+        with_paths(g, self.pieces(g))
+    }
+
+    fn pieces(&self, g: &Geometry) -> Vec<Vec<[f64; 2]>> {
         let close = |p: [f64; 2], q: [f64; 2]| (p[0] - q[0]).hypot(p[1] - q[1]) <= self.tol;
         let mut pieces: Vec<Vec<[f64; 2]>> = Vec::new();
         for r in g.part_ranges() {
@@ -298,28 +326,22 @@ impl LineNodes {
             }
             pieces.push(cur);
         }
-        let mut merged: Vec<Vec<[f64; 2]>> = Vec::new();
-        for p in pieces {
-            if let Some(last) = merged.last_mut()
-                && last.last() == p.first()
-                && !self.is_node(p[0])
-            {
-                last.extend_from_slice(&p[1..]);
-                continue;
-            }
-            merged.push(p);
-        }
-        let mut out = g.clone();
-        out.parts.clear();
-        out.xy.clear();
-        out.z = None;
-        out.m = None;
-        for p in merged {
-            out.parts.push(out.xy.len() as u32);
-            out.xy.extend(p);
-        }
-        out
+        pieces
     }
+}
+
+/// `g` with its paths replaced (Z and M dropped).
+fn with_paths(g: &Geometry, paths: Vec<Vec<[f64; 2]>>) -> Geometry {
+    let mut out = g.clone();
+    out.parts.clear();
+    out.xy.clear();
+    out.z = None;
+    out.m = None;
+    for p in paths {
+        out.parts.push(out.xy.len() as u32);
+        out.xy.extend(p);
+    }
+    out
 }
 
 #[cfg(test)]

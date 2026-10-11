@@ -1,7 +1,9 @@
 """Regenerates testdata/arcgis-reference/ by running ArcGIS Pro tools through the
 ArcGIS bridge (tools/arcgis-bridge). Needs ArcGIS Pro on this machine:
 
-    uv run --with "mcp>=2" python scripts/make-arcgis-reference.py
+    uv run --with "mcp>=2" python scripts/make-arcgis-reference.py [case ...]
+
+With case names, only those cases are rerun and the rest of the manifest is kept.
 
 Each case writes a shapefile and records ArcGIS's messages and output schema in
 manifest.json, which the Rust tests compare GeoForge against.
@@ -44,6 +46,19 @@ CASES = {
     "identity_parcels_clip": ("analysis.Identity", [DATA / "parcels.shp", DATA / "clip_areas.shp"], []),
     "identity_roads_parcels": ("analysis.Identity", [DATA / "roads.shp", DATA / "parcels.shp"], []),
     "identity_wells_clip": ("analysis.Identity", [DATA / "wells.shp", DATA / "clip_areas.shp"], []),
+    "identity_parcels_clip_no_fid": ("analysis.Identity", [DATA / "parcels.shp", DATA / "clip_areas.shp"], ["NO_FID"]),
+    "identity_roads_parcels_fid_only": ("analysis.Identity", [DATA / "roads.shp", DATA / "parcels.shp"], ["ONLY_FID"]),
+    "identity_roads_parcels_relationships": ("analysis.Identity", [DATA / "roads.shp", DATA / "parcels.shp"], ["ALL", "", "KEEP_RELATIONSHIPS"]),
+    "identity_roads_clip": ("analysis.Identity", [DATA / "roads.shp", DATA / "clip_areas.shp"], []),
+    "identity_wells_clip_overlap": ("analysis.Identity", [DATA / "wells.shp", DATA / "clip_areas.shp"], ["ALL", "", "KEEP_RELATIONSHIPS"]),
+    "identity_edges_squares_relationships": ("analysis.Identity", [DATA / "edges.shp", DATA / "squares.shp"], ["ALL", "", "KEEP_RELATIONSHIPS"]),
+    "identity_edges_squares_fid_relationships": ("analysis.Identity", [DATA / "edges.shp", DATA / "squares.shp"], ["ONLY_FID", "", "KEEP_RELATIONSHIPS"]),
+    "identity_edges_squares": ("analysis.Identity", [DATA / "edges.shp", DATA / "squares.shp"], []),
+    "identity_roads_clip_relationships": ("analysis.Identity", [DATA / "roads.shp", DATA / "clip_areas.shp"], ["NO_FID", "", "KEEP_RELATIONSHIPS"]),
+    "union_parcels_clip_no_fid": ("analysis.Union", [f"{DATA / 'parcels.shp'};{DATA / 'clip_areas.shp'}"], ["NO_FID"]),
+    "union_parcels_clip_fid_only": ("analysis.Union", [f"{DATA / 'parcels.shp'};{DATA / 'clip_areas.shp'}"], ["ONLY_FID"]),
+    "union_clip_no_gaps": ("analysis.Union", [f"{DATA / 'clip_areas.shp'}"], ["ALL", "", "NO_GAPS"]),
+    "union_clip_gaps": ("analysis.Union", [f"{DATA / 'clip_areas.shp'}"], ["ALL", "", "GAPS"]),
     "merge_parcels_clip": ("management.Merge", [f"{DATA / 'parcels.shp'};{DATA / 'clip_areas.shp'}"], []),
     # In-place tools (IN_PLACE) run on a copy of the first input, written as the output.
     "near_wells_roads": ("analysis.Near", [DATA / "wells.shp", DATA / "roads.shp"], []),
@@ -118,13 +133,28 @@ SELECT = {
 
 
 def main():
-    if OUT.exists():
-        shutil.rmtree(OUT)
-    OUT.mkdir(parents=True)
+    only = set(sys.argv[1:])
+    unknown = only - set(CASES) - set(SELECT)
+    if unknown:
+        sys.exit(f"unknown cases: {sorted(unknown)}")
     w = server.worker
     info = w.call("info")
     manifest = {"arcgis": {k: info.get(k) for k in ("product", "version", "build", "license")}, "cases": {}}
+    if only:
+        old = json.loads((OUT / "manifest.json").read_text())
+        manifest["cases"] = old["cases"]
+        for name in only:
+            for f in OUT.glob(f"{name}.*"):
+                f.unlink()
+            if (OUT / name).is_dir():
+                shutil.rmtree(OUT / name)
+    else:
+        if OUT.exists():
+            shutil.rmtree(OUT)
+        OUT.mkdir(parents=True)
     for name, (tool, before, after) in CASES.items():
+        if only and name not in only:
+            continue
         out = OUT / (f"{name}.dbf" if tool in TABLE_OUT else f"{name}.shp")
         if tool in WORKSPACE_OUT:
             out = OUT / name
@@ -166,6 +196,8 @@ def main():
         }
         print(f"{name}: {r.get('status')} {manifest['cases'][name]['messages']}")
     for name, (layer, overlap, select, distance, invert) in SELECT.items():
+        if only and name not in only:
+            continue
         out = OUT / f"{name}.shp"
         lyr = f"lyr_{name}"
         w.call("run_tool", tool="management.MakeFeatureLayer", args=[str(DATA / f"{layer}.shp"), lyr],

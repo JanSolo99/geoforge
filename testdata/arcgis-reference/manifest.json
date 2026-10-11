@@ -7693,6 +7693,861 @@
         ]
       ],
       "shapeType": "Polygon"
+    },
+    "identity_parcels_clip_no_fid": {
+      "tool": "analysis.Identity",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "testdata/geoproc/clip_areas.shp",
+        "<out>",
+        "NO_FID"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "identity_roads_parcels_fid_only": {
+      "tool": "analysis.Identity",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "ONLY_FID"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_roads",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "FID_parcel",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "identity_roads_parcels_relationships": {
+      "tool": "analysis.Identity",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "ALL",
+        "",
+        "KEEP_RELATIONSHIPS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_roads",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "LEFT_parce",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "RIGHT_parc",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "LEFT_PAR_1",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "RIGHT_PA_1",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "LEFT_NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "RIGHT_NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "LEFT_VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "RIGHT_VALU",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LEFT_ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "RIGHT_ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "identity_roads_clip_relationships": {
+      "tool": "analysis.Identity",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "testdata/geoproc/clip_areas.shp",
+        "<out>",
+        "NO_FID",
+        "",
+        "KEEP_RELATIONSHIPS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "LEFT_AREA_",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "RIGHT_AREA",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "union_parcels_clip_no_fid": {
+      "tool": "analysis.Union",
+      "args": [
+        "testdata/geoproc/parcels.shp;testdata/geoproc/clip_areas.shp",
+        "<out>",
+        "NO_FID"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "union_parcels_clip_fid_only": {
+      "tool": "analysis.Union",
+      "args": [
+        "testdata/geoproc/parcels.shp;testdata/geoproc/clip_areas.shp",
+        "<out>",
+        "ONLY_FID"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_parcel",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "FID_clip_a",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "union_clip_no_gaps": {
+      "tool": "analysis.Union",
+      "args": [
+        "testdata/geoproc/clip_areas.shp",
+        "<out>",
+        "ALL",
+        "",
+        "NO_GAPS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_clip_a",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "union_clip_gaps": {
+      "tool": "analysis.Union",
+      "args": [
+        "testdata/geoproc/clip_areas.shp",
+        "<out>",
+        "ALL",
+        "",
+        "GAPS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_clip_a",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "identity_roads_clip": {
+      "tool": "analysis.Identity",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "testdata/geoproc/clip_areas.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_roads",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "FID_clip_a",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "identity_wells_clip_overlap": {
+      "tool": "analysis.Identity",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "testdata/geoproc/clip_areas.shp",
+        "<out>",
+        "ALL",
+        "",
+        "KEEP_RELATIONSHIPS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_wells",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LEFT_clip_",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "RIGHT_clip",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "LEFT_AREA_",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "RIGHT_AREA",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "identity_edges_squares_relationships": {
+      "tool": "analysis.Identity",
+      "args": [
+        "testdata/geoproc/edges.shp",
+        "testdata/geoproc/squares.shp",
+        "<out>",
+        "ALL",
+        "",
+        "KEEP_RELATIONSHIPS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_edges",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "EDGE_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "LEFT_squar",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "RIGHT_squa",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "LEFT_SQ_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "RIGHT_SQ_I",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "LEFT_NAME",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "RIGHT_NAME",
+          "String",
+          80,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "identity_edges_squares_fid_relationships": {
+      "tool": "analysis.Identity",
+      "args": [
+        "testdata/geoproc/edges.shp",
+        "testdata/geoproc/squares.shp",
+        "<out>",
+        "ONLY_FID",
+        "",
+        "KEEP_RELATIONSHIPS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_edges",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "EDGE_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "LEFT_squar",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "RIGHT_squa",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "identity_edges_squares": {
+      "tool": "analysis.Identity",
+      "args": [
+        "testdata/geoproc/edges.shp",
+        "testdata/geoproc/squares.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_edges",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "EDGE_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "FID_square",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "SQ_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "NAME_1",
+          "String",
+          80,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
     }
   }
 }

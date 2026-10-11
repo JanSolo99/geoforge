@@ -16,8 +16,8 @@ pub use clip::{ClipArea, clip};
 pub use index::EnvelopeIndex;
 pub use linework::{LineNodes, Meeting, XY_TOLERANCE, meeting, on_path};
 pub use overlay::{
-    OverlayCell, cell_geometry, dissolve, erase, explode, intersection, paths_geometry,
-    polygon_overlay,
+    OverlayCell, cell_geometry, dissolve, enclosed_gaps, erase, explode, intersection,
+    paths_geometry, polygon_overlay,
 };
 pub use proximity::{Nearest, center, completely_within, nearest, outline, relate_matches, within};
 pub use validate::{Problem, ValidationMethod, check, repair};

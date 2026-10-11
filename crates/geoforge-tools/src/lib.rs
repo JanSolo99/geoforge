@@ -672,6 +672,43 @@ pub fn erase(input: &dyn FeatureClass, erase_features: &dyn FeatureClass) -> Res
 /// input first, then the rest; within each, by which inputs cover them (first input
 /// only, second only, both, ...), then by FIDs.
 pub fn union(inputs: &[NamedInput]) -> Result<ToolOutput> {
+    union_with(inputs, JoinAttributes::All, true)
+}
+
+/// `arcpy.analysis.Union(inputs, out, join_attributes, "", gaps)`. With `NO_GAPS`
+/// (`gaps` false) each area enclosed by the inputs but covered by none is added
+/// last, with FID -1 for every input.
+pub fn union_with(inputs: &[NamedInput], join: JoinAttributes, gaps: bool) -> Result<ToolOutput> {
+    let mut out = union_all(inputs)?;
+    if !gaps {
+        let geoms: Vec<geoforge_core::Geometry> = inputs
+            .iter()
+            .map(|i| load(i.features))
+            .collect::<Result<Vec<_>>>()?
+            .into_iter()
+            .flatten()
+            .filter_map(|f| f.geometry)
+            .collect();
+        let row: Vec<Value> = inputs
+            .iter()
+            .flat_map(|i| {
+                std::iter::once(Value::Integer(-1))
+                    .chain(std::iter::repeat_n(Value::Null, i.features.fields().len()))
+            })
+            .collect();
+        for gap in geoforge_geometry::enclosed_gaps(geoms.iter())? {
+            out.features.push(Feature {
+                oid: out.features.len() as i64,
+                geometry: Some(gap),
+                attributes: row.clone(),
+            });
+        }
+    }
+    apply_join_attributes(&mut out, inputs, join);
+    Ok(out)
+}
+
+fn union_all(inputs: &[NamedInput]) -> Result<ToolOutput> {
     let data: Vec<Vec<(i64, geoforge_core::Geometry, Vec<Value>)>> = inputs
         .iter()
         .map(|i| {
@@ -1022,6 +1059,289 @@ pub fn dissolve(
 /// first, then one (multipart) piece per input/identity pair, by FIDs; points are
 /// ordered by Y.
 pub fn identity(input: NamedInput, identity_features: NamedInput) -> Result<ToolOutput> {
+    identity_with(input, identity_features, &IdentityOptions::default())
+}
+
+/// Identity's `join_attributes` and `relationship` parameters.
+#[derive(Debug, Clone, Copy, Default)]
+pub struct IdentityOptions {
+    /// Applies to the identity features' columns only, except that NO_FID also
+    /// drops the input's FID.
+    pub join_attributes: JoinAttributes,
+    /// KEEP_RELATIONSHIPS (line and point input): each identity column becomes a
+    /// `LEFT_`/`RIGHT_` pair; uncovered pieces get 0 or "".
+    pub keep_relationships: bool,
+}
+
+/// `arcpy.analysis.Identity(in, identity, out, join_attributes, "", relationship)`.
+pub fn identity_with(
+    input: NamedInput,
+    identity_features: NamedInput,
+    opts: &IdentityOptions,
+) -> Result<ToolOutput> {
+    let input_cols = 1 + input.features.fields().len();
+    let id_name = identity_features.name.clone();
+    let id_fields = identity_features.features.fields().to_vec();
+    // Polygon inputs: the option is ignored. Points get the columns, all 0 (a
+    // point has no sides).
+    let kind = input.features.geometry_kind();
+    let relationships = opts.keep_relationships && kind != Some(GeometryKind::Polygon);
+    let sideless = kind != Some(GeometryKind::Polyline);
+    let id_cols_len = 1 + id_fields.len();
+    let mut out = identity_all(input, identity_features, relationships && !sideless)?;
+    let join = opts.join_attributes;
+    // (output field, source column, a LEFT/RIGHT column). With relationships the
+    // rows carry the left polygon's columns, then the right one's.
+    let mut cols: Vec<(Field, usize, bool)> = Vec::new();
+    for (k, f) in out.fields[..input_cols].iter().enumerate() {
+        if k > 0 || join != JoinAttributes::NoFid {
+            cols.push((f.clone(), k, false));
+        }
+    }
+    let mut id_cols: Vec<(Field, usize)> = Vec::new();
+    if join != JoinAttributes::NoFid {
+        id_cols.push((out.fields[input_cols].clone(), input_cols));
+    }
+    if join != JoinAttributes::OnlyFid {
+        id_cols.extend(
+            out.fields[input_cols + 1..]
+                .iter()
+                .cloned()
+                .zip(input_cols + 1..),
+        );
+    }
+    for (f, k) in id_cols {
+        if relationships {
+            let base = if k == input_cols {
+                id_name.clone()
+            } else {
+                id_fields[k - input_cols - 1].name.clone()
+            };
+            let right = if sideless { 0 } else { id_cols_len };
+            for (side, offset) in [("LEFT_", 0), ("RIGHT_", right)] {
+                let mut g = f.clone();
+                g.name = format!("{side}{base}");
+                cols.push((g, k + offset, true));
+            }
+        } else {
+            cols.push((f, k, false));
+        }
+    }
+    out.fields = cols.iter().map(|c| c.0.clone()).collect();
+    // A side without a polygon: 0 and "" (ONLY_FID: FID -1); points: all 0.
+    for feat in &mut out.features {
+        let missing = |k: usize| {
+            let fid = if k >= input_cols + id_cols_len && !sideless {
+                input_cols + id_cols_len
+            } else {
+                input_cols
+            };
+            feat.attributes[fid] == Value::Integer(-1)
+        };
+        feat.attributes = cols
+            .iter()
+            .map(|(field, k, side)| {
+                let only_fid = join == JoinAttributes::OnlyFid && !sideless;
+                if *side && (sideless || (missing(*k) && !only_fid)) {
+                    zero_value(field.field_type)
+                } else {
+                    feat.attributes[*k].clone()
+                }
+            })
+            .collect();
+    }
+    Ok(out)
+}
+
+/// The identity polygons split where they overlap: (cell, covering FIDs). Only
+/// groups of polygons whose interiors overlap are overlaid; any other polygon
+/// is its own cell.
+fn identity_cells(polys: &Indexed) -> Result<Vec<(geoforge_core::Geometry, Vec<i64>)>> {
+    fn root(parent: &mut [usize], mut i: usize) -> usize {
+        while parent[i] != i {
+            parent[i] = parent[parent[i]];
+            i = parent[i];
+        }
+        i
+    }
+    let n = polys.features.len();
+    let mut parent: Vec<usize> = (0..n).collect();
+    for i in 0..n {
+        let a = polys.features[i].geometry.as_ref().unwrap();
+        for j in polys.candidates(a, 0.0) {
+            if j <= i {
+                continue;
+            }
+            let b = polys.features[j].geometry.as_ref().unwrap();
+            if geoforge_geometry::relate_matches(a, b, "T********")? {
+                let (ri, rj) = (root(&mut parent, i), root(&mut parent, j));
+                parent[ri] = rj;
+            }
+        }
+    }
+    let mut groups: std::collections::BTreeMap<usize, Vec<usize>> = Default::default();
+    for i in 0..n {
+        let r = root(&mut parent, i);
+        groups.entry(r).or_default().push(i);
+    }
+    let mut cells = Vec::new();
+    for members in groups.into_values() {
+        if let [i] = members[..] {
+            let f = &polys.features[i];
+            cells.push((f.geometry.clone().unwrap(), vec![f.oid]));
+            continue;
+        }
+        let input: Vec<(i64, geoforge_core::Geometry)> = members
+            .iter()
+            .map(|&i| {
+                let f = &polys.features[i];
+                (f.oid, f.geometry.clone().unwrap())
+            })
+            .collect();
+        for c in geoforge_geometry::polygon_overlay(&[input])? {
+            if let Some(g) = geoforge_geometry::cell_geometry(&c) {
+                cells.push((g, c.members[0].clone()));
+            }
+        }
+    }
+    Ok(cells)
+}
+
+/// Line Identity rows of one input feature. The line is cut where it meets
+/// other input lines or an identity cell's outline; each piece gets the
+/// polygons left and right of it (L, R) and pieces are grouped by (L, R).
+/// Pass: 0 uncovered, 1 a polygon on one side only (an outer edge), 2 inside a
+/// polygon or along an edge two share, 3 inside an overlap. Without
+/// relationships a group gives a row per polygon in L then R; with them a row
+/// per (left, right) pair.
+#[allow(clippy::type_complexity)]
+fn identity_line_rows(
+    f: &Feature,
+    head: &[Value],
+    splitter: &geoforge_geometry::LineNodes,
+    nodes: &geoforge_geometry::LineNodes,
+    cells_at: &dyn Fn([f64; 2]) -> Vec<i64>,
+    relationships: bool,
+    id_attrs: &dyn Fn(i64) -> Vec<Value>,
+) -> Vec<(u8, i64, i64, i64, geoforge_core::Geometry, Vec<Value>)> {
+    let g = f.geometry.as_ref().unwrap();
+    let pieces = splitter.split(&nodes.split(g));
+    let mut groups: Vec<((Vec<i64>, Vec<i64>), geoforge_core::Geometry)> = Vec::new();
+    for r in pieces.part_ranges() {
+        let path = &pieces.xy[r];
+        let Some((mid, dir)) = halfway(path) else {
+            continue;
+        };
+        let off = 10.0 * splitter.tolerance();
+        let left = cells_at([mid[0] - dir[1] * off, mid[1] + dir[0] * off]);
+        let right = cells_at([mid[0] + dir[1] * off, mid[1] - dir[0] * off]);
+        let key = (left, right);
+        match groups.iter_mut().find(|(k, _)| *k == key) {
+            Some((_, geom)) => {
+                geom.parts.push(geom.xy.len() as u32);
+                geom.xy.extend_from_slice(path);
+            }
+            None => {
+                let mut geom = pieces.clone();
+                geom.parts = vec![0];
+                geom.xy = path.to_vec();
+                groups.push((key, geom));
+            }
+        }
+    }
+    groups.sort_by(|a, b| a.0.cmp(&b.0));
+    let mut rows = Vec::new();
+    for ((left, right), geom) in groups {
+        let pass = match (left.len(), right.len()) {
+            (0, 0) => 0,
+            (0, _) | (_, 0) => 1,
+            (1, 1) => 2,
+            _ => 3,
+        };
+        let geom = nodes.crack(&geom);
+        let or_none = |v: &[i64]| if v.is_empty() { vec![-1] } else { v.to_vec() };
+        let pairs: Vec<(i64, i64)> = if relationships {
+            let (l, r) = (or_none(&left), or_none(&right));
+            l.iter()
+                .flat_map(|&a| r.iter().map(move |&b| (a, b)))
+                .collect()
+        } else {
+            let mut polys: Vec<i64> = Vec::new();
+            for &p in left.iter().chain(&right) {
+                if !polys.contains(&p) {
+                    polys.push(p);
+                }
+            }
+            or_none(&polys).into_iter().map(|p| (p, p)).collect()
+        };
+        for (l, r) in pairs {
+            let mut attrs = head.to_vec();
+            attrs.extend(id_attrs(l));
+            if relationships {
+                attrs.extend(id_attrs(r));
+            }
+            rows.push((pass, f.oid, l, r, geom.clone(), attrs));
+        }
+    }
+    rows
+}
+
+/// A splitter for one line: its own outline plus those of the cells near it.
+fn splitter_inputs(
+    g: &geoforge_core::Geometry,
+    cell_index: &geoforge_geometry::EnvelopeIndex,
+    cells: &[(geoforge_core::Geometry, Vec<i64>)],
+    tol: f64,
+) -> Result<geoforge_geometry::LineNodes> {
+    let near: Vec<geoforge_core::Geometry> = cell_index
+        .candidates(&g.curve_envelope(), tol)
+        .into_iter()
+        .map(|k| geoforge_geometry::outline(&cells[k].0))
+        .collect();
+    geoforge_geometry::LineNodes::new(std::iter::once(g).chain(near.iter()), tol)
+}
+
+/// The point halfway along a path and the unit direction of the line there.
+fn halfway(path: &[[f64; 2]]) -> Option<([f64; 2], [f64; 2])> {
+    let len = |w: &[[f64; 2]]| (w[1][0] - w[0][0]).hypot(w[1][1] - w[0][1]);
+    let half = path.windows(2).map(len).sum::<f64>() / 2.0;
+    let mut walked = 0.0;
+    for w in path.windows(2) {
+        let l = len(w);
+        if l > 0.0 && walked + l >= half {
+            let t = (half - walked) / l;
+            let d = [(w[1][0] - w[0][0]) / l, (w[1][1] - w[0][1]) / l];
+            return Some((
+                [
+                    w[0][0] + t * (w[1][0] - w[0][0]),
+                    w[0][1] + t * (w[1][1] - w[0][1]),
+                ],
+                d,
+            ));
+        }
+        walked += l;
+    }
+    None
+}
+
+/// What ArcGIS writes for a missing related value: 0 or an empty string.
+fn zero_value(t: FieldType) -> Value {
+    match t {
+        FieldType::SmallInteger => Value::SmallInteger(0),
+        FieldType::Integer => Value::Integer(0),
+        FieldType::BigInteger => Value::BigInteger(0),
+        FieldType::Single => Value::Single(0.0),
+        FieldType::Double => Value::Double(0.0),
+        FieldType::String => Value::String(String::new()),
+        _ => Value::Null,
+    }
+}
+
+fn identity_all(
+    input: NamedInput,
+    identity_features: NamedInput,
+    relationships: bool,
+) -> Result<ToolOutput> {
     let kind = input
         .features
         .geometry_kind()
@@ -1032,7 +1352,7 @@ pub fn identity(input: NamedInput, identity_features: NamedInput) -> Result<Tool
         ));
     }
     if kind == GeometryKind::Polygon {
-        let mut out = union(&[input, identity_features])?;
+        let mut out = union_all(&[input, identity_features])?;
         out.features
             .retain(|f| f.attributes.first() != Some(&Value::Integer(-1)));
         for (i, f) in out.features.iter_mut().enumerate() {
@@ -1051,12 +1371,27 @@ pub fn identity(input: NamedInput, identity_features: NamedInput) -> Result<Tool
         },
     ]);
     let polys = Indexed::load(identity_features.features)?;
-    let missing: Vec<Value> = std::iter::once(Value::Integer(-1))
-        .chain(std::iter::repeat_n(
-            Value::Null,
-            identity_features.features.fields().len(),
-        ))
+    // ArcGIS splits the identity polygons into cells where they overlap: a piece
+    // in an overlap is written once per covering polygon, after all others.
+    let cells = identity_cells(&polys)?;
+    let cell_index = geoforge_geometry::EnvelopeIndex::new(cells.iter().map(|(g, _)| Some(g)));
+    let by_oid: std::collections::HashMap<i64, usize> = polys
+        .features
+        .iter()
+        .enumerate()
+        .map(|(i, f)| (f.oid, i))
         .collect();
+    let id_attrs = |fid: i64| -> Vec<Value> {
+        let mut a = vec![Value::Integer(fid as i32)];
+        match by_oid.get(&fid).map(|&i| &polys.features[i]) {
+            Some(p) => a.extend(p.attributes.iter().cloned()),
+            None => a.extend(std::iter::repeat_n(
+                Value::Null,
+                identity_features.features.fields().len(),
+            )),
+        }
+        a
+    };
     let lines = load(input.features)?;
     // ArcGIS cracks lines wherever two input lines meet.
     let nodes = geoforge_geometry::LineNodes::new(
@@ -1070,12 +1405,35 @@ pub fn identity(input: NamedInput, identity_features: NamedInput) -> Result<Tool
             g
         }
     };
-    // (covered?, input FID, identity FID, geometry, attributes)
+    // (pass, input FID, left FID, right FID, geometry, attributes); pass 0 is
+    // uncovered, 1 inside one polygon, 2 inside an overlap.
     let mut rows = Vec::new();
+    let tol = default_xy_tolerance(input.features.spatial_reference_wkt());
+    // The identity polygons on each side of a line piece, probed just off its middle.
+    let cells_at = |p: [f64; 2]| -> Vec<i64> {
+        let pt = geoforge_core::Geometry::point(p[0], p[1]);
+        cell_index
+            .candidates(&pt.envelope(), 0.0)
+            .into_iter()
+            .find(|&k| geoforge_geometry::within(&pt, &cells[k].0).unwrap_or(false))
+            .map_or_else(Vec::new, |k| cells[k].1.clone())
+    };
     for f in lines {
         let g = f.geometry.as_ref().unwrap();
         let mut head = vec![Value::Integer(f.oid as i32)];
         head.extend(f.attributes.iter().cloned());
+        if kind == GeometryKind::Polyline {
+            rows.extend(identity_line_rows(
+                &f,
+                &head,
+                &splitter_inputs(g, &cell_index, &cells, tol)?,
+                &nodes,
+                &cells_at,
+                relationships,
+                &id_attrs,
+            ));
+            continue;
+        }
         // Only the identity features near this one can cover part of it.
         let near: Vec<&Feature> = polys
             .candidates(g, 0.0)
@@ -1085,37 +1443,56 @@ pub fn identity(input: NamedInput, identity_features: NamedInput) -> Result<Tool
         let area = ClipArea::new(near.iter().filter_map(|p| p.geometry.as_ref()))?;
         if let Some(rest) = geoforge_geometry::erase(g, &area)? {
             let mut attrs = head.clone();
-            attrs.extend(missing.iter().cloned());
-            rows.push((false, f.oid, -1, crack(rest), attrs));
+            attrs.extend(id_attrs(-1));
+            if relationships {
+                attrs.extend(id_attrs(-1));
+            }
+            rows.push((0, f.oid, -1, -1, crack(rest), attrs));
         }
-        for p in near {
-            if let Some(common) = geoforge_geometry::intersection(g, p.geometry.as_ref().unwrap())?
-            {
+        for k in cell_index.candidates(&g.curve_envelope(), 0.0) {
+            let (cell, members) = &cells[k];
+            let Some(common) = geoforge_geometry::intersection(g, cell)? else {
+                continue;
+            };
+            let common = crack(common);
+            let pass = if members.len() > 1 { 2 } else { 1 };
+            let pairs: Vec<(i64, i64)> = if relationships {
+                members
+                    .iter()
+                    .flat_map(|&l| members.iter().map(move |&r| (l, r)))
+                    .collect()
+            } else {
+                members.iter().map(|&m| (m, m)).collect()
+            };
+            for (l, r) in pairs {
                 let mut attrs = head.clone();
-                attrs.push(Value::Integer(p.oid as i32));
-                attrs.extend(p.attributes.iter().cloned());
-                rows.push((true, f.oid, p.oid, crack(common), attrs));
+                attrs.extend(id_attrs(l));
+                if relationships {
+                    attrs.extend(id_attrs(r));
+                }
+                rows.push((pass, f.oid, l, r, common.clone(), attrs));
             }
         }
     }
     if dimension(kind) == 0 {
         rows.sort_by(|a, b| {
             let (pa, pb) = (
-                a.3.xy.first().copied().unwrap_or_default(),
-                b.3.xy.first().copied().unwrap_or_default(),
+                a.4.xy.first().copied().unwrap_or_default(),
+                b.4.xy.first().copied().unwrap_or_default(),
             );
             pa[1].total_cmp(&pb[1]).then(pa[0].total_cmp(&pb[0]))
         });
     } else {
-        rows.sort_by_key(|a| (a.0, a.1, a.2));
+        // Stable: a feature's rows keep their (L, R) order within a pass.
+        rows.sort_by_key(|a| (a.0, a.1));
     }
     let features: Vec<Feature> = rows
         .into_iter()
         .enumerate()
         .map(|(i, r)| Feature {
             oid: i as i64,
-            geometry: Some(r.3),
-            attributes: r.4,
+            geometry: Some(r.4),
+            attributes: r.5,
         })
         .collect();
     Ok(ToolOutput {

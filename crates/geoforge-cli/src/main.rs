@@ -52,6 +52,12 @@ enum Tool {
         /// One or more inputs followed by the output.
         #[arg(num_args = 2.., required = true)]
         paths: Vec<PathBuf>,
+        /// ALL, NO_FID or ONLY_FID.
+        #[arg(long, default_value = "ALL")]
+        join_attributes: String,
+        /// GAPS, or NO_GAPS to add the enclosed areas no input covers.
+        #[arg(long, default_value = "GAPS")]
+        gaps: String,
     },
     /// Remove the parts of input features inside erase polygons (ArcGIS "Erase").
     Erase {
@@ -65,6 +71,12 @@ enum Tool {
         in_features: PathBuf,
         identity_features: PathBuf,
         out_feature_class: PathBuf,
+        /// ALL, NO_FID or ONLY_FID (for the identity features' columns).
+        #[arg(long, default_value = "ALL")]
+        join_attributes: String,
+        /// NO_RELATIONSHIPS, or KEEP_RELATIONSHIPS for LEFT_/RIGHT_ columns (lines).
+        #[arg(long, default_value = "NO_RELATIONSHIPS")]
+        relationship: String,
     },
     /// Combine inputs of the same geometry type into one (ArcGIS "Merge"):
     /// `gf merge a b ... out`.
@@ -229,19 +241,26 @@ fn main() -> ExitCode {
         } => (|| {
             let out = paths.pop().unwrap();
             let opts = geoforge_tools::IntersectOptions {
-                join_attributes: geoforge_tools::JoinAttributes::parse(&join_attributes)
-                    .ok_or_else(|| {
-                        Error::Unsupported(format!("join_attributes {join_attributes}"))
-                    })?,
+                join_attributes: join_attributes_arg(&join_attributes)?,
                 output_type: geoforge_tools::OutputType::parse(&output_type)
                     .ok_or_else(|| Error::Unsupported(format!("output_type {output_type}")))?,
             };
             overlay_tool(&paths, &out, |i| geoforge_tools::intersect_with(i, &opts))
         })(),
-        Tool::Union { mut paths } => {
+        Tool::Union {
+            mut paths,
+            join_attributes,
+            gaps,
+        } => (|| {
             let out = paths.pop().unwrap();
-            overlay_tool(&paths, &out, geoforge_tools::union)
-        }
+            let join = join_attributes_arg(&join_attributes)?;
+            let gaps = match gaps.to_ascii_uppercase().as_str() {
+                "GAPS" => true,
+                "NO_GAPS" => false,
+                other => return Err(Error::Unsupported(format!("gaps {other}"))),
+            };
+            overlay_tool(&paths, &out, |i| geoforge_tools::union_with(i, join, gaps))
+        })(),
         Tool::Erase {
             in_features,
             erase_features,
@@ -259,10 +278,20 @@ fn main() -> ExitCode {
             in_features,
             identity_features,
             out_feature_class,
+            join_attributes,
+            relationship,
         } => (|| {
+            let opts = geoforge_tools::IdentityOptions {
+                join_attributes: join_attributes_arg(&join_attributes)?,
+                keep_relationships: match relationship.to_ascii_uppercase().as_str() {
+                    "NO_RELATIONSHIPS" => false,
+                    "KEEP_RELATIONSHIPS" => true,
+                    other => return Err(Error::Unsupported(format!("relationship {other}"))),
+                },
+            };
             let (fc, _) = open_feature_class(&in_features)?;
             let (id, _) = open_feature_class(&identity_features)?;
-            let out = geoforge_tools::identity(
+            let out = geoforge_tools::identity_with(
                 geoforge_tools::NamedInput {
                     name: dataset_name(&in_features),
                     features: fc.as_ref(),
@@ -271,6 +300,7 @@ fn main() -> ExitCode {
                     name: dataset_name(&identity_features),
                     features: id.as_ref(),
                 },
+                &opts,
             )?;
             write_output(out, &out_feature_class, source_gdb(&in_features).as_deref())
         })(),
@@ -1043,6 +1073,11 @@ fn catalog_path(p: &Path) -> String {
         .unwrap_or_else(|_| p.to_path_buf())
         .display()
         .to_string()
+}
+
+fn join_attributes_arg(s: &str) -> Result<geoforge_tools::JoinAttributes> {
+    geoforge_tools::JoinAttributes::parse(s)
+        .ok_or_else(|| Error::Unsupported(format!("join_attributes {s}")))
 }
 
 fn validation_method_arg(s: &str) -> Result<geoforge_geometry::ValidationMethod> {

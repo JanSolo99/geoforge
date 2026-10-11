@@ -248,6 +248,31 @@ pub fn dissolve<'a>(geoms: impl IntoIterator<Item = &'a Geometry>) -> Result<Opt
     }
 }
 
+/// Areas enclosed by the polygons but covered by none (holes of their union, minus
+/// any islands inside them): Union's NO_GAPS rows. One per hole, in the order of
+/// the union's polygons and rings.
+pub fn enclosed_gaps<'a>(
+    polygons: impl IntoIterator<Item = &'a Geometry>,
+) -> Result<Vec<Geometry>> {
+    let mut parts = Vec::new();
+    for g in polygons {
+        if g.kind == GeometryKind::Polygon {
+            parts.extend(to_multipolygon(&linear(g)?).0);
+        }
+    }
+    let union = unary_union(parts.iter());
+    let mut out = Vec::new();
+    for poly in &union.0 {
+        for hole in poly.interiors() {
+            let ring = MultiPolygon(vec![geo::Polygon::new(hole.clone(), Vec::new())]);
+            if let Some(g) = from_multipolygon(&ring.difference(&union)) {
+                out.push(g);
+            }
+        }
+    }
+    Ok(out)
+}
+
 /// Joins paths sharing an endpoint where exactly two path ends meet.
 pub(crate) fn merge_paths(mut paths: Vec<Vec<[f64; 2]>>) -> Vec<Vec<[f64; 2]>> {
     loop {

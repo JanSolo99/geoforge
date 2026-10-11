@@ -58,8 +58,15 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
 - [x] Line×line Intersect (shared stretches), `output_type` POINT/LINE (outline crossings
       per feature pair, incl. ArcGIS's late rows for points inside shared stretches;
       shared polygon boundaries), `join_attributes` ALL/NO_FID/ONLY_FID — match ArcGIS
-- [ ] Overlay Z/M, `cluster_tolerance`; POINT/LINE output for 3+ inputs; `join_attributes`
-      for Union/Identity
+- [x] Union `join_attributes` and `gaps` (NO_GAPS adds enclosed uncovered areas last, FID
+      -1); Identity `join_attributes` (applies to the identity side; NO_FID also drops the
+      input FID) and `relationship` (LEFT_/RIGHT_ pairs by side of each line piece; missing
+      side 0/"" or -1 with ONLY_FID; points get the columns, all 0). Identity of lines and
+      points splits overlapping identity polygons into cells; line rows come in passes
+      (uncovered, outer edges, inside/shared edges, overlaps) — match ArcGIS
+- [ ] Line Identity/Intersect where input lines overlap each other (ArcGIS writes the shared
+      stretch once per line in a late pass, in the first line's direction)
+- [ ] Overlay Z/M, `cluster_tolerance`; POINT/LINE output for 3+ inputs
 - [x] Spatial index: R-tree over envelopes (`EnvelopeIndex`) in Near, Spatial Join,
       Select By Location, Identity and Intersect; nearest search stops once no envelope
       can be closer. 10k parcels × 20k wells: Spatial Join 45 s → 0.06 s, Near 1.9 s → 0.09 s
