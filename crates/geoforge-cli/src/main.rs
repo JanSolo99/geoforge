@@ -127,6 +127,10 @@ enum Tool {
         /// Add a field with the distance to the joined feature.
         #[arg(long)]
         distance_field_name: Option<String>,
+        /// A join field's merge rule, FIELD=RULE[:DELIMITER] (repeatable): First,
+        /// Last, Join, Sum, Mean, Median, Mode, Min, Max, StdDev, Count, Range.
+        #[arg(long = "merge-rule")]
+        merge_rules: Vec<String>,
     },
     /// Write the input features that relate to selecting features (ArcGIS "Select
     /// Layer By Location" with a new selection, then "Copy Features").
@@ -346,7 +350,23 @@ fn main() -> ExitCode {
             match_option,
             search_radius,
             distance_field_name,
+            merge_rules,
         } => (|| {
+            let merge_rules = merge_rules
+                .iter()
+                .map(|m| {
+                    let (field, rule) = m.split_once('=').ok_or_else(|| {
+                        Error::Unsupported(format!("merge rule `{m}`: expected FIELD=RULE"))
+                    })?;
+                    let (rule, delim) = match rule.split_once(':') {
+                        Some((r, d)) => (r, Some(d)),
+                        None => (rule, None),
+                    };
+                    let rule = geoforge_tools::MergeRule::parse(rule, delim)
+                        .ok_or_else(|| Error::Unsupported(format!("merge rule {rule}")))?;
+                    Ok((field.to_owned(), rule))
+                })
+                .collect::<Result<Vec<_>>>()?;
             let (target, _) = open_feature_class(&target_features)?;
             let (join, _) = open_feature_class(&join_features)?;
             let opts = geoforge_tools::SpatialJoinOptions {
@@ -367,6 +387,7 @@ fn main() -> ExitCode {
                     .map(|r| parse_distance(r, target.spatial_reference_wkt()))
                     .transpose()?,
                 distance_field_name,
+                merge_rules,
             };
             let out = geoforge_tools::spatial_join(target.as_ref(), join.as_ref(), &opts)?;
             write_output(

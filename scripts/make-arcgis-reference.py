@@ -21,6 +21,30 @@ import server  # noqa: E402
 DATA = ROOT / "testdata" / "geoproc"
 OUT = ROOT / "testdata" / "arcgis-reference"
 
+def win(path):
+    """A path as ArcGIS under Wine sees it (for paths inside parameter strings)."""
+    return "Z:" + str(path).replace("/", "\\")
+
+
+def field_mapping(target, join, rules):
+    """A Spatial Join field mapping string: the target's fields (First), then the join
+    fields with the given merge rules (Join uses ';')."""
+    def entry(src, name, ftype, length, rule):
+        delim = '";"' if rule == "Join" else "#"
+        span = f"0,{length - 1}" if ftype == "Text" else "-1,-1"
+        prec = 0 if ftype in ("Text", "Double") else length
+        return (f'{name} "{name}" true true false {length} {ftype} 0 {prec},{rule},{delim},'
+                f"{win(src)},{name},{span}")
+    parts = [entry(target, n, t, l, "First") for n, t, l in TARGET_FIELDS[target.stem]]
+    parts += [entry(join, n, t, l, rules.get(n, "First")) for n, t, l in TARGET_FIELDS[join.stem]]
+    return ";".join(parts)
+
+
+TARGET_FIELDS = {
+    "clip_areas": [("AREA_ID", "Long", 10)],
+    "parcels": [("PARCEL_ID", "Long", 10), ("NAME", "Text", 20), ("VALUE", "Double", 19), ("ZONE", "Long", 5)],
+}
+
 CASES = {
     # name: (tool, args before the output, args after the output)
     "clip_parcels": ("analysis.Clip", [DATA / "parcels.shp", DATA / "clip_areas.shp"], []),
@@ -120,6 +144,14 @@ CASES = {
     "buffer_parcels_10_list_zone": ("analysis.Buffer", [DATA / "parcels.shp"], ["10 Meters", "FULL", "ROUND", "LIST", "ZONE"]),
     "buffer_roads_20_list_class": ("analysis.Buffer", [DATA / "roads.shp"], ["20 Meters", "FULL", "ROUND", "LIST", "CLASS"]),
     "buffer_wells_depth_field": ("analysis.Buffer", [DATA / "wells.shp"], ["DEPTH"]),
+    "sj_rules_a": ("analysis.SpatialJoin", [DATA / "clip_areas.shp", DATA / "parcels.shp"], ["JOIN_ONE_TO_ONE", "KEEP_ALL",
+        field_mapping(DATA / "clip_areas.shp", DATA / "parcels.shp", {"PARCEL_ID": "Mean", "VALUE": "Sum", "ZONE": "Mode", "NAME": "Last"}), "INTERSECT"]),
+    "sj_rules_b": ("analysis.SpatialJoin", [DATA / "clip_areas.shp", DATA / "parcels.shp"], ["JOIN_ONE_TO_ONE", "KEEP_ALL",
+        field_mapping(DATA / "clip_areas.shp", DATA / "parcels.shp", {"PARCEL_ID": "Median", "VALUE": "StdDev", "ZONE": "Range", "NAME": "Count"}), "INTERSECT"]),
+    "sj_rules_c": ("analysis.SpatialJoin", [DATA / "clip_areas.shp", DATA / "parcels.shp"], ["JOIN_ONE_TO_ONE", "KEEP_ALL",
+        field_mapping(DATA / "clip_areas.shp", DATA / "parcels.shp", {"PARCEL_ID": "Max", "VALUE": "Min", "ZONE": "Count", "NAME": "Join"}), "INTERSECT"]),
+    "sj_rules_d": ("analysis.SpatialJoin", [DATA / "clip_areas.shp", DATA / "parcels.shp"], ["JOIN_ONE_TO_ONE", "KEEP_ALL",
+        field_mapping(DATA / "clip_areas.shp", DATA / "parcels.shp", {"PARCEL_ID": "Range", "VALUE": "Mean", "ZONE": "Median", "NAME": "First"}), "WITHIN_A_DISTANCE", "60 Meters"]),
 }
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools whose output is a table, written as <name>.dbf.

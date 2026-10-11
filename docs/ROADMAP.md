@@ -56,8 +56,13 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       name, other geometry types skipped with WARNING 000594) — match ArcGIS
 - [x] Split (one shapefile per text value, named after it; ERROR 003911 for non-text
       fields) and Near with several near feature classes (`NEAR_FC`) — match ArcGIS
-- [ ] Split into a geodatabase; Spatial Join field-map merge rules other than First;
-      selection types other than NEW_SELECTION (needs layers)
+- [x] Spatial Join merge rules (First, Last, Join, Sum, Mean, Median, Mode, Min, Max,
+      StdDev, Count, Range; `gf spatial-join --merge-rule FIELD=RULE[:DELIM]`): output types
+      kept (integers rounded), numeric rules give text fields null, Count writes text, Mode
+      ties go to the smallest value, sample standard deviation; Join text too long for its
+      field empties that field and the rest of the row (WARNING 001156) — match ArcGIS
+- [ ] Split into a geodatabase (needs adding to an existing one); field-map output field
+      definitions (type/length/name changes); selection types other than NEW_SELECTION
 - [x] Line cracking: Intersect, Identity and Split split line results wherever two
       input lines meet (crossings, touches, shared-stretch ends; also lines of the same
       input), Clip and Erase do not; pieces an overlay split at a mere touch are rejoined.

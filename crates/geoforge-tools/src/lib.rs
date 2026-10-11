@@ -2073,6 +2073,8 @@ impl MatchOption {
 /// Spatial Join options beyond the inputs.
 #[derive(Debug, Clone)]
 pub struct SpatialJoinOptions {
+    /// Merge rules of join fields (one to one), by field name; others take First.
+    pub merge_rules: Vec<(String, MergeRule)>,
     /// `JOIN_ONE_TO_MANY` (else one to one).
     pub one_to_many: bool,
     /// `KEEP_ALL` (else `KEEP_COMMON`).
@@ -2089,6 +2091,143 @@ pub struct SpatialJoinOptions {
 /// Matches are taken in join-FID order; one to one keeps the first's attributes,
 /// one to many writes a row per match (`Join_Count` 1, or 0 with `JOIN_FID` -1
 /// for an unmatched target kept by `KEEP_ALL`).
+/// A field map's merge rule: how the values of several matching join features
+/// become one (ArcGIS `FieldMap.mergeRule`).
+#[derive(Debug, Clone, PartialEq)]
+pub enum MergeRule {
+    First,
+    Last,
+    Join(String),
+    Sum,
+    Mean,
+    Median,
+    Mode,
+    Min,
+    Max,
+    StdDev,
+    Count,
+    Range,
+}
+
+impl MergeRule {
+    /// `Sum`, `Join` (delimiter `,` unless given), ... as arcpy names them.
+    pub fn parse(rule: &str, delimiter: Option<&str>) -> Option<Self> {
+        Some(match rule.to_ascii_lowercase().as_str() {
+            "first" => Self::First,
+            "last" => Self::Last,
+            "join" => Self::Join(delimiter.unwrap_or(",").to_owned()),
+            "sum" => Self::Sum,
+            "mean" => Self::Mean,
+            "median" => Self::Median,
+            "mode" => Self::Mode,
+            "min" => Self::Min,
+            "max" => Self::Max,
+            "stddev" | "standard deviation" => Self::StdDev,
+            "count" => Self::Count,
+            "range" => Self::Range,
+            _ => return None,
+        })
+    }
+}
+
+/// The merged value of `values` (matches in join FID order) for a field of `field`'s
+/// type. `Err` holds text that does not fit a text field (ArcGIS WARNING 001156).
+fn merge_values(
+    rule: &MergeRule,
+    values: &[&Value],
+    field: &Field,
+) -> std::result::Result<Value, String> {
+    let text_field = field.field_type == FieldType::String;
+    let numbers = || -> Vec<f64> { values.iter().filter_map(|v| number(v)).collect() };
+    // Numbers stored in the output field's type (integers rounded).
+    let typed = |x: f64| -> Value {
+        match field.field_type {
+            FieldType::SmallInteger => Value::SmallInteger(x.round() as i16),
+            FieldType::Integer => Value::Integer(x.round() as i32),
+            FieldType::BigInteger => Value::BigInteger(x.round() as i64),
+            FieldType::Single => Value::Single(x as f32),
+            FieldType::String => Value::String(format!("{x}")),
+            _ => Value::Double(x),
+        }
+    };
+    let stat = |f: &dyn Fn(&mut Vec<f64>) -> Option<f64>| -> Value {
+        if text_field {
+            return Value::Null;
+        }
+        let mut v = numbers();
+        if v.is_empty() {
+            return Value::Null;
+        }
+        v.sort_by(f64::total_cmp);
+        f(&mut v).map_or(Value::Null, typed)
+    };
+    Ok(match rule {
+        MergeRule::First => values.first().map_or(Value::Null, |v| (*v).clone()),
+        MergeRule::Last => values.last().map_or(Value::Null, |v| (*v).clone()),
+        MergeRule::Sum => stat(&|v| Some(v.iter().sum())),
+        MergeRule::Mean => stat(&|v| Some(v.iter().sum::<f64>() / v.len() as f64)),
+        MergeRule::Median => stat(&|v| {
+            let n = v.len();
+            Some(if n % 2 == 1 {
+                v[n / 2]
+            } else {
+                (v[n / 2 - 1] + v[n / 2]) / 2.0
+            })
+        }),
+        // Most frequent; ties go to the smallest value.
+        MergeRule::Mode => stat(&|v| {
+            let mut best = (v[0], 0usize);
+            let mut i = 0;
+            while i < v.len() {
+                let j = v[i..].iter().take_while(|&&x| x == v[i]).count();
+                if j > best.1 {
+                    best = (v[i], j);
+                }
+                i += j;
+            }
+            Some(best.0)
+        }),
+        MergeRule::Min => stat(&|v| v.first().copied()),
+        MergeRule::Max => stat(&|v| v.last().copied()),
+        MergeRule::Range => stat(&|v| Some(v[v.len() - 1] - v[0])),
+        MergeRule::StdDev => stat(&|v| {
+            let n = v.len() as f64;
+            if v.len() < 2 {
+                return Some(0.0);
+            }
+            let mean = v.iter().sum::<f64>() / n;
+            Some((v.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / (n - 1.0)).sqrt())
+        }),
+        MergeRule::Count => {
+            let n = values.iter().filter(|v| !v.is_null()).count();
+            if text_field {
+                Value::String(n.to_string())
+            } else {
+                typed(n as f64)
+            }
+        }
+        MergeRule::Join(delim) => {
+            let parts: Vec<String> = values
+                .iter()
+                .filter(|v| !v.is_null())
+                .map(|v| match v {
+                    Value::String(s) => s.trim_end().to_owned(),
+                    other => number(other).map_or_else(String::new, |x| format!("{x}")),
+                })
+                .collect();
+            let joined = parts.join(delim);
+            if text_field {
+                if field.length > 0 && joined.chars().count() > field.length as usize {
+                    return Err(joined);
+                }
+                Value::String(joined)
+            } else {
+                joined.trim().parse::<f64>().map_or(Value::Null, typed)
+            }
+        }
+    })
+}
+
 pub fn spatial_join(
     target: &dyn FeatureClass,
     join: &dyn FeatureClass,
@@ -2110,6 +2249,8 @@ pub fn spatial_join(
         push_unique(&mut fields, f.clone());
     }
     let radius = opts.search_radius.unwrap_or(0.0);
+    let rules = &opts.merge_rules;
+    let mut messages = Vec::new();
     let mut features = Vec::new();
     for t in target.features() {
         let t = t?;
@@ -2167,6 +2308,34 @@ pub fn spatial_join(
             }
             a
         };
+        // One to one with merge rules: each join field merged over all matches.
+        // Text that does not fit stops the row there: that field and the ones after
+        // it stay empty (ArcGIS WARNING 001156).
+        let merged = |mut a: Vec<Value>, messages: &mut Vec<String>| {
+            let first = a.len() - join.fields().len();
+            for (k, f) in join.fields().iter().enumerate() {
+                let rule = rules
+                    .iter()
+                    .find(|(n, _)| n.eq_ignore_ascii_case(&f.name))
+                    .map_or(&MergeRule::First, |(_, r)| r);
+                let values: Vec<&Value> = matches
+                    .iter()
+                    .map(|&(i, _)| &joins.features[i].attributes[k])
+                    .collect();
+                match merge_values(rule, &values, f) {
+                    Ok(v) => a[first + k] = v,
+                    Err(text) => {
+                        messages.push(format!(
+                            "WARNING 001156: Failed on input OID {}, could not write value '{text}' to output field {}",
+                            t.oid, f.name
+                        ));
+                        a[first + k..].iter_mut().for_each(|v| *v = Value::Null);
+                        break;
+                    }
+                }
+            }
+            a
+        };
         let mut rows = Vec::new();
         if matches.is_empty() {
             if opts.keep_all {
@@ -2174,8 +2343,10 @@ pub fn spatial_join(
             }
         } else if opts.one_to_many {
             rows.extend(matches.iter().map(|&m| row(1, Some(m))));
-        } else {
+        } else if rules.is_empty() {
             rows.push(row(matches.len(), Some(matches[0])));
+        } else {
+            rows.push(merged(row(matches.len(), Some(matches[0])), &mut messages));
         }
         for attributes in rows {
             features.push(Feature {
@@ -2192,7 +2363,7 @@ pub fn spatial_join(
         fields,
         spatial_reference_wkt: target.spatial_reference_wkt().map(str::to_owned),
         features,
-        messages: Vec::new(),
+        messages,
     })
 }
 

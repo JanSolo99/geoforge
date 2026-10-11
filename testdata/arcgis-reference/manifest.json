@@ -10617,6 +10617,331 @@
         ]
       ],
       "shapeType": "Polygon"
+    },
+    "sj_rules_a": {
+      "tool": "analysis.SpatialJoin",
+      "args": [
+        "testdata/geoproc/clip_areas.shp",
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "JOIN_ONE_TO_ONE",
+        "KEEP_ALL",
+        "AREA_ID \"AREA_ID\" true true false 10 Long 0 10,First,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\clip_areas.shp,AREA_ID,-1,-1;PARCEL_ID \"PARCEL_ID\" true true false 10 Long 0 10,Mean,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,PARCEL_ID,-1,-1;NAME \"NAME\" true true false 20 Text 0 0,Last,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,NAME,0,19;VALUE \"VALUE\" true true false 19 Double 0 0,Sum,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,VALUE,-1,-1;ZONE \"ZONE\" true true false 5 Long 0 5,Mode,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,ZONE,-1,-1",
+        "INTERSECT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Join_Count",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "TARGET_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sj_rules_b": {
+      "tool": "analysis.SpatialJoin",
+      "args": [
+        "testdata/geoproc/clip_areas.shp",
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "JOIN_ONE_TO_ONE",
+        "KEEP_ALL",
+        "AREA_ID \"AREA_ID\" true true false 10 Long 0 10,First,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\clip_areas.shp,AREA_ID,-1,-1;PARCEL_ID \"PARCEL_ID\" true true false 10 Long 0 10,Median,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,PARCEL_ID,-1,-1;NAME \"NAME\" true true false 20 Text 0 0,Count,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,NAME,0,19;VALUE \"VALUE\" true true false 19 Double 0 0,StdDev,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,VALUE,-1,-1;ZONE \"ZONE\" true true false 5 Long 0 5,Range,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,ZONE,-1,-1",
+        "INTERSECT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Join_Count",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "TARGET_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sj_rules_c": {
+      "tool": "analysis.SpatialJoin",
+      "args": [
+        "testdata/geoproc/clip_areas.shp",
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "JOIN_ONE_TO_ONE",
+        "KEEP_ALL",
+        "AREA_ID \"AREA_ID\" true true false 10 Long 0 10,First,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\clip_areas.shp,AREA_ID,-1,-1;PARCEL_ID \"PARCEL_ID\" true true false 10 Long 0 10,Max,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,PARCEL_ID,-1,-1;NAME \"NAME\" true true false 20 Text 0 0,Join,\";\",Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,NAME,0,19;VALUE \"VALUE\" true true false 19 Double 0 0,Min,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,VALUE,-1,-1;ZONE \"ZONE\" true true false 5 Long 0 5,Count,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,ZONE,-1,-1",
+        "INTERSECT"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000595: C:\\users\\jansolo\\AppData\\Local\\Temp\\sj_rules_c0.fid contains the full list of records not able to be processed.",
+        "WARNING 001156: Failed on input OID 0, could not write value 'Lot 2;Lot 3;Lot 4;Lot 7;Lot 8;Lot 9;Lot 10;Lot 13;Lot 14;Lot 15;Lot 16;Lot 19;Lot 20;Lot 21;Lot 22;Lot 26;Lot 27' to output field NAME",
+        "WARNING 001156: Failed on input OID 1, could not write value 'Lot 10;Lot 11;Lot 12;Lot 16;Lot 17;Lot 18;Lot 22;Lot 23;Lot 24;Lot 28;Lot 29;Lot 30' to output field NAME"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Join_Count",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "TARGET_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sj_rules_d": {
+      "tool": "analysis.SpatialJoin",
+      "args": [
+        "testdata/geoproc/clip_areas.shp",
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "JOIN_ONE_TO_ONE",
+        "KEEP_ALL",
+        "AREA_ID \"AREA_ID\" true true false 10 Long 0 10,First,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\clip_areas.shp,AREA_ID,-1,-1;PARCEL_ID \"PARCEL_ID\" true true false 10 Long 0 10,Range,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,PARCEL_ID,-1,-1;NAME \"NAME\" true true false 20 Text 0 0,First,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,NAME,0,19;VALUE \"VALUE\" true true false 19 Double 0 0,Mean,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,VALUE,-1,-1;ZONE \"ZONE\" true true false 5 Long 0 5,Median,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,ZONE,-1,-1",
+        "WITHIN_A_DISTANCE",
+        "60 Meters"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Join_Count",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "TARGET_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
     }
   }
 }
