@@ -302,8 +302,19 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         b-trees, overflow pages, automatic indexes, schema beyond page 1, lock-byte page; passes
         `PRAGMA integrity_check` at page sizes 512–65536 and SQLite keeps editing the files;
         2 million rows in 0.18 s (≈ 8× SQLite's own bulk insert), with an index 0.53 s (≈ 3×)
-  - [ ] GeoPackage: writing, WAL files, curve geometries, Project's extra `fid_` field, 64-bit
-        ObjectIDs in file geodatabases
+  - [x] GeoPackage writing as ArcGIS does (`gf <tool> ... out.gpkg/name`): ArcGIS's schema for a
+        new file, feature tables with its column definitions and checks, OBJECTID from 1,
+        little-endian blobs without envelope (MULTIPOLYGON/MULTILINESTRING, OGC ring order),
+        coordinates snapped to ArcGIS's XY domain, Esri WKT and WKT2 spatial reference rows,
+        R*Tree spatial index bulk-loaded (passes `rtreecheck`) with ArcGIS's triggers; equal
+        row for row to ArcGIS's Copy Features output; ArcGIS reads, queries and edits the
+        files. Adding a table rewrites the file. 1 million points in 0.5 s (GDAL: 1.3 s)
+  - [x] ArcGIS XY domains: geographic, Mercator variants, Plate Carrée exact, Transverse
+        Mercator's y origin exact (x approximate)
+  - [ ] GeoPackage: attribute tables, WAL files, curve geometries, Project's extra `fid_` field,
+        coordinate system descriptions from ArcGIS's database; Transverse Mercator x origin and
+        other projections' XY domains (also for file geodatabase output); 64-bit ObjectIDs in
+        file geodatabases
 
 ## Phase 8 — Rendering & UI
 - [ ] wgpu-based 2D map renderer (symbology, labeling, raster stretch)

@@ -84,6 +84,19 @@ pub struct Table {
     pub sql: String,
 }
 
+/// An entry of the schema table: a table, index, view or trigger.
+#[derive(Debug, Clone)]
+pub struct SchemaObject {
+    /// `table`, `index`, `view` or `trigger`.
+    pub kind: String,
+    pub name: String,
+    pub table: String,
+    /// 0 for objects without a b-tree (views, triggers, virtual tables).
+    pub root_page: u32,
+    /// `None` for automatic indexes.
+    pub sql: Option<String>,
+}
+
 /// An open database file, held in memory.
 pub struct Database {
     path: PathBuf,
@@ -91,6 +104,7 @@ pub struct Database {
     page_size: usize,
     usable: usize,
     tables: Vec<Table>,
+    objects: Vec<SchemaObject>,
 }
 
 impl Database {
@@ -127,10 +141,19 @@ impl Database {
             page_size,
             usable,
             tables: Vec::new(),
+            objects: Vec::new(),
         };
         let mut tables = Vec::new();
+        let mut objects = Vec::new();
         for (_, values) in db.rows(1)? {
             let text = |i: usize| values.get(i).and_then(|v| v.as_str()).unwrap_or("");
+            objects.push(SchemaObject {
+                kind: text(0).to_string(),
+                name: text(1).to_string(),
+                table: text(2).to_string(),
+                root_page: values.get(3).and_then(SqlValue::as_i64).unwrap_or(0) as u32,
+                sql: values.get(4).and_then(|v| v.as_str()).map(str::to_string),
+            });
             if text(0) != "table" {
                 continue;
             }
@@ -143,11 +166,27 @@ impl Database {
             });
         }
         db.tables = tables;
+        db.objects = objects;
         Ok(db)
     }
 
     pub fn path(&self) -> &Path {
         &self.path
+    }
+
+    /// Every schema entry, in schema order.
+    pub fn objects(&self) -> &[SchemaObject] {
+        &self.objects
+    }
+
+    /// The header's `application_id` and `user_version`.
+    pub fn ids(&self) -> (u32, u32) {
+        let be = |at: usize| u32::from_be_bytes(self.data[at..at + 4].try_into().unwrap());
+        (be(68), be(60))
+    }
+
+    pub fn page_size(&self) -> usize {
+        self.page_size
     }
 
     pub fn tables(&self) -> &[Table] {
@@ -234,35 +273,93 @@ impl Database {
     fn leaf_cell(&self, page: &[u8], at: usize) -> Result<Row> {
         let (size, n1) = varint(page, at)?;
         let (rowid, n2) = varint(page, at + n1)?;
-        let start = at + n1 + n2;
-        let size = size as usize;
-        let u = self.usable;
-        let x = u - 35;
-        let payload = if size <= x {
-            page.get(start..start + size)
-                .ok_or_else(|| bad("cell past the page"))?
-                .to_vec()
-        } else {
-            let m = (u - 12) * 32 / 255 - 23;
-            let k = m + (size - m) % (u - 4);
-            let local = if k <= x { k } else { m };
-            let mut payload = page
-                .get(start..start + local)
-                .ok_or_else(|| bad("cell past the page"))?
-                .to_vec();
-            let mut next = be32(page, start + local)?;
-            while payload.len() < size {
-                if next == 0 {
-                    return Err(bad("overflow chain ends early"));
-                }
-                let (bytes, _) = self.page(next)?;
-                next = be32(bytes, 0)?;
-                let take = (size - payload.len()).min(u - 4);
-                payload.extend_from_slice(&bytes[4..4 + take]);
-            }
-            payload
-        };
+        let payload = self.payload(page, at + n1 + n2, size as usize, false)?;
         Ok((rowid as i64, record(&payload)?))
+    }
+
+    /// A cell's payload of `size` bytes starting at `start`, following its
+    /// overflow chain.
+    fn payload(&self, page: &[u8], start: usize, size: usize, index: bool) -> Result<Vec<u8>> {
+        let u = self.usable;
+        let x = if index {
+            (u - 12) * 64 / 255 - 23
+        } else {
+            u - 35
+        };
+        if size <= x {
+            return Ok(page
+                .get(start..start + size)
+                .ok_or_else(|| bad("cell past the page"))?
+                .to_vec());
+        }
+        let m = (u - 12) * 32 / 255 - 23;
+        let k = m + (size - m) % (u - 4);
+        let local = if k <= x { k } else { m };
+        let mut payload = page
+            .get(start..start + local)
+            .ok_or_else(|| bad("cell past the page"))?
+            .to_vec();
+        let mut next = be32(page, start + local)?;
+        while payload.len() < size {
+            if next == 0 {
+                return Err(bad("overflow chain ends early"));
+            }
+            let (bytes, _) = self.page(next)?;
+            next = be32(bytes, 0)?;
+            let take = (size - payload.len()).min(u - 4);
+            payload.extend_from_slice(&bytes[4..4 + take]);
+        }
+        Ok(payload)
+    }
+
+    /// The entries of the index b-tree rooted at `root`, in key order: the
+    /// indexed values and the rowid.
+    pub fn index_entries(&self, root: u32) -> Result<Vec<(Vec<SqlValue>, i64)>> {
+        let mut out = Vec::new();
+        self.index_page(root, 0, &mut out)?;
+        Ok(out)
+    }
+
+    fn index_page(
+        &self,
+        page: u32,
+        depth: usize,
+        out: &mut Vec<(Vec<SqlValue>, i64)>,
+    ) -> Result<()> {
+        if depth > 40 {
+            return Err(bad("index b-tree too deep"));
+        }
+        let (bytes, h) = self.page(page)?;
+        let kind = bytes[h];
+        let cells = u16::from_be_bytes([bytes[h + 3], bytes[h + 4]]) as usize;
+        let mut entry = |at: usize| -> Result<()> {
+            let (size, n) = varint(bytes, at)?;
+            let mut values = record(&self.payload(bytes, at + n, size as usize, true)?)?;
+            let rowid = values.pop().and_then(|v| v.as_i64()).unwrap_or(0);
+            out.push((values, rowid));
+            Ok(())
+        };
+        match kind {
+            0x0a => {
+                for k in 0..cells {
+                    entry(be16(bytes, h + 8 + 2 * k)?)?;
+                }
+            }
+            0x02 => {
+                for k in 0..cells {
+                    let ptr = be16(bytes, h + 12 + 2 * k)?;
+                    self.index_page(be32(bytes, ptr)?, depth + 1, out)?;
+                    let (size, n) = varint(bytes, ptr + 4)?;
+                    let mut values =
+                        record(&self.payload(bytes, ptr + 4 + n, size as usize, true)?)?;
+                    let rowid = values.pop().and_then(|v| v.as_i64()).unwrap_or(0);
+                    out.push((values, rowid));
+                }
+                self.index_page(be32(bytes, h + 8)?, depth + 1, out)?;
+            }
+            other => return Err(bad(format!("page {page}: index page type {other:#x}"))),
+        }
+        Ok(())
     }
 }
 
@@ -421,7 +518,7 @@ fn identifier(text: &str) -> (String, &str) {
 }
 
 /// Column definitions from a CREATE TABLE statement.
-fn parse_columns(sql: &str) -> Vec<Column> {
+pub fn parse_columns(sql: &str) -> Vec<Column> {
     let (Some(open), Some(close)) = (sql.find('('), sql.rfind(')')) else {
         return Vec::new();
     };
@@ -469,6 +566,97 @@ fn parse_columns(sql: &str) -> Vec<Column> {
     columns
 }
 
+/// The columns of each automatic index SQLite creates for a table's PRIMARY
+/// KEY (unless it aliases the rowid) and UNIQUE constraints, in its numbering
+/// order (`sqlite_autoindex_<table>_1`, `_2`, ...): column constraints first,
+/// then table constraints; a constraint repeating an earlier one's columns adds
+/// no index.
+pub fn autoindex_columns(sql: &str, columns: &[Column]) -> Vec<Vec<usize>> {
+    let (Some(open), Some(close)) = (sql.find('('), sql.rfind(')')) else {
+        return Vec::new();
+    };
+    let position = |name: &str| {
+        columns
+            .iter()
+            .position(|c| c.name.eq_ignore_ascii_case(name))
+    };
+    let mut out: Vec<Vec<usize>> = Vec::new();
+    let add = |cols: Vec<usize>, out: &mut Vec<Vec<usize>>| {
+        if !cols.is_empty() && !out.contains(&cols) {
+            out.push(cols);
+        }
+    };
+    let mut table_constraints = Vec::new();
+    let mut col = 0;
+    for def in split_top(&sql[open + 1..close]) {
+        let head = def.trim_start().to_ascii_uppercase();
+        if ["CONSTRAINT", "PRIMARY", "UNIQUE", "CHECK", "FOREIGN"]
+            .iter()
+            .any(|k| head.starts_with(k) && head[k.len()..].starts_with([' ', '(', '\t', '\n']))
+        {
+            table_constraints.push(def);
+            continue;
+        }
+        let (_, rest) = identifier(&def);
+        let upper = rest.to_ascii_uppercase();
+        let words: Vec<&str> = upper
+            .split(|c: char| c.is_whitespace() || c == '(' || c == ')' || c == ',')
+            .filter(|w| !w.is_empty())
+            .collect();
+        for (k, w) in words.iter().enumerate() {
+            let primary = *w == "PRIMARY" && words.get(k + 1) == Some(&"KEY");
+            if (primary && !columns[col].rowid_alias) || *w == "UNIQUE" {
+                add(vec![col], &mut out);
+            }
+        }
+        col += 1;
+    }
+    for def in table_constraints {
+        let upper = def.to_ascii_uppercase();
+        let kind_at = ["PRIMARY KEY", "UNIQUE"]
+            .iter()
+            .filter_map(|k| upper.find(k))
+            .min();
+        let Some(at) = kind_at else { continue };
+        let Some(list_open) = def[at..].find('(') else {
+            continue;
+        };
+        let list_close = def[at + list_open..]
+            .find(')')
+            .unwrap_or(def.len() - at - list_open);
+        let list = &def[at + list_open + 1..at + list_open + list_close];
+        let cols: Vec<usize> = split_top(list)
+            .iter()
+            .filter_map(|c| position(&identifier(c).0))
+            .collect();
+        let alias =
+            upper[at..].starts_with("PRIMARY") && cols.len() == 1 && columns[cols[0]].rowid_alias;
+        if !alias {
+            add(cols, &mut out);
+        }
+    }
+    out
+}
+
+/// The indexed columns of `CREATE [UNIQUE] INDEX name ON table (col, ...)`,
+/// or `None` when it uses expressions, collations or descending order.
+pub fn index_columns(sql: &str, columns: &[Column]) -> Option<Vec<usize>> {
+    let open = sql.find('(')?;
+    let close = sql.rfind(')')?;
+    split_top(&sql[open + 1..close])
+        .iter()
+        .map(|c| {
+            let (name, rest) = identifier(c);
+            if !rest.trim().is_empty() && !rest.trim().eq_ignore_ascii_case("ASC") {
+                return None;
+            }
+            columns
+                .iter()
+                .position(|col| col.name.eq_ignore_ascii_case(&name))
+        })
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -485,6 +673,25 @@ mod tests {
         assert!(cols[0].rowid_alias && cols[0].not_null);
         assert_eq!(cols[2].declared_type, "TEXT(20)");
         assert_eq!(cols[4].declared_type, "");
+    }
+
+    #[test]
+    fn automatic_indexes() {
+        let sql = "CREATE TABLE gpkg_metadata (id INTEGER CONSTRAINT m_pk PRIMARY KEY ASC \
+                   AUTOINCREMENT NOT NULL UNIQUE,md_scope TEXT NOT NULL)";
+        assert_eq!(autoindex_columns(sql, &parse_columns(sql)), vec![vec![0]]);
+        let sql = "CREATE TABLE g (table_name TEXT NOT NULL,column_name TEXT NOT NULL,x INT,\
+                   CONSTRAINT pk PRIMARY KEY (table_name, column_name),\
+                   CONSTRAINT uk UNIQUE (table_name))";
+        assert_eq!(
+            autoindex_columns(sql, &parse_columns(sql)),
+            vec![vec![0, 1], vec![0]]
+        );
+        let sql = "CREATE TABLE c (table_name TEXT NOT NULL PRIMARY KEY,identifier TEXT UNIQUE)";
+        assert_eq!(
+            autoindex_columns(sql, &parse_columns(sql)),
+            vec![vec![0], vec![1]]
+        );
     }
 
     #[test]

@@ -5,8 +5,10 @@
 //! (outer rings clockwise) with their start vertices kept, and empty geometries
 //! read as null (empty points stay empty points).
 
+mod base;
 pub mod sqlite;
 pub mod sqlite_writer;
+pub mod write;
 
 use std::path::Path;
 

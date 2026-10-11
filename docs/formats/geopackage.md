@@ -45,3 +45,36 @@ Observed black-box with `testdata/gpkg/sample.gpkg` (written by GDAL,
   | Buffer, Pairwise Buffer, Dissolve, Intersect, Erase, Feature To Point, Multipart To Singlepart | ERROR 010672 |
   | Export Features                                    | ERROR 002809 (OBJECTID) |
   | Spatial Join                                       | ERROR 002809 (TARGET_FID) |
+
+## Writing (Copy Features into a GeoPackage made by Create SQLite Database)
+
+- New file: GeoPackage 1.4 (`application_id` GPKG, `user_version` 10400), page size 4096,
+  with all gpkg_* tables (tile and metadata ones too), the tile-matrix triggers,
+  `sqlite_sequence`, and spatial references -1, 0 and 4326 (`crates/geoforge-gpkg/src/base.rs`).
+- Feature table: `CREATE TABLE [t] ([OBJECTID] INTEGER primary key autoincrement not null,
+  [Shape] MULTIPOLYGON, ...)` with a type check per column:
+
+  | ArcGIS field | Column                      |
+  |--------------|-----------------------------|
+  | Short        | SMALLINT, range checked     |
+  | Long         | MEDIUMINT, range checked    |
+  | Big Integer  | INTEGER                     |
+  | Float        | FLOAT, range checked        |
+  | Double       | DOUBLE                      |
+  | Text(n)      | TEXT(n), length checked     |
+  | Date         | DATETIME, text `YYYY-MM-DDTHH:MM:SS.0Z` rounded to whole seconds |
+  | Date Only    | DATE, text `YYYY-MM-DD`     |
+  | GUID         | TEXT(38) collate nocase     |
+  | Blob         | BLOB                        |
+  | Time Only, Timestamp Offset | ERROR 000308 |
+
+- OBJECTIDs are renumbered from 1; `sqlite_sequence` holds the count.
+- Geometry blobs: version 0, little-endian, no envelope, srs_id; ISO WKB with Z/M codes
+  (1000/2000/3000); polygons always MULTIPOLYGON with OGC ring order (outer counterclockwise,
+  start vertex kept), lines MULTILINESTRING; missing M is NaN. Coordinates are snapped to
+  the coordinate system's XY domain (UTM: origin −5120900/−9998100, resolution 0.0001).
+- gpkg_contents: identifier = table name, description NULL, extent NULL, last_change in
+  milliseconds UTC. gpkg_spatial_ref_sys: srs_id = EPSG code, Esri WKT (degree to 15
+  digits), a description from ArcGIS's projection database, Esri-flavoured WKT2.
+- Spatial index: `rtree_<t>_Shape` R*Tree with seven triggers using ST_* functions and a
+  `gpkg_rtree_index` extension row (write-only). Node blobs are 1228 bytes (51 entries).

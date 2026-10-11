@@ -2157,6 +2157,34 @@ fn check_64bit_oids(tool: &Tool) -> Result<()> {
     }))
 }
 
+/// The gpkg_spatial_ref_sys row ArcGIS writes for a coordinate system: the EPSG
+/// code as srs_id, its Esri WKT and name, and a description made from the name.
+fn gpkg_spatial_ref(crs: &geoforge_proj::Crs) -> Option<geoforge_gpkg::write::SpatialRef> {
+    let (_, latest) = crs.wkid()?;
+    let definition = crs.database_wkt();
+    let name = definition.split('"').nth(1)?.to_string();
+    // ArcGIS takes descriptions from its own projection database; this matches
+    // it for names like WGS_1984_UTM_Zone_33N and GCS_WGS_1984 only.
+    let description = name.strip_prefix("GCS_").unwrap_or(&name).replace('_', " ");
+    // Esri's own codes (World_Robinson 54030, USA_Contiguous_Albers 102003).
+    let organization = if (53000..55000).contains(&latest) || latest >= 100000 {
+        "Esri"
+    } else {
+        "EPSG"
+    };
+    Some(geoforge_gpkg::write::SpatialRef {
+        srs_id: latest as i64,
+        srs_name: name,
+        organization: organization.into(),
+        organization_coordsys_id: latest as i64,
+        definition_12_063: crs
+            .esri_wkt2(organization, latest)
+            .unwrap_or_else(|| "undefined".into()),
+        definition,
+        description: Some(description),
+    })
+}
+
 /// A path inside a GeoPackage file (`data.gpkg/main.roads`): the file and the
 /// table name, if any.
 fn geopackage_item(path: &Path) -> Option<(PathBuf, Option<String>)> {
@@ -2470,10 +2498,33 @@ fn write_output(mut out: ToolOutput, output: &Path, source_gdb: Option<&Path>) -
     out.spatial_reference_wkt = out
         .spatial_reference_wkt
         .map(|w| geoforge_proj::Crs::from_wkt(&w).map_or(w, |crs| crs.arcgis_wkt()));
-    if geopackage_item(output).is_some() {
-        return Err(Error::Unsupported(
-            "writing to a GeoPackage (read only so far)".into(),
-        ));
+    if let Some((gpkg, item)) = geopackage_item(output) {
+        let name = item
+            .ok_or_else(|| Error::Unsupported("name the output table inside the .gpkg".into()))?;
+        let name = name.strip_prefix("main.").unwrap_or(&name).to_string();
+        let crs = out
+            .spatial_reference_wkt
+            .as_deref()
+            .and_then(|w| geoforge_proj::Crs::from_wkt(w).ok());
+        let spatial_ref = crs.as_ref().and_then(gpkg_spatial_ref);
+        let xy_domain = crs.as_ref().and_then(geoforge_proj::Crs::xy_domain);
+        geoforge_gpkg::write::write_table(
+            &gpkg,
+            &geoforge_gpkg::write::NewTable {
+                name: &name,
+                geometry: Some((out.kind, out.has_z, out.has_m)),
+                fields: &out.fields,
+                spatial_ref: spatial_ref.as_ref(),
+                xy_domain,
+                features: &out.features,
+            },
+        )?;
+        println!(
+            "Wrote {} features to {}",
+            out.features.len(),
+            output.display()
+        );
+        return Ok(());
     }
     match locate(output) {
         Location::Geodatabase { gdb, item } => {
