@@ -16456,6 +16456,315 @@
       "messages": [],
       "fields": [],
       "shapeType": null
+    },
+    "zst_25m_all": {
+      "tool": "gp.ZonalStatisticsAsTable_sa",
+      "args": [
+        "testdata/raster/zones_25m.tif",
+        "Value",
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "DATA",
+        "ALL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COUNT",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "AREA",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "MIN",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "MAX",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "RANGE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "MEAN",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "STD",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "SUM",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "MEDIAN",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "PCT90",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null
+    },
+    "zst_4m_int_all": {
+      "tool": "gp.ZonalStatisticsAsTable_sa",
+      "args": [
+        "testdata/raster/zones_4m.tif",
+        "Value",
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>",
+        "DATA",
+        "ALL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COUNT",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "AREA",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "MIN",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MAX",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "RANGE",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MEAN",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "STD",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "SUM",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "VARIETY",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MAJORITY",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MAJORITY_C",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MAJORITY_P",
+          "Single",
+          13,
+          0,
+          0
+        ],
+        [
+          "MINORITY",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MINORITY_C",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MINORITY_P",
+          "Single",
+          13,
+          0,
+          0
+        ],
+        [
+          "MEDIAN",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "PCT90",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": null
+    },
+    "zonal_mean_25m": {
+      "tool": "gp.ZonalStatistics_sa",
+      "args": [
+        "testdata/raster/zones_25m.tif",
+        "Value",
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "MEAN",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "zonal_majority_shifted": {
+      "tool": "gp.ZonalStatistics_sa",
+      "args": [
+        "testdata/raster/zones_shifted.tif",
+        "Value",
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>",
+        "MAJORITY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "zonal_range_4m": {
+      "tool": "gp.ZonalStatistics_sa",
+      "args": [
+        "testdata/raster/zones_4m.tif",
+        "Value",
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>",
+        "RANGE",
+        "NODATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "zonal_median_4m": {
+      "tool": "gp.ZonalStatistics_sa",
+      "args": [
+        "testdata/raster/zones_4m.tif",
+        "Value",
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>",
+        "MEDIAN",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

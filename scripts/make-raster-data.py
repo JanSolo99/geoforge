@@ -24,7 +24,7 @@ def dem(rows=120, cols=150):
     return z
 
 
-def write(name, data, dtype, nodata=None, options=(), cell=10.0, point=False):
+def write(name, data, dtype, nodata=None, options=(), cell=10.0, point=False, origin=(500000.0, 5001200.0)):
     if data.ndim == 2:
         data = data[np.newaxis]
     bands, rows, cols = data.shape
@@ -32,7 +32,7 @@ def write(name, data, dtype, nodata=None, options=(), cell=10.0, point=False):
     ds = drv.Create(str(OUT / name), cols, rows, bands, dtype, list(options))
     if point:
         ds.SetMetadataItem("AREA_OR_POINT", "Point")
-    ds.SetGeoTransform((500000.0, cell, 0.0, 5001200.0, 0.0, -cell))
+    ds.SetGeoTransform((origin[0], cell, 0.0, origin[1], 0.0, -cell))
     sr = osr.SpatialReference()
     sr.ImportFromEPSG(32633)
     ds.SetProjection(sr.ExportToWkt())
@@ -85,6 +85,16 @@ zones = ((xx // 50) + 3 * (yy // 60)).astype(np.uint8)
 zones[(xx - 75) ** 2 + (yy - 60) ** 2 < 15 ** 2] = 7
 zones[100:, 130:] = 255
 write("zones.tif", zones, gdal.GDT_Byte, nodata=255)
+# Zones on other grids: 25 m cells offset by (-13, +4) m and reaching past the
+# DEM's west and north edges; 10 m cells shifted 3 m; 4 m cells inside the DEM.
+yy, xx = np.mgrid[0:40, 0:50]
+zones25 = ((xx // 12) + 4 * (yy // 15)).astype(np.uint8)
+zones25[30:, 40:] = 255
+write("zones_25m.tif", zones25, gdal.GDT_Byte, nodata=255, cell=25.0, origin=(499987.0, 5001204.0))
+yy, xx = np.mgrid[0:100, 0:130]
+write("zones_shifted.tif", ((xx // 30) + 5 * (yy // 25)).astype(np.uint8), gdal.GDT_Byte, nodata=255, origin=(500023.0, 5001173.0))
+yy, xx = np.mgrid[0:250, 0:300]
+write("zones_4m.tif", ((xx // 70) + 5 * (yy // 60)).astype(np.uint8), gdal.GDT_Byte, nodata=255, cell=4.0, origin=(500101.0, 5001102.0))
 # Observer points for Viewshed (UTM 33N): one on the main hill, one in a valley.
 from osgeo import ogr  # noqa: E402
 

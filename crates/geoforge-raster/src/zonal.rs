@@ -216,8 +216,8 @@ fn zone_value(stat: ZonalStatistic, values: &mut [f64]) -> Option<f64> {
 }
 
 /// Spatial Analyst Zonal Statistics (raster output) with zones and values on the
-/// same grid. With `ignore_nodata` false a zone holding any NoData value cell is
-/// NoData throughout.
+/// same grid (see `resample::zones_on_value_grid`). With `ignore_nodata` false a
+/// zone holding any NoData value cell is NoData throughout.
 pub fn zonal_statistics(
     zones: &Raster,
     values: &Raster,
@@ -246,6 +246,11 @@ pub fn zonal_statistics(
             } else {
                 zone_value(stat, &mut vals)
             };
+            // An integer median of an even count rounds down.
+            let r = match stat {
+                ZonalStatistic::Median if !values.data_type.is_float() => r.map(f64::floor),
+                _ => r,
+            };
             (z, r)
         })
         .collect();
@@ -273,9 +278,17 @@ pub fn zonal_statistics(
             .collect();
         out
     } else {
-        // Range is stored like an 8-bit result (observed).
-        let eight = is_eight_bit(values.data_type) || stat == ZonalStatistic::Range;
-        integer_raster(values, &cells, eight)
+        let eight = is_eight_bit(values.data_type);
+        let max = cells.iter().flatten().copied().fold(0.0, f64::max);
+        if stat == ZonalStatistic::Range && !eight && max < 255.0 {
+            // A range from wider input that fits is unsigned 8-bit (observed).
+            let mut out = values.like(DataType::U8);
+            out.nodata = Some(255.0);
+            out.bands[0] = cells.iter().map(|v| v.unwrap_or(255.0)).collect();
+            out
+        } else {
+            integer_raster(values, &cells, eight)
+        }
     }
 }
 
@@ -321,8 +334,8 @@ pub fn table_statistics(keyword: &str) -> Option<Vec<TableStatistic>> {
     })
 }
 
-/// Spatial Analyst Zonal Statistics as Table (zones and values on one grid):
-/// one row per zone in order of first appearance, with VALUE, COUNT and AREA
+/// Spatial Analyst Zonal Statistics as Table (zones and values on one grid, see
+/// `resample::zones_on_value_grid`): one row per zone in order of first appearance, with VALUE, COUNT and AREA
 /// followed by the requested statistics. Median averages the middle pair and
 /// PCT90 interpolates linearly; integer values keep integer MIN, MAX, RANGE,
 /// MEDIAN and PCT90 and add VARIETY and MAJORITY/MINORITY with their counts and
@@ -456,8 +469,9 @@ pub fn zonal_table(
                     row.push(Value::Single(pct as f32));
                 }
                 Median => {
+                    // An integer median of an even count rounds down.
                     let m = (v[(n - 1) / 2] + v[n / 2]) / 2.0;
-                    row.push(val(m, integer));
+                    row.push(val(if integer { m.floor() } else { m }, integer));
                 }
                 Percentile => {
                     let pos = 0.9 * (n - 1) as f64;

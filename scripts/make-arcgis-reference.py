@@ -334,6 +334,8 @@ CASES = {
     "zst_int_all": ("gp.ZonalStatisticsAsTable_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_int16_packbits.tif"], ["DATA", "ALL"]),
     "zst_mean_nodata": ("gp.ZonalStatisticsAsTable_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_nodata.tif"], ["NODATA", "MEAN"]),
     "zst_min_max": ("gp.ZonalStatisticsAsTable_sa", [RASTER / "zones.tif", "Value", RASTER / "dem.tif"], ["DATA", "MIN_MAX_MEAN"]),
+    "zst_25m_all": ("gp.ZonalStatisticsAsTable_sa", [RASTER / "zones_25m.tif", "Value", RASTER / "dem_nodata.tif"], ["DATA", "ALL"]),
+    "zst_4m_int_all": ("gp.ZonalStatisticsAsTable_sa", [RASTER / "zones_4m.tif", "Value", RASTER / "dem_int16_packbits.tif"], ["DATA", "ALL"]),
     "hillshade_shadows_315_15": ("gp.HillShade_sa", [RASTER / "dem.tif"], [315, 15, "SHADOWS", 3]),
     "hillshade_shadows_200_25": ("gp.HillShade_sa", [RASTER / "dem_nodata.tif"], [200, 25, "SHADOWS", 2]),
     "viewshed_hill": ("gp.Viewshed_sa", [RASTER / "dem.tif", RASTER / "observer_hill.shp"], []),
@@ -348,6 +350,10 @@ CASES = {
     "zonal_majority": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_int16_packbits.tif"], ["MAJORITY", "DATA"]),
     "zonal_variety": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_int16_packbits.tif"], ["VARIETY", "DATA"]),
     "zonal_min_f": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem.tif"], ["MINIMUM", "DATA"]),
+    "zonal_mean_25m": ("gp.ZonalStatistics_sa", [RASTER / "zones_25m.tif", "Value", RASTER / "dem_nodata.tif"], ["MEAN", "DATA"]),
+    "zonal_majority_shifted": ("gp.ZonalStatistics_sa", [RASTER / "zones_shifted.tif", "Value", RASTER / "dem_int16_packbits.tif"], ["MAJORITY", "DATA"]),
+    "zonal_median_4m": ("gp.ZonalStatistics_sa", [RASTER / "zones_4m.tif", "Value", RASTER / "dem_int16_packbits.tif"], ["MEDIAN", "DATA"]),
+    "zonal_range_4m": ("gp.ZonalStatistics_sa", [RASTER / "zones_4m.tif", "Value", RASTER / "dem_int16_packbits.tif"], ["RANGE", "NODATA"]),
 }
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
 RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",

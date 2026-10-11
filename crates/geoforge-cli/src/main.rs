@@ -413,7 +413,7 @@ enum Tool {
         #[arg(long, default_value = "DATA")]
         missing_values: String,
     },
-    /// Spatial Analyst "Zonal Statistics" (zones and values on the same grid).
+    /// Spatial Analyst "Zonal Statistics".
     ZonalStatistics {
         in_zone_data: PathBuf,
         in_value_raster: PathBuf,
@@ -601,7 +601,7 @@ enum Tool {
         in_mask_data: PathBuf,
         out_raster: PathBuf,
     },
-    /// Spatial Analyst "Zonal Statistics as Table" (.dbf; zones and values on one grid).
+    /// Spatial Analyst "Zonal Statistics as Table" (.dbf).
     ZonalStatisticsAsTable {
         in_zone_data: PathBuf,
         in_value_raster: PathBuf,
@@ -1446,13 +1446,10 @@ fn main() -> ExitCode {
             };
             let zones = geoforge_raster::read_geotiff(&in_zone_data)?;
             let values = geoforge_raster::read_geotiff(&in_value_raster)?;
-            if (zones.width, zones.height, zones.transform)
-                != (values.width, values.height, values.transform)
-            {
-                return Err(Error::Unsupported(
-                    "zone and value rasters on different grids".into(),
-                ));
-            }
+            let (zones, values) = geoforge_raster::resample::zones_on_value_grid(&zones, &values)
+                .ok_or_else(|| {
+                Error::Unsupported("zone and value rasters do not overlap".into())
+            })?;
             write_raster(
                 &out_raster,
                 &geoforge_raster::zonal::zonal_statistics(&zones, &values, stat, ignore),
@@ -1879,13 +1876,10 @@ fn main() -> ExitCode {
             };
             let zones = geoforge_raster::read_geotiff(&in_zone_data)?;
             let values = geoforge_raster::read_geotiff(&in_value_raster)?;
-            if (zones.width, zones.height, zones.transform)
-                != (values.width, values.height, values.transform)
-            {
-                return Err(Error::Unsupported(
-                    "zone and value rasters on different grids".into(),
-                ));
-            }
+            let (zones, values) = geoforge_raster::resample::zones_on_value_grid(&zones, &values)
+                .ok_or_else(|| {
+                Error::Unsupported("zone and value rasters do not overlap".into())
+            })?;
             let (fields, rows) =
                 geoforge_raster::zonal::zonal_table(&zones, &values, &stats, ignore);
             write_table(&geoforge_tools::TableOutput { fields, rows }, &out_table)

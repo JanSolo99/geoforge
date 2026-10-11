@@ -238,3 +238,71 @@ pub fn extract_by_mask(input: &Raster, mask: &Raster) -> Raster {
         .collect();
     out
 }
+
+/// Nearest-neighbor copy of `r` onto a north-up grid given by its transform and
+/// size; cells outside `r` are NoData.
+pub fn onto_grid(r: &Raster, transform: [f64; 6], cols: usize, rows: usize) -> Raster {
+    let nodata = r.nodata.unwrap_or(if r.data_type.is_float() {
+        f32::MIN as f64
+    } else {
+        crate::focal::type_max(r.data_type)
+    });
+    let mut out = Raster::new(cols, rows, r.data_type, transform);
+    out.epsg = r.epsg;
+    out.nodata = Some(nodata);
+    let t = &r.transform;
+    for row in 0..rows {
+        let y = transform[3] + transform[5] * (row as f64 + 0.5);
+        let fy = ((y - t[3]) / t[5]).floor();
+        for col in 0..cols {
+            let x = transform[0] + transform[1] * (col as f64 + 0.5);
+            let fx = ((x - t[0]) / t[1]).floor();
+            let inside = fx >= 0.0 && fy >= 0.0 && fx < r.width as f64 && fy < r.height as f64;
+            out.bands[0][row * cols + col] = if inside {
+                r.bands[0][fy as usize * r.width + fx as usize]
+            } else {
+                nodata
+            };
+        }
+    }
+    out
+}
+
+/// Zones and values on one grid, as Spatial Analyst's zonal tools line them up:
+/// the value raster's cells over the intersection of both extents (widened to
+/// whole value cells), with the zones sampled at the cell centers. `None` when
+/// the extents do not overlap.
+pub fn zones_on_value_grid(zones: &Raster, values: &Raster) -> Option<(Raster, Raster)> {
+    let same = (zones.width, zones.height, zones.transform)
+        == (values.width, values.height, values.transform);
+    if same {
+        return Some((zones.clone(), values.clone()));
+    }
+    let (zx0, zy0, zx1, zy1) = zones.extent();
+    let (vx0, vy0, vx1, vy1) = values.extent();
+    let (x0, y0, x1, y1) = (zx0.max(vx0), zy0.max(vy0), zx1.min(vx1), zy1.min(vy1));
+    if x0 >= x1 || y0 >= y1 {
+        return None;
+    }
+    let t = &values.transform;
+    let (cw, ch) = (values.cell_width(), values.cell_height());
+    // Value-grid columns and rows covering the intersection; a 1e-9 cell margin
+    // keeps edges that fall on grid lines from adding a sliver cell.
+    let c0 = ((x0 - t[0]) / cw + 1e-9).floor().max(0.0) as usize;
+    let c1 = (((x1 - t[0]) / cw - 1e-9).ceil() as usize).min(values.width);
+    let r0 = ((t[3] - y1) / ch + 1e-9).floor().max(0.0) as usize;
+    let r1 = (((t[3] - y0) / ch - 1e-9).ceil() as usize).min(values.height);
+    let transform = [
+        t[0] + cw * c0 as f64,
+        cw,
+        0.0,
+        t[3] - ch * r0 as f64,
+        0.0,
+        t[5],
+    ];
+    let (cols, rows) = (c1 - c0, r1 - r0);
+    Some((
+        onto_grid(zones, transform, cols, rows),
+        onto_grid(values, transform, cols, rows),
+    ))
+}
