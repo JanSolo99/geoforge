@@ -42,8 +42,12 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       Join (one to one/many, keep all/common, INTERSECT, WITHIN_A_DISTANCE, (COMPLETELY_)
       CONTAINS/WITHIN with Esri's boundary rule, CLOSEST, distance field) — match ArcGIS
       (distances to ~1e-9 m; ArcGIS computes on its own grid)
-- [ ] Split, Append, Select Layer By Location; Near with several near feature classes
-      (`NEAR_FC`); Spatial Join field-map merge rules other than First
+- [x] Select Layer By Location (all 13 planar overlap types, search distance, invert;
+      `gf select-by-location` writes the selection) and Append (TEST/NO_TEST, fields by
+      name, other geometry types skipped with WARNING 000594) — match ArcGIS
+- [ ] Split (one output per split value); Near with several near feature classes
+      (`NEAR_FC`); Spatial Join field-map merge rules other than First; selection types
+      other than NEW_SELECTION (needs layers)
 - [ ] Line overlays: crack input lines at their mutual crossings, as ArcGIS does
       (Identity writes uncovered road pieces split there: same lines, more parts)
 - [ ] Overlay Z/M, line×line Intersect, `cluster_tolerance`, `output_type` POINT/LINE

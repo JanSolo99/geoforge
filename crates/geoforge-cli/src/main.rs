@@ -109,6 +109,37 @@ enum Tool {
         #[arg(long)]
         distance_field_name: Option<String>,
     },
+    /// Write the input features that relate to selecting features (ArcGIS "Select
+    /// Layer By Location" with a new selection, then "Copy Features").
+    SelectByLocation {
+        in_features: PathBuf,
+        /// INTERSECT, WITHIN_A_DISTANCE, CONTAINS, COMPLETELY_CONTAINS,
+        /// CONTAINS_CLEMENTINI, WITHIN, COMPLETELY_WITHIN, WITHIN_CLEMENTINI,
+        /// ARE_IDENTICAL_TO, BOUNDARY_TOUCHES, SHARE_A_LINE_SEGMENT_WITH,
+        /// CROSSED_BY_THE_OUTLINE_OF or HAVE_THEIR_CENTER_IN.
+        overlap_type: String,
+        select_features: PathBuf,
+        out_feature_class: PathBuf,
+        /// For INTERSECT and WITHIN_A_DISTANCE, e.g. "30 Meters".
+        #[arg(long)]
+        search_distance: Option<String>,
+        /// INVERT: select the features that do not relate.
+        #[arg(long, default_value = "NOT_INVERT")]
+        invert_spatial_relationship: String,
+    },
+    /// Add the features of inputs to an existing target (ArcGIS "Append"):
+    /// `gf append a b ... target`. Updates the target shapefile in place.
+    Append {
+        /// One or more inputs followed by the target.
+        #[arg(num_args = 2.., required = true)]
+        paths: Vec<PathBuf>,
+        /// TEST (schemas must match) or NO_TEST (fields matched by name).
+        #[arg(long, default_value = "TEST")]
+        schema_type: String,
+        /// Write the result here instead of updating the target.
+        #[arg(long)]
+        output: Option<PathBuf>,
+    },
     /// Merge features by attribute values (ArcGIS "Dissolve").
     Dissolve {
         in_features: PathBuf,
@@ -250,6 +281,60 @@ fn main() -> ExitCode {
                 &out_feature_class,
                 source_gdb(&target_features).as_deref(),
             )
+        })(),
+        Tool::SelectByLocation {
+            in_features,
+            overlap_type,
+            select_features,
+            out_feature_class,
+            search_distance,
+            invert_spatial_relationship,
+        } => (|| {
+            let (fc, _) = open_feature_class(&in_features)?;
+            let (sel, _) = open_feature_class(&select_features)?;
+            let overlap = geoforge_tools::Overlap::parse(&overlap_type)
+                .ok_or_else(|| Error::Unsupported(format!("overlap_type {overlap_type}")))?;
+            let invert = match invert_spatial_relationship.to_ascii_uppercase().as_str() {
+                "INVERT" => true,
+                "NOT_INVERT" => false,
+                other => return Err(Error::Unsupported(format!("invert {other}"))),
+            };
+            let distance = search_distance
+                .as_deref()
+                .map(|d| parse_distance(d, fc.spatial_reference_wkt()))
+                .transpose()?;
+            let out = geoforge_tools::select_by_location(
+                fc.as_ref(),
+                overlap,
+                sel.as_ref(),
+                distance,
+                invert,
+            )?;
+            write_output(out, &out_feature_class, source_gdb(&in_features).as_deref())
+        })(),
+        Tool::Append {
+            mut paths,
+            schema_type,
+            output,
+        } => (|| {
+            let target_path = paths.pop().unwrap();
+            let test = match schema_type.to_ascii_uppercase().as_str() {
+                "TEST" => true,
+                "NO_TEST" => false,
+                other => return Err(Error::Unsupported(format!("schema_type {other}"))),
+            };
+            let (target, _) = open_feature_class(&target_path)?;
+            let inputs: Vec<Box<dyn FeatureClass>> = paths
+                .iter()
+                .map(|p| open_feature_class(p).map(|(f, _)| f))
+                .collect::<Result<_>>()?;
+            let refs: Vec<&dyn FeatureClass> = inputs.iter().map(|b| b.as_ref()).collect();
+            let out = geoforge_tools::append(&refs, target.as_ref(), test)?;
+            drop(target);
+            match output {
+                Some(o) => write_output(out, &o, source_gdb(&target_path).as_deref()),
+                None => update_in_place(out, &target_path),
+            }
         })(),
         Tool::Dissolve {
             in_features,
@@ -596,7 +681,11 @@ fn write_output(out: ToolOutput, output: &Path, source_gdb: Option<&Path>) -> Re
             })?;
             write_geodatabase(out, &gdb, &item, source_gdb)
         }
-        Location::Shapefile(path) => write_shapefile(out, &path),
+        Location::Shapefile(path) => {
+            let n = write_shapefile(out, &path)?;
+            println!("Wrote {n} features to {}", path.display());
+            Ok(())
+        }
     }
 }
 
@@ -652,7 +741,8 @@ fn write_geodatabase(
     Ok(())
 }
 
-fn write_shapefile(out: ToolOutput, path: &Path) -> Result<()> {
+/// Writes a shapefile; returns the number of features written.
+fn write_shapefile(out: ToolOutput, path: &Path) -> Result<usize> {
     let mut keep = Vec::new();
     for (i, f) in out.fields.iter().enumerate() {
         match shapefile_field(f.field_type) {
@@ -717,8 +807,7 @@ fn write_shapefile(out: ToolOutput, path: &Path) -> Result<()> {
         );
     }
     w.finish()?;
-    println!("Wrote {n} features to {}", path.display());
-    Ok(())
+    Ok(n)
 }
 
 fn source_gdb(input: &Path) -> Option<PathBuf> {
@@ -813,8 +902,13 @@ fn near_tool(
     if let Some(output) = output {
         return write_output(out, output, source_gdb(input).as_deref());
     }
-    // In place: write next to the input, then replace its files.
-    let Location::Shapefile(shp) = locate(input) else {
+    update_in_place(out, input)
+}
+
+/// Replaces a shapefile with a tool's output (tools that edit their input, like
+/// Near and Append): written next to it, then moved over its files.
+fn update_in_place(out: ToolOutput, dataset: &Path) -> Result<()> {
+    let Location::Shapefile(shp) = locate(dataset) else {
         return Err(Error::Unsupported(
             "updating a geodatabase feature class in place is not implemented yet; give an output"
                 .into(),
@@ -824,8 +918,11 @@ fn near_tool(
         .file_stem()
         .map(|s| s.to_string_lossy().into_owned())
         .unwrap_or_default();
-    let tmp = shp.with_file_name(format!("{stem}.gf-near-tmp.shp"));
-    write_shapefile(out, &tmp)?;
+    let tmp = shp.with_file_name(format!("{stem}.gf-tmp.shp"));
+    for m in &out.messages {
+        eprintln!("{m}");
+    }
+    let n = write_shapefile(out, &tmp)?;
     for ext in ["shp", "shx", "dbf", "prj", "cpg"] {
         let from = tmp.with_extension(ext);
         if from.exists() {
@@ -836,6 +933,7 @@ fn near_tool(
     for ext in ["sbn", "sbx"] {
         std::fs::remove_file(shp.with_extension(ext)).ok();
     }
+    println!("Updated {} ({n} features)", shp.display());
     Ok(())
 }
 

@@ -13,4 +13,4 @@ pub use clip::{ClipArea, clip};
 pub use overlay::{
     OverlayCell, cell_geometry, dissolve, erase, explode, intersection, polygon_overlay,
 };
-pub use proximity::{Nearest, completely_within, nearest, within};
+pub use proximity::{Nearest, center, completely_within, nearest, outline, relate_matches, within};

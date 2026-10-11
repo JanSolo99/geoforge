@@ -2375,6 +2375,153 @@
       ],
       "shapeType": "Point"
     },
+    "append_clip_to_parcels": {
+      "tool": "management.Append",
+      "args": [
+        "testdata/geoproc/clip_areas.shp",
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "NO_TEST"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "append_parcels_to_clip": {
+      "tool": "management.Append",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "testdata/geoproc/clip_areas.shp",
+        "<out>",
+        "NO_TEST"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "append_parcels_to_parcels": {
+      "tool": "management.Append",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "TEST"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
     "merge_parcels_clip_source": {
       "tool": "management.Merge",
       "args": [
@@ -2440,6 +2587,1056 @@
           "String",
           254,
           0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sel_parcels_intersect_clip": {
+      "tool": "management.SelectLayerByLocation",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "INTERSECT",
+        "testdata/geoproc/clip_areas.shp",
+        "",
+        "NEW_SELECTION",
+        "NOT_INVERT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sel_parcels_intersect_clip_invert": {
+      "tool": "management.SelectLayerByLocation",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "INTERSECT",
+        "testdata/geoproc/clip_areas.shp",
+        "",
+        "NEW_SELECTION",
+        "INVERT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sel_parcels_intersect_roads_10": {
+      "tool": "management.SelectLayerByLocation",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "INTERSECT",
+        "testdata/geoproc/roads.shp",
+        "10 Meters",
+        "NEW_SELECTION",
+        "NOT_INVERT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sel_wells_dist_roads_30": {
+      "tool": "management.SelectLayerByLocation",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "WITHIN_A_DISTANCE",
+        "testdata/geoproc/roads.shp",
+        "30 Meters",
+        "NEW_SELECTION",
+        "NOT_INVERT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "sel_parcels_dist_wells_5": {
+      "tool": "management.SelectLayerByLocation",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "WITHIN_A_DISTANCE",
+        "testdata/geoproc/wells.shp",
+        "5 Meters",
+        "NEW_SELECTION",
+        "NOT_INVERT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sel_parcels_within_clip": {
+      "tool": "management.SelectLayerByLocation",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "WITHIN",
+        "testdata/geoproc/clip_areas.shp",
+        "",
+        "NEW_SELECTION",
+        "NOT_INVERT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sel_parcels_completely_within_clip": {
+      "tool": "management.SelectLayerByLocation",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "COMPLETELY_WITHIN",
+        "testdata/geoproc/clip_areas.shp",
+        "",
+        "NEW_SELECTION",
+        "NOT_INVERT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sel_parcels_within_clementini_clip": {
+      "tool": "management.SelectLayerByLocation",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "WITHIN_CLEMENTINI",
+        "testdata/geoproc/clip_areas.shp",
+        "",
+        "NEW_SELECTION",
+        "NOT_INVERT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sel_wells_within_parcels": {
+      "tool": "management.SelectLayerByLocation",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "WITHIN",
+        "testdata/geoproc/parcels.shp",
+        "",
+        "NEW_SELECTION",
+        "NOT_INVERT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "sel_wells_within_clementini_parcels": {
+      "tool": "management.SelectLayerByLocation",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "WITHIN_CLEMENTINI",
+        "testdata/geoproc/parcels.shp",
+        "",
+        "NEW_SELECTION",
+        "NOT_INVERT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "sel_parcels_contains_wells": {
+      "tool": "management.SelectLayerByLocation",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "CONTAINS",
+        "testdata/geoproc/wells.shp",
+        "",
+        "NEW_SELECTION",
+        "NOT_INVERT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sel_parcels_completely_contains_wells": {
+      "tool": "management.SelectLayerByLocation",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "COMPLETELY_CONTAINS",
+        "testdata/geoproc/wells.shp",
+        "",
+        "NEW_SELECTION",
+        "NOT_INVERT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sel_parcels_contains_clementini_wells": {
+      "tool": "management.SelectLayerByLocation",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "CONTAINS_CLEMENTINI",
+        "testdata/geoproc/wells.shp",
+        "",
+        "NEW_SELECTION",
+        "NOT_INVERT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sel_parcels_center_in_clip": {
+      "tool": "management.SelectLayerByLocation",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "HAVE_THEIR_CENTER_IN",
+        "testdata/geoproc/clip_areas.shp",
+        "",
+        "NEW_SELECTION",
+        "NOT_INVERT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sel_parcels_touch_clip": {
+      "tool": "management.SelectLayerByLocation",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "BOUNDARY_TOUCHES",
+        "testdata/geoproc/clip_areas.shp",
+        "",
+        "NEW_SELECTION",
+        "NOT_INVERT"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000117: Warning empty output generated."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sel_parcels_crossed_by_roads": {
+      "tool": "management.SelectLayerByLocation",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "CROSSED_BY_THE_OUTLINE_OF",
+        "testdata/geoproc/roads.shp",
+        "",
+        "NEW_SELECTION",
+        "NOT_INVERT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sel_parcels_share_segment_clip": {
+      "tool": "management.SelectLayerByLocation",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "SHARE_A_LINE_SEGMENT_WITH",
+        "testdata/geoproc/clip_areas.shp",
+        "",
+        "NEW_SELECTION",
+        "NOT_INVERT"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000117: Warning empty output generated."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sel_roads_crossed_by_parcels": {
+      "tool": "management.SelectLayerByLocation",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "CROSSED_BY_THE_OUTLINE_OF",
+        "testdata/geoproc/parcels.shp",
+        "",
+        "NEW_SELECTION",
+        "NOT_INVERT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "sel_parcels_identical_parcels": {
+      "tool": "management.SelectLayerByLocation",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "ARE_IDENTICAL_TO",
+        "testdata/geoproc/parcels.shp",
+        "",
+        "NEW_SELECTION",
+        "NOT_INVERT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
           0
         ]
       ],

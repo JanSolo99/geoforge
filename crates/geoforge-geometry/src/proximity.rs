@@ -164,6 +164,55 @@ pub fn completely_within(a: &Geometry, b: &Geometry) -> Result<bool> {
     Ok(gb.relate(&ga).matches("T**FF*FF*").unwrap_or(false))
 }
 
+/// Whether the DE-9IM matrix of `a` against `b` matches `pattern`
+/// (e.g. `"T*F**F***"`, Clementini within).
+pub fn relate_matches(a: &Geometry, b: &Geometry, pattern: &str) -> Result<bool> {
+    let (ga, gb) = (to_geo(a)?, to_geo(b)?);
+    ga.relate(&gb)
+        .matches(pattern)
+        .map_err(|e| geoforge_core::Error::Unsupported(format!("DE-9IM pattern {pattern}: {e}")))
+}
+
+/// A polygon's rings as a polyline; other geometries unchanged.
+pub fn outline(g: &Geometry) -> Geometry {
+    let mut out = g.clone();
+    if g.kind == GeometryKind::Polygon {
+        out.kind = GeometryKind::Polyline;
+    }
+    out
+}
+
+/// The center ArcGIS uses for HAVE_THEIR_CENTER_IN: the centroid of a polygon
+/// or multipoint, the point halfway along a line.
+pub fn center(g: &Geometry) -> Result<Option<[f64; 2]>> {
+    use geo::{Centroid, InterpolatableLine, Length};
+    let g = linear(g)?;
+    if g.xy.is_empty() {
+        return Ok(None);
+    }
+    Ok(match g.kind {
+        GeometryKind::Polyline => {
+            let ml = to_multilinestring(&g);
+            let half = ml.0.iter().map(|l| geo::Euclidean.length(l)).sum::<f64>() / 2.0;
+            let mut walked = 0.0;
+            let mut found = None;
+            for l in &ml.0 {
+                let len = geo::Euclidean.length(l);
+                if walked + len >= half && len > 0.0 {
+                    found = l
+                        .point_at_ratio_from_start(&geo::Euclidean, (half - walked) / len)
+                        .map(|p| [p.x(), p.y()]);
+                    break;
+                }
+                walked += len;
+            }
+            found.or(Some(g.xy[0]))
+        }
+        GeometryKind::Polygon => to_multipolygon(&g).centroid().map(|p| [p.x(), p.y()]),
+        _ => to_multipoint(&g).centroid().map(|p| [p.x(), p.y()]),
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -192,6 +241,18 @@ mod tests {
         let inside = nearest(&sq, &Geometry::point(4.0, 5.0)).unwrap().unwrap();
         assert_eq!(inside.distance, 0.0);
         assert_eq!(inside.to, [4.0, 5.0]);
+    }
+
+    #[test]
+    fn centers_and_patterns() {
+        let sq = square(0.0, 0.0, 10.0);
+        assert_eq!(center(&sq).unwrap(), Some([5.0, 5.0]));
+        let mut line = outline(&sq);
+        assert_eq!(line.kind, GeometryKind::Polyline);
+        assert_eq!(center(&line).unwrap(), Some([10.0, 10.0]));
+        line.xy.truncate(2);
+        assert!(relate_matches(&line, &sq, "F1*******").unwrap());
+        assert!(relate_matches(&sq, &sq, "T*F**FFF*").unwrap());
     }
 
     #[test]

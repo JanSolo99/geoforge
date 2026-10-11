@@ -59,9 +59,37 @@ CASES = {
     "sj_wells_parcels_within": ("analysis.SpatialJoin", [DATA / "wells.shp", DATA / "parcels.shp"], ["JOIN_ONE_TO_ONE", "KEEP_ALL", "", "WITHIN"]),
     "sj_parcels_wells_contains": ("analysis.SpatialJoin", [DATA / "parcels.shp", DATA / "wells.shp"], ["JOIN_ONE_TO_ONE", "KEEP_ALL", "", "CONTAINS"]),
     "sj_wells_roads_50": ("analysis.SpatialJoin", [DATA / "wells.shp", DATA / "roads.shp"], ["JOIN_ONE_TO_ONE", "KEEP_ALL", "", "WITHIN_A_DISTANCE", "50 Meters", "DIST"]),
+    "append_clip_to_parcels": ("management.Append", [DATA / "clip_areas.shp", DATA / "parcels.shp"], ["NO_TEST"]),
+    "append_parcels_to_clip": ("management.Append", [DATA / "parcels.shp", DATA / "clip_areas.shp"], ["NO_TEST"]),
+    "append_parcels_to_parcels": ("management.Append", [DATA / "parcels.shp", DATA / "parcels.shp"], ["TEST"]),
     "merge_parcels_clip_source": ("management.Merge", [f"{DATA / 'parcels.shp'};{DATA / 'clip_areas.shp'}"], ["", "ADD_SOURCE_INFO"]),
 }
-IN_PLACE = {"analysis.Near"}
+# In-place tools: the index of the input they edit (run on a copy written as the output).
+IN_PLACE = {"analysis.Near": 0, "management.Append": 1}
+
+# Select Layer By Location cases, saved with Copy Features:
+# name: (in_layer, overlap_type, select_features, search_distance, invert)
+SELECT = {
+    "sel_parcels_intersect_clip": ("parcels", "INTERSECT", "clip_areas", "", False),
+    "sel_parcels_intersect_clip_invert": ("parcels", "INTERSECT", "clip_areas", "", True),
+    "sel_parcels_intersect_roads_10": ("parcels", "INTERSECT", "roads", "10 Meters", False),
+    "sel_wells_dist_roads_30": ("wells", "WITHIN_A_DISTANCE", "roads", "30 Meters", False),
+    "sel_parcels_dist_wells_5": ("parcels", "WITHIN_A_DISTANCE", "wells", "5 Meters", False),
+    "sel_parcels_within_clip": ("parcels", "WITHIN", "clip_areas", "", False),
+    "sel_parcels_completely_within_clip": ("parcels", "COMPLETELY_WITHIN", "clip_areas", "", False),
+    "sel_parcels_within_clementini_clip": ("parcels", "WITHIN_CLEMENTINI", "clip_areas", "", False),
+    "sel_wells_within_parcels": ("wells", "WITHIN", "parcels", "", False),
+    "sel_wells_within_clementini_parcels": ("wells", "WITHIN_CLEMENTINI", "parcels", "", False),
+    "sel_parcels_contains_wells": ("parcels", "CONTAINS", "wells", "", False),
+    "sel_parcels_completely_contains_wells": ("parcels", "COMPLETELY_CONTAINS", "wells", "", False),
+    "sel_parcels_contains_clementini_wells": ("parcels", "CONTAINS_CLEMENTINI", "wells", "", False),
+    "sel_parcels_center_in_clip": ("parcels", "HAVE_THEIR_CENTER_IN", "clip_areas", "", False),
+    "sel_parcels_touch_clip": ("parcels", "BOUNDARY_TOUCHES", "clip_areas", "", False),
+    "sel_parcels_crossed_by_roads": ("parcels", "CROSSED_BY_THE_OUTLINE_OF", "roads", "", False),
+    "sel_parcels_share_segment_clip": ("parcels", "SHARE_A_LINE_SEGMENT_WITH", "clip_areas", "", False),
+    "sel_roads_crossed_by_parcels": ("roads", "CROSSED_BY_THE_OUTLINE_OF", "parcels", "", False),
+    "sel_parcels_identical_parcels": ("parcels", "ARE_IDENTICAL_TO", "parcels", "", False),
+}
 
 
 def main():
@@ -74,9 +102,10 @@ def main():
     for name, (tool, before, after) in CASES.items():
         out = OUT / f"{name}.shp"
         if tool in IN_PLACE:
-            w.call("run_tool", tool="management.CopyFeatures", args=[str(before[0]), str(out)],
+            k = IN_PLACE[tool]
+            w.call("run_tool", tool="management.CopyFeatures", args=[str(before[k]), str(out)],
                    env={"overwriteOutput": True})
-            args = [str(out)] + [str(a) for a in before[1:]] + after
+            args = [str(out) if i == k else str(a) for i, a in enumerate(before)] + after
         else:
             args = [str(a) for a in before] + [str(out)] + after
         r = w.call("run_tool", tool=tool, args=args, env={"overwriteOutput": True})
@@ -90,6 +119,29 @@ def main():
             "shapeType": d.get("shapeType"),
         }
         print(f"{name}: {r.get('status')} {manifest['cases'][name]['messages']}")
+    for name, (layer, overlap, select, distance, invert) in SELECT.items():
+        out = OUT / f"{name}.shp"
+        lyr = f"lyr_{name}"
+        w.call("run_tool", tool="management.MakeFeatureLayer", args=[str(DATA / f"{layer}.shp"), lyr],
+               env={"overwriteOutput": True})
+        r = w.call("run_tool", tool="management.SelectLayerByLocation",
+                   args=[lyr, overlap, str(DATA / f"{select}.shp"), distance, "NEW_SELECTION",
+                         "INVERT" if invert else "NOT_INVERT"])
+        if r.get("status") == "succeeded":
+            r = w.call("run_tool", tool="management.CopyFeatures", args=[lyr, str(out)],
+                       env={"overwriteOutput": True})
+        d = w.call("describe", path=str(out)) if r.get("status") == "succeeded" else {}
+        manifest["cases"][name] = {
+            "tool": "management.SelectLayerByLocation",
+            "args": [f"testdata/geoproc/{layer}.shp", overlap, f"testdata/geoproc/{select}.shp",
+                     distance, "NEW_SELECTION", "INVERT" if invert else "NOT_INVERT"],
+            "status": r.get("status"),
+            "messages": [m["text"] for m in r.get("messages", []) if m["severity"] > 0],
+            "fields": [[f["name"], f["type"], f["length"], f["precision"], f["scale"]] for f in d.get("fields", [])],
+            "shapeType": d.get("shapeType"),
+        }
+        print(f"{name}: {r.get('status')} {manifest['cases'][name]['messages']}")
+        w.call("run_tool", tool="management.Delete", args=[lyr])
     (OUT / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     w.stop()
 

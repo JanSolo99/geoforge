@@ -1205,3 +1205,214 @@ pub fn spatial_join(
         messages: Vec::new(),
     })
 }
+
+/// Select Layer By Location `overlap_type`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Overlap {
+    Intersect,
+    WithinADistance,
+    Contains,
+    CompletelyContains,
+    ContainsClementini,
+    Within,
+    CompletelyWithin,
+    WithinClementini,
+    AreIdenticalTo,
+    BoundaryTouches,
+    ShareALineSegmentWith,
+    CrossedByTheOutlineOf,
+    HaveTheirCenterIn,
+}
+
+impl Overlap {
+    pub fn parse(s: &str) -> Option<Self> {
+        Some(match s.to_ascii_uppercase().as_str() {
+            "INTERSECT" => Self::Intersect,
+            "WITHIN_A_DISTANCE" => Self::WithinADistance,
+            "CONTAINS" => Self::Contains,
+            "COMPLETELY_CONTAINS" => Self::CompletelyContains,
+            "CONTAINS_CLEMENTINI" => Self::ContainsClementini,
+            "WITHIN" => Self::Within,
+            "COMPLETELY_WITHIN" => Self::CompletelyWithin,
+            "WITHIN_CLEMENTINI" => Self::WithinClementini,
+            "ARE_IDENTICAL_TO" => Self::AreIdenticalTo,
+            "BOUNDARY_TOUCHES" => Self::BoundaryTouches,
+            "SHARE_A_LINE_SEGMENT_WITH" => Self::ShareALineSegmentWith,
+            "CROSSED_BY_THE_OUTLINE_OF" => Self::CrossedByTheOutlineOf,
+            "HAVE_THEIR_CENTER_IN" => Self::HaveTheirCenterIn,
+            _ => return None,
+        })
+    }
+}
+
+/// Whether input geometry `a` stands in relation `overlap` to selecting geometry
+/// `b` (Esri semantics: CONTAINS/WITHIN count boundary contact, the CLEMENTINI
+/// variants do not, COMPLETELY_* exclude any boundary contact).
+fn relates(
+    a: &geoforge_core::Geometry,
+    b: &geoforge_core::Geometry,
+    overlap: Overlap,
+    distance: f64,
+) -> Result<bool> {
+    use geoforge_geometry as g;
+    Ok(match overlap {
+        Overlap::Intersect | Overlap::WithinADistance => {
+            g::nearest(a, b)?.is_some_and(|n| n.distance <= distance)
+        }
+        Overlap::Contains => g::within(b, a)?,
+        Overlap::CompletelyContains => g::completely_within(b, a)?,
+        Overlap::ContainsClementini => g::relate_matches(a, b, "T*****FF*")?,
+        Overlap::Within => g::within(a, b)?,
+        Overlap::CompletelyWithin => g::completely_within(a, b)?,
+        Overlap::WithinClementini => g::relate_matches(a, b, "T*F**F***")?,
+        Overlap::AreIdenticalTo => g::relate_matches(a, b, "T*F**FFF*")?,
+        Overlap::BoundaryTouches => {
+            g::relate_matches(a, b, "FT*******")?
+                || g::relate_matches(a, b, "F**T*****")?
+                || g::relate_matches(a, b, "F***T****")?
+        }
+        Overlap::ShareALineSegmentWith => {
+            g::relate_matches(&g::outline(a), &g::outline(b), "1********")?
+        }
+        Overlap::CrossedByTheOutlineOf => {
+            g::relate_matches(&g::outline(a), &g::outline(b), "0********")?
+        }
+        Overlap::HaveTheirCenterIn => match g::center(a)? {
+            Some([x, y]) => g::nearest(&geoforge_core::Geometry::point(x, y), b)?
+                .is_some_and(|n| n.distance == 0.0),
+            None => false,
+        },
+    })
+}
+
+/// `arcpy.management.SelectLayerByLocation(in_layer, overlap_type,
+/// select_features, search_distance, "NEW_SELECTION", invert)` followed by Copy
+/// Features: the input features (in FID order) related to any selecting feature.
+/// `search_distance` applies to INTERSECT and WITHIN_A_DISTANCE.
+pub fn select_by_location(
+    input: &dyn FeatureClass,
+    overlap: Overlap,
+    select_features: &dyn FeatureClass,
+    search_distance: Option<f64>,
+    invert: bool,
+) -> Result<ToolOutput> {
+    let kind = input
+        .geometry_kind()
+        .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
+    let selecting = load(select_features)?;
+    let distance = search_distance.unwrap_or(0.0);
+    let pad = match overlap {
+        Overlap::Intersect | Overlap::WithinADistance => distance,
+        _ => 0.0,
+    };
+    let mut features = Vec::new();
+    for f in input.features() {
+        let f = f?;
+        let mut hit = false;
+        if let Some(a) = &f.geometry {
+            let ea = a.envelope();
+            for s in &selecting {
+                let b = s.geometry.as_ref().unwrap();
+                let eb = b.envelope();
+                if ea.xmin > eb.xmax + pad
+                    || eb.xmin > ea.xmax + pad
+                    || ea.ymin > eb.ymax + pad
+                    || eb.ymin > ea.ymax + pad
+                {
+                    continue;
+                }
+                if relates(a, b, overlap, distance)? {
+                    hit = true;
+                    break;
+                }
+            }
+        }
+        if hit != invert {
+            features.push(Feature {
+                oid: features.len() as i64,
+                ..f
+            });
+        }
+    }
+    Ok(ToolOutput {
+        kind,
+        has_z: input.has_z(),
+        has_m: input.has_m(),
+        fields: input.fields().to_vec(),
+        spatial_reference_wkt: input.spatial_reference_wkt().map(str::to_owned),
+        messages: if features.is_empty() {
+            vec!["WARNING 000117: Warning empty output generated.".into()]
+        } else {
+            Vec::new()
+        },
+        features,
+    })
+}
+
+/// `arcpy.management.Append(inputs, target, schema_type)`: the target with the
+/// inputs' features added after its own. The target keeps its schema; input
+/// values go to target fields of the same name (others are dropped, missing ones
+/// null); features of another geometry type are skipped with a warning. `TEST`
+/// requires every input to match the target's fields and geometry type.
+pub fn append(
+    inputs: &[&dyn FeatureClass],
+    target: &dyn FeatureClass,
+    test: bool,
+) -> Result<ToolOutput> {
+    let kind = target.geometry_kind();
+    let fields = target.fields().to_vec();
+    let mut features: Vec<Feature> = target.features().collect::<Result<_>>()?;
+    let mut messages = Vec::new();
+    for input in inputs {
+        let same_kind = input.geometry_kind() == kind;
+        let positions: Vec<Option<usize>> = fields
+            .iter()
+            .map(|f| {
+                input
+                    .fields()
+                    .iter()
+                    .position(|g| g.name.eq_ignore_ascii_case(&f.name))
+            })
+            .collect();
+        if test {
+            let same = input.fields().len() == fields.len()
+                && positions
+                    .iter()
+                    .zip(&fields)
+                    .all(|(p, f)| p.is_some_and(|p| input.fields()[p].field_type == f.field_type));
+            if !same || !same_kind {
+                return Err(Error::Unsupported(
+                    "ERROR 000466: input does not match the schema of the target; use NO_TEST"
+                        .into(),
+                ));
+            }
+        }
+        for (n, f) in input.features().enumerate() {
+            let f = f?;
+            // ArcGIS skips features of another geometry type, one warning each.
+            if !same_kind {
+                messages.push(format!(
+                    "WARNING 000594: Input feature {n}: No support for this geometry type.."
+                ));
+                continue;
+            }
+            features.push(Feature {
+                oid: features.len() as i64,
+                attributes: positions
+                    .iter()
+                    .map(|p| p.map_or(Value::Null, |p| f.attributes[p].clone()))
+                    .collect(),
+                geometry: f.geometry,
+            });
+        }
+    }
+    Ok(ToolOutput {
+        kind: kind.ok_or_else(|| Error::Unsupported("appending to tables".into()))?,
+        has_z: target.has_z(),
+        has_m: target.has_m(),
+        fields,
+        spatial_reference_wkt: target.spatial_reference_wkt().map(str::to_owned),
+        features,
+        messages,
+    })
+}
