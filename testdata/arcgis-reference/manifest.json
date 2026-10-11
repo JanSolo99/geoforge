@@ -15251,6 +15251,178 @@
       "messages": [],
       "fields": [],
       "shapeType": null
+    },
+    "plus_dem_int16": {
+      "tool": "gp.Plus_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "plus_int16_const": {
+      "tool": "gp.Plus_sa",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        5,
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "minus_nodata_dem": {
+      "tool": "gp.Minus_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "testdata/raster/dem.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "times_int16_half": {
+      "tool": "gp.Times_sa",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        0.5,
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "times_zones_int16": {
+      "tool": "gp.Times_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "divide_int16_zones": {
+      "tool": "gp.Divide_sa",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "testdata/raster/zones.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "divide_dem_3": {
+      "tool": "gp.Divide_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        3,
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "isnull_dem_nodata": {
+      "tool": "gp.IsNull_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "int_dem": {
+      "tool": "gp.Int_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "float_int16": {
+      "tool": "gp.Float_sa",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "con_zones": {
+      "tool": "gp.Con_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "testdata/raster/dem.tif",
+        "<out>",
+        "testdata/raster/dem_int16_packbits.tif",
+        "Value > 3"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "con_zones_const": {
+      "tool": "gp.Con_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        1,
+        "<out>",
+        0,
+        "Value = 7"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "con_no_false": {
+      "tool": "gp.Con_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "",
+        "Value > 250"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "setnull_zones": {
+      "tool": "gp.SetNull_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "testdata/raster/dem.tif",
+        "<out>",
+        "Value = 7"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

@@ -181,6 +181,9 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         matching ArcGIS, including its integer output type choice: from 8-bit input a 1/2/4-bit
         layout (NoData 1/3/15), then signed, then unsigned 8-bit; otherwise U16 for non-negative
         results, else S16, then 32-bit; zonal Sum/Mean/Std are float
+  - [x] Local tools matching ArcGIS: Plus, Minus, Times, Divide (raster or constant operands;
+        integer inputs give 32-bit integers, Divide truncating, ÷0 NoData), Int, Float, Is Null,
+        Con and Set Null with `Value` where clauses
   - [ ] Zonal Statistics as Table; zones and values on different grids (cell size/snap env)
 - [ ] Hillshade, slope, aspect, curvature, contours, viewshed, hydrology (fill/flow dir/accumulation/watershed)
   - [x] Slope (degree/percent rise, z-factor), Aspect, Hillshade (no shadows), planar, matching

@@ -436,6 +436,64 @@ enum Tool {
         #[arg(long)]
         out_plan_curve_raster: Option<PathBuf>,
     },
+    /// Spatial Analyst "Plus": raster or constant operands.
+    Plus {
+        in1: String,
+        in2: String,
+        out_raster: PathBuf,
+    },
+    /// Spatial Analyst "Minus".
+    Minus {
+        in1: String,
+        in2: String,
+        out_raster: PathBuf,
+    },
+    /// Spatial Analyst "Times".
+    Times {
+        in1: String,
+        in2: String,
+        out_raster: PathBuf,
+    },
+    /// Spatial Analyst "Divide" (integer inputs divide to a truncated integer).
+    Divide {
+        in1: String,
+        in2: String,
+        out_raster: PathBuf,
+    },
+    /// Spatial Analyst "Int": truncate to integer.
+    Int {
+        in_raster: PathBuf,
+        out_raster: PathBuf,
+    },
+    /// Spatial Analyst "Float".
+    Float {
+        in_raster: PathBuf,
+        out_raster: PathBuf,
+    },
+    /// Spatial Analyst "Is Null".
+    IsNull {
+        in_raster: PathBuf,
+        out_raster: PathBuf,
+    },
+    /// Spatial Analyst "Con": conditional choice per cell.
+    Con {
+        in_conditional_raster: PathBuf,
+        in_true_raster_or_constant: String,
+        out_raster: PathBuf,
+        #[arg(long)]
+        in_false_raster_or_constant: Option<String>,
+        /// e.g. "Value > 3".
+        #[arg(long = "where")]
+        where_clause: Option<String>,
+    },
+    /// Spatial Analyst "Set Null".
+    SetNull {
+        in_conditional_raster: PathBuf,
+        in_false_raster_or_constant: String,
+        out_raster: PathBuf,
+        #[arg(long = "where")]
+        where_clause: Option<String>,
+    },
     /// Spatial Analyst "Aspect" (planar): downslope direction, −1 on flat cells.
     Aspect {
         in_raster: PathBuf,
@@ -1286,6 +1344,95 @@ fn main() -> ExitCode {
                 write_raster(&p, &plan)?;
             }
             Ok(())
+        })(),
+        Tool::Plus {
+            in1,
+            in2,
+            out_raster,
+        } => math_tool(
+            geoforge_raster::local::MathOp::Plus,
+            &in1,
+            &in2,
+            &out_raster,
+        ),
+        Tool::Minus {
+            in1,
+            in2,
+            out_raster,
+        } => math_tool(
+            geoforge_raster::local::MathOp::Minus,
+            &in1,
+            &in2,
+            &out_raster,
+        ),
+        Tool::Times {
+            in1,
+            in2,
+            out_raster,
+        } => math_tool(
+            geoforge_raster::local::MathOp::Times,
+            &in1,
+            &in2,
+            &out_raster,
+        ),
+        Tool::Divide {
+            in1,
+            in2,
+            out_raster,
+        } => math_tool(
+            geoforge_raster::local::MathOp::Divide,
+            &in1,
+            &in2,
+            &out_raster,
+        ),
+        Tool::Int {
+            in_raster,
+            out_raster,
+        } => geoforge_raster::read_geotiff(&in_raster)
+            .and_then(|r| write_raster(&out_raster, &geoforge_raster::local::int(&r))),
+        Tool::Float {
+            in_raster,
+            out_raster,
+        } => geoforge_raster::read_geotiff(&in_raster)
+            .and_then(|r| write_raster(&out_raster, &geoforge_raster::local::float(&r))),
+        Tool::IsNull {
+            in_raster,
+            out_raster,
+        } => geoforge_raster::read_geotiff(&in_raster)
+            .and_then(|r| write_raster(&out_raster, &geoforge_raster::local::is_null(&r))),
+        Tool::Con {
+            in_conditional_raster,
+            in_true_raster_or_constant,
+            out_raster,
+            in_false_raster_or_constant,
+            where_clause,
+        } => (|| {
+            let cond = geoforge_raster::read_geotiff(&in_conditional_raster)?;
+            let t = operand(&in_true_raster_or_constant)?;
+            let f = in_false_raster_or_constant
+                .as_deref()
+                .filter(|s| !s.is_empty())
+                .map(operand)
+                .transpose()?;
+            let clause = value_clause(where_clause.as_deref())?;
+            write_raster(
+                &out_raster,
+                &geoforge_raster::local::con(&cond, &t, f.as_ref(), clause.as_ref()),
+            )
+        })(),
+        Tool::SetNull {
+            in_conditional_raster,
+            in_false_raster_or_constant,
+            out_raster,
+            where_clause,
+        } => (|| {
+            let cond = geoforge_raster::read_geotiff(&in_conditional_raster)?;
+            let f = operand(&in_false_raster_or_constant)?;
+            let clause = value_clause(where_clause.as_deref())?;
+            write_raster(
+                &out_raster,
+                &geoforge_raster::local::set_null(&cond, &f, clause.as_ref()),
+            )
         })(),
         Tool::Aspect {
             in_raster,
@@ -2260,4 +2407,30 @@ fn write_raster(path: &Path, raster: &geoforge_raster::Raster) -> Result<()> {
         raster.height
     );
     Ok(())
+}
+
+/// A raster path or a numeric constant.
+fn operand(text: &str) -> Result<geoforge_raster::local::Operand> {
+    match geoforge_raster::local::Operand::constant(text) {
+        Some(c) => Ok(c),
+        None => Ok(geoforge_raster::local::Operand::Raster(
+            geoforge_raster::read_geotiff(Path::new(text))?,
+        )),
+    }
+}
+
+fn value_clause(text: Option<&str>) -> Result<Option<geoforge_raster::local::ValueClause>> {
+    match text.filter(|t| !t.trim().is_empty()) {
+        None => Ok(None),
+        Some(t) => geoforge_raster::local::ValueClause::parse(t)
+            .map(Some)
+            .ok_or_else(|| Error::Unsupported(format!("where clause {t}"))),
+    }
+}
+
+fn math_tool(op: geoforge_raster::local::MathOp, a: &str, b: &str, out: &Path) -> Result<()> {
+    let (a, b) = (operand(a)?, operand(b)?);
+    let result = geoforge_raster::local::math(op, &a, &b)
+        .ok_or_else(|| Error::Unsupported("at least one input must be a raster".into()))?;
+    write_raster(out, &result)
 }

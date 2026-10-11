@@ -8,6 +8,7 @@
 pub mod focal;
 mod geotiff;
 pub mod hydro;
+pub mod local;
 pub mod surface;
 pub mod zonal;
 

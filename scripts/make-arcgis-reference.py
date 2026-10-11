@@ -22,6 +22,15 @@ DATA = ROOT / "testdata" / "geoproc"
 RASTER = ROOT / "testdata" / "raster"
 OUT = ROOT / "testdata" / "arcgis-reference"
 
+def rel(a):
+    """A case argument as recorded in the manifest: paths relative to the repository."""
+    if isinstance(a, Path):
+        return str(a.relative_to(ROOT))
+    if isinstance(a, str):
+        return a.replace(str(ROOT) + "/", "")
+    return a
+
+
 def win(path):
     """A path as ArcGIS under Wine sees it (for paths inside parameter strings)."""
     return "Z:" + str(path).replace("/", "\\")
@@ -276,6 +285,20 @@ CASES = {
     "curvature_dem": ("gp.Curvature_sa", [RASTER / "dem.tif"], [1]),
     "curvature_dem_nodata": ("gp.Curvature_sa", [RASTER / "dem_nodata.tif"], [1]),
     "curvature_dem_z2": ("gp.Curvature_sa", [RASTER / "dem_int16_packbits.tif"], [2]),
+    "plus_dem_int16": ("gp.Plus_sa", [RASTER / "dem.tif", RASTER / "dem_int16_packbits.tif"], []),
+    "plus_int16_const": ("gp.Plus_sa", [RASTER / "dem_int16_packbits.tif", 5], []),
+    "minus_nodata_dem": ("gp.Minus_sa", [RASTER / "dem_nodata.tif", RASTER / "dem.tif"], []),
+    "times_int16_half": ("gp.Times_sa", [RASTER / "dem_int16_packbits.tif", 0.5], []),
+    "times_zones_int16": ("gp.Times_sa", [RASTER / "zones.tif", RASTER / "dem_int16_packbits.tif"], []),
+    "divide_int16_zones": ("gp.Divide_sa", [RASTER / "dem_int16_packbits.tif", RASTER / "zones.tif"], []),
+    "divide_dem_3": ("gp.Divide_sa", [RASTER / "dem.tif", 3], []),
+    "isnull_dem_nodata": ("gp.IsNull_sa", [RASTER / "dem_nodata.tif"], []),
+    "int_dem": ("gp.Int_sa", [RASTER / "dem_nodata.tif"], []),
+    "float_int16": ("gp.Float_sa", [RASTER / "dem_int16_packbits.tif"], []),
+    "con_zones": ("gp.Con_sa", [RASTER / "zones.tif", RASTER / "dem.tif"], [RASTER / "dem_int16_packbits.tif", "Value > 3"]),
+    "con_zones_const": ("gp.Con_sa", [RASTER / "zones.tif", 1], [0, "Value = 7"]),
+    "con_no_false": ("gp.Con_sa", [RASTER / "dem_nodata.tif", RASTER / "dem_nodata.tif"], ["", "Value > 250"]),
+    "setnull_zones": ("gp.SetNull_sa", [RASTER / "zones.tif", RASTER / "dem.tif"], ["Value = 7"]),
     "zonal_mean": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_nodata.tif"], ["MEAN", "DATA"]),
     "zonal_max_strict": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_nodata.tif"], ["MAXIMUM", "NODATA"]),
     "zonal_range_int": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_int16_packbits.tif"], ["RANGE", "DATA"]),
@@ -289,7 +312,8 @@ CASES = {
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
 RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
               "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa",
-              "gp.Curvature_sa"}
+              "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
+              "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa"}
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable"}
@@ -358,14 +382,14 @@ def main():
         if tool in WORKSPACE_OUT:
             out = OUT / name
             out.mkdir()
-            args = [str(a) for a in before] + [str(out)] + after
+            args = [str(a) for a in before] + [str(out)] + [str(a) if isinstance(a, Path) else a for a in after]
         elif tool in IN_PLACE:
             k = IN_PLACE[tool]
             w.call("run_tool", tool="management.CopyFeatures", args=[str(before[k]), str(out)],
                    env={"overwriteOutput": True})
             args = [str(out) if i == k else str(a) for i, a in enumerate(before)] + after
         else:
-            args = [str(a) for a in before] + [str(out)] + after
+            args = [str(a) for a in before] + [str(out)] + [str(a) if isinstance(a, Path) else a for a in after]
         r = w.call("run_tool", tool=tool, args=args, env={"overwriteOutput": True})
         if tool in WORKSPACE_OUT:
             outputs = {}
@@ -387,7 +411,7 @@ def main():
         d = w.call("describe", path=str(out)) if r.get("status") == "succeeded" and tool not in TEXT_OUT | RASTER_OUT else {}
         manifest["cases"][name] = {
             "tool": tool,
-            "args": [str(Path(a).relative_to(ROOT)) if isinstance(a, Path) else a.replace(str(ROOT) + "/", "") for a in before] + ["<out>"] + after,
+            "args": [rel(a) for a in before] + ["<out>"] + [rel(a) for a in after],
             "status": r.get("status"),
             "messages": [m["text"] for m in r.get("messages", []) if m["severity"] > 0],
             "fields": [[f["name"], f["type"], f["length"], f["precision"], f["scale"]] for f in d.get("fields", [])],
