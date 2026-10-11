@@ -51,7 +51,11 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       selection types other than NEW_SELECTION (needs layers)
 - [ ] Line overlays: crack input lines at their mutual crossings, as ArcGIS does
       (Identity writes uncovered road pieces split there: same lines, more parts)
-- [ ] Overlay Z/M, line×line Intersect, `cluster_tolerance`, `output_type` POINT/LINE
+- [x] Line×line Intersect (shared stretches), `output_type` POINT/LINE (outline crossings
+      per feature pair, incl. ArcGIS's late rows for points inside shared stretches;
+      shared polygon boundaries), `join_attributes` ALL/NO_FID/ONLY_FID — match ArcGIS
+- [ ] Overlay Z/M, `cluster_tolerance`; POINT/LINE output for 3+ inputs; `join_attributes`
+      for Union/Identity
 - [ ] Validation + repair (Check/Repair Geometry), spatial index (R-tree) for overlays,
       Near and Spatial Join (all pairs are compared today)
 - [ ] Shapefile writer: `.sbn/.sbx` and `.shp.xml` (ArcGIS writes both for tool outputs)

@@ -27,7 +27,8 @@ fn dimension(k: GeometryKind) -> u8 {
 
 /// The common part of two geometries, with the lower of their dimensions
 /// (ArcGIS Intersect `output_type="INPUT"`). `None` when they do not intersect.
-/// Supported: anything with a polygon, and points with lines.
+/// Supported: anything with a polygon, points with lines, and lines with lines
+/// (their shared stretches).
 pub fn intersection(a: &Geometry, b: &Geometry) -> Result<Option<Geometry>> {
     if !envelopes_touch(&a.curve_envelope(), &b.curve_envelope()) {
         return Ok(None);
@@ -55,6 +56,10 @@ pub fn intersection(a: &Geometry, b: &Geometry) -> Result<Option<Geometry>> {
                 })
                 .collect();
             Ok(select_points(lo, &keep))
+        }
+        GeometryKind::Polyline if lo.kind == GeometryKind::Polyline => {
+            let m = crate::linework::meeting(a, b, crate::linework::XY_TOLERANCE)?;
+            Ok(paths_geometry(m.shared))
         }
         _ => Err(Error::Unsupported(format!(
             "intersecting {:?} with {:?}",
@@ -244,7 +249,7 @@ pub fn dissolve<'a>(geoms: impl IntoIterator<Item = &'a Geometry>) -> Result<Opt
 }
 
 /// Joins paths sharing an endpoint where exactly two path ends meet.
-fn merge_paths(mut paths: Vec<Vec<[f64; 2]>>) -> Vec<Vec<[f64; 2]>> {
+pub(crate) fn merge_paths(mut paths: Vec<Vec<[f64; 2]>>) -> Vec<Vec<[f64; 2]>> {
     loop {
         let mut joined = false;
         'outer: for i in 0..paths.len() {
@@ -319,4 +324,20 @@ pub fn explode(g: &Geometry) -> Vec<Geometry> {
 /// Converts a cell to an Esri polygon.
 pub fn cell_geometry(cell: &OverlayCell) -> Option<Geometry> {
     from_multipolygon(&cell.geometry)
+}
+
+/// Paths as a polyline; `None` if there are none.
+pub fn paths_geometry(paths: Vec<Vec<[f64; 2]>>) -> Option<Geometry> {
+    if paths.is_empty() {
+        return None;
+    }
+    let mut g = Geometry::point(0.0, 0.0);
+    g.kind = GeometryKind::Polyline;
+    g.xy.clear();
+    g.parts.clear();
+    for p in paths {
+        g.parts.push(g.xy.len() as u32);
+        g.xy.extend(p);
+    }
+    Some(g)
 }

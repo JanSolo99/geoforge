@@ -40,6 +40,12 @@ enum Tool {
         /// Two or more inputs followed by the output.
         #[arg(num_args = 3.., required = true)]
         paths: Vec<PathBuf>,
+        /// ALL, NO_FID or ONLY_FID.
+        #[arg(long, default_value = "ALL")]
+        join_attributes: String,
+        /// INPUT (lowest input dimension), LINE or POINT.
+        #[arg(long, default_value = "INPUT")]
+        output_type: String,
     },
     /// Planar overlay of polygon inputs (ArcGIS "Union"): `gf union a b ... out`.
     Union {
@@ -192,10 +198,22 @@ fn main() -> ExitCode {
             clip_features,
             out_feature_class,
         } => clip_tool(&in_features, &clip_features, &out_feature_class),
-        Tool::Intersect { mut paths } => {
+        Tool::Intersect {
+            mut paths,
+            join_attributes,
+            output_type,
+        } => (|| {
             let out = paths.pop().unwrap();
-            overlay_tool(&paths, &out, geoforge_tools::intersect)
-        }
+            let opts = geoforge_tools::IntersectOptions {
+                join_attributes: geoforge_tools::JoinAttributes::parse(&join_attributes)
+                    .ok_or_else(|| {
+                        Error::Unsupported(format!("join_attributes {join_attributes}"))
+                    })?,
+                output_type: geoforge_tools::OutputType::parse(&output_type)
+                    .ok_or_else(|| Error::Unsupported(format!("output_type {output_type}")))?,
+            };
+            overlay_tool(&paths, &out, |i| geoforge_tools::intersect_with(i, &opts))
+        })(),
         Tool::Union { mut paths } => {
             let out = paths.pop().unwrap();
             overlay_tool(&paths, &out, geoforge_tools::union)
@@ -874,7 +892,7 @@ fn dataset_name(path: &Path) -> String {
 fn overlay_tool(
     inputs: &[PathBuf],
     output: &Path,
-    tool: fn(&[geoforge_tools::NamedInput]) -> Result<ToolOutput>,
+    tool: impl Fn(&[geoforge_tools::NamedInput]) -> Result<ToolOutput>,
 ) -> Result<()> {
     let opened: Vec<Box<dyn FeatureClass>> = inputs
         .iter()

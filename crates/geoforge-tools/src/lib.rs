@@ -197,6 +197,220 @@ fn load(input: &dyn FeatureClass) -> Result<Vec<Feature>> {
 /// whose geometries share something, in the lowest input dimension. Rows are in
 /// input FID order; point outputs are ordered by Y (as ArcGIS emits them).
 pub fn intersect(inputs: &[NamedInput]) -> Result<ToolOutput> {
+    intersect_with(inputs, &IntersectOptions::default())
+}
+
+/// Intersect / Union `join_attributes`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum JoinAttributes {
+    #[default]
+    All,
+    NoFid,
+    OnlyFid,
+}
+
+impl JoinAttributes {
+    pub fn parse(s: &str) -> Option<Self> {
+        Some(match s.to_ascii_uppercase().as_str() {
+            "ALL" => Self::All,
+            "NO_FID" => Self::NoFid,
+            "ONLY_FID" => Self::OnlyFid,
+            _ => return None,
+        })
+    }
+}
+
+/// Intersect `output_type`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum OutputType {
+    /// The lowest dimension of the inputs.
+    #[default]
+    Input,
+    Line,
+    Point,
+}
+
+impl OutputType {
+    pub fn parse(s: &str) -> Option<Self> {
+        Some(match s.to_ascii_uppercase().as_str() {
+            "INPUT" => Self::Input,
+            "LINE" => Self::Line,
+            "POINT" => Self::Point,
+            _ => return None,
+        })
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct IntersectOptions {
+    pub join_attributes: JoinAttributes,
+    pub output_type: OutputType,
+}
+
+/// Keeps the columns `join` asks for from an output laid out as `FID_<name>` plus
+/// the fields of each input in turn (renaming clashes afresh).
+fn apply_join_attributes(out: &mut ToolOutput, inputs: &[NamedInput], join: JoinAttributes) {
+    if join == JoinAttributes::All {
+        return;
+    }
+    let mut keep = Vec::new();
+    let mut fields = Vec::new();
+    let mut col = 0;
+    for input in inputs {
+        if join == JoinAttributes::OnlyFid {
+            keep.push(col);
+            push_unique(
+                &mut fields,
+                Field::new(format!("FID_{}", input.name), FieldType::Integer),
+            );
+        } else {
+            for (k, f) in input.features.fields().iter().enumerate() {
+                keep.push(col + 1 + k);
+                push_unique(&mut fields, f.clone());
+            }
+        }
+        col += 1 + input.features.fields().len();
+    }
+    out.fields = fields;
+    for f in &mut out.features {
+        f.attributes = keep.iter().map(|&i| f.attributes[i].clone()).collect();
+    }
+}
+
+/// `arcpy.analysis.Intersect(inputs, out, join_attributes, "", output_type)`.
+/// LINE output of polygons is their shared boundaries; POINT output is where the
+/// inputs' outlines (polygon boundaries, lines) cross or touch, one multipoint
+/// per pair of features (two inputs).
+pub fn intersect_with(inputs: &[NamedInput], opts: &IntersectOptions) -> Result<ToolOutput> {
+    let all_polygons = inputs
+        .iter()
+        .all(|i| i.features.geometry_kind() == Some(GeometryKind::Polygon));
+    let mut out = match opts.output_type {
+        OutputType::Point => intersect_outlines(inputs, true)?,
+        OutputType::Line if all_polygons => intersect_outlines(inputs, false)?,
+        _ => intersect_input(inputs)?,
+    };
+    apply_join_attributes(&mut out, inputs, opts.join_attributes);
+    Ok(out)
+}
+
+/// Intersect's POINT output, or LINE output of polygons, for two inputs.
+///
+/// Points come per pair of features. As in ArcGIS, a point lying inside a stretch
+/// shared by some pair (e.g. where a third line crosses two coincident ones) is
+/// written in a second pass after all others, both for the pair that shares the
+/// stretch and for the pair that crosses there. Rows are ordered by FID, polygon
+/// inputs' FIDs first.
+fn intersect_outlines(inputs: &[NamedInput], points: bool) -> Result<ToolOutput> {
+    use geoforge_geometry::{XY_TOLERANCE as TOL, on_path};
+    let [a_in, b_in] = inputs else {
+        return Err(Error::Unsupported(
+            "Intersect LINE/POINT output of more than two inputs".into(),
+        ));
+    };
+    for i in inputs {
+        if dimension(i.features.geometry_kind().unwrap_or(GeometryKind::Point)) == 0 {
+            return Err(Error::Unsupported(
+                "Intersect LINE/POINT output with point inputs".into(),
+            ));
+        }
+    }
+    let (a_data, b_data) = (load(a_in.features)?, load(b_in.features)?);
+    let mut meetings = Vec::new();
+    for fa in &a_data {
+        for fb in &b_data {
+            let m = geoforge_geometry::meeting(
+                fa.geometry.as_ref().unwrap(),
+                fb.geometry.as_ref().unwrap(),
+                TOL,
+            )?;
+            if !m.points.is_empty() || !m.shared.is_empty() {
+                meetings.push((fa, fb, m));
+            }
+        }
+    }
+    // Sort key: FIDs with polygon inputs first.
+    let polygon_first = b_in.features.geometry_kind() == Some(GeometryKind::Polygon)
+        && a_in.features.geometry_kind() != Some(GeometryKind::Polygon);
+    let key = |a: i64, b: i64| if polygon_first { (b, a) } else { (a, b) };
+    // (pass, key, geometry, attributes)
+    type Row = (u8, (i64, i64), geoforge_core::Geometry, Vec<Value>);
+    let mut rows: Vec<Row> = Vec::new();
+    let attrs = |fa: &Feature, fb: &Feature| {
+        let mut v = vec![Value::Integer(fa.oid as i32)];
+        v.extend(fa.attributes.iter().cloned());
+        v.push(Value::Integer(fb.oid as i32));
+        v.extend(fb.attributes.iter().cloned());
+        v
+    };
+    let multipoint = |pts: Vec<[f64; 2]>| {
+        let mut g = geoforge_core::Geometry::point(0.0, 0.0);
+        g.kind = GeometryKind::Multipoint;
+        g.xy = pts;
+        g
+    };
+    for (fa, fb, m) in &meetings {
+        if !points {
+            if let Some(g) = geoforge_geometry::paths_geometry(m.shared.clone()) {
+                rows.push((0, key(fa.oid, fb.oid), g, attrs(fa, fb)));
+            }
+            continue;
+        }
+        let in_shared = |p: [f64; 2]| {
+            meetings
+                .iter()
+                .any(|(_, _, o)| o.shared.iter().any(|s| on_path(p, s, TOL, true)))
+        };
+        let (late, first): (Vec<[f64; 2]>, Vec<[f64; 2]>) =
+            m.points.iter().partition(|&&p| in_shared(p));
+        let mut late = late;
+        // Nodes made inside this pair's shared stretches by other pairs' points.
+        for (_, _, o) in &meetings {
+            for &p in &o.points {
+                if m.shared.iter().any(|s| on_path(p, s, TOL, true))
+                    && !late.iter().any(|q| (p[0] - q[0]).hypot(p[1] - q[1]) <= TOL)
+                {
+                    late.push(p);
+                }
+            }
+        }
+        if !first.is_empty() {
+            rows.push((0, key(fa.oid, fb.oid), multipoint(first), attrs(fa, fb)));
+        }
+        if !late.is_empty() {
+            rows.push((1, key(fa.oid, fb.oid), multipoint(late), attrs(fa, fb)));
+        }
+    }
+    rows.sort_by_key(|r| (r.0, r.1));
+    let features: Vec<Feature> = rows
+        .into_iter()
+        .enumerate()
+        .map(|(i, r)| Feature {
+            oid: i as i64,
+            geometry: Some(r.2),
+            attributes: r.3,
+        })
+        .collect();
+    Ok(ToolOutput {
+        kind: if points {
+            GeometryKind::Multipoint
+        } else {
+            GeometryKind::Polyline
+        },
+        has_z: false,
+        has_m: false,
+        fields: overlay_fields(inputs),
+        spatial_reference_wkt: a_in.features.spatial_reference_wkt().map(str::to_owned),
+        messages: if features.is_empty() {
+            vec!["WARNING 000117: Warning empty output generated.".into()]
+        } else {
+            Vec::new()
+        },
+        features,
+    })
+}
+
+fn intersect_input(inputs: &[NamedInput]) -> Result<ToolOutput> {
     if inputs.len() < 2 {
         return Err(Error::Unsupported(
             "Intersect needs at least two inputs".into(),

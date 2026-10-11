@@ -68,6 +68,14 @@ CASES = {
     "split_roads_parcels_name": ("analysis.Split", [DATA / "roads.shp", DATA / "parcels.shp", "NAME"], []),
     "split_wells_parcels_name": ("analysis.Split", [DATA / "wells.shp", DATA / "parcels.shp", "NAME"], []),
     "split_parcels_parcels_name": ("analysis.Split", [DATA / "parcels.shp", DATA / "parcels.shp", "NAME"], []),
+    # Intersect output_type: args after the output are join_attributes, cluster_tolerance, output_type.
+    "intersect_roads_streams": ("analysis.Intersect", [f"{DATA / 'roads.shp'};{DATA / 'streams.shp'}"], []),
+    "intersect_roads_streams_point": ("analysis.Intersect", [f"{DATA / 'roads.shp'};{DATA / 'streams.shp'}"], ["ALL", "", "POINT"]),
+    "intersect_roads_parcels_point": ("analysis.Intersect", [f"{DATA / 'roads.shp'};{DATA / 'parcels.shp'}"], ["ALL", "", "POINT"]),
+    "intersect_parcels_clip_line": ("analysis.Intersect", [f"{DATA / 'parcels.shp'};{DATA / 'clip_areas.shp'}"], ["ALL", "", "LINE"]),
+    "intersect_parcels_clip_point": ("analysis.Intersect", [f"{DATA / 'parcels.shp'};{DATA / 'clip_areas.shp'}"], ["ALL", "", "POINT"]),
+    "intersect_parcels_clip_fid_only": ("analysis.Intersect", [f"{DATA / 'parcels.shp'};{DATA / 'clip_areas.shp'}"], ["ONLY_FID"]),
+    "intersect_parcels_clip_no_fid": ("analysis.Intersect", [f"{DATA / 'parcels.shp'};{DATA / 'clip_areas.shp'}"], ["NO_FID"]),
     "merge_parcels_clip_source": ("management.Merge", [f"{DATA / 'parcels.shp'};{DATA / 'clip_areas.shp'}"], ["", "ADD_SOURCE_INFO"]),
 }
 WORKSPACE_OUT = {"analysis.Split"}
