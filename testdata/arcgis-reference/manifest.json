@@ -16389,6 +16389,36 @@
         ]
       ],
       "shapeType": null
+    },
+    "hillshade_shadows_315_15": {
+      "tool": "gp.HillShade_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        315,
+        15,
+        "SHADOWS",
+        3
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "hillshade_shadows_200_25": {
+      "tool": "gp.HillShade_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        200,
+        25,
+        "SHADOWS",
+        2
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

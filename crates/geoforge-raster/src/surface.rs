@@ -108,8 +108,70 @@ pub fn aspect(dem: &Raster) -> Raster {
     map_cells(dem, DataType::F32, float_nodata(dem), false, compass_aspect)
 }
 
-/// Spatial Analyst Hillshade without shadows: 0–254 illumination, 8-bit unsigned
-/// with NoData 255. Values are truncated, as ArcGIS does.
+/// Spatial Analyst Hillshade: 0–254 illumination, 8-bit unsigned with NoData 255.
+/// Values are truncated, as ArcGIS does. With `shadows`, cells whose view of the
+/// sun is blocked are 0: the ray toward the sun is followed one cell at a time,
+/// sampling the surface bilinearly (approximates ArcGIS; a few cells within a
+/// few centimeters of the horizon differ).
+pub fn hillshade_with(
+    dem: &Raster,
+    azimuth: f64,
+    altitude: f64,
+    z_factor: f64,
+    shadows: bool,
+) -> Raster {
+    let mut out = hillshade(dem, azimuth, altitude, z_factor);
+    if !shadows {
+        return out;
+    }
+    let (w, h) = (dem.width, dem.height);
+    let (dx, dy) = (azimuth.to_radians().sin(), -azimuth.to_radians().cos());
+    let rise = altitude.to_radians().tan() * dem.cell_width();
+    // Outside the raster: None; NoData under the ray: Some(None), skipped.
+    let sample = |fx: f64, fy: f64| -> Option<Option<f64>> {
+        if fx < 0.0 || fy < 0.0 || fx > (w - 1) as f64 || fy > (h - 1) as f64 {
+            return None;
+        }
+        let (x0, y0) = ((fx as usize).min(w - 2), (fy as usize).min(h - 2));
+        let (tx, ty) = (fx - x0 as f64, fy - y0 as f64);
+        let mut sum = 0.0;
+        for (x, y, wt) in [
+            (x0, y0, (1.0 - tx) * (1.0 - ty)),
+            (x0 + 1, y0, tx * (1.0 - ty)),
+            (x0, y0 + 1, (1.0 - tx) * ty),
+            (x0 + 1, y0 + 1, tx * ty),
+        ] {
+            match dem.get(x, y) {
+                Some(v) => sum += wt * v,
+                None => return Some(None),
+            }
+        }
+        Some(Some(sum * z_factor))
+    };
+    for row in 0..h {
+        for col in 0..w {
+            let i = row * w + col;
+            if out.bands[0][i] == HILLSHADE_NODATA || out.bands[0][i] == 0.0 {
+                continue;
+            }
+            let Some(z0) = dem.get(col, row) else {
+                continue;
+            };
+            let z0 = z0 * z_factor;
+            let mut k = 1.0;
+            while let Some(v) = sample(col as f64 + dx * k, row as f64 + dy * k) {
+                if v.is_some_and(|v| v > z0 + k * rise) {
+                    out.bands[0][i] = 0.0;
+                    break;
+                }
+                k += 1.0;
+            }
+        }
+    }
+    out
+}
+
+/// Hillshade without shadows (see [`hillshade_with`]).
 pub fn hillshade(dem: &Raster, azimuth: f64, altitude: f64, z_factor: f64) -> Raster {
     let zenith = (90.0 - altitude).to_radians();
     let azimuth_math = (360.0 - azimuth + 90.0).rem_euclid(360.0).to_radians();

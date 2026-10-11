@@ -626,6 +626,9 @@ enum Tool {
         azimuth: f64,
         #[arg(long, default_value_t = 45.0)]
         altitude: f64,
+        /// NO_SHADOWS or SHADOWS.
+        #[arg(long, default_value = "NO_SHADOWS")]
+        model_shadows: String,
         #[arg(long, default_value_t = 1.0)]
         z_factor: f64,
     },
@@ -1890,10 +1893,18 @@ fn main() -> ExitCode {
             out_raster,
             azimuth,
             altitude,
+            model_shadows,
             z_factor,
         } => (|| {
+            let shadows = match model_shadows.to_ascii_uppercase().as_str() {
+                "NO_SHADOWS" => false,
+                "SHADOWS" => true,
+                other => return Err(Error::Unsupported(format!("model_shadows {other}"))),
+            };
             let dem = geoforge_raster::read_geotiff(&in_raster)?;
-            let out = geoforge_raster::surface::hillshade(&dem, azimuth, altitude, z_factor);
+            let out = geoforge_raster::surface::hillshade_with(
+                &dem, azimuth, altitude, z_factor, shadows,
+            );
             write_raster(&out_raster, &out)
         })(),
         Tool::CheckGeometry {

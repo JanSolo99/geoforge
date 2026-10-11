@@ -334,6 +334,8 @@ CASES = {
     "zst_int_all": ("gp.ZonalStatisticsAsTable_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_int16_packbits.tif"], ["DATA", "ALL"]),
     "zst_mean_nodata": ("gp.ZonalStatisticsAsTable_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_nodata.tif"], ["NODATA", "MEAN"]),
     "zst_min_max": ("gp.ZonalStatisticsAsTable_sa", [RASTER / "zones.tif", "Value", RASTER / "dem.tif"], ["DATA", "MIN_MAX_MEAN"]),
+    "hillshade_shadows_315_15": ("gp.HillShade_sa", [RASTER / "dem.tif"], [315, 15, "SHADOWS", 3]),
+    "hillshade_shadows_200_25": ("gp.HillShade_sa", [RASTER / "dem_nodata.tif"], [200, 25, "SHADOWS", 2]),
     "zonal_mean": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_nodata.tif"], ["MEAN", "DATA"]),
     "zonal_max_strict": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_nodata.tif"], ["MAXIMUM", "NODATA"]),
     "zonal_range_int": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_int16_packbits.tif"], ["RANGE", "DATA"]),

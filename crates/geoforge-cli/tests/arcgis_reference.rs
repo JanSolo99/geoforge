@@ -1847,6 +1847,30 @@ fn gf_args(case: &str) -> Vec<&'static str> {
             "--statistics-type",
             "MIN_MAX_MEAN",
         ],
+        "hillshade_shadows_315_15" => vec![
+            "hillshade",
+            "testdata/raster/dem.tif",
+            "<out>",
+            "--altitude",
+            "15",
+            "--model-shadows",
+            "SHADOWS",
+            "--z-factor",
+            "3",
+        ],
+        "hillshade_shadows_200_25" => vec![
+            "hillshade",
+            "testdata/raster/dem_nodata.tif",
+            "<out>",
+            "--azimuth",
+            "200",
+            "--altitude",
+            "25",
+            "--model-shadows",
+            "SHADOWS",
+            "--z-factor",
+            "2",
+        ],
         "slope_dem" => vec!["slope", "testdata/raster/dem.tif"],
         "slope_dem_percent_z" => vec![
             "slope",
@@ -2218,8 +2242,11 @@ const KNOWN_FEATURE_DIFFERENCES: &[(&str, &[usize])] = &[
 ];
 
 /// Raster cases where some cells are known to differ from ArcGIS, with the most
-/// differing cells allowed: Flow Direction resolves flats differently in places.
+/// differing cells allowed: Flow Direction resolves flats differently in places,
+/// and Hillshade shadows differ for cells within centimeters of the horizon.
 const KNOWN_RASTER_DIFFERENCES: &[(&str, usize)] = &[
+    ("hillshade_shadows_315_15", 3),
+    ("hillshade_shadows_200_25", 29),
     ("flowdir_hydro_filled", 5),
     ("flowdir_hydro_force", 5),
     ("flowdir_hydro_raw", 3),

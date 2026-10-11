@@ -194,7 +194,9 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         are NoData; a NoData corner drops out of its row/column weighted mean (Hillshade instead
         needs all 8); Hillshade truncates to 0–254 with NoData 255; float output NoData is −FLT_MAX,
         or 3.4e38 when the input has NoData; Aspect −1 on flat cells
-  - [ ] Geodesic method, Hillshade shadows, tiled output with statistics (.aux.xml) like ArcGIS
+  - [x] Hillshade shadows: ray toward the sun sampled bilinearly cell by cell, past NoData
+  - [ ] Hillshade shadows exactly as ArcGIS (3 and 29 cells near the horizon differ in the tests)
+  - [ ] Geodesic method, tiled output with statistics (.aux.xml) like ArcGIS
   - [x] Curvature (with profile and plan outputs), identical to ArcGIS: Zevenbergen–Thorne with
         NoData and off-edge neighbors taking the center value
   - [x] Contour matching ArcGIS: four triangles per square of cell centers around the corner
