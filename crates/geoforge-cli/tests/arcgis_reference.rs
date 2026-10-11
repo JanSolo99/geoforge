@@ -2123,6 +2123,30 @@ fn gf_args(case: &str) -> Vec<&'static str> {
             "--resampling-type",
             "MAJORITY",
         ],
+        "resample_classes_majority_60" => vec![
+            "resample",
+            "testdata/raster/classes_u8.tif",
+            "<out>",
+            "60",
+            "--resampling-type",
+            "MAJORITY",
+        ],
+        "resample_classes_majority_90" => vec![
+            "resample",
+            "testdata/raster/classes_u8.tif",
+            "<out>",
+            "90",
+            "--resampling-type",
+            "MAJORITY",
+        ],
+        "resample_classes_majority_45" => vec![
+            "resample",
+            "testdata/raster/classes_u8.tif",
+            "<out>",
+            "45",
+            "--resampling-type",
+            "MAJORITY",
+        ],
         "zst_all" => vec![
             "zonal-statistics-as-table",
             "testdata/raster/zones.tif",
@@ -2583,6 +2607,8 @@ const KNOWN_RASTER_DIFFERENCES: &[(&str, usize)] = &[
     ("flowdir_hydro_raw", 3),
     ("flowdir_hydro_nodata", 5),
     ("flowdir_hydro_int", 930),
+    // A center between NoData cells that ArcGIS fills from its neighbors.
+    ("resample_classes_majority_60", 1),
 ];
 
 /// Grid, cell type, NoData, coordinate system and every cell; float cells within

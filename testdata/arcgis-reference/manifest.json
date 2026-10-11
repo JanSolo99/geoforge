@@ -17473,6 +17473,45 @@
       "messages": [],
       "fields": [],
       "shapeType": null
+    },
+    "resample_classes_majority_60": {
+      "tool": "management.Resample",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "60",
+        "MAJORITY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "resample_classes_majority_90": {
+      "tool": "management.Resample",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "90",
+        "MAJORITY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "resample_classes_majority_45": {
+      "tool": "management.Resample",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "45",
+        "MAJORITY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

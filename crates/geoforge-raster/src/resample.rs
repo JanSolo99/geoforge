@@ -28,8 +28,9 @@ fn cubic_weight(t: f64) -> f64 {
 /// corner and has round(extent / cell) columns and rows. Bilinear and cubic
 /// (Keys, a = −0.5) interpolate between cell centers, dropping taps outside the
 /// raster or on NoData and renormalizing the remaining weights; majority takes
-/// the most common value among input cells centered in the output cell widened
-/// by one input cell (ties to the smaller value).
+/// the most common value among the 4 × 4 input cells nearest the output cell
+/// center, clipped to the output extent (ties to the smaller value), and is
+/// NoData where the center falls in a NoData cell or outside the input.
 pub fn resample(r: &Raster, cell: f64, technique: Technique) -> Raster {
     let (cw, ch) = (r.cell_width(), r.cell_height());
     let cols = ((r.width as f64 * cw / cell).round() as usize).max(1);
@@ -87,34 +88,42 @@ pub fn resample(r: &Raster, cell: f64, technique: Technique) -> Raster {
                     (wsum != 0.0).then(|| sum / wsum)
                 }
                 Technique::Majority => {
-                    // Input cells centered within the output cell widened by one
-                    // input cell on every side.
-                    let (x0, x1) = (
-                        (col as f64 * cell / cw - 1.5).ceil() as isize,
-                        ((col + 1) as f64 * cell / cw + 0.5).ceil() as isize,
+                    // The 4 × 4 input cells nearest the output cell center,
+                    // clipped to the output extent; NoData where the center
+                    // falls in a NoData cell or outside the input.
+                    let (max_x, max_y) = (
+                        (cols as f64 * cell / cw).min(r.width as f64),
+                        (rows as f64 * cell / ch).min(r.height as f64),
                     );
-                    let (y0, y1) = (
-                        (row as f64 * cell / ch - 1.5).ceil() as isize,
-                        ((row + 1) as f64 * cell / ch + 0.5).ceil() as isize,
-                    );
-                    let mut vals: Vec<f64> = Vec::new();
-                    for y in y0..y1 {
-                        for x in x0..x1 {
-                            vals.extend(at(x, y));
+                    let (cx, cy) = (fx.floor() as isize, fy.floor() as isize);
+                    if at(cx, cy).is_none() {
+                        None
+                    } else {
+                        let (x0, y0) = (
+                            (fx - 0.5).floor() as isize - 1,
+                            (fy - 0.5).floor() as isize - 1,
+                        );
+                        let mut vals: Vec<f64> = Vec::new();
+                        for y in y0..y0 + 4 {
+                            for x in x0..x0 + 4 {
+                                if (x as f64) < max_x && (y as f64) < max_y {
+                                    vals.extend(at(x, y));
+                                }
+                            }
                         }
+                        let mut best: Option<(f64, usize)> = None;
+                        for (k, v) in vals.iter().enumerate() {
+                            if vals[..k].contains(v) {
+                                continue;
+                            }
+                            let n = vals.iter().filter(|&&u| u == *v).count();
+                            // Ties go to the smaller value.
+                            if best.is_none_or(|b| n > b.1 || (n == b.1 && *v < b.0)) {
+                                best = Some((*v, n));
+                            }
+                        }
+                        best.map(|b| b.0)
                     }
-                    let mut best: Option<(f64, usize)> = None;
-                    for (k, v) in vals.iter().enumerate() {
-                        if vals[..k].contains(v) {
-                            continue;
-                        }
-                        let n = vals.iter().filter(|&&u| u == *v).count();
-                        // Ties go to the smaller value.
-                        if best.is_none_or(|b| n > b.1 || (n == b.1 && *v < b.0)) {
-                            best = Some((*v, n));
-                        }
-                    }
-                    best.map(|b| b.0)
                 }
             };
             out.bands[0][row * cols + col] = v.map_or(nodata, |v| r.data_type.store(v));
