@@ -252,9 +252,10 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         the uncovered part is larger; integer fields use ArcGIS's sub-byte/8-bit type choice
   - [x] GeoTIFF reader: 1/2/4-bit samples (ArcGIS writes them)
   - [x] Resample (nearest, bilinear, cubic a = −0.5 with out-of-raster taps dropped and weights
-        renormalized, majority over the output cell widened by one input cell, ties to the
-        smaller value), Euclidean Distance (exact, max distance) and Extract by Mask (same grid),
-        matching ArcGIS
+        renormalized; majority over the 4 × 4 input cells nearest the output cell center,
+        clipped to the output extent, ties to the smaller value, NoData where the center cell
+        is — one cell at a NoData hole still differs), Euclidean Distance (exact, max distance)
+        and Extract by Mask, matching ArcGIS
   - [ ] Raster To Polygon SIMPLIFY; Polyline To Raster options; most-frequent ties (first
         feature assumed). SIMPLIFY is not vertex weeding: a 7-step 30 m staircase from (210, 0)
         to (0, 210) becomes (210, 0) → (118.519, 118.519) → (0, 210), bulging off the cell
