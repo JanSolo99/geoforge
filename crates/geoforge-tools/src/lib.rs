@@ -26,9 +26,6 @@ pub struct ToolOutput {
 /// outside the (dissolved) clip polygons are dropped; split features stay
 /// multipart.
 pub fn clip(input: &dyn FeatureClass, clip_features: &dyn FeatureClass) -> Result<ToolOutput> {
-    let kind = input
-        .geometry_kind()
-        .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
     if clip_features.geometry_kind() != Some(GeometryKind::Polygon) {
         return Err(Error::Unsupported(
             "ERROR 000365: clip features must be polygons".into(),
@@ -38,12 +35,18 @@ pub fn clip(input: &dyn FeatureClass, clip_features: &dyn FeatureClass) -> Resul
         .features()
         .filter_map(|f| f.map(|f| f.geometry).transpose())
         .collect::<Result<_>>()?;
-    let area = ClipArea::new(clip_geoms.iter())?;
+    clip_to_area(input, &ClipArea::new(clip_geoms.iter())?)
+}
+
+fn clip_to_area(input: &dyn FeatureClass, area: &ClipArea) -> Result<ToolOutput> {
+    let kind = input
+        .geometry_kind()
+        .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
     let mut features = Vec::new();
     for f in input.features() {
         let f = f?;
         let Some(g) = &f.geometry else { continue };
-        if let Some(mut out) = geoforge_geometry::clip(g, &area)? {
+        if let Some(mut out) = geoforge_geometry::clip(g, area)? {
             if kind != GeometryKind::Point && kind != GeometryKind::Multipoint {
                 zm::restore(&mut out, g, input.has_z(), input.has_m());
             }
@@ -864,8 +867,8 @@ pub fn identity(input: NamedInput, identity_features: NamedInput) -> Result<Tool
     })
 }
 
-/// A Merge input: its features and the path ArcGIS records in `MERGE_SRC`.
-pub struct MergeInput<'a> {
+/// An input with the path ArcGIS records for it (`MERGE_SRC`, `NEAR_FC`).
+pub struct PathInput<'a> {
     pub source: String,
     pub features: &'a dyn FeatureClass,
 }
@@ -874,7 +877,7 @@ pub struct MergeInput<'a> {
 /// mapping: fields of all inputs matched by name (first definition wins, in input
 /// order), features of each input in turn, null where an input lacks a field.
 /// `add_source` appends `MERGE_SRC` (text, 254) holding each feature's input path.
-pub fn merge(inputs: &[MergeInput], add_source: bool) -> Result<ToolOutput> {
+pub fn merge(inputs: &[PathInput], add_source: bool) -> Result<ToolOutput> {
     let first = inputs
         .first()
         .ok_or_else(|| Error::Unsupported("Merge needs at least one input".into()))?;
@@ -974,10 +977,12 @@ fn closest(
 /// `NEAR_ANGLE`) to a copy of the input. The location is the closest point on the
 /// near feature; the angle runs from the input's closest point to it, in degrees
 /// counter-clockwise from east (-180..180], 0 when they touch. Features with
-/// nothing within the radius get -1 in every field.
+/// nothing within the radius get -1 in every field. With several near feature
+/// classes, `NEAR_FC` (text, 254) names the one the closest feature is in (the
+/// earlier class wins a tie).
 pub fn near(
     input: &dyn FeatureClass,
-    near_features: &dyn FeatureClass,
+    near_features: &[PathInput],
     search_radius: Option<f64>,
     location: bool,
     angle: bool,
@@ -985,7 +990,10 @@ pub fn near(
     let kind = input
         .geometry_kind()
         .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
-    let candidates = load(near_features)?;
+    let classes: Vec<Vec<Feature>> = near_features
+        .iter()
+        .map(|n| load(n.features))
+        .collect::<Result<_>>()?;
     let mut fields = input.fields().to_vec();
     let mut added = vec!["NEAR_FID", "NEAR_DIST"];
     if location {
@@ -993,6 +1001,9 @@ pub fn near(
     }
     if angle {
         added.push("NEAR_ANGLE");
+    }
+    if near_features.len() > 1 {
+        added.push("NEAR_FC");
     }
     // Existing NEAR_* fields are overwritten, as ArcGIS does.
     let slots: Vec<usize> = added
@@ -1002,12 +1013,15 @@ pub fn near(
                 .iter()
                 .position(|f| f.name.eq_ignore_ascii_case(name))
                 .unwrap_or_else(|| {
-                    let t = if name == "NEAR_FID" {
-                        FieldType::Integer
-                    } else {
-                        FieldType::Double
+                    let mut f = match name {
+                        "NEAR_FID" => Field::new(name, FieldType::Integer),
+                        "NEAR_FC" => Field::new(name, FieldType::String),
+                        _ => Field::new(name, FieldType::Double),
                     };
-                    fields.push(Field::new(name, t));
+                    if name == "NEAR_FC" {
+                        f.length = 254;
+                    }
+                    fields.push(f);
                     fields.len() - 1
                 })
         })
@@ -1015,17 +1029,26 @@ pub fn near(
     let mut features = Vec::new();
     for f in input.features() {
         let mut f = f?;
-        let found = match &f.geometry {
-            Some(g) => closest(g, &candidates, search_radius)?,
-            None => None,
-        };
+        // (class, feature, nearest)
+        let mut found: Option<(usize, usize, geoforge_geometry::Nearest)> = None;
+        if let Some(g) = &f.geometry {
+            for (c, candidates) in classes.iter().enumerate() {
+                if let Some((i, n)) = closest(g, candidates, search_radius)?
+                    && found.is_none_or(|(_, _, b)| n.distance < b.distance)
+                {
+                    found = Some((c, i, n));
+                }
+            }
+        }
         let values: Vec<Value> = added
             .iter()
             .map(|&name| match &found {
                 None if name == "NEAR_FID" => Value::Integer(-1),
+                None if name == "NEAR_FC" => Value::Null,
                 None => Value::Double(-1.0),
-                Some((i, n)) => match name {
-                    "NEAR_FID" => Value::Integer(candidates[*i].oid as i32),
+                Some((c, i, n)) => match name {
+                    "NEAR_FID" => Value::Integer(classes[*c][*i].oid as i32),
+                    "NEAR_FC" => Value::String(near_features[*c].source.clone()),
                     "NEAR_DIST" => Value::Double(n.distance),
                     "NEAR_X" => Value::Double(n.to[0]),
                     "NEAR_Y" => Value::Double(n.to[1]),
@@ -1415,4 +1438,54 @@ pub fn append(
         features,
         messages,
     })
+}
+
+/// `arcpy.analysis.Split(in_features, split_features, split_field, out_workspace)`:
+/// for each value of the text `split_field` (ascending), the input clipped by the
+/// split features with that value, named after the value. Values whose clip is
+/// empty give no output.
+pub fn split(
+    input: &dyn FeatureClass,
+    split_features: &dyn FeatureClass,
+    split_field: &str,
+) -> Result<Vec<(String, ToolOutput)>> {
+    let index = split_features
+        .fields()
+        .iter()
+        .position(|f| f.name.eq_ignore_ascii_case(split_field))
+        .ok_or_else(|| {
+            Error::Unsupported(format!(
+                "ERROR 000728: Field {split_field} does not exist within table"
+            ))
+        })?;
+    if split_features.geometry_kind() != Some(GeometryKind::Polygon) {
+        return Err(Error::Unsupported("split features must be polygons".into()));
+    }
+    if split_features.fields()[index].field_type != FieldType::String {
+        return Err(Error::Unsupported(
+            "ERROR 003911: The field is not of type TEXT".into(),
+        ));
+    }
+    let mut groups: std::collections::BTreeMap<String, Vec<geoforge_core::Geometry>> =
+        Default::default();
+    for f in load(split_features)? {
+        let Value::String(v) = &f.attributes[index] else {
+            continue;
+        };
+        groups
+            .entry(v.trim_end().to_owned())
+            .or_default()
+            .push(f.geometry.unwrap());
+    }
+    let mut outputs = Vec::new();
+    for (value, geoms) in groups {
+        if value.is_empty() {
+            continue;
+        }
+        let out = clip_to_area(input, &ClipArea::new(geoms.iter())?)?;
+        if !out.features.is_empty() {
+            outputs.push((value, out));
+        }
+    }
+    Ok(outputs)
 }

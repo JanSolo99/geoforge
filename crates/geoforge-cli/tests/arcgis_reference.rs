@@ -394,6 +394,40 @@ fn gf_args(case: &str) -> Vec<&'static str> {
             "testdata/geoproc/parcels.shp",
             "--output",
         ],
+        "near_wells_roads_clip" => vec![
+            "near",
+            "testdata/geoproc/wells.shp",
+            "testdata/geoproc/roads.shp;testdata/geoproc/clip_areas.shp",
+            "<out>",
+            "--location",
+            "LOCATION",
+            "--angle",
+            "ANGLE",
+        ],
+        "split_parcels_clip" => vec![
+            "split",
+            "testdata/geoproc/parcels.shp",
+            "testdata/geoproc/clip_areas.shp",
+            "AREA_ID",
+        ],
+        "split_roads_parcels_name" => vec![
+            "split",
+            "testdata/geoproc/roads.shp",
+            "testdata/geoproc/parcels.shp",
+            "NAME",
+        ],
+        "split_wells_parcels_name" => vec![
+            "split",
+            "testdata/geoproc/wells.shp",
+            "testdata/geoproc/parcels.shp",
+            "NAME",
+        ],
+        "split_parcels_parcels_name" => vec![
+            "split",
+            "testdata/geoproc/parcels.shp",
+            "testdata/geoproc/parcels.shp",
+            "NAME",
+        ],
         other => panic!("no gf command for case {other}"),
     }
 }
@@ -437,6 +471,84 @@ fn same_value(a: &Value, b: &Value) -> bool {
     }
 }
 
+/// Differences between our output and ArcGIS's for one output file.
+fn compare(case: &str, ours: &Path, theirs: &Path, fields: &serde_json::Value) -> Vec<String> {
+    let ours = ShapefileReader::open(ours).unwrap();
+    let theirs = ShapefileReader::open(theirs).unwrap();
+    let mut diffs = Vec::new();
+
+    // Schema: names and types as ArcGIS reports them (FID and Shape excluded).
+    let expected: Vec<(String, String)> = fields.as_array().unwrap()[2..]
+        .iter()
+        .map(|f| {
+            (
+                f[0].as_str().unwrap().to_owned(),
+                f[1].as_str().unwrap().to_owned(),
+            )
+        })
+        .collect();
+    let got: Vec<(String, String)> = ours
+        .fields()
+        .iter()
+        .map(|f| (f.name.clone(), type_name(f.field_type).to_owned()))
+        .collect();
+    if got != expected {
+        diffs.push(format!("schema: ours {got:?}, ArcGIS {expected:?}"));
+    }
+
+    let a: Vec<_> = ours.features().map(Result::unwrap).collect();
+    let b: Vec<_> = theirs.features().map(Result::unwrap).collect();
+    if a.len() != b.len() {
+        diffs.push(format!("count: ours {}, ArcGIS {}", a.len(), b.len()));
+    }
+    // Clip agrees within ArcGIS's own XY tolerance (0.001 m: coordinates closer
+    // than that are the same point to ArcGIS). Buffers are densified differently
+    // (vertex placement on arcs), so compare shape within 2 × the 0.1 m deviation.
+    let is_buffer = case.starts_with("buffer");
+    let (shape_tol, area_tol) = if is_buffer {
+        (0.2, 1e-4)
+    } else {
+        (0.001, 1e-7)
+    };
+    for (i, (fa, fb)) in a.iter().zip(&b).enumerate() {
+        for (k, (va, vb)) in fa.attributes.iter().zip(&fb.attributes).enumerate() {
+            if !same_value(va, vb) {
+                diffs.push(format!("feature {i} field {k}: ours {va:?}, ArcGIS {vb:?}"));
+            }
+        }
+        let (Some(ga), Some(gb)) = (&fa.geometry, &fb.geometry) else {
+            if fa.geometry.is_some() != fb.geometry.is_some() {
+                diffs.push(format!("feature {i}: null geometry mismatch"));
+            }
+            continue;
+        };
+        let h = hausdorff(ga, gb);
+        if h > shape_tol {
+            diffs.push(format!(
+                "feature {i}: shapes differ by {h:.6} (tolerance {shape_tol})"
+            ));
+        }
+        let (ma, mb) = match ga.kind {
+            GeometryKind::Polygon => (esri_area(ga), esri_area(gb)),
+            GeometryKind::Polyline => (esri_length(ga), esri_length(gb)),
+            _ => (0.0, 0.0),
+        };
+        // Within ArcGIS's 0.001 m XY tolerance an outline may move by that much,
+        // changing the area by up to perimeter × 0.001.
+        let slack = if ga.kind == GeometryKind::Polygon && !is_buffer {
+            esri_length(gb) * 0.001
+        } else {
+            0.0
+        };
+        if (ma - mb).abs() > area_tol * mb.abs().max(1.0) + slack {
+            diffs.push(format!(
+                "feature {i}: area/length ours {ma:.6}, ArcGIS {mb:.6}"
+            ));
+        }
+    }
+    diffs
+}
+
 #[test]
 fn tools_match_arcgis_output() {
     let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
@@ -448,7 +560,14 @@ fn tools_match_arcgis_output() {
     std::fs::create_dir_all(&out_dir).unwrap();
     let mut failures = Vec::new();
     for (case, info) in manifest["cases"].as_object().unwrap() {
-        let out = out_dir.join(format!("{case}.shp"));
+        // Workspace tools (Split) write into a folder.
+        let out = if info.get("outputs").is_some() {
+            let dir = out_dir.join(case);
+            std::fs::create_dir_all(&dir).unwrap();
+            dir
+        } else {
+            out_dir.join(format!("{case}.shp"))
+        };
         let mut args: Vec<String> = gf_args(case).iter().map(|a| a.to_string()).collect();
         match args.iter().position(|a| a == "<out>") {
             Some(i) => args[i] = out.display().to_string(),
@@ -459,85 +578,64 @@ fn tools_match_arcgis_output() {
             .args(&args)
             .output()
             .unwrap();
-        if !run.status.success() {
-            failures.push(format!(
-                "{case}: gf failed: {}",
+        let mut diffs = Vec::new();
+        if info["status"] == "failed" {
+            // ArcGIS refused: gf must refuse with the same error code.
+            let stderr = String::from_utf8_lossy(&run.stderr);
+            let codes: Vec<&str> = info["messages"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .filter_map(|m| m.as_str()?.strip_prefix("ERROR ")?.get(..6))
+                .collect();
+            if run.status.success() || !codes.iter().any(|c| stderr.contains(c)) {
+                diffs.push(format!(
+                    "ArcGIS failed with {codes:?}; gf: {}",
+                    if run.status.success() {
+                        "succeeded".into()
+                    } else {
+                        stderr
+                    }
+                ));
+            }
+        } else if let Some(outputs) = info["outputs"].as_object() {
+            // Workspace outputs (Split): the same files, each matching.
+            let mut ours: Vec<String> = std::fs::read_dir(&out)
+                .unwrap()
+                .filter_map(|e| e.ok()?.file_name().into_string().ok())
+                .filter(|n| n.ends_with(".shp"))
+                .collect();
+            ours.sort();
+            let theirs: Vec<String> = outputs.keys().cloned().collect();
+            if ours != theirs {
+                diffs.push(format!("outputs: ours {ours:?}, ArcGIS {theirs:?}"));
+            }
+            for (name, o) in outputs {
+                if out.join(name).exists() {
+                    diffs.extend(
+                        compare(
+                            case,
+                            &out.join(name),
+                            &reference.join(case).join(name),
+                            &o["fields"],
+                        )
+                        .into_iter()
+                        .map(|d| format!("{name}: {d}")),
+                    );
+                }
+            }
+        } else if !run.status.success() {
+            diffs.push(format!(
+                "gf failed: {}",
                 String::from_utf8_lossy(&run.stderr)
             ));
-            continue;
-        }
-        let ours = ShapefileReader::open(&out).unwrap();
-        let theirs = ShapefileReader::open(reference.join(format!("{case}.shp"))).unwrap();
-        let mut diffs = Vec::new();
-
-        // Schema: names and types as ArcGIS reports them (FID and Shape excluded).
-        let expected: Vec<(String, String)> = info["fields"].as_array().unwrap()[2..]
-            .iter()
-            .map(|f| {
-                (
-                    f[0].as_str().unwrap().to_owned(),
-                    f[1].as_str().unwrap().to_owned(),
-                )
-            })
-            .collect();
-        let got: Vec<(String, String)> = ours
-            .fields()
-            .iter()
-            .map(|f| (f.name.clone(), type_name(f.field_type).to_owned()))
-            .collect();
-        if got != expected {
-            diffs.push(format!("schema: ours {got:?}, ArcGIS {expected:?}"));
-        }
-
-        let a: Vec<_> = ours.features().map(Result::unwrap).collect();
-        let b: Vec<_> = theirs.features().map(Result::unwrap).collect();
-        if a.len() != b.len() {
-            diffs.push(format!("count: ours {}, ArcGIS {}", a.len(), b.len()));
-        }
-        // Clip agrees within ArcGIS's own XY tolerance (0.001 m: coordinates closer
-        // than that are the same point to ArcGIS). Buffers are densified differently
-        // (vertex placement on arcs), so compare shape within 2 × the 0.1 m deviation.
-        let is_buffer = case.starts_with("buffer");
-        let (shape_tol, area_tol) = if is_buffer {
-            (0.2, 1e-4)
         } else {
-            (0.001, 1e-7)
-        };
-        for (i, (fa, fb)) in a.iter().zip(&b).enumerate() {
-            for (k, (va, vb)) in fa.attributes.iter().zip(&fb.attributes).enumerate() {
-                if !same_value(va, vb) {
-                    diffs.push(format!("feature {i} field {k}: ours {va:?}, ArcGIS {vb:?}"));
-                }
-            }
-            let (Some(ga), Some(gb)) = (&fa.geometry, &fb.geometry) else {
-                if fa.geometry.is_some() != fb.geometry.is_some() {
-                    diffs.push(format!("feature {i}: null geometry mismatch"));
-                }
-                continue;
-            };
-            let h = hausdorff(ga, gb);
-            if h > shape_tol {
-                diffs.push(format!(
-                    "feature {i}: shapes differ by {h:.6} (tolerance {shape_tol})"
-                ));
-            }
-            let (ma, mb) = match ga.kind {
-                GeometryKind::Polygon => (esri_area(ga), esri_area(gb)),
-                GeometryKind::Polyline => (esri_length(ga), esri_length(gb)),
-                _ => (0.0, 0.0),
-            };
-            // Within ArcGIS's 0.001 m XY tolerance an outline may move by that much,
-            // changing the area by up to perimeter × 0.001.
-            let slack = if ga.kind == GeometryKind::Polygon && !is_buffer {
-                esri_length(gb) * 0.001
-            } else {
-                0.0
-            };
-            if (ma - mb).abs() > area_tol * mb.abs().max(1.0) + slack {
-                diffs.push(format!(
-                    "feature {i}: area/length ours {ma:.6}, ArcGIS {mb:.6}"
-                ));
-            }
+            diffs = compare(
+                case,
+                &out,
+                &reference.join(format!("{case}.shp")),
+                &info["fields"],
+            );
         }
         if !diffs.is_empty() {
             failures.push(format!(

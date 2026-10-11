@@ -62,8 +62,16 @@ CASES = {
     "append_clip_to_parcels": ("management.Append", [DATA / "clip_areas.shp", DATA / "parcels.shp"], ["NO_TEST"]),
     "append_parcels_to_clip": ("management.Append", [DATA / "parcels.shp", DATA / "clip_areas.shp"], ["NO_TEST"]),
     "append_parcels_to_parcels": ("management.Append", [DATA / "parcels.shp", DATA / "parcels.shp"], ["TEST"]),
+    "near_wells_roads_clip": ("analysis.Near", [DATA / "wells.shp", f"{DATA / 'roads.shp'};{DATA / 'clip_areas.shp'}"], ["", "LOCATION", "ANGLE"]),
+    # Split writes one shapefile per split value into a folder (WORKSPACE_OUT).
+    "split_parcels_clip": ("analysis.Split", [DATA / "parcels.shp", DATA / "clip_areas.shp", "AREA_ID"], []),
+    "split_roads_parcels_name": ("analysis.Split", [DATA / "roads.shp", DATA / "parcels.shp", "NAME"], []),
+    "split_wells_parcels_name": ("analysis.Split", [DATA / "wells.shp", DATA / "parcels.shp", "NAME"], []),
+    "split_parcels_parcels_name": ("analysis.Split", [DATA / "parcels.shp", DATA / "parcels.shp", "NAME"], []),
     "merge_parcels_clip_source": ("management.Merge", [f"{DATA / 'parcels.shp'};{DATA / 'clip_areas.shp'}"], ["", "ADD_SOURCE_INFO"]),
 }
+WORKSPACE_OUT = {"analysis.Split"}
+
 # In-place tools: the index of the input they edit (run on a copy written as the output).
 IN_PLACE = {"analysis.Near": 0, "management.Append": 1}
 
@@ -101,7 +109,11 @@ def main():
     manifest = {"arcgis": {k: info.get(k) for k in ("product", "version", "build", "license")}, "cases": {}}
     for name, (tool, before, after) in CASES.items():
         out = OUT / f"{name}.shp"
-        if tool in IN_PLACE:
+        if tool in WORKSPACE_OUT:
+            out = OUT / name
+            out.mkdir()
+            args = [str(a) for a in before] + [str(out)] + after
+        elif tool in IN_PLACE:
             k = IN_PLACE[tool]
             w.call("run_tool", tool="management.CopyFeatures", args=[str(before[k]), str(out)],
                    env={"overwriteOutput": True})
@@ -109,6 +121,23 @@ def main():
         else:
             args = [str(a) for a in before] + [str(out)] + after
         r = w.call("run_tool", tool=tool, args=args, env={"overwriteOutput": True})
+        if tool in WORKSPACE_OUT:
+            outputs = {}
+            for shp in sorted(out.glob("*.shp")):
+                d = w.call("describe", path=str(shp))
+                outputs[shp.name] = {
+                    "fields": [[f["name"], f["type"], f["length"], f["precision"], f["scale"]] for f in d.get("fields", [])],
+                    "shapeType": d.get("shapeType"),
+                }
+            manifest["cases"][name] = {
+                "tool": tool,
+                "args": [str(Path(a).relative_to(ROOT)) if isinstance(a, Path) else a for a in before] + ["<out>"] + after,
+                "status": r.get("status"),
+                "messages": [m["text"] for m in r.get("messages", []) if m["severity"] > 0],
+                "outputs": outputs,
+            }
+            print(f"{name}: {r.get('status')} {sorted(outputs)} {manifest['cases'][name]['messages']}")
+            continue
         d = w.call("describe", path=str(out)) if r.get("status") == "succeeded" else {}
         manifest["cases"][name] = {
             "tool": tool,

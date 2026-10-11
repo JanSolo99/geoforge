@@ -45,9 +45,10 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
 - [x] Select Layer By Location (all 13 planar overlap types, search distance, invert;
       `gf select-by-location` writes the selection) and Append (TEST/NO_TEST, fields by
       name, other geometry types skipped with WARNING 000594) — match ArcGIS
-- [ ] Split (one output per split value); Near with several near feature classes
-      (`NEAR_FC`); Spatial Join field-map merge rules other than First; selection types
-      other than NEW_SELECTION (needs layers)
+- [x] Split (one shapefile per text value, named after it; ERROR 003911 for non-text
+      fields) and Near with several near feature classes (`NEAR_FC`) — match ArcGIS
+- [ ] Split into a geodatabase; Spatial Join field-map merge rules other than First;
+      selection types other than NEW_SELECTION (needs layers)
 - [ ] Line overlays: crack input lines at their mutual crossings, as ArcGIS does
       (Identity writes uncovered road pieces split there: same lines, more parts)
 - [ ] Overlay Z/M, line×line Intersect, `cluster_tolerance`, `output_type` POINT/LINE

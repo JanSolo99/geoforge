@@ -75,7 +75,8 @@ enum Tool {
     /// given.
     Near {
         in_features: PathBuf,
-        near_features: PathBuf,
+        /// One near feature class, or several joined with ';' (adds NEAR_FC).
+        near_features: String,
         /// Write the result here instead of updating the input.
         out_feature_class: Option<PathBuf>,
         /// Only consider near features within this distance, e.g. "100 Meters".
@@ -139,6 +140,15 @@ enum Tool {
         /// Write the result here instead of updating the target.
         #[arg(long)]
         output: Option<PathBuf>,
+    },
+    /// Clip the input by each group of split polygons sharing a text value, one
+    /// output per value named after it (ArcGIS "Split").
+    Split {
+        in_features: PathBuf,
+        split_features: PathBuf,
+        split_field: String,
+        /// A folder; outputs are `<value>.shp`.
+        out_workspace: PathBuf,
     },
     /// Merge features by attribute values (ArcGIS "Dissolve").
     Dissolve {
@@ -336,6 +346,12 @@ fn main() -> ExitCode {
                 None => update_in_place(out, &target_path),
             }
         })(),
+        Tool::Split {
+            in_features,
+            split_features,
+            split_field,
+            out_workspace,
+        } => split_tool(&in_features, &split_features, &split_field, &out_workspace),
         Tool::Dissolve {
             in_features,
             out_feature_class,
@@ -877,7 +893,7 @@ fn overlay_tool(
 
 fn near_tool(
     input: &Path,
-    near_features: &Path,
+    near_features: &str,
     output: Option<&Path>,
     search_radius: Option<&str>,
     location: &str,
@@ -893,11 +909,28 @@ fn near_tool(
     let location = flag(location, "LOCATION", "NO_LOCATION")?;
     let angle = flag(angle, "ANGLE", "NO_ANGLE")?;
     let (fc, _) = open_feature_class(input)?;
-    let (nf, _) = open_feature_class(near_features)?;
+    let near_paths: Vec<PathBuf> = near_features
+        .split(';')
+        .map(str::trim)
+        .filter(|p| !p.is_empty())
+        .map(PathBuf::from)
+        .collect();
+    let opened: Vec<Box<dyn FeatureClass>> = near_paths
+        .iter()
+        .map(|p| open_feature_class(p).map(|(f, _)| f))
+        .collect::<Result<_>>()?;
+    let near_inputs: Vec<geoforge_tools::PathInput> = near_paths
+        .iter()
+        .zip(&opened)
+        .map(|(p, f)| geoforge_tools::PathInput {
+            source: catalog_path(p),
+            features: f.as_ref(),
+        })
+        .collect();
     let radius = search_radius
         .map(|r| parse_distance(r, fc.spatial_reference_wkt()))
         .transpose()?;
-    let out = geoforge_tools::near(fc.as_ref(), nf.as_ref(), radius, location, angle)?;
+    let out = geoforge_tools::near(fc.as_ref(), &near_inputs, radius, location, angle)?;
     drop(fc);
     if let Some(output) = output {
         return write_output(out, output, source_gdb(input).as_deref());
@@ -937,6 +970,43 @@ fn update_in_place(out: ToolOutput, dataset: &Path) -> Result<()> {
     Ok(())
 }
 
+/// A dataset's full path, as ArcGIS records it in fields like `MERGE_SRC`.
+fn catalog_path(p: &Path) -> String {
+    std::path::absolute(p)
+        .unwrap_or_else(|_| p.to_path_buf())
+        .display()
+        .to_string()
+}
+
+fn split_tool(
+    input: &Path,
+    split_features: &Path,
+    split_field: &str,
+    out_workspace: &Path,
+) -> Result<()> {
+    if matches!(locate(out_workspace), Location::Geodatabase { .. }) {
+        return Err(Error::Unsupported(
+            "splitting into a geodatabase needs adding to an existing one (not implemented yet); use a folder".into(),
+        ));
+    }
+    if !out_workspace.is_dir() {
+        return Err(Error::Unsupported(format!(
+            "ERROR 000732: Target Workspace: Dataset {} does not exist or is not supported",
+            out_workspace.display()
+        )));
+    }
+    let (fc, _) = open_feature_class(input)?;
+    let (sf, _) = open_feature_class(split_features)?;
+    for (value, out) in geoforge_tools::split(fc.as_ref(), sf.as_ref(), split_field)? {
+        let name: String = value
+            .chars()
+            .map(|c| if "/\\:*?\"<>|".contains(c) { '_' } else { c })
+            .collect();
+        write_output(out, &out_workspace.join(format!("{name}.shp")), None)?;
+    }
+    Ok(())
+}
+
 fn merge_tool(inputs: &[PathBuf], output: &Path, add_source: &str) -> Result<()> {
     let add = match add_source.to_ascii_uppercase().as_str() {
         "NO_SOURCE_INFO" => false,
@@ -947,14 +1017,11 @@ fn merge_tool(inputs: &[PathBuf], output: &Path, add_source: &str) -> Result<()>
         .iter()
         .map(|p| open_feature_class(p).map(|(f, _)| f))
         .collect::<Result<_>>()?;
-    let merge_inputs: Vec<geoforge_tools::MergeInput> = inputs
+    let merge_inputs: Vec<geoforge_tools::PathInput> = inputs
         .iter()
         .zip(&opened)
-        .map(|(p, f)| geoforge_tools::MergeInput {
-            source: std::path::absolute(p)
-                .unwrap_or_else(|_| p.clone())
-                .display()
-                .to_string(),
+        .map(|(p, f)| geoforge_tools::PathInput {
+            source: catalog_path(p),
             features: f.as_ref(),
         })
         .collect();
