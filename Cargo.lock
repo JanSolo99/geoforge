@@ -333,6 +333,7 @@ dependencies = [
  "geoforge-csv",
  "geoforge-filegdb",
  "geoforge-geometry",
+ "geoforge-gpkg",
  "geoforge-json",
  "geoforge-proj",
  "geoforge-raster",
@@ -383,6 +384,7 @@ dependencies = [
 name = "geoforge-gpkg"
 version = "0.0.1"
 dependencies = [
+ "chrono",
  "geoforge-core",
  "geoforge-testkit",
  "serde_json",

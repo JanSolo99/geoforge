@@ -291,7 +291,15 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
   - [x] Own read-only SQLite reader (`geoforge-gpkg::sqlite`): header, table b-trees, overflow
         pages, records with type affinity, CREATE TABLE columns and rowid aliases; checked row
         for row against Python's sqlite3 at page sizes 512, 4096 and 65536
-  - [ ] GeoPackage feature tables (geometry blobs, gpkg_contents, spatial reference systems)
+  - [x] GeoPackage feature and attribute tables read as ArcGIS reads them (`main.` names, 64-bit
+        ObjectID, SQLite types → ArcGIS field types, Esri ring orientation keeping start
+        vertices, empty points), usable as input to every `gf` tool; tools that ArcGIS refuses
+        to run from 64-bit ObjectIDs into shapefiles fail the same way
+        (`docs/formats/geopackage.md`)
+  - [x] Shapefile output: Date Only fields fail with ERROR 000308; empty points written as
+        −DBL_MAX as ArcGIS does
+  - [ ] GeoPackage: writing, WAL files, curve geometries, Project's extra `fid_` field, 64-bit
+        ObjectIDs in file geodatabases
 
 ## Phase 8 — Rendering & UI
 - [ ] wgpu-based 2D map renderer (symbology, labeling, raster stretch)

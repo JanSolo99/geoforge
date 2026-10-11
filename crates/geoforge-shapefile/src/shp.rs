@@ -83,8 +83,8 @@ pub fn decode_record(content: &[u8]) -> Result<Option<Geometry>> {
 
     if kind == GeometryKind::Point {
         let [x, y] = c.f64s::<2>()?;
-        // Esri stores an empty point as NaN coordinates.
-        if x.is_nan() || y.is_nan() {
+        // An empty point: NaN coordinates, or -DBL_MAX as ArcGIS writes them.
+        if x.is_nan() || y.is_nan() || (x == f64::MIN && y == f64::MIN) {
             return Ok(Some(Geometry {
                 xy: Vec::new(),
                 ..Geometry::point(0.0, 0.0)
@@ -209,7 +209,8 @@ pub fn encode_record(st: ShapeType, geometry: Option<&Geometry>, out: &mut Vec<u
     out.extend_from_slice(&st.code().to_le_bytes());
 
     if g.kind == GeometryKind::Point {
-        let [x, y] = g.xy.first().copied().unwrap_or([f64::NAN; 2]);
+        // ArcGIS writes an empty point as -DBL_MAX coordinates.
+        let [x, y] = g.xy.first().copied().unwrap_or([f64::MIN; 2]);
         put(out, x);
         put(out, y);
         if st.has_z() {
@@ -404,7 +405,7 @@ mod tests {
     }
 
     #[test]
-    fn empty_point_roundtrips_as_nan() {
+    fn empty_point_roundtrips() {
         let empty = Geometry {
             xy: Vec::new(),
             ..Geometry::point(0.0, 0.0)

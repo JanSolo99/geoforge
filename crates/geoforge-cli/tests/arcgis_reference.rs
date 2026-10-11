@@ -30,6 +30,55 @@ fn gf_args(case: &str) -> Vec<&'static str> {
             "testdata/geoproc/wells.shp",
             "testdata/geoproc/clip_areas.shp",
         ],
+        "copy_gpkg_points" => vec!["copy-features", "testdata/gpkg/shapes.gpkg/main.points"],
+        "copy_gpkg_points_zm" => vec!["copy-features", "testdata/gpkg/shapes.gpkg/main.points_zm"],
+        "copy_gpkg_multipoints" => vec![
+            "copy-features",
+            "testdata/gpkg/shapes.gpkg/main.multipoints",
+        ],
+        "copy_gpkg_multilines" => {
+            vec!["copy-features", "testdata/gpkg/shapes.gpkg/main.multilines"]
+        }
+        "copy_gpkg_polygons" => vec!["copy-features", "testdata/gpkg/shapes.gpkg/main.polygons"],
+        "copy_gpkg_multipolygons" => vec![
+            "copy-features",
+            "testdata/gpkg/shapes.gpkg/main.multipolygons",
+        ],
+        "copy_gpkg_polygons_z" => {
+            vec!["copy-features", "testdata/gpkg/shapes.gpkg/main.polygons_z"]
+        }
+        "copy_gpkg_geographic" => {
+            vec!["copy-features", "testdata/gpkg/shapes.gpkg/main.geographic"]
+        }
+        "buffer_gpkg_lines_10" => vec![
+            "buffer",
+            "testdata/gpkg/shapes.gpkg/main.lines",
+            "<out>",
+            "10 Meters",
+        ],
+        "clip_gpkg_multipolygons" => vec![
+            "clip",
+            "testdata/gpkg/shapes.gpkg/main.multipolygons",
+            "testdata/geoproc/clip_areas.shp",
+        ],
+        "select_gpkg_polygons" => vec![
+            "select",
+            "testdata/gpkg/shapes.gpkg/main.polygons",
+            "<out>",
+            "--where",
+            "long_f > 150000",
+        ],
+        "dissolve_gpkg_multipolygons" => {
+            vec!["dissolve", "testdata/gpkg/shapes.gpkg/main.multipolygons"]
+        }
+        "copy_gpkg_date_only" => vec!["copy-features", "testdata/gpkg/sample.gpkg/main.lines"],
+        "copy_gpkg_big_integer" => vec!["copy-features", "testdata/gpkg/sample.gpkg/main.points"],
+        "buffer_gpkg_big_integer" => vec![
+            "buffer",
+            "testdata/gpkg/sample.gpkg/main.lines",
+            "<out>",
+            "10 Meters",
+        ],
         "buffer_roads_25" => vec!["buffer", "testdata/geoproc/roads.shp", "<out>", "25 Meters"],
         "buffer_roads_25_flat" => vec![
             "buffer",

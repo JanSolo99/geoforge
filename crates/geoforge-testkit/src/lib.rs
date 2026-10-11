@@ -277,6 +277,17 @@ fn run(cmd: &mut Command) -> Result<String, String> {
 /// Coordinate sequences of a WKT string: every innermost parenthesized list.
 pub fn wkt_sequences(wkt: &str) -> Vec<Vec<Coord>> {
     let head = wkt.split('(').next().unwrap_or_default();
+    // ArcGIS writes an empty point to a shapefile as -DBL_MAX coordinates, which
+    // GDAL reports as a point (printed rounded, so it parses as -inf).
+    if head.trim_start().starts_with("POINT")
+        && wkt[head.len()..]
+            .split(|c: char| c == '(' || c == ')' || c.is_whitespace())
+            .filter_map(|t| t.parse::<f64>().ok())
+            .take(2)
+            .all(|v| v <= -1e308)
+    {
+        return Vec::new();
+    }
     let words: Vec<&str> = head.split_whitespace().collect();
     let has_zm = words.contains(&"ZM");
     let has_z = has_zm || words.contains(&"Z");

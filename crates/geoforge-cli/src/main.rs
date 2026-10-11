@@ -725,7 +725,12 @@ enum Tool {
 }
 
 fn main() -> ExitCode {
-    let result = match Cli::parse().tool {
+    let tool = Cli::parse().tool;
+    if let Err(e) = check_64bit_oids(&tool) {
+        eprintln!("ERROR: {e}");
+        return ExitCode::FAILURE;
+    }
+    let result = match tool {
         Tool::Describe { dataset } => describe(&dataset),
         Tool::CopyFeatures {
             in_features,
@@ -2083,7 +2088,112 @@ fn locate(path: &Path) -> Location {
     }
 }
 
+/// Tools that ArcGIS refuses to run from a table with 64-bit ObjectIDs (every
+/// GeoPackage table) into a shapefile (observed in ArcGIS Pro 3.7; Select, Copy
+/// Features and Clip on points run).
+fn check_64bit_oids(tool: &Tool) -> Result<()> {
+    let (inputs, output, code): (Vec<&PathBuf>, &PathBuf, &str) = match tool {
+        Tool::Buffer {
+            in_features,
+            out_feature_class,
+            ..
+        }
+        | Tool::Dissolve {
+            in_features,
+            out_feature_class,
+            ..
+        }
+        | Tool::Erase {
+            in_features,
+            out_feature_class,
+            ..
+        }
+        | Tool::FeatureToPoint {
+            in_features,
+            out_feature_class,
+            ..
+        }
+        | Tool::MultipartToSinglepart {
+            in_features,
+            out_feature_class,
+        } => (vec![in_features], out_feature_class, "010672"),
+        // Clip runs for points but not for lines and polygons (observed).
+        Tool::Clip {
+            in_features,
+            out_feature_class,
+            ..
+        } if open_feature_class(in_features).is_ok_and(|(fc, _)| {
+            fc.geometry_kind() != Some(geoforge_core::GeometryKind::Point)
+        }) =>
+        {
+            (vec![in_features], out_feature_class, "010672")
+        }
+        Tool::Intersect { paths, .. } => {
+            let (out, inputs) = paths.split_last().expect("clap requires paths");
+            (inputs.iter().collect(), out, "010672")
+        }
+        Tool::SpatialJoin {
+            target_features,
+            out_feature_class,
+            ..
+        } => (vec![target_features], out_feature_class, "002809"),
+        _ => return Ok(()),
+    };
+    let to_shapefile =
+        geopackage_item(output).is_none() && matches!(locate(output), Location::Shapefile(_));
+    if !to_shapefile || !inputs.iter().any(|p| geopackage_item(p).is_some()) {
+        return Ok(());
+    }
+    Err(Error::Unsupported(if code == "010672" {
+        "ERROR 010672: The output workspace does not support database fields containing 64 \
+         bit integer values."
+            .into()
+    } else {
+        format!(
+            "ERROR 002809: Field TARGET_FID in {} is of an unsupported type for the output \
+             workspace.",
+            output.display()
+        )
+    }))
+}
+
+/// A path inside a GeoPackage file (`data.gpkg/main.roads`): the file and the
+/// table name, if any.
+fn geopackage_item(path: &Path) -> Option<(PathBuf, Option<String>)> {
+    let mut prefix = PathBuf::new();
+    let comps: Vec<_> = path.components().collect();
+    for (i, c) in comps.iter().enumerate() {
+        prefix.push(c);
+        if prefix
+            .extension()
+            .is_some_and(|e| e.eq_ignore_ascii_case("gpkg"))
+            && (prefix.is_file() || !prefix.exists())
+        {
+            let item = comps[i + 1..]
+                .last()
+                .map(|c| c.as_os_str().to_string_lossy().into_owned());
+            return Some((prefix, item));
+        }
+    }
+    None
+}
+
 fn open_feature_class(path: &Path) -> Result<(Box<dyn FeatureClass>, &'static str)> {
+    if let Some((gpkg, item)) = geopackage_item(path) {
+        let item = item.ok_or_else(|| {
+            Error::Unsupported(format!(
+                "{} is a workspace; name a table inside it",
+                gpkg.display()
+            ))
+        })?;
+        let table = geoforge_gpkg::GeoPackage::open(&gpkg)?.open_table(&item)?;
+        let kind = if table.geometry_kind().is_some() {
+            "FeatureClass"
+        } else {
+            "Table"
+        };
+        return Ok((Box::new(table), kind));
+    }
     if path
         .extension()
         .is_some_and(|e| e.eq_ignore_ascii_case("csv"))
@@ -2309,6 +2419,7 @@ fn shapefile_field(t: FieldType) -> ShapefileField {
         FieldType::Blob | FieldType::Raster => ShapefileField::Drop,
         FieldType::BigInteger
         | FieldType::Xml
+        | FieldType::DateOnly
         | FieldType::TimeOnly
         | FieldType::TimestampOffset => ShapefileField::Fail,
         _ => ShapefileField::Store,
@@ -2359,6 +2470,11 @@ fn write_output(mut out: ToolOutput, output: &Path, source_gdb: Option<&Path>) -
     out.spatial_reference_wkt = out
         .spatial_reference_wkt
         .map(|w| geoforge_proj::Crs::from_wkt(&w).map_or(w, |crs| crs.arcgis_wkt()));
+    if geopackage_item(output).is_some() {
+        return Err(Error::Unsupported(
+            "writing to a GeoPackage (read only so far)".into(),
+        ));
+    }
     match locate(output) {
         Location::Geodatabase { gdb, item } => {
             let item = item.ok_or_else(|| {

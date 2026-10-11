@@ -17765,6 +17765,854 @@
       "messages": [],
       "fields": [],
       "shapeType": null
+    },
+    "copy_gpkg_points": {
+      "tool": "management.CopyFeatures",
+      "args": [
+        "testdata/gpkg/shapes.gpkg/main.points",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000592: Output format does not support BLOB, Raster, or GUID fields. Field(s) blob_f will not be converted to output."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "short_f",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "long_f",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "float_f",
+          "Single",
+          13,
+          0,
+          0
+        ],
+        [
+          "double_f",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "text_f",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "text20_f",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "bool_f",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "datetime_f",
+          "Date",
+          8,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "copy_gpkg_points_zm": {
+      "tool": "management.CopyFeatures",
+      "args": [
+        "testdata/gpkg/shapes.gpkg/main.points_zm",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000592: Output format does not support BLOB, Raster, or GUID fields. Field(s) blob_f will not be converted to output."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "short_f",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "long_f",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "float_f",
+          "Single",
+          13,
+          0,
+          0
+        ],
+        [
+          "double_f",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "text_f",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "text20_f",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "bool_f",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "datetime_f",
+          "Date",
+          8,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "copy_gpkg_multipoints": {
+      "tool": "management.CopyFeatures",
+      "args": [
+        "testdata/gpkg/shapes.gpkg/main.multipoints",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000592: Output format does not support BLOB, Raster, or GUID fields. Field(s) blob_f will not be converted to output."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "short_f",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "long_f",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "float_f",
+          "Single",
+          13,
+          0,
+          0
+        ],
+        [
+          "double_f",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "text_f",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "text20_f",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "bool_f",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "datetime_f",
+          "Date",
+          8,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Multipoint"
+    },
+    "copy_gpkg_multilines": {
+      "tool": "management.CopyFeatures",
+      "args": [
+        "testdata/gpkg/shapes.gpkg/main.multilines",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000592: Output format does not support BLOB, Raster, or GUID fields. Field(s) blob_f will not be converted to output."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "short_f",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "long_f",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "float_f",
+          "Single",
+          13,
+          0,
+          0
+        ],
+        [
+          "double_f",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "text_f",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "text20_f",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "bool_f",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "datetime_f",
+          "Date",
+          8,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "copy_gpkg_polygons": {
+      "tool": "management.CopyFeatures",
+      "args": [
+        "testdata/gpkg/shapes.gpkg/main.polygons",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000592: Output format does not support BLOB, Raster, or GUID fields. Field(s) blob_f will not be converted to output."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "short_f",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "long_f",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "float_f",
+          "Single",
+          13,
+          0,
+          0
+        ],
+        [
+          "double_f",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "text_f",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "text20_f",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "bool_f",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "datetime_f",
+          "Date",
+          8,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "copy_gpkg_multipolygons": {
+      "tool": "management.CopyFeatures",
+      "args": [
+        "testdata/gpkg/shapes.gpkg/main.multipolygons",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000592: Output format does not support BLOB, Raster, or GUID fields. Field(s) blob_f will not be converted to output."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "short_f",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "long_f",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "float_f",
+          "Single",
+          13,
+          0,
+          0
+        ],
+        [
+          "double_f",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "text_f",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "text20_f",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "bool_f",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "datetime_f",
+          "Date",
+          8,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "copy_gpkg_polygons_z": {
+      "tool": "management.CopyFeatures",
+      "args": [
+        "testdata/gpkg/shapes.gpkg/main.polygons_z",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000592: Output format does not support BLOB, Raster, or GUID fields. Field(s) blob_f will not be converted to output."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "short_f",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "long_f",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "float_f",
+          "Single",
+          13,
+          0,
+          0
+        ],
+        [
+          "double_f",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "text_f",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "text20_f",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "bool_f",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "datetime_f",
+          "Date",
+          8,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "copy_gpkg_geographic": {
+      "tool": "management.CopyFeatures",
+      "args": [
+        "testdata/gpkg/shapes.gpkg/main.geographic",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000592: Output format does not support BLOB, Raster, or GUID fields. Field(s) blob_f will not be converted to output."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "short_f",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "long_f",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "float_f",
+          "Single",
+          13,
+          0,
+          0
+        ],
+        [
+          "double_f",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "text_f",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "text20_f",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "bool_f",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "datetime_f",
+          "Date",
+          8,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "buffer_gpkg_lines_10": {
+      "tool": "analysis.Buffer",
+      "args": [
+        "testdata/gpkg/shapes.gpkg/main.lines",
+        "<out>",
+        "10 Meters"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 010672: The output workspace does not support database fields containing 64 bit integer values.",
+        "Failed to execute (Buffer)."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "copy_gpkg_big_integer": {
+      "tool": "management.CopyFeatures",
+      "args": [
+        "testdata/gpkg/sample.gpkg/main.points",
+        "<out>"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 000210: Cannot create output /mnt/media/ArcGIS_Linux/testdata/arcgis-reference/copy_gpkg_big_integer.shp",
+        "WARNING 000592: Output format does not support BLOB, Raster, or GUID fields. Field(s) blob_f will not be converted to output.",
+        "ERROR 000308: Invalid field type",
+        "Failed to execute (CopyFeatures)."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "buffer_gpkg_big_integer": {
+      "tool": "analysis.Buffer",
+      "args": [
+        "testdata/gpkg/sample.gpkg/main.lines",
+        "<out>",
+        "10 Meters"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 010672: The output workspace does not support database fields containing 64 bit integer values.",
+        "Failed to execute (Buffer)."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "clip_gpkg_multipolygons": {
+      "tool": "analysis.Clip",
+      "args": [
+        "testdata/gpkg/shapes.gpkg/main.multipolygons",
+        "testdata/geoproc/clip_areas.shp",
+        "<out>"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 010672: The output workspace does not support database fields containing 64 bit integer values.",
+        "Failed to execute (Clip)."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "select_gpkg_polygons": {
+      "tool": "analysis.Select",
+      "args": [
+        "testdata/gpkg/shapes.gpkg/main.polygons",
+        "<out>",
+        "long_f > 150000"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000592: Output format does not support BLOB, Raster, or GUID fields. Field(s) blob_f will not be converted to output."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "short_f",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "long_f",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "float_f",
+          "Single",
+          13,
+          0,
+          0
+        ],
+        [
+          "double_f",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "text_f",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "text20_f",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "bool_f",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "datetime_f",
+          "Date",
+          8,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "dissolve_gpkg_multipolygons": {
+      "tool": "management.Dissolve",
+      "args": [
+        "testdata/gpkg/shapes.gpkg/main.multipolygons",
+        "<out>"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 010672: The output workspace does not support database fields containing 64 bit integer values.",
+        "Failed to execute (Dissolve)."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "copy_gpkg_date_only": {
+      "tool": "management.CopyFeatures",
+      "args": [
+        "testdata/gpkg/sample.gpkg/main.lines",
+        "<out>"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 000210: Cannot create output /mnt/media/ArcGIS_Linux/testdata/arcgis-reference/copy_gpkg_date_only.shp",
+        "WARNING 000592: Output format does not support BLOB, Raster, or GUID fields. Field(s) blob_f will not be converted to output.",
+        "ERROR 000308: Invalid field type",
+        "Failed to execute (CopyFeatures)."
+      ],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

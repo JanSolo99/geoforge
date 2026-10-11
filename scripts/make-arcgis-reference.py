@@ -20,6 +20,8 @@ import server  # noqa: E402
 
 DATA = ROOT / "testdata" / "geoproc"
 RASTER = ROOT / "testdata" / "raster"
+GPKG = ROOT / "testdata" / "gpkg" / "shapes.gpkg"
+GPKG_BIG = ROOT / "testdata" / "gpkg" / "sample.gpkg"
 OUT = ROOT / "testdata" / "arcgis-reference"
 
 def rel(a):
@@ -60,6 +62,21 @@ CASES = {
     "clip_parcels": ("analysis.Clip", [DATA / "parcels.shp", DATA / "clip_areas.shp"], []),
     "clip_roads": ("analysis.Clip", [DATA / "roads.shp", DATA / "clip_areas.shp"], []),
     "clip_wells": ("analysis.Clip", [DATA / "wells.shp", DATA / "clip_areas.shp"], []),
+    "copy_gpkg_points": ("management.CopyFeatures", [GPKG / "main.points"], []),
+    "copy_gpkg_points_zm": ("management.CopyFeatures", [GPKG / "main.points_zm"], []),
+    "copy_gpkg_multipoints": ("management.CopyFeatures", [GPKG / "main.multipoints"], []),
+    "copy_gpkg_multilines": ("management.CopyFeatures", [GPKG / "main.multilines"], []),
+    "copy_gpkg_polygons": ("management.CopyFeatures", [GPKG / "main.polygons"], []),
+    "copy_gpkg_multipolygons": ("management.CopyFeatures", [GPKG / "main.multipolygons"], []),
+    "copy_gpkg_polygons_z": ("management.CopyFeatures", [GPKG / "main.polygons_z"], []),
+    "copy_gpkg_geographic": ("management.CopyFeatures", [GPKG / "main.geographic"], []),
+    "buffer_gpkg_lines_10": ("analysis.Buffer", [GPKG / "main.lines"], ["10 Meters"]),
+    "clip_gpkg_multipolygons": ("analysis.Clip", [GPKG / "main.multipolygons", DATA / "clip_areas.shp"], []),
+    "select_gpkg_polygons": ("analysis.Select", [GPKG / "main.polygons"], ["long_f > 150000"]),
+    "dissolve_gpkg_multipolygons": ("management.Dissolve", [GPKG / "main.multipolygons"], []),
+    "copy_gpkg_date_only": ("management.CopyFeatures", [GPKG_BIG / "main.lines"], []),
+    "copy_gpkg_big_integer": ("management.CopyFeatures", [GPKG_BIG / "main.points"], []),
+    "buffer_gpkg_big_integer": ("analysis.Buffer", [GPKG_BIG / "main.lines"], ["10 Meters"]),
     "buffer_roads_25": ("analysis.Buffer", [DATA / "roads.shp"], ["25 Meters"]),
     "buffer_roads_25_flat": ("analysis.Buffer", [DATA / "roads.shp"], ["25 Meters", "FULL", "FLAT"]),
     "buffer_roads_25_all": ("analysis.Buffer", [DATA / "roads.shp"], ["25 Meters", "FULL", "ROUND", "ALL"]),
