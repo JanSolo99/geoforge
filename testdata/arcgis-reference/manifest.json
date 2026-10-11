@@ -13771,6 +13771,171 @@
         ]
       ],
       "shapeType": null
+    },
+    "json_roads": {
+      "tool": "conversion.FeaturesToJSON",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "NOT_FORMATTED",
+        "NO_Z_VALUES",
+        "NO_M_VALUES",
+        "NO_GEOJSON"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "json_roads_formatted": {
+      "tool": "conversion.FeaturesToJSON",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "FORMATTED",
+        "NO_Z_VALUES",
+        "NO_M_VALUES",
+        "NO_GEOJSON"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "json_parcels": {
+      "tool": "conversion.FeaturesToJSON",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "NOT_FORMATTED",
+        "NO_Z_VALUES",
+        "NO_M_VALUES",
+        "NO_GEOJSON"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "json_wells": {
+      "tool": "conversion.FeaturesToJSON",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "NOT_FORMATTED",
+        "NO_Z_VALUES",
+        "NO_M_VALUES",
+        "NO_GEOJSON"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "json_wells_wgs84": {
+      "tool": "conversion.FeaturesToJSON",
+      "args": [
+        "testdata/geoproc/wells_wgs84.shp",
+        "<out>",
+        "NOT_FORMATTED",
+        "NO_Z_VALUES",
+        "NO_M_VALUES",
+        "NO_GEOJSON"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "geojson_roads": {
+      "tool": "conversion.FeaturesToJSON",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "NOT_FORMATTED",
+        "NO_Z_VALUES",
+        "NO_M_VALUES",
+        "GEOJSON"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "geojson_parcels": {
+      "tool": "conversion.FeaturesToJSON",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "NOT_FORMATTED",
+        "NO_Z_VALUES",
+        "NO_M_VALUES",
+        "GEOJSON"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "geojson_parcels_formatted": {
+      "tool": "conversion.FeaturesToJSON",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "FORMATTED",
+        "NO_Z_VALUES",
+        "NO_M_VALUES",
+        "GEOJSON"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "geojson_wells": {
+      "tool": "conversion.FeaturesToJSON",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "NOT_FORMATTED",
+        "NO_Z_VALUES",
+        "NO_M_VALUES",
+        "GEOJSON"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "json_roads_zm": {
+      "tool": "conversion.FeaturesToJSON",
+      "args": [
+        "testdata/geoproc/roads_zm.shp",
+        "<out>",
+        "NOT_FORMATTED",
+        "Z_VALUES",
+        "M_VALUES",
+        "NO_GEOJSON"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "json_bad_lines": {
+      "tool": "conversion.FeaturesToJSON",
+      "args": [
+        "testdata/geoproc/bad_lines.shp",
+        "<out>",
+        "NOT_FORMATTED",
+        "NO_Z_VALUES",
+        "NO_M_VALUES",
+        "NO_GEOJSON"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

@@ -172,7 +172,10 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
 - [ ] Python bindings via PyO3 (`geoforge` module, arcpy-like API)
 
 ## Phase 7 — Databases & other formats
-- [ ] GeoPackage / SpatiaLite, PostGIS, GeoJSON, KML, GML, DXF, E00, ERDAS IMG, JPEG2000
+- [x] Features To JSON: Esri JSON and GeoJSON written byte for byte as ArcGIS writes them
+      (`geoforge-json`: `%.17g` coordinates, field-scale-dependent number forms, formatted
+      header with a one-line features array, wkid/latestWkid through PROJ's identify)
+- [ ] JSON To Features; GeoPackage / SpatiaLite, PostGIS, KML, GML, DXF, E00, ERDAS IMG, JPEG2000
 
 ## Phase 8 — Rendering & UI
 - [ ] wgpu-based 2D map renderer (symbology, labeling, raster stretch)

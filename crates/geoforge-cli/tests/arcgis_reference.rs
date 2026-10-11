@@ -1095,6 +1095,109 @@ fn gf_args(case: &str) -> Vec<&'static str> {
             "--output-record-option",
             "ONLY_DUPLICATES",
         ],
+        "json_roads" => vec![
+            "features-to-json",
+            "testdata/geoproc/roads.shp",
+            "<out>",
+            "--format-json",
+            "NOT_FORMATTED",
+            "--geojson",
+            "NO_GEOJSON",
+        ],
+        "json_roads_formatted" => vec![
+            "features-to-json",
+            "testdata/geoproc/roads.shp",
+            "<out>",
+            "--format-json",
+            "FORMATTED",
+            "--geojson",
+            "NO_GEOJSON",
+        ],
+        "json_parcels" => vec![
+            "features-to-json",
+            "testdata/geoproc/parcels.shp",
+            "<out>",
+            "--format-json",
+            "NOT_FORMATTED",
+            "--geojson",
+            "NO_GEOJSON",
+        ],
+        "json_wells" => vec![
+            "features-to-json",
+            "testdata/geoproc/wells.shp",
+            "<out>",
+            "--format-json",
+            "NOT_FORMATTED",
+            "--geojson",
+            "NO_GEOJSON",
+        ],
+        "json_wells_wgs84" => vec![
+            "features-to-json",
+            "testdata/geoproc/wells_wgs84.shp",
+            "<out>",
+            "--format-json",
+            "NOT_FORMATTED",
+            "--geojson",
+            "NO_GEOJSON",
+        ],
+        "geojson_roads" => vec![
+            "features-to-json",
+            "testdata/geoproc/roads.shp",
+            "<out>",
+            "--format-json",
+            "NOT_FORMATTED",
+            "--geojson",
+            "GEOJSON",
+        ],
+        "geojson_parcels" => vec![
+            "features-to-json",
+            "testdata/geoproc/parcels.shp",
+            "<out>",
+            "--format-json",
+            "NOT_FORMATTED",
+            "--geojson",
+            "GEOJSON",
+        ],
+        "geojson_parcels_formatted" => vec![
+            "features-to-json",
+            "testdata/geoproc/parcels.shp",
+            "<out>",
+            "--format-json",
+            "FORMATTED",
+            "--geojson",
+            "GEOJSON",
+        ],
+        "geojson_wells" => vec![
+            "features-to-json",
+            "testdata/geoproc/wells.shp",
+            "<out>",
+            "--format-json",
+            "NOT_FORMATTED",
+            "--geojson",
+            "GEOJSON",
+        ],
+        "json_roads_zm" => vec![
+            "features-to-json",
+            "testdata/geoproc/roads_zm.shp",
+            "<out>",
+            "--format-json",
+            "NOT_FORMATTED",
+            "--geojson",
+            "NO_GEOJSON",
+            "--include-z-values",
+            "Z_VALUES",
+            "--include-m-values",
+            "M_VALUES",
+        ],
+        "json_bad_lines" => vec![
+            "features-to-json",
+            "testdata/geoproc/bad_lines.shp",
+            "<out>",
+            "--format-json",
+            "NOT_FORMATTED",
+            "--geojson",
+            "NO_GEOJSON",
+        ],
         "identity_parcels_clip_no_fid" => vec![
             "identity",
             "testdata/geoproc/parcels.shp",
@@ -1415,7 +1518,13 @@ fn tools_match_arcgis_output() {
         // Table tools (Check Geometry) write a .dbf.
         let table = reference.join(format!("{case}.dbf")).exists()
             && !reference.join(format!("{case}.shp")).exists();
-        let out = if info.get("outputs").is_some() {
+        // Text outputs (Features To JSON) are compared byte for byte.
+        let text_ext = ["json", "geojson"]
+            .into_iter()
+            .find(|e| reference.join(format!("{case}.{e}")).exists());
+        let out = if let Some(ext) = text_ext {
+            out_dir.join(format!("{case}.{ext}"))
+        } else if info.get("outputs").is_some() {
             let dir = out_dir.join(case);
             std::fs::create_dir_all(&dir).unwrap();
             dir
@@ -1485,6 +1594,29 @@ fn tools_match_arcgis_output() {
                 "gf failed: {}",
                 String::from_utf8_lossy(&run.stderr)
             ));
+        } else if let Some(ext) = text_ext {
+            let (ours, theirs) = (
+                std::fs::read_to_string(&out).unwrap_or_default(),
+                std::fs::read_to_string(reference.join(format!("{case}.{ext}"))).unwrap(),
+            );
+            if ours != theirs {
+                let at = ours
+                    .chars()
+                    .zip(theirs.chars())
+                    .position(|(a, b)| a != b)
+                    .unwrap_or(ours.len().min(theirs.len()));
+                let around = |t: &str| {
+                    t.chars()
+                        .skip(at.saturating_sub(60))
+                        .take(140)
+                        .collect::<String>()
+                };
+                diffs.push(format!(
+                    "text differs at char {at}:\n      ours   {}\n      ArcGIS {}",
+                    around(&ours),
+                    around(&theirs)
+                ));
+            }
         } else if table {
             diffs = compare_tables(
                 &out,

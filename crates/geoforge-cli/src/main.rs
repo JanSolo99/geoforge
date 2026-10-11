@@ -302,6 +302,23 @@ enum Tool {
         #[arg(long)]
         output: Option<PathBuf>,
     },
+    /// Write features as Esri JSON or GeoJSON (ArcGIS "Features To JSON").
+    FeaturesToJson {
+        in_features: PathBuf,
+        out_json_file: PathBuf,
+        /// NOT_FORMATTED or FORMATTED.
+        #[arg(long, default_value = "NOT_FORMATTED")]
+        format_json: String,
+        /// NO_Z_VALUES or Z_VALUES.
+        #[arg(long, default_value = "NO_Z_VALUES")]
+        include_z_values: String,
+        /// NO_M_VALUES or M_VALUES.
+        #[arg(long, default_value = "NO_M_VALUES")]
+        include_m_values: String,
+        /// NO_GEOJSON or GEOJSON.
+        #[arg(long, default_value = "NO_GEOJSON")]
+        geojson: String,
+    },
     /// Transform features to another coordinate system (ArcGIS "Project").
     Project {
         in_dataset: PathBuf,
@@ -849,6 +866,54 @@ fn main() -> ExitCode {
                 Some(o) => write_output(out, &o, source_gdb(&in_features).as_deref()),
                 None => update_in_place(out, &in_features),
             }
+        })(),
+        Tool::FeaturesToJson {
+            in_features,
+            out_json_file,
+            format_json,
+            include_z_values,
+            include_m_values,
+            geojson,
+        } => (|| {
+            let flag = |v: &str, yes: &str, no: &str| match v.to_ascii_uppercase() {
+                x if x == yes => Ok(true),
+                x if x == no => Ok(false),
+                x => Err(Error::Unsupported(format!(
+                    "expected {yes} or {no}, got {x}"
+                ))),
+            };
+            let formatted = flag(&format_json, "FORMATTED", "NOT_FORMATTED")?;
+            let geojson = flag(&geojson, "GEOJSON", "NO_GEOJSON")?;
+            let (fc, _) = open_feature_class(&in_features)?;
+            let kind = fc
+                .geometry_kind()
+                .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
+            let features: Vec<Feature> = fc.features().collect::<Result<_>>()?;
+            let wkid = fc
+                .spatial_reference_wkt()
+                .and_then(|w| geoforge_proj::Crs::from_wkt(w).ok())
+                .and_then(|c| c.wkid());
+            let d = geoforge_json::Dataset {
+                kind,
+                oid_name: fc.oid_field_name(),
+                fields: fc.fields(),
+                features: &features,
+                wkid,
+                z: flag(&include_z_values, "Z_VALUES", "NO_Z_VALUES")? && fc.has_z(),
+                m: flag(&include_m_values, "M_VALUES", "NO_M_VALUES")? && fc.has_m(),
+            };
+            let text = if geojson {
+                geoforge_json::geojson(&d, formatted)
+            } else {
+                geoforge_json::esri_json(&d, formatted)
+            };
+            std::fs::write(&out_json_file, text).map_err(|e| Error::io(&out_json_file, e))?;
+            println!(
+                "Wrote {} ({} features)",
+                out_json_file.display(),
+                features.len()
+            );
+            Ok(())
         })(),
         Tool::Project {
             in_dataset,

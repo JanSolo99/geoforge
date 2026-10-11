@@ -205,8 +205,21 @@ CASES = {
     "gnt_wells_roads_all": ("analysis.GenerateNearTable", [DATA / "wells.shp", DATA / "roads.shp"], ["100 Meters", "LOCATION", "ANGLE", "ALL", 2]),
     "find_identical_parcels_zone": ("management.FindIdentical", [DATA / "parcels.shp"], ["ZONE"]),
     "find_identical_parcels_shape": ("management.FindIdentical", [DATA / "parcels.shp"], ["Shape", "", "", "ONLY_DUPLICATES"]),
+    "json_roads": ("conversion.FeaturesToJSON", [DATA / "roads.shp"], ["NOT_FORMATTED", "NO_Z_VALUES", "NO_M_VALUES", "NO_GEOJSON"]),
+    "json_roads_formatted": ("conversion.FeaturesToJSON", [DATA / "roads.shp"], ["FORMATTED", "NO_Z_VALUES", "NO_M_VALUES", "NO_GEOJSON"]),
+    "json_parcels": ("conversion.FeaturesToJSON", [DATA / "parcels.shp"], ["NOT_FORMATTED", "NO_Z_VALUES", "NO_M_VALUES", "NO_GEOJSON"]),
+    "json_wells": ("conversion.FeaturesToJSON", [DATA / "wells.shp"], ["NOT_FORMATTED", "NO_Z_VALUES", "NO_M_VALUES", "NO_GEOJSON"]),
+    "json_wells_wgs84": ("conversion.FeaturesToJSON", [DATA / "wells_wgs84.shp"], ["NOT_FORMATTED", "NO_Z_VALUES", "NO_M_VALUES", "NO_GEOJSON"]),
+    "geojson_roads": ("conversion.FeaturesToJSON", [DATA / "roads.shp"], ["NOT_FORMATTED", "NO_Z_VALUES", "NO_M_VALUES", "GEOJSON"]),
+    "geojson_parcels": ("conversion.FeaturesToJSON", [DATA / "parcels.shp"], ["NOT_FORMATTED", "NO_Z_VALUES", "NO_M_VALUES", "GEOJSON"]),
+    "geojson_parcels_formatted": ("conversion.FeaturesToJSON", [DATA / "parcels.shp"], ["FORMATTED", "NO_Z_VALUES", "NO_M_VALUES", "GEOJSON"]),
+    "geojson_wells": ("conversion.FeaturesToJSON", [DATA / "wells.shp"], ["NOT_FORMATTED", "NO_Z_VALUES", "NO_M_VALUES", "GEOJSON"]),
+    "json_roads_zm": ("conversion.FeaturesToJSON", [DATA / "roads_zm.shp"], ["NOT_FORMATTED", "Z_VALUES", "M_VALUES", "NO_GEOJSON"]),
+    "json_bad_lines": ("conversion.FeaturesToJSON", [DATA / "bad_lines.shp"], ["NOT_FORMATTED", "NO_Z_VALUES", "NO_M_VALUES", "NO_GEOJSON"]),
 }
 WORKSPACE_OUT = {"analysis.Split"}
+# Tools that write a text file: compared byte for byte.
+TEXT_OUT = {"conversion.FeaturesToJSON"}
 # Tools whose output is a table, written as <name>.dbf.
 TABLE_OUT = {"management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical"}
 
@@ -262,6 +275,8 @@ def main():
         if only and name not in only:
             continue
         out = OUT / (f"{name}.dbf" if tool in TABLE_OUT else f"{name}.shp")
+        if tool in TEXT_OUT:
+            out = OUT / (f"{name}.geojson" if "GEOJSON" in after else f"{name}.json")
         if tool in WORKSPACE_OUT:
             out = OUT / name
             out.mkdir()
@@ -291,7 +306,7 @@ def main():
             }
             print(f"{name}: {r.get('status')} {sorted(outputs)} {manifest['cases'][name]['messages']}")
             continue
-        d = w.call("describe", path=str(out)) if r.get("status") == "succeeded" else {}
+        d = w.call("describe", path=str(out)) if r.get("status") == "succeeded" and tool not in TEXT_OUT else {}
         manifest["cases"][name] = {
             "tool": tool,
             "args": [str(Path(a).relative_to(ROOT)) if isinstance(a, Path) else a.replace(str(ROOT) + "/", "") for a in before] + ["<out>"] + after,
@@ -314,7 +329,7 @@ def main():
         if r.get("status") == "succeeded":
             r = w.call("run_tool", tool="management.CopyFeatures", args=[lyr, str(out)],
                        env={"overwriteOutput": True})
-        d = w.call("describe", path=str(out)) if r.get("status") == "succeeded" else {}
+        d = w.call("describe", path=str(out)) if r.get("status") == "succeeded" and tool not in TEXT_OUT else {}
         manifest["cases"][name] = {
             "tool": "management.SelectLayerByLocation",
             "args": [f"testdata/geoproc/{layer}.shp", overlap, f"testdata/geoproc/{select}.shp",

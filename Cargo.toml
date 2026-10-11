@@ -17,6 +17,7 @@ geoforge-raster = { path = "crates/geoforge-raster" }
 geoforge-testkit = { path = "crates/geoforge-testkit" }
 geoforge-geometry = { path = "crates/geoforge-geometry" }
 geoforge-tools = { path = "crates/geoforge-tools" }
+geoforge-json = { path = "crates/geoforge-json" }
 thiserror = "2"
 chrono = { version = "0.4", default-features = false, features = ["std", "clock"] }
 encoding_rs = "0.8"
@@ -27,6 +28,7 @@ geo = { version = "0.33", default-features = false }
 rstar = "0.12"
 i_overlay = { version = "4.5", default-features = false }
 proj = { version = "0.31", default-features = false }
+proj-sys = { version = "0.27", default-features = false }
 approx = "0.5"
 
 [workspace.lints.rust]

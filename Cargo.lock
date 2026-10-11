@@ -314,6 +314,7 @@ dependencies = [
  "geoforge-core",
  "geoforge-filegdb",
  "geoforge-geometry",
+ "geoforge-json",
  "geoforge-proj",
  "geoforge-shapefile",
  "geoforge-testkit",
@@ -352,11 +353,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "geoforge-json"
+version = "0.0.1"
+dependencies = [
+ "geoforge-core",
+]
+
+[[package]]
 name = "geoforge-proj"
 version = "0.0.1"
 dependencies = [
  "geoforge-core",
  "proj",
+ "proj-sys",
 ]
 
 [[package]]

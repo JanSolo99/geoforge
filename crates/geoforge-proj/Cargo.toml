@@ -9,6 +9,7 @@ publish.workspace = true
 [dependencies]
 geoforge-core.workspace = true
 proj.workspace = true
+proj-sys.workspace = true
 
 [lints]
 workspace = true

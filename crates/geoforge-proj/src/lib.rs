@@ -76,9 +76,83 @@ impl Crs {
         &self.wkt
     }
 
+    /// The Esri `wkid` and `latestWkid` of this CRS, as PROJ identifies it: an
+    /// Esri code (e.g. 102100) with the EPSG one as the latest, or the EPSG code
+    /// for both. `None` when PROJ finds no confident match.
+    pub fn wkid(&self) -> Option<(u32, u32)> {
+        let matches = identify(&self.wkt, None);
+        let best = |authority: &str| {
+            matches
+                .iter()
+                .filter(|(a, _, c)| a == authority && *c >= 70)
+                .max_by_key(|(_, _, c)| *c)
+                .map(|(_, code, c)| (*code, *c))
+        };
+        match (best("ESRI"), best("EPSG")) {
+            (Some((esri, 100)), Some((epsg, c))) if c < 100 => Some((esri, epsg)),
+            (Some((esri, 100)), None) => Some((esri, esri)),
+            // Web Mercator keeps its older Esri code as the wkid in ArcGIS.
+            (_, Some((3857, _))) => Some((102100, 3857)),
+            (_, Some((epsg, _))) => Some((epsg, epsg)),
+            (Some((esri, _)), None) => Some((esri, esri)),
+            (None, None) => None,
+        }
+    }
+
     pub fn is_geographic(&self) -> bool {
         self.wkt.trim_start().starts_with("GEOGCS")
     }
+}
+
+/// PROJ's matches for a CRS definition: (authority, code, confidence 0–100).
+fn identify(def: &str, authority: Option<&str>) -> Vec<(String, u32, i32)> {
+    use proj_sys::*;
+    use std::ffi::{CStr, CString};
+    let Ok(text) = CString::new(def) else {
+        return Vec::new();
+    };
+    let auth = authority.and_then(|a| CString::new(a).ok());
+    let auth_ptr = auth.as_ref().map_or(std::ptr::null(), |a| a.as_ptr());
+    let mut out = Vec::new();
+    // SAFETY: every PROJ object created here is destroyed before returning, and
+    // the strings read from PROJ are copied while their objects are alive.
+    unsafe {
+        let ctx = proj_context_create();
+        let pj = proj_create(ctx, text.as_ptr());
+        if !pj.is_null() {
+            let mut confidence: *mut std::os::raw::c_int = std::ptr::null_mut();
+            let list = proj_identify(ctx, pj, auth_ptr, std::ptr::null(), &mut confidence);
+            if !list.is_null() {
+                for i in 0..proj_list_get_count(list) {
+                    let obj = proj_list_get(ctx, list, i);
+                    if obj.is_null() {
+                        continue;
+                    }
+                    let (auth, code) = (proj_get_id_auth_name(obj, 0), proj_get_id_code(obj, 0));
+                    if !auth.is_null() && !code.is_null() {
+                        let auth = CStr::from_ptr(auth).to_string_lossy().into_owned();
+                        let code = CStr::from_ptr(code).to_string_lossy().parse::<u32>();
+                        let c = if confidence.is_null() {
+                            0
+                        } else {
+                            *confidence.add(i as usize)
+                        };
+                        if let Ok(code) = code {
+                            out.push((auth, code, c));
+                        }
+                    }
+                    proj_destroy(obj);
+                }
+                proj_list_destroy(list);
+            }
+            if !confidence.is_null() {
+                proj_int_list_destroy(confidence);
+            }
+            proj_destroy(pj);
+        }
+        proj_context_destroy(ctx);
+    }
+    out
 }
 
 /// PROJ's Esri WKT as ArcGIS Pro writes it to a new `.prj`: the degree unit to full
@@ -126,7 +200,16 @@ mod tests {
         let wgs84 = Crs::parse("4326").unwrap();
         assert!(wgs84.is_geographic());
         assert!(wgs84.esri_wkt().contains("0.017453292519943295"));
+        assert_eq!(wgs84.wkid(), Some((4326, 4326)));
         let utm = Crs::parse("32633").unwrap();
+        assert_eq!(utm.wkid(), Some((32633, 32633)));
+        let prj = std::fs::read_to_string(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../testdata/geoproc/roads.prj"
+        ))
+        .unwrap();
+        assert_eq!(Crs::from_wkt(&prj).unwrap().wkid(), Some((32633, 32633)));
+        assert_eq!(Crs::parse("3857").unwrap().wkid(), Some((102100, 3857)));
         assert!(
             utm.esri_wkt()
                 .starts_with("PROJCS[\"WGS_1984_UTM_Zone_33N\"")
