@@ -199,11 +199,12 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
   - [ ] Geodesic method, tiled output with statistics (.aux.xml) like ArcGIS
   - [x] Curvature (with profile and plan outputs), identical to ArcGIS: Zevenbergen–Thorne with
         NoData and off-edge neighbors taking the center value
-  - [x] Contour matching ArcGIS: four triangles per square of cell centers around the corner
-        mean, higher ground on the right, ordered by value descending then vertex count; Id and
-        Contour fields
-  - [ ] Contour: ring start vertices (ArcGIS starts closed rings elsewhere; shapes are equal),
-        cells exactly at a contour value (integer DEMs), two lines along NoData
+  - [x] Contour matching ArcGIS (float and integer surfaces, NoData): four triangles per square
+        of cell centers around the corner mean, a cell equal to the contour value counts as below,
+        exactly collinear vertices dropped, a square with one NoData corner keeps the triangles
+        away from it, higher ground on the right, ordered by value descending then by length; Id
+        and Contour fields
+  - [ ] Contour: closed rings start at another vertex than ArcGIS's (shapes are equal)
   - [x] Fill (priority flood from the edge and NoData, z-limit per sink) and Flow Accumulation
         (D8, FLOAT/INTEGER, weights) matching ArcGIS exactly
   - [x] Flow Direction D8 (NORMAL/FORCE): steepest descent, single-cell pits raised first, ties

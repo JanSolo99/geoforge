@@ -2,9 +2,10 @@
 //!
 //! As ArcGIS does, each square of four cell centers is split into four triangles
 //! around its center (whose value is the mean of the corners), and contours are
-//! linear within each triangle, so they cross both diagonals. Squares touching a
-//! NoData cell are skipped. Lines keep higher ground on their right; they come out
-//! ordered by contour value descending, then by vertex count.
+//! linear within each triangle, so they cross both diagonals. Next to NoData, a
+//! square with one NoData corner keeps the triangles away from it (center = mean
+//! of the other three). Lines keep higher ground on their right; they come out
+//! ordered by contour value descending, then by length.
 
 use std::collections::HashMap;
 
@@ -60,12 +61,18 @@ pub fn contour(r: &Raster, interval: f64, base: f64) -> Vec<ContourLine> {
     let z = |n: Node| -> f64 {
         match n {
             Node::Cell(row, col) => r.bands[0][row * w + col],
+            // The mean of the square's corners that have values.
             Node::Middle(row, col) => {
-                (r.bands[0][row * w + col]
-                    + r.bands[0][row * w + col + 1]
-                    + r.bands[0][(row + 1) * w + col]
-                    + r.bands[0][(row + 1) * w + col + 1])
-                    / 4.0
+                let vals: Vec<f64> = [
+                    (row, col),
+                    (row, col + 1),
+                    (row + 1, col),
+                    (row + 1, col + 1),
+                ]
+                .iter()
+                .filter_map(|&(y, x)| r.get(x, y))
+                .collect();
+                vals.iter().sum::<f64>() / vals.len() as f64
             }
         }
     };
@@ -80,7 +87,7 @@ pub fn contour(r: &Raster, interval: f64, base: f64) -> Vec<ContourLine> {
         };
         // One oriented segment (entry edge → exit edge) per crossed triangle, in
         // scan order: squares from the bottom row up, west to east.
-        let mut segments: Vec<(Edge, Edge)> = Vec::new();
+        let mut segments: Vec<([f64; 2], [f64; 2])> = Vec::new();
         for row in (0..h - 1).rev() {
             for col in 0..w - 1 {
                 let corners = [
@@ -89,10 +96,10 @@ pub fn contour(r: &Raster, interval: f64, base: f64) -> Vec<ContourLine> {
                     (row + 1, col),
                     (row + 1, col + 1),
                 ];
-                if corners
-                    .iter()
-                    .any(|&(y, x)| r.is_nodata(r.bands[0][y * w + x]))
-                {
+                // A square with two or more NoData corners is skipped; with one,
+                // only the triangles away from it are used.
+                let missing = |&(y, x): &(usize, usize)| r.get(x, y).is_none();
+                if corners.iter().filter(|c| missing(c)).count() > 1 {
                     continue;
                 }
                 let tl = Node::Cell(row, col);
@@ -101,7 +108,13 @@ pub fn contour(r: &Raster, interval: f64, base: f64) -> Vec<ContourLine> {
                 let br = Node::Cell(row + 1, col + 1);
                 let c = Node::Middle(row, col);
                 for tri in [[tl, tr, c], [tr, br, c], [br, bl, c], [bl, tl, c]] {
-                    let above = tri.map(|n| z(n) >= level);
+                    if tri.iter().any(|n| match *n {
+                        Node::Cell(y, x) => missing(&(y, x)),
+                        Node::Middle(..) => false,
+                    }) {
+                        continue;
+                    }
+                    let above = tri.map(|n| z(n) > level);
                     if above.iter().all(|&a| a) || above.iter().all(|&a| !a) {
                         continue;
                     }
@@ -110,72 +123,102 @@ pub fn contour(r: &Raster, interval: f64, base: f64) -> Vec<ContourLine> {
                         .map(|i| edge(tri[i], tri[(i + 1) % 3]))
                         .collect();
                     let (p0, p1) = (crossing(crossed[0]), crossing(crossed[1]));
+                    // A contour through a corner exactly can cross a triangle
+                    // in a single point.
+                    if (p0[0] - p1[0]).abs() < 1e-9 && (p0[1] - p1[1]).abs() < 1e-9 {
+                        continue;
+                    }
                     let high = xy(tri[above.iter().position(|&a| a).unwrap_or(0)]);
                     // Higher ground on the right of p0 → p1.
                     let side =
                         (p1[0] - p0[0]) * (high[1] - p0[1]) - (p1[1] - p0[1]) * (high[0] - p0[0]);
-                    segments.push(if side < 0.0 {
-                        (crossed[0], crossed[1])
-                    } else {
-                        (crossed[1], crossed[0])
-                    });
+                    segments.push(if side < 0.0 { (p0, p1) } else { (p1, p0) });
                 }
             }
         }
-        let by_entry: HashMap<Edge, usize> =
-            segments.iter().enumerate().map(|(i, s)| (s.0, i)).collect();
-        let by_exit: HashMap<Edge, usize> =
-            segments.iter().enumerate().map(|(i, s)| (s.1, i)).collect();
-        let mut used = vec![false; segments.len()];
-        for first in 0..segments.len() {
-            if used[first] {
-                continue;
-            }
-            // Walk back to the start of an open line; a ring starts here.
-            let mut start = first;
-            while let Some(&p) = by_exit.get(&segments[start].0) {
-                if p == first {
-                    start = first;
-                    break;
-                }
-                if used[p] {
-                    break;
-                }
-                start = p;
-            }
-            let mut points = vec![crossing(segments[start].0)];
-            let mut cur = start;
-            loop {
-                used[cur] = true;
-                let p = crossing(segments[cur].1);
-                if points.last() != Some(&p) {
-                    points.push(p);
-                }
-                match by_entry.get(&segments[cur].1) {
-                    Some(&n) if !used[n] => cur = n,
-                    Some(&n) if n == start => {
-                        // Closed ring: end exactly on its first vertex.
-                        let first_pt = points[0];
-                        if points.last() != Some(&first_pt) {
-                            points.push(first_pt);
-                        }
-                        break;
-                    }
-                    _ => break,
-                }
-            }
-            if points.len() >= 2 {
-                lines.push(ContourLine {
-                    value: level,
-                    points,
-                });
-            }
-        }
+        lines.extend(link(&segments).into_iter().map(|points| ContourLine {
+            value: level,
+            points: drop_collinear(points),
+        }));
     }
+    let length = |l: &ContourLine| {
+        l.points
+            .windows(2)
+            .map(|w| (w[1][0] - w[0][0]).hypot(w[1][1] - w[0][1]))
+            .sum::<f64>()
+    };
     lines.sort_by(|a, b| {
         b.value
             .total_cmp(&a.value)
-            .then(a.points.len().cmp(&b.points.len()))
+            .then(length(a).total_cmp(&length(b)))
     });
     lines
+}
+
+/// Joins oriented segments end to start into lines (rings close on their first
+/// point). Segments meet at shared points, matched to 1e-6.
+fn link(segments: &[([f64; 2], [f64; 2])]) -> Vec<Vec<[f64; 2]>> {
+    let key = |p: [f64; 2]| ((p[0] * 1e6).round() as i64, (p[1] * 1e6).round() as i64);
+    let mut starting: HashMap<(i64, i64), Vec<usize>> = HashMap::new();
+    let mut ending: HashMap<(i64, i64), Vec<usize>> = HashMap::new();
+    for (i, s) in segments.iter().enumerate() {
+        starting.entry(key(s.0)).or_default().push(i);
+        ending.entry(key(s.1)).or_default().push(i);
+    }
+    let mut used = vec![false; segments.len()];
+    let mut lines = Vec::new();
+    for first in 0..segments.len() {
+        if used[first] {
+            continue;
+        }
+        // Walk back to the start of an open line; a ring starts at `first`.
+        let mut start = first;
+        let mut seen = vec![first];
+        while let Some(&p) = ending
+            .get(&key(segments[start].0))
+            .and_then(|c| c.iter().find(|&&p| !used[p]))
+        {
+            if p == first || seen.contains(&p) {
+                break;
+            }
+            seen.push(p);
+            start = p;
+        }
+        let mut points = vec![segments[start].0];
+        let mut cur = start;
+        loop {
+            used[cur] = true;
+            points.push(segments[cur].1);
+            match starting
+                .get(&key(segments[cur].1))
+                .and_then(|c| c.iter().find(|&&n| !used[n]))
+            {
+                Some(&n) => cur = n,
+                None => break,
+            }
+        }
+        if points.len() >= 2 {
+            lines.push(points);
+        }
+    }
+    lines
+}
+
+/// Removes vertices exactly in line with their neighbors (contours through
+/// cells holding the contour value run straight across several triangles).
+fn drop_collinear(points: Vec<[f64; 2]>) -> Vec<[f64; 2]> {
+    if points.len() < 3 {
+        return points;
+    }
+    let mut out = vec![points[0]];
+    for i in 1..points.len() - 1 {
+        let (a, b, c) = (out[out.len() - 1], points[i], points[i + 1]);
+        let cross = (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
+        let len2 = (c[0] - a[0]).powi(2) + (c[1] - a[1]).powi(2);
+        if cross.abs() > 1e-9 * len2 {
+            out.push(b);
+        }
+    }
+    out.push(points[points.len() - 1]);
+    out
 }

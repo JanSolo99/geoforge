@@ -2236,10 +2236,7 @@ fn compare(case: &str, ours: &Path, theirs: &Path, fields: &serde_json::Value) -
 /// when the whole case does. Contour: two lines along NoData differ slightly, and
 /// contours through cells exactly at a contour value (integer DEMs) are not yet
 /// traced as ArcGIS does.
-const KNOWN_FEATURE_DIFFERENCES: &[(&str, &[usize])] = &[
-    ("contour_dem_nodata_15", &[5, 11]),
-    ("contour_int16_25", &[]),
-];
+const KNOWN_FEATURE_DIFFERENCES: &[(&str, &[usize])] = &[];
 
 /// Raster cases where some cells are known to differ from ArcGIS, with the most
 /// differing cells allowed: Flow Direction resolves flats differently in places,
