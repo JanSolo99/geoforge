@@ -3813,8 +3813,9 @@ pub fn find_identical(
         .collect();
     let keys = field_positions(input, &names)?;
     let feats: Vec<Feature> = input.features().collect::<Result<_>>()?;
-    // Groups in order of first appearance.
-    let mut groups: Vec<(Vec<Value>, Option<Vec<[f64; 2]>>, Vec<i64>)> = Vec::new();
+    // Groups in order of first appearance: (values, shape, FIDs).
+    type Group = (Vec<Value>, Option<Vec<[f64; 2]>>, Vec<i64>);
+    let mut groups: Vec<Group> = Vec::new();
     for f in &feats {
         let key: Vec<Value> = keys.iter().map(|&i| f.attributes[i].clone()).collect();
         let geom = shape.then(|| {
