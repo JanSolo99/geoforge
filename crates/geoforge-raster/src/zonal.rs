@@ -278,3 +278,197 @@ pub fn zonal_statistics(
         integer_raster(values, &cells, eight)
     }
 }
+
+/// Statistics of Zonal Statistics as Table, in ArcGIS's column order.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum TableStatistic {
+    Min,
+    Max,
+    Range,
+    Mean,
+    Std,
+    Sum,
+    Variety,
+    Majority,
+    Minority,
+    Median,
+    Percentile,
+}
+
+/// The statistics an ArcGIS `statistics_type` keyword asks for (integer-only
+/// ones are dropped later for float values).
+pub fn table_statistics(keyword: &str) -> Option<Vec<TableStatistic>> {
+    use TableStatistic::*;
+    Some(match keyword.to_ascii_uppercase().as_str() {
+        "ALL" => vec![
+            Min, Max, Range, Mean, Std, Sum, Variety, Majority, Minority, Median, Percentile,
+        ],
+        "MEAN" => vec![Mean],
+        "MAJORITY" => vec![Majority],
+        "MAXIMUM" => vec![Max],
+        "MEDIAN" => vec![Median],
+        "MINIMUM" => vec![Min],
+        "MINORITY" => vec![Minority],
+        "PERCENTILE" => vec![Percentile],
+        "RANGE" => vec![Range],
+        "STD" => vec![Std],
+        "SUM" => vec![Sum],
+        "VARIETY" => vec![Variety],
+        "MIN_MAX" => vec![Min, Max],
+        "MEAN_STD" => vec![Mean, Std],
+        "MIN_MAX_MEAN" => vec![Min, Max, Mean],
+        _ => return None,
+    })
+}
+
+/// Spatial Analyst Zonal Statistics as Table (zones and values on one grid):
+/// one row per zone in order of first appearance, with VALUE, COUNT and AREA
+/// followed by the requested statistics. Median averages the middle pair and
+/// PCT90 interpolates linearly; integer values keep integer MIN, MAX, RANGE,
+/// MEDIAN and PCT90 and add VARIETY and MAJORITY/MINORITY with their counts and
+/// percentages. With `ignore_nodata` false, zones holding NoData are left out.
+pub fn zonal_table(
+    zones: &Raster,
+    values: &Raster,
+    stats: &[TableStatistic],
+    ignore_nodata: bool,
+) -> (Vec<geoforge_core::Field>, Vec<Vec<geoforge_core::Value>>) {
+    use TableStatistic::*;
+    use geoforge_core::{Field, FieldType, Value};
+    let integer = !values.data_type.is_float();
+    let mut stats: Vec<TableStatistic> = stats
+        .iter()
+        .copied()
+        .filter(|s| integer || !matches!(s, Variety | Majority | Minority))
+        .collect();
+    stats.sort();
+    stats.dedup();
+    let num = |name: &str, int: bool| {
+        Field::new(
+            name,
+            if int {
+                FieldType::Integer
+            } else {
+                FieldType::Double
+            },
+        )
+    };
+    let mut fields = vec![
+        Field::new("VALUE", FieldType::Integer),
+        num("COUNT", false),
+        num("AREA", false),
+    ];
+    for s in &stats {
+        match s {
+            Min => fields.push(num("MIN", integer)),
+            Max => fields.push(num("MAX", integer)),
+            Range => fields.push(num("RANGE", integer)),
+            Mean => fields.push(num("MEAN", false)),
+            Std => fields.push(num("STD", false)),
+            Sum => fields.push(num("SUM", false)),
+            Variety => fields.push(num("VARIETY", true)),
+            Majority | Minority => {
+                let base = if *s == Majority {
+                    "MAJORITY"
+                } else {
+                    "MINORITY"
+                };
+                fields.push(num(base, true));
+                fields.push(num(&format!("{base}_COUNT"), true));
+                fields.push(Field::new(format!("{base}_PERCENT"), FieldType::Single));
+            }
+            Median => fields.push(num("MEDIAN", integer)),
+            Percentile => fields.push(num("PCT90", integer)),
+        }
+    }
+    let mut order: Vec<i64> = Vec::new();
+    let mut per_zone: BTreeMap<i64, (Vec<f64>, bool)> = BTreeMap::new();
+    for i in 0..zones.width * zones.height {
+        let z = zones.bands[0][i];
+        if zones.is_nodata(z) {
+            continue;
+        }
+        let key = z as i64;
+        let entry = per_zone.entry(key).or_insert_with(|| {
+            order.push(key);
+            (Vec::new(), false)
+        });
+        let v = values.bands[0][i];
+        if values.is_nodata(v) {
+            entry.1 = true;
+        } else {
+            entry.0.push(v);
+        }
+    }
+    let cell_area = values.cell_width() * values.cell_height();
+    let mut rows = Vec::new();
+    for key in order {
+        let (mut v, missing) = per_zone.remove(&key).unwrap_or_default();
+        if v.is_empty() || (missing && !ignore_nodata) {
+            continue;
+        }
+        v.sort_by(f64::total_cmp);
+        let n = v.len();
+        let sum: f64 = v.iter().sum();
+        let mean = sum / n as f64;
+        let std = (v.iter().map(|x| (x - mean) * (x - mean)).sum::<f64>() / n as f64).sqrt();
+        let val = |x: f64, int: bool| {
+            if int {
+                Value::Integer(x.round() as i32)
+            } else {
+                Value::Double(x)
+            }
+        };
+        let mut runs: Vec<(f64, usize)> = Vec::new();
+        for &x in &v {
+            match runs.last_mut() {
+                Some((last, c)) if *last == x => *c += 1,
+                _ => runs.push((x, 1)),
+            }
+        }
+        let mut row = vec![
+            Value::Integer(key as i32),
+            Value::Double(n as f64),
+            Value::Double(n as f64 * cell_area),
+        ];
+        for s in &stats {
+            match s {
+                Min => row.push(val(v[0], integer)),
+                Max => row.push(val(v[n - 1], integer)),
+                Range => row.push(val(v[n - 1] - v[0], integer)),
+                Mean => row.push(Value::Double(mean)),
+                Std => row.push(Value::Double(std)),
+                Sum => row.push(Value::Double(sum)),
+                Variety => row.push(Value::Integer(runs.len() as i32)),
+                Majority | Minority => {
+                    // Ties go to the smallest value.
+                    let pick = if *s == Majority {
+                        runs.iter()
+                            .fold(runs[0], |b, r| if r.1 > b.1 { *r } else { b })
+                    } else {
+                        runs.iter()
+                            .fold(runs[0], |b, r| if r.1 < b.1 { *r } else { b })
+                    };
+                    row.push(Value::Integer(pick.0 as i32));
+                    row.push(Value::Integer(pick.1 as i32));
+                    // Percentages are rounded to 4 decimals.
+                    let pct = (pick.1 as f64 / n as f64 * 100.0 * 1e4).round() / 1e4;
+                    row.push(Value::Single(pct as f32));
+                }
+                Median => {
+                    let m = (v[(n - 1) / 2] + v[n / 2]) / 2.0;
+                    row.push(val(m, integer));
+                }
+                Percentile => {
+                    let pos = 0.9 * (n - 1) as f64;
+                    let lo = pos.floor() as usize;
+                    let hi = (lo + 1).min(n - 1);
+                    let p = v[lo] + (v[hi] - v[lo]) * (pos - lo as f64);
+                    row.push(val(p, integer));
+                }
+            }
+        }
+        rows.push(row);
+    }
+    (fields, rows)
+}

@@ -601,6 +601,18 @@ enum Tool {
         in_mask_data: PathBuf,
         out_raster: PathBuf,
     },
+    /// Spatial Analyst "Zonal Statistics as Table" (.dbf; zones and values on one grid).
+    ZonalStatisticsAsTable {
+        in_zone_data: PathBuf,
+        in_value_raster: PathBuf,
+        out_table: PathBuf,
+        /// DATA (ignore NoData) or NODATA.
+        #[arg(long, default_value = "DATA")]
+        ignore_nodata: String,
+        /// ALL, MEAN, MIN_MAX_MEAN, …
+        #[arg(long, default_value = "ALL")]
+        statistics_type: String,
+    },
     /// Spatial Analyst "Aspect" (planar): downslope direction, −1 on flat cells.
     Aspect {
         in_raster: PathBuf,
@@ -1838,6 +1850,33 @@ fn main() -> ExitCode {
                 &out_raster,
                 &geoforge_raster::resample::extract_by_mask(&r, &m),
             )
+        })(),
+        Tool::ZonalStatisticsAsTable {
+            in_zone_data,
+            in_value_raster,
+            out_table,
+            ignore_nodata,
+            statistics_type,
+        } => (|| {
+            let stats = geoforge_raster::zonal::table_statistics(&statistics_type)
+                .ok_or_else(|| Error::Unsupported(format!("statistic {statistics_type}")))?;
+            let ignore = match ignore_nodata.to_ascii_uppercase().as_str() {
+                "DATA" => true,
+                "NODATA" => false,
+                other => return Err(Error::Unsupported(format!("ignore_nodata {other}"))),
+            };
+            let zones = geoforge_raster::read_geotiff(&in_zone_data)?;
+            let values = geoforge_raster::read_geotiff(&in_value_raster)?;
+            if (zones.width, zones.height, zones.transform)
+                != (values.width, values.height, values.transform)
+            {
+                return Err(Error::Unsupported(
+                    "zone and value rasters on different grids".into(),
+                ));
+            }
+            let (fields, rows) =
+                geoforge_raster::zonal::zonal_table(&zones, &values, &stats, ignore);
+            write_table(&geoforge_tools::TableOutput { fields, rows }, &out_table)
         })(),
         Tool::Aspect {
             in_raster,

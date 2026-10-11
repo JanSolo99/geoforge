@@ -184,7 +184,10 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
   - [x] Local tools matching ArcGIS: Plus, Minus, Times, Divide (raster or constant operands;
         integer inputs give 32-bit integers, Divide truncating, ÷0 NoData), Int, Float, Is Null,
         Con and Set Null with `Value` where clauses
-  - [ ] Zonal Statistics as Table; zones and values on different grids (cell size/snap env)
+  - [x] Zonal Statistics as Table (.dbf): zones in order of first appearance, median of the middle
+        pair, PCT90 linearly interpolated, integer-only VARIETY/MAJORITY/MINORITY with counts and
+        percentages rounded to 4 decimals, matching ArcGIS
+  - [ ] Zones and values on different grids (cell size/snap environments)
 - [ ] Hillshade, slope, aspect, curvature, contours, viewshed, hydrology (fill/flow dir/accumulation/watershed)
   - [x] Slope (degree/percent rise, z-factor), Aspect, Hillshade (no shadows), planar, matching
         ArcGIS cell for cell: Horn's gradient; border cells and cells with a NoData edge neighbor

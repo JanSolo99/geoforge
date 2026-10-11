@@ -330,6 +330,10 @@ CASES = {
     "resample_dem_bilinear": ("management.Resample", [RASTER / "dem.tif"], ["25", "BILINEAR"]),
     "resample_dem_cubic": ("management.Resample", [RASTER / "dem.tif"], ["7", "CUBIC"]),
     "resample_landuse_majority": ("management.Resample", [RASTER / "landuse_u8.tif"], ["60", "MAJORITY"]),
+    "zst_all": ("gp.ZonalStatisticsAsTable_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_nodata.tif"], ["DATA", "ALL"]),
+    "zst_int_all": ("gp.ZonalStatisticsAsTable_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_int16_packbits.tif"], ["DATA", "ALL"]),
+    "zst_mean_nodata": ("gp.ZonalStatisticsAsTable_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_nodata.tif"], ["NODATA", "MEAN"]),
+    "zst_min_max": ("gp.ZonalStatisticsAsTable_sa", [RASTER / "zones.tif", "Value", RASTER / "dem.tif"], ["DATA", "MIN_MAX_MEAN"]),
     "zonal_mean": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_nodata.tif"], ["MEAN", "DATA"]),
     "zonal_max_strict": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_nodata.tif"], ["MAXIMUM", "NODATA"]),
     "zonal_range_int": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_int16_packbits.tif"], ["RANGE", "DATA"]),
@@ -352,7 +356,7 @@ WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable"}
 # Tools whose output is a table, written as <name>.dbf.
-TABLE_OUT = {"management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical"}
+TABLE_OUT = {"gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical"}
 
 # In-place tools: the index of the input they edit (run on a copy written as the output).
 IN_PLACE = {"analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.AddGeometryAttributes": 0}
