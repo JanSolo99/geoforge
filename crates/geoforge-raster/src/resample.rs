@@ -1,0 +1,240 @@
+//! Resample (Data Management), Euclidean Distance and Extract by Mask (Spatial
+//! Analyst).
+
+use crate::{DataType, Raster};
+
+/// Resampling technique.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Technique {
+    Nearest,
+    Bilinear,
+    Cubic,
+    Majority,
+}
+
+fn cubic_weight(t: f64) -> f64 {
+    let a = -0.5;
+    let t = t.abs();
+    if t <= 1.0 {
+        (a + 2.0) * t * t * t - (a + 3.0) * t * t + 1.0
+    } else if t < 2.0 {
+        a * t * t * t - 5.0 * a * t * t + 8.0 * a * t - 4.0 * a
+    } else {
+        0.0
+    }
+}
+
+/// Resample to square cells of `cell` size. The grid keeps the input's top-left
+/// corner and has round(extent / cell) columns and rows. Bilinear and cubic
+/// (Keys, a = −0.5) interpolate between cell centers, dropping taps outside the
+/// raster or on NoData and renormalizing the remaining weights; majority takes
+/// the most common value among input cells centered in the output cell widened
+/// by one input cell (ties to the smaller value).
+pub fn resample(r: &Raster, cell: f64, technique: Technique) -> Raster {
+    let (cw, ch) = (r.cell_width(), r.cell_height());
+    let cols = ((r.width as f64 * cw / cell).round() as usize).max(1);
+    let rows = ((r.height as f64 * ch / cell).round() as usize).max(1);
+    let mut out = Raster::new(
+        cols,
+        rows,
+        r.data_type,
+        [r.transform[0], cell, 0.0, r.transform[3], 0.0, -cell],
+    );
+    out.epsg = r.epsg;
+    out.nodata = r.nodata;
+    let nodata = r.nodata.unwrap_or(f64::NAN);
+    let (w, h) = (r.width as isize, r.height as isize);
+    let at = |x: isize, y: isize| -> Option<f64> {
+        if x < 0 || y < 0 || x >= w || y >= h {
+            None
+        } else {
+            r.get(x as usize, y as usize)
+        }
+    };
+    for row in 0..rows {
+        for col in 0..cols {
+            // Output cell center in input cell units.
+            let fx = (col as f64 + 0.5) * cell / cw;
+            let fy = (row as f64 + 0.5) * cell / ch;
+            let v = match technique {
+                Technique::Nearest => at(fx.floor() as isize, fy.floor() as isize),
+                Technique::Bilinear | Technique::Cubic => {
+                    let (gx, gy) = (fx - 0.5, fy - 0.5);
+                    let (x0, y0) = (gx.floor() as isize, gy.floor() as isize);
+                    let taps: &[isize] = if technique == Technique::Cubic {
+                        &[-1, 0, 1, 2]
+                    } else {
+                        &[0, 1]
+                    };
+                    let weight = |d: f64| {
+                        if technique == Technique::Cubic {
+                            cubic_weight(d)
+                        } else {
+                            (1.0 - d.abs()).max(0.0)
+                        }
+                    };
+                    let (mut sum, mut wsum) = (0.0, 0.0);
+                    for &m in taps {
+                        for &n in taps {
+                            let (x, y) = (x0 + n, y0 + m);
+                            if let Some(v) = at(x, y) {
+                                let wt = weight(gx - x as f64) * weight(gy - y as f64);
+                                sum += wt * v;
+                                wsum += wt;
+                            }
+                        }
+                    }
+                    (wsum != 0.0).then(|| sum / wsum)
+                }
+                Technique::Majority => {
+                    // Input cells centered within the output cell widened by one
+                    // input cell on every side.
+                    let (x0, x1) = (
+                        (col as f64 * cell / cw - 1.5).ceil() as isize,
+                        ((col + 1) as f64 * cell / cw + 0.5).ceil() as isize,
+                    );
+                    let (y0, y1) = (
+                        (row as f64 * cell / ch - 1.5).ceil() as isize,
+                        ((row + 1) as f64 * cell / ch + 0.5).ceil() as isize,
+                    );
+                    let mut vals: Vec<f64> = Vec::new();
+                    for y in y0..y1 {
+                        for x in x0..x1 {
+                            vals.extend(at(x, y));
+                        }
+                    }
+                    let mut best: Option<(f64, usize)> = None;
+                    for (k, v) in vals.iter().enumerate() {
+                        if vals[..k].contains(v) {
+                            continue;
+                        }
+                        let n = vals.iter().filter(|&&u| u == *v).count();
+                        // Ties go to the smaller value.
+                        if best.is_none_or(|b| n > b.1 || (n == b.1 && *v < b.0)) {
+                            best = Some((*v, n));
+                        }
+                    }
+                    best.map(|b| b.0)
+                }
+            };
+            out.bands[0][row * cols + col] = v.map_or(nodata, |v| r.data_type.store(v));
+        }
+    }
+    out
+}
+
+/// Squared 1-D distance transform (Felzenszwalb–Huttenlocher) of `f` in place;
+/// infinite entries are cells without a source.
+fn edt_1d(f: &mut [f64]) {
+    const FAR: f64 = 1e20;
+    let n = f.len();
+    if n == 0 {
+        return;
+    }
+    let g: Vec<f64> = f
+        .iter()
+        .map(|&x| if x.is_finite() { x } else { FAR })
+        .collect();
+    let mut v = vec![0usize; n];
+    let mut z = vec![0.0; n + 1];
+    let mut k = 0;
+    z[0] = f64::NEG_INFINITY;
+    z[1] = f64::INFINITY;
+    for q in 1..n {
+        loop {
+            let p = v[k];
+            let s = ((g[q] + (q * q) as f64) - (g[p] + (p * p) as f64)) / (2.0 * (q - p) as f64);
+            if s <= z[k] {
+                k -= 1;
+                continue;
+            }
+            k += 1;
+            v[k] = q;
+            z[k] = s;
+            z[k + 1] = f64::INFINITY;
+            break;
+        }
+    }
+    k = 0;
+    for (q, out) in f.iter_mut().enumerate() {
+        while z[k + 1] < q as f64 {
+            k += 1;
+        }
+        let p = v[k];
+        let d = (q as f64 - p as f64).powi(2) + g[p];
+        *out = if d >= FAR / 2.0 { f64::INFINITY } else { d };
+    }
+}
+
+/// Spatial Analyst Euclidean Distance from the cells of `source` that have values,
+/// in map units between cell centers (square cells); beyond `max_distance`,
+/// NoData.
+pub fn euclidean_distance(source: &Raster, max_distance: Option<f64>) -> Raster {
+    let (w, h) = (source.width, source.height);
+    let mut grid: Vec<f64> = (0..w * h)
+        .map(|i| {
+            if source.is_nodata(source.bands[0][i]) {
+                f64::INFINITY
+            } else {
+                0.0
+            }
+        })
+        .collect();
+    let mut col = vec![0.0; h];
+    for x in 0..w {
+        for y in 0..h {
+            col[y] = grid[y * w + x];
+        }
+        edt_1d(&mut col);
+        for y in 0..h {
+            grid[y * w + x] = col[y];
+        }
+    }
+    for y in 0..h {
+        edt_1d(&mut grid[y * w..(y + 1) * w]);
+    }
+    let nodata = 3.4e38_f32 as f64;
+    let mut out = source.like(DataType::F32);
+    out.nodata = Some(nodata);
+    let cell = source.cell_width();
+    out.bands[0] = grid
+        .into_iter()
+        .map(|d2| {
+            let d = d2.sqrt() * cell;
+            if !d.is_finite() || max_distance.is_some_and(|m| d > m) {
+                nodata
+            } else {
+                DataType::F32.store(d)
+            }
+        })
+        .collect();
+    out
+}
+
+/// Spatial Analyst Extract by Mask with the mask on the same grid: cells where
+/// the mask is NoData become NoData.
+pub fn extract_by_mask(input: &Raster, mask: &Raster) -> Raster {
+    let mut out = input.like(input.data_type);
+    let nodata = input.nodata.unwrap_or(if input.data_type.is_float() {
+        f32::MIN as f64
+    } else {
+        crate::focal::type_max(input.data_type)
+    });
+    let nodata = if input.data_type.is_float() && input.nodata.is_none() {
+        f32::MIN as f64
+    } else {
+        nodata
+    };
+    out.nodata = Some(nodata);
+    out.bands[0] = (0..input.width * input.height)
+        .map(|i| {
+            let v = input.bands[0][i];
+            if mask.is_nodata(mask.bands[0][i]) || input.is_nodata(v) {
+                nodata
+            } else {
+                v
+            }
+        })
+        .collect();
+    out
+}

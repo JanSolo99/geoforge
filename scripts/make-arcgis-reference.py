@@ -323,6 +323,13 @@ CASES = {
     "p2r_parcels_maxarea": ("conversion.PolygonToRaster", [DATA / "parcels.shp", "FID"], ["MAXIMUM_AREA", "", 5]),
     "pt2r_wells_most": ("conversion.PointToRaster", [DATA / "wells.shp", "DEPTH"], ["MOST_FREQUENT", "", 20]),
     "pt2r_wells_sum": ("conversion.PointToRaster", [DATA / "wells.shp", "DEPTH"], ["SUM", "", 20]),
+    "eucdist_streams": ("gp.EucDistance_sa", [OUT / "streams_hydro.tif"], []),
+    "eucdist_streams_max": ("gp.EucDistance_sa", [OUT / "streams_hydro.tif"], [150]),
+    "extract_dem_zones": ("gp.ExtractByMask_sa", [RASTER / "dem.tif", RASTER / "zones.tif"], []),
+    "resample_dem_nearest": ("management.Resample", [RASTER / "dem.tif"], ["25", "NEAREST"]),
+    "resample_dem_bilinear": ("management.Resample", [RASTER / "dem.tif"], ["25", "BILINEAR"]),
+    "resample_dem_cubic": ("management.Resample", [RASTER / "dem.tif"], ["7", "CUBIC"]),
+    "resample_landuse_majority": ("management.Resample", [RASTER / "landuse_u8.tif"], ["60", "MAJORITY"]),
     "zonal_mean": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_nodata.tif"], ["MEAN", "DATA"]),
     "zonal_max_strict": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_nodata.tif"], ["MAXIMUM", "NODATA"]),
     "zonal_range_int": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_int16_packbits.tif"], ["RANGE", "DATA"]),
@@ -339,7 +346,8 @@ RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatist
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",
               "gp.StreamOrder_sa", "gp.FlowLength_sa", "gp.Watershed_sa", "conversion.FeatureToRaster",
-              "conversion.PolygonToRaster", "conversion.PointToRaster"}
+              "conversion.PolygonToRaster", "conversion.PointToRaster", "gp.EucDistance_sa", "gp.ExtractByMask_sa",
+              "management.Resample"}
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable"}

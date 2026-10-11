@@ -15937,6 +15937,93 @@
       "messages": [],
       "fields": [],
       "shapeType": null
+    },
+    "eucdist_streams": {
+      "tool": "gp.EucDistance_sa",
+      "args": [
+        "testdata/arcgis-reference/streams_hydro.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "eucdist_streams_max": {
+      "tool": "gp.EucDistance_sa",
+      "args": [
+        "testdata/arcgis-reference/streams_hydro.tif",
+        "<out>",
+        150
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "extract_dem_zones": {
+      "tool": "gp.ExtractByMask_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/zones.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "resample_dem_nearest": {
+      "tool": "management.Resample",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "25",
+        "NEAREST"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "resample_dem_bilinear": {
+      "tool": "management.Resample",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "25",
+        "BILINEAR"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "resample_dem_cubic": {
+      "tool": "management.Resample",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "7",
+        "CUBIC"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "resample_landuse_majority": {
+      "tool": "management.Resample",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "60",
+        "MAJORITY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

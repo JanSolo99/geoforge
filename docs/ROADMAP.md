@@ -214,6 +214,10 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         cells whose interior they cross, most length wins; MAXIMUM_AREA leaves cells NoData when
         the uncovered part is larger; integer fields use ArcGIS's sub-byte/8-bit type choice
   - [x] GeoTIFF reader: 1/2/4-bit samples (ArcGIS writes them)
+  - [x] Resample (nearest, bilinear, cubic a = −0.5 with out-of-raster taps dropped and weights
+        renormalized, majority over the output cell widened by one input cell, ties to the
+        smaller value), Euclidean Distance (exact, max distance) and Extract by Mask (same grid),
+        matching ArcGIS
   - [ ] Raster To Polygon SIMPLIFY; Polyline To Raster options; most-frequent ties (first
         feature assumed)
   - [ ] Flow Direction on flats: ArcGIS's flat resolution is approximated (5×5 look-ahead, then

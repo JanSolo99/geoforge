@@ -12,6 +12,7 @@ mod geotiff;
 pub mod hydro;
 pub mod local;
 pub mod rasterize;
+pub mod resample;
 pub mod surface;
 pub mod zonal;
 

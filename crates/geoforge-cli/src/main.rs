@@ -579,6 +579,28 @@ enum Tool {
         #[arg(long)]
         cellsize: f64,
     },
+    /// Data Management "Resample" to square cells.
+    Resample {
+        in_raster: PathBuf,
+        out_raster: PathBuf,
+        cell_size: f64,
+        /// NEAREST, BILINEAR, CUBIC or MAJORITY.
+        #[arg(long, default_value = "NEAREST")]
+        resampling_type: String,
+    },
+    /// Spatial Analyst "Euclidean Distance" from a raster source.
+    EucDistance {
+        in_source_data: PathBuf,
+        out_distance_raster: PathBuf,
+        #[arg(long)]
+        maximum_distance: Option<f64>,
+    },
+    /// Spatial Analyst "Extract by Mask" (mask on the same grid).
+    ExtractByMask {
+        in_raster: PathBuf,
+        in_mask_data: PathBuf,
+        out_raster: PathBuf,
+    },
     /// Spatial Analyst "Aspect" (planar): downslope direction, −1 on flat cells.
     Aspect {
         in_raster: PathBuf,
@@ -1770,6 +1792,52 @@ fn main() -> ExitCode {
                 .ok_or_else(|| Error::Unsupported("no features to rasterize".into()))?;
             r.epsg = epsg;
             write_raster(&out_raster, &r)
+        })(),
+        Tool::Resample {
+            in_raster,
+            out_raster,
+            cell_size,
+            resampling_type,
+        } => (|| {
+            use geoforge_raster::resample::Technique;
+            let t = match resampling_type.to_ascii_uppercase().as_str() {
+                "NEAREST" => Technique::Nearest,
+                "BILINEAR" => Technique::Bilinear,
+                "CUBIC" => Technique::Cubic,
+                "MAJORITY" => Technique::Majority,
+                other => return Err(Error::Unsupported(format!("resampling type {other}"))),
+            };
+            let r = geoforge_raster::read_geotiff(&in_raster)?;
+            write_raster(
+                &out_raster,
+                &geoforge_raster::resample::resample(&r, cell_size, t),
+            )
+        })(),
+        Tool::EucDistance {
+            in_source_data,
+            out_distance_raster,
+            maximum_distance,
+        } => (|| {
+            let r = geoforge_raster::read_geotiff(&in_source_data)?;
+            write_raster(
+                &out_distance_raster,
+                &geoforge_raster::resample::euclidean_distance(&r, maximum_distance),
+            )
+        })(),
+        Tool::ExtractByMask {
+            in_raster,
+            in_mask_data,
+            out_raster,
+        } => (|| {
+            let r = geoforge_raster::read_geotiff(&in_raster)?;
+            let m = geoforge_raster::read_geotiff(&in_mask_data)?;
+            if (r.width, r.height, r.transform) != (m.width, m.height, m.transform) {
+                return Err(Error::Unsupported("mask on a different grid".into()));
+            }
+            write_raster(
+                &out_raster,
+                &geoforge_raster::resample::extract_by_mask(&r, &m),
+            )
         })(),
         Tool::Aspect {
             in_raster,
