@@ -176,6 +176,12 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         as NoData, majority/minority ties go to the center value, NoData is the output type's
         maximum, Variety writes a 4-bit raster (NoData 15) for 3×3, integer Sum is 32-bit
   - [ ] Majority ties not involving the center (smallest value assumed, unverified)
+  - [x] Reclassify (values and inclusive ranges, NODATA, DATA/NODATA for missing values) and
+        Zonal Statistics as a raster (zones on the value grid; ten statistics; DATA/NODATA)
+        matching ArcGIS, including its integer output type choice: from 8-bit input a 1/2/4-bit
+        layout (NoData 1/3/15), then signed, then unsigned 8-bit; otherwise U16 for non-negative
+        results, else S16, then 32-bit; zonal Sum/Mean/Std are float
+  - [ ] Zonal Statistics as Table; zones and values on different grids (cell size/snap env)
 - [ ] Hillshade, slope, aspect, curvature, contours, viewshed, hydrology (fill/flow dir/accumulation/watershed)
   - [x] Slope (degree/percent rise, z-factor), Aspect, Hillshade (no shadows), planar, matching
         ArcGIS cell for cell: Horn's gradient; border cells and cells with a NoData edge neighbor

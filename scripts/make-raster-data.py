@@ -78,3 +78,10 @@ hydro_nd[5:8, 40:43] = -9999.0
 write("hydro.tif", hydro, gdal.GDT_Float32)
 write("hydro_nodata.tif", hydro_nd, gdal.GDT_Float32, nodata=-9999.0)
 write("hydro_int.tif", np.round(hydro).astype(np.int16), gdal.GDT_Int16)
+# Zones on the DEM grid: six irregular zones, one split in two parts, and a
+# NoData corner.
+yy, xx = np.mgrid[0:120, 0:150]
+zones = ((xx // 50) + 3 * (yy // 60)).astype(np.uint8)
+zones[(xx - 75) ** 2 + (yy - 60) ** 2 < 15 ** 2] = 7
+zones[100:, 130:] = 255
+write("zones.tif", zones, gdal.GDT_Byte, nodata=255)

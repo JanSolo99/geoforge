@@ -9,6 +9,7 @@ pub mod focal;
 mod geotiff;
 pub mod hydro;
 pub mod surface;
+pub mod zonal;
 
 pub use geotiff::{Compression, read_geotiff, write_geotiff};
 

@@ -403,6 +403,28 @@ enum Tool {
         #[arg(long, default_value = "FLOAT")]
         data_type: String,
     },
+    /// Spatial Analyst "Reclassify" on cell values.
+    Reclassify {
+        in_raster: PathBuf,
+        /// "old new;…" or "from to new;…" (NODATA allowed as new).
+        remap: String,
+        out_raster: PathBuf,
+        /// DATA (keep unmatched values) or NODATA.
+        #[arg(long, default_value = "DATA")]
+        missing_values: String,
+    },
+    /// Spatial Analyst "Zonal Statistics" (zones and values on the same grid).
+    ZonalStatistics {
+        in_zone_data: PathBuf,
+        in_value_raster: PathBuf,
+        out_raster: PathBuf,
+        /// MEAN, MAJORITY, MAXIMUM, MEDIAN, MINIMUM, MINORITY, RANGE, STD, SUM, VARIETY.
+        #[arg(long, default_value = "MEAN")]
+        statistics_type: String,
+        /// DATA (ignore NoData) or NODATA.
+        #[arg(long, default_value = "DATA")]
+        ignore_nodata: String,
+    },
     /// Spatial Analyst "Aspect" (planar): downslope direction, −1 on flat cells.
     Aspect {
         in_raster: PathBuf,
@@ -1187,6 +1209,53 @@ fn main() -> ExitCode {
             write_raster(
                 &out_accumulation_raster,
                 &geoforge_raster::hydro::flow_accumulation(&dirs, weight.as_ref(), integer),
+            )
+        })(),
+        Tool::Reclassify {
+            in_raster,
+            remap,
+            out_raster,
+            missing_values,
+        } => (|| {
+            let entries = geoforge_raster::zonal::parse_remap(&remap)
+                .ok_or_else(|| Error::Unsupported(format!("remap {remap}")))?;
+            let keep = match missing_values.to_ascii_uppercase().as_str() {
+                "DATA" => true,
+                "NODATA" => false,
+                other => return Err(Error::Unsupported(format!("missing_values {other}"))),
+            };
+            let input = geoforge_raster::read_geotiff(&in_raster)?;
+            write_raster(
+                &out_raster,
+                &geoforge_raster::zonal::reclassify(&input, &entries, keep),
+            )
+        })(),
+        Tool::ZonalStatistics {
+            in_zone_data,
+            in_value_raster,
+            out_raster,
+            statistics_type,
+            ignore_nodata,
+        } => (|| {
+            let stat = geoforge_raster::zonal::ZonalStatistic::parse(&statistics_type)
+                .ok_or_else(|| Error::Unsupported(format!("statistic {statistics_type}")))?;
+            let ignore = match ignore_nodata.to_ascii_uppercase().as_str() {
+                "DATA" => true,
+                "NODATA" => false,
+                other => return Err(Error::Unsupported(format!("ignore_nodata {other}"))),
+            };
+            let zones = geoforge_raster::read_geotiff(&in_zone_data)?;
+            let values = geoforge_raster::read_geotiff(&in_value_raster)?;
+            if (zones.width, zones.height, zones.transform)
+                != (values.width, values.height, values.transform)
+            {
+                return Err(Error::Unsupported(
+                    "zone and value rasters on different grids".into(),
+                ));
+            }
+            write_raster(
+                &out_raster,
+                &geoforge_raster::zonal::zonal_statistics(&zones, &values, stat, ignore),
             )
         })(),
         Tool::Aspect {

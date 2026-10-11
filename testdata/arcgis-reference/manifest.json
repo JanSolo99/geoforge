@@ -14968,6 +14968,253 @@
       "messages": [],
       "fields": [],
       "shapeType": null
+    },
+    "reclass_landuse": {
+      "tool": "gp.Reclassify_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "Value",
+        "0 10;1 10;2 20;3 30",
+        "<out>",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "reclass_landuse_nodata": {
+      "tool": "gp.Reclassify_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "Value",
+        "0 10;1 10;2 20;3 30",
+        "<out>",
+        "NODATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "reclass_dem_ranges": {
+      "tool": "gp.Reclassify_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "Value",
+        "180 220 1;220 260 2;260 300 3;300 340 4",
+        "<out>",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "reclass_int16_ranges": {
+      "tool": "gp.Reclassify_sa",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "Value",
+        "180 220 1;220 260 2;260 400 300",
+        "<out>",
+        "NODATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "reclass_dem_to_nodata": {
+      "tool": "gp.Reclassify_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "Value",
+        "180 250 NODATA;250 340 5",
+        "<out>",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "zonal_mean": {
+      "tool": "gp.ZonalStatistics_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "Value",
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "MEAN",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "zonal_max_strict": {
+      "tool": "gp.ZonalStatistics_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "Value",
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "MAXIMUM",
+        "NODATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "zonal_range_int": {
+      "tool": "gp.ZonalStatistics_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "Value",
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>",
+        "RANGE",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "zonal_std": {
+      "tool": "gp.ZonalStatistics_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "Value",
+        "testdata/raster/dem.tif",
+        "<out>",
+        "STD",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "zonal_sum_int": {
+      "tool": "gp.ZonalStatistics_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "Value",
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>",
+        "SUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "zonal_median": {
+      "tool": "gp.ZonalStatistics_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "Value",
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>",
+        "MEDIAN",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "zonal_majority": {
+      "tool": "gp.ZonalStatistics_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "Value",
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>",
+        "MAJORITY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "zonal_variety": {
+      "tool": "gp.ZonalStatistics_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "Value",
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>",
+        "VARIETY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "zonal_min_f": {
+      "tool": "gp.ZonalStatistics_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "Value",
+        "testdata/raster/dem.tif",
+        "<out>",
+        "MINIMUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "reclass_landuse_4bit": {
+      "tool": "gp.Reclassify_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "Value",
+        "0 1;1 2;2 3;3 4;4 4",
+        "<out>",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "reclass_landuse_200": {
+      "tool": "gp.Reclassify_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "Value",
+        "0 200;1 200;2 200;3 200;4 200",
+        "<out>",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "reclass_dem_signed": {
+      "tool": "gp.Reclassify_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "Value",
+        "180 250 -5;250 340 5",
+        "<out>",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }
