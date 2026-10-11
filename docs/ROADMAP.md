@@ -38,11 +38,17 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       STD/COUNT/FIRST/LAST, multi/single part, line merging) — all match ArcGIS
 - [x] Identity (polygon/line/point inputs; Union's cells and order for polygons), Merge
       (fields matched by name, `ADD_SOURCE_INFO` → `MERGE_SRC`) — match ArcGIS
-- [ ] Split, Append, Spatial Join, Near, Select by Location
+- [x] Near (radius, location, angle; updates the input in place like ArcGIS) and Spatial
+      Join (one to one/many, keep all/common, INTERSECT, WITHIN_A_DISTANCE, (COMPLETELY_)
+      CONTAINS/WITHIN with Esri's boundary rule, CLOSEST, distance field) — match ArcGIS
+      (distances to ~1e-9 m; ArcGIS computes on its own grid)
+- [ ] Split, Append, Select Layer By Location; Near with several near feature classes
+      (`NEAR_FC`); Spatial Join field-map merge rules other than First
 - [ ] Line overlays: crack input lines at their mutual crossings, as ArcGIS does
       (Identity writes uncovered road pieces split there: same lines, more parts)
 - [ ] Overlay Z/M, line×line Intersect, `cluster_tolerance`, `output_type` POINT/LINE
-- [ ] Validation + repair (Check/Repair Geometry), spatial index (R-tree) for overlays
+- [ ] Validation + repair (Check/Repair Geometry), spatial index (R-tree) for overlays,
+      Near and Spatial Join (all pairs are compared today)
 - [ ] Shapefile writer: `.sbn/.sbx` and `.shp.xml` (ArcGIS writes both for tool outputs)
 
 ## Phase 3 — File Geodatabase

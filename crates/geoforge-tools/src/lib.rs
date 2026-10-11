@@ -169,21 +169,14 @@ fn dimension(k: GeometryKind) -> u8 {
 /// names that clash with earlier ones suffixed `_1`, `_2`, ... (as ArcGIS does).
 fn overlay_fields(inputs: &[NamedInput]) -> Vec<Field> {
     let mut fields: Vec<Field> = Vec::new();
-    let mut add = |mut f: Field| {
-        let base = f.name.clone();
-        let mut n = 1;
-        while fields.iter().any(|g| g.name.eq_ignore_ascii_case(&f.name)) {
-            f.name = format!("{base}_{n}");
-            n += 1;
-        }
-        fields.push(f);
-    };
     for input in inputs {
-        add(Field::new(
-            format!("FID_{}", input.name),
-            FieldType::Integer,
-        ));
-        input.features.fields().iter().cloned().for_each(&mut add);
+        push_unique(
+            &mut fields,
+            Field::new(format!("FID_{}", input.name), FieldType::Integer),
+        );
+        for f in input.features.fields() {
+            push_unique(&mut fields, f.clone());
+        }
     }
     fields
 }
@@ -937,6 +930,277 @@ pub fn merge(inputs: &[MergeInput], add_source: bool) -> Result<ToolOutput> {
         has_m: inputs.iter().any(|i| i.features.has_m()),
         fields,
         spatial_reference_wkt: first.features.spatial_reference_wkt().map(str::to_owned),
+        features,
+        messages: Vec::new(),
+    })
+}
+
+/// Appends `f` to `fields`, suffixing `_1`, `_2`, ... while its name is taken.
+fn push_unique(fields: &mut Vec<Field>, mut f: Field) {
+    let base = f.name.clone();
+    let mut n = 1;
+    while fields.iter().any(|g| g.name.eq_ignore_ascii_case(&f.name)) {
+        f.name = format!("{base}_{n}");
+        n += 1;
+    }
+    fields.push(f);
+}
+
+/// The smallest distance from `g` to any of `candidates` (first lowest FID on
+/// ties), within `radius` if given.
+fn closest(
+    g: &geoforge_core::Geometry,
+    candidates: &[Feature],
+    radius: Option<f64>,
+) -> Result<Option<(usize, geoforge_geometry::Nearest)>> {
+    let mut best: Option<(usize, geoforge_geometry::Nearest)> = None;
+    for (i, c) in candidates.iter().enumerate() {
+        let Some(cg) = &c.geometry else { continue };
+        let Some(n) = geoforge_geometry::nearest(g, cg)? else {
+            continue;
+        };
+        if radius.is_some_and(|r| n.distance > r) {
+            continue;
+        }
+        if best.is_none_or(|(_, b)| n.distance < b.distance) {
+            best = Some((i, n));
+        }
+    }
+    Ok(best)
+}
+
+/// `arcpy.analysis.Near(in_features, near_features, search_radius, location,
+/// angle)`, planar: adds `NEAR_FID` and `NEAR_DIST` (and `NEAR_X`, `NEAR_Y`,
+/// `NEAR_ANGLE`) to a copy of the input. The location is the closest point on the
+/// near feature; the angle runs from the input's closest point to it, in degrees
+/// counter-clockwise from east (-180..180], 0 when they touch. Features with
+/// nothing within the radius get -1 in every field.
+pub fn near(
+    input: &dyn FeatureClass,
+    near_features: &dyn FeatureClass,
+    search_radius: Option<f64>,
+    location: bool,
+    angle: bool,
+) -> Result<ToolOutput> {
+    let kind = input
+        .geometry_kind()
+        .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
+    let candidates = load(near_features)?;
+    let mut fields = input.fields().to_vec();
+    let mut added = vec!["NEAR_FID", "NEAR_DIST"];
+    if location {
+        added.extend(["NEAR_X", "NEAR_Y"]);
+    }
+    if angle {
+        added.push("NEAR_ANGLE");
+    }
+    // Existing NEAR_* fields are overwritten, as ArcGIS does.
+    let slots: Vec<usize> = added
+        .iter()
+        .map(|&name| {
+            fields
+                .iter()
+                .position(|f| f.name.eq_ignore_ascii_case(name))
+                .unwrap_or_else(|| {
+                    let t = if name == "NEAR_FID" {
+                        FieldType::Integer
+                    } else {
+                        FieldType::Double
+                    };
+                    fields.push(Field::new(name, t));
+                    fields.len() - 1
+                })
+        })
+        .collect();
+    let mut features = Vec::new();
+    for f in input.features() {
+        let mut f = f?;
+        let found = match &f.geometry {
+            Some(g) => closest(g, &candidates, search_radius)?,
+            None => None,
+        };
+        let values: Vec<Value> = added
+            .iter()
+            .map(|&name| match &found {
+                None if name == "NEAR_FID" => Value::Integer(-1),
+                None => Value::Double(-1.0),
+                Some((i, n)) => match name {
+                    "NEAR_FID" => Value::Integer(candidates[*i].oid as i32),
+                    "NEAR_DIST" => Value::Double(n.distance),
+                    "NEAR_X" => Value::Double(n.to[0]),
+                    "NEAR_Y" => Value::Double(n.to[1]),
+                    _ if n.distance == 0.0 => Value::Double(0.0),
+                    _ => Value::Double(
+                        (n.to[1] - n.from[1])
+                            .atan2(n.to[0] - n.from[0])
+                            .to_degrees(),
+                    ),
+                },
+            })
+            .collect();
+        f.attributes.resize(fields.len(), Value::Null);
+        for (&slot, v) in slots.iter().zip(values) {
+            f.attributes[slot] = v;
+        }
+        features.push(f);
+    }
+    Ok(ToolOutput {
+        kind,
+        has_z: input.has_z(),
+        has_m: input.has_m(),
+        fields,
+        spatial_reference_wkt: input.spatial_reference_wkt().map(str::to_owned),
+        features,
+        messages: Vec::new(),
+    })
+}
+
+/// Spatial Join `match_option`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MatchOption {
+    Intersect,
+    WithinADistance,
+    Contains,
+    CompletelyContains,
+    Within,
+    CompletelyWithin,
+    Closest,
+}
+
+impl MatchOption {
+    pub fn parse(s: &str) -> Option<Self> {
+        Some(match s.to_ascii_uppercase().as_str() {
+            "INTERSECT" => Self::Intersect,
+            "WITHIN_A_DISTANCE" => Self::WithinADistance,
+            "CONTAINS" => Self::Contains,
+            "COMPLETELY_CONTAINS" => Self::CompletelyContains,
+            "WITHIN" => Self::Within,
+            "COMPLETELY_WITHIN" => Self::CompletelyWithin,
+            "CLOSEST" => Self::Closest,
+            _ => return None,
+        })
+    }
+}
+
+/// Spatial Join options beyond the inputs.
+#[derive(Debug, Clone)]
+pub struct SpatialJoinOptions {
+    /// `JOIN_ONE_TO_MANY` (else one to one).
+    pub one_to_many: bool,
+    /// `KEEP_ALL` (else `KEEP_COMMON`).
+    pub keep_all: bool,
+    pub match_option: MatchOption,
+    pub search_radius: Option<f64>,
+    pub distance_field_name: Option<String>,
+}
+
+/// `arcpy.analysis.SpatialJoin(target, join, out, ...)` with the default field
+/// mapping (merge rule First): `Join_Count`, the optional distance field,
+/// `TARGET_FID` (and `JOIN_FID` one to many), then target and join fields.
+/// The distance field is only filled for `CLOSEST` (-1 otherwise, as in ArcGIS).
+/// Matches are taken in join-FID order; one to one keeps the first's attributes,
+/// one to many writes a row per match (`Join_Count` 1, or 0 with `JOIN_FID` -1
+/// for an unmatched target kept by `KEEP_ALL`).
+pub fn spatial_join(
+    target: &dyn FeatureClass,
+    join: &dyn FeatureClass,
+    opts: &SpatialJoinOptions,
+) -> Result<ToolOutput> {
+    let kind = target
+        .geometry_kind()
+        .ok_or_else(|| Error::Unsupported("target has no geometry".into()))?;
+    let joins = load(join)?;
+    let mut fields = vec![Field::new("Join_Count", FieldType::Integer)];
+    if let Some(name) = &opts.distance_field_name {
+        fields.push(Field::new(name.clone(), FieldType::Double));
+    }
+    fields.push(Field::new("TARGET_FID", FieldType::Integer));
+    if opts.one_to_many {
+        fields.push(Field::new("JOIN_FID", FieldType::Integer));
+    }
+    for f in target.fields().iter().chain(join.fields()) {
+        push_unique(&mut fields, f.clone());
+    }
+    let radius = opts.search_radius.unwrap_or(0.0);
+    let mut features = Vec::new();
+    for t in target.features() {
+        let t = t?;
+        // (join index, distance)
+        let mut matches: Vec<(usize, f64)> = Vec::new();
+        if let Some(tg) = &t.geometry {
+            if opts.match_option == MatchOption::Closest {
+                if let Some((i, n)) = closest(tg, &joins, opts.search_radius)? {
+                    matches.push((i, n.distance));
+                }
+            } else {
+                for (i, j) in joins.iter().enumerate() {
+                    let jg = j.geometry.as_ref().unwrap();
+                    let Some(n) = geoforge_geometry::nearest(tg, jg)? else {
+                        continue;
+                    };
+                    let hit = match opts.match_option {
+                        MatchOption::Intersect | MatchOption::WithinADistance => {
+                            n.distance <= radius
+                        }
+                        MatchOption::Within => geoforge_geometry::within(tg, jg)?,
+                        MatchOption::CompletelyWithin => {
+                            geoforge_geometry::completely_within(tg, jg)?
+                        }
+                        MatchOption::Contains => geoforge_geometry::within(jg, tg)?,
+                        MatchOption::CompletelyContains => {
+                            geoforge_geometry::completely_within(jg, tg)?
+                        }
+                        MatchOption::Closest => unreachable!(),
+                    };
+                    if hit {
+                        matches.push((i, n.distance));
+                    }
+                }
+            }
+        }
+        let row = |count: usize, m: Option<(usize, f64)>| {
+            let mut a = vec![Value::Integer(count as i32)];
+            if opts.distance_field_name.is_some() {
+                a.push(Value::Double(match m {
+                    Some((_, d)) if opts.match_option == MatchOption::Closest => d,
+                    _ => -1.0,
+                }));
+            }
+            a.push(Value::Integer(t.oid as i32));
+            if opts.one_to_many {
+                a.push(Value::Integer(m.map_or(-1, |m| joins[m.0].oid as i32)));
+            }
+            a.extend(t.attributes.iter().cloned());
+            match m {
+                Some((i, _)) => a.extend(joins[i].attributes.iter().cloned()),
+                None => a.extend(std::iter::repeat_n(Value::Null, join.fields().len())),
+            }
+            a
+        };
+        let mut rows = Vec::new();
+        if matches.is_empty() {
+            if opts.keep_all {
+                rows.push(row(0, None));
+            }
+        } else if opts.one_to_many {
+            rows.extend(matches.iter().map(|&m| row(1, Some(m))));
+        } else {
+            rows.push(row(matches.len(), Some(matches[0])));
+        }
+        for attributes in rows {
+            features.push(Feature {
+                oid: features.len() as i64,
+                geometry: t.geometry.clone(),
+                attributes,
+            });
+        }
+    }
+    Ok(ToolOutput {
+        kind,
+        has_z: target.has_z(),
+        has_m: target.has_m(),
+        fields,
+        spatial_reference_wkt: target.spatial_reference_wkt().map(str::to_owned),
         features,
         messages: Vec::new(),
     })

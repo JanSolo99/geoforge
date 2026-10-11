@@ -70,6 +70,45 @@ enum Tool {
         #[arg(long, default_value = "NO_SOURCE_INFO")]
         add_source: String,
     },
+    /// Add the distance to the closest near feature (ArcGIS "Near", planar).
+    /// Updates the input shapefile in place, as ArcGIS does, unless an output is
+    /// given.
+    Near {
+        in_features: PathBuf,
+        near_features: PathBuf,
+        /// Write the result here instead of updating the input.
+        out_feature_class: Option<PathBuf>,
+        /// Only consider near features within this distance, e.g. "100 Meters".
+        #[arg(long)]
+        search_radius: Option<String>,
+        /// LOCATION: add NEAR_X and NEAR_Y.
+        #[arg(long, default_value = "NO_LOCATION")]
+        location: String,
+        /// ANGLE: add NEAR_ANGLE.
+        #[arg(long, default_value = "NO_ANGLE")]
+        angle: String,
+    },
+    /// Join attributes by spatial relationship (ArcGIS "Spatial Join").
+    SpatialJoin {
+        target_features: PathBuf,
+        join_features: PathBuf,
+        out_feature_class: PathBuf,
+        /// JOIN_ONE_TO_ONE or JOIN_ONE_TO_MANY.
+        #[arg(long, default_value = "JOIN_ONE_TO_ONE")]
+        join_operation: String,
+        /// KEEP_ALL or KEEP_COMMON.
+        #[arg(long, default_value = "KEEP_ALL")]
+        join_type: String,
+        /// INTERSECT, WITHIN_A_DISTANCE, CONTAINS, COMPLETELY_CONTAINS, WITHIN,
+        /// COMPLETELY_WITHIN or CLOSEST.
+        #[arg(long, default_value = "INTERSECT")]
+        match_option: String,
+        #[arg(long)]
+        search_radius: Option<String>,
+        /// Add a field with the distance to the joined feature.
+        #[arg(long)]
+        distance_field_name: Option<String>,
+    },
     /// Merge features by attribute values (ArcGIS "Dissolve").
     Dissolve {
         in_features: PathBuf,
@@ -159,6 +198,59 @@ fn main() -> ExitCode {
             let out = paths.pop().unwrap();
             merge_tool(&paths, &out, &add_source)
         }
+        Tool::Near {
+            in_features,
+            near_features,
+            out_feature_class,
+            search_radius,
+            location,
+            angle,
+        } => near_tool(
+            &in_features,
+            &near_features,
+            out_feature_class.as_deref(),
+            search_radius.as_deref(),
+            &location,
+            &angle,
+        ),
+        Tool::SpatialJoin {
+            target_features,
+            join_features,
+            out_feature_class,
+            join_operation,
+            join_type,
+            match_option,
+            search_radius,
+            distance_field_name,
+        } => (|| {
+            let (target, _) = open_feature_class(&target_features)?;
+            let (join, _) = open_feature_class(&join_features)?;
+            let opts = geoforge_tools::SpatialJoinOptions {
+                one_to_many: match join_operation.to_ascii_uppercase().as_str() {
+                    "JOIN_ONE_TO_ONE" => false,
+                    "JOIN_ONE_TO_MANY" => true,
+                    other => return Err(Error::Unsupported(format!("join_operation {other}"))),
+                },
+                keep_all: match join_type.to_ascii_uppercase().as_str() {
+                    "KEEP_ALL" => true,
+                    "KEEP_COMMON" => false,
+                    other => return Err(Error::Unsupported(format!("join_type {other}"))),
+                },
+                match_option: geoforge_tools::MatchOption::parse(&match_option)
+                    .ok_or_else(|| Error::Unsupported(format!("match_option {match_option}")))?,
+                search_radius: search_radius
+                    .as_deref()
+                    .map(|r| parse_distance(r, target.spatial_reference_wkt()))
+                    .transpose()?,
+                distance_field_name,
+            };
+            let out = geoforge_tools::spatial_join(target.as_ref(), join.as_ref(), &opts)?;
+            write_output(
+                out,
+                &out_feature_class,
+                source_gdb(&target_features).as_deref(),
+            )
+        })(),
         Tool::Dissolve {
             in_features,
             out_feature_class,
@@ -692,6 +784,59 @@ fn overlay_tool(
         })
         .collect();
     write_output(tool(&named)?, output, source_gdb(&inputs[0]).as_deref())
+}
+
+fn near_tool(
+    input: &Path,
+    near_features: &Path,
+    output: Option<&Path>,
+    search_radius: Option<&str>,
+    location: &str,
+    angle: &str,
+) -> Result<()> {
+    let flag = |value: &str, yes: &str, no: &str| match value.to_ascii_uppercase() {
+        v if v == yes => Ok(true),
+        v if v == no => Ok(false),
+        v => Err(Error::Unsupported(format!(
+            "expected {yes} or {no}, got {v}"
+        ))),
+    };
+    let location = flag(location, "LOCATION", "NO_LOCATION")?;
+    let angle = flag(angle, "ANGLE", "NO_ANGLE")?;
+    let (fc, _) = open_feature_class(input)?;
+    let (nf, _) = open_feature_class(near_features)?;
+    let radius = search_radius
+        .map(|r| parse_distance(r, fc.spatial_reference_wkt()))
+        .transpose()?;
+    let out = geoforge_tools::near(fc.as_ref(), nf.as_ref(), radius, location, angle)?;
+    drop(fc);
+    if let Some(output) = output {
+        return write_output(out, output, source_gdb(input).as_deref());
+    }
+    // In place: write next to the input, then replace its files.
+    let Location::Shapefile(shp) = locate(input) else {
+        return Err(Error::Unsupported(
+            "updating a geodatabase feature class in place is not implemented yet; give an output"
+                .into(),
+        ));
+    };
+    let stem = shp
+        .file_stem()
+        .map(|s| s.to_string_lossy().into_owned())
+        .unwrap_or_default();
+    let tmp = shp.with_file_name(format!("{stem}.gf-near-tmp.shp"));
+    write_shapefile(out, &tmp)?;
+    for ext in ["shp", "shx", "dbf", "prj", "cpg"] {
+        let from = tmp.with_extension(ext);
+        if from.exists() {
+            std::fs::rename(&from, shp.with_extension(ext)).map_err(|e| Error::io(&from, e))?;
+        }
+    }
+    // The spatial index no longer matches the rewritten file.
+    for ext in ["sbn", "sbx"] {
+        std::fs::remove_file(shp.with_extension(ext)).ok();
+    }
+    Ok(())
 }
 
 fn merge_tool(inputs: &[PathBuf], output: &Path, add_source: &str) -> Result<()> {
