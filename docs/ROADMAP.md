@@ -195,6 +195,10 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         over the intersection of both extents (widened to whole value cells), zones sampled at
         cell centers; integer medians of even counts round down; Range from 16-bit input that
         fits is unsigned 8-bit
+  - [x] Extract by Mask with the mask on any grid: the larger cell size, aligned to the input
+        over the intersection of both extents, both sampled at cell centers; integer output
+        takes ArcGIS's type choice (16-bit input → U16, 8-bit → sub-byte layouts), float
+        NoData −FLT_MAX, matching ArcGIS
   - [ ] Cell size/snap/extent/mask environments
 - [ ] Hillshade, slope, aspect, curvature, contours, viewshed, hydrology (fill/flow dir/accumulation/watershed)
   - [x] Slope (degree/percent rise, z-factor), Aspect, Hillshade (no shadows), planar, matching

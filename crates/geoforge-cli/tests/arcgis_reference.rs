@@ -1834,6 +1834,36 @@ fn gf_args(case: &str) -> Vec<&'static str> {
             "testdata/raster/dem.tif",
             "testdata/raster/zones.tif",
         ],
+        "extract_dem_mask25" => vec![
+            "extract-by-mask",
+            "testdata/raster/dem.tif",
+            "testdata/raster/zones_25m.tif",
+        ],
+        "extract_dem_mask4m" => vec![
+            "extract-by-mask",
+            "testdata/raster/dem.tif",
+            "testdata/raster/zones_4m.tif",
+        ],
+        "extract_int16_shifted" => vec![
+            "extract-by-mask",
+            "testdata/raster/dem_int16_packbits.tif",
+            "testdata/raster/zones_shifted.tif",
+        ],
+        "extract_int16_zones" => vec![
+            "extract-by-mask",
+            "testdata/raster/dem_int16_packbits.tif",
+            "testdata/raster/zones.tif",
+        ],
+        "extract_landuse_zones" => vec![
+            "extract-by-mask",
+            "testdata/raster/landuse_u8.tif",
+            "testdata/raster/zones.tif",
+        ],
+        "extract_nodata_mask25" => vec![
+            "extract-by-mask",
+            "testdata/raster/dem_nodata.tif",
+            "testdata/raster/zones_25m.tif",
+        ],
         "resample_dem_nearest" => vec!["resample", "testdata/raster/dem.tif", "<out>", "25"],
         "resample_dem_bilinear" => vec![
             "resample",

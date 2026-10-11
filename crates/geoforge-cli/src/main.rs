@@ -595,7 +595,7 @@ enum Tool {
         #[arg(long)]
         maximum_distance: Option<f64>,
     },
-    /// Spatial Analyst "Extract by Mask" (mask on the same grid).
+    /// Spatial Analyst "Extract by Mask".
     ExtractByMask {
         in_raster: PathBuf,
         in_mask_data: PathBuf,
@@ -1852,13 +1852,9 @@ fn main() -> ExitCode {
         } => (|| {
             let r = geoforge_raster::read_geotiff(&in_raster)?;
             let m = geoforge_raster::read_geotiff(&in_mask_data)?;
-            if (r.width, r.height, r.transform) != (m.width, m.height, m.transform) {
-                return Err(Error::Unsupported("mask on a different grid".into()));
-            }
-            write_raster(
-                &out_raster,
-                &geoforge_raster::resample::extract_by_mask(&r, &m),
-            )
+            let out = geoforge_raster::resample::extract_by_mask(&r, &m)
+                .ok_or_else(|| Error::Unsupported("raster and mask do not overlap".into()))?;
+            write_raster(&out_raster, &out)
         })(),
         Tool::ZonalStatisticsAsTable {
             in_zone_data,

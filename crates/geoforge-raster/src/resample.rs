@@ -211,32 +211,46 @@ pub fn euclidean_distance(source: &Raster, max_distance: Option<f64>) -> Raster 
     out
 }
 
-/// Spatial Analyst Extract by Mask with the mask on the same grid: cells where
-/// the mask is NoData become NoData.
-pub fn extract_by_mask(input: &Raster, mask: &Raster) -> Raster {
-    let mut out = input.like(input.data_type);
-    let nodata = input.nodata.unwrap_or(if input.data_type.is_float() {
-        f32::MIN as f64
-    } else {
-        crate::focal::type_max(input.data_type)
-    });
-    let nodata = if input.data_type.is_float() && input.nodata.is_none() {
-        f32::MIN as f64
-    } else {
-        nodata
-    };
-    out.nodata = Some(nodata);
-    out.bands[0] = (0..input.width * input.height)
+/// Spatial Analyst Extract by Mask: the input's cells where the mask has data.
+/// As in ArcGIS, the output takes the larger of the two cell sizes, aligned to the
+/// input raster over the intersection of both extents, and samples both rasters
+/// at its cell centers. Float output is 32-bit with NoData −FLT_MAX; integer
+/// output takes ArcGIS's type choice for the values present.
+pub fn extract_by_mask(input: &Raster, mask: &Raster) -> Option<Raster> {
+    let cell = input.cell_width().max(mask.cell_width());
+    let (transform, cols, rows) = common_grid(mask, input, cell)?;
+    let values = onto_grid(input, transform, cols, rows);
+    let mask = onto_grid(mask, transform, cols, rows);
+    let cells: Vec<Option<f64>> = (0..cols * rows)
         .map(|i| {
-            let v = input.bands[0][i];
-            if mask.is_nodata(mask.bands[0][i]) || input.is_nodata(v) {
-                nodata
-            } else {
-                v
-            }
+            let v = values.bands[0][i];
+            (!mask.is_nodata(mask.bands[0][i]) && !values.is_nodata(v)).then_some(v)
         })
         .collect();
-    out
+    if input.data_type.is_float() {
+        let nodata = f32::MIN as f64;
+        let mut out = values.like(DataType::F32);
+        out.nodata = Some(nodata);
+        out.bands[0] = cells.iter().map(|v| v.unwrap_or(nodata)).collect();
+        return Some(out);
+    }
+    let (min, max) = cells
+        .iter()
+        .flatten()
+        .fold((f64::INFINITY, f64::NEG_INFINITY), |(a, b), &v| {
+            (a.min(v), b.max(v))
+        });
+    let (min, max) = if min.is_finite() {
+        (min, max)
+    } else {
+        (0.0, 0.0)
+    };
+    let eight = matches!(input.data_type, DataType::U8 | DataType::I8);
+    let (t, nodata) = crate::zonal::integer_output(min, max, eight);
+    let mut out = values.like(t);
+    out.nodata = Some(nodata);
+    out.bands[0] = cells.iter().map(|v| v.unwrap_or(nodata)).collect();
+    Some(out)
 }
 
 /// Nearest-neighbor copy of `r` onto a north-up grid given by its transform and
@@ -278,31 +292,29 @@ pub fn zones_on_value_grid(zones: &Raster, values: &Raster) -> Option<(Raster, R
     if same {
         return Some((zones.clone(), values.clone()));
     }
-    let (zx0, zy0, zx1, zy1) = zones.extent();
-    let (vx0, vy0, vx1, vy1) = values.extent();
-    let (x0, y0, x1, y1) = (zx0.max(vx0), zy0.max(vy0), zx1.min(vx1), zy1.min(vy1));
-    if x0 >= x1 || y0 >= y1 {
-        return None;
-    }
-    let t = &values.transform;
-    let (cw, ch) = (values.cell_width(), values.cell_height());
-    // Value-grid columns and rows covering the intersection; a 1e-9 cell margin
-    // keeps edges that fall on grid lines from adding a sliver cell.
-    let c0 = ((x0 - t[0]) / cw + 1e-9).floor().max(0.0) as usize;
-    let c1 = (((x1 - t[0]) / cw - 1e-9).ceil() as usize).min(values.width);
-    let r0 = ((t[3] - y1) / ch + 1e-9).floor().max(0.0) as usize;
-    let r1 = (((t[3] - y0) / ch - 1e-9).ceil() as usize).min(values.height);
-    let transform = [
-        t[0] + cw * c0 as f64,
-        cw,
-        0.0,
-        t[3] - ch * r0 as f64,
-        0.0,
-        t[5],
-    ];
-    let (cols, rows) = (c1 - c0, r1 - r0);
+    let (transform, cols, rows) = common_grid(zones, values, values.cell_width())?;
     Some((
         onto_grid(zones, transform, cols, rows),
         onto_grid(values, transform, cols, rows),
     ))
+}
+
+/// A north-up grid of `cell`-sized cells aligned to `snap`'s origin covering the
+/// intersection of both extents (widened to whole cells); `None` when the
+/// extents do not overlap.
+fn common_grid(other: &Raster, snap: &Raster, cell: f64) -> Option<([f64; 6], usize, usize)> {
+    let (ax0, ay0, ax1, ay1) = other.extent();
+    let (bx0, by0, bx1, by1) = snap.extent();
+    let (x0, y0, x1, y1) = (ax0.max(bx0), ay0.max(by0), ax1.min(bx1), ay1.min(by1));
+    if x0 >= x1 || y0 >= y1 {
+        return None;
+    }
+    let t = &snap.transform;
+    // A 1e-9 cell margin keeps edges on grid lines from adding a sliver cell.
+    let c0 = ((x0 - t[0]) / cell + 1e-9).floor();
+    let c1 = ((x1 - t[0]) / cell - 1e-9).ceil();
+    let r0 = ((t[3] - y1) / cell + 1e-9).floor();
+    let r1 = ((t[3] - y0) / cell - 1e-9).ceil();
+    let transform = [t[0] + cell * c0, cell, 0.0, t[3] - cell * r0, 0.0, -cell];
+    Some((transform, (c1 - c0) as usize, (r1 - r0) as usize))
 }

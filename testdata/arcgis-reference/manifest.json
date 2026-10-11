@@ -16765,6 +16765,78 @@
       "messages": [],
       "fields": [],
       "shapeType": null
+    },
+    "extract_dem_mask25": {
+      "tool": "gp.ExtractByMask_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/zones_25m.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "extract_dem_mask4m": {
+      "tool": "gp.ExtractByMask_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/zones_4m.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "extract_int16_shifted": {
+      "tool": "gp.ExtractByMask_sa",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "testdata/raster/zones_shifted.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "extract_int16_zones": {
+      "tool": "gp.ExtractByMask_sa",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "testdata/raster/zones.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "extract_landuse_zones": {
+      "tool": "gp.ExtractByMask_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "testdata/raster/zones.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "extract_nodata_mask25": {
+      "tool": "gp.ExtractByMask_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "testdata/raster/zones_25m.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }
