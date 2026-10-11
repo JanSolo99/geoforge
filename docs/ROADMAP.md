@@ -65,8 +65,9 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       `.dbf` table output) — match ArcGIS on 34 broken shapes
 - [ ] Check/Repair Geometry: geodatabase output tables, curves, multipoint and Z/M
       problems ("empty Z values", "bad envelope", ...)
-- [ ] Clip/Erase against many polygons: dissolving all clip features up front dominates
-      (Clip of 20k points by 10k parcels: 1.5 s)
+- [x] Clip/Erase against many polygons: each feature is clipped by the union of only the
+      clip polygons whose envelopes reach it (unions cached per candidate set). 10k parcels
+      by 10k parcels: 34 s → 0.05 s; by 300 road buffers: 30 s → 1.6 s; 20k wells: 1.6 s → 0.05 s
 - [ ] Shapefile writer: `.sbn/.sbx` and `.shp.xml` (ArcGIS writes both for tool outputs)
 
 ## Phase 3 — File Geodatabase

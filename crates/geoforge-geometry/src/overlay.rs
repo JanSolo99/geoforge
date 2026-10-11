@@ -81,23 +81,23 @@ fn select_points(g: &Geometry, keep: &[usize]) -> Option<Geometry> {
 
 /// What remains of `g` outside `area` (ArcGIS Erase). `None` when nothing does.
 pub fn erase(g: &Geometry, area: &ClipArea) -> Result<Option<Geometry>> {
-    if !area.touches(&g.curve_envelope()) {
-        return Ok(Some(g.clone()));
+    if let GeometryKind::Point | GeometryKind::Multipoint = g.kind {
+        let keep: Vec<usize> = (0..g.xy.len())
+            .filter(|&i| !area.contains_point(g.xy[i]))
+            .collect();
+        return Ok(select_points(g, &keep));
     }
+    let Some(local) = area.around(&g.curve_envelope()) else {
+        return Ok(Some(g.clone()));
+    };
     Ok(match g.kind {
-        GeometryKind::Point | GeometryKind::Multipoint => {
-            let keep: Vec<usize> = (0..g.xy.len())
-                .filter(|&i| !area.contains_point(g.xy[i]))
-                .collect();
-            select_points(g, &keep)
-        }
         GeometryKind::Polyline => {
-            from_multilinestring(&area.polygons().clip(&to_multilinestring(&linear(g)?), true))
+            from_multilinestring(&local.clip(&to_multilinestring(&linear(g)?), true))
         }
         GeometryKind::Polygon => {
-            from_multipolygon(&to_multipolygon(&linear(g)?).difference(area.polygons()))
+            from_multipolygon(&to_multipolygon(&linear(g)?).difference(&*local))
         }
-        GeometryKind::MultiPatch => return Err(Error::Unsupported("erasing multipatches".into())),
+        _ => return Err(Error::Unsupported("erasing multipatches".into())),
     })
 }
 
