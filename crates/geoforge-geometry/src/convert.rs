@@ -82,6 +82,29 @@ pub fn from_multipolygon(mp: &MultiPolygon<f64>) -> Option<Geometry> {
     Some(g)
 }
 
+/// Distance below which a spike counts as degenerate: about 1 mm at projected
+/// coordinate magnitudes (2e-10 relative), comparable to ArcGIS's XY tolerance.
+fn spike_tolerance(pts: &[[f64; 2]]) -> f64 {
+    let mag = pts
+        .iter()
+        .fold(1.0f64, |m, p| m.max(p[0].abs()).max(p[1].abs()));
+    2e-10 * mag
+}
+
+/// `b` is the tip of a spike: `a` and `c` lie on the same side of it, and one of
+/// them is within `tol` of the line through `b` and the other.
+fn is_spike(a: [f64; 2], b: [f64; 2], c: [f64; 2], tol: f64) -> bool {
+    let (u, v) = ([a[0] - b[0], a[1] - b[1]], [c[0] - b[0], c[1] - b[1]]);
+    let dot = u[0] * v[0] + u[1] * v[1];
+    if dot <= 0.0 {
+        return false; // a real corner, not a fold-back
+    }
+    let cross = (u[0] * v[1] - u[1] * v[0]).abs();
+    let (lu, lv) = (u[0].hypot(u[1]), v[0].hypot(v[1]));
+    // Height of the shorter arm's end above the longer arm's line.
+    cross / lu.max(lv) <= tol
+}
+
 /// Overlay can leave degenerate pieces where inputs touch exactly: repeated points,
 /// spikes (A, B, A) and zero-area rings. Returns the closed, cleaned ring, or `None`
 /// if nothing with area remains.
@@ -95,22 +118,27 @@ fn clean_ring(coords: &[Coord<f64>]) -> Option<Vec<[f64; 2]>> {
     if pts.len() > 1 && pts.first() == pts.last() {
         pts.pop();
     }
-    // Remove spikes until none are left (removing one can expose another).
+    // Remove spikes until none are left (removing one can expose another). A spike
+    // is a vertex whose neighbours lie in (nearly) the same direction from it:
+    // overlay leaves these, sub-millimetre wide, where edges cross almost exactly.
+    let tol = spike_tolerance(&pts);
     let mut changed = true;
     while changed && pts.len() >= 3 {
         changed = false;
         let n = pts.len();
         for i in 0..n {
-            let (prev, next) = (pts[(i + n - 1) % n], pts[(i + 1) % n]);
-            if prev == next {
-                // Drop the spike tip and one copy of the base point.
-                let (a, b) = if (i + 1) % n > i {
-                    (i, (i + 1) % n)
-                } else {
-                    ((i + 1) % n, i)
-                };
-                pts.remove(b);
-                pts.remove(a);
+            let (a, b, c) = (pts[(i + n - 1) % n], pts[i], pts[(i + 1) % n]);
+            if a == c || is_spike(a, b, c, tol) {
+                pts.remove(i);
+                // Merge the neighbours if they coincide now.
+                let n = pts.len();
+                if n >= 2 {
+                    let j = i % n;
+                    let prev = (j + n - 1) % n;
+                    if pts[prev] == pts[j] {
+                        pts.remove(j);
+                    }
+                }
                 changed = true;
                 break;
             }

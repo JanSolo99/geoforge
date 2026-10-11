@@ -35,6 +35,38 @@ enum Tool {
         clip_features: PathBuf,
         out_feature_class: PathBuf,
     },
+    /// Geometric intersection of inputs (ArcGIS "Intersect"): `gf intersect a b ... out`.
+    Intersect {
+        /// Two or more inputs followed by the output.
+        #[arg(num_args = 3.., required = true)]
+        paths: Vec<PathBuf>,
+    },
+    /// Planar overlay of polygon inputs (ArcGIS "Union"): `gf union a b ... out`.
+    Union {
+        /// One or more inputs followed by the output.
+        #[arg(num_args = 2.., required = true)]
+        paths: Vec<PathBuf>,
+    },
+    /// Remove the parts of input features inside erase polygons (ArcGIS "Erase").
+    Erase {
+        in_features: PathBuf,
+        erase_features: PathBuf,
+        out_feature_class: PathBuf,
+    },
+    /// Merge features by attribute values (ArcGIS "Dissolve").
+    Dissolve {
+        in_features: PathBuf,
+        out_feature_class: PathBuf,
+        /// Field(s) to group by (repeatable). None: dissolve everything into one.
+        #[arg(long = "dissolve-field")]
+        dissolve_fields: Vec<String>,
+        /// Statistics as ArcGIS writes them: "VALUE SUM;PARCEL_ID COUNT".
+        #[arg(long)]
+        statistics_fields: Option<String>,
+        /// MULTI_PART (default) or SINGLE_PART.
+        #[arg(long, default_value = "MULTI_PART")]
+        multi_part: String,
+    },
     /// Buffer features by a distance (ArcGIS "Buffer", planar).
     Buffer {
         in_features: PathBuf,
@@ -63,6 +95,40 @@ fn main() -> ExitCode {
             clip_features,
             out_feature_class,
         } => clip_tool(&in_features, &clip_features, &out_feature_class),
+        Tool::Intersect { mut paths } => {
+            let out = paths.pop().unwrap();
+            overlay_tool(&paths, &out, geoforge_tools::intersect)
+        }
+        Tool::Union { mut paths } => {
+            let out = paths.pop().unwrap();
+            overlay_tool(&paths, &out, geoforge_tools::union)
+        }
+        Tool::Erase {
+            in_features,
+            erase_features,
+            out_feature_class,
+        } => (|| {
+            let (fc, _) = open_feature_class(&in_features)?;
+            let (er, _) = open_feature_class(&erase_features)?;
+            write_output(
+                geoforge_tools::erase(fc.as_ref(), er.as_ref())?,
+                &out_feature_class,
+                source_gdb(&in_features).as_deref(),
+            )
+        })(),
+        Tool::Dissolve {
+            in_features,
+            out_feature_class,
+            dissolve_fields,
+            statistics_fields,
+            multi_part,
+        } => dissolve_tool(
+            &in_features,
+            &out_feature_class,
+            &dissolve_fields,
+            statistics_fields.as_deref(),
+            &multi_part,
+        ),
         Tool::Buffer {
             in_features,
             out_feature_class,
@@ -549,6 +615,73 @@ fn clip_tool(input: &Path, clip_features: &Path, output: &Path) -> Result<()> {
     let (fc, _) = open_feature_class(input)?;
     let (clip, _) = open_feature_class(clip_features)?;
     let out = geoforge_tools::clip(fc.as_ref(), clip.as_ref())?;
+    write_output(out, output, source_gdb(input).as_deref())
+}
+
+/// The name ArcGIS uses for a dataset in output field names (`FID_<name>`).
+fn dataset_name(path: &Path) -> String {
+    match locate(path) {
+        Location::Geodatabase {
+            item: Some(item), ..
+        } => item,
+        _ => path
+            .file_stem()
+            .map(|s| s.to_string_lossy().into_owned())
+            .unwrap_or_default(),
+    }
+}
+
+fn overlay_tool(
+    inputs: &[PathBuf],
+    output: &Path,
+    tool: fn(&[geoforge_tools::NamedInput]) -> Result<ToolOutput>,
+) -> Result<()> {
+    let opened: Vec<Box<dyn FeatureClass>> = inputs
+        .iter()
+        .map(|p| open_feature_class(p).map(|(f, _)| f))
+        .collect::<Result<_>>()?;
+    let named: Vec<geoforge_tools::NamedInput> = inputs
+        .iter()
+        .zip(&opened)
+        .map(|(p, f)| geoforge_tools::NamedInput {
+            name: dataset_name(p),
+            features: f.as_ref(),
+        })
+        .collect();
+    write_output(tool(&named)?, output, source_gdb(&inputs[0]).as_deref())
+}
+
+fn dissolve_tool(
+    input: &Path,
+    output: &Path,
+    fields: &[String],
+    statistics: Option<&str>,
+    multi_part: &str,
+) -> Result<()> {
+    let (fc, _) = open_feature_class(input)?;
+    let mut stats = Vec::new();
+    for item in statistics
+        .unwrap_or("")
+        .split(';')
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+    {
+        let mut words = item.split_whitespace();
+        let (Some(field), Some(stat)) = (words.next(), words.next()) else {
+            return Err(Error::Unsupported(format!(
+                "statistic `{item}`: expected \"FIELD STATISTIC\""
+            )));
+        };
+        let stat = geoforge_tools::Statistic::parse(stat)
+            .ok_or_else(|| Error::Unsupported(format!("statistic type {stat}")))?;
+        stats.push((field.to_owned(), stat));
+    }
+    let multi = match multi_part.to_ascii_uppercase().as_str() {
+        "MULTI_PART" => true,
+        "SINGLE_PART" => false,
+        other => return Err(Error::Unsupported(format!("multi_part {other}"))),
+    };
+    let out = geoforge_tools::dissolve(fc.as_ref(), fields, &stats, multi)?;
     write_output(out, output, source_gdb(input).as_deref())
 }
 

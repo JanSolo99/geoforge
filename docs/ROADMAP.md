@@ -32,7 +32,12 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       point buffers exactly (ArcGIS arc densification rule reproduced)
 - [ ] Buffer: true arcs in geodatabase output (ArcGIS stores buffers as circular arcs),
       dissolve LIST, line_side LEFT/RIGHT/OUTSIDE_ONLY, geodesic for geographic data
-- [ ] Intersect, Union, Erase, Dissolve, Identity, Split, Merge, Append
+- [x] Intersect (polygon/line/point inputs; overlapping features of one input split
+      into regions output once per feature, as ArcGIS does), Erase, Union (planar
+      overlay, ArcGIS row order), Dissolve (fields, statistics SUM/MEAN/MIN/MAX/RANGE/
+      STD/COUNT/FIRST/LAST, multi/single part, line merging) — all match ArcGIS
+- [ ] Identity, Split, Merge, Append, Spatial Join, Near, Select by Location
+- [ ] Overlay Z/M, line×line Intersect, `cluster_tolerance`, `output_type` POINT/LINE
 - [ ] Validation + repair (Check/Repair Geometry), spatial index (R-tree) for overlays
 - [ ] Shapefile writer: `.sbn/.sbx` and `.shp.xml` (ArcGIS writes both for tool outputs)
 

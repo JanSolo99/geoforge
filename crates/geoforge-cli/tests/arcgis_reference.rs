@@ -60,6 +60,62 @@ fn gf_args(case: &str) -> Vec<&'static str> {
             "<out>",
             "-10 Meters",
         ],
+        "intersect_parcels_clip" => vec![
+            "intersect",
+            "testdata/geoproc/parcels.shp",
+            "testdata/geoproc/clip_areas.shp",
+        ],
+        "intersect_roads_parcels" => vec![
+            "intersect",
+            "testdata/geoproc/roads.shp",
+            "testdata/geoproc/parcels.shp",
+        ],
+        "intersect_wells_parcels" => vec![
+            "intersect",
+            "testdata/geoproc/wells.shp",
+            "testdata/geoproc/parcels.shp",
+        ],
+        "erase_parcels" => vec![
+            "erase",
+            "testdata/geoproc/parcels.shp",
+            "testdata/geoproc/clip_areas.shp",
+        ],
+        "erase_roads" => vec![
+            "erase",
+            "testdata/geoproc/roads.shp",
+            "testdata/geoproc/clip_areas.shp",
+        ],
+        "union_parcels_clip" => vec![
+            "union",
+            "testdata/geoproc/parcels.shp",
+            "testdata/geoproc/clip_areas.shp",
+        ],
+        "dissolve_parcels_zone" => vec![
+            "dissolve",
+            "testdata/geoproc/parcels.shp",
+            "<out>",
+            "--dissolve-field",
+            "ZONE",
+            "--statistics-fields",
+            "VALUE SUM;PARCEL_ID COUNT",
+        ],
+        "dissolve_parcels_all" => vec!["dissolve", "testdata/geoproc/parcels.shp", "<out>"],
+        "dissolve_parcels_zone_single" => vec![
+            "dissolve",
+            "testdata/geoproc/parcels.shp",
+            "<out>",
+            "--dissolve-field",
+            "ZONE",
+            "--multi-part",
+            "SINGLE_PART",
+        ],
+        "dissolve_roads_class" => vec![
+            "dissolve",
+            "testdata/geoproc/roads.shp",
+            "<out>",
+            "--dissolve-field",
+            "CLASS",
+        ],
         other => panic!("no gf command for case {other}"),
     }
 }
@@ -179,7 +235,14 @@ fn tools_match_arcgis_output() {
                 GeometryKind::Polyline => (esri_length(ga), esri_length(gb)),
                 _ => (0.0, 0.0),
             };
-            if (ma - mb).abs() > area_tol * mb.abs().max(1.0) {
+            // Within ArcGIS's 0.001 m XY tolerance an outline may move by that much,
+            // changing the area by up to perimeter × 0.001.
+            let slack = if ga.kind == GeometryKind::Polygon && !is_buffer {
+                esri_length(gb) * 0.001
+            } else {
+                0.0
+            };
+            if (ma - mb).abs() > area_tol * mb.abs().max(1.0) + slack {
                 diffs.push(format!(
                     "feature {i}: area/length ours {ma:.6}, ArcGIS {mb:.6}"
                 ));

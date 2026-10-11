@@ -31,8 +31,28 @@ impl ClipArea {
     }
 }
 
+impl ClipArea {
+    pub(crate) fn polygons(&self) -> &MultiPolygon<f64> {
+        &self.area
+    }
+
+    pub(crate) fn touches(&self, env: &geoforge_core::Envelope) -> bool {
+        self.bounds.is_some_and(|b| {
+            !env.is_empty()
+                && env.xmax >= b.min().x
+                && env.xmin <= b.max().x
+                && env.ymax >= b.min().y
+                && env.ymin <= b.max().y
+        })
+    }
+
+    pub(crate) fn contains_point(&self, p: [f64; 2]) -> bool {
+        self.area.intersects(&Point::new(p[0], p[1]))
+    }
+}
+
 /// Curves are densified before overlay (the result is linear, as in a shapefile).
-fn linear(g: &Geometry) -> Result<Geometry> {
+pub(crate) fn linear(g: &Geometry) -> Result<Geometry> {
     if g.has_curves() {
         g.densify_curves_arcgis(geoforge_core::curves::arcgis_densify_deviation(false))
     } else {
