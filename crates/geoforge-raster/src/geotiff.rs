@@ -131,6 +131,18 @@ pub fn read_geotiff(path: &Path) -> Result<Raster> {
         None => None,
     };
 
+    // Stored statistics: an ArcGIS/GDAL .aux.xml beside the file, else the
+    // GDAL_METADATA tag.
+    let aux = std::fs::read_to_string(format!("{}.aux.xml", path.display())).ok();
+    let tag = match dec.find_tag(Tag::Unknown(42112)).map_err(err)? {
+        Some(v) => v.into_string().ok(),
+        None => None,
+    };
+    let statistics = aux
+        .as_deref()
+        .and_then(stored_statistics)
+        .or_else(|| tag.as_deref().and_then(stored_statistics));
+
     let compression = dec
         .find_tag_unsigned::<u16>(Tag::Compression)
         .map_err(err)?
@@ -161,8 +173,22 @@ pub fn read_geotiff(path: &Path) -> Result<Raster> {
         transform,
         nodata,
         epsg,
+        statistics,
         bands,
     })
+}
+
+/// STATISTICS_MINIMUM and STATISTICS_MAXIMUM of the first band from GDAL
+/// metadata XML (`<Item name=…>` in the TIFF tag, `<MDI key=…>` in .aux.xml).
+fn stored_statistics(xml: &str) -> Option<(f64, f64)> {
+    let item = |key: &str| -> Option<f64> {
+        let at = xml.find(&format!("\"{key}\""))?;
+        let rest = &xml[at..];
+        let start = rest.find('>')? + 1;
+        let end = rest[start..].find('<')? + start;
+        rest[start..end].trim().parse().ok()
+    };
+    Some((item("STATISTICS_MINIMUM")?, item("STATISTICS_MAXIMUM")?))
 }
 
 fn interleaved_to_bands(

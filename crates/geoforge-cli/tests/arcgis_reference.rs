@@ -1647,6 +1647,68 @@ fn gf_args(case: &str) -> Vec<&'static str> {
         ],
         "divide_dem_3" => vec!["divide", "testdata/raster/dem.tif", "3"],
         "isnull_dem_nodata" => vec!["is-null", "testdata/raster/dem_nodata.tif"],
+        "plus_zones_zones" => vec![
+            "plus",
+            "testdata/raster/zones.tif",
+            "testdata/raster/zones.tif",
+        ],
+        "minus_zones_zones" => vec![
+            "minus",
+            "testdata/raster/zones.tif",
+            "testdata/raster/zones.tif",
+        ],
+        "times_zones_zones" => vec![
+            "times",
+            "testdata/raster/zones.tif",
+            "testdata/raster/zones.tif",
+        ],
+        "divide_zones_zones" => vec![
+            "divide",
+            "testdata/raster/zones.tif",
+            "testdata/raster/zones.tif",
+        ],
+        "minus_zones_300" => vec!["minus", "testdata/raster/zones.tif", "300"],
+        "times_zones_1000" => vec!["times", "testdata/raster/zones.tif", "1000"],
+        "plus_zones_neg5" => vec!["plus", "testdata/raster/zones.tif", "-5"],
+        "divide_zones_300" => vec!["divide", "testdata/raster/zones.tif", "300"],
+        "divide_zones_neg2" => vec!["divide", "testdata/raster/zones.tif", "-2"],
+        "plus_int16_int16" => vec![
+            "plus",
+            "testdata/raster/dem_int16_packbits.tif",
+            "testdata/raster/dem_int16_packbits.tif",
+        ],
+        "divide_int16_int16" => vec![
+            "divide",
+            "testdata/raster/dem_int16_packbits.tif",
+            "testdata/raster/dem_int16_packbits.tif",
+        ],
+        "plus_dem_landuse" => vec![
+            "plus",
+            "testdata/raster/dem.tif",
+            "testdata/raster/landuse_u8.tif",
+        ],
+        "plus_shifted_dem" => vec![
+            "plus",
+            "testdata/raster/zones_shifted.tif",
+            "testdata/raster/dem.tif",
+        ],
+        "plus_4m_dem" => vec![
+            "plus",
+            "testdata/raster/zones_4m.tif",
+            "testdata/raster/dem.tif",
+        ],
+        "plus_25m_4m" => vec![
+            "plus",
+            "testdata/raster/zones_25m.tif",
+            "testdata/raster/zones_4m.tif",
+        ],
+        "minus_int16_25m" => vec![
+            "minus",
+            "testdata/raster/dem_int16_packbits.tif",
+            "testdata/raster/zones_25m.tif",
+        ],
+        "int_zones" => vec!["int", "testdata/raster/zones.tif"],
+        "int_int16" => vec!["int", "testdata/raster/dem_int16_packbits.tif"],
         "int_dem" => vec!["int", "testdata/raster/dem_nodata.tif"],
         "float_int16" => vec!["float", "testdata/raster/dem_int16_packbits.tif"],
         "con_zones" => vec![

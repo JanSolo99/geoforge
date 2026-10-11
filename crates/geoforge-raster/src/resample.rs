@@ -264,6 +264,7 @@ pub fn onto_grid(r: &Raster, transform: [f64; 6], cols: usize, rows: usize) -> R
     let mut out = Raster::new(cols, rows, r.data_type, transform);
     out.epsg = r.epsg;
     out.nodata = Some(nodata);
+    out.statistics = r.statistics;
     let t = &r.transform;
     for row in 0..rows {
         let y = transform[3] + transform[5] * (row as f64 + 0.5);

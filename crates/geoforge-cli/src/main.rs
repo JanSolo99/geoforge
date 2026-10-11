@@ -438,25 +438,33 @@ enum Tool {
     },
     /// Spatial Analyst "Plus": raster or constant operands.
     Plus {
+        #[arg(allow_negative_numbers = true)]
         in1: String,
+        #[arg(allow_negative_numbers = true)]
         in2: String,
         out_raster: PathBuf,
     },
     /// Spatial Analyst "Minus".
     Minus {
+        #[arg(allow_negative_numbers = true)]
         in1: String,
+        #[arg(allow_negative_numbers = true)]
         in2: String,
         out_raster: PathBuf,
     },
     /// Spatial Analyst "Times".
     Times {
+        #[arg(allow_negative_numbers = true)]
         in1: String,
+        #[arg(allow_negative_numbers = true)]
         in2: String,
         out_raster: PathBuf,
     },
     /// Spatial Analyst "Divide" (integer inputs divide to a truncated integer).
     Divide {
+        #[arg(allow_negative_numbers = true)]
         in1: String,
+        #[arg(allow_negative_numbers = true)]
         in2: String,
         out_raster: PathBuf,
     },

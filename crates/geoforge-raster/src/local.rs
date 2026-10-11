@@ -78,10 +78,19 @@ pub enum MathOp {
     Divide,
 }
 
-/// Plus, Minus, Times, Divide: float output if either operand is float, else 32-bit
-/// integer (Divide then truncates); NoData where either input is NoData or on
-/// division by zero.
+/// Plus, Minus, Times, Divide: float output if either operand is float; integer
+/// output takes ArcGIS's type for the operands (see [`math_type`]), Divide then
+/// rounding down; NoData where either input is NoData or on division by zero.
+/// Rasters on different grids are combined on [`common_grid`].
 pub fn math(op: MathOp, a: &Operand, b: &Operand) -> Option<Raster> {
+    let (a, b) = match (a, b) {
+        (Operand::Raster(ra), Operand::Raster(rb)) => {
+            let (ra, rb) = common_grid(ra, rb)?;
+            (Operand::Raster(ra), Operand::Raster(rb))
+        }
+        _ => (a.clone(), b.clone()),
+    };
+    let (a, b) = (&a, &b);
     let g = grid(&[a, b])?;
     let float = a.is_float() || b.is_float();
     let n = g.width * g.height;
@@ -93,24 +102,191 @@ pub fn math(op: MathOp, a: &Operand, b: &Operand) -> Option<Raster> {
             MathOp::Times => x * y,
             MathOp::Divide if y == 0.0 => return None,
             MathOp::Divide if float => x / y,
-            MathOp::Divide => (x / y).trunc(),
+            MathOp::Divide => (x / y).floor(),
         })
     });
     Some(if float {
         float_raster(g, values)
     } else {
-        int_raster(g, values)
+        let (t, nodata) = math_type(op, a, b);
+        typed_raster(g, values, t, nodata)
     })
 }
 
-/// Int: truncates toward zero into a 32-bit integer raster.
+fn typed_raster(
+    g: &Raster,
+    values: impl Iterator<Item = Option<f64>>,
+    t: DataType,
+    nodata: f64,
+) -> Raster {
+    let mut out = g.like(t);
+    out.nodata = Some(nodata);
+    out.bands[0] = values.map(|v| v.map_or(nodata, |v| t.store(v))).collect();
+    out
+}
+
+/// Two rasters on one grid as ArcGIS's local tools combine them by default: the
+/// intersection of their extents in cells of the larger size, anchored at its
+/// lower-left corner with round(extent / cell) columns and rows, both sampled
+/// at the cell centers.
+pub fn common_grid(a: &Raster, b: &Raster) -> Option<(Raster, Raster)> {
+    if (a.width, a.height, a.transform) == (b.width, b.height, b.transform) {
+        return Some((a.clone(), b.clone()));
+    }
+    let (ax0, ay0, ax1, ay1) = a.extent();
+    let (bx0, by0, bx1, by1) = b.extent();
+    let (x0, y0, x1, y1) = (ax0.max(bx0), ay0.max(by0), ax1.min(bx1), ay1.min(by1));
+    if x0 >= x1 || y0 >= y1 {
+        return None;
+    }
+    let cell = a.cell_width().max(b.cell_width());
+    let cols = (((x1 - x0) / cell).round() as usize).max(1);
+    let rows = (((y1 - y0) / cell).round() as usize).max(1);
+    let transform = [x0, cell, 0.0, y0 + rows as f64 * cell, 0.0, -cell];
+    Some((
+        crate::resample::onto_grid(a, transform, cols, rows),
+        crate::resample::onto_grid(b, transform, cols, rows),
+    ))
+}
+
+/// The value range of an integer type.
+fn type_range(t: DataType) -> (f64, f64) {
+    match t {
+        DataType::U8 => (0.0, u8::MAX as f64),
+        DataType::I8 => (i8::MIN as f64, i8::MAX as f64),
+        DataType::U16 => (0.0, u16::MAX as f64),
+        DataType::I16 => (i16::MIN as f64, i16::MAX as f64),
+        DataType::U32 => (0.0, u32::MAX as f64),
+        _ => (i32::MIN as f64, i32::MAX as f64),
+    }
+}
+
+/// The smallest integer type holding `lo..=hi`, unsigned when `lo` ≥ 0, with
+/// NoData at the end of its range.
+fn smallest_type(lo: f64, hi: f64) -> (DataType, f64) {
+    let order = if lo >= 0.0 {
+        [DataType::U8, DataType::U16, DataType::U32, DataType::I32]
+    } else {
+        [DataType::I8, DataType::I16, DataType::I32, DataType::I32]
+    };
+    let t = order
+        .into_iter()
+        .find(|&t| {
+            let (a, b) = type_range(t);
+            a <= lo && hi <= b
+        })
+        .unwrap_or(DataType::I32);
+    let nodata = match t {
+        DataType::U8 | DataType::U16 | DataType::U32 => type_range(t).1,
+        _ => type_range(t).0,
+    };
+    (t, nodata)
+}
+
+impl Operand {
+    /// The values the operand can take as ArcGIS knows them: a constant's value
+    /// or a raster's stored statistics.
+    fn known_range(&self) -> Option<(f64, f64)> {
+        match self {
+            Operand::Raster(r) => r.statistics,
+            Operand::Constant(c) => Some((*c, *c)),
+        }
+    }
+
+    /// The values its type allows: a raster's pixel type, or the smallest type
+    /// holding a constant.
+    fn type_range(&self) -> (f64, f64) {
+        match self {
+            Operand::Raster(r) => type_range(r.data_type),
+            Operand::Constant(c) => type_range(smallest_type(*c, *c).0),
+        }
+    }
+
+    fn integer_type(&self) -> DataType {
+        match self {
+            Operand::Raster(r) => r.data_type,
+            Operand::Constant(c) => smallest_type(*c, *c).0,
+        }
+    }
+}
+
+/// The range of `op` over operands in `a` and `b` (Divide rounding down, never by 0).
+fn op_range(op: MathOp, a: (f64, f64), b: (f64, f64)) -> (f64, f64) {
+    let mut bs = vec![b.0, b.1];
+    if b.0 <= 0.0 && 0.0 <= b.1 {
+        bs.retain(|&v| v != 0.0);
+        if b.1 >= 1.0 {
+            bs.push(1.0);
+        }
+        if b.0 <= -1.0 {
+            bs.push(-1.0);
+        }
+    }
+    let mut out = (f64::INFINITY, f64::NEG_INFINITY);
+    for x in [a.0, a.1] {
+        for &y in &bs {
+            let v = match op {
+                MathOp::Plus => x + y,
+                MathOp::Minus => x - y,
+                MathOp::Times => x * y,
+                MathOp::Divide => (x / y).floor(),
+            };
+            out = (out.0.min(v), out.1.max(v));
+        }
+    }
+    if out.0 > out.1 { (0.0, 0.0) } else { out }
+}
+
+/// ArcGIS's integer output type for `a op b` (observed). When every raster
+/// operand has stored statistics, the type fits the range the statistics and
+/// constants allow, like other Spatial Analyst output (1/2/4-bit layouts, then
+/// 8-bit, ...). Otherwise it follows the operand types: Plus, Minus and Times
+/// take the smallest type holding the result over the types' full ranges (U8 +
+/// U8 → U16, U8 − U8 → S16, S16 + U8 → S32); Divide keeps the wider type, or
+/// the next wider signed type when an operand is signed.
+pub fn math_type(op: MathOp, a: &Operand, b: &Operand) -> (DataType, f64) {
+    if let (Some(ra), Some(rb)) = (a.known_range(), b.known_range()) {
+        let (lo, hi) = op_range(op, ra, rb);
+        return crate::zonal::integer_output(lo, hi, true);
+    }
+    if op == MathOp::Divide {
+        let (ta, tb) = (a.integer_type(), b.integer_type());
+        let width = |t: DataType| match t {
+            DataType::U8 | DataType::I8 => 8,
+            DataType::U16 | DataType::I16 => 16,
+            _ => 32,
+        };
+        let signed = |t: DataType| matches!(t, DataType::I8 | DataType::I16 | DataType::I32);
+        let w = width(ta).max(width(tb));
+        let t = match (signed(ta) || signed(tb), w) {
+            (false, 8) => DataType::U8,
+            (false, 16) => DataType::U16,
+            (false, _) => DataType::U32,
+            (true, 8) => DataType::I16,
+            (true, _) => DataType::I32,
+        };
+        let (lo, hi) = type_range(t);
+        return (t, if lo < 0.0 { lo } else { hi });
+    }
+    let (lo, hi) = op_range(op, a.type_range(), b.type_range());
+    smallest_type(lo, hi)
+}
+
+/// Int: truncates toward zero. Float input gives a 32-bit integer raster;
+/// integer input with stored statistics takes the type fitting them, else keeps
+/// its type (observed).
 pub fn int(r: &Raster) -> Raster {
-    int_raster(
-        r,
-        r.bands[0]
-            .iter()
-            .map(|&v| (!r.is_nodata(v)).then(|| v.trunc())),
-    )
+    let values = r.bands[0]
+        .iter()
+        .map(|&v| (!r.is_nodata(v)).then(|| v.trunc()));
+    if r.data_type.is_float() {
+        return int_raster(r, values);
+    }
+    let (t, nodata) = match r.statistics {
+        Some((lo, hi)) => crate::zonal::integer_output(lo, hi, true),
+        None => smallest_type(type_range(r.data_type).0, type_range(r.data_type).1),
+    };
+    typed_raster(r, values, t, nodata)
 }
 
 /// Float: the values as 32-bit float.

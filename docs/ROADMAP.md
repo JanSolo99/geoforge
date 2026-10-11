@@ -199,6 +199,13 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         over the intersection of both extents, both sampled at cell centers; integer output
         takes ArcGIS's type choice (16-bit input → U16, 8-bit → sub-byte layouts), float
         NoData −FLT_MAX, matching ArcGIS
+  - [x] Local math on any grids and ArcGIS's integer types: two rasters meet on the
+        intersection of their extents in the larger cells, anchored at its lower-left corner;
+        with stored statistics (GDAL metadata or .aux.xml) on every raster the type fits the range
+        the statistics and constants allow (1/2/4-bit, 8-bit, ...), otherwise it follows the
+        operand types (U8 + U8 → U16, U8 − U8 → S16, S16 + U8 → S32; Divide keeps the wider type,
+        or the next signed one); integer Divide rounds down; Int keeps or narrows the type
+  - [ ] Con/Set Null with rasters on different grids; Con/Set Null output types by the same rule
   - [ ] Cell size/snap/extent/mask environments
 - [ ] Hillshade, slope, aspect, curvature, contours, viewshed, hydrology (fill/flow dir/accumulation/watershed)
   - [x] Slope (degree/percent rise, z-factor), Aspect, Hillshade (no shadows), planar, matching

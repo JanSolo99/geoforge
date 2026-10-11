@@ -69,6 +69,9 @@ pub struct Raster {
     pub nodata: Option<f64>,
     /// EPSG code of the coordinate system, when the file names one.
     pub epsg: Option<u32>,
+    /// Minimum and maximum of band 0 as stored with the file (GDAL metadata or
+    /// `.aux.xml`), which ArcGIS uses to choose some output types.
+    pub statistics: Option<(f64, f64)>,
     /// One `width * height` row-major vector per band. NoData cells hold the
     /// NoData value as stored.
     pub bands: Vec<Vec<f64>>,
@@ -84,6 +87,7 @@ impl Raster {
             transform,
             nodata: None,
             epsg: None,
+            statistics: None,
             bands: vec![vec![0.0; width * height]],
         }
     }
@@ -92,6 +96,7 @@ impl Raster {
     pub fn like(&self, data_type: DataType) -> Self {
         Raster {
             nodata: None,
+            statistics: None,
             data_type,
             bands: vec![vec![0.0; self.width * self.height]],
             ..self.clone()
