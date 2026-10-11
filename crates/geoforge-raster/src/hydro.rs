@@ -478,10 +478,10 @@ pub fn watershed(directions: &Raster, pour_points: &Raster) -> Raster {
         .collect();
     let order = upstream_first(&down, &valid);
     for &i in order.iter().rev() {
-        if label[i].is_none() {
-            if let Some(j) = down[i] {
-                label[i] = label[j];
-            }
+        if label[i].is_none()
+            && let Some(j) = down[i]
+        {
+            label[i] = label[j];
         }
     }
     let max = label.iter().flatten().copied().fold(0.0, f64::max);
