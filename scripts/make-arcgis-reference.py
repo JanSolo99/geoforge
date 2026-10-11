@@ -356,6 +356,14 @@ CASES = {
     "f2r_roads": ("conversion.FeatureToRaster", [DATA / "roads.shp", "FID"], [4]),
     "p2r_parcels_center": ("conversion.PolygonToRaster", [DATA / "parcels.shp", "FID"], ["CELL_CENTER", "", 5]),
     "p2r_parcels_maxarea": ("conversion.PolygonToRaster", [DATA / "parcels.shp", "FID"], ["MAXIMUM_AREA", "", 5]),
+    "p2r_parcels_zone_maxarea_25": ("conversion.PolygonToRaster", [DATA / "parcels.shp", "ZONE"], ["MAXIMUM_AREA", "", 25]),
+    "p2r_parcels_zone_combined_25": ("conversion.PolygonToRaster", [DATA / "parcels.shp", "ZONE"], ["MAXIMUM_COMBINED_AREA", "", 25]),
+    "p2r_combine_maxarea": ("conversion.PolygonToRaster", [RASTER / "combine_polys.shp", "CODE"], ["MAXIMUM_AREA", "", 10]),
+    "p2r_combine_combined": ("conversion.PolygonToRaster", [RASTER / "combine_polys.shp", "CODE"], ["MAXIMUM_COMBINED_AREA", "", 10]),
+    "pl2r_combine_maxlen": ("conversion.PolylineToRaster", [RASTER / "combine_lines.shp", "CODE"], ["MAXIMUM_LENGTH", "", 10]),
+    "pl2r_combine_combined": ("conversion.PolylineToRaster", [RASTER / "combine_lines.shp", "CODE"], ["MAXIMUM_COMBINED_LENGTH", "", 10]),
+    "pl2r_roads_class": ("conversion.PolylineToRaster", [DATA / "roads.shp", "CLASS"], ["MAXIMUM_LENGTH", "", 20]),
+    "pl2r_roads_class_combined": ("conversion.PolylineToRaster", [DATA / "roads.shp", "CLASS"], ["MAXIMUM_COMBINED_LENGTH", "", 20]),
     "pt2r_wells_most": ("conversion.PointToRaster", [DATA / "wells.shp", "DEPTH"], ["MOST_FREQUENT", "", 20]),
     "pt2r_ties_most": ("conversion.PointToRaster", [RASTER / "tie_points.shp", "CLASS"], ["MOST_FREQUENT", "", 10]),
     "pt2r_ties_count": ("conversion.PointToRaster", [RASTER / "tie_points.shp", "CLASS"], ["COUNT", "", 10]),
@@ -418,7 +426,7 @@ RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatist
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",
               "gp.StreamOrder_sa", "gp.FlowLength_sa", "gp.Watershed_sa", "conversion.FeatureToRaster",
-              "conversion.PolygonToRaster", "conversion.PointToRaster", "gp.EucDistance_sa", "gp.ExtractByMask_sa",
+              "conversion.PolygonToRaster", "conversion.PolylineToRaster", "conversion.PointToRaster", "gp.EucDistance_sa", "gp.ExtractByMask_sa",
               "management.Resample", "gp.Viewshed_sa"}
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.

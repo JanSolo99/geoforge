@@ -139,3 +139,41 @@ for (cx, cy), values in cells:
         f.SetGeometry(ogr.CreateGeometryFromWkt(f"POINT ({x} {y})"))
         lyr.CreateFeature(f)
 ds = None
+
+# Polygons and lines where the largest single feature and the largest value
+# combined over features disagree within a 10 m cell (combined-area/length rules).
+def write_features(name, kind, rows):
+    path = OUT / f"{name}.shp"
+    if path.exists():
+        drv.DeleteDataSource(str(path))
+    ds = drv.CreateDataSource(str(path))
+    lyr = ds.CreateLayer(name, srs, kind)
+    lyr.CreateField(ogr.FieldDefn("CODE", ogr.OFTInteger))
+    for value, wkt in rows:
+        f = ogr.Feature(lyr.GetLayerDefn())
+        f.SetField("CODE", value)
+        f.SetGeometry(ogr.CreateGeometryFromWkt(wkt))
+        lyr.CreateFeature(f)
+    ds = None
+
+
+def strip(value, x0, x1, y0=0.0, y1=10.0):
+    x0, x1, y0, y1 = (500000 + x0, 500000 + x1, 5000000 + y0, 5000000 + y1)
+    return value, f"POLYGON (({x0} {y0},{x0} {y1},{x1} {y1},{x1} {y0},{x0} {y0}))"
+
+
+def line(value, x0, y0, x1, y1):
+    return value, f"LINESTRING ({500000 + x0} {5000000 + y0},{500000 + x1} {5000000 + y1})"
+
+
+write_features("combine_polys", ogr.wkbPolygon, [
+    strip(1, 0, 3), strip(2, 3, 5.5), strip(2, 5.5, 8),
+    strip(3, 10, 14), strip(4, 14, 17), strip(4, 17, 20),
+    strip(5, 20, 23), strip(6, 23, 25.25), strip(6, 25.25, 27.5),
+    strip(7, 30, 40),
+])
+write_features("combine_lines", ogr.wkbLineString, [
+    line(1, 5, 6, 9.5, 6), line(2, 5, 7.5, 8, 7.5), line(2, 5, 9, 8, 9),
+    line(3, 11, 5, 19, 5), line(4, 11, 7, 16, 7), line(4, 11, 9, 16, 9),
+    line(5, 31, 15, 35, 15),
+])

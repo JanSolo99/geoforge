@@ -572,8 +572,19 @@ enum Tool {
         in_features: PathBuf,
         value_field: String,
         out_raster: PathBuf,
-        /// CELL_CENTER or MAXIMUM_AREA.
+        /// CELL_CENTER, MAXIMUM_AREA or MAXIMUM_COMBINED_AREA.
         #[arg(long, default_value = "CELL_CENTER")]
+        cell_assignment: String,
+        #[arg(long)]
+        cellsize: f64,
+    },
+    /// Conversion "Polyline To Raster".
+    PolylineToRaster {
+        in_features: PathBuf,
+        value_field: String,
+        out_raster: PathBuf,
+        /// MAXIMUM_LENGTH or MAXIMUM_COMBINED_LENGTH.
+        #[arg(long, default_value = "MAXIMUM_LENGTH")]
         cell_assignment: String,
         #[arg(long)]
         cellsize: f64,
@@ -1780,6 +1791,25 @@ fn main() -> ExitCode {
             r.epsg = epsg;
             write_raster(&out_raster, &r)
         })(),
+        Tool::PolylineToRaster {
+            in_features,
+            value_field,
+            out_raster,
+            cell_assignment,
+            cellsize,
+        } => (|| {
+            use geoforge_raster::rasterize::*;
+            let assignment = match cell_assignment.to_ascii_uppercase().as_str() {
+                "MAXIMUM_LENGTH" => LineAssignment::MaximumLength,
+                "MAXIMUM_COMBINED_LENGTH" => LineAssignment::MaximumCombinedLength,
+                other => return Err(Error::Unsupported(format!("cell assignment {other}"))),
+            };
+            let (features, kind, epsg, _) = rasterize_input(&in_features, &value_field)?;
+            let mut r = polyline_to_raster(&features, cellsize, assignment, kind)
+                .ok_or_else(|| Error::Unsupported("no features to rasterize".into()))?;
+            r.epsg = epsg;
+            write_raster(&out_raster, &r)
+        })(),
         Tool::PolygonToRaster {
             in_features,
             value_field,
@@ -1791,6 +1821,7 @@ fn main() -> ExitCode {
             let assignment = match cell_assignment.to_ascii_uppercase().as_str() {
                 "CELL_CENTER" => PolygonAssignment::CellCenter,
                 "MAXIMUM_AREA" => PolygonAssignment::MaximumArea,
+                "MAXIMUM_COMBINED_AREA" => PolygonAssignment::MaximumCombinedArea,
                 other => return Err(Error::Unsupported(format!("cell assignment {other}"))),
             };
             let (features, kind, epsg, _) = rasterize_input(&in_features, &value_field)?;

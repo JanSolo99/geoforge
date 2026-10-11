@@ -17645,6 +17645,126 @@
       "messages": [],
       "fields": [],
       "shapeType": null
+    },
+    "p2r_parcels_zone_maxarea_25": {
+      "tool": "conversion.PolygonToRaster",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "ZONE",
+        "<out>",
+        "MAXIMUM_AREA",
+        "",
+        25
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "p2r_parcels_zone_combined_25": {
+      "tool": "conversion.PolygonToRaster",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "ZONE",
+        "<out>",
+        "MAXIMUM_COMBINED_AREA",
+        "",
+        25
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "pl2r_roads_class": {
+      "tool": "conversion.PolylineToRaster",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "CLASS",
+        "<out>",
+        "MAXIMUM_LENGTH",
+        "",
+        20
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "pl2r_roads_class_combined": {
+      "tool": "conversion.PolylineToRaster",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "CLASS",
+        "<out>",
+        "MAXIMUM_COMBINED_LENGTH",
+        "",
+        20
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "p2r_combine_maxarea": {
+      "tool": "conversion.PolygonToRaster",
+      "args": [
+        "testdata/raster/combine_polys.shp",
+        "CODE",
+        "<out>",
+        "MAXIMUM_AREA",
+        "",
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "p2r_combine_combined": {
+      "tool": "conversion.PolygonToRaster",
+      "args": [
+        "testdata/raster/combine_polys.shp",
+        "CODE",
+        "<out>",
+        "MAXIMUM_COMBINED_AREA",
+        "",
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "pl2r_combine_maxlen": {
+      "tool": "conversion.PolylineToRaster",
+      "args": [
+        "testdata/raster/combine_lines.shp",
+        "CODE",
+        "<out>",
+        "MAXIMUM_LENGTH",
+        "",
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "pl2r_combine_combined": {
+      "tool": "conversion.PolylineToRaster",
+      "args": [
+        "testdata/raster/combine_lines.shp",
+        "CODE",
+        "<out>",
+        "MAXIMUM_COMBINED_LENGTH",
+        "",
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

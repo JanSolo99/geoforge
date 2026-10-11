@@ -16,6 +16,8 @@ pub enum PolygonAssignment {
     CellCenter,
     /// The polygon covering most of the cell.
     MaximumArea,
+    /// The value covering most of the cell over all its polygons.
+    MaximumCombinedArea,
 }
 
 /// How a point cell combines several points.
@@ -53,17 +55,33 @@ fn extent(features: &[(Geometry, f64)]) -> Option<(f64, f64, f64, f64)> {
     e
 }
 
+/// How a tool fits its grid to the features' extent.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum GridFit {
+    /// round(extent / cell) cells from the lower-left corner (polygons).
+    Round,
+    /// The extent widened by half a cell on every side, then rounded (Feature
+    /// To Raster on points and lines, Point To Raster).
+    Widened,
+    /// floor(extent / cell) + 1 cells from the lower-left corner (Polyline To
+    /// Raster).
+    FloorPlusOne,
+}
+
 /// An empty grid for `features` at `cell` size, NoData everywhere.
-fn grid(features: &[(Geometry, f64)], cell: f64, widen: bool) -> Option<Raster> {
+fn grid(features: &[(Geometry, f64)], cell: f64, fit: GridFit) -> Option<Raster> {
     let (mut x0, mut y0, mut x1, mut y1) = extent(features)?;
-    if widen {
+    if fit == GridFit::Widened {
         x0 -= cell / 2.0;
         y0 -= cell / 2.0;
         x1 += cell / 2.0;
         y1 += cell / 2.0;
     }
-    let cols = (((x1 - x0) / cell).round() as usize).max(1);
-    let rows = (((y1 - y0) / cell).round() as usize).max(1);
+    let count = |d: f64| match fit {
+        GridFit::FloorPlusOne => (d / cell + 1e-9).floor() as usize + 1,
+        _ => ((d / cell).round() as usize).max(1),
+    };
+    let (cols, rows) = (count(x1 - x0), count(y1 - y0));
     let top = y0 + rows as f64 * cell;
     let mut r = Raster::new(cols, rows, DataType::F64, [x0, cell, 0.0, top, 0.0, -cell]);
     r.bands[0] = vec![f64::NAN; cols * rows];
@@ -179,11 +197,12 @@ pub fn polygons_to_raster(
     assignment: PolygonAssignment,
     kind: ValueKind,
 ) -> Option<Raster> {
-    let mut r = grid(features, cell, false)?;
+    let mut r = grid(features, cell, GridFit::Round)?;
     let (w, h) = (r.width, r.height);
     let t = r.transform;
     let mut best = vec![0.0f64; w * h];
     let mut covered = vec![0.0f64; w * h];
+    let mut by_value: std::collections::HashMap<usize, Vec<(f64, f64)>> = Default::default();
     for (g, value) in features {
         if g.kind != GeometryKind::Polygon || g.xy.is_empty() {
             continue;
@@ -213,11 +232,31 @@ pub fn polygons_to_raster(
                             r.bands[0][i] = *value;
                         }
                     }
+                    PolygonAssignment::MaximumCombinedArea => {
+                        let half = cell / 2.0;
+                        let a = area_in_box(g, x - half, y - half, x + half, y + half);
+                        if a > 0.0 {
+                            covered[i] += a;
+                            let per = by_value.entry(i).or_default();
+                            match per.iter_mut().find(|p| p.0 == *value) {
+                                Some(p) => p.1 += a,
+                                None => per.push((*value, a)),
+                            }
+                        }
+                    }
                 }
             }
         }
     }
-    if assignment == PolygonAssignment::MaximumArea {
+    // The value with the largest combined area; ties to the first value seen.
+    for (i, per) in by_value {
+        let top = per
+            .iter()
+            .fold(per[0], |b, p| if p.1 > b.1 { *p } else { b });
+        best[i] = top.1;
+        r.bands[0][i] = top.0;
+    }
+    if assignment != PolygonAssignment::CellCenter {
         // The uncovered part of a cell competes too: NoData when it is larger.
         for i in 0..w * h {
             if best[i] <= cell * cell - covered[i] {
@@ -235,7 +274,7 @@ pub fn points_to_raster(
     assignment: PointAssignment,
     kind: ValueKind,
 ) -> Option<Raster> {
-    let mut r = grid(features, cell, true)?;
+    let mut r = grid(features, cell, GridFit::Widened)?;
     let (w, h) = (r.width, r.height);
     let t = r.transform;
     let mut cells: Vec<Vec<f64>> = vec![Vec::new(); w * h];
@@ -319,7 +358,43 @@ pub fn points_to_raster(
 /// value (touching a cell's edge or corner is not enough); where lines share a
 /// cell the feature with the most length in it wins (MAXIMUM_LENGTH).
 pub fn lines_to_raster(features: &[(Geometry, f64)], cell: f64, kind: ValueKind) -> Option<Raster> {
-    let mut r = grid(features, cell, true)?;
+    rasterize_lines(
+        features,
+        cell,
+        LineAssignment::MaximumLength,
+        kind,
+        GridFit::Widened,
+    )
+}
+
+/// How Polyline To Raster picks a cell's value among the lines crossing it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LineAssignment {
+    /// The feature with the most length in the cell.
+    MaximumLength,
+    /// The value with the most length in the cell over all its features.
+    MaximumCombinedLength,
+}
+
+/// Polyline To Raster: like Feature To Raster on lines, but the grid starts at
+/// the lines' lower-left corner with floor(extent / cell) + 1 cells.
+pub fn polyline_to_raster(
+    features: &[(Geometry, f64)],
+    cell: f64,
+    assignment: LineAssignment,
+    kind: ValueKind,
+) -> Option<Raster> {
+    rasterize_lines(features, cell, assignment, kind, GridFit::FloorPlusOne)
+}
+
+fn rasterize_lines(
+    features: &[(Geometry, f64)],
+    cell: f64,
+    assignment: LineAssignment,
+    kind: ValueKind,
+    fit: GridFit,
+) -> Option<Raster> {
+    let mut r = grid(features, cell, fit)?;
     let (w, h) = (r.width, r.height);
     let t = r.transform;
     // Length inside each cell per feature.
@@ -424,7 +499,21 @@ pub fn lines_to_raster(features: &[(Geometry, f64)], cell: f64, kind: ValueKind)
             }
         }
     }
-    for (i, per) in lengths {
+    for (i, mut per) in lengths {
+        if assignment == LineAssignment::MaximumCombinedLength {
+            // Lengths summed per value, kept at the value's first feature.
+            let mut combined: Vec<(usize, f64)> = Vec::new();
+            for &(f, len) in &per {
+                match combined
+                    .iter_mut()
+                    .find(|c| features[c.0].1 == features[f].1)
+                {
+                    Some(c) => c.1 += len,
+                    None => combined.push((f, len)),
+                }
+            }
+            per = combined;
+        }
         // The longest; ties go to the earlier feature.
         let mut best = per[0];
         for &p in &per[1..] {
