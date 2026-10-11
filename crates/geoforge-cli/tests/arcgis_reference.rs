@@ -116,6 +116,34 @@ fn gf_args(case: &str) -> Vec<&'static str> {
             "--dissolve-field",
             "CLASS",
         ],
+        "identity_parcels_clip" => vec![
+            "identity",
+            "testdata/geoproc/parcels.shp",
+            "testdata/geoproc/clip_areas.shp",
+        ],
+        "identity_roads_parcels" => vec![
+            "identity",
+            "testdata/geoproc/roads.shp",
+            "testdata/geoproc/parcels.shp",
+        ],
+        "identity_wells_clip" => vec![
+            "identity",
+            "testdata/geoproc/wells.shp",
+            "testdata/geoproc/clip_areas.shp",
+        ],
+        "merge_parcels_clip" => vec![
+            "merge",
+            "testdata/geoproc/parcels.shp",
+            "testdata/geoproc/clip_areas.shp",
+        ],
+        "merge_parcels_clip_source" => vec![
+            "merge",
+            "testdata/geoproc/parcels.shp",
+            "testdata/geoproc/clip_areas.shp",
+            "<out>",
+            "--add-source",
+            "ADD_SOURCE_INFO",
+        ],
         other => panic!("no gf command for case {other}"),
     }
 }
@@ -140,9 +168,20 @@ fn same_value(a: &Value, b: &Value) -> bool {
         Value::Double(n) => Some(*n),
         _ => None,
     };
+    // MERGE_SRC holds the input path as each system spells it (ArcGIS: a Wine
+    // path); compare the file names.
+    let file_name = |v: &Value| match v {
+        Value::String(s) if s.contains(['/', '\\']) => {
+            s.rsplit(['/', '\\']).next().map(str::to_owned)
+        }
+        _ => None,
+    };
     match (num(a), num(b)) {
         (Some(x), Some(y)) => x == y || (x - y).abs() <= 1e-11 * x.abs().max(1.0),
-        _ => a == b,
+        _ => match (file_name(a), file_name(b)) {
+            (Some(x), Some(y)) => x == y,
+            _ => a == b,
+        },
     }
 }
 

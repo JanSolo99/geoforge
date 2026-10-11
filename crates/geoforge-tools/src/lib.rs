@@ -770,3 +770,174 @@ pub fn dissolve(
         messages: Vec::new(),
     })
 }
+
+/// `arcpy.analysis.Identity(in_features, identity_features, out)` with
+/// `join_attributes="ALL"`: the input features split by the identity polygons,
+/// each piece carrying the attributes of the identity feature it falls in (or
+/// `FID_<name>` = -1 outside them all). Polygon inputs give Union's cells covered
+/// by the input, in Union's order; line pieces outside the identity features come
+/// first, then one (multipart) piece per input/identity pair, by FIDs; points are
+/// ordered by Y.
+pub fn identity(input: NamedInput, identity_features: NamedInput) -> Result<ToolOutput> {
+    let kind = input
+        .features
+        .geometry_kind()
+        .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
+    if identity_features.features.geometry_kind() != Some(GeometryKind::Polygon) {
+        return Err(Error::Unsupported(
+            "identity features must be polygons".into(),
+        ));
+    }
+    if kind == GeometryKind::Polygon {
+        let mut out = union(&[input, identity_features])?;
+        out.features
+            .retain(|f| f.attributes.first() != Some(&Value::Integer(-1)));
+        for (i, f) in out.features.iter_mut().enumerate() {
+            f.oid = i as i64;
+        }
+        return Ok(out);
+    }
+    let fields = overlay_fields(&[
+        NamedInput {
+            name: input.name.clone(),
+            features: input.features,
+        },
+        NamedInput {
+            name: identity_features.name.clone(),
+            features: identity_features.features,
+        },
+    ]);
+    let polys = load(identity_features.features)?;
+    let area = ClipArea::new(polys.iter().filter_map(|f| f.geometry.as_ref()))?;
+    let missing: Vec<Value> = std::iter::once(Value::Integer(-1))
+        .chain(std::iter::repeat_n(
+            Value::Null,
+            identity_features.features.fields().len(),
+        ))
+        .collect();
+    // (covered?, input FID, identity FID, geometry, attributes)
+    let mut rows = Vec::new();
+    for f in load(input.features)? {
+        let g = f.geometry.as_ref().unwrap();
+        let mut head = vec![Value::Integer(f.oid as i32)];
+        head.extend(f.attributes.iter().cloned());
+        if let Some(rest) = geoforge_geometry::erase(g, &area)? {
+            let mut attrs = head.clone();
+            attrs.extend(missing.iter().cloned());
+            rows.push((false, f.oid, -1, rest, attrs));
+        }
+        for p in &polys {
+            if let Some(common) = geoforge_geometry::intersection(g, p.geometry.as_ref().unwrap())?
+            {
+                let mut attrs = head.clone();
+                attrs.push(Value::Integer(p.oid as i32));
+                attrs.extend(p.attributes.iter().cloned());
+                rows.push((true, f.oid, p.oid, common, attrs));
+            }
+        }
+    }
+    if dimension(kind) == 0 {
+        rows.sort_by(|a, b| {
+            let (pa, pb) = (
+                a.3.xy.first().copied().unwrap_or_default(),
+                b.3.xy.first().copied().unwrap_or_default(),
+            );
+            pa[1].total_cmp(&pb[1]).then(pa[0].total_cmp(&pb[0]))
+        });
+    } else {
+        rows.sort_by_key(|a| (a.0, a.1, a.2));
+    }
+    let features: Vec<Feature> = rows
+        .into_iter()
+        .enumerate()
+        .map(|(i, r)| Feature {
+            oid: i as i64,
+            geometry: Some(r.3),
+            attributes: r.4,
+        })
+        .collect();
+    Ok(ToolOutput {
+        kind,
+        has_z: false,
+        has_m: false,
+        fields,
+        spatial_reference_wkt: input.features.spatial_reference_wkt().map(str::to_owned),
+        messages: if features.is_empty() {
+            vec!["WARNING 000117: Warning empty output generated.".into()]
+        } else {
+            Vec::new()
+        },
+        features,
+    })
+}
+
+/// A Merge input: its features and the path ArcGIS records in `MERGE_SRC`.
+pub struct MergeInput<'a> {
+    pub source: String,
+    pub features: &'a dyn FeatureClass,
+}
+
+/// `arcpy.management.Merge(inputs, out, "", add_source)` with the default field
+/// mapping: fields of all inputs matched by name (first definition wins, in input
+/// order), features of each input in turn, null where an input lacks a field.
+/// `add_source` appends `MERGE_SRC` (text, 254) holding each feature's input path.
+pub fn merge(inputs: &[MergeInput], add_source: bool) -> Result<ToolOutput> {
+    let first = inputs
+        .first()
+        .ok_or_else(|| Error::Unsupported("Merge needs at least one input".into()))?;
+    let kind = first.features.geometry_kind();
+    if inputs.iter().any(|i| i.features.geometry_kind() != kind) {
+        return Err(Error::Unsupported(
+            "ERROR 000898: all inputs must have the same geometry type".into(),
+        ));
+    }
+    let mut fields: Vec<Field> = Vec::new();
+    for i in inputs {
+        for f in i.features.fields() {
+            if !fields.iter().any(|g| g.name.eq_ignore_ascii_case(&f.name)) {
+                fields.push(f.clone());
+            }
+        }
+    }
+    let mut features = Vec::new();
+    for i in inputs {
+        let positions: Vec<Option<usize>> = fields
+            .iter()
+            .map(|f| {
+                i.features
+                    .fields()
+                    .iter()
+                    .position(|g| g.name.eq_ignore_ascii_case(&f.name))
+            })
+            .collect();
+        for f in i.features.features() {
+            let f = f?;
+            let mut attributes: Vec<Value> = positions
+                .iter()
+                .map(|p| p.map_or(Value::Null, |p| f.attributes[p].clone()))
+                .collect();
+            if add_source {
+                attributes.push(Value::String(i.source.clone()));
+            }
+            features.push(Feature {
+                oid: features.len() as i64,
+                geometry: f.geometry,
+                attributes,
+            });
+        }
+    }
+    if add_source {
+        let mut f = Field::new("MERGE_SRC", FieldType::String);
+        f.length = 254;
+        fields.push(f);
+    }
+    Ok(ToolOutput {
+        kind: kind.unwrap_or(GeometryKind::Point),
+        has_z: inputs.iter().any(|i| i.features.has_z()),
+        has_m: inputs.iter().any(|i| i.features.has_m()),
+        fields,
+        spatial_reference_wkt: first.features.spatial_reference_wkt().map(str::to_owned),
+        features,
+        messages: Vec::new(),
+    })
+}

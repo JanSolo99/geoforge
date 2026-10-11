@@ -36,7 +36,11 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       into regions output once per feature, as ArcGIS does), Erase, Union (planar
       overlay, ArcGIS row order), Dissolve (fields, statistics SUM/MEAN/MIN/MAX/RANGE/
       STD/COUNT/FIRST/LAST, multi/single part, line merging) — all match ArcGIS
-- [ ] Identity, Split, Merge, Append, Spatial Join, Near, Select by Location
+- [x] Identity (polygon/line/point inputs; Union's cells and order for polygons), Merge
+      (fields matched by name, `ADD_SOURCE_INFO` → `MERGE_SRC`) — match ArcGIS
+- [ ] Split, Append, Spatial Join, Near, Select by Location
+- [ ] Line overlays: crack input lines at their mutual crossings, as ArcGIS does
+      (Identity writes uncovered road pieces split there: same lines, more parts)
 - [ ] Overlay Z/M, line×line Intersect, `cluster_tolerance`, `output_type` POINT/LINE
 - [ ] Validation + repair (Check/Repair Geometry), spatial index (R-tree) for overlays
 - [ ] Shapefile writer: `.sbn/.sbx` and `.shp.xml` (ArcGIS writes both for tool outputs)

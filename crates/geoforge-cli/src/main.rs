@@ -53,6 +53,23 @@ enum Tool {
         erase_features: PathBuf,
         out_feature_class: PathBuf,
     },
+    /// Split input features by identity polygons, joining their attributes
+    /// (ArcGIS "Identity").
+    Identity {
+        in_features: PathBuf,
+        identity_features: PathBuf,
+        out_feature_class: PathBuf,
+    },
+    /// Combine inputs of the same geometry type into one (ArcGIS "Merge"):
+    /// `gf merge a b ... out`.
+    Merge {
+        /// One or more inputs followed by the output.
+        #[arg(num_args = 2.., required = true)]
+        paths: Vec<PathBuf>,
+        /// NO_SOURCE_INFO (default) or ADD_SOURCE_INFO (adds MERGE_SRC).
+        #[arg(long, default_value = "NO_SOURCE_INFO")]
+        add_source: String,
+    },
     /// Merge features by attribute values (ArcGIS "Dissolve").
     Dissolve {
         in_features: PathBuf,
@@ -116,6 +133,32 @@ fn main() -> ExitCode {
                 source_gdb(&in_features).as_deref(),
             )
         })(),
+        Tool::Identity {
+            in_features,
+            identity_features,
+            out_feature_class,
+        } => (|| {
+            let (fc, _) = open_feature_class(&in_features)?;
+            let (id, _) = open_feature_class(&identity_features)?;
+            let out = geoforge_tools::identity(
+                geoforge_tools::NamedInput {
+                    name: dataset_name(&in_features),
+                    features: fc.as_ref(),
+                },
+                geoforge_tools::NamedInput {
+                    name: dataset_name(&identity_features),
+                    features: id.as_ref(),
+                },
+            )?;
+            write_output(out, &out_feature_class, source_gdb(&in_features).as_deref())
+        })(),
+        Tool::Merge {
+            mut paths,
+            add_source,
+        } => {
+            let out = paths.pop().unwrap();
+            merge_tool(&paths, &out, &add_source)
+        }
         Tool::Dissolve {
             in_features,
             out_feature_class,
@@ -649,6 +692,31 @@ fn overlay_tool(
         })
         .collect();
     write_output(tool(&named)?, output, source_gdb(&inputs[0]).as_deref())
+}
+
+fn merge_tool(inputs: &[PathBuf], output: &Path, add_source: &str) -> Result<()> {
+    let add = match add_source.to_ascii_uppercase().as_str() {
+        "NO_SOURCE_INFO" => false,
+        "ADD_SOURCE_INFO" => true,
+        other => return Err(Error::Unsupported(format!("add_source {other}"))),
+    };
+    let opened: Vec<Box<dyn FeatureClass>> = inputs
+        .iter()
+        .map(|p| open_feature_class(p).map(|(f, _)| f))
+        .collect::<Result<_>>()?;
+    let merge_inputs: Vec<geoforge_tools::MergeInput> = inputs
+        .iter()
+        .zip(&opened)
+        .map(|(p, f)| geoforge_tools::MergeInput {
+            source: std::path::absolute(p)
+                .unwrap_or_else(|_| p.clone())
+                .display()
+                .to_string(),
+            features: f.as_ref(),
+        })
+        .collect();
+    let out = geoforge_tools::merge(&merge_inputs, add)?;
+    write_output(out, output, source_gdb(&inputs[0]).as_deref())
 }
 
 fn dissolve_tool(
