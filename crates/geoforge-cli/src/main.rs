@@ -502,6 +502,40 @@ enum Tool {
         #[arg(long, default_value_t = 0.0)]
         base_contour: f64,
     },
+    /// Spatial Analyst "Basin".
+    Basin {
+        in_flow_direction_raster: PathBuf,
+        out_raster: PathBuf,
+    },
+    /// Spatial Analyst "Watershed" (raster pour points).
+    Watershed {
+        in_flow_direction_raster: PathBuf,
+        in_pour_point_data: PathBuf,
+        out_raster: PathBuf,
+    },
+    /// Spatial Analyst "Stream Link".
+    StreamLink {
+        in_stream_raster: PathBuf,
+        in_flow_direction_raster: PathBuf,
+        out_raster: PathBuf,
+    },
+    /// Spatial Analyst "Stream Order".
+    StreamOrder {
+        in_stream_raster: PathBuf,
+        in_flow_direction_raster: PathBuf,
+        out_raster: PathBuf,
+        /// STRAHLER or SHREVE.
+        #[arg(long, default_value = "STRAHLER")]
+        order_method: String,
+    },
+    /// Spatial Analyst "Flow Length" (unweighted).
+    FlowLength {
+        in_flow_direction_raster: PathBuf,
+        out_raster: PathBuf,
+        /// DOWNSTREAM or UPSTREAM.
+        #[arg(long, default_value = "DOWNSTREAM")]
+        direction_measurement: String,
+    },
     /// Spatial Analyst "Aspect" (planar): downslope direction, −1 on flat cells.
     Aspect {
         in_raster: PathBuf,
@@ -1482,6 +1516,64 @@ fn main() -> ExitCode {
                 messages: Vec::new(),
             };
             write_output(out, &out_polyline_features, None)
+        })(),
+        Tool::Basin {
+            in_flow_direction_raster,
+            out_raster,
+        } => geoforge_raster::read_geotiff(&in_flow_direction_raster)
+            .and_then(|d| write_raster(&out_raster, &geoforge_raster::hydro::basin(&d))),
+        Tool::Watershed {
+            in_flow_direction_raster,
+            in_pour_point_data,
+            out_raster,
+        } => (|| {
+            let d = geoforge_raster::read_geotiff(&in_flow_direction_raster)?;
+            let p = geoforge_raster::read_geotiff(&in_pour_point_data)?;
+            write_raster(&out_raster, &geoforge_raster::hydro::watershed(&d, &p))
+        })(),
+        Tool::StreamLink {
+            in_stream_raster,
+            in_flow_direction_raster,
+            out_raster,
+        } => (|| {
+            let s = geoforge_raster::read_geotiff(&in_stream_raster)?;
+            let d = geoforge_raster::read_geotiff(&in_flow_direction_raster)?;
+            write_raster(&out_raster, &geoforge_raster::hydro::stream_link(&s, &d))
+        })(),
+        Tool::StreamOrder {
+            in_stream_raster,
+            in_flow_direction_raster,
+            out_raster,
+            order_method,
+        } => (|| {
+            use geoforge_raster::hydro::StreamOrder;
+            let method = match order_method.to_ascii_uppercase().as_str() {
+                "STRAHLER" => StreamOrder::Strahler,
+                "SHREVE" => StreamOrder::Shreve,
+                other => return Err(Error::Unsupported(format!("order method {other}"))),
+            };
+            let s = geoforge_raster::read_geotiff(&in_stream_raster)?;
+            let d = geoforge_raster::read_geotiff(&in_flow_direction_raster)?;
+            write_raster(
+                &out_raster,
+                &geoforge_raster::hydro::stream_order(&s, &d, method),
+            )
+        })(),
+        Tool::FlowLength {
+            in_flow_direction_raster,
+            out_raster,
+            direction_measurement,
+        } => (|| {
+            let upstream = match direction_measurement.to_ascii_uppercase().as_str() {
+                "DOWNSTREAM" => false,
+                "UPSTREAM" => true,
+                other => return Err(Error::Unsupported(format!("direction {other}"))),
+            };
+            let d = geoforge_raster::read_geotiff(&in_flow_direction_raster)?;
+            write_raster(
+                &out_raster,
+                &geoforge_raster::hydro::flow_length(&d, upstream),
+            )
         })(),
         Tool::Aspect {
             in_raster,

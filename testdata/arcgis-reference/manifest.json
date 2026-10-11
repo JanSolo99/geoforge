@@ -15549,6 +15549,116 @@
         ]
       ],
       "shapeType": "Polyline"
+    },
+    "streams_hydro": {
+      "tool": "gp.Con_sa",
+      "args": [
+        "testdata/arcgis-reference/flowacc_hydro.tif",
+        1,
+        "<out>",
+        "",
+        "Value > 60"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "basin_hydro": {
+      "tool": "gp.Basin_sa",
+      "args": [
+        "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "basin_hydro_nodata": {
+      "tool": "gp.Basin_sa",
+      "args": [
+        "testdata/arcgis-reference/flowdir_hydro_nodata.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "streamlink_hydro": {
+      "tool": "gp.StreamLink_sa",
+      "args": [
+        "testdata/arcgis-reference/streams_hydro.tif",
+        "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "streamorder_strahler": {
+      "tool": "gp.StreamOrder_sa",
+      "args": [
+        "testdata/arcgis-reference/streams_hydro.tif",
+        "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+        "<out>",
+        "STRAHLER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "streamorder_shreve": {
+      "tool": "gp.StreamOrder_sa",
+      "args": [
+        "testdata/arcgis-reference/streams_hydro.tif",
+        "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+        "<out>",
+        "SHREVE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "flowlength_down": {
+      "tool": "gp.FlowLength_sa",
+      "args": [
+        "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+        "<out>",
+        "DOWNSTREAM"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "flowlength_up": {
+      "tool": "gp.FlowLength_sa",
+      "args": [
+        "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+        "<out>",
+        "UPSTREAM"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "watershed_links": {
+      "tool": "gp.Watershed_sa",
+      "args": [
+        "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+        "testdata/arcgis-reference/streamlink_hydro.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

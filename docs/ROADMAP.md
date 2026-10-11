@@ -203,6 +203,9 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         (D8, FLOAT/INTEGER, weights) matching ArcGIS exactly
   - [x] Flow Direction D8 (NORMAL/FORCE): steepest descent, single-cell pits raised first, ties
         to the larger code (two) or the middle of the arc (three), corners flow diagonally out
+  - [x] Basin (touching outlets form one basin, numbered in raster order), Watershed (raster
+        pour points), Stream Link (stretches numbered in raster order of their heads), Stream
+        Order (Strahler, Shreve) and unweighted Flow Length (downstream/upstream), matching ArcGIS
   - [ ] Flow Direction on flats: ArcGIS's flat resolution is approximated (5×5 look-ahead, then
         Jenson–Domingue passes preferring edge neighbors); a few cells differ on float DEMs and
         about 12% on an integer DEM's large flats

@@ -302,6 +302,15 @@ CASES = {
     "contour_dem_20": ("gp.Contour_sa", [RASTER / "dem.tif"], [20, 0]),
     "contour_dem_nodata_15": ("gp.Contour_sa", [RASTER / "dem_nodata.tif"], [15, 5]),
     "contour_int16_25": ("gp.Contour_sa", [RASTER / "dem_int16_packbits.tif"], [25, 0]),
+    "streams_hydro": ("gp.Con_sa", [OUT / "flowacc_hydro.tif", 1], ["", "Value > 60"]),
+    "basin_hydro": ("gp.Basin_sa", [OUT / "flowdir_hydro_filled.tif"], []),
+    "basin_hydro_nodata": ("gp.Basin_sa", [OUT / "flowdir_hydro_nodata.tif"], []),
+    "streamlink_hydro": ("gp.StreamLink_sa", [OUT / "streams_hydro.tif", OUT / "flowdir_hydro_filled.tif"], []),
+    "streamorder_strahler": ("gp.StreamOrder_sa", [OUT / "streams_hydro.tif", OUT / "flowdir_hydro_filled.tif"], ["STRAHLER"]),
+    "streamorder_shreve": ("gp.StreamOrder_sa", [OUT / "streams_hydro.tif", OUT / "flowdir_hydro_filled.tif"], ["SHREVE"]),
+    "flowlength_down": ("gp.FlowLength_sa", [OUT / "flowdir_hydro_filled.tif"], ["DOWNSTREAM"]),
+    "flowlength_up": ("gp.FlowLength_sa", [OUT / "flowdir_hydro_filled.tif"], ["UPSTREAM"]),
+    "watershed_links": ("gp.Watershed_sa", [OUT / "flowdir_hydro_filled.tif", OUT / "streamlink_hydro.tif"], []),
     "zonal_mean": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_nodata.tif"], ["MEAN", "DATA"]),
     "zonal_max_strict": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_nodata.tif"], ["MAXIMUM", "NODATA"]),
     "zonal_range_int": ("gp.ZonalStatistics_sa", [RASTER / "zones.tif", "Value", RASTER / "dem_int16_packbits.tif"], ["RANGE", "DATA"]),
@@ -316,7 +325,8 @@ CASES = {
 RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
               "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa",
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
-              "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa"}
+              "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",
+              "gp.StreamOrder_sa", "gp.FlowLength_sa", "gp.Watershed_sa"}
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable"}

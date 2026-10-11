@@ -6,16 +6,20 @@ use crate::{DataType, Raster};
 
 /// The integer cell type and NoData ArcGIS gives an integer result whose values
 /// run from `min` to `max` (observed): results from 8-bit input may be stored with
-/// 1, 2 or 4 bits (NoData 1, 3 or 15) or as signed then unsigned 8-bit; wider
+/// 1, 2 or 4 bits (NoData 1, 3 or 15, or 0 when the top value is used and 0 is not) or as signed then unsigned 8-bit; wider
 /// input gives unsigned 16-bit when there are no negative values, else signed
 /// 16-bit, then 32-bit.
 pub fn integer_output(min: f64, max: f64, eight_bit_input: bool) -> (DataType, f64) {
     if eight_bit_input {
         if min >= 0.0 {
             for bits in [1u32, 2, 4] {
-                let nodata = ((1u32 << bits) - 1) as f64;
-                if max < nodata {
-                    return (DataType::U8, nodata);
+                let top = ((1u32 << bits) - 1) as f64;
+                if max < top {
+                    return (DataType::U8, top);
+                }
+                // Every value up to the top is possible but 0 is unused.
+                if max == top && min > 0.0 {
+                    return (DataType::U8, 0.0);
                 }
             }
         }

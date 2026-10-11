@@ -365,3 +365,259 @@ mod tests {
         assert_eq!(pick(&[1, 4, 64]), 1);
     }
 }
+
+/// Downstream neighbor of every cell along valid D8 codes, or `None` at outlets
+/// (flow off the raster, into NoData, or an undefined direction).
+fn downstream_cells(directions: &Raster) -> Vec<Option<usize>> {
+    let (w, h) = (directions.width, directions.height);
+    (0..w * h)
+        .map(|i| {
+            let code = value(directions, i)? as u8;
+            let &(_, dx, dy) = D8.iter().find(|d| d.0 == code)?;
+            let (x, y) = ((i % w) as isize + dx, (i / w) as isize + dy);
+            if x < 0 || y < 0 || x >= w as isize || y >= h as isize {
+                return None;
+            }
+            let j = y as usize * w + x as usize;
+            value(directions, j).map(|_| j)
+        })
+        .collect()
+}
+
+/// Cells in an order where every cell comes after all cells flowing into it.
+fn upstream_first(down: &[Option<usize>], valid: &[bool]) -> Vec<usize> {
+    let mut inflow = vec![0u32; down.len()];
+    for j in down.iter().flatten() {
+        inflow[*j] += 1;
+    }
+    let mut order = Vec::with_capacity(down.len());
+    let mut stack: Vec<usize> = (0..down.len())
+        .filter(|&i| valid[i] && inflow[i] == 0)
+        .collect();
+    while let Some(i) = stack.pop() {
+        order.push(i);
+        if let Some(j) = down[i] {
+            inflow[j] -= 1;
+            if inflow[j] == 0 {
+                stack.push(j);
+            }
+        }
+    }
+    order
+}
+
+fn int_result(like: &Raster, data_type: DataType, nodata: f64, values: Vec<Option<f64>>) -> Raster {
+    let mut out = like.like(data_type);
+    out.nodata = Some(nodata);
+    out.bands[0] = values.into_iter().map(|v| v.unwrap_or(nodata)).collect();
+    out
+}
+
+/// Spatial Analyst Basin: each cell labeled by the outlet it drains to. Outlet
+/// cells that touch (8-connected) form one basin; basins are numbered in the
+/// raster order of their first cell.
+pub fn basin(directions: &Raster) -> Raster {
+    let n = directions.width * directions.height;
+    let down = downstream_cells(directions);
+    let valid: Vec<bool> = (0..n).map(|i| value(directions, i).is_some()).collect();
+    let outlet: Vec<bool> = (0..n).map(|i| valid[i] && down[i].is_none()).collect();
+    // Group touching outlets.
+    let mut group: Vec<Option<usize>> = vec![None; n];
+    let mut groups = 0;
+    for i in 0..n {
+        if !outlet[i] || group[i].is_some() {
+            continue;
+        }
+        group[i] = Some(groups);
+        let mut stack = vec![i];
+        while let Some(c) = stack.pop() {
+            for (_, j, _) in neighbors(directions, c) {
+                if outlet[j] && group[j].is_none() {
+                    group[j] = Some(groups);
+                    stack.push(j);
+                }
+            }
+        }
+        groups += 1;
+    }
+    let order = upstream_first(&down, &valid);
+    for &i in order.iter().rev() {
+        if let Some(j) = down[i] {
+            group[i] = group[j];
+        }
+    }
+    let mut number: Vec<Option<f64>> = vec![None; groups];
+    let mut next = 0.0;
+    let label = group
+        .iter()
+        .map(|g| {
+            let g = (*g)?;
+            Some(*number[g].get_or_insert_with(|| {
+                next += 1.0;
+                next
+            }))
+        })
+        .collect();
+    int_result(directions, DataType::U16, 32767.0, label)
+}
+
+/// Spatial Analyst Watershed: each cell labeled with the value of the first pour
+/// point cell at or below it; cells that reach none are NoData.
+pub fn watershed(directions: &Raster, pour_points: &Raster) -> Raster {
+    let n = directions.width * directions.height;
+    let down = downstream_cells(directions);
+    let valid: Vec<bool> = (0..n).map(|i| value(directions, i).is_some()).collect();
+    let mut label: Vec<Option<f64>> = (0..n)
+        .map(|i| {
+            if valid[i] {
+                value(pour_points, i)
+            } else {
+                None
+            }
+        })
+        .collect();
+    let order = upstream_first(&down, &valid);
+    for &i in order.iter().rev() {
+        if label[i].is_none() {
+            if let Some(j) = down[i] {
+                label[i] = label[j];
+            }
+        }
+    }
+    let max = label.iter().flatten().copied().fold(0.0, f64::max);
+    let (t, nd) = if max < 255.0 {
+        (DataType::U8, 255.0)
+    } else if max < 65535.0 {
+        (DataType::U16, 65535.0)
+    } else {
+        (DataType::I32, i32::MAX as f64)
+    };
+    int_result(directions, t, nd, label)
+}
+
+/// Stream cells (non-zero, non-NoData) and their stream-only downstream links.
+fn stream_network(streams: &Raster, directions: &Raster) -> (Vec<bool>, Vec<Option<usize>>) {
+    let n = directions.width * directions.height;
+    let is_stream: Vec<bool> = (0..n)
+        .map(|i| value(streams, i).is_some_and(|v| v != 0.0) && value(directions, i).is_some())
+        .collect();
+    let down = downstream_cells(directions)
+        .into_iter()
+        .enumerate()
+        .map(|(i, d)| d.filter(|&j| is_stream[i] && is_stream[j]))
+        .collect();
+    (is_stream, down)
+}
+
+/// Spatial Analyst Stream Link: a unique value for each stretch of stream between
+/// junctions, numbered in raster order of the stretches' upstream cells.
+pub fn stream_link(streams: &Raster, directions: &Raster) -> Raster {
+    let n = directions.width * directions.height;
+    let (is_stream, down) = stream_network(streams, directions);
+    let mut inflow = vec![0u32; n];
+    for j in down.iter().flatten() {
+        inflow[*j] += 1;
+    }
+    let mut label: Vec<Option<f64>> = vec![None; n];
+    let mut next = 0.0;
+    for i in 0..n {
+        // A stretch starts at a source or just below a junction.
+        let head = is_stream[i] && inflow[i] != 1;
+        if head {
+            next += 1.0;
+            let mut cur = i;
+            loop {
+                label[cur] = Some(next);
+                match down[cur] {
+                    Some(j) if inflow[j] == 1 => cur = j,
+                    _ => break,
+                }
+            }
+        }
+    }
+    int_result(directions, DataType::I32, i32::MAX as f64, label)
+}
+
+/// Stream ordering method.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum StreamOrder {
+    Strahler,
+    Shreve,
+}
+
+/// Spatial Analyst Stream Order.
+pub fn stream_order(streams: &Raster, directions: &Raster, method: StreamOrder) -> Raster {
+    let n = directions.width * directions.height;
+    let (is_stream, down) = stream_network(streams, directions);
+    let order = upstream_first(&down, &is_stream);
+    let mut ups: Vec<Vec<f64>> = vec![Vec::new(); n];
+    let mut result: Vec<Option<f64>> = vec![None; n];
+    for &i in &order {
+        let v = if ups[i].is_empty() {
+            1.0
+        } else {
+            match method {
+                StreamOrder::Shreve => ups[i].iter().sum(),
+                StreamOrder::Strahler => {
+                    let max = ups[i].iter().copied().fold(0.0, f64::max);
+                    if ups[i].iter().filter(|&&u| u == max).count() > 1 {
+                        max + 1.0
+                    } else {
+                        max
+                    }
+                }
+            }
+        };
+        result[i] = Some(v);
+        if let Some(j) = down[i] {
+            ups[j].push(v);
+        }
+    }
+    int_result(directions, DataType::U16, 65535.0, result)
+}
+
+/// Spatial Analyst Flow Length (unweighted): downstream distance to the outlet or
+/// the longest upstream path, along D8 steps of one cell or one diagonal.
+pub fn flow_length(directions: &Raster, upstream: bool) -> Raster {
+    let (w, n) = (directions.width, directions.width * directions.height);
+    let down = downstream_cells(directions);
+    let valid: Vec<bool> = (0..n).map(|i| value(directions, i).is_some()).collect();
+    let step = |i: usize, j: usize| {
+        let diagonal = i % w != j % w && i / w != j / w;
+        if diagonal {
+            directions.cell_width().hypot(directions.cell_height())
+        } else if i % w != j % w {
+            directions.cell_width()
+        } else {
+            directions.cell_height()
+        }
+    };
+    let order = upstream_first(&down, &valid);
+    let mut len = vec![0.0f64; n];
+    if upstream {
+        for &i in &order {
+            if let Some(j) = down[i] {
+                len[j] = len[j].max(len[i] + step(i, j));
+            }
+        }
+    } else {
+        for &i in order.iter().rev() {
+            if let Some(j) = down[i] {
+                len[i] = len[j] + step(i, j);
+            }
+        }
+    }
+    let mut out = directions.like(DataType::F32);
+    let nodata = f32::MIN as f64;
+    out.nodata = Some(nodata);
+    out.bands[0] = (0..n)
+        .map(|i| {
+            if valid[i] {
+                DataType::F32.store(len[i])
+            } else {
+                nodata
+            }
+        })
+        .collect();
+    out
+}

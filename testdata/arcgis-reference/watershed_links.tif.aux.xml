@@ -1,0 +1,14 @@
+<PAMDataset>
+  <PAMRasterBand band="1">
+    <Histograms>
+      <HistItem>
+        <HistMin>-0.5</HistMin>
+        <HistMax>74.5</HistMax>
+        <BucketCount>75</BucketCount>
+        <IncludeOutOfRange>1</IncludeOutOfRange>
+        <Approximate>0</Approximate>
+        <HistCounts>0|85|150|184|69|231|234|153|132|131|105|218|82|325|82|97|9|63|131|123|1|141|7|132|117|105|116|21|116|246|24|120|26|70|8|1|29|212|155|104|258|100|222|256|68|1|105|158|79|156|10|62|65|33|235|91|89|88|26|182|1|105|49|38|286|34|20|275|29|25|43|211|12|98|135</HistCounts>
+      </HistItem>
+    </Histograms>
+  </PAMRasterBand>
+</PAMDataset>

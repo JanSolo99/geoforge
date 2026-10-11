@@ -1660,6 +1660,56 @@ fn gf_args(case: &str) -> Vec<&'static str> {
             "<out>",
             "25",
         ],
+        "streams_hydro" => vec![
+            "con",
+            "testdata/arcgis-reference/flowacc_hydro.tif",
+            "1",
+            "<out>",
+            "--where",
+            "Value > 60",
+        ],
+        "basin_hydro" => vec![
+            "basin",
+            "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+        ],
+        "basin_hydro_nodata" => vec![
+            "basin",
+            "testdata/arcgis-reference/flowdir_hydro_nodata.tif",
+        ],
+        "streamlink_hydro" => vec![
+            "stream-link",
+            "testdata/arcgis-reference/streams_hydro.tif",
+            "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+        ],
+        "streamorder_strahler" => vec![
+            "stream-order",
+            "testdata/arcgis-reference/streams_hydro.tif",
+            "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+        ],
+        "streamorder_shreve" => vec![
+            "stream-order",
+            "testdata/arcgis-reference/streams_hydro.tif",
+            "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+            "<out>",
+            "--order-method",
+            "SHREVE",
+        ],
+        "flowlength_down" => vec![
+            "flow-length",
+            "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+        ],
+        "flowlength_up" => vec![
+            "flow-length",
+            "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+            "<out>",
+            "--direction-measurement",
+            "UPSTREAM",
+        ],
+        "watershed_links" => vec![
+            "watershed",
+            "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+            "testdata/arcgis-reference/streamlink_hydro.tif",
+        ],
         "slope_dem" => vec!["slope", "testdata/raster/dem.tif"],
         "slope_dem_percent_z" => vec![
             "slope",
