@@ -611,6 +611,51 @@ fn gf_args(case: &str) -> Vec<&'static str> {
             "testdata/geoproc/parcels.shp",
             "NAME",
         ],
+        "intersect_3_line" => vec![
+            "intersect",
+            "testdata/geoproc/parcels.shp",
+            "testdata/geoproc/clip_areas.shp",
+            "testdata/geoproc/roads.shp",
+            "<out>",
+            "--output-type",
+            "LINE",
+        ],
+        "intersect_tri_lines_point" => vec![
+            "intersect",
+            "testdata/geoproc/tri_a.shp",
+            "testdata/geoproc/tri_b.shp",
+            "testdata/geoproc/tri_c.shp",
+            "<out>",
+            "--output-type",
+            "POINT",
+        ],
+        "intersect_tri_polys_line" => vec![
+            "intersect",
+            "testdata/geoproc/tri_p.shp",
+            "testdata/geoproc/tri_q.shp",
+            "testdata/geoproc/tri_r.shp",
+            "<out>",
+            "--output-type",
+            "LINE",
+        ],
+        "intersect_tri_polys_point" => vec![
+            "intersect",
+            "testdata/geoproc/tri_p.shp",
+            "testdata/geoproc/tri_q.shp",
+            "testdata/geoproc/tri_r.shp",
+            "<out>",
+            "--output-type",
+            "POINT",
+        ],
+        "intersect_tri_mixed_point" => vec![
+            "intersect",
+            "testdata/geoproc/tri_p.shp",
+            "testdata/geoproc/tri_a.shp",
+            "testdata/geoproc/tri_c.shp",
+            "<out>",
+            "--output-type",
+            "POINT",
+        ],
         "identity_parcels_clip_no_fid" => vec![
             "identity",
             "testdata/geoproc/parcels.shp",
@@ -839,8 +884,13 @@ fn compare(case: &str, ours: &Path, theirs: &Path, fields: &serde_json::Value) -
     // than that are the same point to ArcGIS). Buffers are densified differently
     // (vertex placement on arcs), so compare shape within 2 × the 0.1 m deviation.
     let is_buffer = case.starts_with("buffer");
+    // Intersect of three or more inputs runs as a cascade of overlays, each of
+    // which may move a vertex within the tolerance: allow two steps.
+    let cascade = case.starts_with("intersect_tri") || case.starts_with("intersect_3");
     let (shape_tol, area_tol) = if is_buffer {
         (0.2, 1e-4)
+    } else if cascade {
+        (0.002, 1e-7)
     } else {
         (0.001, 1e-7)
     };

@@ -75,7 +75,12 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       (within one grid step: ArcGIS rounds as it splits)
 - [ ] Z of POINT output where a line crosses a hole at its corners (one case: ArcGIS
       interpolates between the outer-ring crossings; on a plain square it does not)
-- [ ] `cluster_tolerance`; POINT/LINE output for 3+ inputs
+- [x] Intersect POINT/LINE output of three or more inputs (where every input's outline
+      meets; shared stretches cracked at all outline nodes), rows of lower-dimension
+      inputs first and line pieces in overlaps in the late pass, repeated field names
+      NAME_1, NAME_12, NAME_12_13, ... — match ArcGIS (its cascade moves vertices up
+      to ~2 × tolerance)
+- [ ] `cluster_tolerance`
 - [x] Spatial index: R-tree over envelopes (`EnvelopeIndex`) in Near, Spatial Join,
       Select By Location, Identity and Intersect; nearest search stops once no envelope
       can be closer. 10k parcels × 20k wells: Spatial Join 45 s → 0.06 s, Near 1.9 s → 0.09 s

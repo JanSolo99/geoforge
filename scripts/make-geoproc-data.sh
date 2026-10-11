@@ -83,3 +83,23 @@ ogr2ogr -f "ESRI Shapefile" roads_zm.shp /tmp/gf-roads-zm.csv -oo GEOM_POSSIBLE_
 ogr2ogr -f "ESRI Shapefile" parcels_z.shp /tmp/gf-parcels-z.csv -oo GEOM_POSSIBLE_NAMES=WKT \
   -oo KEEP_GEOM_COLUMNS=NO -oo AUTODETECT_TYPE=YES -nlt POLYGONZ -a_srs roads.prj -lco ENCODING=UTF-8
 rm /tmp/gf-roads-zm.csv /tmp/gf-parcels-z.csv
+
+# Three-way meetings for Intersect POINT/LINE output with three inputs: tri_a/tri_b/tri_c
+# are lines that all cross at (500050 5000010) (tri_c also crosses tri_a elsewhere);
+# tri_p/tri_q/tri_r are squares whose outlines share x=500050 from y 10 to 30.
+mk() { # name type csv-body
+  printf 'WKT,TID,NAME\n%s\n' "$3" > /tmp/gf-$1.csv
+  rm -f $1.*
+  ogr2ogr -f "ESRI Shapefile" $1.shp /tmp/gf-$1.csv -oo GEOM_POSSIBLE_NAMES=WKT \
+    -oo KEEP_GEOM_COLUMNS=NO -oo AUTODETECT_TYPE=YES -nlt $2 -a_srs roads.prj -lco ENCODING=UTF-8
+  rm /tmp/gf-$1.csv
+}
+mk tri_a LINESTRING '"LINESTRING (500000 5000010,500100 5000010)",1,a1
+"LINESTRING (500000 5000040,500100 5000040)",2,a2'
+mk tri_b LINESTRING '"LINESTRING (500050 4999990,500050 5000060)",1,b1'
+mk tri_c LINESTRING '"LINESTRING (500040 5000000,500060 5000020)",1,c1
+"LINESTRING (500070 5000000,500070 5000050)",2,c2'
+mk tri_p POLYGON '"POLYGON ((500000 5000000,500000 5000050,500050 5000050,500050 5000000,500000 5000000))",1,p1'
+mk tri_q POLYGON '"POLYGON ((500050 5000000,500050 5000050,500100 5000050,500100 5000000,500050 5000000))",1,q1'
+mk tri_r POLYGON '"POLYGON ((500050 5000010,500050 5000030,500090 5000030,500090 5000010,500050 5000010))",1,r1
+"POLYGON ((500020 5000020,500020 5000060,500080 5000060,500080 5000020,500020 5000020))",2,r2'

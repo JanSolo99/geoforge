@@ -348,12 +348,12 @@ pub fn intersect_with(inputs: &[NamedInput], opts: &IntersectOptions) -> Result<
 /// stretch and for the pair that crosses there. Rows are ordered by FID, polygon
 /// inputs' FIDs first.
 fn intersect_outlines(inputs: &[NamedInput], points: bool) -> Result<ToolOutput> {
-    use geoforge_geometry::{XY_TOLERANCE as TOL, on_path};
-    let [a_in, b_in] = inputs else {
+    use geoforge_geometry::{Meeting, XY_TOLERANCE as TOL, on_path};
+    if inputs.len() < 2 {
         return Err(Error::Unsupported(
-            "Intersect LINE/POINT output of more than two inputs".into(),
+            "Intersect needs at least two inputs".into(),
         ));
-    };
+    }
     for i in inputs {
         if dimension(i.features.geometry_kind().unwrap_or(GeometryKind::Point)) == 0 {
             return Err(Error::Unsupported(
@@ -361,34 +361,54 @@ fn intersect_outlines(inputs: &[NamedInput], points: bool) -> Result<ToolOutput>
             ));
         }
     }
-    let (a_data, b_data) = (load(a_in.features)?, load(b_in.features)?);
-    let b_index = geoforge_geometry::EnvelopeIndex::new(b_data.iter().map(|f| f.geometry.as_ref()));
-    let mut meetings = Vec::new();
-    for fa in &a_data {
-        let candidates = b_index.candidates(&fa.geometry.as_ref().unwrap().curve_envelope(), TOL);
-        for fb in candidates.into_iter().map(|k| &b_data[k]) {
-            let m = geoforge_geometry::meeting(
-                fa.geometry.as_ref().unwrap(),
-                fb.geometry.as_ref().unwrap(),
-                TOL,
-            )?;
+    let data: Vec<Vec<Feature>> = inputs
+        .iter()
+        .map(|i| load(i.features))
+        .collect::<Result<_>>()?;
+    let indexes: Vec<geoforge_geometry::EnvelopeIndex> = data
+        .iter()
+        .map(|fs| geoforge_geometry::EnvelopeIndex::new(fs.iter().map(|f| f.geometry.as_ref())))
+        .collect();
+    let geom = |i: usize, k: usize| data[i][k].geometry.as_ref().unwrap();
+    // Where the outlines of one feature per input all meet: pairs of the first
+    // two inputs, narrowed by each further input.
+    let mut combos: Vec<(Vec<usize>, Meeting)> = Vec::new();
+    for ka in 0..data[0].len() {
+        for kb in indexes[1].candidates(&geom(0, ka).curve_envelope(), TOL) {
+            let m = geoforge_geometry::meeting(geom(0, ka), geom(1, kb), TOL)?;
             if !m.points.is_empty() || !m.shared.is_empty() {
-                meetings.push((fa, fb, m));
+                combos.push((vec![ka, kb], m));
             }
         }
     }
+    for i in 2..inputs.len() {
+        let mut next = Vec::new();
+        for (ks, m) in &combos {
+            let mut env = geoforge_core::Envelope::EMPTY;
+            for p in m.points.iter().chain(m.shared.iter().flatten()) {
+                env.expand_xy(p[0], p[1]);
+            }
+            for k in indexes[i].candidates(&env, TOL) {
+                let narrowed = narrow_meeting(m, geom(i, k), TOL)?;
+                if !narrowed.points.is_empty() || !narrowed.shared.is_empty() {
+                    let mut ks = ks.clone();
+                    ks.push(k);
+                    next.push((ks, narrowed));
+                }
+            }
+        }
+        combos = next;
+    }
     // Sort key: FIDs with polygon inputs first.
-    let polygon_first = b_in.features.geometry_kind() == Some(GeometryKind::Polygon)
-        && a_in.features.geometry_kind() != Some(GeometryKind::Polygon);
-    let key = |a: i64, b: i64| if polygon_first { (b, a) } else { (a, b) };
-    // (pass, key, geometry, attributes)
-    type Row = (u8, (i64, i64), geoforge_core::Geometry, Vec<Value>);
-    let mut rows: Vec<Row> = Vec::new();
-    let attrs = |fa: &Feature, fb: &Feature| {
-        let mut v = vec![Value::Integer(fa.oid as i32)];
-        v.extend(fa.attributes.iter().cloned());
-        v.push(Value::Integer(fb.oid as i32));
-        v.extend(fb.attributes.iter().cloned());
+    let mut order: Vec<usize> = (0..inputs.len()).collect();
+    order.sort_by_key(|&i| inputs[i].features.geometry_kind() != Some(GeometryKind::Polygon));
+    let key = |ks: &[usize]| -> Vec<i64> { order.iter().map(|&i| data[i][ks[i]].oid).collect() };
+    let attrs = |ks: &[usize]| -> Vec<Value> {
+        let mut v = Vec::new();
+        for (i, &k) in ks.iter().enumerate() {
+            v.push(Value::Integer(data[i][k].oid as i32));
+            v.extend(data[i][k].attributes.iter().cloned());
+        }
         v
     };
     let multipoint = |pts: Vec<[f64; 2]>| {
@@ -397,23 +417,43 @@ fn intersect_outlines(inputs: &[NamedInput], points: bool) -> Result<ToolOutput>
         g.xy = pts;
         g
     };
-    for (fa, fb, m) in &meetings {
-        if !points {
+    // Lines are cracked where any two input outlines meet.
+    let nodes = if points {
+        None
+    } else {
+        let outlines: Vec<geoforge_core::Geometry> = data
+            .iter()
+            .flatten()
+            .filter_map(|f| f.geometry.as_ref().map(geoforge_geometry::outline))
+            .collect();
+        Some(geoforge_geometry::LineNodes::new(outlines.iter(), TOL)?)
+    };
+    // (pass, key, input feature indices, geometry, attributes)
+    type Row = (
+        u8,
+        Vec<i64>,
+        Vec<usize>,
+        geoforge_core::Geometry,
+        Vec<Value>,
+    );
+    let mut rows: Vec<Row> = Vec::new();
+    for (ks, m) in &combos {
+        if let Some(nodes) = &nodes {
             if let Some(g) = geoforge_geometry::paths_geometry(m.shared.clone()) {
-                rows.push((0, key(fa.oid, fb.oid), g, attrs(fa, fb)));
+                rows.push((0, key(ks), ks.clone(), nodes.crack(&g), attrs(ks)));
             }
             continue;
         }
         let in_shared = |p: [f64; 2]| {
-            meetings
+            combos
                 .iter()
-                .any(|(_, _, o)| o.shared.iter().any(|s| on_path(p, s, TOL, true)))
+                .any(|(_, o)| o.shared.iter().any(|s| on_path(p, s, TOL, true)))
         };
         let (late, first): (Vec<[f64; 2]>, Vec<[f64; 2]>) =
             m.points.iter().partition(|&&p| in_shared(p));
         let mut late = late;
-        // Nodes made inside this pair's shared stretches by other pairs' points.
-        for (_, _, o) in &meetings {
+        // Nodes made inside this combination's shared stretches by other ones' points.
+        for (_, o) in &combos {
             for &p in &o.points {
                 if m.shared.iter().any(|s| on_path(p, s, TOL, true))
                     && !late.iter().any(|q| (p[0] - q[0]).hypot(p[1] - q[1]) <= TOL)
@@ -423,40 +463,33 @@ fn intersect_outlines(inputs: &[NamedInput], points: bool) -> Result<ToolOutput>
             }
         }
         if !first.is_empty() {
-            rows.push((0, key(fa.oid, fb.oid), multipoint(first), attrs(fa, fb)));
+            rows.push((0, key(ks), ks.clone(), multipoint(first), attrs(ks)));
         }
         if !late.is_empty() {
-            rows.push((1, key(fa.oid, fb.oid), multipoint(late), attrs(fa, fb)));
+            rows.push((1, key(ks), ks.clone(), multipoint(late), attrs(ks)));
         }
     }
-    // Z and M from the two features, in input order.
+    // Z and M from the features combined: polygon inputs first for POINT output
+    // (as its row order), else in input order.
     let (has_z, has_m) = zm_of(inputs);
     if has_z || has_m {
-        let geom = |data: &[Feature], oid: i64| {
-            data.iter()
-                .find(|f| f.oid == oid)
-                .and_then(|f| f.geometry.clone())
-        };
         for r in &mut rows {
-            let (oa, ob) = if polygon_first { (r.1.1, r.1.0) } else { r.1 };
-            let (ga, gb) = (geom(&a_data, oa), geom(&b_data, ob));
-            // POINT output takes Z from the polygon input first (its row order too).
-            let sources: Vec<&geoforge_core::Geometry> = if points && polygon_first {
-                gb.iter().chain(ga.iter()).collect()
+            let sources: Vec<&geoforge_core::Geometry> = if points {
+                order.iter().map(|&i| geom(i, r.2[i])).collect()
             } else {
-                ga.iter().chain(gb.iter()).collect()
+                (0..inputs.len()).map(|i| geom(i, r.2[i])).collect()
             };
-            zm::restore_from(&mut r.2, &sources, has_z, has_m, true);
+            zm::restore_from(&mut r.3, &sources, has_z, has_m, true);
         }
     }
-    rows.sort_by_key(|r| (r.0, r.1));
+    rows.sort_by(|a, b| (a.0, &a.1).cmp(&(b.0, &b.1)));
     let features: Vec<Feature> = rows
         .into_iter()
         .enumerate()
         .map(|(i, r)| Feature {
             oid: i as i64,
-            geometry: Some(r.2),
-            attributes: r.3,
+            geometry: Some(r.3),
+            attributes: r.4,
         })
         .collect();
     Ok(ToolOutput {
@@ -468,7 +501,10 @@ fn intersect_outlines(inputs: &[NamedInput], points: bool) -> Result<ToolOutput>
         has_z,
         has_m,
         fields: overlay_fields(inputs),
-        spatial_reference_wkt: a_in.features.spatial_reference_wkt().map(str::to_owned),
+        spatial_reference_wkt: inputs[0]
+            .features
+            .spatial_reference_wkt()
+            .map(str::to_owned),
         messages: if features.is_empty() {
             vec!["WARNING 000117: Warning empty output generated.".into()]
         } else {
@@ -476,6 +512,56 @@ fn intersect_outlines(inputs: &[NamedInput], points: bool) -> Result<ToolOutput>
         },
         features,
     })
+}
+
+/// What of a meeting of outlines also lies on `g`'s outline: its points on it, and
+/// where its shared stretches meet it.
+fn narrow_meeting(
+    m: &geoforge_geometry::Meeting,
+    g: &geoforge_core::Geometry,
+    tol: f64,
+) -> Result<geoforge_geometry::Meeting> {
+    let outline = geoforge_geometry::outline(g);
+    let paths: Vec<Vec<[f64; 2]>> = outline
+        .part_ranges()
+        .map(|r| outline.xy[r].to_vec())
+        .filter(|p| p.len() >= 2)
+        .collect();
+    let mut out = geoforge_geometry::Meeting::default();
+    let push = |out: &mut geoforge_geometry::Meeting, p: [f64; 2]| {
+        if !out
+            .points
+            .iter()
+            .any(|q| (p[0] - q[0]).hypot(p[1] - q[1]) <= tol)
+        {
+            out.points.push(p);
+        }
+    };
+    for &p in &m.points {
+        if paths
+            .iter()
+            .any(|path| geoforge_geometry::on_path(p, path, tol, false))
+        {
+            push(&mut out, p);
+        }
+    }
+    for s in &m.shared {
+        let Some(stretch) = geoforge_geometry::paths_geometry(vec![s.clone()]) else {
+            continue;
+        };
+        let sub = geoforge_geometry::meeting(&stretch, g, tol)?;
+        for p in sub.points {
+            push(&mut out, p);
+        }
+        out.shared.extend(sub.shared);
+    }
+    let shared = out.shared.clone();
+    out.points.retain(|&p| {
+        !shared
+            .iter()
+            .any(|s| geoforge_geometry::on_path(p, s, tol, false))
+    });
+    Ok(out)
 }
 
 fn intersect_input(inputs: &[NamedInput]) -> Result<ToolOutput> {
@@ -609,7 +695,9 @@ fn intersect_input(inputs: &[NamedInput]) -> Result<ToolOutput> {
                     for (k, &i) in poly_inputs.iter().enumerate() {
                         fids[i] = cell_fids[k];
                     }
-                    rows.push((false, fids, piece.clone()));
+                    // Pieces in an overlap of one input's polygons come later.
+                    let overlapping = members.iter().any(|m| m.len() > 1);
+                    rows.push((overlapping, fids, piece.clone()));
                 }
             }
         }
@@ -623,7 +711,18 @@ fn intersect_input(inputs: &[NamedInput]) -> Result<ToolOutput> {
             pa[1].total_cmp(&pb[1]).then(pa[0].total_cmp(&pb[0]))
         });
     } else {
-        rows.sort_by(|a, b| a.0.cmp(&b.0).then(a.1.cmp(&b.1)));
+        // FIDs of lower-dimension inputs come first in the order.
+        let mut order: Vec<usize> = (0..inputs.len()).collect();
+        order.sort_by_key(|&i| {
+            dimension(
+                inputs[i]
+                    .features
+                    .geometry_kind()
+                    .unwrap_or(GeometryKind::Point),
+            )
+        });
+        let key = |fids: &[i64]| -> Vec<i64> { order.iter().map(|&i| fids[i]).collect() };
+        rows.sort_by(|a, b| a.0.cmp(&b.0).then(key(&a.1).cmp(&key(&b.1))));
     }
     // ArcGIS cracks lines wherever two input lines meet.
     let nodes = if kind == GeometryKind::Polyline {
@@ -1707,11 +1806,22 @@ pub fn merge(inputs: &[PathInput], add_source: bool) -> Result<ToolOutput> {
 }
 
 /// Appends `f` to `fields`, suffixing `_1`, `_2`, ... while its name is taken.
+/// Adds a field, renamed as ArcGIS's overlays rename repeated names: NAME, NAME_1,
+/// NAME_12, NAME_12_13, NAME_12_13_14, ...
 fn push_unique(fields: &mut Vec<Field>, mut f: Field) {
     let base = f.name.clone();
     let mut n = 1;
     while fields.iter().any(|g| g.name.eq_ignore_ascii_case(&f.name)) {
-        f.name = format!("{base}_{n}");
+        f.name = match n {
+            1 => format!("{base}_1"),
+            _ => {
+                let mut name = format!("{base}_12");
+                for k in 3..=n {
+                    name.push_str(&format!("_1{k}"));
+                }
+                name
+            }
+        };
         n += 1;
     }
     fields.push(f);

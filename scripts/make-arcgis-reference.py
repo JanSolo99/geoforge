@@ -109,6 +109,11 @@ CASES = {
     "identity_roads_zm_parcels": ("analysis.Identity", [DATA / "roads_zm.shp", DATA / "parcels.shp"], []),
     "union_parcels_z_clip": ("analysis.Union", [f"{DATA / 'parcels_z.shp'};{DATA / 'clip_areas.shp'}"], []),
     "split_roads_zm_parcels_name": ("analysis.Split", [DATA / "roads_zm.shp", DATA / "parcels.shp", "NAME"], []),
+    "intersect_3_line": ("analysis.Intersect", [f"{DATA / 'parcels.shp'};{DATA / 'clip_areas.shp'};{DATA / 'roads.shp'}"], ["ALL", "", "LINE"]),
+    "intersect_tri_lines_point": ("analysis.Intersect", [f"{DATA / 'tri_a.shp'};{DATA / 'tri_b.shp'};{DATA / 'tri_c.shp'}"], ["ALL", "", "POINT"]),
+    "intersect_tri_polys_line": ("analysis.Intersect", [f"{DATA / 'tri_p.shp'};{DATA / 'tri_q.shp'};{DATA / 'tri_r.shp'}"], ["ALL", "", "LINE"]),
+    "intersect_tri_polys_point": ("analysis.Intersect", [f"{DATA / 'tri_p.shp'};{DATA / 'tri_q.shp'};{DATA / 'tri_r.shp'}"], ["ALL", "", "POINT"]),
+    "intersect_tri_mixed_point": ("analysis.Intersect", [f"{DATA / 'tri_p.shp'};{DATA / 'tri_a.shp'};{DATA / 'tri_c.shp'}"], ["ALL", "", "POINT"]),
 }
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools whose output is a table, written as <name>.dbf.
