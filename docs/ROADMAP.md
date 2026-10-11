@@ -167,8 +167,12 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         orders, BigTIFF, planar and pixel-interleaved bands, PixelIsPoint, GDAL_NODATA, EPSG
         GeoKeys (own chunk decoder; the `tiff` crate's LZW rejects GDAL's small tiles), checked
         cell for cell against GDAL
-  - [x] Writer: single band, striped, any compression, EPSG GeoKeys and GDAL_NODATA
-  - [ ] Tiled writer, overviews, COG layout, user-defined CRS GeoKeys
+  - [x] Writer (own encoder): strips or tiles, all bands, none/LZW/Deflate/PackBits (rows
+        packed separately), horizontal and floating-point predictors (LZW/Deflate only, as
+        libtiff), internal overviews (nearest/average), BigTIFF, EPSG GeoKeys and GDAL_NODATA;
+        checked with GDAL and read by ArcGIS; tool output uses ArcGIS's 128×128 tiles
+  - [ ] COG layout (overviews before the full image, ghost area), user-defined CRS GeoKeys,
+        .aux.xml statistics like ArcGIS
 - [ ] Map algebra (local/focal/zonal/global), reclass, resample
   - [x] Focal Statistics (rectangle/circle/annulus in cells; mean, majority, maximum, median,
         minimum, minority, range, std, sum, variety; DATA/NODATA) matching ArcGIS: radii truncate

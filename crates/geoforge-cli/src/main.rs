@@ -2846,15 +2846,23 @@ fn buffer_tool(
     write_output(out, output, source_gdb(input).as_deref())
 }
 
-/// Writes a raster result as GeoTIFF: LZW for integer cells, uncompressed floats,
-/// as ArcGIS writes Spatial Analyst output.
+/// Writes a raster result as GeoTIFF the way ArcGIS writes Spatial Analyst
+/// output: 128×128 tiles, LZW for integer cells, uncompressed floats.
 fn write_raster(path: &Path, raster: &geoforge_raster::Raster) -> Result<()> {
     let compression = if raster.data_type.is_float() {
         geoforge_raster::Compression::None
     } else {
         geoforge_raster::Compression::Lzw
     };
-    geoforge_raster::write_geotiff(path, raster, compression)?;
+    geoforge_raster::write_geotiff_with(
+        path,
+        raster,
+        &geoforge_raster::WriteOptions {
+            compression,
+            tile: Some((128, 128)),
+            ..Default::default()
+        },
+    )?;
     println!(
         "Wrote {} ({}x{})",
         path.display(),

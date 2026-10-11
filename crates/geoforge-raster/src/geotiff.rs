@@ -3,13 +3,12 @@
 //! GDAL_NODATA) are handled here.
 
 use std::fs::File;
-use std::io::{BufReader, BufWriter};
+use std::io::BufReader;
 use std::path::Path;
 
 use geoforge_core::{Error, Result};
 use tiff::ColorType;
 use tiff::decoder::{Decoder, DecodingResult, Limits};
-use tiff::encoder::{TiffEncoder, colortype};
 use tiff::tags::{PlanarConfiguration, SampleFormat, Tag};
 
 use crate::{DataType, Raster};
@@ -337,7 +336,7 @@ fn read_chunks<R: std::io::Read + std::io::Seek>(
     Ok(bands)
 }
 
-fn decompress(
+pub(crate) fn decompress(
     raw: &[u8],
     compression: u16,
     expected: usize,
@@ -496,59 +495,24 @@ fn parse_nodata(text: &str) -> Option<f64> {
     }
 }
 
-/// Writes band 0 of `raster` as a single-band, striped GeoTIFF.
+/// Writes `raster` as a striped GeoTIFF (see [`crate::write_geotiff_with`] for
+/// tiles, predictors and overviews).
 pub fn write_geotiff(path: &Path, raster: &Raster, compression: Compression) -> Result<()> {
-    let file = File::create(path).map_err(|e| Error::io(path, e))?;
-    let err = |e| tiff_error(path, e);
-    let comp = match compression {
-        Compression::None => tiff::encoder::Compression::Uncompressed,
-        Compression::Lzw => tiff::encoder::Compression::Lzw,
-        Compression::Deflate => tiff::encoder::Compression::Deflate(Default::default()),
-        Compression::PackBits => tiff::encoder::Compression::Packbits,
-    };
-    let mut enc = TiffEncoder::new(BufWriter::new(file))
-        .map_err(err)?
-        .with_compression(comp);
-    let band = &raster.bands[0];
-    let (w, h) = (raster.width as u32, raster.height as u32);
-    macro_rules! write_as {
-        ($ct:ty, $t:ty) => {{
-            let data: Vec<$t> = band.iter().map(|&v| v as $t).collect();
-            let mut image = enc.new_image::<$ct>(w, h).map_err(err)?;
-            geo_tags(image.encoder(), raster).map_err(err)?;
-            image.write_data(&data).map_err(err)?;
-        }};
-    }
-    match raster.data_type {
-        DataType::U8 => write_as!(colortype::Gray8, u8),
-        DataType::I8 => write_as!(colortype::GrayI8, i8),
-        DataType::U16 => write_as!(colortype::Gray16, u16),
-        DataType::I16 => write_as!(colortype::GrayI16, i16),
-        DataType::U32 => write_as!(colortype::Gray32, u32),
-        DataType::I32 => write_as!(colortype::GrayI32, i32),
-        DataType::F32 => write_as!(colortype::Gray32Float, f32),
-        DataType::F64 => write_as!(colortype::Gray64Float, f64),
-    }
-    Ok(())
+    crate::write_geotiff_with(
+        path,
+        raster,
+        &crate::WriteOptions {
+            compression,
+            ..Default::default()
+        },
+    )
 }
 
-fn geo_tags<W: std::io::Write + std::io::Seek, K: tiff::encoder::TiffKind>(
-    dir: &mut tiff::encoder::DirectoryEncoder<'_, W, K>,
-    r: &Raster,
-) -> tiff::TiffResult<()> {
-    let t = &r.transform;
-    if t[2] == 0.0 && t[4] == 0.0 {
-        dir.write_tag(Tag::ModelPixelScaleTag, &[t[1], -t[5], 0.0][..])?;
-        dir.write_tag(Tag::ModelTiepointTag, &[0.0, 0.0, 0.0, t[0], t[3], 0.0][..])?;
-    } else {
-        let m = [
-            t[1], t[2], 0.0, t[0], t[4], t[5], 0.0, t[3], 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
-        ];
-        dir.write_tag(Tag::Unknown(MODEL_TRANSFORMATION), &m[..])?;
-    }
+/// The GeoKeyDirectory for an EPSG code (raster type PixelIsArea).
+pub(crate) fn geo_keys(epsg: Option<u32>) -> Vec<u16> {
     let mut keys: Vec<u16> = vec![1, 1, 0, 0];
     let mut key = |id: u16, value: u16| keys.extend([id, 0, 1, value]);
-    match r.epsg {
+    match epsg {
         Some(code) if is_geographic_code(code) => {
             key(GT_MODEL_TYPE, 2);
             key(GT_RASTER_TYPE, 1);
@@ -562,19 +526,10 @@ fn geo_tags<W: std::io::Write + std::io::Seek, K: tiff::encoder::TiffKind>(
         _ => key(GT_RASTER_TYPE, 1),
     }
     keys[3] = (keys.len() as u16 - 4) / 4;
-    dir.write_tag(Tag::GeoKeyDirectoryTag, &keys[..])?;
-    if let Some(nd) = r.nodata {
-        dir.write_tag(Tag::GdalNodata, format_nodata(nd, r.data_type).as_str())?;
-    }
-    Ok(())
+    keys
 }
 
-/// EPSG geographic 2D CRS codes live in 4000–4999 (e.g. 4326, 4283).
-fn is_geographic_code(code: u32) -> bool {
-    (4000..5000).contains(&code)
-}
-
-fn format_nodata(v: f64, data_type: DataType) -> String {
+pub(crate) fn format_nodata(v: f64, data_type: DataType) -> String {
     if v.is_nan() {
         "nan".into()
     } else if data_type.is_float() {
@@ -583,4 +538,9 @@ fn format_nodata(v: f64, data_type: DataType) -> String {
     } else {
         format!("{}", v as i64)
     }
+}
+
+/// EPSG geographic 2D CRS codes live in 4000–4999 (e.g. 4326, 4283).
+fn is_geographic_code(code: u32) -> bool {
+    (4000..5000).contains(&code)
 }

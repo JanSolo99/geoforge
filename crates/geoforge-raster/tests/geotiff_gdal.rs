@@ -220,3 +220,163 @@ fn tempdir(tag: &str) -> PathBuf {
     std::fs::create_dir_all(&dir).unwrap();
     dir
 }
+
+fn gdal_json(path: &Path) -> serde_json::Value {
+    let out = Command::new("gdalinfo")
+        .arg("-json")
+        .arg(path)
+        .output()
+        .unwrap();
+    assert!(out.status.success(), "gdalinfo {}", path.display());
+    serde_json::from_slice(&out.stdout).unwrap()
+}
+
+#[test]
+fn tiled_writer_with_overviews() {
+    use geoforge_raster::{OverviewResampling, WriteOptions, write_geotiff_with};
+    if !gdal_available() {
+        eprintln!("GDAL not installed; skipping");
+        return;
+    }
+    let dir = tempdir("tiled");
+    let cases = [
+        ("dem.tif", Compression::Deflate, Some((64, 32)), true, false),
+        ("dem_f64.tif", Compression::Lzw, Some((16, 16)), true, true),
+        (
+            "dem_nodata.tif",
+            Compression::None,
+            Some((128, 128)),
+            false,
+            false,
+        ),
+        (
+            "dem_int16_packbits.tif",
+            Compression::PackBits,
+            None,
+            true,
+            false,
+        ),
+        (
+            "landuse_u8.tif",
+            Compression::Lzw,
+            Some((32, 16)),
+            true,
+            true,
+        ),
+        (
+            "rgb_planar_u16.tif",
+            Compression::Deflate,
+            Some((32, 32)),
+            true,
+            false,
+        ),
+        ("rgb_pixel_u8.tif", Compression::Lzw, None, true, true),
+        (
+            "dem_bigtiff_i32.tif",
+            Compression::Deflate,
+            Some((48, 48)),
+            true,
+            false,
+        ),
+    ];
+    for (name, compression, tile, predictor, bigtiff) in cases {
+        let r = read_geotiff(&testdata(name)).unwrap();
+        let out = dir.join(format!("t_{name}"));
+        let opts = WriteOptions {
+            compression,
+            tile,
+            predictor,
+            overviews: vec![2, 4],
+            overview_resampling: if r.data_type.is_float() {
+                OverviewResampling::Average
+            } else {
+                OverviewResampling::Nearest
+            },
+            bigtiff,
+        };
+        write_geotiff_with(&out, &r, &opts).unwrap();
+        let g = gdal_read(&out, &dir);
+        assert_eq!(g.size, (r.width, r.height), "{name}");
+        assert_eq!(g.transform, r.transform.to_vec(), "{name}");
+        assert_eq!(g.epsg, r.epsg, "{name}");
+        assert_eq!(
+            g.nodata.map(f64::to_bits),
+            r.nodata.map(f64::to_bits),
+            "{name}"
+        );
+        let all: Vec<f64> = r.bands.concat();
+        assert_eq!(g.values.len(), all.len(), "{name}");
+        let bad = all.iter().zip(&g.values).position(|(a, b)| !same(*a, *b));
+        assert_eq!(
+            bad,
+            None,
+            "{name}: values {:?}",
+            bad.map(|i| (all[i], g.values[i]))
+        );
+        let info = gdal_json(&out);
+        let band = &info["bands"][0];
+        let block: Vec<u64> = band["block"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|v| v.as_u64().unwrap())
+            .collect();
+        if let Some((tw, th)) = tile {
+            assert_eq!(block, vec![tw as u64, th as u64], "{name}: tiles");
+        }
+        let ovr = band["overviews"].as_array().unwrap();
+        assert_eq!(ovr.len(), 2, "{name}: overviews");
+        assert_eq!(
+            ovr[0]["size"],
+            serde_json::json!([r.width.div_ceil(2), r.height.div_ceil(2)]),
+            "{name}"
+        );
+        // GDAL reads the first overview's cells as written.
+        let ov = dir.join(format!("ov_{name}"));
+        let st = Command::new("gdal_translate")
+            .args([
+                "-q", "-ovr", "0", "-ot", "Float64", "-of", "ENVI", "-b", "1",
+            ])
+            .arg(&out)
+            .arg(&ov)
+            .status()
+            .unwrap();
+        assert!(st.success());
+        let bytes = std::fs::read(&ov).unwrap();
+        let got: Vec<f64> = bytes
+            .as_chunks::<8>()
+            .0
+            .iter()
+            .map(|c| f64::from_le_bytes(*c))
+            .collect();
+        let (w, h) = (r.width.div_ceil(2), r.height.div_ceil(2));
+        let mut expect = Vec::new();
+        for y in 0..h {
+            for x in 0..w {
+                let cells: Vec<f64> = [(0, 0), (1, 0), (0, 1), (1, 1)]
+                    .iter()
+                    .filter(|(dx, dy)| 2 * x + dx < r.width && 2 * y + dy < r.height)
+                    .map(|(dx, dy)| r.bands[0][(2 * y + dy) * r.width + 2 * x + dx])
+                    .filter(|v| !r.is_nodata(*v))
+                    .collect();
+                expect.push(if r.data_type.is_float() {
+                    if cells.is_empty() {
+                        r.nodata.unwrap()
+                    } else {
+                        r.data_type
+                            .store(cells.iter().sum::<f64>() / cells.len() as f64)
+                    }
+                } else {
+                    r.bands[0][2 * y * r.width + 2 * x]
+                });
+            }
+        }
+        assert!(
+            expect.iter().zip(&got).all(|(a, b)| same(*a, *b)),
+            "{name}: overview"
+        );
+        // And our reader agrees with itself.
+        let back = read_geotiff(&out).unwrap();
+        assert_eq!(back.bands, r.bands, "{name}: read back");
+    }
+}

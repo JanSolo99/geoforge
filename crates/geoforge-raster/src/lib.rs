@@ -14,9 +14,11 @@ pub mod local;
 pub mod rasterize;
 pub mod resample;
 pub mod surface;
+mod writer;
 pub mod zonal;
 
 pub use geotiff::{Compression, read_geotiff, write_geotiff};
+pub use writer::{OverviewResampling, WriteOptions, write_geotiff_with};
 
 /// The pixel type a raster is stored with (ArcGIS "Pixel Type").
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
