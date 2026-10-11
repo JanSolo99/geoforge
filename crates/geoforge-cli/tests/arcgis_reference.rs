@@ -664,6 +664,13 @@ fn compare(case: &str, ours: &Path, theirs: &Path, fields: &serde_json::Value) -
             }
             continue;
         };
+        if ga.num_parts() != gb.num_parts() {
+            diffs.push(format!(
+                "feature {i}: parts ours {}, ArcGIS {}",
+                ga.num_parts(),
+                gb.num_parts()
+            ));
+        }
         let h = hausdorff(ga, gb);
         if h > shape_tol {
             diffs.push(format!(

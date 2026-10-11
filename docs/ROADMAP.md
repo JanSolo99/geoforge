@@ -49,8 +49,12 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       fields) and Near with several near feature classes (`NEAR_FC`) — match ArcGIS
 - [ ] Split into a geodatabase; Spatial Join field-map merge rules other than First;
       selection types other than NEW_SELECTION (needs layers)
-- [ ] Line overlays: crack input lines at their mutual crossings, as ArcGIS does
-      (Identity writes uncovered road pieces split there: same lines, more parts)
+- [x] Line cracking: Intersect, Identity and Split split line results wherever two
+      input lines meet (crossings, touches, shared-stretch ends; also lines of the same
+      input), Clip and Erase do not; pieces an overlay split at a mere touch are rejoined.
+      Part counts now match ArcGIS in every reference case (checked by the test)
+- [ ] Order of parts within cracked lines (ArcGIS's looks engine-internal: sometimes
+      reversed or rotated; shapes and part counts match)
 - [x] Line×line Intersect (shared stretches), `output_type` POINT/LINE (outline crossings
       per feature pair, incl. ArcGIS's late rows for points inside shared stretches;
       shared polygon boundaries), `join_attributes` ALL/NO_FID/ONLY_FID — match ArcGIS

@@ -188,6 +188,140 @@ pub fn meeting(a: &Geometry, b: &Geometry, tol: f64) -> Result<Meeting> {
     Ok(Meeting { points, shared })
 }
 
+/// Where input lines meet: crossings, touches and the ends of shared stretches,
+/// between any two lines (also two parts of one feature). ArcGIS's overlay
+/// tools crack lines at these points.
+pub struct LineNodes {
+    tree: rstar::RTree<[f64; 2]>,
+    tol: f64,
+}
+
+/// The single-part paths of a line geometry.
+fn paths(g: &Geometry) -> Vec<Geometry> {
+    g.part_ranges()
+        .filter(|r| r.len() >= 2)
+        .map(|r| Geometry {
+            kind: GeometryKind::Polyline,
+            parts: vec![0],
+            part_types: None,
+            xy: g.xy[r].to_vec(),
+            z: None,
+            m: None,
+            curves: Vec::new(),
+        })
+        .collect()
+}
+
+impl LineNodes {
+    /// The nodes of a set of lines (non-line geometries are ignored).
+    pub fn new<'a>(lines: impl IntoIterator<Item = &'a Geometry>, tol: f64) -> Result<Self> {
+        let mut parts = Vec::new();
+        for g in lines {
+            if g.kind == GeometryKind::Polyline {
+                parts.extend(paths(&linear(g)?));
+            }
+        }
+        let index = crate::EnvelopeIndex::new(parts.iter().map(Some));
+        let mut points = Vec::new();
+        for (i, a) in parts.iter().enumerate() {
+            for j in index.candidates(&a.envelope(), tol) {
+                if j <= i {
+                    continue;
+                }
+                let m = meeting(a, &parts[j], tol)?;
+                points.extend(m.points);
+                for s in m.shared {
+                    points.push(s[0]);
+                    points.push(s[s.len() - 1]);
+                }
+            }
+        }
+        Ok(Self {
+            tree: rstar::RTree::bulk_load(points),
+            tol,
+        })
+    }
+
+    fn near(&self, lo: [f64; 2], hi: [f64; 2]) -> impl Iterator<Item = [f64; 2]> + '_ {
+        let t = self.tol;
+        self.tree
+            .locate_in_envelope_intersecting(&rstar::AABB::from_corners(
+                [lo[0] - t, lo[1] - t],
+                [hi[0] + t, hi[1] + t],
+            ))
+            .copied()
+    }
+
+    fn is_node(&self, p: [f64; 2]) -> bool {
+        self.near(p, p)
+            .any(|q| (p[0] - q[0]).hypot(p[1] - q[1]) <= self.tol)
+    }
+
+    /// Splits each path of a line at the nodes inside it, and joins consecutive
+    /// paths that meet end to start at a point that is no node (an overlay may
+    /// split a line where it only touches a polygon's boundary).
+    pub fn crack(&self, g: &Geometry) -> Geometry {
+        if g.kind != GeometryKind::Polyline || g.has_curves() {
+            return g.clone();
+        }
+        let close = |p: [f64; 2], q: [f64; 2]| (p[0] - q[0]).hypot(p[1] - q[1]) <= self.tol;
+        let mut pieces: Vec<Vec<[f64; 2]>> = Vec::new();
+        for r in g.part_ranges() {
+            let path = &g.xy[r];
+            let mut cur = vec![path[0]];
+            for (k, w) in path.windows(2).enumerate() {
+                let (a, b) = (w[0], w[1]);
+                let lo = [a[0].min(b[0]), a[1].min(b[1])];
+                let hi = [a[0].max(b[0]), a[1].max(b[1])];
+                let mut cuts: Vec<(f64, [f64; 2])> = self
+                    .near(lo, hi)
+                    .filter(|&n| !close(n, a) && !close(n, b))
+                    .filter_map(|n| {
+                        let (d, t) = to_segment(n, (a, b));
+                        (d <= self.tol).then_some((t, n))
+                    })
+                    .collect();
+                cuts.sort_by(|x, y| x.0.total_cmp(&y.0));
+                for (_, n) in cuts {
+                    // Nodes of several line pairs at one spot cut once.
+                    if close(n, *cur.last().unwrap()) {
+                        continue;
+                    }
+                    cur.push(n);
+                    pieces.push(std::mem::replace(&mut cur, vec![n]));
+                }
+                cur.push(b);
+                // A node at an interior vertex.
+                if k + 2 < path.len() && self.is_node(b) {
+                    pieces.push(std::mem::replace(&mut cur, vec![b]));
+                }
+            }
+            pieces.push(cur);
+        }
+        let mut merged: Vec<Vec<[f64; 2]>> = Vec::new();
+        for p in pieces {
+            if let Some(last) = merged.last_mut()
+                && last.last() == p.first()
+                && !self.is_node(p[0])
+            {
+                last.extend_from_slice(&p[1..]);
+                continue;
+            }
+            merged.push(p);
+        }
+        let mut out = g.clone();
+        out.parts.clear();
+        out.xy.clear();
+        out.z = None;
+        out.m = None;
+        for p in merged {
+            out.parts.push(out.xy.len() as u32);
+            out.xy.extend(p);
+        }
+        out
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -224,5 +358,30 @@ mod tests {
         let d = line(&[[15.0, 5.0], [15.0, -5.0]]);
         let m = meeting(&a, &d, 0.001).unwrap();
         assert_eq!(m.points, vec![[15.0, 5.0]]);
+    }
+
+    #[test]
+    fn cracks_at_nodes_and_rejoins_elsewhere() {
+        let a = line(&[[0.0, 0.0], [10.0, 0.0], [20.0, 0.0]]);
+        let b = line(&[[5.0, -5.0], [5.0, 5.0]]);
+        let c = line(&[[10.0, 0.0], [10.0, 5.0]]);
+        let nodes = LineNodes::new([&a, &b, &c], 0.001).unwrap();
+        // Split where b crosses and where c touches at a vertex.
+        let parts: Vec<Vec<[f64; 2]>> = {
+            let g = nodes.crack(&a);
+            g.part_ranges().map(|r| g.xy[r].to_vec()).collect()
+        };
+        assert_eq!(
+            parts,
+            vec![
+                vec![[0.0, 0.0], [5.0, 0.0]],
+                vec![[5.0, 0.0], [10.0, 0.0]],
+                vec![[10.0, 0.0], [20.0, 0.0]],
+            ]
+        );
+        // Pieces meeting at a point no other line reaches are joined.
+        let mut split = line(&[[0.0, 1.0], [3.0, 1.0], [3.0, 1.0], [8.0, 1.0]]);
+        split.parts = vec![0, 2];
+        assert_eq!(nodes.crack(&split).parts, vec![0]);
     }
 }

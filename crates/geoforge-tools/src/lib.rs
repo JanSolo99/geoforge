@@ -35,10 +35,17 @@ pub fn clip(input: &dyn FeatureClass, clip_features: &dyn FeatureClass) -> Resul
         .features()
         .filter_map(|f| f.map(|f| f.geometry).transpose())
         .collect::<Result<_>>()?;
-    clip_to_area(input, &ClipArea::new(clip_geoms.iter())?)
+    clip_to_area(input, &ClipArea::new(clip_geoms.iter())?, None)
 }
 
-fn clip_to_area(input: &dyn FeatureClass, area: &ClipArea) -> Result<ToolOutput> {
+/// The input's parts inside `area`. Lines are cracked at `nodes` (Split), or
+/// only rejoined where the overlay split them at a mere touch (Clip).
+fn clip_to_area(
+    input: &dyn FeatureClass,
+    area: &ClipArea,
+    nodes: Option<&geoforge_geometry::LineNodes>,
+) -> Result<ToolOutput> {
+    let tol = default_xy_tolerance(input.spatial_reference_wkt());
     let kind = input
         .geometry_kind()
         .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
@@ -47,6 +54,12 @@ fn clip_to_area(input: &dyn FeatureClass, area: &ClipArea) -> Result<ToolOutput>
         let f = f?;
         let Some(g) = &f.geometry else { continue };
         if let Some(mut out) = geoforge_geometry::clip(g, area)? {
+            if kind == GeometryKind::Polyline {
+                out = match nodes {
+                    Some(n) => n.crack(&out),
+                    None => geoforge_geometry::LineNodes::new([g], tol)?.crack(&out),
+                };
+            }
             if kind != GeometryKind::Point && kind != GeometryKind::Multipoint {
                 zm::restore(&mut out, g, input.has_z(), input.has_m());
             }
@@ -559,11 +572,20 @@ fn intersect_input(inputs: &[NamedInput]) -> Result<ToolOutput> {
     } else {
         rows.sort_by(|a, b| a.0.cmp(&b.0).then(a.1.cmp(&b.1)));
     }
+    // ArcGIS cracks lines wherever two input lines meet.
+    let nodes = if kind == GeometryKind::Polyline {
+        Some(geoforge_geometry::LineNodes::new(
+            data.iter().flatten().filter_map(|f| f.geometry.as_ref()),
+            default_xy_tolerance(inputs[0].features.spatial_reference_wkt()),
+        )?)
+    } else {
+        None
+    };
     let partial: Vec<(geoforge_core::Geometry, Vec<Value>)> = rows
         .into_iter()
         .map(|(_, fids, g)| {
             (
-                g,
+                nodes.as_ref().map_or(g.clone(), |n| n.crack(&g)),
                 fids.iter()
                     .enumerate()
                     .flat_map(|(i, &fid)| attrs_of(i, fid))
@@ -612,11 +634,15 @@ pub fn erase(input: &dyn FeatureClass, erase_features: &dyn FeatureClass) -> Res
         .filter_map(|f| f.map(|f| f.geometry).transpose())
         .collect::<Result<_>>()?;
     let area = ClipArea::new(erase_geoms.iter())?;
+    let tol = default_xy_tolerance(input.spatial_reference_wkt());
     let mut features = Vec::new();
     for f in input.features() {
         let f = f?;
         let Some(g) = &f.geometry else { continue };
-        if let Some(out) = geoforge_geometry::erase(g, &area)? {
+        if let Some(mut out) = geoforge_geometry::erase(g, &area)? {
+            if kind == GeometryKind::Polyline {
+                out = geoforge_geometry::LineNodes::new([g], tol)?.crack(&out);
+            }
             features.push(Feature {
                 oid: f.oid,
                 geometry: Some(out),
@@ -1031,9 +1057,22 @@ pub fn identity(input: NamedInput, identity_features: NamedInput) -> Result<Tool
             identity_features.features.fields().len(),
         ))
         .collect();
+    let lines = load(input.features)?;
+    // ArcGIS cracks lines wherever two input lines meet.
+    let nodes = geoforge_geometry::LineNodes::new(
+        lines.iter().filter_map(|f| f.geometry.as_ref()),
+        default_xy_tolerance(input.features.spatial_reference_wkt()),
+    )?;
+    let crack = |g: geoforge_core::Geometry| {
+        if kind == GeometryKind::Polyline {
+            nodes.crack(&g)
+        } else {
+            g
+        }
+    };
     // (covered?, input FID, identity FID, geometry, attributes)
     let mut rows = Vec::new();
-    for f in load(input.features)? {
+    for f in lines {
         let g = f.geometry.as_ref().unwrap();
         let mut head = vec![Value::Integer(f.oid as i32)];
         head.extend(f.attributes.iter().cloned());
@@ -1047,7 +1086,7 @@ pub fn identity(input: NamedInput, identity_features: NamedInput) -> Result<Tool
         if let Some(rest) = geoforge_geometry::erase(g, &area)? {
             let mut attrs = head.clone();
             attrs.extend(missing.iter().cloned());
-            rows.push((false, f.oid, -1, rest, attrs));
+            rows.push((false, f.oid, -1, crack(rest), attrs));
         }
         for p in near {
             if let Some(common) = geoforge_geometry::intersection(g, p.geometry.as_ref().unwrap())?
@@ -1055,7 +1094,7 @@ pub fn identity(input: NamedInput, identity_features: NamedInput) -> Result<Tool
                 let mut attrs = head.clone();
                 attrs.push(Value::Integer(p.oid as i32));
                 attrs.extend(p.attributes.iter().cloned());
-                rows.push((true, f.oid, p.oid, common, attrs));
+                rows.push((true, f.oid, p.oid, crack(common), attrs));
             }
         }
     }
@@ -1707,12 +1746,22 @@ pub fn split(
             .or_default()
             .push(f.geometry.unwrap());
     }
+    // Unlike Clip, Split cracks lines wherever two input lines meet.
+    let nodes = if input.geometry_kind() == Some(GeometryKind::Polyline) {
+        let lines = load(input)?;
+        Some(geoforge_geometry::LineNodes::new(
+            lines.iter().filter_map(|f| f.geometry.as_ref()),
+            default_xy_tolerance(input.spatial_reference_wkt()),
+        )?)
+    } else {
+        None
+    };
     let mut outputs = Vec::new();
     for (value, geoms) in groups {
         if value.is_empty() {
             continue;
         }
-        let out = clip_to_area(input, &ClipArea::new(geoms.iter())?)?;
+        let out = clip_to_area(input, &ClipArea::new(geoms.iter())?, nodes.as_ref())?;
         if !out.features.is_empty() {
             outputs.push((value, out));
         }
