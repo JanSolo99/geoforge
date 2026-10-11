@@ -384,3 +384,19 @@ pub fn inside_point(g: &Geometry) -> Result<Option<Pt>> {
         _ => Ok(centroid(&g)?),
     }
 }
+
+/// Area of a polygon (holes subtracted; curves densified).
+pub fn area(g: &Geometry) -> Result<f64> {
+    use geo::Area;
+    Ok(to_multipolygon(&linear(g)?).unsigned_area())
+}
+
+/// Length of a line, or the perimeter of a polygon (all rings).
+pub fn length(g: &Geometry) -> Result<f64> {
+    use geo::Length;
+    Ok(to_multilinestring(&linear(g)?)
+        .0
+        .iter()
+        .map(|l| geo::Euclidean.length(l))
+        .sum())
+}

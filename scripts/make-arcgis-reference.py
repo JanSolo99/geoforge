@@ -195,13 +195,23 @@ CASES = {
     "stats_wells_median": ("analysis.Statistics", [DATA / "wells.shp"], ["DEPTH MEDIAN;DEPTH VARIANCE;DEPTH UNIQUE"]),
     "freq_parcels_zone": ("analysis.Frequency", [DATA / "parcels.shp"], ["ZONE", "VALUE"]),
     "freq_roads_class": ("analysis.Frequency", [DATA / "roads.shp"], ["CLASS"]),
+    "aga_parcels": ("management.AddGeometryAttributes", [DATA / "parcels.shp"], ["AREA;PERIMETER_LENGTH;CENTROID;CENTROID_INSIDE;EXTENT;PART_COUNT;POINT_COUNT"]),
+    "aga_roads": ("management.AddGeometryAttributes", [DATA / "roads.shp"], ["LENGTH;LINE_START_MID_END;LINE_BEARING;PART_COUNT;POINT_COUNT;EXTENT"]),
+    "aga_roads_km": ("management.AddGeometryAttributes", [DATA / "roads.shp"], ["LENGTH", "KILOMETERS"]),
+    "aga_parcels_ha": ("management.AddGeometryAttributes", [DATA / "parcels.shp"], ["AREA", "", "HECTARES"]),
+    "points_to_line_wells": ("management.PointsToLine", [DATA / "wells.shp"], []),
+    "points_to_line_wells_sorted": ("management.PointsToLine", [DATA / "wells.shp"], ["", "DEPTH"]),
+    "gnt_wells_roads": ("analysis.GenerateNearTable", [DATA / "wells.shp", DATA / "roads.shp"], []),
+    "gnt_wells_roads_all": ("analysis.GenerateNearTable", [DATA / "wells.shp", DATA / "roads.shp"], ["100 Meters", "LOCATION", "ANGLE", "ALL", 2]),
+    "find_identical_parcels_zone": ("management.FindIdentical", [DATA / "parcels.shp"], ["ZONE"]),
+    "find_identical_parcels_shape": ("management.FindIdentical", [DATA / "parcels.shp"], ["Shape", "", "", "ONLY_DUPLICATES"]),
 }
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools whose output is a table, written as <name>.dbf.
-TABLE_OUT = {"management.CheckGeometry", "analysis.Statistics", "analysis.Frequency"}
+TABLE_OUT = {"management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical"}
 
 # In-place tools: the index of the input they edit (run on a copy written as the output).
-IN_PLACE = {"analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0}
+IN_PLACE = {"analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.AddGeometryAttributes": 0}
 
 # Select Layer By Location cases, saved with Copy Features:
 # name: (in_layer, overlap_type, select_features, search_distance, invert)

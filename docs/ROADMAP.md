@@ -112,6 +112,10 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       quoted names; BETWEEN rejected with ERROR 000358 as for shapefiles), Summary Statistics
       (sample STD/VARIANCE, unlike Dissolve's population ones; MEDIAN, UNIQUE) and Frequency
       into `.dbf` tables — match ArcGIS
+- [x] Add Geometry Attributes (area, perimeter/length with units, centroid, inside point,
+      extent, start/mid/end, bearing, part and point counts; in place), Points To Line (line
+      and sort fields, close), Generate Near Table (CLOSEST or ALL with rank and count,
+      location, angle), Find Identical (fields or Shape, ONLY_DUPLICATES) — match ArcGIS
 - [ ] Feature To Point INSIDE for U/L-shaped polygons whose centroid lies outside (ArcGIS
       also searches vertically)
 - [ ] Check/Repair Geometry: geodatabase output tables, curves, multipoint and Z/M

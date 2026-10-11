@@ -3484,3 +3484,366 @@ pub fn frequency(
     }
     Ok(TableOutput { fields, rows: out })
 }
+
+/// One `Geometry_Properties` choice of Add Geometry Attributes.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GeometryProperty {
+    Area,
+    PerimeterLength,
+    Length,
+    Centroid,
+    CentroidInside,
+    Extent,
+    LineStartMidEnd,
+    LineBearing,
+    PartCount,
+    PointCount,
+    PointXy,
+}
+
+impl GeometryProperty {
+    pub fn parse(s: &str) -> Option<Self> {
+        Some(match s.trim().to_ascii_uppercase().as_str() {
+            "AREA" => Self::Area,
+            "PERIMETER_LENGTH" => Self::PerimeterLength,
+            "LENGTH" => Self::Length,
+            "CENTROID" => Self::Centroid,
+            "CENTROID_INSIDE" => Self::CentroidInside,
+            "EXTENT" => Self::Extent,
+            "LINE_START_MID_END" => Self::LineStartMidEnd,
+            "LINE_BEARING" => Self::LineBearing,
+            "PART_COUNT" => Self::PartCount,
+            "POINT_COUNT" => Self::PointCount,
+            "POINT_X_Y_Z_M" => Self::PointXy,
+            _ => return None,
+        })
+    }
+
+    fn fields(self) -> &'static [&'static str] {
+        match self {
+            Self::Area => &["POLY_AREA"],
+            Self::PerimeterLength => &["PERIMETER"],
+            Self::Length => &["LENGTH"],
+            Self::Centroid => &["CENTROID_X", "CENTROID_Y"],
+            Self::CentroidInside => &["INSIDE_X", "INSIDE_Y"],
+            Self::Extent => &["EXT_MIN_X", "EXT_MIN_Y", "EXT_MAX_X", "EXT_MAX_Y"],
+            Self::LineStartMidEnd => &["START_X", "START_Y", "MID_X", "MID_Y", "END_X", "END_Y"],
+            Self::LineBearing => &["BEARING"],
+            Self::PartCount => &["PART_COUNT"],
+            Self::PointCount => &["PNT_COUNT"],
+            Self::PointXy => &["POINT_X", "POINT_Y"],
+        }
+    }
+}
+
+/// `arcpy.management.AddGeometryAttributes(in, properties, length_unit,
+/// area_unit)`: the properties' fields (doubles) added or overwritten; lengths
+/// divided by `length_unit` and areas by `area_unit` (meters / square meters per
+/// unit; 1 keeps the coordinate system's units).
+pub fn add_geometry_attributes(
+    input: &dyn FeatureClass,
+    properties: &[GeometryProperty],
+    length_unit: f64,
+    area_unit: f64,
+) -> Result<ToolOutput> {
+    use GeometryProperty as P;
+    let kind = input
+        .geometry_kind()
+        .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
+    let mut fields = input.fields().to_vec();
+    let mut slots = Vec::new();
+    for p in properties {
+        for name in p.fields() {
+            let i = fields
+                .iter()
+                .position(|f| f.name.eq_ignore_ascii_case(name))
+                .unwrap_or_else(|| {
+                    fields.push(Field::new(*name, FieldType::Double));
+                    fields.len() - 1
+                });
+            slots.push(i);
+        }
+    }
+    let mut features = Vec::new();
+    for f in input.features() {
+        let mut f = f?;
+        f.attributes.resize(fields.len(), Value::Null);
+        let mut values: Vec<Option<f64>> = Vec::new();
+        let g = f.geometry.as_ref().filter(|g| !g.xy.is_empty());
+        for p in properties {
+            let Some(g) = g else {
+                values.extend(std::iter::repeat_n(None, p.fields().len()));
+                continue;
+            };
+            match p {
+                P::Area => values.push(Some(geoforge_geometry::area(g)? / area_unit)),
+                P::PerimeterLength | P::Length => {
+                    values.push(Some(geoforge_geometry::length(g)? / length_unit));
+                }
+                P::Centroid => {
+                    let c = geoforge_geometry::centroid(g)?;
+                    values.extend([c.map(|c| c[0]), c.map(|c| c[1])]);
+                }
+                P::CentroidInside => {
+                    let c = geoforge_geometry::inside_point(g)?;
+                    values.extend([c.map(|c| c[0]), c.map(|c| c[1])]);
+                }
+                P::Extent => {
+                    let e = g.envelope();
+                    values.extend([Some(e.xmin), Some(e.ymin), Some(e.xmax), Some(e.ymax)]);
+                }
+                P::LineStartMidEnd => {
+                    let mid = geoforge_geometry::center(g)?;
+                    let (s, e) = (g.xy[0], g.xy[g.xy.len() - 1]);
+                    values.extend([
+                        Some(s[0]),
+                        Some(s[1]),
+                        mid.map(|m| m[0]),
+                        mid.map(|m| m[1]),
+                        Some(e[0]),
+                        Some(e[1]),
+                    ]);
+                }
+                P::LineBearing => {
+                    let (s, e) = (g.xy[0], g.xy[g.xy.len() - 1]);
+                    let b = (e[0] - s[0])
+                        .atan2(e[1] - s[1])
+                        .to_degrees()
+                        .rem_euclid(360.0);
+                    values.push(Some(b));
+                }
+                // Polygons count their exterior rings (holes belong to them).
+                P::PartCount => values.push(Some(if g.kind == GeometryKind::Polygon {
+                    geoforge_geometry::explode(g).len() as f64
+                } else {
+                    g.num_parts() as f64
+                })),
+                P::PointCount => values.push(Some(g.num_points() as f64)),
+                P::PointXy => values.extend([Some(g.xy[0][0]), Some(g.xy[0][1])]),
+            }
+        }
+        for (&i, v) in slots.iter().zip(values) {
+            f.attributes[i] = v.map_or(Value::Null, Value::Double);
+        }
+        features.push(f);
+    }
+    Ok(ToolOutput {
+        kind,
+        has_z: input.has_z(),
+        has_m: input.has_m(),
+        fields,
+        spatial_reference_wkt: input.spatial_reference_wkt().map(str::to_owned),
+        features,
+        messages: Vec::new(),
+    })
+}
+
+/// `arcpy.management.PointsToLine(in, out, line_field, sort_field, close_line)`:
+/// one line per value of `line_field` (sorted; one line without it) through its
+/// points in `sort_field` order (else FID order).
+pub fn points_to_line(
+    input: &dyn FeatureClass,
+    line_field: Option<&str>,
+    sort_field: Option<&str>,
+    close: bool,
+) -> Result<ToolOutput> {
+    let line_key = line_field
+        .map(|n| field_positions(input, &[n.to_owned()]).map(|v| v[0]))
+        .transpose()?;
+    let sort_key = sort_field
+        .map(|n| field_positions(input, &[n.to_owned()]).map(|v| v[0]))
+        .transpose()?;
+    let pts: Vec<Feature> = load(input)?;
+    let keys: Vec<usize> = line_key.into_iter().collect();
+    let rows: Vec<Vec<Value>> = pts
+        .iter()
+        .enumerate()
+        .map(|(i, f)| {
+            let mut r = f.attributes.clone();
+            r.push(Value::Integer(i as i32));
+            r
+        })
+        .collect();
+    let idx = input.fields().len();
+    let mut features = Vec::new();
+    for (key, mut members) in group_rows(rows, &keys) {
+        if let Some(s) = sort_key {
+            members.sort_by(|a, b| compare(&a[s], &b[s]));
+        }
+        let mut xy: Vec<[f64; 2]> = members
+            .iter()
+            .filter_map(|m| match &m[idx] {
+                Value::Integer(i) => pts[*i as usize]
+                    .geometry
+                    .as_ref()
+                    .and_then(|g| g.xy.first().copied()),
+                _ => None,
+            })
+            .collect();
+        if close && xy.len() > 2 {
+            xy.push(xy[0]);
+        }
+        if xy.len() < 2 {
+            continue;
+        }
+        let mut g = geoforge_core::Geometry::point(0.0, 0.0);
+        g.kind = GeometryKind::Polyline;
+        g.parts = vec![0];
+        g.xy = xy;
+        features.push(Feature {
+            oid: features.len() as i64,
+            geometry: Some(g),
+            attributes: key,
+        });
+    }
+    Ok(ToolOutput {
+        kind: GeometryKind::Polyline,
+        has_z: false,
+        has_m: false,
+        fields: line_key
+            .map(|i| vec![input.fields()[i].clone()])
+            .unwrap_or_default(),
+        spatial_reference_wkt: input.spatial_reference_wkt().map(str::to_owned),
+        features,
+        messages: Vec::new(),
+    })
+}
+
+/// `arcpy.analysis.GenerateNearTable(in, near, out_table, search_radius, location,
+/// angle, closest, closest_count)`: per input feature (FID order) its nearest
+/// features, nearest first (ties by FID): only the closest, or all within the
+/// radius up to `closest_count` (0 = no limit) with NEAR_RANK.
+pub fn generate_near_table(
+    input: &dyn FeatureClass,
+    near: &dyn FeatureClass,
+    search_radius: Option<f64>,
+    location: bool,
+    angle: bool,
+    all: bool,
+    closest_count: usize,
+) -> Result<TableOutput> {
+    let near_features = Indexed::load(near)?;
+    let mut fields = vec![
+        Field::new("IN_FID", FieldType::Integer),
+        Field::new("NEAR_FID", FieldType::Integer),
+        Field::new("NEAR_DIST", FieldType::Double),
+    ];
+    if all {
+        fields.push(Field::new("NEAR_RANK", FieldType::Integer));
+    }
+    if location {
+        for n in ["FROM_X", "FROM_Y", "NEAR_X", "NEAR_Y"] {
+            fields.push(Field::new(n, FieldType::Double));
+        }
+    }
+    if angle {
+        fields.push(Field::new("NEAR_ANGLE", FieldType::Double));
+    }
+    let mut rows = Vec::new();
+    for f in input.features() {
+        let f = f?;
+        let Some(g) = &f.geometry else { continue };
+        let mut found: Vec<(usize, geoforge_geometry::Nearest)> = Vec::new();
+        if all {
+            let pad = search_radius.unwrap_or(f64::INFINITY);
+            let candidates: Vec<usize> = if pad.is_finite() {
+                near_features.candidates(g, pad)
+            } else {
+                (0..near_features.features.len()).collect()
+            };
+            for i in candidates {
+                let Some(ng) = &near_features.features[i].geometry else {
+                    continue;
+                };
+                if let Some(n) = geoforge_geometry::nearest(g, ng)?
+                    && search_radius.is_none_or(|r| n.distance <= r)
+                {
+                    found.push((i, n));
+                }
+            }
+            found.sort_by(|a, b| a.1.distance.total_cmp(&b.1.distance).then(a.0.cmp(&b.0)));
+            if closest_count > 0 {
+                found.truncate(closest_count);
+            }
+        } else if let Some(hit) = near_features.closest(g, search_radius)? {
+            found.push(hit);
+        }
+        for (rank, (i, n)) in found.into_iter().enumerate() {
+            let mut row = vec![
+                Value::Integer(f.oid as i32),
+                Value::Integer(near_features.features[i].oid as i32),
+                Value::Double(n.distance),
+            ];
+            if all {
+                row.push(Value::Integer(rank as i32 + 1));
+            }
+            if location {
+                row.extend([n.from[0], n.from[1], n.to[0], n.to[1]].map(Value::Double));
+            }
+            if angle {
+                let a = if n.distance == 0.0 {
+                    0.0
+                } else {
+                    (n.to[1] - n.from[1])
+                        .atan2(n.to[0] - n.from[0])
+                        .to_degrees()
+                };
+                row.push(Value::Double(a));
+            }
+            rows.push(row);
+        }
+    }
+    Ok(TableOutput { fields, rows })
+}
+
+/// `arcpy.management.FindIdentical(in, out_table, fields, xy_tolerance, z_tolerance,
+/// output_record_option)`: IN_FID and FEAT_SEQ, the same sequence number for
+/// records whose values (or shapes, field `Shape`) are identical; with
+/// `only_duplicates`, only groups of two or more.
+pub fn find_identical(
+    input: &dyn FeatureClass,
+    fields: &[String],
+    only_duplicates: bool,
+) -> Result<TableOutput> {
+    let shape = fields.iter().any(|f| f.eq_ignore_ascii_case("Shape"));
+    let names: Vec<String> = fields
+        .iter()
+        .filter(|f| !f.eq_ignore_ascii_case("Shape"))
+        .cloned()
+        .collect();
+    let keys = field_positions(input, &names)?;
+    let feats: Vec<Feature> = input.features().collect::<Result<_>>()?;
+    // Groups in order of first appearance.
+    let mut groups: Vec<(Vec<Value>, Option<Vec<[f64; 2]>>, Vec<i64>)> = Vec::new();
+    for f in &feats {
+        let key: Vec<Value> = keys.iter().map(|&i| f.attributes[i].clone()).collect();
+        let geom = shape.then(|| {
+            f.geometry
+                .as_ref()
+                .map(|g| g.xy.clone())
+                .unwrap_or_default()
+        });
+        match groups.iter_mut().find(|(k, g, _)| *k == key && *g == geom) {
+            Some((_, _, ids)) => ids.push(f.oid),
+            None => groups.push((key, geom, vec![f.oid])),
+        }
+    }
+    let mut rows = Vec::new();
+    let mut seq = 0;
+    for (_, _, ids) in groups {
+        if only_duplicates && ids.len() < 2 {
+            continue;
+        }
+        seq += 1;
+        for id in ids {
+            rows.push(vec![Value::Integer(id as i32), Value::Integer(seq)]);
+        }
+    }
+    Ok(TableOutput {
+        fields: vec![
+            Field::new("IN_FID", FieldType::Integer),
+            Field::new("FEAT_SEQ", FieldType::Integer),
+        ],
+        rows,
+    })
+}

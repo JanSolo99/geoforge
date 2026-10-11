@@ -201,6 +201,63 @@ enum Tool {
         #[arg(long)]
         summary_fields: Option<String>,
     },
+    /// Add geometry measures as fields (ArcGIS "Add Geometry Attributes"). Updates
+    /// the input in place unless an output is given.
+    AddGeometryAttributes {
+        in_features: PathBuf,
+        /// "AREA;PERIMETER_LENGTH;LENGTH;CENTROID;CENTROID_INSIDE;EXTENT;
+        /// LINE_START_MID_END;LINE_BEARING;PART_COUNT;POINT_COUNT;POINT_X_Y_Z_M".
+        geometry_properties: String,
+        /// METERS, KILOMETERS, FEET_INT, FEET_US, MILES_INT, YARDS, NAUTICAL_MILES.
+        #[arg(long)]
+        length_unit: Option<String>,
+        /// SQUARE_METERS, SQUARE_KILOMETERS, HECTARES, ACRES, SQUARE_FEET, SQUARE_MILES.
+        #[arg(long)]
+        area_unit: Option<String>,
+        #[arg(long)]
+        output: Option<PathBuf>,
+    },
+    /// Lines connecting points (ArcGIS "Points To Line").
+    PointsToLine {
+        in_features: PathBuf,
+        out_feature_class: PathBuf,
+        #[arg(long)]
+        line_field: Option<String>,
+        #[arg(long)]
+        sort_field: Option<String>,
+        /// NO_CLOSE or CLOSE.
+        #[arg(long, default_value = "NO_CLOSE")]
+        close_line: String,
+    },
+    /// Distances to nearby features as a .dbf table (ArcGIS "Generate Near Table").
+    GenerateNearTable {
+        in_features: PathBuf,
+        near_features: PathBuf,
+        out_table: PathBuf,
+        #[arg(long)]
+        search_radius: Option<String>,
+        /// NO_LOCATION or LOCATION.
+        #[arg(long, default_value = "NO_LOCATION")]
+        location: String,
+        /// NO_ANGLE or ANGLE.
+        #[arg(long, default_value = "NO_ANGLE")]
+        angle: String,
+        /// CLOSEST or ALL.
+        #[arg(long, default_value = "CLOSEST")]
+        closest: String,
+        #[arg(long, default_value_t = 0)]
+        closest_count: usize,
+    },
+    /// Groups of records with identical values or shapes (ArcGIS "Find Identical").
+    FindIdentical {
+        in_dataset: PathBuf,
+        out_table: PathBuf,
+        /// Fields separated by ';' ("Shape" compares geometries).
+        fields: String,
+        /// ALL or ONLY_DUPLICATES.
+        #[arg(long, default_value = "ALL")]
+        output_record_option: String,
+    },
     /// One feature per part (ArcGIS "Multipart To Singlepart").
     MultipartToSinglepart {
         in_features: PathBuf,
@@ -590,6 +647,128 @@ fn main() -> ExitCode {
                 &split(&frequency_fields),
                 &split(summary_fields.as_deref().unwrap_or("")),
             )?;
+            write_table(&out, &out_table)
+        })(),
+        Tool::AddGeometryAttributes {
+            in_features,
+            geometry_properties,
+            length_unit,
+            area_unit,
+            output,
+        } => (|| {
+            let props = geometry_properties
+                .split(';')
+                .filter(|p| !p.trim().is_empty())
+                .map(|p| {
+                    geoforge_tools::GeometryProperty::parse(p)
+                        .ok_or_else(|| Error::Unsupported(format!("geometry property {p}")))
+                })
+                .collect::<Result<Vec<_>>>()?;
+            let length = match length_unit
+                .as_deref()
+                .map(str::to_ascii_uppercase)
+                .as_deref()
+            {
+                None | Some("") | Some("METERS") => 1.0,
+                Some("KILOMETERS") => 1000.0,
+                Some("FEET_INT") => 0.3048,
+                Some("FEET_US") => 1200.0 / 3937.0,
+                Some("MILES_INT") => 1609.344,
+                Some("YARDS") => 0.9144,
+                Some("NAUTICAL_MILES") => 1852.0,
+                Some(other) => return Err(Error::Unsupported(format!("length unit {other}"))),
+            };
+            let area = match area_unit.as_deref().map(str::to_ascii_uppercase).as_deref() {
+                None | Some("") | Some("SQUARE_METERS") => 1.0,
+                Some("SQUARE_KILOMETERS") => 1e6,
+                Some("HECTARES") => 1e4,
+                Some("ACRES") => 4046.8564224,
+                Some("SQUARE_FEET") => 0.09290304,
+                Some("SQUARE_MILES") => 2589988.110336,
+                Some(other) => return Err(Error::Unsupported(format!("area unit {other}"))),
+            };
+            let (fc, _) = open_feature_class(&in_features)?;
+            let out = geoforge_tools::add_geometry_attributes(fc.as_ref(), &props, length, area)?;
+            drop(fc);
+            match output {
+                Some(o) => write_output(out, &o, source_gdb(&in_features).as_deref()),
+                None => update_in_place(out, &in_features),
+            }
+        })(),
+        Tool::PointsToLine {
+            in_features,
+            out_feature_class,
+            line_field,
+            sort_field,
+            close_line,
+        } => (|| {
+            let close = match close_line.to_ascii_uppercase().as_str() {
+                "NO_CLOSE" => false,
+                "CLOSE" => true,
+                other => return Err(Error::Unsupported(format!("close_line {other}"))),
+            };
+            let (fc, _) = open_feature_class(&in_features)?;
+            let out = geoforge_tools::points_to_line(
+                fc.as_ref(),
+                line_field.as_deref(),
+                sort_field.as_deref(),
+                close,
+            )?;
+            write_output(out, &out_feature_class, source_gdb(&in_features).as_deref())
+        })(),
+        Tool::GenerateNearTable {
+            in_features,
+            near_features,
+            out_table,
+            search_radius,
+            location,
+            angle,
+            closest,
+            closest_count,
+        } => (|| {
+            let flag = |v: &str, yes: &str, no: &str| match v.to_ascii_uppercase() {
+                x if x == yes => Ok(true),
+                x if x == no => Ok(false),
+                x => Err(Error::Unsupported(format!(
+                    "expected {yes} or {no}, got {x}"
+                ))),
+            };
+            let (fc, _) = open_feature_class(&in_features)?;
+            let (near, _) = open_feature_class(&near_features)?;
+            let radius = search_radius
+                .as_deref()
+                .map(|r| parse_distance(r, fc.spatial_reference_wkt()))
+                .transpose()?;
+            let out = geoforge_tools::generate_near_table(
+                fc.as_ref(),
+                near.as_ref(),
+                radius,
+                flag(&location, "LOCATION", "NO_LOCATION")?,
+                flag(&angle, "ANGLE", "NO_ANGLE")?,
+                flag(&closest, "ALL", "CLOSEST")?,
+                closest_count,
+            )?;
+            write_table(&out, &out_table)
+        })(),
+        Tool::FindIdentical {
+            in_dataset,
+            out_table,
+            fields,
+            output_record_option,
+        } => (|| {
+            let only = match output_record_option.to_ascii_uppercase().as_str() {
+                "ALL" => false,
+                "ONLY_DUPLICATES" => true,
+                other => return Err(Error::Unsupported(format!("output_record_option {other}"))),
+            };
+            let names: Vec<String> = fields
+                .split(';')
+                .map(str::trim)
+                .filter(|s| !s.is_empty())
+                .map(str::to_owned)
+                .collect();
+            let (fc, _) = open_feature_class(&in_dataset)?;
+            let out = geoforge_tools::find_identical(fc.as_ref(), &names, only)?;
             write_table(&out, &out_table)
         })(),
         Tool::MultipartToSinglepart {

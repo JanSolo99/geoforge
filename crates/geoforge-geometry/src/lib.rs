@@ -12,7 +12,7 @@ pub mod overlay;
 pub mod proximity;
 pub mod validate;
 
-pub use bounding::{Bounding, BoundingKind, bounding, centroid, inside_point};
+pub use bounding::{Bounding, BoundingKind, area, bounding, centroid, inside_point, length};
 pub use buffer::{BufferOptions, LineEnd, LineSide, buffer, buffer_union};
 pub use clip::{ClipArea, clip};
 pub use index::EnvelopeIndex;

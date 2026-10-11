@@ -1024,6 +1024,77 @@ fn gf_args(case: &str) -> Vec<&'static str> {
             "VALUE",
         ],
         "freq_roads_class" => vec!["frequency", "testdata/geoproc/roads.shp", "<out>", "CLASS"],
+        "aga_parcels" => vec![
+            "add-geometry-attributes",
+            "testdata/geoproc/parcels.shp",
+            "AREA;PERIMETER_LENGTH;CENTROID;CENTROID_INSIDE;EXTENT;PART_COUNT;POINT_COUNT",
+            "--output",
+        ],
+        "aga_roads" => vec![
+            "add-geometry-attributes",
+            "testdata/geoproc/roads.shp",
+            "LENGTH;LINE_START_MID_END;LINE_BEARING;PART_COUNT;POINT_COUNT;EXTENT",
+            "--output",
+        ],
+        "aga_roads_km" => vec![
+            "add-geometry-attributes",
+            "testdata/geoproc/roads.shp",
+            "LENGTH",
+            "--length-unit",
+            "KILOMETERS",
+            "--output",
+        ],
+        "aga_parcels_ha" => vec![
+            "add-geometry-attributes",
+            "testdata/geoproc/parcels.shp",
+            "AREA",
+            "--area-unit",
+            "HECTARES",
+            "--output",
+        ],
+        "points_to_line_wells" => vec!["points-to-line", "testdata/geoproc/wells.shp"],
+        "points_to_line_wells_sorted" => vec![
+            "points-to-line",
+            "testdata/geoproc/wells.shp",
+            "<out>",
+            "--sort-field",
+            "DEPTH",
+        ],
+        "gnt_wells_roads" => vec![
+            "generate-near-table",
+            "testdata/geoproc/wells.shp",
+            "testdata/geoproc/roads.shp",
+        ],
+        "gnt_wells_roads_all" => vec![
+            "generate-near-table",
+            "testdata/geoproc/wells.shp",
+            "testdata/geoproc/roads.shp",
+            "<out>",
+            "--search-radius",
+            "100 Meters",
+            "--location",
+            "LOCATION",
+            "--angle",
+            "ANGLE",
+            "--closest",
+            "ALL",
+            "--closest-count",
+            "2",
+        ],
+        "find_identical_parcels_zone" => vec![
+            "find-identical",
+            "testdata/geoproc/parcels.shp",
+            "<out>",
+            "ZONE",
+        ],
+        "find_identical_parcels_shape" => vec![
+            "find-identical",
+            "testdata/geoproc/parcels.shp",
+            "<out>",
+            "Shape",
+            "--output-record-option",
+            "ONLY_DUPLICATES",
+        ],
         "identity_parcels_clip_no_fid" => vec![
             "identity",
             "testdata/geoproc/parcels.shp",
@@ -1132,22 +1203,11 @@ fn zm_diff(a: &geoforge_core::Geometry, b: &geoforge_core::Geometry) -> Option<S
     None
 }
 
-/// Rows of a .dbf table, with paths (CLASS) reduced to the file name: ArcGIS
-/// writes its own Windows form of the path.
-fn table_rows(path: &Path) -> Vec<Vec<String>> {
+/// Rows of a .dbf table.
+fn table_rows(path: &Path) -> Vec<Vec<Value>> {
     let dbf = geoforge_shapefile::dbf::DbfReader::open(path, Some("UTF-8")).unwrap();
     (0..dbf.num_records())
-        .map(|i| {
-            dbf.read(i)
-                .unwrap()
-                .0
-                .iter()
-                .map(|v| match v {
-                    Value::String(s) => s.rsplit(['/', '\\']).next().unwrap().to_owned(),
-                    other => format!("{other:?}"),
-                })
-                .collect()
-        })
+        .map(|i| dbf.read(i).unwrap().0)
         .collect()
 }
 
@@ -1171,8 +1231,9 @@ fn compare_tables(ours: &Path, theirs: &Path, fields: &serde_json::Value) -> Vec
     if a.len() != b.len() {
         diffs.push(format!("count: ours {}, ArcGIS {}", a.len(), b.len()));
     }
+    // Paths (CLASS) compare by file name, numbers within the usual noise.
     for (i, (ra, rb)) in a.iter().zip(&b).enumerate() {
-        if ra != rb {
+        if ra.len() != rb.len() || ra.iter().zip(rb).any(|(x, y)| !same_value(x, y)) {
             diffs.push(format!("row {i}: ours {ra:?}, ArcGIS {rb:?}"));
         }
     }

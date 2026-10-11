@@ -13110,6 +13110,667 @@
         ]
       ],
       "shapeType": null
+    },
+    "aga_parcels": {
+      "tool": "management.AddGeometryAttributes",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "AREA;PERIMETER_LENGTH;CENTROID;CENTROID_INSIDE;EXTENT;PART_COUNT;POINT_COUNT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "POLY_AREA",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "PERIMETER",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "CENTROID_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "CENTROID_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "INSIDE_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "INSIDE_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "EXT_MIN_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "EXT_MIN_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "EXT_MAX_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "EXT_MAX_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "PART_COUNT",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "PNT_COUNT",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "aga_roads": {
+      "tool": "management.AddGeometryAttributes",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "LENGTH;LINE_START_MID_END;LINE_BEARING;PART_COUNT;POINT_COUNT;EXTENT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "LENGTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "START_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "START_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "MID_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "MID_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "END_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "END_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "BEARING",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "PART_COUNT",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "PNT_COUNT",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "EXT_MIN_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "EXT_MIN_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "EXT_MAX_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "EXT_MAX_Y",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "aga_roads_km": {
+      "tool": "management.AddGeometryAttributes",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "LENGTH",
+        "KILOMETERS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "LENGTH",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "aga_parcels_ha": {
+      "tool": "management.AddGeometryAttributes",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "AREA",
+        "",
+        "HECTARES"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "POLY_AREA",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "points_to_line_wells": {
+      "tool": "management.PointsToLine",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "points_to_line_wells_sorted": {
+      "tool": "management.PointsToLine",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "",
+        "DEPTH"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "gnt_wells_roads": {
+      "tool": "analysis.GenerateNearTable",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "testdata/geoproc/roads.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "IN_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NEAR_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NEAR_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null
+    },
+    "gnt_wells_roads_all": {
+      "tool": "analysis.GenerateNearTable",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "100 Meters",
+        "LOCATION",
+        "ANGLE",
+        "ALL",
+        2
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "IN_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NEAR_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NEAR_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "NEAR_RANK",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "FROM_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "FROM_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "NEAR_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "NEAR_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "NEAR_ANGLE",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null
+    },
+    "find_identical_parcels_zone": {
+      "tool": "management.FindIdentical",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "ZONE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "IN_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "FEAT_SEQ",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": null
+    },
+    "find_identical_parcels_shape": {
+      "tool": "management.FindIdentical",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "Shape",
+        "",
+        "",
+        "ONLY_DUPLICATES"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000117: Warning empty output generated."
+      ],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "IN_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "FEAT_SEQ",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": null
     }
   }
 }
