@@ -194,6 +194,11 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
   - [ ] Geodesic method, Hillshade shadows, tiled output with statistics (.aux.xml) like ArcGIS
   - [x] Curvature (with profile and plan outputs), identical to ArcGIS: Zevenbergen–Thorne with
         NoData and off-edge neighbors taking the center value
+  - [x] Contour matching ArcGIS: four triangles per square of cell centers around the corner
+        mean, higher ground on the right, ordered by value descending then vertex count; Id and
+        Contour fields
+  - [ ] Contour: ring start vertices (ArcGIS starts closed rings elsewhere; shapes are equal),
+        cells exactly at a contour value (integer DEMs), two lines along NoData
   - [x] Fill (priority flood from the edge and NoData, z-limit per sink) and Flow Accumulation
         (D8, FLOAT/INTEGER, weights) matching ArcGIS exactly
   - [x] Flow Direction D8 (NORMAL/FORCE): steepest descent, single-cell pits raised first, ties

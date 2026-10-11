@@ -15423,6 +15423,132 @@
       "messages": [],
       "fields": [],
       "shapeType": null
+    },
+    "contour_dem_20": {
+      "tool": "gp.Contour_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        20,
+        0
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Contour",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "contour_dem_nodata_15": {
+      "tool": "gp.Contour_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        15,
+        5
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Contour",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "contour_int16_25": {
+      "tool": "gp.Contour_sa",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>",
+        25,
+        0
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Contour",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
     }
   }
 }

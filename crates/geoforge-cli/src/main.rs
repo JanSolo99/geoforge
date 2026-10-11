@@ -494,6 +494,14 @@ enum Tool {
         #[arg(long = "where")]
         where_clause: Option<String>,
     },
+    /// Spatial Analyst "Contour": polylines with fields Id and Contour.
+    Contour {
+        in_raster: PathBuf,
+        out_polyline_features: PathBuf,
+        contour_interval: f64,
+        #[arg(long, default_value_t = 0.0)]
+        base_contour: f64,
+    },
     /// Spatial Analyst "Aspect" (planar): downslope direction, −1 on flat cells.
     Aspect {
         in_raster: PathBuf,
@@ -1433,6 +1441,47 @@ fn main() -> ExitCode {
                 &out_raster,
                 &geoforge_raster::local::set_null(&cond, &f, clause.as_ref()),
             )
+        })(),
+        Tool::Contour {
+            in_raster,
+            out_polyline_features,
+            contour_interval,
+            base_contour,
+        } => (|| {
+            let r = geoforge_raster::read_geotiff(&in_raster)?;
+            let lines = geoforge_raster::contour::contour(&r, contour_interval, base_contour);
+            let features = lines
+                .into_iter()
+                .enumerate()
+                .map(|(i, l)| {
+                    let mut g = geoforge_core::Geometry::point(0.0, 0.0);
+                    g.kind = geoforge_core::GeometryKind::Polyline;
+                    g.parts = vec![0];
+                    g.xy = l.points;
+                    Feature {
+                        oid: i as i64,
+                        geometry: Some(g),
+                        attributes: vec![Value::Integer(i as i32 + 1), Value::Double(l.value)],
+                    }
+                })
+                .collect();
+            let wkt = r
+                .epsg
+                .map(|code| geoforge_proj::Crs::parse(&code.to_string()).map(|c| c.arcgis_wkt()))
+                .transpose()?;
+            let out = ToolOutput {
+                kind: geoforge_core::GeometryKind::Polyline,
+                has_z: false,
+                has_m: false,
+                fields: vec![
+                    Field::new("Id", FieldType::Integer),
+                    Field::new("Contour", FieldType::Double),
+                ],
+                spatial_reference_wkt: wkt,
+                features,
+                messages: Vec::new(),
+            };
+            write_output(out, &out_polyline_features, None)
         })(),
         Tool::Aspect {
             in_raster,
