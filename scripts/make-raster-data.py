@@ -63,3 +63,18 @@ write("dem_point.tif", z32, gdal.GDT_Float32, point=True)
 rgb = np.stack([np.round(z).astype(np.uint16), np.round(z * 2).astype(np.uint16), (np.arange(z.size).reshape(z.shape) % 65536).astype(np.uint16)])
 write("rgb_planar_u16.tif", rgb, gdal.GDT_UInt16, options=["INTERLEAVE=BAND", "COMPRESS=LZW", "PREDICTOR=2"])
 write("rgb_pixel_u8.tif", (rgb % 256).astype(np.uint8), gdal.GDT_Byte, options=["INTERLEAVE=PIXEL", "TILED=YES", "COMPRESS=DEFLATE", "PREDICTOR=2"])
+# Hydrology: a valley draining south with single-cell pits, a closed basin, a
+# flat terrace and a NoData hole.
+y, x = np.mgrid[0:80, 0:100].astype(np.float64)
+hydro = 100 + 0.004 * (x - 50) ** 2 - 0.3 * y + 1.5 * np.sin(x / 5.0) * np.cos(y / 6.0)
+hydro += 0.01 * np.sin(x * 1.7 + y * 0.9)
+for py, px in [(20, 30), (40, 60), (55, 48), (10, 80)]:
+    hydro[py, px] -= 4.0
+hydro[30:38, 15:25] -= 6.0 * np.exp(-((y[30:38, 15:25] - 34) ** 2 + (x[30:38, 15:25] - 20) ** 2) / 8)
+hydro[60:66, 70:80] = 90.0
+hydro = hydro.astype(np.float32)
+hydro_nd = hydro.copy()
+hydro_nd[5:8, 40:43] = -9999.0
+write("hydro.tif", hydro, gdal.GDT_Float32)
+write("hydro_nodata.tif", hydro_nd, gdal.GDT_Float32, nodata=-9999.0)
+write("hydro_int.tif", np.round(hydro).astype(np.int16), gdal.GDT_Int16)

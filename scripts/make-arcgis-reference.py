@@ -253,9 +253,22 @@ CASES = {
     "focal_median_f64": ("gp.FocalStatistics_sa", [RASTER / "dem_f64.tif"], ["Rectangle 3 3 CELL", "MEDIAN", "DATA"]),
     "focal_variety_landuse": ("gp.FocalStatistics_sa", [RASTER / "landuse_u8.tif"], ["Rectangle 3 3 CELL", "VARIETY", "DATA"]),
     "focal_max_f64": ("gp.FocalStatistics_sa", [RASTER / "dem_f64.tif"], ["Circle 1.5 CELL", "MAXIMUM", "DATA"]),
+    "fill_hydro": ("gp.Fill_sa", [RASTER / "hydro.tif"], []),
+    "fill_hydro_nodata": ("gp.Fill_sa", [RASTER / "hydro_nodata.tif"], []),
+    "fill_hydro_int": ("gp.Fill_sa", [RASTER / "hydro_int.tif"], []),
+    "fill_hydro_zlimit": ("gp.Fill_sa", [RASTER / "hydro.tif"], [3]),
+    "flowdir_hydro_filled": ("gp.FlowDirection_sa", [OUT / "fill_hydro.tif"], ["NORMAL", "", "D8"]),
+    "flowdir_hydro_force": ("gp.FlowDirection_sa", [OUT / "fill_hydro.tif"], ["FORCE", "", "D8"]),
+    "flowdir_hydro_raw": ("gp.FlowDirection_sa", [RASTER / "hydro.tif"], ["NORMAL", "", "D8"]),
+    "flowdir_hydro_nodata": ("gp.FlowDirection_sa", [OUT / "fill_hydro_nodata.tif"], ["NORMAL", "", "D8"]),
+    "flowdir_hydro_int": ("gp.FlowDirection_sa", [OUT / "fill_hydro_int.tif"], ["NORMAL", "", "D8"]),
+    "flowacc_hydro": ("gp.FlowAccumulation_sa", [OUT / "flowdir_hydro_filled.tif"], ["", "FLOAT", "D8"]),
+    "flowacc_hydro_int": ("gp.FlowAccumulation_sa", [OUT / "flowdir_hydro_filled.tif"], ["", "INTEGER", "D8"]),
+    "flowacc_hydro_nodata": ("gp.FlowAccumulation_sa", [OUT / "flowdir_hydro_nodata.tif"], ["", "FLOAT", "D8"]),
 }
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
-RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa"}
+RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
+              "gp.FlowDirection_sa", "gp.FlowAccumulation_sa"}
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable"}

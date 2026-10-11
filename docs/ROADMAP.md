@@ -183,6 +183,13 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         needs all 8); Hillshade truncates to 0–254 with NoData 255; float output NoData is −FLT_MAX,
         or 3.4e38 when the input has NoData; Aspect −1 on flat cells
   - [ ] Geodesic method, Hillshade shadows, tiled output with statistics (.aux.xml) like ArcGIS
+  - [x] Fill (priority flood from the edge and NoData, z-limit per sink) and Flow Accumulation
+        (D8, FLOAT/INTEGER, weights) matching ArcGIS exactly
+  - [x] Flow Direction D8 (NORMAL/FORCE): steepest descent, single-cell pits raised first, ties
+        to the larger code (two) or the middle of the arc (three), corners flow diagonally out
+  - [ ] Flow Direction on flats: ArcGIS's flat resolution is approximated (5×5 look-ahead, then
+        Jenson–Domingue passes preferring edge neighbors); a few cells differ on float DEMs and
+        about 12% on an integer DEM's large flats
 
 ## Phase 6 — Toolbox framework
 - [ ] Tool trait: typed parameters, validation, progress, cancellation, geoprocessing history

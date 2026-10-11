@@ -378,6 +378,31 @@ enum Tool {
         #[arg(long, default_value = "DATA")]
         ignore_nodata: String,
     },
+    /// Spatial Analyst "Fill": remove sinks from an elevation raster.
+    Fill {
+        in_surface_raster: PathBuf,
+        out_surface_raster: PathBuf,
+        #[arg(long)]
+        z_limit: Option<f64>,
+    },
+    /// Spatial Analyst "Flow Direction" (D8).
+    FlowDirection {
+        in_surface_raster: PathBuf,
+        out_flow_direction_raster: PathBuf,
+        /// NORMAL or FORCE (all edge cells flow outward).
+        #[arg(long, default_value = "NORMAL")]
+        force_flow: String,
+    },
+    /// Spatial Analyst "Flow Accumulation" (D8).
+    FlowAccumulation {
+        in_flow_direction_raster: PathBuf,
+        out_accumulation_raster: PathBuf,
+        #[arg(long)]
+        in_weight_raster: Option<PathBuf>,
+        /// FLOAT or INTEGER.
+        #[arg(long, default_value = "FLOAT")]
+        data_type: String,
+    },
     /// Spatial Analyst "Aspect" (planar): downslope direction, −1 on flat cells.
     Aspect {
         in_raster: PathBuf,
@@ -1115,6 +1140,54 @@ fn main() -> ExitCode {
             let input = geoforge_raster::read_geotiff(&in_raster)?;
             let out = geoforge_raster::focal::focal_statistics(&input, nbr, stat, ignore);
             write_raster(&out_raster, &out)
+        })(),
+        Tool::Fill {
+            in_surface_raster,
+            out_surface_raster,
+            z_limit,
+        } => (|| {
+            let dem = geoforge_raster::read_geotiff(&in_surface_raster)?;
+            write_raster(
+                &out_surface_raster,
+                &geoforge_raster::hydro::fill(&dem, z_limit),
+            )
+        })(),
+        Tool::FlowDirection {
+            in_surface_raster,
+            out_flow_direction_raster,
+            force_flow,
+        } => (|| {
+            let force = match force_flow.to_ascii_uppercase().as_str() {
+                "NORMAL" => false,
+                "FORCE" => true,
+                other => return Err(Error::Unsupported(format!("force_flow {other}"))),
+            };
+            let dem = geoforge_raster::read_geotiff(&in_surface_raster)?;
+            write_raster(
+                &out_flow_direction_raster,
+                &geoforge_raster::hydro::flow_direction(&dem, force),
+            )
+        })(),
+        Tool::FlowAccumulation {
+            in_flow_direction_raster,
+            out_accumulation_raster,
+            in_weight_raster,
+            data_type,
+        } => (|| {
+            let integer = match data_type.to_ascii_uppercase().as_str() {
+                "FLOAT" => false,
+                "INTEGER" => true,
+                other => return Err(Error::Unsupported(format!("data type {other}"))),
+            };
+            let dirs = geoforge_raster::read_geotiff(&in_flow_direction_raster)?;
+            let weight = in_weight_raster
+                .as_deref()
+                .map(geoforge_raster::read_geotiff)
+                .transpose()?;
+            write_raster(
+                &out_accumulation_raster,
+                &geoforge_raster::hydro::flow_accumulation(&dirs, weight.as_ref(), integer),
+            )
         })(),
         Tool::Aspect {
             in_raster,

@@ -14809,6 +14809,165 @@
       "messages": [],
       "fields": [],
       "shapeType": null
+    },
+    "fill_hydro": {
+      "tool": "gp.Fill_sa",
+      "args": [
+        "testdata/raster/hydro.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "fill_hydro_nodata": {
+      "tool": "gp.Fill_sa",
+      "args": [
+        "testdata/raster/hydro_nodata.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "fill_hydro_int": {
+      "tool": "gp.Fill_sa",
+      "args": [
+        "testdata/raster/hydro_int.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "fill_hydro_zlimit": {
+      "tool": "gp.Fill_sa",
+      "args": [
+        "testdata/raster/hydro.tif",
+        "<out>",
+        3
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010577: Input surface raster has no sinks to fill for the Z-limit specified."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "flowdir_hydro_filled": {
+      "tool": "gp.FlowDirection_sa",
+      "args": [
+        "testdata/arcgis-reference/fill_hydro.tif",
+        "<out>",
+        "NORMAL",
+        "",
+        "D8"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "flowdir_hydro_force": {
+      "tool": "gp.FlowDirection_sa",
+      "args": [
+        "testdata/arcgis-reference/fill_hydro.tif",
+        "<out>",
+        "FORCE",
+        "",
+        "D8"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "flowdir_hydro_raw": {
+      "tool": "gp.FlowDirection_sa",
+      "args": [
+        "testdata/raster/hydro.tif",
+        "<out>",
+        "NORMAL",
+        "",
+        "D8"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "flowdir_hydro_nodata": {
+      "tool": "gp.FlowDirection_sa",
+      "args": [
+        "testdata/arcgis-reference/fill_hydro_nodata.tif",
+        "<out>",
+        "NORMAL",
+        "",
+        "D8"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "flowdir_hydro_int": {
+      "tool": "gp.FlowDirection_sa",
+      "args": [
+        "testdata/arcgis-reference/fill_hydro_int.tif",
+        "<out>",
+        "NORMAL",
+        "",
+        "D8"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "flowacc_hydro": {
+      "tool": "gp.FlowAccumulation_sa",
+      "args": [
+        "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+        "<out>",
+        "",
+        "FLOAT",
+        "D8"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "flowacc_hydro_int": {
+      "tool": "gp.FlowAccumulation_sa",
+      "args": [
+        "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+        "<out>",
+        "",
+        "INTEGER",
+        "D8"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "flowacc_hydro_nodata": {
+      "tool": "gp.FlowAccumulation_sa",
+      "args": [
+        "testdata/arcgis-reference/flowdir_hydro_nodata.tif",
+        "<out>",
+        "",
+        "FLOAT",
+        "D8"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

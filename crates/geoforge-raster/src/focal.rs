@@ -117,8 +117,9 @@ impl FocalStatistic {
     }
 }
 
-/// Focal Statistics' output NoData: the largest value of the output type.
-fn max_nodata(t: DataType) -> f64 {
+/// The largest value of a cell type, which Focal Statistics and the hydrology tools
+/// use as output NoData.
+pub(crate) fn type_max(t: DataType) -> f64 {
     match t {
         DataType::U8 => u8::MAX as f64,
         DataType::I8 => i8::MAX as f64,
@@ -207,7 +208,7 @@ pub fn focal_statistics(
             .unwrap_or(8);
         ((1u32 << bits) - 1) as f64
     } else {
-        max_nodata(data_type)
+        type_max(data_type)
     };
     let mut out = input.like(data_type);
     out.nodata = Some(nodata);
