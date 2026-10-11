@@ -5,12 +5,14 @@
 pub mod buffer;
 pub mod clip;
 pub mod convert;
+pub mod index;
 pub mod linework;
 pub mod overlay;
 pub mod proximity;
 
 pub use buffer::{BufferOptions, LineEnd, buffer, buffer_union};
 pub use clip::{ClipArea, clip};
+pub use index::EnvelopeIndex;
 pub use linework::{Meeting, XY_TOLERANCE, meeting, on_path};
 pub use overlay::{
     OverlayCell, cell_geometry, dissolve, erase, explode, intersection, paths_geometry,

@@ -316,9 +316,11 @@ fn intersect_outlines(inputs: &[NamedInput], points: bool) -> Result<ToolOutput>
         }
     }
     let (a_data, b_data) = (load(a_in.features)?, load(b_in.features)?);
+    let b_index = geoforge_geometry::EnvelopeIndex::new(b_data.iter().map(|f| f.geometry.as_ref()));
     let mut meetings = Vec::new();
     for fa in &a_data {
-        for fb in &b_data {
+        let candidates = b_index.candidates(&fa.geometry.as_ref().unwrap().curve_envelope(), TOL);
+        for fb in candidates.into_iter().map(|k| &b_data[k]) {
             let m = geoforge_geometry::meeting(
                 fa.geometry.as_ref().unwrap(),
                 fb.geometry.as_ref().unwrap(),
@@ -476,9 +478,12 @@ fn intersect_input(inputs: &[NamedInput]) -> Result<ToolOutput> {
             .collect(),
     };
     for &i in other_inputs.iter().skip(1) {
+        let index =
+            geoforge_geometry::EnvelopeIndex::new(data[i].iter().map(|f| f.geometry.as_ref()));
         let mut next = Vec::new();
         for (fids, g) in &partial {
-            for f in &data[i] {
+            for k in index.candidates(&g.curve_envelope(), 0.0) {
+                let f = &data[i][k];
                 if let Some(common) =
                     geoforge_geometry::intersection(g, f.geometry.as_ref().unwrap())?
                 {
@@ -506,6 +511,7 @@ fn intersect_input(inputs: &[NamedInput]) -> Result<ToolOutput> {
         }
         combos
     };
+    let cell_index = geoforge_geometry::EnvelopeIndex::new(cells.iter().map(|(g, _)| Some(g)));
     if other_inputs.is_empty() {
         for (g, members) in &cells {
             let overlapping = members.iter().any(|m| m.len() > 1);
@@ -519,7 +525,8 @@ fn intersect_input(inputs: &[NamedInput]) -> Result<ToolOutput> {
                 vec![(g.clone(), Vec::new())]
             } else {
                 let mut v = Vec::new();
-                for (cell, members) in &cells {
+                for k in cell_index.candidates(&g.curve_envelope(), 0.0) {
+                    let (cell, members) = &cells[k];
                     if let Some(common) = geoforge_geometry::intersection(g, cell)? {
                         v.push((common, members.clone()));
                     }
@@ -1017,8 +1024,7 @@ pub fn identity(input: NamedInput, identity_features: NamedInput) -> Result<Tool
             features: identity_features.features,
         },
     ]);
-    let polys = load(identity_features.features)?;
-    let area = ClipArea::new(polys.iter().filter_map(|f| f.geometry.as_ref()))?;
+    let polys = Indexed::load(identity_features.features)?;
     let missing: Vec<Value> = std::iter::once(Value::Integer(-1))
         .chain(std::iter::repeat_n(
             Value::Null,
@@ -1031,12 +1037,19 @@ pub fn identity(input: NamedInput, identity_features: NamedInput) -> Result<Tool
         let g = f.geometry.as_ref().unwrap();
         let mut head = vec![Value::Integer(f.oid as i32)];
         head.extend(f.attributes.iter().cloned());
+        // Only the identity features near this one can cover part of it.
+        let near: Vec<&Feature> = polys
+            .candidates(g, 0.0)
+            .into_iter()
+            .map(|i| &polys.features[i])
+            .collect();
+        let area = ClipArea::new(near.iter().filter_map(|p| p.geometry.as_ref()))?;
         if let Some(rest) = geoforge_geometry::erase(g, &area)? {
             let mut attrs = head.clone();
             attrs.extend(missing.iter().cloned());
             rows.push((false, f.oid, -1, rest, attrs));
         }
-        for p in &polys {
+        for p in near {
             if let Some(common) = geoforge_geometry::intersection(g, p.geometry.as_ref().unwrap())?
             {
                 let mut attrs = head.clone();
@@ -1163,27 +1176,37 @@ fn push_unique(fields: &mut Vec<Field>, mut f: Field) {
     fields.push(f);
 }
 
-/// The smallest distance from `g` to any of `candidates` (first lowest FID on
-/// ties), within `radius` if given.
-fn closest(
-    g: &geoforge_core::Geometry,
-    candidates: &[Feature],
-    radius: Option<f64>,
-) -> Result<Option<(usize, geoforge_geometry::Nearest)>> {
-    let mut best: Option<(usize, geoforge_geometry::Nearest)> = None;
-    for (i, c) in candidates.iter().enumerate() {
-        let Some(cg) = &c.geometry else { continue };
-        let Some(n) = geoforge_geometry::nearest(g, cg)? else {
-            continue;
-        };
-        if radius.is_some_and(|r| n.distance > r) {
-            continue;
-        }
-        if best.is_none_or(|(_, b)| n.distance < b.distance) {
-            best = Some((i, n));
-        }
+/// Features loaded with an envelope index over their shapes.
+struct Indexed {
+    features: Vec<Feature>,
+    index: geoforge_geometry::EnvelopeIndex,
+}
+
+impl Indexed {
+    fn load(fc: &dyn FeatureClass) -> Result<Self> {
+        Ok(Self::new(load(fc)?))
     }
-    Ok(best)
+
+    fn new(features: Vec<Feature>) -> Self {
+        let index =
+            geoforge_geometry::EnvelopeIndex::new(features.iter().map(|f| f.geometry.as_ref()));
+        Self { features, index }
+    }
+
+    /// The closest feature to `g` (lowest FID on ties), within `radius` if given.
+    fn closest(
+        &self,
+        g: &geoforge_core::Geometry,
+        radius: Option<f64>,
+    ) -> Result<Option<(usize, geoforge_geometry::Nearest)>> {
+        self.index
+            .closest(g, |i| self.features[i].geometry.as_ref(), radius)
+    }
+
+    /// Positions of the features whose envelopes come within `pad` of `g`'s.
+    fn candidates(&self, g: &geoforge_core::Geometry, pad: f64) -> Vec<usize> {
+        self.index.candidates(&g.curve_envelope(), pad)
+    }
 }
 
 /// `arcpy.analysis.Near(in_features, near_features, search_radius, location,
@@ -1204,9 +1227,9 @@ pub fn near(
     let kind = input
         .geometry_kind()
         .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
-    let classes: Vec<Vec<Feature>> = near_features
+    let classes: Vec<Indexed> = near_features
         .iter()
-        .map(|n| load(n.features))
+        .map(|n| Indexed::load(n.features))
         .collect::<Result<_>>()?;
     let mut fields = input.fields().to_vec();
     let mut added = vec!["NEAR_FID", "NEAR_DIST"];
@@ -1247,7 +1270,7 @@ pub fn near(
         let mut found: Option<(usize, usize, geoforge_geometry::Nearest)> = None;
         if let Some(g) = &f.geometry {
             for (c, candidates) in classes.iter().enumerate() {
-                if let Some((i, n)) = closest(g, candidates, search_radius)?
+                if let Some((i, n)) = candidates.closest(g, search_radius)?
                     && found.is_none_or(|(_, _, b)| n.distance < b.distance)
                 {
                     found = Some((c, i, n));
@@ -1261,7 +1284,7 @@ pub fn near(
                 None if name == "NEAR_FC" => Value::Null,
                 None => Value::Double(-1.0),
                 Some((c, i, n)) => match name {
-                    "NEAR_FID" => Value::Integer(classes[*c][*i].oid as i32),
+                    "NEAR_FID" => Value::Integer(classes[*c].features[*i].oid as i32),
                     "NEAR_FC" => Value::String(near_features[*c].source.clone()),
                     "NEAR_DIST" => Value::Double(n.distance),
                     "NEAR_X" => Value::Double(n.to[0]),
@@ -1346,7 +1369,7 @@ pub fn spatial_join(
     let kind = target
         .geometry_kind()
         .ok_or_else(|| Error::Unsupported("target has no geometry".into()))?;
-    let joins = load(join)?;
+    let joins = Indexed::load(join)?;
     let mut fields = vec![Field::new("Join_Count", FieldType::Integer)];
     if let Some(name) = &opts.distance_field_name {
         fields.push(Field::new(name.clone(), FieldType::Double));
@@ -1366,12 +1389,12 @@ pub fn spatial_join(
         let mut matches: Vec<(usize, f64)> = Vec::new();
         if let Some(tg) = &t.geometry {
             if opts.match_option == MatchOption::Closest {
-                if let Some((i, n)) = closest(tg, &joins, opts.search_radius)? {
+                if let Some((i, n)) = joins.closest(tg, opts.search_radius)? {
                     matches.push((i, n.distance));
                 }
             } else {
-                for (i, j) in joins.iter().enumerate() {
-                    let jg = j.geometry.as_ref().unwrap();
+                for i in joins.candidates(tg, radius) {
+                    let jg = joins.features[i].geometry.as_ref().unwrap();
                     let Some(n) = geoforge_geometry::nearest(tg, jg)? else {
                         continue;
                     };
@@ -1405,11 +1428,13 @@ pub fn spatial_join(
             }
             a.push(Value::Integer(t.oid as i32));
             if opts.one_to_many {
-                a.push(Value::Integer(m.map_or(-1, |m| joins[m.0].oid as i32)));
+                a.push(Value::Integer(
+                    m.map_or(-1, |m| joins.features[m.0].oid as i32),
+                ));
             }
             a.extend(t.attributes.iter().cloned());
             match m {
-                Some((i, _)) => a.extend(joins[i].attributes.iter().cloned()),
+                Some((i, _)) => a.extend(joins.features[i].attributes.iter().cloned()),
                 None => a.extend(std::iter::repeat_n(Value::Null, join.fields().len())),
             }
             a
@@ -1536,7 +1561,7 @@ pub fn select_by_location(
     let kind = input
         .geometry_kind()
         .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
-    let selecting = load(select_features)?;
+    let selecting = Indexed::load(select_features)?;
     let distance = search_distance.unwrap_or(0.0);
     let pad = match overlap {
         Overlap::Intersect | Overlap::WithinADistance => distance,
@@ -1547,17 +1572,8 @@ pub fn select_by_location(
         let f = f?;
         let mut hit = false;
         if let Some(a) = &f.geometry {
-            let ea = a.envelope();
-            for s in &selecting {
-                let b = s.geometry.as_ref().unwrap();
-                let eb = b.envelope();
-                if ea.xmin > eb.xmax + pad
-                    || eb.xmin > ea.xmax + pad
-                    || ea.ymin > eb.ymax + pad
-                    || eb.ymin > ea.ymax + pad
-                {
-                    continue;
-                }
+            for i in selecting.candidates(a, pad) {
+                let b = selecting.features[i].geometry.as_ref().unwrap();
                 if relates(a, b, overlap, distance)? {
                     hit = true;
                     break;

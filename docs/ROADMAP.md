@@ -56,8 +56,12 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       shared polygon boundaries), `join_attributes` ALL/NO_FID/ONLY_FID — match ArcGIS
 - [ ] Overlay Z/M, `cluster_tolerance`; POINT/LINE output for 3+ inputs; `join_attributes`
       for Union/Identity
-- [ ] Validation + repair (Check/Repair Geometry), spatial index (R-tree) for overlays,
-      Near and Spatial Join (all pairs are compared today)
+- [x] Spatial index: R-tree over envelopes (`EnvelopeIndex`) in Near, Spatial Join,
+      Select By Location, Identity and Intersect; nearest search stops once no envelope
+      can be closer. 10k parcels × 20k wells: Spatial Join 45 s → 0.06 s, Near 1.9 s → 0.09 s
+- [ ] Validation + repair (Check/Repair Geometry)
+- [ ] Clip/Erase against many polygons: dissolving all clip features up front dominates
+      (Clip of 20k points by 10k parcels: 1.5 s)
 - [ ] Shapefile writer: `.sbn/.sbx` and `.shp.xml` (ArcGIS writes both for tool outputs)
 
 ## Phase 3 — File Geodatabase
