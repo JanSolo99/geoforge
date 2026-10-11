@@ -205,7 +205,9 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         the statistics and constants allow (1/2/4-bit, 8-bit, ...), otherwise it follows the
         operand types (U8 + U8 → U16, U8 − U8 → S16, S16 + U8 → S32; Divide keeps the wider type,
         or the next signed one); integer Divide rounds down; Int keeps or narrows the type
-  - [ ] Con/Set Null with rasters on different grids; Con/Set Null output types by the same rule
+  - [x] Con/Set Null on any grids with the same type rule over the true/false values; Con's
+        grid comes from the condition and true rasters only (the false raster is sampled onto
+        it), Set Null's from the condition and false rasters, matching ArcGIS
   - [ ] Cell size/snap/extent/mask environments
 - [ ] Hillshade, slope, aspect, curvature, contours, viewshed, hydrology (fill/flow dir/accumulation/watershed)
   - [x] Slope (degree/percent rise, z-factor), Aspect, Hillshade (no shadows), planar, matching

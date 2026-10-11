@@ -17051,6 +17051,174 @@
       "messages": [],
       "fields": [],
       "shapeType": null
+    },
+    "con_zones_zones_int16": {
+      "tool": "gp.Con_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "testdata/raster/zones.tif",
+        "<out>",
+        "testdata/raster/dem_int16_packbits.tif"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "con_zones_int16_only": {
+      "tool": "gp.Con_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "con_zones_300_zones": {
+      "tool": "gp.Con_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "300",
+        "<out>",
+        "testdata/raster/zones.tif"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "con_zones_neg5_zones": {
+      "tool": "gp.Con_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "-5",
+        "<out>",
+        "testdata/raster/zones.tif"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "con_int16_5_9": {
+      "tool": "gp.Con_sa",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "5",
+        "<out>",
+        "9",
+        "Value > 250"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "con_dem_int16_5": {
+      "tool": "gp.Con_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>",
+        "5",
+        "Value > 250"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "con_25m_dem_int16": {
+      "tool": "gp.Con_sa",
+      "args": [
+        "testdata/raster/zones_25m.tif",
+        "testdata/raster/dem.tif",
+        "<out>",
+        "testdata/raster/dem_int16_packbits.tif"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "con_dem_4m_shifted": {
+      "tool": "gp.Con_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/zones_4m.tif",
+        "<out>",
+        "testdata/raster/zones_shifted.tif",
+        "Value > 250"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "con_dem_dem_25m": {
+      "tool": "gp.Con_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/dem.tif",
+        "<out>",
+        "testdata/raster/zones_25m.tif",
+        "Value > 250"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "setnull_zones_int16": {
+      "tool": "gp.SetNull_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "setnull_zones_5": {
+      "tool": "gp.SetNull_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "5",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "setnull_25m_4m": {
+      "tool": "gp.SetNull_sa",
+      "args": [
+        "testdata/raster/zones_25m.tif",
+        "testdata/raster/zones_4m.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "setnull_25m_dem": {
+      "tool": "gp.SetNull_sa",
+      "args": [
+        "testdata/raster/zones_25m.tif",
+        "testdata/raster/dem.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

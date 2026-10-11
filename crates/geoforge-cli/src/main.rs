@@ -486,9 +486,10 @@ enum Tool {
     /// Spatial Analyst "Con": conditional choice per cell.
     Con {
         in_conditional_raster: PathBuf,
+        #[arg(allow_negative_numbers = true)]
         in_true_raster_or_constant: String,
         out_raster: PathBuf,
-        #[arg(long)]
+        #[arg(long, allow_negative_numbers = true)]
         in_false_raster_or_constant: Option<String>,
         /// e.g. "Value > 3".
         #[arg(long = "where")]
@@ -497,6 +498,7 @@ enum Tool {
     /// Spatial Analyst "Set Null".
     SetNull {
         in_conditional_raster: PathBuf,
+        #[arg(allow_negative_numbers = true)]
         in_false_raster_or_constant: String,
         out_raster: PathBuf,
         #[arg(long = "where")]
@@ -1551,10 +1553,9 @@ fn main() -> ExitCode {
                 .map(operand)
                 .transpose()?;
             let clause = value_clause(where_clause.as_deref())?;
-            write_raster(
-                &out_raster,
-                &geoforge_raster::local::con(&cond, &t, f.as_ref(), clause.as_ref()),
-            )
+            let out = geoforge_raster::local::con(&cond, &t, f.as_ref(), clause.as_ref())
+                .ok_or_else(|| Error::Unsupported("input rasters do not overlap".into()))?;
+            write_raster(&out_raster, &out)
         })(),
         Tool::SetNull {
             in_conditional_raster,
@@ -1565,10 +1566,9 @@ fn main() -> ExitCode {
             let cond = geoforge_raster::read_geotiff(&in_conditional_raster)?;
             let f = operand(&in_false_raster_or_constant)?;
             let clause = value_clause(where_clause.as_deref())?;
-            write_raster(
-                &out_raster,
-                &geoforge_raster::local::set_null(&cond, &f, clause.as_ref()),
-            )
+            let out = geoforge_raster::local::set_null(&cond, &f, clause.as_ref())
+                .ok_or_else(|| Error::Unsupported("input rasters do not overlap".into()))?;
+            write_raster(&out_raster, &out)
         })(),
         Tool::Contour {
             in_raster,

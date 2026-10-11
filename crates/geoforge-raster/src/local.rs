@@ -125,28 +125,61 @@ fn typed_raster(
     out
 }
 
-/// Two rasters on one grid as ArcGIS's local tools combine them by default: the
-/// intersection of their extents in cells of the larger size, anchored at its
-/// lower-left corner with round(extent / cell) columns and rows, both sampled
-/// at the cell centers.
-pub fn common_grid(a: &Raster, b: &Raster) -> Option<(Raster, Raster)> {
-    if (a.width, a.height, a.transform) == (b.width, b.height, b.transform) {
-        return Some((a.clone(), b.clone()));
+/// The grid ArcGIS's local tools put their rasters on by default: the
+/// intersection of their extents in cells of the largest size, anchored at its
+/// lower-left corner with round(extent / cell) columns and rows. `None` when
+/// the extents do not overlap; the shared grid when all rasters are on one.
+pub fn local_grid(rasters: &[&Raster]) -> Option<([f64; 6], usize, usize)> {
+    let first = rasters.first()?;
+    if rasters
+        .iter()
+        .all(|r| (r.width, r.height, r.transform) == (first.width, first.height, first.transform))
+    {
+        return Some((first.transform, first.width, first.height));
     }
-    let (ax0, ay0, ax1, ay1) = a.extent();
-    let (bx0, by0, bx1, by1) = b.extent();
-    let (x0, y0, x1, y1) = (ax0.max(bx0), ay0.max(by0), ax1.min(bx1), ay1.min(by1));
+    let (mut x0, mut y0, mut x1, mut y1) = first.extent();
+    let mut cell = first.cell_width();
+    for r in &rasters[1..] {
+        let (a, b, c, d) = r.extent();
+        (x0, y0, x1, y1) = (x0.max(a), y0.max(b), x1.min(c), y1.min(d));
+        cell = cell.max(r.cell_width());
+    }
     if x0 >= x1 || y0 >= y1 {
         return None;
     }
-    let cell = a.cell_width().max(b.cell_width());
     let cols = (((x1 - x0) / cell).round() as usize).max(1);
     let rows = (((y1 - y0) / cell).round() as usize).max(1);
-    let transform = [x0, cell, 0.0, y0 + rows as f64 * cell, 0.0, -cell];
     Some((
-        crate::resample::onto_grid(a, transform, cols, rows),
-        crate::resample::onto_grid(b, transform, cols, rows),
+        [x0, cell, 0.0, y0 + rows as f64 * cell, 0.0, -cell],
+        cols,
+        rows,
     ))
+}
+
+/// Two rasters on their [`local_grid`], sampled at its cell centers.
+pub fn common_grid(a: &Raster, b: &Raster) -> Option<(Raster, Raster)> {
+    let (t, cols, rows) = local_grid(&[a, b])?;
+    Some((a.onto(t, cols, rows), b.onto(t, cols, rows)))
+}
+
+impl Raster {
+    /// This raster sampled onto another grid (a copy when it is the same grid).
+    fn onto(&self, transform: [f64; 6], cols: usize, rows: usize) -> Raster {
+        if (self.transform, self.width, self.height) == (transform, cols, rows) {
+            self.clone()
+        } else {
+            crate::resample::onto_grid(self, transform, cols, rows)
+        }
+    }
+}
+
+impl Operand {
+    fn onto(&self, grid: ([f64; 6], usize, usize)) -> Operand {
+        match self {
+            Operand::Raster(r) => Operand::Raster(r.onto(grid.0, grid.1, grid.2)),
+            Operand::Constant(c) => Operand::Constant(*c),
+        }
+    }
 }
 
 /// The value range of an integer type.
@@ -355,44 +388,50 @@ impl ValueClause {
     }
 }
 
-/// The type of a result made from `ops`: float if any is float; from constants
-/// only, the smallest integer layout; otherwise 32-bit integer.
+/// The output of Con / Set Null from the values of `ops`: float if any is
+/// float; else, as for the math tools, the type fitting the known ranges of the
+/// operands (constants and rasters with stored statistics) when all are known,
+/// or the smallest type holding all their types' values (observed).
 fn conditional_raster(g: &Raster, ops: &[&Operand], values: Vec<Option<f64>>) -> Raster {
     if ops.iter().any(|o| o.is_float()) {
-        float_raster(g, values.into_iter())
-    } else if ops.iter().all(|o| o.raster().is_none()) {
-        let (min, max) = values
-            .iter()
-            .flatten()
-            .fold((f64::INFINITY, f64::NEG_INFINITY), |(a, b), &v| {
-                (a.min(v), b.max(v))
-            });
-        let (min, max) = if min.is_finite() {
-            (min, max)
-        } else {
-            (0.0, 0.0)
-        };
-        let (t, nodata) = crate::zonal::integer_output(min, max, true);
-        let mut out = g.like(t);
-        out.nodata = Some(nodata);
-        out.bands[0] = values
-            .into_iter()
-            .map(|v| v.map_or(nodata, |v| t.store(v)))
-            .collect();
-        out
-    } else {
-        int_raster(g, values.into_iter())
+        return float_raster(g, values.into_iter());
     }
+    let union = |ranges: &mut dyn Iterator<Item = (f64, f64)>| {
+        ranges.fold((f64::INFINITY, f64::NEG_INFINITY), |(a, b), (lo, hi)| {
+            (a.min(lo), b.max(hi))
+        })
+    };
+    let known: Option<Vec<(f64, f64)>> = ops.iter().map(|o| o.known_range()).collect();
+    let (t, nodata) = match known {
+        Some(k) => {
+            let (lo, hi) = union(&mut k.into_iter());
+            crate::zonal::integer_output(lo, hi, true)
+        }
+        None => {
+            let (lo, hi) = union(&mut ops.iter().map(|o| o.type_range()));
+            smallest_type(lo, hi)
+        }
+    };
+    typed_raster(g, values.into_iter(), t, nodata)
 }
 
 /// Con: where the condition raster holds (non-zero, or matching `clause`) take
 /// `if_true`, else `if_false` (NoData when absent); NoData where the condition is.
+/// The output is on the [`local_grid`] of the condition and true rasters; `None`
+/// when they do not overlap.
 pub fn con(
     condition: &Raster,
     if_true: &Operand,
     if_false: Option<&Operand>,
     clause: Option<&ValueClause>,
-) -> Raster {
+) -> Option<Raster> {
+    // The false raster takes no part in the grid (observed).
+    let mut on_grid = vec![condition];
+    on_grid.extend(if_true.raster());
+    let grid = local_grid(&on_grid)?;
+    let condition = condition.onto(grid.0, grid.1, grid.2);
+    let if_true = if_true.onto(grid);
+    let if_false = if_false.map(|o| o.onto(grid));
     let n = condition.width * condition.height;
     let values = (0..n)
         .map(|i| {
@@ -404,18 +443,27 @@ pub fn con(
             if hit {
                 if_true.get(i)
             } else {
-                if_false?.get(i)
+                if_false.as_ref()?.get(i)
             }
         })
         .collect();
-    let mut ops = vec![if_true];
-    ops.extend(if_false);
-    conditional_raster(condition, &ops, values)
+    let mut ops = vec![&if_true];
+    ops.extend(if_false.as_ref());
+    Some(conditional_raster(&condition, &ops, values))
 }
 
 /// SetNull: NoData where the condition holds (non-zero, or matching `clause`),
-/// else `if_false`.
-pub fn set_null(condition: &Raster, if_false: &Operand, clause: Option<&ValueClause>) -> Raster {
+/// else `if_false`, on the [`local_grid`] of both rasters.
+pub fn set_null(
+    condition: &Raster,
+    if_false: &Operand,
+    clause: Option<&ValueClause>,
+) -> Option<Raster> {
+    let mut on_grid = vec![condition];
+    on_grid.extend(if_false.raster());
+    let grid = local_grid(&on_grid)?;
+    let condition = condition.onto(grid.0, grid.1, grid.2);
+    let if_false = if_false.onto(grid);
     let n = condition.width * condition.height;
     let values = (0..n)
         .map(|i| {
@@ -430,5 +478,5 @@ pub fn set_null(condition: &Raster, if_false: &Operand, clause: Option<&ValueCla
             }
         })
         .collect();
-    conditional_raster(condition, &[if_false], values)
+    Some(conditional_raster(&condition, &[&if_false], values))
 }
