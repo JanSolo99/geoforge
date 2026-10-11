@@ -3848,3 +3848,48 @@ pub fn find_identical(
         rows,
     })
 }
+
+/// `arcpy.management.XYTableToPoint(in_table, out, x_field, y_field, z_field,
+/// coordinate_system)`: a point per row at its X/Y (and Z) values, all fields
+/// kept; rows without coordinates get no shape.
+pub fn xy_table_to_point(
+    table: &dyn FeatureClass,
+    x_field: &str,
+    y_field: &str,
+    z_field: Option<&str>,
+    spatial_reference_wkt: Option<String>,
+) -> Result<ToolOutput> {
+    let pos = |n: &str| field_positions(table, &[n.to_owned()]).map(|v| v[0]);
+    let (xi, yi) = (pos(x_field)?, pos(y_field)?);
+    let zi = z_field.map(pos).transpose()?;
+    let mut features = Vec::new();
+    for f in table.features() {
+        let f = f?;
+        let (x, y) = (number(&f.attributes[xi]), number(&f.attributes[yi]));
+        let geometry = x.zip(y).map(|(x, y)| {
+            let mut g = geoforge_core::Geometry::point(x, y);
+            if let Some(zi) = zi {
+                g.z = Some(vec![number(&f.attributes[zi]).unwrap_or(0.0)]);
+            }
+            g
+        });
+        features.push(Feature {
+            oid: features.len() as i64,
+            geometry,
+            attributes: f.attributes,
+        });
+    }
+    Ok(ToolOutput {
+        kind: GeometryKind::Point,
+        has_z: zi.is_some(),
+        has_m: false,
+        fields: table.fields().to_vec(),
+        spatial_reference_wkt,
+        features,
+        messages: if zi.is_some() {
+            vec!["WARNING 090111: No vertical coordinate system defined".into()]
+        } else {
+            Vec::new()
+        },
+    })
+}

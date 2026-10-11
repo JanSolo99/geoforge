@@ -178,6 +178,9 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
 - [x] JSON To Features: Esri JSON (field types kept, the OID becomes an empty field,
       Shape_Length/Shape_Area added at 0 as ArcGIS's geodatabase detour leaves them) and GeoJSON
       (one geometry type, numbers as doubles, text(254), always 3D) — match ArcGIS
+- [x] CSV (`geoforge-csv`): tables read with ArcGIS's type inference (Long / Double /
+      Text(254), usable by every tool), Export Table to `.csv` byte-identical to ArcGIS's (BOM,
+      CRLF, `%.15f` doubles, RFC 4180 quoting), XY Table To Point (Z field, coordinate system)
 - [ ] GeoPackage / SpatiaLite, PostGIS, KML, GML, DXF, E00, ERDAS IMG, JPEG2000
 
 ## Phase 8 — Rendering & UI

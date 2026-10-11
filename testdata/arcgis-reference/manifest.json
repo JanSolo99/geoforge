@@ -14277,6 +14277,196 @@
         ]
       ],
       "shapeType": "Polyline"
+    },
+    "csv_parcels": {
+      "tool": "conversion.ExportTable",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "csv_wells": {
+      "tool": "conversion.ExportTable",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "csv_bad_lines": {
+      "tool": "conversion.ExportTable",
+      "args": [
+        "testdata/geoproc/bad_lines.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "csv_stations_back": {
+      "tool": "conversion.ExportTable",
+      "args": [
+        "testdata/geoproc/stations.csv",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "xy_stations": {
+      "tool": "management.XYTableToPoint",
+      "args": [
+        "testdata/geoproc/stations.csv",
+        "<out>",
+        "X",
+        "Y",
+        "",
+        32633
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "STATION",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ELEV",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "ACTIVE",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "xy_stations_z": {
+      "tool": "management.XYTableToPoint",
+      "args": [
+        "testdata/geoproc/stations.csv",
+        "<out>",
+        "X",
+        "Y",
+        "ELEV",
+        32633
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 090111: No vertical coordinate system defined"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "STATION",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ELEV",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "ACTIVE",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point"
     }
   }
 }

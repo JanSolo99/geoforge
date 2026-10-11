@@ -327,6 +327,23 @@ enum Tool {
         #[arg(long)]
         geometry_type: Option<String>,
     },
+    /// Write a table's attributes to CSV (ArcGIS "Export Table" to .csv).
+    ExportTable {
+        in_table: PathBuf,
+        out_table: PathBuf,
+    },
+    /// Points from X/Y (and Z) columns of a table or CSV (ArcGIS "XY Table To Point").
+    XyTableToPoint {
+        in_table: PathBuf,
+        out_feature_class: PathBuf,
+        x_field: String,
+        y_field: String,
+        #[arg(long)]
+        z_field: Option<String>,
+        /// A factory code, .prj file or WKT (default WGS 84, as ArcGIS).
+        #[arg(long, default_value = "4326")]
+        coordinate_system: String,
+    },
     /// Transform features to another coordinate system (ArcGIS "Project").
     Project {
         in_dataset: PathBuf,
@@ -961,6 +978,46 @@ fn main() -> ExitCode {
             };
             write_output(out, &out_features, None)
         })(),
+        Tool::ExportTable {
+            in_table,
+            out_table,
+        } => (|| {
+            if out_table
+                .extension()
+                .is_none_or(|e| !e.eq_ignore_ascii_case("csv"))
+            {
+                return Err(Error::Unsupported("Export Table writes .csv here".into()));
+            }
+            let (fc, _) = open_feature_class(&in_table)?;
+            let rows = fc
+                .features()
+                .map(|f| f.map(|f| f.attributes))
+                .collect::<Result<Vec<_>>>()?;
+            let n = rows.len();
+            let text = geoforge_csv::write(fc.fields(), rows);
+            std::fs::write(&out_table, text).map_err(|e| Error::io(&out_table, e))?;
+            println!("Wrote {} ({n} rows)", out_table.display());
+            Ok(())
+        })(),
+        Tool::XyTableToPoint {
+            in_table,
+            out_feature_class,
+            x_field,
+            y_field,
+            z_field,
+            coordinate_system,
+        } => (|| {
+            let crs = geoforge_proj::Crs::parse(&coordinate_system)?;
+            let (table, _) = open_feature_class(&in_table)?;
+            let out = geoforge_tools::xy_table_to_point(
+                table.as_ref(),
+                &x_field,
+                &y_field,
+                z_field.as_deref(),
+                Some(crs.esri_wkt().to_owned()),
+            )?;
+            write_output(out, &out_feature_class, None)
+        })(),
         Tool::Project {
             in_dataset,
             out_dataset,
@@ -1085,6 +1142,12 @@ fn locate(path: &Path) -> Location {
 }
 
 fn open_feature_class(path: &Path) -> Result<(Box<dyn FeatureClass>, &'static str)> {
+    if path
+        .extension()
+        .is_some_and(|e| e.eq_ignore_ascii_case("csv"))
+    {
+        return Ok((Box::new(geoforge_csv::CsvTable::open(path)?), "TextFile"));
+    }
     match locate(path) {
         Location::Shapefile(p) => Ok((Box::new(ShapefileReader::open(p)?), "ShapeFile")),
         Location::Geodatabase {

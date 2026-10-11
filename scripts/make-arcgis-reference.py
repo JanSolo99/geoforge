@@ -222,10 +222,16 @@ CASES = {
     "j2f_geojson_parcels": ("conversion.JSONToFeatures", [OUT / "geojson_parcels.geojson"], ["POLYGON"]),
     "j2f_geojson_wells": ("conversion.JSONToFeatures", [OUT / "geojson_wells.geojson"], ["POINT"]),
     "j2f_geojson_roads": ("conversion.JSONToFeatures", [OUT / "geojson_roads.geojson"], ["POLYLINE"]),
+    "csv_parcels": ("conversion.ExportTable", [DATA / "parcels.shp"], []),
+    "csv_wells": ("conversion.ExportTable", [DATA / "wells.shp"], []),
+    "csv_bad_lines": ("conversion.ExportTable", [DATA / "bad_lines.shp"], []),
+    "csv_stations_back": ("conversion.ExportTable", [DATA / "stations.csv"], []),
+    "xy_stations": ("management.XYTableToPoint", [DATA / "stations.csv"], ["X", "Y", "", 32633]),
+    "xy_stations_z": ("management.XYTableToPoint", [DATA / "stations.csv"], ["X", "Y", "ELEV", 32633]),
 }
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.
-TEXT_OUT = {"conversion.FeaturesToJSON"}
+TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable"}
 # Tools whose output is a table, written as <name>.dbf.
 TABLE_OUT = {"management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical"}
 
@@ -283,6 +289,8 @@ def main():
         out = OUT / (f"{name}.dbf" if tool in TABLE_OUT else f"{name}.shp")
         if tool in TEXT_OUT:
             out = OUT / (f"{name}.geojson" if "GEOJSON" in after else f"{name}.json")
+            if tool == "conversion.ExportTable":
+                out = OUT / f"{name}.csv"
         if tool in WORKSPACE_OUT:
             out = OUT / name
             out.mkdir()

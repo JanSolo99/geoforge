@@ -18,6 +18,7 @@ geoforge-geometry.workspace = true
 geoforge-tools.workspace = true
 geoforge-proj.workspace = true
 geoforge-json.workspace = true
+geoforge-csv.workspace = true
 clap.workspace = true
 chrono.workspace = true
 

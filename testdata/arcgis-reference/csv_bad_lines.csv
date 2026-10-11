@@ -1,0 +1,16 @@
+﻿ID,DESCR
+1,valid line
+2,duplicate vertex
+3,single point part
+4,zero length
+5,null
+6,short segment
+7,self crossing
+8,backtrack
+9,closed loop
+10,T junction
+11,end on own middle
+12,overlapping parts
+13,near pass
+14,near-duplicate vertex
+15,parts touching ends

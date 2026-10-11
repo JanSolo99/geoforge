@@ -1231,6 +1231,30 @@ fn gf_args(case: &str) -> Vec<&'static str> {
             "--geometry-type",
             "POLYLINE",
         ],
+        "csv_parcels" => vec!["export-table", "testdata/geoproc/parcels.shp"],
+        "csv_wells" => vec!["export-table", "testdata/geoproc/wells.shp"],
+        "csv_bad_lines" => vec!["export-table", "testdata/geoproc/bad_lines.shp"],
+        "csv_stations_back" => vec!["export-table", "testdata/geoproc/stations.csv"],
+        "xy_stations" => vec![
+            "xy-table-to-point",
+            "testdata/geoproc/stations.csv",
+            "<out>",
+            "X",
+            "Y",
+            "--coordinate-system",
+            "32633",
+        ],
+        "xy_stations_z" => vec![
+            "xy-table-to-point",
+            "testdata/geoproc/stations.csv",
+            "<out>",
+            "X",
+            "Y",
+            "--z-field",
+            "ELEV",
+            "--coordinate-system",
+            "32633",
+        ],
         "identity_parcels_clip_no_fid" => vec![
             "identity",
             "testdata/geoproc/parcels.shp",
@@ -1552,7 +1576,7 @@ fn tools_match_arcgis_output() {
         let table = reference.join(format!("{case}.dbf")).exists()
             && !reference.join(format!("{case}.shp")).exists();
         // Text outputs (Features To JSON) are compared byte for byte.
-        let text_ext = ["json", "geojson"]
+        let text_ext = ["json", "geojson", "csv"]
             .into_iter()
             .find(|e| reference.join(format!("{case}.{e}")).exists());
         let out = if let Some(ext) = text_ext {

@@ -18,6 +18,7 @@ geoforge-testkit = { path = "crates/geoforge-testkit" }
 geoforge-geometry = { path = "crates/geoforge-geometry" }
 geoforge-tools = { path = "crates/geoforge-tools" }
 geoforge-json = { path = "crates/geoforge-json" }
+geoforge-csv = { path = "crates/geoforge-csv" }
 thiserror = "2"
 chrono = { version = "0.4", default-features = false, features = ["std", "clock"] }
 encoding_rs = "0.8"

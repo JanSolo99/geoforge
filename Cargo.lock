@@ -318,6 +318,7 @@ dependencies = [
  "chrono",
  "clap",
  "geoforge-core",
+ "geoforge-csv",
  "geoforge-filegdb",
  "geoforge-geometry",
  "geoforge-json",
@@ -334,6 +335,13 @@ version = "0.0.1"
 dependencies = [
  "chrono",
  "thiserror",
+]
+
+[[package]]
+name = "geoforge-csv"
+version = "0.0.1"
+dependencies = [
+ "geoforge-core",
 ]
 
 [[package]]
