@@ -364,6 +364,20 @@ enum Tool {
         #[arg(long, default_value_t = 1.0)]
         z_factor: f64,
     },
+    /// Spatial Analyst "Focal Statistics".
+    FocalStatistics {
+        in_raster: PathBuf,
+        out_raster: PathBuf,
+        /// "Rectangle 3 3 CELL", "Circle 2 CELL" or "Annulus 1 3 CELL".
+        #[arg(long, default_value = "Rectangle 3 3 CELL")]
+        neighborhood: String,
+        /// MEAN, MAJORITY, MAXIMUM, MEDIAN, MINIMUM, MINORITY, RANGE, STD, SUM, VARIETY.
+        #[arg(long, default_value = "MEAN")]
+        statistics_type: String,
+        /// DATA (ignore NoData) or NODATA.
+        #[arg(long, default_value = "DATA")]
+        ignore_nodata: String,
+    },
     /// Spatial Analyst "Aspect" (planar): downslope direction, −1 on flat cells.
     Aspect {
         in_raster: PathBuf,
@@ -1079,6 +1093,27 @@ fn main() -> ExitCode {
             };
             let dem = geoforge_raster::read_geotiff(&in_raster)?;
             let out = geoforge_raster::surface::slope(&dem, unit, z_factor);
+            write_raster(&out_raster, &out)
+        })(),
+        Tool::FocalStatistics {
+            in_raster,
+            out_raster,
+            neighborhood,
+            statistics_type,
+            ignore_nodata,
+        } => (|| {
+            use geoforge_raster::focal::{FocalStatistic, Neighborhood};
+            let nbr = Neighborhood::parse(&neighborhood)
+                .ok_or_else(|| Error::Unsupported(format!("neighborhood {neighborhood}")))?;
+            let stat = FocalStatistic::parse(&statistics_type)
+                .ok_or_else(|| Error::Unsupported(format!("statistic {statistics_type}")))?;
+            let ignore = match ignore_nodata.to_ascii_uppercase().as_str() {
+                "DATA" => true,
+                "NODATA" => false,
+                other => return Err(Error::Unsupported(format!("ignore_nodata {other}"))),
+            };
+            let input = geoforge_raster::read_geotiff(&in_raster)?;
+            let out = geoforge_raster::focal::focal_statistics(&input, nbr, stat, ignore);
             write_raster(&out_raster, &out)
         })(),
         Tool::Aspect {

@@ -14611,6 +14611,204 @@
       "messages": [],
       "fields": [],
       "shapeType": null
+    },
+    "focal_mean_nodata": {
+      "tool": "gp.FocalStatistics_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "Rectangle 3 3 CELL",
+        "MEAN",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "focal_mean_nodata_strict": {
+      "tool": "gp.FocalStatistics_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "Rectangle 3 3 CELL",
+        "MEAN",
+        "NODATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "focal_max_int16_5x3": {
+      "tool": "gp.FocalStatistics_sa",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>",
+        "Rectangle 5 3 CELL",
+        "MAXIMUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "focal_min_int16_4x4": {
+      "tool": "gp.FocalStatistics_sa",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>",
+        "Rectangle 4 4 CELL",
+        "MINIMUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "focal_std_circle2": {
+      "tool": "gp.FocalStatistics_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "Circle 2 CELL",
+        "STD",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "focal_range_annulus": {
+      "tool": "gp.FocalStatistics_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "Annulus 1 3 CELL",
+        "RANGE",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "focal_majority_landuse": {
+      "tool": "gp.FocalStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 3 3 CELL",
+        "MAJORITY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010666: Some majority or minority statistics type results are not unique."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "focal_minority_landuse": {
+      "tool": "gp.FocalStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Circle 2 CELL",
+        "MINORITY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "focal_sum_landuse": {
+      "tool": "gp.FocalStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 3 3 CELL",
+        "SUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "focal_sum_dem": {
+      "tool": "gp.FocalStatistics_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "Rectangle 3 3 CELL",
+        "SUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "focal_median_int16": {
+      "tool": "gp.FocalStatistics_sa",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>",
+        "Rectangle 3 3 CELL",
+        "MEDIAN",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "focal_median_f64": {
+      "tool": "gp.FocalStatistics_sa",
+      "args": [
+        "testdata/raster/dem_f64.tif",
+        "<out>",
+        "Rectangle 3 3 CELL",
+        "MEDIAN",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "focal_variety_landuse": {
+      "tool": "gp.FocalStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 3 3 CELL",
+        "VARIETY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "focal_max_f64": {
+      "tool": "gp.FocalStatistics_sa",
+      "args": [
+        "testdata/raster/dem_f64.tif",
+        "<out>",
+        "Circle 1.5 CELL",
+        "MAXIMUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

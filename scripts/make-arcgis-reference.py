@@ -239,9 +239,23 @@ CASES = {
     "hillshade_dem": ("gp.HillShade_sa", [RASTER / "dem.tif"], [315, 45, "NO_SHADOWS", 1]),
     "hillshade_dem_nodata": ("gp.HillShade_sa", [RASTER / "dem_nodata.tif"], [200, 30, "NO_SHADOWS", 1]),
     "hillshade_dem_z3": ("gp.HillShade_sa", [RASTER / "dem.tif"], [315, 45, "NO_SHADOWS", 3]),
+    "focal_mean_nodata": ("gp.FocalStatistics_sa", [RASTER / "dem_nodata.tif"], ["Rectangle 3 3 CELL", "MEAN", "DATA"]),
+    "focal_mean_nodata_strict": ("gp.FocalStatistics_sa", [RASTER / "dem_nodata.tif"], ["Rectangle 3 3 CELL", "MEAN", "NODATA"]),
+    "focal_max_int16_5x3": ("gp.FocalStatistics_sa", [RASTER / "dem_int16_packbits.tif"], ["Rectangle 5 3 CELL", "MAXIMUM", "DATA"]),
+    "focal_min_int16_4x4": ("gp.FocalStatistics_sa", [RASTER / "dem_int16_packbits.tif"], ["Rectangle 4 4 CELL", "MINIMUM", "DATA"]),
+    "focal_std_circle2": ("gp.FocalStatistics_sa", [RASTER / "dem.tif"], ["Circle 2 CELL", "STD", "DATA"]),
+    "focal_range_annulus": ("gp.FocalStatistics_sa", [RASTER / "dem_nodata.tif"], ["Annulus 1 3 CELL", "RANGE", "DATA"]),
+    "focal_majority_landuse": ("gp.FocalStatistics_sa", [RASTER / "landuse_u8.tif"], ["Rectangle 3 3 CELL", "MAJORITY", "DATA"]),
+    "focal_minority_landuse": ("gp.FocalStatistics_sa", [RASTER / "landuse_u8.tif"], ["Circle 2 CELL", "MINORITY", "DATA"]),
+    "focal_sum_landuse": ("gp.FocalStatistics_sa", [RASTER / "landuse_u8.tif"], ["Rectangle 3 3 CELL", "SUM", "DATA"]),
+    "focal_sum_dem": ("gp.FocalStatistics_sa", [RASTER / "dem.tif"], ["Rectangle 3 3 CELL", "SUM", "DATA"]),
+    "focal_median_int16": ("gp.FocalStatistics_sa", [RASTER / "dem_int16_packbits.tif"], ["Rectangle 3 3 CELL", "MEDIAN", "DATA"]),
+    "focal_median_f64": ("gp.FocalStatistics_sa", [RASTER / "dem_f64.tif"], ["Rectangle 3 3 CELL", "MEDIAN", "DATA"]),
+    "focal_variety_landuse": ("gp.FocalStatistics_sa", [RASTER / "landuse_u8.tif"], ["Rectangle 3 3 CELL", "VARIETY", "DATA"]),
+    "focal_max_f64": ("gp.FocalStatistics_sa", [RASTER / "dem_f64.tif"], ["Circle 1.5 CELL", "MAXIMUM", "DATA"]),
 }
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
-RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa"}
+RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa"}
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable"}

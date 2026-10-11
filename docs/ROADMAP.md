@@ -170,6 +170,12 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
   - [x] Writer: single band, striped, any compression, EPSG GeoKeys and GDAL_NODATA
   - [ ] Tiled writer, overviews, COG layout, user-defined CRS GeoKeys
 - [ ] Map algebra (local/focal/zonal/global), reclass, resample
+  - [x] Focal Statistics (rectangle/circle/annulus in cells; mean, majority, maximum, median,
+        minimum, minority, range, std, sum, variety; DATA/NODATA) matching ArcGIS: radii truncate
+        to whole cells, the annulus is inclusive at both ends, NODATA treats cells beyond the edge
+        as NoData, majority/minority ties go to the center value, NoData is the output type's
+        maximum, Variety writes a 4-bit raster (NoData 15) for 3×3, integer Sum is 32-bit
+  - [ ] Majority ties not involving the center (smallest value assumed, unverified)
 - [ ] Hillshade, slope, aspect, curvature, contours, viewshed, hydrology (fill/flow dir/accumulation/watershed)
   - [x] Slope (degree/percent rise, z-factor), Aspect, Hillshade (no shadows), planar, matching
         ArcGIS cell for cell: Horn's gradient; border cells and cells with a NoData edge neighbor
