@@ -172,6 +172,35 @@ enum Tool {
         /// A folder; outputs are `<value>.shp`.
         out_workspace: PathBuf,
     },
+    /// Features matching an SQL expression (ArcGIS "Select").
+    Select {
+        in_features: PathBuf,
+        out_feature_class: PathBuf,
+        /// e.g. "ZONE IN (1, 3) AND NAME LIKE 'Lot 1%'".
+        #[arg(long = "where")]
+        where_clause: Option<String>,
+    },
+    /// Summary statistics into a .dbf table (ArcGIS "Summary Statistics").
+    Statistics {
+        in_table: PathBuf,
+        out_table: PathBuf,
+        /// "FIELD STAT;FIELD STAT": SUM, MEAN, MIN, MAX, RANGE, STD, COUNT, FIRST,
+        /// LAST, MEDIAN, VARIANCE, UNIQUE.
+        statistics_fields: String,
+        /// Fields to summarize by (repeatable).
+        #[arg(long = "case-field")]
+        case_fields: Vec<String>,
+    },
+    /// Counts per combination of field values into a .dbf table (ArcGIS "Frequency").
+    Frequency {
+        in_table: PathBuf,
+        out_table: PathBuf,
+        /// Fields separated by ';'.
+        frequency_fields: String,
+        /// Fields to sum, separated by ';'.
+        #[arg(long)]
+        summary_fields: Option<String>,
+    },
     /// One feature per part (ArcGIS "Multipart To Singlepart").
     MultipartToSinglepart {
         in_features: PathBuf,
@@ -507,6 +536,62 @@ fn main() -> ExitCode {
             split_field,
             out_workspace,
         } => split_tool(&in_features, &split_features, &split_field, &out_workspace),
+        Tool::Select {
+            in_features,
+            out_feature_class,
+            where_clause,
+        } => (|| {
+            let (fc, _) = open_feature_class(&in_features)?;
+            let out = geoforge_tools::select(fc.as_ref(), where_clause.as_deref())?;
+            write_output(out, &out_feature_class, source_gdb(&in_features).as_deref())
+        })(),
+        Tool::Statistics {
+            in_table,
+            out_table,
+            statistics_fields,
+            case_fields,
+        } => (|| {
+            let mut stats = Vec::new();
+            for item in statistics_fields
+                .split(';')
+                .map(str::trim)
+                .filter(|s| !s.is_empty())
+            {
+                let mut w = item.split_whitespace();
+                let (Some(field), Some(stat)) = (w.next(), w.next()) else {
+                    return Err(Error::Unsupported(format!(
+                        "statistic `{item}`: expected \"FIELD STATISTIC\""
+                    )));
+                };
+                let stat = geoforge_tools::Statistic::parse(stat)
+                    .ok_or_else(|| Error::Unsupported(format!("statistic type {stat}")))?;
+                stats.push((field.to_owned(), stat));
+            }
+            let (fc, _) = open_feature_class(&in_table)?;
+            let out = geoforge_tools::statistics(fc.as_ref(), &stats, &case_fields)?;
+            write_table(&out, &out_table)
+        })(),
+        Tool::Frequency {
+            in_table,
+            out_table,
+            frequency_fields,
+            summary_fields,
+        } => (|| {
+            let split = |s: &str| -> Vec<String> {
+                s.split(';')
+                    .map(str::trim)
+                    .filter(|s| !s.is_empty())
+                    .map(str::to_owned)
+                    .collect()
+            };
+            let (fc, _) = open_feature_class(&in_table)?;
+            let out = geoforge_tools::frequency(
+                fc.as_ref(),
+                &split(&frequency_fields),
+                &split(summary_fields.as_deref().unwrap_or("")),
+            )?;
+            write_table(&out, &out_table)
+        })(),
         Tool::MultipartToSinglepart {
             in_features,
             out_feature_class,
@@ -1334,6 +1419,39 @@ fn check_geometry_tool(in_features: &str, out_table: &Path, method: &str) -> Res
     let cpg = out_table.with_extension("cpg");
     std::fs::write(&cpg, "UTF-8").map_err(|e| Error::io(&cpg, e))?;
     println!("Wrote {} ({} problems)", out_table.display(), rows.len());
+    Ok(())
+}
+
+/// Writes a table as a `.dbf` (with `.cpg`), field names by the shapefile rules.
+fn write_table(table: &geoforge_tools::TableOutput, path: &Path) -> Result<()> {
+    if path
+        .extension()
+        .is_none_or(|e| !e.eq_ignore_ascii_case("dbf"))
+    {
+        return Err(Error::Unsupported(
+            "tables are written as .dbf; geodatabase tables are not implemented yet".into(),
+        ));
+    }
+    let names =
+        geoforge_shapefile::validate_field_names(table.fields.iter().map(|f| f.name.as_str()));
+    let dbf_fields = table
+        .fields
+        .iter()
+        .zip(names)
+        .map(|(f, n)| geoforge_shapefile::dbf::DbfField::from_field(n, f))
+        .collect::<Result<Vec<_>>>()?;
+    let mut w = geoforge_shapefile::dbf::DbfWriter::create(
+        path,
+        dbf_fields,
+        chrono::Local::now().date_naive(),
+    )?;
+    for row in &table.rows {
+        w.push(row)?;
+    }
+    w.finish()?;
+    let cpg = path.with_extension("cpg");
+    std::fs::write(&cpg, "UTF-8").map_err(|e| Error::io(&cpg, e))?;
+    println!("Wrote {} ({} rows)", path.display(), table.rows.len());
     Ok(())
 }
 

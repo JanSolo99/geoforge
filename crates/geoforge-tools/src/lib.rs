@@ -2,7 +2,10 @@
 //! output schema, feature order, messages) as observed through the ArcGIS bridge
 //! and recorded in `testdata/arcgis-reference/manifest.json`.
 
+mod sql;
 mod zm;
+
+pub use sql::WhereClause;
 
 use geoforge_core::{Error, Feature, FeatureClass, Field, FieldType, GeometryKind, Result, Value};
 use geoforge_geometry::{BufferOptions, ClipArea, LineEnd};
@@ -1082,6 +1085,9 @@ pub enum Statistic {
     Count,
     First,
     Last,
+    Median,
+    Variance,
+    Unique,
 }
 
 impl Statistic {
@@ -1096,6 +1102,9 @@ impl Statistic {
             "COUNT" => Self::Count,
             "FIRST" => Self::First,
             "LAST" => Self::Last,
+            "MEDIAN" => Self::Median,
+            "VARIANCE" => Self::Variance,
+            "UNIQUE" => Self::Unique,
             _ => return None,
         })
     }
@@ -1111,6 +1120,94 @@ impl Statistic {
             Self::Count => "COUNT",
             Self::First => "FIRST",
             Self::Last => "LAST",
+            Self::Median => "MEDIAN",
+            Self::Variance => "VARIANCE",
+            Self::Unique => "UNIQUE",
+        }
+    }
+
+    /// The output field `PREFIX_FIELD`: counts are integers, first/last/min/max keep
+    /// the field's type, the rest are doubles.
+    fn field(self, src: &Field) -> Field {
+        let field_type = match self {
+            Statistic::Count | Statistic::Unique => FieldType::Integer,
+            Statistic::Min | Statistic::Max | Statistic::First | Statistic::Last => src.field_type,
+            _ => FieldType::Double,
+        };
+        let mut f = Field::new(format!("{}_{}", self.prefix(), src.name), field_type);
+        f.length = src.length;
+        f
+    }
+
+    /// The statistic of a group's values (in feature order, nulls included).
+    /// `sample`: standard deviation and variance over n - 1 (Summary Statistics)
+    /// rather than n (Dissolve).
+    fn compute(self, all: &[&Value], sample: bool) -> Value {
+        let values: Vec<&Value> = all.iter().copied().filter(|v| !v.is_null()).collect();
+        let mut nums: Vec<f64> = values.iter().filter_map(|v| number(v)).collect();
+        let n = nums.len() as f64;
+        let mean = nums.iter().sum::<f64>() / n;
+        let or_null = |ok: bool, v: f64| if ok { Value::Double(v) } else { Value::Null };
+        match self {
+            Statistic::Count => Value::Integer(values.len() as i32),
+            Statistic::Unique => {
+                let mut distinct: Vec<&Value> = Vec::new();
+                for v in &values {
+                    if !distinct.contains(v) {
+                        distinct.push(v);
+                    }
+                }
+                Value::Integer(distinct.len() as i32)
+            }
+            Statistic::Sum => Value::Double(nums.iter().sum()),
+            Statistic::Mean => or_null(!nums.is_empty(), mean),
+            Statistic::Range => nums
+                .iter()
+                .copied()
+                .reduce(f64::max)
+                .zip(nums.iter().copied().reduce(f64::min))
+                .map_or(Value::Null, |(a, b)| Value::Double(a - b)),
+            Statistic::Std | Statistic::Variance => {
+                let denominator = if sample { n - 1.0 } else { n };
+                let var = if sample && n < 2.0 {
+                    0.0
+                } else {
+                    nums.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / denominator
+                };
+                or_null(
+                    !nums.is_empty(),
+                    if self == Statistic::Std {
+                        var.sqrt()
+                    } else {
+                        var
+                    },
+                )
+            }
+            Statistic::Median => {
+                nums.sort_by(f64::total_cmp);
+                let k = nums.len();
+                if k == 0 {
+                    Value::Null
+                } else if k % 2 == 1 {
+                    Value::Double(nums[k / 2])
+                } else {
+                    Value::Double((nums[k / 2 - 1] + nums[k / 2]) / 2.0)
+                }
+            }
+            Statistic::Min => values
+                .iter()
+                .copied()
+                .min_by(|a, b| compare(a, b))
+                .cloned()
+                .unwrap_or(Value::Null),
+            Statistic::Max => values
+                .iter()
+                .copied()
+                .max_by(|a, b| compare(a, b))
+                .cloned()
+                .unwrap_or(Value::Null),
+            Statistic::First => all.first().map_or(Value::Null, |v| (*v).clone()),
+            Statistic::Last => all.last().map_or(Value::Null, |v| (*v).clone()),
         }
     }
 }
@@ -1194,15 +1291,7 @@ pub fn dissolve(
 
     let mut fields: Vec<Field> = keys.iter().map(|&i| input.fields()[i].clone()).collect();
     for &(i, s) in &stats {
-        let src = &input.fields()[i];
-        let field_type = match s {
-            Statistic::Count => FieldType::Integer,
-            Statistic::Min | Statistic::Max | Statistic::First | Statistic::Last => src.field_type,
-            _ => FieldType::Double,
-        };
-        let mut f = Field::new(format!("{}_{}", s.prefix(), src.name), field_type);
-        f.length = src.length;
-        fields.push(f);
+        fields.push(s.field(&input.fields()[i]));
     }
     let out_kind = if dimension(kind) == 0 && multi_part {
         GeometryKind::Multipoint
@@ -1219,59 +1308,8 @@ pub fn dissolve(
         };
         let mut attrs = key.clone();
         for &(i, s) in &stats {
-            let values: Vec<&Value> = members
-                .iter()
-                .map(|f| &f.attributes[i])
-                .filter(|v| !v.is_null())
-                .collect();
-            let nums: Vec<f64> = values.iter().filter_map(|v| number(v)).collect();
-            let n = nums.len() as f64;
-            let mean = nums.iter().sum::<f64>() / n;
-            attrs.push(match s {
-                Statistic::Count => Value::Integer(values.len() as i32),
-                Statistic::Sum => Value::Double(nums.iter().sum()),
-                Statistic::Mean => {
-                    if nums.is_empty() {
-                        Value::Null
-                    } else {
-                        Value::Double(mean)
-                    }
-                }
-                Statistic::Range => nums
-                    .iter()
-                    .copied()
-                    .reduce(f64::max)
-                    .zip(nums.iter().copied().reduce(f64::min))
-                    .map_or(Value::Null, |(a, b)| Value::Double(a - b)),
-                // ArcGIS reports the population standard deviation.
-                Statistic::Std => {
-                    if nums.is_empty() {
-                        Value::Null
-                    } else {
-                        Value::Double(
-                            (nums.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / n).sqrt(),
-                        )
-                    }
-                }
-                Statistic::Min => values
-                    .iter()
-                    .copied()
-                    .min_by(|a, b| compare(a, b))
-                    .cloned()
-                    .unwrap_or(Value::Null),
-                Statistic::Max => values
-                    .iter()
-                    .copied()
-                    .max_by(|a, b| compare(a, b))
-                    .cloned()
-                    .unwrap_or(Value::Null),
-                Statistic::First => members
-                    .first()
-                    .map_or(Value::Null, |f| f.attributes[i].clone()),
-                Statistic::Last => members
-                    .last()
-                    .map_or(Value::Null, |f| f.attributes[i].clone()),
-            });
+            let values: Vec<&Value> = members.iter().map(|f| &f.attributes[i]).collect();
+            attrs.push(s.compute(&values, false));
         }
         if multi_part {
             features.push(Feature {
@@ -3301,4 +3339,148 @@ pub fn add_xy(input: &dyn FeatureClass) -> Result<ToolOutput> {
         features,
         messages: Vec::new(),
     })
+}
+
+/// A table result (no geometry): fields and rows.
+#[derive(Debug, Clone)]
+pub struct TableOutput {
+    pub fields: Vec<Field>,
+    pub rows: Vec<Vec<Value>>,
+}
+
+/// `arcpy.analysis.Select(in, out, where_clause)`: the features the clause
+/// selects (all without one).
+pub fn select(input: &dyn FeatureClass, where_clause: Option<&str>) -> Result<ToolOutput> {
+    let kind = input
+        .geometry_kind()
+        .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
+    let clause = where_clause
+        .filter(|w| !w.trim().is_empty())
+        .map(|w| WhereClause::parse(w, input.fields()))
+        .transpose()?;
+    let mut features = Vec::new();
+    for f in input.features() {
+        let f = f?;
+        if clause.as_ref().is_none_or(|c| c.matches(&f.attributes)) {
+            features.push(f);
+        }
+    }
+    Ok(ToolOutput {
+        kind,
+        has_z: input.has_z(),
+        has_m: input.has_m(),
+        fields: input.fields().to_vec(),
+        spatial_reference_wkt: input.spatial_reference_wkt().map(str::to_owned),
+        messages: if features.is_empty() {
+            vec!["WARNING 000117: Warning empty output generated.".into()]
+        } else {
+            Vec::new()
+        },
+        features,
+    })
+}
+
+fn field_positions(input: &dyn FeatureClass, names: &[String]) -> Result<Vec<usize>> {
+    names
+        .iter()
+        .map(|n| {
+            input
+                .fields()
+                .iter()
+                .position(|f| f.name.eq_ignore_ascii_case(n))
+                .ok_or_else(|| {
+                    Error::Unsupported(format!(
+                        "ERROR 000728: Field {n} does not exist within table"
+                    ))
+                })
+        })
+        .collect()
+}
+
+/// Rows grouped by the values at `keys`, groups sorted by those values.
+fn group_rows(rows: Vec<Vec<Value>>, keys: &[usize]) -> Vec<(Vec<Value>, Vec<Vec<Value>>)> {
+    let mut groups: Vec<(Vec<Value>, Vec<Vec<Value>>)> = Vec::new();
+    for r in rows {
+        let key: Vec<Value> = keys.iter().map(|&i| r[i].clone()).collect();
+        match groups.iter_mut().find(|(k, _)| k == &key) {
+            Some((_, m)) => m.push(r),
+            None => groups.push((key, vec![r])),
+        }
+    }
+    groups.sort_by(|a, b| {
+        a.0.iter()
+            .zip(&b.0)
+            .map(|(x, y)| compare(x, y))
+            .find(|o| o.is_ne())
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+    groups
+}
+
+/// `arcpy.analysis.Statistics(in, out_table, statistics_fields, case_field)`: per
+/// combination of the case fields (sorted), FREQUENCY and each `PREFIX_FIELD`.
+pub fn statistics(
+    input: &dyn FeatureClass,
+    stats: &[(String, Statistic)],
+    case_fields: &[String],
+) -> Result<TableOutput> {
+    let keys = field_positions(input, case_fields)?;
+    let stat_fields = field_positions(
+        input,
+        &stats.iter().map(|(n, _)| n.clone()).collect::<Vec<_>>(),
+    )?;
+    let mut fields: Vec<Field> = keys.iter().map(|&i| input.fields()[i].clone()).collect();
+    fields.push(Field::new("FREQUENCY", FieldType::Integer));
+    for (&i, (_, s)) in stat_fields.iter().zip(stats) {
+        fields.push(s.field(&input.fields()[i]));
+    }
+    let rows: Vec<Vec<Value>> = input
+        .features()
+        .map(|f| f.map(|f| f.attributes))
+        .collect::<Result<_>>()?;
+    let mut out = Vec::new();
+    for (key, members) in group_rows(rows, &keys) {
+        let mut row = key;
+        row.push(Value::Integer(members.len() as i32));
+        for (&i, (_, s)) in stat_fields.iter().zip(stats) {
+            let values: Vec<&Value> = members.iter().map(|m| &m[i]).collect();
+            row.push(s.compute(&values, true));
+        }
+        out.push(row);
+    }
+    Ok(TableOutput { fields, rows: out })
+}
+
+/// `arcpy.analysis.Frequency(in, out_table, frequency_fields, summary_fields)`:
+/// per combination of the frequency fields (sorted), FREQUENCY, the values, and
+/// the sums of the summary fields.
+pub fn frequency(
+    input: &dyn FeatureClass,
+    frequency_fields: &[String],
+    summary_fields: &[String],
+) -> Result<TableOutput> {
+    let keys = field_positions(input, frequency_fields)?;
+    let sums = field_positions(input, summary_fields)?;
+    let mut fields = vec![Field::new("FREQUENCY", FieldType::Integer)];
+    fields.extend(keys.iter().map(|&i| input.fields()[i].clone()));
+    fields.extend(sums.iter().map(|&i| {
+        let mut f = input.fields()[i].clone();
+        f.field_type = FieldType::Double;
+        f
+    }));
+    let rows: Vec<Vec<Value>> = input
+        .features()
+        .map(|f| f.map(|f| f.attributes))
+        .collect::<Result<_>>()?;
+    let mut out = Vec::new();
+    for (key, members) in group_rows(rows, &keys) {
+        let mut row = vec![Value::Integer(members.len() as i32)];
+        row.extend(key);
+        for &i in &sums {
+            let values: Vec<&Value> = members.iter().map(|m| &m[i]).collect();
+            row.push(Statistic::Sum.compute(&values, false));
+        }
+        out.push(row);
+    }
+    Ok(TableOutput { fields, rows: out })
 }

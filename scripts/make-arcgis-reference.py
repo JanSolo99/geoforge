@@ -178,10 +178,27 @@ CASES = {
     "mbg_wells_hull_all": ("management.MinimumBoundingGeometry", [DATA / "wells.shp"], ["CONVEX_HULL", "ALL"]),
     "mbg_parcels_env_zone_mbg": ("management.MinimumBoundingGeometry", [DATA / "parcels.shp"], ["ENVELOPE", "LIST", "ZONE", "MBG_FIELDS"]),
     "addxy_wells": ("management.AddXY", [DATA / "wells.shp"], []),
+    "select_parcels_value": ("analysis.Select", [DATA / "parcels.shp"], ["VALUE > 5000"]),
+    "select_parcels_in_and": ("analysis.Select", [DATA / "parcels.shp"], ["ZONE IN (1, 3) AND VALUE < 8000"]),
+    "select_parcels_like": ("analysis.Select", [DATA / "parcels.shp"], ["NAME LIKE 'Lot 1%'"]),
+    "select_parcels_between_or": ("analysis.Select", [DATA / "parcels.shp"], ["PARCEL_ID BETWEEN 10 AND 20 OR ZONE = 0"]),
+    "select_parcels_not": ("analysis.Select", [DATA / "parcels.shp"], ["NOT ZONE = 2"]),
+    "select_parcels_quoted": ("analysis.Select", [DATA / "parcels.shp"], ['"NAME" = \'Lot 7\'']),
+    "select_parcels_parens": ("analysis.Select", [DATA / "parcels.shp"], ["(ZONE = 1 OR ZONE = 2) AND NOT (VALUE >= 3000 AND VALUE <= 6000)"]),
+    "select_parcels_like_underscore": ("analysis.Select", [DATA / "parcels.shp"], ["NAME LIKE 'Lot _'"]),
+    "select_parcels_not_in": ("analysis.Select", [DATA / "parcels.shp"], ["ZONE NOT IN (0, 1)"]),
+    "select_wells_depth": ("analysis.Select", [DATA / "wells.shp"], ["DEPTH >= 100.5"]),
+    "select_wells_none": ("analysis.Select", [DATA / "wells.shp"], ["DEPTH < 0"]),
+    "select_parcels_all": ("analysis.Select", [DATA / "parcels.shp"], []),
+    "stats_parcels_zone": ("analysis.Statistics", [DATA / "parcels.shp"], ["VALUE SUM;VALUE MEAN;VALUE MIN;VALUE MAX;VALUE RANGE;VALUE STD;VALUE COUNT;PARCEL_ID FIRST;PARCEL_ID LAST;NAME FIRST", "ZONE"]),
+    "stats_parcels_all": ("analysis.Statistics", [DATA / "parcels.shp"], ["VALUE SUM;VALUE MEAN;PARCEL_ID COUNT"]),
+    "stats_wells_median": ("analysis.Statistics", [DATA / "wells.shp"], ["DEPTH MEDIAN;DEPTH VARIANCE;DEPTH UNIQUE"]),
+    "freq_parcels_zone": ("analysis.Frequency", [DATA / "parcels.shp"], ["ZONE", "VALUE"]),
+    "freq_roads_class": ("analysis.Frequency", [DATA / "roads.shp"], ["CLASS"]),
 }
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools whose output is a table, written as <name>.dbf.
-TABLE_OUT = {"management.CheckGeometry"}
+TABLE_OUT = {"management.CheckGeometry", "analysis.Statistics", "analysis.Frequency"}
 
 # In-place tools: the index of the input they edit (run on a copy written as the output).
 IN_PLACE = {"analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0}

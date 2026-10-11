@@ -12240,6 +12240,876 @@
         ]
       ],
       "shapeType": "Point"
+    },
+    "select_parcels_value": {
+      "tool": "analysis.Select",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "VALUE > 5000"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "select_parcels_in_and": {
+      "tool": "analysis.Select",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "ZONE IN (1, 3) AND VALUE < 8000"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "select_parcels_like": {
+      "tool": "analysis.Select",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "NAME LIKE 'Lot 1%'"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "select_parcels_between_or": {
+      "tool": "analysis.Select",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "PARCEL_ID BETWEEN 10 AND 20 OR ZONE = 0"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 000358: Invalid expression PARCEL_ID BETWEEN 10 AND 20 OR ZONE = 0",
+        "Failed to execute (Select)."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "select_parcels_not": {
+      "tool": "analysis.Select",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "NOT ZONE = 2"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "select_parcels_quoted": {
+      "tool": "analysis.Select",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "\"NAME\" = 'Lot 7'"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "select_parcels_parens": {
+      "tool": "analysis.Select",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "(ZONE = 1 OR ZONE = 2) AND NOT (VALUE >= 3000 AND VALUE <= 6000)"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "select_parcels_like_underscore": {
+      "tool": "analysis.Select",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "NAME LIKE 'Lot _'"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "select_parcels_not_in": {
+      "tool": "analysis.Select",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "ZONE NOT IN (0, 1)"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "select_wells_depth": {
+      "tool": "analysis.Select",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "DEPTH >= 100.5"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "select_wells_none": {
+      "tool": "analysis.Select",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "DEPTH < 0"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000117: Warning empty output generated."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "select_parcels_all": {
+      "tool": "analysis.Select",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "stats_parcels_zone": {
+      "tool": "analysis.Statistics",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "VALUE SUM;VALUE MEAN;VALUE MIN;VALUE MAX;VALUE RANGE;VALUE STD;VALUE COUNT;PARCEL_ID FIRST;PARCEL_ID LAST;NAME FIRST",
+        "ZONE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "FREQUENCY",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "SUM_VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "MEAN_VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "MIN_VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "MAX_VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "RANGE_VALU",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "STD_VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "COUNT_VALU",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "FIRST_PARC",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "LAST_PARCE",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "FIRST_NAME",
+          "String",
+          20,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null
+    },
+    "stats_parcels_all": {
+      "tool": "analysis.Statistics",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "VALUE SUM;VALUE MEAN;PARCEL_ID COUNT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "FREQUENCY",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "SUM_VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "MEAN_VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "COUNT_PARC",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": null
+    },
+    "stats_wells_median": {
+      "tool": "analysis.Statistics",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "DEPTH MEDIAN;DEPTH VARIANCE;DEPTH UNIQUE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "FREQUENCY",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MEDIAN_DEP",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "VARIANCE_D",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "UNIQUE_DEP",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": null
+    },
+    "freq_parcels_zone": {
+      "tool": "analysis.Frequency",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "ZONE",
+        "VALUE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "FREQUENCY",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null
+    },
+    "freq_roads_class": {
+      "tool": "analysis.Frequency",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "CLASS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "FREQUENCY",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": null
     }
   }
 }

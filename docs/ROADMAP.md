@@ -108,6 +108,10 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       DANGLE_LEN), Minimum Bounding Geometry (envelope, convex hull, rectangles by area/width,
       circle; NONE/ALL/LIST; MBG_FIELDS; straight lines widened 1 unit each side), Add XY
       Coordinates — match ArcGIS
+- [x] Select with SQL `where_clause` (comparisons, AND/OR/NOT, IN, LIKE, IS NULL, arithmetic,
+      quoted names; BETWEEN rejected with ERROR 000358 as for shapefiles), Summary Statistics
+      (sample STD/VARIANCE, unlike Dissolve's population ones; MEDIAN, UNIQUE) and Frequency
+      into `.dbf` tables — match ArcGIS
 - [ ] Feature To Point INSIDE for U/L-shaped polygons whose centroid lies outside (ArcGIS
       also searches vertically)
 - [ ] Check/Repair Geometry: geodatabase output tables, curves, multipoint and Z/M
