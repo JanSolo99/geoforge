@@ -163,6 +163,12 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
 
 ## Phase 5 — Raster
 - [ ] GeoTIFF/COG read/write (tiling, compression, overviews)
+  - [x] Reader: strips and tiles, none/LZW/Deflate/PackBits with predictors 2 and 3, both byte
+        orders, BigTIFF, planar and pixel-interleaved bands, PixelIsPoint, GDAL_NODATA, EPSG
+        GeoKeys (own chunk decoder; the `tiff` crate's LZW rejects GDAL's small tiles), checked
+        cell for cell against GDAL
+  - [x] Writer: single band, striped, any compression, EPSG GeoKeys and GDAL_NODATA
+  - [ ] Tiled writer, overviews, COG layout, user-defined CRS GeoKeys
 - [ ] Map algebra (local/focal/zonal/global), reclass, resample
 - [ ] Hillshade, slope, aspect, curvature, contours, viewshed, hydrology (fill/flow dir/accumulation/watershed)
 

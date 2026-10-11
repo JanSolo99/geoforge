@@ -30,6 +30,9 @@ rstar = "0.12"
 i_overlay = { version = "4.5", default-features = false }
 proj = { version = "0.31", default-features = false }
 proj-sys = { version = "0.27", default-features = false }
+tiff = "0.11"
+weezl = "0.1"
+flate2 = "1"
 approx = "0.5"
 
 [workspace.lints.rust]
