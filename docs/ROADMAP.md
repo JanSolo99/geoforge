@@ -298,6 +298,10 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         (`docs/formats/geopackage.md`)
   - [x] Shapefile output: Date Only fields fail with ERROR 000308; empty points written as
         −DBL_MAX as ArcGIS does
+  - [x] Own SQLite writer (`geoforge-gpkg::sqlite_writer`): bulk-loaded table and index
+        b-trees, overflow pages, automatic indexes, schema beyond page 1, lock-byte page; passes
+        `PRAGMA integrity_check` at page sizes 512–65536 and SQLite keeps editing the files;
+        2 million rows in 0.18 s (≈ 8× SQLite's own bulk insert), with an index 0.53 s (≈ 3×)
   - [ ] GeoPackage: writing, WAL files, curve geometries, Project's extra `fid_` field, 64-bit
         ObjectIDs in file geodatabases
 

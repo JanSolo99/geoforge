@@ -6,6 +6,7 @@
 //! read as null (empty points stay empty points).
 
 pub mod sqlite;
+pub mod sqlite_writer;
 
 use std::path::Path;
 

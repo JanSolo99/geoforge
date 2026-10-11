@@ -279,7 +279,7 @@ fn be32(b: &[u8], at: usize) -> Result<u32> {
 }
 
 /// A SQLite varint: big-endian groups of 7 bits, the ninth byte whole.
-fn varint(b: &[u8], at: usize) -> Result<(u64, usize)> {
+pub(crate) fn varint(b: &[u8], at: usize) -> Result<(u64, usize)> {
     let mut v = 0u64;
     for i in 0..9 {
         let byte = *b.get(at + i).ok_or_else(|| bad("short varint"))?;
