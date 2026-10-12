@@ -165,7 +165,11 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
       in the reference case
 - [ ] Project: Esri-only methods PROJ has no alias for (e.g. `ED_1950_To_WGS_1984_NGA_7PAR`),
       ArcGIS's default method choice per area, vertical CS
-- [ ] Datum transforms with grid shifts
+- [x] Datum transforms with grid shifts: `NAD_1927_To_NAD_1983_NADCON` (alone and chained with
+      `NAD_1983_To_WGS_1984_1`) match ArcGIS to ~1e-9° once PROJ has the grid; no grids are
+      bundled, PROJ fetches them with `PROJ_NETWORK=ON` (the reference cases run only then)
+- [ ] Grid-shift methods beyond NADCON checked against ArcGIS (NTv2, HARN, Alaska); a clear
+      error naming the missing grid instead of "missing datum grid?"
 
 ## Phase 5 — Raster
 - [ ] GeoTIFF/COG read/write (tiling, compression, overviews)

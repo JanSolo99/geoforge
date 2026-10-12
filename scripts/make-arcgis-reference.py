@@ -192,6 +192,8 @@ CASES = {
     "project_ed50_utm33_32633_t1": ("management.Project", [DATA / "wells_ed50_utm33.shp"], [32633, "ED_1950_To_WGS_1984_1"]),
     "project_ed50_utm33_4326_t7": ("management.Project", [DATA / "wells_ed50_utm33.shp"], [4326, "ED_1950_To_WGS_1984_7"]),
     "project_wgs84_ed50_t1": ("management.Project", [DATA / "wells_wgs84.shp"], [4230, "ED_1950_To_WGS_1984_1"]),
+    "project_nad27_nadcon": ("management.Project", [DATA / "wells_us_nad27.shp"], [4269, "NAD_1927_To_NAD_1983_NADCON"]),
+    "project_nad27_nadcon_wgs84": ("management.Project", [DATA / "wells_us_nad27.shp"], [4326, "NAD_1927_To_NAD_1983_NADCON + NAD_1983_To_WGS_1984_1"]),
     "project_wgs84_ed50_utm33_t18": ("management.Project", [DATA / "wells_wgs84.shp"], [23033, "ED_1950_To_WGS_1984_18"]),
     "m2s_roads": ("management.MultipartToSinglepart", [DATA / "roads.shp"], []),
     "m2s_parcels_clip": ("management.MultipartToSinglepart", [OUT / "clip_parcels.shp"], []),

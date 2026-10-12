@@ -18990,6 +18990,104 @@
         ]
       ],
       "shapeType": "Point"
+    },
+    "project_nad27_nadcon": {
+      "tool": "management.Project",
+      "args": [
+        "testdata/geoproc/wells_us_nad27.shp",
+        "<out>",
+        4269,
+        "NAD_1927_To_NAD_1983_NADCON"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "x",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "y",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "id",
+          "String",
+          80,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "project_nad27_nadcon_wgs84": {
+      "tool": "management.Project",
+      "args": [
+        "testdata/geoproc/wells_us_nad27.shp",
+        "<out>",
+        4326,
+        "NAD_1927_To_NAD_1983_NADCON + NAD_1983_To_WGS_1984_1"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "x",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "y",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "id",
+          "String",
+          80,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
     }
   }
 }

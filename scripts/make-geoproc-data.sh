@@ -116,3 +116,12 @@ for pair in "wells_ed50 EPSG:4230" "wells_ed50_utm33 EPSG:23033"; do
   rm -f $1.shp $1.shx $1.dbf $1.prj $1.cpg
   ogr2ogr -f "ESRI Shapefile" $1.shp wells.shp -t_srs $2 -lco ENCODING=UTF-8
 done
+
+# wells_us_nad27: four US points on NAD 1927 (NADCON grid transformations need US data).
+printf 'x,y,id\n-105.0,39.7,1\n-100.5,35.2,2\n-120.3,38.1,3\n-84.4,33.7,4\n' > us_tmp.csv
+cat > us_tmp.vrt <<VRT
+<OGRVRTDataSource><OGRVRTLayer name="us_tmp"><SrcDataSource>us_tmp.csv</SrcDataSource><GeometryType>wkbPoint</GeometryType><LayerSRS>EPSG:4267</LayerSRS><GeometryField encoding="PointFromColumns" x="x" y="y"/></OGRVRTLayer></OGRVRTDataSource>
+VRT
+rm -f wells_us_nad27.shp wells_us_nad27.shx wells_us_nad27.dbf wells_us_nad27.prj wells_us_nad27.cpg
+ogr2ogr -f "ESRI Shapefile" wells_us_nad27.shp us_tmp.vrt -lco ENCODING=UTF-8
+rm -f us_tmp.csv us_tmp.vrt

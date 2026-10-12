@@ -888,6 +888,22 @@ fn gf_args(case: &str) -> Vec<&'static str> {
                 "ED_1950_To_WGS_1984_7",
             ]
         }
+        "project_nad27_nadcon" => vec![
+            "project",
+            "testdata/geoproc/wells_us_nad27.shp",
+            "<out>",
+            "4269",
+            "--transform-method",
+            "NAD_1927_To_NAD_1983_NADCON",
+        ],
+        "project_nad27_nadcon_wgs84" => vec![
+            "project",
+            "testdata/geoproc/wells_us_nad27.shp",
+            "<out>",
+            "4326",
+            "--transform-method",
+            "NAD_1927_To_NAD_1983_NADCON + NAD_1983_To_WGS_1984_1",
+        ],
         "project_wgs84_ed50_t1" => {
             vec![
                 "project",
@@ -2991,6 +3007,12 @@ fn tools_match_arcgis_output() {
     std::fs::create_dir_all(&out_dir).unwrap();
     let mut failures = Vec::new();
     for (case, info) in manifest["cases"].as_object().unwrap() {
+        // Datum grids are downloaded by PROJ on demand: opt in with PROJ_NETWORK=ON.
+        if case.starts_with("project_nad27_")
+            && std::env::var("PROJ_NETWORK").as_deref() != Ok("ON")
+        {
+            continue;
+        }
         // Workspace tools (Split) write into a folder.
         // Table tools (Check Geometry) write a .dbf.
         let table = reference.join(format!("{case}.dbf")).exists()
