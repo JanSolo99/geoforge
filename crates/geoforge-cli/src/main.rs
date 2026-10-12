@@ -350,6 +350,10 @@ enum Tool {
         out_dataset: PathBuf,
         /// A factory code (4326, 32633, 3857, ...), a .prj file or WKT.
         out_coor_system: String,
+        /// Geographic transformation(s) between the datums, e.g.
+        /// "ED_1950_To_WGS_1984_1" or "A + B" for a chain.
+        #[arg(long)]
+        transform_method: Option<String>,
     },
     /// Write the `.sbn`/`.sbx` spatial index of a shapefile (ArcGIS "Add Spatial
     /// Index"); gf writes one with every shapefile anyway.
@@ -1335,10 +1339,11 @@ fn main() -> ExitCode {
             in_dataset,
             out_dataset,
             out_coor_system,
+            transform_method,
         } => (|| {
             let target = geoforge_proj::Crs::parse(&out_coor_system)?;
             let (fc, _) = open_feature_class(&in_dataset)?;
-            let out = geoforge_tools::project(fc.as_ref(), &target)?;
+            let out = geoforge_tools::project(fc.as_ref(), &target, transform_method.as_deref())?;
             write_output(out, &out_dataset, source_gdb(&in_dataset).as_deref())
         })(),
         Tool::AddSpatialIndex { in_features } => (|| {

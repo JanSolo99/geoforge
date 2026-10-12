@@ -18613,6 +18613,383 @@
       ],
       "fields": [],
       "shapeType": null
+    },
+    "project_ed50_4326_default": {
+      "tool": "management.Project",
+      "args": [
+        "testdata/geoproc/wells_ed50.shp",
+        "<out>",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          18,
+          11
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "project_ed50_4326_t1": {
+      "tool": "management.Project",
+      "args": [
+        "testdata/geoproc/wells_ed50.shp",
+        "<out>",
+        4326,
+        "ED_1950_To_WGS_1984_1"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          18,
+          11
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "project_ed50_4326_t18": {
+      "tool": "management.Project",
+      "args": [
+        "testdata/geoproc/wells_ed50.shp",
+        "<out>",
+        4326,
+        "ED_1950_To_WGS_1984_18"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          18,
+          11
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "project_ed50_4326_t23": {
+      "tool": "management.Project",
+      "args": [
+        "testdata/geoproc/wells_ed50.shp",
+        "<out>",
+        4326,
+        "ED_1950_To_WGS_1984_23"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          18,
+          11
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "project_ed50_4326_chain": {
+      "tool": "management.Project",
+      "args": [
+        "testdata/geoproc/wells_ed50.shp",
+        "<out>",
+        4326,
+        "ED_1950_To_ETRS_1989_1 + ETRS_1989_To_WGS_1984"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          18,
+          11
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "project_ed50_utm33_32633_t1": {
+      "tool": "management.Project",
+      "args": [
+        "testdata/geoproc/wells_ed50_utm33.shp",
+        "<out>",
+        32633,
+        "ED_1950_To_WGS_1984_1"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          18,
+          11
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "project_ed50_utm33_4326_t7": {
+      "tool": "management.Project",
+      "args": [
+        "testdata/geoproc/wells_ed50_utm33.shp",
+        "<out>",
+        4326,
+        "ED_1950_To_WGS_1984_7"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          18,
+          11
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "project_wgs84_ed50_t1": {
+      "tool": "management.Project",
+      "args": [
+        "testdata/geoproc/wells_wgs84.shp",
+        "<out>",
+        4230,
+        "ED_1950_To_WGS_1984_1"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          18,
+          11
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "project_wgs84_ed50_utm33_t18": {
+      "tool": "management.Project",
+      "args": [
+        "testdata/geoproc/wells_wgs84.shp",
+        "<out>",
+        23033,
+        "ED_1950_To_WGS_1984_18"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          18,
+          11
+        ]
+      ],
+      "shapeType": "Point"
     }
   }
 }

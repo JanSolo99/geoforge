@@ -158,7 +158,13 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
 - [x] Project tool (`gf project in out 4326`): vertices transformed by PROJ, Z/M kept — matches
       ArcGIS to ~1e-13° / sub-mm on WGS 84 ↔ UTM / Web Mercator; output `.prj` is ArcGIS's
       regenerated WKT, which every tool now writes (ArcGIS does not copy the input's text)
-- [ ] Project: geographic transformations between datums (`transform_method`), vertical CS
+- [x] Project `transform_method`: ArcGIS's transformation names (`A + B` chains, either direction)
+      found through PROJ's EPSG/Esri aliases and applied between the geographic systems
+      (`gf project --transform-method`); ED50 ↔ WGS 84 / ETRS89 Helmert methods match ArcGIS on
+      geographic and projected data. Without a method PROJ's pick agreed with ArcGIS's default
+      in the reference case
+- [ ] Project: Esri-only methods PROJ has no alias for (e.g. `ED_1950_To_WGS_1984_NGA_7PAR`),
+      ArcGIS's default method choice per area, vertical CS
 - [ ] Datum transforms with grid shifts
 
 ## Phase 5 — Raster

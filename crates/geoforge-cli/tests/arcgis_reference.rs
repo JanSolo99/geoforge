@@ -826,6 +826,88 @@ fn gf_args(case: &str) -> Vec<&'static str> {
         "project_parcels_z_4326" => {
             vec!["project", "testdata/geoproc/parcels_z.shp", "<out>", "4326"]
         }
+        "project_ed50_4326_default" => vec![
+            "project",
+            "testdata/geoproc/wells_ed50.shp",
+            "<out>",
+            "4326",
+        ],
+        "project_ed50_4326_t1" => vec![
+            "project",
+            "testdata/geoproc/wells_ed50.shp",
+            "<out>",
+            "4326",
+            "--transform-method",
+            "ED_1950_To_WGS_1984_1",
+        ],
+        "project_ed50_4326_t18" => {
+            vec![
+                "project",
+                "testdata/geoproc/wells_ed50.shp",
+                "<out>",
+                "4326",
+                "--transform-method",
+                "ED_1950_To_WGS_1984_18",
+            ]
+        }
+        "project_ed50_4326_t23" => {
+            vec![
+                "project",
+                "testdata/geoproc/wells_ed50.shp",
+                "<out>",
+                "4326",
+                "--transform-method",
+                "ED_1950_To_WGS_1984_23",
+            ]
+        }
+        "project_ed50_4326_chain" => vec![
+            "project",
+            "testdata/geoproc/wells_ed50.shp",
+            "<out>",
+            "4326",
+            "--transform-method",
+            "ED_1950_To_ETRS_1989_1 + ETRS_1989_To_WGS_1984",
+        ],
+        "project_ed50_utm33_32633_t1" => {
+            vec![
+                "project",
+                "testdata/geoproc/wells_ed50_utm33.shp",
+                "<out>",
+                "32633",
+                "--transform-method",
+                "ED_1950_To_WGS_1984_1",
+            ]
+        }
+        "project_ed50_utm33_4326_t7" => {
+            vec![
+                "project",
+                "testdata/geoproc/wells_ed50_utm33.shp",
+                "<out>",
+                "4326",
+                "--transform-method",
+                "ED_1950_To_WGS_1984_7",
+            ]
+        }
+        "project_wgs84_ed50_t1" => {
+            vec![
+                "project",
+                "testdata/geoproc/wells_wgs84.shp",
+                "<out>",
+                "4230",
+                "--transform-method",
+                "ED_1950_To_WGS_1984_1",
+            ]
+        }
+        "project_wgs84_ed50_utm33_t18" => {
+            vec![
+                "project",
+                "testdata/geoproc/wells_wgs84.shp",
+                "<out>",
+                "23033",
+                "--transform-method",
+                "ED_1950_To_WGS_1984_18",
+            ]
+        }
         "m2s_roads" => vec!["multipart-to-singlepart", "testdata/geoproc/roads.shp"],
         "m2s_parcels_clip" => vec![
             "multipart-to-singlepart",

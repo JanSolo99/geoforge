@@ -465,10 +465,17 @@ fn arcgis_style(wkt: &str) -> String {
     )
 }
 
-/// A transformation between two CRSs (PROJ picks the operation; no datum grid
-/// shifts are configured).
+/// A transformation between two CRSs. Without a method PROJ picks the operation;
+/// with one (ArcGIS's `transform_method`, e.g. `ED_1950_To_WGS_1984_1` or
+/// `A + B` for a chain) the named steps are applied between the two geographic
+/// systems. No datum grids are configured beyond what PROJ finds itself.
 pub struct Transform {
-    pj: Proj,
+    inner: Inner,
+}
+
+enum Inner {
+    Auto(Proj),
+    Steps(Steps),
 }
 
 impl Transform {
@@ -476,17 +483,217 @@ impl Transform {
         // new_known_crs normalizes axis order to x/y (longitude first).
         let pj = Proj::new_known_crs(&from.wkt, &to.wkt, None)
             .map_err(|e| proj_error("transformation", e))?;
-        Ok(Self { pj })
+        Ok(Self {
+            inner: Inner::Auto(pj),
+        })
+    }
+
+    /// `method` is ArcGIS's `transform_method`: transformation names joined by `+`,
+    /// each applied in the direction that fits (ArcGIS inverts them as needed). Names
+    /// are found through PROJ's EPSG/Esri aliases; `None` or an empty text leaves the
+    /// choice to PROJ.
+    pub fn with_method(from: &Crs, to: &Crs, method: Option<&str>) -> Result<Self> {
+        match method.map(str::trim).filter(|m| !m.is_empty()) {
+            None => Self::new(from, to),
+            Some(m) => Ok(Self {
+                inner: Inner::Steps(Steps::new(from, to, m)?),
+            }),
+        }
     }
 
     /// Transforms coordinates in place.
     pub fn apply(&self, xy: &mut [[f64; 2]]) -> Result<()> {
+        match &self.inner {
+            Inner::Auto(pj) => {
+                for p in xy.iter_mut() {
+                    let (x, y) = pj
+                        .convert((p[0], p[1]))
+                        .map_err(|e| proj_error("transforming coordinates", e))?;
+                    *p = [x, y];
+                }
+                Ok(())
+            }
+            Inner::Steps(steps) => steps.apply(xy),
+        }
+    }
+}
+
+/// PROJ operations applied one after the other (x/y order, degrees), each with its
+/// direction: source CRS → its geographic CRS, the named steps, geographic → target.
+struct Steps {
+    ctx: *mut proj_sys::PJ_CONTEXT,
+    legs: Vec<(*mut proj_sys::PJ, proj_sys::PJ_DIRECTION)>,
+}
+
+impl Drop for Steps {
+    fn drop(&mut self) {
+        // SAFETY: the objects were created on this context and are destroyed once.
+        unsafe {
+            for (pj, _) in self.legs.drain(..) {
+                proj_sys::proj_destroy(pj);
+            }
+            proj_sys::proj_context_destroy(self.ctx);
+        }
+    }
+}
+
+impl Steps {
+    fn new(from: &Crs, to: &Crs, method: &str) -> Result<Self> {
+        use proj_sys::*;
+        use std::ffi::CString;
+        let text = |s: &str| {
+            CString::new(s).map_err(|_| proj_error("transformation", "text contains a NUL"))
+        };
+        // SAFETY: every object created below is either pushed to `steps.legs` (and
+        // destroyed with it) or destroyed before the function returns.
+        unsafe {
+            let ctx = proj_context_create();
+            let mut steps = Steps {
+                ctx,
+                legs: Vec::new(),
+            };
+            let mut temp: Vec<*mut PJ> = Vec::new();
+            let result = (|| -> Result<()> {
+                let normalized = |pj: *mut PJ| -> Result<*mut PJ> {
+                    let n = if pj.is_null() {
+                        pj
+                    } else {
+                        proj_normalize_for_visualization(ctx, pj)
+                    };
+                    if !pj.is_null() {
+                        proj_destroy(pj);
+                    }
+                    if n.is_null() {
+                        return Err(proj_error("transformation", "no usable operation"));
+                    }
+                    Ok(n)
+                };
+                let between = |a: *mut PJ, b: *mut PJ| -> Result<*mut PJ> {
+                    normalized(proj_create_crs_to_crs_from_pj(
+                        ctx,
+                        a,
+                        b,
+                        std::ptr::null_mut(),
+                        std::ptr::null(),
+                    ))
+                };
+                let same = |a: *mut PJ, b: *mut PJ| -> bool {
+                    let crit = PJ_COMPARISON_CRITERION_PJ_COMP_EQUIVALENT_EXCEPT_AXIS_ORDER_GEOGCRS;
+                    if proj_is_equivalent_to_with_ctx(ctx, a, b, crit) != 0 {
+                        return true;
+                    }
+                    let (da, db) = (
+                        proj_crs_get_datum_forced(ctx, a),
+                        proj_crs_get_datum_forced(ctx, b),
+                    );
+                    let eq = !da.is_null()
+                        && !db.is_null()
+                        && proj_is_equivalent_to_with_ctx(ctx, da, db, crit) != 0;
+                    for d in [da, db] {
+                        if !d.is_null() {
+                            proj_destroy(d);
+                        }
+                    }
+                    eq
+                };
+
+                let src = proj_create(ctx, text(&from.wkt)?.as_ptr());
+                temp.push(src);
+                let dst = proj_create(ctx, text(&to.wkt)?.as_ptr());
+                temp.push(dst);
+                if src.is_null() || dst.is_null() {
+                    return Err(proj_error("coordinate system", "PROJ cannot read it"));
+                }
+                let mut cur = proj_crs_get_geodetic_crs(ctx, src);
+                temp.push(cur);
+                steps.legs.push((between(src, cur)?, PJ_DIRECTION_PJ_FWD));
+                for name in method.split('+').map(str::trim) {
+                    let cname = text(name)?;
+                    let types = [
+                        PJ_TYPE_PJ_TYPE_TRANSFORMATION,
+                        PJ_TYPE_PJ_TYPE_CONCATENATED_OPERATION,
+                    ];
+                    let list = proj_create_from_name(
+                        ctx,
+                        std::ptr::null(),
+                        cname.as_ptr(),
+                        types.as_ptr(),
+                        types.len(),
+                        0,
+                        10,
+                        std::ptr::null(),
+                    );
+                    let mut op = std::ptr::null_mut();
+                    if !list.is_null() {
+                        if proj_list_get_count(list) > 0 {
+                            op = proj_list_get(ctx, list, 0);
+                        }
+                        proj_list_destroy(list);
+                    }
+                    if op.is_null() {
+                        return Err(proj_error(
+                            "transformation",
+                            format!("unknown geographic transformation {name}"),
+                        ));
+                    }
+                    temp.push(op);
+                    let (s, t) = (proj_get_source_crs(ctx, op), proj_get_target_crs(ctx, op));
+                    temp.extend([s, t]);
+                    if s.is_null() || t.is_null() {
+                        return Err(proj_error(
+                            "transformation",
+                            format!("{name} is not a transformation between two systems"),
+                        ));
+                    }
+                    let direction = if same(s, cur) {
+                        cur = t;
+                        PJ_DIRECTION_PJ_FWD
+                    } else if same(t, cur) {
+                        cur = s;
+                        PJ_DIRECTION_PJ_INV
+                    } else {
+                        return Err(proj_error(
+                            "transformation",
+                            format!("{name} does not convert from the datum before it"),
+                        ));
+                    };
+                    let n = proj_normalize_for_visualization(ctx, op);
+                    if n.is_null() {
+                        return Err(proj_error("transformation", format!("{name} is unusable")));
+                    }
+                    steps.legs.push((n, direction));
+                }
+                steps.legs.push((between(cur, dst)?, PJ_DIRECTION_PJ_FWD));
+                Ok(())
+            })();
+            for pj in temp {
+                if !pj.is_null() {
+                    proj_destroy(pj);
+                }
+            }
+            result.map(|()| steps)
+        }
+    }
+
+    fn apply(&self, xy: &mut [[f64; 2]]) -> Result<()> {
+        use proj_sys::*;
         for p in xy.iter_mut() {
-            let (x, y) = self
-                .pj
-                .convert((p[0], p[1]))
-                .map_err(|e| proj_error("transforming coordinates", e))?;
-            *p = [x, y];
+            let mut c = PJ_COORD {
+                v: [p[0], p[1], 0.0, f64::INFINITY],
+            };
+            for &(pj, direction) in &self.legs {
+                // SAFETY: `pj` is alive as long as `self`; PJ_COORD is plain data.
+                c = unsafe { proj_trans(pj, direction, c) };
+                // SAFETY: reading the f64 view of the union.
+                if unsafe { c.v[0] }.is_infinite() {
+                    return Err(proj_error(
+                        "transforming coordinates",
+                        "the operation failed (missing datum grid?)",
+                    ));
+                }
+            }
+            // SAFETY: as above.
+            *p = unsafe { [c.v[0], c.v[1]] };
         }
         Ok(())
     }

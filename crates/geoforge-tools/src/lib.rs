@@ -2816,10 +2816,16 @@ pub fn repair_geometry(
     })
 }
 
-/// `arcpy.management.Project(in_dataset, out_dataset, out_coor_system)`: every
-/// vertex transformed to `target` (PROJ chooses the operation; datum grid shifts
-/// are not configured). Z and M are kept; true curves are densified first.
-pub fn project(input: &dyn FeatureClass, target: &geoforge_proj::Crs) -> Result<ToolOutput> {
+/// `arcpy.management.Project(in_dataset, out_dataset, out_coor_system,
+/// {transform_method})`: every vertex transformed to `target`. Without a
+/// `transform_method` PROJ chooses the operation (not always ArcGIS's default for the
+/// datum pair); with one, the named geographic transformations are applied. Z and M
+/// are kept; true curves are densified first.
+pub fn project(
+    input: &dyn FeatureClass,
+    target: &geoforge_proj::Crs,
+    transform_method: Option<&str>,
+) -> Result<ToolOutput> {
     let kind = input
         .geometry_kind()
         .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
@@ -2829,7 +2835,7 @@ pub fn project(input: &dyn FeatureClass, target: &geoforge_proj::Crs) -> Result<
         )
     })?;
     let source = geoforge_proj::Crs::from_wkt(source)?;
-    let transform = geoforge_proj::Transform::new(&source, target)?;
+    let transform = geoforge_proj::Transform::with_method(&source, target, transform_method)?;
     let deviation = geoforge_core::curves::arcgis_densify_deviation(source.is_geographic());
     let mut features = Vec::new();
     for f in input.features() {

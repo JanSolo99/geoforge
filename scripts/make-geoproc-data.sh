@@ -107,3 +107,12 @@ mk tri_r POLYGON '"POLYGON ((500050 5000010,500050 5000030,500090 5000030,500090
 # wells_wgs84: the wells in geographic WGS 84 (input for projecting back to UTM).
 rm -f wells_wgs84.shp wells_wgs84.shx wells_wgs84.dbf wells_wgs84.prj wells_wgs84.cpg
 ogr2ogr -f "ESRI Shapefile" wells_wgs84.shp wells.shp -t_srs EPSG:4326 -lco ENCODING=UTF-8
+
+# wells_ed50 / wells_ed50_utm33: the wells on the European Datum 1950, geographic and
+# as ED50 / UTM zone 33N (inputs for datum transformations; the shift is GDAL's, it does
+# not matter which).
+for pair in "wells_ed50 EPSG:4230" "wells_ed50_utm33 EPSG:23033"; do
+  set -- $pair
+  rm -f $1.shp $1.shx $1.dbf $1.prj $1.cpg
+  ogr2ogr -f "ESRI Shapefile" $1.shp wells.shp -t_srs $2 -lco ENCODING=UTF-8
+done
