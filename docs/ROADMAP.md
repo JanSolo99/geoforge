@@ -128,6 +128,9 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       DANGLE_LEN), Minimum Bounding Geometry (envelope, convex hull, rectangles by area/width,
       circle; NONE/ALL/LIST; MBG_FIELDS; straight lines widened 1 unit each side), Add XY
       Coordinates — match ArcGIS
+- [x] Symmetrical Difference (`gf symmetrical-difference`): Union's one-input-only rows in its
+      order, minus slivers narrower than the XY tolerance and vertices within it of their
+      neighbours' line (spikes included) — matches ArcGIS. Union itself still keeps such slivers
 - [x] Select with SQL `where_clause` (comparisons, AND/OR/NOT, IN, LIKE, IS NULL, arithmetic,
       quoted names; BETWEEN rejected with ERROR 000358 as for shapefiles), Summary Statistics
       (sample STD/VARIANCE, unlike Dissolve's population ones; MEDIAN, UNIQUE) and Frequency

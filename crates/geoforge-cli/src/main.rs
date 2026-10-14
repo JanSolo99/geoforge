@@ -70,6 +70,13 @@ enum Tool {
         #[arg(long, default_value = "GAPS")]
         gaps: String,
     },
+    /// The parts of two polygon inputs the other does not cover (ArcGIS "Symmetrical
+    /// Difference"): `gf symmetrical-difference in update out`.
+    SymmetricalDifference {
+        in_features: PathBuf,
+        update_features: PathBuf,
+        out_feature_class: PathBuf,
+    },
     /// Remove the parts of input features inside erase polygons (ArcGIS "Erase").
     Erase {
         in_features: PathBuf,
@@ -812,6 +819,15 @@ fn main() -> ExitCode {
             };
             overlay_tool(&paths, &out, |i| geoforge_tools::union_with(i, join, gaps))
         })(),
+        Tool::SymmetricalDifference {
+            in_features,
+            update_features,
+            out_feature_class,
+        } => overlay_tool(
+            &[in_features, update_features],
+            &out_feature_class,
+            geoforge_tools::symmetrical_difference,
+        ),
         Tool::Erase {
             in_features,
             erase_features,

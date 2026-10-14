@@ -496,6 +496,18 @@ fn gf_args(case: &str) -> Vec<&'static str> {
             "--field-mapping",
             r#"ZONE "ZONE" true true false 5 Short 0 5,First,#,testdata/geoproc/parcels.shp,ZONE,-1,-1;NAME "NAME" true true false 20 Text 0 0,First,#,testdata/geoproc/parcels.shp,NAME,-1,-1"#,
         ],
+        "symdiff_parcels_clip" => vec![
+            "symmetrical-difference",
+            "testdata/geoproc/parcels.shp",
+            "testdata/geoproc/clip_areas.shp",
+            "<out>",
+        ],
+        "symdiff_clip_parcels" => vec![
+            "symmetrical-difference",
+            "testdata/geoproc/clip_areas.shp",
+            "testdata/geoproc/parcels.shp",
+            "<out>",
+        ],
         "append_parcels_to_clip" => vec![
             "append",
             "testdata/geoproc/parcels.shp",

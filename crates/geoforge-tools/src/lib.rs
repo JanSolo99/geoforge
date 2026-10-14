@@ -999,6 +999,109 @@ pub fn union(inputs: &[NamedInput]) -> Result<ToolOutput> {
     union_with(inputs, JoinAttributes::All, true)
 }
 
+/// Removes the rings of a polygon whose average width (area over half the perimeter)
+/// is below `tolerance`.
+fn drop_slivers(g: &mut geoforge_core::Geometry, tolerance: f64) {
+    if g.z.is_some() || g.m.is_some() || g.has_curves() {
+        return;
+    }
+    let rings: Vec<std::ops::Range<usize>> = g.part_ranges().collect();
+    let mut xy = Vec::new();
+    let mut parts = Vec::new();
+    for r in rings {
+        let ring = &g.xy[r];
+        let area = geoforge_core::geometry::ring_signed_area2(ring).abs() / 2.0;
+        let perimeter: f64 = ring
+            .windows(2)
+            .map(|w| (w[1][0] - w[0][0]).hypot(w[1][1] - w[0][1]))
+            .sum();
+        if perimeter > 0.0 && area / (perimeter / 2.0) < tolerance {
+            continue;
+        }
+        let ring = tidy_ring(ring, tolerance);
+        if ring.len() < 4 {
+            continue;
+        }
+        parts.push(xy.len() as u32);
+        xy.extend_from_slice(&ring);
+    }
+    g.parts = parts;
+    g.xy = xy;
+}
+
+/// A closed ring without vertices within `tolerance` of the previous one or of the
+/// line through their neighbours (what overlay noise leaves on straight edges).
+fn tidy_ring(ring: &[[f64; 2]], tolerance: f64) -> Vec<[f64; 2]> {
+    let mut pts: Vec<[f64; 2]> = ring[..ring.len() - 1].to_vec();
+    let dist = |a: [f64; 2], b: [f64; 2]| (a[0] - b[0]).hypot(a[1] - b[1]);
+    loop {
+        let n = pts.len();
+        if n < 3 {
+            break;
+        }
+        let mut removed = false;
+        for i in 0..n {
+            let (prev, p, next) = (pts[(i + n - 1) % n], pts[i], pts[(i + 1) % n]);
+            let len = dist(prev, next);
+            let off_line = if len == 0.0 {
+                dist(prev, p)
+            } else {
+                ((next[0] - prev[0]) * (prev[1] - p[1]) - (prev[0] - p[0]) * (next[1] - prev[1]))
+                    .abs()
+                    / len
+            };
+            // Within noise of the line through its neighbours: collinear, or a spike.
+            if dist(prev, p) < tolerance || off_line < tolerance {
+                pts.remove(i);
+                removed = true;
+                break;
+            }
+        }
+        if !removed {
+            break;
+        }
+    }
+    let first = pts[0];
+    pts.push(first);
+    pts
+}
+
+/// `arcpy.analysis.SymDiff(in_features, update_features, out)`: the parts of either
+/// input the other does not cover, with the attributes of both inputs (FID -1 and
+/// empty values for the one that is absent). These are the rows of Union covered by
+/// one input only, in Union's order.
+pub fn symmetrical_difference(inputs: &[NamedInput]) -> Result<ToolOutput> {
+    let [a, _] = inputs else {
+        return Err(Error::Unsupported(
+            "Symmetrical Difference takes exactly two inputs".into(),
+        ));
+    };
+    let mut out = union(inputs)?;
+    let b_fid = 1 + a.features.fields().len();
+    let mut kept = Vec::new();
+    for mut f in std::mem::take(&mut out.features) {
+        let absent_a = matches!(f.attributes[0], Value::Integer(-1));
+        let absent_b = matches!(f.attributes[b_fid], Value::Integer(-1));
+        if absent_a == absent_b {
+            continue;
+        }
+        // Slivers narrower than the XY tolerance (edges that coincide within it)
+        // are not parts in ArcGIS's result.
+        if let Some(g) = &mut f.geometry {
+            drop_slivers(g, geoforge_geometry::XY_TOLERANCE);
+            if g.xy.is_empty() {
+                continue;
+            }
+        }
+        kept.push(Feature {
+            oid: kept.len() as i64,
+            ..f
+        });
+    }
+    out.features = kept;
+    Ok(out)
+}
+
 /// `arcpy.analysis.Union(inputs, out, join_attributes, "", gaps)`. With `NO_GAPS`
 /// (`gaps` false) each area enclosed by the inputs but covered by none is added
 /// last, with FID -1 for every input.
