@@ -19568,6 +19568,120 @@
         ]
       ],
       "shapeType": "Polygon"
+    },
+    "append_fm_a": {
+      "tool": "management.Append",
+      "args": [
+        "testdata/geoproc/clip_areas.shp",
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "NO_TEST",
+        "PARCEL_ID \"PARCEL_ID\" true true false 10 Long 0 10,First,#,testdata/geoproc/clip_areas.shp,AREA_ID,-1,-1;NAME \"NAME\" true true false 20 Text 0 0,First,#,testdata/geoproc/parcels.shp,NAME,-1,-1;VALUE \"VALUE\" true true false 19 Double 0 0,First,#,testdata/geoproc/clip_areas.shp,AREA_ID,-1,-1;ZONE \"ZONE\" true true false 5 Long 0 5,First,#,testdata/geoproc/clip_areas.shp,AREA_ID,-1,-1"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "append_fm_text": {
+      "tool": "management.Append",
+      "args": [
+        "testdata/geoproc/clip_areas.shp",
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "NO_TEST",
+        "PARCEL_ID \"PARCEL_ID\" true true false 10 Long 0 10,First,#,testdata/geoproc/parcels.shp,PARCEL_ID,-1,-1,testdata/geoproc/clip_areas.shp,AREA_ID,-1,-1;NAME \"NAME\" true true false 20 Text 0 0,First,#,testdata/geoproc/clip_areas.shp,AREA_ID,-1,-1;VALUE \"VALUE\" true true false 19 Double 0 0,First,#,testdata/geoproc/parcels.shp,VALUE,-1,-1;ZONE \"ZONE\" true true false 5 Long 0 5,First,#,testdata/geoproc/parcels.shp,ZONE,-1,-1"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
     }
   }
 }

@@ -2771,27 +2771,69 @@ pub fn append(
     target: &dyn FeatureClass,
     test: bool,
 ) -> Result<ToolOutput> {
+    let inputs: Vec<PathInput> = inputs
+        .iter()
+        .map(|&features| PathInput {
+            source: String::new(),
+            features,
+        })
+        .collect();
+    append_with(&inputs, target, test, None)
+}
+
+/// [`append`] with a field mapping (`NO_TEST`): each target field named in the mapping
+/// takes the first of its sources that belongs to the input being appended (found by
+/// table name), converted to the target field's type; unmapped target fields are null.
+pub fn append_with(
+    inputs: &[PathInput],
+    target: &dyn FeatureClass,
+    test: bool,
+    field_map: Option<&[FieldMapEntry]>,
+) -> Result<ToolOutput> {
     let kind = target.geometry_kind();
     let fields = target.fields().to_vec();
     let mut features: Vec<Feature> = target.features().collect::<Result<_>>()?;
     let mut messages = Vec::new();
-    for input in inputs {
+    for pi in inputs {
+        let input = pi.features;
         let same_kind = input.geometry_kind() == kind;
-        let positions: Vec<Option<usize>> = fields
-            .iter()
-            .map(|f| {
-                input
-                    .fields()
+        let positions: Vec<Option<(usize, i64, i64)>> = match field_map {
+            None => fields
+                .iter()
+                .map(|f| {
+                    input
+                        .fields()
+                        .iter()
+                        .position(|g| g.name.eq_ignore_ascii_case(&f.name))
+                        .map(|p| (p, -1, -1))
+                })
+                .collect(),
+            Some(map) => {
+                let stem = table_stem(&pi.source);
+                fields
                     .iter()
-                    .position(|g| g.name.eq_ignore_ascii_case(&f.name))
-            })
-            .collect();
+                    .map(|f| {
+                        map.iter()
+                            .find(|e| e.field.name.eq_ignore_ascii_case(&f.name))?
+                            .sources
+                            .iter()
+                            .filter(|src| table_stem(&src.table) == stem)
+                            .find_map(|src| {
+                                input
+                                    .fields()
+                                    .iter()
+                                    .position(|g| g.name.eq_ignore_ascii_case(&src.field))
+                                    .map(|p| (p, src.start, src.end))
+                            })
+                    })
+                    .collect()
+            }
+        };
         if test {
             let same = input.fields().len() == fields.len()
-                && positions
-                    .iter()
-                    .zip(&fields)
-                    .all(|(p, f)| p.is_some_and(|p| input.fields()[p].field_type == f.field_type));
+                && positions.iter().zip(&fields).all(|(p, f)| {
+                    p.is_some_and(|(p, ..)| input.fields()[p].field_type == f.field_type)
+                });
             if !same || !same_kind {
                 return Err(Error::Unsupported(
                     "ERROR 000466: input does not match the schema of the target; use NO_TEST"
@@ -2812,7 +2854,14 @@ pub fn append(
                 oid: features.len() as i64,
                 attributes: positions
                     .iter()
-                    .map(|p| p.map_or(Value::Null, |p| f.attributes[p].clone()))
+                    .zip(&fields)
+                    .map(|(p, field)| match (p, field_map) {
+                        (None, _) => Value::Null,
+                        (Some((p, ..)), None) => f.attributes[*p].clone(),
+                        (Some((p, a, b)), Some(_)) => {
+                            fieldmap::coerce(&fieldmap::substring(&f.attributes[*p], *a, *b), field)
+                        }
+                    })
                     .collect(),
                 geometry: f.geometry,
             });

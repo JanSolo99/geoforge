@@ -169,6 +169,9 @@ enum Tool {
         /// Write the result here instead of updating the target.
         #[arg(long)]
         output: Option<PathBuf>,
+        /// A field mapping string as ArcGIS's `field_mapping` parameter (NO_TEST).
+        #[arg(long)]
+        field_mapping: Option<String>,
     },
     /// Clip the input by each group of split polygons sharing a text value, one
     /// output per value named after it (ArcGIS "Split").
@@ -942,6 +945,7 @@ fn main() -> ExitCode {
             mut paths,
             schema_type,
             output,
+            field_mapping,
         } => (|| {
             let target_path = paths.pop().unwrap();
             let test = match schema_type.to_ascii_uppercase().as_str() {
@@ -954,8 +958,20 @@ fn main() -> ExitCode {
                 .iter()
                 .map(|p| open_feature_class(p).map(|(f, _)| f))
                 .collect::<Result<_>>()?;
-            let refs: Vec<&dyn FeatureClass> = inputs.iter().map(|b| b.as_ref()).collect();
-            let out = geoforge_tools::append(&refs, target.as_ref(), test)?;
+            let field_map = field_mapping
+                .as_deref()
+                .map(geoforge_tools::parse_field_mapping)
+                .transpose()?;
+            let named: Vec<geoforge_tools::PathInput> = paths
+                .iter()
+                .zip(&inputs)
+                .map(|(p, f)| geoforge_tools::PathInput {
+                    source: catalog_path(p),
+                    features: f.as_ref(),
+                })
+                .collect();
+            let out =
+                geoforge_tools::append_with(&named, target.as_ref(), test, field_map.as_deref())?;
             drop(target);
             match output {
                 Some(o) => write_output(out, &o, source_gdb(&target_path).as_deref()),

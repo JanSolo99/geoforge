@@ -76,7 +76,9 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
 - [x] Merge with a field mapping (`gf merge ... --field-mapping`): output fields as mapped, each
       input contributing its own source field (found by table name), values converted to the
       output type — matches ArcGIS
-- [ ] Field mappings for Append and Feature Class To Feature Class; Date outputs
+- [x] Append with a field mapping (`--field-mapping`, NO_TEST): target fields take the first source
+      belonging to the appended input, converted to the target's type — matches ArcGIS
+- [ ] Field mappings for Feature Class To Feature Class; Date outputs
 - [ ] Split into a geodatabase (needs adding to an existing one); selection types other than
       NEW_SELECTION
 - [x] Line cracking: Intersect, Identity and Split split line results wherever two
