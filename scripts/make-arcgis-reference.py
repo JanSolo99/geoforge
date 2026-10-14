@@ -102,6 +102,8 @@ CASES = {
     "intersect_parcels_clip": ("analysis.Intersect", [f"{DATA / 'parcels.shp'};{DATA / 'clip_areas.shp'}"], []),
     "intersect_roads_parcels": ("analysis.Intersect", [f"{DATA / 'roads.shp'};{DATA / 'parcels.shp'}"], []),
     "intersect_wells_parcels": ("analysis.Intersect", [f"{DATA / 'wells.shp'};{DATA / 'parcels.shp'}"], []),
+    "update_parcels_clip": ("analysis.Update", [PARCELS, CLIP], []),
+    "update_clip_parcels": ("analysis.Update", [CLIP, PARCELS], []),
     "symdiff_parcels_clip": ("analysis.SymDiff", [PARCELS, CLIP], []),
     "symdiff_clip_parcels": ("analysis.SymDiff", [CLIP, PARCELS], []),
     "erase_parcels": ("analysis.Erase", [DATA / "parcels.shp", DATA / "clip_areas.shp"], []),

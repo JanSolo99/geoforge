@@ -1066,6 +1066,36 @@ fn tidy_ring(ring: &[[f64; 2]], tolerance: f64) -> Vec<[f64; 2]> {
     pts
 }
 
+/// `arcpy.analysis.Update(in_features, update_features, out)` (`BORDERS`): the input
+/// polygons without the area the update polygons cover, in input order, followed by the
+/// update polygons. The output has the input's fields; an update polygon carries the
+/// values of the fields it shares by name (the others are null).
+pub fn update(input: &dyn FeatureClass, update_features: &dyn FeatureClass) -> Result<ToolOutput> {
+    let mut out = erase(input, update_features)?;
+    let positions: Vec<Option<usize>> = out
+        .fields
+        .iter()
+        .map(|f| {
+            update_features
+                .fields()
+                .iter()
+                .position(|g| g.name.eq_ignore_ascii_case(&f.name))
+        })
+        .collect();
+    for f in update_features.features() {
+        let f = f?;
+        out.features.push(Feature {
+            oid: out.features.len() as i64,
+            attributes: positions
+                .iter()
+                .map(|p| p.map_or(Value::Null, |p| f.attributes[p].clone()))
+                .collect(),
+            geometry: f.geometry,
+        });
+    }
+    Ok(out)
+}
+
 /// `arcpy.analysis.SymDiff(in_features, update_features, out)`: the parts of either
 /// input the other does not cover, with the attributes of both inputs (FID -1 and
 /// empty values for the one that is absent). These are the rows of Union covered by

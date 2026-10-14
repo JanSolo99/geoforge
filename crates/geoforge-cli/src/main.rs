@@ -77,6 +77,12 @@ enum Tool {
         update_features: PathBuf,
         out_feature_class: PathBuf,
     },
+    /// Replace the area update polygons cover (ArcGIS "Update"): `gf update in update out`.
+    Update {
+        in_features: PathBuf,
+        update_features: PathBuf,
+        out_feature_class: PathBuf,
+    },
     /// Remove the parts of input features inside erase polygons (ArcGIS "Erase").
     Erase {
         in_features: PathBuf,
@@ -828,6 +834,19 @@ fn main() -> ExitCode {
             &out_feature_class,
             geoforge_tools::symmetrical_difference,
         ),
+        Tool::Update {
+            in_features,
+            update_features,
+            out_feature_class,
+        } => (|| {
+            let (fc, _) = open_feature_class(&in_features)?;
+            let (up, _) = open_feature_class(&update_features)?;
+            write_output(
+                geoforge_tools::update(fc.as_ref(), up.as_ref())?,
+                &out_feature_class,
+                source_gdb(&in_features).as_deref(),
+            )
+        })(),
         Tool::Erase {
             in_features,
             erase_features,

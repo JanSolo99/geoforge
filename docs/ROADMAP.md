@@ -131,6 +131,8 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
 - [x] Symmetrical Difference (`gf symmetrical-difference`): Union's one-input-only rows in its
       order, minus slivers narrower than the XY tolerance and vertices within it of their
       neighbours' line (spikes included) — matches ArcGIS. Union itself still keeps such slivers
+- [x] Update (`gf update`, BORDERS): Erase's rows followed by the update polygons carrying the
+      same-named fields — matches ArcGIS; NO_BORDERS not implemented
 - [x] Select with SQL `where_clause` (comparisons, AND/OR/NOT, IN, LIKE, IS NULL, arithmetic,
       quoted names; BETWEEN rejected with ERROR 000358 as for shapefiles), Summary Statistics
       (sample STD/VARIANCE, unlike Dissolve's population ones; MEDIAN, UNIQUE) and Frequency

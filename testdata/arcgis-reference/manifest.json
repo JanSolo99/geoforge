@@ -19980,6 +19980,95 @@
         ]
       ],
       "shapeType": "Polygon"
+    },
+    "update_parcels_clip": {
+      "tool": "analysis.Update",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "testdata/geoproc/clip_areas.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "update_clip_parcels": {
+      "tool": "analysis.Update",
+      "args": [
+        "testdata/geoproc/clip_areas.shp",
+        "testdata/geoproc/parcels.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
     }
   }
 }
