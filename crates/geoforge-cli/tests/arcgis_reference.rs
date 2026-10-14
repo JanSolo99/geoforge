@@ -604,6 +604,36 @@ fn gf_args(case: &str) -> Vec<&'static str> {
             "--spatial-sort-method",
             "UL",
         ],
+        "deli_parcels_shape" => vec![
+            "delete-identical",
+            "testdata/geoproc/parcels_dups.shp",
+            "Shape",
+            "--output",
+        ],
+        "deli_parcels_zone" => vec![
+            "delete-identical",
+            "testdata/geoproc/parcels_dups.shp",
+            "ZONE",
+            "--output",
+        ],
+        "deli_parcels_zone_value" => vec![
+            "delete-identical",
+            "testdata/geoproc/parcels_dups.shp",
+            "ZONE;VALUE",
+            "--output",
+        ],
+        "deli_parcels_shape_zone" => vec![
+            "delete-identical",
+            "testdata/geoproc/parcels_dups.shp",
+            "Shape;ZONE",
+            "--output",
+        ],
+        "deli_wells_shape" => vec![
+            "delete-identical",
+            "testdata/geoproc/wells_dups.shp",
+            "Shape",
+            "--output",
+        ],
         "symdiff_parcels_clip" => vec![
             "symmetrical-difference",
             "testdata/geoproc/parcels.shp",

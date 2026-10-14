@@ -136,6 +136,8 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
 - [x] Sort (`gf sort in out "ZONE DESCENDING;VALUE ASCENDING"`): field keys (numbers by value, text by
       bytes, ties in input order) and `Shape` with UR/UL/LR/LL (the envelope corner's y then x),
       `ORIG_FID` added — matches ArcGIS on 12 cases
+- [x] Delete Identical (`gf delete-identical`, in place or `--output`): first of each group kept in
+      input order, FIDs closed up, "N duplicate(s) from M group(s) deleted." — matches ArcGIS
 - [ ] Polygon To Line / Feature To Line: ArcGIS's row order is banded (holes first, then outer
       rings, row of parcels by row) in a way not worked out; LEFT_FID/RIGHT_FID semantics known
 - [x] Select with SQL `where_clause` (comparisons, AND/OR/NOT, IN, LIKE, IS NULL, arithmetic,

@@ -116,6 +116,11 @@ CASES = {
     "sort_roads_ll": ("management.Sort", [DATA / "roads.shp"], ["Shape ASCENDING", "LL"]),
     "sort_parcels_zone_shape": ("management.Sort", [DATA / "parcels.shp"], ["ZONE ASCENDING;Shape ASCENDING", "UL"]),
     "sort_clip_ul": ("management.Sort", [DATA / "clip_areas.shp"], ["Shape ASCENDING", "UL"]),
+    "deli_parcels_shape": ("management.DeleteIdentical", [DATA / "parcels_dups.shp"], ["Shape"]),
+    "deli_parcels_zone": ("management.DeleteIdentical", [DATA / "parcels_dups.shp"], ["ZONE"]),
+    "deli_parcels_zone_value": ("management.DeleteIdentical", [DATA / "parcels_dups.shp"], ["ZONE;VALUE"]),
+    "deli_parcels_shape_zone": ("management.DeleteIdentical", [DATA / "parcels_dups.shp"], ["Shape;ZONE"]),
+    "deli_wells_shape": ("management.DeleteIdentical", [DATA / "wells_dups.shp"], ["Shape"]),
     "symdiff_parcels_clip": ("analysis.SymDiff", [PARCELS, CLIP], []),
     "symdiff_clip_parcels": ("analysis.SymDiff", [CLIP, PARCELS], []),
     "erase_parcels": ("analysis.Erase", [DATA / "parcels.shp", DATA / "clip_areas.shp"], []),
@@ -532,7 +537,7 @@ TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable"}
 TABLE_OUT = {"gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical"}
 
 # In-place tools: the index of the input they edit (run on a copy written as the output).
-IN_PLACE = {"analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.AddGeometryAttributes": 0}
+IN_PLACE = {"management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.AddGeometryAttributes": 0}
 
 # Select Layer By Location cases, saved with Copy Features:
 # name: (in_layer, overlap_type, select_features, search_distance, invert)

@@ -130,3 +130,12 @@ rm -f us_tmp.csv us_tmp.vrt
 # ArcGIS stored them; Feature To Point INSIDE (ArcGIS's label point) is checked on them.
 # Not regenerated here: made by arcpy from /scratchpad polygons, minus two degenerate ones
 # (self-intersecting input that ArcGIS turns into holes touching the outer ring).
+
+# parcels_dups / wells_dups: the parcels (wells) twice, the second copy in reverse order
+# (input for Delete Identical).
+for n in parcels wells; do
+  rm -f ${n}_dups.shp ${n}_dups.shx ${n}_dups.dbf ${n}_dups.prj ${n}_dups.cpg
+  ogr2ogr -f "ESRI Shapefile" ${n}_dups.shp $n.shp -lco ENCODING=UTF-8
+  ogr2ogr -f "ESRI Shapefile" -append ${n}_dups.shp $n.shp -lco ENCODING=UTF-8
+  ogr2ogr -f "ESRI Shapefile" -append ${n}_dups.shp $n.shp -lco ENCODING=UTF-8 -where "FID < 5"
+done

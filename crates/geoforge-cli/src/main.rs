@@ -217,6 +217,18 @@ enum Tool {
         #[arg(long, default_value = "UR")]
         spatial_sort_method: String,
     },
+    /// Delete records that repeat the values (or shape) of an earlier one (ArcGIS "Delete
+    /// Identical"). Updates the input shapefile in place unless an output is given.
+    DeleteIdentical {
+        in_dataset: PathBuf,
+        /// Fields to compare, `;`-separated; `Shape` compares geometries.
+        fields: String,
+        /// Vertices closer than this count as equal (default 0.001, the XY tolerance).
+        #[arg(long, default_value_t = 0.001)]
+        xy_tolerance: f64,
+        #[arg(long)]
+        output: Option<PathBuf>,
+    },
     /// Features matching an SQL expression (ArcGIS "Select").
     Select {
         in_features: PathBuf,
@@ -1060,6 +1072,25 @@ fn main() -> ExitCode {
             split_field,
             out_workspace,
         } => split_tool(&in_features, &split_features, &split_field, &out_workspace),
+        Tool::DeleteIdentical {
+            in_dataset,
+            fields,
+            xy_tolerance,
+            output,
+        } => (|| {
+            let names: Vec<String> = fields
+                .split(';')
+                .map(|f| f.trim().to_owned())
+                .filter(|f| !f.is_empty())
+                .collect();
+            let (fc, _) = open_feature_class(&in_dataset)?;
+            let out = geoforge_tools::delete_identical(fc.as_ref(), &names, xy_tolerance)?;
+            drop(fc);
+            match output {
+                Some(o) => write_output(out, &o, source_gdb(&in_dataset).as_deref()),
+                None => update_in_place(out, &in_dataset),
+            }
+        })(),
         Tool::Sort {
             in_dataset,
             out_dataset,

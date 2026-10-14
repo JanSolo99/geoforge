@@ -4429,6 +4429,69 @@ pub fn find_identical(
     })
 }
 
+/// `arcpy.management.DeleteIdentical(in_dataset, fields, xy_tolerance)`: the first of each
+/// group of records whose `fields` agree (the field `Shape` compares geometries, vertex by
+/// vertex within `xy_tolerance`), in input order; the others are deleted and FIDs closed up.
+pub fn delete_identical(
+    input: &dyn FeatureClass,
+    fields: &[String],
+    xy_tolerance: f64,
+) -> Result<ToolOutput> {
+    let kind = input
+        .geometry_kind()
+        .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
+    let shape = fields.iter().any(|f| f.eq_ignore_ascii_case("Shape"));
+    let names: Vec<String> = fields
+        .iter()
+        .filter(|f| !f.eq_ignore_ascii_case("Shape"))
+        .cloned()
+        .collect();
+    let keys = field_positions(input, &names)?;
+    let same_shape =
+        |a: &Option<geoforge_core::Geometry>, b: &Option<geoforge_core::Geometry>| match (a, b) {
+            (None, None) => true,
+            (Some(a), Some(b)) => {
+                a.parts == b.parts
+                    && a.xy.len() == b.xy.len()
+                    && a.xy.iter().zip(&b.xy).all(|(p, q)| {
+                        (p[0] - q[0]).abs() <= xy_tolerance && (p[1] - q[1]).abs() <= xy_tolerance
+                    })
+            }
+            _ => false,
+        };
+    // Kept features and, per kept feature, how many records duplicated it.
+    let mut kept: Vec<(Feature, Vec<Value>, usize)> = Vec::new();
+    for f in input.features() {
+        let f = f?;
+        let key: Vec<Value> = keys.iter().map(|&i| f.attributes[i].clone()).collect();
+        match kept
+            .iter_mut()
+            .find(|(g, k, _)| *k == key && (!shape || same_shape(&g.geometry, &f.geometry)))
+        {
+            Some((_, _, dups)) => *dups += 1,
+            None => kept.push((f, key, 0)),
+        }
+    }
+    let deleted: usize = kept.iter().map(|k| k.2).sum();
+    let groups = kept.iter().filter(|k| k.2 > 0).count();
+    let features = kept
+        .into_iter()
+        .enumerate()
+        .map(|(i, (f, ..))| Feature { oid: i as i64, ..f })
+        .collect();
+    Ok(ToolOutput {
+        kind,
+        has_z: input.has_z(),
+        has_m: input.has_m(),
+        fields: input.fields().to_vec(),
+        spatial_reference_wkt: input.spatial_reference_wkt().map(str::to_owned),
+        features,
+        messages: vec![format!(
+            "{deleted} duplicate(s) from {groups} group(s) deleted."
+        )],
+    })
+}
+
 /// `arcpy.management.XYTableToPoint(in_table, out, x_field, y_field, z_field,
 /// coordinate_system)`: a point per row at its X/Y (and Z) values, all fields
 /// kept; rows without coordinates get no shape.
