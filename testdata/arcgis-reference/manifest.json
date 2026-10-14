@@ -20967,6 +20967,730 @@
         ]
       ],
       "shapeType": "Point"
+    },
+    "addfield_long": {
+      "tool": "management.AddField",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "f_long",
+        "LONG"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "f_long",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "addfield_short": {
+      "tool": "management.AddField",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "f_short",
+        "SHORT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "f_short",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "addfield_float": {
+      "tool": "management.AddField",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "f_float",
+        "FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "f_float",
+          "Single",
+          13,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "addfield_double": {
+      "tool": "management.AddField",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "f_double",
+        "DOUBLE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "f_double",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "addfield_text15": {
+      "tool": "management.AddField",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "f_text",
+        "TEXT",
+        "",
+        "",
+        15
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "f_text",
+          "String",
+          15,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "addfield_text_default": {
+      "tool": "management.AddField",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "f_text",
+        "TEXT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "f_text",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "addfield_date": {
+      "tool": "management.AddField",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "f_date",
+        "DATE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "f_date",
+          "Date",
+          8,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "addfield_long5": {
+      "tool": "management.AddField",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "f_long5",
+        "LONG",
+        5
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "f_long5",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "addfield_dbl_10_3": {
+      "tool": "management.AddField",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "f_d",
+        "DOUBLE",
+        10,
+        3
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "f_d",
+          "Double",
+          11,
+          10,
+          3
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "addfield_flt_8_2": {
+      "tool": "management.AddField",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "f_f",
+        "FLOAT",
+        8,
+        2
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "f_f",
+          "Double",
+          9,
+          8,
+          2
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "addfield_badname": {
+      "tool": "management.AddField",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "bad name",
+        "LONG"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000304: Renamed field bad name to bad_name"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "bad_name",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "addfield_dup": {
+      "tool": "management.AddField",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "DEPTH",
+        "DOUBLE"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000012: DEPTH already exists"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "delfield_one": {
+      "tool": "management.DeleteField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "NAME"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "delfield_two": {
+      "tool": "management.DeleteField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "ZONE;VALUE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "delfield_keep": {
+      "tool": "management.DeleteField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "NAME;ZONE",
+        "KEEP_FIELDS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
     }
   }
 }

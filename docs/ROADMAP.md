@@ -138,6 +138,10 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       `ORIG_FID` added — matches ArcGIS on 12 cases
 - [x] Delete Identical (`gf delete-identical`, in place or `--output`): first of each group kept in
       input order, FIDs closed up, "N duplicate(s) from M group(s) deleted." — matches ArcGIS
+- [x] Add Field (TEXT/SHORT/LONG/FLOAT/DOUBLE/DATE with precision, scale, length; names fixed up with
+      WARNING 000304; an existing name warns, ERROR 000012 for another type) and Delete Field
+      (DELETE_FIELDS/KEEP_FIELDS; the last field stays, ERROR 002557) for shapefiles, in place or
+      `--output` — match ArcGIS on 15 cases; Alter Field, Calculate Field still to do
 - [ ] Polygon To Line / Feature To Line: ArcGIS's row order is banded (holes first, then outer
       rings, row of parcels by row) in a way not worked out; LEFT_FID/RIGHT_FID semantics known
 - [x] Select with SQL `where_clause` (comparisons, AND/OR/NOT, IN, LIKE, IS NULL, arithmetic,

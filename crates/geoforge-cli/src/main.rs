@@ -217,6 +217,34 @@ enum Tool {
         #[arg(long, default_value = "UR")]
         spatial_sort_method: String,
     },
+    /// Append a field (ArcGIS "Add Field"). Updates the input shapefile in place unless
+    /// an output is given.
+    AddField {
+        in_table: PathBuf,
+        field_name: String,
+        /// TEXT, FLOAT, DOUBLE, SHORT, LONG or DATE.
+        field_type: String,
+        #[arg(long)]
+        precision: Option<u32>,
+        #[arg(long)]
+        scale: Option<u32>,
+        #[arg(long)]
+        length: Option<u32>,
+        #[arg(long)]
+        output: Option<PathBuf>,
+    },
+    /// Remove fields (ArcGIS "Delete Field"). Updates the input shapefile in place unless
+    /// an output is given.
+    DeleteField {
+        in_table: PathBuf,
+        /// Field names, `;`-separated.
+        drop_field: String,
+        /// DELETE_FIELDS (default) or KEEP_FIELDS (delete all others).
+        #[arg(long, default_value = "DELETE_FIELDS")]
+        method: String,
+        #[arg(long)]
+        output: Option<PathBuf>,
+    },
     /// Delete records that repeat the values (or shape) of an earlier one (ArcGIS "Delete
     /// Identical"). Updates the input shapefile in place unless an output is given.
     DeleteIdentical {
@@ -1072,6 +1100,54 @@ fn main() -> ExitCode {
             split_field,
             out_workspace,
         } => split_tool(&in_features, &split_features, &split_field, &out_workspace),
+        Tool::AddField {
+            in_table,
+            field_name,
+            field_type,
+            precision,
+            scale,
+            length,
+            output,
+        } => (|| {
+            let (fc, _) = open_feature_class(&in_table)?;
+            let out = geoforge_tools::add_field(
+                fc.as_ref(),
+                &field_name,
+                &field_type,
+                precision,
+                scale,
+                length,
+            )?;
+            drop(fc);
+            match output {
+                Some(o) => write_output(out, &o, source_gdb(&in_table).as_deref()),
+                None => update_in_place(out, &in_table),
+            }
+        })(),
+        Tool::DeleteField {
+            in_table,
+            drop_field,
+            method,
+            output,
+        } => (|| {
+            let keep = match method.to_ascii_uppercase().as_str() {
+                "DELETE_FIELDS" => false,
+                "KEEP_FIELDS" => true,
+                other => return Err(Error::Unsupported(format!("method {other}"))),
+            };
+            let names: Vec<String> = drop_field
+                .split(';')
+                .map(|f| f.trim().to_owned())
+                .filter(|f| !f.is_empty())
+                .collect();
+            let (fc, _) = open_feature_class(&in_table)?;
+            let out = geoforge_tools::delete_field(fc.as_ref(), &names, keep)?;
+            drop(fc);
+            match output {
+                Some(o) => write_output(out, &o, source_gdb(&in_table).as_deref()),
+                None => update_in_place(out, &in_table),
+            }
+        })(),
         Tool::DeleteIdentical {
             in_dataset,
             fields,

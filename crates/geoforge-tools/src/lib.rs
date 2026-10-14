@@ -4429,6 +4429,146 @@ pub fn find_identical(
     })
 }
 
+/// `arcpy.management.AddField(in_table, name, type, precision, scale, length)` for a
+/// shapefile: the field is appended and filled with its default (0, empty text, no date).
+/// A name that already exists (any case) of the same type only warns (WARNING 000012).
+pub fn add_field(
+    input: &dyn FeatureClass,
+    name: &str,
+    field_type: &str,
+    precision: Option<u32>,
+    scale: Option<u32>,
+    length: Option<u32>,
+) -> Result<ToolOutput> {
+    let kind = input
+        .geometry_kind()
+        .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
+    if name.chars().count() > 10 {
+        return Err(Error::Unsupported(
+            "ERROR 000313: The length of Field Name must not be larger than 10".into(),
+        ));
+    }
+    if name.chars().next().is_some_and(|c| c.is_ascii_digit()) {
+        return Err(Error::Unsupported(
+            "ERROR 000310: The Field name must not start with a number".into(),
+        ));
+    }
+    let (ft, default) = match field_type.to_ascii_uppercase().as_str() {
+        "TEXT" => (FieldType::String, Value::String(String::new())),
+        "SHORT" => (FieldType::SmallInteger, Value::SmallInteger(0)),
+        "LONG" => (FieldType::Integer, Value::Integer(0)),
+        "FLOAT" => (FieldType::Single, Value::Single(0.0)),
+        "DOUBLE" => (FieldType::Double, Value::Double(0.0)),
+        "DATE" => (FieldType::Date, Value::Null),
+        "BIGINTEGER" => {
+            return Err(Error::Unsupported(
+                "ERROR 003738: The data type is not supported by the workspace.".into(),
+            ));
+        }
+        "BLOB" => {
+            return Err(Error::Unsupported(
+                "ERROR 001140: Data format does not support BLOB fields.".into(),
+            ));
+        }
+        other => return Err(Error::Unsupported(format!("field type {other}"))),
+    };
+    let mut field = Field::new(name, ft);
+    field.precision = precision.unwrap_or(0);
+    field.scale = scale.unwrap_or(0);
+    if ft == FieldType::String {
+        field.length = length.unwrap_or(254);
+    }
+    let mut out = ToolOutput {
+        kind,
+        has_z: input.has_z(),
+        has_m: input.has_m(),
+        fields: input.fields().to_vec(),
+        spatial_reference_wkt: input.spatial_reference_wkt().map(str::to_owned),
+        features: input.features().collect::<Result<_>>()?,
+        messages: Vec::new(),
+    };
+    // The name as the shapefile will keep it (spaces and symbols become `_`).
+    let stored: String = name
+        .chars()
+        .map(|c| {
+            if c.is_alphanumeric() || c == '_' {
+                c
+            } else {
+                '_'
+            }
+        })
+        .collect();
+    if let Some(existing) = out
+        .fields
+        .iter()
+        .find(|f| f.name.eq_ignore_ascii_case(&stored))
+    {
+        if existing.field_type == ft {
+            out.messages
+                .push(format!("WARNING 000012: {name} already exists"));
+            return Ok(out);
+        }
+        return Err(Error::Unsupported(format!(
+            "ERROR 000012: {name} already exists"
+        )));
+    }
+    if stored != name {
+        out.messages
+            .push(format!("WARNING 000304: Renamed field {name} to {stored}"));
+    }
+    out.fields.push(field);
+    for f in &mut out.features {
+        f.attributes.push(default.clone());
+    }
+    Ok(out)
+}
+
+/// `arcpy.management.DeleteField(in_table, drop_field, method)`: the listed fields are
+/// removed (`DELETE_FIELDS`), or every field but the listed ones (`KEEP_FIELDS`). A
+/// shapefile keeps at least one attribute field (ERROR 002557); names that do not exist
+/// are ignored.
+pub fn delete_field(
+    input: &dyn FeatureClass,
+    names: &[String],
+    keep_listed: bool,
+) -> Result<ToolOutput> {
+    let kind = input
+        .geometry_kind()
+        .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
+    let listed = |f: &Field| names.iter().any(|n| n.eq_ignore_ascii_case(&f.name));
+    let keep: Vec<usize> = input
+        .fields()
+        .iter()
+        .enumerate()
+        .filter(|(_, f)| listed(f) == keep_listed)
+        .map(|(i, _)| i)
+        .collect();
+    if keep.is_empty() && !input.fields().is_empty() {
+        let last = input.fields().last().map_or("", |f| f.name.as_str());
+        return Err(Error::Unsupported(format!(
+            "ERROR 002557: Cannot delete field {last}"
+        )));
+    }
+    let features = input
+        .features()
+        .map(|f| {
+            f.map(|mut f| {
+                f.attributes = keep.iter().map(|&i| f.attributes[i].clone()).collect();
+                f
+            })
+        })
+        .collect::<Result<_>>()?;
+    Ok(ToolOutput {
+        kind,
+        has_z: input.has_z(),
+        has_m: input.has_m(),
+        fields: keep.iter().map(|&i| input.fields()[i].clone()).collect(),
+        spatial_reference_wkt: input.spatial_reference_wkt().map(str::to_owned),
+        features,
+        messages: Vec::new(),
+    })
+}
+
 /// `arcpy.management.DeleteIdentical(in_dataset, fields, xy_tolerance)`: the first of each
 /// group of records whose `fields` agree (the field `Shape` compares geometries, vertex by
 /// vertex within `xy_tolerance`), in input order; the others are deleted and FIDs closed up.

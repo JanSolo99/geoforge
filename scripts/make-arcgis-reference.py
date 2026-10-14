@@ -121,6 +121,21 @@ CASES = {
     "deli_parcels_zone_value": ("management.DeleteIdentical", [DATA / "parcels_dups.shp"], ["ZONE;VALUE"]),
     "deli_parcels_shape_zone": ("management.DeleteIdentical", [DATA / "parcels_dups.shp"], ["Shape;ZONE"]),
     "deli_wells_shape": ("management.DeleteIdentical", [DATA / "wells_dups.shp"], ["Shape"]),
+    "addfield_long": ("management.AddField", [DATA / "wells.shp"], ["f_long", "LONG"]),
+    "addfield_short": ("management.AddField", [DATA / "wells.shp"], ["f_short", "SHORT"]),
+    "addfield_float": ("management.AddField", [DATA / "wells.shp"], ["f_float", "FLOAT"]),
+    "addfield_double": ("management.AddField", [DATA / "wells.shp"], ["f_double", "DOUBLE"]),
+    "addfield_text15": ("management.AddField", [DATA / "wells.shp"], ["f_text", "TEXT", "", "", 15]),
+    "addfield_text_default": ("management.AddField", [DATA / "wells.shp"], ["f_text", "TEXT"]),
+    "addfield_date": ("management.AddField", [DATA / "wells.shp"], ["f_date", "DATE"]),
+    "addfield_long5": ("management.AddField", [DATA / "wells.shp"], ["f_long5", "LONG", 5]),
+    "addfield_dbl_10_3": ("management.AddField", [DATA / "wells.shp"], ["f_d", "DOUBLE", 10, 3]),
+    "addfield_flt_8_2": ("management.AddField", [DATA / "wells.shp"], ["f_f", "FLOAT", 8, 2]),
+    "addfield_badname": ("management.AddField", [DATA / "wells.shp"], ["bad name", "LONG"]),
+    "addfield_dup": ("management.AddField", [DATA / "wells.shp"], ["DEPTH", "DOUBLE"]),
+    "delfield_one": ("management.DeleteField", [DATA / "parcels.shp"], ["NAME"]),
+    "delfield_two": ("management.DeleteField", [DATA / "parcels.shp"], ["ZONE;VALUE"]),
+    "delfield_keep": ("management.DeleteField", [DATA / "parcels.shp"], ["NAME;ZONE", "KEEP_FIELDS"]),
     "symdiff_parcels_clip": ("analysis.SymDiff", [PARCELS, CLIP], []),
     "symdiff_clip_parcels": ("analysis.SymDiff", [CLIP, PARCELS], []),
     "erase_parcels": ("analysis.Erase", [DATA / "parcels.shp", DATA / "clip_areas.shp"], []),
@@ -537,7 +552,7 @@ TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable"}
 TABLE_OUT = {"gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical"}
 
 # In-place tools: the index of the input they edit (run on a copy written as the output).
-IN_PLACE = {"management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.AddGeometryAttributes": 0}
+IN_PLACE = {"management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.AddGeometryAttributes": 0}
 
 # Select Layer By Location cases, saved with Copy Features:
 # name: (in_layer, overlap_type, select_features, search_distance, invert)
