@@ -19088,6 +19088,54 @@
         ]
       ],
       "shapeType": "Point"
+    },
+    "f2p_label_polys_inside": {
+      "tool": "management.FeatureToPoint",
+      "args": [
+        "testdata/geoproc/label_polys.shp",
+        "<out>",
+        "INSIDE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "K",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point"
     }
   }
 }

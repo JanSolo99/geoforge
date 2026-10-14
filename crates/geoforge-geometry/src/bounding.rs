@@ -309,80 +309,230 @@ pub fn centroid(g: &Geometry) -> Result<Option<Pt>> {
 
 /// A point inside a polygon / on a line (Feature To Point `INSIDE`, arcpy's
 /// label point). Lines: the point on the line nearest its envelope's center.
-/// Polygons: the centroid when it lies inside; otherwise, on the horizontal
-/// line through the envelope's center, the exterior span is split at the center
-/// and the midpoint of the half that lies inside and farthest from any edge is
-/// taken. (ArcGIS also searches vertically for shapes like a U; not reproduced.)
+/// Polygons: see [`polygon_label_point`].
 pub fn inside_point(g: &Geometry) -> Result<Option<Pt>> {
     let g = linear(g)?;
     if g.xy.is_empty() {
         return Ok(None);
     }
-    let env = g.envelope();
-    let center = [(env.xmin + env.xmax) / 2.0, (env.ymin + env.ymax) / 2.0];
     match g.kind {
         GeometryKind::Polyline => {
+            let env = g.envelope();
+            let center = [(env.xmin + env.xmax) / 2.0, (env.ymin + env.ymax) / 2.0];
             let line = g.clone();
             let p = Geometry::point(center[0], center[1]);
             Ok(crate::proximity::nearest(&line, &p)?.map(|n| n.from))
         }
-        GeometryKind::Polygon => {
-            let mp = to_multipolygon(&g);
-            if let Some(c) = mp.centroid()
-                && geo::Contains::contains(&mp, &c)
-            {
-                return Ok(Some([c.x(), c.y()]));
-            }
-            let y = center[1];
-            // Crossings of the horizontal line with exterior rings, and all rings.
-            let crossings = |exterior_only: bool| {
-                let mut xs: Vec<f64> = Vec::new();
-                for poly in &mp.0 {
-                    let rings = std::iter::once(poly.exterior())
-                        .chain(poly.interiors().iter().filter(|_| !exterior_only));
-                    for ring in rings {
-                        for w in ring.0.windows(2) {
-                            let (a, b) = (w[0], w[1]);
-                            if (a.y > y) != (b.y > y) {
-                                xs.push(a.x + (y - a.y) / (b.y - a.y) * (b.x - a.x));
-                            }
-                        }
-                    }
-                }
-                xs.sort_by(f64::total_cmp);
-                xs
-            };
-            let outer = crossings(true);
-            let all = crossings(false);
-            let edge_distance = |x: f64| {
-                all.iter()
-                    .map(|&c| (c - x).abs())
-                    .fold(f64::INFINITY, f64::min)
-            };
-            let is_inside = |x: f64| all.iter().filter(|&&c| c < x).count() % 2 == 1;
-            let mut candidates: Vec<f64> = Vec::new();
-            for span in outer.chunks(2).filter(|s| s.len() == 2) {
-                if span[0] < center[0] && center[0] < span[1] {
-                    candidates.push((span[0] + center[0]) / 2.0);
-                    candidates.push((center[0] + span[1]) / 2.0);
-                } else {
-                    candidates.push((span[0] + span[1]) / 2.0);
-                }
-            }
-            let best = candidates.into_iter().filter(|&x| is_inside(x)).fold(
-                None::<(f64, f64)>,
-                |best, x| {
-                    let d = edge_distance(x);
-                    match best {
-                        Some((_, bd)) if bd >= d => best,
-                        _ => Some((x, d)),
-                    }
-                },
-            );
-            Ok(best.map(|(x, _)| [x, y]).or_else(|| Some(g.xy[0])))
-        }
+        GeometryKind::Polygon => Ok(polygon_label_point(&g)),
         _ => Ok(centroid(&g)?),
     }
+}
+
+type Ring = Vec<Pt>;
+
+fn ring_area(r: &[Pt]) -> f64 {
+    let n = r.len();
+    (0..n)
+        .map(|i| r[i][0] * r[(i + 1) % n][1] - r[(i + 1) % n][0] * r[i][1])
+        .sum::<f64>()
+        / 2.0
+}
+
+fn ring_centroid(r: &[Pt]) -> Pt {
+    let n = r.len();
+    let (mut a, mut cx, mut cy) = (0.0, 0.0, 0.0);
+    for i in 0..n {
+        let (p, q) = (r[i], r[(i + 1) % n]);
+        let f = p[0] * q[1] - q[0] * p[1];
+        a += f;
+        cx += (p[0] + q[0]) * f;
+        cy += (p[1] + q[1]) * f;
+    }
+    if a == 0.0 {
+        r[0]
+    } else {
+        [cx / (3.0 * a), cy / (3.0 * a)]
+    }
+}
+
+/// Area centroid with signed areas (holes subtract).
+fn rings_centroid(rings: &[&Ring]) -> Pt {
+    let (mut a, mut x, mut y) = (0.0, 0.0, 0.0);
+    for r in rings {
+        let area = ring_area(r);
+        let c = ring_centroid(r);
+        a += area;
+        x += area * c[0];
+        y += area * c[1];
+    }
+    if a == 0.0 {
+        rings[0][0]
+    } else {
+        [x / a, y / a]
+    }
+}
+
+fn ring_edges<'a>(rings: &'a [&'a Ring]) -> impl Iterator<Item = (Pt, Pt)> + 'a {
+    rings.iter().flat_map(|r| {
+        let n = r.len();
+        (0..n).map(move |i| (r[i], r[(i + 1) % n]))
+    })
+}
+
+/// Even-odd containment.
+fn rings_contain(rings: &[&Ring], p: Pt) -> bool {
+    let mut inside = false;
+    for (a, b) in ring_edges(rings) {
+        if (a[1] > p[1]) != (b[1] > p[1])
+            && a[0] + (p[1] - a[1]) * (b[0] - a[0]) / (b[1] - a[1]) > p[0]
+        {
+            inside = !inside;
+        }
+    }
+    inside
+}
+
+fn boundary_distance(rings: &[&Ring], p: Pt) -> f64 {
+    ring_edges(rings)
+        .map(|(a, b)| {
+            let (ex, ey) = (b[0] - a[0], b[1] - a[1]);
+            let l = ex * ex + ey * ey;
+            let t = if l == 0.0 {
+                0.0
+            } else {
+                (((p[0] - a[0]) * ex + (p[1] - a[1]) * ey) / l).clamp(0.0, 1.0)
+            };
+            (p[0] - a[0] - t * ex).hypot(p[1] - a[1] - t * ey)
+        })
+        .fold(f64::INFINITY, f64::min)
+}
+
+fn shares_vertex(a: &Ring, b: &Ring) -> bool {
+    a.iter().any(|p| b.contains(p))
+}
+
+/// The midpoint of the lowest stretch of the vertical line `X = x` inside the part.
+fn lowest_chord_midpoint(rings: &[&Ring], x: f64) -> Option<f64> {
+    let mut ys: Vec<f64> = ring_edges(rings)
+        .filter(|(a, b)| (a[0] > x) != (b[0] > x))
+        .map(|(a, b)| a[1] + (x - a[0]) * (b[1] - a[1]) / (b[0] - a[0]))
+        .collect();
+    if ys.len() < 2 {
+        return None;
+    }
+    ys.sort_by(f64::total_cmp);
+    Some((ys[0] + ys[1]) / 2.0)
+}
+
+/// ArcGIS's polygon label point (arcpy `Polygon.labelPoint`, Feature To Point
+/// `INSIDE`), reconstructed from its outputs (`docs/formats/label-point.md`).
+/// Only the largest part counts. Candidates: the area centroid of its outer ring
+/// (when inside the part; weight 6) and the midpoints of the lowest stretch of the
+/// vertical lines at 1/2, 3/4 and 1/4 of the envelope width (weights 5, 4, 3 by
+/// distance to the centroid). The candidate with the largest distance to the part's
+/// boundary times its weight wins. Rings are expected as ArcGIS stores them: outer
+/// rings clockwise, holes counter-clockwise.
+fn polygon_label_point(g: &Geometry) -> Option<Pt> {
+    let mut rings: Vec<Ring> = g
+        .part_ranges()
+        .map(|r| {
+            let mut v = g.xy[r].to_vec();
+            if v.len() > 1 && v.first() == v.last() {
+                v.pop();
+            }
+            v
+        })
+        .filter(|v| v.len() >= 3)
+        .collect();
+    if rings.is_empty() {
+        return None;
+    }
+    let mut outers: Vec<Ring> = rings
+        .iter()
+        .filter(|r| ring_area(r) < 0.0)
+        .cloned()
+        .collect();
+    let holes: Vec<Ring> = rings
+        .iter()
+        .filter(|r| ring_area(r) > 0.0)
+        .cloned()
+        .collect();
+    let holes = if outers.is_empty() {
+        // Orientation not Esri's: every ring is a part of its own.
+        outers = rings
+            .drain(..)
+            .map(|mut r| {
+                r.reverse();
+                r
+            })
+            .collect();
+        Vec::new()
+    } else {
+        holes
+    };
+    let mut parts: Vec<Vec<Ring>> = outers.into_iter().map(|o| vec![o]).collect();
+    for h in holes {
+        let hc = ring_centroid(&h);
+        if let Some(p) = parts
+            .iter_mut()
+            .find(|p| shares_vertex(&h, &p[0]) || rings_contain(&[&p[0]], hc))
+        {
+            p.push(h);
+        }
+    }
+    // The part with the largest net area (the first on a tie).
+    let mut best_part = 0;
+    let mut best_area = f64::NEG_INFINITY;
+    for (i, p) in parts.iter().enumerate() {
+        let a: f64 = -p.iter().map(|r| ring_area(r)).sum::<f64>();
+        if a > best_area {
+            best_area = a;
+            best_part = i;
+        }
+    }
+    let part: Vec<&Ring> = parts[best_part].iter().collect();
+    let outer = part[0];
+    let touching: Vec<&Ring> = std::iter::once(outer)
+        .chain(
+            part[1..]
+                .iter()
+                .copied()
+                .filter(|h| shares_vertex(h, outer)),
+        )
+        .collect();
+    let c = rings_centroid(&touching);
+    let (x0, x1) = part
+        .iter()
+        .flat_map(|r| r.iter())
+        .fold((f64::INFINITY, f64::NEG_INFINITY), |(lo, hi), p| {
+            (lo.min(p[0]), hi.max(p[0]))
+        });
+    // 1/2, 3/4, 1/4: the order breaks distance ties (3/4 before 1/4).
+    let mut lines: Vec<Pt> = [0.5, 0.75, 0.25]
+        .iter()
+        .filter_map(|f| {
+            let x = x0 + (x1 - x0) * f;
+            lowest_chord_midpoint(&part, x).map(|y| [x, y])
+        })
+        .collect();
+    lines.sort_by(|a, b| {
+        (a[0] - c[0])
+            .hypot(a[1] - c[1])
+            .total_cmp(&(b[0] - c[0]).hypot(b[1] - c[1]))
+    });
+    let mut candidates: Vec<(Pt, f64)> = Vec::new();
+    if rings_contain(&part, c) {
+        candidates.push((c, 6.0));
+    }
+    candidates.extend(lines.iter().enumerate().map(|(i, &q)| (q, 5.0 - i as f64)));
+    let mut best: Option<(f64, Pt)> = None;
+    for (q, w) in candidates {
+        let score = boundary_distance(&part, q) * w;
+        if best.is_none_or(|(s, _)| score > s) {
+            best = Some((score, q));
+        }
+    }
+    Some(best.map_or(c, |(_, q)| q))
 }
 
 /// Area of a polygon (holes subtracted; curves densified).
@@ -399,4 +549,73 @@ pub fn length(g: &Geometry) -> Result<f64> {
         .iter()
         .map(|l| geo::Euclidean.length(l))
         .sum())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// A polygon from closed rings in Esri orientation (outer clockwise).
+    fn polygon(rings: &[&[Pt]]) -> Geometry {
+        let mut g = Geometry::point(0.0, 0.0);
+        g.kind = GeometryKind::Polygon;
+        g.xy.clear();
+        for r in rings {
+            g.parts.push(g.xy.len() as u32);
+            g.xy.extend_from_slice(r);
+        }
+        g
+    }
+
+    /// ArcGIS's label points for hand-made shapes (arcpy `labelPoint`).
+    #[test]
+    fn label_point_of_u_c_and_ring_shapes() {
+        let u_up: &[Pt] = &[
+            [0., 0.],
+            [0., 30.],
+            [10., 30.],
+            [10., 10.],
+            [20., 10.],
+            [20., 30.],
+            [30., 30.],
+            [30., 0.],
+            [0., 0.],
+        ];
+        let c_tall: &[Pt] = &[
+            [0., 0.],
+            [0., 100.],
+            [30., 100.],
+            [30., 90.],
+            [10., 90.],
+            [10., 10.],
+            [30., 10.],
+            [30., 0.],
+            [0., 0.],
+        ];
+        let u_down: &[Pt] = &[
+            [0., 0.],
+            [0., 30.],
+            [30., 30.],
+            [30., 0.],
+            [20., 0.],
+            [20., 20.],
+            [10., 20.],
+            [10., 0.],
+            [0., 0.],
+        ];
+        let outer: &[Pt] = &[[0., 0.], [0., 40.], [40., 40.], [40., 0.], [0., 0.]];
+        let hole: &[Pt] = &[[10., 10.], [30., 10.], [30., 30.], [10., 30.], [10., 10.]];
+        for (g, want) in [
+            (polygon(&[u_up]), [15., 5.]),
+            (polygon(&[c_tall]), [15., 5.]),
+            (polygon(&[u_down]), [15., 25.]),
+            (polygon(&[outer, hole]), [20., 5.]),
+        ] {
+            let p = inside_point(&g).unwrap().unwrap();
+            assert!(
+                (p[0] - want[0]).abs() < 1e-9 && (p[1] - want[1]).abs() < 1e-9,
+                "{p:?}"
+            );
+        }
+    }
 }

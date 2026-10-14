@@ -936,6 +936,13 @@ fn gf_args(case: &str) -> Vec<&'static str> {
             "--point-location",
             "CENTROID",
         ],
+        "f2p_label_polys_inside" => vec![
+            "feature-to-point",
+            "testdata/geoproc/label_polys.shp",
+            "<out>",
+            "--point-location",
+            "INSIDE",
+        ],
         "f2p_roads_centroid" => vec![
             "feature-to-point",
             "testdata/geoproc/roads.shp",

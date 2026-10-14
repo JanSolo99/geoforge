@@ -125,3 +125,8 @@ VRT
 rm -f wells_us_nad27.shp wells_us_nad27.shx wells_us_nad27.dbf wells_us_nad27.prj wells_us_nad27.cpg
 ogr2ogr -f "ESRI Shapefile" wells_us_nad27.shp us_tmp.vrt -lco ENCODING=UTF-8
 rm -f us_tmp.csv us_tmp.vrt
+
+# label_polys: 298 random polygons (stars, histograms, rotated, with holes, two-part) as
+# ArcGIS stored them; Feature To Point INSIDE (ArcGIS's label point) is checked on them.
+# Not regenerated here: made by arcpy from /scratchpad polygons, minus two degenerate ones
+# (self-intersecting input that ArcGIS turns into holes touching the outer ring).

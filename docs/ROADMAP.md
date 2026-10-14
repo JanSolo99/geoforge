@@ -116,8 +116,12 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       extent, start/mid/end, bearing, part and point counts; in place), Points To Line (line
       and sort fields, close), Generate Near Table (CLOSEST or ALL with rank and count,
       location, angle), Find Identical (fields or Shape, ONLY_DUPLICATES) — match ArcGIS
-- [ ] Feature To Point INSIDE for U/L-shaped polygons whose centroid lies outside (ArcGIS
-      also searches vertically)
+- [x] Feature To Point INSIDE for any polygon: ArcGIS's label point reconstructed from its outputs
+      (largest part; area centroid and the lowest chord midpoints of vertical lines at 1/2, 3/4,
+      1/4 of the width, scored by boundary distance × rank weight; `docs/formats/label-point.md`)
+      — matches ArcGIS on 298 random polygons incl. holes and multipart
+- [ ] Label point of self-intersecting input that ArcGIS simplifies into holes touching the outer
+      ring (two of 300 random polygons differ)
 - [ ] Check/Repair Geometry: geodatabase output tables, curves, multipoint and Z/M
       problems ("empty Z values", "bad envelope", ...)
 - [x] Clip/Erase against many polygons: each feature is clipped by the union of only the

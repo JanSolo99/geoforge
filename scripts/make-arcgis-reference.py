@@ -199,6 +199,7 @@ CASES = {
     "m2s_parcels_clip": ("management.MultipartToSinglepart", [OUT / "clip_parcels.shp"], []),
     "f2p_parcels_centroid": ("management.FeatureToPoint", [DATA / "parcels.shp"], ["CENTROID"]),
     "f2p_parcels_inside": ("management.FeatureToPoint", [DATA / "parcels.shp"], ["INSIDE"]),
+    "f2p_label_polys_inside": ("management.FeatureToPoint", [DATA / "label_polys.shp"], ["INSIDE"]),
     "f2p_roads_centroid": ("management.FeatureToPoint", [DATA / "roads.shp"], ["CENTROID"]),
     "f2p_roads_inside": ("management.FeatureToPoint", [DATA / "roads.shp"], ["INSIDE"]),
     "fv2p_roads_all": ("management.FeatureVerticesToPoints", [DATA / "roads.shp"], ["ALL"]),
