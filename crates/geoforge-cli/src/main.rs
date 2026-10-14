@@ -131,6 +131,10 @@ enum Tool {
         /// Last, Join, Sum, Mean, Median, Mode, Min, Max, StdDev, Count, Range.
         #[arg(long = "merge-rule")]
         merge_rules: Vec<String>,
+        /// A full field mapping string as ArcGIS's `field_mapping` parameter: output
+        /// names, types, lengths, merge rules and source fields.
+        #[arg(long)]
+        field_mapping: Option<String>,
     },
     /// Write the input features that relate to selecting features (ArcGIS "Select
     /// Layer By Location" with a new selection, then "Copy Features").
@@ -847,7 +851,12 @@ fn main() -> ExitCode {
             search_radius,
             distance_field_name,
             merge_rules,
+            field_mapping,
         } => (|| {
+            let field_map = field_mapping
+                .as_deref()
+                .map(geoforge_tools::parse_field_mapping)
+                .transpose()?;
             let merge_rules = merge_rules
                 .iter()
                 .map(|m| {
@@ -884,6 +893,9 @@ fn main() -> ExitCode {
                     .transpose()?,
                 distance_field_name,
                 merge_rules,
+                field_map,
+                target_name: geoforge_tools::table_stem(&target_features.to_string_lossy()),
+                join_name: geoforge_tools::table_stem(&join_features.to_string_lossy()),
             };
             let out = geoforge_tools::spatial_join(target.as_ref(), join.as_ref(), &opts)?;
             write_output(

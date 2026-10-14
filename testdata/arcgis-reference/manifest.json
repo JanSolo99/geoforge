@@ -19136,6 +19136,312 @@
         ]
       ],
       "shapeType": "Point"
+    },
+    "sj_fm_rename": {
+      "tool": "analysis.SpatialJoin",
+      "args": [
+        "testdata/geoproc/clip_areas.shp",
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "JOIN_ONE_TO_ONE",
+        "KEEP_ALL",
+        "AREA_ID \"AREA_ID\" true true false 10 Long 0 10,First,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\clip_areas.shp,AREA_ID,-1,-1;PID \"PID\" true true false 10 Long 0 10,First,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,PARCEL_ID,-1,-1",
+        "INTERSECT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Join_Count",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "TARGET_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "PID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sj_fm_types": {
+      "tool": "analysis.SpatialJoin",
+      "args": [
+        "testdata/geoproc/clip_areas.shp",
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "JOIN_ONE_TO_ONE",
+        "KEEP_ALL",
+        "AREA_ID \"AREA_ID\" true true false 10 Long 0 10,First,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\clip_areas.shp,AREA_ID,-1,-1;VAL_I \"VAL_I\" true true false 10 Long 0 10,First,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,VALUE,-1,-1;ZN \"ZN\" true true false 19 Double 0 0,First,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,ZONE,-1,-1;NM \"NM\" true true false 5 Text 0 0,First,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,NAME,0,4;SUB \"SUB\" true true false 20 Text 0 0,First,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,NAME,2,5;PTXT \"PTXT\" true true false 12 Text 0 0,First,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,PARCEL_ID,-1,-1",
+        "INTERSECT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Join_Count",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "TARGET_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "VAL_I",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ZN",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "NM",
+          "String",
+          5,
+          0,
+          0
+        ],
+        [
+          "SUB",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "PTXT",
+          "String",
+          12,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sj_fm_sources": {
+      "tool": "analysis.SpatialJoin",
+      "args": [
+        "testdata/geoproc/clip_areas.shp",
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "JOIN_ONE_TO_ONE",
+        "KEEP_ALL",
+        "BOTH \"BOTH\" true true false 10 Long 0 10,First,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\clip_areas.shp,AREA_ID,-1,-1,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,PARCEL_ID,-1,-1;REV \"REV\" true true false 10 Long 0 10,First,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,PARCEL_ID,-1,-1,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\clip_areas.shp,AREA_ID,-1,-1;TOT \"TOT\" true true false 19 Double 0 0,Sum,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,VALUE,-1,-1;CNT \"CNT\" true true false 10 Long 0 10,Count,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,VALUE,-1,-1;FL \"FL\" true true false 12 Float 0 0,First,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,VALUE,-1,-1;SH \"SH\" true true false 5 Short 0 5,First,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,ZONE,-1,-1",
+        "INTERSECT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Join_Count",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "TARGET_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "BOTH",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "REV",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "TOT",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "CNT",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "FL",
+          "Single",
+          13,
+          0,
+          0
+        ],
+        [
+          "SH",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sj_fm_many": {
+      "tool": "analysis.SpatialJoin",
+      "args": [
+        "testdata/geoproc/clip_areas.shp",
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "JOIN_ONE_TO_MANY",
+        "KEEP_COMMON",
+        "AREA_ID \"AREA_ID\" true true false 10 Long 0 10,First,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\clip_areas.shp,AREA_ID,-1,-1;PID \"PID\" true true false 10 Long 0 10,First,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,PARCEL_ID,-1,-1;NM \"NM\" true true false 8 Text 0 0,First,#,Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp,NAME,-1,-1",
+        "INTERSECT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Join_Count",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "TARGET_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "JOIN_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "PID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NM",
+          "String",
+          8,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
     }
   }
 }

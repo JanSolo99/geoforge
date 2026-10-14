@@ -52,6 +52,17 @@ def field_mapping(target, join, rules):
     return ";".join(parts)
 
 
+
+def fm(*entries):
+    """A Spatial Join field mapping string from (name, type, length, rule, delimiter,
+    [(table, field, start, end), ...]) entries (tables are given as paths)."""
+    out = []
+    for name, ftype, length, rule, delim, sources in entries:
+        prec = 0 if ftype in ("Text", "Double", "Float") else length
+        src = ",".join(f"{win(t)},{f},{a},{b}" for t, f, a, b in sources)
+        out.append(f'{name} "{name}" true true false {length} {ftype} 0 {prec},{rule},{delim},{src}')
+    return ";".join(out)
+
 TARGET_FIELDS = {
     "clip_areas": [("AREA_ID", "Long", 10)],
     "parcels": [("PARCEL_ID", "Long", 10), ("NAME", "Text", 20), ("VALUE", "Double", 19), ("ZONE", "Long", 5)],
@@ -179,6 +190,27 @@ CASES = {
         field_mapping(DATA / "clip_areas.shp", DATA / "parcels.shp", {"PARCEL_ID": "Max", "VALUE": "Min", "ZONE": "Count", "NAME": "Join"}), "INTERSECT"]),
     "sj_rules_d": ("analysis.SpatialJoin", [DATA / "clip_areas.shp", DATA / "parcels.shp"], ["JOIN_ONE_TO_ONE", "KEEP_ALL",
         field_mapping(DATA / "clip_areas.shp", DATA / "parcels.shp", {"PARCEL_ID": "Range", "VALUE": "Mean", "ZONE": "Median", "NAME": "First"}), "WITHIN_A_DISTANCE", "60 Meters"]),
+    "sj_fm_rename": ("analysis.SpatialJoin", [DATA / "clip_areas.shp", DATA / "parcels.shp"], ["JOIN_ONE_TO_ONE", "KEEP_ALL",
+        fm(("AREA_ID", "Long", 10, "First", "#", [(DATA / "clip_areas.shp", "AREA_ID", -1, -1)]),
+           ("PID", "Long", 10, "First", "#", [(DATA / "parcels.shp", "PARCEL_ID", -1, -1)])), "INTERSECT"]),
+    "sj_fm_types": ("analysis.SpatialJoin", [DATA / "clip_areas.shp", DATA / "parcels.shp"], ["JOIN_ONE_TO_ONE", "KEEP_ALL",
+        fm(("AREA_ID", "Long", 10, "First", "#", [(DATA / "clip_areas.shp", "AREA_ID", -1, -1)]),
+           ("VAL_I", "Long", 10, "First", "#", [(DATA / "parcels.shp", "VALUE", -1, -1)]),
+           ("ZN", "Double", 19, "First", "#", [(DATA / "parcels.shp", "ZONE", -1, -1)]),
+           ("NM", "Text", 5, "First", "#", [(DATA / "parcels.shp", "NAME", 0, 4)]),
+           ("SUB", "Text", 20, "First", "#", [(DATA / "parcels.shp", "NAME", 2, 5)]),
+           ("PTXT", "Text", 12, "First", "#", [(DATA / "parcels.shp", "PARCEL_ID", -1, -1)])), "INTERSECT"]),
+    "sj_fm_sources": ("analysis.SpatialJoin", [DATA / "clip_areas.shp", DATA / "parcels.shp"], ["JOIN_ONE_TO_ONE", "KEEP_ALL",
+        fm(("BOTH", "Long", 10, "First", "#", [(DATA / "clip_areas.shp", "AREA_ID", -1, -1), (DATA / "parcels.shp", "PARCEL_ID", -1, -1)]),
+           ("REV", "Long", 10, "First", "#", [(DATA / "parcels.shp", "PARCEL_ID", -1, -1), (DATA / "clip_areas.shp", "AREA_ID", -1, -1)]),
+           ("TOT", "Double", 19, "Sum", "#", [(DATA / "parcels.shp", "VALUE", -1, -1)]),
+           ("CNT", "Long", 10, "Count", "#", [(DATA / "parcels.shp", "VALUE", -1, -1)]),
+           ("FL", "Float", 12, "First", "#", [(DATA / "parcels.shp", "VALUE", -1, -1)]),
+           ("SH", "Short", 5, "First", "#", [(DATA / "parcels.shp", "ZONE", -1, -1)])), "INTERSECT"]),
+    "sj_fm_many": ("analysis.SpatialJoin", [DATA / "clip_areas.shp", DATA / "parcels.shp"], ["JOIN_ONE_TO_MANY", "KEEP_COMMON",
+        fm(("AREA_ID", "Long", 10, "First", "#", [(DATA / "clip_areas.shp", "AREA_ID", -1, -1)]),
+           ("PID", "Long", 10, "First", "#", [(DATA / "parcels.shp", "PARCEL_ID", -1, -1)]),
+           ("NM", "Text", 8, "First", "#", [(DATA / "parcels.shp", "NAME", -1, -1)])), "INTERSECT"]),
     "project_wells_4326": ("management.Project", [DATA / "wells.shp"], [4326]),
     "project_parcels_3857": ("management.Project", [DATA / "parcels.shp"], [3857]),
     "project_roads_32634": ("management.Project", [DATA / "roads.shp"], [32634]),

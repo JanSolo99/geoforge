@@ -2,9 +2,11 @@
 //! output schema, feature order, messages) as observed through the ArcGIS bridge
 //! and recorded in `testdata/arcgis-reference/manifest.json`.
 
+mod fieldmap;
 mod sql;
 mod zm;
 
+pub use fieldmap::{FieldMapEntry, MapSource, parse_field_mapping, table_stem};
 pub use sql::WhereClause;
 
 use geoforge_core::{Error, Feature, FeatureClass, Field, FieldType, GeometryKind, Result, Value};
@@ -2188,6 +2190,13 @@ pub struct SpatialJoinOptions {
     pub match_option: MatchOption,
     pub search_radius: Option<f64>,
     pub distance_field_name: Option<String>,
+    /// A full field mapping (`field_mapping` parameter): output fields, types, merge
+    /// rules and their sources. `None` keeps every input field as it is.
+    pub field_map: Option<Vec<FieldMapEntry>>,
+    /// The file stems ([`table_stem`]) of the target and join tables, which tell the
+    /// tables named in `field_map` apart.
+    pub target_name: String,
+    pub join_name: String,
 }
 
 /// `arcpy.analysis.SpatialJoin(target, join, out, ...)` with the default field
@@ -2351,8 +2360,53 @@ pub fn spatial_join(
     if opts.one_to_many {
         fields.push(Field::new("JOIN_FID", FieldType::Integer));
     }
-    for f in target.fields().iter().chain(join.fields()) {
-        push_unique(&mut fields, f.clone());
+    let head_len = fields.len();
+    // With a field mapping: for each output field, the (is join table, field index)
+    // of each source.
+    let plan: Option<Vec<Vec<(bool, usize)>>> = match &opts.field_map {
+        None => None,
+        Some(map) => {
+            let find = |fc: &dyn FeatureClass, name: &str| {
+                fc.fields()
+                    .iter()
+                    .position(|f| f.name.eq_ignore_ascii_case(name))
+                    .ok_or_else(|| {
+                        Error::Unsupported(format!(
+                            "ERROR 000728: Field {name} does not exist within table"
+                        ))
+                    })
+            };
+            Some(
+                map.iter()
+                    .map(|e| {
+                        e.sources
+                            .iter()
+                            .map(|src| {
+                                let stem = table_stem(&src.table);
+                                if stem == opts.join_name && stem != opts.target_name {
+                                    Ok((true, find(join, &src.field)?))
+                                } else if stem == opts.target_name {
+                                    Ok((false, find(target, &src.field)?))
+                                } else {
+                                    Err(Error::Unsupported(format!(
+                                        "field mapping names the table {}, which is neither input",
+                                        src.table
+                                    )))
+                                }
+                            })
+                            .collect::<Result<Vec<_>>>()
+                    })
+                    .collect::<Result<Vec<_>>>()?,
+            )
+        }
+    };
+    match &opts.field_map {
+        Some(map) => fields.extend(map.iter().map(|e| e.field.clone())),
+        None => {
+            for f in target.fields().iter().chain(join.fields()) {
+                push_unique(&mut fields, f.clone());
+            }
+        }
     }
     let radius = opts.search_radius.unwrap_or(0.0);
     let rules = &opts.merge_rules;
@@ -2442,8 +2496,64 @@ pub fn spatial_join(
             }
             a
         };
+        // The mapped output fields for the join rows `subset`.
+        let mapped = |mut head: Vec<Value>, subset: &[usize], messages: &mut Vec<String>| {
+            head.truncate(head_len);
+            let (map, plan) = (opts.field_map.as_ref().unwrap(), plan.as_ref().unwrap());
+            let mut failed = false;
+            for (entry, sources) in map.iter().zip(plan) {
+                if failed {
+                    head.push(Value::Null);
+                    continue;
+                }
+                let mut values: Vec<Value> = Vec::new();
+                for (src, &(from_join, k)) in entry.sources.iter().zip(sources) {
+                    if from_join {
+                        values.extend(subset.iter().map(|&i| {
+                            fieldmap::substring(
+                                &joins.features[i].attributes[k],
+                                src.start,
+                                src.end,
+                            )
+                        }));
+                    } else {
+                        values.push(fieldmap::substring(&t.attributes[k], src.start, src.end));
+                    }
+                }
+                let refs: Vec<&Value> = values.iter().collect();
+                match merge_values(&entry.rule, &refs, &entry.field) {
+                    Ok(v) => head.push(fieldmap::coerce(&v, &entry.field)),
+                    Err(text) => {
+                        messages.push(format!(
+                            "WARNING 001156: Failed on input OID {}, could not write value '{text}' to output field {}",
+                            t.oid, entry.field.name
+                        ));
+                        failed = true;
+                        head.push(Value::Null);
+                    }
+                }
+            }
+            head
+        };
         let mut rows = Vec::new();
-        if matches.is_empty() {
+        if plan.is_some() {
+            if matches.is_empty() {
+                if opts.keep_all {
+                    rows.push(mapped(row(0, None), &[], &mut messages));
+                }
+            } else if opts.one_to_many {
+                for &m in &matches {
+                    rows.push(mapped(row(1, Some(m)), &[m.0], &mut messages));
+                }
+            } else {
+                let all: Vec<usize> = matches.iter().map(|m| m.0).collect();
+                rows.push(mapped(
+                    row(matches.len(), Some(matches[0])),
+                    &all,
+                    &mut messages,
+                ));
+            }
+        } else if matches.is_empty() {
             if opts.keep_all {
                 rows.push(row(0, None));
             }
