@@ -3000,6 +3000,49 @@ fn compare_rasters(case: &str, ours: &Path, arcgis: &Path) -> Vec<String> {
     } else if bad > 4 {
         diffs.push(format!("{bad} cells differ"));
     }
+    diffs.extend(compare_statistics(ours, arcgis, bad > 0));
+    diffs
+}
+
+/// A `STATISTICS_<key>` value of a `<raster>.aux.xml`.
+fn aux_statistic(raster: &Path, key: &str) -> Option<f64> {
+    let text = std::fs::read_to_string(format!("{}.aux.xml", raster.display())).ok()?;
+    let marker = format!("STATISTICS_{key}\">");
+    let start = text.find(&marker)? + marker.len();
+    text[start..start + text[start..].find('<')?].parse().ok()
+}
+
+/// ArcGIS writes cell statistics beside most Spatial Analyst outputs (and none beside a
+/// few); later tools pick their output types from them, so ours must agree.
+fn compare_statistics(ours: &Path, arcgis: &Path, cells_differ: bool) -> Vec<String> {
+    let mut diffs = Vec::new();
+    let theirs = |k| aux_statistic(arcgis, k);
+    let mine = |k| aux_statistic(ours, k);
+    if theirs("MEAN").is_none() {
+        if mine("MEAN").is_some() {
+            diffs.push("statistics written where ArcGIS has none".into());
+        }
+        return diffs;
+    }
+    for (key, rel) in [
+        ("COUNT", 0.0),
+        ("MINIMUM", 1e-5),
+        ("MAXIMUM", 1e-5),
+        ("MEAN", 1e-4),
+        ("STDDEV", 1e-3),
+    ] {
+        match (mine(key), theirs(key)) {
+            (Some(a), Some(b)) => {
+                // Cells that differ from ArcGIS's move the counts and moments: only
+                // check that the statistics exist.
+                if !cells_differ && (a - b).abs() > rel * b.abs().max(1.0) {
+                    diffs.push(format!("STATISTICS_{key}: ours {a}, ArcGIS {b}"));
+                }
+            }
+            (None, Some(_)) => diffs.push(format!("STATISTICS_{key} missing")),
+            _ => {}
+        }
+    }
     diffs
 }
 

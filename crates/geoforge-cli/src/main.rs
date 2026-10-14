@@ -1430,7 +1430,7 @@ fn main() -> ExitCode {
             z_limit,
         } => (|| {
             let dem = geoforge_raster::read_geotiff(&in_surface_raster)?;
-            write_raster(
+            write_raster_plain(
                 &out_surface_raster,
                 &geoforge_raster::hydro::fill(&dem, z_limit),
             )
@@ -1446,7 +1446,7 @@ fn main() -> ExitCode {
                 other => return Err(Error::Unsupported(format!("force_flow {other}"))),
             };
             let dem = geoforge_raster::read_geotiff(&in_surface_raster)?;
-            write_raster(
+            write_raster_plain(
                 &out_flow_direction_raster,
                 &geoforge_raster::hydro::flow_direction(&dem, force),
             )
@@ -1486,7 +1486,7 @@ fn main() -> ExitCode {
                 other => return Err(Error::Unsupported(format!("missing_values {other}"))),
             };
             let input = geoforge_raster::read_geotiff(&in_raster)?;
-            write_raster(
+            write_raster_plain(
                 &out_raster,
                 &geoforge_raster::zonal::reclassify(&input, &entries, keep),
             )
@@ -1511,7 +1511,7 @@ fn main() -> ExitCode {
                 .ok_or_else(|| {
                 Error::Unsupported("zone and value rasters do not overlap".into())
             })?;
-            write_raster(
+            write_raster_plain(
                 &out_raster,
                 &geoforge_raster::zonal::zonal_statistics(&zones, &values, stat, ignore),
             )
@@ -1663,7 +1663,7 @@ fn main() -> ExitCode {
             in_flow_direction_raster,
             out_raster,
         } => geoforge_raster::read_geotiff(&in_flow_direction_raster)
-            .and_then(|d| write_raster(&out_raster, &geoforge_raster::hydro::basin(&d))),
+            .and_then(|d| write_raster_basin(&out_raster, &geoforge_raster::hydro::basin(&d))),
         Tool::Watershed {
             in_flow_direction_raster,
             in_pour_point_data,
@@ -1671,7 +1671,7 @@ fn main() -> ExitCode {
         } => (|| {
             let d = geoforge_raster::read_geotiff(&in_flow_direction_raster)?;
             let p = geoforge_raster::read_geotiff(&in_pour_point_data)?;
-            write_raster(&out_raster, &geoforge_raster::hydro::watershed(&d, &p))
+            write_raster_plain(&out_raster, &geoforge_raster::hydro::watershed(&d, &p))
         })(),
         Tool::StreamLink {
             in_stream_raster,
@@ -1680,7 +1680,7 @@ fn main() -> ExitCode {
         } => (|| {
             let s = geoforge_raster::read_geotiff(&in_stream_raster)?;
             let d = geoforge_raster::read_geotiff(&in_flow_direction_raster)?;
-            write_raster(&out_raster, &geoforge_raster::hydro::stream_link(&s, &d))
+            write_raster_plain(&out_raster, &geoforge_raster::hydro::stream_link(&s, &d))
         })(),
         Tool::StreamOrder {
             in_stream_raster,
@@ -1921,7 +1921,7 @@ fn main() -> ExitCode {
             maximum_distance,
         } => (|| {
             let r = geoforge_raster::read_geotiff(&in_source_data)?;
-            write_raster(
+            write_raster_plain(
                 &out_distance_raster,
                 &geoforge_raster::resample::euclidean_distance(&r, maximum_distance),
             )
@@ -3190,6 +3190,26 @@ fn buffer_tool(
 /// Writes a raster result as GeoTIFF the way ArcGIS writes Spatial Analyst
 /// output: 128×128 tiles, LZW for integer cells, uncompressed floats.
 fn write_raster(path: &Path, raster: &geoforge_raster::Raster) -> Result<()> {
+    write_raster_with(path, raster, true)
+}
+
+/// For the tools whose ArcGIS output carries no statistics (Euclidean Distance, Fill,
+/// Flow Direction, Reclassify, Stream Link, Watershed, Zonal Statistics).
+fn write_raster_plain(path: &Path, raster: &geoforge_raster::Raster) -> Result<()> {
+    write_raster_with(path, raster, false)
+}
+
+/// ArcGIS's Basin writes statistics whose cell count is 0.
+fn write_raster_basin(path: &Path, raster: &geoforge_raster::Raster) -> Result<()> {
+    write_raster_with(path, raster, false)?;
+    geoforge_raster::stats::write_aux_statistics_count(path, raster, Some(0))
+}
+
+fn write_raster_with(
+    path: &Path,
+    raster: &geoforge_raster::Raster,
+    statistics: bool,
+) -> Result<()> {
     let compression = if raster.data_type.is_float() {
         geoforge_raster::Compression::None
     } else {
@@ -3204,6 +3224,9 @@ fn write_raster(path: &Path, raster: &geoforge_raster::Raster) -> Result<()> {
             ..Default::default()
         },
     )?;
+    if statistics {
+        geoforge_raster::stats::write_aux_statistics(path, raster)?;
+    }
     println!(
         "Wrote {} ({}x{})",
         path.display(),

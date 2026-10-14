@@ -13,6 +13,7 @@ pub mod hydro;
 pub mod local;
 pub mod rasterize;
 pub mod resample;
+pub mod stats;
 pub mod surface;
 mod writer;
 pub mod zonal;

@@ -195,10 +195,16 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         checked with GDAL and read by ArcGIS; tool output uses ArcGIS's 128×128 tiles
   - [x] Reader keeps stored statistics (GDAL_METADATA tag, .aux.xml) — ArcGIS's local tools
         choose output types from them
-  - [ ] COG layout (overviews before the full image, ghost area), user-defined CRS GeoKeys,
-        .aux.xml statistics like ArcGIS (varies by tool: most write min/max/mean/stddev with a
-        histogram of one bucket per integer value or 256 for floats; hydrology and zonal tools
-        write only a histogram with half-integer bounds; some integer outputs use 256 buckets)
+  - [x] `.aux.xml` statistics beside every Spatial Analyst output, as ArcGIS writes them (count,
+        min, max, mean, sample standard deviation, `%.14g` numbers; none for Euclidean Distance,
+        Fill, Flow Direction, Reclassify, Stream Link, Watershed, Zonal Statistics; Basin writes
+        count 0), so chained tools pick the same output types; checked on all 167 references
+  - [ ] `.aux.xml` histograms. Found so far: the bucket is `floor((v - min) / (max - min) *
+        (n - 1) + 0.001)` for 256-bucket float histograms (exact on 14 of 14 float outputs);
+        integer histograms have one bucket per value (bounds min..max, or half-integer bounds
+        for resample/streamlink/watershed), but several tools (slope, times, zonal means, ...)
+        follow other rules not yet worked out
+  - [ ] COG layout (overviews before the full image, ghost area), user-defined CRS GeoKeys
 - [ ] Map algebra (local/focal/zonal/global), reclass, resample
   - [x] Focal Statistics (rectangle/circle/annulus in cells; mean, majority, maximum, median,
         minimum, minority, range, std, sum, variety; DATA/NODATA) matching ArcGIS: radii truncate
