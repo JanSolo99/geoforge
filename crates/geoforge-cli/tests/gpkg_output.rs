@@ -134,3 +134,80 @@ fn export_table_into_geopackage_like_arcgis() {
     }
     std::fs::remove_dir_all(&dir).ok();
 }
+
+/// Frequency and Statistics tables written into a GeoPackage equal ArcGIS's.
+#[test]
+fn statistics_tables_into_geopackage_like_arcgis() {
+    let dir = std::env::temp_dir().join(format!("geoforge-gpkg-stat-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let out = dir.join("out.gpkg");
+    let runs: [(&str, &[&str]); 3] = [
+        (
+            "freq_zone",
+            &[
+                "frequency",
+                "testdata/geoproc/parcels.shp",
+                "<out>",
+                "ZONE",
+                "--summary-fields",
+                "VALUE",
+            ],
+        ),
+        (
+            "stats_zone",
+            &[
+                "statistics",
+                "testdata/geoproc/parcels.shp",
+                "<out>",
+                "VALUE SUM;VALUE MEAN;VALUE STD;PARCEL_ID COUNT;NAME FIRST",
+                "--case-field",
+                "ZONE",
+            ],
+        ),
+        (
+            "stats_median",
+            &[
+                "statistics",
+                "testdata/geoproc/wells.shp",
+                "<out>",
+                "DEPTH MEDIAN;DEPTH VARIANCE;DEPTH UNIQUE",
+            ],
+        ),
+    ];
+    for (name, args) in runs {
+        let mut cmd = Command::new(env!("CARGO_BIN_EXE_gf"));
+        for a in args {
+            if *a == "<out>" {
+                cmd.arg(out.join(name));
+            } else if a.starts_with("testdata/") {
+                cmd.arg(root().join(a));
+            } else {
+                cmd.arg(a);
+            }
+        }
+        let run = cmd.output().unwrap();
+        assert!(
+            run.status.success(),
+            "{name}: {}",
+            String::from_utf8_lossy(&run.stderr)
+        );
+    }
+    let ours = Database::open(&out).unwrap();
+    let arcgis = Database::open(&root().join("testdata/gpkg/arcgis_stat_tables.gpkg")).unwrap();
+    for t in arcgis.tables() {
+        if t.root_page == 0
+            || !["freq_zone", "stats_zone", "stats_median"].contains(&t.name.as_str())
+        {
+            continue;
+        }
+        let ours_table = ours.table(&t.name).unwrap();
+        assert_eq!(t.sql, ours_table.sql, "{} schema", t.name);
+        let a = arcgis.select(t).unwrap();
+        let b = ours.select(ours_table).unwrap();
+        assert_eq!(a.len(), b.len(), "{}", t.name);
+        for (x, y) in a.iter().zip(&b) {
+            assert!(x == y, "{} rowid {}: {:?} vs {:?}", t.name, x.0, x.1, y.1);
+        }
+    }
+    std::fs::remove_dir_all(&dir).ok();
+}

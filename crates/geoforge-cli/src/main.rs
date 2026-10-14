@@ -2921,6 +2921,33 @@ fn check_geometry_tool(in_features: &str, out_table: &Path, method: &str) -> Res
 
 /// Writes a table as a `.dbf` (with `.cpg`), field names by the shapefile rules.
 fn write_table(table: &geoforge_tools::TableOutput, path: &Path) -> Result<()> {
+    if let Some((gpkg, item)) = geopackage_item(path) {
+        let name = item
+            .ok_or_else(|| Error::Unsupported("name the output table inside the .gpkg".into()))?;
+        let name = name.strip_prefix("main.").unwrap_or(&name).to_string();
+        let features: Vec<geoforge_core::Feature> = table
+            .rows
+            .iter()
+            .enumerate()
+            .map(|(i, row)| geoforge_core::Feature {
+                oid: i as i64 + 1,
+                geometry: None,
+                attributes: row.clone(),
+            })
+            .collect();
+        geoforge_gpkg::write::write_table(
+            &gpkg,
+            &geoforge_gpkg::write::NewTable {
+                name: &name,
+                geometry: None,
+                fields: &table.fields,
+                spatial_ref: None,
+                xy_domain: None,
+                features: &features,
+            },
+        )?;
+        return Ok(());
+    }
     if path
         .extension()
         .is_none_or(|e| !e.eq_ignore_ascii_case("dbf"))

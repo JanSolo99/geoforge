@@ -327,6 +327,8 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         Mercator's y origin exact (x approximate)
   - [x] Export Table into a GeoPackage (`gf export-table in out.gpkg/name`): attribute tables
         equal row for row to ArcGIS's (`testdata/gpkg/arcgis_tables.gpkg`)
+  - [x] Table outputs (Frequency, Statistics, Summary/Near tables, ...) into a GeoPackage:
+        Frequency and Statistics tables equal ArcGIS's (`testdata/gpkg/arcgis_stat_tables.gpkg`)
   - [ ] GeoPackage: WAL files, curve geometries, Project's extra `fid_` field,
         coordinate system descriptions from ArcGIS's database; Transverse Mercator x origin and
         other projections' XY domains (also for file geodatabase output); 64-bit ObjectIDs in
