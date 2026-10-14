@@ -2948,12 +2948,44 @@ fn write_table(table: &geoforge_tools::TableOutput, path: &Path) -> Result<()> {
         )?;
         return Ok(());
     }
+    if let Location::Geodatabase { gdb, item } = locate(path) {
+        let name =
+            item.ok_or_else(|| Error::Unsupported("name the output table inside the .gdb".into()))?;
+        if gdb.exists() {
+            return Err(Error::Unsupported(format!(
+                "{} exists; adding to an existing geodatabase is not implemented yet",
+                gdb.display()
+            )));
+        }
+        let names = geodatabase_field_names(&table.fields);
+        let fields: Vec<Field> = table
+            .fields
+            .iter()
+            .zip(&names)
+            .map(|(f, n)| Field {
+                name: n.clone(),
+                ..f.clone()
+            })
+            .collect();
+        let mut w = geoforge_filegdb::GeodatabaseWriter::create(&gdb)?;
+        let mut t = w.create_table(&name, None, false, false, &fields, None)?;
+        for (i, row) in table.rows.iter().enumerate() {
+            t.write(&Feature {
+                oid: i as i64 + 1,
+                geometry: None,
+                attributes: row.clone(),
+            })?;
+        }
+        w.finish_table(t)?;
+        w.finish()?;
+        return Ok(());
+    }
     if path
         .extension()
         .is_none_or(|e| !e.eq_ignore_ascii_case("dbf"))
     {
         return Err(Error::Unsupported(
-            "tables are written as .dbf; geodatabase tables are not implemented yet".into(),
+            "tables are written as .dbf, in a GeoPackage or in a new geodatabase".into(),
         ));
     }
     let names =

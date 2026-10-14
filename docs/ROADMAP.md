@@ -149,6 +149,8 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
       ArcGIS default resolutions (coordinates snap like ArcGIS); high-precision dates only
       when needed. 203 inputs round-trip; GDAL reads every output and its spatial filter
       matches ours on the written index.
+- [x] Table outputs (Frequency, Statistics, ...) into a new geodatabase: fields and rows equal
+      ArcGIS's (`testdata/gdb-reference/stat_tables.gdb`)
 - [ ] Write: add to an existing geodatabase (system tables must be rewritten with their indexes)
 - [ ] Write: per-vertex missing M values mixed with present ones (encoding unknown)
 - [ ] Write: attribute indexes, subtypes, relationship classes, feature datasets

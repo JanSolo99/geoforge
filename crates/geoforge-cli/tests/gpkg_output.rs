@@ -211,3 +211,83 @@ fn statistics_tables_into_geopackage_like_arcgis() {
     }
     std::fs::remove_dir_all(&dir).ok();
 }
+
+/// The same tables into a new file geodatabase: fields (names, types, lengths) and
+/// rows equal those of ArcGIS's testdata/gdb-reference/stat_tables.gdb.
+#[test]
+fn statistics_tables_into_geodatabase_like_arcgis() {
+    use geoforge_core::FeatureClass;
+    use geoforge_filegdb::Geodatabase;
+    let dir = std::env::temp_dir().join(format!("geoforge-gdb-stat-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let runs: [(&str, &[&str]); 3] = [
+        (
+            "freq_zone",
+            &[
+                "frequency",
+                "testdata/geoproc/parcels.shp",
+                "<out>",
+                "ZONE",
+                "--summary-fields",
+                "VALUE",
+            ],
+        ),
+        (
+            "stats_zone",
+            &[
+                "statistics",
+                "testdata/geoproc/parcels.shp",
+                "<out>",
+                "VALUE SUM;VALUE MEAN;VALUE STD;PARCEL_ID COUNT;NAME FIRST",
+                "--case-field",
+                "ZONE",
+            ],
+        ),
+        (
+            "stats_median",
+            &[
+                "statistics",
+                "testdata/geoproc/wells.shp",
+                "<out>",
+                "DEPTH MEDIAN;DEPTH VARIANCE;DEPTH UNIQUE",
+            ],
+        ),
+    ];
+    // A new geodatabase takes one table per run here: write each to its own and compare.
+    for (name, args) in runs {
+        let gdb = dir.join(format!("{name}.gdb"));
+        let mut cmd = Command::new(env!("CARGO_BIN_EXE_gf"));
+        for a in args {
+            if *a == "<out>" {
+                cmd.arg(gdb.join(name));
+            } else if a.starts_with("testdata/") {
+                cmd.arg(root().join(a));
+            } else {
+                cmd.arg(a);
+            }
+        }
+        let run = cmd.output().unwrap();
+        assert!(
+            run.status.success(),
+            "{name}: {}",
+            String::from_utf8_lossy(&run.stderr)
+        );
+        let ours = Geodatabase::open(&gdb).unwrap().open_table(name).unwrap();
+        let theirs = Geodatabase::open(&root().join("testdata/gdb-reference/stat_tables.gdb"))
+            .unwrap()
+            .open_table(name)
+            .unwrap();
+        let describe = |t: &dyn FeatureClass| -> Vec<(String, String, u32)> {
+            t.fields()
+                .iter()
+                .map(|f| (f.name.clone(), format!("{:?}", f.field_type), f.length))
+                .collect()
+        };
+        assert_eq!(describe(&ours), describe(&theirs), "{name} fields");
+        let rows = |t: &dyn FeatureClass| -> Vec<Vec<geoforge_core::Value>> {
+            t.features().map(|f| f.unwrap().attributes).collect()
+        };
+        assert_eq!(rows(&ours), rows(&theirs), "{name} rows");
+    }
+    std::fs::remove_dir_all(&dir).ok();
+}
