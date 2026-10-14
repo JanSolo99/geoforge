@@ -39,8 +39,14 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       `dissolve_option` LIST (one multipart buffer per value combination, sorted), distance
       from a field — match ArcGIS (one-sided ROUND ends within 0.02% of area: ArcGIS's
       quarter arcs stop a fraction of a degree short of the line's axis)
-- [ ] Buffer: true arcs in geodatabase output (ArcGIS stores buffers as circular arcs),
-      geodesic for geographic data
+- [x] Buffer: true arcs in geodatabase output, as ArcGIS keeps them (point buffers, dissolved or
+      not; undissolved polygon buffers; line and dissolved polygon buffers stay densified, as in
+      ArcGIS): `recover_arcs` finds the runs of vertices on each input vertex's circle; a point's
+      circle is a two-vertex ring from the north pole through the south pole, trimmed arcs split
+      at the north pole and keep the south pole as interior point; CCW flag on hole arcs. Matches
+      ArcGIS's vertices and arcs (`testdata/gdb-reference/buffers.gdb`); open: where ArcGIS starts
+      a polygon ring (its seam can split an arc), one 2° stretch of a 60 m dissolve kept as vertices
+- [ ] Buffer: geodesic for geographic data
 - [x] Intersect (polygon/line/point inputs; overlapping features of one input split
       into regions output once per feature, as ArcGIS does), Erase, Union (planar
       overlay, ArcGIS row order), Dissolve (fields, statistics SUM/MEAN/MIN/MAX/RANGE/

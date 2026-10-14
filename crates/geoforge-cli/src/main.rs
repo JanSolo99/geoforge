@@ -3178,7 +3178,12 @@ fn buffer_tool(
         }
         other => return Err(Error::Unsupported(format!("dissolve_option {other}"))),
     };
-    let out = geoforge_tools::buffer(fc.as_ref(), distance, line_end, side, dissolve)?;
+    // A geodatabase keeps the round parts as true arcs, as ArcGIS does.
+    let out = if matches!(locate(output), Location::Geodatabase { .. }) {
+        geoforge_tools::buffer_arcs(fc.as_ref(), distance, line_end, side, dissolve)?
+    } else {
+        geoforge_tools::buffer(fc.as_ref(), distance, line_end, side, dissolve)?
+    };
     write_output(out, output, source_gdb(input).as_deref())
 }
 

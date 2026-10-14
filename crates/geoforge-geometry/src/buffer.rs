@@ -400,6 +400,248 @@ fn buffer_mp(g: &Geometry, opts: &BufferOptions) -> Result<MultiPolygon<f64>> {
     })
 }
 
+/// A circle a buffer was built around: an input vertex and the buffer distance.
+pub type BufferCircle = ([f64; 2], f64);
+
+/// Whether `v` lies on the polygon [`circle`] builds (or on the true circle).
+fn on_circle(v: [f64; 2], (c, r): BufferCircle, max_deviation: f64, tol: f64) -> bool {
+    let d = (v[0] - c[0]).hypot(v[1] - c[1]);
+    if (d - r).abs() <= tol {
+        return true;
+    }
+    let n = arcgis_arc_segments(TAU, r, max_deviation);
+    if d > r + tol || d < r * (std::f64::consts::PI / n as f64).cos() - tol {
+        return false;
+    }
+    // Distance to the chord of the sector `v` falls in (vertices start due north,
+    // run clockwise).
+    let theta = (v[0] - c[0]).atan2(v[1] - c[1]).rem_euclid(TAU);
+    let k = ((theta / TAU * n as f64).floor() as usize).min(n - 1);
+    let at = |k: usize| {
+        let a = TAU * k as f64 / n as f64;
+        [c[0] + r * a.sin(), c[1] + r * a.cos()]
+    };
+    let (p, q) = (at(k), at(k + 1));
+    let (ex, ey) = (q[0] - p[0], q[1] - p[1]);
+    let t = (((v[0] - p[0]) * ex + (v[1] - p[1]) * ey) / (ex * ex + ey * ey)).clamp(0.0, 1.0);
+    (v[0] - p[0] - t * ex).hypot(v[1] - p[1] - t * ey) <= tol
+}
+
+/// The point of circle 1 ∩ circle 2 nearest `near`.
+fn circle_intersection(a: BufferCircle, b: BufferCircle, near: [f64; 2]) -> Option<[f64; 2]> {
+    let (dx, dy) = (b.0[0] - a.0[0], b.0[1] - a.0[1]);
+    let d = dx.hypot(dy);
+    if d == 0.0 || d > a.1 + b.1 || d < (a.1 - b.1).abs() {
+        return None;
+    }
+    let x = (d * d + a.1 * a.1 - b.1 * b.1) / (2.0 * d);
+    let h = (a.1 * a.1 - x * x).max(0.0).sqrt();
+    let (ux, uy) = (dx / d, dy / d);
+    let m = [a.0[0] + x * ux, a.0[1] + x * uy];
+    let p = [m[0] - h * uy, m[1] + h * ux];
+    let q = [m[0] + h * uy, m[1] - h * ux];
+    let dist = |p: [f64; 2]| (p[0] - near[0]).hypot(p[1] - near[1]);
+    Some(if dist(p) <= dist(q) { p } else { q })
+}
+
+fn project_onto(v: [f64; 2], (c, r): BufferCircle) -> [f64; 2] {
+    let d = (v[0] - c[0]).hypot(v[1] - c[1]);
+    if d == 0.0 {
+        return v;
+    }
+    [c[0] + (v[0] - c[0]) * r / d, c[1] + (v[1] - c[1]) * r / d]
+}
+
+/// Replaces the round parts of a buffer polygon by true circular arcs, as ArcGIS
+/// stores them in a geodatabase: every run of vertices on one of `circles` (the
+/// polygons [`buffer`] builds, with their chord endpoints moved onto the circle)
+/// becomes one arc given by its end points and its midpoint. A ring that is a whole
+/// circle becomes the two-vertex ring ArcGIS writes (start due north, arc through
+/// the opposite point). Other polygons and lines are returned unchanged.
+pub fn recover_arcs(
+    g: &Geometry,
+    circles: &[BufferCircle],
+    max_deviation: f64,
+    poles: bool,
+) -> Geometry {
+    use geoforge_core::geometry::{ARC_CCW, ARC_INTERIOR_POINT, ARC_MINOR, Segment, SegmentKind};
+    use rstar::RTree;
+    use rstar::primitives::GeomWithData;
+    if g.kind != GeometryKind::Polygon || circles.is_empty() || g.has_curves() {
+        return g.clone();
+    }
+    let rmax = circles.iter().map(|c| c.1).fold(0.0, f64::max);
+    let tol = 1e-6 * (1.0 + rmax);
+    let tree = RTree::bulk_load(
+        circles
+            .iter()
+            .enumerate()
+            .map(|(i, c)| GeomWithData::new(c.0, i))
+            .collect(),
+    );
+    let reach = rmax + max_deviation + tol;
+    let mut out = g.clone();
+    out.parts.clear();
+    out.xy.clear();
+    out.curves.clear();
+    let mut curves: Vec<Segment> = Vec::new();
+    for range in g.part_ranges() {
+        let mut ring: Vec<[f64; 2]> = g.xy[range].to_vec();
+        if ring.len() > 1 && ring.first() == ring.last() {
+            ring.pop();
+        }
+        let n = ring.len();
+        // The circles each vertex lies on.
+        let on: Vec<Vec<usize>> = ring
+            .iter()
+            .map(|&v| {
+                let mut ids: Vec<usize> = tree
+                    .locate_within_distance(v, reach * reach)
+                    .map(|e| e.data)
+                    .filter(|&i| on_circle(v, circles[i], max_deviation, tol))
+                    .collect();
+                ids.sort_unstable();
+                ids
+            })
+            .collect();
+        // The circle each segment (vertex i to i + 1) runs along, if any.
+        let seg: Vec<Option<usize>> = (0..n)
+            .map(|i| {
+                let next = &on[(i + 1) % n];
+                on[i].iter().copied().find(|c| next.contains(c))
+            })
+            .collect();
+        let start_part = out.xy.len() as u32;
+        out.parts.push(start_part);
+        if n < 3 || seg.iter().all(Option::is_none) {
+            out.xy.extend_from_slice(&ring);
+            out.xy.push(ring[0]);
+            continue;
+        }
+        if let Some(c) = seg[0].filter(|&c| seg.iter().all(|&s| s == Some(c))) {
+            // A whole circle.
+            let (center, r) = circles[c];
+            let top = [center[0], center[1] + r];
+            curves.push(Segment {
+                start: out.xy.len() as u32,
+                kind: SegmentKind::CircularArc {
+                    point: [center[0], center[1] - r],
+                    bits: ARC_INTERIOR_POINT,
+                },
+            });
+            out.xy.push(top);
+            out.xy.push(top);
+            continue;
+        }
+        // Rotate so the ring starts where a run (or a straight stretch) begins.
+        let s = (0..n)
+            .find(|&i| seg[(i + n - 1) % n] != seg[i])
+            .unwrap_or(0);
+        let at = |k: usize| (s + k) % n;
+        // Where a vertex lands: on the circle(s) it joins.
+        let place = |k: usize| -> [f64; 2] {
+            let (i, p) = (at(k), (at(k) + n - 1) % n);
+            let v = ring[i];
+            match (seg[p], seg[i]) {
+                (Some(a), Some(b)) if a != b => {
+                    circle_intersection(circles[a], circles[b], v).unwrap_or(v)
+                }
+                (Some(_), Some(_)) | (None, None) => v,
+                (Some(a), None) => project_onto(v, circles[a]),
+                (None, Some(b)) => project_onto(v, circles[b]),
+            }
+        };
+        let first = out.xy.len();
+        let mut k = 0;
+        while k < n {
+            let begin = place(k);
+            match seg[at(k)] {
+                None => {
+                    out.xy.push(begin);
+                    k += 1;
+                }
+                Some(c) => {
+                    let mut len = 1;
+                    while k + len < n && seg[at(k + len)] == Some(c) {
+                        len += 1;
+                    }
+                    let end = place((k + len) % n);
+                    // Total sweep: the angle steps between the run's own vertices,
+                    // corrected for the moved end points.
+                    let (center, r) = circles[c];
+                    let ang = |p: [f64; 2]| (p[1] - center[1]).atan2(p[0] - center[0]);
+                    let mut sweep = 0.0;
+                    for j in 0..len {
+                        let (a, b) = (ring[at(k + j)], ring[at((k + j + 1) % n)]);
+                        let mut d = ang(b) - ang(a);
+                        while d > std::f64::consts::PI {
+                            d -= TAU;
+                        }
+                        while d <= -std::f64::consts::PI {
+                            d += TAU;
+                        }
+                        sweep += d;
+                    }
+                    let mut d = ang(end) - ang(begin) - sweep;
+                    d -= TAU * (d / TAU).round();
+                    sweep += d;
+                    // ArcGIS draws a point's buffer as a ring starting at the north pole
+                    // with one arc through the south pole; trimmed, an arc through the north
+                    // pole is split there and one through the south pole keeps it as its
+                    // interior point. (Corner arcs of polygon buffers use midpoints.)
+                    let a0 = ang(begin);
+                    let sign = sweep.signum();
+                    let t_of = |theta: f64| ((theta - a0) * sign).rem_euclid(TAU);
+                    let strictly_inside = |theta: f64, lo: f64, hi: f64| {
+                        let t = t_of(theta);
+                        t > lo + 1e-9 && t < hi - 1e-9
+                    };
+                    let (north, south) =
+                        (std::f64::consts::FRAC_PI_2, -std::f64::consts::FRAC_PI_2);
+                    let mut pieces: Vec<([f64; 2], f64, f64)> = Vec::new(); // start, from, to (t)
+                    if poles && strictly_inside(north, 0.0, sweep.abs()) {
+                        let t = t_of(north);
+                        pieces.push((begin, 0.0, t));
+                        pieces.push(([center[0], center[1] + r], t, sweep.abs()));
+                    } else {
+                        pieces.push((begin, 0.0, sweep.abs()));
+                    }
+                    for (start, from, to) in pieces {
+                        let interior = if poles && strictly_inside(south, from, to) {
+                            [center[0], center[1] - r]
+                        } else {
+                            let mid = a0 + sign * (from + to) / 2.0;
+                            [center[0] + r * mid.cos(), center[1] + r * mid.sin()]
+                        };
+                        curves.push(Segment {
+                            start: out.xy.len() as u32,
+                            kind: SegmentKind::CircularArc {
+                                point: interior,
+                                bits: ARC_INTERIOR_POINT
+                                    | if sign > 0.0 { ARC_CCW } else { 0 }
+                                    | if to - from < std::f64::consts::PI {
+                                        ARC_MINOR
+                                    } else {
+                                        0
+                                    },
+                            },
+                        });
+                        out.xy.push(start);
+                    }
+                    k += len;
+                }
+            }
+        }
+        if out.xy.len() == first {
+            continue;
+        }
+        let closing = out.xy[first];
+        out.xy.push(closing);
+    }
+    out.curves = curves;
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

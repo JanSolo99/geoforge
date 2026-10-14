@@ -142,6 +142,30 @@ pub fn buffer(
     side: geoforge_geometry::LineSide,
     dissolve: Dissolve,
 ) -> Result<ToolOutput> {
+    buffer_inner(input, distance, line_end, side, dissolve, false)
+}
+
+/// [`buffer`] with the round parts as true circular arcs where ArcGIS keeps them
+/// (geodatabase output): point buffers, and polygon buffers that are not dissolved.
+/// Line buffers and dissolved polygon buffers stay densified, as in ArcGIS.
+pub fn buffer_arcs(
+    input: &dyn FeatureClass,
+    distance: BufferDistance,
+    line_end: LineEnd,
+    side: geoforge_geometry::LineSide,
+    dissolve: Dissolve,
+) -> Result<ToolOutput> {
+    buffer_inner(input, distance, line_end, side, dissolve, true)
+}
+
+fn buffer_inner(
+    input: &dyn FeatureClass,
+    distance: BufferDistance,
+    line_end: LineEnd,
+    side: geoforge_geometry::LineSide,
+    dissolve: Dissolve,
+    arcs: bool,
+) -> Result<ToolOutput> {
     use geoforge_geometry::LineSide;
     let kind = input
         .geometry_kind()
@@ -201,6 +225,29 @@ pub fn buffer(
             buffered.push((f, d, b));
         }
     }
+    // The circles the buffers were built around, per buffered feature.
+    let max_deviation = geoforge_core::curves::arcgis_densify_deviation(false);
+    let is_point = matches!(kind, GeometryKind::Point | GeometryKind::Multipoint);
+    let keep_arcs = arcs
+        && match kind {
+            GeometryKind::Point | GeometryKind::Multipoint => true,
+            GeometryKind::Polygon => matches!(dissolve, Dissolve::None),
+            _ => false,
+        };
+    let circles_of =
+        |g: &geoforge_core::Geometry, d: f64| -> Vec<geoforge_geometry::BufferCircle> {
+            if d == 0.0 {
+                return Vec::new();
+            }
+            g.xy.iter().map(|&p| (p, d.abs())).collect()
+        };
+    let with_arcs = |b: geoforge_core::Geometry, circles: &[geoforge_geometry::BufferCircle]| {
+        if keep_arcs {
+            geoforge_geometry::recover_arcs(&b, circles, max_deviation, is_point)
+        } else {
+            b
+        }
+    };
     let mut out = ToolOutput {
         kind: GeometryKind::Polygon,
         has_z: false,
@@ -214,9 +261,14 @@ pub fn buffer(
         Dissolve::All => {
             let union = geoforge_geometry::dissolve(buffered.iter().map(|b| &b.2))?;
             if let Some(g) = union {
+                let circles: Vec<_> = buffered
+                    .iter()
+                    .filter_map(|(f, d, _)| Some(circles_of(f.geometry.as_ref()?, *d)))
+                    .flatten()
+                    .collect();
                 out.features.push(Feature {
                     oid: 1,
-                    geometry: Some(g),
+                    geometry: Some(with_arcs(g, &circles)),
                     attributes: Vec::new(),
                 });
             }
@@ -227,12 +279,24 @@ pub fn buffer(
                 .map(|n| field_index(n))
                 .collect::<Result<_>>()?;
             out.fields = keys.iter().map(|&i| input.fields()[i].clone()).collect();
-            let mut groups: Vec<(Vec<Value>, Vec<geoforge_core::Geometry>)> = Vec::new();
-            for (f, _, b) in buffered {
+            type Group = (
+                Vec<Value>,
+                Vec<geoforge_core::Geometry>,
+                Vec<geoforge_geometry::BufferCircle>,
+            );
+            let mut groups: Vec<Group> = Vec::new();
+            for (f, d, b) in buffered {
                 let key: Vec<Value> = keys.iter().map(|&i| f.attributes[i].clone()).collect();
-                match groups.iter_mut().find(|(k, _)| k == &key) {
-                    Some((_, members)) => members.push(b),
-                    None => groups.push((key, vec![b])),
+                let circles = f
+                    .geometry
+                    .as_ref()
+                    .map_or_else(Vec::new, |g| circles_of(g, d));
+                match groups.iter_mut().find(|(k, ..)| k == &key) {
+                    Some((_, members, all)) => {
+                        members.push(b);
+                        all.extend(circles);
+                    }
+                    None => groups.push((key, vec![b], circles)),
                 }
             }
             groups.sort_by(|a, b| {
@@ -242,11 +306,11 @@ pub fn buffer(
                     .find(|o| o.is_ne())
                     .unwrap_or(std::cmp::Ordering::Equal)
             });
-            for (key, members) in groups {
+            for (key, members, circles) in groups {
                 if let Some(g) = geoforge_geometry::dissolve(members.iter())? {
                     out.features.push(Feature {
                         oid: out.features.len() as i64,
-                        geometry: Some(g),
+                        geometry: Some(with_arcs(g, &circles)),
                         attributes: key,
                     });
                 }
@@ -257,12 +321,16 @@ pub fn buffer(
             out.fields.push(Field::new("BUFF_DIST", FieldType::Double));
             out.fields.push(Field::new("ORIG_FID", FieldType::Integer));
             for (f, d, b) in buffered {
+                let circles = f
+                    .geometry
+                    .as_ref()
+                    .map_or_else(Vec::new, |g| circles_of(g, d));
                 let mut attributes = f.attributes;
                 attributes.push(Value::Double(d));
                 attributes.push(Value::Integer(f.oid as i32));
                 out.features.push(Feature {
                     oid: f.oid,
-                    geometry: Some(b),
+                    geometry: Some(with_arcs(b, &circles)),
                     attributes,
                 });
             }

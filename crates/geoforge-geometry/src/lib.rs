@@ -13,7 +13,9 @@ pub mod proximity;
 pub mod validate;
 
 pub use bounding::{Bounding, BoundingKind, area, bounding, centroid, inside_point, length};
-pub use buffer::{BufferOptions, LineEnd, LineSide, buffer, buffer_union};
+pub use buffer::{
+    BufferCircle, BufferOptions, LineEnd, LineSide, buffer, buffer_union, recover_arcs,
+};
 pub use clip::{ClipArea, clip};
 pub use index::EnvelopeIndex;
 pub use linework::{LineNodes, Meeting, XY_TOLERANCE, meeting, on_path};
