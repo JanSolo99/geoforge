@@ -133,6 +133,11 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       neighbours' line (spikes included) — matches ArcGIS. Union itself still keeps such slivers
 - [x] Update (`gf update`, BORDERS): Erase's rows followed by the update polygons carrying the
       same-named fields — matches ArcGIS; NO_BORDERS not implemented
+- [x] Sort (`gf sort in out "ZONE DESCENDING;VALUE ASCENDING"`): field keys (numbers by value, text by
+      bytes, ties in input order) and `Shape` with UR/UL/LR/LL (the envelope corner's y then x),
+      `ORIG_FID` added — matches ArcGIS on 12 cases
+- [ ] Polygon To Line / Feature To Line: ArcGIS's row order is banded (holes first, then outer
+      rings, row of parcels by row) in a way not worked out; LEFT_FID/RIGHT_FID semantics known
 - [x] Select with SQL `where_clause` (comparisons, AND/OR/NOT, IN, LIKE, IS NULL, arithmetic,
       quoted names; BETWEEN rejected with ERROR 000358 as for shapefiles), Summary Statistics
       (sample STD/VARIANCE, unlike Dissolve's population ones; MEDIAN, UNIQUE) and Frequency

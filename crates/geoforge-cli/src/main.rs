@@ -206,6 +206,17 @@ enum Tool {
         /// A folder; outputs are `<value>.shp`.
         out_workspace: PathBuf,
     },
+    /// Reorder features by field values and/or location (ArcGIS "Sort").
+    Sort {
+        in_dataset: PathBuf,
+        out_dataset: PathBuf,
+        /// Keys as ArcGIS writes them, e.g. "ZONE DESCENDING;VALUE ASCENDING"; the
+        /// field `Shape` sorts spatially. A key alone means ascending.
+        sort_field: String,
+        /// UR (default), UL, LR or LL: where a `Shape` key starts.
+        #[arg(long, default_value = "UR")]
+        spatial_sort_method: String,
+    },
     /// Features matching an SQL expression (ArcGIS "Select").
     Select {
         in_features: PathBuf,
@@ -1049,6 +1060,33 @@ fn main() -> ExitCode {
             split_field,
             out_workspace,
         } => split_tool(&in_features, &split_features, &split_field, &out_workspace),
+        Tool::Sort {
+            in_dataset,
+            out_dataset,
+            sort_field,
+            spatial_sort_method,
+        } => (|| {
+            let keys = sort_field
+                .split(';')
+                .filter(|k| !k.trim().is_empty())
+                .map(|k| {
+                    let mut parts = k.split_whitespace();
+                    let name = parts.next().unwrap_or_default().to_owned();
+                    match parts.next().map(str::to_ascii_uppercase).as_deref() {
+                        None | Some("ASCENDING") => Ok((name, true)),
+                        Some("DESCENDING") => Ok((name, false)),
+                        Some(other) => Err(Error::Unsupported(format!("sort order {other}"))),
+                    }
+                })
+                .collect::<Result<Vec<_>>>()?;
+            let spatial =
+                geoforge_tools::SpatialSort::parse(&spatial_sort_method).ok_or_else(|| {
+                    Error::Unsupported(format!("spatial_sort_method {spatial_sort_method}"))
+                })?;
+            let (fc, _) = open_feature_class(&in_dataset)?;
+            let out = geoforge_tools::sort(fc.as_ref(), &keys, spatial)?;
+            write_output(out, &out_dataset, source_gdb(&in_dataset).as_deref())
+        })(),
         Tool::Select {
             in_features,
             out_feature_class,

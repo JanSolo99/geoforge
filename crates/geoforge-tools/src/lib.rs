@@ -3805,6 +3805,129 @@ pub fn feature_class_to_feature_class(
     Ok(out)
 }
 
+/// Sort's `spatial_sort_method`: the corner of the extent a `Shape` key starts from.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SpatialSort {
+    /// Upper right: top to bottom, right to left.
+    UpperRight,
+    UpperLeft,
+    LowerRight,
+    LowerLeft,
+}
+
+impl SpatialSort {
+    pub fn parse(s: &str) -> Option<Self> {
+        Some(match s.to_ascii_uppercase().as_str() {
+            "UR" => Self::UpperRight,
+            "UL" => Self::UpperLeft,
+            "LR" => Self::LowerRight,
+            "LL" => Self::LowerLeft,
+            _ => return None,
+        })
+    }
+}
+
+/// `arcpy.management.Sort(in, out, sort_field, spatial_sort_method)`: the features
+/// ordered by the keys in turn (`ascending` per key; the field `Shape` sorts by the
+/// envelope corner `spatial` names — its y, then its x — and is ignored if absent), ties
+/// in input order. Text compares by bytes. FIDs are renumbered, the old one kept in
+/// `ORIG_FID`.
+pub fn sort(
+    input: &dyn FeatureClass,
+    keys: &[(String, bool)],
+    spatial: SpatialSort,
+) -> Result<ToolOutput> {
+    use std::cmp::Ordering;
+    let kind = input
+        .geometry_kind()
+        .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
+    // Each key is a field position, or None for Shape.
+    let mut resolved: Vec<(Option<usize>, bool)> = Vec::new();
+    for (name, ascending) in keys {
+        if name.eq_ignore_ascii_case("shape") {
+            resolved.push((None, *ascending));
+        } else {
+            let i = input
+                .fields()
+                .iter()
+                .position(|f| f.name.eq_ignore_ascii_case(name))
+                .ok_or_else(|| {
+                    Error::Unsupported(format!(
+                        "ERROR 000728: Field {name} does not exist within table"
+                    ))
+                })?;
+            resolved.push((Some(i), *ascending));
+        }
+    }
+    let mut features: Vec<Feature> = input.features().collect::<Result<_>>()?;
+    let corner = |f: &Feature| -> (f64, f64) {
+        let e = f
+            .geometry
+            .as_ref()
+            .map_or(geoforge_core::Envelope::EMPTY, |g| g.envelope());
+        let x = match spatial {
+            SpatialSort::UpperRight | SpatialSort::LowerRight => e.xmax,
+            _ => e.xmin,
+        };
+        let y = match spatial {
+            SpatialSort::UpperRight | SpatialSort::UpperLeft => e.ymax,
+            _ => e.ymin,
+        };
+        // Order: upper corners first top to bottom, right corners first right to left.
+        let sy = if matches!(spatial, SpatialSort::UpperRight | SpatialSort::UpperLeft) {
+            -1.0
+        } else {
+            1.0
+        };
+        let sx = if matches!(spatial, SpatialSort::UpperRight | SpatialSort::LowerRight) {
+            -1.0
+        } else {
+            1.0
+        };
+        (sy * y, sx * x)
+    };
+    features.sort_by(|a, b| {
+        for &(key, ascending) in &resolved {
+            let ord = match key {
+                Some(i) => compare_values(&a.attributes[i], &b.attributes[i]),
+                None => {
+                    let (ca, cb) = (corner(a), corner(b));
+                    ca.0.total_cmp(&cb.0).then(ca.1.total_cmp(&cb.1))
+                }
+            };
+            let ord = if ascending { ord } else { ord.reverse() };
+            if ord != Ordering::Equal {
+                return ord;
+            }
+        }
+        Ordering::Equal
+    });
+    for (i, f) in features.iter_mut().enumerate() {
+        f.attributes.push(Value::Integer(f.oid as i32));
+        f.oid = i as i64;
+    }
+    Ok(ToolOutput {
+        kind,
+        has_z: input.has_z(),
+        has_m: input.has_m(),
+        fields: with_orig_fid(input),
+        spatial_reference_wkt: input.spatial_reference_wkt().map(str::to_owned),
+        features,
+        messages: Vec::new(),
+    })
+}
+
+/// Nulls first, numbers by value, text by bytes.
+fn compare_values(a: &Value, b: &Value) -> std::cmp::Ordering {
+    match (a, b) {
+        (Value::Null, Value::Null) => std::cmp::Ordering::Equal,
+        (Value::Null, _) => std::cmp::Ordering::Less,
+        (_, Value::Null) => std::cmp::Ordering::Greater,
+        (Value::String(x), Value::String(y)) => x.as_bytes().cmp(y.as_bytes()),
+        _ => compare(a, b),
+    }
+}
+
 /// `arcpy.analysis.Select(in, out, where_clause)`: the features the clause
 /// selects (all without one).
 pub fn select(input: &dyn FeatureClass, where_clause: Option<&str>) -> Result<ToolOutput> {

@@ -20069,6 +20069,643 @@
         ]
       ],
       "shapeType": "Polygon"
+    },
+    "sort_parcels_name": {
+      "tool": "management.Sort",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "NAME ASCENDING",
+        "UR"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sort_parcels_zone_value": {
+      "tool": "management.Sort",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "ZONE DESCENDING;VALUE ASCENDING",
+        "UR"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sort_parcels_value_desc": {
+      "tool": "management.Sort",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "VALUE DESCENDING",
+        "UR"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sort_wells_depth": {
+      "tool": "management.Sort",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "DEPTH ASCENDING",
+        "UR"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "sort_wells_ur": {
+      "tool": "management.Sort",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "Shape ASCENDING",
+        "UR"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "sort_wells_ul": {
+      "tool": "management.Sort",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "Shape ASCENDING",
+        "UL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "sort_wells_lr": {
+      "tool": "management.Sort",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "Shape ASCENDING",
+        "LR"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "sort_wells_ll": {
+      "tool": "management.Sort",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "Shape ASCENDING",
+        "LL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "sort_roads_ur": {
+      "tool": "management.Sort",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "Shape ASCENDING",
+        "UR"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "sort_roads_ll": {
+      "tool": "management.Sort",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "Shape ASCENDING",
+        "LL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "sort_parcels_zone_shape": {
+      "tool": "management.Sort",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "ZONE ASCENDING;Shape ASCENDING",
+        "UL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sort_clip_ul": {
+      "tool": "management.Sort",
+      "args": [
+        "testdata/geoproc/clip_areas.shp",
+        "<out>",
+        "Shape ASCENDING",
+        "UL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
     }
   }
 }
