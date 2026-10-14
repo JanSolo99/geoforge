@@ -168,8 +168,8 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
 - [x] Datum transforms with grid shifts: `NAD_1927_To_NAD_1983_NADCON` (alone and chained with
       `NAD_1983_To_WGS_1984_1`) match ArcGIS to ~1e-9° once PROJ has the grid; no grids are
       bundled, PROJ fetches them with `PROJ_NETWORK=ON` (the reference cases run only then)
-- [ ] Grid-shift methods beyond NADCON checked against ArcGIS (NTv2, HARN, Alaska); a clear
-      error naming the missing grid instead of "missing datum grid?"
+- [x] A missing datum grid is named in the error (and the `PROJ_NETWORK=ON` / `PROJ_DATA` remedy)
+- [ ] Grid-shift methods beyond NADCON checked against ArcGIS (NTv2, HARN, Alaska)
 
 ## Phase 5 — Raster
 - [ ] GeoTIFF/COG read/write (tiling, compression, overviews)

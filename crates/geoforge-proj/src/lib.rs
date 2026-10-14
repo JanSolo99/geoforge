@@ -523,6 +523,8 @@ impl Transform {
 struct Steps {
     ctx: *mut proj_sys::PJ_CONTEXT,
     legs: Vec<(*mut proj_sys::PJ, proj_sys::PJ_DIRECTION)>,
+    /// Datum grids the named steps use that PROJ did not find locally.
+    missing_grids: Vec<String>,
 }
 
 impl Drop for Steps {
@@ -551,6 +553,7 @@ impl Steps {
             let mut steps = Steps {
                 ctx,
                 legs: Vec::new(),
+                missing_grids: Vec::new(),
             };
             let mut temp: Vec<*mut PJ> = Vec::new();
             let result = (|| -> Result<()> {
@@ -657,6 +660,32 @@ impl Steps {
                             format!("{name} does not convert from the datum before it"),
                         ));
                     };
+                    for i in 0..proj_coordoperation_get_grid_used_count(ctx, op) {
+                        let (mut short, mut available) = (std::ptr::null(), 0);
+                        let np = std::ptr::null_mut();
+                        let ni = std::ptr::null_mut();
+                        if proj_coordoperation_get_grid_used(
+                            ctx,
+                            op,
+                            i,
+                            &mut short,
+                            np,
+                            np,
+                            np,
+                            ni,
+                            ni,
+                            &mut available,
+                        ) != 0
+                            && available == 0
+                            && !short.is_null()
+                        {
+                            steps.missing_grids.push(
+                                std::ffi::CStr::from_ptr(short)
+                                    .to_string_lossy()
+                                    .into_owned(),
+                            );
+                        }
+                    }
                     let n = proj_normalize_for_visualization(ctx, op);
                     if n.is_null() {
                         return Err(proj_error("transformation", format!("{name} is unusable")));
@@ -686,10 +715,16 @@ impl Steps {
                 c = unsafe { proj_trans(pj, direction, c) };
                 // SAFETY: reading the f64 view of the union.
                 if unsafe { c.v[0] }.is_infinite() {
-                    return Err(proj_error(
-                        "transforming coordinates",
-                        "the operation failed (missing datum grid?)",
-                    ));
+                    let why = if self.missing_grids.is_empty() {
+                        "the operation failed (point outside the transformation's area?)".into()
+                    } else {
+                        format!(
+                            "datum grid {} not found (PROJ downloads grids when PROJ_NETWORK=ON, \
+                             or put them in PROJ_DATA), or the point lies outside it",
+                            self.missing_grids.join(", ")
+                        )
+                    };
+                    return Err(proj_error("transforming coordinates", why));
                 }
             }
             // SAFETY: as above.
