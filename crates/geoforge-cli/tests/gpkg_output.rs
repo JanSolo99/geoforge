@@ -273,7 +273,7 @@ fn statistics_tables_into_geodatabase_like_arcgis() {
             String::from_utf8_lossy(&run.stderr)
         );
         let ours = Geodatabase::open(&gdb).unwrap().open_table(name).unwrap();
-        let theirs = Geodatabase::open(&root().join("testdata/gdb-reference/stat_tables.gdb"))
+        let theirs = Geodatabase::open(root().join("testdata/gdb-reference/stat_tables.gdb"))
             .unwrap()
             .open_table(name)
             .unwrap();
