@@ -29,6 +29,17 @@ enum Tool {
         in_features: PathBuf,
         out_feature_class: PathBuf,
     },
+    /// Copy the features a where clause selects, with an optional field mapping
+    /// (ArcGIS "Feature Class To Feature Class").
+    FeatureClassToFeatureClass {
+        in_features: PathBuf,
+        out_feature_class: PathBuf,
+        #[arg(long)]
+        where_clause: Option<String>,
+        /// A field mapping string as ArcGIS's `field_mapping` parameter.
+        #[arg(long)]
+        field_mapping: Option<String>,
+    },
     /// Extract the parts of input features inside clip polygons (ArcGIS "Clip").
     Clip {
         in_features: PathBuf,
@@ -750,6 +761,25 @@ fn main() -> ExitCode {
             in_features,
             out_feature_class,
         } => copy_features(&in_features, &out_feature_class),
+        Tool::FeatureClassToFeatureClass {
+            in_features,
+            out_feature_class,
+            where_clause,
+            field_mapping,
+        } => (|| {
+            let (fc, _) = open_feature_class(&in_features)?;
+            let field_map = field_mapping
+                .as_deref()
+                .map(geoforge_tools::parse_field_mapping)
+                .transpose()?;
+            let out = geoforge_tools::feature_class_to_feature_class(
+                fc.as_ref(),
+                &catalog_path(&in_features),
+                where_clause.as_deref(),
+                field_map.as_deref(),
+            )?;
+            write_output(out, &out_feature_class, source_gdb(&in_features).as_deref())
+        })(),
         Tool::Clip {
             in_features,
             clip_features,

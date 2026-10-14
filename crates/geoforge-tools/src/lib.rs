@@ -3625,6 +3625,53 @@ pub struct TableOutput {
     pub rows: Vec<Vec<Value>>,
 }
 
+/// `arcpy.conversion.FeatureClassToFeatureClass(in, out_path, out_name, where_clause,
+/// field_mapping)`: the features the clause selects, with the output fields the mapping
+/// describes (its sources are the input's fields; `source` is the input's path, which
+/// tells them from other tables) or all fields as they are.
+pub fn feature_class_to_feature_class(
+    input: &dyn FeatureClass,
+    source: &str,
+    where_clause: Option<&str>,
+    field_map: Option<&[FieldMapEntry]>,
+) -> Result<ToolOutput> {
+    let mut out = select(input, where_clause)?;
+    let Some(map) = field_map else {
+        return Ok(out);
+    };
+    let stem = table_stem(source);
+    // Per output field: the input position and text span of its first source.
+    let positions: Vec<Option<(usize, i64, i64)>> = map
+        .iter()
+        .map(|e| {
+            e.sources
+                .iter()
+                .filter(|src| table_stem(&src.table) == stem)
+                .find_map(|src| {
+                    input
+                        .fields()
+                        .iter()
+                        .position(|g| g.name.eq_ignore_ascii_case(&src.field))
+                        .map(|p| (p, src.start, src.end))
+                })
+        })
+        .collect();
+    for f in &mut out.features {
+        f.attributes = positions
+            .iter()
+            .zip(map)
+            .map(|(p, e)| match p {
+                None => Value::Null,
+                Some((p, a, b)) => {
+                    fieldmap::coerce(&fieldmap::substring(&f.attributes[*p], *a, *b), &e.field)
+                }
+            })
+            .collect();
+    }
+    out.fields = map.iter().map(|e| e.field.clone()).collect();
+    Ok(out)
+}
+
 /// `arcpy.analysis.Select(in, out, where_clause)`: the features the clause
 /// selects (all without one).
 pub fn select(input: &dyn FeatureClass, where_clause: Option<&str>) -> Result<ToolOutput> {

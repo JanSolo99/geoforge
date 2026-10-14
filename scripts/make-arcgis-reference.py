@@ -147,6 +147,11 @@ CASES = {
     "append_fm_text": ("management.Append", [CLIP, PARCELS], ["NO_TEST", fm(("PARCEL_ID", "Long", 10, "First", "#", [(PARCELS, "PARCEL_ID", -1, -1), (CLIP, "AREA_ID", -1, -1)]),
         ("NAME", "Text", 20, "First", "#", [(CLIP, "AREA_ID", -1, -1)]), ("VALUE", "Double", 19, "First", "#", [(PARCELS, "VALUE", -1, -1)]),
         ("ZONE", "Long", 5, "First", "#", [(PARCELS, "ZONE", -1, -1)]), linux=True)]),
+    "fc2fc_where": ("conversion.FeatureClassToFeatureClass", [PARCELS], ["ZONE = 2"]),
+    "fc2fc_map": ("conversion.FeatureClassToFeatureClass", [PARCELS], ["VALUE > 5000", fm(("PID", "Long", 10, "First", "#", [(PARCELS, "PARCEL_ID", -1, -1)]),
+        ("LBL", "Text", 4, "First", "#", [(PARCELS, "NAME", 0, 3)]), ("V", "Long", 10, "First", "#", [(PARCELS, "VALUE", -1, -1)]), linux=True)]),
+    "fc2fc_order": ("conversion.FeatureClassToFeatureClass", [PARCELS], ["", fm(("ZONE", "Short", 5, "First", "#", [(PARCELS, "ZONE", -1, -1)]),
+        ("NAME", "Text", 20, "First", "#", [(PARCELS, "NAME", -1, -1)]), linux=True)]),
     "append_parcels_to_clip": ("management.Append", [DATA / "parcels.shp", DATA / "clip_areas.shp"], ["NO_TEST"]),
     "append_parcels_to_parcels": ("management.Append", [DATA / "parcels.shp", DATA / "parcels.shp"], ["TEST"]),
     "near_wells_roads_clip": ("analysis.Near", [DATA / "wells.shp", f"{DATA / 'roads.shp'};{DATA / 'clip_areas.shp'}"], ["", "LOCATION", "ANGLE"]),
@@ -578,6 +583,9 @@ def main():
             w.call("run_tool", tool="management.CopyFeatures", args=[str(before[k]), str(out)],
                    env={"overwriteOutput": True})
             args = [str(out) if i == k else str(a) for i, a in enumerate(before)] + after
+        elif tool == "conversion.FeatureClassToFeatureClass":
+            # (in_features, out_path, out_name, where_clause, field_mapping)
+            args = [str(before[0]), str(out.parent), out.stem] + after
         else:
             args = [str(a) for a in before] + [str(out)] + [str(a) if isinstance(a, Path) else a for a in after]
         r = w.call("run_tool", tool=tool, args=args, env={"overwriteOutput": True})

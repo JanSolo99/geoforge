@@ -78,7 +78,9 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       output type — matches ArcGIS
 - [x] Append with a field mapping (`--field-mapping`, NO_TEST): target fields take the first source
       belonging to the appended input, converted to the target's type — matches ArcGIS
-- [ ] Field mappings for Feature Class To Feature Class; Date outputs
+- [x] Feature Class To Feature Class (`gf feature-class-to-feature-class`, where clause and field
+      mapping) — matches ArcGIS
+- [ ] Date outputs in field mappings; Merge/Append mappings with merge rules over several rows
 - [ ] Split into a geodatabase (needs adding to an existing one); selection types other than
       NEW_SELECTION
 - [x] Line cracking: Intersect, Identity and Split split line results wherever two
