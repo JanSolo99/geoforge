@@ -1299,13 +1299,43 @@ fn main() -> ExitCode {
             in_table,
             out_table,
         } => (|| {
+            let (fc, _) = open_feature_class(&in_table)?;
+            if let Some((gpkg, item)) = geopackage_item(&out_table) {
+                let name = item.ok_or_else(|| {
+                    Error::Unsupported("name the output table inside the .gpkg".into())
+                })?;
+                let name = name.strip_prefix("main.").unwrap_or(&name).to_string();
+                let features = fc
+                    .features()
+                    .map(|f| {
+                        f.map(|mut f| {
+                            f.geometry = None;
+                            f
+                        })
+                    })
+                    .collect::<Result<Vec<_>>>()?;
+                geoforge_gpkg::write::write_table(
+                    &gpkg,
+                    &geoforge_gpkg::write::NewTable {
+                        name: &name,
+                        geometry: None,
+                        fields: fc.fields(),
+                        spatial_ref: None,
+                        xy_domain: None,
+                        features: &features,
+                    },
+                )?;
+                println!("Wrote {} rows to {}", features.len(), out_table.display());
+                return Ok(());
+            }
             if out_table
                 .extension()
                 .is_none_or(|e| !e.eq_ignore_ascii_case("csv"))
             {
-                return Err(Error::Unsupported("Export Table writes .csv here".into()));
+                return Err(Error::Unsupported(
+                    "Export Table writes .csv or a GeoPackage table here".into(),
+                ));
             }
-            let (fc, _) = open_feature_class(&in_table)?;
             let rows = fc
                 .features()
                 .map(|f| f.map(|f| f.attributes))

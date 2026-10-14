@@ -79,3 +79,58 @@ fn copy_features_into_geopackage_like_arcgis() {
     }
     std::fs::remove_dir_all(&dir).ok();
 }
+
+/// Export Table into a GeoPackage: attribute tables (no geometry column, no R*Tree)
+/// equal, row for row, testdata/gpkg/arcgis_tables.gpkg made by ArcGIS's Export Table.
+#[test]
+fn export_table_into_geopackage_like_arcgis() {
+    let dir = std::env::temp_dir().join(format!("geoforge-gpkg-tab-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let out = dir.join("out.gpkg");
+    for layer in ["parcels", "roads", "wells"] {
+        let run = Command::new(env!("CARGO_BIN_EXE_gf"))
+            .arg("export-table")
+            .arg(root().join(format!("testdata/geoproc/{layer}.shp")))
+            .arg(out.join(format!("{layer}_tab")))
+            .output()
+            .unwrap();
+        assert!(
+            run.status.success(),
+            "{}",
+            String::from_utf8_lossy(&run.stderr)
+        );
+    }
+    let ours = Database::open(&out).unwrap();
+    let arcgis = Database::open(&root().join("testdata/gpkg/arcgis_tables.gpkg")).unwrap();
+    let schema = |db: &Database| -> Vec<(String, String, String, Option<String>)> {
+        db.objects()
+            .iter()
+            .map(|o| {
+                (
+                    o.kind.clone(),
+                    o.name.clone(),
+                    o.table.clone(),
+                    o.sql.clone(),
+                )
+            })
+            .collect()
+    };
+    assert_eq!(schema(&ours), schema(&arcgis), "schema");
+    for t in arcgis.tables() {
+        if t.root_page == 0 {
+            continue;
+        }
+        let mut a = arcgis.select(t).unwrap();
+        let mut b = ours.select(ours.table(&t.name).unwrap()).unwrap();
+        if t.name == "gpkg_contents" {
+            for row in a.iter_mut().chain(b.iter_mut()) {
+                row.1[4] = SqlValue::Null; // last_change
+            }
+        }
+        assert_eq!(a.len(), b.len(), "{}", t.name);
+        for (x, y) in a.iter().zip(&b) {
+            assert!(x == y, "{} rowid {}: {:?} vs {:?}", t.name, x.0, x.1, y.1);
+        }
+    }
+    std::fs::remove_dir_all(&dir).ok();
+}

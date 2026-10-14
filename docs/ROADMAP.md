@@ -325,7 +325,9 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         files. Adding a table rewrites the file. 1 million points in 0.5 s (GDAL: 1.3 s)
   - [x] ArcGIS XY domains: geographic, Mercator variants, Plate Carrée exact, Transverse
         Mercator's y origin exact (x approximate)
-  - [ ] GeoPackage: attribute tables, WAL files, curve geometries, Project's extra `fid_` field,
+  - [x] Export Table into a GeoPackage (`gf export-table in out.gpkg/name`): attribute tables
+        equal row for row to ArcGIS's (`testdata/gpkg/arcgis_tables.gpkg`)
+  - [ ] GeoPackage: WAL files, curve geometries, Project's extra `fid_` field,
         coordinate system descriptions from ArcGIS's database; Transverse Mercator x origin and
         other projections' XY domains (also for file geodatabase output); 64-bit ObjectIDs in
         file geodatabases
