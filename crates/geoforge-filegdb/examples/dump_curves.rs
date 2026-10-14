@@ -1,5 +1,4 @@
 //! Prints the vertices and arcs of feature N (default the first) of a geodatabase feature class.
-use geoforge_core::FeatureClass;
 use geoforge_filegdb::Geodatabase;
 
 fn main() {

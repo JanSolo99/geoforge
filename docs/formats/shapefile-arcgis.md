@@ -87,5 +87,9 @@ and on 10k-polygon / 20k-point sets.
   248, ...). Below the root, a node whose subtree holds at most 8 features keeps
   all of them (its own first, then its descendants' in node order). ArcGIS still
   keeps about 0.15% of uniformly spread points a level higher than this rule.
+  Example (298 points, `f2p_label_polys_inside`): node 2 ends up holding 4 features,
+  node 5's own one first, then the three from node 4's subtree, while node 5's deeper 31
+  stay in place. Neither "subtree of at most 8" nor merging a node with its children's own
+  features (in either child order) reproduces it, and the latter breaks `r2pt_dem_nodata`.
 - `.sbx`: the same header (own length), then big-endian (offset, length) in words
   of each `.sbn` record.
