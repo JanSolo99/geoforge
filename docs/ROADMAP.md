@@ -73,7 +73,10 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       values converted as ArcGIS does (doubles round to integers, text that is not a number
       reads as 0, numbers become text, text cut to the length) — matches ArcGIS; visible/alias
       are ignored for shapefile output as in ArcGIS
-- [ ] Field mappings for Merge, Append and Feature Class To Feature Class; Date outputs
+- [x] Merge with a field mapping (`gf merge ... --field-mapping`): output fields as mapped, each
+      input contributing its own source field (found by table name), values converted to the
+      output type — matches ArcGIS
+- [ ] Field mappings for Append and Feature Class To Feature Class; Date outputs
 - [ ] Split into a geodatabase (needs adding to an existing one); selection types other than
       NEW_SELECTION
 - [x] Line cracking: Intersect, Identity and Split split line results wherever two

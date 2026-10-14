@@ -19442,6 +19442,132 @@
         ]
       ],
       "shapeType": "Polygon"
+    },
+    "merge_fm_id": {
+      "tool": "management.Merge",
+      "args": [
+        "testdata/geoproc/parcels.shp;testdata/geoproc/clip_areas.shp",
+        "<out>",
+        "ID \"ID\" true true false 10 Long 0 10,First,#,testdata/geoproc/clip_areas.shp,AREA_ID,-1,-1,testdata/geoproc/parcels.shp,PARCEL_ID,-1,-1",
+        "NO_SOURCE_INFO"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "merge_fm_types": {
+      "tool": "management.Merge",
+      "args": [
+        "testdata/geoproc/clip_areas.shp;testdata/geoproc/parcels.shp",
+        "<out>",
+        "ID \"ID\" true true false 19 Double 0 0,First,#,testdata/geoproc/clip_areas.shp,AREA_ID,-1,-1,testdata/geoproc/parcels.shp,PARCEL_ID,-1,-1;LBL \"LBL\" true true false 4 Text 0 0,First,#,testdata/geoproc/parcels.shp,NAME,0,3;V \"V\" true true false 10 Long 0 10,First,#,testdata/geoproc/parcels.shp,VALUE,-1,-1;Z \"Z\" true true false 5 Short 0 5,First,#,testdata/geoproc/parcels.shp,ZONE,-1,-1",
+        "NO_SOURCE_INFO"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LBL",
+          "String",
+          4,
+          0,
+          0
+        ],
+        [
+          "V",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Z",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "merge_fm_same_name": {
+      "tool": "management.Merge",
+      "args": [
+        "testdata/geoproc/clip_areas.shp;testdata/geoproc/parcels.shp",
+        "<out>",
+        "NAME \"NAME\" true true false 30 Text 0 0,First,#,testdata/geoproc/parcels.shp,NAME,-1,-1,testdata/geoproc/clip_areas.shp,AREA_ID,-1,-1",
+        "NO_SOURCE_INFO"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          30,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
     }
   }
 }

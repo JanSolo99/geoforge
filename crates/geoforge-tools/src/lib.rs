@@ -1930,6 +1930,18 @@ pub struct PathInput<'a> {
 /// order), features of each input in turn, null where an input lacks a field.
 /// `add_source` appends `MERGE_SRC` (text, 254) holding each feature's input path.
 pub fn merge(inputs: &[PathInput], add_source: bool) -> Result<ToolOutput> {
+    merge_with(inputs, add_source, None)
+}
+
+/// [`merge`] with a field mapping: the output fields are the mapping's, and each
+/// input's rows take their values from the mapped source fields of that input
+/// (found by table name; an input none of whose fields is mapped leaves the field
+/// null), converted to the output field's type.
+pub fn merge_with(
+    inputs: &[PathInput],
+    add_source: bool,
+    field_map: Option<&[FieldMapEntry]>,
+) -> Result<ToolOutput> {
     let first = inputs
         .first()
         .ok_or_else(|| Error::Unsupported("Merge needs at least one input".into()))?;
@@ -1940,29 +1952,61 @@ pub fn merge(inputs: &[PathInput], add_source: bool) -> Result<ToolOutput> {
         ));
     }
     let mut fields: Vec<Field> = Vec::new();
-    for i in inputs {
-        for f in i.features.fields() {
-            if !fields.iter().any(|g| g.name.eq_ignore_ascii_case(&f.name)) {
-                fields.push(f.clone());
+    if let Some(map) = field_map {
+        fields.extend(map.iter().map(|e| e.field.clone()));
+    } else {
+        for i in inputs {
+            for f in i.features.fields() {
+                if !fields.iter().any(|g| g.name.eq_ignore_ascii_case(&f.name)) {
+                    fields.push(f.clone());
+                }
             }
         }
     }
     let mut features = Vec::new();
     for i in inputs {
-        let positions: Vec<Option<usize>> = fields
-            .iter()
-            .map(|f| {
-                i.features
-                    .fields()
-                    .iter()
-                    .position(|g| g.name.eq_ignore_ascii_case(&f.name))
-            })
-            .collect();
+        // Per output field: the source position in this input, with the text span.
+        let positions: Vec<Option<(usize, i64, i64)>> = match field_map {
+            None => fields
+                .iter()
+                .map(|f| {
+                    i.features
+                        .fields()
+                        .iter()
+                        .position(|g| g.name.eq_ignore_ascii_case(&f.name))
+                        .map(|p| (p, -1, -1))
+                })
+                .collect(),
+            Some(map) => {
+                let stem = table_stem(&i.source);
+                map.iter()
+                    .map(|e| {
+                        e.sources
+                            .iter()
+                            .filter(|src| table_stem(&src.table) == stem)
+                            .find_map(|src| {
+                                i.features
+                                    .fields()
+                                    .iter()
+                                    .position(|g| g.name.eq_ignore_ascii_case(&src.field))
+                                    .map(|p| (p, src.start, src.end))
+                            })
+                    })
+                    .collect()
+            }
+        };
         for f in i.features.features() {
             let f = f?;
             let mut attributes: Vec<Value> = positions
                 .iter()
-                .map(|p| p.map_or(Value::Null, |p| f.attributes[p].clone()))
+                .zip(&fields)
+                .map(|(p, field)| match (p, field_map) {
+                    (None, _) => Value::Null,
+                    (Some((p, ..)), None) => f.attributes[*p].clone(),
+                    (Some((p, a, b)), Some(_)) => {
+                        fieldmap::coerce(&fieldmap::substring(&f.attributes[*p], *a, *b), field)
+                    }
+                })
                 .collect();
             if add_source {
                 attributes.push(Value::String(i.source.clone()));

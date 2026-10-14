@@ -53,13 +53,14 @@ def field_mapping(target, join, rules):
 
 
 
-def fm(*entries):
+def fm(*entries, linux=False):
     """A Spatial Join field mapping string from (name, type, length, rule, delimiter,
     [(table, field, start, end), ...]) entries (tables are given as paths)."""
     out = []
     for name, ftype, length, rule, delim, sources in entries:
         prec = 0 if ftype in ("Text", "Double", "Float") else length
-        src = ",".join(f"{win(t)},{f},{a},{b}" for t, f, a, b in sources)
+        where = str if linux else win
+        src = ",".join(f"{where(t)},{f},{a},{b}" for t, f, a, b in sources)
         out.append(f'{name} "{name}" true true false {length} {ftype} 0 {prec},{rule},{delim},{src}')
     return ";".join(out)
 
@@ -67,6 +68,9 @@ TARGET_FIELDS = {
     "clip_areas": [("AREA_ID", "Long", 10)],
     "parcels": [("PARCEL_ID", "Long", 10), ("NAME", "Text", 20), ("VALUE", "Double", 19), ("ZONE", "Long", 5)],
 }
+
+CLIP = DATA / "clip_areas.shp"
+PARCELS = DATA / "parcels.shp"
 
 CASES = {
     # name: (tool, args before the output, args after the output)
@@ -153,6 +157,11 @@ CASES = {
     "intersect_parcels_clip_point": ("analysis.Intersect", [f"{DATA / 'parcels.shp'};{DATA / 'clip_areas.shp'}"], ["ALL", "", "POINT"]),
     "intersect_parcels_clip_fid_only": ("analysis.Intersect", [f"{DATA / 'parcels.shp'};{DATA / 'clip_areas.shp'}"], ["ONLY_FID"]),
     "intersect_parcels_clip_no_fid": ("analysis.Intersect", [f"{DATA / 'parcels.shp'};{DATA / 'clip_areas.shp'}"], ["NO_FID"]),
+    "merge_fm_id": ("management.Merge", [f"{PARCELS};{CLIP}"], [fm(("ID", "Long", 10, "First", "#", [(DATA / "clip_areas.shp", "AREA_ID", -1, -1), (DATA / "parcels.shp", "PARCEL_ID", -1, -1)]), linux=True), "NO_SOURCE_INFO"]),
+    "merge_fm_types": ("management.Merge", [f"{CLIP};{PARCELS}"], [fm(("ID", "Double", 19, "First", "#", [(DATA / "clip_areas.shp", "AREA_ID", -1, -1), (DATA / "parcels.shp", "PARCEL_ID", -1, -1)]),
+        ("LBL", "Text", 4, "First", "#", [(DATA / "parcels.shp", "NAME", 0, 3)]), ("V", "Long", 10, "First", "#", [(DATA / "parcels.shp", "VALUE", -1, -1)]),
+        ("Z", "Short", 5, "First", "#", [(DATA / "parcels.shp", "ZONE", -1, -1)]), linux=True), "NO_SOURCE_INFO"]),
+    "merge_fm_same_name": ("management.Merge", [f"{CLIP};{PARCELS}"], [fm(("NAME", "Text", 30, "First", "#", [(DATA / "parcels.shp", "NAME", -1, -1), (DATA / "clip_areas.shp", "AREA_ID", -1, -1)]), linux=True), "NO_SOURCE_INFO"]),
     "merge_parcels_clip_source": ("management.Merge", [f"{DATA / 'parcels.shp'};{DATA / 'clip_areas.shp'}"], ["", "ADD_SOURCE_INFO"]),
     "check_bad_esri": ("management.CheckGeometry", [f"{DATA / 'bad_polygons.shp'};{DATA / 'bad_lines.shp'}"], ["ESRI"]),
     "check_bad_ogc": ("management.CheckGeometry", [f"{DATA / 'bad_polygons.shp'};{DATA / 'bad_lines.shp'}"], ["OGC"]),

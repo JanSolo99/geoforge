@@ -87,6 +87,9 @@ enum Tool {
         /// NO_SOURCE_INFO (default) or ADD_SOURCE_INFO (adds MERGE_SRC).
         #[arg(long, default_value = "NO_SOURCE_INFO")]
         add_source: String,
+        /// A field mapping string as ArcGIS's `field_mappings` parameter.
+        #[arg(long)]
+        field_mapping: Option<String>,
     },
     /// Add the distance to the closest near feature (ArcGIS "Near", planar).
     /// Updates the input shapefile in place, as ArcGIS does, unless an output is
@@ -822,9 +825,10 @@ fn main() -> ExitCode {
         Tool::Merge {
             mut paths,
             add_source,
+            field_mapping,
         } => {
             let out = paths.pop().unwrap();
-            merge_tool(&paths, &out, &add_source)
+            merge_tool(&paths, &out, &add_source, field_mapping.as_deref())
         }
         Tool::Near {
             in_features,
@@ -3052,7 +3056,12 @@ fn split_tool(
     Ok(())
 }
 
-fn merge_tool(inputs: &[PathBuf], output: &Path, add_source: &str) -> Result<()> {
+fn merge_tool(
+    inputs: &[PathBuf],
+    output: &Path,
+    add_source: &str,
+    field_mapping: Option<&str>,
+) -> Result<()> {
     let add = match add_source.to_ascii_uppercase().as_str() {
         "NO_SOURCE_INFO" => false,
         "ADD_SOURCE_INFO" => true,
@@ -3070,7 +3079,10 @@ fn merge_tool(inputs: &[PathBuf], output: &Path, add_source: &str) -> Result<()>
             features: f.as_ref(),
         })
         .collect();
-    let out = geoforge_tools::merge(&merge_inputs, add)?;
+    let field_map = field_mapping
+        .map(geoforge_tools::parse_field_mapping)
+        .transpose()?;
+    let out = geoforge_tools::merge_with(&merge_inputs, add, field_map.as_deref())?;
     write_output(out, output, source_gdb(&inputs[0]).as_deref())
 }
 
