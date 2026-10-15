@@ -211,92 +211,21 @@ impl TableWriter {
     /// non-geometry fields in order.
     pub fn push(&mut self, geometry: Option<&Geometry>, values: &[Value]) -> Result<u64> {
         let oid = self.offsets.len() as u64 + 1;
-        let row = &mut self.row;
-        row.clear();
-        let null_bytes = self.nullable_count.div_ceil(8);
-        // Spare bits are set, like ArcGIS.
-        row.resize(null_bytes, 0xFF);
-        let mut nullable_i = 0;
-        let mut vi = 0;
-        let mut envelope = None;
-        for f in &self.fields {
-            if f.field_type == GdbFieldType::ObjectId {
-                continue;
-            }
-            let value_present = if f.field_type == GdbFieldType::Geometry {
-                match geometry {
-                    Some(g) => {
-                        let def = f
-                            .geometry
-                            .as_ref()
-                            .ok_or_else(|| err("geometry field without definition"))?;
-                        // FileGDB polygons need clockwise shells, counter-clockwise holes.
-                        let oriented;
-                        let g = if g.kind == GeometryKind::Polygon && g.curves.is_empty() {
-                            let mut o = g.clone();
-                            o.orient_rings_esri();
-                            oriented = o;
-                            &oriented
-                        } else {
-                            g
-                        };
-                        let mut blob = Vec::new();
-                        encode(
-                            g,
-                            def,
-                            self.geometry_kind,
-                            self.has_z,
-                            self.has_m,
-                            &mut blob,
-                        )
-                        .map_err(|e| err(format!("OBJECTID {oid}: {e}")))?;
-                        put_varuint(row, blob.len() as u64);
-                        row.extend_from_slice(&blob);
-                        // Index the coordinates as stored (snapped to the resolution).
-                        let mut e = g.curve_envelope();
-                        let snap =
-                            |v: f64, o: f64| ((v - o) * def.xy_scale).round() / def.xy_scale + o;
-                        e.xmin = snap(e.xmin, def.x_origin);
-                        e.xmax = snap(e.xmax, def.x_origin);
-                        e.ymin = snap(e.ymin, def.y_origin);
-                        e.ymax = snap(e.ymax, def.y_origin);
-                        if !e.is_empty() {
-                            envelope = Some(e);
-                        }
-                        true
-                    }
-                    None => false,
-                }
-            } else {
-                let v = values.get(vi).unwrap_or(&Value::Null);
-                vi += 1;
-                if v.is_null() {
-                    false
-                } else {
-                    write_value(row, f, v)
-                        .map_err(|e| err(format!("OBJECTID {oid}, field {}: {e}", f.name)))?;
-                    if let (GdbFieldType::DateTime, Value::Date(t)) = (f.field_type, v)
-                        && t.and_utc().timestamp_subsec_millis() != 0
-                        && !self.subsecond.contains(&f.name)
-                    {
-                        self.subsecond.push(f.name.clone());
-                    }
-                    true
-                }
-            };
-            if f.nullable {
-                if value_present {
-                    row[nullable_i / 8] &= !(1 << (nullable_i % 8));
-                }
-                nullable_i += 1;
-            } else if !value_present {
-                return Err(err(format!(
-                    "OBJECTID {oid}: field {} is not nullable",
-                    f.name
-                )));
-            }
-        }
-
+        let envelope = encode_row(
+            &RowLayout {
+                fields: &self.fields,
+                geometry_kind: self.geometry_kind,
+                has_z: self.has_z,
+                has_m: self.has_m,
+                nullable_count: self.nullable_count,
+            },
+            &mut self.subsecond,
+            oid,
+            geometry,
+            values,
+            &mut self.row,
+        )?;
+        let row = &self.row;
         let io = |e| Error::io(&self.path, e);
         self.out
             .write_all(&(row.len() as u32).to_le_bytes())
@@ -398,6 +327,112 @@ impl TableWriter {
             indexes,
         })
     }
+}
+
+/// The parts of a table's definition that decide how a row is encoded.
+pub(crate) struct RowLayout<'a> {
+    pub fields: &'a [GdbField],
+    pub geometry_kind: Option<GeometryKind>,
+    pub has_z: bool,
+    pub has_m: bool,
+    pub nullable_count: usize,
+}
+
+/// Encodes one row (without its leading size) into `row`; returns the geometry's
+/// envelope as stored (snapped to the resolution). `values` follow the non-OID,
+/// non-geometry fields in order.
+pub(crate) fn encode_row(
+    layout: &RowLayout,
+    subsecond: &mut Vec<String>,
+    oid: u64,
+    geometry: Option<&Geometry>,
+    values: &[Value],
+    row: &mut Vec<u8>,
+) -> Result<Option<Envelope>> {
+    row.clear();
+    let null_bytes = layout.nullable_count.div_ceil(8);
+    // Spare bits are set, like ArcGIS.
+    row.resize(null_bytes, 0xFF);
+    let mut nullable_i = 0;
+    let mut vi = 0;
+    let mut envelope = None;
+    for f in layout.fields {
+        if f.field_type == GdbFieldType::ObjectId {
+            continue;
+        }
+        let value_present = if f.field_type == GdbFieldType::Geometry {
+            match geometry {
+                Some(g) => {
+                    let def = f
+                        .geometry
+                        .as_ref()
+                        .ok_or_else(|| err("geometry field without definition"))?;
+                    // FileGDB polygons need clockwise shells, counter-clockwise holes.
+                    let oriented;
+                    let g = if g.kind == GeometryKind::Polygon && g.curves.is_empty() {
+                        let mut o = g.clone();
+                        o.orient_rings_esri();
+                        oriented = o;
+                        &oriented
+                    } else {
+                        g
+                    };
+                    let mut blob = Vec::new();
+                    encode(
+                        g,
+                        def,
+                        layout.geometry_kind,
+                        layout.has_z,
+                        layout.has_m,
+                        &mut blob,
+                    )
+                    .map_err(|e| err(format!("OBJECTID {oid}: {e}")))?;
+                    put_varuint(row, blob.len() as u64);
+                    row.extend_from_slice(&blob);
+                    // Index the coordinates as stored (snapped to the resolution).
+                    let mut e = g.curve_envelope();
+                    let snap = |v: f64, o: f64| ((v - o) * def.xy_scale).round() / def.xy_scale + o;
+                    e.xmin = snap(e.xmin, def.x_origin);
+                    e.xmax = snap(e.xmax, def.x_origin);
+                    e.ymin = snap(e.ymin, def.y_origin);
+                    e.ymax = snap(e.ymax, def.y_origin);
+                    if !e.is_empty() {
+                        envelope = Some(e);
+                    }
+                    true
+                }
+                None => false,
+            }
+        } else {
+            let v = values.get(vi).unwrap_or(&Value::Null);
+            vi += 1;
+            if v.is_null() {
+                false
+            } else {
+                write_value(row, f, v)
+                    .map_err(|e| err(format!("OBJECTID {oid}, field {}: {e}", f.name)))?;
+                if let (GdbFieldType::DateTime, Value::Date(t)) = (f.field_type, v)
+                    && t.and_utc().timestamp_subsec_millis() != 0
+                    && !subsecond.contains(&f.name)
+                {
+                    subsecond.push(f.name.clone());
+                }
+                true
+            }
+        };
+        if f.nullable {
+            if value_present {
+                row[nullable_i / 8] &= !(1 << (nullable_i % 8));
+            }
+            nullable_i += 1;
+        } else if !value_present {
+            return Err(err(format!(
+                "OBJECTID {oid}: field {} is not nullable",
+                f.name
+            )));
+        }
+    }
+    Ok(envelope)
 }
 
 fn write_tablx(path: &Path, offsets: &[u64], file_size: u64) -> Result<()> {

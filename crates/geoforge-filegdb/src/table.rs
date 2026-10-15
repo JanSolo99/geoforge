@@ -108,6 +108,10 @@ pub struct GeometryDef {
     pub z_tolerance: f64,
     pub extent: Envelope,
     pub grid_sizes: Vec<f64>,
+    /// File offsets of the stored extent (four f64) and of the first grid size, for a
+    /// definition read from a table (`None` when built in memory).
+    pub extent_at: Option<u64>,
+    pub grid_at: Option<u64>,
 }
 
 #[derive(Debug, Clone)]
@@ -147,6 +151,8 @@ pub struct Table {
     pub(crate) utf8: bool,
     /// Uses ArcGIS Pro 3.2 extensions (64-bit OBJECTIDs or new field types).
     pro_3_2: bool,
+    version: i32,
+    field_section_len: u32,
     valid_rows: u64,
     geometry_type: u8,
     has_z: bool,
@@ -211,6 +217,11 @@ impl Table {
         for _ in 0..n {
             fields.push(read_field(&mut r, has_z, has_m)?);
         }
+        // Section-relative offsets become file offsets.
+        for g in fields.iter_mut().filter_map(|f| f.geometry.as_mut()) {
+            g.extent_at = g.extent_at.map(|o| o + field_offset + 4);
+            g.grid_at = g.grid_at.map(|o| o + field_offset + 4);
+        }
         let oid_index = fields
             .iter()
             .position(|f| f.field_type == GdbFieldType::ObjectId);
@@ -235,6 +246,8 @@ impl Table {
             file,
             path,
             utf8,
+            version,
+            field_section_len: size as u32,
             pro_3_2: version == 4
                 || field_version >= 6
                 || fields.iter().any(|f| {
@@ -517,6 +530,21 @@ impl Table {
         let mut blob = vec![0u8; len];
         self.file.read_exact_at(&mut blob, offset + 4).map_err(io)?;
         self.decode_row(oid, &blob).map(Some)
+    }
+
+    /// The file offset of row `oid` in the `.gdbtable`, or `None` if it is deleted.
+    pub(crate) fn raw_offset(&self, oid: u64) -> Result<Option<u64>> {
+        self.tablx.offset(&self.path, oid)
+    }
+
+    /// Whether this is a 64-bit OBJECTID table (ArcGIS Pro 3.2 format, version 4).
+    pub(crate) fn is_version_4(&self) -> bool {
+        self.version == 4
+    }
+
+    /// The field section's size in bytes (for the header's "maximum row size").
+    pub(crate) fn field_section_size(&self) -> u32 {
+        self.field_section_len
     }
 
     /// All rows in OBJECTID order.
@@ -900,6 +928,7 @@ fn read_geometry_def(r: &mut Reader, layer_z: bool, layer_m: bool) -> Result<Geo
     let xy_tolerance = r.f64()?;
     let m_tolerance = if has_m { r.f64()? } else { 0.0 };
     let z_tolerance = if has_z { r.f64()? } else { 0.0 };
+    let extent_at = r.p as u64;
     let (xmin, ymin, xmax, ymax) = (r.f64()?, r.f64()?, r.f64()?, r.f64()?);
     let pair = |r: &mut Reader| -> Result<Option<(f64, f64)>> {
         let (lo, hi) = (r.f64()?, r.f64()?);
@@ -918,9 +947,11 @@ fn read_geometry_def(r: &mut Reader, layer_z: bool, layer_m: bool) -> Result<Geo
 
     // Spatial grid: a 0 byte, a count, then the sizes. Some writers stop early.
     let mut grid_sizes = Vec::new();
+    let mut grid_at = None;
     if r.remaining() >= 5 {
         r.u8()?;
         let n = r.u32()? as usize;
+        grid_at = (n > 0).then_some(r.p as u64);
         for _ in 0..n.min(3) {
             grid_sizes.push(r.f64()?);
         }
@@ -941,6 +972,8 @@ fn read_geometry_def(r: &mut Reader, layer_z: bool, layer_m: bool) -> Result<Geo
         z_tolerance,
         extent,
         grid_sizes,
+        extent_at: Some(extent_at),
+        grid_at,
     })
 }
 

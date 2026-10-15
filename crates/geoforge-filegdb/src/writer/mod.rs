@@ -5,6 +5,7 @@
 //! files, user tables from `a00000009` with an OBJECTID and spatial index.
 
 mod btree;
+mod edit;
 mod geometry;
 mod keys;
 mod rebuild;
@@ -21,6 +22,7 @@ use crate::table::{GdbField, GdbFieldType, GeometryDef};
 use btree::{spatial_entries, write_index};
 use table::TableWriter;
 
+pub use edit::TableEditor;
 pub use rebuild::rebuild_attribute_indexes;
 
 const TYPE_FOLDER: &str = "{F3783E6F-65CA-4514-8315-CE3985DAD3B1}";
@@ -714,6 +716,8 @@ fn default_geometry_def(srs_wkt: Option<&str>, has_z: bool, has_m: bool) -> Geom
         z_tolerance: 0.001,
         extent: Envelope::EMPTY,
         grid_sizes: vec![0.0],
+        extent_at: None,
+        grid_at: None,
     }
 }
 
@@ -735,6 +739,8 @@ fn items_shape_def() -> GeometryDef {
         z_tolerance: 0.001,
         extent: Envelope::EMPTY,
         grid_sizes: vec![0.012, 0.4, 12.0],
+        extent_at: None,
+        grid_at: None,
     }
 }
 
