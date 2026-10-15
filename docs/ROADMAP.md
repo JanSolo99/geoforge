@@ -4,6 +4,18 @@ See [`GAP_ANALYSIS.md`](GAP_ANALYSIS.md) (and `gap_list.csv`) for everything Arc
 GeoForge does not yet, with difficulty, verifiability against ArcGIS, a recommended order and an
 ENVI-parity outlook.
 
+**Policy.** The goal is a native, open-source Linux replica of ArcGIS Pro with all of its features.
+Nothing is written off as impossible or out of scope until it has been investigated in depth
+(black-box probes through the ArcGIS bridge, the official documentation, public format
+specifications); "not yet understood" is the strongest label an item may carry. The three
+structural blockers come first, because most of the rest depends on them:
+1. **Editing an existing file geodatabase** (rows, fields, indexes, subtypes, relationship
+   classes, feature datasets, topology, attribute rules).
+2. **The tool framework** (typed parameters, environments, layers and selections, messages,
+   geoprocessing history, Python bindings, toolboxes).
+3. **The raster stack** (cell size / extent / mask / snap environments, Project Raster, Mosaic,
+   Clip, multi-band, pyramids and statistics, more raster formats).
+
 Built in thin vertical slices: each phase ends with something usable from `gf`
 and verified against GDAL/OGR output on real data.
 
