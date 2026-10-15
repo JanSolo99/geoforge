@@ -16,4 +16,4 @@ pub use schema::{
     SubtypeField, Subtypes,
 };
 pub use table::{GdbField, GdbFieldType, GeometryDef, Table, compare_values};
-pub use writer::{GeodatabaseWriter, TableBuilder};
+pub use writer::{GeodatabaseWriter, TableBuilder, rebuild_attribute_indexes};

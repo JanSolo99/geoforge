@@ -7,6 +7,7 @@
 mod btree;
 mod geometry;
 mod keys;
+mod rebuild;
 mod system_rows;
 mod table;
 
@@ -19,6 +20,8 @@ use crate::schema::{Domain, DomainKind, MergePolicy, SplitPolicy};
 use crate::table::{GdbField, GdbFieldType, GeometryDef};
 use btree::{spatial_entries, write_index};
 use table::TableWriter;
+
+pub use rebuild::rebuild_attribute_indexes;
 
 const TYPE_FOLDER: &str = "{F3783E6F-65CA-4514-8315-CE3985DAD3B1}";
 const TYPE_WORKSPACE: &str = "{C673FE0F-7280-404F-8532-20755DD8FC06}";

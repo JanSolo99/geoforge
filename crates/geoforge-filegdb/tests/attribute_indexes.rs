@@ -133,3 +133,61 @@ fn large_attribute_indexes_equal_arcgis() {
     std::fs::remove_dir_all(&dir).ok();
     assert!(problems.is_empty(), "{problems:#?}");
 }
+
+fn copy_dir(from: &Path, to: &Path) {
+    std::fs::create_dir_all(to).unwrap();
+    for e in std::fs::read_dir(from).unwrap() {
+        let e = e.unwrap();
+        std::fs::copy(e.path(), to.join(e.file_name())).unwrap();
+    }
+}
+
+/// Rebuilding every attribute index of an ArcGIS-created geodatabase (system tables,
+/// editing templates and a user table with an index on a text field) from its rows
+/// reproduces ArcGIS's `.atx` files byte for byte.
+#[test]
+fn rebuilt_indexes_equal_arcgis_in_a_whole_geodatabase() {
+    let reference = root().join("testdata/gdb-reference/edit_base.gdb");
+    let dir = std::env::temp_dir().join(format!("gf-atx-rebuild-{}", std::process::id()));
+    let copy = dir.join("copy.gdb");
+    copy_dir(&reference, &copy);
+    let mut atx: Vec<String> = std::fs::read_dir(&reference)
+        .unwrap()
+        .map(|e| e.unwrap().file_name().to_string_lossy().into_owned())
+        .filter(|n| n.ends_with(".atx"))
+        .collect();
+    atx.sort();
+    // Overwrite every index with junk, then rebuild from the tables.
+    for n in &atx {
+        std::fs::write(copy.join(n), b"junk").unwrap();
+    }
+    let mut tables: Vec<String> = atx
+        .iter()
+        .map(|n| n.split('.').next().unwrap().to_owned())
+        .collect();
+    tables.dedup();
+    let mut built = 0;
+    for t in &tables {
+        built += geoforge_filegdb::rebuild_attribute_indexes(copy.join(t))
+            .unwrap()
+            .len();
+    }
+    assert_eq!(built, atx.len());
+    let mut problems = Vec::new();
+    for n in &atx {
+        let (ours, theirs) = (
+            std::fs::read(copy.join(n)).unwrap(),
+            std::fs::read(reference.join(n)).unwrap(),
+        );
+        if ours != theirs {
+            problems.push(format!(
+                "{n}: ours {} bytes, ArcGIS {} bytes, first difference {:?}",
+                ours.len(),
+                theirs.len(),
+                ours.iter().zip(&theirs).position(|(a, b)| a != b)
+            ));
+        }
+    }
+    std::fs::remove_dir_all(&dir).ok();
+    assert!(problems.is_empty(), "{problems:#?}");
+}
