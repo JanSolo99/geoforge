@@ -6,6 +6,7 @@
 
 mod btree;
 mod geometry;
+mod keys;
 mod system_rows;
 mod table;
 
@@ -68,6 +69,12 @@ pub struct TableBuilder {
 }
 
 impl TableBuilder {
+    /// Adds an attribute index on `field` (`arcpy.management.AddIndex`). Call before
+    /// writing rows. Text, integer, floating point, date and GUID fields can be indexed.
+    pub fn add_attribute_index(&mut self, name: &str, field: &str) -> Result<()> {
+        self.writer.add_index(name, field)
+    }
+
     /// Appends a feature (its `oid` is ignored; OBJECTIDs are assigned 1, 2, ...).
     pub fn write(&mut self, feature: &Feature) -> Result<u64> {
         if self.kind.is_none() && feature.geometry.is_some() {
@@ -190,6 +197,7 @@ impl GeodatabaseWriter {
             extent,
             grid,
             subsecond,
+            indexes,
         } = t.writer.finish()?;
         let mut fields = t.fields.clone();
         for f in &mut fields {
@@ -198,6 +206,16 @@ impl GeodatabaseWriter {
         let mut def = t.def.clone();
         if let Some(d) = &mut def {
             d.extent = extent;
+        }
+        let mut index_names = Vec::new();
+        for ix in &indexes {
+            write_index(
+                &base.with_extension(format!("{}.atx", ix.name)),
+                ix.key_size,
+                ix.kind,
+                &ix.entries,
+            )?;
+            index_names.push((ix.name.clone(), ix.field.clone()));
         }
         match (grid, &mut def) {
             (Some(grid), Some(d)) => {
@@ -208,12 +226,12 @@ impl GeodatabaseWriter {
                     0x40,
                     &spatial_entries(&envelopes, grid),
                 )?;
-                write_gdbindexes(&base.with_extension("gdbindexes"), true)?;
+                write_gdbindexes(&base.with_extension("gdbindexes"), true, &index_names)?;
                 if !self.spatial_refs.iter().any(|s| same_sr(s, d)) {
                     self.spatial_refs.push(d.clone());
                 }
             }
-            _ => write_gdbindexes(&base.with_extension("gdbindexes"), false)?,
+            _ => write_gdbindexes(&base.with_extension("gdbindexes"), false, &index_names)?,
         }
 
         let uuid = self.uuid();
@@ -734,7 +752,7 @@ fn geometry_code(k: GeometryKind) -> i32 {
     }
 }
 
-fn write_gdbindexes(path: &Path, spatial: bool) -> Result<()> {
+fn write_gdbindexes(path: &Path, spatial: bool, attribute: &[(String, String)]) -> Result<()> {
     let mut out = Vec::new();
     let entry = |out: &mut Vec<u8>, name: &str, magic2: i32, magic3: i16, expr: &str| {
         out.extend_from_slice(&(name.encode_utf16().count() as u32).to_le_bytes());
@@ -749,10 +767,13 @@ fn write_gdbindexes(path: &Path, spatial: bool) -> Result<()> {
             .for_each(|u| out.extend_from_slice(&u.to_le_bytes()));
         out.extend_from_slice(&0i16.to_le_bytes());
     };
-    out.extend_from_slice(&(1 + u32::from(spatial)).to_le_bytes());
+    out.extend_from_slice(&(1 + u32::from(spatial) + attribute.len() as u32).to_le_bytes());
     entry(&mut out, "FDO_OBJECTID", 16, -1, "OBJECTID");
     if spatial {
         entry(&mut out, "FDO_SHAPE", 4, 0, "SHAPE");
+    }
+    for (name, field) in attribute {
+        entry(&mut out, name, 2, 0, field);
     }
     std::fs::write(path, out).map_err(|e| Error::io(path, e))
 }

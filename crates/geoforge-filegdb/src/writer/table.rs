@@ -8,6 +8,7 @@ use chrono::{NaiveDate, NaiveTime};
 use geoforge_core::{Envelope, Error, Geometry, GeometryKind, Result, Value};
 
 use super::geometry::encode;
+use super::keys;
 use crate::table::{GdbField, GdbFieldType};
 
 const HEADER_LEN: u64 = 40;
@@ -25,6 +26,8 @@ pub(crate) struct Finished {
     pub grid: Option<f64>,
     /// Date fields that hold sub-second values.
     pub subsecond: Vec<String>,
+    /// Attribute indexes, entries sorted.
+    pub indexes: Vec<BuiltIndex>,
 }
 
 pub(crate) struct TableWriter {
@@ -49,6 +52,27 @@ pub(crate) struct TableWriter {
     row: Vec<u8>,
     /// Date fields that received sub-second values (need `HighPrecision`).
     pub subsecond: Vec<String>,
+    /// Attribute indexes being collected.
+    indexes: Vec<IndexCollector>,
+}
+
+/// Keys of one attribute index as rows are written.
+struct IndexCollector {
+    name: String,
+    field: String,
+    /// Position of the field among the values passed to `push`.
+    value_at: usize,
+    layout: keys::Layout,
+    entries: Vec<(keys::Key, u32)>,
+}
+
+/// A finished attribute index: sorted `(key bytes, OBJECTID)` pairs.
+pub(crate) struct BuiltIndex {
+    pub name: String,
+    pub field: String,
+    pub key_size: usize,
+    pub kind: u8,
+    pub entries: Vec<(Vec<u8>, u32)>,
 }
 
 /// Layer flag bits: geometry type in the low byte, UTF-8 strings, "high precision"
@@ -134,7 +158,49 @@ impl TableWriter {
             envelopes: Vec::new(),
             row: Vec::new(),
             subsecond: Vec::new(),
+            indexes: Vec::new(),
         })
+    }
+
+    /// Indexes the values of `field` (named in the table) as rows are written.
+    pub fn add_index(&mut self, name: &str, field: &str) -> Result<()> {
+        let mut value_at = 0;
+        let mut found = None;
+        for f in &self.fields {
+            if matches!(
+                f.field_type,
+                GdbFieldType::ObjectId | GdbFieldType::Geometry
+            ) {
+                continue;
+            }
+            if f.name.eq_ignore_ascii_case(field) {
+                found = Some(f);
+                break;
+            }
+            value_at += 1;
+        }
+        let f = found.ok_or_else(|| err(format!("cannot index {field}: no such field")))?;
+        let layout = keys::layout(f).ok_or_else(|| {
+            err(format!(
+                "fields of type {:?} cannot be indexed",
+                f.field_type
+            ))
+        })?;
+        if self
+            .indexes
+            .iter()
+            .any(|i| i.name.eq_ignore_ascii_case(name))
+        {
+            return Err(err(format!("index {name} already exists")));
+        }
+        self.indexes.push(IndexCollector {
+            name: name.to_owned(),
+            field: f.name.clone(),
+            value_at,
+            layout,
+            entries: Vec::new(),
+        });
+        Ok(())
     }
 
     pub fn row_count(&self) -> u64 {
@@ -243,6 +309,14 @@ impl TableWriter {
             self.extent.union(&e);
             self.envelopes.push((oid, e));
         }
+        for ix in &mut self.indexes {
+            if let Some(k) = values
+                .get(ix.value_at)
+                .and_then(|v| keys::key_of(&ix.layout, v))
+            {
+                ix.entries.push((k, oid as u32));
+            }
+        }
         Ok(oid)
     }
 
@@ -298,11 +372,30 @@ impl TableWriter {
             &self.offsets,
             self.pos,
         )?;
+        let indexes = self
+            .indexes
+            .into_iter()
+            .map(|mut ix| {
+                ix.entries.sort_by(|a, b| a.0.cmp(&b.0).then(a.1.cmp(&b.1)));
+                BuiltIndex {
+                    key_size: ix.layout.key_size,
+                    kind: ix.layout.kind,
+                    entries: ix
+                        .entries
+                        .iter()
+                        .map(|(k, oid)| (keys::encode(&ix.layout, k), *oid))
+                        .collect(),
+                    name: ix.name,
+                    field: ix.field,
+                }
+            })
+            .collect();
         Ok(Finished {
             envelopes: self.envelopes,
             extent: self.extent,
             grid,
             subsecond: self.subsecond,
+            indexes,
         })
     }
 }

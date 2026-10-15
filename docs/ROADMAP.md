@@ -213,7 +213,10 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
       ArcGIS's (`testdata/gdb-reference/stat_tables.gdb`)
 - [ ] Write: add to an existing geodatabase (system tables must be rewritten with their indexes)
 - [ ] Write: per-vertex missing M values mixed with present ones (encoding unknown)
-- [ ] Write: attribute indexes, subtypes, relationship classes, feature datasets
+- [x] Write: attribute indexes on new tables (`TableBuilder::add_attribute_index`; all indexable field
+      types; `.atx` and `.gdbindexes` byte-identical to ArcGIS's, also 300 000-row three-level
+      trees) — the page layout (shared boundary children, bottom-up page numbers) is documented
+- [ ] Write: subtypes, relationship classes, feature datasets
 - [x] Written geodatabases open in ArcGIS Pro 3.7: Describe, counts, domains, Check Geometry
       (no problems beyond those already in the source data), Copy Features out of them
 - [ ] Projected coordinate systems: use ArcGIS's projection-derived XY domain origin (needs Phase 4)

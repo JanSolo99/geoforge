@@ -15,16 +15,21 @@ pub(crate) fn write_index(
     kind_byte: u8,
     entries: &[(Vec<u8>, u32)],
 ) -> Result<()> {
-    let per_page = (PAGE - LEAF_HEADER) / (4 + key_size);
-    let values_at = LEAF_HEADER + per_page * 4;
+    // Entries per leaf. Keys start after the id array of a full leaf, in leaf and
+    // internal pages alike; an internal page therefore holds `per_leaf + 1` child ids
+    // and `per_leaf` keys.
+    let per_leaf = (PAGE - LEAF_HEADER) / (4 + key_size);
+    let values_at = LEAF_HEADER + per_leaf * 4;
+    let per_node = per_leaf + 1;
 
-    // Level 0: leaves. Each level is a list of (pages' entries, max key of page).
+    // Level 0: leaves. `levels[l]` holds, per page of level l, the key it has in its
+    // parent: a leaf's last key; an internal page's last stored key.
     let leaves: Vec<&[(Vec<u8>, u32)]> = if entries.is_empty() {
         vec![&[]]
     } else {
-        entries.chunks(per_page).collect()
+        entries.chunks(per_leaf).collect()
     };
-    let mut levels: Vec<Vec<Vec<u8>>> = Vec::new(); // max key per node, per level
+    let mut levels: Vec<Vec<Vec<u8>>> = Vec::new();
     levels.push(
         leaves
             .iter()
@@ -35,23 +40,39 @@ pub(crate) fn write_index(
             })
             .collect(),
     );
-    // Internal nodes hold up to `per_page` children.
-    let mut fanouts: Vec<usize> = Vec::new();
+    // Internal pages of a level take `per_node` children each, and the last child of
+    // one page is also the first child of the next.
+    let groups_of = |n: usize| -> Vec<std::ops::Range<usize>> {
+        let mut out = Vec::new();
+        let mut start = 0;
+        loop {
+            let end = (start + per_node).min(n);
+            out.push(start..end);
+            if end == n {
+                return out;
+            }
+            start = end - 1;
+        }
+    };
+    let mut level_groups: Vec<Vec<std::ops::Range<usize>>> = Vec::new();
     while levels.last().unwrap().len() > 1 {
         let below = levels.last().unwrap();
-        let nodes: Vec<Vec<u8>> = below
-            .chunks(per_page)
-            .map(|c| c.last().unwrap().clone())
+        let groups = groups_of(below.len());
+        let keys: Vec<Vec<u8>> = groups
+            .iter()
+            .map(|g| below[g.end - 1 - usize::from(g.len() >= 2)].clone())
             .collect();
-        fanouts.push(per_page);
-        levels.push(nodes);
+        level_groups.push(groups);
+        levels.push(keys);
     }
     let depth = levels.len();
 
-    // Page numbering: root = 1, then each level top-down, leaves last.
+    // Page numbering as ArcGIS writes it: the root is page 1, then the leaves in
+    // order, then each internal level bottom-up.
     let mut first_page = vec![0usize; depth];
-    let mut next = 1;
-    for lvl in (0..depth).rev() {
+    first_page[depth - 1] = 1;
+    let mut next = 2;
+    for lvl in 0..depth - 1 {
         first_page[lvl] = next;
         next += levels[lvl].len();
     }
@@ -73,15 +94,19 @@ pub(crate) fn write_index(
     }
     for lvl in 1..depth {
         let children = &levels[lvl - 1];
-        for (i, group) in (0..children.len())
-            .collect::<Vec<_>>()
-            .chunks(per_page)
-            .enumerate()
-        {
+        let groups = &level_groups[lvl - 1];
+        for (i, group) in groups.iter().enumerate() {
             let p = &mut pages[first_page[lvl] + i - 1];
-            let n = group.len() - 1; // values for all but the last child
+            // Pages of one level are chained (the root is alone).
+            let next_node = if i + 1 < groups.len() {
+                (first_page[lvl] + i + 1) as u32
+            } else {
+                0
+            };
+            p[0..4].copy_from_slice(&next_node.to_le_bytes());
+            let n = group.len() - 1; // a key for every child but the last
             p[4..8].copy_from_slice(&(n as u32).to_le_bytes());
-            for (j, &c) in group.iter().enumerate() {
+            for (j, c) in group.clone().enumerate() {
                 let page_no = (first_page[lvl - 1] + c) as u32;
                 p[INTERNAL_HEADER + 4 * j..][..4].copy_from_slice(&page_no.to_le_bytes());
                 if j < n {
@@ -100,7 +125,6 @@ pub(crate) fn write_index(
     out.extend_from_slice(&(entries.len() as u32).to_le_bytes());
     out.extend_from_slice(&0i32.to_le_bytes());
     out.extend_from_slice(&1i32.to_le_bytes());
-    let _ = fanouts;
     std::fs::write(path, out).map_err(|e| Error::io(path, e))
 }
 

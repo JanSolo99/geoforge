@@ -17,6 +17,7 @@ pub(crate) struct BTree {
     pub key_size: usize,
     oid_size: usize,
     depth: u32,
+    /// Where keys start (the same in leaf and internal pages).
     values_offset: usize,
     leaf_header: usize,
     internal_header: usize,

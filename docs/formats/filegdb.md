@@ -106,6 +106,31 @@ Verified against brute-force scans of every index in the GDAL test data.
   sorted as signed i64; a feature has one entry per cell its envelope covers, per
   level it is indexed at. A grid size of 0 means the index is unusable (all keys 0).
 
+## Writing attribute indexes (verified byte for byte against ArcGIS Pro 3.7)
+- Entry in `.gdbindexes` after `FDO_OBJECTID` (and `FDO_SHAPE`): name, `i16 0, i32 2, i16 0,
+  i32 1`, expression = the field name. A UNIQUE index writes the same bytes as a plain one.
+- Keys (one per non-null value; nulls are not indexed; empty text is): Short/Long/BigInteger as
+  native little-endian integers (key size 2/4/8, trailer kind byte `0x40`); Float/Double and all
+  date types (days as f64; DateTimeOffset in UTC) as native floats (4/8, kind `0x60`); text as
+  UTF-16LE padded with spaces to `2 × min(length, 80)` bytes, compared by UTF-16 code units, case
+  sensitive (kind `0x20`); GUID/GlobalID as the 38 ASCII characters (kind `0`). Ties by OBJECTID.
+- Trailer: `u8 keySize, u8 kind, i32 1, u32 depth, u32 count, i32 0, i32 1`.
+- Pages: leaves hold `(4096 - 12) / (4 + keySize)` entries, filled in order. An internal page
+  holds `per_leaf` keys and `per_leaf + 1` child ids (keys at the same offset as in leaves),
+  key `j` = last key under child `j`. **Consecutive internal pages of a level share a boundary
+  child** (the last child of one is the first of the next), each page's key in its parent is its
+  last stored key, and pages of one level are chained through `next`.
+- Page numbers: root = 1, then all leaves in order, then each internal level bottom-up.
+  Checked with 300 000 rows (three levels) on Long, Double and Text keys.
+
+## Editing existing geodatabases (observed through ArcGIS; work in progress)
+Adding a table touches `a1` (row), `a4` (item row with its definition XML), `a6` (relationship
+row), the `.atx` indexes of those three, a new `a4.freelist`, and the `timestamps` file (a small
+counter table). Row updates append the new row and put the old space on the table's `.freelist`
+(created on first use); deletes zero the `.gdbtablx` entry. Adding fields or indexes changes the
+table's own `.gdbtable` / `.gdbindexes`; the catalog XML does not list them. See the experiments
+in the session notes.
+
 ## Writing (what GeoForge produces)
 Mirrors GDAL's OpenFileGDB writer, which ArcGIS opens: system tables a1–a7 with the
 fixed rows in `src/writer/system_rows.rs`, `gdb` = `05 00 00 00 DE AD BE EF`,
