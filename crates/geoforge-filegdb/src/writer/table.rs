@@ -207,6 +207,25 @@ impl TableWriter {
         self.offsets.len() as u64
     }
 
+    /// Like [`TableWriter::push`] for a given OBJECTID, which must exceed all earlier ones;
+    /// OBJECTIDs skipped over stay deleted.
+    pub fn push_at(
+        &mut self,
+        oid: u64,
+        geometry: Option<&Geometry>,
+        values: &[Value],
+    ) -> Result<u64> {
+        if oid <= self.offsets.len() as u64 {
+            return Err(err(format!(
+                "OBJECTID {oid} is not above the previous ones"
+            )));
+        }
+        while (self.offsets.len() as u64) + 1 < oid {
+            self.offsets.push(0);
+        }
+        self.push(geometry, values)
+    }
+
     /// Appends a row and returns its OBJECTID. `values` follow the non-OID,
     /// non-geometry fields in order.
     pub fn push(&mut self, geometry: Option<&Geometry>, values: &[Value]) -> Result<u64> {
@@ -258,7 +277,7 @@ impl TableWriter {
             .out
             .into_inner()
             .map_err(|e| Error::io(&self.path, e.into_error()))?;
-        let rows = self.offsets.len() as u32;
+        let rows = self.offsets.iter().filter(|o| **o != 0).count() as u32;
         let mut h = Vec::new();
         h.extend_from_slice(&rows.to_le_bytes());
         h.extend_from_slice(&self.max_row.max(self.field_section_len).to_le_bytes());

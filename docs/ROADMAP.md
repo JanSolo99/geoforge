@@ -223,6 +223,9 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
 - [x] Edit rows of an existing table or feature class in place (`TableEditor`: insert, update,
       delete; row space is appended, `.gdbtablx`, spatial index, extent and attribute indexes follow;
       ArcGIS reads, edits and compacts the result)
+- [x] `rewrite_table`: replace the fields and rows of an existing table keeping its file number, geometry
+      definition, chosen OBJECTIDs and surviving attribute indexes (the primitive for Add/Delete Field
+      and in-place tools on `.gdb` data); not yet wired into `gf`
 - [ ] Editing in place from tools (Calculate Field, Add/Delete Field, Append, ... on `.gdb` data),
       Delete and Rename of items, adding fields to existing geodatabase tables
 - [ ] ArcGIS's `timestamps`, `.freelist` (space reuse) and `.horizon` files; 64-bit OBJECTID (v4) tables

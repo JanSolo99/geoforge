@@ -9,6 +9,7 @@ mod edit;
 mod geometry;
 mod keys;
 mod rebuild;
+mod rewrite;
 mod system_rows;
 mod table;
 
@@ -24,6 +25,7 @@ use table::TableWriter;
 
 pub use edit::TableEditor;
 pub use rebuild::rebuild_attribute_indexes;
+pub use rewrite::rewrite_table;
 
 const TYPE_FOLDER: &str = "{F3783E6F-65CA-4514-8315-CE3985DAD3B1}";
 const TYPE_WORKSPACE: &str = "{C673FE0F-7280-404F-8532-20755DD8FC06}";
@@ -882,7 +884,7 @@ fn field(name: &str, field_type: GdbFieldType, nullable: bool, length: u32) -> G
     }
 }
 
-fn to_gdb_field(f: &Field) -> Result<GdbField> {
+pub(crate) fn to_gdb_field(f: &Field) -> Result<GdbField> {
     use GdbFieldType as G;
     let (t, len) = match f.field_type {
         FieldType::SmallInteger => (G::Int16, 2),
@@ -1017,7 +1019,11 @@ fn geometry_code(k: GeometryKind) -> i32 {
     }
 }
 
-fn write_gdbindexes(path: &Path, spatial: bool, attribute: &[(String, String)]) -> Result<()> {
+pub(crate) fn write_gdbindexes(
+    path: &Path,
+    spatial: bool,
+    attribute: &[(String, String)],
+) -> Result<()> {
     let mut out = Vec::new();
     let entry = |out: &mut Vec<u8>, name: &str, magic2: i32, magic3: i16, expr: &str| {
         out.extend_from_slice(&(name.encode_utf16().count() as u32).to_le_bytes());

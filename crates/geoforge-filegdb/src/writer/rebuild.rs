@@ -11,13 +11,13 @@ use crate::bytes::{Reader, err};
 use crate::table::{GdbFieldType, Table};
 
 /// One entry of a `.gdbindexes` file.
-struct RawIndex {
-    name: String,
-    flag: i32,
-    expression: String,
+pub(super) struct RawIndex {
+    pub name: String,
+    pub flag: i32,
+    pub expression: String,
 }
 
-fn read_raw(path: &Path) -> Result<Vec<RawIndex>> {
+pub(super) fn read_raw(path: &Path) -> Result<Vec<RawIndex>> {
     let bytes = std::fs::read(path).map_err(|e| Error::io(path, e))?;
     let mut r = Reader::new(&bytes);
     let n = r.u32()?;
