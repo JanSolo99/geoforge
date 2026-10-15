@@ -1,5 +1,9 @@
 # Roadmap
 
+See [`GAP_ANALYSIS.md`](GAP_ANALYSIS.md) (and `gap_list.csv`) for everything ArcGIS Pro has that
+GeoForge does not yet, with difficulty, verifiability against ArcGIS, a recommended order and an
+ENVI-parity outlook.
+
 Built in thin vertical slices: each phase ends with something usable from `gf`
 and verified against GDAL/OGR output on real data.
 

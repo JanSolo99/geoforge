@@ -1,0 +1,470 @@
+area,tool_or_feature,status,difficulty,verifiable_with_arcgis,priority
+Analysis > Extract,Clip,done,S,Y,P0
+Analysis > Extract,Select (SQL),done,S,Y,P0
+Analysis > Extract,Split,partial,S,Y,P1
+Analysis > Extract,Split By Attributes,missing,S,Y,P2
+Analysis > Extract,Table Select,missing,S,Y,P1
+Analysis > Extract,Spatial Select (Select Layer By Location + Copy),partial,M,Y,P1
+Analysis > Extract,Select Layer By Attribute (selection model),missing,M,Y,P1
+Analysis > Overlay,Intersect,done,M,Y,P0
+Analysis > Overlay,Union,done,M,Y,P0
+Analysis > Overlay,Erase,done,S,Y,P0
+Analysis > Overlay,Identity,done,M,Y,P0
+Analysis > Overlay,Symmetrical Difference,done,M,Y,P0
+Analysis > Overlay,Update,partial,S,Y,P2
+Analysis > Overlay,Spatial Join,done,M,Y,P0
+Analysis > Overlay,Feature To Polygon,missing,M,Y,P1
+Analysis > Overlay,Feature To Line,missing,M,Y,P1
+Analysis > Overlay,Polygon To Line,missing,M,Y,P1
+Analysis > Overlay,Split Line At Point / Split Line At Vertices,missing,M,Y,P2
+Analysis > Overlay,Count Overlapping Features,missing,M,Y,P2
+Analysis > Overlay,Tabulate Intersection,missing,M,Y,P2
+Analysis > Overlay,Summarize Within,missing,M,Y,P2
+Analysis > Overlay,Summarize Nearby,missing,M,Y,P2
+Analysis > Overlay,Apportion Polygon,missing,M,Y,P3
+Analysis > Overlay,Interpolate Points / Join Features / Aggregate Points,missing,M,P,P3
+Analysis > Proximity,Buffer,partial,M,Y,P0
+Analysis > Proximity,Multiple Ring Buffer,missing,S,Y,P1
+Analysis > Proximity,Near,done,S,Y,P0
+Analysis > Proximity,Generate Near Table,done,M,Y,P0
+Analysis > Proximity,Point Distance,missing,S,Y,P2
+Analysis > Proximity,Create Thiessen Polygons,missing,M,Y,P1
+Analysis > Proximity,Polygon Neighbors,missing,M,Y,P2
+Analysis > Proximity,Pairwise Buffer,missing,S,Y,P1
+Analysis > Proximity,Pairwise Clip / Pairwise Intersect / Pairwise Erase / Pairwise Dissolve,missing,S,Y,P2
+Analysis > Proximity,Graphic Buffer,missing,M,Y,P3
+Analysis > Proximity,Create Buffers (pro-only),missing,S,Y,P3
+Analysis > Proximity,Near 3D / Generate Near Table 3D,missing,M,Y,P3
+Analysis > Statistics,Summary Statistics,done,S,Y,P0
+Analysis > Statistics,Frequency,done,S,Y,P0
+Analysis > Statistics,Statistics (Table Statistics),missing,S,Y,P2
+Analysis > Statistics,Tabulate Area (Spatial Analyst),missing,M,Y,P2
+Data Management > Features,Copy Features,done,S,Y,P0
+Data Management > Features,Feature Class To Feature Class,done,S,Y,P0
+Data Management > Features,Feature Class To Geodatabase,missing,S,Y,P1
+Data Management > Features,Multipart To Singlepart,done,S,Y,P0
+Data Management > Features,Singlepart To Multipart,missing,S,Y,P2
+Data Management > Features,Feature To Point,done,M,Y,P0
+Data Management > Features,Feature Vertices To Points,done,S,Y,P0
+Data Management > Features,Minimum Bounding Geometry,done,M,Y,P0
+Data Management > Features,Points To Line,done,S,Y,P0
+Data Management > Features,Add XY Coordinates,done,S,Y,P0
+Data Management > Features,Add Geometry Attributes,done,S,Y,P0
+Data Management > Features,Dissolve,done,M,Y,P0
+Data Management > Features,Unsplit Line,missing,M,Y,P2
+Data Management > Features,Merge,done,S,Y,P0
+Data Management > Features,Merge Branch / Append,partial,S,Y,P1
+Data Management > Features,Eliminate,missing,M,Y,P2
+Data Management > Features,Eliminate Polygon Part,missing,S,Y,P2
+Data Management > Features,Integrate,missing,M,Y,P1
+Data Management > Features,Snap,missing,M,Y,P2
+Data Management > Features,Densify,missing,S,Y,P2
+Data Management > Features,Feature Envelope To Polygon,missing,S,Y,P2
+Data Management > Features,Feature To 3D By Attribute,missing,S,Y,P3
+Data Management > Features,Polygon To Centerline (Cartography),missing,L,Y,P4
+Data Management > Features,Create Features / Create Feature Class / Create Table,missing,S,Y,P0
+Data Management > Features,Create Random Points,missing,S,P,P3
+Data Management > Features,Create Fishnet,missing,S,Y,P1
+Data Management > Features,Generate Points Along Lines,missing,S,Y,P2
+Data Management > Features,Generate Tessellation,missing,M,Y,P2
+Data Management > Features,Create Spatial Sampling Locations,missing,M,P,P4
+Data Management > Features,Check Geometry,done,M,Y,P0
+Data Management > Features,Repair Geometry,done,M,Y,P0
+Data Management > Features,Delete Features / Delete Rows / Delete,missing,S,Y,P1
+Data Management > Features,Truncate Table,missing,S,Y,P2
+Data Management > Features,Add Spatial Index / Remove Spatial Index,partial,S,Y,P2
+Data Management > Features,Calculate Geometry Attributes (legacy),partial,S,Y,P2
+Data Management > Features,Rotate / Scale / Move / Flip features,missing,S,Y,P3
+Data Management > Features,Transform Features (rubbersheet),missing,L,Y,P4
+Data Management > Features,Adjust 3D Z,missing,S,Y,P3
+Data Management > Features,"Feature Compression, Compress/Uncompress File Geodatabase Data",missing,L,P,P4
+Data Management > Features,Enable/Disable Editor Tracking,missing,M,Y,P3
+Data Management > Features,Enable Attachments / Add Attachments / Generate Attachment Match Table,missing,M,Y,P3
+Data Management > Features,Enable Archiving,missing,L,Y,P4
+Data Management > Fields & Tables,Add Field,done,S,Y,P0
+Data Management > Fields & Tables,Add Fields (multiple),missing,S,Y,P1
+Data Management > Fields & Tables,Delete Field,done,S,Y,P0
+Data Management > Fields & Tables,Alter Field,missing,S,Y,P1
+Data Management > Fields & Tables,Calculate Field,partial,L,Y,P0
+Data Management > Fields & Tables,Calculate Fields,missing,S,Y,P1
+Data Management > Fields & Tables,Calculate Field with Arcade,missing,XL,Y,P3
+Data Management > Fields & Tables,Field Mapping / Field Info,partial,M,Y,P0
+Data Management > Fields & Tables,Assign Default To Field,missing,S,Y,P3
+Data Management > Fields & Tables,Convert Field,missing,S,Y,P3
+Data Management > Fields & Tables,Join Field,missing,M,Y,P0
+Data Management > Fields & Tables,Add Join / Remove Join (layer-based),missing,M,Y,P1
+Data Management > Fields & Tables,Add Relate / Create Relationship Class,missing,M,Y,P2
+Data Management > Fields & Tables,Table To Table,missing,S,Y,P1
+Data Management > Fields & Tables,Table To Geodatabase,missing,S,Y,P1
+Data Management > Fields & Tables,Sort,done,S,Y,P0
+Data Management > Fields & Tables,Delete Identical,done,S,Y,P0
+Data Management > Fields & Tables,Find Identical,done,S,Y,P0
+Data Management > Fields & Tables,Create Table / Make Table View,missing,S,Y,P1
+Data Management > Fields & Tables,Make Query Table,missing,M,Y,P3
+Data Management > Fields & Tables,Add Index / Remove Index,missing,M,Y,P2
+Data Management > Fields & Tables,Calculate Statistics,missing,S,Y,P3
+Data Management > Fields & Tables,Generate Rank / Rank by,missing,S,P,P3
+Data Management > Fields & Tables,Generate Unique ID/GlobalIDs (Add GlobalIDs),missing,M,Y,P2
+Data Management > Fields & Tables,Create Domain / Add Coded Value To Domain / Table To Domain / Domain To Table,missing,M,Y,P2
+Data Management > Fields & Tables,Assign Domain To Field,missing,S,Y,P2
+Data Management > Fields & Tables,Add Subtype / Set Subtype Field / Remove Subtype,missing,M,Y,P2
+Data Management > Fields & Tables,Table Compare / Feature Compare / Raster Compare / File Compare,missing,M,Y,P2
+Data Management > Fields & Tables,Detect Feature Changes,missing,L,Y,P3
+Data Management > Fields & Tables,Create Relationship Class etc.,missing,M,Y,P2
+Data Management > Fields & Tables,Pivot Table / Transpose Fields,missing,M,Y,P2
+Data Management > Fields & Tables,Summarize Attributes / Concatenate / Cross Tabulate,missing,M,Y,P3
+Data Management > Fields & Tables,"Text-processing: Parse Path, Create Unique Name, Validate Table Name etc.",missing,S,Y,P2
+Data Management > Workspace / Geodatabase Administration,Create File GDB / Create Folder / Create Feature Dataset,partial,M,Y,P0
+Data Management > Workspace / Geodatabase Administration,Compact / Compress File GDB,missing,L,Y,P2
+Data Management > Workspace / Geodatabase Administration,Upgrade Dataset / Upgrade Spatial Reference,missing,M,Y,P4
+Data Management > Workspace / Geodatabase Administration,Create Enterprise Geodatabase / Mobile GDB,missing,L,P,P3
+Data Management > Workspace / Geodatabase Administration,Create Database Connection,missing,M,N,P3
+Data Management > Workspace / Geodatabase Administration,Create Mobile Geodatabase,missing,L,Y,P2
+Data Management > Workspace / Geodatabase Administration,Rebuild Indexes / Analyze Datasets,missing,S,Y,P4
+Data Management > Workspace / Geodatabase Administration,Register/Unregister with Geodatabase,missing,M,P,P4
+Data Management > Workspace / Geodatabase Administration,"Create/Manage Versions, Reconcile, Post",missing,XL,N,P4
+Data Management > Workspace / Geodatabase Administration,Delete/Rename/Copy/Move (dataset management),missing,S,Y,P0
+Data Management > Workspace / Geodatabase Administration,"Add Rule / Attribute rules (Add Attribute Rule, Evaluate Rules)",missing,XL,Y,P3
+Data Management > Workspace / Geodatabase Administration,"Topology tools (Create Topology, Add Rule To Topology, Validate Topology)",missing,XL,Y,P3
+Data Management > Workspace / Geodatabase Administration,Geometric Network / Create Geometric Network,missing,XL,P,P4
+Data Management > Workspace / Geodatabase Administration,Parcel Fabric tools,missing,XL,P,P4
+Data Management > Projections and Transformations,Project,done,M,Y,P0
+Data Management > Projections and Transformations,Define Projection,missing,S,Y,P0
+Data Management > Projections and Transformations,Batch Project,missing,S,Y,P1
+Data Management > Projections and Transformations,Create Custom Geographic Transformation,missing,M,Y,P2
+Data Management > Projections and Transformations,Create Spatial Reference,missing,S,Y,P2
+Data Management > Projections and Transformations,Project Raster,missing,L,Y,P0
+Data Management > Projections and Transformations,Warp / Rectify / Georeference,missing,L,Y,P2
+Data Management > Projections and Transformations,Convert Coordinate Notation,missing,M,Y,P2
+Data Management > Projections and Transformations,Raster Define Projection,missing,S,Y,P1
+Data Management > Projections and Transformations,Flip/Mirror/Rotate/Shift/Rescale (raster geometry),missing,S,Y,P2
+Data Management > Projections and Transformations,Reproject on-the-fly (map),missing,M,N,P3
+Data Management > Raster,Resample,done,S,Y,P0
+Data Management > Raster,Clip (raster),missing,S,Y,P0
+Data Management > Raster,Mosaic / Mosaic To New Raster,missing,M,Y,P0
+Data Management > Raster,Composite Bands,missing,S,Y,P0
+Data Management > Raster,Extract Bands,missing,S,Y,P0
+Data Management > Raster,Copy Raster,missing,S,Y,P0
+Data Management > Raster,Raster To Other Format,missing,S,Y,P1
+Data Management > Raster,Build Pyramids,missing,M,Y,P1
+Data Management > Raster,Calculate Statistics (raster),missing,S,Y,P0
+Data Management > Raster,Build Raster Attribute Table,missing,S,Y,P1
+Data Management > Raster,Create Raster Dataset / Create Random Raster,missing,S,Y,P2
+Data Management > Raster,Split Raster,missing,S,Y,P2
+Data Management > Raster,Cell Statistics / Band Collection Statistics,missing,M,Y,P1
+Data Management > Raster,Pansharpen (DM),missing,M,Y,P2
+Data Management > Raster,Set Raster Properties / Delete Raster Attribute,missing,S,Y,P2
+Data Management > Raster,Shaded Relief,missing,M,Y,P2
+Data Management > Raster,Create Mosaic Dataset / Add Rasters To Mosaic Dataset / Build Seamlines etc.,missing,XL,Y,P3
+Data Management > Raster,Create Raster Catalog,missing,M,P,P4
+Data Management > Raster,"Compute Pansharpen Weights, Color Balance",missing,L,Y,P3
+Data Management > Raster,"Image Compression: LZ77, JPEG, JPEG2000, LERC, ZSTD",partial,L,Y,P2
+Data Management > Raster,Convert Raster Format to CRF,missing,XL,P,P3
+Data Management > Raster,Mask / Nodata handling environments,partial,M,Y,P0
+"Data Management > Layers, Views, Selections",Make Feature Layer / Make Table View / Make Raster Layer / Make XY Event Layer,missing,M,Y,P1
+"Data Management > Layers, Views, Selections",Select Layer By Attribute / Select Layer By Location,partial,M,Y,P1
+"Data Management > Layers, Views, Selections",Save To Layer File / Apply Symbology From Layer / Add Join,missing,L,Y,P2
+"Data Management > Layers, Views, Selections",Get Count / Get Raster Properties / Get Field Value / Get Cell Value,missing,S,Y,P0
+"Data Management > Layers, Views, Selections",Copy Rows / Delete Rows,missing,S,Y,P0
+"Data Management > Layers, Views, Selections",Calculate Value / Iterate Features (ModelBuilder),missing,M,P,P3
+Data Management > Generalization & Simplification,Simplify Line (Cartography),missing,M,Y,P2
+Data Management > Generalization & Simplification,Simplify Polygon,missing,M,Y,P2
+Data Management > Generalization & Simplification,"Smooth Line / Smooth Polygon (PAEK, BEZIER)",missing,M,Y,P2
+Data Management > Generalization & Simplification,Thin Road Network,missing,L,Y,P4
+Data Management > Generalization & Simplification,Aggregate Points / Aggregate Polygons,missing,M,Y,P3
+Data Management > Generalization & Simplification,Dissolve Boundaries / Collapse Dual Lines,missing,L,Y,P4
+Data Management > Generalization & Simplification,Eliminate / Eliminate Polygon Part,missing,M,Y,P2
+Data Management > Generalization & Simplification,"Delineate Built-Up Areas, Resolve Building Conflicts",missing,XL,P,P4
+Data Management > LAS Dataset / 3D / Point cloud,"LAS reader/writer (LAS 1.0-1.4, LAZ, zLAS)",missing,L,Y,P1
+Data Management > LAS Dataset / 3D / Point cloud,Create LAS Dataset,missing,M,Y,P2
+Data Management > LAS Dataset / 3D / Point cloud,LAS Dataset To Raster,missing,M,Y,P1
+Data Management > LAS Dataset / 3D / Point cloud,LAS To Multipoint,missing,S,Y,P1
+Data Management > LAS Dataset / 3D / Point cloud,Classify LAS Ground / Noise / Building / Overlap / By Height,missing,L,Y,P2
+Data Management > LAS Dataset / 3D / Point cloud,Extract LAS,missing,S,Y,P2
+Data Management > LAS Dataset / 3D / Point cloud,Point Cloud To Raster / Multipoint,missing,M,Y,P2
+Data Management > LAS Dataset / 3D / Point cloud,Convert LAS / Tile LAS / Thin LAS,missing,M,Y,P2
+Data Management > LAS Dataset / 3D / Point cloud,"Locate Outliers, Colorize LAS",missing,M,Y,P3
+Data Management > LAS Dataset / 3D / Point cloud,"Point cloud scene layers (I3S, SLPK)",missing,XL,P,P4
+Conversion,Features To JSON / JSON To Features,done,M,Y,P0
+Conversion,Export Table (csv),done,S,Y,P0
+Conversion,Export Table to dbf/gdb/gpkg,partial,S,Y,P1
+Conversion,Table To Excel / Excel To Table,missing,M,Y,P1
+Conversion,XY Table To Point,done,S,Y,P0
+Conversion,Export Features,partial,S,Y,P0
+Conversion,Feature Class To Shapefile / Table To dBASE,partial,S,Y,P1
+Conversion,Raster To Point / Polygon,done,M,Y,P0
+Conversion,Raster To Polyline,missing,M,Y,P1
+Conversion,Raster To ASCII / ASCII To Raster / Float To Raster / Raster To Float,missing,S,Y,P1
+Conversion,Feature To Raster / Polygon To Raster / Polyline To Raster / Point To Raster,done,M,Y,P0
+Conversion,Points To Raster (Point to raster stats),missing,S,Y,P2
+Conversion,Raster To Other Format (TIFF/IMG/JPEG/PNG/BMP/GIF),partial,M,Y,P1
+Conversion,Export Raster Data / Raster To Video,missing,M,P,P4
+Conversion,KML To Layer / Layer To KML / Map To KML,missing,M,Y,P2
+Conversion,"Import CAD / CAD To Geodatabase (DWG, DXF, DGN)",missing,XL,Y,P3
+Conversion,"GML / WFS To Features / OGC (WMS, WCS)",missing,L,P,P3
+Conversion,Import XML / Export XML Workspace Document,missing,M,Y,P2
+Conversion,"Metadata tools (Import Metadata, Export Metadata, Upgrade Metadata, FGDC/ISO 19139/19115)",missing,L,Y,P2
+Conversion,"Multidimensional: NetCDF To Raster/Feature/Table, Make NetCDF Layers, HDF, GRIB",missing,L,Y,P2
+Conversion,Feature Class To CAD / Export CAD,missing,L,P,P4
+Conversion,Excel / Parquet / Arrow (Pro 3.x Parquet support),missing,M,P,P3
+Conversion,Table To Table to SQLite/Database,missing,M,P,P4
+Conversion,Layer To KML,missing,M,P,P3
+Conversion,Raster To LAS and LAS To Raster,missing,M,Y,P2
+Conversion,OSM / Open Street Map (Load OSM),missing,M,N,P4
+Cartography,"Generalization (Aggregate Polygons, Simplify, Smooth, Collapse Road Detail)",missing,L,Y,P3
+Cartography,"Masking (Feature Outline Masks, Polygon Mask)",missing,M,Y,P3
+Cartography,"Graphic Conflicts (Resolve Road Conflicts, Detect Graphic Conflict)",missing,XL,P,P4
+Cartography,"Grids and Graticules (Grid, Graticule, Measured Grid, Reference Grid)",missing,M,Y,P2
+Cartography,"Annotation (Convert Labels To Annotation, Feature To Annotation)",missing,XL,Y,P4
+Cartography,"Cartographic Partitions, Data Driven Pages (Build Cartographic Partition)",missing,M,Y,P3
+Cartography,"Symbology tools (Apply Symbology From Layer, Add Colormap, Create Cartographic Partitions)",missing,L,Y,P3
+Cartography,Representations / Cartographic Representation tools,missing,XL,P,P4
+Cartography,"Tiling schemes: Generate Map Server Cache Tiling Scheme, Create Map Tile Package",missing,XL,P,P3
+Cartography,Create Vector Tile Package / Index,missing,XL,P,P3
+Spatial Analyst > Map Algebra / Local / Math,Plus Minus Times Divide Int Float,done,S,Y,P0
+Spatial Analyst > Map Algebra / Local / Math,Abs Exp Exp2 Exp10 Ln Log2 Log10 Sqrt Square Power Mod,missing,S,Y,P0
+Spatial Analyst > Map Algebra / Local / Math,Sin Cos Tan Asin Acos Atan Atan2 Sinh Cosh Tanh,missing,S,Y,P1
+Spatial Analyst > Map Algebra / Local / Math,And Or Not Xor Bitwise (BitwiseAnd...),missing,S,Y,P1
+Spatial Analyst > Map Algebra / Local / Math,"Equal To, Greater Than, Less Than (+ Frequency)",missing,S,Y,P0
+Spatial Analyst > Map Algebra / Local / Math,Boolean And / Or,missing,S,Y,P1
+Spatial Analyst > Map Algebra / Local / Math,Round Down / Round Up / Negate / Ceil/Floor,missing,S,Y,P1
+Spatial Analyst > Map Algebra / Local / Math,Is Null,done,S,Y,P0
+Spatial Analyst > Map Algebra / Local / Math,Con,done,S,Y,P0
+Spatial Analyst > Map Algebra / Local / Math,Set Null,done,S,Y,P0
+Spatial Analyst > Map Algebra / Local / Math,Pick,missing,S,Y,P1
+Spatial Analyst > Map Algebra / Local / Math,Cell Statistics (local),missing,M,Y,P0
+Spatial Analyst > Map Algebra / Local / Math,Combine,missing,M,Y,P1
+Spatial Analyst > Map Algebra / Local / Math,Equal To Frequency etc.,missing,S,Y,P2
+Spatial Analyst > Map Algebra / Local / Math,Highest Position / Lowest Position,missing,S,Y,P2
+Spatial Analyst > Map Algebra / Local / Math,Popularity / Rank / Majority / Minority / Variety,missing,S,Y,P2
+Spatial Analyst > Map Algebra / Local / Math,Lookup,missing,S,Y,P1
+Spatial Analyst > Map Algebra / Local / Math,Raster Calculator (expression parser),missing,M,Y,P0
+Spatial Analyst > Map Algebra / Local / Math,Reclassify (cell value),done,S,Y,P0
+Spatial Analyst > Map Algebra / Local / Math,Reclass by Table / Slice / Rescale by Function,missing,M,Y,P1
+Spatial Analyst > Map Algebra / Local / Math,Raster Calculator (Python Raster class operator overloading),missing,M,Y,P1
+Spatial Analyst > Map Algebra / Local / Math,Fuzzy Membership / Fuzzy Overlay,missing,M,Y,P2
+Spatial Analyst > Map Algebra / Local / Math,Weighted Overlay / Weighted Sum,missing,S,Y,P1
+Spatial Analyst > Neighborhood / Zonal / Extraction,Focal Statistics,done,M,Y,P0
+Spatial Analyst > Neighborhood / Zonal / Extraction,Block Statistics,missing,S,Y,P1
+Spatial Analyst > Neighborhood / Zonal / Extraction,Filter (LOW/HIGH),missing,S,Y,P1
+Spatial Analyst > Neighborhood / Zonal / Extraction,Line Statistics / Point Statistics,missing,M,Y,P2
+Spatial Analyst > Neighborhood / Zonal / Extraction,Focal Flow,missing,S,Y,P3
+Spatial Analyst > Neighborhood / Zonal / Extraction,Zonal Statistics + as Table,done,M,Y,P0
+Spatial Analyst > Neighborhood / Zonal / Extraction,Zonal Fill / Zonal Geometry (+ as Table) / Zonal Histogram,missing,M,Y,P1
+Spatial Analyst > Neighborhood / Zonal / Extraction,Tabulate Area,missing,M,Y,P1
+Spatial Analyst > Neighborhood / Zonal / Extraction,Extract by Mask,done,S,Y,P0
+Spatial Analyst > Neighborhood / Zonal / Extraction,Extract by Attributes / Circle / Points / Polygon / Rectangle,missing,S,Y,P1
+Spatial Analyst > Neighborhood / Zonal / Extraction,Extract Values to Points / Sample,missing,S,Y,P1
+Spatial Analyst > Neighborhood / Zonal / Extraction,Extract Multi Values to Points,missing,S,Y,P2
+Spatial Analyst > Surface / Hydrology / Distance / Density,Slope / Aspect / Curvature,done,M,Y,P0
+Spatial Analyst > Surface / Hydrology / Distance / Density,Hillshade,partial,M,Y,P0
+Spatial Analyst > Surface / Hydrology / Distance / Density,Contour,done,M,Y,P0
+Spatial Analyst > Surface / Hydrology / Distance / Density,Contour List / Contour With Barriers,missing,M,Y,P2
+Spatial Analyst > Surface / Hydrology / Distance / Density,Viewshed (classic),partial,L,Y,P2
+Spatial Analyst > Surface / Hydrology / Distance / Density,Viewshed 2 / Observer Points,missing,L,Y,P3
+Spatial Analyst > Surface / Hydrology / Distance / Density,Visibility,missing,L,Y,P3
+Spatial Analyst > Surface / Hydrology / Distance / Density,Cut Fill / Surface Volume / Area and Volume Statistics,missing,M,Y,P2
+Spatial Analyst > Surface / Hydrology / Distance / Density,Aspect,done,M,Y,P0
+Spatial Analyst > Surface / Hydrology / Distance / Density,Surface Parameters,missing,M,Y,P2
+Spatial Analyst > Surface / Hydrology / Distance / Density,Observer Points,missing,M,Y,P3
+Spatial Analyst > Surface / Hydrology / Distance / Density,Fill / Flow Direction (D8) / Flow Accumulation,done,M,Y,P0
+Spatial Analyst > Surface / Hydrology / Distance / Density,"Flow Direction (MFD, DINF)",missing,L,Y,P2
+Spatial Analyst > Surface / Hydrology / Distance / Density,Basin / Watershed / Stream Link / Stream Order / Flow Length,done,M,Y,P0
+Spatial Analyst > Surface / Hydrology / Distance / Density,Stream To Feature / Stream Order (Shreve),missing,M,Y,P1
+Spatial Analyst > Surface / Hydrology / Distance / Density,Snap Pour Point,missing,S,Y,P1
+Spatial Analyst > Surface / Hydrology / Distance / Density,Sink / Flow Distance / Watershed vs Basin,missing,M,Y,P2
+Spatial Analyst > Surface / Hydrology / Distance / Density,Euclidean Distance,partial,M,Y,P0
+Spatial Analyst > Surface / Hydrology / Distance / Density,Euclidean Direction / Allocation,missing,M,Y,P1
+Spatial Analyst > Surface / Hydrology / Distance / Density,Cost Distance / Cost Allocation / Cost Back Link / Cost Path / Corridor / Path Distance / Cost Connectivity,missing,L,Y,P2
+Spatial Analyst > Surface / Hydrology / Distance / Density,Distance Accumulation / Distance Allocation,missing,L,Y,P3
+Spatial Analyst > Surface / Hydrology / Distance / Density,Optimal Path As Line / Region Network,missing,L,Y,P3
+Spatial Analyst > Surface / Hydrology / Distance / Density,Kernel Density / Point Density / Line Density,missing,M,Y,P1
+Spatial Analyst > Surface / Hydrology / Distance / Density,Kernel Density with barriers,missing,L,Y,P3
+Spatial Analyst > Surface / Hydrology / Distance / Density,Interpolation: IDW,missing,M,Y,P1
+Spatial Analyst > Surface / Hydrology / Distance / Density,"Kriging, Natural Neighbor, Spline, Spline with Barriers, Topo To Raster, Trend",missing,L,Y,P2
+Spatial Analyst > Surface / Hydrology / Distance / Density,"Solar Radiation (Area, Points, Graphics, Sunmap)",missing,XL,Y,P3
+Spatial Analyst > Surface / Hydrology / Distance / Density,"Groundwater (Darcy Flow, Particle Track)",missing,L,Y,P4
+Spatial Analyst > Surface / Hydrology / Distance / Density,"Multivariate (Class Probability, Principal Components, ISO Cluster, Maximum Likelihood Classification, Create Signatures, Dendrogram, Band Collection Stats)",missing,L,Y,P2
+Spatial Analyst > Surface / Hydrology / Distance / Density,"Segmentation and Classification (Segment Mean Shift, Train Random Trees, Train SVM, Classify Raster)",missing,XL,P,P3
+Spatial Analyst > Surface / Hydrology / Distance / Density,"Generalization (Aggregate, Boundary Clean, Expand, Majority Filter, Nibble, Region Group, Shrink, Thin, Thin Raster)",missing,M,Y,P2
+Spatial Analyst > Surface / Hydrology / Distance / Density,"Overlay: Fuzzy, Weighted Overlay, Weighted Sum, Combine",missing,M,Y,P1
+Spatial Analyst > Surface / Hydrology / Distance / Density,"Raster Creation: Create Constant Raster, Create Random Raster, Create Normal Raster",missing,S,P,P2
+Spatial Analyst > Surface / Hydrology / Distance / Density,"Raster Reclass: Reclassify, Rescale, Slice, Lookup",partial,M,Y,P0
+Spatial Analyst > Surface / Hydrology / Distance / Density,"Environment settings (cell size, extent, snap, mask, output CS, scratch workspace, parallel processing, compression, pyramid, tile size)",missing,M,Y,P0
+Spatial Analyst > Surface / Hydrology / Distance / Density,Geodesic Slope/Aspect with geographic data,missing,M,Y,P2
+3D Analyst,TIN Create / Edit TIN / TIN To Raster / TIN Domain / TIN Node / TIN Edge / TIN Triangle,missing,L,Y,P2
+3D Analyst,Raster To TIN (Raster To TIN uses Z tolerance),missing,L,Y,P3
+3D Analyst,"Terrain datasets (Create Terrain, Build Terrain)",missing,XL,Y,P4
+3D Analyst,Add Z Information / Interpolate Shape / Surface Information / Stack Profile,missing,M,Y,P2
+3D Analyst,Interpolate Polygon To Multipatch / Extrude Between / Skyline / Sky Barrier / Skyline Graph,missing,L,Y,P3
+3D Analyst,Line Of Sight / Construct Sight Lines / Intervisibility,missing,L,Y,P3
+3D Analyst,"Features To 3D, Layer 3D To Feature Class, Multipatch tools (Intersect 3D Line With Surface, Is Closed 3D, Replace Profile)",missing,M,Y,P3
+3D Analyst,Multipatch geometry read/write,done,M,Y,P0
+3D Analyst,"Scene layer packages (SLPK, I3S)",missing,XL,P,P4
+3D Analyst,"Raster To Multipoint, Voxel tools",missing,L,P,P4
+3D Analyst,Visibility / Viewshed 3D / Shadow Volume,missing,L,Y,P4
+Geostatistical Analyst,"Exploratory Spatial Data Analysis (histogram, Voronoi map, QQ plot, semivariogram cloud)",missing,L,N,P3
+Geostatistical Analyst,Create Geostatistical Layer / GA Layer To Grid / Contour / Points,missing,L,Y,P3
+Geostatistical Analyst,"Kriging (ordinary, simple, universal, indicator, probability, disjunctive, cokriging, empirical Bayesian)",missing,XL,Y,P3
+Geostatistical Analyst,"IDW, Global/Local Polynomial, RBF, Diffusion/Areal interpolation",missing,L,Y,P2
+Geostatistical Analyst,Cross Validation / Validation / Subset Features,missing,M,Y,P3
+Geostatistical Analyst,Geostatistical simulation (Gaussian Geostatistical Simulations),missing,XL,N,P4
+Network Analyst,Create Network Dataset / Build Network,missing,XL,Y,P2
+Network Analyst,Network dataset XML (Create Network Dataset From Template),missing,M,Y,P3
+Network Analyst,Make Route/Closest Facility/Service Area/OD Cost Matrix/Location-Allocation/VRP layer,missing,XL,Y,P2
+Network Analyst,Solve,missing,XL,Y,P2
+Network Analyst,Add Locations / Add Field To Analysis Layer / Calculate Locations,missing,L,Y,P3
+Network Analyst,"Network Analysis arcpy.na module (Route, ServiceArea, ClosestFacility)",missing,L,Y,P3
+Network Analyst,Service Area Polygons generation,missing,L,Y,P3
+Network Analyst,Vehicle Routing Problem solver,missing,XL,Y,P4
+Network Analyst,Online network/routing (World service),missing,XL,N,P4
+Network Analyst,"Utility Network (Trace, Validate, Update Subnetwork, Disable ...)",missing,XL,N,P4
+Network Analyst,Network Analyst on public transit (GTFS),missing,XL,Y,P4
+Spatial Statistics,Mean Center / Median Center / Central Feature,missing,S,Y,P1
+Spatial Statistics,Standard Distance / Directional Distribution (Standard Deviational Ellipse),missing,S,Y,P1
+Spatial Statistics,Linear Directional Mean,missing,S,Y,P2
+Spatial Statistics,Average Nearest Neighbor,missing,S,Y,P1
+Spatial Statistics,Multi-Distance Spatial Cluster Analysis (Ripley's K),missing,M,Y,P2
+Spatial Statistics,Spatial Autocorrelation (Moran's I) / Incremental Spatial Autocorrelation,missing,M,Y,P1
+Spatial Statistics,High/Low Clustering (Getis-Ord General G),missing,M,Y,P2
+Spatial Statistics,Hot Spot Analysis (Getis-Ord Gi*),missing,M,Y,P1
+Spatial Statistics,Optimized Hot Spot Analysis,missing,L,Y,P2
+Spatial Statistics,Cluster and Outlier Analysis (Anselin Local Moran's I),missing,M,Y,P1
+Spatial Statistics,Optimized Outlier Analysis,missing,L,Y,P2
+Spatial Statistics,"Spatial Weights Matrix (Generate Spatial Weights Matrix, Generate Network SWM)",missing,M,Y,P1
+Spatial Statistics,Spatially Constrained Multivariate Clustering,missing,L,Y,P3
+Spatial Statistics,"Multivariate Clustering (K-Means, K-Medoids)",missing,M,Y,P2
+Spatial Statistics,"Density-based Clustering (DBSCAN, HDBSCAN, OPTICS)",missing,M,Y,P2
+Spatial Statistics,Ordinary Least Squares (OLS) / Exploratory Regression,missing,M,Y,P1
+Spatial Statistics,Geographically Weighted Regression (GWR) / Multiscale GWR,missing,L,Y,P2
+Spatial Statistics,Generalized Linear Regression (GLR) / Forest-based Classification and Regression,missing,XL,P,P3
+Spatial Statistics,"Spatial Lag/Error, Spatial Regression",missing,M,Y,P3
+Spatial Statistics,Similarity Search / Grouping Analysis / Build Balanced Zones,missing,L,P,P3
+Spatial Statistics,Calculate Distance Band / Collect Events / Create Spatial Weights Matrix,missing,S,Y,P2
+Spatial Statistics,Kernel Interpolation With Barriers / Areal Interpolation,missing,L,Y,P3
+Spatial Statistics,Subset Features / Calculate Composite Index / Trend Detection,missing,M,Y,P3
+Spatial Statistics,Geographic Cluster Detection (SaTScan-like) / Colocation Analysis,missing,L,Y,P4
+Spatial Statistics,Dimension Reduction / Neighborhood Summary Statistics,missing,M,Y,P3
+Space Time Pattern Mining,"Create Space Time Cube (from defined locations, from features)",missing,L,Y,P3
+Space Time Pattern Mining,Emerging Hot Spot Analysis / Local Outlier Analysis / Time Series Clustering,missing,L,Y,P3
+Space Time Pattern Mining,Visualize Space Time Cube / Curve Fit Forecast / Exponential Smoothing / Forest-Based Forecast,missing,L,P,P4
+Space Time Pattern Mining,Mann-Kendall trend,missing,S,Y,P3
+Image Analyst (and raster functions),"Classification: Maximum Likelihood, ISO Cluster, Random Trees, SVM, K-nearest, Classify Raster, Train ...",missing,L,P,P2
+Image Analyst (and raster functions),Segment Mean Shift,missing,L,Y,P3
+Image Analyst (and raster functions),Accuracy Assessment / Confusion Matrix / Create Accuracy Assessment Points,missing,M,Y,P2
+Image Analyst (and raster functions),"Change detection: Compute Change Raster, Detect Change Using Change Analysis Raster, Change Detection Wizard",missing,M,Y,P3
+Image Analyst (and raster functions),"Image Analyst raster functions (~170: NDVI, SAVI, Band Arithmetic, Remap, Clip, Convolution, Pansharpening, Hillshade, Colormap, Stretch, Gamma, Statistics, Local, Focal, Mosaic, Mask, Composite, Extract Band, Spectral Conversion, Orthorectification, Fuzzy, ...)",missing,XL,Y,P2
+Image Analyst (and raster functions),"Spectral indices (Compute Spectral Index e.g. NDVI, EVI, NDWI)",missing,S,Y,P1
+Image Analyst (and raster functions),Band Arithmetic function,missing,S,Y,P1
+Image Analyst (and raster functions),"Deep learning tools (Train Deep Learning Model, Detect Objects Using Deep Learning, Classify Pixels, Export Training Data, Segment Anything)",missing,XL,N,P4
+Image Analyst (and raster functions),"Object classification, Object tracking, Super Resolution",missing,XL,N,P4
+Image Analyst (and raster functions),"Feature extraction: Raster To Polygon, Raster Object Detection",partial,M,Y,P2
+Image Analyst (and raster functions),"Orthomapping (Create Ortho Mapping Project, Compute Block Adjustment, Generate DEM/DSM/Orthomosaic from drone imagery)",missing,XL,N,P4
+Image Analyst (and raster functions),Motion imagery / FMV,missing,XL,N,P4
+Image Analyst (and raster functions),"Pansharpening (Gram-Schmidt, Brovey, IHS, Esri)",missing,M,Y,P2
+Image Analyst (and raster functions),"Radiometric: Compute Surface Reflectance, Apparent Reflectance, Dark Object Subtraction",missing,M,Y,P2
+Image Analyst (and raster functions),Raster Analysis (Raster Analytics: distributed on server),missing,XL,N,P4
+Image Analyst (and raster functions),"Mosaic dataset functions (Seamlines, Color Balance, Cloud Mask)",missing,XL,Y,P4
+Image Analyst (and raster functions),"Principal Components, Band Indexes, Hyperspectral Spectral Angle Mapper",missing,M,Y,P2
+Image Analyst (and raster functions),"Geometry / terrain: Compute Camera Model, Build Footprints",missing,L,Y,P4
+Image Analyst (and raster functions),"Raster Collections, Time-Series Analysis (Generate Trend Raster, Predict using trend, Analyze Changes using CCDC, LandTrendr)",missing,L,Y,P4
+Image Analyst (and raster functions),"Multidimensional raster tools (Make Multidimensional Raster Layer, Aggregate, Subset, Generate Multidimensional Anomaly)",missing,L,Y,P3
+Image Analyst (and raster functions),"Interpolation of Voids: Fill Voids, Remove Cloud",missing,M,Y,P3
+Image Analyst (and raster functions),"Vegetation index surfaces: Tasseled Cap, Thematic",missing,S,Y,P2
+Geocoding,Create Locator / Create Composite Address Locator,missing,XL,P,P4
+Geocoding,Geocode Addresses / Reverse Geocode / Rebuild Address Locator,missing,XL,P,P4
+Geocoding,Standardize Addresses / Geocode Table,missing,L,P,P4
+Linear Referencing,Create Routes,missing,M,Y,P2
+Linear Referencing,Calibrate Routes,missing,M,Y,P2
+Linear Referencing,Locate Features Along Routes,missing,M,Y,P2
+Linear Referencing,Make Route Event Layer / Route Event Properties,missing,M,Y,P2
+Linear Referencing,Overlay Route Events / Dissolve Route Events / Transform Route Events / Fabricate Routes,missing,L,Y,P3
+Linear Referencing,Create Route Event Tables,missing,M,Y,P3
+Linear Referencing,M-aware geometry (read/write),done,M,Y,P0
+Linear Referencing,Location Referencing (LRS),missing,XL,N,P4
+Editing tools (geoprocessing + editor),Append / Merge / Divide / Cut / Union / Planarize / Reshape / Trim / Extend / Fillet / Generalize,missing,M,Y,P3
+Editing tools (geoprocessing + editor),"Edit session semantics (arcpy.da.Editor, Start/Stop Editing, undo/redo)",missing,L,Y,P2
+Editing tools (geoprocessing + editor),Feature templates / Construction tools,missing,XL,N,P4
+Editing tools (geoprocessing + editor),Snapping environment / Attribute Transfer / Align Features,missing,M,Y,P3
+Editing tools (geoprocessing + editor),Rubbersheet Features / Edgematch Features,missing,L,Y,P3
+Editing tools (geoprocessing + editor),Subtype/domain/attribute-rule validation on edit,missing,L,Y,P3
+Editing tools (geoprocessing + editor),Topology editing,missing,XL,Y,P4
+File formats (vector),Shapefile (.shp/.shx/.dbf/.prj/.cpg/.sbn/.sbx),done,-,Y,P0
+File formats (vector),File Geodatabase read,done,XL,Y,P0
+File formats (vector),File Geodatabase write new,partial,XL,Y,P0
+File formats (vector),"File Geodatabase edit in place (update/delete/insert rows, schema changes)",missing,XL,Y,P0
+File formats (vector),Mobile Geodatabase (.geodatabase) read/write,missing,L,Y,P2
+File formats (vector),GeoPackage read/write,done,L,Y,P0
+File formats (vector),SpatiaLite (.sqlite),missing,M,Y,P2
+File formats (vector),KML/KMZ,missing,M,Y,P2
+File formats (vector),GML / GeoRSS / WFS,missing,L,P,P3
+File formats (vector),DXF / DWG / DGN,missing,XL,Y,P3
+File formats (vector),CSV / TXT tables,done,S,Y,P0
+File formats (vector),Excel xlsx/xls,missing,M,Y,P1
+File formats (vector),Esri JSON / GeoJSON,done,M,Y,P0
+File formats (vector),"TopoJSON, GeoJSONL, Parquet, Arrow, FlatGeobuf, MVT",missing,M,P,P3
+File formats (vector),Coverage / E00 / ArcInfo,missing,L,Y,P4
+File formats (vector),PostgreSQL / PostGIS / Oracle / SQL Server / SAP HANA enterprise GDB,missing,XL,N,P4
+File formats (vector),Personal geodatabase (.mdb),missing,L,N,P4
+File formats (vector),Shapefile .shp.xml metadata,missing,M,Y,P2
+File formats (vector),"Annotation, Dimension feature classes, Relationship classes (write)",missing,L,Y,P3
+File formats (vector),"Layer files (.lyrx, .lyr) / Project (.aprx) / Map packages (.mpkx) / Layer packages (.lpkx) / Project packages (.ppkx) / Tile packages (.tpkx) / Vector tile (.vtpk) / Scene (.slpk) / Geoprocessing package (.gpkx)",missing,L,Y,P2
+File formats (raster),"GeoTIFF read/write (strips/tiles, LZW/Deflate/PackBits, BigTIFF)",done,L,Y,P0
+File formats (raster),"GeoTIFF compression JPEG, LERC, ZSTD, WebP",missing,M,Y,P2
+File formats (raster),COG layout & overviews,missing,M,Y,P1
+File formats (raster),.aux.xml statistics/histograms,partial,M,Y,P0
+File formats (raster),ERDAS IMG (HFA) read/write,missing,L,Y,P2
+File formats (raster),"ESRI Grid (Arc/Info binary grid, ArcInfo workspace)",missing,L,Y,P2
+File formats (raster),ASCII grid / Float grid / BIL / BIP / BSQ / ESRI hdr,missing,S,Y,P1
+File formats (raster),JPEG / PNG / BMP / GIF,missing,S,Y,P2
+File formats (raster),JPEG2000 (.jp2),missing,L,Y,P3
+File formats (raster),MrSID / ECW,missing,XL,N,P4
+File formats (raster),CRF (Cloud Raster Format) / MRF,missing,L,Y,P3
+File formats (raster),"Esri geodatabase rasters (raster dataset, raster catalog, mosaic dataset in GDB)",missing,XL,Y,P3
+File formats (raster),NetCDF / HDF4 / HDF5 / GRIB / GRIB2,missing,L,Y,P2
+File formats (raster),"Multidimensional raster (Zarr, CRF multidim)",missing,L,P,P4
+File formats (raster),LAS/LAZ/zLAS/E57,missing,L,Y,P1
+File formats (raster),"DEM formats: DTED, USGS DEM, SDTS",missing,M,Y,P3
+File formats (raster),"NITF / SRTM HGT / SAR (Sentinel SAFE, TerraSAR, Radarsat) , Landsat/Sentinel-2 metadata readers",missing,L,P,P3
+File formats (raster),"Raster function templates (.rft.xml), Raster types",missing,L,Y,P3
+arcpy API (Python bindings),"Python bindings (PyO3 `geoforge` module, arcpy-like)",missing,L,Y,P1
+arcpy API (Python bindings),arcpy.da.SearchCursor / UpdateCursor / InsertCursor / Editor,missing,M,Y,P1
+arcpy API (Python bindings),"arcpy.da.Describe, arcpy.Describe, arcpy.ListFields",partial,M,Y,P1
+arcpy API (Python bindings),arcpy.ListFeatureClasses/ListTables/ListDatasets/ListRasters/ListWorkspaces/Walk,missing,S,Y,P1
+arcpy API (Python bindings),"arcpy.Exists, arcpy.CreateUniqueName, arcpy.ValidateFieldName",missing,S,Y,P1
+arcpy API (Python bindings),"arcpy.geometry (PointGeometry, Polyline, Polygon, Multipoint; methods: buffer, clip, contains, crosses, disjoint, distanceTo, equals, intersect, overlaps, touches, union, within, ...; projectAs)",partial,L,Y,P1
+arcpy API (Python bindings),"arcpy.Geometry methods: queryPointAndDistance, positionAlongLine, segmentAlongLine, getArea/getLength geodesic",missing,M,Y,P2
+arcpy API (Python bindings),"arcpy.sa (Raster objects, map algebra operators, all SA functions)",missing,L,Y,P1
+arcpy API (Python bindings),arcpy.na,missing,XL,Y,P3
+arcpy API (Python bindings),"arcpy.mp (Map automation: Project, Map, Layout, Layer, symbology objects, MapSeries, export)",missing,XL,P,P3
+arcpy API (Python bindings),"arcpy.metadata, arcpy.management helpers",missing,M,Y,P3
+arcpy API (Python bindings),"arcpy.env / ProcessingEnvironment (workspace, overwriteOutput, extent, cellSize, outputCoordinateSystem, scratchGDB)",missing,M,Y,P0
+arcpy API (Python bindings),arcpy.AddMessage/AddWarning/AddError/GetMessages/ExecuteError/ProgressBar,missing,S,Y,P1
+arcpy API (Python bindings),arcpy.SpatialReference / ListSpatialReferences / ListTransformations,partial,M,Y,P1
+arcpy API (Python bindings),arcpy.Parameter/ Python toolbox (.pyt) / script tools (.atbx) runner,missing,L,Y,P2
+arcpy API (Python bindings),arcpy.ImportToolbox / Result objects / geoprocessing history,missing,M,Y,P2
+arcpy API (Python bindings),arcpy.conversion/analysis/... namespaces & Tool signatures mirrored,missing,M,Y,P1
+arcpy API (Python bindings),arcpy.ListEnvironments/ ListTools / GetParameterInfo,missing,S,Y,P2
+arcpy API (Python bindings),arcpy.mapping (legacy),missing,-,-,P4
+Application-level,"Geoprocessing framework (Tool trait, typed params, validation, messages, cancellation, history)",missing,L,Y,P0
+Application-level,Environment settings framework,missing,M,Y,P0
+Application-level,"ModelBuilder (.atbx models, iterate, preconditions)",missing,XL,P,P3
+Application-level,Python toolboxes (.pyt) / script tools,missing,L,Y,P2
+Application-level,Task framework (Tasks .esriTasks),missing,L,N,P4
+Application-level,"Map view (2D renderer: symbology unique values/graduated/proportional/heat map, labeling Maplex/Standard, transparency, scale ranges)",missing,XL,P,P3
+Application-level,"Layout view / page export (PDF, PNG, TIFF, SVG, JPEG, EPS)",missing,XL,P,P4
+Application-level,"Scene view (3D, global, local, extrusion, lighting, terrain)",missing,XL,P,P4
+Application-level,"Symbology (styles .stylx, CIM symbols, marker/line/fill layers, dictionary symbols MIL-STD-2525)",missing,XL,P,P4
+Application-level,Labeling engine (Maplex),missing,XL,N,P4
+Application-level,Attribute table / Selection / Definition queries / Field aliases / Joins in-layer / Charts,missing,L,P,P3
+Application-level,Geoprocessing history & metadata of outputs,missing,M,Y,P3
+Application-level,Project file (.aprx) read/write (CIM JSON in zip),missing,L,Y,P2
+Application-level,"Bookmarks, Time slider, Animation, Share",missing,L,N,P4
+Application-level,Coordinate system picker/ Datum transformation UI,missing,M,N,P4
+Application-level,"Web tools / Publishing (Share As Web Layer, Share Web Tool, Stage Service, Upload Service Definition)",missing,XL,N,P4
+Application-level,"Portal / ArcGIS Online / ArcGIS Enterprise integration (sign in, content, Feature Services, Hosted layers)",missing,XL,N,P4
+Application-level,"ArcGIS API for Python / REST (Feature service query, Map service export)",missing,L,P,P3
+Application-level,"Offline: Map packages, Mobile map packages, Offline maps",missing,L,P,P4
+Application-level,Plugins/Add-ins/SDK (.NET),missing,-,N,P4
+Utility Network (list only),Create Utility Network / Add Rule / Trace / Validate Network Topology / Update Subnetwork / Export Subnetwork,missing,XL,N,P4
+Location Referencing / Business Analyst / Defense (skipped),"Location Referencing, Business Analyst, Defense/Military Analyst, Indoors, Parcel Fabric administration",missing,XL,N,P4
