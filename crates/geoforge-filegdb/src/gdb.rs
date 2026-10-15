@@ -153,6 +153,19 @@ impl Geodatabase {
     }
 
     /// Opens a table or feature class by name (case-insensitive, as in ArcGIS).
+    /// The path of a table's files without extension (`<gdb>/aXXXXXXXX`).
+    pub fn table_base(&self, name: &str) -> Result<PathBuf> {
+        let id = self
+            .entries
+            .iter()
+            .find(|e| e.name.eq_ignore_ascii_case(name))
+            .map(|e| e.table_id)
+            .ok_or_else(|| {
+                Error::Unsupported(format!("no table {name} in {}", self.dir.display()))
+            })?;
+        Ok(table_path(&self.dir, id))
+    }
+
     pub fn open_table(&self, name: &str) -> Result<Table> {
         let entry = self
             .entries
