@@ -1,3 +1,9 @@
+> **Superseded in part.** A second pass fetched every page of ArcGIS Pro's official tool reference
+> (doc.esri.com/en/arcgis-pro/latest) and recorded 2,157 tools with their arcpy names, licences and
+> URLs: see [`arcgis-inventory/`](arcgis-inventory/README.md) (per-toolbox CSVs, `hard_items.md` with
+> the documented algorithms of the hard tools, and `corrections.md` listing what this memory-based
+> document got wrong). Where the two disagree, the inventory is right.
+
 > **Status note.** Generated 2026-10-15 by a review agent from its own knowledge of the
 > ArcGIS Pro 3.x tool reference and a read of this repository. Tool names and parameters were
 > **not** checked against pro.arcgis.com, and the done/partial/missing marks predate the last

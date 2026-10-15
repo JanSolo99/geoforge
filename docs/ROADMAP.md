@@ -1,5 +1,9 @@
 # Roadmap
 
+The verified inventory of ArcGIS Pro's tools, formats and arcpy API (from the official documentation,
+2,157 tools) is in [`arcgis-inventory/`](arcgis-inventory/README.md); its `hard_items.md` collects the
+documented algorithms of the hard-to-replicate tools.
+
 See [`GAP_ANALYSIS.md`](GAP_ANALYSIS.md) (and `gap_list.csv`) for everything ArcGIS Pro has that
 GeoForge does not yet, with difficulty, verifiability against ArcGIS, a recommended order and an
 ENVI-parity outlook.
