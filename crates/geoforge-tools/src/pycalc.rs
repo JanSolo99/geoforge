@@ -1135,7 +1135,7 @@ fn format_value(v: &Py, spec: &str) -> Res<String> {
         (None, other) => str_of(other),
         (Some(c), _) => return Err(format!("unknown format code '{c}'")),
     };
-    let negative = matches!(kind, Some('s')) == false
+    let negative = !matches!(kind, Some('s'))
         && numeric(v).is_some_and(|f| f < 0.0 || (f == 0.0 && f.is_sign_negative()))
         && !matches!(v, Py::Str(_));
     if group {
