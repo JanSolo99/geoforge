@@ -226,8 +226,11 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
 - [x] `rewrite_table`: replace the fields and rows of an existing table keeping its file number, geometry
       definition, chosen OBJECTIDs and surviving attribute indexes (the primitive for Add/Delete Field
       and in-place tools on `.gdb` data); not yet wired into `gf`
-- [ ] Editing in place from tools (Calculate Field, Add/Delete Field, Append, ... on `.gdb` data),
-      Delete and Rename of items, adding fields to existing geodatabase tables
+- [x] Editing in place from tools on `.gdb` data (`gf` in-place tools such as Add/Delete Field, Calculate
+      Field, Append, Near, Delete Identical go through `rewrite_table`; OBJECTIDs the tool carries through
+      are kept; `tests/gdb_in_place.rs`). Not yet re-verified in ArcGIS for every tool
+- [ ] Delete and Rename of geodatabase items (edit a1/a4/a6, remove files), domains, subtypes,
+      relationship classes, feature datasets
 - [ ] ArcGIS's `timestamps`, `.freelist` (space reuse) and `.horizon` files; 64-bit OBJECTID (v4) tables
 - [ ] Write: per-vertex missing M values mixed with present ones (encoding unknown)
 - [x] Write: attribute indexes on new tables (`TableBuilder::add_attribute_index`; all indexable field
@@ -369,8 +372,9 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
   - [ ] Raster To Polygon SIMPLIFY: rule worked out for blocky rasters (104 of 122 test rasters exact;
         arcs between nodes, corners displaced diagonally by a from a fixed grid, Douglas-Peucker-like
         split with collapse/clamp, fewest-vertices choice of a) — see `docs/formats/raster-to-polygon-simplify.md`;
-        open: which corners are kept on smooth curves (circles, ellipse, real DEM classes), float ties
-        in the choice of a. Original observation: SIMPLIFY is not vertex weeding: a 7-step 30 m staircase from (210, 0)
+        open (parked after two more agent rounds, 118/139 rasters, realistic rasters 0-40%): which corners are kept on
+        smooth curves (circles, ellipse, real DEM classes), float ties in the choice of a; best untested idea: Potrace-like
+        fewest-lines search between displaced corners constrained to stay within a; steps 1-6, 8-11 of notes.md are portable. Original observation: SIMPLIFY is not vertex weeding: a 7-step 30 m staircase from (210, 0)
         to (0, 210) becomes (210, 0) → (118.519, 118.519) → (0, 210), bulging off the cell
         corners (longer staircases: 221.812 for 14 steps, 327.009 for 21, 428.4 for 28); shared
         edges stay identical between neighbors

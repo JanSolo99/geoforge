@@ -3098,11 +3098,18 @@ fn near_tool(
 /// Replaces a shapefile with a tool's output (tools that edit their input, like
 /// Near and Append): written next to it, then moved over its files.
 fn update_in_place(out: ToolOutput, dataset: &Path) -> Result<()> {
-    let Location::Shapefile(shp) = locate(dataset) else {
-        return Err(Error::Unsupported(
-            "updating a geodatabase feature class in place is not implemented yet; give an output"
-                .into(),
-        ));
+    let shp = match locate(dataset) {
+        Location::Shapefile(shp) => shp,
+        Location::Geodatabase {
+            gdb,
+            item: Some(item),
+        } => return update_gdb_in_place(out, &gdb, &item),
+        Location::Geodatabase { .. } => {
+            return Err(Error::Unsupported(format!(
+                "{} is a workspace; name a table inside it",
+                dataset.display()
+            )));
+        }
     };
     let stem = shp
         .file_stem()
@@ -3121,6 +3128,30 @@ fn update_in_place(out: ToolOutput, dataset: &Path) -> Result<()> {
         }
     }
     println!("Updated {} ({n} features)", shp.display());
+    Ok(())
+}
+
+/// Replaces the rows of a geodatabase table with a tool's output, keeping the table's
+/// identity, geometry definition and indexes. Rows keep their OBJECTID when the tool
+/// carried it through; rows without a usable one are numbered after the largest used.
+fn update_gdb_in_place(out: ToolOutput, gdb: &Path, item: &str) -> Result<()> {
+    for m in &out.messages {
+        eprintln!("{m}");
+    }
+    let base = Geodatabase::open(gdb)?.table_base(item)?;
+    let mut seen = std::collections::HashSet::new();
+    let rows: Vec<(Option<u64>, geoforge_core::Feature)> = out
+        .features
+        .into_iter()
+        .map(|f| {
+            let oid = u64::try_from(f.oid)
+                .ok()
+                .filter(|o| *o > 0 && seen.insert(*o));
+            (oid, f)
+        })
+        .collect();
+    let n = geoforge_filegdb::rewrite_table(&base, &out.fields, &rows)?;
+    println!("Updated {}/{item} ({n} features)", gdb.display());
     Ok(())
 }
 
