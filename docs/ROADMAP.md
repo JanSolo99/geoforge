@@ -366,7 +366,11 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         lines' lower-left corner with floor(extent / cell) + 1 cells, unlike Feature To Raster)
         and Polygon To Raster MAXIMUM_COMBINED_AREA, matching ArcGIS; sub-byte results whose
         values run exactly from 1 to the layout's top keep NoData 0
-  - [ ] Raster To Polygon SIMPLIFY; priority fields. SIMPLIFY is not vertex weeding: a 7-step 30 m staircase from (210, 0)
+  - [ ] Raster To Polygon SIMPLIFY: rule worked out for blocky rasters (104 of 122 test rasters exact;
+        arcs between nodes, corners displaced diagonally by a from a fixed grid, Douglas-Peucker-like
+        split with collapse/clamp, fewest-vertices choice of a) — see `docs/formats/raster-to-polygon-simplify.md`;
+        open: which corners are kept on smooth curves (circles, ellipse, real DEM classes), float ties
+        in the choice of a. Original observation: SIMPLIFY is not vertex weeding: a 7-step 30 m staircase from (210, 0)
         to (0, 210) becomes (210, 0) → (118.519, 118.519) → (0, 210), bulging off the cell
         corners (longer staircases: 221.812 for 14 steps, 327.009 for 21, 428.4 for 28); shared
         edges stay identical between neighbors
