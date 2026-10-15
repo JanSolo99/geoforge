@@ -245,6 +245,22 @@ enum Tool {
         #[arg(long)]
         output: Option<PathBuf>,
     },
+    /// Fill a field with a Python expression (ArcGIS "Calculate Field", PYTHON3).
+    /// Updates the input shapefile in place unless an output is given.
+    CalculateField {
+        in_table: PathBuf,
+        field: String,
+        /// e.g. "!VALUE! * 2" (`!FIELD!` stands for the row's value).
+        expression: String,
+        /// Python code defining functions the expression uses.
+        #[arg(long, default_value = "")]
+        code_block: String,
+        /// Creates the field with this type (TEXT, LONG, DOUBLE, ...) if it is missing.
+        #[arg(long)]
+        field_type: Option<String>,
+        #[arg(long)]
+        output: Option<PathBuf>,
+    },
     /// Delete records that repeat the values (or shape) of an earlier one (ArcGIS "Delete
     /// Identical"). Updates the input shapefile in place unless an output is given.
     DeleteIdentical {
@@ -1142,6 +1158,28 @@ fn main() -> ExitCode {
                 .collect();
             let (fc, _) = open_feature_class(&in_table)?;
             let out = geoforge_tools::delete_field(fc.as_ref(), &names, keep)?;
+            drop(fc);
+            match output {
+                Some(o) => write_output(out, &o, source_gdb(&in_table).as_deref()),
+                None => update_in_place(out, &in_table),
+            }
+        })(),
+        Tool::CalculateField {
+            in_table,
+            field,
+            expression,
+            code_block,
+            field_type,
+            output,
+        } => (|| {
+            let (fc, _) = open_feature_class(&in_table)?;
+            let out = geoforge_tools::calculate_field(
+                fc.as_ref(),
+                &field,
+                &expression,
+                &code_block,
+                field_type.as_deref(),
+            )?;
             drop(fc);
             match output {
                 Some(o) => write_output(out, &o, source_gdb(&in_table).as_deref()),

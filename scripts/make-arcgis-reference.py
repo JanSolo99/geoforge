@@ -136,6 +136,34 @@ CASES = {
     "delfield_one": ("management.DeleteField", [DATA / "parcels.shp"], ["NAME"]),
     "delfield_two": ("management.DeleteField", [DATA / "parcels.shp"], ["ZONE;VALUE"]),
     "delfield_keep": ("management.DeleteField", [DATA / "parcels.shp"], ["NAME;ZONE", "KEEP_FIELDS"]),
+    "cf_value_x2": ("management.CalculateField", [PARCELS], ["calc", "!VALUE! * 2", "PYTHON3", "", "DOUBLE"]),
+    "cf_div_long": ("management.CalculateField", [PARCELS], ["calc", "!PARCEL_ID! / 2", "PYTHON3", "", "LONG"]),
+    "cf_floordiv": ("management.CalculateField", [PARCELS], ["calc", "!PARCEL_ID! // 2", "PYTHON3", "", "LONG"]),
+    "cf_val_long": ("management.CalculateField", [PARCELS], ["calc", "!VALUE! * 2", "PYTHON3", "", "LONG"]),
+    "cf_ratio": ("management.CalculateField", [PARCELS], ["calc", "!PARCEL_ID! / 3", "PYTHON3", "", "DOUBLE"]),
+    "cf_upper": ("management.CalculateField", [PARCELS], ["calc", "!NAME!.upper()", "PYTHON3", "", "TEXT"]),
+    "cf_slice": ("management.CalculateField", [PARCELS], ["calc", "!NAME![4:]", "PYTHON3", "", "TEXT"]),
+    "cf_concat": ("management.CalculateField", [PARCELS], ["calc", "'X' + str(!ZONE!)", "PYTHON3", "", "TEXT"]),
+    "cf_round": ("management.CalculateField", [PARCELS], ["calc", "round(!VALUE!, 1)", "PYTHON3", "", "DOUBLE"]),
+    "cf_sqrt": ("management.CalculateField", [PARCELS], ["calc", "math.sqrt(!VALUE!)", "PYTHON3", "", "DOUBLE"]),
+    "cf_ifexp": ("management.CalculateField", [PARCELS], ["calc", "!VALUE! if !ZONE! > 1 else -1", "PYTHON3", "", "DOUBLE"]),
+    "cf_len": ("management.CalculateField", [PARCELS], ["calc", "len(!NAME!)", "PYTHON3", "", "LONG"]),
+    "cf_mod": ("management.CalculateField", [PARCELS], ["calc", "!PARCEL_ID! % 3", "PYTHON3", "", "LONG"]),
+    "cf_pow": ("management.CalculateField", [PARCELS], ["calc", "!PARCEL_ID! ** 2", "PYTHON3", "", "LONG"]),
+    "cf_fid": ("management.CalculateField", [PARCELS], ["calc", "!FID!", "PYTHON3", "", "LONG"]),
+    "cf_idtext": ("management.CalculateField", [PARCELS], ["calc", "!PARCEL_ID!", "PYTHON3", "", "TEXT"]),
+    "cf_valtext": ("management.CalculateField", [PARCELS], ["calc", "!VALUE!", "PYTHON3", "", "TEXT"]),
+    "cf_replace": ("management.CalculateField", [PARCELS], ["calc", "!NAME!.replace('Lot','L')", "PYTHON3", "", "TEXT"]),
+    "cf_short": ("management.CalculateField", [PARCELS], ["calc", "!VALUE!", "PYTHON3", "", "SHORT"]),
+    "cf_codeblock": ("management.CalculateField", [PARCELS], ["calc", "f(!ZONE!)", "PYTHON3", "def f(z):\n    if z > 2:\n        return 10\n    return z * 5", "LONG"]),
+    "cf_percent": ("management.CalculateField", [PARCELS], ["calc", "'%s-%d' % (!NAME!, !ZONE!)", "PYTHON3", "", "TEXT"]),
+    "cf_fstring": ("management.CalculateField", [PARCELS], ["calc", "f'{!NAME!}_{!ZONE!}'", "PYTHON3", "", "TEXT"]),
+    "cf_zone_plus": ("management.CalculateField", [PARCELS], ["calc", "!ZONE! + 0.6", "PYTHON3", "", "LONG"]),
+    "cf_int": ("management.CalculateField", [PARCELS], ["calc", "int(!VALUE!)", "PYTHON3", "", "DOUBLE"]),
+    "cf_strip": ("management.CalculateField", [PARCELS], ["calc", "!NAME!.strip().lower()", "PYTHON3", "", "TEXT"]),
+    "cf_max": ("management.CalculateField", [PARCELS], ["calc", "max(!ZONE!, 2)", "PYTHON3", "", "LONG"]),
+    "cf_date": ("management.CalculateField", [PARCELS], ["calc", "'2020-05-17'", "PYTHON3", "", "DATE"]),
+    "cf_existing": ("management.CalculateField", [PARCELS], ["ZONE", "!ZONE! * 10", "PYTHON3", "", "LONG"]),
     "symdiff_parcels_clip": ("analysis.SymDiff", [PARCELS, CLIP], []),
     "symdiff_clip_parcels": ("analysis.SymDiff", [CLIP, PARCELS], []),
     "erase_parcels": ("analysis.Erase", [DATA / "parcels.shp", DATA / "clip_areas.shp"], []),
@@ -552,7 +580,7 @@ TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable"}
 TABLE_OUT = {"gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical"}
 
 # In-place tools: the index of the input they edit (run on a copy written as the output).
-IN_PLACE = {"management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.AddGeometryAttributes": 0}
+IN_PLACE = {"management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.AddGeometryAttributes": 0}
 
 # Select Layer By Location cases, saved with Copy Features:
 # name: (in_layer, overlap_type, select_features, search_distance, invert)

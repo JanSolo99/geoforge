@@ -3,6 +3,7 @@
 //! and recorded in `testdata/arcgis-reference/manifest.json`.
 
 mod fieldmap;
+pub mod pycalc;
 mod sql;
 mod zm;
 
@@ -4567,6 +4568,160 @@ pub fn delete_field(
         features,
         messages: Vec::new(),
     })
+}
+
+/// A row value as the Python of a Calculate Field expression sees it.
+fn to_py(v: &Value) -> pycalc::Py {
+    use pycalc::Py;
+    match v {
+        Value::Null => Py::None,
+        Value::SmallInteger(n) => Py::Int(i64::from(*n)),
+        Value::Integer(n) => Py::Int(i64::from(*n)),
+        Value::BigInteger(n) => Py::Int(*n),
+        Value::Single(n) => Py::Float(f64::from(*n)),
+        Value::Double(n) => Py::Float(*n),
+        Value::String(s) | Value::Guid(s) | Value::Xml(s) => Py::Str(s.clone()),
+        Value::Date(d) => Py::Str(d.format("%Y-%m-%d %H:%M:%S").to_string()),
+        Value::DateOnly(d) => Py::Str(d.format("%Y-%m-%d").to_string()),
+        _ => Py::None,
+    }
+}
+
+/// A calculated value stored in `field`; `None` for a result the field cannot hold.
+fn from_py(v: &pycalc::Py, field: &Field) -> Option<Value> {
+    use pycalc::Py;
+    if matches!(v, Py::None) {
+        return Some(Value::Null);
+    }
+    let number = match v {
+        Py::Bool(b) => Some(f64::from(u8::from(*b))),
+        Py::Int(n) => Some(*n as f64),
+        Py::Float(f) => Some(*f),
+        _ => None,
+    };
+    match field.field_type {
+        FieldType::SmallInteger => {
+            let n = number?.round_ties_even();
+            (n.abs() <= f64::from(i16::MAX)).then_some(Value::SmallInteger(n as i16))
+        }
+        FieldType::Integer => {
+            let n = number?.round_ties_even();
+            (n.abs() <= f64::from(i32::MAX)).then_some(Value::Integer(n as i32))
+        }
+        FieldType::BigInteger => Some(Value::BigInteger(number?.round_ties_even() as i64)),
+        FieldType::Single => Some(Value::Single(number? as f32)),
+        FieldType::Double => Some(Value::Double(number?)),
+        FieldType::String => {
+            let text = pycalc::to_text(v);
+            Some(Value::String(if field.length > 0 {
+                text.chars().take(field.length as usize).collect()
+            } else {
+                text
+            }))
+        }
+        FieldType::Date => match v {
+            Py::Str(s) => {
+                let s = s.trim();
+                chrono::NaiveDateTime::parse_from_str(s, "%Y-%m-%d %H:%M:%S")
+                    .or_else(|_| chrono::NaiveDateTime::parse_from_str(s, "%Y-%m-%dT%H:%M:%S"))
+                    .or_else(|_| {
+                        chrono::NaiveDate::parse_from_str(s, "%Y-%m-%d")
+                            .map(|d| d.and_hms_opt(0, 0, 0).unwrap())
+                    })
+                    .ok()
+                    .map(Value::Date)
+            }
+            _ => None,
+        },
+        _ => None,
+    }
+}
+
+/// `arcpy.management.CalculateField(in_table, field, expression, "PYTHON3", code_block,
+/// field_type)` for a shapefile: the Python expression evaluated per row with `!FIELD!`
+/// values, stored in `field` (created from `field_type` if it does not exist). A row whose
+/// expression fails (or gives None) has no value to store, and shapefile fields cannot be
+/// null: ERROR 160145.
+pub fn calculate_field(
+    input: &dyn FeatureClass,
+    field: &str,
+    expression: &str,
+    code_block: &str,
+    field_type: Option<&str>,
+) -> Result<ToolOutput> {
+    let kind = input
+        .geometry_kind()
+        .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
+    let mut out = match input
+        .fields()
+        .iter()
+        .any(|f| f.name.eq_ignore_ascii_case(field))
+    {
+        true => ToolOutput {
+            kind,
+            has_z: input.has_z(),
+            has_m: input.has_m(),
+            fields: input.fields().to_vec(),
+            spatial_reference_wkt: input.spatial_reference_wkt().map(str::to_owned),
+            features: input.features().collect::<Result<_>>()?,
+            messages: Vec::new(),
+        },
+        false => match field_type {
+            Some(t) if !t.trim().is_empty() => add_field(input, field, t, None, None, None)?,
+            _ => {
+                return Err(Error::Unsupported(format!(
+                    "ERROR 000728: Field {field} does not exist within table"
+                )));
+            }
+        },
+    };
+    let target = out
+        .fields
+        .iter()
+        .position(|f| f.name.eq_ignore_ascii_case(field))
+        .ok_or_else(|| Error::Unsupported(format!("ERROR 000728: Field {field} does not exist")))?;
+    let interp = pycalc::Interp::new(code_block)
+        .map_err(|e| Error::Unsupported(format!("ERROR 000539: Error running expression: {e}")))?;
+    // Fields the expression names (the OID field counts as FID / OBJECTID).
+    let tokens = pycalc::field_tokens(expression);
+    let mut positions: Vec<(String, Option<usize>)> = Vec::new();
+    for t in &tokens {
+        let pos = out
+            .fields
+            .iter()
+            .position(|f| f.name.eq_ignore_ascii_case(t));
+        if pos.is_none() && !["FID", "OID", "OBJECTID"].contains(&t.as_str()) {
+            return Err(Error::Unsupported(format!(
+                "ERROR 000539: Invalid field {t}"
+            )));
+        }
+        positions.push((t.clone(), pos));
+    }
+    let target_field = out.fields[target].clone();
+    for f in &mut out.features {
+        let mut row = std::collections::HashMap::new();
+        for (name, pos) in &positions {
+            row.insert(
+                name.clone(),
+                match pos {
+                    Some(p) => to_py(&f.attributes[*p]),
+                    None => pycalc::Py::Int(f.oid),
+                },
+            );
+        }
+        let value = interp
+            .eval(expression, &row)
+            .ok()
+            .and_then(|v| from_py(&v, &target_field))
+            .unwrap_or(Value::Null);
+        if value.is_null() {
+            return Err(Error::Unsupported(
+                "ERROR 160145: The field is not nullable.".into(),
+            ));
+        }
+        f.attributes[target] = value;
+    }
+    Ok(out)
 }
 
 /// `arcpy.management.DeleteIdentical(in_dataset, fields, xy_tolerance)`: the first of each

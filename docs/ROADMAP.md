@@ -142,6 +142,14 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       WARNING 000304; an existing name warns, ERROR 000012 for another type) and Delete Field
       (DELETE_FIELDS/KEEP_FIELDS; the last field stays, ERROR 002557) for shapefiles, in place or
       `--output` — match ArcGIS on 15 cases; Alter Field, Calculate Field still to do
+- [x] Calculate Field (`gf calculate-field`, PYTHON3): a Python-subset interpreter (`pycalc`:
+      arithmetic with Python semantics, comparisons, conditional expressions, str methods and
+      slicing, `%` / `format` / f-string formatting, `math`, common builtins, a code block with
+      `def`/`if`/`for`/`while`) with `!FIELD!` values; integers round half to even into integer
+      fields, numbers become text, a failing or None row is ERROR 160145 for a shapefile; the
+      field is created from `--field-type` if missing — matches ArcGIS on 28 expressions.
+      Not covered: Arcade/SQL expressions, comprehensions, dictionaries, exceptions, imports
+      besides `math`, date arithmetic
 - [ ] Polygon To Line / Feature To Line: ArcGIS's row order is banded (holes first, then outer
       rings, row of parcels by row) in a way not worked out; LEFT_FID/RIGHT_FID semantics known
 - [x] Select with SQL `where_clause` (comparisons, AND/OR/NOT, IN, LIKE, IS NULL, arithmetic,
