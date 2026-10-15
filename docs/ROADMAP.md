@@ -215,7 +215,17 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
       matches ours on the written index.
 - [x] Table outputs (Frequency, Statistics, ...) into a new geodatabase: fields and rows equal
       ArcGIS's (`testdata/gdb-reference/stat_tables.gdb`)
-- [ ] Write: add to an existing geodatabase (system tables must be rewritten with their indexes)
+- [x] Write: add to an existing geodatabase — tables, feature classes, domains: `GeodatabaseWriter::open_existing`
+      appends rows to `GDB_SystemCatalog`, `GDB_SpatialRefs`, `GDB_Items` and `GDB_ItemRelationships`
+      and rebuilds their indexes (the rebuild reproduces ArcGIS's `.atx` files byte for byte);
+      `gf` tool outputs now go into an existing `.gdb`. Checked in ArcGIS: it lists, describes and
+      reads the new items, creates further items in the same geodatabase, indexes, edits and compacts
+- [x] Edit rows of an existing table or feature class in place (`TableEditor`: insert, update,
+      delete; row space is appended, `.gdbtablx`, spatial index, extent and attribute indexes follow;
+      ArcGIS reads, edits and compacts the result)
+- [ ] Editing in place from tools (Calculate Field, Add/Delete Field, Append, ... on `.gdb` data),
+      Delete and Rename of items, adding fields to existing geodatabase tables
+- [ ] ArcGIS's `timestamps`, `.freelist` (space reuse) and `.horizon` files; 64-bit OBJECTID (v4) tables
 - [ ] Write: per-vertex missing M values mixed with present ones (encoding unknown)
 - [x] Write: attribute indexes on new tables (`TableBuilder::add_attribute_index`; all indexable field
       types; `.atx` and `.gdbindexes` byte-identical to ArcGIS's, also 300 000-row three-level

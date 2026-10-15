@@ -58,6 +58,19 @@ pub struct GeodatabaseWriter {
     spatial_refs: Vec<GeometryDef>,
     domains: Vec<DomainItem>,
     rng: u64,
+    /// Set when adding to a geodatabase that already exists.
+    existing: Option<Existing>,
+}
+
+/// What an existing geodatabase's catalog holds that new items need to refer to.
+struct Existing {
+    root_uuid: String,
+    /// (lower-case name, UUID) of the domains already defined.
+    domain_uuids: Vec<(String, String)>,
+    /// Spatial reference rows already in `GDB_SpatialRefs`: (text, FalseX, FalseY, XYUnits).
+    spatial_refs: Vec<(String, f64, f64, f64)>,
+    /// The largest DSID in the existing item definitions.
+    max_dsid: i64,
 }
 
 /// A table or feature class being filled. Hand it back to
@@ -112,6 +125,103 @@ impl GeodatabaseWriter {
             spatial_refs: Vec::new(),
             domains: Vec::new(),
             rng: seed | 1,
+            existing: None,
+        })
+    }
+
+    /// Opens an existing `.gdb` to add tables, feature classes and domains to it. The
+    /// catalog tables (`GDB_SystemCatalog`, `GDB_SpatialRefs`, `GDB_Items`,
+    /// `GDB_ItemRelationships`) get new rows and their indexes are rebuilt by
+    /// [`GeodatabaseWriter::finish`]; existing items are left untouched.
+    pub fn open_existing(dir: impl AsRef<Path>) -> Result<Self> {
+        use crate::table::Table;
+        let dir = dir.as_ref().to_path_buf();
+        let path = |n: u64| dir.join(format!("a{n:08x}"));
+        let catalog = Table::open(path(1))?;
+        let mut tables = Vec::new();
+        for r in catalog.features() {
+            let r = r?;
+            if let Some(Value::String(name)) = r.attributes.first()
+                && !name.is_empty()
+            {
+                tables.push((name.clone(), r.oid as u64));
+            }
+        }
+        let next_table = catalog.max_oid() + 1;
+        let items = Table::open(path(4))?;
+        let col = |name: &str| {
+            items
+                .fields()
+                .iter()
+                .position(|f| f.name.eq_ignore_ascii_case(name))
+                .ok_or_else(|| Error::Unsupported(format!("GDB_Items has no {name} field")))
+        };
+        let (c_uuid, c_type, c_name, c_path, c_def) = (
+            col("UUID")?,
+            col("Type")?,
+            col("Name")?,
+            col("Path")?,
+            col("Definition")?,
+        );
+        let (mut root_uuid, mut domain_uuids, mut max_dsid) = (None, Vec::new(), 2i64);
+        for r in items.features() {
+            let r = r?;
+            let text = |i: usize| match &r.attributes[i] {
+                Value::String(s) | Value::Guid(s) | Value::Xml(s) => s.clone(),
+                _ => String::new(),
+            };
+            let (uuid, ty) = (text(c_uuid), text(c_type));
+            if ty.eq_ignore_ascii_case(TYPE_FOLDER) && text(c_path) == "\\" {
+                root_uuid = Some(uuid.clone());
+            }
+            if ty.eq_ignore_ascii_case(TYPE_CODED_DOMAIN)
+                || ty.eq_ignore_ascii_case(TYPE_RANGE_DOMAIN)
+            {
+                domain_uuids.push((text(c_name).to_lowercase(), uuid));
+            }
+            let def = text(c_def);
+            if let Some(a) = def.find("<DSID>")
+                && let Some(b) = def[a..].find("</DSID>")
+                && let Ok(n) = def[a + 6..a + b].parse::<i64>()
+            {
+                max_dsid = max_dsid.max(n);
+            }
+        }
+        let sr = Table::open(path(3))?;
+        let spatial_refs = sr
+            .features()
+            .filter_map(|r| r.ok())
+            .filter_map(|r| match r.attributes.as_slice() {
+                [
+                    Value::String(t),
+                    Value::Double(x),
+                    Value::Double(y),
+                    Value::Double(u),
+                    ..,
+                ] => Some((t.clone(), *x, *y, *u)),
+                _ => None,
+            })
+            .collect();
+        let seed = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map_or(0, |d| d.as_nanos() as u64)
+            ^ (u64::from(std::process::id()) << 32);
+        Ok(Self {
+            dir,
+            next_table,
+            tables,
+            items: Vec::new(),
+            spatial_refs: Vec::new(),
+            domains: Vec::new(),
+            rng: seed | 1,
+            existing: Some(Existing {
+                root_uuid: root_uuid.ok_or_else(|| {
+                    Error::Unsupported("the geodatabase has no root folder item".into())
+                })?,
+                domain_uuids,
+                spatial_refs,
+                max_dsid,
+            }),
         })
     }
 
@@ -122,6 +232,11 @@ impl GeodatabaseWriter {
             .domains
             .iter()
             .any(|d| d.domain.name.eq_ignore_ascii_case(&domain.name))
+            || self.existing.as_ref().is_some_and(|e| {
+                e.domain_uuids
+                    .iter()
+                    .any(|(n, _)| *n == domain.name.to_lowercase())
+            })
         {
             return Err(Error::Unsupported(format!(
                 "domain {} already exists",
@@ -134,6 +249,18 @@ impl GeodatabaseWriter {
             domain: domain.clone(),
         });
         Ok(())
+    }
+
+    /// Whether a domain named `name` exists (added here, or already in the geodatabase).
+    pub fn has_domain(&self, name: &str) -> bool {
+        let lower = name.to_lowercase();
+        self.domains
+            .iter()
+            .any(|d| d.domain.name.to_lowercase() == lower)
+            || self
+                .existing
+                .as_ref()
+                .is_some_and(|e| e.domain_uuids.iter().any(|(n, _)| *n == lower))
     }
 
     /// Starts a feature class (`kind = Some(..)`) or table (`None`). `fields` are the
@@ -240,9 +367,13 @@ impl GeodatabaseWriter {
         }
 
         let uuid = self.uuid();
+        let dsid = match &self.existing {
+            Some(e) => e.max_dsid as usize + 1 + self.items.len(),
+            None => self.items.len() + 3,
+        };
         let definition = item_definition(
             &t.name,
-            self.items.len() + 3,
+            dsid,
             t.kind,
             t.has_z,
             t.has_m,
@@ -263,6 +394,9 @@ impl GeodatabaseWriter {
 
     /// Writes the system tables. The geodatabase is complete afterwards.
     pub fn finish(mut self) -> Result<()> {
+        if self.existing.is_some() {
+            return self.finish_existing();
+        }
         let s = |v: &str| Value::String(v.to_owned());
         let g = |v: &str| Value::Guid(v.to_owned());
 
@@ -332,27 +466,7 @@ impl GeodatabaseWriter {
         }
         let mut t = self.system(3, fields)?;
         for d in std::mem::take(&mut self.spatial_refs) {
-            let wkt = d
-                .srs_wkt
-                .clone()
-                .unwrap_or_else(|| "{B286C06B-0879-11D2-AACA-00C04FA33C20}".into());
-            let v = Value::Double;
-            t.push(
-                None,
-                &[
-                    s(&wkt),
-                    v(d.x_origin),
-                    v(d.y_origin),
-                    v(d.xy_scale),
-                    v(d.z_origin),
-                    v(d.z_scale),
-                    v(d.m_origin),
-                    v(d.m_scale),
-                    v(d.xy_tolerance),
-                    v(d.z_tolerance),
-                    v(d.m_tolerance),
-                ],
-            )?;
+            t.push(None, &spatial_ref_values(&d))?;
         }
         t.finish()?;
 
@@ -429,60 +543,10 @@ impl GeodatabaseWriter {
             ],
         )?;
         for item in &self.items {
-            let (ty, sub2, info1) = match item.kind {
-                Some(k) => (
-                    TYPE_FEATURE_CLASS,
-                    Value::Integer(geometry_code(k)),
-                    s("SHAPE"),
-                ),
-                None => (TYPE_TABLE, Value::Null, Value::Null),
-            };
-            t.push(
-                None,
-                &[
-                    g(&item.uuid),
-                    g(ty),
-                    s(&item.name),
-                    s(&item.name.to_uppercase()),
-                    s(&format!("\\{}", item.name)),
-                    Value::Integer(1),
-                    sub2,
-                    info1,
-                    null.clone(),
-                    s(""),
-                    Value::Xml(item.definition.clone()),
-                    null.clone(),
-                    null.clone(),
-                    Value::Integer(1),
-                    null.clone(),
-                ],
-            )?;
+            t.push(None, &item_values(item))?;
         }
         for d in &self.domains {
-            let ty = match d.domain.kind {
-                DomainKind::Coded(_) => TYPE_CODED_DOMAIN,
-                DomainKind::Range { .. } => TYPE_RANGE_DOMAIN,
-            };
-            t.push(
-                None,
-                &[
-                    g(&d.uuid),
-                    g(ty),
-                    s(&d.domain.name),
-                    s(&d.domain.name.to_uppercase()),
-                    s(""),
-                    null.clone(),
-                    null.clone(),
-                    null.clone(),
-                    null.clone(),
-                    s(""),
-                    Value::Xml(domain_xml(&d.domain)),
-                    null.clone(),
-                    null.clone(),
-                    Value::Integer(1),
-                    null.clone(),
-                ],
-            )?;
+            t.push(None, &domain_values(d))?;
         }
         t.finish()?;
 
@@ -532,17 +596,7 @@ impl GeodatabaseWriter {
         }
         for (origin, dest, ty) in links {
             let uuid = self.uuid();
-            t.push(
-                None,
-                &[
-                    g(&uuid),
-                    g(&origin),
-                    g(&dest),
-                    g(ty),
-                    Value::Null,
-                    Value::Integer(1),
-                ],
-            )?;
+            t.push(None, &relationship_values(&uuid, &origin, &dest, ty))?;
         }
         t.finish()?;
 
@@ -574,6 +628,98 @@ impl GeodatabaseWriter {
         };
         write("gdb", &[0x05, 0, 0, 0, 0xDE, 0xAD, 0xBE, 0xEF])?;
         write("timestamps", &[0xFF; 400])?;
+        Ok(())
+    }
+
+    /// Appends the new items to the catalog tables of an existing geodatabase.
+    fn finish_existing(mut self) -> Result<()> {
+        use crate::writer::edit::TableEditor;
+        let ex = self.existing.take().expect("existing geodatabase");
+        let row = |attributes: Vec<Value>| Feature {
+            oid: 0,
+            geometry: None,
+            attributes,
+        };
+        // GDB_SpatialRefs: spatial references not registered yet.
+        let known = |d: &GeometryDef| {
+            let wkt = d
+                .srs_wkt
+                .clone()
+                .unwrap_or_else(|| "{B286C06B-0879-11D2-AACA-00C04FA33C20}".into());
+            ex.spatial_refs.iter().any(|(t, x, y, u)| {
+                *t == wkt && *x == d.x_origin && *y == d.y_origin && *u == d.xy_scale
+            })
+        };
+        let new_refs: Vec<GeometryDef> = std::mem::take(&mut self.spatial_refs)
+            .into_iter()
+            .filter(|d| !known(d))
+            .collect();
+        if !new_refs.is_empty() {
+            let mut ed = TableEditor::open(self.table_path(3))?;
+            for d in &new_refs {
+                ed.insert(&row(spatial_ref_values(d)))?;
+            }
+            ed.finish()?;
+        }
+        // GDB_Items and GDB_ItemRelationships.
+        let mut links: Vec<(String, String, &str)> = self
+            .items
+            .iter()
+            .map(|i| (ex.root_uuid.clone(), i.uuid.clone(), REL_DATASET_IN_FOLDER))
+            .collect();
+        for item in &self.items {
+            for name in &item.domains {
+                let lower = name.to_lowercase();
+                let found = self
+                    .domains
+                    .iter()
+                    .find(|d| d.domain.name.to_lowercase() == lower)
+                    .map(|d| d.uuid.clone())
+                    .or_else(|| {
+                        ex.domain_uuids
+                            .iter()
+                            .find(|(n, _)| *n == lower)
+                            .map(|(_, u)| u.clone())
+                    });
+                if let Some(d) = found {
+                    links.push((item.uuid.clone(), d, REL_DOMAIN_IN_DATASET));
+                }
+            }
+        }
+        if !self.items.is_empty() || !self.domains.is_empty() {
+            let mut ed = TableEditor::open(self.table_path(4))?;
+            for item in &self.items {
+                ed.insert(&row(item_values(item)))?;
+            }
+            for d in &self.domains {
+                ed.insert(&row(domain_values(d)))?;
+            }
+            ed.finish()?;
+            let mut ed = TableEditor::open(self.table_path(6))?;
+            for (origin, dest, ty) in links {
+                let uuid = self.uuid();
+                ed.insert(&row(relationship_values(&uuid, &origin, &dest, ty)))?;
+            }
+            ed.finish()?;
+        }
+        // GDB_SystemCatalog: last, so a table is listed only once everything else is in place.
+        if !self.tables.is_empty() {
+            let mut ed = TableEditor::open(self.table_path(1))?;
+            let mut new_tables: Vec<&(String, u64)> = self
+                .tables
+                .iter()
+                .filter(|(_, id)| *id > ed.max_oid())
+                .collect();
+            new_tables.sort_by_key(|t| t.1);
+            for (name, id) in new_tables {
+                while ed.max_oid() + 1 < *id {
+                    ed.insert(&row(vec![Value::String(String::new()), Value::Integer(0)]))?;
+                }
+                let at = ed.insert(&row(vec![Value::String(name.clone()), Value::Integer(0)]))?;
+                debug_assert_eq!(at, *id);
+            }
+            ed.finish()?;
+        }
         Ok(())
     }
 
@@ -609,6 +755,116 @@ impl GeodatabaseWriter {
             h[10..].concat()
         )
     }
+}
+
+/// A row of `GDB_SpatialRefs` for a geometry definition.
+fn spatial_ref_values(d: &GeometryDef) -> Vec<Value> {
+    let wkt = d
+        .srs_wkt
+        .clone()
+        .unwrap_or_else(|| "{B286C06B-0879-11D2-AACA-00C04FA33C20}".into());
+    let v = Value::Double;
+    vec![
+        Value::String(wkt),
+        v(d.x_origin),
+        v(d.y_origin),
+        v(d.xy_scale),
+        v(d.z_origin),
+        v(d.z_scale),
+        v(d.m_origin),
+        v(d.m_scale),
+        v(d.xy_tolerance),
+        v(d.z_tolerance),
+        v(d.m_tolerance),
+    ]
+}
+
+/// A row of `GDB_Items` (without its OBJECTID).
+#[allow(clippy::too_many_arguments)]
+fn catalog_item_values(
+    uuid: &str,
+    ty: &str,
+    name: &str,
+    physical_name: &str,
+    path: &str,
+    subtype1: Value,
+    subtype2: Value,
+    info1: Value,
+    definition: Value,
+    properties: i32,
+) -> Vec<Value> {
+    let null = Value::Null;
+    vec![
+        Value::Guid(uuid.to_owned()),
+        Value::Guid(ty.to_owned()),
+        Value::String(name.to_owned()),
+        Value::String(physical_name.to_owned()),
+        Value::String(path.to_owned()),
+        subtype1,
+        subtype2,
+        info1,
+        null.clone(),
+        Value::String(String::new()),
+        definition,
+        null.clone(),
+        null.clone(),
+        Value::Integer(properties),
+        null,
+    ]
+}
+
+fn item_values(item: &Item) -> Vec<Value> {
+    let (ty, sub2, info1) = match item.kind {
+        Some(k) => (
+            TYPE_FEATURE_CLASS,
+            Value::Integer(geometry_code(k)),
+            Value::String("SHAPE".to_owned()),
+        ),
+        None => (TYPE_TABLE, Value::Null, Value::Null),
+    };
+    catalog_item_values(
+        &item.uuid,
+        ty,
+        &item.name,
+        &item.name.to_uppercase(),
+        &format!("\\{}", item.name),
+        Value::Integer(1),
+        sub2,
+        info1,
+        Value::Xml(item.definition.clone()),
+        1,
+    )
+}
+
+fn domain_values(d: &DomainItem) -> Vec<Value> {
+    let ty = match d.domain.kind {
+        DomainKind::Coded(_) => TYPE_CODED_DOMAIN,
+        DomainKind::Range { .. } => TYPE_RANGE_DOMAIN,
+    };
+    catalog_item_values(
+        &d.uuid,
+        ty,
+        &d.domain.name,
+        &d.domain.name.to_uppercase(),
+        "",
+        Value::Null,
+        Value::Null,
+        Value::Null,
+        Value::Xml(domain_xml(&d.domain)),
+        1,
+    )
+}
+
+/// A row of `GDB_ItemRelationships`.
+fn relationship_values(uuid: &str, origin: &str, dest: &str, ty: &str) -> Vec<Value> {
+    vec![
+        Value::Guid(uuid.to_owned()),
+        Value::Guid(origin.to_owned()),
+        Value::Guid(dest.to_owned()),
+        Value::Guid(ty.to_owned()),
+        Value::Null,
+        Value::Integer(1),
+    ]
 }
 
 fn field(name: &str, field_type: GdbFieldType, nullable: bool, length: u32) -> GdbField {

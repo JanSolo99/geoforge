@@ -31,8 +31,18 @@ fn matches_arcgis_indexes() {
     let (mut same, mut total, mut differing) = (0, 0, Vec::new());
     for p in &sbns {
         let name = p.file_name().unwrap().to_string_lossy().to_string();
-        // In-place tools (Repair Geometry, Append) leave ArcGIS's earlier index.
-        if name.starts_with("repair_") || name.starts_with("append_") {
+        // In-place tools (Repair Geometry, Append, Delete Identical, field tools) leave ArcGIS's earlier index.
+        if [
+            "repair_",
+            "append_",
+            "deli_",
+            "addfield_",
+            "delfield_",
+            "cf_",
+        ]
+        .iter()
+        .any(|p| name.starts_with(p))
+        {
             continue;
         }
         let shp = std::fs::read(p.with_extension("shp")).unwrap();

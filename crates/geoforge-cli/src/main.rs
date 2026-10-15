@@ -2856,18 +2856,26 @@ fn write_output(mut out: ToolOutput, output: &Path, source_gdb: Option<&Path>) -
     }
 }
 
+/// A writer for a new geodatabase, or one that adds to the geodatabase at `gdb` if it exists.
+fn open_geodatabase_writer(gdb: &Path) -> Result<geoforge_filegdb::GeodatabaseWriter> {
+    if gdb.join("a00000001.gdbtable").is_file() {
+        geoforge_filegdb::GeodatabaseWriter::open_existing(gdb)
+    } else if gdb.exists() {
+        Err(Error::Unsupported(format!(
+            "{} exists but is not a file geodatabase",
+            gdb.display()
+        )))
+    } else {
+        geoforge_filegdb::GeodatabaseWriter::create(gdb)
+    }
+}
+
 fn write_geodatabase(
     out: ToolOutput,
     gdb: &Path,
     name: &str,
     source_gdb: Option<&Path>,
 ) -> Result<()> {
-    if gdb.exists() {
-        return Err(Error::Unsupported(format!(
-            "{} exists; adding to an existing geodatabase is not implemented yet",
-            gdb.display()
-        )));
-    }
     let names = geodatabase_field_names(&out.fields);
     let fields: Vec<Field> = out
         .fields
@@ -2878,15 +2886,13 @@ fn write_geodatabase(
             ..f.clone()
         })
         .collect();
-    let mut w = geoforge_filegdb::GeodatabaseWriter::create(gdb)?;
+    let mut w = open_geodatabase_writer(gdb)?;
     // Like ArcGIS, carry over the attribute domains the copied fields use.
     if let Some(source) = source_gdb {
         let src = Geodatabase::open(source)?;
-        let mut added: Vec<&str> = Vec::new();
         for name in fields.iter().filter_map(|f| f.domain.as_deref()) {
-            if let Some(d) = src.domain(name).filter(|_| !added.contains(&name)) {
+            if let Some(d) = src.domain(name).filter(|d| !w.has_domain(&d.name)) {
                 w.add_domain(d)?;
-                added.push(name);
             }
         }
     }
@@ -3231,12 +3237,6 @@ fn write_table(table: &geoforge_tools::TableOutput, path: &Path) -> Result<()> {
     if let Location::Geodatabase { gdb, item } = locate(path) {
         let name =
             item.ok_or_else(|| Error::Unsupported("name the output table inside the .gdb".into()))?;
-        if gdb.exists() {
-            return Err(Error::Unsupported(format!(
-                "{} exists; adding to an existing geodatabase is not implemented yet",
-                gdb.display()
-            )));
-        }
         let names = geodatabase_field_names(&table.fields);
         let fields: Vec<Field> = table
             .fields
@@ -3247,7 +3247,7 @@ fn write_table(table: &geoforge_tools::TableOutput, path: &Path) -> Result<()> {
                 ..f.clone()
             })
             .collect();
-        let mut w = geoforge_filegdb::GeodatabaseWriter::create(&gdb)?;
+        let mut w = open_geodatabase_writer(&gdb)?;
         let mut t = w.create_table(&name, None, false, false, &fields, None)?;
         for (i, row) in table.rows.iter().enumerate() {
             t.write(&Feature {
