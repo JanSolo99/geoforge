@@ -4129,6 +4129,7 @@ name = "rustgis-geoforge"
 version = "0.2.0"
 dependencies = [
  "geoforge-core",
+ "geoforge-geometry",
  "geoforge-tools",
  "rustgis-analysis",
  "rustgis-data",

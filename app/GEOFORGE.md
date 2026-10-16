@@ -15,8 +15,12 @@ original copyright notices and mark modified files.
   Desktop only (not built for wasm32).
 - `crates/geoforge` (`rustgis-geoforge`): registers `geoforge-tools` as the external suite `geoforge`
   (ids `geoforge:clip`, `erase`, `intersect`, `union`, `symmetrical_difference`, `dissolve`,
-  `multipart_to_singlepart`, `feature_to_point`), enabled by the engine feature `geoforge`. Layers are
-  WGS 84, so only topology tools are exposed; Buffer/Near wait for geodesic support. `geoforge-tools`
+  `multipart_to_singlepart`, `feature_to_point`, `select`, `buffer`, `near`, `spatial_join`,
+  `select_by_location`, `frequency`, `statistics`), enabled by the engine feature `geoforge`. Layers are
+  WGS 84 lon/lat; topology tools run on them as they are, tools that measure (Buffer, Near, search
+  distances) run in the UTM zone at the centre of their inputs (metres, planar, as ArcGIS on projected
+  data) and project the result back (`Work` in `crates/geoforge/src/lib.rs`). Data wider than ~12°
+  gets a message that distances are approximate. Layers do not yet remember a native CRS. `geoforge-tools`
   has a default `proj` feature (Project); the app turns it off because proj-sys's `libsqlite3-sys`
   conflicts with the app's rusqlite.
 - Next: more tools in the registry, then Python/MCP bindings.

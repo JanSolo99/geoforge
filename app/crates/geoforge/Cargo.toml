@@ -14,4 +14,5 @@ rustgis-data = { workspace = true }
 rustgis-analysis = { workspace = true }
 serde_json = { workspace = true }
 geoforge-core = { path = "../../../crates/geoforge-core" }
+geoforge-geometry = { path = "../../../crates/geoforge-geometry" }
 geoforge-tools = { path = "../../../crates/geoforge-tools", default-features = false }

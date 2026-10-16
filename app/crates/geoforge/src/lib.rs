@@ -7,15 +7,16 @@
 //! classes, the engine runs the ArcGIS algorithm (parameters, output schema, row order as
 //! ArcGIS's), and its output comes back as a layer.
 //!
-//! Layers in RustGIS are WGS 84 longitude/latitude, so the engine runs with that coordinate
-//! system: overlay tools (topology, not distances) behave as ArcGIS does on geographic data,
-//! with ArcGIS's geographic XY tolerance. Distance tools (Buffer, Near) wait for geodesic
-//! support; ArcGIS's own buffer on geographic data is geodesic.
+//! Layers in RustGIS are WGS 84 longitude/latitude. Tools that only relate shapes (Clip, Erase,
+//! Intersect, ...) run on them as they are, with ArcGIS's geographic XY tolerance. Tools that
+//! measure (Buffer, Near, search distances) run in the UTM zone of the data, as ArcGIS does on
+//! projected data, in metres, and their results are projected back: see [`Work`].
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
 
 use geoforge_core as gf;
 use geoforge_tools as tools;
 use rustgis_analysis::{Inputs, Output, ParamKind as K, ParamSpec as P, ToolResult, ToolSpec};
+use rustgis_data::raster::{Crs, Transformer};
 use rustgis_data::source::filegdb::from_geoforge;
 use rustgis_data::{Dataset, Field, FieldType, Geometry, GeometryType, Value};
 use rustgis_geom::Coord;
@@ -36,10 +37,86 @@ pub fn register() {
 }
 
 // ---------------------------------------------------------------------------------------------
+// working coordinate system
+
+/// The coordinate system a tool runs in. Layers are longitude/latitude; a tool that measures
+/// distances runs in the UTM zone of its inputs (metres, planar, like ArcGIS on projected data)
+/// and its output is projected back.
+struct Work {
+    wkt: String,
+    to: Option<(Transformer, Transformer)>,
+    /// Said once to the user when the data is too wide for one zone to be accurate.
+    note: Option<String>,
+}
+
+impl Work {
+    /// Longitude/latitude as they are.
+    fn degrees() -> Work {
+        Work { wkt: WGS84_WKT.into(), to: None, note: None }
+    }
+
+    /// The UTM zone at the centre of `layers`' extent.
+    fn metres(layers: &[&Dataset]) -> Result<Work, String> {
+        let mut e = rustgis_geom::Extent::EMPTY;
+        for g in layers.iter().flat_map(|d| d.features.iter()).filter_map(|f| f.geometry.as_ref()) {
+            g.for_each_coord(|c| e.expand(c));
+        }
+        if e.is_empty() {
+            return Ok(Work::degrees());
+        }
+        let (lon, lat) = ((e.min_x + e.max_x) / 2.0, ((e.min_y + e.max_y) / 2.0).clamp(-80.0, 84.0));
+        let zone = (((lon + 180.0) / 6.0).floor() as i32).rem_euclid(60) + 1;
+        let north = lat >= 0.0;
+        let code = (if north { 32600 } else { 32700 }) + zone as u32;
+        let crs = Crs::from_epsg(code).ok_or_else(|| format!("no coordinate system EPSG:{code}"))?;
+        let t = crs.transformer()?;
+        let back = crs.transformer()?;
+        let central = f64::from(zone) * 6.0 - 183.0;
+        let wide = e.width() > 12.0 || (e.min_y.abs() > 84.0 || e.max_y.abs() > 84.0);
+        let name = format!("WGS_1984_UTM_Zone_{zone}{}", if north { 'N' } else { 'S' });
+        let wkt = format!(
+            "PROJCS[\"{name}\",{WGS84_WKT},PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000.0],PARAMETER[\"False_Northing\",{}],PARAMETER[\"Central_Meridian\",{central}],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0.0],UNIT[\"Meter\",1.0]]",
+            if north { "0.0" } else { "10000000.0" }
+        );
+        let note = wide.then(|| format!("The data spans more than one UTM zone; distances are measured in {name} and are approximate away from its central meridian."));
+        Ok(Work { wkt, to: Some((t, back)), note })
+    }
+
+    /// A longitude/latitude coordinate in the working system.
+    fn fwd(&self, c: Coord) -> Option<Coord> {
+        match &self.to {
+            None => Some(c),
+            Some((t, _)) => t.from_lonlat(c),
+        }
+    }
+
+    /// A working coordinate in longitude/latitude.
+    fn back(&self, c: Coord) -> Option<Coord> {
+        match &self.to {
+            None => Some(c),
+            Some((_, t)) => t.to_lonlat(c),
+        }
+    }
+
+    /// A geometry with every coordinate moved by `f`; `None` when one can't be.
+    fn geometry(&self, g: &Geometry, f: impl Fn(&Work, Coord) -> Option<Coord>) -> Option<Geometry> {
+        let ok = std::cell::Cell::new(true);
+        let out = g.map_coords(&|c| {
+            f(self, c).filter(|p| p.x.is_finite() && p.y.is_finite()).unwrap_or_else(|| {
+                ok.set(false);
+                c
+            })
+        });
+        ok.get().then_some(out)
+    }
+}
+
+// ---------------------------------------------------------------------------------------------
 // conversions
 
 /// A layer (or its selected rows) as a GeoForge feature class.
 struct Fc {
+    wkt: String,
     kind: Option<gf::GeometryKind>,
     fields: Vec<gf::Field>,
     features: Vec<gf::Feature>,
@@ -65,7 +142,7 @@ impl gf::FeatureClass for Fc {
         "Shape"
     }
     fn spatial_reference_wkt(&self) -> Option<&str> {
-        Some(WGS84_WKT)
+        Some(&self.wkt)
     }
     fn stored_extent(&self) -> Option<gf::Envelope> {
         None
@@ -159,7 +236,7 @@ fn has_multipoints(ds: &Dataset) -> bool {
     ds.features.iter().any(|f| matches!(f.geometry, Some(Geometry::MultiPoint(_))))
 }
 
-fn to_fc(ds: &Dataset, rows: &[usize]) -> Fc {
+fn to_fc(ds: &Dataset, rows: &[usize], work: &Work) -> Fc {
     let mut kind = kind_of(ds.geometry_type);
     if kind == Some(gf::GeometryKind::Point) && has_multipoints(ds) {
         kind = Some(gf::GeometryKind::Multipoint);
@@ -169,11 +246,11 @@ fn to_fc(ds: &Dataset, rows: &[usize]) -> Fc {
         .filter_map(|&r| ds.features.get(r).map(|f| (r, f)))
         .map(|(_, f)| gf::Feature {
             oid: f.id as i64,
-            geometry: f.geometry.as_ref().and_then(to_gf_geometry),
+            geometry: f.geometry.as_ref().and_then(|g| work.geometry(g, Work::fwd)).as_ref().and_then(to_gf_geometry),
             attributes: f.attrs.iter().zip(&ds.fields).map(|(v, fl)| to_gf_value(v, fl.ty)).collect(),
         })
         .collect();
-    Fc { kind, fields: ds.fields.iter().map(to_gf_field).collect(), features }
+    Fc { wkt: work.wkt.clone(), kind, fields: ds.fields.iter().map(to_gf_field).collect(), features }
 }
 
 fn from_gf_value(v: gf::Value) -> Value {
@@ -203,7 +280,7 @@ fn from_gf_field_type(t: gf::FieldType) -> FieldType {
 }
 
 /// A tool's output as a layer named `name`.
-fn to_dataset(out: tools::ToolOutput, name: String) -> Dataset {
+fn to_dataset(out: tools::ToolOutput, name: String, work: &Work) -> Dataset {
     let geometry_type = match out.kind {
         gf::GeometryKind::Point | gf::GeometryKind::Multipoint => GeometryType::Point,
         gf::GeometryKind::Polyline => GeometryType::Polyline,
@@ -221,7 +298,7 @@ fn to_dataset(out: tools::ToolOutput, name: String) -> Dataset {
         .collect();
     let mut ds = Dataset::new(name, geometry_type, fields);
     for f in out.features {
-        let g = f.geometry.as_ref().and_then(from_geoforge);
+        let g = f.geometry.as_ref().and_then(from_geoforge).and_then(|g| work.geometry(&g, Work::back));
         ds.push_next(g, f.attributes.into_iter().map(from_gf_value).collect());
     }
     ds
@@ -238,13 +315,28 @@ fn flag(p: &Json, k: &str) -> bool {
     p.get(k).and_then(Json::as_bool).unwrap_or(false)
 }
 
-fn layer<'a>(inp: &'a dyn Inputs, p: &Json, k: &str) -> Result<(&'a Dataset, Fc), String> {
+/// A layer as a feature class in `work`'s coordinate system. As in ArcGIS, a layer with a
+/// selection is read as its selected features unless `whole`.
+fn layer_in<'a>(inp: &'a dyn Inputs, p: &Json, k: &str, work: &Work, whole: bool) -> Result<(&'a Dataset, Fc), String> {
     let name = text(p, k);
     let ds = inp.dataset(name).ok_or_else(|| format!("no layer named '{name}'"))?;
-    // As in ArcGIS, a layer with a selection is read as its selected features.
     let sel = inp.selection(name);
-    let rows: Vec<usize> = if sel.is_empty() { (0..ds.features.len()).collect() } else { sel.to_vec() };
-    Ok((ds, to_fc(ds, &rows)))
+    let rows: Vec<usize> = if sel.is_empty() || whole { (0..ds.features.len()).collect() } else { sel.to_vec() };
+    Ok((ds, to_fc(ds, &rows, work)))
+}
+
+fn layer<'a>(inp: &'a dyn Inputs, p: &Json, k: &str) -> Result<(&'a Dataset, Fc), String> {
+    layer_in(inp, p, k, &Work::degrees(), false)
+}
+
+/// The datasets named by parameters `keys`.
+fn datasets<'a>(inp: &'a dyn Inputs, p: &Json, keys: &[&str]) -> Result<Vec<&'a Dataset>, String> {
+    keys.iter()
+        .map(|k| {
+            let name = text(p, k);
+            inp.dataset(name).ok_or_else(|| format!("no layer named '{name}'"))
+        })
+        .collect()
 }
 
 fn out_name(p: &Json, default: String) -> String {
@@ -252,16 +344,68 @@ fn out_name(p: &Json, default: String) -> String {
     if n.is_empty() { default } else { n.to_string() }
 }
 
-fn finish(out: tools::ToolOutput, name: String) -> Result<ToolResult, String> {
-    let messages = out.messages.clone();
-    let ds = to_dataset(out, name);
+fn messages(out: &tools::ToolOutput, ds: &Dataset, work: &Work) -> Vec<String> {
     let mut m = vec![format!("{}: {} features", ds.name, ds.features.len())];
-    m.extend(messages);
+    m.extend(work.note.clone());
+    m.extend(out.messages.clone());
+    m
+}
+
+fn finish_in(out: tools::ToolOutput, name: String, work: &Work) -> Result<ToolResult, String> {
+    let ds = to_dataset_checked(out.clone(), name, work)?;
+    let m = messages(&out, &ds, work);
     Ok(ToolResult { output: Output::Layer(ds), messages: m })
+}
+
+fn finish(out: tools::ToolOutput, name: String) -> Result<ToolResult, String> {
+    finish_in(out, name, &Work::degrees())
+}
+
+/// [`to_dataset`], failing when a result coordinate can't be projected back.
+fn to_dataset_checked(out: tools::ToolOutput, name: String, work: &Work) -> Result<Dataset, String> {
+    let expected = out.features.iter().filter(|f| f.geometry.is_some()).count();
+    let ds = to_dataset(out, name, work);
+    let got = ds.features.iter().filter(|f| f.geometry.is_some()).count();
+    if got < expected {
+        return Err(format!("{} result shapes could not be projected back to longitude/latitude", expected - got));
+    }
+    Ok(ds)
+}
+
+fn table_dataset(t: tools::TableOutput, name: String) -> Dataset {
+    let fields = t.fields.iter().map(|f| Field::new(&f.name, from_gf_field_type(f.field_type))).collect();
+    let mut ds = Dataset::new(name, GeometryType::None, fields);
+    for row in t.rows {
+        ds.push_next(None, row.into_iter().map(from_gf_value).collect());
+    }
+    ds
 }
 
 fn err(e: gf::Error) -> String {
     e.to_string()
+}
+
+/// A number parameter.
+fn number(p: &Json, k: &str) -> Option<f64> {
+    p.get(k).and_then(|v| v.as_f64().or_else(|| v.as_str().and_then(|s| s.trim().parse().ok()))).filter(|f| f.is_finite())
+}
+
+/// A distance parameter `k` in the unit parameter `units`, in metres.
+fn metres(p: &Json, k: &str) -> Option<f64> {
+    let d = number(p, k)?;
+    let f = match text(p, "units").to_ascii_uppercase().as_str() {
+        "KILOMETERS" => 1000.0,
+        "MILES" => 1609.344,
+        "FEET" => 0.3048,
+        "YARDS" => 0.9144,
+        "NAUTICAL_MILES" => 1852.0,
+        _ => 1.0,
+    };
+    Some(d * f)
+}
+
+fn list(p: &Json, k: &str) -> Vec<String> {
+    text(p, k).split(';').map(str::trim).filter(|s| !s.is_empty()).map(String::from).collect()
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -311,7 +455,7 @@ fn symmetrical_difference(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, Stri
 
 fn dissolve(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     let (ds, fc) = layer(inp, p, "input")?;
-    let fields: Vec<String> = text(p, "fields").split(';').map(str::trim).filter(|s| !s.is_empty()).map(String::from).collect();
+    let fields = list(p, "fields");
     let multi = !flag(p, "single_part");
     finish(tools::dissolve(&fc, &fields, &[], multi).map_err(err)?, out_name(p, format!("{}_Dissolve", ds.name)))
 }
@@ -327,8 +471,150 @@ fn feature_to_point(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     finish(tools::feature_to_point(&fc, inside).map_err(err)?, out_name(p, format!("{}_Point", ds.name)))
 }
 
+fn select(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let (ds, fc) = layer(inp, p, "input")?;
+    let clause = text(p, "where");
+    let clause = (!clause.is_empty()).then_some(clause);
+    finish(tools::select(&fc, clause).map_err(err)?, out_name(p, format!("{}_Select", ds.name)))
+}
+
+/// Buffer: in the UTM zone of the input, so the distance is on the ground.
+fn buffer(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    use geoforge_geometry::{LineEnd, LineSide};
+    let ds0 = datasets(inp, p, &["input"])?;
+    let work = Work::metres(&ds0)?;
+    let (ds, fc) = layer_in(inp, p, "input", &work, false)?;
+    let d = metres(p, "distance").ok_or("Buffer: 'Distance' must be a number")?;
+    let end = match text(p, "line_end").to_ascii_uppercase().as_str() {
+        "FLAT" => LineEnd::Flat,
+        _ => LineEnd::Round,
+    };
+    let side = match text(p, "line_side").to_ascii_uppercase().as_str() {
+        "LEFT" => LineSide::Left,
+        "RIGHT" => LineSide::Right,
+        "OUTSIDE_ONLY" => LineSide::OutsideOnly,
+        _ => LineSide::Full,
+    };
+    let dissolve = match text(p, "dissolve").to_ascii_uppercase().as_str() {
+        "ALL" => tools::Dissolve::All,
+        "LIST" => tools::Dissolve::List(list(p, "dissolve_fields")),
+        _ => tools::Dissolve::None,
+    };
+    let out = tools::buffer(&fc, tools::BufferDistance::Linear(d), end, side, dissolve).map_err(err)?;
+    finish_in(out, out_name(p, format!("{}_Buffer", ds.name)), &work)
+}
+
+/// Near: adds `NEAR_FID`/`NEAR_DIST` (metres) to the input layer, as ArcGIS does in place.
+fn near(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let all = datasets(inp, p, &["input", "near"])?;
+    let work = Work::metres(&all)?;
+    let (ds, fc) = layer_in(inp, p, "input", &work, true)?;
+    let (nds, nfc) = layer_in(inp, p, "near", &work, false)?;
+    let radius = metres(p, "search_radius");
+    let (loc, ang) = (flag(p, "location"), flag(p, "angle"));
+    let near = [tools::PathInput { source: nds.name.clone(), features: &nfc }];
+    let out = tools::near(&fc, &near, radius, loc, ang).map_err(err)?;
+    let mut out_ds = to_dataset_checked(out.clone(), ds.name.clone(), &work)?;
+    // NEAR_X / NEAR_Y are working-system coordinates: back to longitude/latitude.
+    if loc && let (Some(xi), Some(yi)) = (out_ds.field_index("NEAR_X"), out_ds.field_index("NEAR_Y")) {
+        for f in &mut out_ds.features {
+            let (x, y) = (f.attrs.get(xi).and_then(Value::as_f64), f.attrs.get(yi).and_then(Value::as_f64));
+            if let (Some(x), Some(y)) = (x, y)
+                && !(x == -1.0 && y == -1.0)
+                && let Some(c) = work.back(Coord::new(x, y))
+            {
+                f.attrs[xi] = Value::Float(c.x);
+                f.attrs[yi] = Value::Float(c.y);
+            }
+        }
+    }
+    let m = messages(&out, &out_ds, &work);
+    Ok(ToolResult { output: Output::Update { layer: ds.name.clone(), dataset: out_ds }, messages: m })
+}
+
+fn spatial_join(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let option = tools::MatchOption::parse(text(p, "match_option")).unwrap_or(tools::MatchOption::Intersect);
+    let measures = matches!(option, tools::MatchOption::WithinADistance | tools::MatchOption::Closest);
+    let all = datasets(inp, p, &["input", "other"])?;
+    let work = if measures { Work::metres(&all)? } else { Work::degrees() };
+    let (target, tfc) = layer_in(inp, p, "input", &work, false)?;
+    let (join, jfc) = layer_in(inp, p, "other", &work, false)?;
+    let opts = tools::SpatialJoinOptions {
+        merge_rules: Vec::new(),
+        one_to_many: text(p, "join_operation").eq_ignore_ascii_case("JOIN_ONE_TO_MANY"),
+        keep_all: !flag(p, "keep_common"),
+        match_option: option,
+        search_radius: metres(p, "search_radius"),
+        distance_field_name: Some(text(p, "distance_field_name").to_string()).filter(|s| !s.is_empty()),
+        field_map: None,
+        target_name: target.name.clone(),
+        join_name: join.name.clone(),
+    };
+    let out = tools::spatial_join(&tfc, &jfc, &opts).map_err(err)?;
+    finish_in(out, out_name(p, format!("{}_SpatialJoin", target.name)), &work)
+}
+
+fn select_by_location(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let overlap = tools::Overlap::parse(text(p, "overlap_type")).unwrap_or(tools::Overlap::Intersect);
+    let distance = metres(p, "search_distance");
+    let measures = matches!(overlap, tools::Overlap::WithinADistance)
+        || (matches!(overlap, tools::Overlap::Intersect) && distance.is_some_and(|d| d > 0.0));
+    let all = datasets(inp, p, &["input", "other"])?;
+    let work = if measures { Work::metres(&all)? } else { Work::degrees() };
+    let (ds, mut fc) = layer_in(inp, p, "input", &work, false)?;
+    let (_, sfc) = layer_in(inp, p, "other", &work, false)?;
+    // The tool renumbers its output's OIDs, so each feature carries its own through a hidden field.
+    fc.fields.push(gf::Field::new("__ID", gf::FieldType::BigInteger));
+    for f in &mut fc.features {
+        f.attributes.push(gf::Value::BigInteger(f.oid));
+    }
+    let out = tools::select_by_location(&fc, overlap, &sfc, distance, flag(p, "invert")).map_err(err)?;
+    let ids: std::collections::HashSet<i64> = out
+        .features
+        .iter()
+        .filter_map(|f| if let Some(gf::Value::BigInteger(i)) = f.attributes.last() { Some(*i) } else { None })
+        .collect();
+    let rows: Vec<usize> = ds.features.iter().enumerate().filter(|(_, f)| ids.contains(&(f.id as i64))).map(|(i, _)| i).collect();
+    let mut m = vec![format!("{} of {} features selected", rows.len(), ds.features.len())];
+    m.extend(work.note.clone());
+    Ok(ToolResult { output: Output::Selection { layer: ds.name.clone(), rows }, messages: m })
+}
+
+fn frequency(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let (ds, fc) = layer(inp, p, "input")?;
+    let t = tools::frequency(&fc, &list(p, "fields"), &list(p, "summary_fields")).map_err(err)?;
+    let t = table_dataset(t, out_name(p, format!("{}_Frequency", ds.name)));
+    let m = vec![format!("{}: {} rows", t.name, t.features.len())];
+    Ok(ToolResult { output: Output::Table(t), messages: m })
+}
+
+fn statistics(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let (ds, fc) = layer(inp, p, "input")?;
+    // "FIELD STAT;FIELD STAT"
+    let stats: Vec<(String, tools::Statistic)> = list(p, "statistics")
+        .iter()
+        .map(|s| {
+            let (f, st) = s.rsplit_once(char::is_whitespace).ok_or_else(|| format!("'{s}': write FIELD STATISTIC"))?;
+            let st = tools::Statistic::parse(st.trim()).ok_or_else(|| format!("unknown statistic '{st}'"))?;
+            Ok((f.trim().to_string(), st))
+        })
+        .collect::<Result<_, String>>()?;
+    let t = tools::statistics(&fc, &stats, &list(p, "case_fields")).map_err(err)?;
+    let t = table_dataset(t, out_name(p, format!("{}_Statistics", ds.name)));
+    let m = vec![format!("{}: {} rows", t.name, t.features.len())];
+    Ok(ToolResult { output: Output::Table(t), messages: m })
+}
+
 const INPUT: P = P { name: "input", label: "Input Features", kind: K::Layer, required: true, default: "", help: "" };
 const OTHER: P = P { name: "other", label: "Overlay Features", kind: K::Layer, required: true, default: "", help: "" };
+const UNITS: P = P {
+    name: "units",
+    label: "Units",
+    kind: K::Choice(&["METERS", "KILOMETERS", "MILES", "FEET", "YARDS", "NAUTICAL_MILES"]),
+    required: false,
+    default: "\"METERS\"",
+    help: "Unit of the distances.",
+};
 const OUTPUT: P = P {
     name: "output",
     label: "Output Name",
@@ -439,6 +725,236 @@ const DEFS: &[Def] = &[
         ],
         run: feature_to_point,
     },
+    Def {
+        id: "select",
+        name: "Select",
+        toolbox: "GeoForge › Analysis › Extract",
+        summary: "Features that match an SQL expression (ArcGIS Pro Select).",
+        params: &[
+            INPUT,
+            P {
+                name: "where",
+                label: "Expression",
+                kind: K::Text,
+                required: false,
+                default: "",
+                help: "SQL, e.g. POP > 100 AND NAME LIKE 'A%'",
+            },
+            OUTPUT,
+        ],
+        run: select,
+    },
+    Def {
+        id: "buffer",
+        name: "Buffer",
+        toolbox: "GeoForge › Analysis › Proximity",
+        summary: "Zones around features, measured on the ground in the data's UTM zone (ArcGIS Pro Buffer, planar).",
+        params: &[
+            INPUT,
+            P { name: "distance", label: "Distance", kind: K::Number, required: true, default: "", help: "" },
+            UNITS,
+            P {
+                name: "line_side",
+                label: "Side Type",
+                kind: K::Choice(&["FULL", "LEFT", "RIGHT", "OUTSIDE_ONLY"]),
+                required: false,
+                default: "\"FULL\"",
+                help: "",
+            },
+            P { name: "line_end", label: "End Type", kind: K::Choice(&["ROUND", "FLAT"]), required: false, default: "\"ROUND\"", help: "" },
+            P {
+                name: "dissolve",
+                label: "Dissolve Type",
+                kind: K::Choice(&["NONE", "ALL", "LIST"]),
+                required: false,
+                default: "\"NONE\"",
+                help: "",
+            },
+            P {
+                name: "dissolve_fields",
+                label: "Dissolve Fields",
+                kind: K::Text,
+                required: false,
+                default: "",
+                help: "For LIST: field names separated by semicolons.",
+            },
+            OUTPUT,
+        ],
+        run: buffer,
+    },
+    Def {
+        id: "near",
+        name: "Near",
+        toolbox: "GeoForge › Analysis › Proximity",
+        summary: "Adds the distance (m) and ID of the nearest feature to the input layer (ArcGIS Pro Near, in place).",
+        params: &[
+            INPUT,
+            P { name: "near", label: "Near Features", kind: K::Layer, required: true, default: "", help: "" },
+            P {
+                name: "search_radius",
+                label: "Search Radius",
+                kind: K::Number,
+                required: false,
+                default: "",
+                help: "No radius: search everywhere.",
+            },
+            UNITS,
+            P {
+                name: "location",
+                label: "Add NEAR_X/NEAR_Y",
+                kind: K::Bool,
+                required: false,
+                default: "false",
+                help: "Written as longitude and latitude.",
+            },
+            P {
+                name: "angle",
+                label: "Add NEAR_ANGLE",
+                kind: K::Bool,
+                required: false,
+                default: "false",
+                help: "Degrees counter-clockwise from the UTM grid's east.",
+            },
+        ],
+        run: near,
+    },
+    Def {
+        id: "spatial_join",
+        name: "Spatial Join",
+        toolbox: "GeoForge › Analysis › Overlay",
+        summary: "Joins attributes of one layer to another by location (ArcGIS Pro Spatial Join).",
+        params: &[
+            INPUT,
+            OTHER,
+            P {
+                name: "join_operation",
+                label: "Join Operation",
+                kind: K::Choice(&["JOIN_ONE_TO_ONE", "JOIN_ONE_TO_MANY"]),
+                required: false,
+                default: "\"JOIN_ONE_TO_ONE\"",
+                help: "",
+            },
+            P { name: "keep_common", label: "Keep only matching features", kind: K::Bool, required: false, default: "false", help: "" },
+            P {
+                name: "match_option",
+                label: "Match Option",
+                kind: K::Choice(&[
+                    "INTERSECT",
+                    "WITHIN_A_DISTANCE",
+                    "CONTAINS",
+                    "COMPLETELY_CONTAINS",
+                    "WITHIN",
+                    "COMPLETELY_WITHIN",
+                    "CLOSEST",
+                ]),
+                required: false,
+                default: "\"INTERSECT\"",
+                help: "",
+            },
+            P { name: "search_radius", label: "Search Radius", kind: K::Number, required: false, default: "", help: "" },
+            UNITS,
+            P {
+                name: "distance_field_name",
+                label: "Distance Field Name",
+                kind: K::Text,
+                required: false,
+                default: "",
+                help: "For CLOSEST: metres.",
+            },
+            OUTPUT,
+        ],
+        run: spatial_join,
+    },
+    Def {
+        id: "select_by_location",
+        name: "Select Layer By Location",
+        toolbox: "GeoForge › Data Management › Layers and Table Views",
+        summary: "Selects the features of a layer related to features of another (ArcGIS Pro Select Layer By Location).",
+        params: &[
+            INPUT,
+            P {
+                name: "overlap_type",
+                label: "Relationship",
+                kind: K::Choice(&[
+                    "INTERSECT",
+                    "WITHIN_A_DISTANCE",
+                    "CONTAINS",
+                    "COMPLETELY_CONTAINS",
+                    "CONTAINS_CLEMENTINI",
+                    "WITHIN",
+                    "COMPLETELY_WITHIN",
+                    "WITHIN_CLEMENTINI",
+                    "ARE_IDENTICAL_TO",
+                    "BOUNDARY_TOUCHES",
+                    "SHARE_A_LINE_SEGMENT_WITH",
+                    "CROSSED_BY_THE_OUTLINE_OF",
+                    "HAVE_THEIR_CENTER_IN",
+                ]),
+                required: false,
+                default: "\"INTERSECT\"",
+                help: "",
+            },
+            OTHER,
+            P { name: "search_distance", label: "Search Distance", kind: K::Number, required: false, default: "", help: "" },
+            UNITS,
+            P { name: "invert", label: "Invert spatial relationship", kind: K::Bool, required: false, default: "false", help: "" },
+        ],
+        run: select_by_location,
+    },
+    Def {
+        id: "frequency",
+        name: "Frequency",
+        toolbox: "GeoForge › Analysis › Statistics",
+        summary: "A table of how often each combination of field values occurs (ArcGIS Pro Frequency).",
+        params: &[
+            INPUT,
+            P {
+                name: "fields",
+                label: "Frequency Fields",
+                kind: K::Text,
+                required: true,
+                default: "",
+                help: "Field names separated by semicolons.",
+            },
+            P {
+                name: "summary_fields",
+                label: "Summary Fields",
+                kind: K::Text,
+                required: false,
+                default: "",
+                help: "Numeric fields to sum, separated by semicolons.",
+            },
+            OUTPUT,
+        ],
+        run: frequency,
+    },
+    Def {
+        id: "statistics",
+        name: "Summary Statistics",
+        toolbox: "GeoForge › Analysis › Statistics",
+        summary: "Statistics of fields, per case field (ArcGIS Pro Summary Statistics).",
+        params: &[
+            INPUT,
+            P {
+                name: "statistics",
+                label: "Statistics Fields",
+                kind: K::Text,
+                required: true,
+                default: "",
+                help: "FIELD STATISTIC pairs separated by semicolons: POP SUM;AREA MEAN. Statistics: SUM MEAN MIN MAX RANGE STD COUNT FIRST LAST MEDIAN VARIANCE UNIQUE.",
+            },
+            P {
+                name: "case_fields",
+                label: "Case Fields",
+                kind: K::Text,
+                required: false,
+                default: "",
+                help: "Field names separated by semicolons.",
+            },
+            OUTPUT,
+        ],
+        run: statistics,
+    },
 ];
 
 fn specs() -> Vec<ToolSpec> {
@@ -527,11 +1043,97 @@ mod tests {
         assert_eq!(union.features.len(), 3);
     }
 
+    fn points(name: &str, pts: &[(f64, f64)]) -> Dataset {
+        let mut d = Dataset::new(name, GeometryType::Point, vec![Field::new("N", FieldType::Integer)]);
+        for (i, (x, y)) in pts.iter().enumerate() {
+            d.push(Some(Geometry::Point(Coord::new(*x, *y))), vec![Value::Int(i as i64)]);
+        }
+        d
+    }
+
+    /// Ground distance in metres between two lon/lat points (haversine).
+    fn ground(a: Coord, b: Coord) -> f64 {
+        let (p, q) = (a.y.to_radians(), b.y.to_radians());
+        let h = ((q - p) / 2.0).sin().powi(2) + p.cos() * q.cos() * ((b.x - a.x).to_radians() / 2.0).sin().powi(2);
+        2.0 * 6_371_008.8 * h.sqrt().asin()
+    }
+
+    #[test]
+    fn buffer_distance_is_on_the_ground() {
+        register();
+        // Sydney and Tromsø: a degree is a very different length in each.
+        for (lon, lat) in [(151.2, -33.9), (18.9, 69.6)] {
+            let layers = Layers(vec![points("p", &[(lon, lat)])]);
+            let d =
+                dataset(rustgis_analysis::run("geoforge:buffer", &layers, &json!({"input": "p", "distance": 1, "units": "KILOMETERS"})));
+            let Some(Geometry::Polygon(ps)) = &d.features[0].geometry else { panic!("polygon") };
+            let c = Coord::new(lon, lat);
+            let ring = &ps[0][0];
+            assert!(ring.len() > 16);
+            for v in ring {
+                let r = ground(c, *v);
+                assert!((r - 1000.0).abs() < 5.0, "{lat}: {r}");
+            }
+            // ArcGIS's schema for a buffer: the input fields, BUFF_DIST, ORIG_FID.
+            let names: Vec<&str> = d.fields.iter().map(|f| f.name.as_str()).collect();
+            assert_eq!(names, ["N", "BUFF_DIST", "ORIG_FID"]);
+        }
+    }
+
+    #[test]
+    fn near_measures_metres_and_updates_in_place() {
+        register();
+        let layers = Layers(vec![points("a", &[(10.0, 50.0)]), points("b", &[(10.0, 50.01), (11.0, 50.0)])]);
+        let r = rustgis_analysis::run("geoforge:near", &layers, &json!({"input": "a", "near": "b", "location": true})).unwrap();
+        let Output::Update { layer, dataset } = r.output else { panic!("update") };
+        assert_eq!(layer, "a");
+        let at = |n: &str| dataset.features[0].attrs[dataset.field_index(n).unwrap()].clone();
+        let want = ground(Coord::new(10.0, 50.0), Coord::new(10.0, 50.01));
+        assert!(matches!(at("NEAR_DIST"), Value::Float(d) if (d - want).abs() < 1.0), "{:?} vs {want}", at("NEAR_DIST"));
+        assert_eq!(at("NEAR_FID"), Value::Int(1));
+        // NEAR_X/NEAR_Y come back as longitude/latitude.
+        assert!(matches!(at("NEAR_Y"), Value::Float(y) if (y - 50.01).abs() < 1e-6));
+    }
+
+    #[test]
+    fn select_by_distance_and_tables() {
+        register();
+        let layers = Layers(vec![points("a", &[(10.0, 50.0), (10.0, 50.5)]), points("b", &[(10.0, 50.001)])]);
+        let r = rustgis_analysis::run(
+            "geoforge:select_by_location",
+            &layers,
+            &json!({"input": "a", "other": "b", "overlap_type": "WITHIN_A_DISTANCE", "search_distance": 500}),
+        )
+        .unwrap();
+        let Output::Selection { rows, .. } = r.output else { panic!("selection") };
+        assert_eq!(rows, vec![0]);
+        let f = rustgis_analysis::run("geoforge:frequency", &layers, &json!({"input": "a", "fields": "N"})).unwrap();
+        let Output::Table(t) = f.output else { panic!("table") };
+        assert_eq!(t.features.len(), 2);
+        let s = rustgis_analysis::run("geoforge:statistics", &layers, &json!({"input": "a", "statistics": "N SUM"})).unwrap();
+        let Output::Table(t) = s.output else { panic!("table") };
+        assert_eq!(t.features[0].attrs, vec![Value::Int(2), Value::Float(1.0)]);
+    }
+
     #[test]
     fn bad_parameters_are_errors_not_panics() {
         register();
         let layers = Layers(vec![square("a", 0.0, 0.0, 1.0)]);
-        for id in ["clip", "erase", "intersect", "union", "dissolve", "feature_to_point"] {
+        for id in [
+            "clip",
+            "erase",
+            "intersect",
+            "union",
+            "dissolve",
+            "feature_to_point",
+            "buffer",
+            "near",
+            "spatial_join",
+            "select_by_location",
+            "select",
+            "frequency",
+            "statistics",
+        ] {
             let _ = rustgis_analysis::run(&format!("geoforge:{id}"), &layers, &json!({"input": "nope", "clip": 3, "other": null}));
             let _ = rustgis_analysis::run(
                 &format!("geoforge:{id}"),
