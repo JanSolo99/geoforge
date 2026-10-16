@@ -229,8 +229,13 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
 - [x] Editing in place from tools on `.gdb` data (`gf` in-place tools such as Add/Delete Field, Calculate
       Field, Append, Near, Delete Identical go through `rewrite_table`; OBJECTIDs the tool carries through
       are kept; `tests/gdb_in_place.rs`). Not yet re-verified in ArcGIS for every tool
-- [ ] Delete and Rename of geodatabase items (edit a1/a4/a6, remove files), domains, subtypes,
-      relationship classes, feature datasets
+- [x] Delete and Rename of tables, feature classes, relationship classes, feature datasets and domains
+      (`delete_item`, `rename_item`, `delete_domain`, `rename_domain`; `gf delete/rename/delete-domain/
+      alter-domain`): catalog, items, relationships, definition XML and files equal ArcGIS's after each
+      operation (`testdata/gdb-reference/catalog_ops`, `scripts/gdb-snapshot.py`); ArcGIS reads, edits and
+      compacts the results. A table's deletion takes its relationship classes with it; a domain fields use is
+      refused (ERROR 002630)
+- [ ] Delete and Rename of subtypes
 - [ ] ArcGIS's `timestamps`, `.freelist` (space reuse) and `.horizon` files; 64-bit OBJECTID (v4) tables
 - [ ] Write: per-vertex missing M values mixed with present ones (encoding unknown)
 - [x] Write: attribute indexes on new tables (`TableBuilder::add_attribute_index`; all indexable field

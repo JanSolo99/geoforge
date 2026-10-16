@@ -17,5 +17,6 @@ pub use schema::{
 };
 pub use table::{GdbField, GdbFieldType, GeometryDef, Table, compare_values};
 pub use writer::{
-    GeodatabaseWriter, TableBuilder, TableEditor, rebuild_attribute_indexes, rewrite_table,
+    GeodatabaseWriter, TableBuilder, TableEditor, delete_domain, delete_item,
+    rebuild_attribute_indexes, rename_domain, rename_item, rewrite_table,
 };

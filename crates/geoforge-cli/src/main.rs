@@ -273,6 +273,31 @@ enum Tool {
         #[arg(long)]
         output: Option<PathBuf>,
     },
+    /// Delete a shapefile (with its sidecar files) or an item of a file geodatabase: a table,
+    /// feature class, relationship class (also the relationship classes that use a deleted
+    /// table) or feature dataset with its feature classes (ArcGIS "Delete").
+    Delete {
+        /// `roads.shp` or `city.gdb/roads`.
+        in_data: PathBuf,
+    },
+    /// Rename a shapefile or a geodatabase item; a feature dataset's children move with it
+    /// (ArcGIS "Rename"). The new name is the last component of `out_data`.
+    Rename {
+        in_data: PathBuf,
+        /// A new name, or a path ending in it (`city.gdb/roads2`).
+        out_data: PathBuf,
+    },
+    /// Delete a domain from a file geodatabase; one fields use is refused (ArcGIS "Delete Domain").
+    DeleteDomain {
+        in_workspace: PathBuf,
+        domain_name: String,
+    },
+    /// Rename a domain of a file geodatabase, and in the fields that use it (ArcGIS "Alter Domain").
+    AlterDomain {
+        in_workspace: PathBuf,
+        domain_name: String,
+        new_domain_name: String,
+    },
     /// Features matching an SQL expression (ArcGIS "Select").
     Select {
         in_features: PathBuf,
@@ -1186,6 +1211,18 @@ fn main() -> ExitCode {
                 None => update_in_place(out, &in_table),
             }
         })(),
+        Tool::Delete { in_data } => delete_data(&in_data),
+        Tool::Rename { in_data, out_data } => rename_data(&in_data, &out_data),
+        Tool::DeleteDomain {
+            in_workspace,
+            domain_name,
+        } => geoforge_filegdb::delete_domain(&in_workspace, &domain_name),
+        Tool::AlterDomain {
+            in_workspace,
+            domain_name,
+            new_domain_name,
+        } => geoforge_filegdb::rename_domain(&in_workspace, &domain_name, &new_domain_name)
+            ,
         Tool::DeleteIdentical {
             in_dataset,
             fields,
@@ -2987,6 +3024,118 @@ fn source_gdb(input: &Path) -> Option<PathBuf> {
     match locate(input) {
         Location::Geodatabase { gdb, .. } => Some(gdb),
         Location::Shapefile(_) => None,
+    }
+}
+
+/// The files of a shapefile: `<stem>.<ext>` for each extension a shapefile (or ArcGIS, beside it) uses.
+fn shapefile_files(shp: &Path) -> Vec<PathBuf> {
+    const EXTENSIONS: &[&str] = &[
+        "shp", "shx", "dbf", "prj", "cpg", "sbn", "sbx", "shp.xml", "qix", "idx", "atx", "ixs",
+        "mxs", "fbn", "fbx", "ain", "aih", "dbf.xml", "dbf.lock",
+    ];
+    let (Some(dir), Some(stem)) = (shp.parent(), shp.file_stem()) else {
+        return Vec::new();
+    };
+    let dir = if dir.as_os_str().is_empty() {
+        Path::new(".")
+    } else {
+        dir
+    };
+    let stem = stem.to_string_lossy().into_owned();
+    std::fs::read_dir(dir)
+        .map(|rd| {
+            rd.flatten()
+                .map(|e| e.path())
+                .filter(|p| {
+                    let name = p
+                        .file_name()
+                        .map(|n| n.to_string_lossy().to_ascii_lowercase())
+                        .unwrap_or_default();
+                    let prefix = format!("{}.", stem.to_ascii_lowercase());
+                    name.strip_prefix(&prefix).is_some_and(|ext| {
+                        EXTENSIONS.contains(&ext)
+                            || (ext.ends_with(".lock") && ext.starts_with("shp"))
+                    })
+                })
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
+/// Delete: a shapefile with its sidecar files, or a geodatabase item.
+fn delete_data(path: &Path) -> Result<()> {
+    match locate(path) {
+        Location::Shapefile(shp) => {
+            let files = shapefile_files(&shp);
+            if files.is_empty() {
+                return Err(Error::Unsupported(format!(
+                    "ERROR 000732: Dataset {} does not exist or is not supported",
+                    shp.display()
+                )));
+            }
+            for f in files {
+                std::fs::remove_file(&f).map_err(|e| Error::io(&f, e))?;
+            }
+            Ok(())
+        }
+        Location::Geodatabase { gdb, item: Some(item) } => {
+            let gone = geoforge_filegdb::delete_item(&gdb, &item)?;
+            println!("Deleted: {}", gone.join(", "));
+            Ok(())
+        }
+        Location::Geodatabase { item: None, .. } => Err(Error::Unsupported(
+            "name the item to delete inside the .gdb (deleting a whole geodatabase: remove the folder)".into(),
+        )),
+    }
+}
+
+/// Rename: a shapefile's files, or a geodatabase item.
+fn rename_data(path: &Path, to: &Path) -> Result<()> {
+    let new = to
+        .file_stem()
+        .or_else(|| to.file_name())
+        .map(|n| n.to_string_lossy().into_owned())
+        .ok_or_else(|| Error::Unsupported("give the new name".into()))?;
+    match locate(path) {
+        Location::Shapefile(shp) => {
+            let files = shapefile_files(&shp);
+            if files.is_empty() {
+                return Err(Error::Unsupported(format!(
+                    "ERROR 000732: Dataset {} does not exist or is not supported",
+                    shp.display()
+                )));
+            }
+            let dir = shp.parent().unwrap_or(Path::new("."));
+            let old_stem = shp
+                .file_stem()
+                .map(|s| s.to_string_lossy().into_owned())
+                .unwrap_or_default();
+            if shapefile_files(&dir.join(format!("{new}.shp")))
+                .iter()
+                .any(|p| !files.contains(p))
+            {
+                return Err(Error::Unsupported(format!(
+                    "ERROR 000725: Output Dataset or Feature Class: Dataset {new} already exists."
+                )));
+            }
+            for f in files {
+                let name = f
+                    .file_name()
+                    .map(|n| n.to_string_lossy().into_owned())
+                    .unwrap_or_default();
+                let rest = name.get(old_stem.len()..).unwrap_or("");
+                let dest = dir.join(format!("{new}{rest}"));
+                std::fs::rename(&f, &dest).map_err(|e| Error::io(&f, e))?;
+            }
+            Ok(())
+        }
+        Location::Geodatabase {
+            gdb,
+            item: Some(item),
+        } => geoforge_filegdb::rename_item(&gdb, &item, &new),
+        Location::Geodatabase { item: None, .. } => Err(Error::Unsupported(
+            "name the item to rename inside the .gdb".into(),
+        )),
     }
 }
 

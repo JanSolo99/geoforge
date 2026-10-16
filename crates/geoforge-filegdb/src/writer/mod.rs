@@ -5,6 +5,7 @@
 //! files, user tables from `a00000009` with an OBJECTID and spatial index.
 
 mod btree;
+mod catalog;
 mod edit;
 mod geometry;
 mod keys;
@@ -23,6 +24,7 @@ use crate::table::{GdbField, GdbFieldType, GeometryDef};
 use btree::{spatial_entries, write_index};
 use table::TableWriter;
 
+pub use catalog::{delete_domain, delete_item, rename_domain, rename_item};
 pub use edit::TableEditor;
 pub use rebuild::rebuild_attribute_indexes;
 pub use rewrite::rewrite_table;
