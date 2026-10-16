@@ -1,0 +1,893 @@
+//! L4: the session (project, undo, active map/layer/tool) and the command registry.
+//!
+//! **Everything is a command.** Each user-visible action is a [`CommandSpec`] with an id; the
+//! ribbon, keyboard shortcuts, command search and the command line all dispatch through
+//! [`Session::run`]. Programmatic calls never open dialogs.
+#![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
+
+pub mod cmd;
+pub mod project;
+pub mod sample;
+pub mod sources;
+#[cfg(test)]
+mod tests;
+
+pub use project::Project;
+pub use rustgis_analysis as analysis;
+pub use rustgis_data as data;
+pub use rustgis_geom as geom;
+pub use rustgis_map as map;
+pub use rustgis_plugins as plugins;
+pub use rustgis_render as render;
+
+use std::path::PathBuf;
+
+use rustgis_map::{Camera, Map};
+use serde_json::Value;
+
+pub type CmdResult = Result<Value, String>;
+
+/// A command.
+#[derive(Clone, Copy)]
+pub struct CommandSpec {
+    pub id: &'static str,
+    pub label: &'static str,
+    /// Where it lives in the UI: `Home › Navigate`, `Analyze › Geoprocessing`…
+    pub location: &'static str,
+    /// Default shortcut (`Mod+S`, `F5`); `Mod` = Ctrl, or ⌘ on macOS.
+    pub shortcut: &'static str,
+    /// Parameter description for scripts and agents.
+    pub params: &'static str,
+    /// Whether it changes the project (and so takes an undo snapshot).
+    pub mutates: bool,
+    /// `None` = enabled; `Some(reason)` = disabled.
+    pub enabled: fn(&Session) -> Option<&'static str>,
+    pub run: fn(&mut Session, &Value) -> CmdResult,
+}
+
+fn always(_: &Session) -> Option<&'static str> {
+    None
+}
+
+impl CommandSpec {
+    /// The top-level keys its [`params`](CommandSpec::params) description names, or `None` when
+    /// the description is not a `{"key": …}` object (nothing to check against).
+    pub fn param_keys(&self) -> Option<Vec<&'static str>> {
+        param_keys(self.params)
+    }
+
+    pub const fn new(id: &'static str, label: &'static str, location: &'static str, run: fn(&mut Session, &Value) -> CmdResult) -> Self {
+        CommandSpec { id, label, location, shortcut: "", params: "{}", mutates: true, enabled: always, run }
+    }
+    pub const fn key(mut self, s: &'static str) -> Self {
+        self.shortcut = s;
+        self
+    }
+    pub const fn params(mut self, p: &'static str) -> Self {
+        self.params = p;
+        self
+    }
+    /// Doesn't change the project (no undo snapshot, not dirtying).
+    pub const fn view(mut self) -> Self {
+        self.mutates = false;
+        self
+    }
+    pub const fn when(mut self, f: fn(&Session) -> Option<&'static str>) -> Self {
+        self.enabled = f;
+        self
+    }
+}
+
+/// The keys of a `{"key": …, "other"?: …}` description: quoted words at the top level that open
+/// an entry (after `{` or a top-level `,`, followed by `?`, `:`, `,`, `}` or `|`) or an
+/// alternative (after `|`, followed by `?` or `:`, as in `"path": folder | "url": …` or
+/// `"lon" | "x": number`).
+pub fn param_keys(desc: &str) -> Option<Vec<&str>> {
+    #[derive(PartialEq)]
+    enum At {
+        Value,
+        Entry,
+        Alternative,
+    }
+    let bytes = desc.as_bytes();
+    if bytes.iter().find(|c| !c.is_ascii_whitespace()) != Some(&b'{') {
+        return None;
+    }
+    let (mut keys, mut depth, mut at, mut i) = (Vec::new(), 0usize, At::Value, 0);
+    while let Some(&c) = bytes.get(i) {
+        match c {
+            b'"' => {
+                let end = bytes.get(i + 1..).and_then(|r| r.iter().position(|&c| c == b'"')).map_or(bytes.len(), |n| i + 1 + n);
+                let next = bytes.get(end + 1..).and_then(|r| r.iter().find(|c| !c.is_ascii_whitespace()));
+                let key = match at {
+                    At::Entry => matches!(next, Some(b'?' | b':' | b',' | b'}' | b'|')),
+                    At::Alternative => matches!(next, Some(b'?' | b':')),
+                    At::Value => false,
+                };
+                if depth == 1 && key {
+                    keys.extend(desc.get(i + 1..end));
+                }
+                at = At::Value;
+                i = end;
+            }
+            b'{' | b'[' | b'(' => {
+                depth += 1;
+                at = if depth == 1 { At::Entry } else { At::Value };
+            }
+            b'}' | b']' | b')' => {
+                depth = depth.saturating_sub(1);
+                at = At::Value;
+            }
+            b',' if depth == 1 => at = At::Entry,
+            b'|' if depth == 1 => at = At::Alternative,
+            c if c.is_ascii_whitespace() => {}
+            _ => at = At::Value,
+        }
+        i += 1;
+    }
+    Some(keys)
+}
+
+/// `s` cut to `n` characters, with `…` when cut.
+fn clip(s: &str, n: usize) -> String {
+    if s.chars().count() > n { s.chars().take(n).chain(['…']).collect() } else { s.to_string() }
+}
+
+pub struct Registry {
+    pub commands: Vec<CommandSpec>,
+}
+
+impl Registry {
+    pub fn get(&self, id: &str) -> Option<&CommandSpec> {
+        self.commands.iter().find(|c| c.id == id)
+    }
+}
+
+/// The interactive map tool.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum Tool {
+    #[default]
+    Explore,
+    Select,
+    ZoomIn,
+    Measure,
+    MeasureArea,
+    CreatePoint,
+    CreateLine,
+    CreatePolygon,
+    /// Draws a graphic: the shape is one of [`GRAPHIC_TOOLS`]' shapes.
+    Graphic(&'static str),
+}
+
+/// The graphic drawing tools: (shape, tool code, label).
+pub const GRAPHIC_TOOLS: &[(&str, &str, &str)] = &[
+    ("point", "graphicPoint", "Point"),
+    ("text", "graphicText", "Text"),
+    ("line", "graphicLine", "Line"),
+    ("curve", "graphicCurve", "Curve"),
+    ("freehand", "graphicFreehand", "Freehand"),
+    ("polygon", "graphicPolygon", "Polygon"),
+    ("lasso", "graphicLasso", "Lasso"),
+    ("rectangle", "graphicRectangle", "Rectangle"),
+    ("circle", "graphicCircle", "Circle"),
+    ("ellipse", "graphicEllipse", "Ellipse"),
+    ("picture", "graphicPicture", "Picture"),
+];
+
+impl Tool {
+    pub fn code(self) -> &'static str {
+        match self {
+            Tool::Explore => "explore",
+            Tool::Select => "select",
+            Tool::ZoomIn => "zoomIn",
+            Tool::Measure => "measure",
+            Tool::MeasureArea => "measureArea",
+            Tool::CreatePoint => "createPoint",
+            Tool::CreateLine => "createLine",
+            Tool::CreatePolygon => "createPolygon",
+            Tool::Graphic(shape) => GRAPHIC_TOOLS.iter().find(|g| g.0 == shape).map_or("graphicPoint", |g| g.1),
+        }
+    }
+    pub fn from_code(s: &str) -> Option<Tool> {
+        if let Some(g) = GRAPHIC_TOOLS.iter().find(|g| g.1.eq_ignore_ascii_case(s.trim())) {
+            return Some(Tool::Graphic(g.0));
+        }
+        [
+            Tool::Explore,
+            Tool::Select,
+            Tool::ZoomIn,
+            Tool::Measure,
+            Tool::MeasureArea,
+            Tool::CreatePoint,
+            Tool::CreateLine,
+            Tool::CreatePolygon,
+        ]
+        .into_iter()
+        .find(|t| t.code().eq_ignore_ascii_case(s.trim()))
+    }
+    pub fn label(self) -> &'static str {
+        match self {
+            Tool::Explore => "Explore",
+            Tool::Select => "Select",
+            Tool::ZoomIn => "Zoom In",
+            Tool::Measure => "Measure Distance",
+            Tool::MeasureArea => "Measure Area",
+            Tool::CreatePoint => "Create Point",
+            Tool::CreateLine => "Create Line",
+            Tool::CreatePolygon => "Create Polygon",
+            Tool::Graphic(shape) => GRAPHIC_TOOLS.iter().find(|g| g.0 == shape).map_or("Point", |g| g.2),
+        }
+    }
+    pub fn creates(self) -> bool {
+        matches!(self, Tool::CreatePoint | Tool::CreateLine | Tool::CreatePolygon)
+    }
+}
+
+/// One geoprocessing history row.
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GpRecord {
+    pub tool: String,
+    pub params: Value,
+    pub ok: bool,
+    pub messages: Vec<String>,
+    pub millis: u64,
+    /// The layers the run added (by name at the time).
+    #[serde(default)]
+    pub outputs: Vec<String>,
+}
+
+/// A topology problem found by `topology.validate` (shown in the Error Inspector).
+#[derive(Clone, Debug, PartialEq)]
+pub struct TopologyIssue {
+    pub rule: String,
+    pub layer: String,
+    pub rows: Vec<usize>,
+    pub lon: f64,
+    pub lat: f64,
+}
+
+/// Something worth telling the user (status bar / notifications).
+#[derive(Clone, Debug, PartialEq)]
+pub struct Notice {
+    pub text: String,
+    pub error: bool,
+}
+
+const UNDO_LIMIT: usize = 40;
+
+pub struct Session {
+    pub project: Project,
+    pub path: Option<PathBuf>,
+    pub dirty: bool,
+    /// Favourite, recent and saved data sources (kept with the app's preferences, not the
+    /// project).
+    pub sources: sources::Sources,
+    pub registry: Registry,
+    /// Bumped on every change so views can cache.
+    pub revision: u64,
+    pub tool: Tool,
+    /// The layer selected in the Layers pane (the one the Style and Data tabs act on).
+    pub active_layer: Option<u32>,
+    /// Map view size in logical points (set by the UI each frame).
+    pub view_size: (f64, f64),
+    pub notices: Vec<Notice>,
+    /// Notices given in this session, including ones no longer kept (see [`Session::notices_since`]).
+    notices_given: u64,
+    /// Layer whose attribute table is open.
+    pub table_layer: Option<u32>,
+    /// The standalone table shown in the attribute table instead of a layer, by its id.
+    pub table_standalone: Option<u32>,
+    /// Edits per layer id since the project was last saved (Edit › Status). A failed command's
+    /// are rolled back; undo doesn't subtract them, since they count edits made, not the net change.
+    pub edit_counts: std::collections::HashMap<u32, cmd::design::EditCounts>,
+    /// The feature cache fills itself after projection changes (Data › Feature Cache).
+    pub auto_cache: bool,
+    /// Mensuration results (Analyze › Mensuration › Results).
+    pub measurements: Vec<serde_json::Value>,
+    /// The last topology check's errors (Edit › Error Inspector).
+    pub topology_errors: Vec<TopologyIssue>,
+    /// The layout shown instead of the map view, if any (an index into `project.layouts`).
+    pub active_layout: Option<usize>,
+    /// Tasks made in this session (lower-cased names). Others came from files, and their steps
+    /// may not touch files when run.
+    pub trusted_tasks: std::collections::HashSet<String>,
+    /// Models made in this session (lower-cased names); the steps of others may not touch files.
+    pub trusted_models: std::collections::HashSet<String>,
+    /// Notebooks made in this session (lower-cased names); the cells of others may not touch files.
+    pub trusted_notebooks: std::collections::HashSet<String>,
+    /// A notebook is running: it may not start another, even through a task or model (no
+    /// unbounded recursion).
+    pub(crate) notebook_running: bool,
+    /// How many geoprocessing history records came with the opened project (from its file).
+    pub history_from_file: usize,
+    /// The report open in the Report pane, if any.
+    pub active_report: Option<usize>,
+    /// The presentation and notebook open in their panes, if any.
+    pub active_presentation: Option<usize>,
+    pub active_notebook: Option<usize>,
+    /// Drawing tools stay active after a graphic is drawn (Edit › Graphics).
+    pub keep_tool: bool,
+    /// Copied features (Edit › Clipboard).
+    pub clipboard: Option<cmd::clipboard::Clipboard>,
+    undo: Vec<(Project, &'static str)>,
+    redo: Vec<(Project, &'static str)>,
+    back: Vec<Camera>,
+    forward: Vec<Camera>,
+    /// Last camera recorded in the extent history.
+    last_camera: Option<Camera>,
+    /// The projection the extent history's cameras are in (their units change with it).
+    history_projection: String,
+    /// Finished asynchronous tool runs waiting for `gp.finish` (the browser's GeoLibre tools).
+    pub(crate) pending: Vec<PendingRun>,
+    pub(crate) next_pending: u64,
+    /// Asynchronous runs started and not yet complete: (id, job, resolved params, start time).
+    #[cfg(feature = "geolibre")]
+    pub(crate) started: Vec<(u64, rustgis_geolibre::Job, serde_json::Value, u64)>,
+    /// Plugin tool runs started and not yet complete (`gp::plugin_start`).
+    pub(crate) plugin_runs: Vec<cmd::gp::StartedRun>,
+    /// Data downloads of this project under way (Add Data › From URL), by id.
+    downloading: Vec<u64>,
+    /// Downloads that landed, waiting for `layer.addDownload`.
+    pub(crate) downloaded: Vec<(u64, Vec<u8>)>,
+    /// Downloads a command asked for where nothing may wait (the browser): the parameters of
+    /// `layer.addUrl` calls, for the front end to fetch and add (see [`Session::take_url_requests`]).
+    pub(crate) url_requests: Vec<serde_json::Value>,
+    /// Set by [`Session::request_url`] for [`Session::guarded`]: the command running changed
+    /// nothing, it only left a request (a plugin's own answer can't claim that).
+    request_only: bool,
+    /// Query results the app ran off the frame (the SQL pane), waiting for `layer.addSql {"ran"}`:
+    /// the id, the query and database (label) they came from, and the result.
+    #[cfg(not(target_arch = "wasm32"))]
+    pub(crate) sql_results: Vec<(u64, String, Option<String>, rustgis_data::source::duckdb::Output)>,
+}
+
+/// The most `layer.addUrl` requests kept for the front end at a time.
+const MAX_URL_REQUESTS: usize = 16;
+
+/// A finished tool run, held until `gp.finish` applies it.
+pub(crate) struct PendingRun {
+    pub id: u64,
+    pub tool: String,
+    pub params: serde_json::Value,
+    pub result: Result<rustgis_analysis::ToolResult, String>,
+    pub millis: u64,
+}
+
+/// Empties the windows of a project's streamed layers (they are read again from their sources).
+fn strip_windows(p: &mut Project) {
+    for l in p.maps.iter_mut().flat_map(|m| m.layers.iter_mut()) {
+        if let Some(src) = &mut l.source {
+            src.reset();
+            l.dataset.features = Vec::new();
+            l.selection.clear();
+            l.touch_geometry();
+        }
+    }
+}
+
+/// The first streamed layer whose features or fields differ between two versions of a project
+/// for a reason other than a read of its source.
+fn edited_streamed(before: &Project, after: &Project) -> Option<String> {
+    let schema = |l: &rustgis_map::Layer| l.dataset.fields.iter().map(|f| (f.name.clone(), f.ty)).collect::<Vec<_>>();
+    for (mb, ma) in before.maps.iter().zip(&after.maps) {
+        for la in ma.layers.iter().filter(|l| l.is_streamed()) {
+            let Some(lb) = mb.layers.iter().find(|l| l.id == la.id && l.is_streamed()) else { continue };
+            let reads = |l: &rustgis_map::Layer| l.source.as_ref().map(|s| s.reads);
+            if reads(la) == reads(lb) && (la.dataset.features != lb.dataset.features || schema(la) != schema(lb)) {
+                return Some(la.name.clone());
+            }
+        }
+    }
+    None
+}
+
+/// Commands that change a layer's features or fields, refused on streamed layers (whose features
+/// are a window read again from the file as the view moves, so edits would be lost).
+fn edits_features(id: &str) -> bool {
+    const SETTINGS: &[&str] =
+        &["edit.enable", "edit.settings", "edit.status", "edit.template", "edit.snapping", "edit.snap", "edit.tools", "edit.copy"];
+    id.starts_with("edit.") && !SETTINGS.contains(&id)
+}
+
+impl Session {
+    pub fn new(project: Project) -> Self {
+        // Cheap: the suite's tools load the first time a tool list is needed.
+        #[cfg(feature = "geolibre")]
+        rustgis_geolibre::register();
+        rustgis_plugins::tools::register();
+        // FlatGeobuf and GeoParquet by their web address are read through the tile fetchers.
+        render::rustgis_tiles::remote::install();
+        Session {
+            project,
+            path: None,
+            dirty: false,
+            sources: sources::Sources::default(),
+            registry: Registry { commands: cmd::all() },
+            revision: 1,
+            tool: Tool::Explore,
+            active_layer: None,
+            view_size: (1200.0, 720.0),
+            notices: Vec::new(),
+            notices_given: 0,
+            table_layer: None,
+            table_standalone: None,
+            clipboard: None,
+            keep_tool: false,
+            active_layout: None,
+            trusted_tasks: Default::default(),
+            trusted_models: Default::default(),
+            trusted_notebooks: Default::default(),
+            notebook_running: false,
+            history_from_file: 0,
+            active_report: None,
+            active_presentation: None,
+            active_notebook: None,
+            edit_counts: std::collections::HashMap::new(),
+            topology_errors: Vec::new(),
+            measurements: Vec::new(),
+            auto_cache: false,
+            undo: Vec::new(),
+            redo: Vec::new(),
+            back: Vec::new(),
+            forward: Vec::new(),
+            last_camera: None,
+            history_projection: String::new(),
+            pending: Vec::new(),
+            next_pending: 0,
+            #[cfg(feature = "geolibre")]
+            started: Vec::new(),
+            plugin_runs: Vec::new(),
+            downloading: Vec::new(),
+            downloaded: Vec::new(),
+            url_requests: Vec::new(),
+            request_only: false,
+            #[cfg(not(target_arch = "wasm32"))]
+            sql_results: Vec::new(),
+        }
+    }
+
+    /// Keeps a query's result the app ran off the frame, for `layer.addSql {"ran": id}`, with the
+    /// query and database it came from: the command takes it only for that same query, so the
+    /// layer's saved query is the one that made it. A few at a time: past that many, the oldest
+    /// are forgotten.
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn sql_ran(&mut self, sql: &str, database: Option<&str>, out: rustgis_data::source::duckdb::Output) -> u64 {
+        self.next_pending = self.next_pending.wrapping_add(1);
+        if self.sql_results.len() >= 8 {
+            self.sql_results.remove(0);
+        }
+        let database = database.and_then(|d| cmd::layer::database_param(&serde_json::json!({"database": d}))).map(|d| d.label());
+        self.sql_results.push((self.next_pending, sql.to_string(), database, out));
+        self.next_pending
+    }
+
+    /// Starts a data download for this project (the front end fetches it): its id, for
+    /// [`Session::download_landed`].
+    pub fn download_started(&mut self) -> u64 {
+        self.next_pending = self.next_pending.wrapping_add(1);
+        // A few at a time: past that many, the oldest are forgotten.
+        if self.downloading.len() >= 64 {
+            self.downloading.remove(0);
+        }
+        self.downloading.push(self.next_pending);
+        self.next_pending
+    }
+
+    /// Hands over a download's bytes, for `layer.addDownload {"id"}`; `false` when it was dropped
+    /// (another project was opened meanwhile).
+    pub fn download_landed(&mut self, id: u64, bytes: Vec<u8>) -> bool {
+        let Some(i) = self.downloading.iter().position(|d| *d == id) else { return false };
+        self.downloading.remove(i);
+        self.downloaded.push((id, bytes));
+        true
+    }
+
+    /// Forgets a download that failed.
+    pub fn download_failed(&mut self, id: u64) {
+        self.downloading.retain(|d| *d != id);
+    }
+
+    /// Forgets a download the front end opens itself (a project by its address), saying whether
+    /// it still belongs to this project: `false` when another project was opened meanwhile.
+    pub fn download_done(&mut self, id: u64) -> bool {
+        let current = self.downloading.contains(&id);
+        self.download_failed(id);
+        current
+    }
+
+    /// Keeps a `layer.addUrl` request for the front end to download off the frame and add when
+    /// it lands (the browser, where a command may not wait): the command's answer, which says
+    /// so. An address asked for again while it waits is asked for once, and past a few waiting
+    /// requests the next is refused rather than silently dropping one already promised.
+    pub fn request_url(&mut self, p: &serde_json::Value) -> Result<serde_json::Value, String> {
+        let url = p.get("url").and_then(serde_json::Value::as_str).unwrap_or("").to_string();
+        if !self.url_requests.iter().any(|q| q.get("url").and_then(serde_json::Value::as_str) == Some(url.as_str())) {
+            if self.url_requests.len() >= MAX_URL_REQUESTS {
+                return Err(format!("{url}: {MAX_URL_REQUESTS} downloads are already waiting; try again when they have landed"));
+            }
+            self.url_requests.push(p.clone());
+        }
+        self.request_only = true;
+        Ok(serde_json::json!({"pending": true, "url": url}))
+    }
+
+    /// The `layer.addUrl` requests waiting for the front end ([`Session::request_url`]), taken.
+    pub fn take_url_requests(&mut self) -> Vec<serde_json::Value> {
+        std::mem::take(&mut self.url_requests)
+    }
+
+    pub fn map(&self) -> &Map {
+        self.project.map()
+    }
+    pub fn map_mut(&mut self) -> &mut Map {
+        self.project.map_mut()
+    }
+
+    /// Runs a command by id. Mutating commands snapshot the project for undo; an error or a
+    /// panic restores it.
+    pub fn run(&mut self, id: &str, params: &Value) -> CmdResult {
+        if id.starts_with(rustgis_plugins::PREFIX) {
+            return self.run_plugin(id, params);
+        }
+        let Some(&spec) = self.registry.get(id) else { return Err(format!("unknown command '{id}'")) };
+        // Keys the command does not read: said, so a script or an agent can correct itself.
+        if let (Value::Object(given), Some(known)) = (params, spec.param_keys()) {
+            // Bounded: the keys come from the caller (the first few, each clipped).
+            let unknown: Vec<&String> = given.keys().filter(|k| !known.contains(&k.as_str())).collect();
+            if !unknown.is_empty() {
+                let mut said: Vec<String> = unknown.iter().take(5).map(|k| format!("'{}'", clip(k, 40))).collect();
+                if unknown.len() > 5 {
+                    said.push(format!("{} more", unknown.len() - 5));
+                }
+                let reads = if known.is_empty() { "no parameters".to_string() } else { known.join(", ") };
+                self.notify(format!("{id} ignores {} (it reads {reads})", said.join(", ")), false);
+            }
+        }
+        // Layer conditions apply to the layer the parameters name, falling back to the active one.
+        let named = params.get("layer").and_then(|_| self.layer_id(params).ok());
+        let active = self.active_layer;
+        if named.is_some() {
+            self.active_layer = named;
+        }
+        // Restored on every path, even if a condition were to panic.
+        let enabled = spec.enabled;
+        let blocked = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| enabled(self))).unwrap_or(Some("unavailable"));
+        self.active_layer = active;
+        if let Some(why) = blocked {
+            return Err(format!("{}: {why}", spec.label));
+        }
+        let (run, mutates, label) = (spec.run, spec.mutates, spec.label);
+        if mutates && edits_features(id) {
+            let target = named.or(active).and_then(|l| self.map().layer(l));
+            if let Some(l) = target.filter(|l| l.is_streamed()) {
+                return Err(format!("{label}: {} is read in place from its file; Load All Features (layer.loadAll) to edit it", l.name));
+            }
+        }
+        let res = self.guarded(label, mutates, |s| run(s, params));
+        // What was added, for the Data Sources pane's Recent list.
+        if res.is_ok()
+            && let Some(src) = sources::added_by(id, params)
+        {
+            self.sources.note(src);
+        }
+        res
+    }
+
+    /// Runs `f` as the command `label`: when it `mutates`, the project is snapshotted for undo
+    /// and restored if `f` fails or panics.
+    pub(crate) fn guarded(&mut self, label: &'static str, mutates: bool, f: impl FnOnce(&mut Session) -> CmdResult) -> CmdResult {
+        let snapshot = mutates.then(|| self.project.clone());
+        // Edit counts roll back with the project when a command fails part way.
+        let counts = mutates.then(|| self.edit_counts.clone());
+        self.request_only = false;
+        // Requests a failed command left for the front end go with its other changes.
+        let requests = self.url_requests.len();
+        let res = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| f(self)))
+            .unwrap_or_else(|_| Err(format!("{label} failed unexpectedly; the project was restored")));
+        // A command that changed a streamed layer's features or fields (not by reading its
+        // source) would lose the change at the next read: undone, with a way to edit it instead.
+        let res = match (&res, &snapshot) {
+            (Ok(_), Some(snap)) => match edited_streamed(snap, &self.project) {
+                Some(name) => Err(format!("{label}: {name} is read in place from its file; Load All Features (layer.loadAll) to edit it")),
+                None => res,
+            },
+            _ => res,
+        };
+        match (&res, snapshot) {
+            // A command that only left a request for the front end (a download in the browser,
+            // [`Session::request_url`]) changed nothing: no undo step, nothing to save yet. The
+            // session's own flag says so, not the answer, which a plugin's command could forge.
+            (Ok(_), Some(_)) if std::mem::take(&mut self.request_only) => {}
+            (Ok(_), Some(mut snap)) => {
+                // Undo keeps streamed layers' sources, not their windows: they read the view again.
+                strip_windows(&mut snap);
+                self.undo.push((snap, label));
+                if self.undo.len() > UNDO_LIMIT {
+                    self.undo.remove(0);
+                }
+                self.redo.clear();
+                self.dirty = true;
+            }
+            (Err(_), Some(snap)) => {
+                self.project = snap;
+                if let Some(c) = counts {
+                    self.edit_counts = c;
+                }
+            }
+            _ => {}
+        }
+        if res.is_err() {
+            self.url_requests.truncate(requests);
+        }
+        if let Err(e) = &res {
+            self.notify(e.clone(), true);
+        }
+        self.fix_active_layer();
+        self.revision = self.revision.wrapping_add(1);
+        res
+    }
+
+    pub fn notify(&mut self, text: impl Into<String>, error: bool) {
+        self.notices.push(Notice { text: text.into(), error });
+        self.notices_given += 1;
+        if self.notices.len() > 200 {
+            self.notices.remove(0);
+        }
+    }
+
+    /// A mark to pass to [`Session::notices_since`].
+    pub fn notice_mark(&self) -> u64 {
+        self.notices_given
+    }
+
+    /// The notices given since `mark` was taken (those still kept): what a command said beside its
+    /// result, for front ends without a status bar (the CLI, the MCP server, the AI Assistant).
+    pub fn notices_since(&self, mark: u64) -> &[Notice] {
+        let n = usize::try_from(self.notices_given.saturating_sub(mark)).unwrap_or(usize::MAX).min(self.notices.len());
+        self.notices.get(self.notices.len() - n..).unwrap_or_default()
+    }
+
+    pub fn can_undo(&self) -> bool {
+        !self.undo.is_empty()
+    }
+    pub fn can_redo(&self) -> bool {
+        !self.redo.is_empty()
+    }
+    pub fn undo_label(&self) -> Option<&'static str> {
+        self.undo.last().map(|u| u.1)
+    }
+    pub fn redo_label(&self) -> Option<&'static str> {
+        self.redo.last().map(|u| u.1)
+    }
+
+    /// Forgets undo/redo and extent history and marks the project clean (after new/open, or a
+    /// front end setting up how the project starts).
+    pub fn clear_history(&mut self) {
+        self.undo.clear();
+        self.redo.clear();
+        self.back.clear();
+        self.forward.clear();
+        self.last_camera = None;
+        self.dirty = false;
+        self.trusted_tasks.clear();
+        self.trusted_models.clear();
+        self.trusted_notebooks.clear();
+        self.edit_counts.clear();
+        self.topology_errors.clear();
+        self.measurements.clear();
+        // Runs of the previous project mustn't land in this one.
+        self.pending.clear();
+        #[cfg(feature = "geolibre")]
+        self.started.clear();
+        self.plugin_runs.clear();
+        self.downloading.clear();
+        self.downloaded.clear();
+        self.url_requests.clear();
+        #[cfg(not(target_arch = "wasm32"))]
+        self.sql_results.clear();
+    }
+
+    pub(crate) fn undo(&mut self) -> bool {
+        let Some((p, label)) = self.undo.pop() else { return false };
+        let cur = std::mem::replace(&mut self.project, p);
+        self.project.keep_table_ids(&cur);
+        self.redo.push((cur, label));
+        self.touch_all_geometry();
+        true
+    }
+
+    pub(crate) fn redo(&mut self) -> bool {
+        let Some((p, label)) = self.redo.pop() else { return false };
+        let cur = std::mem::replace(&mut self.project, p);
+        self.project.keep_table_ids(&cur);
+        self.undo.push((cur, label));
+        self.touch_all_geometry();
+        true
+    }
+
+    fn touch_all_geometry(&mut self) {
+        for m in &mut self.project.maps {
+            for l in &mut m.layers {
+                l.touch_geometry();
+            }
+        }
+        self.revision = self.revision.wrapping_add(1);
+    }
+
+    /// Drops the extent history when the map has switched projection since it was recorded (by a
+    /// command, undo or opening a project): its cameras are in the old projection's units.
+    fn check_history_projection(&mut self) {
+        let code = self.map().projection.code();
+        if code != self.history_projection {
+            self.back.clear();
+            self.forward.clear();
+            self.last_camera = None;
+            self.history_projection = code;
+        }
+    }
+
+    /// How many changes can be undone.
+    pub fn undo_depth(&self) -> usize {
+        self.undo.len()
+    }
+
+    /// Moves every other map to the active map's centre and scale (View › Link Views).
+    pub fn sync_linked_views(&mut self) {
+        let (c, scale, active) = (self.map().center_lonlat(), self.scale(), self.project.active_map);
+        for (i, m) in self.project.maps.iter_mut().enumerate() {
+            if i == active || m.projection.is_globe() {
+                continue;
+            }
+            if let Some(mc) = m.to_map(c) {
+                m.camera.center = mc;
+                m.set_scale(scale);
+            }
+        }
+    }
+
+    /// Records the camera in the previous/next extent history when it settles somewhere new.
+    pub fn record_extent(&mut self) {
+        if self.project.link_views {
+            self.sync_linked_views();
+        }
+        self.check_history_projection();
+        let cam = self.map().camera;
+        if let Some(last) = self.last_camera {
+            let moved = (last.center.x - cam.center.x).abs() > last.res * 2.0 || (last.res / cam.res - 1.0).abs() > 0.01;
+            if !moved {
+                return;
+            }
+            self.back.push(last);
+            if self.back.len() > 50 {
+                self.back.remove(0);
+            }
+            self.forward.clear();
+        }
+        self.last_camera = Some(cam);
+    }
+
+    pub(crate) fn extent_back(&mut self) -> bool {
+        self.check_history_projection();
+        let Some(c) = self.back.pop() else { return false };
+        let cur = self.map().camera;
+        self.forward.push(cur);
+        self.map_mut().camera = c;
+        self.last_camera = Some(c);
+        true
+    }
+
+    pub(crate) fn extent_forward(&mut self) -> bool {
+        self.check_history_projection();
+        let Some(c) = self.forward.pop() else { return false };
+        let cur = self.map().camera;
+        self.back.push(cur);
+        self.map_mut().camera = c;
+        self.last_camera = Some(c);
+        true
+    }
+
+    pub fn can_extent_back(&self) -> bool {
+        !self.back.is_empty() && self.map().projection.code() == self.history_projection
+    }
+    pub fn can_extent_forward(&self) -> bool {
+        !self.forward.is_empty() && self.map().projection.code() == self.history_projection
+    }
+
+    /// Keeps `active_layer` pointing at a layer of the active map.
+    pub(crate) fn fix_active_layer(&mut self) {
+        if self.active_layout.is_some_and(|i| i >= self.project.layouts.len()) {
+            self.active_layout = None;
+        }
+        if self.active_report.is_some_and(|i| i >= self.project.reports.len()) {
+            self.active_report = None;
+        }
+        if self.active_presentation.is_some_and(|i| i >= self.project.presentations.len()) {
+            self.active_presentation = None;
+        }
+        if self.active_notebook.is_some_and(|i| i >= self.project.notebooks.len()) {
+            self.active_notebook = None;
+        }
+        let map = self.project.map();
+        if let Some(id) = self.active_layer
+            && map.layer(id).is_none()
+        {
+            self.active_layer = map.layers.first().map(|l| l.id);
+        }
+        if let Some(id) = self.table_layer
+            && map.layer(id).is_none()
+        {
+            self.table_layer = None;
+        }
+        if self.table_standalone.is_some_and(|id| self.project.table(id).is_none()) {
+            self.table_standalone = None;
+        }
+    }
+
+    /// A colour ramp by name: one of the built-in ones, else one of the project's custom ramps.
+    pub fn ramp(&self, name: &str) -> Result<rustgis_map::Ramp, String> {
+        rustgis_map::Ramp::from_name(name)
+            .or_else(|| {
+                self.project
+                    .ramps
+                    .iter()
+                    .find(|r| r.name().eq_ignore_ascii_case(name.trim()))
+                    .map(|r| rustgis_map::Ramp::Custom(Box::new(r.clone())))
+            })
+            .ok_or_else(|| format!("unknown colour scheme '{name}'"))
+    }
+
+    /// Resolves a `layer` parameter (name or id), defaulting to the active layer.
+    pub fn layer_id(&self, p: &Value) -> Result<u32, String> {
+        let map = self.map();
+        match p.get("layer") {
+            Some(Value::Number(n)) => n
+                .as_u64()
+                .and_then(|n| u32::try_from(n).ok())
+                .filter(|id| map.layer(*id).is_some())
+                .ok_or_else(|| format!("no layer with id {n}")),
+            Some(Value::String(s)) => map
+                .layer_by_name(s)
+                .map(|l| l.id)
+                .or_else(|| s.parse::<u32>().ok().filter(|id| map.layer(*id).is_some()))
+                .ok_or_else(|| format!("no layer named '{s}'")),
+            _ => {
+                self.active_layer.filter(|id| map.layer(*id).is_some()).ok_or_else(|| "select a layer in the Layers pane first".to_string())
+            }
+        }
+    }
+
+    /// Resolves a `table` parameter to a standalone table's position in the project: by its id,
+    /// or by text as [`project::find_table`] reads it (a name, else an id).
+    pub fn table_index(&self, p: &Value) -> Result<usize, String> {
+        let tables = &self.project.tables;
+        match p.get("table") {
+            Some(Value::Number(n)) => n
+                .as_u64()
+                .and_then(|id| tables.iter().position(|t| u64::from(t.id) == id))
+                .ok_or_else(|| format!("no standalone table with id {n}")),
+            Some(Value::String(s)) => project::find_table(tables, s).ok_or_else(|| format!("no standalone table named '{s}'")),
+            _ => Err("give the table's name or id (\"table\")".to_string()),
+        }
+    }
+
+    /// The scale denominator now.
+    pub fn scale(&self) -> f64 {
+        self.map().scale()
+    }
+
+    /// Fits the camera to a lon/lat extent in the current view size.
+    pub fn zoom_to(&mut self, e: &rustgis_geom::Extent) {
+        let (w, h) = self.view_size;
+        let m = self.map_mut();
+        if m.projection.is_globe() {
+            rustgis_map::Globe::fit(&mut m.camera, e, w, h);
+        } else {
+            m.fit_lonlat(e, w, h);
+        }
+        self.record_extent();
+    }
+
+    pub fn title(&self) -> String {
+        self.project.name.clone()
+    }
+}

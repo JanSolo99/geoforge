@@ -1,0 +1,32 @@
+//! L2: web map tiles — raster tiles (XYZ, TMS, WMS), Mapbox Vector Tiles and a subset of
+//! MapLibre styles: tile addresses and math, a cache that fetches in the background, and drawing
+//! into a pixmap in Web Mercator.
+//!
+//! Nothing here blocks on the network while drawing: [`draw::draw`] draws what the cache has
+//! (standing in for missing tiles with ones it has at other zooms) and says whether more is on
+//! its way; [`cache::generation`] tells the app when to draw again.
+#![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
+
+pub mod address;
+pub mod boundaries;
+pub mod cache;
+pub mod cog;
+pub mod draw;
+pub mod geocode;
+pub mod mbtiles;
+pub mod mvt;
+pub mod overpass;
+pub mod overture;
+pub mod pmtiles;
+pub mod portal;
+pub mod remote;
+pub mod s3;
+pub mod source;
+pub mod sourcecoop;
+pub mod sprite;
+pub mod stac;
+pub mod style;
+pub mod template;
+
+pub use draw::{Drawn, Frame, Label, draw};
+pub use source::{Kind, Spec};

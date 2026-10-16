@@ -1,0 +1,68 @@
+name: CI
+
+# macOS and Windows are slow: pushes to main test on every platform, pull requests on Linux only,
+# plus macOS and Windows when labelled `ci:macos`, `ci:windows` or `ci:full` (both). Adding the
+# label runs that platform straight away (ci-label.yml); later pushes include it here.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+
+jobs:
+  lint:
+    name: Lint (pre-commit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: pre-commit/action@v3.0.1
+
+  wasm:
+    name: Web app (wasm32)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+      - name: Build for the browser
+        run: cargo build --locked --target wasm32-unknown-unknown -p rustgis-web
+
+  plan:
+    name: Platforms
+    runs-on: ubuntu-latest
+    outputs:
+      os: ${{ steps.os.outputs.os }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: .github/scripts
+      - id: os
+        env:
+          EVENT: ${{ github.event_name }}
+          ACTION: ${{ github.event.action }}
+          LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+        run: echo "os=$(.github/scripts/platforms.sh)" >> "$GITHUB_OUTPUT"
+
+  test:
+    needs: plan
+    uses: ./.github/workflows/test-rust.yml
+    with:
+      os: ${{ needs.plan.outputs.os }}
