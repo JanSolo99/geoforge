@@ -1885,6 +1885,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "geoforge-core"
+version = "0.0.1"
+dependencies = [
+ "chrono",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "geoforge-filegdb"
+version = "0.0.1"
+dependencies = [
+ "chrono",
+ "geoforge-core",
+ "roxmltree 0.20.0",
+ "thiserror 2.0.21",
+]
+
+[[package]]
 name = "geographiclib-rs"
 version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3906,6 +3924,12 @@ checksum = "4e27ee8bb91ca0adcf0ecb116293afa12d393f9c2b9b9cd54d33e8078fe19839"
 
 [[package]]
 name = "roxmltree"
+version = "0.20.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6c20b6793b5c2fa6553b250154b78d6d0db37e72700ae35fad9387a46f487c97"
+
+[[package]]
+name = "roxmltree"
 version = "0.21.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f1964b10c76125c36f8afe190065a4bf9a87bf324842c05701330bba9f1cacbb"
@@ -4033,6 +4057,8 @@ dependencies = [
  "crs-definitions",
  "csv",
  "flatgeobuf",
+ "geoforge-core",
+ "geoforge-filegdb",
  "geozero",
  "image",
  "laz",
@@ -4041,7 +4067,7 @@ dependencies = [
  "parquet",
  "postgres",
  "proj4rs",
- "roxmltree",
+ "roxmltree 0.21.1",
  "rusqlite",
  "rustgis-geom",
  "rustls",
@@ -4107,7 +4133,7 @@ version = "0.2.0"
 dependencies = [
  "base64 0.22.1",
  "proj4rs",
- "roxmltree",
+ "roxmltree 0.21.1",
  "rustgis-data",
  "rustgis-geom",
  "serde",
@@ -4168,7 +4194,7 @@ dependencies = [
  "image",
  "log",
  "miniz_oxide 0.8.9",
- "roxmltree",
+ "roxmltree 0.21.1",
  "rustgis-data",
  "rustgis-geom",
  "serde_json",

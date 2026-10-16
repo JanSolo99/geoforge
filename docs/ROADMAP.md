@@ -432,7 +432,8 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
 
 ## Phase 8 — Rendering & UI
 - [ ] wgpu-based 2D map renderer (symbology, labeling, raster stretch)
-- [ ] Desktop app shell (decision deferred: Qt via cxx-qt vs Tauri vs egui/iced)
+- [ ] Desktop app shell: `app/` (vendored RustGIS, egui) is the shell. File Geodatabase `FeatureSource`
+      done (`app/crates/data/src/source/filegdb.rs`); next: register our tools in its `ToolSpec` registry
 - [ ] Layout view + PDF/PNG/TIFF export; 3D scene view
 
 ## Phase 9 — Advanced

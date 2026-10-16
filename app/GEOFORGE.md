@@ -7,3 +7,10 @@ shell (map view, symbology, labels, layouts, tiles, web app, Python/MCP, assista
 GeoForge's engine (`../crates`: File Geodatabase, ArcGIS-verified geoprocessing, rasters) is to be
 wired in as the data and analysis backend. Changes we make here stay under Apache-2.0; keep the
 original copyright notices and mark modified files.
+
+## Wiring status
+- `crates/data/src/source/filegdb.rs` (added by GeoForge): a `FeatureSource` for `.gdb` folders over
+  `geoforge-filegdb` (spatial-index extent reads, curves densified, MultiPatch refused). Reached through
+  `source::open_path` for the `gdb` extension; not in `EXTENSIONS`, since a geodatabase is a folder.
+  Desktop only (not built for wasm32).
+- Next: register GeoForge's tools in the `ToolSpec` registry (`crates/analysis`), then Python/MCP bindings.
