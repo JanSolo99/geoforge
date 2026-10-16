@@ -10,7 +10,13 @@ publish.workspace = true
 chrono.workspace = true
 geoforge-core.workspace = true
 geoforge-geometry.workspace = true
-geoforge-proj.workspace = true
+geoforge-proj = { workspace = true, optional = true }
+
+[features]
+default = ["proj"]
+# Project (needs PROJ). The RustGIS app builds without it: PROJ's build pins an older SQLite
+# binding than the app's.
+proj = ["dep:geoforge-proj"]
 
 [lints]
 workspace = true

@@ -13,4 +13,10 @@ original copyright notices and mark modified files.
   `geoforge-filegdb` (spatial-index extent reads, curves densified, MultiPatch refused). Reached through
   `source::open_path` for the `gdb` extension; not in `EXTENSIONS`, since a geodatabase is a folder.
   Desktop only (not built for wasm32).
-- Next: register GeoForge's tools in the `ToolSpec` registry (`crates/analysis`), then Python/MCP bindings.
+- `crates/geoforge` (`rustgis-geoforge`): registers `geoforge-tools` as the external suite `geoforge`
+  (ids `geoforge:clip`, `erase`, `intersect`, `union`, `symmetrical_difference`, `dissolve`,
+  `multipart_to_singlepart`, `feature_to_point`), enabled by the engine feature `geoforge`. Layers are
+  WGS 84, so only topology tools are exposed; Buffer/Near wait for geodesic support. `geoforge-tools`
+  has a default `proj` feature (Project); the app turns it off because proj-sys's `libsqlite3-sys`
+  conflicts with the app's rusqlite.
+- Next: more tools in the registry, then Python/MCP bindings.

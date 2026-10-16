@@ -3226,6 +3226,7 @@ pub fn repair_geometry(
 /// `transform_method` PROJ chooses the operation (not always ArcGIS's default for the
 /// datum pair); with one, the named geographic transformations are applied. Z and M
 /// are kept; true curves are densified first.
+#[cfg(feature = "proj")]
 pub fn project(
     input: &dyn FeatureClass,
     target: &geoforge_proj::Crs,

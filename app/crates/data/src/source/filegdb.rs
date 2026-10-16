@@ -140,9 +140,9 @@ fn value(v: GfValue) -> Value {
     }
 }
 
-/// The map's geometry model from a decoded shape; `None` for MultiPatch and for a shape with no
+/// The map's geometry model from a GeoForge shape (curves densified); `None` for MultiPatch and for a shape with no
 /// vertices.
-fn geometry(g: &GfGeometry) -> Option<Geometry> {
+pub fn from_geoforge(g: &GfGeometry) -> Option<Geometry> {
     let dense;
     let g = if g.has_curves() {
         dense = g.densify_curves(ARC_STEP).ok()?;
@@ -250,7 +250,7 @@ impl FeatureSource for FileGdbSource {
         let mut features = Vec::with_capacity(rows.len());
         for f in rows {
             let g = match (&f.geometry, has_geometry) {
-                (Some(g), true) => match geometry(g).and_then(|g| self.reproject.geometry(g)) {
+                (Some(g), true) => match from_geoforge(g).and_then(|g| self.reproject.geometry(g)) {
                     Some(g) => Some(g),
                     None => {
                         skipped += 1;

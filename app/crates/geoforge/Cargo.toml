@@ -1,0 +1,17 @@
+[package]
+name = "rustgis-geoforge"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "GeoForge's ArcGIS-verified geoprocessing tools (geoforge-tools) as RustGIS tools"
+
+[lints]
+workspace = true
+
+[dependencies]
+rustgis-geom = { workspace = true }
+rustgis-data = { workspace = true }
+rustgis-analysis = { workspace = true }
+serde_json = { workspace = true }
+geoforge-core = { path = "../../../crates/geoforge-core" }
+geoforge-tools = { path = "../../../crates/geoforge-tools", default-features = false }

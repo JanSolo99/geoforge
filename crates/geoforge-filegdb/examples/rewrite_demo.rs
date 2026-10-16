@@ -1,6 +1,6 @@
 //! `rewrite_demo <src.gdb> <dst.gdb>`: copies a geodatabase, adds a field EXTRA to feature class
 //! `wells` and drops its row 3 and field DEPTH, for checking the result in ArcGIS.
-use geoforge_core::{Feature, FeatureClass, Field, FieldType, Value};
+use geoforge_core::{Feature, Field, FieldType, Value};
 use geoforge_filegdb::{Geodatabase, rewrite_table};
 
 fn main() {
