@@ -91,9 +91,9 @@ fn triangle(points: &Value) -> Geometry {
     g
 }
 
+#[allow(clippy::field_reassign_with_default)]
 fn environment(c: &Value, tri: &Value) -> Environment {
     let e = &c["env"];
-    #[allow(clippy::field_reassign_with_default)]
     let mut out = Environment::default();
     out.cell_size = e["cell_size"].as_f64();
     out.extent = e["extent"].as_array().map(|v| {
