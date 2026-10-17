@@ -137,4 +137,34 @@ fixed rows in `src/writer/system_rows.rs`, `gdb` = `05 00 00 00 DE AD BE EF`,
 `timestamps` = 400 × `FF`, field section at offset 40, layer flags `0x100 | 0x200 |
 geomType | M<<30 | Z<<31`, dense `.gdbtablx` v3, `.gdbindexes` with FDO_OBJECTID
 (and FDO_SHAPE + single-level `.spx`). XY resolution: 1e-9 for geographic, 1e-4 with
-origin -2147483647 otherwise (ArcGIS defaults); Z/M origin -100000, scale 10000.
+origin -2147483647 otherwise (ArcGIS defaults); Z/M origin -100000, scale 10000. Systems ArcGIS knows get
+its own XY domain from `src/xy_domains.tsv.gz` (below).
+
+## Schema items (observed through ArcGIS Pro 3.7; written and edited by `src/writer`)
+Everything below lives in `GDB_Items` rows (`Definition` XML), `GDB_ItemRelationships` and, for classes with a
+table, `GDB_SystemCatalog`. Item type GUIDs by prefix: feature class `70737809`, table `CD06BC3B`, feature
+dataset `74737149`, relationship class `B606A7E1`, coded/range domain `8C368B12` / `C29DA988`; relationship
+types: dataset in folder `DC78F1AB`, dataset in feature dataset `A1633A59`, domain in dataset `17E08ADB`,
+datasets related through `725BADAB`.
+- **Feature dataset**: an item with path `\ds`, `DEFeatureDataset` XML carrying the coordinate system and XY domain,
+  a root-folder link; its classes have path `\ds\name`, link only to the dataset (`A1633A59`), and take the dataset's
+  coordinate system and domain. Creating the dataset registers its system in `GDB_SpatialRefs`.
+- **Subtypes** are definition XML only: `SubtypeFieldName`, `DefaultSubtypeCode`, `Subtypes` with per-subtype
+  `SubtypeFieldInfo` (domain, default). The subtype field's `DefaultValueNumeric` follows the default code (XML only;
+  the table file's default changes with `AssignDefaultToField`). `GPFieldInfoExs` lists, in table order, only fields
+  with something to say; an entry that loses its domain and has nothing else is dropped, one that loses its default stays.
+  A new subtype starts with an entry for every field that has a default. Removing a subtype's domain removes its whole
+  entry. A domain used by a table (field or subtype) is linked to it (`17E08ADB`).
+- **Relationship classes**: an item (`DatasetSubtype1` 1/2/3 = one to one/many/many to many, `DatasetSubtype2` 1 when it has
+  a table) linked to the root folder and, through `725BADAB`, to origin and destination. One with a table (attributed or many to
+  many) also lists that table in the catalog: fields `<origin fk>, <destination fk>, RID` (RID the object ID, last), the
+  two keys indexed `GDB_<DSID>_<field>`, and `DestinationClassKeys` in the definition. Deleting a class deletes the
+  relationship classes that use it (and their tables).
+- **GDAL reads a relationship class only if the definition's first node is its root element**: an `<?xml ... ?>`
+  declaration at the start hides it (GDAL then logs "Cannot find root 'Relationship' node").
+- **Delete/Rename** change catalog name (and leave a gap in its OBJECTIDs), item `Name`/`PhysicalName` (upper case)/`Path`,
+  and the names inside definitions (`CatalogPath`, `Name`, an empty table `AliasName` becomes the new name, class names in
+  relationship classes, `DomainName`); a dataset's children move with it; documentation and item info are untouched.
+- **XY domains** (`xy_domains.tsv.gz`, from `scripts/make-xy-domains.py`): a domain's extent is always 2^53 / scale, so the
+  origin, resolution and tolerance per coordinate system are all there is; the origin comes from ArcGIS's projection
+  engine (Mercator reaches about ±89°, sinusoidal 89.84°) and cannot be derived by a formula.
