@@ -18,7 +18,9 @@ pub use buffer::{
     BufferCircle, BufferOptions, LineEnd, LineSide, buffer, buffer_union, recover_arcs,
 };
 pub use clip::{ClipArea, clip};
-pub use geodesic::{GeodesicOptions, buffer_geodesic, buffer_geodesic_union};
+pub use geodesic::{
+    GeodesicOptions, azimuth, buffer_geodesic, buffer_geodesic_union, nearest_geodesic,
+};
 pub use index::EnvelopeIndex;
 pub use linework::{LineNodes, Meeting, XY_TOLERANCE, meeting, on_path};
 pub use overlay::{

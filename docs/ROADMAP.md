@@ -86,6 +86,12 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       Join (one to one/many, keep all/common, INTERSECT, WITHIN_A_DISTANCE, (COMPLETELY_)
       CONTAINS/WITHIN with Esri's boundary rule, CLOSEST, distance field) — match ArcGIS
       (distances to ~1e-9 m; ArcGIS computes on its own grid)
+  - [x] Geodesic Near / Generate Near Table (`--method GEODESIC`) and Spatial Join `CLOSEST_GEODESIC` /
+        `WITHIN_A_DISTANCE_GEODESIC` on longitude/latitude data (`geoforge-geometry::nearest_geodesic`; metres on WGS 84,
+        azimuth angles): equal to ArcGIS between points and for polygons; ArcGIS finds the closest point on a plain line
+        only approximately, so line cases differ by up to 0.08 % in distance (`tests/near_geodesic.rs`, 54 cases). Segments
+        are straight in longitude/latitude, so pairs across the antimeridian are not handled. The app's Near, Generate
+        Near Table and Spatial Join use it (Select By Location distances still use the UTM zone).
 - [x] Select Layer By Location (all 13 planar overlap types, search distance, invert;
       `gf select-by-location` writes the selection) and Append (TEST/NO_TEST, fields by
       name, other geometry types skipped with WARNING 000594) — match ArcGIS

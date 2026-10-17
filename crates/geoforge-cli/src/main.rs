@@ -133,6 +133,9 @@ enum Tool {
         /// ANGLE: add NEAR_ANGLE.
         #[arg(long, default_value = "NO_ANGLE")]
         angle: String,
+        /// PLANAR or GEODESIC (longitude/latitude data: metres on the ellipsoid, azimuth angles).
+        #[arg(long, default_value = "PLANAR")]
+        method: String,
     },
     /// Join attributes by spatial relationship (ArcGIS "Spatial Join").
     SpatialJoin {
@@ -453,6 +456,9 @@ enum Tool {
         closest: String,
         #[arg(long, default_value_t = 0)]
         closest_count: usize,
+        /// PLANAR or GEODESIC.
+        #[arg(long, default_value = "PLANAR")]
+        method: String,
     },
     /// Groups of records with identical values or shapes (ArcGIS "Find Identical").
     FindIdentical {
@@ -1077,6 +1083,7 @@ fn main() -> ExitCode {
             search_radius,
             location,
             angle,
+            method,
         } => near_tool(
             &in_features,
             &near_features,
@@ -1084,6 +1091,7 @@ fn main() -> ExitCode {
             search_radius.as_deref(),
             &location,
             &angle,
+            &method,
         ),
         Tool::SpatialJoin {
             target_features,
@@ -1643,7 +1651,9 @@ fn main() -> ExitCode {
             angle,
             closest,
             closest_count,
+            method,
         } => (|| {
+            let method = near_method(&method)?;
             let flag = |v: &str, yes: &str, no: &str| match v.to_ascii_uppercase() {
                 x if x == yes => Ok(true),
                 x if x == no => Ok(false),
@@ -1655,9 +1665,9 @@ fn main() -> ExitCode {
             let (near, _) = open_feature_class(&near_features)?;
             let radius = search_radius
                 .as_deref()
-                .map(|r| parse_distance(r, fc.spatial_reference_wkt()))
+                .map(|r| near_radius(r, method, fc.spatial_reference_wkt()))
                 .transpose()?;
-            let out = geoforge_tools::generate_near_table(
+            let out = geoforge_tools::generate_near_table_with(
                 fc.as_ref(),
                 near.as_ref(),
                 radius,
@@ -1665,6 +1675,7 @@ fn main() -> ExitCode {
                 flag(&angle, "ANGLE", "NO_ANGLE")?,
                 flag(&closest, "ALL", "CLOSEST")?,
                 closest_count,
+                method,
             )?;
             write_table(&out, &out_table)
         })(),
@@ -3554,7 +3565,9 @@ fn near_tool(
     search_radius: Option<&str>,
     location: &str,
     angle: &str,
+    method: &str,
 ) -> Result<()> {
+    let method = near_method(method)?;
     let flag = |value: &str, yes: &str, no: &str| match value.to_ascii_uppercase() {
         v if v == yes => Ok(true),
         v if v == no => Ok(false),
@@ -3584,9 +3597,10 @@ fn near_tool(
         })
         .collect();
     let radius = search_radius
-        .map(|r| parse_distance(r, fc.spatial_reference_wkt()))
+        .map(|r| near_radius(r, method, fc.spatial_reference_wkt()))
         .transpose()?;
-    let out = geoforge_tools::near(fc.as_ref(), &near_inputs, radius, location, angle)?;
+    let out =
+        geoforge_tools::near_with(fc.as_ref(), &near_inputs, radius, location, angle, method)?;
     drop(fc);
     if let Some(output) = output {
         return write_output(out, output, source_gdb(input).as_deref());
@@ -3916,6 +3930,19 @@ fn dissolve_tool(
 
 /// Parses an ArcGIS linear distance ("25", "25 Meters", "0.5 Kilometers") into the
 /// units of `wkt` (the last `UNIT[...]` of a projected system).
+fn near_method(text: &str) -> Result<geoforge_tools::NearMethod> {
+    geoforge_tools::NearMethod::parse(text)
+        .ok_or_else(|| Error::Unsupported(format!("method `{text}`: expected PLANAR or GEODESIC")))
+}
+
+/// A Near search radius: in the data's unit when planar, in metres (from a linear unit) when geodesic.
+fn near_radius(text: &str, method: geoforge_tools::NearMethod, wkt: Option<&str>) -> Result<f64> {
+    match method {
+        geoforge_tools::NearMethod::Planar => parse_distance(text, wkt),
+        geoforge_tools::NearMethod::Geodesic => parse_distance(text, None),
+    }
+}
+
 fn parse_distance(text: &str, wkt: Option<&str>) -> Result<f64> {
     let mut words = text.split_whitespace();
     let value: f64 = words

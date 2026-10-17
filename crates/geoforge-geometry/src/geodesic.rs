@@ -488,3 +488,97 @@ pub fn buffer_geodesic_union<'a>(
     }
     Ok(from_multipolygon(&unary_union(polys.iter())))
 }
+
+/// Shortest geodesic distance (metres) from `p` to the segment `a`–`b`, which is straight in
+/// longitude/latitude as ArcGIS stores it, and the point attained. Scans the segment, then refines
+/// around the best sample by golden section.
+fn point_segment(earth: &Earth, p: [f64; 2], a: [f64; 2], b: [f64; 2]) -> (f64, [f64; 2]) {
+    let at = |t: f64| [a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1])];
+    let dist = |t: f64| earth.distance(p, at(t));
+    if a == b {
+        return (dist(0.0), a);
+    }
+    const SAMPLES: usize = 16;
+    let (mut best_i, mut best_d) = (0, f64::INFINITY);
+    for i in 0..=SAMPLES {
+        let d = dist(i as f64 / SAMPLES as f64);
+        if d < best_d {
+            (best_i, best_d) = (i, d);
+        }
+    }
+    let step = 1.0 / SAMPLES as f64;
+    let (mut lo, mut hi) = (
+        (best_i as f64 * step - step).max(0.0),
+        (best_i as f64 * step + step).min(1.0),
+    );
+    let phi = (5f64.sqrt() - 1.0) / 2.0;
+    for _ in 0..60 {
+        let (m1, m2) = (hi - phi * (hi - lo), lo + phi * (hi - lo));
+        if dist(m1) < dist(m2) {
+            hi = m2;
+        } else {
+            lo = m1;
+        }
+    }
+    let t = (lo + hi) / 2.0;
+    let refined = (dist(t), at(t));
+    if refined.0 <= best_d {
+        refined
+    } else {
+        (best_d, at(best_i as f64 * step))
+    }
+}
+
+impl Earth {
+    fn distance(&self, a: [f64; 2], b: [f64; 2]) -> f64 {
+        let (s12, _, _, _): (f64, f64, f64, f64) = self.g.inverse(a[1], a[0], b[1], b[0]);
+        s12
+    }
+}
+
+/// The closest approach of two geometries in longitude/latitude, measured on the WGS 84 ellipsoid
+/// (`Near` with `GEODESIC`): the distance in metres, and the points attained. Segments are straight
+/// in longitude/latitude. Zero when they overlap. `None` if either is empty.
+///
+/// Between points and for polygons against points the results equal ArcGIS's; ArcGIS finds the
+/// closest point on a line only approximately (up to 0.08 % off in distance).
+pub fn nearest_geodesic(a: &Geometry, b: &Geometry) -> Result<Option<crate::Nearest>> {
+    let Some(planar) = crate::nearest(a, b)? else {
+        return Ok(None);
+    };
+    if planar.distance == 0.0 {
+        return Ok(Some(planar));
+    }
+    let earth = Earth::wgs84();
+    let (a, b) = (crate::clip::linear(a)?, crate::clip::linear(b)?);
+    let (sa, sb) = (
+        crate::proximity::segments(&a),
+        crate::proximity::segments(&b),
+    );
+    let mut best: Option<crate::Nearest> = None;
+    let mut keep = |distance: f64, from: [f64; 2], to: [f64; 2]| {
+        if best.is_none_or(|n| distance < n.distance) {
+            best = Some(crate::Nearest { distance, from, to });
+        }
+    };
+    // The closest approach of two segments is at an end of one of them.
+    for &(p, q) in &sa {
+        for &(r, s) in &sb {
+            for end in [p, q] {
+                let (d, at) = point_segment(&earth, end, r, s);
+                keep(d, end, at);
+            }
+            for end in [r, s] {
+                let (d, at) = point_segment(&earth, end, p, q);
+                keep(d, at, end);
+            }
+        }
+    }
+    Ok(best)
+}
+
+/// The azimuth in degrees (clockwise from north, -180..180] at `from` of the geodesic to `to`; 0
+/// when they coincide.
+pub fn azimuth(from: [f64; 2], to: [f64; 2]) -> f64 {
+    Earth::wgs84().azimuths(from, to).map_or(0.0, |(az, _)| az)
+}

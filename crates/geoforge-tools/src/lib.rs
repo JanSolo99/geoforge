@@ -2234,9 +2234,18 @@ impl Indexed {
         &self,
         g: &geoforge_core::Geometry,
         radius: Option<f64>,
+        method: NearMethod,
     ) -> Result<Option<(usize, geoforge_geometry::Nearest)>> {
-        self.index
-            .closest(g, |i| self.features[i].geometry.as_ref(), radius)
+        match method {
+            NearMethod::Planar => {
+                self.index
+                    .closest(g, |i| self.features[i].geometry.as_ref(), radius)
+            }
+            NearMethod::Geodesic => {
+                self.index
+                    .closest_geodesic(g, |i| self.features[i].geometry.as_ref(), radius)
+            }
+        }
     }
 
     /// Positions of the features whose envelopes come within `pad` of `g`'s.
@@ -2259,6 +2268,44 @@ pub fn near(
     search_radius: Option<f64>,
     location: bool,
     angle: bool,
+) -> Result<ToolOutput> {
+    near_with(
+        input,
+        near_features,
+        search_radius,
+        location,
+        angle,
+        NearMethod::Planar,
+    )
+}
+
+/// How Near measures: on a flat plane in the data's units, or on the WGS 84 ellipsoid.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum NearMethod {
+    Planar,
+    /// Data in longitude/latitude: distances and the search radius in metres, angles as azimuths
+    /// (clockwise from north, -180..180]. Segments are straight in longitude/latitude.
+    Geodesic,
+}
+
+impl NearMethod {
+    pub fn parse(s: &str) -> Option<Self> {
+        match s.to_ascii_uppercase().as_str() {
+            "" | "PLANAR" => Some(Self::Planar),
+            "GEODESIC" => Some(Self::Geodesic),
+            _ => None,
+        }
+    }
+}
+
+/// [`near`] with a measuring method.
+pub fn near_with(
+    input: &dyn FeatureClass,
+    near_features: &[PathInput],
+    search_radius: Option<f64>,
+    location: bool,
+    angle: bool,
+    method: NearMethod,
 ) -> Result<ToolOutput> {
     let kind = input
         .geometry_kind()
@@ -2306,7 +2353,7 @@ pub fn near(
         let mut found: Option<(usize, usize, geoforge_geometry::Nearest)> = None;
         if let Some(g) = &f.geometry {
             for (c, candidates) in classes.iter().enumerate() {
-                if let Some((i, n)) = candidates.closest(g, search_radius)?
+                if let Some((i, n)) = candidates.closest(g, search_radius, method)?
                     && found.is_none_or(|(_, _, b)| n.distance < b.distance)
                 {
                     found = Some((c, i, n));
@@ -2326,6 +2373,9 @@ pub fn near(
                     "NEAR_X" => Value::Double(n.to[0]),
                     "NEAR_Y" => Value::Double(n.to[1]),
                     _ if n.distance == 0.0 => Value::Double(0.0),
+                    _ if method == NearMethod::Geodesic => {
+                        Value::Double(geoforge_geometry::azimuth(n.from, n.to))
+                    }
                     _ => Value::Double(
                         (n.to[1] - n.from[1])
                             .atan2(n.to[0] - n.from[0])
@@ -2361,9 +2411,20 @@ pub enum MatchOption {
     Within,
     CompletelyWithin,
     Closest,
+    /// `WITHIN_A_DISTANCE_GEODESIC`: longitude/latitude data, the radius and distances in metres.
+    WithinADistanceGeodesic,
+    /// `CLOSEST_GEODESIC`.
+    ClosestGeodesic,
 }
 
 impl MatchOption {
+    fn method(self) -> NearMethod {
+        match self {
+            Self::WithinADistanceGeodesic | Self::ClosestGeodesic => NearMethod::Geodesic,
+            _ => NearMethod::Planar,
+        }
+    }
+
     pub fn parse(s: &str) -> Option<Self> {
         Some(match s.to_ascii_uppercase().as_str() {
             "INTERSECT" => Self::Intersect,
@@ -2373,6 +2434,8 @@ impl MatchOption {
             "WITHIN" => Self::Within,
             "COMPLETELY_WITHIN" => Self::CompletelyWithin,
             "CLOSEST" => Self::Closest,
+            "WITHIN_A_DISTANCE_GEODESIC" => Self::WithinADistanceGeodesic,
+            "CLOSEST_GEODESIC" => Self::ClosestGeodesic,
             _ => return None,
         })
     }
@@ -2617,20 +2680,36 @@ pub fn spatial_join(
         // (join index, distance)
         let mut matches: Vec<(usize, f64)> = Vec::new();
         if let Some(tg) = &t.geometry {
-            if opts.match_option == MatchOption::Closest {
-                if let Some((i, n)) = joins.closest(tg, opts.search_radius)? {
+            if matches!(
+                opts.match_option,
+                MatchOption::Closest | MatchOption::ClosestGeodesic
+            ) {
+                if let Some((i, n)) =
+                    joins.closest(tg, opts.search_radius, opts.match_option.method())?
+                {
                     matches.push((i, n.distance));
                 }
             } else {
-                for i in joins.candidates(tg, radius) {
+                let geodesic = opts.match_option.method() == NearMethod::Geodesic;
+                let pad = if geodesic {
+                    degrees_for(tg, radius)
+                } else {
+                    radius
+                };
+                for i in joins.candidates(tg, pad) {
                     let jg = joins.features[i].geometry.as_ref().unwrap();
-                    let Some(n) = geoforge_geometry::nearest(tg, jg)? else {
+                    let n = if geodesic {
+                        geoforge_geometry::nearest_geodesic(tg, jg)?
+                    } else {
+                        geoforge_geometry::nearest(tg, jg)?
+                    };
+                    let Some(n) = n else {
                         continue;
                     };
                     let hit = match opts.match_option {
-                        MatchOption::Intersect | MatchOption::WithinADistance => {
-                            n.distance <= radius
-                        }
+                        MatchOption::Intersect
+                        | MatchOption::WithinADistance
+                        | MatchOption::WithinADistanceGeodesic => n.distance <= radius,
                         MatchOption::Within => geoforge_geometry::within(tg, jg)?,
                         MatchOption::CompletelyWithin => {
                             geoforge_geometry::completely_within(tg, jg)?
@@ -2639,7 +2718,7 @@ pub fn spatial_join(
                         MatchOption::CompletelyContains => {
                             geoforge_geometry::completely_within(jg, tg)?
                         }
-                        MatchOption::Closest => unreachable!(),
+                        MatchOption::Closest | MatchOption::ClosestGeodesic => unreachable!(),
                     };
                     if hit {
                         matches.push((i, n.distance));
@@ -2651,7 +2730,14 @@ pub fn spatial_join(
             let mut a = vec![Value::Integer(count as i32)];
             if opts.distance_field_name.is_some() {
                 a.push(Value::Double(match m {
-                    Some((_, d)) if opts.match_option == MatchOption::Closest => d,
+                    Some((_, d))
+                        if matches!(
+                            opts.match_option,
+                            MatchOption::Closest | MatchOption::ClosestGeodesic
+                        ) =>
+                    {
+                        d
+                    }
                     _ => -1.0,
                 }));
             }
@@ -4326,6 +4412,37 @@ pub fn generate_near_table(
     all: bool,
     closest_count: usize,
 ) -> Result<TableOutput> {
+    generate_near_table_with(
+        input,
+        near,
+        search_radius,
+        location,
+        angle,
+        all,
+        closest_count,
+        NearMethod::Planar,
+    )
+}
+
+/// The conservative search radius in degrees of longitude/latitude for `radius` metres around `g`.
+fn degrees_for(g: &geoforge_core::Geometry, radius: f64) -> f64 {
+    let env = g.curve_envelope();
+    let lat = env.ymin.abs().max(env.ymax.abs()).min(89.0);
+    radius / (110_574.0 * lat.to_radians().cos().max(0.017))
+}
+
+/// [`generate_near_table`] with a measuring method.
+#[allow(clippy::too_many_arguments)]
+pub fn generate_near_table_with(
+    input: &dyn FeatureClass,
+    near: &dyn FeatureClass,
+    search_radius: Option<f64>,
+    location: bool,
+    angle: bool,
+    all: bool,
+    closest_count: usize,
+    method: NearMethod,
+) -> Result<TableOutput> {
     let near_features = Indexed::load(near)?;
     let mut fields = vec![
         Field::new("IN_FID", FieldType::Integer),
@@ -4349,7 +4466,10 @@ pub fn generate_near_table(
         let Some(g) = &f.geometry else { continue };
         let mut found: Vec<(usize, geoforge_geometry::Nearest)> = Vec::new();
         if all {
-            let pad = search_radius.unwrap_or(f64::INFINITY);
+            let pad = match (method, search_radius) {
+                (NearMethod::Geodesic, Some(r)) => degrees_for(g, r),
+                (_, r) => r.unwrap_or(f64::INFINITY),
+            };
             let candidates: Vec<usize> = if pad.is_finite() {
                 near_features.candidates(g, pad)
             } else {
@@ -4359,7 +4479,11 @@ pub fn generate_near_table(
                 let Some(ng) = &near_features.features[i].geometry else {
                     continue;
                 };
-                if let Some(n) = geoforge_geometry::nearest(g, ng)?
+                let n = match method {
+                    NearMethod::Planar => geoforge_geometry::nearest(g, ng)?,
+                    NearMethod::Geodesic => geoforge_geometry::nearest_geodesic(g, ng)?,
+                };
+                if let Some(n) = n
                     && search_radius.is_none_or(|r| n.distance <= r)
                 {
                     found.push((i, n));
@@ -4369,7 +4493,7 @@ pub fn generate_near_table(
             if closest_count > 0 {
                 found.truncate(closest_count);
             }
-        } else if let Some(hit) = near_features.closest(g, search_radius)? {
+        } else if let Some(hit) = near_features.closest(g, search_radius, method)? {
             found.push(hit);
         }
         for (rank, (i, n)) in found.into_iter().enumerate() {
@@ -4387,6 +4511,8 @@ pub fn generate_near_table(
             if angle {
                 let a = if n.distance == 0.0 {
                     0.0
+                } else if method == NearMethod::Geodesic {
+                    geoforge_geometry::azimuth(n.from, n.to)
                 } else {
                     (n.to[1] - n.from[1])
                         .atan2(n.to[0] - n.from[0])

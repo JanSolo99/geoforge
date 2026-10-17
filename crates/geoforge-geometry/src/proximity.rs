@@ -18,7 +18,7 @@ pub struct Nearest {
 }
 
 /// Segments of a geometry (polygon rings closed); a point is a zero-length segment.
-fn segments(g: &Geometry) -> Vec<([f64; 2], [f64; 2])> {
+pub(crate) fn segments(g: &Geometry) -> Vec<([f64; 2], [f64; 2])> {
     match g.kind {
         GeometryKind::Point | GeometryKind::Multipoint => g.xy.iter().map(|&p| (p, p)).collect(),
         _ => g

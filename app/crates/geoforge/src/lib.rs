@@ -540,37 +540,26 @@ fn buffer_by_zone(
 
 /// Near: adds `NEAR_FID`/`NEAR_DIST` (metres) to the input layer, as ArcGIS does in place.
 fn near(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
-    let all = datasets(inp, p, &["input", "near"])?;
-    let work = Work::metres(&all)?;
+    let work = Work::degrees();
     let (ds, fc) = layer_in(inp, p, "input", &work, true)?;
     let (nds, nfc) = layer_in(inp, p, "near", &work, false)?;
     let radius = metres(p, "search_radius");
     let (loc, ang) = (flag(p, "location"), flag(p, "angle"));
     let near = [tools::PathInput { source: nds.name.clone(), features: &nfc }];
-    let out = tools::near(&fc, &near, radius, loc, ang).map_err(err)?;
-    let mut out_ds = to_dataset_checked(out.clone(), ds.name.clone(), &work)?;
-    // NEAR_X / NEAR_Y are working-system coordinates: back to longitude/latitude.
-    if loc && let (Some(xi), Some(yi)) = (out_ds.field_index("NEAR_X"), out_ds.field_index("NEAR_Y")) {
-        for f in &mut out_ds.features {
-            let (x, y) = (f.attrs.get(xi).and_then(Value::as_f64), f.attrs.get(yi).and_then(Value::as_f64));
-            if let (Some(x), Some(y)) = (x, y)
-                && !(x == -1.0 && y == -1.0)
-                && let Some(c) = work.back(Coord::new(x, y))
-            {
-                f.attrs[xi] = Value::Float(c.x);
-                f.attrs[yi] = Value::Float(c.y);
-            }
-        }
-    }
+    let out = tools::near_with(&fc, &near, radius, loc, ang, tools::NearMethod::Geodesic).map_err(err)?;
+    let out_ds = to_dataset_checked(out.clone(), ds.name.clone(), &work)?;
     let m = messages(&out, &out_ds, &work);
     Ok(ToolResult { output: Output::Update { layer: ds.name.clone(), dataset: out_ds }, messages: m })
 }
 
 fn spatial_join(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
-    let option = tools::MatchOption::parse(text(p, "match_option")).unwrap_or(tools::MatchOption::Intersect);
-    let measures = matches!(option, tools::MatchOption::WithinADistance | tools::MatchOption::Closest);
-    let all = datasets(inp, p, &["input", "other"])?;
-    let work = if measures { Work::metres(&all)? } else { Work::degrees() };
+    let option = match tools::MatchOption::parse(text(p, "match_option")).unwrap_or(tools::MatchOption::Intersect) {
+        // Distances are on the ground.
+        tools::MatchOption::WithinADistance => tools::MatchOption::WithinADistanceGeodesic,
+        tools::MatchOption::Closest => tools::MatchOption::ClosestGeodesic,
+        other => other,
+    };
+    let work = Work::degrees();
     let (target, tfc) = layer_in(inp, p, "input", &work, false)?;
     let (join, jfc) = layer_in(inp, p, "other", &work, false)?;
     let opts = tools::SpatialJoinOptions {
@@ -759,13 +748,22 @@ fn find_identical(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
 
 /// Generate Near Table: distances in metres.
 fn generate_near_table(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
-    let all = datasets(inp, p, &["input", "near"])?;
-    let work = Work::metres(&all)?;
+    let work = Work::degrees();
     let (ds, fc) = layer_in(inp, p, "input", &work, false)?;
     let (_, nfc) = layer_in(inp, p, "near", &work, false)?;
     let count = number(p, "closest_count").map_or(1, |c| c.max(1.0) as usize);
     let all_matches = text(p, "method").eq_ignore_ascii_case("ALL");
-    let t = tools::generate_near_table(&fc, &nfc, metres(p, "search_radius"), false, flag(p, "angle"), all_matches, count).map_err(err)?;
+    let t = tools::generate_near_table_with(
+        &fc,
+        &nfc,
+        metres(p, "search_radius"),
+        false,
+        flag(p, "angle"),
+        all_matches,
+        count,
+        tools::NearMethod::Geodesic,
+    )
+    .map_err(err)?;
     let t = table_dataset(t, out_name(p, format!("{}_NearTable", ds.name)));
     let mut m = vec![format!("{}: {} rows", t.name, t.features.len())];
     m.extend(work.note);
@@ -978,7 +976,7 @@ const DEFS: &[Def] = &[
         id: "near",
         name: "Near",
         toolbox: "GeoForge › Analysis › Proximity",
-        summary: "Adds the distance (m) and ID of the nearest feature to the input layer (ArcGIS Pro Near, in place).",
+        summary: "Adds the distance (m, on the ellipsoid) and ID of the nearest feature to the input layer (ArcGIS Pro Near with GEODESIC, in place).",
         params: &[
             INPUT,
             P { name: "near", label: "Near Features", kind: K::Layer, required: true, default: "", help: "" },
@@ -1005,7 +1003,7 @@ const DEFS: &[Def] = &[
                 kind: K::Bool,
                 required: false,
                 default: "false",
-                help: "Degrees counter-clockwise from the UTM grid's east.",
+                help: "Azimuth in degrees clockwise from north.",
             },
         ],
         run: near,
@@ -1644,7 +1642,7 @@ mod tests {
     }
 
     #[test]
-    fn near_measures_metres_and_updates_in_place() {
+    fn near_measures_metres_on_the_ellipsoid_and_updates_in_place() {
         register();
         let layers = Layers(vec![points("a", &[(10.0, 50.0)]), points("b", &[(10.0, 50.01), (11.0, 50.0)])]);
         let r = rustgis_analysis::run("geoforge:near", &layers, &json!({"input": "a", "near": "b", "location": true})).unwrap();
@@ -1656,6 +1654,29 @@ mod tests {
         assert_eq!(at("NEAR_FID"), Value::Int(1));
         // NEAR_X/NEAR_Y come back as longitude/latitude.
         assert!(matches!(at("NEAR_Y"), Value::Float(y) if (y - 50.01).abs() < 1e-6));
+    }
+
+    #[test]
+    fn near_and_spatial_join_are_geodesic_across_wide_areas() {
+        register();
+        // Far apart and far north: one UTM zone could not measure this.
+        let layers = Layers(vec![points("a", &[(-120.0, 70.0)]), points("b", &[(-100.0, 71.0), (60.0, 80.0)])]);
+        // ArcGIS Near (GEODESIC) on the same points.
+        let want = 750_149.660_147_738_2;
+        let r = rustgis_analysis::run("geoforge:near", &layers, &json!({"input": "a", "near": "b", "angle": true})).unwrap();
+        let Output::Update { dataset, .. } = r.output else { panic!("update") };
+        let at = |n: &str| dataset.features[0].attrs[dataset.field_index(n).unwrap()].clone();
+        assert!(matches!(at("NEAR_DIST"), Value::Float(d) if (d - want).abs() < 0.01), "{:?} vs {want}", at("NEAR_DIST"));
+        // ArcGIS: azimuth 72.1355 degrees clockwise from north.
+        assert!(matches!(at("NEAR_ANGLE"), Value::Float(a) if (a - 72.13552930038288).abs() < 1e-6), "{:?}", at("NEAR_ANGLE"));
+        let j = rustgis_analysis::run(
+            "geoforge:spatial_join",
+            &layers,
+            &json!({"input": "a", "other": "b", "match_option": "CLOSEST", "distance_field_name": "D"}),
+        )
+        .unwrap();
+        let Output::Layer(out) = j.output else { panic!("layer") };
+        assert!(matches!(out.features[0].attrs[out.field_index("D").unwrap()], Value::Float(d) if (d - want).abs() < 0.01));
     }
 
     #[test]
@@ -1763,7 +1784,12 @@ mod tests {
                 r.bands[0][row * 24 + col] = (100.0 - d) as f32 as f64;
             }
         }
-        let path = std::env::temp_dir().join(format!("gf-bridge-{name}-{}.tif", std::process::id()));
+        static N: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+        let path = std::env::temp_dir().join(format!(
+            "gf-bridge-{name}-{}-{}.tif",
+            std::process::id(),
+            N.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+        ));
         geoforge_raster::write_geotiff(&path, &r, geoforge_raster::Compression::None).unwrap();
         let app = rustgis_data::raster::read_path(&path).unwrap();
         (r, WithRasters { layers: Layers(vec![]), rasters: vec![(name.to_string(), app, path.display().to_string())] })
@@ -1772,7 +1798,12 @@ mod tests {
     fn raster_of(r: Result<ToolResult, String>) -> geoforge_raster::Raster {
         let Output::Layers(mut v) = r.unwrap().output else { panic!("layers") };
         let rustgis_analysis::OutputLayer::Raster { bytes, .. } = v.remove(0) else { panic!("raster") };
-        let path = std::env::temp_dir().join(format!("gf-bridge-out-{}-{}.tif", std::process::id(), bytes.len()));
+        static N: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+        let path = std::env::temp_dir().join(format!(
+            "gf-bridge-out-{}-{}.tif",
+            std::process::id(),
+            N.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+        ));
         std::fs::write(&path, bytes).unwrap();
         let out = geoforge_raster::read_geotiff(&path).unwrap();
         std::fs::remove_file(&path).ok();

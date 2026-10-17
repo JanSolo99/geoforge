@@ -98,6 +98,47 @@ impl EnvelopeIndex {
     }
 }
 
+impl EnvelopeIndex {
+    /// Like [`closest`](Self::closest), measuring on the WGS 84 ellipsoid (geometries in
+    /// longitude/latitude; distances in metres).
+    pub fn closest_geodesic<'a>(
+        &self,
+        g: &Geometry,
+        geometry: impl Fn(usize) -> Option<&'a Geometry>,
+        radius: Option<f64>,
+    ) -> Result<Option<(usize, Nearest)>> {
+        /// The shortest metres in a degree of latitude.
+        const METRES_PER_DEGREE: f64 = 110_574.0;
+        let env = g.curve_envelope();
+        if env.is_empty() {
+            return Ok(None);
+        }
+        let mut best: Option<(usize, Nearest)> = None;
+        for entry in self.tree.iter() {
+            let (lo, hi) = (entry.geom().lower(), entry.geom().upper());
+            let gap = (env.ymin - hi[1]).max(lo[1] - env.ymax).max(0.0) * METRES_PER_DEGREE;
+            if best.is_some_and(|(_, b)| gap > b.distance) || radius.is_some_and(|r| gap > r) {
+                continue;
+            }
+            let Some(other) = geometry(entry.data) else {
+                continue;
+            };
+            let Some(n) = crate::geodesic::nearest_geodesic(g, other)? else {
+                continue;
+            };
+            if radius.is_some_and(|r| n.distance > r) {
+                continue;
+            }
+            if best.is_none_or(|(i, b)| {
+                n.distance < b.distance || (n.distance == b.distance && entry.data < i)
+            }) {
+                best = Some((entry.data, n));
+            }
+        }
+        Ok(best)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
