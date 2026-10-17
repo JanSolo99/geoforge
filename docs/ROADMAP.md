@@ -425,8 +425,9 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
       Spatial Join, Select, Split, Frequency, Statistics), Data Management (fields, features, geodatabase schema tools via
       `gf`), Spatial Analyst (surface, hydrology, focal, local, zonal, reclass, distance, extraction) done; the rest of the
       2,157-tool inventory is not
-- [~] Python bindings: the app's PyO3 package and MCP server dispatch through the same registry (`gp.run` with
-      `geoforge:<tool>`); an arcpy-shaped `geoforge` module (`geoforge.analysis.Buffer(...)`) is not written
+- [x] Python bindings: the app's PyO3 package and MCP server dispatch through the registry (`gp.run` with
+      `geoforge:<tool>`), and `rustgis.arcpy` gives it ArcGIS's shape (`arcpy.analysis.Buffer("Cities", "out", "100 Kilometers")`,
+      `management`, `conversion`, `sa`; inputs as layer names or paths, outputs written to paths; 10 tests)
 
 ## Phase 7 — Databases & other formats
 - [x] Features To JSON: Esri JSON and GeoJSON written byte for byte as ArcGIS writes them

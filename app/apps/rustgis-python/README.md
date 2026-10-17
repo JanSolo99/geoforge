@@ -41,3 +41,25 @@ any of them. See the [Python guide](https://rustgis.app/python/) and the
 [getting-started notebook](https://github.com/opengeos/RustGIS/blob/main/apps/rustgis-python/examples/getting-started.ipynb).
 
 Licensed under Apache-2.0.
+
+## arcpy-shaped API (GeoForge)
+
+`rustgis.arcpy` runs GeoForge's ArcGIS-verified tools with ArcGIS Pro's names, positional parameters and keywords:
+
+```python
+import rustgis
+from rustgis import arcpy
+
+arcpy.use(rustgis.Session(sample=True))
+arcpy.analysis.Buffer("Cities", "Cities_100km", "100 Kilometers")   # geodesic on the ellipsoid
+arcpy.analysis.Select("Cities", "Mega", "pop_max > 10000000")
+arcpy.management.AddField("Cities", "ratio", "DOUBLE")
+arcpy.conversion.PolygonToRaster("Countries", "", "Grid", "CELL_CENTER", cellsize=2)
+arcpy.sa.FocalStatistics("Grid", "Rectangle 3 3 CELL", "MAXIMUM", out_raster="GridMax")
+arcpy.analysis.Buffer("Cities", "/data/out.gdb/buffers", "10 Kilometers")  # written there, too
+```
+
+Toolboxes: `analysis`, `management`, `conversion`, `sa` (about 65 tools; `arcpy.ListTools()`). Inputs are layer names,
+`Layer` objects or file paths (added as layers). An output that is a path is written there as well. Tools return a
+`Result` (`getOutput`, `getMessages`). Not arcpy: layers are longitude/latitude, `arcpy.sa` functions take the output as
+`out_raster=`, and `env` has only `workspace` and `overwriteOutput`.

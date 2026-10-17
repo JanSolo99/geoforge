@@ -1,0 +1,124 @@
+"""Tests for the arcpy-shaped API (run after `maturin develop`)."""
+
+import os
+
+import pytest
+
+import rustgis
+from rustgis import arcpy
+
+
+@pytest.fixture
+def s():
+    """A session with the World Atlas sample open, the tools' session."""
+    session = rustgis.Session(sample=True)
+    arcpy.use(session)
+    arcpy.env.overwriteOutput = False
+    arcpy.env.workspace = None
+    return session
+
+
+def fields(session, name):
+    """Field names of a layer (its info lists them as `name (Type)`)."""
+    return {f.split(" (")[0] for f in session.layer(name).info["fields"]}
+
+
+def count(session, name):
+    return session.layer(name).info["features"]
+
+
+def test_buffer_takes_arcpy_arguments(s):
+    r = arcpy.analysis.Buffer("Cities", "Cities_100km", "100 Kilometers")
+    assert r.getOutput(0) == "Cities_100km" and str(r) == "Cities_100km"
+    assert count(s, "Cities_100km") == count(s, "Cities")
+    assert "Cities_100km" in r.getMessages()
+    # Keywords work as in arcpy, and a plain number is the data's unit.
+    r = arcpy.analysis.Buffer(in_features="Cities", out_feature_class="Cities_5deg", buffer_distance_or_field=5, dissolve_option="ALL")
+    assert count(s, "Cities_5deg") == 1
+
+
+def test_distances_are_on_the_ground(s):
+    arcpy.analysis.Buffer("Cities", "B1", "10 Kilometers")
+    arcpy.analysis.Buffer("Cities", "B2", "10 Miles")
+    # Ten miles cover more ground than ten kilometres: the area of the first feature grows.
+    a1 = s.layer("B1").to_geojson()["features"][0]["geometry"]["coordinates"][0]
+    a2 = s.layer("B2").to_geojson()["features"][0]["geometry"]["coordinates"][0]
+    spread = lambda ring: max(p[1] for p in ring) - min(p[1] for p in ring)
+    assert spread(a2) > spread(a1) * 1.5
+
+
+def test_outputs_that_exist_need_overwrite(s):
+    arcpy.analysis.Buffer("Cities", "Twice", "10 Kilometers")
+    with pytest.raises(rustgis.RustGISError, match="already exists"):
+        arcpy.analysis.Buffer("Cities", "Twice", "10 Kilometers")
+    arcpy.env.overwriteOutput = True
+    arcpy.analysis.Buffer("Cities", "Twice", "10 Kilometers")
+
+
+def test_wrong_arguments_are_python_errors(s):
+    with pytest.raises(TypeError, match="unexpected keyword"):
+        arcpy.analysis.Buffer("Cities", "X", "1 Kilometers", nonsense=1)
+    with pytest.raises(TypeError, match="at most"):
+        arcpy.analysis.Clip(*["a"] * 9)
+    with pytest.raises(rustgis.RustGISError, match="unknown distance unit"):
+        arcpy.analysis.Buffer("Cities", "X", "1 Parsecs")
+    with pytest.raises(rustgis.RustGISError):
+        arcpy.analysis.Buffer("No such layer", "X", "1 Kilometers")
+
+
+def test_overlay_select_and_tables(s):
+    arcpy.analysis.Buffer("Cities", "Big", "300 Kilometers")
+    r = arcpy.analysis.Clip("Countries", "Big", "Near_cities")
+    assert count(s, "Near_cities") > 0
+    r = arcpy.analysis.Select("Cities", "Megacities", "pop_max > 10000000")
+    assert 0 < count(s, "Megacities") < count(s, "Cities")
+    r = arcpy.analysis.Frequency("Cities", "ByCountry", ["adm0name"])
+    assert r.getOutput(0) == "ByCountry"
+    r = arcpy.analysis.Statistics("Cities", "Pop", [["pop_max", "SUM"], ["pop_max", "MEAN"]])
+    assert r.outputCount == 1
+
+
+def test_management_in_place_tools(s):
+    arcpy.management.AddField("Cities", "ratio", "DOUBLE")
+    arcpy.management.CalculateField("Cities", "ratio", "!pop_max! / 1000.0", "PYTHON3")
+    assert "ratio" in fields(s, "Cities")
+    arcpy.management.AddXY("Cities")
+    arcpy.management.DeleteField("Cities", ["ratio"])
+    assert "ratio" not in fields(s, "Cities")
+
+
+def test_select_layer_by_location_selects(s):
+    arcpy.analysis.Buffer("Cities", "Hub", "50 Kilometers")
+    r = arcpy.management.SelectLayerByLocation("Cities", "WITHIN_A_DISTANCE", "Hub", "10 Kilometers")
+    assert r.raw["selected"] > 0
+
+
+def test_files_are_added_and_written(s, tmp_path):
+    out = str(tmp_path / "buffers.shp")
+    r = arcpy.analysis.Buffer("Cities", out, "20 Kilometers")
+    assert os.path.exists(out) and r.getOutput(0) == out
+    # A file is a valid input: it is added as a layer named after it.
+    r = arcpy.analysis.Buffer(out, "Again", "1 Kilometers")
+    assert count(s, "Again") > 0 and "buffers" in {l["name"] for l in s.layers()}
+    gdb = str(tmp_path / "city.gdb" / "cities")
+    arcpy.management.Merge(["Cities"], gdb)
+    assert os.path.isdir(tmp_path / "city.gdb")
+
+
+def test_rasters_flow_through_spatial_analyst(s):
+    r = arcpy.conversion.PolygonToRaster("Countries", "", "Grid", "CELL_CENTER", cellsize=2)
+    assert r.getOutput(0) == "Grid"
+    # Spatial Analyst functions take the output as `out_raster`, as keyword.
+    arcpy.sa.FocalStatistics("Grid", "Rectangle 3 3 CELL", "MAXIMUM", out_raster="GridMax")
+    arcpy.sa.Plus("Grid", 10, out_raster="GridPlus")
+    arcpy.sa.Slope("Grid", "DEGREE", 1, out_raster="GridSlope")
+    names = {l["name"] for l in s.layers()}
+    assert {"Grid", "GridMax", "GridPlus", "GridSlope"} <= names
+    r = arcpy.conversion.RasterToPoint("Grid", "GridPoints")
+    assert count(s, "GridPoints") > 100
+
+
+def test_list_tools():
+    names = arcpy.ListTools("Buffer*")
+    assert names == ["Buffer_analysis"]
+    assert len(arcpy.ListTools()) > 60
