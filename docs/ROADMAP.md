@@ -245,7 +245,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
       items, `\ds\name` paths, `DatasetInFeatureDataset` relationships and the dataset's registered
       coordinate system as ArcGIS writes them; classes take the dataset's XY domain; `gf create-feature-dataset`,
       outputs to `city.gdb/Ds/name`); ArcGIS lists, reads, edits and deletes in them. Not done: projecting an
-      output to the dataset's coordinate system; ArcGIS's projection-derived XY domain for projected datasets
+      output to the dataset's coordinate system (done in `gf`: outputs are projected to it); ArcGIS's projection-derived XY domain for projected datasets (done)
 - [x] Write: subtypes and field defaults (`create_table_with_subtypes`; subtype field, default subtype,
       per-subtype domains and defaults; the `Subtypes` element equals ArcGIS's character for character, the subtype
       field takes the default code as its default, domains link to the table) and simple relationship
@@ -261,7 +261,10 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
       defaults equal ArcGIS's after 12 operations (`testdata/gdb-reference/subtype_ops`); ArcGIS applies them
 - [x] Written geodatabases open in ArcGIS Pro 3.7: Describe, counts, domains, Check Geometry
       (no problems beyond those already in the source data), Copy Features out of them
-- [ ] Projected coordinate systems: use ArcGIS's projection-derived XY domain origin (needs Phase 4)
+- [x] Projected coordinate systems: ArcGIS's XY domain (origin, resolution, tolerance) for every system PROJ
+      knows (7,135 by Esri name), collected from ArcGIS through the bridge (`scripts/make-xy-domains.py`,
+      `xy_domains.tsv.gz`); used by file geodatabase and GeoPackage output. The origin comes from ArcGIS's own
+      projection engine, so it is a table, not a formula; a system ArcGIS does not know keeps the fixed origin
 
 ## Phase 4 — CRS
 - [x] PROJ binding (`geoforge-proj` on the `proj` crate, system PROJ >= 9.6.2 or built from
@@ -448,8 +451,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
   - [x] Table outputs (Frequency, Statistics, Summary/Near tables, ...) into a GeoPackage:
         Frequency and Statistics tables equal ArcGIS's (`testdata/gpkg/arcgis_stat_tables.gpkg`)
   - [ ] GeoPackage: WAL files, curve geometries, Project's extra `fid_` field,
-        coordinate system descriptions from ArcGIS's database; Transverse Mercator x origin and
-        other projections' XY domains (also for file geodatabase output); 64-bit ObjectIDs in
+        coordinate system descriptions from ArcGIS's database; 64-bit ObjectIDs in
         file geodatabases
 
 ## Phase 8 — Rendering & UI

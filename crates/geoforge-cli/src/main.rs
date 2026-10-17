@@ -3101,7 +3101,7 @@ fn write_output(mut out: ToolOutput, output: &Path, source_gdb: Option<&Path>) -
             .as_deref()
             .and_then(|w| geoforge_proj::Crs::from_wkt(w).ok());
         let spatial_ref = crs.as_ref().and_then(gpkg_spatial_ref);
-        let xy_domain = crs.as_ref().and_then(geoforge_proj::Crs::xy_domain);
+        let xy_domain = crs.as_ref().and_then(arcgis_xy_domain);
         geoforge_gpkg::write::write_table(
             &gpkg,
             &geoforge_gpkg::write::NewTable {
@@ -3188,8 +3188,14 @@ fn write_geodatabase(
             }
         }
     }
-    // In a feature dataset the class takes the dataset's coordinate system (the output's is not
-    // projected to it).
+    // In a feature dataset the class takes the dataset's coordinate system: the output is
+    // projected to it (as ArcGIS does), unless it has none or says the same.
+    let mut out = out;
+    if let Some(ds) = dataset
+        && let Some(Some(target)) = w.feature_dataset_srs(ds)
+    {
+        out = project_to(out, &target)?;
+    }
     let mut t = match dataset {
         Some(ds) => w.create_feature_class_in(ds, name, out.kind, out.has_z, out.has_m, &fields)?,
         None => w.create_table(
@@ -3288,6 +3294,41 @@ fn source_gdb(input: &Path) -> Option<PathBuf> {
         Location::Geodatabase { gdb, .. } => Some(gdb),
         Location::Shapefile(_) => None,
     }
+}
+
+/// `out` with its coordinates in the system `target_wkt`, when it has another one.
+fn project_to(mut out: ToolOutput, target_wkt: &str) -> Result<ToolOutput> {
+    let Some(source_wkt) = out.spatial_reference_wkt.clone() else {
+        return Ok(out);
+    };
+    let (source, target) = (
+        geoforge_proj::Crs::from_wkt(&source_wkt)?,
+        geoforge_proj::Crs::from_wkt(target_wkt)?,
+    );
+    if source.arcgis_wkt() == target.arcgis_wkt() {
+        return Ok(out);
+    }
+    let transform = geoforge_proj::Transform::with_method(&source, &target, None)?;
+    let deviation = geoforge_core::curves::arcgis_densify_deviation(source.is_geographic());
+    for f in &mut out.features {
+        if let Some(g) = &mut f.geometry {
+            if g.has_curves() {
+                *g = g.densify_curves_arcgis(deviation)?;
+            }
+            transform.apply(&mut g.xy)?;
+        }
+    }
+    out.spatial_reference_wkt = Some(target.arcgis_wkt());
+    eprintln!("The output was projected to the feature dataset's coordinate system.");
+    Ok(out)
+}
+
+/// The XY domain ArcGIS gives a coordinate system: its own table (`geoforge_filegdb::xy_domains`), else
+/// what could be derived from the projection.
+fn arcgis_xy_domain(crs: &geoforge_proj::Crs) -> Option<(f64, f64, f64)> {
+    geoforge_filegdb::xy_domains::for_wkt(crs.arcgis_wkt().as_str())
+        .map(|d| (d.x_origin, d.y_origin, 1.0 / d.scale))
+        .or_else(|| crs.xy_domain())
 }
 
 /// `city.gdb/table` as the geodatabase and the table's name.

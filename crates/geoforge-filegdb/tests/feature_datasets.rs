@@ -213,3 +213,43 @@ fn classes_join_a_dataset_of_an_existing_geodatabase() {
     );
     std::fs::remove_dir_all(gdb.parent().unwrap()).ok();
 }
+
+/// A projected coordinate system gets ArcGIS's own XY domain, not a fixed one
+/// (testdata/gdb-reference/catalog_ops/before.gdb: UTM 33N dataset `ds`).
+#[test]
+fn projected_systems_get_arcgis_xy_domain() {
+    let gdb = tmp("xy").join("a.gdb");
+    build(&gdb);
+    let ours = Geodatabase::open(&gdb).unwrap();
+    let theirs =
+        Geodatabase::open(root().join("testdata/gdb-reference/catalog_ops/before.gdb")).unwrap();
+    let (a, b) = (
+        ours.open_table("inds").unwrap(),
+        theirs.open_table("inds").unwrap(),
+    );
+    let (da, db) = (a.geometry_def().unwrap(), b.geometry_def().unwrap());
+    assert_eq!(
+        (da.x_origin, da.y_origin, da.xy_scale, da.xy_tolerance),
+        (db.x_origin, db.y_origin, db.xy_scale, db.xy_tolerance)
+    );
+    assert_eq!((da.x_origin, da.y_origin), (-5120900.0, -9998100.0));
+    std::fs::remove_dir_all(gdb.parent().unwrap()).ok();
+}
+
+#[test]
+fn xy_domain_table_has_what_arcgis_reported() {
+    use geoforge_filegdb::xy_domains::by_name;
+    let d = by_name("WGS_1984_Web_Mercator_Auxiliary_Sphere").unwrap();
+    assert_eq!(
+        (d.x_origin, d.y_origin, d.scale, d.tolerance),
+        (-20037700.0, -30241100.0, 10000.0, 0.001)
+    );
+    // Feet: a finer scale, in the system's unit.
+    let d = by_name("NAD_1983_StatePlane_New_York_Long_Island_FIPS_3104_Feet").unwrap();
+    assert_eq!((d.x_origin, d.y_origin), (-120039300.0, -96540300.0));
+    assert!((d.scale - 3048.006096).abs() < 1e-3, "{}", d.scale);
+    // Geographic systems: -400 and 1e9.
+    let d = by_name("GCS_WGS_1984").unwrap();
+    assert_eq!((d.x_origin, d.y_origin, d.scale), (-400.0, -400.0, 1e9));
+    assert!(by_name("not a system").is_none());
+}

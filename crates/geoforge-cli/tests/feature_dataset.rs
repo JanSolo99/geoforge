@@ -88,3 +88,75 @@ fn outputs_go_into_a_feature_dataset() {
     assert_eq!(db.entries().len(), 1);
     std::fs::remove_dir_all(&d).ok();
 }
+
+/// An output in another coordinate system is projected to the dataset's, as ArcGIS does.
+#[test]
+fn outputs_are_projected_to_the_datasets_system() {
+    let d = std::env::temp_dir().join(format!("gf-fds-proj-{}", std::process::id()));
+    std::fs::remove_dir_all(&d).ok();
+    std::fs::create_dir_all(&d).unwrap();
+    let gdb = d.join("c.gdb");
+    assert!(
+        gf(&[
+            "create-feature-dataset",
+            gdb.to_str().unwrap(),
+            "Utm",
+            "32633"
+        ])
+        .status
+        .success()
+    );
+    let shp = root().join("testdata/shp/point.shp");
+    let into = gdb.join("Utm").join("pts");
+    let out = gf(&[
+        "copy-features",
+        shp.to_str().unwrap(),
+        into.to_str().unwrap(),
+    ]);
+    assert!(
+        out.status.success(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    assert!(
+        String::from_utf8_lossy(&out.stderr).contains("projected"),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let db = Geodatabase::open(&gdb).unwrap();
+    let t = db.open_table("pts").unwrap();
+    let g = t.features().next().unwrap().unwrap().geometry.unwrap();
+    // The source's first point (lon, lat) through PROJ.
+    let src = Command::new("ogrinfo")
+        .args(["-al", "-geom=WKT"])
+        .arg(&shp)
+        .output()
+        .unwrap();
+    let text = String::from_utf8_lossy(&src.stdout).into_owned();
+    let wkt = text
+        .lines()
+        .find(|l| l.trim_start().starts_with("POINT"))
+        .unwrap();
+    let coords: Vec<f64> = wkt
+        .trim()
+        .trim_start_matches("POINT")
+        .trim()
+        .trim_matches(|c| c == '(' || c == ')')
+        .split_whitespace()
+        .filter_map(|v| v.parse().ok())
+        .collect();
+    let from = geoforge_proj::Crs::parse("4326").unwrap();
+    let to = geoforge_proj::Crs::parse("32633").unwrap();
+    let mut xy = [[coords[0], coords[1]]];
+    geoforge_proj::Transform::with_method(&from, &to, None)
+        .unwrap()
+        .apply(&mut xy)
+        .unwrap();
+    assert!(
+        (g.xy[0][0] - xy[0][0]).abs() < 0.01 && (g.xy[0][1] - xy[0][1]).abs() < 0.01,
+        "{:?} vs {xy:?}",
+        g.xy[0]
+    );
+    assert!(g.xy[0][0].abs() > 1000.0, "metres, not degrees");
+    std::fs::remove_dir_all(&d).ok();
+}

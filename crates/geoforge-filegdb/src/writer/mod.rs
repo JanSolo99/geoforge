@@ -559,6 +559,23 @@ impl GeodatabaseWriter {
         Ok(())
     }
 
+    /// The coordinate system (Esri WKT; inner `None` = unknown) of the feature dataset `name`, one
+    /// made by this writer or already there; `None` when there is no such dataset.
+    pub fn feature_dataset_srs(&self, name: &str) -> Option<Option<String>> {
+        self.datasets
+            .iter()
+            .find(|d| d.name.eq_ignore_ascii_case(name))
+            .map(|d| d.def.srs_wkt.clone())
+            .or_else(|| {
+                self.existing
+                    .as_ref()?
+                    .datasets
+                    .iter()
+                    .find(|(n, _, _)| n.eq_ignore_ascii_case(name))
+                    .map(|(_, _, d)| d.srs_wkt.clone())
+            })
+    }
+
     /// Creates a feature class inside the feature dataset `dataset` (one made by this writer or
     /// already in the geodatabase). It takes the dataset's coordinate system and XY domain.
     pub fn create_feature_class_in(
@@ -1597,8 +1614,7 @@ pub fn validate_table_name(name: &str) -> Result<()> {
 fn default_geometry_def(srs_wkt: Option<&str>, has_z: bool, has_m: bool) -> GeometryDef {
     let geographic = srs_wkt.is_some_and(|w| w.trim_start().starts_with("GEOGCS"));
     // Unknown coordinate system: ArcGIS Pro 3.7 uses origin -450359962737.0495.
-    // Projected systems get a domain derived from the projection (Phase 4); until
-    // then they share a generous fixed origin.
+    // Systems ArcGIS knows get its own domain (`xy_domains`); others a generous fixed origin.
     let (origin, scale, tol) = if geographic {
         (-400.0, 1e9, 8.983152841195215e-9)
     } else if srs_wkt.is_none() {
@@ -1606,7 +1622,7 @@ fn default_geometry_def(srs_wkt: Option<&str>, has_z: bool, has_m: bool) -> Geom
     } else {
         (-2147483647.0, 10000.0, 0.001)
     };
-    GeometryDef {
+    let mut def = GeometryDef {
         srs_wkt: srs_wkt.map(str::to_owned),
         has_z,
         has_m,
@@ -1624,7 +1640,15 @@ fn default_geometry_def(srs_wkt: Option<&str>, has_z: bool, has_m: bool) -> Geom
         grid_sizes: vec![0.0],
         extent_at: None,
         grid_at: None,
+    };
+    // ArcGIS's own default for the system, when it is one it knows.
+    if let Some(d) = srs_wkt.and_then(crate::xy_domains::for_wkt) {
+        def.x_origin = d.x_origin;
+        def.y_origin = d.y_origin;
+        def.xy_scale = d.scale;
+        def.xy_tolerance = d.tolerance;
     }
+    def
 }
 
 /// GDB_Items.Shape storage, as ArcGIS defines it (WGS84, 1e-6 degree resolution).

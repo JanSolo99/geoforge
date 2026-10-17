@@ -8,6 +8,7 @@ pub mod index;
 pub mod schema;
 pub mod table;
 pub mod writer;
+pub mod xy_domains;
 
 pub use gdb::{CatalogEntry, Geodatabase};
 pub use index::IndexDef;
