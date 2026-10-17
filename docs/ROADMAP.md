@@ -246,7 +246,13 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
       coordinate system as ArcGIS writes them; classes take the dataset's XY domain; `gf create-feature-dataset`,
       outputs to `city.gdb/Ds/name`); ArcGIS lists, reads, edits and deletes in them. Not done: projecting an
       output to the dataset's coordinate system; ArcGIS's projection-derived XY domain for projected datasets
-- [ ] Write: subtypes, relationship classes
+- [x] Write: subtypes and field defaults (`create_table_with_subtypes`; subtype field, default subtype,
+      per-subtype domains and defaults; the `Subtypes` element equals ArcGIS's character for character, the subtype
+      field takes the default code as its default, domains link to the table) and simple relationship
+      classes (`add_relationship_class`: one to one / one to many, composite, notification, labels, keys; items,
+      links and Describe equal ArcGIS's; GDAL lists them). ArcGIS reads all of it. The reader now resolves subtype
+      defaults against the table's real field types (ArcGIS lists only some fields in the definition)
+- [ ] Write: attributed and many-to-many relationship classes (they have a table); Delete/Rename of subtypes
 - [x] Written geodatabases open in ArcGIS Pro 3.7: Describe, counts, domains, Check Geometry
       (no problems beyond those already in the source data), Copy Features out of them
 - [ ] Projected coordinate systems: use ArcGIS's projection-derived XY domain origin (needs Phase 4)

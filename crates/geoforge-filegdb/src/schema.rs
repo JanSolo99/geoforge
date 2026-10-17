@@ -169,7 +169,7 @@ pub fn esri_field_type(name: &str) -> Option<FieldType> {
 }
 
 /// Parses a domain code / range bound / default as the domain's field type.
-fn typed_value(raw: &str, t: FieldType) -> Value {
+pub(crate) fn typed_value(raw: &str, t: FieldType) -> Value {
     let raw = raw.trim();
     let parsed = match t {
         FieldType::SmallInteger => raw.parse().ok().map(Value::SmallInteger),

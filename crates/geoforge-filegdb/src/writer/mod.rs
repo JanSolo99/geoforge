@@ -19,7 +19,9 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use geoforge_core::{Envelope, Error, Feature, Field, FieldType, GeometryKind, Result, Value};
 
-use crate::schema::{Domain, DomainKind, MergePolicy, SplitPolicy};
+use crate::schema::{
+    Cardinality, Domain, DomainKind, MergePolicy, RelationshipClass, SplitPolicy, Subtypes,
+};
 use crate::table::{GdbField, GdbFieldType, GeometryDef};
 use btree::{spatial_entries, write_index};
 use table::TableWriter;
@@ -35,6 +37,8 @@ const TYPE_FEATURE_CLASS: &str = "{70737809-852C-4A03-9E22-2CECEA5B9BFA}";
 const TYPE_TABLE: &str = "{CD06BC3B-789D-4C51-AAFA-A467912B8965}";
 const REL_DATASET_IN_FOLDER: &str = "{DC78F1AB-34E4-43AC-BA47-1C4EABD0E7C7}";
 const REL_DOMAIN_IN_DATASET: &str = "{17E08ADB-2B31-4DCD-8FDD-DF529E88F843}";
+const TYPE_RELATIONSHIP_CLASS: &str = "{B606A7E1-FA5B-439C-849C-6E9C2481537B}";
+const REL_RELATED_THROUGH: &str = "{725BADAB-3452-491B-A795-55F32D67229C}";
 const TYPE_FEATURE_DATASET: &str = "{74737149-DCB5-4257-8904-B9724E32A530}";
 const REL_DATASET_IN_FEATURE_DATASET: &str = "{A1633A59-46BA-4448-8706-D8ABE2B2B02E}";
 const TYPE_CODED_DOMAIN: &str = "{8C368B12-A12E-4C7E-9638-C9C64E69E98F}";
@@ -50,6 +54,17 @@ struct Item {
     domains: Vec<String>,
     /// The feature dataset it lives in.
     dataset: Option<String>,
+    /// Its field names (OBJECTID and the shape field included), for relationship keys.
+    field_names: Vec<String>,
+}
+
+/// A relationship class being added.
+struct RelItem {
+    uuid: String,
+    dsid: usize,
+    rc: RelationshipClass,
+    origin: String,
+    destination: String,
 }
 
 /// A feature dataset: a folder of feature classes sharing one coordinate system.
@@ -72,6 +87,7 @@ pub struct GeodatabaseWriter {
     tables: Vec<(String, u64)>,
     items: Vec<Item>,
     datasets: Vec<DatasetItem>,
+    relationships: Vec<RelItem>,
     spatial_refs: Vec<GeometryDef>,
     domains: Vec<DomainItem>,
     rng: u64,
@@ -90,11 +106,16 @@ struct Existing {
     max_dsid: i64,
     /// The feature datasets already there: (name, UUID, coordinate system).
     datasets: Vec<(String, String, GeometryDef)>,
+    /// The tables and feature classes already there: (name, UUID).
+    classes: Vec<(String, String)>,
+    /// Names of the relationship classes already there.
+    relationship_names: Vec<String>,
 }
 
 /// A table or feature class being filled. Hand it back to
 /// [`GeodatabaseWriter::finish_table`] when done.
 pub struct TableBuilder {
+    subtypes: Option<Subtypes>,
     dataset: Option<String>,
     name: String,
     id: u64,
@@ -143,6 +164,7 @@ impl GeodatabaseWriter {
             tables: Vec::new(),
             items: Vec::new(),
             datasets: Vec::new(),
+            relationships: Vec::new(),
             spatial_refs: Vec::new(),
             domains: Vec::new(),
             rng: seed | 1,
@@ -186,6 +208,7 @@ impl GeodatabaseWriter {
         );
         let (mut root_uuid, mut domain_uuids, mut max_dsid) = (None, Vec::new(), 2i64);
         let mut existing_datasets = Vec::new();
+        let (mut existing_classes, mut existing_relationships) = (Vec::new(), Vec::new());
         for r in items.features() {
             let r = r?;
             let text = |i: usize| match &r.attributes[i] {
@@ -202,6 +225,15 @@ impl GeodatabaseWriter {
                 domain_uuids.push((text(c_name).to_lowercase(), uuid.clone()));
             }
             let def = text(c_def);
+            if ty.len() >= 10
+                && (ty[..10].eq_ignore_ascii_case("{70737809-")
+                    || ty[..10].eq_ignore_ascii_case("{CD06BC3B-"))
+            {
+                existing_classes.push((text(c_name), uuid.clone()));
+            }
+            if ty.len() >= 10 && ty[..10].eq_ignore_ascii_case("{B606A7E1-") {
+                existing_relationships.push(text(c_name));
+            }
             if ty.len() >= 10
                 && ty[..10].eq_ignore_ascii_case("{74737149-")
                 && let Some(d) = parse_dataset_def(&def)
@@ -240,11 +272,14 @@ impl GeodatabaseWriter {
             tables,
             items: Vec::new(),
             datasets: Vec::new(),
+            relationships: Vec::new(),
             spatial_refs: Vec::new(),
             domains: Vec::new(),
             rng: seed | 1,
             existing: Some(Existing {
                 datasets: existing_datasets,
+                classes: existing_classes,
+                relationship_names: existing_relationships,
                 root_uuid: root_uuid.ok_or_else(|| {
                     Error::Unsupported("the geodatabase has no root folder item".into())
                 })?,
@@ -307,6 +342,158 @@ impl GeodatabaseWriter {
     ) -> Result<TableBuilder> {
         let def = kind.map(|_| default_geometry_def(srs_wkt, has_z, has_m));
         self.create_table_with(name, kind, has_z, has_m, fields, def, None)
+    }
+
+    /// Creates a table or feature class with subtypes (`arcpy.management.SetSubtypeField`,
+    /// `AddSubtype`, `SetDefaultSubtype`, `AssignDomainToField`/`AssignDefaultToField` by subtype).
+    /// The subtype field must be a short or long integer field of `fields`; the field takes the
+    /// default subtype's code as its default value, as ArcGIS does. Domains named by subtype
+    /// fields must exist (`add_domain`, or already in the geodatabase).
+    #[allow(clippy::too_many_arguments)]
+    pub fn create_table_with_subtypes(
+        &mut self,
+        name: &str,
+        kind: Option<GeometryKind>,
+        has_z: bool,
+        has_m: bool,
+        fields: &[Field],
+        srs_wkt: Option<&str>,
+        subtypes: Subtypes,
+    ) -> Result<TableBuilder> {
+        let bad = |m: String| Error::Unsupported(m);
+        let find = |n: &str| fields.iter().find(|f| f.name.eq_ignore_ascii_case(n));
+        let key = find(&subtypes.field).ok_or_else(|| {
+            bad(format!(
+                "ERROR 000728: Field {} does not exist within table",
+                subtypes.field
+            ))
+        })?;
+        if !matches!(key.field_type, FieldType::SmallInteger | FieldType::Integer) {
+            return Err(bad(format!(
+                "the subtype field {} must be a short or long integer",
+                key.name
+            )));
+        }
+        let mut codes = std::collections::HashSet::new();
+        for s in &subtypes.subtypes {
+            if !codes.insert(s.code) {
+                return Err(bad(format!("subtype code {} is used twice", s.code)));
+            }
+            for sf in &s.fields {
+                if find(&sf.field).is_none() {
+                    return Err(bad(format!(
+                        "ERROR 000728: Field {} does not exist within table",
+                        sf.field
+                    )));
+                }
+                if let Some(d) = &sf.domain
+                    && !self.has_domain(d)
+                {
+                    return Err(bad(format!("ERROR 000732: Domain {d} does not exist")));
+                }
+            }
+        }
+        if !codes.contains(&subtypes.default_code) {
+            return Err(bad(format!(
+                "the default subtype code {} is not a subtype",
+                subtypes.default_code
+            )));
+        }
+        let mut fields = fields.to_vec();
+        for f in &mut fields {
+            if f.name.eq_ignore_ascii_case(&subtypes.field) {
+                f.default = Some(match f.field_type {
+                    FieldType::SmallInteger => {
+                        Value::SmallInteger(i16::try_from(subtypes.default_code).map_err(|_| {
+                            bad("the default subtype code does not fit a short integer".into())
+                        })?)
+                    }
+                    _ => Value::Integer(i32::try_from(subtypes.default_code).map_err(|_| {
+                        bad("the default subtype code does not fit a long integer".into())
+                    })?),
+                });
+            }
+        }
+        let def = kind.map(|_| default_geometry_def(srs_wkt, has_z, has_m));
+        let mut t = self.create_table_with(name, kind, has_z, has_m, &fields, def, None)?;
+        t.subtypes = Some(subtypes);
+        Ok(t)
+    }
+
+    /// Adds a relationship class between two tables or feature classes
+    /// (`arcpy.management.CreateRelationshipClass`): one to one or one to many, composite or not,
+    /// with the origin's primary key and the destination's foreign key. The classes may be made
+    /// by this writer or already in the geodatabase. Relationship classes with their own table
+    /// (attributed, many to many) are not written yet.
+    pub fn add_relationship_class(&mut self, rc: &RelationshipClass) -> Result<()> {
+        let bad = |m: String| Error::Unsupported(m);
+        validate_table_name(&rc.name)?;
+        if self.name_taken(&rc.name) {
+            return Err(bad(format!(
+                "ERROR 000258: Output {} already exists",
+                rc.name
+            )));
+        }
+        if rc.is_attributed || rc.cardinality == Cardinality::ManyToMany {
+            return Err(bad(
+                "attributed and many-to-many relationship classes are not supported yet".into(),
+            ));
+        }
+        let uuid_of = |w: &Self, name: &str| {
+            w.items
+                .iter()
+                .find(|i| i.name.eq_ignore_ascii_case(name))
+                .map(|i| i.uuid.clone())
+                .or_else(|| {
+                    w.existing
+                        .as_ref()?
+                        .classes
+                        .iter()
+                        .find(|(n, _)| n.eq_ignore_ascii_case(name))
+                        .map(|(_, u)| u.clone())
+                })
+                .ok_or_else(|| {
+                    bad(format!(
+                        "ERROR 000732: Dataset {name} does not exist or is not supported"
+                    ))
+                })
+        };
+        let (origin, destination) = (uuid_of(self, &rc.origin)?, uuid_of(self, &rc.destination)?);
+        let has_field = |w: &Self, class: &str, field: &str| -> Result<bool> {
+            if let Some(i) = w.items.iter().find(|i| i.name.eq_ignore_ascii_case(class)) {
+                return Ok(i.field_names.iter().any(|f| f.eq_ignore_ascii_case(field)));
+            }
+            let id = w
+                .tables
+                .iter()
+                .find(|(n, _)| n.eq_ignore_ascii_case(class))
+                .map(|t| t.1)
+                .ok_or_else(|| bad(format!("no table {class}")))?;
+            let t = crate::table::Table::open(w.table_path(id))?;
+            Ok(t.all_fields()
+                .iter()
+                .any(|f| f.name.eq_ignore_ascii_case(field)))
+        };
+        for (class, field) in [
+            (&rc.origin, &rc.origin_primary_key),
+            (&rc.destination, &rc.origin_foreign_key),
+        ] {
+            if !has_field(self, class, field)? {
+                return Err(bad(format!(
+                    "ERROR 000728: Field {field} does not exist within table"
+                )));
+            }
+        }
+        let dsid = self.next_dsid();
+        let uuid = self.uuid();
+        self.relationships.push(RelItem {
+            uuid,
+            dsid,
+            rc: rc.clone(),
+            origin,
+            destination,
+        });
+        Ok(())
     }
 
     /// Creates a feature dataset (`arcpy.management.CreateFeatureDataset`): a folder of feature
@@ -387,10 +574,17 @@ impl GeodatabaseWriter {
                 .datasets
                 .iter()
                 .any(|d| d.name.eq_ignore_ascii_case(name))
+            || self
+                .relationships
+                .iter()
+                .any(|r| r.rc.name.eq_ignore_ascii_case(name))
             || self.existing.as_ref().is_some_and(|e| {
                 e.datasets
                     .iter()
                     .any(|(n, _, _)| n.eq_ignore_ascii_case(name))
+                    || e.relationship_names
+                        .iter()
+                        .any(|n| n.eq_ignore_ascii_case(name))
             })
     }
 
@@ -400,7 +594,7 @@ impl GeodatabaseWriter {
             .existing
             .as_ref()
             .map_or(3, |e| e.max_dsid as usize + 1);
-        base + self.items.len() + self.datasets.len()
+        base + self.items.len() + self.datasets.len() + self.relationships.len()
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -444,6 +638,7 @@ impl GeodatabaseWriter {
         let writer =
             TableWriter::create(&self.table_path(id), gdb_fields.clone(), kind, has_z, has_m)?;
         Ok(TableBuilder {
+            subtypes: None,
             dataset,
             name: name.to_owned(),
             id,
@@ -511,6 +706,7 @@ impl GeodatabaseWriter {
             t.has_m,
             def.as_ref(),
             &fields,
+            t.subtypes.as_ref(),
         );
         if let Some(ds) = &t.dataset {
             // A class in a feature dataset has the dataset's name in its path.
@@ -524,7 +720,19 @@ impl GeodatabaseWriter {
             );
             definition = definition.replacen(&from, &to, 1);
         }
-        let domains = fields.iter().filter_map(|f| f.domain.clone()).collect();
+        let mut domains: Vec<String> = fields.iter().filter_map(|f| f.domain.clone()).collect();
+        for sf in t
+            .subtypes
+            .iter()
+            .flat_map(|s| &s.subtypes)
+            .flat_map(|s| &s.fields)
+        {
+            if let Some(d) = &sf.domain
+                && !domains.iter().any(|n| n.eq_ignore_ascii_case(d))
+            {
+                domains.push(d.clone());
+            }
+        }
         self.items.push(Item {
             uuid,
             name: t.name.clone(),
@@ -532,6 +740,7 @@ impl GeodatabaseWriter {
             definition,
             domains,
             dataset: t.dataset.clone(),
+            field_names: fields.iter().map(|f| f.name.clone()).collect(),
         });
         self.tables.push((t.name, t.id));
         Ok(())
@@ -693,6 +902,9 @@ impl GeodatabaseWriter {
         for item in &self.items {
             t.push(None, &item_values(item))?;
         }
+        for r in &self.relationships {
+            t.push(None, &relationship_item_values(r))?;
+        }
         for d in &self.domains {
             t.push(None, &domain_values(d))?;
         }
@@ -735,6 +947,11 @@ impl GeodatabaseWriter {
             Some(d) => (d, i.uuid.clone(), REL_DATASET_IN_FEATURE_DATASET),
             None => (root_uuid.clone(), i.uuid.clone(), REL_DATASET_IN_FOLDER),
         }));
+        for r in &self.relationships {
+            links.push((root_uuid.clone(), r.uuid.clone(), REL_DATASET_IN_FOLDER));
+            links.push((r.origin.clone(), r.uuid.clone(), REL_RELATED_THROUGH));
+            links.push((r.destination.clone(), r.uuid.clone(), REL_RELATED_THROUGH));
+        }
         for item in &self.items {
             for name in &item.domains {
                 if let Some(d) = self
@@ -827,6 +1044,11 @@ impl GeodatabaseWriter {
                     None => (ex.root_uuid.clone(), i.uuid.clone(), REL_DATASET_IN_FOLDER),
                 }),
         );
+        for r in &self.relationships {
+            links.push((ex.root_uuid.clone(), r.uuid.clone(), REL_DATASET_IN_FOLDER));
+            links.push((r.origin.clone(), r.uuid.clone(), REL_RELATED_THROUGH));
+            links.push((r.destination.clone(), r.uuid.clone(), REL_RELATED_THROUGH));
+        }
         for item in &self.items {
             for name in &item.domains {
                 let lower = name.to_lowercase();
@@ -846,13 +1068,20 @@ impl GeodatabaseWriter {
                 }
             }
         }
-        if !self.items.is_empty() || !self.domains.is_empty() || !self.datasets.is_empty() {
+        if !self.items.is_empty()
+            || !self.domains.is_empty()
+            || !self.datasets.is_empty()
+            || !self.relationships.is_empty()
+        {
             let mut ed = TableEditor::open(self.table_path(4))?;
             for d in &self.datasets {
                 ed.insert(&row(dataset_values(d)))?;
             }
             for item in &self.items {
                 ed.insert(&row(item_values(item)))?;
+            }
+            for r in &self.relationships {
+                ed.insert(&row(relationship_item_values(r)))?;
             }
             for d in &self.domains {
                 ed.insert(&row(domain_values(d)))?;
@@ -1018,6 +1247,52 @@ fn item_values(item: &Item) -> Vec<Value> {
     )
 }
 
+/// A row of `GDB_Items` for a relationship class.
+fn relationship_item_values(r: &RelItem) -> Vec<Value> {
+    let rc = &r.rc;
+    let x = xml_escape;
+    let (card, subtype) = match rc.cardinality {
+        Cardinality::OneToOne => ("esriRelCardinalityOneToOne", 1),
+        Cardinality::OneToMany => ("esriRelCardinalityOneToMany", 2),
+        Cardinality::ManyToMany => ("esriRelCardinalityManyToMany", 3),
+    };
+    let notification = match rc.notification.as_str() {
+        "" => "None",
+        n => n,
+    };
+    let key = |name: &str, role: &str| {
+        format!(
+            "    <RelationshipClassKey xsi:type=\"typens:RelationshipClassKey\">\n      <ObjectKeyName>{}</ObjectKeyName>\n      <ClassKeyName></ClassKeyName>\n      <KeyRole>{role}</KeyRole>\n    </RelationshipClassKey>\n",
+            x(name)
+        )
+    };
+    let definition = format!(
+        "<DERelationshipClassInfo xsi:type=\"typens:DERelationshipClassInfo\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xmlns:typens=\"http://www.esri.com/schemas/ArcGIS/10.8\">\n  <CatalogPath>\\{n}</CatalogPath>\n  <Name>{n}</Name>\n  <ChildrenExpanded>false</ChildrenExpanded>\n  <DatasetType>esriDTRelationshipClass</DatasetType>\n  <DSID>{dsid}</DSID>\n  <Versioned>false</Versioned>\n  <CanVersion>false</CanVersion>\n  <HasOID>false</HasOID>\n  <OIDFieldName></OIDFieldName>\n  <GPFieldInfoExs xsi:type=\"typens:ArrayOfGPFieldInfoEx\">\n  </GPFieldInfoExs>\n  <CLSID></CLSID>\n  <EXTCLSID></EXTCLSID>\n  <Cardinality>{card}</Cardinality>\n  <Notification>esriRelNotification{notification}</Notification>\n  <IsAttributed>false</IsAttributed>\n  <IsComposite>{composite}</IsComposite>\n  <OriginClassNames xsi:type=\"typens:Names\">\n    <Name>{origin}</Name>\n  </OriginClassNames>\n  <DestinationClassNames xsi:type=\"typens:Names\">\n    <Name>{dest}</Name>\n  </DestinationClassNames>\n  <KeyType>esriRelKeyTypeSingle</KeyType>\n  <ClassKey>esriRelClassKeyUndefined</ClassKey>\n  <ForwardPathLabel>{fwd}</ForwardPathLabel>\n  <BackwardPathLabel>{back}</BackwardPathLabel>\n  <IsReflexive>{reflexive}</IsReflexive>\n  <OriginClassKeys xsi:type=\"typens:ArrayOfRelationshipClassKey\">\n{pk}{fk}  </OriginClassKeys>\n  <RelationshipRules xsi:type=\"typens:ArrayOfRelationshipRule\">\n  </RelationshipRules>\n  <IsAttachmentRelationship>false</IsAttachmentRelationship>\n</DERelationshipClassInfo>\n",
+        n = x(&rc.name),
+        dsid = r.dsid,
+        composite = rc.is_composite,
+        origin = x(&rc.origin),
+        dest = x(&rc.destination),
+        fwd = x(&rc.forward_label),
+        back = x(&rc.backward_label),
+        reflexive = rc.origin.eq_ignore_ascii_case(&rc.destination),
+        pk = key(&rc.origin_primary_key, "esriRelKeyRoleOriginPrimary"),
+        fk = key(&rc.origin_foreign_key, "esriRelKeyRoleOriginForeign"),
+    );
+    catalog_item_values(
+        &r.uuid,
+        TYPE_RELATIONSHIP_CLASS,
+        &rc.name,
+        &rc.name.to_uppercase(),
+        &format!("\\{}", rc.name),
+        Value::Integer(subtype),
+        Value::Integer(0),
+        Value::Null,
+        Value::Xml(definition),
+        1,
+    )
+}
+
 /// A row of `GDB_Items` for a feature dataset.
 fn dataset_values(d: &DatasetItem) -> Vec<Value> {
     let sr_type = match &d.def.srs_wkt {
@@ -1170,6 +1445,10 @@ pub(crate) fn to_gdb_field(f: &Field) -> Result<GdbField> {
     let mut g = field(&f.name, t, f.nullable, len);
     g.alias = f.alias.clone().filter(|a| *a != f.name);
     g.domain = f.domain.clone();
+    g.default = f
+        .default
+        .as_ref()
+        .and_then(|v| crate::table::encode_default(t, v));
     Ok(g)
 }
 
@@ -1357,6 +1636,7 @@ fn esri_type_name(t: GdbFieldType) -> &'static str {
 
 /// `DEFeatureClassInfo` / `DETableInfo` XML for GDB_Items.Definition, in the shape
 /// GDAL and ArcGIS write.
+#[allow(clippy::too_many_arguments)]
 fn item_definition(
     name: &str,
     dsid: usize,
@@ -1365,6 +1645,7 @@ fn item_definition(
     has_m: bool,
     def: Option<&GeometryDef>,
     fields: &[GdbField],
+    subtypes: Option<&Subtypes>,
 ) -> String {
     let root = if kind.is_some() {
         "DEFeatureClassInfo"
@@ -1382,7 +1663,7 @@ fn item_definition(
     );
     for f in fields {
         x += &format!(
-            "    <GPFieldInfoEx xsi:type=\"typens:GPFieldInfoEx\">\n      <Name>{}</Name>\n{}{}      <FieldType>{}</FieldType>\n      <IsNullable>{}</IsNullable>\n      <Length>{}</Length>\n      <Precision>0</Precision>\n      <Scale>0</Scale>\n{}    </GPFieldInfoEx>\n",
+            "    <GPFieldInfoEx xsi:type=\"typens:GPFieldInfoEx\">\n      <Name>{}</Name>\n{}{}      <FieldType>{}</FieldType>\n{}      <IsNullable>{}</IsNullable>\n      <Length>{}</Length>\n      <Precision>0</Precision>\n      <Scale>0</Scale>\n{}    </GPFieldInfoEx>\n",
             xml_escape(&f.name),
             f.alias
                 .as_deref()
@@ -1393,6 +1674,7 @@ fn item_definition(
                 .map(|d| format!("      <DomainName>{}</DomainName>\n", xml_escape(d)))
                 .unwrap_or_default(),
             esri_type_name(f.field_type),
+            default_xml(f),
             f.nullable,
             f.length,
             match f.field_type {
@@ -1447,7 +1729,74 @@ fn item_definition(
                 "  <CLSID>{7A566981-C114-11D2-8A28-006097AFF44E}</CLSID>\n  <EXTCLSID></EXTCLSID>\n"
         }
     }
+    if let Some(st) = subtypes {
+        x += &subtypes_xml(st);
+    }
     x += &format!("</typens:{root}>\n");
+    x
+}
+
+/// A field's default value as the definition gives it.
+fn default_xml(f: &GdbField) -> String {
+    let Some(v) = f
+        .default
+        .as_deref()
+        .and_then(|d| crate::table::decode_default(f.field_type, d))
+    else {
+        return String::new();
+    };
+    match v {
+        Value::String(s) => format!(
+            "      <DefaultValueString>{}</DefaultValueString>\n",
+            xml_escape(&s)
+        ),
+        Value::SmallInteger(n) => format!("      <DefaultValueNumeric>{n}</DefaultValueNumeric>\n"),
+        Value::Integer(n) => format!("      <DefaultValueNumeric>{n}</DefaultValueNumeric>\n"),
+        Value::BigInteger(n) => format!("      <DefaultValueNumeric>{n}</DefaultValueNumeric>\n"),
+        Value::Single(n) => format!("      <DefaultValueNumeric>{n}</DefaultValueNumeric>\n"),
+        Value::Double(n) => format!("      <DefaultValueNumeric>{n}</DefaultValueNumeric>\n"),
+        _ => String::new(),
+    }
+}
+
+/// The subtype elements of a table definition.
+fn subtypes_xml(st: &Subtypes) -> String {
+    let mut x = format!(
+        "  <SubtypeFieldName>{}</SubtypeFieldName>\n  <DefaultSubtypeCode>{}</DefaultSubtypeCode>\n  <Subtypes xsi:type=\"typens:ArrayOfSubtype\">\n",
+        xml_escape(&st.field),
+        st.default_code
+    );
+    for s in &st.subtypes {
+        x += &format!(
+            "    <Subtype xsi:type=\"typens:Subtype\">\n      <SubtypeName>{}</SubtypeName>\n      <SubtypeCode>{}</SubtypeCode>\n      <FieldInfos xsi:type=\"typens:ArrayOfSubtypeFieldInfo\">\n",
+            xml_escape(&s.name),
+            s.code
+        );
+        for f in &s.fields {
+            x += &format!(
+                "        <SubtypeFieldInfo xsi:type=\"typens:SubtypeFieldInfo\">\n          <FieldName>{}</FieldName>\n",
+                xml_escape(&f.field)
+            );
+            if let Some(d) = &f.domain {
+                x += &format!("          <DomainName>{}</DomainName>\n", xml_escape(d));
+            }
+            if let Some(v) = &f.default {
+                let (ty, text) = match v {
+                    Value::SmallInteger(n) => ("xs:short", n.to_string()),
+                    Value::Integer(n) => ("xs:int", n.to_string()),
+                    Value::BigInteger(n) => ("xs:long", n.to_string()),
+                    Value::Single(n) => ("xs:float", n.to_string()),
+                    Value::Double(n) => ("xs:double", n.to_string()),
+                    Value::String(s) => ("xs:string", xml_escape(s)),
+                    _ => ("xs:string", String::new()),
+                };
+                x += &format!("          <DefaultValue xsi:type=\"{ty}\">{text}</DefaultValue>\n");
+            }
+            x += "        </SubtypeFieldInfo>\n";
+        }
+        x += "      </FieldInfos>\n    </Subtype>\n";
+    }
+    x += "  </Subtypes>\n";
     x
 }
 

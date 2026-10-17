@@ -140,8 +140,55 @@ impl GdbField {
         f.domain = self.domain.clone();
         f.nullable = self.nullable;
         f.length = self.length;
+        f.default = self
+            .default
+            .as_deref()
+            .and_then(|d| decode_default(self.field_type, d));
         f
     }
+}
+
+/// A field's default value from the bytes stored in the table's field section.
+pub(crate) fn decode_default(t: GdbFieldType, d: &[u8]) -> Option<Value> {
+    use GdbFieldType as G;
+    Some(match t {
+        G::Int16 => Value::SmallInteger(i16::from_le_bytes(d.try_into().ok()?)),
+        G::Int32 => Value::Integer(i32::from_le_bytes(d.try_into().ok()?)),
+        G::Int64 => Value::BigInteger(i64::from_le_bytes(d.try_into().ok()?)),
+        G::Float32 => Value::Single(f32::from_le_bytes(d.try_into().ok()?)),
+        G::Float64 => Value::Double(f64::from_le_bytes(d.try_into().ok()?)),
+        G::String => Value::String(String::from_utf8(d.to_vec()).ok()?),
+        _ => return None,
+    })
+}
+
+/// The bytes a table stores for a default value of a field of type `t`; `None` when the type
+/// holds no default or the value does not fit it.
+pub(crate) fn encode_default(t: GdbFieldType, v: &Value) -> Option<Vec<u8>> {
+    use GdbFieldType as G;
+    let int = |v: &Value| match v {
+        Value::SmallInteger(i) => Some(i64::from(*i)),
+        Value::Integer(i) => Some(i64::from(*i)),
+        Value::BigInteger(i) => Some(*i),
+        _ => None,
+    };
+    let float = |v: &Value| match v {
+        Value::Single(f) => Some(f64::from(*f)),
+        Value::Double(f) => Some(*f),
+        other => int(other).map(|i| i as f64),
+    };
+    Some(match t {
+        G::Int16 => i16::try_from(int(v)?).ok()?.to_le_bytes().to_vec(),
+        G::Int32 => i32::try_from(int(v)?).ok()?.to_le_bytes().to_vec(),
+        G::Int64 => int(v)?.to_le_bytes().to_vec(),
+        G::Float32 => (float(v)? as f32).to_le_bytes().to_vec(),
+        G::Float64 => float(v)?.to_le_bytes().to_vec(),
+        G::String => match v {
+            Value::String(s) if !s.is_empty() => s.as_bytes().to_vec(),
+            _ => return None,
+        },
+        _ => return None,
+    })
 }
 
 /// An open table. Feature IDs are OBJECTIDs (1-based).
@@ -305,6 +352,22 @@ impl Table {
             .map(GdbField::to_field)
             .collect();
         self.subtypes = def.subtypes.clone();
+        // ArcGIS lists only some fields in the definition, so a subtype's default may have been
+        // read as text where its field is numeric: the table knows the field's type.
+        if let Some(st) = &mut self.subtypes {
+            for sf in st.subtypes.iter_mut().flat_map(|s| s.fields.iter_mut()) {
+                let Some(f) = self
+                    .fields
+                    .iter()
+                    .find(|f| f.name.eq_ignore_ascii_case(&sf.field))
+                else {
+                    continue;
+                };
+                if let Some(Value::String(raw)) = &sf.default {
+                    sf.default = Some(crate::schema::typed_value(raw, f.field_type.esri()));
+                }
+            }
+        }
     }
 
     /// Indexes listed in `.gdbindexes` (attribute and spatial).

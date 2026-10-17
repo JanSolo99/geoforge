@@ -32,6 +32,9 @@ pub struct Field {
     pub nullable: bool,
     /// Name of the attribute domain constraining this field, if any.
     pub domain: Option<String>,
+    /// The value a new row gets when none is given (ArcGIS "default value"), for the types a
+    /// geodatabase stores one for: numbers and text.
+    pub default: Option<crate::Value>,
 }
 
 impl Field {
@@ -45,6 +48,7 @@ impl Field {
             scale: 0,
             nullable: true,
             domain: None,
+            default: None,
         }
     }
 }
