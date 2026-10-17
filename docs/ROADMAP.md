@@ -244,8 +244,8 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
 - [x] Write: feature datasets (`create_feature_dataset`, `create_feature_class_in`; new or existing geodatabase;
       items, `\ds\name` paths, `DatasetInFeatureDataset` relationships and the dataset's registered
       coordinate system as ArcGIS writes them; classes take the dataset's XY domain; `gf create-feature-dataset`,
-      outputs to `city.gdb/Ds/name`); ArcGIS lists, reads, edits and deletes in them. Not done: projecting an
-      output to the dataset's coordinate system (done in `gf`: outputs are projected to it); ArcGIS's projection-derived XY domain for projected datasets (done)
+      outputs to `city.gdb/Ds/name`); ArcGIS lists, reads, edits and deletes in them. `gf` projects an output to
+      the dataset's coordinate system, and the class takes ArcGIS's own XY domain for that system
 - [x] Write: subtypes and field defaults (`create_table_with_subtypes`; subtype field, default subtype,
       per-subtype domains and defaults; the `Subtypes` element equals ArcGIS's character for character, the subtype
       field takes the default code as its default, domains link to the table) and simple relationship
