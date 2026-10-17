@@ -28,7 +28,7 @@ fn area_unit(name: &str) -> f64 {
     match name.to_ascii_uppercase().as_str() {
         "SQUARE_KILOMETERS" => 1e6,
         "HECTARES" => 1e4,
-        "ACRES" => 4046.856_422_4,
+        "ACRES" => 4_046.856_422_4,
         "SQUARE_FEET" => 0.092_903_04,
         "SQUARE_MILES" => 2_589_988.110_336,
         "SQUARE_YARDS" => 0.836_127_36,
