@@ -241,7 +241,12 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
 - [x] Write: attribute indexes on new tables (`TableBuilder::add_attribute_index`; all indexable field
       types; `.atx` and `.gdbindexes` byte-identical to ArcGIS's, also 300 000-row three-level
       trees) — the page layout (shared boundary children, bottom-up page numbers) is documented
-- [ ] Write: subtypes, relationship classes, feature datasets
+- [x] Write: feature datasets (`create_feature_dataset`, `create_feature_class_in`; new or existing geodatabase;
+      items, `\ds\name` paths, `DatasetInFeatureDataset` relationships and the dataset's registered
+      coordinate system as ArcGIS writes them; classes take the dataset's XY domain; `gf create-feature-dataset`,
+      outputs to `city.gdb/Ds/name`); ArcGIS lists, reads, edits and deletes in them. Not done: projecting an
+      output to the dataset's coordinate system; ArcGIS's projection-derived XY domain for projected datasets
+- [ ] Write: subtypes, relationship classes
 - [x] Written geodatabases open in ArcGIS Pro 3.7: Describe, counts, domains, Check Geometry
       (no problems beyond those already in the source data), Copy Features out of them
 - [ ] Projected coordinate systems: use ArcGIS's projection-derived XY domain origin (needs Phase 4)

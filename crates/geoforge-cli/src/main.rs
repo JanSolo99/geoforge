@@ -273,6 +273,16 @@ enum Tool {
         #[arg(long)]
         output: Option<PathBuf>,
     },
+    /// Create a feature dataset in a file geodatabase (ArcGIS "Create Feature Dataset"); the
+    /// geodatabase is created too if it does not exist. Feature classes written to
+    /// `city.gdb/Dataset/name` join it and take its coordinate system.
+    CreateFeatureDataset {
+        /// `city.gdb`.
+        out_dataset_path: PathBuf,
+        out_name: String,
+        /// An EPSG/Esri code, a `.prj` file or WKT; none = unknown coordinate system.
+        spatial_reference: Option<String>,
+    },
     /// Delete a shapefile (with its sidecar files) or an item of a file geodatabase: a table,
     /// feature class, relationship class (also the relationship classes that use a deleted
     /// table) or feature dataset with its feature classes (ArcGIS "Delete").
@@ -1211,6 +1221,28 @@ fn main() -> ExitCode {
                 None => update_in_place(out, &in_table),
             }
         })(),
+        Tool::CreateFeatureDataset {
+            out_dataset_path,
+            out_name,
+            spatial_reference,
+        } => (|| {
+            let wkt = match spatial_reference
+                .as_deref()
+                .map(str::trim)
+                .filter(|s| !s.is_empty())
+            {
+                Some(s) => Some(geoforge_proj::Crs::parse(s)?.arcgis_wkt()),
+                None => None,
+            };
+            let mut w = open_geodatabase_writer(&out_dataset_path)?;
+            w.create_feature_dataset(&out_name, wkt.as_deref())?;
+            w.finish()?;
+            println!(
+                "Created feature dataset {}",
+                out_dataset_path.join(&out_name).display()
+            );
+            Ok(())
+        })(),
         Tool::Delete { in_data } => delete_data(&in_data),
         Tool::Rename { in_data, out_data } => rename_data(&in_data, &out_data),
         Tool::DeleteDomain {
@@ -1221,8 +1253,7 @@ fn main() -> ExitCode {
             in_workspace,
             domain_name,
             new_domain_name,
-        } => geoforge_filegdb::rename_domain(&in_workspace, &domain_name, &new_domain_name)
-            ,
+        } => geoforge_filegdb::rename_domain(&in_workspace, &domain_name, &new_domain_name),
         Tool::DeleteIdentical {
             in_dataset,
             fields,
@@ -2883,7 +2914,13 @@ fn write_output(mut out: ToolOutput, output: &Path, source_gdb: Option<&Path>) -
             let item = item.ok_or_else(|| {
                 Error::Unsupported("name the output feature class inside the .gdb".into())
             })?;
-            write_geodatabase(out, &gdb, &item, source_gdb)
+            write_geodatabase(
+                out,
+                &gdb,
+                &item,
+                source_gdb,
+                output_dataset(output, &gdb).as_deref(),
+            )
         }
         Location::Shapefile(path) => {
             let n = write_shapefile(out, &path)?;
@@ -2907,11 +2944,18 @@ fn open_geodatabase_writer(gdb: &Path) -> Result<geoforge_filegdb::GeodatabaseWr
     }
 }
 
+/// The feature dataset an output path names: `city.gdb/Dataset/name`.
+fn output_dataset(output: &Path, gdb: &Path) -> Option<String> {
+    let rest: Vec<_> = output.strip_prefix(gdb).ok()?.components().collect();
+    (rest.len() == 2).then(|| rest[0].as_os_str().to_string_lossy().into_owned())
+}
+
 fn write_geodatabase(
     out: ToolOutput,
     gdb: &Path,
     name: &str,
     source_gdb: Option<&Path>,
+    dataset: Option<&str>,
 ) -> Result<()> {
     let names = geodatabase_field_names(&out.fields);
     let fields: Vec<Field> = out
@@ -2933,21 +2977,29 @@ fn write_geodatabase(
             }
         }
     }
-    let mut t = w.create_table(
-        name,
-        Some(out.kind),
-        out.has_z,
-        out.has_m,
-        &fields,
-        out.spatial_reference_wkt.as_deref(),
-    )?;
+    // In a feature dataset the class takes the dataset's coordinate system (the output's is not
+    // projected to it).
+    let mut t = match dataset {
+        Some(ds) => w.create_feature_class_in(ds, name, out.kind, out.has_z, out.has_m, &fields)?,
+        None => w.create_table(
+            name,
+            Some(out.kind),
+            out.has_z,
+            out.has_m,
+            &fields,
+            out.spatial_reference_wkt.as_deref(),
+        )?,
+    };
     let n = out.features.len();
     for f in &out.features {
         t.write(f)?;
     }
     w.finish_table(t)?;
     w.finish()?;
-    println!("Wrote {n} features to {}", gdb.join(name).display());
+    println!(
+        "Wrote {n} features to {}",
+        gdb.join(dataset.unwrap_or("")).join(name).display()
+    );
     Ok(())
 }
 

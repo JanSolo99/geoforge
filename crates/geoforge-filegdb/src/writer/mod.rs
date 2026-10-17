@@ -35,6 +35,8 @@ const TYPE_FEATURE_CLASS: &str = "{70737809-852C-4A03-9E22-2CECEA5B9BFA}";
 const TYPE_TABLE: &str = "{CD06BC3B-789D-4C51-AAFA-A467912B8965}";
 const REL_DATASET_IN_FOLDER: &str = "{DC78F1AB-34E4-43AC-BA47-1C4EABD0E7C7}";
 const REL_DOMAIN_IN_DATASET: &str = "{17E08ADB-2B31-4DCD-8FDD-DF529E88F843}";
+const TYPE_FEATURE_DATASET: &str = "{74737149-DCB5-4257-8904-B9724E32A530}";
+const REL_DATASET_IN_FEATURE_DATASET: &str = "{A1633A59-46BA-4448-8706-D8ABE2B2B02E}";
 const TYPE_CODED_DOMAIN: &str = "{8C368B12-A12E-4C7E-9638-C9C64E69E98F}";
 const TYPE_RANGE_DOMAIN: &str = "{C29DA988-8C3E-45F7-8B5C-18E51EE7BEB4}";
 
@@ -46,6 +48,16 @@ struct Item {
     definition: String,
     /// Domains referenced by this table's fields.
     domains: Vec<String>,
+    /// The feature dataset it lives in.
+    dataset: Option<String>,
+}
+
+/// A feature dataset: a folder of feature classes sharing one coordinate system.
+struct DatasetItem {
+    uuid: String,
+    name: String,
+    def: GeometryDef,
+    dsid: usize,
 }
 
 struct DomainItem {
@@ -59,6 +71,7 @@ pub struct GeodatabaseWriter {
     next_table: u64,
     tables: Vec<(String, u64)>,
     items: Vec<Item>,
+    datasets: Vec<DatasetItem>,
     spatial_refs: Vec<GeometryDef>,
     domains: Vec<DomainItem>,
     rng: u64,
@@ -75,11 +88,14 @@ struct Existing {
     spatial_refs: Vec<(String, f64, f64, f64)>,
     /// The largest DSID in the existing item definitions.
     max_dsid: i64,
+    /// The feature datasets already there: (name, UUID, coordinate system).
+    datasets: Vec<(String, String, GeometryDef)>,
 }
 
 /// A table or feature class being filled. Hand it back to
 /// [`GeodatabaseWriter::finish_table`] when done.
 pub struct TableBuilder {
+    dataset: Option<String>,
     name: String,
     id: u64,
     writer: TableWriter,
@@ -126,6 +142,7 @@ impl GeodatabaseWriter {
             next_table: 9,
             tables: Vec::new(),
             items: Vec::new(),
+            datasets: Vec::new(),
             spatial_refs: Vec::new(),
             domains: Vec::new(),
             rng: seed | 1,
@@ -168,6 +185,7 @@ impl GeodatabaseWriter {
             col("Definition")?,
         );
         let (mut root_uuid, mut domain_uuids, mut max_dsid) = (None, Vec::new(), 2i64);
+        let mut existing_datasets = Vec::new();
         for r in items.features() {
             let r = r?;
             let text = |i: usize| match &r.attributes[i] {
@@ -181,9 +199,15 @@ impl GeodatabaseWriter {
             if ty.eq_ignore_ascii_case(TYPE_CODED_DOMAIN)
                 || ty.eq_ignore_ascii_case(TYPE_RANGE_DOMAIN)
             {
-                domain_uuids.push((text(c_name).to_lowercase(), uuid));
+                domain_uuids.push((text(c_name).to_lowercase(), uuid.clone()));
             }
             let def = text(c_def);
+            if ty.len() >= 10
+                && ty[..10].eq_ignore_ascii_case("{74737149-")
+                && let Some(d) = parse_dataset_def(&def)
+            {
+                existing_datasets.push((text(c_name), uuid.clone(), d));
+            }
             if let Some(a) = def.find("<DSID>")
                 && let Some(b) = def[a..].find("</DSID>")
                 && let Ok(n) = def[a + 6..a + b].parse::<i64>()
@@ -215,10 +239,12 @@ impl GeodatabaseWriter {
             next_table,
             tables,
             items: Vec::new(),
+            datasets: Vec::new(),
             spatial_refs: Vec::new(),
             domains: Vec::new(),
             rng: seed | 1,
             existing: Some(Existing {
+                datasets: existing_datasets,
                 root_uuid: root_uuid.ok_or_else(|| {
                     Error::Unsupported("the geodatabase has no root folder item".into())
                 })?,
@@ -279,18 +305,122 @@ impl GeodatabaseWriter {
         fields: &[Field],
         srs_wkt: Option<&str>,
     ) -> Result<TableBuilder> {
+        let def = kind.map(|_| default_geometry_def(srs_wkt, has_z, has_m));
+        self.create_table_with(name, kind, has_z, has_m, fields, def, None)
+    }
+
+    /// Creates a feature dataset (`arcpy.management.CreateFeatureDataset`): a folder of feature
+    /// classes that share its coordinate system and XY domain. `srs_wkt` is Esri WKT, `None` for
+    /// an unknown system.
+    pub fn create_feature_dataset(&mut self, name: &str, srs_wkt: Option<&str>) -> Result<()> {
         validate_table_name(name)?;
-        if self
-            .tables
+        if self.name_taken(name) {
+            return Err(Error::Unsupported(format!(
+                "ERROR 000258: Output {name} already exists"
+            )));
+        }
+        let def = default_geometry_def(srs_wkt, false, false);
+        let dsid = self.next_dsid();
+        let uuid = self.uuid();
+        // ArcGIS registers the dataset's coordinate system when it creates the dataset.
+        if !self.spatial_refs.iter().any(|s| same_sr(s, &def)) {
+            self.spatial_refs.push(def.clone());
+        }
+        self.datasets.push(DatasetItem {
+            uuid,
+            name: name.to_owned(),
+            def,
+            dsid,
+        });
+        Ok(())
+    }
+
+    /// Creates a feature class inside the feature dataset `dataset` (one made by this writer or
+    /// already in the geodatabase). It takes the dataset's coordinate system and XY domain.
+    pub fn create_feature_class_in(
+        &mut self,
+        dataset: &str,
+        name: &str,
+        kind: GeometryKind,
+        has_z: bool,
+        has_m: bool,
+        fields: &[Field],
+    ) -> Result<TableBuilder> {
+        let (dataset, mut def) = self
+            .datasets
+            .iter()
+            .find(|d| d.name.eq_ignore_ascii_case(dataset))
+            .map(|d| (d.name.clone(), d.def.clone()))
+            .or_else(|| {
+                self.existing.as_ref().and_then(|e| {
+                    e.datasets
+                        .iter()
+                        .find(|(n, _, _)| n.eq_ignore_ascii_case(dataset))
+                        .map(|(n, _, d)| (n.clone(), d.clone()))
+                })
+            })
+            .ok_or_else(|| {
+                Error::Unsupported(format!(
+                    "ERROR 000732: Dataset {dataset} does not exist or is not supported"
+                ))
+            })?;
+        def.has_z = has_z;
+        def.has_m = has_m;
+        def.extent = Envelope::EMPTY;
+        def.grid_sizes = vec![0.0];
+        self.create_table_with(
+            name,
+            Some(kind),
+            has_z,
+            has_m,
+            fields,
+            Some(def),
+            Some(dataset),
+        )
+    }
+
+    fn name_taken(&self, name: &str) -> bool {
+        self.tables
             .iter()
             .any(|(n, _)| n.eq_ignore_ascii_case(name))
-        {
+            || self
+                .datasets
+                .iter()
+                .any(|d| d.name.eq_ignore_ascii_case(name))
+            || self.existing.as_ref().is_some_and(|e| {
+                e.datasets
+                    .iter()
+                    .any(|(n, _, _)| n.eq_ignore_ascii_case(name))
+            })
+    }
+
+    /// The next DSID: one past every item definition so far.
+    fn next_dsid(&self) -> usize {
+        let base = self
+            .existing
+            .as_ref()
+            .map_or(3, |e| e.max_dsid as usize + 1);
+        base + self.items.len() + self.datasets.len()
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn create_table_with(
+        &mut self,
+        name: &str,
+        kind: Option<GeometryKind>,
+        has_z: bool,
+        has_m: bool,
+        fields: &[Field],
+        def: Option<GeometryDef>,
+        dataset: Option<String>,
+    ) -> Result<TableBuilder> {
+        validate_table_name(name)?;
+        if self.name_taken(name) {
             return Err(Error::Unsupported(format!(
                 "a table named {name} already exists"
             )));
         }
         let mut gdb_fields = vec![field("OBJECTID", GdbFieldType::ObjectId, false, 4)];
-        let def = kind.map(|_| default_geometry_def(srs_wkt, has_z, has_m));
         if let Some(def) = &def {
             let mut f = field("SHAPE", GdbFieldType::Geometry, true, 0);
             f.geometry = Some(def.clone());
@@ -314,6 +444,7 @@ impl GeodatabaseWriter {
         let writer =
             TableWriter::create(&self.table_path(id), gdb_fields.clone(), kind, has_z, has_m)?;
         Ok(TableBuilder {
+            dataset,
             name: name.to_owned(),
             id,
             writer,
@@ -371,11 +502,8 @@ impl GeodatabaseWriter {
         }
 
         let uuid = self.uuid();
-        let dsid = match &self.existing {
-            Some(e) => e.max_dsid as usize + 1 + self.items.len(),
-            None => self.items.len() + 3,
-        };
-        let definition = item_definition(
+        let dsid = self.next_dsid();
+        let mut definition = item_definition(
             &t.name,
             dsid,
             t.kind,
@@ -384,6 +512,18 @@ impl GeodatabaseWriter {
             def.as_ref(),
             &fields,
         );
+        if let Some(ds) = &t.dataset {
+            // A class in a feature dataset has the dataset's name in its path.
+            let (from, to) = (
+                format!("<CatalogPath>\\{}</CatalogPath>", xml_escape(&t.name)),
+                format!(
+                    "<CatalogPath>\\{}\\{}</CatalogPath>",
+                    xml_escape(ds),
+                    xml_escape(&t.name)
+                ),
+            );
+            definition = definition.replacen(&from, &to, 1);
+        }
         let domains = fields.iter().filter_map(|f| f.domain.clone()).collect();
         self.items.push(Item {
             uuid,
@@ -391,6 +531,7 @@ impl GeodatabaseWriter {
             kind: t.kind,
             definition,
             domains,
+            dataset: t.dataset.clone(),
         });
         self.tables.push((t.name, t.id));
         Ok(())
@@ -546,6 +687,9 @@ impl GeodatabaseWriter {
                 null.clone(),
             ],
         )?;
+        for d in &self.datasets {
+            t.push(None, &dataset_values(d))?;
+        }
         for item in &self.items {
             t.push(None, &item_values(item))?;
         }
@@ -583,10 +727,14 @@ impl GeodatabaseWriter {
             ],
         )?;
         let mut links: Vec<(String, String, &str)> = self
-            .items
+            .datasets
             .iter()
-            .map(|i| (root_uuid.clone(), i.uuid.clone(), REL_DATASET_IN_FOLDER))
+            .map(|d| (root_uuid.clone(), d.uuid.clone(), REL_DATASET_IN_FOLDER))
             .collect();
+        links.extend(self.items.iter().map(|i| match self.dataset_uuid(i, None) {
+            Some(d) => (d, i.uuid.clone(), REL_DATASET_IN_FEATURE_DATASET),
+            None => (root_uuid.clone(), i.uuid.clone(), REL_DATASET_IN_FOLDER),
+        }));
         for item in &self.items {
             for name in &item.domains {
                 if let Some(d) = self
@@ -667,10 +815,18 @@ impl GeodatabaseWriter {
         }
         // GDB_Items and GDB_ItemRelationships.
         let mut links: Vec<(String, String, &str)> = self
-            .items
+            .datasets
             .iter()
-            .map(|i| (ex.root_uuid.clone(), i.uuid.clone(), REL_DATASET_IN_FOLDER))
+            .map(|d| (ex.root_uuid.clone(), d.uuid.clone(), REL_DATASET_IN_FOLDER))
             .collect();
+        links.extend(
+            self.items
+                .iter()
+                .map(|i| match self.dataset_uuid(i, Some(&ex)) {
+                    Some(d) => (d, i.uuid.clone(), REL_DATASET_IN_FEATURE_DATASET),
+                    None => (ex.root_uuid.clone(), i.uuid.clone(), REL_DATASET_IN_FOLDER),
+                }),
+        );
         for item in &self.items {
             for name in &item.domains {
                 let lower = name.to_lowercase();
@@ -690,8 +846,11 @@ impl GeodatabaseWriter {
                 }
             }
         }
-        if !self.items.is_empty() || !self.domains.is_empty() {
+        if !self.items.is_empty() || !self.domains.is_empty() || !self.datasets.is_empty() {
             let mut ed = TableEditor::open(self.table_path(4))?;
+            for d in &self.datasets {
+                ed.insert(&row(dataset_values(d)))?;
+            }
             for item in &self.items {
                 ed.insert(&row(item_values(item)))?;
             }
@@ -725,6 +884,22 @@ impl GeodatabaseWriter {
             ed.finish()?;
         }
         Ok(())
+    }
+
+    /// The UUID of the feature dataset an item lives in.
+    fn dataset_uuid(&self, item: &Item, existing: Option<&Existing>) -> Option<String> {
+        let name = item.dataset.as_deref()?;
+        self.datasets
+            .iter()
+            .find(|d| d.name.eq_ignore_ascii_case(name))
+            .map(|d| d.uuid.clone())
+            .or_else(|| {
+                existing?
+                    .datasets
+                    .iter()
+                    .find(|(n, _, _)| n.eq_ignore_ascii_case(name))
+                    .map(|(_, u, _)| u.clone())
+            })
     }
 
     fn table_path(&self, id: u64) -> PathBuf {
@@ -831,12 +1006,94 @@ fn item_values(item: &Item) -> Vec<Value> {
         ty,
         &item.name,
         &item.name.to_uppercase(),
-        &format!("\\{}", item.name),
+        &match &item.dataset {
+            Some(d) => format!("\\{d}\\{}", item.name),
+            None => format!("\\{}", item.name),
+        },
         Value::Integer(1),
         sub2,
         info1,
         Value::Xml(item.definition.clone()),
         1,
+    )
+}
+
+/// A row of `GDB_Items` for a feature dataset.
+fn dataset_values(d: &DatasetItem) -> Vec<Value> {
+    let sr_type = match &d.def.srs_wkt {
+        Some(w) if w.trim_start().starts_with("GEOGCS") => "typens:GeographicCoordinateSystem",
+        Some(_) => "typens:ProjectedCoordinateSystem",
+        None => "typens:UnknownCoordinateSystem",
+    };
+    let n = xml_escape(&d.name);
+    let definition = format!(
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<typens:DEFeatureDataset xmlns:typens=\"http://www.esri.com/schemas/ArcGIS/10.3\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xsi:type=\"typens:DEFeatureDataset\">\n  <CatalogPath>\\{n}</CatalogPath>\n  <Name>{n}</Name>\n  <ChildrenExpanded>false</ChildrenExpanded>\n  <DatasetType>esriDTFeatureDataset</DatasetType>\n  <DSID>{}</DSID>\n  <Versioned>false</Versioned>\n  <CanVersion>false</CanVersion>\n  <Extent xsi:nil=\"true\"></Extent>\n{}\n</typens:DEFeatureDataset>\n",
+        d.dsid,
+        spatial_reference_xml(&d.def, sr_type),
+    );
+    catalog_item_values(
+        &d.uuid,
+        TYPE_FEATURE_DATASET,
+        &d.name,
+        &d.name.to_uppercase(),
+        &format!("\\{}", d.name),
+        Value::Null,
+        Value::Null,
+        Value::Null,
+        Value::Xml(definition),
+        1,
+    )
+}
+
+/// A feature dataset's coordinate system and XY domain from its item definition.
+fn parse_dataset_def(xml: &str) -> Option<GeometryDef> {
+    let doc = roxmltree::Document::parse(xml).ok()?;
+    let sr = doc
+        .descendants()
+        .find(|n| n.has_tag_name("SpatialReference"))?;
+    let get = |tag: &str| {
+        sr.children()
+            .find(|n| n.has_tag_name(tag))
+            .and_then(|n| n.text())
+            .map(str::to_owned)
+    };
+    let num = |tag: &str, default: f64| {
+        get(tag)
+            .and_then(|v| v.trim().parse().ok())
+            .unwrap_or(default)
+    };
+    let mut def = default_geometry_def(get("WKT").as_deref(), false, false);
+    def.x_origin = num("XOrigin", def.x_origin);
+    def.y_origin = num("YOrigin", def.y_origin);
+    def.xy_scale = num("XYScale", def.xy_scale);
+    def.z_origin = num("ZOrigin", def.z_origin);
+    def.z_scale = num("ZScale", def.z_scale);
+    def.m_origin = num("MOrigin", def.m_origin);
+    def.m_scale = num("MScale", def.m_scale);
+    def.xy_tolerance = num("XYTolerance", def.xy_tolerance);
+    def.z_tolerance = num("ZTolerance", def.z_tolerance);
+    def.m_tolerance = num("MTolerance", def.m_tolerance);
+    Some(def)
+}
+
+/// The `SpatialReference` element of a definition.
+fn spatial_reference_xml(d: &GeometryDef, sr_type: &str) -> String {
+    format!(
+        "  <SpatialReference xsi:type=\"{sr_type}\">\n{}    <XOrigin>{}</XOrigin>\n    <YOrigin>{}</YOrigin>\n    <XYScale>{}</XYScale>\n    <ZOrigin>{}</ZOrigin>\n    <ZScale>{}</ZScale>\n    <MOrigin>{}</MOrigin>\n    <MScale>{}</MScale>\n    <XYTolerance>{}</XYTolerance>\n    <ZTolerance>{}</ZTolerance>\n    <MTolerance>{}</MTolerance>\n    <HighPrecision>true</HighPrecision>\n  </SpatialReference>",
+        d.srs_wkt
+            .as_deref()
+            .map(|w| format!("    <WKT>{}</WKT>\n", xml_escape(w)))
+            .unwrap_or_default(),
+        d.x_origin,
+        d.y_origin,
+        d.xy_scale,
+        d.z_origin,
+        d.z_scale,
+        d.m_origin,
+        d.m_scale,
+        d.xy_tolerance,
+        d.z_tolerance,
+        d.m_tolerance,
     )
 }
 
