@@ -15,6 +15,7 @@ def s():
     arcpy.use(session)
     arcpy.env.overwriteOutput = False
     arcpy.env.workspace = None
+    arcpy.env.cellSize = arcpy.env.extent = arcpy.env.snapRaster = arcpy.env.mask = None
     return session
 
 
@@ -122,3 +123,16 @@ def test_list_tools():
     names = arcpy.ListTools("Buffer*")
     assert names == ["Buffer_analysis"]
     assert len(arcpy.ListTools()) > 60
+
+
+def test_raster_environments_shape_spatial_analyst_output(s):
+    arcpy.conversion.PolygonToRaster("Countries", "", "Grid", "CELL_CENTER", cellsize=2)
+    arcpy.sa.Plus("Grid", 1, out_raster="Plain")
+    plain = s.layer("Plain").info
+    arcpy.env.cellSize = 4
+    arcpy.sa.Plus("Grid", 1, out_raster="Coarse")
+    arcpy.env.cellSize = None
+    assert s.layer("Coarse").info != plain
+    arcpy.env.cellSize = "not a size"
+    with pytest.raises(rustgis.RustGISError, match="cellSize"):
+        arcpy.sa.Plus("Grid", 1, out_raster="Bad")

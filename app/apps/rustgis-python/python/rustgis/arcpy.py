@@ -17,8 +17,10 @@ there as well as added to the session. Tools return a :class:`Result`.
 
 What is not arcpy: the data model is the session's (longitude/latitude layers); distances in a
 linear unit are measured on the ground; ``arcpy.sa`` functions take the output name as the keyword
-``out_raster`` and return a :class:`Result`, not a ``Raster`` object; ``env`` holds only
-``workspace`` and ``overwriteOutput``.
+``out_raster`` and return a :class:`Result`, not a ``Raster`` object; ``env`` holds
+``workspace``, ``overwriteOutput`` and the raster environments ``cellSize`` (a number), ``extent``
+(``"xmin ymin xmax ymax"``, a 4-sequence or an object with ``XMin``..``YMax``), ``snapRaster`` and
+``mask`` (a raster or polygon layer), which ``arcpy.sa`` functions honour.
 """
 
 from __future__ import annotations
@@ -40,6 +42,10 @@ class _Env:
     def __init__(self) -> None:
         self.workspace: Optional[str] = None
         self.overwriteOutput: bool = False
+        self.cellSize: Any = None
+        self.extent: Any = None
+        self.snapRaster: Any = None
+        self.mask: Any = None
 
 
 env = _Env()
@@ -305,6 +311,32 @@ def _as_layer(s: Session, value: Any) -> Any:
     return text  # let the tool say it is missing
 
 
+# Tools that ignore the raster environments (they take their own grid or make vectors).
+_NO_ENV = {"contour", "resample", "euclidean_distance", "extract_by_mask", "zonal_statistics", "zonal_statistics_as_table", "raster_to_point", "raster_to_polygon", "polygon_to_raster", "polyline_to_raster", "point_to_raster"}
+
+
+def _env_params(s: Session, tool: str, module: str) -> Dict[str, Any]:
+    """The raster environments that are set, as tool parameters (Spatial Analyst tools only)."""
+    if module != "sa" or tool in _NO_ENV:
+        return {}
+    out: Dict[str, Any] = {}
+    if env.cellSize not in (None, ""):
+        try:
+            out["cell_size"] = float(env.cellSize)
+        except (TypeError, ValueError):
+            raise RustGISError(f"env.cellSize must be a number, not {env.cellSize!r}") from None
+    e = env.extent
+    if e not in (None, ""):
+        if hasattr(e, "XMin"):
+            e = [e.XMin, e.YMin, e.XMax, e.YMax]
+        out["extent"] = e if isinstance(e, str) else " ".join(repr(float(v)) for v in e)
+    if env.snapRaster not in (None, ""):
+        out["snap_raster"] = _as_layer(s, env.snapRaster)
+    if env.mask not in (None, ""):
+        out["mask"] = _as_layer(s, env.mask)
+    return out
+
+
 _PATHY = re.compile(r"(\.[A-Za-z0-9]{2,5}$)|[\\/]")
 
 
@@ -380,6 +412,8 @@ def _make(module: str, name: str, tool: str, args: Tuple[Arg, ...], outputs: Tup
         if "output" in params and "output" in {a for a in params} and not env.overwriteOutput:
             if any(l.get("name") == params["output"] for l in s.layers()):
                 raise RustGISError(f"ERROR 000258: Output {params['output']} already exists")
+        for k, v in _env_params(s, tool, module).items():
+            params.setdefault(k, v)
         before = {l.get("id"): l.get("name") for l in s.layers()}
         s.notices()
         raw = s.run("gp.run", tool=_PREFIX + tool, params=params)

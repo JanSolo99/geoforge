@@ -7,6 +7,7 @@
 
 pub mod contour;
 pub mod conversion;
+pub mod env;
 pub mod focal;
 mod geotiff;
 pub mod hydro;

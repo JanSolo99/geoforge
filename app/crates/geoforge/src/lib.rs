@@ -1504,7 +1504,7 @@ fn specs() -> Vec<ToolSpec> {
             name: d.name,
             toolbox: d.toolbox,
             summary: d.summary,
-            params: d.params,
+            params: raster::params_of(d),
             run: rustgis_analysis::external_placeholder,
         })
         .collect()
@@ -1817,6 +1817,50 @@ mod tests {
         assert_eq!(hs.width, 24);
         let filled = rustgis_analysis::run("geoforge:fill", &inp, &json!({"input": "DEM", "output": "Filled"})).unwrap();
         assert!(filled.messages[0].starts_with("Filled"));
+    }
+
+    #[test]
+    fn raster_environments_equal_the_engine() {
+        use geoforge_raster::env::{self, Environment, Reads, Sampling};
+        register();
+        let (dem_gf, inp) = dem("DEMENV");
+        // A coarser cell size and a shifted extent: Slope reads one cell of context, bilinearly.
+        let out = raster_of(rustgis_analysis::run(
+            "geoforge:slope",
+            &inp,
+            &json!({"input": "DEMENV", "cell_size": 60, "extent": "500100 5000100 500500 5000500"}),
+        ));
+        let e = Environment { cell_size: Some(60.0), extent: Some([500_100.0, 5_000_100.0, 500_500.0, 5_000_500.0]), ..Default::default() };
+        let want = env::run(&[&dem_gf], &e, Reads::Context, Sampling::Bilinear, &|r| {
+            geoforge_raster::surface::slope(&r[0], geoforge_raster::surface::SlopeUnit::Degree, 1.0)
+        })
+        .unwrap();
+        assert_eq!((out.width, out.height, out.transform), (want.width, want.height, want.transform));
+        assert_eq!(out.bands[0], want.bands[0]);
+        // Local math honours the extent too, and a raster mask turns cells to NoData.
+        let plus = raster_of(rustgis_analysis::run(
+            "geoforge:plus",
+            &inp,
+            &json!({"in1": "DEMENV", "in2": "1", "extent": "500060 5000060 500300 5000300"}),
+        ));
+        assert_eq!((plus.width, plus.height), (8, 8));
+        let masked =
+            raster_of(rustgis_analysis::run("geoforge:fill", &inp, &json!({"input": "DEMENV", "mask": "DEMENV", "cell_size": 30})));
+        assert_eq!(masked.width, 24);
+        // Bad environment values are errors, not panics.
+        for bad in [
+            json!({"cell_size": -1}),
+            json!({"cell_size": 0}),
+            json!({"extent": "1 2 3"}),
+            json!({"extent": "a b c d"}),
+            json!({"snap_raster": "nope"}),
+            json!({"mask": "nope"}),
+            json!({"extent": "5 5 1 1"}),
+        ] {
+            let mut p = json!({"input": "DEMENV"});
+            p.as_object_mut().unwrap().extend(bad.as_object().unwrap().clone());
+            assert!(rustgis_analysis::run("geoforge:slope", &inp, &p).is_err(), "{p}");
+        }
     }
 
     #[test]

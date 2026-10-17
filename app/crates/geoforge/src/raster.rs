@@ -9,6 +9,8 @@
 //! results (contours, points, polygons) are projected to longitude/latitude like every layer.
 
 use std::path::{Path, PathBuf};
+
+use gfr::env::{Reads, Sampling};
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use geoforge_raster as gfr;
@@ -18,6 +20,7 @@ use rustgis_data::{Dataset, Field, FieldType, Geometry, GeometryType, Value};
 use rustgis_geom::Coord;
 use serde_json::Value as Json;
 
+use crate::gf;
 use crate::{Def, INPUT, OUTPUT, flag, layer, number, out_name, table_dataset, text};
 
 const RASTER: P = P { name: "input", label: "Input Raster", kind: K::RasterLayer, required: true, default: "", help: "" };
@@ -126,6 +129,140 @@ fn done(layers: Vec<(String, gfr::Raster)>) -> Result<ToolResult, String> {
     Ok(ToolResult { output: Output::Layers(out), messages })
 }
 
+/// The environment parameters every environment-aware raster tool takes (`arcpy.env`).
+pub(crate) const ENV_PARAMS: &[P] = &[
+    P {
+        name: "cell_size",
+        label: "Cell size (environment)",
+        kind: K::Number,
+        required: false,
+        default: "",
+        help: "Output cell size, in the raster's units.",
+    },
+    P {
+        name: "extent",
+        label: "Extent (environment)",
+        kind: K::Text,
+        required: false,
+        default: "",
+        help: "\"xmin ymin xmax ymax\" in the raster's coordinate system.",
+    },
+    P { name: "snap_raster", label: "Snap raster (environment)", kind: K::RasterLayer, required: false, default: "", help: "" },
+    P {
+        name: "mask",
+        label: "Mask (environment)",
+        kind: K::Text,
+        required: false,
+        default: "",
+        help: "A raster or polygon layer; cells outside it are NoData.",
+    },
+];
+
+/// The tools that honour the environments.
+pub(crate) fn takes_environment(id: &str) -> bool {
+    !matches!(
+        id,
+        "contour"
+            | "resample"
+            | "euclidean_distance"
+            | "extract_by_mask"
+            | "zonal_statistics"
+            | "raster_to_point"
+            | "raster_to_polygon"
+            | "polygon_to_raster"
+            | "polyline_to_raster"
+            | "point_to_raster"
+            | "zonal_statistics_as_table"
+    )
+}
+
+/// A raster tool's parameters with the environment parameters appended (leaked once per tool).
+pub(crate) fn params_of(d: &Def) -> &'static [P] {
+    static CACHE: std::sync::Mutex<Vec<(&'static str, &'static [P])>> = std::sync::Mutex::new(Vec::new());
+    if !DEFS.iter().any(|x| x.id == d.id) || !takes_environment(d.id) {
+        return d.params;
+    }
+    let mut cache = CACHE.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    if let Some((_, p)) = cache.iter().find(|(id, _)| *id == d.id) {
+        return p;
+    }
+    let all: &'static [P] = Box::leak([d.params, ENV_PARAMS].concat().into_boxed_slice());
+    cache.push((d.id, all));
+    all
+}
+
+fn polygons_in(ds: &Dataset, crs: Crs) -> Result<Vec<gf::Geometry>, String> {
+    let t = crs.transformer()?;
+    let mut out = Vec::new();
+    for f in &ds.features {
+        let Some(Geometry::Polygon(polys)) = &f.geometry else { continue };
+        for poly in polys {
+            let mut g = gf::Geometry::point(0.0, 0.0);
+            g.kind = gf::GeometryKind::Polygon;
+            g.parts.clear();
+            g.xy.clear();
+            for ring in poly {
+                g.parts.push(g.xy.len() as u32);
+                for c in ring {
+                    let c = t.from_lonlat(*c).ok_or("a mask vertex is outside the raster's coordinate system")?;
+                    g.xy.push([c.x, c.y]);
+                }
+            }
+            out.push(g);
+        }
+    }
+    Ok(out)
+}
+
+/// The environments set in the parameters.
+fn env_of(inp: &dyn Inputs, p: &Json, crs: Crs) -> Result<gfr::env::Environment, String> {
+    let mut e = gfr::env::Environment::default();
+    if p.get("cell_size").is_some_and(|v| !v.is_null() && v.as_str() != Some("")) {
+        e.cell_size = Some(number(p, "cell_size").filter(|c| *c > 0.0).ok_or("the cell size environment must be a positive number")?);
+    }
+    if !text(p, "extent").is_empty() {
+        let v: Vec<f64> = text(p, "extent")
+            .split(|c: char| c.is_whitespace() || c == ',')
+            .filter(|w| !w.is_empty())
+            .map(str::parse)
+            .collect::<Result<_, _>>()
+            .map_err(|_| format!("extent '{}'", text(p, "extent")))?;
+        if v.len() != 4 || v.iter().any(|x| !x.is_finite()) {
+            return Err(format!("extent '{}': expected xmin ymin xmax ymax", text(p, "extent")));
+        }
+        e.extent = Some([v[0], v[1], v[2], v[3]]);
+    }
+    if !text(p, "snap_raster").is_empty() {
+        e.snap = Some(gfr::env::Snap::of(&load(inp, text(p, "snap_raster"))?.0));
+    }
+    let mask = text(p, "mask");
+    if !mask.is_empty() {
+        e.mask = Some(if inp.raster(mask).is_some() {
+            gfr::env::Mask::Raster(load(inp, mask)?.0)
+        } else {
+            let ds = inp.dataset(mask).ok_or_else(|| format!("no layer named '{mask}'"))?;
+            gfr::env::Mask::Polygons(polygons_in(ds, crs)?)
+        });
+    }
+    Ok(e)
+}
+
+/// Runs `f` on `rasters` under the environments in `p`.
+fn eval(
+    inp: &dyn Inputs,
+    p: &Json,
+    rasters: &[&gfr::Raster],
+    crs: Crs,
+    reads: gfr::env::Reads,
+    sampling: gfr::env::Sampling,
+    f: &dyn Fn(&[gfr::Raster]) -> gfr::Raster,
+) -> Result<gfr::Raster, String> {
+    let env = env_of(inp, p, crs)?;
+    gfr::env::run(rasters, &env, reads, sampling, f).ok_or_else(|| {
+        "no output grid: the input rasters do not overlap, or the environments give more than the supported number of cells".to_string()
+    })
+}
+
 fn one(p: &Json, default: String, r: gfr::Raster) -> Result<ToolResult, String> {
     done(vec![(out_name(p, default), r)])
 }
@@ -144,34 +281,55 @@ fn base_name(_: &dyn Inputs, p: &Json, key: &str) -> String {
 // surface
 
 fn slope(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
-    let (dem, _) = input(inp, p, "input")?;
+    let (dem, crs) = input(inp, p, "input")?;
     let unit = match choice(p, "output_measurement", "DEGREE").as_str() {
         "DEGREE" => gfr::surface::SlopeUnit::Degree,
         "PERCENT_RISE" => gfr::surface::SlopeUnit::PercentRise,
         other => return Err(format!("output measurement {other}")),
     };
-    one(p, format!("{}_Slope", base_name(inp, p, "input")), gfr::surface::slope(&dem, unit, number(p, "z_factor").unwrap_or(1.0)))
+    let z = number(p, "z_factor").unwrap_or(1.0);
+    one(
+        p,
+        format!("{}_Slope", base_name(inp, p, "input")),
+        eval(inp, p, &[&dem], crs, Reads::Context, Sampling::Bilinear, &|r| gfr::surface::slope(&r[0], unit, z))?,
+    )
 }
 
 fn aspect(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
-    let (dem, _) = input(inp, p, "input")?;
-    one(p, format!("{}_Aspect", base_name(inp, p, "input")), gfr::surface::aspect(&dem))
+    let (dem, crs) = input(inp, p, "input")?;
+    one(
+        p,
+        format!("{}_Aspect", base_name(inp, p, "input")),
+        eval(inp, p, &[&dem], crs, Reads::Context, Sampling::Bilinear, &|r| gfr::surface::aspect(&r[0]))?,
+    )
 }
 
 fn hillshade(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
-    let (dem, _) = input(inp, p, "input")?;
+    let (dem, crs) = input(inp, p, "input")?;
     let (az, alt, z) = (number(p, "azimuth").unwrap_or(315.0), number(p, "altitude").unwrap_or(45.0), number(p, "z_factor").unwrap_or(1.0));
-    let out = if flag(p, "model_shadows") {
-        gfr::surface::hillshade_with(&dem, az, alt, z, true)
-    } else {
-        gfr::surface::hillshade(&dem, az, alt, z)
-    };
+    let shadows = flag(p, "model_shadows");
+    let out = eval(inp, p, &[&dem], crs, Reads::Cropped, Sampling::Bilinear, &|r| {
+        if shadows { gfr::surface::hillshade_with(&r[0], az, alt, z, true) } else { gfr::surface::hillshade(&r[0], az, alt, z) }
+    })?;
     one(p, format!("{}_Hillshade", base_name(inp, p, "input")), out)
 }
 
 fn curvature(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
-    let (dem, _) = input(inp, p, "input")?;
-    let (curv, profile, plan) = gfr::surface::curvature(&dem, number(p, "z_factor").unwrap_or(1.0));
+    let (dem, crs) = input(inp, p, "input")?;
+    let z = number(p, "z_factor").unwrap_or(1.0);
+    let call = |r: &gfr::Raster| gfr::surface::curvature(r, z);
+    let (curv, profile, plan) = if env_of(inp, p, crs)?.is_empty() {
+        call(&dem)
+    } else {
+        // The three outputs share one grid: run the tool once per output.
+        let pick = |k: usize| {
+            eval(inp, p, &[&dem], crs, Reads::Context, Sampling::Bilinear, &move |r| {
+                let (a, b, c) = call(&r[0]);
+                [a, b, c][k].clone()
+            })
+        };
+        (pick(0)?, pick(1)?, pick(2)?)
+    };
     let n = out_name(p, format!("{}_Curvature", base_name(inp, p, "input")));
     let mut layers = vec![(n.clone(), curv)];
     if flag(p, "profile") {
@@ -217,68 +375,104 @@ fn contour(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
 // hydrology
 
 fn fill(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
-    let (dem, _) = input(inp, p, "input")?;
-    one(p, format!("{}_Fill", base_name(inp, p, "input")), gfr::hydro::fill(&dem, number(p, "z_limit")))
+    let (dem, crs) = input(inp, p, "input")?;
+    let limit = number(p, "z_limit");
+    one(
+        p,
+        format!("{}_Fill", base_name(inp, p, "input")),
+        eval(inp, p, &[&dem], crs, Reads::Cropped, Sampling::Nearest, &|r| gfr::hydro::fill(&r[0], limit))?,
+    )
 }
 
 fn flow_direction(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
-    let (dem, _) = input(inp, p, "input")?;
+    let (dem, crs) = input(inp, p, "input")?;
     let force = match choice(p, "force_flow", "NORMAL").as_str() {
         "NORMAL" => false,
         "FORCE" => true,
         other => return Err(format!("force_flow {other}")),
     };
-    one(p, format!("{}_FlowDir", base_name(inp, p, "input")), gfr::hydro::flow_direction(&dem, force))
+    one(
+        p,
+        format!("{}_FlowDir", base_name(inp, p, "input")),
+        eval(inp, p, &[&dem], crs, Reads::Context, Sampling::Nearest, &|r| gfr::hydro::flow_direction(&r[0], force))?,
+    )
 }
 
 fn flow_accumulation(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
-    let (d, _) = input(inp, p, "input")?;
+    let (d, crs) = input(inp, p, "input")?;
     let weight = if text(p, "weight").is_empty() { None } else { Some(input(inp, p, "weight")?.0) };
     let integer = match choice(p, "data_type", "FLOAT").as_str() {
         "FLOAT" => false,
         "INTEGER" => true,
         other => return Err(format!("data type {other}")),
     };
-    one(p, format!("{}_FlowAcc", base_name(inp, p, "input")), gfr::hydro::flow_accumulation(&d, weight.as_ref(), integer))
+    one(p, format!("{}_FlowAcc", base_name(inp, p, "input")), {
+        let mut rs = vec![&d];
+        rs.extend(weight.as_ref());
+        let has_weight = weight.is_some();
+        eval(inp, p, &rs, crs, Reads::Cropped, Sampling::Nearest, &|r| {
+            gfr::hydro::flow_accumulation(&r[0], if has_weight { r.get(1) } else { None }, integer)
+        })?
+    })
 }
 
 fn basin(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
-    let (d, _) = input(inp, p, "input")?;
-    one(p, format!("{}_Basin", base_name(inp, p, "input")), gfr::hydro::basin(&d))
+    let (d, crs) = input(inp, p, "input")?;
+    one(
+        p,
+        format!("{}_Basin", base_name(inp, p, "input")),
+        eval(inp, p, &[&d], crs, Reads::Cropped, Sampling::Nearest, &|r| gfr::hydro::basin(&r[0]))?,
+    )
 }
 
 fn watershed(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
-    let (d, _) = input(inp, p, "input")?;
+    let (d, crs) = input(inp, p, "input")?;
     let (pour, _) = input(inp, p, "pour_points")?;
-    one(p, format!("{}_Watershed", base_name(inp, p, "input")), gfr::hydro::watershed(&d, &pour))
+    one(
+        p,
+        format!("{}_Watershed", base_name(inp, p, "input")),
+        eval(inp, p, &[&d, &pour], crs, Reads::Cropped, Sampling::Nearest, &|r| gfr::hydro::watershed(&r[0], &r[1]))?,
+    )
 }
 
 fn stream_link(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
-    let (s, _) = input(inp, p, "streams")?;
+    let (s, crs) = input(inp, p, "streams")?;
     let (d, _) = input(inp, p, "input")?;
-    one(p, format!("{}_StreamLink", base_name(inp, p, "streams")), gfr::hydro::stream_link(&s, &d))
+    one(
+        p,
+        format!("{}_StreamLink", base_name(inp, p, "streams")),
+        eval(inp, p, &[&s, &d], crs, Reads::Cropped, Sampling::Nearest, &|r| gfr::hydro::stream_link(&r[0], &r[1]))?,
+    )
 }
 
 fn stream_order(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     use gfr::hydro::StreamOrder;
-    let (s, _) = input(inp, p, "streams")?;
+    let (s, crs) = input(inp, p, "streams")?;
     let (d, _) = input(inp, p, "input")?;
     let method = match choice(p, "order_method", "STRAHLER").as_str() {
         "STRAHLER" => StreamOrder::Strahler,
         "SHREVE" => StreamOrder::Shreve,
         other => return Err(format!("order method {other}")),
     };
-    one(p, format!("{}_StreamOrder", base_name(inp, p, "streams")), gfr::hydro::stream_order(&s, &d, method))
+    one(
+        p,
+        format!("{}_StreamOrder", base_name(inp, p, "streams")),
+        eval(inp, p, &[&s, &d], crs, Reads::Cropped, Sampling::Nearest, &|r| gfr::hydro::stream_order(&r[0], &r[1], method))?,
+    )
 }
 
 fn flow_length(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
-    let (d, _) = input(inp, p, "input")?;
+    let (d, crs) = input(inp, p, "input")?;
     let upstream = match choice(p, "direction_measurement", "DOWNSTREAM").as_str() {
         "DOWNSTREAM" => false,
         "UPSTREAM" => true,
         other => return Err(format!("direction {other}")),
     };
-    one(p, format!("{}_FlowLength", base_name(inp, p, "input")), gfr::hydro::flow_length(&d, upstream))
+    one(
+        p,
+        format!("{}_FlowLength", base_name(inp, p, "input")),
+        eval(inp, p, &[&d], crs, Reads::Cropped, Sampling::Nearest, &|r| gfr::hydro::flow_length(&r[0], upstream))?,
+    )
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -294,7 +488,7 @@ fn data_flag(p: &Json, key: &str) -> Result<bool, String> {
 
 fn focal_statistics(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     use gfr::focal::{FocalStatistic, Neighborhood};
-    let (r, _) = input(inp, p, "input")?;
+    let (r, crs) = input(inp, p, "input")?;
     let nbr = Neighborhood::parse(if text(p, "neighborhood").is_empty() { "Rectangle 3 3 CELL" } else { text(p, "neighborhood") })
         .ok_or_else(|| format!("neighborhood {}", text(p, "neighborhood")))?;
     if nbr.cell_count() > 4_000_000 {
@@ -302,13 +496,19 @@ fn focal_statistics(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     }
     let stat =
         FocalStatistic::parse(&choice(p, "statistics_type", "MEAN")).ok_or_else(|| format!("statistic {}", text(p, "statistics_type")))?;
-    one(p, format!("{}_Focal", base_name(inp, p, "input")), gfr::focal::focal_statistics(&r, nbr, stat, data_flag(p, "ignore_nodata")?))
+    one(p, format!("{}_Focal", base_name(inp, p, "input")), {
+        let ignore = data_flag(p, "ignore_nodata")?;
+        eval(inp, p, &[&r], crs, Reads::Cropped, Sampling::Nearest, &|x| gfr::focal::focal_statistics(&x[0], nbr, stat, ignore))?
+    })
 }
 
 fn reclassify(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
-    let (r, _) = input(inp, p, "input")?;
+    let (r, crs) = input(inp, p, "input")?;
     let entries = gfr::zonal::parse_remap(text(p, "remap")).ok_or_else(|| format!("remap {}", text(p, "remap")))?;
-    one(p, format!("{}_Reclass", base_name(inp, p, "input")), gfr::zonal::reclassify(&r, &entries, data_flag(p, "missing_values")?))
+    one(p, format!("{}_Reclass", base_name(inp, p, "input")), {
+        let missing = data_flag(p, "missing_values")?;
+        eval(inp, p, &[&r], crs, Reads::Cropped, Sampling::Nearest, &|x| gfr::zonal::reclassify(&x[0], &entries, missing))?
+    })
 }
 
 fn zonal_statistics(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
@@ -365,9 +565,48 @@ fn operand(inp: &dyn Inputs, text_value: &str) -> Result<gfr::local::Operand, St
     }
 }
 
+/// Runs `f` on operands under the environments: the raster operands go onto the processing grid, the
+/// constants stay.
+fn eval_operands(
+    inp: &dyn Inputs,
+    p: &Json,
+    ops: &[&gfr::local::Operand],
+    f: &dyn Fn(&[gfr::local::Operand]) -> Option<gfr::Raster>,
+) -> Result<gfr::Raster, String> {
+    use gfr::local::Operand;
+    let rasters: Vec<&gfr::Raster> = ops.iter().filter_map(|o| if let Operand::Raster(r) = o { Some(r) } else { None }).collect();
+    let crs = match ["in1", "input"].into_iter().find(|k| inp.raster(text(p, k)).is_some()) {
+        Some(k) => Some(load(inp, text(p, k))?.1),
+        None => None,
+    };
+    let env = match crs {
+        Some(c) => env_of(inp, p, c)?,
+        None => gfr::env::Environment::default(),
+    };
+    if env.is_empty() || rasters.is_empty() {
+        let owned: Vec<Operand> = ops.iter().map(|o| (*o).clone()).collect();
+        return f(&owned).ok_or_else(|| "the input rasters do not overlap".to_string());
+    }
+    gfr::env::run(&rasters, &env, Reads::Cropped, Sampling::Nearest, &|prepared| {
+        let mut it = prepared.iter();
+        let swapped: Vec<Operand> = ops
+            .iter()
+            .map(|o| {
+                if let Operand::Raster(_) = o {
+                    it.next().map_or_else(|| (*o).clone(), |r| Operand::Raster(r.clone()))
+                } else {
+                    (*o).clone()
+                }
+            })
+            .collect();
+        f(&swapped).unwrap_or_else(|| gfr::Raster::new(1, 1, gfr::DataType::F32, [0.0, 1.0, 0.0, 1.0, 0.0, -1.0]))
+    })
+    .ok_or_else(|| "the input rasters do not overlap".to_string())
+}
+
 fn math(op: gfr::local::MathOp, suffix: &str, inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     let (a, b) = (operand(inp, text(p, "in1"))?, operand(inp, text(p, "in2"))?);
-    let out = gfr::local::math(op, &a, &b).ok_or("the input rasters do not overlap")?;
+    let out = eval_operands(inp, p, &[&a, &b], &|o| gfr::local::math(op, &o[0], &o[1]))?;
     one(p, format!("{}_{suffix}", base_name(inp, p, "in1")), out)
 }
 
@@ -385,16 +624,28 @@ fn divide(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
 }
 
 fn int(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
-    let (r, _) = input(inp, p, "input")?;
-    one(p, format!("{}_Int", base_name(inp, p, "input")), gfr::local::int(&r))
+    let (r, crs) = input(inp, p, "input")?;
+    one(
+        p,
+        format!("{}_Int", base_name(inp, p, "input")),
+        eval(inp, p, &[&r], crs, Reads::Cropped, Sampling::Nearest, &|x| gfr::local::int(&x[0]))?,
+    )
 }
 fn float(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
-    let (r, _) = input(inp, p, "input")?;
-    one(p, format!("{}_Float", base_name(inp, p, "input")), gfr::local::float(&r))
+    let (r, crs) = input(inp, p, "input")?;
+    one(
+        p,
+        format!("{}_Float", base_name(inp, p, "input")),
+        eval(inp, p, &[&r], crs, Reads::Cropped, Sampling::Nearest, &|x| gfr::local::float(&x[0]))?,
+    )
 }
 fn is_null(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
-    let (r, _) = input(inp, p, "input")?;
-    one(p, format!("{}_IsNull", base_name(inp, p, "input")), gfr::local::is_null(&r))
+    let (r, crs) = input(inp, p, "input")?;
+    one(
+        p,
+        format!("{}_IsNull", base_name(inp, p, "input")),
+        eval(inp, p, &[&r], crs, Reads::Cropped, Sampling::Nearest, &|x| gfr::local::is_null(&x[0]))?,
+    )
 }
 
 fn clause(p: &Json) -> Result<Option<gfr::local::ValueClause>, String> {
@@ -409,14 +660,25 @@ fn con(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     let (cond, _) = input(inp, p, "input")?;
     let t = operand(inp, text(p, "true_value"))?;
     let f = if text(p, "false_value").is_empty() { None } else { Some(operand(inp, text(p, "false_value"))?) };
-    let out = gfr::local::con(&cond, &t, f.as_ref(), clause(p)?.as_ref()).ok_or("the input rasters do not overlap")?;
+    let cl = clause(p)?;
+    let cond_op = gfr::local::Operand::Raster(cond);
+    let fv = f.clone().unwrap_or(gfr::local::Operand::Constant(0.0));
+    let out = eval_operands(inp, p, &[&cond_op, &t, &fv], &|o| {
+        let gfr::local::Operand::Raster(c) = &o[0] else { return None };
+        gfr::local::con(c, &o[1], f.as_ref().map(|_| &o[2]), cl.as_ref())
+    })?;
     one(p, format!("{}_Con", base_name(inp, p, "input")), out)
 }
 
 fn set_null(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     let (cond, _) = input(inp, p, "input")?;
     let f = operand(inp, text(p, "false_value"))?;
-    let out = gfr::local::set_null(&cond, &f, clause(p)?.as_ref()).ok_or("the input rasters do not overlap")?;
+    let cl = clause(p)?;
+    let cond_op = gfr::local::Operand::Raster(cond);
+    let out = eval_operands(inp, p, &[&cond_op, &f], &|o| {
+        let gfr::local::Operand::Raster(c) = &o[0] else { return None };
+        gfr::local::set_null(c, &o[1], cl.as_ref())
+    })?;
     one(p, format!("{}_SetNull", base_name(inp, p, "input")), out)
 }
 

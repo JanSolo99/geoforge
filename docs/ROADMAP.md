@@ -352,7 +352,9 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
   - [x] Con/Set Null on any grids with the same type rule over the true/false values; Con's
         grid comes from the condition and true rasters only (the false raster is sampled onto
         it), Set Null's from the condition and false rasters, matching ArcGIS
-  - [ ] Cell size/snap/extent/mask environments
+  - [x] Cell size/snap/extent/mask environments (`geoforge-raster::env`, matched cell-for-cell to ArcGIS on 23 runs in
+        `tests/raster_env.rs`; observed rules in the module docs; app tools take `cell_size`/`extent`/`snap_raster`/`mask`,
+        `arcpy.env.cellSize/extent/snapRaster/mask`; Euclidean Distance, Extract By Mask, Zonal and the vector conversions ignore them)
 - [ ] Hillshade, slope, aspect, curvature, contours, viewshed, hydrology (fill/flow dir/accumulation/watershed)
   - [x] Slope (degree/percent rise, z-factor), Aspect, Hillshade (no shadows), planar, matching
         ArcGIS cell for cell: Horn's gradient; border cells and cells with a NoData edge neighbor
