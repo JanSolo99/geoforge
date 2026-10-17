@@ -21,7 +21,8 @@ original copyright notices and mark modified files.
   `delete_field`, `calculate_field`, `delete_identical`, `find_identical`, `generate_near_table`), enabled by the engine feature `geoforge`. Layers are
   WGS 84 lon/lat; topology tools run on them as they are, tools that measure (Buffer, Near, search
   distances) run in the UTM zone at the centre of their inputs (metres, planar, as ArcGIS on projected
-  data) and project the result back (`Work` in `crates/geoforge/src/lib.rs`). An undissolved Buffer of data wider
+  data) and project the result back (`Work` in `crates/geoforge/src/lib.rs`); Buffer is the exception: it is
+  ArcGIS's geodesic buffer on the ellipsoid, the UTM zone only where that would cross the antimeridian or a pole. An undissolved Buffer of data wider
   than ~12° runs a UTM zone at a time (each feature in its own zone, order kept); other measuring tools on
   such data use one zone and say distances are approximate. Layers do not yet remember a native CRS. `geoforge-tools`
   has a default `proj` feature (Project); the app turns it off because proj-sys's `libsqlite3-sys`

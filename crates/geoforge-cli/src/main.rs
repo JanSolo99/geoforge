@@ -3950,6 +3950,29 @@ fn parse_distance(text: &str, wkt: Option<&str>) -> Result<f64> {
     Ok(value * from / data)
 }
 
+/// A buffer distance. On geographic data a distance in a linear unit is measured on the ellipsoid
+/// (geodesic); a plain number, or one in degrees, is planar in degrees, as ArcGIS does.
+fn buffer_distance(text: &str, wkt: Option<&str>) -> Result<geoforge_tools::BufferDistance> {
+    let geographic = wkt.is_some_and(|w| w.trim_start().starts_with("GEOGCS"));
+    let mut words = text.split_whitespace();
+    let value = words.next().and_then(|v| v.parse::<f64>().ok());
+    let unit = words.next().map(str::to_ascii_lowercase);
+    match (geographic, value, unit.as_deref()) {
+        (true, Some(v), Some("decimaldegrees" | "degrees" | "degree")) => {
+            Ok(geoforge_tools::BufferDistance::Linear(v))
+        }
+        (true, Some(_), Some(_)) => {
+            // Metres from the unit, with a data unit of 1.
+            Ok(geoforge_tools::BufferDistance::Geodesic(parse_distance(
+                text, None,
+            )?))
+        }
+        _ => Ok(geoforge_tools::BufferDistance::Linear(parse_distance(
+            text, wkt,
+        )?)),
+    }
+}
+
 fn buffer_tool(
     input: &Path,
     output: &Path,
@@ -3966,10 +3989,7 @@ fn buffer_tool(
         .next()
         .is_some_and(|v| v.parse::<f64>().is_ok())
     {
-        geoforge_tools::BufferDistance::Linear(parse_distance(
-            distance,
-            fc.spatial_reference_wkt(),
-        )?)
+        buffer_distance(distance, fc.spatial_reference_wkt())?
     } else {
         geoforge_tools::BufferDistance::Field(distance.trim().to_owned())
     };

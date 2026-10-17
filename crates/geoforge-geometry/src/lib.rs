@@ -6,6 +6,7 @@ pub mod bounding;
 pub mod buffer;
 pub mod clip;
 pub mod convert;
+pub mod geodesic;
 pub mod index;
 pub mod linework;
 pub mod overlay;
@@ -17,6 +18,7 @@ pub use buffer::{
     BufferCircle, BufferOptions, LineEnd, LineSide, buffer, buffer_union, recover_arcs,
 };
 pub use clip::{ClipArea, clip};
+pub use geodesic::{GeodesicOptions, buffer_geodesic, buffer_geodesic_union};
 pub use index::EnvelopeIndex;
 pub use linework::{LineNodes, Meeting, XY_TOLERANCE, meeting, on_path};
 pub use overlay::{

@@ -135,6 +135,9 @@ pub enum Dissolve {
 #[derive(Debug, Clone)]
 pub enum BufferDistance {
     Linear(f64),
+    /// Metres measured on the ellipsoid (geographic input with a distance in a linear unit): the
+    /// geodesic buffer. A plain number on geographic data is `Linear`, in degrees, and planar.
+    Geodesic(f64),
     Field(String),
 }
 
@@ -174,10 +177,10 @@ fn buffer_inner(
         .geometry_kind()
         .ok_or_else(|| Error::Unsupported("input has no geometry".into()))?;
     let sr = input.spatial_reference_wkt();
-    if sr.is_some_and(|w| w.trim_start().starts_with("GEOGCS")) {
+    let geographic = sr.is_some_and(|w| w.trim_start().starts_with("GEOGCS"));
+    if matches!(distance, BufferDistance::Geodesic(_)) && !geographic {
         return Err(Error::Unsupported(
-            "buffering geographic data needs geodesic buffers (coordinate systems are Phase 4)"
-                .into(),
+            "a geodesic distance needs geographic input".into(),
         ));
     }
     match (side, kind) {
@@ -203,12 +206,12 @@ fn buffer_inner(
     };
     let distance_field = match &distance {
         BufferDistance::Field(name) => Some(field_index(name)?),
-        BufferDistance::Linear(_) => None,
+        BufferDistance::Linear(_) | BufferDistance::Geodesic(_) => None,
     };
     let options = |d: f64| BufferOptions {
         distance: d,
         line_end,
-        max_deviation: geoforge_core::curves::arcgis_densify_deviation(false),
+        max_deviation: geoforge_core::curves::arcgis_densify_deviation(geographic),
         side,
     };
     // Each feature with its distance (features without one are left out).
@@ -217,21 +220,40 @@ fn buffer_inner(
         let f = f?;
         let Some(g) = &f.geometry else { continue };
         let d = match (&distance, distance_field) {
-            (BufferDistance::Linear(d), _) => *d,
+            (BufferDistance::Linear(d) | BufferDistance::Geodesic(d), _) => *d,
             (_, Some(i)) => match number(&f.attributes[i]) {
                 Some(d) => d,
                 None => continue,
             },
             _ => unreachable!(),
         };
-        if let Some(b) = geoforge_geometry::buffer(g, &options(d))? {
+        let b = if matches!(distance, BufferDistance::Geodesic(_)) {
+            let g = if g.has_curves() {
+                g.densify_curves_arcgis(0.0001)?
+            } else {
+                g.clone()
+            };
+            geoforge_geometry::buffer_geodesic(
+                &g,
+                &geoforge_geometry::GeodesicOptions {
+                    distance: d,
+                    line_end,
+                    side,
+                },
+            )?
+        } else {
+            geoforge_geometry::buffer(g, &options(d))?
+        };
+        if let Some(b) = b {
             buffered.push((f, d, b));
         }
     }
     // The circles the buffers were built around, per buffered feature.
-    let max_deviation = geoforge_core::curves::arcgis_densify_deviation(false);
+    let max_deviation = geoforge_core::curves::arcgis_densify_deviation(geographic);
     let is_point = matches!(kind, GeometryKind::Point | GeometryKind::Multipoint);
+    // True arcs are for projected data; a geodesic buffer is vertices all the way.
     let keep_arcs = arcs
+        && !matches!(distance, BufferDistance::Geodesic(_))
         && match kind {
             GeometryKind::Point | GeometryKind::Multipoint => true,
             GeometryKind::Polygon => matches!(dissolve, Dissolve::None),

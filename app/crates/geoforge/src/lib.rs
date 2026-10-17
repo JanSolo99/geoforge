@@ -441,7 +441,7 @@ fn select(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     finish(tools::select(&fc, clause).map_err(err)?, out_name(p, format!("{}_Select", ds.name)))
 }
 
-/// Buffer: in the UTM zone of the input, so the distance is on the ground.
+/// Buffer: geodesic, as ArcGIS buffers geographic data; a UTM zone where that cannot be drawn.
 fn buffer(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     use geoforge_geometry::{LineEnd, LineSide};
     let ds0 = datasets(inp, p, &["input"])?;
@@ -462,6 +462,17 @@ fn buffer(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
         "LIST" => tools::Dissolve::List(list(p, "dissolve_fields")),
         _ => tools::Dissolve::None,
     };
+    // The layers are longitude/latitude, so the buffer is ArcGIS's geodesic one: the distance on the
+    // ellipsoid, vertex for vertex as ArcGIS places them. Where it would cross the antimeridian or
+    // reach a pole, the buffer falls back to the UTM zone of the data (a zone at a time for wide,
+    // undissolved layers).
+    let degrees = Work::degrees();
+    let (ds, fc) = layer_in(inp, p, "input", &degrees, false)?;
+    match tools::buffer(&fc, tools::BufferDistance::Geodesic(d), end, side, dissolve.clone()) {
+        Ok(out) => return finish_in(out, out_name(p, format!("{}_Buffer", ds.name)), &degrees),
+        Err(e) if e.to_string().contains("antimeridian") => {}
+        Err(e) => return Err(err(e)),
+    }
     // Features are buffered independently unless dissolved: data wider than one UTM zone is
     // buffered a zone at a time, each feature in the zone it lies in.
     if work.note.is_some() && matches!(dissolve, tools::Dissolve::None) {
@@ -1609,13 +1620,14 @@ mod tests {
     }
 
     #[test]
-    fn wide_layers_are_buffered_a_zone_at_a_time() {
+    fn wide_layers_are_buffered_geodesically_and_near_the_antimeridian_by_zone() {
         register();
         // Three continents: one UTM zone would put two of these far from its central meridian.
         let spots = [(151.2, -33.9), (18.9, 69.6), (-118.2, 34.0), (151.3, -33.8)];
         let layers = Layers(vec![points("p", &spots)]);
         let r = rustgis_analysis::run("geoforge:buffer", &layers, &json!({"input": "p", "distance": 1000})).unwrap();
-        assert!(r.messages.iter().any(|m| m.contains("UTM zone")), "{:?}", r.messages);
+        // Geodesic: exact on the ellipsoid wherever the layer is, whatever its width.
+        assert!(!r.messages.iter().any(|m| m.contains("UTM")), "{:?}", r.messages);
         let Output::Layer(d) = r.output else { panic!("layer") };
         assert_eq!(d.features.len(), 4);
         for (f, (lon, lat)) in d.features.iter().zip(spots) {
@@ -1833,6 +1845,15 @@ mod tests {
         assert_eq!(pts.features.len(), 24 * 24);
         let fields: Vec<&str> = pts.fields.iter().map(|f| f.name.as_str()).collect();
         assert_eq!(fields, ["pointid", "grid_code"]);
+    }
+
+    #[test]
+    fn a_buffer_over_the_antimeridian_falls_back_to_the_zone() {
+        register();
+        let layers = Layers(vec![points("p", &[(179.9999, 10.0)])]);
+        let r = rustgis_analysis::run("geoforge:buffer", &layers, &json!({"input": "p", "distance": 5000})).unwrap();
+        let Output::Layer(d) = r.output else { panic!("layer") };
+        assert_eq!(d.features.len(), 1);
     }
 
     fn bowtie(name: &str) -> Dataset {

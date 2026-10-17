@@ -66,7 +66,16 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       at the north pole and keep the south pole as interior point; CCW flag on hole arcs. Matches
       ArcGIS's vertices and arcs (`testdata/gdb-reference/buffers.gdb`); open: where ArcGIS starts
       a polygon ring (its seam can split an arc), one 2° stretch of a 60 m dissolve kept as vertices
-- [ ] Buffer: geodesic for geographic data
+- [x] Buffer: geodesic for geographic data (`BufferDistance::Geodesic`, `geoforge_geometry::buffer_geodesic`; `gf buffer
+      in out "1 Kilometers"` on a geographic system; a plain number or degrees stays planar in degrees, as in
+      ArcGIS). Points are the exact geodesic circle on WGS 84 (starts north, clockwise, 223 steps at 1 km) with
+      ArcGIS's distance-tiered chord deviation; lines and polygons are built from the planar pieces with every offset
+      found by the direct geodesic problem, their arcs on a global azimuth grid (10°/2^k, anchors at multiples of
+      10°, partial stretches by the planar rule for lines and by grid steps for polygons). Equal to ArcGIS's
+      vertex for vertex (points, lines to 5 km, flat/left/right, closed) or within 0.05 m of its boundary
+      (polygons, holes, negative, outside-only) on 25 cases (`testdata/arcgis-reference/geodesic_buffers.json`);
+      0.8 m at a sharp bend at 65 N; beyond 50 km ArcGIS's line arcs differ in a way matched only to their 100 m
+      deviation. Refused: buffers over the antimeridian or a pole (the app falls back to a UTM zone)
 - [x] Intersect (polygon/line/point inputs; overlapping features of one input split
       into regions output once per feature, as ArcGIS does), Erase, Union (planar
       overlay, ArcGIS row order), Dissolve (fields, statistics SUM/MEAN/MIN/MAX/RANGE/

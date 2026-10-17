@@ -28,6 +28,7 @@ chrono.workspace = true
 workspace = true
 
 [dev-dependencies]
+geographiclib-rs.workspace = true
 geoforge-testkit.workspace = true
 geoforge-raster.workspace = true
 serde_json.workspace = true

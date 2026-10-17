@@ -340,6 +340,7 @@ dependencies = [
  "geoforge-shapefile",
  "geoforge-testkit",
  "geoforge-tools",
+ "geographiclib-rs",
  "serde_json",
 ]
 
@@ -377,8 +378,10 @@ version = "0.0.1"
 dependencies = [
  "geo",
  "geoforge-core",
+ "geographiclib-rs",
  "i_overlay",
  "rstar",
+ "serde_json",
 ]
 
 [[package]]
