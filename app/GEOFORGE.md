@@ -35,7 +35,9 @@ original copyright notices and mark modified files.
 - Raster tools (`crates/geoforge/src/raster.rs`): Slope, Aspect, Hillshade, Curvature, Contour, Fill, Flow
   Direction/Accumulation/Length, Basin, Watershed, Stream Link/Order, Focal Statistics, Reclassify, Zonal
   Statistics, Resample, Euclidean Distance, Extract by Mask, Plus/Minus/Times/Divide, Int, Float, Is Null, Con,
-  Set Null, Raster To Point/Polygon. A raster is read from its GeoTIFF (file or embedded bytes) so the pixel type
+  Set Null, Raster To Point/Polygon, Point/Polyline/Polygon To Raster (cell size in degrees), Zonal Statistics as
+  Table. Vector extras (`extra.rs`): Add Geometry Attributes (lengths and areas on the ground), Check Geometry,
+  Repair Geometry, Split. A raster is read from its GeoTIFF (file or embedded bytes) so the pixel type
   and NoData are the file's; results are GeoTIFFs with ArcGIS's tiling and compression, returned as raster
   layers in the input's coordinate system. Vector results (contours, points, polygons) are projected to
   longitude/latitude. Absurd sizes (a contour interval giving over 100,000 levels, a cell size giving over 2^31

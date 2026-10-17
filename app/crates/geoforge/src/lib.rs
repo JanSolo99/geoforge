@@ -13,6 +13,7 @@
 //! projected data, in metres, and their results are projected back: see [`Work`].
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
 
+mod extra;
 mod raster;
 
 use geoforge_core as gf;
@@ -1485,6 +1486,7 @@ const DEFS: &[Def] = &[
 fn specs() -> Vec<ToolSpec> {
     DEFS.iter()
         .chain(raster::DEFS)
+        .chain(extra::DEFS)
         .map(|d| ToolSpec {
             // Ids are `geoforge:<id>`; leaked once, like the other suites' specs.
             id: Box::leak(format!("{PREFIX}{}", d.id).into_boxed_str()),
@@ -1499,7 +1501,7 @@ fn specs() -> Vec<ToolSpec> {
 
 fn run(spec: &ToolSpec, inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     let id = spec.id.strip_prefix(PREFIX).unwrap_or(spec.id);
-    let def = DEFS.iter().chain(raster::DEFS).find(|d| d.id == id).ok_or_else(|| format!("no tool '{}'", spec.id))?;
+    let def = DEFS.iter().chain(raster::DEFS).chain(extra::DEFS).find(|d| d.id == id).ok_or_else(|| format!("no tool '{}'", spec.id))?;
     (def.run)(inp, p)
 }
 
@@ -1831,6 +1833,103 @@ mod tests {
         assert_eq!(pts.features.len(), 24 * 24);
         let fields: Vec<&str> = pts.fields.iter().map(|f| f.name.as_str()).collect();
         assert_eq!(fields, ["pointid", "grid_code"]);
+    }
+
+    fn bowtie(name: &str) -> Dataset {
+        let mut d = Dataset::new(name, GeometryType::Polygon, vec![Field::new("K", FieldType::Text)]);
+        let ring = vec![
+            Coord::new(10.0, 50.0),
+            Coord::new(10.01, 50.01),
+            Coord::new(10.01, 50.0),
+            Coord::new(10.0, 50.01),
+            Coord::new(10.0, 50.0),
+        ];
+        d.push(Some(Geometry::Polygon(vec![vec![ring]])), vec![Value::Text("a".into())]);
+        d
+    }
+
+    #[test]
+    fn geometry_tools_check_repair_split_and_measure() {
+        register();
+        let layers = Layers(vec![bowtie("bow"), square("sq", 10.0, 50.0, 0.01), square("cut", 10.0, 50.0, 0.005)]);
+        // Check Geometry names the self-intersection; Repair Geometry (in place) rebuilds it.
+        let Output::Table(t) = rustgis_analysis::run("geoforge:check_geometry", &layers, &json!({"input": "bow"})).unwrap().output else {
+            panic!("table")
+        };
+        assert_eq!(t.fields.iter().map(|f| f.name.as_str()).collect::<Vec<_>>(), ["CLASS", "FEATURE_ID", "PROBLEM"]);
+        assert_eq!(t.features.len(), 1);
+        let Output::Update { layer, dataset } =
+            rustgis_analysis::run("geoforge:repair_geometry", &layers, &json!({"input": "bow"})).unwrap().output
+        else {
+            panic!("update")
+        };
+        assert_eq!((layer.as_str(), dataset.features.len()), ("bow", 1));
+        // Add Geometry Attributes: the area is on the ground (about 0.01 deg x 0.01 deg at 50 N), the centroid is a coordinate.
+        let Output::Update { dataset: g, .. } = rustgis_analysis::run(
+            "geoforge:add_geometry_attributes",
+            &layers,
+            &json!({"input": "sq", "properties": "AREA;CENTROID", "area_unit": "SQUARE_KILOMETERS"}),
+        )
+        .unwrap()
+        .output
+        else {
+            panic!("update")
+        };
+        let at = |n: &str| g.features[0].attrs[g.field_index(n).unwrap()].as_f64().unwrap();
+        let w = ground(Coord::new(10.0, 50.0), Coord::new(10.01, 50.0));
+        let h = ground(Coord::new(10.0, 50.0), Coord::new(10.0, 50.01));
+        assert!((at("POLY_AREA") - w * h / 1e6).abs() / (w * h / 1e6) < 0.01, "{} vs {}", at("POLY_AREA"), w * h / 1e6);
+        assert!((at("CENTROID_X") - 10.005).abs() < 1e-9 && (at("CENTROID_Y") - 50.005).abs() < 1e-9);
+        // Split: the square cut by the smaller one, named by the text field's value.
+        let Output::Layers(parts) =
+            rustgis_analysis::run("geoforge:split", &layers, &json!({"input": "sq", "other": "cut", "split_field": "NAME"}))
+                .unwrap()
+                .output
+        else {
+            panic!("layers")
+        };
+        assert_eq!(parts.len(), 1);
+        let rustgis_analysis::OutputLayer::Vector(d) = &parts[0] else { panic!("vector") };
+        assert_eq!(d.name, "sq_cut");
+        assert!((area(d) - 0.005 * 0.005).abs() < 1e-9);
+    }
+
+    #[test]
+    fn vector_to_raster_and_zonal_table() {
+        register();
+        let layers = Layers(vec![square("sq", 10.0, 50.0, 0.01)]);
+        let r = raster_of(rustgis_analysis::run("geoforge:polygon_to_raster", &layers, &json!({"input": "sq", "cell_size": 0.001})));
+        assert_eq!((r.width, r.height, r.epsg), (10, 10, Some(4326)));
+        assert!(r.bands[0].iter().all(|v| *v == 1.0));
+        // A cell size that would need more cells than a raster may have is refused.
+        let e = rustgis_analysis::run("geoforge:polygon_to_raster", &layers, &json!({"input": "sq", "cell_size": 1e-12})).unwrap_err();
+        assert!(e.contains("cells"), "{e}");
+        // Zonal Statistics as Table: two zones over the cone.
+        let (_, inp) = dem("DEM");
+        let zones_path = std::env::temp_dir().join(format!("gf-bridge-zones-{}.tif", std::process::id()));
+        let mut z = geoforge_raster::Raster::new(24, 24, geoforge_raster::DataType::I16, [500_000.0, 30.0, 0.0, 5_000_720.0, 0.0, -30.0]);
+        z.epsg = Some(32633);
+        for row in 0..24 {
+            for col in 0..24 {
+                z.bands[0][row * 24 + col] = if col < 12 { 1.0 } else { 2.0 };
+            }
+        }
+        geoforge_raster::write_geotiff(&zones_path, &z, geoforge_raster::Compression::None).unwrap();
+        let mut inp = inp;
+        inp.rasters.push(("Z".into(), rustgis_data::raster::read_path(&zones_path).unwrap(), zones_path.display().to_string()));
+        let Output::Table(t) = rustgis_analysis::run(
+            "geoforge:zonal_statistics_as_table",
+            &inp,
+            &json!({"zones": "Z", "input": "DEM", "statistics_type": "MEAN"}),
+        )
+        .unwrap()
+        .output
+        else {
+            panic!("table")
+        };
+        assert_eq!(t.features.len(), 2);
+        assert!(t.fields.iter().any(|f| f.name == "MEAN"));
+        std::fs::remove_file(&zones_path).ok();
     }
 
     #[test]

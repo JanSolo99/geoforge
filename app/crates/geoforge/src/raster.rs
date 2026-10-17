@@ -18,7 +18,7 @@ use rustgis_data::{Dataset, Field, FieldType, Geometry, GeometryType, Value};
 use rustgis_geom::Coord;
 use serde_json::Value as Json;
 
-use crate::{Def, OUTPUT, flag, number, out_name, text};
+use crate::{Def, INPUT, OUTPUT, flag, layer, number, out_name, table_dataset, text};
 
 const RASTER: P = P { name: "input", label: "Input Raster", kind: K::RasterLayer, required: true, default: "", help: "" };
 
@@ -467,6 +467,139 @@ fn raster_to_polygon(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     }
     let m = vec![format!("{}: {} polygons", out.name, out.features.len())];
     Ok(ToolResult { output: Output::Layer(out), messages: m })
+}
+
+// ---------------------------------------------------------------------------------------------
+// vector to raster, zonal table
+
+type Rasterized = (Vec<(geoforge_core::Geometry, f64)>, gfr::rasterize::ValueKind);
+
+/// The features of a layer with a numeric value field (the feature id when no field is named), as
+/// `(geometry, value)` pairs in longitude/latitude, and the field's value kind.
+fn rasterize_input(inp: &dyn Inputs, p: &Json) -> Result<Rasterized, String> {
+    use gfr::rasterize::ValueKind;
+    let (ds, fc) = layer(inp, p, "input")?;
+    let field = text(p, "value_field");
+    let by_id = field.is_empty() || field.eq_ignore_ascii_case("OBJECTID") || field.eq_ignore_ascii_case("FID");
+    let index = ds.field_index(field);
+    let kind = if by_id {
+        ValueKind::Integer
+    } else {
+        match index.map(|i| ds.fields[i].ty) {
+            Some(FieldType::Integer) => ValueKind::Integer,
+            Some(FieldType::Double) => ValueKind::Double,
+            _ => return Err(format!("field '{field}' is missing or not numeric")),
+        }
+    };
+    let mut out = Vec::new();
+    for f in &fc.features {
+        let value = if by_id {
+            Some(f.oid as f64)
+        } else {
+            match f.attributes.get(index.unwrap_or(0)) {
+                Some(geoforge_core::Value::BigInteger(v)) => Some(*v as f64),
+                Some(geoforge_core::Value::Double(v)) => Some(*v),
+                _ => None,
+            }
+        };
+        if let (Some(g), Some(v)) = (&f.geometry, value) {
+            out.push((g.clone(), v));
+        }
+    }
+    if out.is_empty() {
+        return Err("no features with a value to rasterize".into());
+    }
+    Ok((out, kind))
+}
+
+/// The cell size, refused when the features would need more cells than a raster may have.
+fn cell_size(p: &Json, features: &[(geoforge_core::Geometry, f64)]) -> Result<f64, String> {
+    let cell = number(p, "cell_size").filter(|c| *c > 0.0).ok_or("'Cell size' must be a positive number (in degrees)")?;
+    let mut e = geoforge_core::Envelope::EMPTY;
+    for (g, _) in features {
+        let b = g.envelope();
+        e.expand_xy(b.xmin, b.ymin);
+        e.expand_xy(b.xmax, b.ymax);
+    }
+    let cells = ((e.xmax - e.xmin) / cell + 1.0) * ((e.ymax - e.ymin) / cell + 1.0);
+    if !cells.is_finite() || cells > gfr::MAX_CELLS as f64 {
+        return Err(format!("a cell size of {cell} would need {cells:e} cells"));
+    }
+    Ok(cell)
+}
+
+fn finish_rasterized(p: &Json, r: Option<gfr::Raster>, default: String) -> Result<ToolResult, String> {
+    let mut r = r.ok_or("no features to rasterize")?;
+    r.epsg = Some(4326);
+    one(p, default, r)
+}
+
+fn polygon_to_raster(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    use gfr::rasterize::*;
+    let (features, kind) = rasterize_input(inp, p)?;
+    let cell = cell_size(p, &features)?;
+    let assignment = match choice(p, "cell_assignment", "CELL_CENTER").as_str() {
+        "CELL_CENTER" => PolygonAssignment::CellCenter,
+        "MAXIMUM_AREA" => PolygonAssignment::MaximumArea,
+        "MAXIMUM_COMBINED_AREA" => PolygonAssignment::MaximumCombinedArea,
+        other => return Err(format!("cell assignment {other}")),
+    };
+    finish_rasterized(p, polygons_to_raster(&features, cell, assignment, kind), format!("{}_Raster", text(p, "input")))
+}
+
+fn polyline_to_raster(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    use gfr::rasterize::*;
+    let (features, kind) = rasterize_input(inp, p)?;
+    let cell = cell_size(p, &features)?;
+    let assignment = match choice(p, "cell_assignment", "MAXIMUM_LENGTH").as_str() {
+        "MAXIMUM_LENGTH" => LineAssignment::MaximumLength,
+        "MAXIMUM_COMBINED_LENGTH" => LineAssignment::MaximumCombinedLength,
+        other => return Err(format!("cell assignment {other}")),
+    };
+    finish_rasterized(p, polyline_to_raster_fn(&features, cell, assignment, kind), format!("{}_Raster", text(p, "input")))
+}
+
+fn polyline_to_raster_fn(
+    features: &[(geoforge_core::Geometry, f64)],
+    cell: f64,
+    assignment: gfr::rasterize::LineAssignment,
+    kind: gfr::rasterize::ValueKind,
+) -> Option<gfr::Raster> {
+    gfr::rasterize::polyline_to_raster(features, cell, assignment, kind)
+}
+
+fn point_to_raster(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    use gfr::rasterize::*;
+    let (features, kind) = rasterize_input(inp, p)?;
+    let cell = cell_size(p, &features)?;
+    let assignment = match choice(p, "cell_assignment", "MOST_FREQUENT").as_str() {
+        "MOST_FREQUENT" => PointAssignment::MostFrequent,
+        "SUM" => PointAssignment::Sum,
+        "MEAN" => PointAssignment::Mean,
+        "MAXIMUM" => PointAssignment::Maximum,
+        "MINIMUM" => PointAssignment::Minimum,
+        "COUNT" => PointAssignment::Count,
+        "RANGE" => PointAssignment::Range,
+        "STANDARD_DEVIATION" => PointAssignment::StandardDeviation,
+        other => return Err(format!("cell assignment {other}")),
+    };
+    finish_rasterized(p, points_to_raster(&features, cell, assignment, kind), format!("{}_Raster", text(p, "input")))
+}
+
+fn zonal_statistics_as_table(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let (zones, _) = input(inp, p, "zones")?;
+    let (values, _) = input(inp, p, "input")?;
+    let stats = gfr::zonal::table_statistics(&choice(p, "statistics_type", "ALL"))
+        .ok_or_else(|| format!("statistic {}", text(p, "statistics_type")))?;
+    let (zones, values) = gfr::resample::zones_on_value_grid(&zones, &values).ok_or("zone and value rasters do not overlap")?;
+    let (fields, rows) = gfr::zonal::zonal_table(&zones, &values, &stats, data_flag(p, "ignore_nodata")?);
+    let t = table_dataset(rustgis_tools_table(fields, rows), out_name(p, format!("{}_ZonalTable", text(p, "zones"))));
+    let m = vec![format!("{}: {} zones", t.name, t.features.len())];
+    Ok(ToolResult { output: Output::Table(t), messages: m })
+}
+
+fn rustgis_tools_table(fields: Vec<geoforge_core::Field>, rows: Vec<Vec<geoforge_core::Value>>) -> geoforge_tools::TableOutput {
+    geoforge_tools::TableOutput { fields, rows }
 }
 
 pub(crate) const DEFS: &[Def] = &[
@@ -930,5 +1063,117 @@ pub(crate) const DEFS: &[Def] = &[
         summary: "Polygons of connected cells of the same integer value (ArcGIS Pro Raster To Polygon, NO_SIMPLIFY).",
         params: &[RASTER, OUTPUT],
         run: raster_to_polygon,
+    },
+    Def {
+        id: "polygon_to_raster",
+        name: "Polygon To Raster",
+        toolbox: "GeoForge › Conversion › To Raster",
+        summary: "Polygons to cells carrying a field's value; the cell size is in degrees (ArcGIS Pro Polygon To Raster).",
+        params: &[
+            INPUT,
+            P {
+                name: "value_field",
+                label: "Value field",
+                kind: K::Field,
+                required: false,
+                default: "",
+                help: "A numeric field; empty = the feature id.",
+            },
+            P {
+                name: "cell_assignment",
+                label: "Cell assignment type",
+                kind: K::Choice(&["CELL_CENTER", "MAXIMUM_AREA", "MAXIMUM_COMBINED_AREA"]),
+                required: false,
+                default: "\"CELL_CENTER\"",
+                help: "",
+            },
+            P { name: "cell_size", label: "Cell size", kind: K::Number, required: true, default: "", help: "In degrees." },
+            OUTPUT,
+        ],
+        run: polygon_to_raster,
+    },
+    Def {
+        id: "polyline_to_raster",
+        name: "Polyline To Raster",
+        toolbox: "GeoForge › Conversion › To Raster",
+        summary: "Lines to cells carrying a field's value; the cell size is in degrees (ArcGIS Pro Polyline To Raster).",
+        params: &[
+            INPUT,
+            P {
+                name: "value_field",
+                label: "Value field",
+                kind: K::Field,
+                required: false,
+                default: "",
+                help: "A numeric field; empty = the feature id.",
+            },
+            P {
+                name: "cell_assignment",
+                label: "Cell assignment type",
+                kind: K::Choice(&["MAXIMUM_LENGTH", "MAXIMUM_COMBINED_LENGTH"]),
+                required: false,
+                default: "\"MAXIMUM_LENGTH\"",
+                help: "",
+            },
+            P { name: "cell_size", label: "Cell size", kind: K::Number, required: true, default: "", help: "In degrees." },
+            OUTPUT,
+        ],
+        run: polyline_to_raster,
+    },
+    Def {
+        id: "point_to_raster",
+        name: "Point To Raster",
+        toolbox: "GeoForge › Conversion › To Raster",
+        summary: "Points to cells carrying a field's value; the cell size is in degrees (ArcGIS Pro Point To Raster).",
+        params: &[
+            INPUT,
+            P {
+                name: "value_field",
+                label: "Value field",
+                kind: K::Field,
+                required: false,
+                default: "",
+                help: "A numeric field; empty = the feature id.",
+            },
+            P {
+                name: "cell_assignment",
+                label: "Cell assignment type",
+                kind: K::Choice(&["MOST_FREQUENT", "SUM", "MEAN", "MAXIMUM", "MINIMUM", "COUNT", "RANGE", "STANDARD_DEVIATION"]),
+                required: false,
+                default: "\"MOST_FREQUENT\"",
+                help: "",
+            },
+            P { name: "cell_size", label: "Cell size", kind: K::Number, required: true, default: "", help: "In degrees." },
+            OUTPUT,
+        ],
+        run: point_to_raster,
+    },
+    Def {
+        id: "zonal_statistics_as_table",
+        name: "Zonal Statistics as Table",
+        toolbox: "GeoForge › Spatial Analyst › Zonal",
+        summary: "A table of statistics of the values in each zone (ArcGIS Pro Zonal Statistics as Table).",
+        params: &[
+            P { name: "zones", label: "Zone raster", kind: K::RasterLayer, required: true, default: "", help: "" },
+            P { name: "input", label: "Value raster", kind: K::RasterLayer, required: true, default: "", help: "" },
+            P {
+                name: "statistics_type",
+                label: "Statistics type",
+                kind: K::Text,
+                required: false,
+                default: "\"ALL\"",
+                help: "ALL, MEAN, MEDIAN, MIN_MAX_MEAN, ... as ArcGIS names them.",
+            },
+            P {
+                name: "ignore_nodata",
+                label: "Ignore NoData",
+                kind: K::Choice(&["DATA", "NODATA"]),
+                required: false,
+                default: "\"DATA\"",
+                help: "",
+            },
+            OUTPUT,
+        ],
+        run: zonal_statistics_as_table,
     },
 ];
