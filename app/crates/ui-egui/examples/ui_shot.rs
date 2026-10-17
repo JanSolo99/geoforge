@@ -3,7 +3,7 @@
 //! `cargo run -p rustgis-ui-egui --example ui_shot -- script.jsonl`
 //!
 //! The script is JSON lines: `{"cmd": id, "params": {...}}` runs a command (ui.* included),
-//! `{"shot": "/abs/out.png"}` saves the window, `{"steps": n}` runs frames, `{"sleep": ms}` runs frames for that long, `{"click": label}` clicks the first widget whose label contains it (is it, with `"exact": true`), `{"dark": true}`
+//! `{"shot": "/abs/out.png"}` saves the window, `{"steps": n}` runs frames, `{"sleep": ms}` runs frames for that long, `{"click": label}` clicks the first widget whose label contains it (is it, with `"exact": true`), `{"search": text}` fills the Tools pane's search, `{"dark": true}`
 //! switches theme, and `{"width": w, "height": h}` on the first line sets the size (default
 //! 1480×900 at 2×). The window opens the World Atlas sample.
 
@@ -81,6 +81,12 @@ fn main() {
                 Some(node) => node.click(),
                 None => eprintln!("nothing labelled '{label}'"),
             }
+            for _ in 0..3 {
+                harness.step();
+            }
+        } else if let Some(q) = l.get("search").and_then(|v| v.as_str()) {
+            // The Tools pane's search box.
+            harness.state_mut().gp.search = q.to_string();
             for _ in 0..3 {
                 harness.step();
             }

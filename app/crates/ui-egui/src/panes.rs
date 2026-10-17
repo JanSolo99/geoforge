@@ -1328,6 +1328,49 @@ fn geoprocessing(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
                 }
             }
         };
+        // GeoForge's ArcGIS-verified tools, by ArcGIS toolbox ("GeoForge › Spatial Analyst › Surface"):
+        // first, as they are the ones that behave like ArcGIS Pro.
+        let geoforge: Vec<&'static rustgis_engine::analysis::ToolSpec> =
+            rustgis_engine::analysis::external_tools_of("geoforge").iter().filter(|x| matches(x)).collect();
+        if !geoforge.is_empty() {
+            ui.label(egui::RichText::new(tl!("GeoForge · ArcGIS Pro tools")).size(11.0).color(t.text_dim));
+            let level = |tool: &rustgis_engine::analysis::ToolSpec, i: usize| tool.toolbox.split(" › ").nth(i);
+            if q.is_empty() {
+                let mut tops: Vec<&str> = geoforge.iter().filter_map(|x| level(x, 1)).collect();
+                tops.sort();
+                tops.dedup();
+                for top in tops {
+                    let in_top: Vec<_> = geoforge.iter().copied().filter(|x| level(x, 1) == Some(top)).collect();
+                    egui::CollapsingHeader::new(format!("{} ({})", crate::i18n::location(top), in_top.len()))
+                        .id_salt(("gf-box", top))
+                        .default_open(false)
+                        .show(ui, |ui| {
+                            let mut subs: Vec<&str> = in_top.iter().filter_map(|x| level(x, 2)).collect();
+                            subs.sort();
+                            subs.dedup();
+                            for sub in subs {
+                                let in_sub: Vec<_> = in_top.iter().copied().filter(|x| level(x, 2) == Some(sub)).collect();
+                                egui::CollapsingHeader::new(format!("{} ({})", crate::i18n::location(sub), in_sub.len()))
+                                    .id_salt(("gf-box", top, sub))
+                                    .default_open(false)
+                                    .show(ui, |ui| {
+                                        for tool in in_sub {
+                                            row(app, ui, tool);
+                                        }
+                                    });
+                            }
+                            for tool in in_top.iter().copied().filter(|x| level(x, 2).is_none()) {
+                                row(app, ui, tool);
+                            }
+                        });
+                }
+            } else {
+                for tool in &geoforge {
+                    row(app, ui, tool);
+                }
+            }
+            ui.add_space(6.0);
+        }
         // Plugin tools, by toolbox ("Plugins › Vector Toolkit"): first when browsing (a user
         // who just installed a plugin looks for it), with the matches when searching.
         let plugin_tools: Vec<&'static rustgis_engine::analysis::ToolSpec> =

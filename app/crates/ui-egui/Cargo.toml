@@ -27,6 +27,10 @@ image = { workspace = true, features = ["jpeg"] }
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 rfd = { workspace = true }
 
+[features]
+# GeoForge's ArcGIS-verified tools in the Tools pane (the app enables this through the engine).
+geoforge = ["rustgis-engine/geoforge"]
+
 [dev-dependencies]
 rustgis-plugins = { workspace = true, features = ["testing"] }
 egui_kittest = { workspace = true, features = ["wgpu", "snapshot"] }
