@@ -17,7 +17,7 @@ pub fn commands() -> Vec<C> {
         C::new("share.exportLayer", "Export Features", "Publish › Output", export_layer)
             .view()
             .when(need_layer)
-            .params(r#"{"layer"?, "path": "*.geojson|*.csv|*.fgb|*.gpkg|*.parquet|*.shp|*.zip|*.kml|*.kmz|*.gpx"}"#),
+            .params(r#"{"layer"?, "path": "*.geojson|*.csv|*.fgb|*.gpkg|*.gdb|*.gdb/name|*.parquet|*.shp|*.zip|*.kml|*.kmz|*.gpx"}"#),
         C::new("share.exportTable", "Export Table", "Publish › Output", |s, p| {
             let path = ps(p, "path").ok_or("path is required")?;
             let t = s.project.tables.get(s.table_index(p)?).ok_or("no such table")?;
@@ -25,7 +25,7 @@ pub fn commands() -> Vec<C> {
             Ok(json!({"path": path}))
         })
         .params(
-            r#"{"table": name|id (a standalone table), "path": "*.geojson|*.csv|*.fgb|*.gpkg|*.parquet|*.shp|*.zip|*.kml|*.kmz|*.gpx"}"#,
+            r#"{"table": name|id (a standalone table), "path": "*.geojson|*.csv|*.fgb|*.gpkg|*.gdb|*.gdb/name|*.parquet|*.shp|*.zip|*.kml|*.kmz|*.gpx"}"#,
         )
         .view(),
     ]

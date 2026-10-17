@@ -422,6 +422,23 @@ fn add_data(s: &mut Session, p: &Value) -> CmdResult {
     if rustgis_data::source::is_source_name(path) {
         return add_source(s, p, Origin::Path(path));
     }
+    // A File Geodatabase folder adds its feature classes; `Dir.gdb/name` adds that one.
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        let as_path = Path::new(path);
+        let is_gdb = |q: &Path| q.extension().is_some_and(|e| e.eq_ignore_ascii_case("gdb")) && q.join("a00000001.gdbtable").is_file();
+        if is_gdb(as_path) {
+            return add_source(s, p, Origin::Path(path));
+        }
+        if let (Some(parent), Some(class)) = (as_path.parent(), as_path.file_name().and_then(|n| n.to_str()))
+            && is_gdb(parent)
+            && let Some(dir) = parent.to_str()
+        {
+            let mut q = p.clone();
+            q["layer"] = json!(class);
+            return add_source(s, &q, Origin::Path(dir));
+        }
+    }
     // A large GeoJSON FeatureCollection (any, with `"stream": true`) is read in place, streamed
     // when it holds many features; another GeoJSON document, or one that can't be read so, is
     // read whole below.
@@ -835,7 +852,7 @@ fn add_source_with(
     let mut total = None;
     let tables: Vec<Option<String>> = match (ps(p, "layer").map(str::trim).filter(|t| !t.is_empty()), &origin) {
         (Some(t), _) => vec![Some(t.to_string())],
-        (None, Origin::Path(path)) if path.to_ascii_lowercase().ends_with(".gpkg") => {
+        (None, Origin::Path(path)) if path.to_ascii_lowercase().ends_with(".gpkg") || path.to_ascii_lowercase().ends_with(".gdb") => {
             let mut all = source::layers(Path::new(path)).map_err(err)?;
             if all.len() > MAX_TABLES {
                 total = Some(all.len());

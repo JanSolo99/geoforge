@@ -23,4 +23,10 @@ original copyright notices and mark modified files.
   gets a message that distances are approximate. Layers do not yet remember a native CRS. `geoforge-tools`
   has a default `proj` feature (Project); the app turns it off because proj-sys's `libsqlite3-sys`
   conflicts with the app's rusqlite.
+- Output: `source::filegdb::write` / `io::write_path` write a layer as a feature class in a `.gdb` (`x.gdb`
+  names it after the layer, `x.gdb/name` chooses the name; an existing class of that name is replaced; a
+  folder that is not a geodatabase is refused). Field/table names are made valid, integers wider than 32
+  bits become doubles, booleans small integers. `layer.addData` adds a `.gdb` (all its feature classes) or
+  `x.gdb/name`; `share.exportLayer` takes `*.gdb`. ArcGIS Pro opens the output (Describe, cursor, Check
+  Geometry).
 - Next: more tools in the registry, then Python/MCP bindings.

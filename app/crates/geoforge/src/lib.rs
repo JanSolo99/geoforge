@@ -17,7 +17,7 @@ use geoforge_core as gf;
 use geoforge_tools as tools;
 use rustgis_analysis::{Inputs, Output, ParamKind as K, ParamSpec as P, ToolResult, ToolSpec};
 use rustgis_data::raster::{Crs, Transformer};
-use rustgis_data::source::filegdb::from_geoforge;
+use rustgis_data::source::filegdb::{from_geoforge, to_geoforge as to_gf_geometry};
 use rustgis_data::{Dataset, Field, FieldType, Geometry, GeometryType, Value};
 use rustgis_geom::Coord;
 use serde_json::Value as Json;
@@ -175,51 +175,6 @@ fn to_gf_value(v: &Value, ty: FieldType) -> gf::Value {
         (Value::Text(s), _) => gf::Value::String(s.clone()),
         (Value::Bool(b), _) => gf::Value::SmallInteger(i16::from(*b)),
     }
-}
-
-/// A ring with Esri's orientation (outer clockwise, hole counter-clockwise), closed.
-fn oriented(ring: &[Coord], outer: bool) -> Vec<[f64; 2]> {
-    let mut pts: Vec<[f64; 2]> = ring.iter().map(|c| [c.x, c.y]).collect();
-    if pts.first() != pts.last()
-        && let Some(&first) = pts.first()
-    {
-        pts.push(first);
-    }
-    let area: f64 = pts.windows(2).map(|w| w[0][0] * w[1][1] - w[1][0] * w[0][1]).sum();
-    // Positive area is counter-clockwise.
-    if (area > 0.0) == outer {
-        pts.reverse();
-    }
-    pts
-}
-
-fn to_gf_geometry(g: &Geometry) -> Option<gf::Geometry> {
-    let mut out = gf::Geometry::point(0.0, 0.0);
-    out.xy.clear();
-    match g {
-        Geometry::Point(c) => return Some(gf::Geometry::point(c.x, c.y)),
-        Geometry::MultiPoint(v) => {
-            out.kind = gf::GeometryKind::Multipoint;
-            out.xy = v.iter().map(|c| [c.x, c.y]).collect();
-        }
-        Geometry::Line(parts) => {
-            out.kind = gf::GeometryKind::Polyline;
-            for p in parts.iter().filter(|p| p.len() >= 2) {
-                out.parts.push(out.xy.len() as u32);
-                out.xy.extend(p.iter().map(|c| [c.x, c.y]));
-            }
-        }
-        Geometry::Polygon(polys) => {
-            out.kind = gf::GeometryKind::Polygon;
-            for poly in polys {
-                for (i, ring) in poly.iter().enumerate().filter(|(_, r)| r.len() >= 3) {
-                    out.parts.push(out.xy.len() as u32);
-                    out.xy.extend(oriented(ring, i == 0));
-                }
-            }
-        }
-    }
-    (!out.xy.is_empty()).then_some(out)
 }
 
 fn kind_of(t: GeometryType) -> Option<gf::GeometryKind> {

@@ -4030,7 +4030,7 @@ fn layers_export_to_geopackage_geoparquet_shapefile_and_kmz() {
     std::fs::create_dir_all(&dir).unwrap();
     let mut s = world();
     let want = s.map().layers.iter().find(|l| l.name == "Countries").unwrap().dataset.features.len();
-    for ext in ["gpkg", "parquet", "shp", "kmz", "zip"] {
+    for ext in ["gpkg", "gdb", "parquet", "shp", "kmz", "zip"] {
         let path = dir.join(format!("countries.{ext}")).display().to_string();
         let r = s.run("share.exportLayer", &json!({"layer": "Countries", "path": path})).unwrap();
         assert_eq!((r["features"].as_u64(), r["leftOut"].as_u64()), (Some(want as u64), Some(0)), "{ext}");

@@ -283,6 +283,8 @@ pub fn layers(path: &Path) -> Result<Vec<String>> {
     match ext(path).as_str() {
         #[cfg(not(target_arch = "wasm32"))]
         "gpkg" => gpkg::layers(path),
+        #[cfg(not(target_arch = "wasm32"))]
+        "gdb" => filegdb::layers(path),
         _ => Ok(vec![open_path(path, None)?.info().name.clone()]),
     }
 }

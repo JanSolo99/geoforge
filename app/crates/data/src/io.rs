@@ -329,6 +329,15 @@ pub fn write_bytes(ds: &Dataset, ext: &str) -> Result<(Vec<u8>, usize)> {
 /// Shapefile is written as its `.shp`, `.shx`, `.dbf`, `.prj` and `.cpg` files (or zipped, to a
 /// `.zip`).
 pub fn write_path(ds: &Dataset, path: &Path) -> Result<usize> {
+    // `Dir.gdb/name`: a class of that name in the geodatabase.
+    #[cfg(not(target_arch = "wasm32"))]
+    if let Some(parent) = path.parent()
+        && parent.extension().is_some_and(|e| e.eq_ignore_ascii_case("gdb"))
+        && let Some(name) = path.file_name().and_then(|n| n.to_str())
+    {
+        crate::source::filegdb::write(ds, parent, Some(name))?;
+        return Ok(0);
+    }
     let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("").to_ascii_lowercase();
     match ext.as_str() {
         "gpkg" => {
@@ -339,6 +348,16 @@ pub fn write_path(ds: &Dataset, path: &Path) -> Result<usize> {
             }
             #[cfg(target_arch = "wasm32")]
             Err(DataError::Unsupported("GeoPackage in the browser".into()))
+        }
+        // A File Geodatabase folder: the layer becomes a feature class in it, named after the layer.
+        "gdb" => {
+            #[cfg(not(target_arch = "wasm32"))]
+            {
+                crate::source::filegdb::write(ds, path, None)?;
+                Ok(0)
+            }
+            #[cfg(target_arch = "wasm32")]
+            Err(DataError::Unsupported("File Geodatabase in the browser".into()))
         }
         "shp" => {
             let (parts, left_out) = shapefile_parts(ds)?;
