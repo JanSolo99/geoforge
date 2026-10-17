@@ -244,7 +244,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
       operation (`testdata/gdb-reference/catalog_ops`, `scripts/gdb-snapshot.py`); ArcGIS reads, edits and
       compacts the results. A table's deletion takes its relationship classes with it; a domain fields use is
       refused (ERROR 002630)
-- [ ] Delete and Rename of subtypes
+- [x] Remove subtypes (`remove_subtype`; ArcGIS has no rename operation)
 - [ ] ArcGIS's `timestamps`, `.freelist` (space reuse) and `.horizon` files; 64-bit OBJECTID (v4) tables
 - [ ] Write: per-vertex missing M values mixed with present ones (encoding unknown)
 - [x] Write: attribute indexes on new tables (`TableBuilder::add_attribute_index`; all indexable field
@@ -417,9 +417,16 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         about 12% on an integer DEM's large flats
 
 ## Phase 6 — Toolbox framework
-- [ ] Tool trait: typed parameters, validation, progress, cancellation, geoprocessing history
-- [ ] Port tools by toolbox (Analysis → Data Management → Spatial Analyst → …)
-- [ ] Python bindings via PyO3 (`geoforge` module, arcpy-like API)
+- [~] Tool registry: the app's `ToolSpec` registry (`app/crates/geoforge`) holds ~65 ArcGIS-verified tools with typed
+      parameters (layer, field, number, choice, text, bool), required/default checking, a hostile-parameter test over
+      every tool, and geoprocessing history/undo from the RustGIS engine. Not yet: progress and cancellation for long
+      runs, environments (cell size, extent, mask, snap) as first-class settings
+- [~] Port tools by toolbox: Analysis (Clip, Erase, Intersect, Union, Identity, Update, Symmetrical Difference, Buffer, Near,
+      Spatial Join, Select, Split, Frequency, Statistics), Data Management (fields, features, geodatabase schema tools via
+      `gf`), Spatial Analyst (surface, hydrology, focal, local, zonal, reclass, distance, extraction) done; the rest of the
+      2,157-tool inventory is not
+- [~] Python bindings: the app's PyO3 package and MCP server dispatch through the same registry (`gp.run` with
+      `geoforge:<tool>`); an arcpy-shaped `geoforge` module (`geoforge.analysis.Buffer(...)`) is not written
 
 ## Phase 7 — Databases & other formats
 - [x] Features To JSON: Esri JSON and GeoJSON written byte for byte as ArcGIS writes them
