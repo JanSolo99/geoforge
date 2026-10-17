@@ -252,7 +252,13 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
       classes (`add_relationship_class`: one to one / one to many, composite, notification, labels, keys; items,
       links and Describe equal ArcGIS's; GDAL lists them). ArcGIS reads all of it. The reader now resolves subtype
       defaults against the table's real field types (ArcGIS lists only some fields in the definition)
-- [ ] Write: attributed and many-to-many relationship classes (they have a table); Delete/Rename of subtypes
+- [x] Write: attributed and many-to-many relationship classes (own table `<key>, <key>, RID`, keys indexed
+      `GDB_<DSID>_<field>`; reader-level equal to ArcGIS's; ArcGIS describes and deletes them). Needs the four
+      keys (ArcGIS derives names when the destination keys are left out: not reproduced)
+- [x] Edit subtypes, field domains and defaults of existing tables (`set_subtype_field`, `add_subtype`,
+      `remove_subtype`, `set_default_subtype`, `assign/remove_domain_from_field`, `assign_default_to_field`;
+      `gf set-subtype-field` ... `gf assign-default-to-field`): definition XML, domain links and the table's own
+      defaults equal ArcGIS's after 12 operations (`testdata/gdb-reference/subtype_ops`); ArcGIS applies them
 - [x] Written geodatabases open in ArcGIS Pro 3.7: Describe, counts, domains, Check Geometry
       (no problems beyond those already in the source data), Copy Features out of them
 - [ ] Projected coordinate systems: use ArcGIS's projection-derived XY domain origin (needs Phase 4)

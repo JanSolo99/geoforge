@@ -21,7 +21,16 @@ def table(gdb, name):
 gdb = sys.argv[1]
 items = table(gdb, "GDB_Items")
 names = {i["UUID"]: (i["Path"] or i["Name"] or "root") for i in items}
+def defaults(gdb):
+    out = subprocess.run(["ogrinfo", "-json", "-so", "-al", gdb, "-oo", "LIST_ALL_TABLES=YES"], capture_output=True, text=True).stdout
+    try:
+        layers = json.loads(out)["layers"]
+    except (ValueError, KeyError):
+        return {}
+    return {l["name"]: [[f["name"], f.get("defaultValue")] for f in l.get("fields", [])] for l in layers if not l["name"].startswith("GDB_")}
+
 snap = {
+    "defaults": defaults(gdb),
     "items": sorted(
         ({"name": i["Name"], "physical": i["PhysicalName"], "path": i["Path"], "type": i["Type"][1:9],
           "definition": re.sub(r"\s+", "", i["Definition"] or "")} for i in items),

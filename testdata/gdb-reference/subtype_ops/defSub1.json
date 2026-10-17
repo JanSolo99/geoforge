@@ -1,0 +1,68 @@
+{
+ "defaults": {
+  "base": [
+   [
+    "kind",
+    "1"
+   ],
+   [
+    "name",
+    "'x'"
+   ],
+   [
+    "lanes",
+    null
+   ],
+   [
+    "grade",
+    "1.5"
+   ]
+  ]
+ },
+ "items": [
+  {
+   "name": "Workspace",
+   "physical": "WORKSPACE",
+   "path": "",
+   "type": "C673FE0F",
+   "definition": "<DEWorkspacexsi:type='typens:DEWorkspace'xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'xmlns:xs='http://www.w3.org/2001/XMLSchema'xmlns:typens='http://www.esri.com/schemas/ArcGIS/10.8'><CatalogPath>\\</CatalogPath><Name></Name><ChildrenExpanded>false</ChildrenExpanded><WorkspaceType>esriLocalDatabaseWorkspace</WorkspaceType><WorkspaceFactoryProgID></WorkspaceFactoryProgID><ConnectionString></ConnectionString><ConnectionInfoxsi:nil='true'/><Domainsxsi:type='typens:ArrayOfDomain'></Domains><MajorVersion>3</MajorVersion><MinorVersion>0</MinorVersion><BugfixVersion>0</BugfixVersion><Realm></Realm><MaxAttributeRuleID>0</MaxAttributeRuleID></DEWorkspace>"
+  },
+  {
+   "name": "lanes_dom",
+   "physical": "LANES_DOM",
+   "path": "",
+   "type": "C29DA988",
+   "definition": "<GPRangeDomain2xsi:type='typens:GPRangeDomain2'xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'xmlns:xs='http://www.w3.org/2001/XMLSchema'xmlns:typens='http://www.esri.com/schemas/ArcGIS/10.8'><DomainName>lanes_dom</DomainName><FieldType>esriFieldTypeInteger</FieldType><MergePolicy>esriMPTDefaultValue</MergePolicy><SplitPolicy>esriSPTDefaultValue</SplitPolicy><Description>lanes</Description><Owner></Owner><MaxValuexsi:type='xs:int'>8</MaxValue><MinValuexsi:type='xs:int'>1</MinValue></GPRangeDomain2>"
+  },
+  {
+   "name": "names",
+   "physical": "NAMES",
+   "path": "",
+   "type": "8C368B12",
+   "definition": "<GPCodedValueDomain2xsi:type='typens:GPCodedValueDomain2'xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'xmlns:xs='http://www.w3.org/2001/XMLSchema'xmlns:typens='http://www.esri.com/schemas/ArcGIS/10.8'><DomainName>names</DomainName><FieldType>esriFieldTypeString</FieldType><MergePolicy>esriMPTDefaultValue</MergePolicy><SplitPolicy>esriSPTDefaultValue</SplitPolicy><Description>names</Description><Owner></Owner><CodedValuesxsi:type='typens:ArrayOfCodedValue'><CodedValuexsi:type='typens:CodedValue'><Name>A</Name><Codexsi:type='xs:string'>a</Code></CodedValue></CodedValues></GPCodedValueDomain2>"
+  },
+  {
+   "name": "",
+   "physical": "",
+   "path": "\\",
+   "type": "F3783E6F",
+   "definition": ""
+  },
+  {
+   "name": "base",
+   "physical": "BASE",
+   "path": "\\base",
+   "type": "CD06BC3B",
+   "definition": "<DETableInfoxsi:type='typens:DETableInfo'xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'xmlns:xs='http://www.w3.org/2001/XMLSchema'xmlns:typens='http://www.esri.com/schemas/ArcGIS/10.8'><CatalogPath>\\base</CatalogPath><Name>base</Name><ChildrenExpanded>false</ChildrenExpanded><DatasetType>esriDTTable</DatasetType><DSID>3</DSID><Versioned>false</Versioned><CanVersion>false</CanVersion><ConfigurationKeyword></ConfigurationKeyword><RequiredGeodatabaseClientVersion>10.0</RequiredGeodatabaseClientVersion><HasOID>true</HasOID><OIDFieldName>OBJECTID</OIDFieldName><GPFieldInfoExsxsi:type='typens:ArrayOfGPFieldInfoEx'><GPFieldInfoExxsi:type='typens:GPFieldInfoEx'><Name>OBJECTID</Name><FieldType>esriFieldTypeOID</FieldType><IsNullable>false</IsNullable><Required>true</Required><Editable>false</Editable></GPFieldInfoEx><GPFieldInfoExxsi:type='typens:GPFieldInfoEx'><Name>kind</Name><FieldType>esriFieldTypeSmallInteger</FieldType><DefaultValueNumeric>1</DefaultValueNumeric><IsNullable>true</IsNullable></GPFieldInfoEx><GPFieldInfoExxsi:type='typens:GPFieldInfoEx'><Name>name</Name><FieldType>esriFieldTypeString</FieldType><DefaultValueString>x</DefaultValueString><IsNullable>true</IsNullable></GPFieldInfoEx><GPFieldInfoExxsi:type='typens:GPFieldInfoEx'><Name>grade</Name><FieldType>esriFieldTypeDouble</FieldType><DefaultValueNumeric>1.5</DefaultValueNumeric><IsNullable>true</IsNullable></GPFieldInfoEx></GPFieldInfoExs><CLSID>{7A566981-C114-11D2-8A28-006097AFF44E}</CLSID><EXTCLSID></EXTCLSID><RelationshipClassNamesxsi:type='typens:Names'></RelationshipClassNames><AliasName></AliasName><ModelName></ModelName><HasGlobalID>false</HasGlobalID><GlobalIDFieldName></GlobalIDFieldName><RasterFieldName></RasterFieldName><ExtensionPropertiesxsi:type='typens:PropertySet'><PropertyArrayxsi:type='typens:ArrayOfPropertySetProperty'></PropertyArray></ExtensionProperties><SubtypeFieldName>kind</SubtypeFieldName><DefaultSubtypeCode>1</DefaultSubtypeCode><Subtypesxsi:type='typens:ArrayOfSubtype'><Subtypexsi:type='typens:Subtype'><SubtypeName>Road</SubtypeName><SubtypeCode>1</SubtypeCode><FieldInfosxsi:type='typens:ArrayOfSubtypeFieldInfo'><SubtypeFieldInfoxsi:type='typens:SubtypeFieldInfo'><FieldName>lanes</FieldName><DomainName>lanes_dom</DomainName><DefaultValuexsi:type='xs:int'>2</DefaultValue></SubtypeFieldInfo><SubtypeFieldInfoxsi:type='typens:SubtypeFieldInfo'><FieldName>name</FieldName><DomainName>names</DomainName></SubtypeFieldInfo></FieldInfos></Subtype><Subtypexsi:type='typens:Subtype'><SubtypeName>Rail</SubtypeName><SubtypeCode>2</SubtypeCode><FieldInfosxsi:type='typens:ArrayOfSubtypeFieldInfo'><SubtypeFieldInfoxsi:type='typens:SubtypeFieldInfo'><FieldName>name</FieldName><DomainName>names</DomainName></SubtypeFieldInfo></FieldInfos></Subtype></Subtypes><ControllerMembershipsxsi:type='typens:ArrayOfControllerMembership'></ControllerMemberships><EditorTrackingEnabled>false</EditorTrackingEnabled><CreatorFieldName></CreatorFieldName><CreatedAtFieldName></CreatedAtFieldName><EditorFieldName></EditorFieldName><EditedAtFieldName></EditedAtFieldName><IsTimeInUTC>true</IsTimeInUTC><ChangeTracked>false</ChangeTracked><FieldFilteringEnabled>false</FieldFilteringEnabled><FilteredFieldNamesxsi:type='typens:Names'></FilteredFieldNames><ReplicaTracked>false</ReplicaTracked></DETableInfo>"
+  }
+ ],
+ "rels": [
+  "\\ -> \\base : DC78F1AB",
+  "\\base -> lanes_dom : 17E08ADB",
+  "\\base -> names : 17E08ADB"
+ ],
+ "catalog": [
+  "base"
+ ],
+ "tables": 10
+}

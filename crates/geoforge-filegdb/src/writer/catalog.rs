@@ -30,7 +30,7 @@ const REL_RELATED_THROUGH: &str = "{725BADAB-";
 const REL_DOMAIN_IN_DATASET: &str = "{17E08ADB-";
 
 #[derive(Clone, Copy, PartialEq, Eq)]
-enum Kind {
+pub(super) enum Kind {
     FeatureClass,
     Table,
     Dataset,
@@ -57,41 +57,41 @@ fn kind_of(ty: &str) -> Kind {
 }
 
 /// A `GDB_Items` row with the columns the edits need located.
-struct ItemRow {
-    row: Feature,
-    uuid: String,
-    kind: Kind,
-    name: String,
-    path: String,
+pub(super) struct ItemRow {
+    pub(super) row: Feature,
+    pub(super) uuid: String,
+    pub(super) kind: Kind,
+    pub(super) name: String,
+    pub(super) path: String,
 }
 
-struct Items {
-    rows: Vec<ItemRow>,
-    c_name: usize,
-    c_physical: usize,
-    c_path: usize,
-    c_def: usize,
+pub(super) struct Items {
+    pub(super) rows: Vec<ItemRow>,
+    pub(super) c_name: usize,
+    pub(super) c_physical: usize,
+    pub(super) c_path: usize,
+    pub(super) c_def: usize,
 }
 
-fn text(v: &Value) -> String {
+pub(super) fn text(v: &Value) -> String {
     match v {
         Value::String(s) | Value::Guid(s) | Value::Xml(s) => s.clone(),
         _ => String::new(),
     }
 }
 
-fn column(t: &Table, name: &str) -> Result<usize> {
+pub(super) fn column(t: &Table, name: &str) -> Result<usize> {
     t.fields()
         .iter()
         .position(|f| f.name.eq_ignore_ascii_case(name))
         .ok_or_else(|| Error::Unsupported(format!("{} has no {name} field", "a system table")))
 }
 
-fn base(dir: &Path, id: u64) -> PathBuf {
+pub(super) fn base(dir: &Path, id: u64) -> PathBuf {
     dir.join(format!("a{id:08x}"))
 }
 
-fn load_items(dir: &Path) -> Result<Items> {
+pub(super) fn load_items(dir: &Path) -> Result<Items> {
     let t = Table::open(base(dir, 4))?;
     let (c_uuid, c_type) = (column(&t, "UUID")?, column(&t, "Type")?);
     let (c_name, c_physical, c_path, c_def) = (
@@ -121,20 +121,24 @@ fn load_items(dir: &Path) -> Result<Items> {
 }
 
 /// ArcGIS's error for a name nothing answers to.
-fn missing(name: &str) -> Error {
+pub(super) fn missing(name: &str) -> Error {
     Error::Unsupported(format!(
         "ERROR 000732: Dataset {name} does not exist or is not supported"
     ))
 }
 
-fn is_class(k: Kind) -> bool {
+pub(super) fn is_class(k: Kind) -> bool {
     matches!(
         k,
         Kind::FeatureClass | Kind::Table | Kind::RelationshipClass | Kind::Dataset
     )
 }
 
-fn find<'a>(items: &'a Items, name: &str, want: impl Fn(Kind) -> bool) -> Option<&'a ItemRow> {
+pub(super) fn find<'a>(
+    items: &'a Items,
+    name: &str,
+    want: impl Fn(Kind) -> bool,
+) -> Option<&'a ItemRow> {
     items
         .rows
         .iter()

@@ -55,7 +55,21 @@ pub fn rewrite_table(
                 && (f.field_type != FieldType::String || f.length == 0 || g.length == f.length)
         });
         fields.push(match kept {
-            Some(g) => g.clone(),
+            Some(g) => {
+                let mut g = g.clone();
+                // A changed default replaces the stored one; the rest of the definition stays.
+                let stored = g
+                    .default
+                    .as_deref()
+                    .and_then(|d| crate::table::decode_default(g.field_type, d));
+                if stored != f.default {
+                    g.default = f
+                        .default
+                        .as_ref()
+                        .and_then(|v| crate::table::encode_default(g.field_type, v));
+                }
+                g
+            }
             None => to_gdb_field(f)?,
         });
     }

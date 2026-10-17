@@ -181,6 +181,125 @@ fn relationship_classes_join_classes_of_an_existing_geodatabase_and_are_checked(
     std::fs::remove_dir_all(gdb.parent().unwrap()).ok();
 }
 
+fn keyed(
+    name: &str,
+    cardinality: Cardinality,
+    labels: (&str, &str),
+    notification: &str,
+    keys: [&str; 4],
+) -> RelationshipClass {
+    RelationshipClass {
+        name: name.into(),
+        cardinality,
+        is_composite: false,
+        is_attributed: true,
+        notification: notification.into(),
+        origin: "Parcels".into(),
+        destination: "Owners".into(),
+        origin_primary_key: keys[0].into(),
+        origin_foreign_key: keys[1].into(),
+        destination_primary_key: Some(keys[2].into()),
+        destination_foreign_key: Some(keys[3].into()),
+        forward_label: labels.0.into(),
+        backward_label: labels.1.into(),
+    }
+}
+
+/// Attributed and many-to-many relationship classes have a table of their own: the two keys, then the
+/// object ID `RID`; the keys are indexed `GDB_<DSID>_<field>`, as in ArcGIS Pro's
+/// testdata/gdb-reference/relationship_tables.gdb.
+#[test]
+fn relationship_classes_with_a_table_equal_arcgis() {
+    let gdb = tmp("tables").join("a.gdb");
+    let mut w = GeodatabaseWriter::create(&gdb).unwrap();
+    for (name, f) in [("Parcels", "Pk_Id"), ("Owners", "owner_id")] {
+        let t = w
+            .create_table(
+                name,
+                None,
+                false,
+                false,
+                &[Field::new(f, FieldType::Integer)],
+                None,
+            )
+            .unwrap();
+        w.finish_table(t).unwrap();
+    }
+    w.add_relationship_class(&keyed(
+        "att4",
+        Cardinality::OneToMany,
+        ("f", "b"),
+        "None",
+        ["Pk_Id", "pfk", "owner_id", "ofk"],
+    ))
+    .unwrap();
+    w.add_relationship_class(&keyed(
+        "mn",
+        Cardinality::ManyToMany,
+        ("owns", "owned by"),
+        "Both",
+        ["Pk_Id", "p_key", "owner_id", "o_key"],
+    ))
+    .unwrap();
+    // Without the destination's keys the table's fields are unknown.
+    let mut short = keyed(
+        "x",
+        Cardinality::ManyToMany,
+        ("", ""),
+        "None",
+        ["Pk_Id", "a", "owner_id", "b"],
+    );
+    short.destination_foreign_key = None;
+    assert!(w.add_relationship_class(&short).is_err());
+    w.finish().unwrap();
+    let ours = Geodatabase::open(&gdb).unwrap();
+    let theirs =
+        Geodatabase::open(root().join("testdata/gdb-reference/relationship_tables.gdb")).unwrap();
+    assert_eq!(ours.relationship_classes(), theirs.relationship_classes());
+    assert_eq!(ours.relationship_classes().len(), 2);
+    // The tables: the keys as long integers, nullable, then RID; indexed.
+    for name in ["att4", "mn"] {
+        let (a, b) = (
+            ours.open_table(name).unwrap(),
+            theirs.open_table(name).unwrap(),
+        );
+        let shape = |t: &geoforge_filegdb::Table| {
+            t.all_fields()
+                .iter()
+                .map(|f| (f.name.clone(), f.field_type, f.nullable))
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(shape(&a), shape(&b), "{name}");
+        let ix = |t: &geoforge_filegdb::Table| {
+            t.indexes()
+                .iter()
+                .map(|i| (i.name.clone(), i.expression.clone()))
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(ix(&a), ix(&b), "{name}");
+    }
+    // Rows can be added: the table is an ordinary one.
+    assert_eq!(ours.open_table("mn").unwrap().row_count(), 0);
+    if geoforge_testkit::ogrinfo_available() {
+        let out = Command::new("ogrinfo")
+            .arg("-so")
+            .arg(&gdb)
+            .output()
+            .unwrap();
+        let text = String::from_utf8_lossy(&out.stdout);
+        assert!(
+            text.contains("Relationship: mn") && text.contains("Relationship: att4"),
+            "{text}"
+        );
+        // Deleting the origin removes the relationship classes and their tables.
+        let gone = geoforge_filegdb::delete_item(&gdb, "Parcels").unwrap();
+        assert_eq!(gone.len(), 3, "{gone:?}");
+        let left = Geodatabase::open(&gdb).unwrap();
+        assert_eq!(left.entries().len(), 1);
+    }
+    std::fs::remove_dir_all(gdb.parent().unwrap()).ok();
+}
+
 /// `GF_OUT=/path/x.gdb cargo test -p geoforge-filegdb --test relationship_classes -- --ignored`
 #[test]
 #[ignore]
@@ -194,5 +313,44 @@ fn write_for_arcgis() {
     comp.notification = "Forward".into();
     comp.forward_label = "owns".into();
     w.add_relationship_class(&comp).unwrap();
+    w.finish().unwrap();
+}
+
+/// `GF_OUT=/path/x.gdb cargo test -p geoforge-filegdb --test relationship_classes -- --ignored`
+#[test]
+#[ignore]
+fn write_tables_for_arcgis() {
+    let out = std::env::var("GF_OUT").expect("GF_OUT");
+    std::fs::remove_dir_all(&out).ok();
+    let mut w = GeodatabaseWriter::create(&out).unwrap();
+    for (name, f) in [("Parcels", "Pk_Id"), ("Owners", "owner_id")] {
+        let t = w
+            .create_table(
+                name,
+                None,
+                false,
+                false,
+                &[Field::new(f, FieldType::Integer)],
+                None,
+            )
+            .unwrap();
+        w.finish_table(t).unwrap();
+    }
+    w.add_relationship_class(&keyed(
+        "att4",
+        Cardinality::OneToMany,
+        ("f", "b"),
+        "None",
+        ["Pk_Id", "pfk", "owner_id", "ofk"],
+    ))
+    .unwrap();
+    w.add_relationship_class(&keyed(
+        "mn",
+        Cardinality::ManyToMany,
+        ("owns", "owned by"),
+        "Both",
+        ["Pk_Id", "p_key", "owner_id", "o_key"],
+    ))
+    .unwrap();
     w.finish().unwrap();
 }

@@ -11,6 +11,7 @@ mod geometry;
 mod keys;
 mod rebuild;
 mod rewrite;
+mod subtype_edit;
 mod system_rows;
 mod table;
 
@@ -30,6 +31,10 @@ pub use catalog::{delete_domain, delete_item, rename_domain, rename_item};
 pub use edit::TableEditor;
 pub use rebuild::rebuild_attribute_indexes;
 pub use rewrite::rewrite_table;
+pub use subtype_edit::{
+    add_subtype, assign_default_to_field, assign_domain_to_field, remove_domain_from_field,
+    remove_subtype, set_default_subtype, set_subtype_field,
+};
 
 const TYPE_FOLDER: &str = "{F3783E6F-65CA-4514-8315-CE3985DAD3B1}";
 const TYPE_WORKSPACE: &str = "{C673FE0F-7280-404F-8532-20755DD8FC06}";
@@ -62,6 +67,8 @@ struct Item {
 struct RelItem {
     uuid: String,
     dsid: usize,
+    /// Fields of the relationship's own table (attributed and many-to-many), if it has one.
+    table_fields: Option<[String; 2]>,
     rc: RelationshipClass,
     origin: String,
     destination: String,
@@ -434,11 +441,29 @@ impl GeodatabaseWriter {
                 rc.name
             )));
         }
-        if rc.is_attributed || rc.cardinality == Cardinality::ManyToMany {
-            return Err(bad(
-                "attributed and many-to-many relationship classes are not supported yet".into(),
-            ));
-        }
+        // A many-to-many relationship class always has a table of its own; so does an attributed one.
+        let attributed = rc.is_attributed || rc.cardinality == Cardinality::ManyToMany;
+        let mut rc = rc.clone();
+        rc.is_attributed = attributed;
+        let rc = &rc;
+        let table_keys = if attributed {
+            let (Some(dpk), Some(dfk)) = (&rc.destination_primary_key, &rc.destination_foreign_key)
+            else {
+                return Err(bad(
+                    "ERROR 160263: Invalid relationship class specification (name the destination keys)".into(),
+                ));
+            };
+            validate_field_name(&rc.origin_foreign_key)?;
+            validate_field_name(dfk)?;
+            if rc.origin_foreign_key.eq_ignore_ascii_case(dfk) {
+                return Err(bad(
+                    "ERROR 160263: Invalid relationship class specification".into(),
+                ));
+            }
+            Some((dpk.clone(), [rc.origin_foreign_key.clone(), dfk.clone()]))
+        } else {
+            None
+        };
         let uuid_of = |w: &Self, name: &str| {
             w.items
                 .iter()
@@ -474,10 +499,14 @@ impl GeodatabaseWriter {
                 .iter()
                 .any(|f| f.name.eq_ignore_ascii_case(field)))
         };
-        for (class, field) in [
-            (&rc.origin, &rc.origin_primary_key),
-            (&rc.destination, &rc.origin_foreign_key),
-        ] {
+        // The keys a class must have: the origin's primary key; in a plain relationship the
+        // destination's foreign key; with a table of its own, the destination's primary key.
+        let mut checks = vec![(&rc.origin, &rc.origin_primary_key)];
+        match &table_keys {
+            None => checks.push((&rc.destination, &rc.origin_foreign_key)),
+            Some((dpk, _)) => checks.push((&rc.destination, dpk)),
+        }
+        for (class, field) in checks {
             if !has_field(self, class, field)? {
                 return Err(bad(format!(
                     "ERROR 000728: Field {field} does not exist within table"
@@ -486,9 +515,17 @@ impl GeodatabaseWriter {
         }
         let dsid = self.next_dsid();
         let uuid = self.uuid();
+        let table_fields = match table_keys {
+            Some((_, fields)) => {
+                self.write_relationship_table(&rc.name, &fields, dsid)?;
+                Some(fields)
+            }
+            None => None,
+        };
         self.relationships.push(RelItem {
             uuid,
             dsid,
+            table_fields,
             rc: rc.clone(),
             origin,
             destination,
@@ -564,6 +601,52 @@ impl GeodatabaseWriter {
             Some(def),
             Some(dataset),
         )
+    }
+
+    /// The table of an attributed or many-to-many relationship class: the two keys as long
+    /// integers (indexed, `GDB_<DSID>_<field>`), then the object ID field `RID`.
+    fn write_relationship_table(
+        &mut self,
+        name: &str,
+        keys: &[String; 2],
+        dsid: usize,
+    ) -> Result<()> {
+        let id = self.next_table;
+        self.next_table += 1;
+        let mut fields: Vec<GdbField> = keys
+            .iter()
+            .map(|k| {
+                let mut f = field(k, GdbFieldType::Int32, true, 4);
+                f.alias = Some(k.clone());
+                f
+            })
+            .collect();
+        fields.push(field("RID", GdbFieldType::ObjectId, false, 4));
+        let base = self.table_path(id);
+        let mut w = TableWriter::create(&base, fields, None, false, false)?;
+        let mut index_names = Vec::new();
+        for k in keys {
+            let ix = format!("GDB_{dsid}_{k}");
+            w.add_index(&ix, k)?;
+            index_names.push((ix, k.clone()));
+        }
+        let table::Finished { indexes, .. } = w.finish()?;
+        for ix in &indexes {
+            write_index(
+                &base.with_extension(format!("{}.atx", ix.name)),
+                ix.key_size,
+                ix.kind,
+                &ix.entries,
+            )?;
+        }
+        write_gdbindexes_for(
+            &base.with_extension("gdbindexes"),
+            "RID",
+            false,
+            &index_names,
+        )?;
+        self.tables.push((name.to_owned(), id));
+        Ok(())
     }
 
     fn name_taken(&self, name: &str) -> bool {
@@ -1266,8 +1349,32 @@ fn relationship_item_values(r: &RelItem) -> Vec<Value> {
             x(name)
         )
     };
+    // A relationship class with a table of its own lists its fields and the destination's keys.
+    let (table_xml, dest_keys) = match &r.table_fields {
+        None => (
+            "  <HasOID>false</HasOID>\n  <OIDFieldName></OIDFieldName>\n  <GPFieldInfoExs xsi:type=\"typens:ArrayOfGPFieldInfoEx\">\n  </GPFieldInfoExs>\n".to_string(),
+            String::new(),
+        ),
+        Some(keys) => {
+            let mut t = String::from("  <HasOID>true</HasOID>\n  <OIDFieldName>RID</OIDFieldName>\n  <GPFieldInfoExs xsi:type=\"typens:ArrayOfGPFieldInfoEx\">\n");
+            for k in keys {
+                t += &format!(
+                    "    <GPFieldInfoEx xsi:type=\"typens:GPFieldInfoEx\">\n      <Name>{0}</Name>\n      <AliasName>{0}</AliasName>\n      <FieldType>esriFieldTypeInteger</FieldType>\n      <IsNullable>true</IsNullable>\n    </GPFieldInfoEx>\n",
+                    x(k)
+                );
+            }
+            t += "    <GPFieldInfoEx xsi:type=\"typens:GPFieldInfoEx\">\n      <Name>RID</Name>\n      <FieldType>esriFieldTypeOID</FieldType>\n      <IsNullable>false</IsNullable>\n      <Required>true</Required>\n      <Editable>false</Editable>\n    </GPFieldInfoEx>\n  </GPFieldInfoExs>\n";
+            let dpk = rc.destination_primary_key.as_deref().unwrap_or_default();
+            let d = format!(
+                "  <DestinationClassKeys xsi:type=\"typens:ArrayOfRelationshipClassKey\">\n{}{}  </DestinationClassKeys>\n",
+                key(dpk, "esriRelKeyRoleDestinationPrimary"),
+                key(&keys[1], "esriRelKeyRoleDestinationForeign")
+            );
+            (t, d)
+        }
+    };
     let definition = format!(
-        "<DERelationshipClassInfo xsi:type=\"typens:DERelationshipClassInfo\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xmlns:typens=\"http://www.esri.com/schemas/ArcGIS/10.8\">\n  <CatalogPath>\\{n}</CatalogPath>\n  <Name>{n}</Name>\n  <ChildrenExpanded>false</ChildrenExpanded>\n  <DatasetType>esriDTRelationshipClass</DatasetType>\n  <DSID>{dsid}</DSID>\n  <Versioned>false</Versioned>\n  <CanVersion>false</CanVersion>\n  <HasOID>false</HasOID>\n  <OIDFieldName></OIDFieldName>\n  <GPFieldInfoExs xsi:type=\"typens:ArrayOfGPFieldInfoEx\">\n  </GPFieldInfoExs>\n  <CLSID></CLSID>\n  <EXTCLSID></EXTCLSID>\n  <Cardinality>{card}</Cardinality>\n  <Notification>esriRelNotification{notification}</Notification>\n  <IsAttributed>false</IsAttributed>\n  <IsComposite>{composite}</IsComposite>\n  <OriginClassNames xsi:type=\"typens:Names\">\n    <Name>{origin}</Name>\n  </OriginClassNames>\n  <DestinationClassNames xsi:type=\"typens:Names\">\n    <Name>{dest}</Name>\n  </DestinationClassNames>\n  <KeyType>esriRelKeyTypeSingle</KeyType>\n  <ClassKey>esriRelClassKeyUndefined</ClassKey>\n  <ForwardPathLabel>{fwd}</ForwardPathLabel>\n  <BackwardPathLabel>{back}</BackwardPathLabel>\n  <IsReflexive>{reflexive}</IsReflexive>\n  <OriginClassKeys xsi:type=\"typens:ArrayOfRelationshipClassKey\">\n{pk}{fk}  </OriginClassKeys>\n  <RelationshipRules xsi:type=\"typens:ArrayOfRelationshipRule\">\n  </RelationshipRules>\n  <IsAttachmentRelationship>false</IsAttachmentRelationship>\n</DERelationshipClassInfo>\n",
+        "<DERelationshipClassInfo xsi:type=\"typens:DERelationshipClassInfo\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xmlns:typens=\"http://www.esri.com/schemas/ArcGIS/10.8\">\n  <CatalogPath>\\{n}</CatalogPath>\n  <Name>{n}</Name>\n  <ChildrenExpanded>false</ChildrenExpanded>\n  <DatasetType>esriDTRelationshipClass</DatasetType>\n  <DSID>{dsid}</DSID>\n  <Versioned>false</Versioned>\n  <CanVersion>false</CanVersion>\n{table_xml}  <CLSID></CLSID>\n  <EXTCLSID></EXTCLSID>\n  <Cardinality>{card}</Cardinality>\n  <Notification>esriRelNotification{notification}</Notification>\n  <IsAttributed>{attributed}</IsAttributed>\n  <IsComposite>{composite}</IsComposite>\n  <OriginClassNames xsi:type=\"typens:Names\">\n    <Name>{origin}</Name>\n  </OriginClassNames>\n  <DestinationClassNames xsi:type=\"typens:Names\">\n    <Name>{dest}</Name>\n  </DestinationClassNames>\n  <KeyType>esriRelKeyTypeSingle</KeyType>\n  <ClassKey>esriRelClassKeyUndefined</ClassKey>\n  <ForwardPathLabel>{fwd}</ForwardPathLabel>\n  <BackwardPathLabel>{back}</BackwardPathLabel>\n  <IsReflexive>{reflexive}</IsReflexive>\n  <OriginClassKeys xsi:type=\"typens:ArrayOfRelationshipClassKey\">\n{pk}{fk}  </OriginClassKeys>\n{dest_keys}  <RelationshipRules xsi:type=\"typens:ArrayOfRelationshipRule\">\n  </RelationshipRules>\n  <IsAttachmentRelationship>false</IsAttachmentRelationship>\n</DERelationshipClassInfo>\n",
         n = x(&rc.name),
         dsid = r.dsid,
         composite = rc.is_composite,
@@ -1278,6 +1385,9 @@ fn relationship_item_values(r: &RelItem) -> Vec<Value> {
         reflexive = rc.origin.eq_ignore_ascii_case(&rc.destination),
         pk = key(&rc.origin_primary_key, "esriRelKeyRoleOriginPrimary"),
         fk = key(&rc.origin_foreign_key, "esriRelKeyRoleOriginForeign"),
+        attributed = r.table_fields.is_some(),
+        table_xml = table_xml,
+        dest_keys = dest_keys,
     );
     catalog_item_values(
         &r.uuid,
@@ -1286,7 +1396,7 @@ fn relationship_item_values(r: &RelItem) -> Vec<Value> {
         &rc.name.to_uppercase(),
         &format!("\\{}", rc.name),
         Value::Integer(subtype),
-        Value::Integer(0),
+        Value::Integer(i32::from(r.table_fields.is_some())),
         Value::Null,
         Value::Xml(definition),
         1,
@@ -1562,6 +1672,16 @@ pub(crate) fn write_gdbindexes(
     spatial: bool,
     attribute: &[(String, String)],
 ) -> Result<()> {
+    write_gdbindexes_for(path, "OBJECTID", spatial, attribute)
+}
+
+/// `.gdbindexes` of a table whose object ID field is called `oid`.
+pub(crate) fn write_gdbindexes_for(
+    path: &Path,
+    oid: &str,
+    spatial: bool,
+    attribute: &[(String, String)],
+) -> Result<()> {
     let mut out = Vec::new();
     let entry = |out: &mut Vec<u8>, name: &str, magic2: i32, magic3: i16, expr: &str| {
         out.extend_from_slice(&(name.encode_utf16().count() as u32).to_le_bytes());
@@ -1577,7 +1697,7 @@ pub(crate) fn write_gdbindexes(
         out.extend_from_slice(&0i16.to_le_bytes());
     };
     out.extend_from_slice(&(1 + u32::from(spatial) + attribute.len() as u32).to_le_bytes());
-    entry(&mut out, "FDO_OBJECTID", 16, -1, "OBJECTID");
+    entry(&mut out, &format!("FDO_{oid}"), 16, -1, oid);
     if spatial {
         entry(&mut out, "FDO_SHAPE", 4, 0, "SHAPE");
     }

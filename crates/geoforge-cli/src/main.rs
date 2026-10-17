@@ -283,6 +283,76 @@ enum Tool {
         /// An EPSG/Esri code, a `.prj` file or WKT; none = unknown coordinate system.
         spatial_reference: Option<String>,
     },
+    /// Make a short or long integer field the subtype field of a geodatabase table (ArcGIS "Set
+    /// Subtype Field").
+    SetSubtypeField {
+        in_table: PathBuf,
+        subtype_field: String,
+    },
+    /// Add a subtype to a geodatabase table (ArcGIS "Add Subtype"); it starts with the table's
+    /// field defaults.
+    AddSubtype {
+        in_table: PathBuf,
+        subtype_code: i64,
+        subtype_description: String,
+    },
+    /// Remove subtypes (ArcGIS "Remove Subtype"); codes separated by `;`.
+    RemoveSubtype {
+        in_table: PathBuf,
+        subtype_code: String,
+    },
+    /// Set the default subtype (ArcGIS "Set Default Subtype").
+    SetDefaultSubtype {
+        in_table: PathBuf,
+        subtype_code: i64,
+    },
+    /// Assign a domain to a field, or to it within subtypes (ArcGIS "Assign Domain To Field").
+    AssignDomainToField {
+        in_table: PathBuf,
+        field_name: String,
+        domain_name: String,
+        /// Subtype codes separated by `;`.
+        #[arg(long, default_value = "")]
+        subtype_code: String,
+    },
+    /// Remove a field's domain, or its domain within subtypes (ArcGIS "Remove Domain From Field").
+    RemoveDomainFromField {
+        in_table: PathBuf,
+        field_name: String,
+        #[arg(long, default_value = "")]
+        subtype_code: String,
+    },
+    /// Assign a default value to a field, or to it within subtypes; no value clears it (ArcGIS
+    /// "Assign Default To Field").
+    AssignDefaultToField {
+        in_table: PathBuf,
+        field_name: String,
+        default_value: Option<String>,
+        #[arg(long, default_value = "")]
+        subtype_code: String,
+    },
+    /// Create a relationship class between two tables or feature classes of a file geodatabase
+    /// (ArcGIS "Create Relationship Class"). Attributed and many-to-many classes need all four keys.
+    CreateRelationshipClass {
+        origin_table: PathBuf,
+        destination_table: PathBuf,
+        /// `city.gdb/name`; in the same geodatabase as the tables.
+        out_relationship_class: PathBuf,
+        /// SIMPLE or COMPOSITE.
+        relationship_type: String,
+        forward_label: String,
+        backward_label: String,
+        /// NONE, FORWARD, BACKWARD or BOTH.
+        message_direction: String,
+        /// ONE_TO_ONE, ONE_TO_MANY or MANY_TO_MANY.
+        cardinality: String,
+        /// NONE or ATTRIBUTED.
+        attributed: String,
+        origin_primary_key: String,
+        origin_foreign_key: String,
+        destination_primary_key: Option<String>,
+        destination_foreign_key: Option<String>,
+    },
     /// Delete a shapefile (with its sidecar files) or an item of a file geodatabase: a table,
     /// feature class, relationship class (also the relationship classes that use a deleted
     /// table) or feature dataset with its feature classes (ArcGIS "Delete").
@@ -1242,6 +1312,147 @@ fn main() -> ExitCode {
                 out_dataset_path.join(&out_name).display()
             );
             Ok(())
+        })(),
+        Tool::SetSubtypeField {
+            in_table,
+            subtype_field,
+        } => (|| {
+            let (gdb, table) = gdb_table(&in_table)?;
+            geoforge_filegdb::set_subtype_field(&gdb, &table, &subtype_field)
+        })(),
+        Tool::AddSubtype {
+            in_table,
+            subtype_code,
+            subtype_description,
+        } => (|| {
+            let (gdb, table) = gdb_table(&in_table)?;
+            geoforge_filegdb::add_subtype(&gdb, &table, subtype_code, &subtype_description)
+        })(),
+        Tool::RemoveSubtype {
+            in_table,
+            subtype_code,
+        } => (|| {
+            let (gdb, table) = gdb_table(&in_table)?;
+            geoforge_filegdb::remove_subtype(&gdb, &table, &codes(&subtype_code)?)
+        })(),
+        Tool::SetDefaultSubtype {
+            in_table,
+            subtype_code,
+        } => (|| {
+            let (gdb, table) = gdb_table(&in_table)?;
+            geoforge_filegdb::set_default_subtype(&gdb, &table, subtype_code)
+        })(),
+        Tool::AssignDomainToField {
+            in_table,
+            field_name,
+            domain_name,
+            subtype_code,
+        } => (|| {
+            let (gdb, table) = gdb_table(&in_table)?;
+            geoforge_filegdb::assign_domain_to_field(
+                &gdb,
+                &table,
+                &field_name,
+                &domain_name,
+                &codes(&subtype_code)?,
+            )
+        })(),
+        Tool::RemoveDomainFromField {
+            in_table,
+            field_name,
+            subtype_code,
+        } => (|| {
+            let (gdb, table) = gdb_table(&in_table)?;
+            geoforge_filegdb::remove_domain_from_field(
+                &gdb,
+                &table,
+                &field_name,
+                &codes(&subtype_code)?,
+            )
+        })(),
+        Tool::AssignDefaultToField {
+            in_table,
+            field_name,
+            default_value,
+            subtype_code,
+        } => (|| {
+            let (gdb, table) = gdb_table(&in_table)?;
+            // Numbers by their look; the field's type decides what fits.
+            let value = default_value
+                .as_deref()
+                .map(str::trim)
+                .filter(|v| !v.is_empty())
+                .map(|v| {
+                    v.parse::<i64>()
+                        .map(Value::BigInteger)
+                        .or_else(|_| v.parse::<f64>().map(Value::Double))
+                        .unwrap_or_else(|_| Value::String(v.to_string()))
+                });
+            geoforge_filegdb::assign_default_to_field(
+                &gdb,
+                &table,
+                &field_name,
+                value.as_ref(),
+                &codes(&subtype_code)?,
+            )
+        })(),
+        Tool::CreateRelationshipClass {
+            origin_table,
+            destination_table,
+            out_relationship_class,
+            relationship_type,
+            forward_label,
+            backward_label,
+            message_direction,
+            cardinality,
+            attributed,
+            origin_primary_key,
+            origin_foreign_key,
+            destination_primary_key,
+            destination_foreign_key,
+        } => (|| {
+            let (gdb, origin) = gdb_table(&origin_table)?;
+            let (_, destination) = gdb_table(&destination_table)?;
+            let (_, name) = gdb_table(&out_relationship_class)?;
+            let cardinality = match cardinality.to_ascii_uppercase().as_str() {
+                "ONE_TO_ONE" => geoforge_filegdb::Cardinality::OneToOne,
+                "ONE_TO_MANY" => geoforge_filegdb::Cardinality::OneToMany,
+                "MANY_TO_MANY" => geoforge_filegdb::Cardinality::ManyToMany,
+                other => {
+                    return Err(Error::Unsupported(format!(
+                        "ERROR 000800: The value is not a member of ONE_TO_ONE | ONE_TO_MANY | MANY_TO_MANY: {other}"
+                    )));
+                }
+            };
+            let notification = match message_direction.to_ascii_uppercase().as_str() {
+                "NONE" => "None",
+                "FORWARD" => "Forward",
+                "BACKWARD" => "Backward",
+                "BOTH" => "Both",
+                other => {
+                    return Err(Error::Unsupported(format!(
+                        "ERROR 000800: The value is not a member of NONE | FORWARD | BACKWARD | BOTH: {other}"
+                    )));
+                }
+            };
+            let rc = geoforge_filegdb::RelationshipClass {
+                name,
+                cardinality,
+                is_composite: relationship_type.eq_ignore_ascii_case("COMPOSITE"),
+                is_attributed: attributed.eq_ignore_ascii_case("ATTRIBUTED"),
+                notification: notification.into(),
+                origin,
+                destination,
+                origin_primary_key,
+                origin_foreign_key,
+                destination_primary_key,
+                destination_foreign_key,
+                forward_label,
+                backward_label,
+            };
+            let mut w = geoforge_filegdb::GeodatabaseWriter::open_existing(&gdb)?;
+            w.add_relationship_class(&rc)?;
+            w.finish()
         })(),
         Tool::Delete { in_data } => delete_data(&in_data),
         Tool::Rename { in_data, out_data } => rename_data(&in_data, &out_data),
@@ -3077,6 +3288,32 @@ fn source_gdb(input: &Path) -> Option<PathBuf> {
         Location::Geodatabase { gdb, .. } => Some(gdb),
         Location::Shapefile(_) => None,
     }
+}
+
+/// `city.gdb/table` as the geodatabase and the table's name.
+fn gdb_table(path: &Path) -> Result<(PathBuf, String)> {
+    match locate(path) {
+        Location::Geodatabase {
+            gdb,
+            item: Some(item),
+        } => Ok((gdb, item)),
+        _ => Err(Error::Unsupported(
+            "name a table inside a file geodatabase (city.gdb/table)".into(),
+        )),
+    }
+}
+
+/// Subtype codes separated by `;`.
+fn codes(text: &str) -> Result<Vec<i64>> {
+    text.split(';')
+        .map(str::trim)
+        .filter(|c| !c.is_empty())
+        .map(|c| {
+            c.parse().map_err(|_| {
+                Error::Unsupported(format!("ERROR 000192: Invalid value for Subtype Code: {c}"))
+            })
+        })
+        .collect()
 }
 
 /// The files of a shapefile: `<stem>.<ext>` for each extension a shapefile (or ArcGIS, beside it) uses.
