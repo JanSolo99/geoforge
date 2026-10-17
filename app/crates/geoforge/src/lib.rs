@@ -64,7 +64,13 @@ impl Work {
         if e.is_empty() {
             return Ok(Work::degrees());
         }
-        let (lon, lat) = ((e.min_x + e.max_x) / 2.0, ((e.min_y + e.max_y) / 2.0).clamp(-80.0, 84.0));
+        let wide = e.width() > 12.0 || (e.min_y.abs() > 84.0 || e.max_y.abs() > 84.0);
+        Work::zone((e.min_x + e.max_x) / 2.0, (e.min_y + e.max_y) / 2.0, wide)
+    }
+
+    /// The UTM zone around a longitude/latitude. `wide`: the data reaches well beyond it.
+    fn zone(lon: f64, lat: f64, wide: bool) -> Result<Work, String> {
+        let lat = lat.clamp(-80.0, 84.0);
         let zone = (((lon + 180.0) / 6.0).floor() as i32).rem_euclid(60) + 1;
         let north = lat >= 0.0;
         let code = (if north { 32600 } else { 32700 }) + zone as u32;
@@ -72,7 +78,6 @@ impl Work {
         let t = crs.transformer()?;
         let back = crs.transformer()?;
         let central = f64::from(zone) * 6.0 - 183.0;
-        let wide = e.width() > 12.0 || (e.min_y.abs() > 84.0 || e.max_y.abs() > 84.0);
         let name = format!("WGS_1984_UTM_Zone_{zone}{}", if north { 'N' } else { 'S' });
         let wkt = format!(
             "PROJCS[\"{name}\",{WGS84_WKT},PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",500000.0],PARAMETER[\"False_Northing\",{}],PARAMETER[\"Central_Meridian\",{central}],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0.0],UNIT[\"Meter\",1.0]]",
@@ -438,7 +443,6 @@ fn buffer(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     use geoforge_geometry::{LineEnd, LineSide};
     let ds0 = datasets(inp, p, &["input"])?;
     let work = Work::metres(&ds0)?;
-    let (ds, fc) = layer_in(inp, p, "input", &work, false)?;
     let d = metres(p, "distance").ok_or("Buffer: 'Distance' must be a number")?;
     let end = match text(p, "line_end").to_ascii_uppercase().as_str() {
         "FLAT" => LineEnd::Flat,
@@ -455,8 +459,69 @@ fn buffer(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
         "LIST" => tools::Dissolve::List(list(p, "dissolve_fields")),
         _ => tools::Dissolve::None,
     };
+    // Features are buffered independently unless dissolved: data wider than one UTM zone is
+    // buffered a zone at a time, each feature in the zone it lies in.
+    if work.note.is_some() && matches!(dissolve, tools::Dissolve::None) {
+        return buffer_by_zone(inp, p, d, end, side);
+    }
+    let (ds, fc) = layer_in(inp, p, "input", &work, false)?;
     let out = tools::buffer(&fc, tools::BufferDistance::Linear(d), end, side, dissolve).map_err(err)?;
     finish_in(out, out_name(p, format!("{}_Buffer", ds.name)), &work)
+}
+
+/// Undissolved Buffer of a wide layer: the features grouped by UTM zone, each group buffered in
+/// its zone, and the results put back in the input's order (`ORIG_FID`).
+fn buffer_by_zone(
+    inp: &dyn Inputs,
+    p: &Json,
+    d: f64,
+    end: geoforge_geometry::LineEnd,
+    side: geoforge_geometry::LineSide,
+) -> Result<ToolResult, String> {
+    let name = text(p, "input");
+    let ds = inp.dataset(name).ok_or_else(|| format!("no layer named '{name}'"))?;
+    let sel = inp.selection(name);
+    let rows: Vec<usize> = if sel.is_empty() { (0..ds.features.len()).collect() } else { sel.to_vec() };
+    // Rows by zone (and hemisphere), in order of first appearance.
+    let mut groups: Vec<((i32, bool), Vec<usize>)> = Vec::new();
+    for r in rows {
+        let Some(f) = ds.features.get(r) else { continue };
+        let c = f.geometry.as_ref().map_or(Coord::new(0.0, 0.0), |g| {
+            let e = g.extent();
+            Coord::new((e.min_x + e.max_x) / 2.0, (e.min_y + e.max_y) / 2.0)
+        });
+        let key = ((((c.x + 180.0) / 6.0).floor() as i32).rem_euclid(60) + 1, c.y >= 0.0);
+        match groups.iter_mut().find(|(k, _)| *k == key) {
+            Some((_, v)) => v.push(r),
+            None => groups.push((key, vec![r])),
+        }
+    }
+    let mut out: Option<Dataset> = None;
+    let mut rows_out: Vec<(i64, Option<Geometry>, Vec<Value>)> = Vec::new();
+    let mut messages = Vec::new();
+    for ((zone, north), members) in &groups {
+        let lon = f64::from(*zone) * 6.0 - 183.0;
+        let work = Work::zone(lon, if *north { 1.0 } else { -1.0 }, false)?;
+        let fc = to_fc(ds, &members.clone(), &work);
+        let res = tools::buffer(&fc, tools::BufferDistance::Linear(d), end, side, tools::Dissolve::None).map_err(err)?;
+        messages.extend(res.messages.clone());
+        let part = to_dataset_checked(res, ds.name.clone(), &work)?;
+        let fid = part.field_index("ORIG_FID");
+        for f in part.features {
+            let key = fid.and_then(|i| f.attrs.get(i)).and_then(Value::as_f64).unwrap_or(0.0) as i64;
+            rows_out.push((key, f.geometry, f.attrs));
+        }
+        out.get_or_insert_with(|| Dataset::new(ds.name.clone(), part.geometry_type, part.fields));
+    }
+    let mut out = out.ok_or("Buffer: nothing to buffer")?;
+    out.name = out_name(p, format!("{}_Buffer", ds.name));
+    rows_out.sort_by_key(|r| r.0);
+    for (_, g, a) in rows_out {
+        out.push_next(g, a);
+    }
+    let mut m = vec![format!("{}: {} features, buffered in {} UTM zone(s)", out.name, out.features.len(), groups.len())];
+    m.extend(messages);
+    Ok(ToolResult { output: Output::Layer(out), messages: m })
 }
 
 /// Near: adds `NEAR_FID`/`NEAR_DIST` (metres) to the input layer, as ArcGIS does in place.
@@ -1033,6 +1098,29 @@ mod tests {
             let names: Vec<&str> = d.fields.iter().map(|f| f.name.as_str()).collect();
             assert_eq!(names, ["N", "BUFF_DIST", "ORIG_FID"]);
         }
+    }
+
+    #[test]
+    fn wide_layers_are_buffered_a_zone_at_a_time() {
+        register();
+        // Three continents: one UTM zone would put two of these far from its central meridian.
+        let spots = [(151.2, -33.9), (18.9, 69.6), (-118.2, 34.0), (151.3, -33.8)];
+        let layers = Layers(vec![points("p", &spots)]);
+        let r = rustgis_analysis::run("geoforge:buffer", &layers, &json!({"input": "p", "distance": 1000})).unwrap();
+        assert!(r.messages.iter().any(|m| m.contains("UTM zone")), "{:?}", r.messages);
+        let Output::Layer(d) = r.output else { panic!("layer") };
+        assert_eq!(d.features.len(), 4);
+        for (f, (lon, lat)) in d.features.iter().zip(spots) {
+            // Input order kept: feature i is the buffer of point i.
+            let Some(Geometry::Polygon(ps)) = &f.geometry else { panic!("polygon") };
+            let c = Coord::new(lon, lat);
+            for v in &ps[0][0] {
+                let r = ground(c, *v);
+                assert!((r - 1000.0).abs() < 5.0, "{lat}: {r}");
+            }
+        }
+        let ids: Vec<&Value> = d.features.iter().map(|f| &f.attrs[d.field_index("ORIG_FID").unwrap()]).collect();
+        assert_eq!(ids, [&Value::Int(1), &Value::Int(2), &Value::Int(3), &Value::Int(4)]);
     }
 
     #[test]
