@@ -16,7 +16,9 @@ original copyright notices and mark modified files.
 - `crates/geoforge` (`rustgis-geoforge`): registers `geoforge-tools` as the external suite `geoforge`
   (ids `geoforge:clip`, `erase`, `intersect`, `union`, `symmetrical_difference`, `dissolve`,
   `multipart_to_singlepart`, `feature_to_point`, `select`, `buffer`, `near`, `spatial_join`,
-  `select_by_location`, `frequency`, `statistics`), enabled by the engine feature `geoforge`. Layers are
+  `select_by_location`, `frequency`, `statistics`, `identity`, `update`, `merge`, `append`,
+  `minimum_bounding_geometry`, `feature_vertices_to_points`, `points_to_line`, `sort`, `add_xy`, `add_field`,
+  `delete_field`, `calculate_field`, `delete_identical`, `find_identical`, `generate_near_table`), enabled by the engine feature `geoforge`. Layers are
   WGS 84 lon/lat; topology tools run on them as they are, tools that measure (Buffer, Near, search
   distances) run in the UTM zone at the centre of their inputs (metres, planar, as ArcGIS on projected
   data) and project the result back (`Work` in `crates/geoforge/src/lib.rs`). An undissolved Buffer of data wider
@@ -30,4 +32,9 @@ original copyright notices and mark modified files.
   bits become doubles, booleans small integers. `layer.addData` adds a `.gdb` (all its feature classes) or
   `x.gdb/name`; `share.exportLayer` takes `*.gdb`. ArcGIS Pro opens the output (Describe, cursor, Check
   Geometry).
-- Next: more tools in the registry, then Python/MCP bindings.
+- The CLI, Python and MCP surfaces of the app dispatch through `gp.run`, so every registered tool is
+  reachable from them (`rustgis-cli run --cmd 'gp.run={"tool":"geoforge:buffer",...}'`, checked end to end
+  with an export to a `.gdb`). The hostile-parameter test runs every registered GeoForge tool on junk
+  parameters and fails if one panics.
+- Next: Check/Repair Geometry, Split, Project (needs a PROJ-free path), Feature Class To Feature Class, and
+  the raster tools in the registry.

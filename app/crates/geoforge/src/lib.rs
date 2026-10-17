@@ -600,6 +600,164 @@ fn select_by_location(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> 
     Ok(ToolResult { output: Output::Selection { layer: ds.name.clone(), rows }, messages: m })
 }
 
+/// A tool's output replacing the layer it was run on (the tools ArcGIS runs in place).
+fn finish_update(out: tools::ToolOutput, ds: &Dataset) -> Result<ToolResult, String> {
+    let work = Work::degrees();
+    let new = to_dataset_checked(out.clone(), ds.name.clone(), &work)?;
+    let m = messages(&out, &new, &work);
+    Ok(ToolResult { output: Output::Update { layer: ds.name.clone(), dataset: new }, messages: m })
+}
+
+fn identity(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let [(an, a), (bn, b)] = two(inp, p)?;
+    let opts = tools::IdentityOptions {
+        join_attributes: tools::JoinAttributes::parse(text(p, "join_attributes")).unwrap_or_default(),
+        keep_relationships: flag(p, "keep_relationships"),
+    };
+    let out =
+        tools::identity_with(tools::NamedInput { name: an.clone(), features: &a }, tools::NamedInput { name: bn, features: &b }, &opts)
+            .map_err(err)?;
+    finish(out, out_name(p, format!("{an}_Identity")))
+}
+
+fn update(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let (ds, a) = layer(inp, p, "input")?;
+    let (_, b) = layer(inp, p, "other")?;
+    finish(tools::update(&a, &b).map_err(err)?, out_name(p, format!("{}_Update", ds.name)))
+}
+
+/// Merge: the layers named in `inputs` (semicolon-separated) into one.
+fn merge(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let names = list(p, "inputs");
+    if names.is_empty() {
+        return Err("Merge: name the layers to merge".into());
+    }
+    let fcs: Vec<(String, Fc)> = names
+        .iter()
+        .map(|n| layer(inp, &serde_json::json!({ "x": n }), "x").map(|(d, f)| (d.name.clone(), f)))
+        .collect::<Result<_, _>>()?;
+    let inputs: Vec<tools::PathInput> = fcs.iter().map(|(n, f)| tools::PathInput { source: n.clone(), features: f }).collect();
+    let out = tools::merge_with(&inputs, flag(p, "add_source"), None).map_err(err)?;
+    finish(out, out_name(p, "Merge".to_string()))
+}
+
+/// Append: the layers in `inputs` added to the target layer, which is replaced by the result.
+fn append(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let names = list(p, "inputs");
+    let (target_ds, target) = layer_in(inp, p, "input", &Work::degrees(), true)?;
+    let fcs: Vec<(String, Fc)> = names
+        .iter()
+        .map(|n| layer(inp, &serde_json::json!({ "x": n }), "x").map(|(d, f)| (d.name.clone(), f)))
+        .collect::<Result<_, _>>()?;
+    let inputs: Vec<tools::PathInput> = fcs.iter().map(|(n, f)| tools::PathInput { source: n.clone(), features: f }).collect();
+    let test = text(p, "schema_type").eq_ignore_ascii_case("TEST");
+    let out = tools::append_with(&inputs, &target, test, None).map_err(err)?;
+    finish_update(out, target_ds)
+}
+
+fn minimum_bounding_geometry(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    use geoforge_geometry::BoundingKind as K;
+    let (ds, fc) = layer(inp, p, "input")?;
+    let kind = match text(p, "geometry_type").to_ascii_uppercase().as_str() {
+        "ENVELOPE" => K::Envelope,
+        "CONVEX_HULL" => K::ConvexHull,
+        "RECTANGLE_BY_WIDTH" => K::RectangleByWidth,
+        "CIRCLE" => K::Circle,
+        _ => K::RectangleByArea,
+    };
+    let group = match text(p, "group_option").to_ascii_uppercase().as_str() {
+        "ALL" => tools::BoundingGroup::All,
+        "LIST" => tools::BoundingGroup::List(list(p, "group_fields")),
+        _ => tools::BoundingGroup::None,
+    };
+    let out = tools::minimum_bounding_geometry(&fc, kind, &group, flag(p, "mbg_fields")).map_err(err)?;
+    finish(out, out_name(p, format!("{}_MBG", ds.name)))
+}
+
+fn feature_vertices_to_points(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let (ds, fc) = layer(inp, p, "input")?;
+    let at = tools::VertexLocation::parse(text(p, "point_location")).unwrap_or(tools::VertexLocation::All);
+    finish(tools::feature_vertices_to_points(&fc, at).map_err(err)?, out_name(p, format!("{}_Vertices", ds.name)))
+}
+
+fn points_to_line(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let (ds, fc) = layer(inp, p, "input")?;
+    let opt = |k: &str| Some(text(p, k)).filter(|s| !s.is_empty());
+    let out = tools::points_to_line(&fc, opt("line_field"), opt("sort_field"), flag(p, "close")).map_err(err)?;
+    finish(out, out_name(p, format!("{}_Line", ds.name)))
+}
+
+fn sort(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let (ds, fc) = layer(inp, p, "input")?;
+    // "FIELD ASCENDING;FIELD2 DESCENDING"
+    let keys: Vec<(String, bool)> = list(p, "sort_fields")
+        .iter()
+        .map(|k| match k.rsplit_once(char::is_whitespace) {
+            Some((f, o)) if o.eq_ignore_ascii_case("DESCENDING") => (f.trim().to_string(), false),
+            Some((f, o)) if o.eq_ignore_ascii_case("ASCENDING") => (f.trim().to_string(), true),
+            _ => (k.clone(), true),
+        })
+        .collect();
+    let spatial = tools::SpatialSort::parse(text(p, "spatial_sort_method")).unwrap_or(tools::SpatialSort::UpperRight);
+    finish(tools::sort(&fc, &keys, spatial).map_err(err)?, out_name(p, format!("{}_Sort", ds.name)))
+}
+
+fn add_xy(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let (ds, fc) = layer_in(inp, p, "input", &Work::degrees(), true)?;
+    finish_update(tools::add_xy(&fc).map_err(err)?, ds)
+}
+
+fn add_field(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let (ds, fc) = layer_in(inp, p, "input", &Work::degrees(), true)?;
+    let n = |k: &str| number(p, k).map(|v| v as u32);
+    let out =
+        tools::add_field(&fc, text(p, "field_name"), text(p, "field_type"), n("field_precision"), n("field_scale"), n("field_length"))
+            .map_err(err)?;
+    finish_update(out, ds)
+}
+
+fn delete_field(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let (ds, fc) = layer_in(inp, p, "input", &Work::degrees(), true)?;
+    let keep = text(p, "method").eq_ignore_ascii_case("KEEP_FIELDS");
+    finish_update(tools::delete_field(&fc, &list(p, "fields"), keep).map_err(err)?, ds)
+}
+
+fn calculate_field(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let (ds, fc) = layer_in(inp, p, "input", &Work::degrees(), true)?;
+    let ty = Some(text(p, "field_type")).filter(|s| !s.is_empty());
+    let out = tools::calculate_field(&fc, text(p, "field"), text(p, "expression"), text(p, "code_block"), ty).map_err(err)?;
+    finish_update(out, ds)
+}
+
+fn delete_identical(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let (ds, fc) = layer_in(inp, p, "input", &Work::degrees(), true)?;
+    let tol = number(p, "xy_tolerance").unwrap_or(0.001);
+    finish_update(tools::delete_identical(&fc, &list(p, "fields"), tol).map_err(err)?, ds)
+}
+
+fn find_identical(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let (ds, fc) = layer(inp, p, "input")?;
+    let t = tools::find_identical(&fc, &list(p, "fields"), flag(p, "only_duplicates")).map_err(err)?;
+    let t = table_dataset(t, out_name(p, format!("{}_Identical", ds.name)));
+    let m = vec![format!("{}: {} rows", t.name, t.features.len())];
+    Ok(ToolResult { output: Output::Table(t), messages: m })
+}
+
+/// Generate Near Table: distances in metres.
+fn generate_near_table(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let all = datasets(inp, p, &["input", "near"])?;
+    let work = Work::metres(&all)?;
+    let (ds, fc) = layer_in(inp, p, "input", &work, false)?;
+    let (_, nfc) = layer_in(inp, p, "near", &work, false)?;
+    let count = number(p, "closest_count").map_or(1, |c| c.max(1.0) as usize);
+    let all_matches = text(p, "method").eq_ignore_ascii_case("ALL");
+    let t = tools::generate_near_table(&fc, &nfc, metres(p, "search_radius"), false, flag(p, "angle"), all_matches, count).map_err(err)?;
+    let t = table_dataset(t, out_name(p, format!("{}_NearTable", ds.name)));
+    let mut m = vec![format!("{}: {} rows", t.name, t.features.len())];
+    m.extend(work.note);
+    Ok(ToolResult { output: Output::Table(t), messages: m })
+}
+
 fn frequency(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     let (ds, fc) = layer(inp, p, "input")?;
     let t = tools::frequency(&fc, &list(p, "fields"), &list(p, "summary_fields")).map_err(err)?;
@@ -975,6 +1133,351 @@ const DEFS: &[Def] = &[
         ],
         run: statistics,
     },
+    Def {
+        id: "identity",
+        name: "Identity",
+        toolbox: "GeoForge › Analysis › Overlay",
+        summary: "Splits the input where identity polygons overlap it, keeping all input (ArcGIS Pro Identity).",
+        params: &[
+            INPUT,
+            OTHER,
+            P {
+                name: "join_attributes",
+                label: "Attributes to Join",
+                kind: K::Choice(&["ALL", "NO_FID", "ONLY_FID"]),
+                required: false,
+                default: "\"ALL\"",
+                help: "",
+            },
+            P {
+                name: "keep_relationships",
+                label: "Keep relationships",
+                kind: K::Bool,
+                required: false,
+                default: "false",
+                help: "Lines and points: LEFT_/RIGHT_ columns.",
+            },
+            OUTPUT,
+        ],
+        run: identity,
+    },
+    Def {
+        id: "update",
+        name: "Update",
+        toolbox: "GeoForge › Analysis › Overlay",
+        summary: "The input with the update polygons laid over it (ArcGIS Pro Update).",
+        params: &[INPUT, OTHER, OUTPUT],
+        run: update,
+    },
+    Def {
+        id: "merge",
+        name: "Merge",
+        toolbox: "GeoForge › Data Management › General",
+        summary: "Combines layers into one, matching fields by name (ArcGIS Pro Merge).",
+        params: &[
+            P {
+                name: "inputs",
+                label: "Input Datasets",
+                kind: K::Text,
+                required: true,
+                default: "",
+                help: "Layer names separated by semicolons.",
+            },
+            P {
+                name: "add_source",
+                label: "Add source information (MERGE_SRC)",
+                kind: K::Bool,
+                required: false,
+                default: "false",
+                help: "",
+            },
+            OUTPUT,
+        ],
+        run: merge,
+    },
+    Def {
+        id: "append",
+        name: "Append",
+        toolbox: "GeoForge › Data Management › General",
+        summary: "Adds features of other layers to a target layer, which is updated (ArcGIS Pro Append).",
+        params: &[
+            P {
+                name: "inputs",
+                label: "Input Datasets",
+                kind: K::Text,
+                required: true,
+                default: "",
+                help: "Layer names separated by semicolons.",
+            },
+            P { name: "input", label: "Target Dataset", kind: K::Layer, required: true, default: "", help: "" },
+            P {
+                name: "schema_type",
+                label: "Field Matching Type",
+                kind: K::Choice(&["NO_TEST", "TEST"]),
+                required: false,
+                default: "\"NO_TEST\"",
+                help: "",
+            },
+        ],
+        run: append,
+    },
+    Def {
+        id: "minimum_bounding_geometry",
+        name: "Minimum Bounding Geometry",
+        toolbox: "GeoForge › Data Management › Features",
+        summary: "A polygon around each feature or group (ArcGIS Pro Minimum Bounding Geometry).",
+        params: &[
+            INPUT,
+            P {
+                name: "geometry_type",
+                label: "Geometry Type",
+                kind: K::Choice(&["RECTANGLE_BY_AREA", "RECTANGLE_BY_WIDTH", "CONVEX_HULL", "CIRCLE", "ENVELOPE"]),
+                required: false,
+                default: "\"RECTANGLE_BY_AREA\"",
+                help: "",
+            },
+            P {
+                name: "group_option",
+                label: "Group Option",
+                kind: K::Choice(&["NONE", "ALL", "LIST"]),
+                required: false,
+                default: "\"NONE\"",
+                help: "",
+            },
+            P {
+                name: "group_fields",
+                label: "Group Fields",
+                kind: K::Text,
+                required: false,
+                default: "",
+                help: "For LIST: field names separated by semicolons.",
+            },
+            P {
+                name: "mbg_fields",
+                label: "Add geometry characteristic fields",
+                kind: K::Bool,
+                required: false,
+                default: "false",
+                help: "",
+            },
+            OUTPUT,
+        ],
+        run: minimum_bounding_geometry,
+    },
+    Def {
+        id: "feature_vertices_to_points",
+        name: "Feature Vertices To Points",
+        toolbox: "GeoForge › Data Management › Features",
+        summary: "Points at the vertices, ends, middle or dangles of lines and polygons (ArcGIS Pro Feature Vertices To Points).",
+        params: &[
+            INPUT,
+            P {
+                name: "point_location",
+                label: "Point Type",
+                kind: K::Choice(&["ALL", "START", "END", "BOTH_ENDS", "MID", "DANGLE"]),
+                required: false,
+                default: "\"ALL\"",
+                help: "",
+            },
+            OUTPUT,
+        ],
+        run: feature_vertices_to_points,
+    },
+    Def {
+        id: "points_to_line",
+        name: "Points To Line",
+        toolbox: "GeoForge › Data Management › Features",
+        summary: "Connects points into lines, by line field and sort field (ArcGIS Pro Points To Line).",
+        params: &[
+            INPUT,
+            P { name: "line_field", label: "Line Field", kind: K::Field, required: false, default: "", help: "" },
+            P { name: "sort_field", label: "Sort Field", kind: K::Field, required: false, default: "", help: "" },
+            P { name: "close", label: "Close Line", kind: K::Bool, required: false, default: "false", help: "" },
+            OUTPUT,
+        ],
+        run: points_to_line,
+    },
+    Def {
+        id: "sort",
+        name: "Sort",
+        toolbox: "GeoForge › Data Management › General",
+        summary: "Reorders features by fields or by position (ArcGIS Pro Sort).",
+        params: &[
+            INPUT,
+            P {
+                name: "sort_fields",
+                label: "Sort Fields",
+                kind: K::Text,
+                required: true,
+                default: "",
+                help: "FIELD ASCENDING|DESCENDING pairs separated by semicolons; Shape sorts by position.",
+            },
+            P {
+                name: "spatial_sort_method",
+                label: "Spatial Sort Method",
+                kind: K::Choice(&["UR", "UL", "LR", "LL"]),
+                required: false,
+                default: "\"UR\"",
+                help: "",
+            },
+            OUTPUT,
+        ],
+        run: sort,
+    },
+    Def {
+        id: "add_xy",
+        name: "Add XY Coordinates",
+        toolbox: "GeoForge › Data Management › Features",
+        summary: "Adds POINT_X and POINT_Y to the layer, in place (ArcGIS Pro Add XY Coordinates).",
+        params: &[INPUT],
+        run: add_xy,
+    },
+    Def {
+        id: "add_field",
+        name: "Add Field",
+        toolbox: "GeoForge › Data Management › Fields",
+        summary: "Adds a field to the layer, in place (ArcGIS Pro Add Field).",
+        params: &[
+            INPUT,
+            P { name: "field_name", label: "Field Name", kind: K::Text, required: true, default: "", help: "" },
+            P {
+                name: "field_type",
+                label: "Field Type",
+                kind: K::Choice(&["TEXT", "SHORT", "LONG", "FLOAT", "DOUBLE", "DATE"]),
+                required: true,
+                default: "\"TEXT\"",
+                help: "",
+            },
+            P { name: "field_length", label: "Field Length", kind: K::Number, required: false, default: "", help: "Text fields." },
+            P { name: "field_precision", label: "Field Precision", kind: K::Number, required: false, default: "", help: "" },
+            P { name: "field_scale", label: "Field Scale", kind: K::Number, required: false, default: "", help: "" },
+        ],
+        run: add_field,
+    },
+    Def {
+        id: "delete_field",
+        name: "Delete Field",
+        toolbox: "GeoForge › Data Management › Fields",
+        summary: "Removes fields from the layer, in place (ArcGIS Pro Delete Field).",
+        params: &[
+            INPUT,
+            P { name: "fields", label: "Fields", kind: K::Text, required: true, default: "", help: "Field names separated by semicolons." },
+            P {
+                name: "method",
+                label: "Method",
+                kind: K::Choice(&["DELETE_FIELDS", "KEEP_FIELDS"]),
+                required: false,
+                default: "\"DELETE_FIELDS\"",
+                help: "",
+            },
+        ],
+        run: delete_field,
+    },
+    Def {
+        id: "calculate_field",
+        name: "Calculate Field",
+        toolbox: "GeoForge › Data Management › Fields",
+        summary: "Fills a field from a Python expression using !FIELD! values, in place (ArcGIS Pro Calculate Field, PYTHON3).",
+        params: &[
+            INPUT,
+            P { name: "field", label: "Field Name", kind: K::Text, required: true, default: "", help: "" },
+            P { name: "expression", label: "Expression", kind: K::Text, required: true, default: "", help: "e.g. !POP! / !AREA! * 1000" },
+            P {
+                name: "code_block",
+                label: "Code Block",
+                kind: K::Text,
+                required: false,
+                default: "",
+                help: "Python functions the expression uses.",
+            },
+            P {
+                name: "field_type",
+                label: "Field Type",
+                kind: K::Choice(&["", "TEXT", "SHORT", "LONG", "FLOAT", "DOUBLE", "DATE"]),
+                required: false,
+                default: "",
+                help: "Creates the field if it is missing.",
+            },
+        ],
+        run: calculate_field,
+    },
+    Def {
+        id: "delete_identical",
+        name: "Delete Identical",
+        toolbox: "GeoForge › Data Management › General",
+        summary: "Removes features that repeat the values or shape of an earlier one, in place (ArcGIS Pro Delete Identical).",
+        params: &[
+            INPUT,
+            P {
+                name: "fields",
+                label: "Fields",
+                kind: K::Text,
+                required: true,
+                default: "",
+                help: "Field names separated by semicolons; Shape compares geometries.",
+            },
+            P {
+                name: "xy_tolerance",
+                label: "XY Tolerance",
+                kind: K::Number,
+                required: false,
+                default: "",
+                help: "Degrees. Default 0.001.",
+            },
+        ],
+        run: delete_identical,
+    },
+    Def {
+        id: "find_identical",
+        name: "Find Identical",
+        toolbox: "GeoForge › Data Management › General",
+        summary: "A table of features that share values or shape (ArcGIS Pro Find Identical).",
+        params: &[
+            INPUT,
+            P {
+                name: "fields",
+                label: "Fields",
+                kind: K::Text,
+                required: true,
+                default: "",
+                help: "Field names separated by semicolons; Shape compares geometries.",
+            },
+            P {
+                name: "only_duplicates",
+                label: "Output only duplicate records",
+                kind: K::Bool,
+                required: false,
+                default: "false",
+                help: "",
+            },
+            OUTPUT,
+        ],
+        run: find_identical,
+    },
+    Def {
+        id: "generate_near_table",
+        name: "Generate Near Table",
+        toolbox: "GeoForge › Analysis › Proximity",
+        summary: "A table of the nearest features and their distances in metres (ArcGIS Pro Generate Near Table).",
+        params: &[
+            INPUT,
+            P { name: "near", label: "Near Features", kind: K::Layer, required: true, default: "", help: "" },
+            P { name: "search_radius", label: "Search Radius", kind: K::Number, required: false, default: "", help: "" },
+            UNITS,
+            P {
+                name: "method",
+                label: "Closest or all",
+                kind: K::Choice(&["CLOSEST", "ALL"]),
+                required: false,
+                default: "\"CLOSEST\"",
+                help: "",
+            },
+            P { name: "closest_count", label: "Maximum closest features", kind: K::Number, required: false, default: "1", help: "" },
+            P { name: "angle", label: "Add NEAR_ANGLE", kind: K::Bool, required: false, default: "false", help: "" },
+            OUTPUT,
+        ],
+        run: generate_near_table,
+    },
 ];
 
 fn specs() -> Vec<ToolSpec> {
@@ -1159,30 +1662,79 @@ mod tests {
     }
 
     #[test]
+    fn field_tools_work_in_place_and_others_make_layers() {
+        register();
+        let layers = Layers(vec![points("p", &[(10.0, 50.0), (11.0, 51.0), (10.0, 50.0), (12.0, 52.0)]), square("a", 0.0, 0.0, 1.0)]);
+        let update = |tool: &str, params: Json| match rustgis_analysis::run(tool, &layers, &params).unwrap().output {
+            Output::Update { layer, dataset } => {
+                assert_eq!(layer, "p");
+                dataset
+            }
+            _ => panic!("expected an in-place update"),
+        };
+        let d = update("geoforge:add_field", json!({"input": "p", "field_name": "dbl", "field_type": "DOUBLE"}));
+        assert_eq!(d.fields.last().unwrap().name, "dbl");
+        let d = update("geoforge:calculate_field", json!({"input": "p", "field": "N", "expression": "!N! * 10 + 1"}));
+        assert_eq!(d.features.iter().map(|f| f.attrs[0].clone()).collect::<Vec<_>>(), [1, 11, 21, 31].map(Value::Int));
+        let d = update("geoforge:add_xy", json!({"input": "p"}));
+        let names: Vec<&str> = d.fields.iter().map(|f| f.name.as_str()).collect();
+        assert_eq!(names, ["N", "POINT_X", "POINT_Y"]);
+        let d = update("geoforge:delete_identical", json!({"input": "p", "fields": "Shape"}));
+        assert_eq!(d.features.len(), 3, "the repeated location is gone");
+        let d = update("geoforge:delete_field", json!({"input": "p", "fields": "N", "method": "KEEP_FIELDS"}));
+        assert_eq!(d.fields.len(), 1);
+        // Sort puts the largest first; Merge adds the layers up; Find Identical lists the repeats.
+        let Output::Layer(sorted) =
+            rustgis_analysis::run("geoforge:sort", &layers, &json!({"input": "p", "sort_fields": "N DESCENDING"})).unwrap().output
+        else {
+            panic!("layer")
+        };
+        assert_eq!(sorted.features.iter().map(|f| f.attrs[0].clone()).collect::<Vec<_>>(), [3, 2, 1, 0].map(Value::Int));
+        let Output::Layer(m) = rustgis_analysis::run("geoforge:merge", &layers, &json!({"inputs": "p;p"})).unwrap().output else {
+            panic!("layer")
+        };
+        assert_eq!(m.features.len(), 8);
+        let Output::Table(t) =
+            rustgis_analysis::run("geoforge:find_identical", &layers, &json!({"input": "p", "fields": "Shape", "only_duplicates": true}))
+                .unwrap()
+                .output
+        else {
+            panic!("table")
+        };
+        assert_eq!(t.features.len(), 2);
+        let Output::Layer(v) =
+            rustgis_analysis::run("geoforge:feature_vertices_to_points", &layers, &json!({"input": "a", "point_location": "ALL"}))
+                .unwrap()
+                .output
+        else {
+            panic!("layer")
+        };
+        assert_eq!(v.geometry_type, GeometryType::Point);
+        assert!(v.features.len() >= 4);
+    }
+
+    #[test]
     fn bad_parameters_are_errors_not_panics() {
         register();
-        let layers = Layers(vec![square("a", 0.0, 0.0, 1.0)]);
-        for id in [
-            "clip",
-            "erase",
-            "intersect",
-            "union",
-            "dissolve",
-            "feature_to_point",
-            "buffer",
-            "near",
-            "spatial_join",
-            "select_by_location",
-            "select",
-            "frequency",
-            "statistics",
-        ] {
-            let _ = rustgis_analysis::run(&format!("geoforge:{id}"), &layers, &json!({"input": "nope", "clip": 3, "other": null}));
-            let _ = rustgis_analysis::run(
-                &format!("geoforge:{id}"),
-                &layers,
-                &json!({"input": "a", "clip": "a", "erase": "a", "other": "a", "fields": "NOPE"}),
-            );
+        let layers = Layers(vec![square("a", 0.0, 0.0, 1.0), points("p", &[(10.0, 50.0), (10.0, 50.0)])]);
+        let tools = rustgis_analysis::external_tools_of(SOURCE);
+        assert!(tools.len() >= 25, "{} tools", tools.len());
+        let hostile = [
+            json!({}),
+            json!({"input": "nope", "clip": 3, "other": null, "near": [], "inputs": {}}),
+            json!({"input": "a", "clip": "a", "erase": "a", "other": "a", "near": "a", "fields": "NOPE", "inputs": "a;a", "field": "NOPE", "expression": "1/0 +"}),
+            json!({"input": "p", "clip": "p", "other": "p", "near": "p", "inputs": "p;a;nope", "fields": "N;Shape;N", "field_name": "x y", "field_type": "BLOB",
+                   "distance": -1e308, "search_radius": "NaN", "search_distance": 1e308, "units": "FURLONGS", "closest_count": -5, "sort_fields": "N SIDEWAYS;;",
+                   "statistics": "N MODE", "where": "((", "expression": "!N! +", "code_block": "def f(", "point_location": "x", "match_option": "x"}),
+            json!({"input": 5, "distance": "far", "field": {}, "fields": [1, 2], "method": null}),
+        ];
+        for t in tools {
+            for p in &hostile {
+                if let Err(e) = rustgis_analysis::run(t.id, &layers, p) {
+                    // `run` turns a panic into this message: that is a bug in the tool.
+                    assert!(!e.contains("failed unexpectedly"), "{} panicked on {p}", t.id);
+                }
+            }
         }
     }
 }
