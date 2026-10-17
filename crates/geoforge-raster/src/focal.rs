@@ -34,6 +34,23 @@ impl Neighborhood {
         })
     }
 
+    /// How many cells the neighborhood spans (an upper bound), for refusing absurd sizes.
+    pub fn cell_count(&self) -> u64 {
+        match *self {
+            Neighborhood::Rectangle { width, height } => {
+                (width as u64).saturating_mul(height as u64)
+            }
+            Neighborhood::Circle { radius } => {
+                let d = (radius.abs().floor() * 2.0 + 1.0).min(u32::MAX as f64) as u64;
+                d.saturating_mul(d)
+            }
+            Neighborhood::Annulus { outer, .. } => {
+                let d = (outer.abs().floor() * 2.0 + 1.0).min(u32::MAX as f64) as u64;
+                d.saturating_mul(d)
+            }
+        }
+    }
+
     /// (dx, dy) offsets of the cells in the neighborhood, row by row.
     pub fn offsets(&self) -> Vec<(isize, isize)> {
         let mut out = Vec::new();

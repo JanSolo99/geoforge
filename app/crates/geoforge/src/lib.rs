@@ -13,6 +13,8 @@
 //! projected data, in metres, and their results are projected back: see [`Work`].
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
 
+mod raster;
+
 use geoforge_core as gf;
 use geoforge_tools as tools;
 use rustgis_analysis::{Inputs, Output, ParamKind as K, ParamSpec as P, ToolResult, ToolSpec};
@@ -1482,6 +1484,7 @@ const DEFS: &[Def] = &[
 
 fn specs() -> Vec<ToolSpec> {
     DEFS.iter()
+        .chain(raster::DEFS)
         .map(|d| ToolSpec {
             // Ids are `geoforge:<id>`; leaked once, like the other suites' specs.
             id: Box::leak(format!("{PREFIX}{}", d.id).into_boxed_str()),
@@ -1496,7 +1499,7 @@ fn specs() -> Vec<ToolSpec> {
 
 fn run(spec: &ToolSpec, inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     let id = spec.id.strip_prefix(PREFIX).unwrap_or(spec.id);
-    let def = DEFS.iter().find(|d| d.id == id).ok_or_else(|| format!("no tool '{}'", spec.id))?;
+    let def = DEFS.iter().chain(raster::DEFS).find(|d| d.id == id).ok_or_else(|| format!("no tool '{}'", spec.id))?;
     (def.run)(inp, p)
 }
 
@@ -1713,6 +1716,123 @@ mod tests {
         assert!(v.features.len() >= 4);
     }
 
+    /// A raster layer on disk, as the app holds one.
+    struct WithRasters {
+        layers: Layers,
+        rasters: Vec<(String, rustgis_data::raster::Raster, String)>,
+    }
+
+    impl Inputs for WithRasters {
+        fn dataset(&self, layer: &str) -> Option<&Dataset> {
+            self.layers.dataset(layer)
+        }
+        fn selection(&self, _: &str) -> &[usize] {
+            &[]
+        }
+        fn raster(&self, layer: &str) -> Option<rustgis_analysis::RasterInput<'_>> {
+            self.rasters.iter().find(|(n, ..)| n == layer).map(|(_, r, path)| rustgis_analysis::RasterInput {
+                raster: r,
+                path: Some(path.as_str()),
+                embedded: None,
+            })
+        }
+    }
+
+    /// A cone-shaped DEM in UTM 33N, written as a GeoTIFF and read back by the app.
+    fn dem(name: &str) -> (geoforge_raster::Raster, WithRasters) {
+        let mut r = geoforge_raster::Raster::new(24, 24, geoforge_raster::DataType::F32, [500_000.0, 30.0, 0.0, 5_000_720.0, 0.0, -30.0]);
+        r.epsg = Some(32633);
+        r.nodata = Some(-9999.0);
+        for row in 0..24 {
+            for col in 0..24 {
+                let d = (((col as f64 - 11.5).powi(2) + (row as f64 - 11.5).powi(2)).sqrt()) * 4.0;
+                r.bands[0][row * 24 + col] = (100.0 - d) as f32 as f64;
+            }
+        }
+        let path = std::env::temp_dir().join(format!("gf-bridge-{name}-{}.tif", std::process::id()));
+        geoforge_raster::write_geotiff(&path, &r, geoforge_raster::Compression::None).unwrap();
+        let app = rustgis_data::raster::read_path(&path).unwrap();
+        (r, WithRasters { layers: Layers(vec![]), rasters: vec![(name.to_string(), app, path.display().to_string())] })
+    }
+
+    fn raster_of(r: Result<ToolResult, String>) -> geoforge_raster::Raster {
+        let Output::Layers(mut v) = r.unwrap().output else { panic!("layers") };
+        let rustgis_analysis::OutputLayer::Raster { bytes, .. } = v.remove(0) else { panic!("raster") };
+        let path = std::env::temp_dir().join(format!("gf-bridge-out-{}-{}.tif", std::process::id(), bytes.len()));
+        std::fs::write(&path, bytes).unwrap();
+        let out = geoforge_raster::read_geotiff(&path).unwrap();
+        std::fs::remove_file(&path).ok();
+        out
+    }
+
+    #[test]
+    fn raster_tools_equal_the_engine() {
+        register();
+        let (dem_gf, inp) = dem("DEM");
+        // Slope: the cells the engine computes, with the input's grid and coordinate system.
+        let out = raster_of(rustgis_analysis::run(
+            "geoforge:slope",
+            &inp,
+            &json!({"input": "DEM", "output_measurement": "PERCENT_RISE", "z_factor": 2}),
+        ));
+        let want = geoforge_raster::surface::slope(&dem_gf, geoforge_raster::surface::SlopeUnit::PercentRise, 2.0);
+        assert_eq!((out.width, out.height, out.epsg), (24, 24, Some(32633)));
+        assert_eq!(out.bands[0], want.bands[0]);
+        assert_eq!(out.transform, want.transform);
+        // Local math with a constant, and a Con on the result.
+        let plus = raster_of(rustgis_analysis::run("geoforge:plus", &inp, &json!({"in1": "DEM", "in2": "10"})));
+        assert!((plus.bands[0][12 * 24 + 12] - (dem_gf.bands[0][12 * 24 + 12] + 10.0)).abs() < 1e-4);
+        // Focal statistics, reclassify and resample run and keep the grid or change it as asked.
+        let focal = raster_of(rustgis_analysis::run(
+            "geoforge:focal_statistics",
+            &inp,
+            &json!({"input": "DEM", "neighborhood": "Rectangle 3 3 CELL", "statistics_type": "MAXIMUM"}),
+        ));
+        assert_eq!((focal.width, focal.height), (24, 24));
+        let rs = raster_of(rustgis_analysis::run(
+            "geoforge:resample",
+            &inp,
+            &json!({"input": "DEM", "cell_size": 60, "resampling_type": "BILINEAR"}),
+        ));
+        assert_eq!((rs.width, rs.height), (12, 12));
+        let reclass =
+            raster_of(rustgis_analysis::run("geoforge:reclassify", &inp, &json!({"input": "DEM", "remap": "-100 40 1;40 101 2"})));
+        assert!(reclass.bands[0].iter().all(|v| [1.0, 2.0].contains(v) || *v == reclass.nodata.unwrap_or(f64::NAN)));
+        // Hillshade with shadows and the hydrology chain.
+        let hs = raster_of(rustgis_analysis::run("geoforge:hillshade", &inp, &json!({"input": "DEM", "model_shadows": true})));
+        assert_eq!(hs.width, 24);
+        let filled = rustgis_analysis::run("geoforge:fill", &inp, &json!({"input": "DEM", "output": "Filled"})).unwrap();
+        assert!(filled.messages[0].starts_with("Filled"));
+    }
+
+    #[test]
+    fn raster_vector_results_are_in_longitude_latitude() {
+        register();
+        let (_, inp) = dem("DEM");
+        let Output::Layer(c) =
+            rustgis_analysis::run("geoforge:contour", &inp, &json!({"input": "DEM", "contour_interval": 20, "base_contour": 0}))
+                .unwrap()
+                .output
+        else {
+            panic!("layer")
+        };
+        assert!(c.features.len() >= 3, "{}", c.features.len());
+        assert_eq!(c.fields.iter().map(|f| f.name.as_str()).collect::<Vec<_>>(), ["Id", "Contour"]);
+        for f in &c.features {
+            let Some(Geometry::Line(parts)) = &f.geometry else { panic!("line") };
+            // UTM 33N, 500 000 E 5 000 000 N is 15 E, about 45.1 N.
+            for pt in parts.iter().flatten() {
+                assert!((14.0..16.0).contains(&pt.x) && (44.9..45.3).contains(&pt.y), "{pt:?}");
+            }
+        }
+        let Output::Layer(pts) = rustgis_analysis::run("geoforge:raster_to_point", &inp, &json!({"input": "DEM"})).unwrap().output else {
+            panic!("layer")
+        };
+        assert_eq!(pts.features.len(), 24 * 24);
+        let fields: Vec<&str> = pts.fields.iter().map(|f| f.name.as_str()).collect();
+        assert_eq!(fields, ["pointid", "grid_code"]);
+    }
+
     #[test]
     fn bad_parameters_are_errors_not_panics() {
         register();
@@ -1732,6 +1852,21 @@ mod tests {
             for p in &hostile {
                 if let Err(e) = rustgis_analysis::run(t.id, &layers, p) {
                     // `run` turns a panic into this message: that is a bug in the tool.
+                    assert!(!e.contains("failed unexpectedly"), "{} panicked on {p}", t.id);
+                }
+            }
+        }
+        // The raster tools against a real raster, with parameters that do not fit it.
+        let (_, rinp) = dem("DEM");
+        let raster_hostile = [
+            json!({"input": "DEM"}),
+            json!({"input": "DEM", "in1": "DEM", "in2": "DEM", "mask": "DEM", "zones": "DEM", "streams": "DEM", "weight": "DEM", "pour_points": "DEM", "true_value": "DEM", "false_value": "nan"}),
+            json!({"input": "DEM", "cell_size": 0, "contour_interval": -1, "z_factor": "x", "remap": "1 2", "neighborhood": "Circle -3 CELL", "statistics_type": "MODE", "where_clause": "VALUE >>", "maximum_distance": -5}),
+            json!({"input": "DEM", "cell_size": 1e-300, "contour_interval": 1e-9, "neighborhood": "Rectangle 99999 99999 CELL", "in1": "1e999", "in2": "0", "azimuth": "NaN", "altitude": 1e308}),
+        ];
+        for t in tools {
+            for p in &raster_hostile {
+                if let Err(e) = rustgis_analysis::run(t.id, &rinp, p) {
                     assert!(!e.contains("failed unexpectedly"), "{} panicked on {p}", t.id);
                 }
             }

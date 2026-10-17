@@ -1897,6 +1897,7 @@ name = "geoforge-filegdb"
 version = "0.0.1"
 dependencies = [
  "chrono",
+ "flate2",
  "geoforge-core",
  "roxmltree 0.20.0",
  "thiserror 2.0.21",
@@ -1910,6 +1911,16 @@ dependencies = [
  "geoforge-core",
  "i_overlay",
  "rstar",
+]
+
+[[package]]
+name = "geoforge-raster"
+version = "0.0.1"
+dependencies = [
+ "flate2",
+ "geoforge-core",
+ "tiff",
+ "weezl",
 ]
 
 [[package]]
@@ -4130,6 +4141,7 @@ version = "0.2.0"
 dependencies = [
  "geoforge-core",
  "geoforge-geometry",
+ "geoforge-raster",
  "geoforge-tools",
  "rustgis-analysis",
  "rustgis-data",

@@ -31,6 +31,16 @@ fn cubic_weight(t: f64) -> f64 {
 /// the most common value among the 4 × 4 input cells nearest the output cell
 /// center, clipped to the output extent (ties to the smaller value), and is
 /// NoData where the center falls in a NoData cell or outside the input.
+/// The (columns, rows) `resample(r, cell, ..)` gives.
+pub fn output_size(r: &Raster, cell: f64) -> (u64, u64) {
+    let size =
+        |n: usize, c: f64| ((n as f64 * c / cell).round().clamp(1.0, u64::MAX as f64)) as u64;
+    (
+        size(r.width, r.cell_width()),
+        size(r.height, r.cell_height()),
+    )
+}
+
 pub fn resample(r: &Raster, cell: f64, technique: Technique) -> Raster {
     let (cw, ch) = (r.cell_width(), r.cell_height());
     let cols = ((r.width as f64 * cw / cell).round() as usize).max(1);

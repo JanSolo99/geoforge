@@ -1979,6 +1979,12 @@ fn main() -> ExitCode {
                 "NODATA" => false,
                 other => return Err(Error::Unsupported(format!("ignore_nodata {other}"))),
             };
+            if nbr.cell_count() > 4_000_000 {
+                return Err(Error::Unsupported(format!(
+                    "the neighborhood spans {} cells",
+                    nbr.cell_count()
+                )));
+            }
             let input = geoforge_raster::read_geotiff(&in_raster)?;
             let out = geoforge_raster::focal::focal_statistics(&input, nbr, stat, ignore);
             write_raster(&out_raster, &out)
@@ -2187,6 +2193,14 @@ fn main() -> ExitCode {
             base_contour,
         } => (|| {
             let r = geoforge_raster::read_geotiff(&in_raster)?;
+            if geoforge_raster::contour::level_count(&r, contour_interval, base_contour)
+                > geoforge_raster::contour::MAX_LEVELS
+            {
+                return Err(Error::Unsupported(format!(
+                    "the contour interval {contour_interval} gives more than {} levels",
+                    geoforge_raster::contour::MAX_LEVELS
+                )));
+            }
             let lines = geoforge_raster::contour::contour(&r, contour_interval, base_contour);
             let features = lines
                 .into_iter()
@@ -2469,6 +2483,12 @@ fn main() -> ExitCode {
                 other => return Err(Error::Unsupported(format!("resampling type {other}"))),
             };
             let r = geoforge_raster::read_geotiff(&in_raster)?;
+            let (cols, rows) = geoforge_raster::resample::output_size(&r, cell_size);
+            if cols.saturating_mul(rows) > geoforge_raster::MAX_CELLS {
+                return Err(Error::Unsupported(format!(
+                    "a cell size of {cell_size} would give {cols} x {rows} cells"
+                )));
+            }
             write_raster(
                 &out_raster,
                 &geoforge_raster::resample::resample(&r, cell_size, t),

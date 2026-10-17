@@ -32,6 +32,25 @@ fn edge(a: Node, b: Node) -> Edge {
     if a < b { (a, b) } else { (b, a) }
 }
 
+/// The most contour levels one run draws; more is a mistake (an interval of a millionth of the range).
+pub const MAX_LEVELS: i64 = 100_000;
+
+/// How many contour levels `contour(r, interval, base)` would draw (0 for none).
+pub fn level_count(r: &Raster, interval: f64, base: f64) -> i64 {
+    let mut valid = r.bands[0].iter().copied().filter(|v| !r.is_nodata(*v));
+    let Some(first) = valid.next() else { return 0 };
+    if interval.is_nan() || interval <= 0.0 || !interval.is_finite() {
+        return 0;
+    }
+    let (lo, hi) = valid.fold((first, first), |(lo, hi), v| (lo.min(v), hi.max(v)));
+    let n = ((hi - base) / interval).floor() - ((lo - base) / interval).ceil() + 1.0;
+    if n.is_finite() {
+        n.clamp(0.0, i64::MAX as f64) as i64
+    } else {
+        i64::MAX
+    }
+}
+
 /// Contours at `base + k * interval` between the raster's minimum and maximum.
 pub fn contour(r: &Raster, interval: f64, base: f64) -> Vec<ContourLine> {
     let (w, h) = (r.width, r.height);
@@ -45,6 +64,9 @@ pub fn contour(r: &Raster, interval: f64, base: f64) -> Vec<ContourLine> {
     }
     let lo = valid.iter().copied().fold(f64::INFINITY, f64::min);
     let hi = valid.iter().copied().fold(f64::NEG_INFINITY, f64::max);
+    if level_count(r, interval, base) > MAX_LEVELS {
+        return Vec::new();
+    }
     let k0 = ((lo - base) / interval).ceil() as i64;
     let k1 = ((hi - base) / interval).floor() as i64;
     let t = &r.transform;

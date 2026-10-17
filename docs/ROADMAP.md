@@ -458,7 +458,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
 - [ ] wgpu-based 2D map renderer (symbology, labeling, raster stretch)
 - [ ] Desktop app shell: `app/` (vendored RustGIS, egui) is the shell. File Geodatabase `FeatureSource`
       and File Geodatabase output done (`app/crates/data/src/source/filegdb.rs`), our overlay/proximity tools
-      registered in its `ToolSpec` registry (`app/crates/geoforge`); next: more tools, Python/MCP bindings
+      registered in its `ToolSpec` registry (`app/crates/geoforge`, vector and raster tools); next: more tools
 - [ ] Layout view + PDF/PNG/TIFF export; 3D scene view
 
 ## Phase 9 — Advanced

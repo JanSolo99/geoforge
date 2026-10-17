@@ -21,6 +21,9 @@ pub mod zonal;
 pub use geotiff::{Compression, read_geotiff, write_geotiff};
 pub use writer::{OverviewResampling, WriteOptions, write_geotiff_with};
 
+/// The most cells an output raster may have (tools refuse parameters that would need more).
+pub const MAX_CELLS: u64 = 1 << 31;
+
 /// The pixel type a raster is stored with (ArcGIS "Pixel Type").
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DataType {

@@ -32,6 +32,14 @@ original copyright notices and mark modified files.
   bits become doubles, booleans small integers. `layer.addData` adds a `.gdb` (all its feature classes) or
   `x.gdb/name`; `share.exportLayer` takes `*.gdb`. ArcGIS Pro opens the output (Describe, cursor, Check
   Geometry).
+- Raster tools (`crates/geoforge/src/raster.rs`): Slope, Aspect, Hillshade, Curvature, Contour, Fill, Flow
+  Direction/Accumulation/Length, Basin, Watershed, Stream Link/Order, Focal Statistics, Reclassify, Zonal
+  Statistics, Resample, Euclidean Distance, Extract by Mask, Plus/Minus/Times/Divide, Int, Float, Is Null, Con,
+  Set Null, Raster To Point/Polygon. A raster is read from its GeoTIFF (file or embedded bytes) so the pixel type
+  and NoData are the file's; results are GeoTIFFs with ArcGIS's tiling and compression, returned as raster
+  layers in the input's coordinate system. Vector results (contours, points, polygons) are projected to
+  longitude/latitude. Absurd sizes (a contour interval giving over 100,000 levels, a cell size giving over 2^31
+  cells, a neighborhood of millions of cells) are refused; the hostile-parameter test covers them.
 - The CLI, Python and MCP surfaces of the app dispatch through `gp.run`, so every registered tool is
   reachable from them (`rustgis-cli run --cmd 'gp.run={"tool":"geoforge:buffer",...}'`, checked end to end
   with an export to a `.gdb`). The hostile-parameter test runs every registered GeoForge tool on junk
