@@ -18,6 +18,8 @@ Update this file when a gap is found or closed.
 | IDW | No barriers; the default cell size is checked only with the points' extent | `crates/geoforge-raster/tests/idw.rs` |
 | Integer output types of overlay tools | The `0..1` range gives NoData 16 and wide signed input stays S32 (observed on few runs) | `crates/geoforge-raster/tests/overlay.rs` |
 
+| Pattern statistics | ArcGIS's p-values come from an approximation up to 2e-8 from the exact normal tail; inverse distance treats distances under 1 as 1 (documented by Esri, not exercised by the references); the false discovery rate bins are checked only where nothing is significant | `crates/geoforge-cli/tests/spatstat_patterns.rs` |
+
 ## Not implemented
 
 | Tool | Missing |
@@ -28,7 +30,7 @@ Update this file when a gap is found or closed.
 | Generate Points Along Lines | Chainage fields |
 | Weighted Overlay | RESTRICTED, value fields other than VALUE, the attribute tables of Combine and Weighted Overlay, `gf weighted-overlay` |
 | Multiple Ring Buffer, Create Thiessen Polygons | Probed against ArcGIS (`scripts/research/construct/probe1.py`); ring and cell ordering not analysed yet |
-| Spatial Statistics | 57 of 63 tools (Average Nearest Neighbor, Spatial Autocorrelation, Hot Spot Analysis, ...) |
+| Spatial Statistics | 54 of 63 tools (Generate Spatial Weights Matrix, Collect Events, Ripley's K, Cluster and Outlier Analysis, OLS, GWR, ...); polygon contiguity conceptualizations and weights files in the three pattern tools |
 | Formats | LAS/LAZ, NetCDF/HDF, KML, DXF/DWG, Esri Grid/IMG, TIN, mobile geodatabase, `.shp.xml`, compressed `.cdf` |
 | Network Analyst, 3D Analyst, Geostatistical Analyst, Cartography | Not started |
 

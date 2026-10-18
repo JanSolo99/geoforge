@@ -50,6 +50,26 @@ pub trait Context {
     }
 }
 
+/// What a tool without a feature output reports: named numbers, and messages.
+#[derive(Debug, Clone, Default)]
+pub struct Report {
+    pub rows: Vec<(String, f64)>,
+    pub messages: Vec<String>,
+}
+
+/// How a tool runs: to a new feature class, or to a report of values.
+#[derive(Clone, Copy)]
+pub enum Runner {
+    Features(fn(&dyn Context) -> Result<ToolOutput>),
+    Report(fn(&dyn Context) -> Result<Report>),
+}
+
+/// What a run gave.
+pub enum Outcome {
+    Features(ToolOutput),
+    Report(Report),
+}
+
 pub struct Tool {
     pub id: &'static str,
     pub name: &'static str,
@@ -62,7 +82,7 @@ pub struct Tool {
     /// Whether the tool measures distances or areas: an application holding longitude/latitude
     /// data then runs it in the data's UTM zone, as ArcGIS does on projected data.
     pub measures: bool,
-    pub run: fn(&dyn Context) -> Result<ToolOutput>,
+    pub run: Runner,
 }
 
 pub fn find(id: &str) -> Option<&'static Tool> {
@@ -110,9 +130,12 @@ pub fn validate(tool: &Tool, ctx: &dyn Context) -> Result<()> {
 }
 
 /// Runs `tool` after checking the parameters.
-pub fn run(tool: &Tool, ctx: &dyn Context) -> Result<ToolOutput> {
+pub fn run(tool: &Tool, ctx: &dyn Context) -> Result<Outcome> {
     validate(tool, ctx)?;
-    (tool.run)(ctx)
+    match tool.run {
+        Runner::Features(f) => f(ctx).map(Outcome::Features),
+        Runner::Report(f) => f(ctx).map(Outcome::Report),
+    }
 }
 
 fn text(ctx: &dyn Context, tool: &Tool, name: &str) -> Option<String> {
@@ -404,6 +427,75 @@ fn polygon_to_line(ctx: &dyn Context) -> Result<ToolOutput> {
     construct::polygon_to_line(fc.as_ref())
 }
 
+const CONCEPTS: &[&str] = &[
+    "INVERSE_DISTANCE",
+    "INVERSE_DISTANCE_SQUARED",
+    "FIXED_DISTANCE_BAND",
+    "ZONE_OF_INDIFFERENCE",
+    "K_NEAREST_NEIGHBORS",
+];
+const DISTANCE_METHODS: &[&str] = &["EUCLIDEAN_DISTANCE", "MANHATTAN_DISTANCE"];
+
+fn number_of(ctx: &dyn Context, t: &Tool, name: &str) -> f64 {
+    text(ctx, t, name)
+        .and_then(|v| v.trim().parse().ok())
+        .unwrap_or(0.0)
+}
+
+fn distance_method(ctx: &dyn Context, t: &Tool) -> Result<spatstat::DistanceMethod> {
+    let m = text(ctx, t, "distance_method").unwrap_or_default();
+    spatstat::DistanceMethod::parse(&m)
+        .ok_or_else(|| Error::Unsupported(format!("distance method {m}")))
+}
+
+fn concept(ctx: &dyn Context, t: &Tool, neighbors: usize) -> Result<spatstat::Concept> {
+    let c = text(ctx, t, "conceptualization").unwrap_or_default();
+    spatstat::Concept::parse(&c, neighbors)
+        .ok_or_else(|| Error::Unsupported(format!("conceptualization {c}")))
+}
+
+fn average_nearest_neighbor(ctx: &dyn Context) -> Result<Report> {
+    let t = find("average_nearest_neighbor")
+        .ok_or_else(|| Error::Unsupported("average_nearest_neighbor".into()))?;
+    let fc = ctx.features("input")?;
+    spatstat::average_nearest_neighbor(
+        fc.as_ref(),
+        distance_method(ctx, t)?,
+        number_of(ctx, t, "area"),
+    )
+}
+
+fn spatial_autocorrelation(ctx: &dyn Context) -> Result<Report> {
+    let t = find("spatial_autocorrelation")
+        .ok_or_else(|| Error::Unsupported("spatial_autocorrelation".into()))?;
+    let fc = ctx.features("input")?;
+    let row = text(ctx, t, "standardization").is_some_and(|s| s.eq_ignore_ascii_case("ROW"));
+    spatstat::spatial_autocorrelation(
+        fc.as_ref(),
+        &text(ctx, t, "field").unwrap_or_default(),
+        concept(ctx, t, 8)?,
+        distance_method(ctx, t)?,
+        row,
+        number_of(ctx, t, "distance_band"),
+    )
+}
+
+fn hot_spot_analysis(ctx: &dyn Context) -> Result<ToolOutput> {
+    let t =
+        find("hot_spot_analysis").ok_or_else(|| Error::Unsupported("hot_spot_analysis".into()))?;
+    let fc = ctx.features("input")?;
+    let k = number_of(ctx, t, "number_of_neighbors").max(1.0) as usize;
+    let fdr = text(ctx, t, "apply_fdr").is_some_and(|s| s.eq_ignore_ascii_case("APPLY_FDR"));
+    spatstat::hot_spot_analysis(
+        fc.as_ref(),
+        &text(ctx, t, "field").unwrap_or_default(),
+        concept(ctx, t, k)?,
+        distance_method(ctx, t)?,
+        number_of(ctx, t, "distance_band"),
+        fdr,
+    )
+}
+
 pub static TOOLS: &[Tool] = &[
     Tool {
         id: "mean_center",
@@ -413,7 +505,7 @@ pub static TOOLS: &[Tool] = &[
         params: &[INPUT, WEIGHT, CASE, DIMENSION],
         output_suffix: "MeanCenter",
         measures: true,
-        run: mean_center,
+        run: Runner::Features(mean_center),
     },
     Tool {
         id: "median_center",
@@ -423,7 +515,7 @@ pub static TOOLS: &[Tool] = &[
         params: &[INPUT, WEIGHT, CASE, DIMENSION],
         output_suffix: "MedianCenter",
         measures: true,
-        run: median_center,
+        run: Runner::Features(median_center),
     },
     Tool {
         id: "central_feature",
@@ -451,7 +543,7 @@ pub static TOOLS: &[Tool] = &[
         ],
         output_suffix: "CentralFeature",
         measures: true,
-        run: central_feature,
+        run: Runner::Features(central_feature),
     },
     Tool {
         id: "standard_distance",
@@ -473,7 +565,7 @@ pub static TOOLS: &[Tool] = &[
         ],
         output_suffix: "StandardDistance",
         measures: true,
-        run: standard_distance,
+        run: Runner::Features(standard_distance),
     },
     Tool {
         id: "directional_distribution",
@@ -495,7 +587,7 @@ pub static TOOLS: &[Tool] = &[
         ],
         output_suffix: "DirectionalDistribution",
         measures: true,
-        run: directional_distribution,
+        run: Runner::Features(directional_distribution),
     },
     Tool {
         id: "directional_mean",
@@ -523,7 +615,7 @@ pub static TOOLS: &[Tool] = &[
         ],
         output_suffix: "DirectionalMean",
         measures: true,
-        run: directional_mean,
+        run: Runner::Features(directional_mean),
     },
     Tool {
         id: "densify",
@@ -550,7 +642,7 @@ pub static TOOLS: &[Tool] = &[
         ],
         output_suffix: "Densify",
         measures: false,
-        run: densify,
+        run: Runner::Features(densify),
     },
     Tool {
         id: "generate_points_along_lines",
@@ -601,7 +693,7 @@ pub static TOOLS: &[Tool] = &[
         ],
         output_suffix: "Points",
         measures: true,
-        run: generate_points_along_lines,
+        run: Runner::Features(generate_points_along_lines),
     },
     Tool {
         id: "create_fishnet",
@@ -684,7 +776,7 @@ pub static TOOLS: &[Tool] = &[
         ],
         output_suffix: "Fishnet",
         measures: false,
-        run: create_fishnet,
+        run: Runner::Features(create_fishnet),
     },
     Tool {
         id: "polygon_to_line",
@@ -711,6 +803,140 @@ pub static TOOLS: &[Tool] = &[
         ],
         output_suffix: "Line",
         measures: false,
-        run: polygon_to_line,
+        run: Runner::Features(polygon_to_line),
+    },
+    Tool {
+        id: "average_nearest_neighbor",
+        name: "Average Nearest Neighbor",
+        toolbox: "Spatial Statistics › Analyzing Patterns",
+        summary: "The ratio of observed to expected mean nearest-neighbor distance, with its z-score (ArcGIS Pro Average Nearest Neighbor).",
+        params: &[
+            INPUT,
+            Param {
+                name: "distance_method",
+                label: "Distance Method",
+                kind: Kind::Choice(DISTANCE_METHODS),
+                required: false,
+                default: "EUCLIDEAN_DISTANCE",
+                help: "",
+            },
+            Param {
+                name: "area",
+                label: "Area",
+                kind: Kind::Number,
+                required: false,
+                default: "0",
+                help: "The study area; 0 is the minimum enclosing rectangle of the features.",
+            },
+        ],
+        output_suffix: "AverageNearestNeighbor",
+        measures: true,
+        run: Runner::Report(average_nearest_neighbor),
+    },
+    Tool {
+        id: "spatial_autocorrelation",
+        name: "Spatial Autocorrelation (Global Moran's I)",
+        toolbox: "Spatial Statistics › Analyzing Patterns",
+        summary: "Whether the values of a field cluster, disperse or are random in space (ArcGIS Pro Spatial Autocorrelation; polygon contiguity is not done).",
+        params: &[
+            INPUT,
+            field("field", "Input Field", true, "The numeric field to test."),
+            Param {
+                name: "conceptualization",
+                label: "Conceptualization of Spatial Relationships",
+                kind: Kind::Choice(CONCEPTS),
+                required: false,
+                default: "INVERSE_DISTANCE",
+                help: "",
+            },
+            Param {
+                name: "distance_method",
+                label: "Distance Method",
+                kind: Kind::Choice(DISTANCE_METHODS),
+                required: false,
+                default: "EUCLIDEAN_DISTANCE",
+                help: "",
+            },
+            Param {
+                name: "standardization",
+                label: "Standardization",
+                kind: Kind::Choice(&["NONE", "ROW"]),
+                required: false,
+                default: "NONE",
+                help: "",
+            },
+            Param {
+                name: "distance_band",
+                label: "Distance Band or Threshold Distance",
+                kind: Kind::Number,
+                required: false,
+                default: "0",
+                help: "In the coordinate system's units; 0 relates every pair for inverse distance.",
+            },
+        ],
+        output_suffix: "SpatialAutocorrelation",
+        measures: true,
+        run: Runner::Report(spatial_autocorrelation),
+    },
+    Tool {
+        id: "hot_spot_analysis",
+        name: "Hot Spot Analysis (Getis-Ord Gi*)",
+        toolbox: "Spatial Statistics › Mapping Clusters",
+        summary: "Where features with high or low values cluster, as z-scores and confidence bins (ArcGIS Pro Hot Spot Analysis).",
+        params: &[
+            INPUT,
+            field("field", "Input Field", true, "The numeric field to test."),
+            Param {
+                name: "conceptualization",
+                label: "Conceptualization of Spatial Relationships",
+                kind: Kind::Choice(CONCEPTS),
+                required: false,
+                default: "INVERSE_DISTANCE",
+                help: "",
+            },
+            Param {
+                name: "distance_method",
+                label: "Distance Method",
+                kind: Kind::Choice(DISTANCE_METHODS),
+                required: false,
+                default: "EUCLIDEAN_DISTANCE",
+                help: "",
+            },
+            Param {
+                name: "standardization",
+                label: "Standardization",
+                kind: Kind::Choice(&["NONE", "ROW"]),
+                required: false,
+                default: "NONE",
+                help: "",
+            },
+            Param {
+                name: "distance_band",
+                label: "Distance Band or Threshold Distance",
+                kind: Kind::Number,
+                required: false,
+                default: "0",
+                help: "In the coordinate system's units; 0 relates every pair for inverse distance.",
+            },
+            Param {
+                name: "number_of_neighbors",
+                label: "Number of Neighbors",
+                kind: Kind::Number,
+                required: false,
+                default: "8",
+                help: "For K_NEAREST_NEIGHBORS.",
+            },
+            Param {
+                name: "apply_fdr",
+                label: "Apply False Discovery Rate (FDR) Correction",
+                kind: Kind::Choice(&["NO_FDR", "APPLY_FDR"]),
+                required: false,
+                default: "NO_FDR",
+                help: "",
+            },
+        ],
+        output_suffix: "HotSpots",
+        measures: true,
+        run: Runner::Features(hot_spot_analysis),
     },
 ];

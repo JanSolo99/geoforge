@@ -1908,10 +1908,12 @@ fn main() -> ExitCode {
                 }
                 map.insert(k.to_string(), v.to_string());
             }
-            let output = map
-                .get("output")
-                .cloned()
-                .ok_or_else(|| Error::Unsupported("output=<path> is required".into()))?;
+            let reports = matches!(spec.run, geoforge_tools::registry::Runner::Report(_));
+            let output = match map.get("output") {
+                Some(o) => o.clone(),
+                None if reports => String::new(),
+                None => return Err(Error::Unsupported("output=<path> is required".into())),
+            };
             struct Args(std::collections::HashMap<String, String>);
             impl registry::Context for Args {
                 fn get(&self, name: &str) -> Option<String> {
@@ -1928,10 +1930,22 @@ fn main() -> ExitCode {
                 }
             }
             let ctx = Args(map);
-            let out = registry::run(spec, &ctx)?;
-            let source =
-                registry::Context::get(&ctx, "input").and_then(|i| source_gdb(Path::new(&i)));
-            write_output(out, Path::new(&output), source.as_deref())
+            match registry::run(spec, &ctx)? {
+                registry::Outcome::Features(out) => {
+                    let source = registry::Context::get(&ctx, "input")
+                        .and_then(|i| source_gdb(Path::new(&i)));
+                    write_output(out, Path::new(&output), source.as_deref())
+                }
+                registry::Outcome::Report(r) => {
+                    for (name, v) in &r.rows {
+                        println!("{name}: {v}");
+                    }
+                    for m in &r.messages {
+                        println!("{m}");
+                    }
+                    Ok(())
+                }
+            }
         })(),
         Tool::MeanCenter {
             in_features,

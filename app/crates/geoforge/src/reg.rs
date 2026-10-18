@@ -5,7 +5,8 @@
 //! Modified for GeoForge (not part of upstream GeoForge).
 
 use geoforge_tools::registry::{self, Context, Kind, Tool};
-use rustgis_analysis::{Inputs, ParamKind as K, ParamSpec as P, ToolResult};
+use rustgis_analysis::{Inputs, Output, ParamKind as K, ParamSpec as P, ToolResult};
+use rustgis_data::{Dataset, Field, FieldType, GeometryType, Value};
 use serde_json::Value as Json;
 
 use crate::{OUTPUT, Work, finish_in, layer_in, out_name, text};
@@ -86,8 +87,23 @@ pub(crate) fn run(t: &'static Tool, inp: &dyn Inputs, p: &Json) -> Result<ToolRe
         Work::degrees()
     };
     let ctx = Ctx { inp, p, work: &work };
-    let out = registry::run(t, &ctx).map_err(|e| e.to_string())?;
     let first = t.params.iter().filter(|q| q.kind == Kind::Features).map(|q| text(p, q.name)).find(|n| !n.is_empty());
     let default = first.map_or_else(|| t.output_suffix.to_string(), |n| format!("{n}_{}", t.output_suffix));
-    finish_in(out, out_name(p, default), &work)
+    match registry::run(t, &ctx).map_err(|e| e.to_string())? {
+        registry::Outcome::Features(out) => finish_in(out, out_name(p, default), &work),
+        registry::Outcome::Report(r) => {
+            // A table of the values, and the same lines as messages.
+            let mut ds = Dataset::new(
+                out_name(p, default),
+                GeometryType::None,
+                vec![Field::new("Statistic", FieldType::Text), Field::new("Value", FieldType::Double)],
+            );
+            for (name, v) in &r.rows {
+                ds.push_next(None, vec![Value::Text(name.clone()), Value::Float(*v)]);
+            }
+            let mut messages: Vec<String> = r.rows.iter().map(|(n, v)| format!("{n}: {v}")).collect();
+            messages.extend(r.messages);
+            Ok(ToolResult { output: Output::Table(ds), messages })
+        }
+    }
 }

@@ -531,6 +531,17 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
           `2Z(1 + (Z-2)/4n)` with p = exp(-Z). Open: Median Center's stopping rule (Weiszfeld from the
           mean; ArcGIS takes the same steps but stops at a different one, up to ~10 m apart), the
           app tools and `arcpy.stats`
-    - [ ] Next: Average Nearest Neighbor, Spatial Autocorrelation (Moran's I), Hot Spot Analysis
-          (Getis-Ord Gi*), Generate Spatial Weights Matrix, Collect Events, Multi-Distance Spatial
-          Cluster Analysis (Ripley's K), Cluster and Outlier Analysis, OLS and GWR
+    - [x] Analyzing Patterns / Mapping Clusters: Average Nearest Neighbor (minimum enclosing
+          rectangle area, Euclidean and Manhattan), Spatial Autocorrelation (Global Moran's I,
+          randomization variance; inverse distance, squared, fixed band, zone of indifference
+          1/(1+(d-band)), 8 nearest neighbors; row standardization) and Hot Spot Analysis (Gi*; the
+          feature counts itself at weight 1, row standardization changes nothing; bins by p-value
+          0.01/0.05/0.10; BH false discovery rate) matching Pro 3.7 on 2 point sets x 44 runs
+          (`testdata/arcgis-reference/spatstat_patterns.json`, `crates/geoforge-cli/tests/spatstat_patterns.rs`).
+          Tools that give values rather than features return a `registry::Report` (`gf run` prints
+          it, the app shows a table and messages, arcpy `getOutput(i)`); ArcGIS's p-values are a
+          normal-CDF approximation up to 2e-8 from the exact ones we use. Not done: polygon
+          contiguity conceptualizations, spatial weights files, distances under 1 (treated as 1
+          for inverse distance, unchecked), FDR checked only where nothing is significant
+    - [ ] Next: Generate Spatial Weights Matrix, Collect Events, Multi-Distance Spatial Cluster
+          Analysis (Ripley's K), Cluster and Outlier Analysis (random permutations), OLS and GWR

@@ -387,6 +387,14 @@ _TOOLS = [
     _t("stats", "StandardDistance", "standard_distance", ("Input_Feature_Class", "input"), ("Output_Standard_Distance_Feature_Class", "output"), ("Circle_Size", "circle_size"), ("Weight_Field", "weight_field"), ("Case_Field", "case_field")),
     _t("stats", "DirectionalDistribution", "directional_distribution", ("Input_Feature_Class", "input"), ("Output_Ellipse_Feature_Class", "output"), ("Ellipse_Size", "ellipse_size"), ("Weight_Field", "weight_field"), ("Case_Field", "case_field")),
     _t("stats", "DirectionalMean", "directional_mean", ("Input_Feature_Class", "input"), ("Output_Feature_Class", "output"), ("Orientation_Only", "orientation_only"), ("Case_Field", "case_field")),
+    _t("stats", "AverageNearestNeighbor", "average_nearest_neighbor", ("Input_Feature_Class", "input"), ("Distance_Method", "distance_method"), ("Generate_Report", None), ("Area", "area"), outputs=()),
+    _t("stats", "SpatialAutocorrelation", "spatial_autocorrelation", ("Input_Feature_Class", "input"), ("Input_Field", "field"), ("Generate_Report", None),
+       ("Conceptualization_of_Spatial_Relationships", "conceptualization"), ("Distance_Method", "distance_method"), ("Standardization", "standardization"),
+       ("Distance_Band_or_Threshold_Distance_", "distance_band"), ("Weights_Matrix_File", None), outputs=()),
+    _t("stats", "HotSpots", "hot_spot_analysis", ("Input_Feature_Class", "input"), ("Input_Field", "field"), ("Output_Feature_Class", "output"),
+       ("Conceptualization_of_Spatial_Relationships", "conceptualization"), ("Distance_Method", "distance_method"), ("Standardization", "standardization"),
+       ("Distance_Band_or_Threshold_Distance", "distance_band"), ("number_of_neighbors", "number_of_neighbors"), ("Weights_Matrix_File", None),
+       ("Apply_False_Discovery_Rate__FDR__Correction", "apply_fdr")),
     # sa
     _t("sa", "Slope", "slope", ("in_raster", "input"), ("output_measurement", "output_measurement"), ("z_factor", "z_factor"), ("method", None), ("z_unit", None)),
     _t("sa", "Idw", "idw", ("in_point_features", "input"), ("z_field", "z_field"), ("cell_size", "cell_size"), ("power", "power"),
@@ -505,6 +513,13 @@ def _output_target(value: Any) -> Tuple[str, Optional[str]]:
     return text, None
 
 
+# Tools that report values: the messages hold `name: value` lines; these are the ones arcpy returns.
+_REPORT_OUTPUTS = {
+    "average_nearest_neighbor": (0, 1, 2, 3, 4),
+    "spatial_autocorrelation": (0, 3, 4),
+}
+
+
 def _make(module: str, name: str, tool: str, args: Tuple[Arg, ...], outputs: Tuple[str, ...]) -> Callable[..., Result]:
     arg_names = [a[0] for a in args]
 
@@ -583,6 +598,10 @@ def _make(module: str, name: str, tool: str, args: Tuple[Arg, ...], outputs: Tup
         for layer, path in writes:
             s.run("share.exportLayer", layer=layer, path=path)
             out_names = [path if n == layer else n for n in out_names]
+        if tool in _REPORT_OUTPUTS:
+            # The values, as arcpy's Result.getOutput(i) gives them (strings).
+            values = [m.split(": ", 1)[1] for m, _ in messages if ": " in m]
+            out_names = [values[i] for i in _REPORT_OUTPUTS[tool] if i < len(values)]
         if not out_names and isinstance(raw, dict):
             out_names = [str(params.get("input", ""))]
         return Result(out_names, messages, raw)

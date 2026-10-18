@@ -191,3 +191,13 @@ def test_construction_tools(s):
     assert count(s, "Along") > 20
     with pytest.raises(rustgis.GeoForgeError):
         arcpy.management.PolygonToLine("Net", "Bad", "IDENTIFY_NEIGHBORS")
+
+
+def test_pattern_statistics(s):
+    arcpy.analysis.Select("Cities", "Indian", "adm0name = 'India'")
+    r = arcpy.stats.AverageNearestNeighbor("Indian", "EUCLIDEAN_DISTANCE", "NO_REPORT")
+    assert r.outputCount == 5 and float(r.getOutput(0)) > 0
+    r = arcpy.stats.SpatialAutocorrelation("Indian", "pop_max", "NO_REPORT", "INVERSE_DISTANCE", "EUCLIDEAN_DISTANCE", "NONE", 0)
+    assert r.outputCount == 3 and 0 <= float(r.getOutput(2)) <= 1
+    arcpy.stats.HotSpots("Indian", "pop_max", "Hot", "K_NEAREST_NEIGHBORS", "EUCLIDEAN_DISTANCE", "NONE", 0, 3)
+    assert count(s, "Hot") == count(s, "Indian")

@@ -1686,6 +1686,48 @@ mod tests {
     }
 
     #[test]
+    fn pattern_tools_run_in_the_application() {
+        register();
+        // A tight clump of high values and a spread of low ones.
+        let mut pts: Vec<(f64, f64)> = (0..12).map(|i| (10.0 + 0.002 * (i % 4) as f64, 59.0 + 0.002 * (i / 4) as f64)).collect();
+        pts.extend((0..12).map(|i| (10.2 + 0.03 * (i % 4) as f64, 59.2 + 0.03 * (i / 4) as f64)));
+        let mut d = points("p", &pts);
+        for (i, f) in d.features.iter_mut().enumerate() {
+            f.attrs[0] = Value::Int(if i < 12 { 100 } else { 1 });
+        }
+        let layers = Layers(vec![d]);
+        let ann = rustgis_analysis::run("geoforge:average_nearest_neighbor", &layers, &json!({"input": "p"})).unwrap();
+        assert!(matches!(ann.output, Output::Table(_)));
+        assert!(ann.messages.iter().any(|m| m.starts_with("NNRatio")), "{:?}", ann.messages);
+        let moran = rustgis_analysis::run(
+            "geoforge:spatial_autocorrelation",
+            &layers,
+            &json!({"input": "p", "field": "N", "conceptualization": "K_NEAREST_NEIGHBORS"}),
+        )
+        .unwrap();
+        let Output::Table(t) = moran.output else { panic!("table") };
+        assert_eq!(t.features.len(), 5);
+        // The clump is a hot spot: its Gi* z-scores are positive.
+        let hot = dataset(rustgis_analysis::run(
+            "geoforge:hot_spot_analysis",
+            &layers,
+            &json!({"input": "p", "field": "N", "conceptualization": "FIXED_DISTANCE_BAND", "distance_band": 1000}),
+        ));
+        let names: Vec<&str> = hot.fields.iter().map(|f| f.name.as_str()).collect();
+        assert_eq!(names, ["SOURCE_ID", "N", "GiZScore", "GiPValue", "NNeighbors", "Gi_Bin"]);
+        let z: Vec<f64> = hot.features.iter().filter_map(|f| f.attrs[2].as_f64()).collect();
+        assert!(z[0] > 0.0 && z[20] < z[0], "{z:?}");
+        assert!(
+            rustgis_analysis::run(
+                "geoforge:hot_spot_analysis",
+                &layers,
+                &json!({"input": "p", "field": "N", "conceptualization": "FIXED_DISTANCE_BAND"})
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
     fn idw_interpolates_points_to_a_raster() {
         register();
         // Four corners of a square, values 0..3: the middle cell is their mean.

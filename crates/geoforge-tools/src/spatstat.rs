@@ -687,3 +687,511 @@ pub fn linear_directional_mean(
     }
     Ok(output(input, GeometryKind::Polyline, fields, features))
 }
+
+// ---------------------------------------------------------------------------------------------
+// Analyzing patterns and mapping clusters
+
+use crate::registry::Report;
+
+/// A two-sided p-value of a standard normal z-score (ArcGIS's own comes from an approximation that
+/// is up to 2e-8 away from this exact one).
+pub fn p_value(z: f64) -> f64 {
+    erfc(z.abs() / std::f64::consts::SQRT_2)
+}
+
+/// The complementary error function: the series `erf(x) = 2/sqrt(pi) e^-x^2 sum 2^n x^(2n+1) /
+/// (1 3 ... (2n+1))` (all terms positive) below 3, a continued fraction above.
+fn erfc(x: f64) -> f64 {
+    let ax = x.abs();
+    let r = if ax < 2.0 {
+        let x2 = ax * ax;
+        let (mut term, mut sum) = (ax, ax);
+        for n in 1..200 {
+            term *= 2.0 * x2 / (2 * n + 1) as f64;
+            sum += term;
+            if term < 1e-18 * sum {
+                break;
+            }
+        }
+        1.0 - 2.0 / std::f64::consts::PI.sqrt() * (-x2).exp() * sum
+    } else {
+        let mut f = 0.0;
+        for k in (1..=200).rev() {
+            f = k as f64 / 2.0 / (ax + f);
+        }
+        (-ax * ax).exp() / (std::f64::consts::PI.sqrt() * (ax + f))
+    };
+    if x < 0.0 { 2.0 - r } else { r }
+}
+
+/// How distances are measured.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DistanceMethod {
+    Euclidean,
+    Manhattan,
+}
+
+impl DistanceMethod {
+    pub fn parse(s: &str) -> Option<DistanceMethod> {
+        match s.to_ascii_uppercase().as_str() {
+            "EUCLIDEAN_DISTANCE" | "EUCLIDEAN" | "" => Some(DistanceMethod::Euclidean),
+            "MANHATTAN_DISTANCE" | "MANHATTAN" => Some(DistanceMethod::Manhattan),
+            _ => None,
+        }
+    }
+
+    fn between(self, a: [f64; 2], b: [f64; 2]) -> f64 {
+        match self {
+            DistanceMethod::Euclidean => (a[0] - b[0]).hypot(a[1] - b[1]),
+            DistanceMethod::Manhattan => (a[0] - b[0]).abs() + (a[1] - b[1]).abs(),
+        }
+    }
+}
+
+/// How neighbors weigh on each other (Conceptualization of Spatial Relationships).
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum Concept {
+    InverseDistance,
+    InverseDistanceSquared,
+    FixedDistanceBand,
+    ZoneOfIndifference,
+    /// The `k` nearest neighbors (8 for the autocorrelation tools).
+    KNearestNeighbors(usize),
+}
+
+impl Concept {
+    pub fn parse(s: &str, neighbors: usize) -> Option<Concept> {
+        Some(match s.to_ascii_uppercase().as_str() {
+            "INVERSE_DISTANCE" => Concept::InverseDistance,
+            "INVERSE_DISTANCE_SQUARED" => Concept::InverseDistanceSquared,
+            "FIXED_DISTANCE_BAND" => Concept::FixedDistanceBand,
+            "ZONE_OF_INDIFFERENCE" => Concept::ZoneOfIndifference,
+            "K_NEAREST_NEIGHBORS" => Concept::KNearestNeighbors(neighbors),
+            _ => return None,
+        })
+    }
+}
+
+/// Spatial weights as rows of `(neighbor, weight)`, sorted by neighbor; a feature is not its own
+/// neighbor (Hot Spot Analysis adds itself at weight 1).
+struct Weights {
+    rows: Vec<Vec<(usize, f64)>>,
+}
+
+const MAX_FEATURES: usize = 8000;
+
+impl Weights {
+    /// `band` is the threshold distance (0 for none). Fixed bands and the zone of indifference need
+    /// one; inverse distance with none relates every pair.
+    fn build(
+        points: &[[f64; 2]],
+        concept: Concept,
+        method: DistanceMethod,
+        band: f64,
+    ) -> Result<Weights> {
+        let n = points.len();
+        let needs_band = matches!(
+            concept,
+            Concept::FixedDistanceBand | Concept::ZoneOfIndifference
+        );
+        if needs_band && (band.is_nan() || band <= 0.0) {
+            return Err(err(
+                "ERROR 000928: A non-zero distance band is required for this conceptualization of spatial relationships.",
+            ));
+        }
+        if matches!(
+            concept,
+            Concept::InverseDistance | Concept::InverseDistanceSquared
+        ) && band <= 0.0
+            && n > MAX_FEATURES
+        {
+            return Err(err(format!(
+                "ERROR 000800: relating every pair of {n} features needs a distance band (at most {MAX_FEATURES} without)"
+            )));
+        }
+        let mut rows = Vec::with_capacity(n);
+        for i in 0..n {
+            let mut row: Vec<(usize, f64)> = Vec::new();
+            match concept {
+                Concept::KNearestNeighbors(k) => {
+                    let mut d: Vec<(f64, usize)> = (0..n)
+                        .filter(|j| *j != i)
+                        .map(|j| (method.between(points[i], points[j]), j))
+                        .collect();
+                    d.sort_by(|a, b| a.0.total_cmp(&b.0).then(a.1.cmp(&b.1)));
+                    row = d.into_iter().take(k).map(|(_, j)| (j, 1.0)).collect();
+                    row.sort_by_key(|r| r.0);
+                }
+                _ => {
+                    for j in 0..n {
+                        if j == i {
+                            continue;
+                        }
+                        let d = method.between(points[i], points[j]);
+                        let w = match concept {
+                            Concept::InverseDistance | Concept::InverseDistanceSquared => {
+                                if band > 0.0 && d > band {
+                                    continue;
+                                }
+                                // Distances under one count as one.
+                                let d = d.max(1.0);
+                                if matches!(concept, Concept::InverseDistance) {
+                                    1.0 / d
+                                } else {
+                                    1.0 / (d * d)
+                                }
+                            }
+                            Concept::FixedDistanceBand => {
+                                if d > band {
+                                    continue;
+                                }
+                                1.0
+                            }
+                            Concept::ZoneOfIndifference => {
+                                if d <= band {
+                                    1.0
+                                } else {
+                                    1.0 / (1.0 + (d - band))
+                                }
+                            }
+                            Concept::KNearestNeighbors(_) => continue,
+                        };
+                        row.push((j, w));
+                    }
+                }
+            }
+            rows.push(row);
+        }
+        Ok(Weights { rows })
+    }
+
+    fn row_standardize(&mut self) {
+        for r in &mut self.rows {
+            let s: f64 = r.iter().map(|x| x.1).sum();
+            if s > 0.0 {
+                for x in r.iter_mut() {
+                    x.1 /= s;
+                }
+            }
+        }
+    }
+
+    fn get(&self, i: usize, j: usize) -> f64 {
+        self.rows[i]
+            .binary_search_by_key(&j, |x| x.0)
+            .map_or(0.0, |k| self.rows[i][k].1)
+    }
+}
+
+fn numeric_values(
+    input: &dyn FeatureClass,
+    field: &str,
+    case: Option<&str>,
+) -> Result<(Vec<Item>, Vec<f64>)> {
+    let idx = field_index(input, field, true)?;
+    let all = items(input, &Options { weight: None, case })?;
+    let mut kept = Vec::new();
+    let mut values = Vec::new();
+    for it in all {
+        if let Some(v) = it.attrs.get(idx).and_then(number) {
+            values.push(v);
+            kept.push(it);
+        }
+    }
+    Ok((kept, values))
+}
+
+/// Average Nearest Neighbor: NNRatio, z-score, p-value, expected and observed mean distances.
+/// `area` is the study area (0: the minimum enclosing rectangle of the features).
+pub fn average_nearest_neighbor(
+    input: &dyn FeatureClass,
+    method: DistanceMethod,
+    area: f64,
+) -> Result<Report> {
+    let all = items(
+        input,
+        &Options {
+            weight: None,
+            case: None,
+        },
+    )?;
+    let n = all.len();
+    if n < 2 {
+        return Err(err("ERROR 001095: at least two features are needed"));
+    }
+    let pts: Vec<[f64; 2]> = all.iter().map(|i| i.xy).collect();
+    let area = if area > 0.0 {
+        area
+    } else {
+        let mut g = Geometry::point(0.0, 0.0);
+        g.kind = GeometryKind::Multipoint;
+        g.xy = pts.clone();
+        let b = geoforge_geometry::bounding(
+            [&g],
+            geoforge_geometry::BoundingKind::RectangleByArea,
+            0.0,
+        )?
+        .ok_or_else(|| err("no bounding rectangle"))?;
+        let a = b.width * b.length;
+        if a <= 0.0 {
+            return Err(err(
+                "ERROR 001095: the features cover no area; give the study area",
+            ));
+        }
+        a
+    };
+    let observed = (0..n)
+        .map(|i| {
+            (0..n)
+                .filter(|j| *j != i)
+                .map(|j| method.between(pts[i], pts[j]))
+                .fold(f64::INFINITY, f64::min)
+        })
+        .sum::<f64>()
+        / n as f64;
+    let nf = n as f64;
+    let expected = 0.5 / (nf / area).sqrt();
+    let se = 0.26136 / (nf * nf / area).sqrt();
+    let z = (observed - expected) / se;
+    Ok(Report {
+        rows: vec![
+            ("NNRatio".into(), observed / expected),
+            ("ZScore".into(), z),
+            ("PValue".into(), p_value(z)),
+            ("Expected Mean Distance".into(), expected),
+            ("Observed Mean Distance".into(), observed),
+        ],
+        messages: Vec::new(),
+    })
+}
+
+/// Spatial Autocorrelation (Global Moran's I) of a numeric field: index, expected index, variance,
+/// z-score and p-value (variance under randomization).
+pub fn spatial_autocorrelation(
+    input: &dyn FeatureClass,
+    field: &str,
+    concept: Concept,
+    method: DistanceMethod,
+    row_standardized: bool,
+    band: f64,
+) -> Result<Report> {
+    let (kept, x) = numeric_values(input, field, None)?;
+    let n = x.len();
+    if n < 4 {
+        return Err(err(
+            "ERROR 001095: at least four features with values are needed",
+        ));
+    }
+    let pts: Vec<[f64; 2]> = kept.iter().map(|i| i.xy).collect();
+    let mut w = Weights::build(&pts, concept, method, band)?;
+    if row_standardized {
+        w.row_standardize();
+    }
+    let nf = n as f64;
+    let mean = x.iter().sum::<f64>() / nf;
+    let z: Vec<f64> = x.iter().map(|v| v - mean).collect();
+    let m2: f64 = z.iter().map(|v| v * v).sum();
+    if m2 == 0.0 {
+        return Err(err("ERROR 001096: every value is the same"));
+    }
+    let (mut s0, mut s1, mut s2, mut cross) = (0.0, 0.0, 0.0, 0.0);
+    for i in 0..n {
+        let mut out_sum = 0.0;
+        for &(j, wij) in &w.rows[i] {
+            let wji = w.get(j, i);
+            s0 += wij;
+            // Over all ordered pairs, (wij + wji)^2 / 2: a pair listed one way counts twice.
+            s1 += if wji != 0.0 {
+                0.5 * (wij + wji).powi(2)
+            } else {
+                wij * wij
+            };
+            out_sum += wij;
+            cross += wij * z[i] * z[j];
+        }
+        let in_sum: f64 = (0..n).map(|j| w.get(j, i)).sum();
+        s2 += (out_sum + in_sum).powi(2);
+    }
+    if s0 == 0.0 {
+        return Err(err(
+            "ERROR 000928: no features have neighbors: widen the distance band",
+        ));
+    }
+    let index = nf / s0 * cross / m2;
+    let expected = -1.0 / (nf - 1.0);
+    let kurtosis = nf * z.iter().map(|v| v.powi(4)).sum::<f64>() / (m2 * m2);
+    let a = nf * ((nf * nf - 3.0 * nf + 3.0) * s1 - nf * s2 + 3.0 * s0 * s0);
+    let b = kurtosis * ((nf * nf - nf) * s1 - 2.0 * nf * s2 + 6.0 * s0 * s0);
+    let c = (nf - 1.0) * (nf - 2.0) * (nf - 3.0) * s0 * s0;
+    let variance = (a - b) / c - expected * expected;
+    let zscore = (index - expected) / variance.sqrt();
+    Ok(Report {
+        rows: vec![
+            ("Moran's Index".into(), index),
+            ("Expected Index".into(), expected),
+            ("Variance".into(), variance),
+            ("ZScore".into(), zscore),
+            ("PValue".into(), p_value(zscore)),
+        ],
+        messages: Vec::new(),
+    })
+}
+
+/// The critical p-value of the Benjamini-Hochberg false discovery rate at `alpha` (0 when none of
+/// the p-values passes).
+fn fdr_critical(p: &[f64], alpha: f64) -> f64 {
+    let mut sorted: Vec<f64> = p.to_vec();
+    sorted.sort_by(|a, b| a.total_cmp(b));
+    let n = sorted.len() as f64;
+    let mut crit = 0.0;
+    for (i, v) in sorted.iter().enumerate() {
+        if *v <= alpha * (i + 1) as f64 / n {
+            crit = *v;
+        }
+    }
+    crit
+}
+
+/// Hot Spot Analysis (Getis-Ord Gi*): the features with `SOURCE_ID`, the field, `GiZScore`,
+/// `GiPValue`, `NNeighbors` (the feature counts itself) and `Gi_Bin` (+-3, 2, 1 at 99, 95 and 90 %
+/// confidence, or by the false discovery rate). Row standardization changes nothing for Gi*.
+pub fn hot_spot_analysis(
+    input: &dyn FeatureClass,
+    field: &str,
+    concept: Concept,
+    method: DistanceMethod,
+    band: f64,
+    fdr: bool,
+) -> Result<ToolOutput> {
+    let (kept, x) = numeric_values(input, field, None)?;
+    let n = x.len();
+    if n < 3 {
+        return Err(err(
+            "ERROR 001095: at least three features with values are needed",
+        ));
+    }
+    let pts: Vec<[f64; 2]> = kept.iter().map(|i| i.xy).collect();
+    let w = Weights::build(&pts, concept, method, band)?;
+    let nf = n as f64;
+    let mean = x.iter().sum::<f64>() / nf;
+    let s = (x.iter().map(|v| v * v).sum::<f64>() / nf - mean * mean).sqrt();
+    if s == 0.0 {
+        return Err(err("ERROR 001096: every value is the same"));
+    }
+    let mut zs = Vec::with_capacity(n);
+    let mut counts = Vec::with_capacity(n);
+    for i in 0..n {
+        // The feature itself counts at weight 1.
+        let (mut sw, mut sw2, mut swx) = (1.0, 1.0, x[i]);
+        for &(j, wij) in &w.rows[i] {
+            sw += wij;
+            sw2 += wij * wij;
+            swx += wij * x[j];
+        }
+        counts.push(w.rows[i].len() + 1);
+        let den = s * ((nf * sw2 - sw * sw) / (nf - 1.0)).sqrt();
+        zs.push(if den > 0.0 {
+            (swx - mean * sw) / den
+        } else {
+            0.0
+        });
+    }
+    let ps: Vec<f64> = zs.iter().map(|z| p_value(*z)).collect();
+    let crit: Option<[f64; 3]> = fdr.then(|| {
+        [
+            fdr_critical(&ps, 0.01),
+            fdr_critical(&ps, 0.05),
+            fdr_critical(&ps, 0.10),
+        ]
+    });
+    let bin = |z: f64, p: f64| -> i32 {
+        let level = match crit {
+            Some(c) => {
+                if p <= c[0] && c[0] > 0.0 {
+                    3
+                } else if p <= c[1] && c[1] > 0.0 {
+                    2
+                } else if p <= c[2] && c[2] > 0.0 {
+                    1
+                } else {
+                    0
+                }
+            }
+            // By p-value: 99, 95 and 90 % confidence.
+            None => {
+                if p <= 0.01 {
+                    3
+                } else if p <= 0.05 {
+                    2
+                } else if p <= 0.10 {
+                    1
+                } else {
+                    0
+                }
+            }
+        };
+        if z < 0.0 { -level } else { level }
+    };
+    let src = &input.fields()[field_index(input, field, true)?];
+    let mut fields = vec![
+        Field::new("SOURCE_ID", FieldType::Integer),
+        double(&src.name),
+        double("GiZScore"),
+        double("GiPValue"),
+        Field::new("NNeighbors", FieldType::Integer),
+        Field::new("Gi_Bin", FieldType::Integer),
+    ];
+    for f in &mut fields {
+        if f.field_type == FieldType::Integer {
+            f.precision = 10;
+        }
+    }
+    let idx = field_index(input, field, true)?;
+    let features = kept
+        .iter()
+        .enumerate()
+        .map(|(k, it)| Feature {
+            oid: k as i64,
+            geometry: Some(it.geometry.clone()),
+            attributes: vec![
+                Value::Integer(it.index as i32),
+                Value::Double(it.attrs.get(idx).and_then(number).unwrap_or(0.0)),
+                Value::Double(zs[k]),
+                Value::Double(ps[k]),
+                Value::Integer(counts[k] as i32),
+                Value::Integer(bin(zs[k], ps[k])),
+            ],
+        })
+        .collect();
+    Ok(output(
+        input,
+        input.geometry_kind().unwrap_or(GeometryKind::Point),
+        fields,
+        features,
+    ))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn erfc_matches_known_values() {
+        for (x, want) in [
+            (0.0, 1.0),
+            (0.1, 0.887_537_083_981_715_2),
+            (0.5, 0.479_500_122_186_953_5),
+            (1.0, 0.157_299_207_050_285_13),
+            (2.0, 0.004_677_734_981_047_266),
+            (2.5, 4.069_520_174_449_589e-4),
+            (4.0, 1.541_725_790_028_002e-8),
+            (3.0, 2.209_049_699_858_544e-5),
+            (5.0, 1.537_459_794_428_035e-12),
+        ] {
+            let got = erfc(x);
+            assert!((got - want).abs() <= 1e-12 * want, "{x}: {got} vs {want}");
+        }
+        assert!((erfc(-1.0) - (2.0 - 0.157_299_207_050_285_13)).abs() < 1e-13);
+        assert!((p_value(1.959_963_984_540_054) - 0.05).abs() < 1e-12);
+    }
+}
