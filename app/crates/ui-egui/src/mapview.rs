@@ -84,7 +84,10 @@ pub struct MapView {
     pub pointer_lonlat: Option<Coord>,
     /// Where the map's context menu was opened: the pointer leaves the map for the menu.
     pub menu_lonlat: Option<Coord>,
-    pub dms: bool,
+    /// How the status bar writes the pointer's position.
+    pub coord_format: crate::chrome::CoordFormat,
+    /// Notices the notifications bell has shown (the rest are unread).
+    pub bell_seen: usize,
     pub render_ms: u64,
     pub notices_seen: usize,
     pub toasts: Vec<Toast>,
@@ -125,7 +128,8 @@ impl Default for MapView {
             deleting: None,
             pointer_lonlat: None,
             menu_lonlat: None,
-            dms: false,
+            coord_format: crate::chrome::CoordFormat::default(),
+            bell_seen: 0,
             render_ms: 0,
             notices_seen: 0,
             toasts: Vec::new(),
@@ -1514,7 +1518,7 @@ fn view_tabs(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
         }
         if resp.clicked() && !is {
             let _ = app.run("layout.activate", json!({"name": n}));
-            app.ui.tab = "Publish".into();
+            app.ui.tab = "Share".into();
         }
         x += w + 2.0;
     }

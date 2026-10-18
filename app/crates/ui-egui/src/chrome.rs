@@ -164,18 +164,19 @@ pub fn status_bar(app: &mut RustGisApp, ui: &mut Ui) {
                         }
                     });
                 sep(ui, &t);
-                // Pointer coordinates.
-                let coord = app
-                    .map
-                    .pointer_lonlat
-                    .map(|c| if app.map.dms { rustgis_engine::geom::format_dms(c) } else { rustgis_engine::geom::format_lonlat(c) });
-                let resp = ui.add(
-                    egui::Label::new(egui::RichText::new(coord.unwrap_or_else(|| "—".into())).monospace().size(11.5).color(t.text_dim))
-                        .sense(Sense::click()),
-                );
-                if resp.on_hover_text(tl!("Click to switch between decimal degrees and DMS")).clicked() {
-                    app.map.dms = !app.map.dms;
-                }
+                // Pointer coordinates: a dropdown picks the format (map units, degrees, DMS).
+                let coord = app.map.pointer_lonlat.map(|c| format_pointer(app.map.coord_format, c, app.session.map()));
+                ui.label(egui::RichText::new(coord.unwrap_or_else(|| "—".into())).monospace().size(11.5).color(t.text_dim));
+                egui::ComboBox::from_id_salt("status_coord_format")
+                    .selected_text(tl!(app.map.coord_format.label()))
+                    .width(120.0)
+                    .show_ui(ui, |ui| {
+                        for f in CoordFormat::ALL {
+                            ui.selectable_value(&mut app.map.coord_format, f, tl!(f.label()));
+                        }
+                    })
+                    .response
+                    .on_hover_text(tl!("Coordinate display format"));
                 let projection = match &app.session.map().projection {
                     rustgis_engine::map::Projection::Globe => tl!("WGS 84 / Globe").to_string(),
                     rustgis_engine::map::Projection::WebMercator => tl!("WGS 84 / Web Mercator").to_string(),
@@ -205,6 +206,14 @@ pub fn status_bar(app: &mut RustGisApp, ui: &mut Ui) {
                     ui.label(egui::RichText::new(format!("{} ms", app.map.render_ms)).size(11.0).color(t.text_disabled))
                         .on_hover_text(tl!("Last map render time"));
                     sep(ui, &t);
+                    notification_bell(app, ui, &t);
+                    sep(ui, &t);
+                    if let Some(text) = running_tool(app) {
+                        ui.label(egui::RichText::new(text).size(11.5).color(t.accent_text));
+                        ui.add(egui::Spinner::new().size(14.0).color(t.accent));
+                        sep(ui, &t);
+                        ui.ctx().request_repaint_after(std::time::Duration::from_millis(100));
+                    }
                     // The MCP relay: while it runs, an attached agent works in this session, so
                     // its authenticated client count is shown and a click stops it. Desktop only.
                     #[cfg(not(target_arch = "wasm32"))]
@@ -236,6 +245,104 @@ pub fn status_bar(app: &mut RustGisApp, ui: &mut Ui) {
                 });
             });
         });
+}
+
+/// How the status bar writes the pointer's position.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum CoordFormat {
+    /// The map's own coordinates (metres for Web Mercator and most projections).
+    #[default]
+    MapUnits,
+    /// Decimal degrees.
+    Degrees,
+    /// Degrees, minutes and seconds.
+    Dms,
+}
+
+impl CoordFormat {
+    pub const ALL: [CoordFormat; 3] = [CoordFormat::MapUnits, CoordFormat::Degrees, CoordFormat::Dms];
+
+    pub fn label(self) -> &'static str {
+        match self {
+            CoordFormat::MapUnits => "Map units",
+            CoordFormat::Degrees => "Decimal degrees",
+            CoordFormat::Dms => "Degrees minutes seconds",
+        }
+    }
+}
+
+/// The pointer's position (longitude/latitude) written in a format; map units are in the map's
+/// coordinate system.
+pub fn format_pointer(format: CoordFormat, c: rustgis_engine::geom::Coord, map: &rustgis_engine::map::Map) -> String {
+    match format {
+        CoordFormat::Degrees => rustgis_engine::geom::format_lonlat(c),
+        CoordFormat::Dms => rustgis_engine::geom::format_dms(c),
+        CoordFormat::MapUnits => match map.to_map(c) {
+            Some(m) => format!("{:.2} E  {:.2} N", m.x, m.y),
+            None => "—".into(),
+        },
+    }
+}
+
+/// What the status bar's progress indicator shows while a tool or install runs in the background.
+fn running_tool(app: &RustGisApp) -> Option<String> {
+    if let Some(job) = &app.gp.plugin_run {
+        return Some(crate::i18n::fmt("Running {tool}", &[("tool", job.tool)]));
+    }
+    if let Some((_, tool, _)) = &app.gp.web_run {
+        return Some(crate::i18n::fmt("Running {tool}", &[("tool", tool)]));
+    }
+    app.gp.install.as_ref().map(|_| tl!("Installing tools").to_string())
+}
+
+/// The notifications bell: an unread count over the icon, and the notices queue in a popup.
+fn notification_bell(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
+    let total = app.session.notices.len();
+    let unread = total.saturating_sub(app.map.bell_seen);
+    let (r, resp) = ui.allocate_exact_size(vec2(18.0, 18.0), Sense::click());
+    let c = r.center();
+    let col = if resp.hovered() { t.text } else { t.icon };
+    let st = Stroke::new(1.4, col);
+    // A bell: dome, flared rim and clapper.
+    let dome = [
+        pos2(c.x - 5.0, c.y + 3.0),
+        pos2(c.x - 4.0, c.y - 1.0),
+        pos2(c.x - 2.5, c.y - 4.0),
+        pos2(c.x, c.y - 5.0),
+        pos2(c.x + 2.5, c.y - 4.0),
+        pos2(c.x + 4.0, c.y - 1.0),
+        pos2(c.x + 5.0, c.y + 3.0),
+    ];
+    ui.painter().add(egui::Shape::line(dome.to_vec(), st));
+    ui.painter().line_segment([pos2(c.x - 6.5, c.y + 3.0), pos2(c.x + 6.5, c.y + 3.0)], st);
+    ui.painter().circle_filled(pos2(c.x, c.y + 5.5), 1.4, col);
+    if unread > 0 {
+        let b = pos2(r.max.x - 2.0, r.min.y + 3.0);
+        let any_error = app.session.notices.iter().skip(app.map.bell_seen).any(|n| n.error);
+        ui.painter().circle_filled(b, 5.0, if any_error { t.red } else { t.accent });
+        ui.painter().text(b, Align2::CENTER_CENTER, unread.min(9).to_string(), egui::FontId::proportional(8.0), t.on_accent);
+    }
+    let resp = resp.on_hover_text(tl!("Notifications"));
+    let open = egui::Popup::from_toggle_button_response(&resp)
+        .close_behavior(egui::PopupCloseBehavior::CloseOnClickOutside)
+        .align(egui::RectAlign::TOP_END)
+        .show(|ui| {
+            ui.set_width(340.0);
+            ui.label(egui::RichText::new(tl!("Notifications")).font(semibold(12.0)));
+            ui.separator();
+            if app.session.notices.is_empty() {
+                ui.label(egui::RichText::new(tl!("No notifications")).size(11.5).color(t.text_dim));
+            }
+            egui::ScrollArea::vertical().max_height(260.0).show(ui, |ui| {
+                for n in app.session.notices.iter().rev().take(50) {
+                    ui.add(egui::Label::new(egui::RichText::new(&n.text).size(11.5).color(if n.error { t.red } else { t.text })).wrap());
+                    ui.add_space(2.0);
+                }
+            });
+        });
+    if open.is_some() {
+        app.map.bell_seen = total;
+    }
 }
 
 fn sep(ui: &mut Ui, t: &Tokens) {
@@ -595,5 +702,22 @@ pub fn notices(app: &mut RustGisApp, ctx: &egui::Context) {
             toast.at = now;
         }
         y -= 52.0;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rustgis_engine::geom::Coord;
+
+    #[test]
+    fn pointer_formats() {
+        let map = rustgis_engine::map::Map::new("t");
+        let c = Coord { x: 10.0, y: 50.0 };
+        assert_eq!(format_pointer(CoordFormat::Degrees, c, &map), "10.0000° E  50.0000° N");
+        assert!(format_pointer(CoordFormat::Dms, c, &map).starts_with("10°00′00.0″ E"));
+        // Web Mercator metres: 10 degrees of longitude is about 1 113 195 m.
+        assert!(format_pointer(CoordFormat::MapUnits, c, &map).starts_with("1113194.91 E"));
+        assert_eq!(CoordFormat::default(), CoordFormat::MapUnits);
     }
 }

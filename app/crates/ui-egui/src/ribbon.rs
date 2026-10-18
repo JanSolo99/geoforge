@@ -12,7 +12,7 @@ use crate::theme::{Tokens, regular, semibold};
 use crate::widgets::{CONTENT_H, LABEL_H, big, big_menu, col, group, menu_item, small, small_menu, text_w};
 use crate::{RightPane, RustGisApp, icons};
 
-pub const TABS: [&str; 10] = ["Home", "Data", "Style", "Edit", "Analyze", "View", "Publish", "Plugins", "Settings", "Help"];
+pub const TABS: [&str; 11] = ["Map", "Insert", "Analysis", "View", "Edit", "Imagery", "Style", "Share", "Plugins", "Settings", "Help"];
 
 /// Tabs that always show: Settings holds Customize › Ribbon, the way to show hidden tabs again.
 pub const FIXED_TABS: [&str; 2] = ["Settings", "Help"];
@@ -21,14 +21,14 @@ pub const FIXED_TABS: [&str; 2] = ["Settings", "Help"];
 /// a name that is no tab. Plugins' tabs pass through.
 pub fn current_tab(name: &str) -> &str {
     let tab = match name {
-        "Map" => "Home",
-        "Insert" | "Raster Data" => "Data",
+        "Home" => "Map",
+        "Data" | "Raster Data" => "Insert",
         "Feature Layer" | "Labeling" | "Raster Layer" => "Style",
-        "Analysis" | "Imagery" => "Analyze",
-        "Share" | "Layout" => "Publish",
+        "Analyze" => "Analysis",
+        "Publish" | "Layout" => "Share",
         _ => name,
     };
-    if TABS.contains(&tab) || tab.starts_with("plugin:") { tab } else { "Home" }
+    if TABS.contains(&tab) || tab.starts_with("plugin:") { tab } else { "Map" }
 }
 
 /// Saved hidden tabs under the current names: renamed tabs carry over, and names of tabs whose
@@ -38,9 +38,10 @@ pub fn current_hidden_tabs(saved: Vec<String>) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     for name in saved {
         let tab = match name.as_str() {
-            "Map" => "Home",
-            "Analysis" => "Analyze",
-            "Share" => "Publish",
+            "Home" => "Map",
+            "Data" => "Insert",
+            "Analyze" => "Analysis",
+            "Publish" => "Share",
             n => n,
         };
         if (TABS.contains(&tab) || tab.starts_with("plugin:")) && !FIXED_TABS.contains(&tab) && !out.iter().any(|t| t == tab) {
@@ -98,12 +99,13 @@ pub fn show(app: &mut RustGisApp, ui: &mut Ui) {
                         let tab = app.ui.tab.clone();
                         match tab.as_str() {
                             t if t.starts_with("plugin:") => plugin_tab(app, ui, t.trim_start_matches("plugin:")),
-                            "Data" => data_tab(app, ui),
+                            "Insert" => data_tab(app, ui),
                             "Style" => style_tab(app, ui),
                             "Edit" => edit_tab(app, ui),
-                            "Analyze" => analyze_tab(app, ui),
+                            "Analysis" => analyze_tab(app, ui),
+                            "Imagery" => imagery_groups(app, ui),
                             "View" => view_tab(app, ui),
-                            "Publish" => publish_tab(app, ui),
+                            "Share" => publish_tab(app, ui),
                             "Plugins" => plugins_tab(app, ui),
                             "Settings" => settings_tab(app, ui),
                             "Help" => help_tab(app, ui),
@@ -243,8 +245,8 @@ fn tab_strip(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
                             );
                             let bar = t.accent;
                             ui.painter().rect_filled(
-                                Rect::from_min_max(pos2(r.min.x + 8.0, r.max.y - 3.0), pos2(r.max.x - 8.0, r.max.y - 1.0)),
-                                CornerRadius::same(1),
+                                Rect::from_min_max(pos2(r.min.x + 1.0, r.max.y - 2.0), pos2(r.max.x - 1.0, r.max.y)),
+                                0.0,
                                 bar,
                             );
                         } else if resp.hovered() {
@@ -726,22 +728,22 @@ fn project_group(app: &mut RustGisApp, ui: &mut Ui) {
                 let text = format!("{} ({w:.0} × {h:.0} mm)", tl!(*label));
                 if ui.button(text).clicked() {
                     let _ = app.run("layout.new", json!({"page": id}));
-                    app.ui.tab = "Publish".into();
+                    app.ui.tab = "Share".into();
                     ui.close();
                 }
             }
             ui.separator();
             if ui.button(tl!("Blank Letter page")).clicked() {
                 let _ = app.run("layout.new", json!({"template": "blank"}));
-                app.ui.tab = "Publish".into();
+                app.ui.tab = "Share".into();
                 ui.close();
             }
             menu_item(ui, app, "open", "Import Layout…", "ui.importLayout", Value::Null);
         });
         col(ui, |ui| {
-            small(ui, app, "catalog", "Browser", "Browse the project's maps, tables and folders.", "ui.pane.catalog", Value::Null, false);
+            small(ui, app, "catalog", "Catalog", "Browse the project's maps, tables and folders.", "ui.pane.catalog", Value::Null, false);
             small(ui, app, "add_data", "Add Data", "Add vector data.", "ui.addData", Value::Null, false);
-            small(ui, app, "add_folder", "Add Folder", "Connect a folder to the Browser.", "ui.addFolder", Value::Null, false);
+            small(ui, app, "add_folder", "Add Folder", "Connect a folder to the Catalog.", "ui.addFolder", Value::Null, false);
         });
         col(ui, |ui| {
             small(
@@ -1172,7 +1174,7 @@ fn analysis_groups(app: &mut RustGisApp, ui: &mut Ui) {
             ui,
             app,
             "toolbox",
-            "Tools",
+            "Geoprocessing",
             "Find and run geoprocessing tools.",
             "ui.pane.geoprocessing",
             Value::Null,
@@ -1585,8 +1587,8 @@ fn view_tab(app: &mut RustGisApp, ui: &mut Ui) {
             ui,
             app,
             "contents",
-            "Layers",
-            "Show or hide the Layers pane.",
+            "Contents",
+            "Show or hide the Contents pane.",
             "ui.pane.contents",
             Value::Null,
             app.ui.left == Some(crate::LeftPane::Contents),
@@ -1596,8 +1598,8 @@ fn view_tab(app: &mut RustGisApp, ui: &mut Ui) {
             ui,
             app,
             "catalog",
-            "Browser\nPane",
-            "Show or hide the Browser pane.",
+            "Catalog\nPane",
+            "Show or hide the Catalog pane.",
             "ui.pane.catalog",
             Value::Null,
             app.ui.left == Some(crate::LeftPane::Catalog),
@@ -1739,7 +1741,7 @@ fn view_tab(app: &mut RustGisApp, ui: &mut Ui) {
                 ui,
                 app,
                 "catalog",
-                "Browser View",
+                "Catalog View",
                 "The project's items in place of the map.",
                 "ui.catalogView",
                 Value::Null,
@@ -1779,7 +1781,7 @@ fn view_tab(app: &mut RustGisApp, ui: &mut Ui) {
                 app,
                 "identify",
                 "Item Pop-ups",
-                "Show details when hovering items in the Browser view.",
+                "Show details when hovering items in the Catalog view.",
                 "ui.itemPopups",
                 Value::Null,
                 app.ws.item_popups,
@@ -1821,7 +1823,7 @@ fn view_tab(app: &mut RustGisApp, ui: &mut Ui) {
     });
 }
 
-/// The Data tab: bringing data in, tables, fields, queries, relationships and export.
+/// The Insert tab: bringing data in, tables, fields, queries, relationships and export.
 fn data_tab(app: &mut RustGisApp, ui: &mut Ui) {
     project_group(app, ui);
     layer_templates_group(app, ui);
@@ -1834,7 +1836,7 @@ fn data_tab(app: &mut RustGisApp, ui: &mut Ui) {
     feature_cache_group(app, ui);
 }
 
-/// The Style tab: the drawing of the layer selected in Layers (its symbology, labels and
+/// The Style tab: the drawing of the layer selected in Contents (its symbology, labels and
 /// effects), or a hint when none is.
 fn style_tab(app: &mut RustGisApp, ui: &mut Ui) {
     match active_layer(app) {
@@ -1847,21 +1849,20 @@ fn style_tab(app: &mut RustGisApp, ui: &mut Ui) {
             let t = Tokens::get(ui.ctx());
             ui.add_sized(
                 vec2(220.0, CONTENT_H),
-                egui::Label::new(egui::RichText::new(tl!("Select a layer in Layers to style it.")).color(t.text_dim)).wrap(),
+                egui::Label::new(egui::RichText::new(tl!("Select a layer in Contents to style it.")).color(t.text_dim)).wrap(),
             );
         }),
     }
     styles_group(app, ui);
 }
 
-/// The Analyze tab: geoprocessing, workflows, imagery and notebooks.
+/// The Analysis tab: geoprocessing, workflows and notebooks (imagery has a tab of its own).
 fn analyze_tab(app: &mut RustGisApp, ui: &mut Ui) {
     analysis_groups(app, ui);
     notebook_group(app, ui);
-    imagery_groups(app, ui);
 }
 
-/// The Publish tab: the open layout's groups first, then reports, presentations, export and
+/// The Share tab: the open layout's groups first, then reports, presentations, export and
 /// sharing.
 fn publish_tab(app: &mut RustGisApp, ui: &mut Ui) {
     layout_groups(app, ui);
@@ -1871,7 +1872,7 @@ fn publish_tab(app: &mut RustGisApp, ui: &mut Ui) {
     thumbnail_group(app, ui);
 }
 
-/// The layer selected in Layers.
+/// The layer selected in Contents.
 fn active_layer(app: &RustGisApp) -> Option<&rustgis_engine::map::Layer> {
     app.session.active_layer.and_then(|id| app.session.map().layer(id))
 }
@@ -3836,6 +3837,16 @@ mod tests {
     #[test]
     fn saved_hidden_tabs_never_hide_the_fixed_tabs() {
         let saved = ["Settings", "Help", "Edit", "Share", "Edit"].iter().map(|t| t.to_string()).collect();
-        assert_eq!(current_hidden_tabs(saved), vec!["Edit".to_string(), "Publish".to_string()]);
+        assert_eq!(current_hidden_tabs(saved), vec!["Edit".to_string(), "Share".to_string()]);
+    }
+
+    #[test]
+    fn saved_tab_names_from_older_versions_carry_over() {
+        let saved = ["Home", "Data", "Analyze", "Publish", "Map"].iter().map(|t| t.to_string()).collect();
+        assert_eq!(current_hidden_tabs(saved), ["Map", "Insert", "Analysis", "Share"].map(String::from).to_vec());
+        for (old, new) in [("Home", "Map"), ("Data", "Insert"), ("Analyze", "Analysis"), ("Publish", "Share"), ("Layout", "Share")] {
+            assert_eq!(current_tab(old), new);
+        }
+        assert!(TABS.iter().all(|t| current_tab(t) == *t));
     }
 }

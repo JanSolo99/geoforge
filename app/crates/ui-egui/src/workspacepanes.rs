@@ -364,7 +364,7 @@ pub fn infographics(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
     }
 }
 
-/// The Browser view: the project's items as a grid of cards, in place of the map.
+/// The Catalog view: the project's items as a grid of cards, in place of the map.
 pub fn catalog_view(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
     let p = &app.session.project;
     let mut items: Vec<(&str, String, &str, Option<Value>)> = Vec::new();
@@ -393,7 +393,7 @@ pub fn catalog_view(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
         items.push(("map", a.name.clone(), "Offline area", Some(json!({"cmd": "offline.open", "name": a.name}))));
     }
     ui.horizontal(|ui| {
-        ui.label(egui::RichText::new(tl!("Browser")).font(semibold(16.0)));
+        ui.label(egui::RichText::new(tl!("Catalog")).font(semibold(16.0)));
         if ui.button(tl!("Back to the Map")).clicked() {
             app.ws.catalog_view = false;
         }
@@ -427,7 +427,7 @@ pub fn catalog_view(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
         let _ = app.run(&cmd, json!({"name": a["name"]}));
         app.ws.catalog_view = false;
         if cmd == "layout.activate" {
-            app.ui.tab = "Publish".into();
+            app.ui.tab = "Share".into();
         }
         app.map.invalidate();
     }

@@ -253,7 +253,7 @@ pub fn show(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
                         ui.horizontal(|ui| {
                             let (r, _) = ui.allocate_exact_size(vec2(16.0, 16.0), Sense::hover());
                             icons::paint(ui.painter(), r, "add_folder", t.icon, t.accent);
-                            if ui.link(&f).on_hover_text(tl!("Browse it in the Browser")).clicked() {
+                            if ui.link(&f).on_hover_text(tl!("Browse it in the Catalog")).clicked() {
                                 app.table.folder = Some(std::path::PathBuf::from(&f));
                                 app.ui.left = Some(crate::LeftPane::Catalog);
                             }

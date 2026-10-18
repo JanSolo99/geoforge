@@ -1,5 +1,5 @@
-//! L6: the GeoForge desktop front end, built around a ribbon (Home, Data, Style, Edit, Analyze,
-//! View, Publish), the Layers and Browser panes, a Tools pane, the map view, the
+//! L6: the GeoForge desktop front end, built around a ribbon (Map, Insert, Analysis, Edit, Imagery, Style,
+//! View, Share), the Contents and Catalog panes, a Geoprocessing pane, the map view, the
 //! attribute table and the status bar.
 //!
 //! The UI is thin: it reads [`Session`] state and runs commands by id ([`RustGisApp::run`]).
@@ -334,7 +334,7 @@ pub struct UiState {
 impl Default for UiState {
     fn default() -> Self {
         UiState {
-            tab: "Home".into(),
+            tab: "Map".into(),
             backstage: false,
             backstage_page: "open",
             left: Some(LeftPane::Contents),
@@ -919,7 +919,7 @@ impl RustGisApp {
             "ui.pane.geoprocessing" => toggle_right(&mut self.ui, RightPane::Geoprocessing),
             "ui.pane.symbology" => {
                 if self.session.active_layer.is_none() {
-                    return Err("select a layer in the Layers pane first".into());
+                    return Err("select a layer in the Contents pane first".into());
                 }
                 toggle_right(&mut self.ui, RightPane::Symbology)
             }
@@ -1808,7 +1808,7 @@ impl RustGisApp {
                     .session
                     .active_layer
                     .and_then(|id| self.session.map().layer(id))
-                    .ok_or("select a layer in the Layers pane first")?;
+                    .ok_or("select a layer in the Contents pane first")?;
                 // Any format but GeoPackage, which needs SQLite.
                 let ext = p.get("format").and_then(Value::as_str).unwrap_or("geojson").to_ascii_lowercase();
                 // A streamed layer exports its whole source, not the features read for the view.

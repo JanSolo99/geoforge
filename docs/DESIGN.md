@@ -169,14 +169,14 @@ surfaces, accent text and text-on-accent at least 4.5:1, both themes.
 
 ## 6. First slices
 
-1. **Theme swap** (S). Wire `theme_pro::{light,dark}` behind a setting (`Settings > Appearance >
+1. **Theme swap** (S). Done. Wire `theme_pro::{light,dark}` behind a setting (`Settings > Appearance >
    Theme: GeoForge / Classic`), apply `space`/`radius`/`type_size` in `theme::apply`, regenerate
    `docs/screenshots` and compare. Tests: the contrast tests plus a screenshot script run. Risk: places
    with hard-coded 5/8/10 radii in `widgets.rs` and `ribbon.rs`; grep and route through `radius::*`.
-2. **Status bar** (S). Add cursor coordinates (map CRS, unit dropdown), a notifications bell with the
+2. **Status bar** (S). Done: coordinate format dropdown (map units, decimal degrees, DMS), notifications bell with unread count over the notices queue, spinner and tool name while a background tool or install runs. Add cursor coordinates (map CRS, unit dropdown), a notifications bell with the
    existing `notices` queue, and a progress ring for running tools. Mostly `chrome.rs::status_bar`
    plus a mouse-position hook from `mapview.rs`.
-3. **Ribbon rename and underline** (S-M). Replace `TABS` with Pro's tab set and split the "Home",
+3. **Ribbon rename and underline** (S-M). Done: tabs are Map, Insert, Analysis, View, Edit, Imagery, Style, Share, Plugins, Settings, Help (old names Home/Data/Analyze/Publish still resolve through `current_tab`); full-width 2 px accent underline; panes titled Contents / Catalog / Geoprocessing. Dialog-launcher arrows remain open. Replace `TABS` with Pro's tab set and split the "Home",
    "Data", "Style" and "Analyze" groups back to Map, Insert, Analysis, Edit, Imagery (groups already
    exist; the alias code makes it backward compatible); add the 2 px accent underline and the
    dialog-launcher arrow in `ribbon.rs`; rename panes in `panes.rs`.

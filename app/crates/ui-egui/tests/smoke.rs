@@ -103,7 +103,7 @@ fn every_tab_pane_and_dialog_renders() {
     for _ in 0..4 {
         h.step();
     }
-    for tab in ["Home", "Data", "Style", "Edit", "Analyze", "View", "Publish", "Plugins", "Settings", "Help"] {
+    for tab in ["Map", "Insert", "Analysis", "View", "Edit", "Imagery", "Style", "Share", "Plugins", "Settings", "Help"] {
         h.state_mut().ui.tab = tab.into();
         h.step();
         h.step();
@@ -210,7 +210,7 @@ fn a_tab_strip_wider_than_the_window_scrolls_with_arrow_buttons() {
     h.step();
     assert_eq!(h.state().ui.tab, "Help");
     // A tab opened off screen scrolls into view, so the left arrow goes away.
-    h.state_mut().ui.tab = "Home".into();
+    h.state_mut().ui.tab = "Map".into();
     for _ in 0..4 {
         h.step();
     }
@@ -480,7 +480,15 @@ fn start_up_preferences() {
 #[test]
 fn old_and_unknown_tab_names_open_a_current_tab() {
     let mut h = harness();
-    for (asked, opened) in [("Imagery", "Analyze"), ("Feature Layer", "Style"), ("Share", "Publish"), ("Map", "Home"), ("nope", "Home")] {
+    for (asked, opened) in [
+        ("Imagery", "Imagery"),
+        ("Analyze", "Analysis"),
+        ("Feature Layer", "Style"),
+        ("Publish", "Share"),
+        ("Home", "Map"),
+        ("Data", "Insert"),
+        ("nope", "Map"),
+    ] {
         let _ = h.state_mut().run("ui.tab", json!({"tab": asked}));
         assert_eq!(h.state().ui.tab, opened, "{asked}");
         h.step();
@@ -857,7 +865,7 @@ fn map_context_menu_copies_the_clicked_coordinates() {
 #[test]
 fn bookmarks_menu_removes_bookmarks() {
     let mut h = harness();
-    h.state_mut().ui.tab = "Home".into();
+    h.state_mut().ui.tab = "Map".into();
     for _ in 0..4 {
         h.step();
     }
