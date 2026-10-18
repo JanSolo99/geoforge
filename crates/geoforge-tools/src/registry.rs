@@ -9,7 +9,7 @@
 use geoforge_core::{Error, FeatureClass, Result};
 
 use crate::construct::{self, Fishnet, Placement};
-use crate::{ToolOutput, spatstat};
+use crate::{TableOutput, ToolOutput, spatstat, tables};
 
 /// What a parameter holds.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -62,11 +62,14 @@ pub struct Report {
 pub enum Runner {
     Features(fn(&dyn Context) -> Result<ToolOutput>),
     Report(fn(&dyn Context) -> Result<Report>),
+    /// Gives features or a table, as the input decides.
+    Dynamic(fn(&dyn Context) -> Result<Outcome>),
 }
 
 /// What a run gave.
 pub enum Outcome {
     Features(ToolOutput),
+    Table(TableOutput),
     Report(Report),
 }
 
@@ -135,6 +138,7 @@ pub fn run(tool: &Tool, ctx: &dyn Context) -> Result<Outcome> {
     match tool.run {
         Runner::Features(f) => f(ctx).map(Outcome::Features),
         Runner::Report(f) => f(ctx).map(Outcome::Report),
+        Runner::Dynamic(f) => f(ctx),
     }
 }
 
@@ -494,6 +498,63 @@ fn hot_spot_analysis(ctx: &dyn Context) -> Result<ToolOutput> {
         number_of(ctx, t, "distance_band"),
         fdr,
     )
+}
+
+fn where_of(ctx: &dyn Context, t: &Tool) -> Option<String> {
+    text(ctx, t, "where_clause")
+}
+
+fn copy_rows(ctx: &dyn Context) -> Result<Outcome> {
+    let t = find("copy_rows").ok_or_else(|| Error::Unsupported("copy_rows".into()))?;
+    let fc = ctx.features("input")?;
+    tables::copy_rows(fc.as_ref(), where_of(ctx, t).as_deref()).map(Outcome::Table)
+}
+
+fn table_to_table(ctx: &dyn Context) -> Result<Outcome> {
+    let t = find("table_to_table").ok_or_else(|| Error::Unsupported("table_to_table".into()))?;
+    let fc = ctx.features("input")?;
+    tables::copy_rows(fc.as_ref(), where_of(ctx, t).as_deref()).map(Outcome::Table)
+}
+
+fn get_count(ctx: &dyn Context) -> Result<Report> {
+    let t = find("get_count").ok_or_else(|| Error::Unsupported("get_count".into()))?;
+    let fc = ctx.features("input")?;
+    let n = tables::get_count(fc.as_ref(), where_of(ctx, t).as_deref())?;
+    Ok(Report {
+        rows: vec![("Row Count".into(), n as f64)],
+        messages: Vec::new(),
+    })
+}
+
+fn join_field(ctx: &dyn Context) -> Result<Outcome> {
+    let t = find("join_field").ok_or_else(|| Error::Unsupported("join_field".into()))?;
+    let fc = ctx.features("input")?;
+    let join = ctx.features("join_table")?;
+    let fields: Vec<String> = text(ctx, t, "fields")
+        .map(|f| {
+            f.split(';')
+                .map(str::trim)
+                .filter(|s| !s.is_empty())
+                .map(String::from)
+                .collect()
+        })
+        .unwrap_or_default();
+    match tables::join_field(
+        fc.as_ref(),
+        &text(ctx, t, "in_field").unwrap_or_default(),
+        join.as_ref(),
+        &text(ctx, t, "join_field").unwrap_or_default(),
+        &fields,
+    )? {
+        tables::Joined::Features(o) => Ok(Outcome::Features(o)),
+        tables::Joined::Table(o) => Ok(Outcome::Table(o)),
+    }
+}
+
+fn add_fields(ctx: &dyn Context) -> Result<ToolOutput> {
+    let t = find("add_fields").ok_or_else(|| Error::Unsupported("add_fields".into()))?;
+    let fc = ctx.features("input")?;
+    tables::add_fields(fc.as_ref(), &text(ctx, t, "fields").unwrap_or_default())
 }
 
 pub static TOOLS: &[Tool] = &[
@@ -938,5 +999,155 @@ pub static TOOLS: &[Tool] = &[
         output_suffix: "HotSpots",
         measures: true,
         run: Runner::Features(hot_spot_analysis),
+    },
+    Tool {
+        id: "copy_rows",
+        name: "Copy Rows",
+        toolbox: "Data Management › Tables",
+        summary: "Copies the rows of a table or the attributes of a feature class into a new table (ArcGIS Pro Copy Rows).",
+        params: &[Param {
+            name: "input",
+            label: "Input Rows",
+            kind: Kind::Features,
+            required: true,
+            default: "",
+            help: "",
+        }],
+        output_suffix: "Rows",
+        measures: false,
+        run: Runner::Dynamic(copy_rows),
+    },
+    Tool {
+        id: "table_to_table",
+        name: "Table To Table",
+        toolbox: "Conversion › To Geodatabase",
+        summary: "Copies the rows a where clause selects into a new table (ArcGIS Pro Table To Table).",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Rows",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "where_clause",
+                label: "Expression",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "An SQL where clause.",
+            },
+        ],
+        output_suffix: "Table",
+        measures: false,
+        run: Runner::Dynamic(table_to_table),
+    },
+    Tool {
+        id: "get_count",
+        name: "Get Count",
+        toolbox: "Data Management › Tables",
+        summary: "The number of rows of a table or layer, or that an expression selects (ArcGIS Pro Get Count).",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Rows",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "where_clause",
+                label: "Expression",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "An SQL where clause.",
+            },
+        ],
+        output_suffix: "Count",
+        measures: false,
+        run: Runner::Report(get_count),
+    },
+    Tool {
+        id: "join_field",
+        name: "Join Field",
+        toolbox: "Data Management › Joins",
+        summary: "Adds the fields of a table to another by a common field; the copy, not the input, gets them (ArcGIS Pro Join Field).",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Table",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "",
+            },
+            field(
+                "in_field",
+                "Input Join Field",
+                false,
+                "The field that matches the join table.",
+            ),
+            Param {
+                name: "join_table",
+                label: "Join Table",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "join_field",
+                label: "Join Table Field",
+                kind: Kind::Field {
+                    of: "join_table",
+                    numeric: false,
+                },
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "fields",
+                label: "Transfer Fields",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "Field names separated by semicolons; none: all of them.",
+            },
+        ],
+        output_suffix: "Join",
+        measures: false,
+        run: Runner::Dynamic(join_field),
+    },
+    Tool {
+        id: "add_fields",
+        name: "Add Fields",
+        toolbox: "Data Management › Fields",
+        summary: "Adds several fields to a copy of a feature class (ArcGIS Pro Add Fields, shapefile rules).",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Table",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "fields",
+                label: "Field Description",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+                help: "NAME TYPE [LENGTH] items separated by semicolons; TYPE is TEXT, SHORT, LONG, FLOAT, DOUBLE or DATE.",
+            },
+        ],
+        output_suffix: "Fields",
+        measures: false,
+        run: Runner::Features(add_fields),
     },
 ];

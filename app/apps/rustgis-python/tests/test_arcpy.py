@@ -201,3 +201,13 @@ def test_pattern_statistics(s):
     assert r.outputCount == 3 and 0 <= float(r.getOutput(2)) <= 1
     arcpy.stats.HotSpots("Indian", "pop_max", "Hot", "K_NEAREST_NEIGHBORS", "EUCLIDEAN_DISTANCE", "NONE", 0, 3)
     assert count(s, "Hot") == count(s, "Indian")
+
+
+def test_table_tools(s):
+    arcpy.analysis.Select("Cities", "Indian", "adm0name = 'India'")
+    n = count(s, "Indian")
+    assert int(arcpy.management.GetCount("Indian").getOutput(0)) == n
+    arcpy.management.CopyRows("Indian", "IndianRows")
+    assert n >= 1
+    arcpy.management.AddFields("Indian", [["F1", "LONG"], ["F2", "TEXT", "alias", 12]], out_raster="WithFields")
+    assert {"F1", "F2"} <= fields(s, "WithFields")

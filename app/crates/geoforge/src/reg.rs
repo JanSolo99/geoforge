@@ -26,6 +26,8 @@ pub(crate) fn params_of(t: &'static Tool) -> &'static [P] {
             label: p.label,
             kind: match p.kind {
                 Kind::Features => K::Layer,
+                // The form offers the fields of the first layer parameter only.
+                Kind::Field { of, .. } if t.params.iter().find(|q| q.kind == Kind::Features).is_some_and(|q| q.name != of) => K::Text,
                 Kind::Field { numeric: true, .. } => K::NumericField,
                 Kind::Field { numeric: false, .. } => K::Field,
                 Kind::Choice(c) => K::Choice(c),
@@ -91,6 +93,11 @@ pub(crate) fn run(t: &'static Tool, inp: &dyn Inputs, p: &Json) -> Result<ToolRe
     let default = first.map_or_else(|| t.output_suffix.to_string(), |n| format!("{n}_{}", t.output_suffix));
     match registry::run(t, &ctx).map_err(|e| e.to_string())? {
         registry::Outcome::Features(out) => finish_in(out, out_name(p, default), &work),
+        registry::Outcome::Table(table) => {
+            let ds = crate::table_dataset(table, out_name(p, default));
+            let m = vec![format!("{}: {} rows", ds.name, ds.features.len())];
+            Ok(ToolResult { output: Output::Table(ds), messages: m })
+        }
         registry::Outcome::Report(r) => {
             // A table of the values, and the same lines as messages.
             let mut ds = Dataset::new(

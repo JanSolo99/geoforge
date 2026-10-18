@@ -8,6 +8,7 @@ pub mod pycalc;
 pub mod registry;
 pub mod spatstat;
 mod sql;
+pub mod tables;
 mod zm;
 
 pub use fieldmap::{FieldMapEntry, MapSource, parse_field_mapping, table_stem};

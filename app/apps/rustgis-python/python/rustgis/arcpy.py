@@ -293,6 +293,20 @@ def _fuzzy_function(value: Any) -> Dict[str, Any]:
     return value.params()
 
 
+def _join_fields(value: Any) -> Dict[str, Any]:
+    return {"fields": ";".join(value) if isinstance(value, (list, tuple)) else str(value)}
+
+
+def _field_description(value: Any) -> Dict[str, Any]:
+    """``[["F1", "LONG"], ["F2", "TEXT", "alias", 12]]`` as ``F1 LONG;F2 TEXT 12``."""
+    items = []
+    for row in value:
+        name, ftype = row[0], row[1]
+        length = row[3] if len(row) > 3 and row[3] not in (None, "", "#") else None
+        items.append(f"{name} {ftype}" + (f" {length}" if length else ""))
+    return {"fields": ";".join(items)}
+
+
 def _flag(true_value: str) -> Callable[[Any], bool]:
     return lambda v: isinstance(v, bool) and v or str(v).upper() == true_value
 
@@ -379,6 +393,11 @@ _TOOLS = [
        ("cell_height", "cell_height"), ("number_rows", "number_rows"), ("number_columns", "number_columns"), ("corner_coord", "corner_coord"), ("labels", None), ("template", "template"),
        ("geometry_type", "geometry_type")),
     _t("management", "PolygonToLine", "polygon_to_line", ("in_features", "input"), ("out_feature_class", "output"), ("neighbor_option", "neighbor_option")),
+    _t("management", "CopyRows", "copy_rows", ("in_rows", "input"), ("out_table", "output")),
+    _t("conversion", "TableToTable", "table_to_table", ("in_rows", "input"), ("out_path", None), ("out_name", "output"), ("where_clause", "where_clause"), ("field_mapping", None)),
+    _t("management", "JoinField", "join_field", ("in_data", "input"), ("in_field", "in_field"), ("join_table", "join_table"), ("join_field", "join_field"), ("fields", _join_fields)),
+    _t("management", "AddFields", "add_fields", ("in_table", "input"), ("field_description", _field_description)),
+    _t("management", "GetCount", "get_count", ("in_rows", "input"), outputs=()),
     # stats (Spatial Statistics: Measuring Geographic Distributions)
     _t("stats", "MeanCenter", "mean_center", ("Input_Feature_Class", "input"), ("Output_Feature_Class", "output"), ("Weight_Field", "weight_field"), ("Case_Field", "case_field"), ("Dimension_Field", "dimension_field")),
     _t("stats", "MedianCenter", "median_center", ("Input_Feature_Class", "input"), ("Output_Feature_Class", "output"), ("Weight_Field", "weight_field"), ("Case_Field", "case_field"), ("Dimension_Field", "dimension_field")),
@@ -517,6 +536,7 @@ def _output_target(value: Any) -> Tuple[str, Optional[str]]:
 _REPORT_OUTPUTS = {
     "average_nearest_neighbor": (0, 1, 2, 3, 4),
     "spatial_autocorrelation": (0, 3, 4),
+    "get_count": (0,),
 }
 
 

@@ -444,6 +444,13 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         Not done: IDENTIFY_NEIGHBORS (needs a planar graph), fishnet labels, Densify's ANGLE and
         OFFSET methods and curves, chainage fields, Multiple Ring Buffer and Create Thiessen
         Polygons (probed: `scripts/research/construct/probe1.py`)
+  - [x] Table tools on the shared registry (`geoforge-tools::tables`): Copy Rows, Table To Table
+        (where clause), Join Field (all or named fields, `_1` renaming, first match, nulls where
+        unmatched; features or tables), Add Fields and Get Count matching Pro 3.7 on 9 runs
+        (`testdata/arcgis-reference/tables.json`, `crates/geoforge-cli/tests/tables.rs`). The
+        registry now has table results (`Outcome::Table`). Not done: Delete Rows and Alter Field (they
+        edit their input; shapefiles cannot rename fields), field mappings, GDB table outputs from
+        `gf run`
   - [ ] Raster To Polygon SIMPLIFY: rule worked out for blocky rasters (104 of 122 test rasters exact;
         arcs between nodes, corners displaced diagonally by a from a fixed grid, Douglas-Peucker-like
         split with collapse/clamp, fewest-vertices choice of a) — see `docs/formats/raster-to-polygon-simplify.md`;

@@ -1936,6 +1936,7 @@ fn main() -> ExitCode {
                         .and_then(|i| source_gdb(Path::new(&i)));
                     write_output(out, Path::new(&output), source.as_deref())
                 }
+                registry::Outcome::Table(t) => write_table(&t, Path::new(&output)),
                 registry::Outcome::Report(r) => {
                     for (name, v) in &r.rows {
                         println!("{name}: {v}");
