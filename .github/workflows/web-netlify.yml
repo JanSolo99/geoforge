@@ -1,0 +1,47 @@
+name: Deploy web app to Netlify
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-netlify
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    # Needs the repository secrets NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID (see docs/WEB.md).
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: app
+      - name: Install Trunk
+        run: |
+          set -euo pipefail
+          curl -sSfL -o "$RUNNER_TEMP/trunk.tar.gz" https://github.com/trunk-rs/trunk/releases/download/v0.21.14/trunk-x86_64-unknown-linux-gnu.tar.gz
+          echo "f2b4680cd239693a646a2795e4633c625328d7b2a044fbe749fa3a2fe9e7036b  $RUNNER_TEMP/trunk.tar.gz" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/bin" && tar xzf "$RUNNER_TEMP/trunk.tar.gz" -C "$RUNNER_TEMP/bin" trunk
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+      - name: Build the web app
+        run: scripts/build-web.sh
+      - name: Deploy to Netlify
+        if: github.ref == 'refs/heads/main'
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: |
+          if [ -z "${NETLIFY_AUTH_TOKEN:-}" ] || [ -z "${NETLIFY_SITE_ID:-}" ]; then
+            echo "::error::NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID are not set."
+            exit 1
+          fi
+          scripts/deploy-netlify.sh --prod --message "${GITHUB_SHA::7}"

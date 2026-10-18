@@ -14,6 +14,7 @@ pub(crate) mod external;
 pub mod fgb;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod filegdb;
+pub mod gfshape;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod gdal;
 #[cfg(not(target_arch = "wasm32"))]

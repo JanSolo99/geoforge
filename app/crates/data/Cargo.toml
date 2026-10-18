@@ -36,10 +36,11 @@ image = { workspace = true, features = ["jpeg"] }
 base64 = { workspace = true }
 lz4_flex = { workspace = true }
 ruzstd = { workspace = true }
+# GeoForge's geometry model (the parent repository); pure, so it builds for the browser.
+geoforge-core = { path = "../../../crates/geoforge-core" }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 # GeoForge's engine (the parent repository): File Geodatabase reading.
-geoforge-core = { path = "../../../crates/geoforge-core" }
 geoforge-filegdb = { path = "../../../crates/geoforge-filegdb" }
 rusqlite = { workspace = true }
 postgres = { workspace = true }

@@ -21,7 +21,7 @@ use geoforge_core as gf;
 use geoforge_tools as tools;
 use rustgis_analysis::{Inputs, Output, ParamKind as K, ParamSpec as P, ToolResult, ToolSpec};
 use rustgis_data::raster::{Crs, Transformer};
-use rustgis_data::source::filegdb::{from_geoforge, to_geoforge as to_gf_geometry};
+use rustgis_data::source::gfshape::{from_geoforge, to_geoforge as to_gf_geometry};
 use rustgis_data::{Dataset, Field, FieldType, Geometry, GeometryType, Value};
 use rustgis_geom::Coord;
 use serde_json::Value as Json;
