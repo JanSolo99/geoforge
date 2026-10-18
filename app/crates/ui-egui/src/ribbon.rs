@@ -1362,6 +1362,18 @@ fn view_tab(app: &mut RustGisApp, ui: &mut Ui) {
         big(ui, app, "graticule", "Graticule", "Show latitude/longitude lines on the basemap.", "map.graticule", Value::Null, g, false);
         let dark = app.ui.dark;
         big(ui, app, "dark", "Dark\nMode", "Switch between light and dark themes.", "ui.theme", Value::Null, dark, false);
+        let classic = !crate::theme::pro();
+        big(
+            ui,
+            app,
+            "symbology",
+            "Classic\nTheme",
+            "Switch between the GeoForge (ArcGIS Pro style) and the classic look.",
+            "ui.themeStyle",
+            Value::Null,
+            classic,
+            false,
+        );
     });
     group(ui, "View", |ui| {
         let on = app.session.map().projection.is_globe();

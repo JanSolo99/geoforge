@@ -7,6 +7,17 @@ use egui::{Color32, CornerRadius, FontData, FontDefinitions, FontFamily, FontId,
 /// GeoForge brand colour (the Project tab and the logo) and its lighter tint.
 pub const BRAND: Color32 = Color32::from_rgb(0xB8, 0x4A, 0x2C);
 pub const BRAND_DARK: Color32 = Color32::from_rgb(0x96, 0x3A, 0x22);
+static PRO: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(true);
+
+/// Whether the GeoForge (ArcGIS Pro style) theme is in use rather than the classic one.
+pub fn pro() -> bool {
+    PRO.load(std::sync::atomic::Ordering::Relaxed)
+}
+
+pub fn set_pro(on: bool) {
+    PRO.store(on, std::sync::atomic::Ordering::Relaxed);
+}
+
 /// Contextual tab group colour (Feature Layer, Labeling, Data).
 pub const CONTEXT: Color32 = Color32::from_rgb(0x0E, 0x93, 0x84);
 
@@ -47,7 +58,16 @@ pub struct Tokens {
 }
 
 impl Tokens {
+    /// The GeoForge (ArcGIS Pro style) palette unless the classic one is chosen.
     pub fn light() -> Self {
+        if pro() { crate::theme_pro::light() } else { Self::classic_light() }
+    }
+
+    pub fn dark() -> Self {
+        if pro() { crate::theme_pro::dark() } else { Self::classic_dark() }
+    }
+
+    pub fn classic_light() -> Self {
         Tokens {
             dark: false,
             header: Color32::from_rgb(0xEE, 0xF1, 0xF5),
@@ -83,7 +103,7 @@ impl Tokens {
         }
     }
 
-    pub fn dark() -> Self {
+    pub fn classic_dark() -> Self {
         Tokens {
             dark: true,
             header: Color32::from_rgb(0x17, 0x1B, 0x21),
@@ -177,8 +197,13 @@ pub fn apply(ctx: &egui::Context, t: &Tokens) {
     v.extreme_bg_color = t.input;
     v.faint_bg_color = t.pane_header;
     v.window_stroke = Stroke::new(1.0, t.border_strong);
-    v.window_corner_radius = CornerRadius::same(10);
-    v.menu_corner_radius = CornerRadius::same(8);
+    let (window_r, menu_r, control_r) = if pro() {
+        (crate::theme_pro::radius::POPUP, crate::theme_pro::radius::POPUP, crate::theme_pro::radius::CONTROL)
+    } else {
+        (10, 8, 5)
+    };
+    v.window_corner_radius = CornerRadius::same(window_r);
+    v.menu_corner_radius = CornerRadius::same(menu_r);
     v.selection.bg_fill = t.selection;
     v.selection.stroke = Stroke::new(1.0, t.accent);
     v.hyperlink_color = t.accent_text;
@@ -190,16 +215,16 @@ pub fn apply(ctx: &egui::Context, t: &Tokens) {
     v.widgets.inactive.weak_bg_fill = t.input;
     v.widgets.inactive.bg_stroke = Stroke::new(1.0, t.input_border);
     v.widgets.inactive.fg_stroke = Stroke::new(1.0, t.text);
-    v.widgets.inactive.corner_radius = CornerRadius::same(5);
+    v.widgets.inactive.corner_radius = CornerRadius::same(control_r);
     v.widgets.hovered.bg_fill = t.hover;
     v.widgets.hovered.weak_bg_fill = t.hover;
     v.widgets.hovered.bg_stroke = Stroke::new(1.0, t.border_strong);
     v.widgets.hovered.fg_stroke = Stroke::new(1.0, t.text);
-    v.widgets.hovered.corner_radius = CornerRadius::same(5);
+    v.widgets.hovered.corner_radius = CornerRadius::same(control_r);
     v.widgets.active.bg_fill = t.pressed;
     v.widgets.active.weak_bg_fill = t.pressed;
     v.widgets.active.fg_stroke = Stroke::new(1.0, t.text);
-    v.widgets.active.corner_radius = CornerRadius::same(5);
+    v.widgets.active.corner_radius = CornerRadius::same(control_r);
     v.widgets.open.bg_fill = t.pressed;
     v.widgets.open.weak_bg_fill = t.pressed;
     v.popup_shadow = egui::Shadow { offset: [0, 6], blur: 18, spread: 0, color: t.shadow };

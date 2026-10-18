@@ -33,7 +33,6 @@ mod sqlpane;
 mod stacui;
 mod table;
 pub mod theme;
-#[allow(dead_code)]
 pub mod theme_pro;
 mod update;
 mod widgets;
@@ -406,7 +405,7 @@ pub struct RustGisApp {
     /// The AI Assistant's conversation and settings.
     pub assistant: assistantpane::AssistantState,
     fonts_frames: u32,
-    applied_dark: Option<bool>,
+    applied_dark: Option<(bool, bool)>,
     sent_title: String,
     pub quit_requested: bool,
     logo: Option<egui::TextureHandle>,
@@ -504,6 +503,9 @@ impl RustGisApp {
             self.ui.start_projection = p.code();
         }
         self.ui.start_extent = self.services.load_pref.as_ref().and_then(|load| load("start_extent")).and_then(|v| parse_extent(&v));
+        if let Some(style) = self.services.load_pref.as_ref().and_then(|load| load("theme_style")) {
+            theme::set_pro(style != "classic");
+        }
         if let Some(m) = self.services.load_pref.as_ref().and_then(|load| load("ribbon_minimized")) {
             self.ui.ribbon_minimized = m == "true";
         }
@@ -1043,6 +1045,13 @@ impl RustGisApp {
             "ui.theme" => {
                 self.ui.dark = p.get("dark").and_then(Value::as_bool).unwrap_or(!self.ui.dark);
                 self.ui.dark_follows_system = false;
+            }
+            "ui.themeStyle" => {
+                let pro = p.get("pro").and_then(Value::as_bool).unwrap_or(!theme::pro());
+                theme::set_pro(pro);
+                if let Some(save) = &self.services.save_pref {
+                    save("theme_style", if pro { "geoforge" } else { "classic" });
+                }
             }
             "ui.commandSearch" => self.ui.command_search = Some(String::new()),
             "ui.about" => self.ui.about = true,
@@ -2275,10 +2284,10 @@ impl RustGisApp {
         {
             self.ui.dark = system == egui::Theme::Dark;
         }
-        if self.applied_dark != Some(self.ui.dark) {
+        if self.applied_dark != Some((self.ui.dark, theme::pro())) {
             let t = if self.ui.dark { theme::Tokens::dark() } else { theme::Tokens::light() };
             theme::apply(ctx, &t);
-            self.applied_dark = Some(self.ui.dark);
+            self.applied_dark = Some((self.ui.dark, theme::pro()));
             self.map.invalidate();
         }
     }

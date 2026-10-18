@@ -123,6 +123,8 @@ fn every_tab_pane_and_dialog_renders() {
         ("ui.about", json!(null)),
         ("ui.shortcuts", json!(null)),
         ("ui.theme", json!({"dark": true})),
+        ("ui.themeStyle", json!({"pro": false})),
+        ("ui.themeStyle", json!({"pro": true})),
         ("ui.backstage", json!({"open": true})),
     ] {
         h.state_mut().run(id, p).unwrap_or_else(|e| panic!("{id}: {e}"));
