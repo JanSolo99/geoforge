@@ -1211,6 +1211,9 @@ fn analysis_groups(app: &mut RustGisApp, ui: &mut Ui) {
                 Value::Null,
                 app.ui.right == Some(RightPane::Sql),
             );
+        });
+        // A column holds three controls at most; a fourth overflows into the group label.
+        col(ui, |ui| {
             small(
                 ui,
                 app,
