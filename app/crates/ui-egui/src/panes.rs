@@ -749,6 +749,7 @@ fn folder_browser(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
                         "csv",
                         "tsv",
                         "shp",
+                        "gpkg",
                         "tif",
                         "tiff",
                         "asc",
@@ -766,6 +767,31 @@ fn folder_browser(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
         .collect();
     entries.sort_by(|a, b| b.0.cmp(&a.0).then(a.1.to_lowercase().cmp(&b.1.to_lowercase())));
     for (is_dir, name, path) in entries.into_iter().take(300) {
+        let lower = name.to_lowercase();
+        // A geodatabase or GeoPackage opens in place, listing its feature classes.
+        if (is_dir && lower.ends_with(".gdb")) || (!is_dir && lower.ends_with(".gpkg")) {
+            egui::CollapsingHeader::new(egui::RichText::new(&name).size(12.0)).id_salt(("catalog-db", &path)).default_open(false).show(
+                ui,
+                |ui| match rustgis_engine::data::source::layers(&path) {
+                    Ok(layers) => {
+                        for l in layers {
+                            ui.horizontal(|ui| {
+                                let (r, _) = ui.allocate_exact_size(vec2(16.0, 16.0), Sense::hover());
+                                icons::paint(ui.painter(), r, "add_data", t.icon, t.accent);
+                                let resp = ui.add(egui::Label::new(egui::RichText::new(&l).size(12.0)).sense(Sense::click()));
+                                if resp.on_hover_text(tl!("Double-click to add")).double_clicked() {
+                                    let _ = app.run("layer.addData", json!({"path": path.display().to_string(), "layer": l, "name": l}));
+                                }
+                            });
+                        }
+                    }
+                    Err(e) => {
+                        ui.label(egui::RichText::new(e.to_string()).small().color(t.red));
+                    }
+                },
+            );
+            continue;
+        }
         ui.horizontal(|ui| {
             let (r, _) = ui.allocate_exact_size(vec2(16.0, 16.0), Sense::hover());
             let icon = if is_dir {
