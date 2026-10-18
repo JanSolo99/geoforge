@@ -194,75 +194,117 @@ fn edt_1d_arg(f: &mut [f64], arg: &mut [usize]) {
 
 /// For every cell, the (column, row) of the nearest cell of `source` that has a
 /// value, measured between cell centers; `None` where the source is empty.
+///
+/// Found by vector propagation (each cell offers its source to a neighbor), which
+/// also reproduces ArcGIS's pick among equally near sources:
+/// 1. each row from the east, then from the west (only strictly nearer sources);
+/// 2. top to bottom, each row west to east taking the north-east, north and
+///    north-west neighbors' sources, where an equally near one replaces the current
+///    pick; then east to west from the east neighbor (strictly nearer only);
+/// 3. bottom to top, each row west to east from the south-west, south, south-east
+///    and west neighbors, then east to west from the east neighbor (strictly nearer
+///    only).
+///
+/// This matches ArcGIS Pro 3.7 on every cell of more than 4,600 ties in the
+/// reference and probe rasters, including its distances.
 fn nearest_sources(source: &Raster) -> Vec<Option<(usize, usize)>> {
     let (w, h) = (source.width, source.height);
-    let mut grid: Vec<f64> = (0..w * h)
+    let mut near: Vec<usize> = (0..w * h)
         .map(|i| {
             if source.is_nodata(source.bands[0][i]) {
-                f64::INFINITY
+                NO_SOURCE
             } else {
-                0.0
+                i
             }
         })
         .collect();
-    let mut src_row = vec![0usize; w * h];
-    let mut col = vec![0.0; h];
-    let mut arg = vec![0usize; h];
-    for x in 0..w {
-        for y in 0..h {
-            col[y] = grid[y * w + x];
+    let mut d2: Vec<u64> = near
+        .iter()
+        .map(|&s| if s == NO_SOURCE { u64::MAX } else { 0 })
+        .collect();
+    let mut p = Propagation {
+        w,
+        near: &mut near,
+        d2: &mut d2,
+    };
+    for y in 0..h {
+        let row = y * w;
+        for x in (0..w.saturating_sub(1)).rev() {
+            p.offer(row + x, row + x + 1, false);
         }
-        edt_1d_arg(&mut col, &mut arg);
-        for y in 0..h {
-            grid[y * w + x] = col[y];
-            src_row[y * w + x] = arg[y];
+        for x in 1..w {
+            p.offer(row + x, row + x - 1, false);
         }
     }
-    let mut out = vec![None; w * h];
-    let mut arg = vec![0usize; w];
     for y in 0..h {
-        edt_1d_arg(&mut grid[y * w..(y + 1) * w], &mut arg);
-        for x in 0..w {
-            if grid[y * w + x].is_finite() {
-                let p = arg[x];
-                let found = (p, src_row[y * w + p]);
-                out[y * w + x] =
-                    Some(first_tied_source(source, x, y, grid[y * w + x]).unwrap_or(found));
+        let row = y * w;
+        if y > 0 {
+            for x in 0..w {
+                let k = row + x;
+                if x + 1 < w {
+                    p.offer(k, k - w + 1, true);
+                }
+                p.offer(k, k - w, true);
+                if x > 0 {
+                    p.offer(k, k - w - 1, true);
+                }
             }
         }
+        for x in (0..w.saturating_sub(1)).rev() {
+            p.offer(row + x, row + x + 1, false);
+        }
     }
-    out
+    for y in (0..h).rev() {
+        let row = y * w;
+        for x in 0..w {
+            let k = row + x;
+            if y + 1 < h {
+                if x > 0 {
+                    p.offer(k, k + w - 1, false);
+                }
+                p.offer(k, k + w, false);
+                if x + 1 < w {
+                    p.offer(k, k + w + 1, false);
+                }
+            }
+            if x > 0 {
+                p.offer(k, k - 1, false);
+            }
+        }
+        for x in (0..w.saturating_sub(1)).rev() {
+            p.offer(row + x, row + x + 1, false);
+        }
+    }
+    near.iter()
+        .map(|&s| (s != NO_SOURCE).then(|| (s % w, s / w)))
+        .collect()
 }
 
-/// Among the source cells exactly `d2` (squared cells) from (`x`, `y`), the first in
-/// row-major order, which is the one ArcGIS reports when several are equally near.
-/// Only looked for within 64 cells; farther cells keep the transform's pick.
-fn first_tied_source(source: &Raster, x: usize, y: usize, d2: f64) -> Option<(usize, usize)> {
-    if d2 > 64.0 * 64.0 {
-        return None;
-    }
-    let d2 = d2.round() as i64;
-    let r = (d2 as f64).sqrt() as i64;
-    for dy in -r..=r {
-        let rest = d2 - dy * dy;
-        let dx = (rest as f64).sqrt().round() as i64;
-        if dx * dx != rest {
-            continue;
+const NO_SOURCE: usize = usize::MAX;
+
+/// Per-cell nearest source (cell index) and its squared distance in cells.
+struct Propagation<'a> {
+    w: usize,
+    near: &'a mut [usize],
+    d2: &'a mut [u64],
+}
+
+impl Propagation<'_> {
+    /// Offers cell `from`'s source to cell `to`: taken when strictly nearer, or when
+    /// equally near and `ties` is set.
+    fn offer(&mut self, to: usize, from: usize, ties: bool) {
+        let s = self.near[from];
+        if s == NO_SOURCE {
+            return;
         }
-        let sy = y as i64 + dy;
-        if sy < 0 || sy >= source.height as i64 {
-            continue;
-        }
-        for sx in [x as i64 - dx, x as i64 + dx] {
-            if sx >= 0
-                && sx < source.width as i64
-                && !source.is_nodata(source.bands[0][sy as usize * source.width + sx as usize])
-            {
-                return Some((sx as usize, sy as usize));
-            }
+        let dx = (s % self.w) as i64 - (to % self.w) as i64;
+        let dy = (s / self.w) as i64 - (to / self.w) as i64;
+        let d = (dx * dx + dy * dy) as u64;
+        if d < self.d2[to] || (ties && d == self.d2[to]) {
+            self.near[to] = s;
+            self.d2[to] = d;
         }
     }
-    None
 }
 
 /// Spatial Analyst Euclidean Direction: the azimuth in whole degrees clockwise from

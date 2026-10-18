@@ -405,9 +405,11 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         and Extract by Mask, matching ArcGIS
   - [x] Euclidean Direction (whole-degree azimuth, 360 due north, 0 on sources, 16-bit, NoData 32767)
         and Euclidean Allocation (nearest source's value, ArcGIS's integer type choice, max
-        distance). Equally near sources: ArcGIS's pick is the first in row-major order for 86% of
-        the ties (3% of cells differ in the stream test; rule for the rest unknown); the
-        allocation's value attribute table is not written
+        distance), matching ArcGIS on every cell, including cells equally near to several
+        sources: ArcGIS's pick is reproduced by its vector-propagation order (rows from east
+        then west; top-down taking NE, N, NW with ties replacing; bottom-up from SW, S, SE, W;
+        then from E), checked on 4,600+ ties; the allocation's value attribute table is not
+        written
   - [x] Kernel Density (points and lines; default radius by Silverman's rule, weighted
         by the population field, area units, EXPECTED_COUNTS), Point Density (circle, rectangle,
         annulus, wedge; map or cell units) and Line Density, all matching ArcGIS exactly in 13
