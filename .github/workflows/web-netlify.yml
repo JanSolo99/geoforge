@@ -41,7 +41,7 @@ jobs:
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         run: |
           if [ -z "${NETLIFY_AUTH_TOKEN:-}" ] || [ -z "${NETLIFY_SITE_ID:-}" ]; then
-            echo "::error::NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID are not set."
-            exit 1
+            echo "::warning::NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID are not set (docs/WEB.md); built but not deployed."
+            exit 0
           fi
           scripts/deploy-netlify.sh --prod --message "${GITHUB_SHA::7}"
