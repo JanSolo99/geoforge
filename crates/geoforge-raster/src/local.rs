@@ -16,14 +16,14 @@ impl Operand {
         text.trim().parse().ok().map(Operand::Constant)
     }
 
-    fn is_float(&self) -> bool {
+    pub(crate) fn is_float(&self) -> bool {
         match self {
             Operand::Raster(r) => r.data_type.is_float(),
             Operand::Constant(c) => c.fract() != 0.0,
         }
     }
 
-    fn get(&self, i: usize) -> Option<f64> {
+    pub(crate) fn get(&self, i: usize) -> Option<f64> {
         match self {
             Operand::Raster(r) => {
                 let v = r.bands[0][i];
@@ -33,7 +33,7 @@ impl Operand {
         }
     }
 
-    fn raster(&self) -> Option<&Raster> {
+    pub(crate) fn raster(&self) -> Option<&Raster> {
         match self {
             Operand::Raster(r) => Some(r),
             Operand::Constant(_) => None,
@@ -42,11 +42,11 @@ impl Operand {
 }
 
 /// The first raster among the operands gives the output grid.
-fn grid<'a>(ops: &[&'a Operand]) -> Option<&'a Raster> {
+pub(crate) fn grid<'a>(ops: &[&'a Operand]) -> Option<&'a Raster> {
     ops.iter().find_map(|o| o.raster())
 }
 
-fn float_raster(g: &Raster, values: impl Iterator<Item = Option<f64>>) -> Raster {
+pub(crate) fn float_raster(g: &Raster, values: impl Iterator<Item = Option<f64>>) -> Raster {
     let nodata = f32::MIN as f64;
     let mut out = g.like(DataType::F32);
     out.nodata = Some(nodata);
@@ -113,7 +113,7 @@ pub fn math(op: MathOp, a: &Operand, b: &Operand) -> Option<Raster> {
     })
 }
 
-fn typed_raster(
+pub(crate) fn typed_raster(
     g: &Raster,
     values: impl Iterator<Item = Option<f64>>,
     t: DataType,
@@ -224,7 +224,7 @@ fn smallest_type(lo: f64, hi: f64) -> (DataType, f64) {
 impl Operand {
     /// The values the operand can take as ArcGIS knows them: a constant's value
     /// or a raster's stored statistics.
-    fn known_range(&self) -> Option<(f64, f64)> {
+    pub(crate) fn known_range(&self) -> Option<(f64, f64)> {
         match self {
             Operand::Raster(r) => r.statistics,
             Operand::Constant(c) => Some((*c, *c)),

@@ -636,6 +636,24 @@ def _make(module: str, name: str, tool: str, args: Tuple[Arg, ...], outputs: Tup
     return call
 
 
+# Spatial Analyst math functions: (arcpy name, tool id).
+_SA_UNARY = [
+    ("Abs", "abs"), ("Exp", "exp"), ("Exp2", "exp2"), ("Exp10", "exp10"), ("Ln", "ln"), ("Log2", "log2"), ("Log10", "log10"),
+    ("SquareRoot", "square_root"), ("Square", "square"), ("Negate", "negate"), ("Sin", "sin"), ("Cos", "cos"), ("Tan", "tan"),
+    ("ASin", "asin"), ("ACos", "acos"), ("ATan", "atan"), ("SinH", "sinh"), ("CosH", "cosh"), ("TanH", "tanh"), ("ASinH", "asinh"),
+    ("ACosH", "acosh"), ("ATanH", "atanh"), ("RoundDown", "round_down"), ("RoundUp", "round_up"), ("BooleanNot", "boolean_not"),
+    ("BitwiseNot", "bitwise_not"),
+]
+_SA_BINARY = [
+    ("Power", "power"), ("Mod", "mod"), ("ATan2", "atan2"), ("EqualTo", "equal_to"), ("NotEqual", "not_equal"), ("GreaterThan", "greater_than"),
+    ("GreaterThanEqual", "greater_than_equal"), ("LessThan", "less_than"), ("LessThanEqual", "less_than_equal"), ("BooleanAnd", "boolean_and"),
+    ("BooleanOr", "boolean_or"), ("BooleanXOr", "boolean_xor"), ("Diff", "diff"), ("Over", "over"), ("BitwiseAnd", "bitwise_and"),
+    ("BitwiseOr", "bitwise_or"), ("BitwiseXOr", "bitwise_xor"), ("BitwiseLeftShift", "bitwise_left_shift"), ("BitwiseRightShift", "bitwise_right_shift"),
+]
+_TOOLS += [_t("sa", n, i, ("in_raster_or_constant", "in1")) for n, i in _SA_UNARY]
+_TOOLS += [_t("sa", n, i, ("in_raster_or_constant1", "in1"), ("in_raster_or_constant2", "in2")) for n, i in _SA_BINARY]
+
+
 class _Module:
     """``arcpy.<toolbox>``: its tools as functions."""
 

@@ -1037,6 +1037,126 @@ fn fuzzy_overlay(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     one(p, "FuzzyOverlay".into(), overlay_eval(inp, p, &rs, crs, &|r| gfr::overlay::fuzzy_overlay(r, kind))?)
 }
 
+// ---------------------------------------------------------------------------------------------
+// math functions (gfr::mathfn)
+
+/// The one-raster math functions: tool id, ArcGIS name, the name `mathfn` parses, summary.
+const MATH_UNARY: &[(&str, &str, &str, &str)] = &[
+    ("abs", "Abs", "Abs", "The absolute value of each cell."),
+    ("exp", "Exp", "Exp", "e raised to the power of each cell's value."),
+    ("exp2", "Exp2", "Exp2", "2 raised to the power of each cell's value."),
+    ("exp10", "Exp10", "Exp10", "10 raised to the power of each cell's value."),
+    ("ln", "Ln", "Ln", "The natural logarithm of each cell (NoData for values of 0 or less)."),
+    ("log2", "Log2", "Log2", "The base 2 logarithm of each cell."),
+    ("log10", "Log10", "Log10", "The base 10 logarithm of each cell."),
+    ("square_root", "Square Root", "SquareRoot", "The square root of each cell (NoData for negative values)."),
+    ("square", "Square", "Square", "The square of each cell."),
+    ("negate", "Negate", "Negate", "Each cell's value with its sign changed."),
+    ("sin", "Sin", "Sin", "The sine of each cell (radians)."),
+    ("cos", "Cos", "Cos", "The cosine of each cell (radians)."),
+    ("tan", "Tan", "Tan", "The tangent of each cell (radians)."),
+    ("asin", "ASin", "ASin", "The inverse sine of each cell (NoData outside -1 to 1)."),
+    ("acos", "ACos", "ACos", "The inverse cosine of each cell (NoData outside -1 to 1)."),
+    ("atan", "ATan", "ATan", "The inverse tangent of each cell."),
+    ("sinh", "SinH", "SinH", "The hyperbolic sine of each cell."),
+    ("cosh", "CosH", "CosH", "The hyperbolic cosine of each cell."),
+    ("tanh", "TanH", "TanH", "The hyperbolic tangent of each cell."),
+    ("asinh", "ASinH", "ASinH", "The inverse hyperbolic sine of each cell."),
+    ("acosh", "ACosH", "ACosH", "The inverse hyperbolic cosine of each cell (NoData below 1)."),
+    ("atanh", "ATanH", "ATanH", "The inverse hyperbolic tangent of each cell (NoData outside -1 to 1)."),
+    ("round_down", "Round Down", "RoundDown", "Each cell's value rounded down to a whole number (a float raster)."),
+    ("round_up", "Round Up", "RoundUp", "Each cell's value rounded up to a whole number (a float raster)."),
+    ("boolean_not", "Boolean Not", "BooleanNot", "1 where a cell is 0, else 0."),
+    ("bitwise_not", "Bitwise Not", "BitwiseNot", "The bitwise complement of an integer raster."),
+];
+
+/// The two-operand math functions.
+const MATH_BINARY: &[(&str, &str, &str, &str)] = &[
+    ("power", "Power", "Power", "The first raster raised to the power of the second."),
+    ("mod", "Mod", "Mod", "The remainder of the first raster divided by the second (the dividend's sign)."),
+    ("atan2", "ATan2", "ATan2", "The angle from the x-axis of a point (second, first)."),
+    ("equal_to", "Equal To", "EqualTo", "1 where the operands are equal, else 0."),
+    ("not_equal", "Not Equal", "NotEqual", "1 where the operands differ, else 0."),
+    ("greater_than", "Greater Than", "GreaterThan", "1 where the first is greater, else 0."),
+    ("greater_than_equal", "Greater Than Equal", "GreaterThanEqual", "1 where the first is greater or equal, else 0."),
+    ("less_than", "Less Than", "LessThan", "1 where the first is less, else 0."),
+    ("less_than_equal", "Less Than Equal", "LessThanEqual", "1 where the first is less or equal, else 0."),
+    ("boolean_and", "Boolean And", "BooleanAnd", "1 where both are not 0, else 0."),
+    ("boolean_or", "Boolean Or", "BooleanOr", "1 where either is not 0, else 0."),
+    ("boolean_xor", "Boolean XOr", "BooleanXor", "1 where exactly one is not 0, else 0."),
+    ("diff", "Diff", "Diff", "The first value where the operands differ, else 0."),
+    ("over", "Over", "Over", "The first value where it is not 0, else the second."),
+    ("bitwise_and", "Bitwise And", "BitwiseAnd", "The bitwise AND of two integer rasters."),
+    ("bitwise_or", "Bitwise Or", "BitwiseOr", "The bitwise OR of two integer rasters."),
+    ("bitwise_xor", "Bitwise XOr", "BitwiseXor", "The bitwise exclusive OR of two integer rasters."),
+    ("bitwise_left_shift", "Bitwise Left Shift", "BitwiseLeftShift", "The first shifted left by the second (32-bit)."),
+    ("bitwise_right_shift", "Bitwise Right Shift", "BitwiseRightShift", "The first shifted right by the second (32-bit)."),
+];
+
+/// The tool specs of the math functions: `(id, name, toolbox, summary, params)`.
+pub(crate) fn math_specs() -> Vec<(&'static str, &'static str, &'static str, &'static str, &'static [P])> {
+    let mut out = Vec::new();
+    for (unary, table) in [(true, MATH_UNARY), (false, MATH_BINARY)] {
+        for (id, name, _, summary) in table {
+            let mut params: Vec<P> = if unary {
+                vec![P {
+                    name: "in1",
+                    label: "Input raster",
+                    kind: K::Text,
+                    required: true,
+                    default: "",
+                    help: "A raster layer name or a number.",
+                }]
+            } else {
+                vec![
+                    P {
+                        name: "in1",
+                        label: "Input raster or constant 1",
+                        kind: K::Text,
+                        required: true,
+                        default: "",
+                        help: "A raster layer name or a number.",
+                    },
+                    P { name: "in2", label: "Input raster or constant 2", kind: K::Text, required: true, default: "", help: "" },
+                ]
+            };
+            params.push(OUTPUT);
+            params.extend(ENV_PARAMS.iter().cloned());
+            let leaked: &'static [P] = Box::leak(params.into_boxed_slice());
+            out.push((*id, *name, "GeoForge › Spatial Analyst › Math", *summary, leaked));
+        }
+    }
+    out
+}
+
+/// Runs a math function by tool id; `None` when `id` is not one.
+pub(crate) fn math_run(id: &str, inp: &dyn Inputs, p: &Json) -> Option<Result<ToolResult, String>> {
+    use gfr::mathfn::{Binary, Unary, binary, unary};
+    if let Some((_, name, parse, _)) = MATH_UNARY.iter().find(|t| t.0 == id) {
+        let op = Unary::parse(parse)?;
+        return Some((|| {
+            let a = operand(inp, text(p, "in1"))?;
+            let out = eval_operands(inp, p, &[&a], &|o| match &o[0] {
+                gfr::local::Operand::Raster(r) => Some(unary(op, r)),
+                gfr::local::Operand::Constant(_) => None,
+            })
+            .map_err(|e| if e.contains("overlap") { format!("{name} needs a raster, not a number") } else { e })?;
+            one(p, format!("{}_{}", base_name(inp, p, "in1"), name.replace(' ', "")), out)
+        })());
+    }
+    if let Some((_, name, parse, _)) = MATH_BINARY.iter().find(|t| t.0 == id) {
+        let op = Binary::parse(parse)?;
+        return Some((|| {
+            let (a, b) = (operand(inp, text(p, "in1"))?, operand(inp, text(p, "in2"))?);
+            let out = eval_operands(inp, p, &[&a, &b], &|o| binary(op, &o[0], &o[1])).map_err(|e| {
+                if e.contains("overlap") { format!("{name}: the operands do not overlap, or an operand is not an integer") } else { e }
+            })?;
+            one(p, format!("{}_{}", base_name(inp, p, "in1"), name.replace(' ', "")), out)
+        })());
+    }
+    None
+}
+
 /// Inverse Distance Weighted interpolation of a point layer's field (Spatial Analyst Idw).
 fn idw(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     use gfr::interpolate::{Sample, SearchRadius};

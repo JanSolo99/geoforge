@@ -1504,6 +1504,14 @@ fn specs() -> Vec<ToolSpec> {
         run: rustgis_analysis::external_placeholder,
     });
     // The shared registry's tools: no wrapper of their own.
+    let maths = raster::math_specs().into_iter().map(|(id, name, toolbox, summary, params)| ToolSpec {
+        id: Box::leak(format!("{PREFIX}{id}").into_boxed_str()),
+        name,
+        toolbox,
+        summary,
+        params,
+        run: rustgis_analysis::external_placeholder,
+    });
     let shared = tools::registry::TOOLS.iter().map(|t| ToolSpec {
         id: Box::leak(format!("{PREFIX}{}", t.id).into_boxed_str()),
         name: t.name,
@@ -1512,11 +1520,14 @@ fn specs() -> Vec<ToolSpec> {
         params: reg::params_of(t),
         run: rustgis_analysis::external_placeholder,
     });
-    own.chain(shared).collect()
+    own.chain(maths).chain(shared).collect()
 }
 
 fn run(spec: &ToolSpec, inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     let id = spec.id.strip_prefix(PREFIX).unwrap_or(spec.id);
+    if let Some(r) = raster::math_run(id, inp, p) {
+        return r;
+    }
     if let Some(t) = tools::registry::find(id) {
         return reg::run(t, inp, p);
     }
@@ -1725,6 +1736,39 @@ mod tests {
             )
             .is_err()
         );
+    }
+
+    #[test]
+    fn math_functions_run_in_the_application() {
+        use geoforge_raster::mathfn::{Binary, Unary, binary, unary};
+        register();
+        let (a, inp) = dem("RM");
+        let ln = raster_of(rustgis_analysis::run("geoforge:ln", &inp, &json!({"input": "RM", "in1": "RM"})));
+        let want = unary(Unary::Ln, &a);
+        assert_eq!(ln.bands[0], want.bands[0]);
+        // Another function of the same raster runs (a layer is added).
+        let neg = rustgis_analysis::run("geoforge:negate", &inp, &json!({"in1": "RM"})).unwrap();
+        assert!(matches!(neg.output, Output::Layers(_)));
+        let gt = raster_of(rustgis_analysis::run("geoforge:greater_than", &inp, &json!({"in1": "RM", "in2": "50"})));
+        let want = binary(
+            Binary::GreaterThan,
+            &geoforge_raster::local::Operand::Raster(a.clone()),
+            &geoforge_raster::local::Operand::Constant(50.0),
+        )
+        .unwrap();
+        assert_eq!(gt.bands[0], want.bands[0]);
+        assert_eq!(gt.data_type, geoforge_raster::DataType::U8);
+        let pw = raster_of(rustgis_analysis::run(
+            "geoforge:power",
+            &inp,
+            &json!({"in1": "RM", "in2": "2", "extent": "500060 5000060 500300 5000300"}),
+        ));
+        assert_eq!((pw.width, pw.height), (8, 8));
+        // Bitwise operators refuse floats; a constant alone is not a raster.
+        assert!(rustgis_analysis::run("geoforge:bitwise_and", &inp, &json!({"in1": "RM", "in2": "3"})).is_err());
+        assert!(rustgis_analysis::run("geoforge:abs", &inp, &json!({"in1": "5"})).is_err());
+        assert!(rustgis_analysis::run("geoforge:abs", &inp, &json!({"in1": "nope"})).is_err());
+        assert!(rustgis_analysis::tool("geoforge:boolean_xor").is_some());
     }
 
     #[test]

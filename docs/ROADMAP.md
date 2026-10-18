@@ -451,6 +451,15 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         registry now has table results (`Outcome::Table`). Not done: Delete Rows and Alter Field (they
         edit their input; shapefiles cannot rename fields), field mappings, GDB table outputs from
         `gf run`
+  - [x] Spatial Analyst math functions (`geoforge-raster::mathfn`; `gf math-fn`, 45 app tools,
+        `arcpy.sa.Abs` ... `BitwiseRightShift`): Abs, Exp, Exp2, Exp10, Ln, Log2, Log10, Square Root,
+        Square, Negate, the trigonometric and hyperbolic functions and their inverses, Round Down/Up,
+        Boolean Not, Bitwise Not, Power, Mod, ATan2, the six relational and three Boolean operators,
+        Diff, Over and the bitwise operators matching Pro 3.7 on 125 runs, values, output types and
+        NoData (`testdata/arcgis-reference/mathfn.json`): float results are NoData outside the
+        domain or beyond a 32-bit float; integer results are typed for the range the statistics
+        allow; Mod is fmod; shifts are 32-bit and wrap. Not done: Plus/Minus/Times/Divide type rules
+        beyond the earlier ones (see `local::math_type`), Negate/Abs on constants
   - [ ] Raster To Polygon SIMPLIFY: rule worked out for blocky rasters (104 of 122 test rasters exact;
         arcs between nodes, corners displaced diagonally by a from a fixed grid, Douglas-Peucker-like
         split with collapse/clamp, fewest-vertices choice of a) — see `docs/formats/raster-to-polygon-simplify.md`;

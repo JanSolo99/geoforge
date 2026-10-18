@@ -211,3 +211,16 @@ def test_table_tools(s):
     assert n >= 1
     arcpy.management.AddFields("Indian", [["F1", "LONG"], ["F2", "TEXT", "alias", 12]], out_raster="WithFields")
     assert {"F1", "F2"} <= fields(s, "WithFields")
+
+
+def test_math_functions(s):
+    arcpy.conversion.PolygonToRaster("Countries", "", "Grid", "CELL_CENTER", cellsize=4)
+    arcpy.sa.Abs("Grid", out_raster="G_abs")
+    arcpy.sa.Ln("Grid", out_raster="G_ln")
+    arcpy.sa.Power("Grid", 2, out_raster="G_pow")
+    arcpy.sa.GreaterThan("Grid", 10, out_raster="G_gt")
+    arcpy.sa.BooleanAnd("Grid", "G_gt", out_raster="G_and")
+    names = {l["name"] for l in s.layers()}
+    assert {"G_abs", "G_ln", "G_pow", "G_gt", "G_and"} <= names
+    with pytest.raises(rustgis.GeoForgeError):
+        arcpy.sa.BitwiseAnd("G_ln", 1)

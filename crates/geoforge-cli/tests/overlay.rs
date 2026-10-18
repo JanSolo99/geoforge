@@ -162,3 +162,67 @@ fn overlay_commands_equal_arcgis() {
     }
     std::fs::remove_dir_all(&d).ok();
 }
+
+#[test]
+fn math_fn_command_equals_arcgis() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let r: Value = serde_json::from_slice(
+        &std::fs::read(root.join("testdata/arcgis-reference/mathfn.json")).unwrap(),
+    )
+    .unwrap();
+    let d = std::env::temp_dir().join(format!("gf-mathfn-{}", std::process::id()));
+    std::fs::remove_dir_all(&d).ok();
+    std::fs::create_dir_all(&d).unwrap();
+    let f = write(&d, "f", &r["inputs"]["F"], DataType::F32);
+    let i = write(&d, "i", &r["inputs"]["I"], DataType::I32);
+    let b = write(&d, "b", &r["inputs"]["B"], DataType::I32);
+    let (f, i, b) = (
+        f.to_str().unwrap(),
+        i.to_str().unwrap(),
+        b.to_str().unwrap(),
+    );
+    let o = |n: &str| d.join(format!("{n}.tif")).to_str().unwrap().to_string();
+    let check = |key: &str, path: &str| {
+        let got = read_geotiff(Path::new(path)).unwrap();
+        let want = &r["cases"][key];
+        for (y, row) in want["values"].as_array().unwrap().iter().enumerate() {
+            for (x, w) in row.as_array().unwrap().iter().enumerate() {
+                let w = w.as_f64().unwrap();
+                match got.get(x, y) {
+                    Some(g) => assert!(
+                        (w + 123_456_789.0).abs() >= 10.0
+                            && (g - w).abs() <= 1e-5 * w.abs().max(1.0),
+                        "{key} {y},{x}: {g} vs {w}"
+                    ),
+                    None => assert!(
+                        (w + 123_456_789.0).abs() < 10.0,
+                        "{key} {y},{x}: NoData vs {w}"
+                    ),
+                }
+            }
+        }
+    };
+    run(&["math-fn", "Ln", f, &o("ln")]);
+    check("Ln_F", &o("ln"));
+    run(&["math-fn", "Square", i, &o("sq")]);
+    check("Square_I", &o("sq"));
+    run(&["math-fn", "Mod", i, b, &o("mod")]);
+    check("Mod_IB", &o("mod"));
+    run(&["math-fn", "GreaterThan", f, "0", &o("gt")]);
+    check("GreaterThan_F_const", &o("gt"));
+    run(&["math-fn", "BitwiseAnd", i, b, &o("and")]);
+    check("BitwiseAnd_IB", &o("and"));
+    for bad in [
+        vec!["math-fn", "Nope", f, "x.tif"],
+        vec!["math-fn", "Ln", "5", "x.tif"],
+        vec!["math-fn", "BitwiseAnd", f, "1", "x.tif"],
+        vec!["math-fn", "Power", f, "x.tif"],
+    ] {
+        let out = Command::new(env!("CARGO_BIN_EXE_gf"))
+            .args(&bad)
+            .output()
+            .unwrap();
+        assert!(!out.status.success(), "{bad:?}");
+    }
+    std::fs::remove_dir_all(&d).ok();
+}

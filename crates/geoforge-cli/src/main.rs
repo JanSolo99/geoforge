@@ -914,6 +914,14 @@ enum Tool {
         #[arg(long, num_args = 4, value_names = ["XMIN", "YMIN", "XMAX", "YMAX"])]
         extent: Option<Vec<f64>>,
     },
+    /// Spatial Analyst math function (Abs, Exp, Ln, Sin, ..., Power, Mod, EqualTo, BooleanAnd, Diff,
+    /// BitwiseAnd, ...): `gf math-fn Power dem.tif 2 out.tif`; operands are rasters or numbers.
+    MathFn {
+        function: String,
+        /// One or two operands, then the output raster.
+        #[arg(required = true, num_args = 2..=3)]
+        paths: Vec<String>,
+    },
     /// Spatial Analyst "Cell Statistics" over several rasters.
     CellStatistics {
         /// The input rasters, then the output raster.
@@ -2853,6 +2861,44 @@ fn main() -> ExitCode {
                     )
                 })?;
             write_raster(&out_raster, &r)
+        })(),
+        Tool::MathFn { function, paths } => (|| {
+            use geoforge_raster::local::Operand;
+            use geoforge_raster::mathfn::{Binary, Unary, binary, unary};
+            let (out, ins) = paths
+                .split_last()
+                .ok_or_else(|| Error::Unsupported("no operands".into()))?;
+            let operand = |t: &String| -> Result<Operand> {
+                match Operand::constant(t) {
+                    Some(c) => Ok(c),
+                    None => Ok(Operand::Raster(geoforge_raster::read_geotiff(Path::new(
+                        t,
+                    ))?)),
+                }
+            };
+            let result = match (Unary::parse(&function), Binary::parse(&function), ins) {
+                (Some(op), _, [a]) => match operand(a)? {
+                    Operand::Raster(r) => Some(unary(op, &r)),
+                    Operand::Constant(_) => {
+                        return Err(Error::Unsupported(format!("{function} needs a raster")));
+                    }
+                },
+                (_, Some(op), [a, b]) => binary(op, &operand(a)?, &operand(b)?),
+                (None, None, _) => {
+                    return Err(Error::Unsupported(format!("math function {function}")));
+                }
+                _ => {
+                    return Err(Error::Unsupported(format!(
+                        "{function}: wrong number of operands"
+                    )));
+                }
+            };
+            let r = result.ok_or_else(|| {
+                Error::Unsupported(
+                    "the rasters do not overlap, or a bitwise operator met a float".into(),
+                )
+            })?;
+            write_raster(Path::new(out), &r)
         })(),
         Tool::CellStatistics {
             paths,

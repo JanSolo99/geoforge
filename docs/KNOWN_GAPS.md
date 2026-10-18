@@ -16,6 +16,7 @@ Update this file when a gap is found or closed.
 | Flow Direction on flats | 5x5 look-ahead approximation; a few float-DEM cells and ~12 % of an integer DEM's flats differ | ROADMAP |
 | Raster To Polygon SIMPLIFY | Corner choice on smooth curves not reproduced (104 of 122 blocky test rasters exact) | `docs/formats/raster-to-polygon-simplify.md` |
 | IDW | No barriers; the default cell size is checked only with the points' extent | `crates/geoforge-raster/tests/idw.rs` |
+| Integer NoData of math functions | S32 results of Square/Int use NoData -2147483647 (ArcGIS), but `Int` and the older `Plus`/`Times` S32 outputs still use -2147483648; unverified which ArcGIS gives for them | `crates/geoforge-raster/tests/mathfn.rs` |
 | Integer output types of overlay tools | The `0..1` range gives NoData 16 and wide signed input stays S32 (observed on few runs) | `crates/geoforge-raster/tests/overlay.rs` |
 
 | Pattern statistics | ArcGIS's p-values come from an approximation up to 2e-8 from the exact normal tail; inverse distance treats distances under 1 as 1 (documented by Esri, not exercised by the references); the false discovery rate bins are checked only where nothing is significant | `crates/geoforge-cli/tests/spatstat_patterns.rs` |
