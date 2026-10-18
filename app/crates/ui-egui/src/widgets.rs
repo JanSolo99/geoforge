@@ -11,6 +11,22 @@ use crate::{RustGisApp, icons};
 pub const CONTENT_H: f32 = 72.0;
 pub const LABEL_H: f32 = 18.0;
 
+/// `s` cut to fit `max` points, with an ellipsis when something was cut.
+pub fn elide(ui: &Ui, s: &str, font: egui::FontId, max: f32) -> String {
+    if text_w(ui, s, font.clone()) <= max {
+        return s.to_string();
+    }
+    let mut out: Vec<char> = s.chars().collect();
+    while !out.is_empty() {
+        out.pop();
+        let cut: String = out.iter().collect::<String>().trim_end().to_string() + "…";
+        if text_w(ui, &cut, font.clone()) <= max {
+            return cut;
+        }
+    }
+    "…".into()
+}
+
 pub fn text_w(ui: &Ui, s: &str, font: egui::FontId) -> f32 {
     ui.ctx().fonts_mut(|f| f.layout_no_wrap(s.to_string(), font, egui::Color32::WHITE).size().x)
 }

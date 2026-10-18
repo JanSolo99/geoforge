@@ -1254,7 +1254,7 @@ fn geoprocessing(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
                 t.accent,
             );
             ui.painter().text(pos2(r.min.x + 34.0, r.min.y + 13.0), Align2::LEFT_CENTER, tl!(tool.name), semibold(12.5), t.accent_text);
-            let summary: String = tl!(tool.summary).chars().take(52).collect();
+            let summary = crate::widgets::elide(ui, tl!(tool.summary), regular(11.0), r.width() - 42.0);
             ui.painter().text(pos2(r.min.x + 34.0, r.min.y + 29.0), Align2::LEFT_CENTER, summary, regular(11.0), t.text_dim);
             if resp.on_hover_text(tl!(tool.summary)).clicked() {
                 app.gp.open(Some(tool.id), &app.session);
