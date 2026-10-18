@@ -23532,6 +23532,52 @@
         ]
       ],
       "shapeType": "Polygon"
+    },
+    "eucdir_streams": {
+      "tool": "gp.EucDirection_sa",
+      "args": [
+        "testdata/arcgis-reference/streams_hydro.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "eucdir_streams_max": {
+      "tool": "gp.EucDirection_sa",
+      "args": [
+        "testdata/arcgis-reference/streams_hydro.tif",
+        "<out>",
+        150
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "eucalloc_streams": {
+      "tool": "gp.EucAllocation_sa",
+      "args": [
+        "testdata/arcgis-reference/streams_hydro.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "eucalloc_streams_max": {
+      "tool": "gp.EucAllocation_sa",
+      "args": [
+        "testdata/arcgis-reference/streams_hydro.tif",
+        "<out>",
+        150
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

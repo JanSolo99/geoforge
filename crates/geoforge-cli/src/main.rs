@@ -1003,6 +1003,20 @@ enum Tool {
         #[arg(long)]
         maximum_distance: Option<f64>,
     },
+    /// Spatial Analyst "Euclidean Direction" (azimuth to the nearest source cell).
+    EucDirection {
+        in_source_data: PathBuf,
+        out_direction_raster: PathBuf,
+        #[arg(long)]
+        maximum_distance: Option<f64>,
+    },
+    /// Spatial Analyst "Euclidean Allocation" (value of the nearest source cell).
+    EucAllocation {
+        in_source_data: PathBuf,
+        out_allocation_raster: PathBuf,
+        #[arg(long)]
+        maximum_distance: Option<f64>,
+    },
     /// Spatial Analyst "Extract by Mask".
     ExtractByMask {
         in_raster: PathBuf,
@@ -3117,6 +3131,28 @@ fn main() -> ExitCode {
             write_raster_plain(
                 &out_distance_raster,
                 &geoforge_raster::resample::euclidean_distance(&r, maximum_distance),
+            )
+        })(),
+        Tool::EucDirection {
+            in_source_data,
+            out_direction_raster,
+            maximum_distance,
+        } => (|| {
+            let r = geoforge_raster::read_geotiff(&in_source_data)?;
+            write_raster_plain(
+                &out_direction_raster,
+                &geoforge_raster::resample::euclidean_direction(&r, maximum_distance),
+            )
+        })(),
+        Tool::EucAllocation {
+            in_source_data,
+            out_allocation_raster,
+            maximum_distance,
+        } => (|| {
+            let r = geoforge_raster::read_geotiff(&in_source_data)?;
+            write_raster_plain(
+                &out_allocation_raster,
+                &geoforge_raster::resample::euclidean_allocation(&r, maximum_distance),
             )
         })(),
         Tool::ExtractByMask {

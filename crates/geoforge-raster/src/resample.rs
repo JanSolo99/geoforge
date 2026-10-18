@@ -145,6 +145,12 @@ pub fn resample(r: &Raster, cell: f64, technique: Technique) -> Raster {
 /// Squared 1-D distance transform (Felzenszwalb–Huttenlocher) of `f` in place;
 /// infinite entries are cells without a source.
 fn edt_1d(f: &mut [f64]) {
+    let mut arg = vec![0; f.len()];
+    edt_1d_arg(f, &mut arg);
+}
+
+/// [`edt_1d`] that also reports, per entry, the index of the nearest finite entry.
+fn edt_1d_arg(f: &mut [f64], arg: &mut [usize]) {
     const FAR: f64 = 1e20;
     let n = f.len();
     if n == 0 {
@@ -181,8 +187,154 @@ fn edt_1d(f: &mut [f64]) {
         }
         let p = v[k];
         let d = (q as f64 - p as f64).powi(2) + g[p];
+        arg[q] = p;
         *out = if d >= FAR / 2.0 { f64::INFINITY } else { d };
     }
+}
+
+/// For every cell, the (column, row) of the nearest cell of `source` that has a
+/// value, measured between cell centers; `None` where the source is empty.
+fn nearest_sources(source: &Raster) -> Vec<Option<(usize, usize)>> {
+    let (w, h) = (source.width, source.height);
+    let mut grid: Vec<f64> = (0..w * h)
+        .map(|i| {
+            if source.is_nodata(source.bands[0][i]) {
+                f64::INFINITY
+            } else {
+                0.0
+            }
+        })
+        .collect();
+    let mut src_row = vec![0usize; w * h];
+    let mut col = vec![0.0; h];
+    let mut arg = vec![0usize; h];
+    for x in 0..w {
+        for y in 0..h {
+            col[y] = grid[y * w + x];
+        }
+        edt_1d_arg(&mut col, &mut arg);
+        for y in 0..h {
+            grid[y * w + x] = col[y];
+            src_row[y * w + x] = arg[y];
+        }
+    }
+    let mut out = vec![None; w * h];
+    let mut arg = vec![0usize; w];
+    for y in 0..h {
+        edt_1d_arg(&mut grid[y * w..(y + 1) * w], &mut arg);
+        for x in 0..w {
+            if grid[y * w + x].is_finite() {
+                let p = arg[x];
+                let found = (p, src_row[y * w + p]);
+                out[y * w + x] =
+                    Some(first_tied_source(source, x, y, grid[y * w + x]).unwrap_or(found));
+            }
+        }
+    }
+    out
+}
+
+/// Among the source cells exactly `d2` (squared cells) from (`x`, `y`), the first in
+/// row-major order, which is the one ArcGIS reports when several are equally near.
+/// Only looked for within 64 cells; farther cells keep the transform's pick.
+fn first_tied_source(source: &Raster, x: usize, y: usize, d2: f64) -> Option<(usize, usize)> {
+    if d2 > 64.0 * 64.0 {
+        return None;
+    }
+    let d2 = d2.round() as i64;
+    let r = (d2 as f64).sqrt() as i64;
+    for dy in -r..=r {
+        let rest = d2 - dy * dy;
+        let dx = (rest as f64).sqrt().round() as i64;
+        if dx * dx != rest {
+            continue;
+        }
+        let sy = y as i64 + dy;
+        if sy < 0 || sy >= source.height as i64 {
+            continue;
+        }
+        for sx in [x as i64 - dx, x as i64 + dx] {
+            if sx >= 0
+                && sx < source.width as i64
+                && !source.is_nodata(source.bands[0][sy as usize * source.width + sx as usize])
+            {
+                return Some((sx as usize, sy as usize));
+            }
+        }
+    }
+    None
+}
+
+/// Spatial Analyst Euclidean Direction: the azimuth in whole degrees clockwise from
+/// north (360 due north, 0 on source cells) from each cell to its nearest source
+/// cell. 16-bit signed, NoData 32767 beyond `max_distance`.
+pub fn euclidean_direction(source: &Raster, max_distance: Option<f64>) -> Raster {
+    let near = nearest_sources(source);
+    let cell = source.cell_width();
+    let mut out = source.like(DataType::I16);
+    out.nodata = Some(32767.0);
+    out.bands[0] = near
+        .iter()
+        .enumerate()
+        .map(|(i, n)| {
+            let Some((sx, sy)) = *n else { return 32767.0 };
+            let (x, y) = ((i % source.width) as f64, (i / source.width) as f64);
+            let (dx, dy) = (sx as f64 - x, sy as f64 - y);
+            if max_distance.is_some_and(|m| dx.hypot(dy) * cell > m) {
+                return 32767.0;
+            }
+            if dx == 0.0 && dy == 0.0 {
+                return 0.0;
+            }
+            let a = (dx.atan2(-dy).to_degrees().rem_euclid(360.0) + 0.5).floor();
+            if a == 0.0 || a == 360.0 { 360.0 } else { a }
+        })
+        .collect();
+    out
+}
+
+/// Spatial Analyst Euclidean Allocation: the value of the nearest source cell,
+/// NoData beyond `max_distance`. Integer output takes ArcGIS's type choice for the
+/// values present (as Extract by Mask does); float output is 32-bit.
+pub fn euclidean_allocation(source: &Raster, max_distance: Option<f64>) -> Raster {
+    let near = nearest_sources(source);
+    let cell = source.cell_width();
+    let cells: Vec<Option<f64>> = near
+        .iter()
+        .enumerate()
+        .map(|(i, n)| {
+            let (sx, sy) = (*n)?;
+            let (x, y) = ((i % source.width) as f64, (i / source.width) as f64);
+            if max_distance.is_some_and(|m| (sx as f64 - x).hypot(sy as f64 - y) * cell > m) {
+                return None;
+            }
+            Some(source.bands[0][sy * source.width + sx])
+        })
+        .collect();
+    let (t, nodata) = if source.data_type.is_float() {
+        (DataType::F32, f32::MIN as f64)
+    } else {
+        let (min, max) = cells
+            .iter()
+            .flatten()
+            .fold((f64::INFINITY, f64::NEG_INFINITY), |(a, b), &v| {
+                (a.min(v), b.max(v))
+            });
+        let (min, max) = if min.is_finite() {
+            (min, max)
+        } else {
+            (0.0, 0.0)
+        };
+        crate::zonal::integer_output(
+            min,
+            max,
+            matches!(source.data_type, DataType::U8 | DataType::I8),
+        )
+    };
+    let mut out = source.like(t);
+    out.nodata = Some(nodata);
+    out.bands[0] = cells.iter().map(|v| v.unwrap_or(nodata)).collect();
+    out
 }
 
 /// Spatial Analyst Euclidean Distance from the cells of `source` that have values,

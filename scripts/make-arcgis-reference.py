@@ -522,6 +522,10 @@ CASES = {
     "pt2r_wells_sum": ("conversion.PointToRaster", [DATA / "wells.shp", "DEPTH"], ["SUM", "", 20]),
     "eucdist_streams": ("gp.EucDistance_sa", [OUT / "streams_hydro.tif"], []),
     "eucdist_streams_max": ("gp.EucDistance_sa", [OUT / "streams_hydro.tif"], [150]),
+    "eucdir_streams": ("gp.EucDirection_sa", [OUT / "streams_hydro.tif"], []),
+    "eucdir_streams_max": ("gp.EucDirection_sa", [OUT / "streams_hydro.tif"], [150]),
+    "eucalloc_streams": ("gp.EucAllocation_sa", [OUT / "streams_hydro.tif"], []),
+    "eucalloc_streams_max": ("gp.EucAllocation_sa", [OUT / "streams_hydro.tif"], [150]),
     "extract_dem_zones": ("gp.ExtractByMask_sa", [RASTER / "dem.tif", RASTER / "zones.tif"], []),
     "extract_dem_mask25": ("gp.ExtractByMask_sa", [RASTER / "dem.tif", RASTER / "zones_25m.tif"], []),
     "extract_dem_mask4m": ("gp.ExtractByMask_sa", [RASTER / "dem.tif", RASTER / "zones_4m.tif"], []),
@@ -571,7 +575,7 @@ RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatist
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",
               "gp.StreamOrder_sa", "gp.FlowLength_sa", "gp.Watershed_sa", "conversion.FeatureToRaster",
-              "conversion.PolygonToRaster", "conversion.PolylineToRaster", "conversion.PointToRaster", "gp.EucDistance_sa", "gp.ExtractByMask_sa",
+              "conversion.PolygonToRaster", "conversion.PolylineToRaster", "conversion.PointToRaster", "gp.EucDistance_sa", "gp.EucDirection_sa", "gp.EucAllocation_sa", "gp.ExtractByMask_sa",
               "management.Resample", "gp.Viewshed_sa"}
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.

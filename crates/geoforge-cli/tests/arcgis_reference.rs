@@ -3017,6 +3017,28 @@ fn gf_args(case: &str) -> Vec<&'static str> {
             "--maximum-distance",
             "150",
         ],
+        "eucdir_streams" => vec![
+            "euc-direction",
+            "testdata/arcgis-reference/streams_hydro.tif",
+        ],
+        "eucdir_streams_max" => vec![
+            "euc-direction",
+            "testdata/arcgis-reference/streams_hydro.tif",
+            "<out>",
+            "--maximum-distance",
+            "150",
+        ],
+        "eucalloc_streams" => vec![
+            "euc-allocation",
+            "testdata/arcgis-reference/streams_hydro.tif",
+        ],
+        "eucalloc_streams_max" => vec![
+            "euc-allocation",
+            "testdata/arcgis-reference/streams_hydro.tif",
+            "<out>",
+            "--maximum-distance",
+            "150",
+        ],
         "extract_dem_zones" => vec![
             "extract-by-mask",
             "testdata/raster/dem.tif",
@@ -3549,8 +3571,12 @@ const KNOWN_FEATURE_DIFFERENCES: &[(&str, &[usize])] = &[];
 /// Raster cases where some cells are known to differ from ArcGIS, with the most
 /// differing cells allowed: Flow Direction resolves flats differently in places,
 /// Hillshade shadows differ for cells within centimeters of the horizon, and
-/// Viewshed where sight lines graze the terrain (about 1% of cells).
+/// Viewshed where sight lines graze the terrain (about 1% of cells), and Euclidean
+/// Direction where a cell is equally near to several sources (ArcGIS's pick is the
+/// first in row-major order for 86% of the ties, 3% of the cells differ).
 const KNOWN_RASTER_DIFFERENCES: &[(&str, usize)] = &[
+    ("eucdir_streams", 220),
+    ("eucdir_streams_max", 218),
     ("viewshed_hill", 199),
     ("viewshed_two", 309),
     ("viewshed_hill_z2", 199),

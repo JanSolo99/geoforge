@@ -403,6 +403,11 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         clipped to the output extent, ties to the smaller value, NoData where the center cell
         is — one cell at a NoData hole still differs), Euclidean Distance (exact, max distance)
         and Extract by Mask, matching ArcGIS
+  - [x] Euclidean Direction (whole-degree azimuth, 360 due north, 0 on sources, 16-bit, NoData 32767)
+        and Euclidean Allocation (nearest source's value, ArcGIS's integer type choice, max
+        distance). Equally near sources: ArcGIS's pick is the first in row-major order for 86% of
+        the ties (3% of cells differ in the stream test; rule for the rest unknown); the
+        allocation's value attribute table is not written
   - [x] Point To Raster / Feature To Raster on points: MOST_FREQUENT ties go to the first
         feature; integer fields stay 32-bit (polygons and lines narrow them), COUNT is signed
         8-bit, MEAN of integers single; RANGE and STANDARD_DEVIATION (sample, single, NoData for

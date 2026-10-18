@@ -449,6 +449,8 @@ _TOOLS = [
     _t("sa", "ZonalStatisticsAsTable", "zonal_statistics_as_table", ("in_zone_data", "zones"), ("zone_field", None), ("in_value_raster", "input"), ("out_table", "output"),
        ("ignore_nodata", "ignore_nodata"), ("statistics_type", "statistics_type")),
     _t("sa", "EucDistance", "euclidean_distance", ("in_source_data", "input"), ("maximum_distance", "maximum_distance")),
+    _t("sa", "EucDirection", "euclidean_direction", ("in_source_data", "input"), ("maximum_distance", "maximum_distance")),
+    _t("sa", "EucAllocation", "euclidean_allocation", ("in_source_data", "input"), ("maximum_distance", "maximum_distance")),
     _t("sa", "ExtractByMask", "extract_by_mask", ("in_raster", "input"), ("in_mask_data", "mask")),
     _t("sa", "Plus", "plus", ("in_raster_or_constant1", "in1"), ("in_raster_or_constant2", "in2")),
     _t("sa", "Minus", "minus", ("in_raster_or_constant1", "in1"), ("in_raster_or_constant2", "in2")),
@@ -498,7 +500,7 @@ def _as_layer(s: Session, value: Any) -> Any:
 
 
 # Tools that ignore the raster environments (they take their own grid or make vectors).
-_NO_ENV = {"contour", "resample", "euclidean_distance", "extract_by_mask", "zonal_statistics", "zonal_statistics_as_table", "raster_to_point", "raster_to_polygon", "polygon_to_raster", "polyline_to_raster", "point_to_raster"}
+_NO_ENV = {"contour", "resample", "euclidean_distance", "euclidean_direction", "euclidean_allocation", "extract_by_mask", "zonal_statistics", "zonal_statistics_as_table", "raster_to_point", "raster_to_polygon", "polygon_to_raster", "polyline_to_raster", "point_to_raster"}
 
 
 def _env_params(s: Session, tool: str, module: str) -> Dict[str, Any]:

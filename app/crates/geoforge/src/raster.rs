@@ -165,6 +165,8 @@ pub(crate) fn takes_environment(id: &str) -> bool {
         "contour"
             | "resample"
             | "euclidean_distance"
+            | "euclidean_direction"
+            | "euclidean_allocation"
             | "extract_by_mask"
             | "zonal_statistics"
             | "raster_to_point"
@@ -549,6 +551,16 @@ fn resample(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
 fn euclidean_distance(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     let (r, _) = input(inp, p, "input")?;
     one(p, format!("{}_EucDist", base_name(inp, p, "input")), gfr::resample::euclidean_distance(&r, number(p, "maximum_distance")))
+}
+
+fn euclidean_direction(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let (r, _) = input(inp, p, "input")?;
+    one(p, format!("{}_EucDir", base_name(inp, p, "input")), gfr::resample::euclidean_direction(&r, number(p, "maximum_distance")))
+}
+
+fn euclidean_allocation(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let (r, _) = input(inp, p, "input")?;
+    one(p, format!("{}_EucAllo", base_name(inp, p, "input")), gfr::resample::euclidean_allocation(&r, number(p, "maximum_distance")))
 }
 
 fn extract_by_mask(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
@@ -2053,6 +2065,30 @@ pub(crate) const DEFS: &[Def] = &[
             OUTPUT,
         ],
         run: euclidean_distance,
+    },
+    Def {
+        id: "euclidean_direction",
+        name: "Euclidean Direction",
+        toolbox: "GeoForge › Spatial Analyst › Distance",
+        summary: "Azimuth in degrees from each cell to the nearest source cell (ArcGIS Pro Euclidean Direction).",
+        params: &[
+            RASTER,
+            P { name: "maximum_distance", label: "Maximum distance", kind: K::Number, required: false, default: "", help: "" },
+            OUTPUT,
+        ],
+        run: euclidean_direction,
+    },
+    Def {
+        id: "euclidean_allocation",
+        name: "Euclidean Allocation",
+        toolbox: "GeoForge › Spatial Analyst › Distance",
+        summary: "Value of the nearest source cell for each cell (ArcGIS Pro Euclidean Allocation).",
+        params: &[
+            RASTER,
+            P { name: "maximum_distance", label: "Maximum distance", kind: K::Number, required: false, default: "", help: "" },
+            OUTPUT,
+        ],
+        run: euclidean_allocation,
     },
     Def {
         id: "extract_by_mask",
