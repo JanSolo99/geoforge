@@ -33,6 +33,8 @@ mod sqlpane;
 mod stacui;
 mod table;
 pub mod theme;
+#[allow(dead_code)]
+pub mod theme_pro;
 mod update;
 mod widgets;
 mod workspacepanes;
