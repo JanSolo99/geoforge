@@ -70,6 +70,10 @@ impl Context for Ctx<'_> {
         let (_, fc) = layer_in(self.inp, self.p, name, self.work, false).map_err(geoforge_core::Error::Unsupported)?;
         Ok(Box::new(fc))
     }
+
+    fn default_spatial_reference_wkt(&self) -> Option<String> {
+        Some(self.work.wkt.clone())
+    }
 }
 
 /// Runs a registry tool.
@@ -83,6 +87,7 @@ pub(crate) fn run(t: &'static Tool, inp: &dyn Inputs, p: &Json) -> Result<ToolRe
     };
     let ctx = Ctx { inp, p, work: &work };
     let out = registry::run(t, &ctx).map_err(|e| e.to_string())?;
-    let first = t.params.iter().find(|q| q.kind == Kind::Features).map_or("", |q| text(p, q.name));
-    finish_in(out, out_name(p, format!("{first}_{}", t.output_suffix)), &work)
+    let first = t.params.iter().filter(|q| q.kind == Kind::Features).map(|q| text(p, q.name)).find(|n| !n.is_empty());
+    let default = first.map_or_else(|| t.output_suffix.to_string(), |n| format!("{n}_{}", t.output_suffix));
+    finish_in(out, out_name(p, default), &work)
 }

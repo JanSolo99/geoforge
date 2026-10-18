@@ -372,6 +372,13 @@ _TOOLS = [
        ("cell_assignment", "cell_assignment"), ("priority_field", None), ("cellsize", "cell_size")),
     _t("conversion", "PointToRaster", "point_to_raster", ("in_features", "input"), ("value_field", "value_field"), ("out_rasterdataset", "output"),
        ("cell_assignment", "cell_assignment"), ("priority_field", None), ("cellsize", "cell_size")),
+    _t("edit", "Densify", "densify", ("in_features", "input"), ("densification_method", None), ("distance", "distance"), ("max_deviation", None), ("max_angle", None)),
+    _t("management", "GeneratePointsAlongLines", "generate_points_along_lines", ("Input_Features", "input"), ("Output_Feature_Class", "output"), ("Point_Placement", "point_placement"),
+       ("Distance", "distance"), ("Percentage", "percentage"), ("Include_End_Points", "include_end_points"), ("Add_Chainage_Fields", None)),
+    _t("management", "CreateFishnet", "create_fishnet", ("out_feature_class", "output"), ("origin_coord", "origin_coord"), ("y_axis_coord", "y_axis_coord"), ("cell_width", "cell_width"),
+       ("cell_height", "cell_height"), ("number_rows", "number_rows"), ("number_columns", "number_columns"), ("corner_coord", "corner_coord"), ("labels", None), ("template", "template"),
+       ("geometry_type", "geometry_type")),
+    _t("management", "PolygonToLine", "polygon_to_line", ("in_features", "input"), ("out_feature_class", "output"), ("neighbor_option", "neighbor_option")),
     # stats (Spatial Statistics: Measuring Geographic Distributions)
     _t("stats", "MeanCenter", "mean_center", ("Input_Feature_Class", "input"), ("Output_Feature_Class", "output"), ("Weight_Field", "weight_field"), ("Case_Field", "case_field"), ("Dimension_Field", "dimension_field")),
     _t("stats", "MedianCenter", "median_center", ("Input_Feature_Class", "input"), ("Output_Feature_Class", "output"), ("Weight_Field", "weight_field"), ("Case_Field", "case_field"), ("Dimension_Field", "dimension_field")),
@@ -605,7 +612,8 @@ management = _Module("management")
 sa = _Module("sa")
 conversion = _Module("conversion")
 stats = _Module("stats")
-_modules = {"analysis": analysis, "management": management, "sa": sa, "conversion": conversion, "stats": stats}
+edit = _Module("edit")
+_modules = {"edit": edit, "analysis": analysis, "management": management, "sa": sa, "conversion": conversion, "stats": stats}
 
 sa.RadiusVariable = RadiusVariable
 sa.RadiusFixed = RadiusFixed

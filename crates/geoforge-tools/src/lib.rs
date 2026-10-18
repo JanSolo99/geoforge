@@ -2,6 +2,7 @@
 //! output schema, feature order, messages) as observed through the ArcGIS bridge
 //! and recorded in `testdata/arcgis-reference/manifest.json`.
 
+pub mod construct;
 mod fieldmap;
 pub mod pycalc;
 pub mod registry;

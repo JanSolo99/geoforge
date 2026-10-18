@@ -434,6 +434,16 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         statistics allow (not the values found), values 0..1 giving NoData 16, wide signed input
         staying S32. Not done: Weighted Overlay RESTRICTED, value fields other than VALUE, the
         Combine/Weighted Overlay attribute tables, `gf weighted-overlay`
+  - [x] Construction tools on the shared registry (`geoforge-tools::construct`): Densify, Generate
+        Points Along Lines, Create Fishnet and Polygon To Line (IGNORE_NEIGHBORS), 24 runs matching
+        Pro 3.7 (`testdata/arcgis-reference/construct.json`, probes in `scripts/research/construct/`):
+        a segment longer than the distance is cut into floor(length / distance) + 1 equal parts (one
+        no longer than it stays whole); points along lines walk the parts end to end, strictly
+        before the total length, END_POINTS adding the first and last vertex; the fishnet's x-axis
+        is the y-axis turned a quarter clockwise, polylines list the rows' lines then the columns'.
+        Not done: IDENTIFY_NEIGHBORS (needs a planar graph), fishnet labels, Densify's ANGLE and
+        OFFSET methods and curves, chainage fields, Multiple Ring Buffer and Create Thiessen
+        Polygons (probed: `scripts/research/construct/probe1.py`)
   - [ ] Raster To Polygon SIMPLIFY: rule worked out for blocky rasters (104 of 122 test rasters exact;
         arcs between nodes, corners displaced diagonally by a from a fixed grid, Douglas-Peucker-like
         split with collapse/clamp, fewest-vertices choice of a) — see `docs/formats/raster-to-polygon-simplify.md`;

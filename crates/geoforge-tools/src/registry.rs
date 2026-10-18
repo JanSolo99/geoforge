@@ -8,6 +8,7 @@
 
 use geoforge_core::{Error, FeatureClass, Result};
 
+use crate::construct::{self, Fishnet, Placement};
 use crate::{ToolOutput, spatstat};
 
 /// What a parameter holds.
@@ -43,6 +44,10 @@ pub trait Context {
     fn get(&self, name: &str) -> Option<String>;
     /// The feature layer named by the parameter.
     fn features(&self, name: &str) -> Result<Box<dyn FeatureClass + '_>>;
+    /// The coordinate system new data (a fishnet) gets when no template names one.
+    fn default_spatial_reference_wkt(&self) -> Option<String> {
+        None
+    }
 }
 
 pub struct Tool {
@@ -243,6 +248,162 @@ fn directional_mean(ctx: &dyn Context) -> Result<ToolOutput> {
     )
 }
 
+const LINEAR_UNITS: &[(&str, f64)] = &[
+    ("METERS", 1.0),
+    ("METER", 1.0),
+    ("KILOMETERS", 1000.0),
+    ("KILOMETER", 1000.0),
+    ("CENTIMETERS", 0.01),
+    ("MILLIMETERS", 0.001),
+    ("DECIMETERS", 0.1),
+    ("FEET", 0.3048),
+    ("FOOT", 0.3048),
+    ("INCHES", 0.0254),
+    ("YARDS", 0.9144),
+    ("MILES", 1609.344),
+    ("NAUTICALMILES", 1852.0),
+];
+
+/// Meters per coordinate unit of a projected coordinate system (`None` for geographic ones).
+fn meters_per_unit(wkt: &str) -> Option<f64> {
+    if !wkt.trim_start().to_ascii_uppercase().starts_with("PROJCS") {
+        return None;
+    }
+    let at = wkt.rfind("UNIT[")?;
+    wkt[at..]
+        .split(',')
+        .nth(1)?
+        .trim_end_matches([']', ')', ' '])
+        .trim()
+        .parse()
+        .ok()
+}
+
+/// A distance as `25`, `25 Meters` or `0.5 Kilometers`, in coordinate units.
+fn distance_in_units(text: &str, wkt: Option<&str>) -> Result<f64> {
+    let t = text.trim();
+    let split = t
+        .find(|c: char| c.is_alphabetic() && c != 'e' && c != 'E')
+        .unwrap_or(t.len());
+    let (num, unit) = t.split_at(split);
+    let value: f64 = num
+        .trim()
+        .parse()
+        .map_err(|_| Error::Unsupported(format!("ERROR 000094: '{text}' is not a distance")))?;
+    let unit = unit.trim().to_ascii_uppercase().replace([' ', '_'], "");
+    if unit.is_empty() || unit == "UNKNOWN" {
+        return Ok(value);
+    }
+    let meters = LINEAR_UNITS
+        .iter()
+        .find(|(n, _)| *n == unit)
+        .map(|u| u.1)
+        .ok_or_else(|| {
+            Error::Unsupported(format!("ERROR 000094: unknown distance unit '{unit}'"))
+        })?;
+    let per_unit = wkt.and_then(meters_per_unit).ok_or_else(|| {
+        Error::Unsupported(
+            "ERROR 000800: a distance with a unit needs a projected coordinate system".into(),
+        )
+    })?;
+    Ok(value * meters / per_unit)
+}
+
+fn pair(text: &str, what: &str) -> Result<[f64; 2]> {
+    let v: Vec<f64> = text
+        .split(|c: char| c.is_whitespace() || c == ',' || c == ';')
+        .filter(|w| !w.is_empty())
+        .map(str::parse)
+        .collect::<std::result::Result<_, _>>()
+        .map_err(|_| {
+            Error::Unsupported(format!("ERROR 000094: {what} '{text}': expected 'x y'"))
+        })?;
+    match v.as_slice() {
+        [x, y] if x.is_finite() && y.is_finite() => Ok([*x, *y]),
+        _ => Err(Error::Unsupported(format!(
+            "ERROR 000094: {what} '{text}': expected 'x y'"
+        ))),
+    }
+}
+
+fn densify(ctx: &dyn Context) -> Result<ToolOutput> {
+    let t = find("densify").ok_or_else(|| Error::Unsupported("densify".into()))?;
+    let fc = ctx.features("input")?;
+    let d = text(ctx, t, "distance")
+        .and_then(|v| v.trim().parse::<f64>().ok())
+        .unwrap_or(0.0);
+    construct::densify(fc.as_ref(), d)
+}
+
+fn generate_points_along_lines(ctx: &dyn Context) -> Result<ToolOutput> {
+    let t = find("generate_points_along_lines")
+        .ok_or_else(|| Error::Unsupported("generate_points_along_lines".into()))?;
+    let fc = ctx.features("input")?;
+    let placement =
+        if text(ctx, t, "point_placement").is_some_and(|p| p.eq_ignore_ascii_case("PERCENTAGE")) {
+            Placement::Percentage(
+                text(ctx, t, "percentage")
+                    .and_then(|v| v.parse().ok())
+                    .unwrap_or(0.0),
+            )
+        } else {
+            let d = text(ctx, t, "distance").ok_or_else(|| {
+                Error::Unsupported("ERROR 000735: Distance: value is required".into())
+            })?;
+            Placement::Distance(distance_in_units(&d, fc.spatial_reference_wkt())?)
+        };
+    let ends =
+        text(ctx, t, "include_end_points").is_some_and(|p| p.eq_ignore_ascii_case("END_POINTS"));
+    construct::generate_points_along_lines(fc.as_ref(), placement, ends)
+}
+
+fn create_fishnet(ctx: &dyn Context) -> Result<ToolOutput> {
+    let t = find("create_fishnet").ok_or_else(|| Error::Unsupported("create_fishnet".into()))?;
+    let num = |k: &str| {
+        text(ctx, t, k)
+            .and_then(|v| v.trim().parse::<f64>().ok())
+            .unwrap_or(0.0)
+    };
+    let f = Fishnet {
+        origin: pair(
+            &text(ctx, t, "origin_coord").unwrap_or_default(),
+            "Fishnet Origin Coordinate",
+        )?,
+        y_axis: pair(
+            &text(ctx, t, "y_axis_coord").unwrap_or_default(),
+            "Y-Axis Coordinate",
+        )?,
+        cell: [num("cell_width"), num("cell_height")],
+        rows: num("number_rows").max(0.0) as usize,
+        columns: num("number_columns").max(0.0) as usize,
+        corner: text(ctx, t, "corner_coord")
+            .map(|c| pair(&c, "Opposite Corner of Fishnet"))
+            .transpose()?,
+        polylines: text(ctx, t, "geometry_type")
+            .is_some_and(|g| g.eq_ignore_ascii_case("POLYLINE")),
+    };
+    let wkt = match text(ctx, t, "template") {
+        Some(_) => ctx
+            .features("template")?
+            .spatial_reference_wkt()
+            .map(str::to_owned),
+        None => ctx.default_spatial_reference_wkt(),
+    };
+    construct::create_fishnet(&f, wkt)
+}
+
+fn polygon_to_line(ctx: &dyn Context) -> Result<ToolOutput> {
+    let t = find("polygon_to_line").ok_or_else(|| Error::Unsupported("polygon_to_line".into()))?;
+    if text(ctx, t, "neighbor_option").is_some_and(|n| n.eq_ignore_ascii_case("IDENTIFY_NEIGHBORS"))
+    {
+        return Err(Error::Unsupported(
+            "IDENTIFY_NEIGHBORS is not done yet: use IGNORE_NEIGHBORS".into(),
+        ));
+    }
+    let fc = ctx.features("input")?;
+    construct::polygon_to_line(fc.as_ref())
+}
+
 pub static TOOLS: &[Tool] = &[
     Tool {
         id: "mean_center",
@@ -363,5 +524,193 @@ pub static TOOLS: &[Tool] = &[
         output_suffix: "DirectionalMean",
         measures: true,
         run: directional_mean,
+    },
+    Tool {
+        id: "densify",
+        name: "Densify",
+        toolbox: "Editing",
+        summary: "Adds vertices along the segments of lines and polygons, at most a distance apart (ArcGIS Pro Densify; the copy, not the input, is edited).",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Features",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "Lines or polygons.",
+            },
+            Param {
+                name: "distance",
+                label: "Distance",
+                kind: Kind::Number,
+                required: true,
+                default: "",
+                help: "In the coordinate system's units.",
+            },
+        ],
+        output_suffix: "Densify",
+        measures: false,
+        run: densify,
+    },
+    Tool {
+        id: "generate_points_along_lines",
+        name: "Generate Points Along Lines",
+        toolbox: "Data Management › Features",
+        summary: "Points at a distance or a percentage along lines or polygon boundaries (ArcGIS Pro Generate Points Along Lines).",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Features",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "Lines or polygons.",
+            },
+            Param {
+                name: "point_placement",
+                label: "Point Placement",
+                kind: Kind::Choice(&["DISTANCE", "PERCENTAGE"]),
+                required: false,
+                default: "DISTANCE",
+                help: "",
+            },
+            Param {
+                name: "distance",
+                label: "Distance",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "For example `25 Meters`.",
+            },
+            Param {
+                name: "percentage",
+                label: "Percentage",
+                kind: Kind::Number,
+                required: false,
+                default: "",
+                help: "Between 0 and 100.",
+            },
+            Param {
+                name: "include_end_points",
+                label: "Include End Points",
+                kind: Kind::Choice(&["NO_END_POINTS", "END_POINTS"]),
+                required: false,
+                default: "NO_END_POINTS",
+                help: "",
+            },
+        ],
+        output_suffix: "Points",
+        measures: true,
+        run: generate_points_along_lines,
+    },
+    Tool {
+        id: "create_fishnet",
+        name: "Create Fishnet",
+        toolbox: "Data Management › Features",
+        summary: "A grid of rectangular cells or lines from an origin (ArcGIS Pro Create Fishnet, without labels).",
+        params: &[
+            Param {
+                name: "origin_coord",
+                label: "Fishnet Origin Coordinate",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+                help: "x y",
+            },
+            Param {
+                name: "y_axis_coord",
+                label: "Y-Axis Coordinate",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+                help: "x y: a point along the grid's y-axis.",
+            },
+            Param {
+                name: "cell_width",
+                label: "Cell Size Width",
+                kind: Kind::Number,
+                required: false,
+                default: "0",
+                help: "",
+            },
+            Param {
+                name: "cell_height",
+                label: "Cell Size Height",
+                kind: Kind::Number,
+                required: false,
+                default: "0",
+                help: "",
+            },
+            Param {
+                name: "number_rows",
+                label: "Number of Rows",
+                kind: Kind::Number,
+                required: false,
+                default: "0",
+                help: "",
+            },
+            Param {
+                name: "number_columns",
+                label: "Number of Columns",
+                kind: Kind::Number,
+                required: false,
+                default: "0",
+                help: "",
+            },
+            Param {
+                name: "corner_coord",
+                label: "Opposite Corner of Fishnet",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "x y: replaces the cell size.",
+            },
+            Param {
+                name: "geometry_type",
+                label: "Geometry Type",
+                kind: Kind::Choice(&["POLYGON", "POLYLINE"]),
+                required: false,
+                default: "POLYGON",
+                help: "",
+            },
+            Param {
+                name: "template",
+                label: "Template Extent",
+                kind: Kind::Features,
+                required: false,
+                default: "",
+                help: "Its coordinate system is the fishnet's.",
+            },
+        ],
+        output_suffix: "Fishnet",
+        measures: false,
+        run: create_fishnet,
+    },
+    Tool {
+        id: "polygon_to_line",
+        name: "Polygon To Line",
+        toolbox: "Data Management › Features",
+        summary: "The boundaries of polygons as lines (ArcGIS Pro Polygon To Line; IGNORE_NEIGHBORS).",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Features",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "Polygons.",
+            },
+            Param {
+                name: "neighbor_option",
+                label: "Identify and store polygon neighboring information",
+                kind: Kind::Choice(&["IGNORE_NEIGHBORS", "IDENTIFY_NEIGHBORS"]),
+                required: false,
+                default: "IGNORE_NEIGHBORS",
+                help: "IDENTIFY_NEIGHBORS is not done yet.",
+            },
+        ],
+        output_suffix: "Line",
+        measures: false,
+        run: polygon_to_line,
     },
 ];

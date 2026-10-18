@@ -177,3 +177,17 @@ def test_spatial_statistics_tools(s):
     assert count(s, "CityCenter") == 1
     with pytest.raises(rustgis.GeoForgeError):
         arcpy.stats.StandardDistance("Italian", "Bad", "HUGE")
+
+
+def test_construction_tools(s):
+    arcpy.analysis.Select("Cities", "Indian", "adm0name = 'India'")
+    arcpy.management.CreateFishnet("Net", "70 8", "70 18", 1, 1, 4, 5, "#", "NO_LABELS", "#", "POLYGON")
+    assert count(s, "Net") == 20
+    arcpy.management.PolygonToLine("Net", "NetLines", "IGNORE_NEIGHBORS")
+    assert count(s, "NetLines") == 20
+    arcpy.edit.Densify("NetLines", "DISTANCE", 0.25, out_raster="Dense")
+    assert count(s, "Dense") == 20
+    arcpy.management.GeneratePointsAlongLines("NetLines", "Along", "DISTANCE", "0.5", None, "END_POINTS")
+    assert count(s, "Along") > 20
+    with pytest.raises(rustgis.GeoForgeError):
+        arcpy.management.PolygonToLine("Net", "Bad", "IDENTIFY_NEIGHBORS")
