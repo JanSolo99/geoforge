@@ -372,6 +372,14 @@ _TOOLS = [
        ("cell_assignment", "cell_assignment"), ("priority_field", None), ("cellsize", "cell_size")),
     _t("conversion", "PointToRaster", "point_to_raster", ("in_features", "input"), ("value_field", "value_field"), ("out_rasterdataset", "output"),
        ("cell_assignment", "cell_assignment"), ("priority_field", None), ("cellsize", "cell_size")),
+    # stats (Spatial Statistics: Measuring Geographic Distributions)
+    _t("stats", "MeanCenter", "mean_center", ("Input_Feature_Class", "input"), ("Output_Feature_Class", "output"), ("Weight_Field", "weight_field"), ("Case_Field", "case_field"), ("Dimension_Field", "dimension_field")),
+    _t("stats", "MedianCenter", "median_center", ("Input_Feature_Class", "input"), ("Output_Feature_Class", "output"), ("Weight_Field", "weight_field"), ("Case_Field", "case_field"), ("Dimension_Field", "dimension_field")),
+    _t("stats", "CentralFeature", "central_feature", ("Input_Feature_Class", "input"), ("Output_Feature_Class", "output"), ("Distance_Method", "distance_method"), ("Weight_Field", "weight_field"),
+       ("Self_Potential_Weight_Field", "self_potential_weight_field"), ("Case_Field", "case_field")),
+    _t("stats", "StandardDistance", "standard_distance", ("Input_Feature_Class", "input"), ("Output_Standard_Distance_Feature_Class", "output"), ("Circle_Size", "circle_size"), ("Weight_Field", "weight_field"), ("Case_Field", "case_field")),
+    _t("stats", "DirectionalDistribution", "directional_distribution", ("Input_Feature_Class", "input"), ("Output_Ellipse_Feature_Class", "output"), ("Ellipse_Size", "ellipse_size"), ("Weight_Field", "weight_field"), ("Case_Field", "case_field")),
+    _t("stats", "DirectionalMean", "directional_mean", ("Input_Feature_Class", "input"), ("Output_Feature_Class", "output"), ("Orientation_Only", "orientation_only"), ("Case_Field", "case_field")),
     # sa
     _t("sa", "Slope", "slope", ("in_raster", "input"), ("output_measurement", "output_measurement"), ("z_factor", "z_factor"), ("method", None), ("z_unit", None)),
     _t("sa", "Idw", "idw", ("in_point_features", "input"), ("z_field", "z_field"), ("cell_size", "cell_size"), ("power", "power"),
@@ -596,7 +604,8 @@ analysis = _Module("analysis")
 management = _Module("management")
 sa = _Module("sa")
 conversion = _Module("conversion")
-_modules = {"analysis": analysis, "management": management, "sa": sa, "conversion": conversion}
+stats = _Module("stats")
+_modules = {"analysis": analysis, "management": management, "sa": sa, "conversion": conversion, "stats": stats}
 
 sa.RadiusVariable = RadiusVariable
 sa.RadiusFixed = RadiusFixed

@@ -15,6 +15,7 @@
 
 mod extra;
 mod raster;
+mod reg;
 
 use geoforge_core as gf;
 use geoforge_tools as tools;
@@ -1493,23 +1494,32 @@ const DEFS: &[Def] = &[
 ];
 
 fn specs() -> Vec<ToolSpec> {
-    DEFS.iter()
-        .chain(raster::DEFS)
-        .chain(extra::DEFS)
-        .map(|d| ToolSpec {
-            // Ids are `geoforge:<id>`; leaked once, like the other suites' specs.
-            id: Box::leak(format!("{PREFIX}{}", d.id).into_boxed_str()),
-            name: d.name,
-            toolbox: d.toolbox,
-            summary: d.summary,
-            params: raster::params_of(d),
-            run: rustgis_analysis::external_placeholder,
-        })
-        .collect()
+    let own = DEFS.iter().chain(raster::DEFS).chain(extra::DEFS).map(|d| ToolSpec {
+        // Ids are `geoforge:<id>`; leaked once, like the other suites' specs.
+        id: Box::leak(format!("{PREFIX}{}", d.id).into_boxed_str()),
+        name: d.name,
+        toolbox: d.toolbox,
+        summary: d.summary,
+        params: raster::params_of(d),
+        run: rustgis_analysis::external_placeholder,
+    });
+    // The shared registry's tools: no wrapper of their own.
+    let shared = tools::registry::TOOLS.iter().map(|t| ToolSpec {
+        id: Box::leak(format!("{PREFIX}{}", t.id).into_boxed_str()),
+        name: t.name,
+        toolbox: Box::leak(format!("GeoForge › {}", t.toolbox).into_boxed_str()),
+        summary: t.summary,
+        params: reg::params_of(t),
+        run: rustgis_analysis::external_placeholder,
+    });
+    own.chain(shared).collect()
 }
 
 fn run(spec: &ToolSpec, inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     let id = spec.id.strip_prefix(PREFIX).unwrap_or(spec.id);
+    if let Some(t) = tools::registry::find(id) {
+        return reg::run(t, inp, p);
+    }
     let def = DEFS.iter().chain(raster::DEFS).chain(extra::DEFS).find(|d| d.id == id).ok_or_else(|| format!("no tool '{}'", spec.id))?;
     (def.run)(inp, p)
 }
@@ -1638,6 +1648,41 @@ mod tests {
         assert!(rustgis_analysis::run("geoforge:weighted_overlay", &inp, &json!({"table": "R1:50:1=1"})).is_err());
         assert!(rustgis_analysis::run("geoforge:fuzzy_overlay", &inp, &json!({"inputs": "R1;R2", "overlay_type": "GAMMA"})).is_err());
         assert!(rustgis_analysis::run("geoforge:fuzzy_membership", &inp, &json!({"input": "R1", "function": "LINEAR"})).is_err());
+    }
+
+    #[test]
+    fn registry_tools_run_in_the_application() {
+        register();
+        // A tilted cloud of ten points near Oslo.
+        let pts: Vec<(f64, f64)> =
+            (0..10).map(|i| (10.7 + 0.01 * i as f64 + if i % 2 == 0 { 0.003 } else { -0.003 }, 59.9 + 0.005 * i as f64)).collect();
+        let layers = Layers(vec![points("p", &pts)]);
+        let spec = rustgis_analysis::tool("geoforge:mean_center").expect("registered");
+        assert_eq!(spec.toolbox, "GeoForge › Spatial Statistics › Measuring Geographic Distributions");
+        assert!(spec.params.iter().any(|p| p.name == "weight_field" && p.kind == K::NumericField));
+        let mean = dataset(rustgis_analysis::run("geoforge:mean_center", &layers, &json!({"input": "p"})));
+        let Some(Geometry::Point(c)) = &mean.features[0].geometry else { panic!("point") };
+        assert!((c.x - 10.745).abs() < 1e-4 && (c.y - 59.9225).abs() < 1e-4, "{c:?}");
+        // The weight field and the output name.
+        let w =
+            dataset(rustgis_analysis::run("geoforge:mean_center", &layers, &json!({"input": "p", "weight_field": "N", "output": "Heavy"})));
+        assert_eq!(w.name, "Heavy");
+        let Some(Geometry::Point(c)) = &w.features[0].geometry else { panic!("point") };
+        assert!(c.y > 59.9225, "heavier toward the later points: {c:?}");
+        // Circles and ellipses come back as polygons of 361 vertices.
+        for tool in ["standard_distance", "directional_distribution"] {
+            let d = dataset(rustgis_analysis::run(&format!("geoforge:{tool}"), &layers, &json!({"input": "p"})));
+            let Some(Geometry::Polygon(ps)) = &d.features[0].geometry else { panic!("{tool}: polygon") };
+            assert_eq!(ps[0][0].len(), 361, "{tool}");
+        }
+        let central = dataset(rustgis_analysis::run("geoforge:central_feature", &layers, &json!({"input": "p"})));
+        assert_eq!(central.features.len(), 1);
+        // Bad choices and fields are errors.
+        assert!(rustgis_analysis::run("geoforge:standard_distance", &layers, &json!({"input": "p", "circle_size": "HUGE"})).is_err());
+        assert!(rustgis_analysis::run("geoforge:mean_center", &layers, &json!({"input": "p", "weight_field": "nope"})).is_err());
+        assert!(rustgis_analysis::run("geoforge:mean_center", &layers, &json!({"input": "missing"})).is_err());
+        // Lines only for the directional mean.
+        assert!(rustgis_analysis::run("geoforge:directional_mean", &layers, &json!({"input": "p"})).is_err());
     }
 
     #[test]

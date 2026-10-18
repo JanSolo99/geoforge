@@ -475,6 +475,15 @@ enum Tool {
         in_features: PathBuf,
         out_feature_class: PathBuf,
     },
+    /// Run a tool of the shared registry: `gf run mean_center input=a.shp output=out.shp weight_field=W`.
+    Run {
+        /// The tool's id (see `gf tools`).
+        tool: String,
+        /// `name=value` pairs; layers are paths, `output` is the result's path.
+        args: Vec<String>,
+    },
+    /// List the tools of the shared registry with their parameters.
+    Tools,
     /// Spatial Statistics "Mean Center".
     MeanCenter {
         in_features: PathBuf,
@@ -1861,6 +1870,68 @@ fn main() -> ExitCode {
             let (fc, _) = open_feature_class(&in_features)?;
             let out = geoforge_tools::multipart_to_singlepart(fc.as_ref())?;
             write_output(out, &out_feature_class, source_gdb(&in_features).as_deref())
+        })(),
+        Tool::Tools => {
+            for t in geoforge_tools::registry::TOOLS {
+                println!("{}  {}  [{}]", t.id, t.name, t.toolbox);
+                for p in t.params {
+                    println!(
+                        "    {}{}  {}{}",
+                        p.name,
+                        if p.required { " *" } else { "" },
+                        p.label,
+                        if p.default.is_empty() {
+                            String::new()
+                        } else {
+                            format!(" (default {})", p.default)
+                        }
+                    );
+                }
+                println!("    output *  Output path");
+            }
+            Ok(())
+        }
+        Tool::Run { tool, args } => (|| {
+            use geoforge_tools::registry;
+            let spec = registry::find(&tool)
+                .ok_or_else(|| Error::Unsupported(format!("no tool '{tool}' (see `gf tools`)")))?;
+            let mut map = std::collections::HashMap::new();
+            for a in &args {
+                let (k, v) = a
+                    .split_once('=')
+                    .ok_or_else(|| Error::Unsupported(format!("'{a}': expected name=value")))?;
+                if k != "output" && !spec.params.iter().any(|p| p.name == k) {
+                    return Err(Error::Unsupported(format!(
+                        "{}: no parameter '{k}'",
+                        spec.id
+                    )));
+                }
+                map.insert(k.to_string(), v.to_string());
+            }
+            let output = map
+                .get("output")
+                .cloned()
+                .ok_or_else(|| Error::Unsupported("output=<path> is required".into()))?;
+            struct Args(std::collections::HashMap<String, String>);
+            impl registry::Context for Args {
+                fn get(&self, name: &str) -> Option<String> {
+                    self.0
+                        .get(name)
+                        .map(|v| v.trim().to_string())
+                        .filter(|v| !v.is_empty())
+                }
+                fn features(&self, name: &str) -> Result<Box<dyn FeatureClass + '_>> {
+                    let path = self
+                        .get(name)
+                        .ok_or_else(|| Error::Unsupported(format!("{name} is required")))?;
+                    open_feature_class(Path::new(&path)).map(|(fc, _)| fc)
+                }
+            }
+            let ctx = Args(map);
+            let out = registry::run(spec, &ctx)?;
+            let source =
+                registry::Context::get(&ctx, "input").and_then(|i| source_gdb(Path::new(&i)));
+            write_output(out, Path::new(&output), source.as_deref())
         })(),
         Tool::MeanCenter {
             in_features,

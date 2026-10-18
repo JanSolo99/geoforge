@@ -319,3 +319,66 @@ fn spatial_statistics_equal_arcgis() {
     std::fs::remove_dir_all(&d).ok();
     assert!(failures.is_empty(), "{}", failures.join("\n"));
 }
+
+#[test]
+fn run_command_uses_the_registry() {
+    if !geoforge_testkit::ogrinfo_available() {
+        return;
+    }
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let r: Json = serde_json::from_slice(
+        &std::fs::read(root.join("testdata/arcgis-reference/spatstat.json")).unwrap(),
+    )
+    .unwrap();
+    let d = std::env::temp_dir().join(format!("gf-spatstat-run-{}", std::process::id()));
+    std::fs::remove_dir_all(&d).ok();
+    std::fs::create_dir_all(&d).unwrap();
+    let shp = shapefile(&d, "fa", &r["datasets"]["fa"]);
+    let out = d.join("o.shp");
+    // The same run as the typed command: weights and a case field.
+    run(&[
+        "run".into(),
+        "mean_center".into(),
+        format!("input={}", shp.display()),
+        format!("output={}", out.display()),
+        "weight_field=W".into(),
+        "case_field=G".into(),
+    ]);
+    let failures = compare("A:mean_case", &out, &r["cases"]["A:mean_case"], 1e-3);
+    assert!(failures.is_empty(), "{}", failures.join("\n"));
+    // Choices are checked, unknown parameters and tools refused, `tools` lists them.
+    for bad in [
+        vec![
+            "run".to_string(),
+            "standard_distance".into(),
+            format!("input={}", shp.display()),
+            format!("output={}", d.join("x.shp").display()),
+            "circle_size=HUGE".into(),
+        ],
+        vec![
+            "run".to_string(),
+            "mean_center".into(),
+            format!("input={}", shp.display()),
+            format!("output={}", d.join("x.shp").display()),
+            "nonsense=1".into(),
+        ],
+        vec!["run".to_string(), "no_such_tool".into(), "output=x".into()],
+        vec![
+            "run".to_string(),
+            "mean_center".into(),
+            "input=missing.shp".into(),
+        ],
+    ] {
+        let r = Command::new(env!("CARGO_BIN_EXE_gf"))
+            .args(&bad)
+            .output()
+            .unwrap();
+        assert!(!r.status.success(), "{bad:?}");
+    }
+    let list = Command::new(env!("CARGO_BIN_EXE_gf"))
+        .arg("tools")
+        .output()
+        .unwrap();
+    assert!(String::from_utf8_lossy(&list.stdout).contains("directional_distribution"));
+    std::fs::remove_dir_all(&d).ok();
+}

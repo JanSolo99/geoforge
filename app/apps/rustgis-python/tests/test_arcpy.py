@@ -162,3 +162,18 @@ def test_overlay_and_fuzzy_tools(s):
     assert {"Max", "WSum", "HP", "Comb", "Fz", "Fo", "Wo"} <= names
     with pytest.raises(rustgis.GeoForgeError):
         arcpy.sa.FuzzyMembership("Grid", "not a function", out_raster="Bad")
+
+
+def test_spatial_statistics_tools(s):
+    # Planar statistics run in the data's UTM zone, so use one region.
+    arcpy.analysis.Select("Cities", "Italian", "adm0name = 'India'")
+    arcpy.stats.MeanCenter("Italian", "CityCenter", "pop_max")
+    arcpy.stats.StandardDistance("Italian", "CitySD", "2_STANDARD_DEVIATIONS", "pop_max")
+    arcpy.stats.DirectionalDistribution("Italian", "CityEllipse", "1_STANDARD_DEVIATION")
+    arcpy.stats.CentralFeature("Italian", "CityHub", "MANHATTAN_DISTANCE")
+    arcpy.stats.MedianCenter("Italian", "CityMedian")
+    names = {l["name"] for l in s.layers()}
+    assert {"CityCenter", "CitySD", "CityEllipse", "CityHub", "CityMedian"} <= names
+    assert count(s, "CityCenter") == 1
+    with pytest.raises(rustgis.GeoForgeError):
+        arcpy.stats.StandardDistance("Italian", "Bad", "HUGE")
