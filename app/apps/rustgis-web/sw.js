@@ -1,4 +1,4 @@
-// The RustGIS web app's service worker: it lets the installed app (and the page) start offline.
+// The GeoForge web app's service worker: it lets the installed app (and the page) start offline.
 //
 // This file is a template. `cargo xtask web-pwa dist/web`, run after `trunk build` by the deploy
 // workflows, fills in VERSION and SHELL with the built files (Trunk names them by content hash) and
@@ -10,7 +10,7 @@
 // - Every other request (map tiles, the AI Assistant, plugins, data the user opens, analytics) is
 //   left to the browser: the worker never answers or stores it.
 // - A new deploy's worker waits until the page asks it to take over (the "new version" notice in
-//   index.html) or every RustGIS window has closed, so the app never changes under the user.
+//   index.html) or every GeoForge window has closed, so the app never changes under the user.
 
 const VERSION = "__VERSION__";
 const SHELL = __SHELL__;

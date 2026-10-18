@@ -419,6 +419,7 @@ dependencies = [
  "flate2",
  "geoforge-core",
  "geoforge-testkit",
+ "rstar",
  "serde_json",
  "tiff",
  "weezl",

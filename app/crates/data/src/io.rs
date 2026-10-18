@@ -100,7 +100,7 @@ pub fn read_layers(file_name: &str, bytes: &[u8]) -> Result<Vec<LayerRead>> {
                     .collect()
             } else {
                 return Err(DataError::Format(format!(
-                    "{file_name}: an XML file RustGIS doesn't read (it reads GeoRSS, LandXML, KML and GPX)"
+                    "{file_name}: an XML file GeoForge doesn't read (it reads GeoRSS, LandXML, KML and GPX)"
                 )));
             }
         }
@@ -1448,7 +1448,7 @@ fn read_shapefile_parts(parts: ShapefileParts, name: &str) -> Result<(Dataset, R
     integral_numeric_to_integer(&mut ds);
     let e = ds.extent();
     if !e.is_empty() && (e.min_x < -180.5 || e.max_x > 180.5 || e.min_y < -90.5 || e.max_y > 90.5) {
-        report.messages.push("coordinates are not longitude/latitude; RustGIS reads them as WGS 84 and they may draw out of place".into());
+        report.messages.push("coordinates are not longitude/latitude; GeoForge reads them as WGS 84 and they may draw out of place".into());
     }
     if report.skipped > 0 {
         report.messages.push(format!("{} shapes were unreadable or unsupported", report.skipped));

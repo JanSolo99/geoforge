@@ -40,9 +40,9 @@ def test_run_takes_keywords_including_a_params_keyword(sample):
 
 
 def test_errors_raise_rustgis_error(sample):
-    with pytest.raises(rustgis.RustGISError, match="unknown command"):
+    with pytest.raises(rustgis.GeoForgeError, match="unknown command"):
         sample.run("no.such.command")
-    with pytest.raises(rustgis.RustGISError):
+    with pytest.raises(rustgis.GeoForgeError):
         sample.layer("No such layer").to_geojson()
 
 

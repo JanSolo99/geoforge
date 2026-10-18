@@ -22,7 +22,7 @@ pub fn send_timeout(req: &HttpRequest, timeout: std::time::Duration) -> Result<H
         .max_redirects(0)
         .build()
         .into();
-    let ua = concat!("RustGIS/", env!("CARGO_PKG_VERSION"));
+    let ua = concat!("GeoForge/", env!("CARGO_PKG_VERSION"));
     let result = match (req.method, &req.body) {
         ("POST", body) => {
             let mut b = agent.post(url).header("User-Agent", ua);

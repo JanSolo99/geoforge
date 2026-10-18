@@ -1,6 +1,6 @@
 //! File Geodatabases (`.gdb` folders) read in place through GeoForge's `geoforge-filegdb`.
 //!
-//! Modified for GeoForge (not part of upstream RustGIS).
+//! Modified for GeoForge (not part of upstream GeoForge).
 //!
 //! `open` picks a feature class or table by name (default: the first feature class); a read asks
 //! the table's spatial index (`.spx`) for the rows near the extent, then reads just those rows.

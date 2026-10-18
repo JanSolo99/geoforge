@@ -402,7 +402,7 @@ fn anthropic_format() {
     assert!(req.headers.iter().any(|(k, v)| k == "x-api-key" && v == "k"));
     assert!(req.headers.iter().any(|(k, _)| k == "anthropic-version"));
     let b = body(&req);
-    assert!(b["system"].as_str().is_some_and(|t| t.contains("RustGIS")));
+    assert!(b["system"].as_str().is_some_and(|t| t.contains("GeoForge")));
     assert_eq!(b["fallbacks"], "default");
     assert!(b["tools"][0]["input_schema"].is_object());
     let reply = json!({"content": [
@@ -1201,14 +1201,14 @@ fn chatgpt_authorization_page() {
     };
     let params = |url: &str| chatgpt::query_params(url.split_once('?').map_or("", |(_, q)| q));
     let get = |p: &[(String, String)], k: &str| p.iter().find(|(n, _)| n == k).map(|(_, v)| v.clone());
-    // A first sign-in registers RustGIS, without hints.
+    // A first sign-in registers GeoForge, without hints.
     let url = chatgpt::authorize_url(&a);
     assert!(url.starts_with("https://auth.openai.com/api/accounts/authorize?"));
     let p = params(&url);
     for (k, v) in [
         ("response_type", "code"),
         ("client_id", "dynamic_agent_client"),
-        ("agent_name_hint", "RustGIS"),
+        ("agent_name_hint", "GeoForge"),
         ("ext_agent_host_id", "urn:uuid:00000000-0000-4000-8000-000000000000"),
         ("redirect_uri", "http://127.0.0.1:1455/auth/callback"),
         ("scope", "openid profile email offline_access resource.invoke chatgpt.tokens.use.direct"),

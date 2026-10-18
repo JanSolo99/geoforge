@@ -1,13 +1,13 @@
-//! GeoForge's ArcGIS-verified geoprocessing tools (`geoforge-tools`) as RustGIS tools.
+//! GeoForge's ArcGIS-verified geoprocessing tools (`geoforge-tools`) as GeoForge tools.
 //!
-//! Modified for GeoForge (not part of upstream RustGIS).
+//! Modified for GeoForge (not part of upstream GeoForge).
 //!
 //! The tools join the registry as the external suite [`SOURCE`] (ids `geoforge:<name>`), through
 //! [`rustgis_analysis::register_external`]. A tool's layers are converted to GeoForge feature
 //! classes, the engine runs the ArcGIS algorithm (parameters, output schema, row order as
 //! ArcGIS's), and its output comes back as a layer.
 //!
-//! Layers in RustGIS are WGS 84 longitude/latitude. Tools that only relate shapes (Clip, Erase,
+//! Layers in GeoForge are WGS 84 longitude/latitude. Tools that only relate shapes (Clip, Erase,
 //! Intersect, ...) run on them as they are, with ArcGIS's geographic XY tolerance. Tools that
 //! measure (Buffer, Near, search distances) run in the UTM zone of the data, as ArcGIS does on
 //! projected data, in metres, and their results are projected back: see [`Work`].
@@ -1586,6 +1586,29 @@ mod tests {
             d.push(Some(Geometry::Point(Coord::new(*x, *y))), vec![Value::Int(i as i64)]);
         }
         d
+    }
+
+    #[test]
+    fn idw_interpolates_points_to_a_raster() {
+        register();
+        // Four corners of a square, values 0..3: the middle cell is their mean.
+        let layers = Layers(vec![points("p", &[(0.0, 0.0), (2.0, 0.0), (0.0, 2.0), (2.0, 2.0)])]);
+        let out = raster_of(rustgis_analysis::run("geoforge:idw", &layers, &json!({"input": "p", "z_field": "N", "cell_size": 1})));
+        // Cell centers 0, 1, 2 from the points' lower-left corner: 3 x 3 cells.
+        assert_eq!((out.width, out.height), (3, 3));
+        assert!((out.get(1, 1).unwrap() - 1.5).abs() < 1e-6);
+        // A point on a cell center gives its value (row 2 is the southern row).
+        assert_eq!(out.get(0, 2), Some(0.0));
+        assert_eq!(out.get(2, 0), Some(3.0));
+        // A fixed radius that reaches no point leaves NoData.
+        let fixed = raster_of(rustgis_analysis::run(
+            "geoforge:idw",
+            &layers,
+            &json!({"input": "p", "z_field": "N", "cell_size": 1, "search_type": "FIXED", "fixed_distance": 0.5}),
+        ));
+        assert_eq!(fixed.get(1, 1), None);
+        assert!(rustgis_analysis::run("geoforge:idw", &layers, &json!({"input": "p", "z_field": "N", "power": -1})).is_err());
+        assert!(rustgis_analysis::run("geoforge:idw", &layers, &json!({"input": "p", "z_field": "nope"})).is_err());
     }
 
     /// Ground distance in metres between two lon/lat points (haversine).

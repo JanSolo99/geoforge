@@ -835,7 +835,7 @@ pub(crate) fn import(s: &mut Session, text: &str) -> CmdResult {
     if text.len() as u64 > MAX_LAYOUT {
         return Err("the layout file is too large".into());
     }
-    let mut l: Layout = serde_json::from_str(text).map_err(|e| format!("not a RustGIS layout: {e}"))?;
+    let mut l: Layout = serde_json::from_str(text).map_err(|e| format!("not a GeoForge layout: {e}"))?;
     l.clamp();
     l.name = unique_name(s, &l.name);
     // Frames showing maps this project lacks show the active map instead.

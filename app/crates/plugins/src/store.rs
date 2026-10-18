@@ -1,4 +1,4 @@
-//! Installed plugins on disk (desktop and command line): packages in RustGIS's data folder,
+//! Installed plugins on disk (desktop and command line): packages in GeoForge's data folder,
 //! loaded at startup, plus plugin folders added for development.
 //!
 //! ```text
@@ -43,9 +43,9 @@ pub fn dir() -> Option<PathBuf> {
         return Some(PathBuf::from(d));
     }
     let base = if cfg!(target_os = "windows") {
-        std::env::var_os("LOCALAPPDATA").or_else(|| std::env::var_os("APPDATA")).map(|d| PathBuf::from(d).join("RustGIS"))
+        std::env::var_os("LOCALAPPDATA").or_else(|| std::env::var_os("APPDATA")).map(|d| PathBuf::from(d).join("GeoForge"))
     } else if cfg!(target_os = "macos") {
-        std::env::var_os("HOME").map(|h| PathBuf::from(h).join("Library/Application Support/RustGIS"))
+        std::env::var_os("HOME").map(|h| PathBuf::from(h).join("Library/Application Support/GeoForge"))
     } else {
         std::env::var_os("XDG_DATA_HOME")
             .map(PathBuf::from)

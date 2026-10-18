@@ -1,6 +1,6 @@
-"""The RustGIS app in a Jupyter notebook: an anywidget around a :class:`~rustgis.Session`.
+"""The GeoForge app in a Jupyter notebook: an anywidget around a :class:`~rustgis.Session`.
 
-The widget shows the RustGIS web app (ribbon, panes, map) in the cell, kept in step with the
+The widget shows the GeoForge web app (ribbon, panes, map) in the cell, kept in step with the
 Python session through the project: what Python adds or styles appears in the app, and what is
 done in the app (an edit, a new layer, a pan) is back in the session for Python to read.
 """
@@ -17,7 +17,7 @@ from urllib.parse import quote
 import anywidget
 import traitlets
 
-from . import Layer, PathLike, RustGISError, Session
+from . import Layer, PathLike, GeoForgeError, Session
 
 #: The web app the widget shows; ``RUSTGIS_WEB_URL`` points it at another build (a local
 #: ``trunk serve``, a self-hosted copy).
@@ -36,7 +36,7 @@ _EMBEDDABLE = {
 
 
 class Map(anywidget.AnyWidget):
-    """The RustGIS app in a notebook cell, driven from Python.
+    """The GeoForge app in a notebook cell, driven from Python.
 
     Args:
         session: The session to show; a new one when left out.
@@ -92,7 +92,7 @@ class Map(anywidget.AnyWidget):
     # Commands ------------------------------------------------------------------------------
 
     def run(self, command: str, params: Optional[Dict[str, Any]] = None, /, **kwargs: Any) -> Any:
-        """Runs a RustGIS command by id, then shows the result in the app.
+        """Runs a GeoForge command by id, then shows the result in the app.
 
         Args:
             command: The command id, e.g. ``"layer.symbology"``.
@@ -103,7 +103,7 @@ class Map(anywidget.AnyWidget):
             The command's result, decoded from JSON.
 
         Raises:
-            RustGISError: When the command fails.
+            GeoForgeError: When the command fails.
         """
         try:
             return self._session.run(command, params, **kwargs)
@@ -291,7 +291,7 @@ class Map(anywidget.AnyWidget):
         """Sends the session's project to the app, when it changed."""
         try:
             text = self._session.project_json()
-        except RustGISError as e:
+        except GeoForgeError as e:
             self._hold([(f"couldn't show the project in the app: {e}", True)])
             return
         self._project = text
@@ -325,7 +325,7 @@ class Map(anywidget.AnyWidget):
             self._hold(self._session.notices())
             try:
                 self._session.run("project.openText", text=text)
-            except RustGISError as e:
+            except GeoForgeError as e:
                 self._hold([(f"the app's project couldn't be read: {e}", True)])
                 return
             finally:

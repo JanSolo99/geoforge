@@ -1,6 +1,6 @@
-"""RustGIS from Python: the RustGIS engine in-process, headless.
+"""GeoForge from Python: the GeoForge engine in-process, headless.
 
-Every action in RustGIS is a command with an id and JSON parameters, the same ids the ribbon,
+Every action in GeoForge is a command with an id and JSON parameters, the same ids the ribbon,
 the command line and the AI Assistant use. ``Session.run`` runs any of them; the other methods
 are shortcuts for the common ones.
 
@@ -10,7 +10,7 @@ are shortcuts for the common ones.
 >>> s.to_png("map.png")
 >>> s.save("atlas.rgis")
 
-In Jupyter, ``rustgis.Map`` shows the RustGIS app in the cell, in step with its session
+In Jupyter, ``rustgis.Map`` shows the GeoForge app in the cell, in step with its session
 (``pip install "rustgis[jupyter]"``).
 """
 
@@ -21,10 +21,10 @@ import os
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 from ._rustgis import Engine as _Engine
-from ._rustgis import RustGISError, __version__
+from ._rustgis import GeoForgeError, __version__
 from ._rustgis import load_plugins as _load_plugins
 
-__all__ = ["Layer", "Map", "RustGISError", "Session", "__version__", "load_plugins"]
+__all__ = ["Layer", "Map", "GeoForgeError", "Session", "__version__", "load_plugins"]
 
 PathLike = Union[str, "os.PathLike[str]"]
 
@@ -81,12 +81,12 @@ class Layer:
         """The layer's summary: id, type, feature count, fields, renderer, visibility.
 
         Raises:
-            RustGISError: When the map has no layer of this name.
+            GeoForgeError: When the map has no layer of this name.
         """
         for layer in self.session.layers():
             if layer.get("name") == self.name or str(layer.get("id")) == self.name:
                 return layer
-        raise RustGISError(f"no layer named '{self.name}'")
+        raise GeoForgeError(f"no layer named '{self.name}'")
 
     def to_geojson(self) -> Dict[str, Any]:
         """The layer's features as a GeoJSON FeatureCollection, in longitude and latitude.
@@ -118,7 +118,7 @@ class Layer:
 
 
 class Session:
-    """A RustGIS project open in memory: its maps, layers, symbology, layouts and undo history.
+    """A GeoForge project open in memory: its maps, layers, symbology, layouts and undo history.
 
     Args:
         project: A project file (``.rgis``) to open.
@@ -155,7 +155,7 @@ class Session:
     # Commands ------------------------------------------------------------------------------
 
     def run(self, command: str, params: Optional[Dict[str, Any]] = None, /, **kwargs: Any) -> Any:
-        """Runs a RustGIS command by id.
+        """Runs a GeoForge command by id.
 
         Parameters can be given as a dict, as keyword arguments, or both (keyword arguments win).
         ``Session.commands()`` lists every command with its parameters. The dict is positional
@@ -171,7 +171,7 @@ class Session:
             The command's result, decoded from JSON (``None`` for commands that return nothing).
 
         Raises:
-            RustGISError: When the command fails; the message says why.
+            GeoForgeError: When the command fails; the message says why.
         """
         merged: Dict[str, Any] = dict(params or {})
         merged.update(kwargs)
@@ -342,7 +342,7 @@ class Session:
     def __repr__(self) -> str:
         try:
             names = [layer["name"] for layer in self.layers()]
-        except RustGISError:
+        except GeoForgeError:
             names = []
         return f"Session(layers={names!r})"
 

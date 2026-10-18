@@ -83,7 +83,7 @@ fn bad_packages_are_refused() {
         (json!({"id": "x", "name": "X", "version": "one"}), "version"),
         (json!({"id": "x", "name": "X", "version": "1.0.0", "entry": "../evil.wasm"}), "entry"),
         (json!({"id": "x", "name": "X", "version": "1.0.0", "abi": 99}), "ABI"),
-        (json!({"id": "x", "name": "X", "version": "1.0.0", "minRustgisVersion": "999.0.0"}), "needs RustGIS"),
+        (json!({"id": "x", "name": "X", "version": "1.0.0", "minRustgisVersion": "999.0.0"}), "needs GeoForge"),
         (json!({"id": "x", "name": "X", "version": "1.0.0", "permissions": ["root"]}), "plugin.json"),
         (
             json!({"id": "x", "name": "X", "version": "1.0.0", "tools": [{"id": "t", "name": "T", "params": [{"name": "a", "label": "A", "kind": "laser"}]}]}),
@@ -263,10 +263,10 @@ fn plugin_tabs_are_checked() {
     assert!(matches!(ok.entry("tool:m"), Some(crate::Entry::Tool(t)) if t.id == "m"));
     assert!(matches!(ok.entry("h"), Some(crate::Entry::Command(c)) if c.id == "h"));
     for (bad, why) in [
-        (json!({"label": "Map", "groups": [{"label": "G", "items": ["h"]}]}), "RustGIS's tabs"),
-        (json!({"label": "help", "groups": [{"label": "G", "items": ["h"]}]}), "RustGIS's tabs"),
-        (json!({"label": "Style", "groups": [{"label": "G", "items": ["h"]}]}), "RustGIS's tabs"),
-        (json!({"label": "publish", "groups": [{"label": "G", "items": ["h"]}]}), "RustGIS's tabs"),
+        (json!({"label": "Map", "groups": [{"label": "G", "items": ["h"]}]}), "GeoForge's tabs"),
+        (json!({"label": "help", "groups": [{"label": "G", "items": ["h"]}]}), "GeoForge's tabs"),
+        (json!({"label": "Style", "groups": [{"label": "G", "items": ["h"]}]}), "GeoForge's tabs"),
+        (json!({"label": "publish", "groups": [{"label": "G", "items": ["h"]}]}), "GeoForge's tabs"),
         (json!({"label": "", "groups": [{"label": "G", "items": ["h"]}]}), "label"),
         (json!({"label": "T", "groups": []}), "groups"),
         (json!({"label": "T", "groups": [{"label": "G", "items": []}]}), "items"),

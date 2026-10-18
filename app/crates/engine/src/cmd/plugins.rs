@@ -2,7 +2,7 @@
 //!
 //! A plugin command (`plugin:<plugin>/<command>`) runs through [`Session::run`] like any other:
 //! one undo step, restored if it fails. While it runs, the plugin reaches the project through
-//! the requests [`Bridge`] answers: RustGIS commands by id, and a few `host.*` requests for
+//! the requests [`Bridge`] answers: GeoForge commands by id, and a few `host.*` requests for
 //! reading layers. What it may run depends on the permissions it declared.
 
 use std::sync::Arc;

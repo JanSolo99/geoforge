@@ -48,7 +48,7 @@ pub enum ParamKind {
     VectorLayer,
     /// On or off.
     Bool,
-    /// A file path typed by the user (for data RustGIS doesn't open as a layer, such as LiDAR).
+    /// A file path typed by the user (for data GeoForge doesn't open as a layer, such as LiDAR).
     Path,
 }
 

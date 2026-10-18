@@ -448,7 +448,7 @@ pub fn decode(bytes: &[u8], want: Want) -> Result<Payload, String> {
     }
 }
 
-/// Starts a picture drawn by RustGIS itself (a COG's map tile): its width and height (u32, little
+/// Starts a picture drawn by GeoForge itself (a COG's map tile): its width and height (u32, little
 /// end first), then straight RGBA pixels. No encoding, so no PNG encoder in the browser build.
 pub(crate) const RAW: &[u8] = b"RUSTGIS-RGBA";
 
@@ -545,7 +545,7 @@ mod native {
     pub(super) fn agent() -> ureq::Agent {
         ureq::Agent::config_builder()
             .timeout_global(Some(std::time::Duration::from_secs(30)))
-            .user_agent(concat!("RustGIS/", env!("CARGO_PKG_VERSION"), " (+https://rustgis.app)"))
+            .user_agent(concat!("GeoForge/", env!("CARGO_PKG_VERSION"), " (+https://rustgis.app)"))
             // Redirects are followed by `get`, which checks where each one leads.
             .max_redirects(0)
             .build()
@@ -556,7 +556,7 @@ mod native {
     pub(super) fn download_agent(timeout: std::time::Duration) -> ureq::Agent {
         ureq::Agent::config_builder()
             .timeout_global(Some(timeout))
-            .user_agent(concat!("RustGIS/", env!("CARGO_PKG_VERSION"), " (+https://rustgis.app)"))
+            .user_agent(concat!("GeoForge/", env!("CARGO_PKG_VERSION"), " (+https://rustgis.app)"))
             .max_redirects(0)
             .build()
             .into()

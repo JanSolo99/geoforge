@@ -1,6 +1,6 @@
 """An arcpy-shaped API over GeoForge's ArcGIS-verified geoprocessing tools.
 
-Modified for GeoForge (not part of upstream RustGIS).
+Modified for GeoForge (not part of upstream GeoForge).
 
 The tools keep ArcGIS Pro's names, positional parameters and keywords, so code written against
 ``arcpy.analysis``, ``arcpy.management``, ``arcpy.sa`` and ``arcpy.conversion`` carries over:
@@ -29,7 +29,7 @@ import os
 import re
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
 
-from . import Layer, RustGISError, Session
+from . import Layer, GeoForgeError, Session
 
 __all__ = ["Result", "env", "use", "session", "analysis", "management", "sa", "conversion", "ListTools"]
 
@@ -147,7 +147,7 @@ def _distance(value: Any) -> Dict[str, Any]:
     if not unit or unit in ("UNKNOWN",):
         return {"distance": number}
     if unit not in _UNITS:
-        raise RustGISError(f"unknown distance unit '{m.group(2)}'")
+        raise GeoForgeError(f"unknown distance unit '{m.group(2)}'")
     return {"distance": number, "units": _UNITS[unit]}
 
 
@@ -162,6 +162,40 @@ def _radius(key: str) -> Callable[[Any], Dict[str, Any]]:
         return out
 
     return convert
+
+
+class RadiusVariable:
+    """``arcpy.sa.RadiusVariable(numberofpoints=12, maxdistance=None)``: the nearest points."""
+
+    def __init__(self, numberofpoints: int = 12, maxdistance: Any = None) -> None:
+        self.numberofpoints = numberofpoints
+        self.maxdistance = maxdistance
+
+
+class RadiusFixed:
+    """``arcpy.sa.RadiusFixed(distance=None, minnumberofpoints=0)``: the points within a distance."""
+
+    def __init__(self, distance: Any = None, minnumberofpoints: int = 0) -> None:
+        self.distance = distance
+        self.minnumberofpoints = minnumberofpoints
+
+
+def _search_radius(value: Any) -> Dict[str, Any]:
+    """A ``RadiusVariable`` or ``RadiusFixed`` (or the word ``VARIABLE`` / ``FIXED``) as parameters."""
+    if isinstance(value, RadiusFixed):
+        out: Dict[str, Any] = {"search_type": "FIXED", "min_points": value.minnumberofpoints}
+        if value.distance is not None:
+            out["fixed_distance"] = value.distance
+        return out
+    if isinstance(value, RadiusVariable):
+        out = {"search_type": "VARIABLE", "num_points": value.numberofpoints}
+        if value.maxdistance is not None:
+            out["max_distance"] = value.maxdistance
+        return out
+    word = str(value).upper()
+    if word in ("VARIABLE", "FIXED"):
+        return {"search_type": word}
+    raise GeoForgeError(f"search_radius must be RadiusVariable or RadiusFixed, not {value!r}")
 
 
 def _flag(true_value: str) -> Callable[[Any], bool]:
@@ -245,6 +279,8 @@ _TOOLS = [
        ("cell_assignment", "cell_assignment"), ("priority_field", None), ("cellsize", "cell_size")),
     # sa
     _t("sa", "Slope", "slope", ("in_raster", "input"), ("output_measurement", "output_measurement"), ("z_factor", "z_factor"), ("method", None), ("z_unit", None)),
+    _t("sa", "Idw", "idw", ("in_point_features", "input"), ("z_field", "z_field"), ("cell_size", "cell_size"), ("power", "power"),
+       ("search_radius", _search_radius), ("in_barrier_polyline_features", None)),
     _t("sa", "Aspect", "aspect", ("in_raster", "input"), ("method", None), ("z_unit", None)),
     _t("sa", "Hillshade", "hillshade", ("in_raster", "input"), ("azimuth", "azimuth"), ("altitude", "altitude"), ("model_shadows", ("model_shadows", _flag("SHADOWS"))), ("z_factor", "z_factor")),
     _t("sa", "Curvature", "curvature", ("in_raster", "input"), ("z_factor", "z_factor"), ("out_profile_curve_raster", ("profile", bool)), ("out_plan_curve_raster", ("plan", bool))),
@@ -324,7 +360,7 @@ def _env_params(s: Session, tool: str, module: str) -> Dict[str, Any]:
         try:
             out["cell_size"] = float(env.cellSize)
         except (TypeError, ValueError):
-            raise RustGISError(f"env.cellSize must be a number, not {env.cellSize!r}") from None
+            raise GeoForgeError(f"env.cellSize must be a number, not {env.cellSize!r}") from None
     e = env.extent
     if e not in (None, ""):
         if hasattr(e, "XMin"):
@@ -378,7 +414,7 @@ def _make(module: str, name: str, tool: str, args: Tuple[Arg, ...], outputs: Tup
                 if key == "@pair":
                     names = [_as_layer(s, x) for x in (v if isinstance(v, (list, tuple)) else [v])]
                     if len(names) != 2:
-                        raise RustGISError(f"{name} takes two input layers here")
+                        raise GeoForgeError(f"{name} takes two input layers here")
                     params["input"], params["other"] = names
                     continue
                 params[key] = conv(v)
@@ -411,7 +447,7 @@ def _make(module: str, name: str, tool: str, args: Tuple[Arg, ...], outputs: Tup
                     writes.append((layer, path))
         if "output" in params and "output" in {a for a in params} and not env.overwriteOutput:
             if any(l.get("name") == params["output"] for l in s.layers()):
-                raise RustGISError(f"ERROR 000258: Output {params['output']} already exists")
+                raise GeoForgeError(f"ERROR 000258: Output {params['output']} already exists")
         for k, v in _env_params(s, tool, module).items():
             params.setdefault(k, v)
         before = {l.get("id"): l.get("name") for l in s.layers()}
@@ -458,6 +494,9 @@ management = _Module("management")
 sa = _Module("sa")
 conversion = _Module("conversion")
 _modules = {"analysis": analysis, "management": management, "sa": sa, "conversion": conversion}
+
+sa.RadiusVariable = RadiusVariable
+sa.RadiusFixed = RadiusFixed
 
 for _module, _name, _tool, _args, _outs in _TOOLS:
     setattr(_modules[_module], _name, _make(_module, _name, _tool, _args, _outs))

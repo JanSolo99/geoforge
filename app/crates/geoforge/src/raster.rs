@@ -1,6 +1,6 @@
-//! GeoForge's ArcGIS-verified raster tools (`geoforge-raster`) as RustGIS tools.
+//! GeoForge's ArcGIS-verified raster tools (`geoforge-raster`) as GeoForge tools.
 //!
-//! Modified for GeoForge (not part of upstream RustGIS).
+//! Modified for GeoForge (not part of upstream GeoForge).
 //!
 //! A raster is read from its GeoTIFF (the file it came from, or the bytes a project embeds) so
 //! that the pixel type and NoData value are the file's; a raster from another format is converted
@@ -186,7 +186,8 @@ pub(crate) fn params_of(d: &Def) -> &'static [P] {
     if let Some((_, p)) = cache.iter().find(|(id, _)| *id == d.id) {
         return p;
     }
-    let all: &'static [P] = Box::leak([d.params, ENV_PARAMS].concat().into_boxed_slice());
+    let env: Vec<P> = ENV_PARAMS.iter().filter(|e| !d.params.iter().any(|x| x.name == e.name)).cloned().collect();
+    let all: &'static [P] = Box::leak([d.params, env.as_slice()].concat().into_boxed_slice());
     cache.push((d.id, all));
     all
 }
@@ -848,6 +849,56 @@ fn point_to_raster(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     finish_rasterized(p, points_to_raster(&features, cell, assignment, kind), format!("{}_Raster", text(p, "input")))
 }
 
+/// Inverse Distance Weighted interpolation of a point layer's field (Spatial Analyst Idw).
+fn idw(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    use gfr::interpolate::{Sample, SearchRadius};
+    let (ds, fc) = layer(inp, p, "input")?;
+    let field = text(p, "z_field");
+    let index = ds.field_index(field).ok_or_else(|| format!("field '{field}' is missing"))?;
+    let mut samples = Vec::new();
+    for f in &fc.features {
+        let z = match f.attributes.get(index) {
+            Some(geoforge_core::Value::BigInteger(v)) => *v as f64,
+            Some(geoforge_core::Value::Double(v)) => *v,
+            _ => continue,
+        };
+        if let Some(g) = &f.geometry
+            && matches!(g.kind, geoforge_core::GeometryKind::Point | geoforge_core::GeometryKind::Multipoint)
+        {
+            samples.extend(g.xy.iter().map(|c| Sample { x: c[0], y: c[1], z }));
+        }
+    }
+    if samples.is_empty() {
+        return Err(format!("no point has a value in '{field}'"));
+    }
+    let mut env = env_of(inp, p, Crs::LonLat)?;
+    // The tool's own cell size wins over the environment's.
+    if let Some(c) = number(p, "cell_size") {
+        env.cell_size = Some(c).filter(|c| *c > 0.0).or(env.cell_size);
+        if number(p, "cell_size").is_some_and(|c| c <= 0.0) {
+            return Err("'Cell size' must be a positive number (in degrees)".into());
+        }
+    }
+    let power = number(p, "power").unwrap_or(2.0);
+    if !(power.is_finite() && power > 0.0) {
+        return Err("'Power' must be positive".into());
+    }
+    let search = match choice(p, "search_type", "VARIABLE").as_str() {
+        "VARIABLE" => SearchRadius::Variable {
+            points: number(p, "num_points").map_or(12, |n| n.max(1.0) as usize),
+            max_distance: number(p, "max_distance").filter(|d| *d > 0.0),
+        },
+        "FIXED" => SearchRadius::Fixed {
+            distance: number(p, "fixed_distance").filter(|d| *d > 0.0),
+            min_points: number(p, "min_points").map_or(0, |n| n.max(0.0) as usize),
+        },
+        other => return Err(format!("search radius type {other}")),
+    };
+    let out = gfr::interpolate::idw(&samples, power, search, &env, Some(4326))
+        .ok_or("no output grid: check the cell size and the extent environment")?;
+    one(p, format!("{}_Idw", text(p, "input")), out)
+}
+
 fn zonal_statistics_as_table(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     let (zones, _) = input(inp, p, "zones")?;
     let (values, _) = input(inp, p, "input")?;
@@ -865,6 +916,67 @@ fn rustgis_tools_table(fields: Vec<geoforge_core::Field>, rows: Vec<Vec<geoforge
 }
 
 pub(crate) const DEFS: &[Def] = &[
+    Def {
+        id: "idw",
+        name: "IDW",
+        toolbox: "GeoForge › Spatial Analyst › Interpolation",
+        summary: "Interpolates a surface from points by inverse distance weighting; the cell size is in degrees (ArcGIS Pro IDW).",
+        params: &[
+            P { name: "input", label: "Input point features", kind: K::PointLayer, required: true, default: "", help: "" },
+            P { name: "z_field", label: "Z value field", kind: K::NumericField, required: true, default: "", help: "" },
+            P {
+                name: "cell_size",
+                label: "Output cell size",
+                kind: K::Number,
+                required: false,
+                default: "",
+                help: "In degrees. Default: the shorter side of the points' extent / 250.",
+            },
+            P {
+                name: "power",
+                label: "Power",
+                kind: K::Number,
+                required: false,
+                default: "2",
+                help: "The exponent of the distance; a higher power favours near points.",
+            },
+            P {
+                name: "search_type",
+                label: "Search radius type",
+                kind: K::Choice(&["VARIABLE", "FIXED"]),
+                required: false,
+                default: "\"VARIABLE\"",
+                help: "Variable: the nearest points. Fixed: the points within a distance.",
+            },
+            P { name: "num_points", label: "Number of points (variable)", kind: K::Number, required: false, default: "12", help: "" },
+            P {
+                name: "max_distance",
+                label: "Maximum distance (variable)",
+                kind: K::Number,
+                required: false,
+                default: "",
+                help: "In degrees. Default: the output extent's width plus height.",
+            },
+            P {
+                name: "fixed_distance",
+                label: "Distance (fixed)",
+                kind: K::Number,
+                required: false,
+                default: "",
+                help: "In degrees. Default: five cells.",
+            },
+            P {
+                name: "min_points",
+                label: "Minimum number of points (fixed)",
+                kind: K::Number,
+                required: false,
+                default: "0",
+                help: "A cell with fewer points inside widens the radius a cell at a time.",
+            },
+            OUTPUT,
+        ],
+        run: idw,
+    },
     Def {
         id: "slope",
         name: "Slope",

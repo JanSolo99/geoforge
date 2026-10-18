@@ -797,7 +797,7 @@ fn file_layers(_s: &mut Session, p: &Value) -> CmdResult {
     }
     let ext = Path::new(path).extension().and_then(|e| e.to_str()).unwrap_or("").to_ascii_lowercase();
     if !rustgis_data::io::READ_EXTENSIONS.contains(&ext.as_str()) && !rustgis_data::raster::is_raster_name(path) {
-        return Err(format!("{path}: not a data file RustGIS reads"));
+        return Err(format!("{path}: not a data file GeoForge reads"));
     }
     let name = Path::new(path).file_stem().and_then(|n| n.to_str()).unwrap_or("layer");
     Ok(json!({"count": 1, "layers": [name]}))
@@ -1505,7 +1505,7 @@ fn add_layer_file(s: &mut Session, path: &str) -> CmdResult {
 
 /// Adds a layer from a layer file's JSON.
 pub(crate) fn add_layer_text(s: &mut Session, text: &str) -> CmdResult {
-    let mut layer: rustgis_map::Layer = serde_json::from_str(text).map_err(|e| format!("not a RustGIS layer file: {e}"))?;
+    let mut layer: rustgis_map::Layer = serde_json::from_str(text).map_err(|e| format!("not a GeoForge layer file: {e}"))?;
     // A fresh id and a unique name in this map; the rest goes through project repair.
     let base = layer.name.clone();
     let mut i = 1;
@@ -1669,7 +1669,7 @@ fn read_delimited(
 }
 
 /// The file name for data downloaded from `url`: its last path segment when that has an extension
-/// RustGIS reads, else `<segment or "data">.<ext>` with the extension its contents suggest
+/// GeoForge reads, else `<segment or "data">.<ext>` with the extension its contents suggest
 /// (an error when they suggest none).
 pub fn url_file_name(url: &str, bytes: &[u8]) -> Result<String, String> {
     let path = url.split(['?', '#']).next().unwrap_or(url);
@@ -1691,7 +1691,7 @@ pub fn url_file_name(url: &str, bytes: &[u8]) -> Result<String, String> {
     match rustgis_data::io::sniff_extension(bytes) {
         Some(ext) => Ok(format!("{stem}.{ext}")),
         None => {
-            Err("not a data format RustGIS reads (GeoJSON, CSV, GeoParquet, FlatGeobuf, GeoPackage, zipped Shapefiles, KML, GPX, GeoTIFF)"
+            Err("not a data format GeoForge reads (GeoJSON, CSV, GeoParquet, FlatGeobuf, GeoPackage, zipped Shapefiles, KML, GPX, GeoTIFF)"
                 .into())
         }
     }

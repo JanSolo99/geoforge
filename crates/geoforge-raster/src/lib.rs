@@ -11,6 +11,7 @@ pub mod env;
 pub mod focal;
 mod geotiff;
 pub mod hydro;
+pub mod interpolate;
 pub mod local;
 pub mod rasterize;
 pub mod resample;

@@ -1,6 +1,6 @@
 //! One-click install of the `geolibre` runner: the latest geolibre-rust release's archive for
 //! this platform, downloaded over HTTPS, checked against its published SHA-256 and unpacked into
-//! RustGIS's data folder (where [`crate::runner`] looks for it).
+//! GeoForge's data folder (where [`crate::runner`] looks for it).
 //!
 //! The checksum comes from the same release, so it guards against a corrupted or truncated
 //! download, not against a compromised release: trust rests on HTTPS and on the opengeos
@@ -33,9 +33,9 @@ pub fn target() -> Option<&'static str> {
 /// Where an installed runner lives: a `geolibre` folder in the platform's app-data location.
 pub fn install_dir() -> Option<PathBuf> {
     let base = if cfg!(target_os = "windows") {
-        std::env::var_os("LOCALAPPDATA").or_else(|| std::env::var_os("APPDATA")).map(|d| PathBuf::from(d).join("RustGIS"))
+        std::env::var_os("LOCALAPPDATA").or_else(|| std::env::var_os("APPDATA")).map(|d| PathBuf::from(d).join("GeoForge"))
     } else if cfg!(target_os = "macos") {
-        std::env::var_os("HOME").map(|h| PathBuf::from(h).join("Library/Application Support/RustGIS"))
+        std::env::var_os("HOME").map(|h| PathBuf::from(h).join("Library/Application Support/GeoForge"))
     } else {
         std::env::var_os("XDG_DATA_HOME")
             .map(PathBuf::from)
@@ -50,7 +50,7 @@ fn agent() -> ureq::Agent {
 }
 
 fn get(agent: &ureq::Agent, url: &str) -> Result<ureq::http::Response<ureq::Body>, String> {
-    agent.get(url).header("User-Agent", concat!("RustGIS/", env!("CARGO_PKG_VERSION"))).call().map_err(|e| format!("{url}: {e}"))
+    agent.get(url).header("User-Agent", concat!("GeoForge/", env!("CARGO_PKG_VERSION"))).call().map_err(|e| format!("{url}: {e}"))
 }
 
 /// The latest release's tag and the archive and checksum URLs for `target`.

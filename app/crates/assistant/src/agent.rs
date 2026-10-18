@@ -48,8 +48,8 @@ enum State {
     Calls(VecDeque<ToolCall>, Vec<ToolResult>),
 }
 
-/// What the transcript says when RustGIS itself fails while handling a reply.
-pub const INTERNAL_ERROR: &str = "RustGIS ran into an internal error while handling the model's reply, so the request was stopped. Please report it at https://github.com/opengeos/RustGIS/issues.";
+/// What the transcript says when GeoForge itself fails while handling a reply.
+pub const INTERNAL_ERROR: &str = "GeoForge ran into an internal error while handling the model's reply, so the request was stopped. Please report it at https://github.com/opengeos/RustGIS/issues.";
 
 pub struct Agent {
     pub config: Config,
@@ -264,7 +264,7 @@ impl Agent {
         self.halt(Entry::Note("Stopped.".into()), "Stopped by the user.", "Stopped by the user.");
     }
 
-    /// Runs one step of the conversation. A bug in RustGIS that panics while reading a reply or
+    /// Runs one step of the conversation. A bug in GeoForge that panics while reading a reply or
     /// running its calls ends the turn with an error in the transcript instead of taking the app
     /// down with it (the commands it runs are guarded the same way by `Session::run`). As there,
     /// the session keeps whatever a tool changed before it failed. Where panics abort instead of
@@ -280,8 +280,8 @@ impl Agent {
                     .unwrap_or_default();
                 self.halt(
                     Entry::Error(INTERNAL_ERROR.into()),
-                    "Not run: RustGIS ran into an internal error before this call.",
-                    "RustGIS failed while running this call, so it may have partly taken effect. Check before running it again.",
+                    "Not run: GeoForge ran into an internal error before this call.",
+                    "GeoForge failed while running this call, so it may have partly taken effect. Check before running it again.",
                 );
                 if !detail.is_empty() {
                     self.transcript.push(Entry::Note(tools::clip(&detail, 300)));
@@ -378,12 +378,12 @@ const COMMON: &[&str] = &[
 
 fn system_prompt(s: &Session) -> String {
     let mut p = String::from(
-        "You are the AI assistant built into RustGIS, a desktop GIS. You help the user explore, analyse, style and lay out \
+        "You are the AI assistant built into GeoForge, a desktop GIS. You help the user explore, analyse, style and lay out \
 the map open in front of them by calling tools.
 
 Rules:
 - Act through tools. Never say you changed the map unless a tool call succeeded; if one failed, say so.
-- Every RustGIS action is a command with an id and JSON parameters. Find commands with search_commands and run them with \
+- Every GeoForge action is a command with an id and JSON parameters. Find commands with search_commands and run them with \
 run_command. Geoprocessing (buffer, clip, dissolve, joins, statistics, raster analysis…) is search_tools, then describe_tool, \
 then run_tool; a tool's output becomes a new layer whose name the result gives, for the next step.
 - Name layers by their name (or id) in a `layer` parameter. Never invent layer, field or command names: look them up.

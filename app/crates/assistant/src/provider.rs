@@ -577,7 +577,7 @@ fn responses_request(cfg: &Config, system: &str, turns: &[Turn], tools: &[ToolDe
         body["tools"] = json!([{
             "type": "namespace",
             "name": TOOL_NAMESPACE,
-            "description": "RustGIS: read and change the map, run commands and geoprocessing tools.",
+            "description": "GeoForge: read and change the map, run commands and geoprocessing tools.",
             "tools": functions,
         }]);
         body["tool_choice"] = json!("auto");

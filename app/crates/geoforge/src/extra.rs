@@ -1,7 +1,7 @@
-//! More GeoForge vector tools for the RustGIS registry: geometry attributes, geometry checking and
+//! More GeoForge vector tools for the GeoForge registry: geometry attributes, geometry checking and
 //! repair, and Split.
 //!
-//! Modified for GeoForge (not part of upstream RustGIS).
+//! Modified for GeoForge (not part of upstream GeoForge).
 
 use geoforge_tools as tools;
 use rustgis_analysis::{Inputs, Output, OutputLayer, ParamKind as K, ParamSpec as P, ToolResult};

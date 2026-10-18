@@ -23,8 +23,8 @@ A tile service's address: raster tiles with {z}/{x}/{y} (or {-y}, {q}, {bbox-eps
 A value, a field, or two of them joined by + − × ÷. Applies to the selected rows, or every row when none is selected.	Une valeur, un champ, ou deux d'entre eux reliés par + − × ÷. S'applique aux lignes sélectionnées, ou à toutes les lignes si aucune n'est sélectionnée.
 About	À propos
 About plugins	À propos des extensions
-About RustGIS	À propos de RustGIS
-About RustGIS.	À propos de RustGIS.
+About GeoForge	À propos de GeoForge
+About GeoForge.	À propos de GeoForge.
 Above	Au-dessus
 Above Left	En haut à gauche
 Above Right	En haut à droite
@@ -137,7 +137,7 @@ Area of use: within {r}° of the {lon}° meridian	Domaine d'emploi : à moins de
 Area of use: within {r}° of {lon}°, {lat}°	Domaine d'emploi : à moins de {r}° de {lon}°, {lat}°
 Area {area}   ·   Perimeter {perimeter}	Surface {area}   ·   Périmètre {perimeter}
 Areas (name, land use, area)	Zones (nom, occupation du sol, surface)
-Ask a question about your data, or describe what to do with the map. The assistant runs RustGIS commands for you; every change can be undone.	Posez une question sur vos données, ou décrivez ce qu'il faut faire avec la carte. L'assistant exécute des commandes RustGIS pour vous ; chaque modification peut être annulée.
+Ask a question about your data, or describe what to do with the map. The assistant runs GeoForge commands for you; every change can be undone.	Posez une question sur vos données, ou décrivez ce qu'il faut faire avec la carte. L'assistant exécute des commandes GeoForge pour vous ; chaque modification peut être annulée.
 Ask about the map, or tell it what to do…	Posez une question sur la carte, ou dites-lui quoi faire…
 Ask about your data, or tell the assistant what to do with the map.	Posez une question sur vos données, ou dites à l'assistant quoi faire avec la carte.
 Assistant settings	Paramètres de l'assistant
@@ -654,7 +654,7 @@ Find a place by coordinates.	Trouver un lieu par ses coordonnées.
 Find and run geoprocessing tools.	Trouver et exécuter des outils de géotraitement.
 Find any command by name (Ctrl+K).	Trouver une commande par son nom (Ctrl+K).
 Find Place	Rechercher un lieu
-Find plugins in the RustGIS plugin registry.	Trouver des extensions dans le registre des extensions RustGIS.
+Find plugins in the GeoForge plugin registry.	Trouver des extensions dans le registre des extensions GeoForge.
 Find Similar	Rechercher des similaires
 Find Tools	Rechercher des outils
 Finish Polygon	Terminer le polygone
@@ -783,7 +783,7 @@ Import Thumbnail	Importer une miniature
 Import Web Tool	Importer un outil web
 In Beyond	Masquer au-delà de
 In Progress	En cours
-In RustGIS, it can:	Dans RustGIS, elle peut :
+In GeoForge, it can:	Dans GeoForge, elle peut :
 in progress	en cours
 In project	Dans le projet
 In use	En cours d'utilisation
@@ -1080,7 +1080,7 @@ North	Nord
 North\nArrow	Flèche\ndu nord
 North Polar Stereographic	Stéréographique polaire nord
 Not sandboxed	Hors bac à sable
-not a RustGIS layout	pas une mise en page RustGIS
+not a GeoForge layout	pas une mise en page GeoForge
 not needed	non requise
 Not saved yet	Pas encore enregistré
 Notebook	Bloc-notes
@@ -1110,8 +1110,8 @@ Opacity	Opacité
 Open	Ouvrir
 Open a .rgis project	Ouvrir un projet .rgis
 open a layout first	ouvrez d'abord une mise en page
-Open a RustGIS or Jupyter notebook.	Ouvrir un bloc-notes RustGIS ou Jupyter.
-Open a RustGIS project.	Ouvrir un projet RustGIS.
+Open a GeoForge or Jupyter notebook.	Ouvrir un bloc-notes GeoForge ou Jupyter.
+Open a GeoForge project.	Ouvrir un projet GeoForge.
 Open an offline area to edit.	Ouvrir une zone hors connexion à modifier.
 Open Custom Template	Ouvrir un modèle personnalisé
 Open Custom Template…	Ouvrir un modèle personnalisé…
@@ -1128,7 +1128,7 @@ Open the attribute table of the selected layer.	Ouvrir la table attributaire de 
 Open the layer's attribute table.	Ouvrir la table attributaire de la couche.
 Open the layer's table.	Ouvrir la table de la couche.
 Open the Release Page	Ouvrir la page de la version
-Open the RustGIS user guide.	Ouvrir le guide de l'utilisateur de RustGIS.
+Open the GeoForge user guide.	Ouvrir le guide de l'utilisateur de GeoForge.
 Open the selected layer's table.	Ouvrir la table de la couche sélectionnée.
 Open the Symbology pane.	Ouvrir le volet Symbologie.
 Open {code} on epsg.io	Ouvrir {code} sur epsg.io
@@ -1207,7 +1207,7 @@ Plugin Manager…	Gestionnaire d'extensions…
 Plugin registry	Registre des extensions
 Plugins	Extensions
 Plugins are .rgplugin files. Install only plugins from people you trust.	Les extensions sont des fichiers .rgplugin. N'installez que des extensions provenant de personnes de confiance.
-Plugins run in a sandbox: they can't reach your files or the network, and they change the project only through RustGIS's own commands, within the permissions you accept.	Les extensions s'exécutent dans un bac à sable : elles ne peuvent accéder ni à vos fichiers ni au réseau, et ne modifient le projet qu'au moyen des commandes de RustGIS, dans la limite des autorisations que vous acceptez.
+Plugins run in a sandbox: they can't reach your files or the network, and they change the project only through GeoForge's own commands, within the permissions you accept.	Les extensions s'exécutent dans un bac à sable : elles ne peuvent accéder ni à vos fichiers ni au réseau, et ne modifient le projet qu'au moyen des commandes de GeoForge, dans la limite des autorisations que vous acceptez.
 PMTiles archive	Archive PMTiles
 PMTiles File…	Fichier PMTiles…
 PNG frames (zip)	Images PNG (zip)
@@ -1383,29 +1383,29 @@ Run the task	Exécuter la tâche
 Run Tool	Exécuter l'outil
 Run {name}	Exécuter {name}
 Running…	Exécution…
-RustGIS	RustGIS
-RustGIS deep learning package	Paquetage d'apprentissage profond RustGIS
-RustGIS is a free and open-source GIS written in pure Rust. It runs on the desktop and in the browser, and every action is a command you can also run from the command line.	RustGIS est un SIG libre et open source écrit en Rust pur. Il fonctionne sur le bureau et dans le navigateur, et chaque action est une commande que vous pouvez aussi exécuter en ligne de commande.
-RustGIS layer file	Fichier de couche RustGIS
-RustGIS layers, maps and projects	Couches, cartes et projets RustGIS
-RustGIS layout	Mise en page RustGIS
-RustGIS maps and projects	Cartes et projets RustGIS
-RustGIS or Jupyter notebook	Bloc-notes RustGIS ou Jupyter
-RustGIS plugin	Extension RustGIS
-RustGIS presentation	Présentation RustGIS
-RustGIS project	Projet RustGIS
-RustGIS project template	Modèle de projet RustGIS
-RustGIS ran into an internal error last time. The details are in {path}; please attach them to a bug report.	RustGIS a rencontré une erreur interne la dernière fois. Les détails sont dans {path} ; joignez-les à un rapport de bogue.
-RustGIS ran into an internal error while handling the model's reply, so the request was stopped. Please report it at https://github.com/opengeos/RustGIS/issues.	RustGIS a rencontré une erreur interne en traitant la réponse du modèle, la requête a donc été arrêtée. Merci de la signaler sur https://github.com/opengeos/RustGIS/issues.
-RustGIS report or report template	Rapport ou modèle de rapport RustGIS
-RustGIS styles	Styles RustGIS
-RustGIS task	Tâche RustGIS
-RustGIS {latest} is available.	RustGIS {latest} est disponible.
-RustGIS {version} is the latest version.	RustGIS {version} est la dernière version.
+GeoForge	GeoForge
+GeoForge deep learning package	Paquetage d'apprentissage profond GeoForge
+GeoForge is a free and open-source GIS written in pure Rust. It runs on the desktop and in the browser, and every action is a command you can also run from the command line.	GeoForge est un SIG libre et open source écrit en Rust pur. Il fonctionne sur le bureau et dans le navigateur, et chaque action est une commande que vous pouvez aussi exécuter en ligne de commande.
+GeoForge layer file	Fichier de couche GeoForge
+GeoForge layers, maps and projects	Couches, cartes et projets GeoForge
+GeoForge layout	Mise en page GeoForge
+GeoForge maps and projects	Cartes et projets GeoForge
+GeoForge or Jupyter notebook	Bloc-notes GeoForge ou Jupyter
+GeoForge plugin	Extension GeoForge
+GeoForge presentation	Présentation GeoForge
+GeoForge project	Projet GeoForge
+GeoForge project template	Modèle de projet GeoForge
+GeoForge ran into an internal error last time. The details are in {path}; please attach them to a bug report.	GeoForge a rencontré une erreur interne la dernière fois. Les détails sont dans {path} ; joignez-les à un rapport de bogue.
+GeoForge ran into an internal error while handling the model's reply, so the request was stopped. Please report it at https://github.com/opengeos/RustGIS/issues.	GeoForge a rencontré une erreur interne en traitant la réponse du modèle, la requête a donc été arrêtée. Merci de la signaler sur https://github.com/opengeos/RustGIS/issues.
+GeoForge report or report template	Rapport ou modèle de rapport GeoForge
+GeoForge styles	Styles GeoForge
+GeoForge task	Tâche GeoForge
+GeoForge {latest} is available.	GeoForge {latest} est disponible.
+GeoForge {version} is the latest version.	GeoForge {version} est la dernière version.
 RUSTGIS_ASSISTANT_MODEL	RUSTGIS_ASSISTANT_MODEL
 RUSTGIS_ASSISTANT_PROVIDER	RUSTGIS_ASSISTANT_PROVIDER
 Sample data (Natural Earth)	Données d'exemple (Natural Earth)
-Sample data © Natural Earth (public domain). RustGIS is licensed under Apache-2.0.	Données d'exemple © Natural Earth (domaine public). RustGIS est sous licence Apache-2.0.
+Sample data © Natural Earth (public domain). GeoForge is licensed under Apache-2.0.	Données d'exemple © Natural Earth (domaine public). GeoForge est sous licence Apache-2.0.
 Sample data: Natural Earth (public domain). Licensed under Apache-2.0.	Données d'exemple : Natural Earth (domaine public). Sous licence Apache-2.0.
 Saturation	Saturation
 Save	Enregistrer
@@ -1470,7 +1470,7 @@ Sections	Sections
 See and set the camera's position and scale.	Voir et définir la position et l'échelle de la caméra.
 See the map as people with colour vision deficiencies do.	Voir la carte comme les personnes ayant un trouble de la vision des couleurs.
 See the tools you've run.	Voir les outils exécutés.
-See whether a newer RustGIS has been released.	Vérifier si une version plus récente de RustGIS est parue.
+See whether a newer GeoForge has been released.	Vérifier si une version plus récente de GeoForge est parue.
 Select	Sélectionner
 Select (click)	Sélectionner (clic)
 Select (rectangle)	Sélectionner (rectangle)
@@ -1657,14 +1657,14 @@ Text	Texte
 Text Symbol	Symbole de texte
 The assistant is busy; stop it or wait for it to finish.	L'assistant est occupé ; arrêtez-le ou attendez qu'il ait terminé.
 The assistant wants to run this, and {why}:	L'assistant veut exécuter ceci, et {why} :
-This plugin runs as a program on your computer, outside RustGIS's sandbox. It can do anything you can: read and change your files, use the network and run other programs. Install it only if you trust its author.	Cette extension s'exécute comme un programme sur votre ordinateur, en dehors du bac à sable de RustGIS. Elle peut faire tout ce que vous pouvez faire : lire et modifier vos fichiers, utiliser le réseau et lancer d'autres programmes. Ne l'installez que si vous faites confiance à son auteur.
+This plugin runs as a program on your computer, outside GeoForge's sandbox. It can do anything you can: read and change your files, use the network and run other programs. Install it only if you trust its author.	Cette extension s'exécute comme un programme sur votre ordinateur, en dehors du bac à sable de GeoForge. Elle peut faire tout ce que vous pouvez faire : lire et modifier vos fichiers, utiliser le réseau et lancer d'autres programmes. Ne l'installez que si vous faites confiance à son auteur.
 the capture failed unexpectedly	la capture a échoué de manière inattendue
 the Help tab always shows	l'onglet Aide est toujours affiché
 The job covers the map view	Le travail couvre la vue cartographique
 The key is kept for this session only.	La clé n'est conservée que pour cette session.
 The layer's file couldn't be read: {error}	Le fichier de la couche n'a pas pu être lu : {error}
 the layout export failed unexpectedly	l'export de la mise en page a échoué de manière inattendue
-The list of plugins to browse. Leave it empty for the RustGIS plugin registry.	La liste des extensions à parcourir. Laissez vide pour utiliser le registre des extensions RustGIS.
+The list of plugins to browse. Leave it empty for the GeoForge plugin registry.	La liste des extensions à parcourir. Laissez vide pour utiliser le registre des extensions GeoForge.
 the map has no layers	la carte n'a aucune couche
 The map is drawn in this coordinate system; layers are projected on the fly.	La carte est dessinée dans ce système de coordonnées ; les couches sont projetées à la volée.
 The map view as it is now	La vue cartographique telle qu'elle est maintenant
@@ -1793,11 +1793,11 @@ Web Tile Layers	Couches de tuiles web
 Web Tool	Outil web
 Website	Site web
 Weights	Pondérations
-Welcome to RustGIS	Bienvenue dans RustGIS
+Welcome to GeoForge	Bienvenue dans GeoForge
 West	Ouest
 WGS 84 / Globe	WGS 84 / Globe
 WGS 84 / Web Mercator	WGS 84 / Web Mercator
-What RustGIS opens with: the World Atlas sample or a blank map.	Ce qu'ouvre RustGIS au démarrage : l'exemple World Atlas ou une carte vierge.
+What GeoForge opens with: the World Atlas sample or a blank map.	Ce qu'ouvre GeoForge au démarrage : l'exemple World Atlas ou une carte vierge.
 What's near a point	Ce qui se trouve près d'un point
 Where	Où
 Where Clause	Clause WHERE
@@ -1903,11 +1903,11 @@ The sign-in is kept in the app's settings folder, for your user account only, an
 Sign in with your ChatGPT account.	Connectez-vous avec votre compte ChatGPT.
 A ChatGPT sign-in can only be used with the OpenAI API.	Une connexion ChatGPT ne peut être utilisée qu'avec l'API OpenAI.
 Continue with ChatGPT	Continuer avec ChatGPT
-Eligible requests in RustGIS use your ChatGPT plan. You can manage usage in ChatGPT settings.	Les requêtes admissibles de RustGIS utilisent votre forfait ChatGPT. Vous pouvez gérer l'utilisation dans les paramètres de ChatGPT.
+Eligible requests in GeoForge use your ChatGPT plan. You can manage usage in ChatGPT settings.	Les requêtes admissibles de GeoForge utilisent votre forfait ChatGPT. Vous pouvez gérer l'utilisation dans les paramètres de ChatGPT.
 Got it	Compris
 Manage usage	Gérer l'utilisation
 Requests go to the OpenAI API and use your ChatGPT plan.	Les requêtes sont envoyées à l'API OpenAI et utilisent votre forfait ChatGPT.
-Signed out on this computer, but OpenAI didn't confirm it. You can disconnect RustGIS in ChatGPT's settings.	Déconnecté sur cet ordinateur, mais OpenAI ne l'a pas confirmé. Vous pouvez déconnecter RustGIS dans les paramètres de ChatGPT.
+Signed out on this computer, but OpenAI didn't confirm it. You can disconnect GeoForge in ChatGPT's settings.	Déconnecté sur cet ordinateur, mais OpenAI ne l'a pas confirmé. Vous pouvez déconnecter GeoForge dans les paramètres de ChatGPT.
 Using ChatGPT plan	Forfait ChatGPT utilisé
 You're using your ChatGPT plan	Vous utilisez votre forfait ChatGPT
 Use another account	Utiliser un autre compte

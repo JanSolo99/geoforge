@@ -142,8 +142,18 @@ pub fn processing_grid(inputs: &[&Raster], env: &Environment) -> Option<Grid> {
             t[3],
         ]
     });
+    grid_from(default_extent, default.map(|t| t[1]), env)
+}
+
+/// The processing grid when the tool's own defaults are `default_extent` and `default_cell` (those of
+/// its inputs, or of whatever it reads that is not a raster) and `env` may override them.
+pub fn grid_from(
+    default_extent: Option<[f64; 4]>,
+    default_cell: Option<f64>,
+    env: &Environment,
+) -> Option<Grid> {
     let [mut x0, mut y0, mut x1, mut y1] = env.extent.or(default_extent)?;
-    let cell = env.cell_size.or(default.map(|t| t[1]))?;
+    let cell = env.cell_size.or(default_cell)?;
     if cell <= 0.0 || x1 <= x0 || y1 <= y0 {
         return None;
     }

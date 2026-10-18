@@ -23,9 +23,9 @@ pub(crate) fn cache_dir(env: &str, sub: &str) -> Option<PathBuf> {
         return Some(PathBuf::from(d));
     }
     let base = if cfg!(target_os = "windows") {
-        std::env::var_os("LOCALAPPDATA").map(|d| PathBuf::from(d).join("RustGIS").join("cache"))
+        std::env::var_os("LOCALAPPDATA").map(|d| PathBuf::from(d).join("GeoForge").join("cache"))
     } else if cfg!(target_os = "macos") {
-        std::env::var_os("HOME").map(|h| PathBuf::from(h).join("Library/Caches/RustGIS"))
+        std::env::var_os("HOME").map(|h| PathBuf::from(h).join("Library/Caches/GeoForge"))
     } else {
         std::env::var_os("XDG_CACHE_HOME")
             .map(PathBuf::from)

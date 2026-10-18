@@ -1,4 +1,4 @@
-//! RustGIS desktop app.
+//! GeoForge desktop app.
 //!
 //! `rustgis [project.rgis | data.geojson|csv|shp …] [--sample]`
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
@@ -19,9 +19,9 @@ mod prefs {
 
     pub fn dir() -> Option<PathBuf> {
         if cfg!(target_os = "windows") {
-            std::env::var_os("APPDATA").map(|d| PathBuf::from(d).join("RustGIS"))
+            std::env::var_os("APPDATA").map(|d| PathBuf::from(d).join("GeoForge"))
         } else if cfg!(target_os = "macos") {
-            std::env::var_os("HOME").map(|h| PathBuf::from(h).join("Library/Application Support/RustGIS"))
+            std::env::var_os("HOME").map(|h| PathBuf::from(h).join("Library/Application Support/GeoForge"))
         } else {
             std::env::var_os("XDG_CONFIG_HOME")
                 .map(PathBuf::from)
@@ -85,7 +85,7 @@ mod crash {
         let used = std::fs::metadata(&path).map_or(0, |m| m.len());
         let thread = std::thread::current();
         let entry = format!(
-            "--- RustGIS {} on {} {}, {} UTC, thread {}\n{info}\n{}\n\n",
+            "--- GeoForge {} on {} {}, {} UTC, thread {}\n{info}\n{}\n\n",
             env!("CARGO_PKG_VERSION"),
             std::env::consts::OS,
             std::env::consts::ARCH,
@@ -184,7 +184,7 @@ fn main() -> eframe::Result {
         // Notices are shown as written: translate this one now that the language is known.
         rustgis_ui_egui::i18n::set_current(app.lang());
         let text = rustgis_ui_egui::i18n::fmt(
-            "RustGIS ran into an internal error last time. The details are in {path}; please attach them to a bug report.",
+            "GeoForge ran into an internal error last time. The details are in {path}; please attach them to a bug report.",
             &[("path", &log.display().to_string())],
         );
         app.session.notify(text, true);
@@ -201,8 +201,8 @@ fn main() -> eframe::Result {
     }
     app.session.dirty = false;
     let mut viewport = egui::ViewportBuilder::default()
-        .with_title("RustGIS")
-        .with_app_id("org.rustgis.RustGIS")
+        .with_title("GeoForge")
+        .with_app_id("org.rustgis.GeoForge")
         .with_inner_size([1480.0, 920.0])
         .with_min_inner_size([900.0, 560.0])
         .with_drag_and_drop(true);
@@ -210,7 +210,7 @@ fn main() -> eframe::Result {
         viewport = viewport.with_icon(egui::IconData { rgba, width: size, height: size });
     }
     let options = eframe::NativeOptions { viewport, ..Default::default() };
-    eframe::run_native("RustGIS", options, Box::new(move |_cc| Ok(Box::new(App(app)))))
+    eframe::run_native("GeoForge", options, Box::new(move |_cc| Ok(Box::new(App(app)))))
 }
 
 #[cfg(test)]

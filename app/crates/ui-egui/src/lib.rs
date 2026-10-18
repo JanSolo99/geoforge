@@ -1,4 +1,4 @@
-//! L6: the RustGIS desktop front end, built around a ribbon (Home, Data, Style, Edit, Analyze,
+//! L6: the GeoForge desktop front end, built around a ribbon (Home, Data, Style, Edit, Analyze,
 //! View, Publish), the Layers and Browser panes, a Tools pane, the map view, the
 //! attribute table and the status bar.
 //!
@@ -704,7 +704,7 @@ impl RustGisApp {
             return r;
         }
         if lower.ends_with(".rgislayout") {
-            let text = std::str::from_utf8(bytes).map_err(|_| "not a RustGIS layout".to_string())?;
+            let text = std::str::from_utf8(bytes).map_err(|_| "not a GeoForge layout".to_string())?;
             return self.run("layout.import", json!({"text": text}));
         }
         // A layout picture needs the layout still open.
@@ -738,7 +738,7 @@ impl RustGisApp {
             return self.run("layer.addDataBytes", p);
         }
         let Ok(text) = std::str::from_utf8(bytes) else {
-            let e = crate::i18n::fmt("{name} is not a text file: RustGIS opens GeoJSON, CSV, GeoTIFF and .rgis here", &[("name", name)]);
+            let e = crate::i18n::fmt("{name} is not a text file: GeoForge opens GeoJSON, CSV, GeoTIFF and .rgis here", &[("name", name)]);
             self.session.notify(e.clone(), true);
             return Err(e);
         };
@@ -806,7 +806,7 @@ impl RustGisApp {
         }
     }
 
-    /// The RustGIS logo as a texture (rasterised once from `rustgis_render::logo`).
+    /// The GeoForge logo as a texture (rasterised once from `rustgis_render::logo`).
     pub fn logo(&mut self, ctx: &egui::Context) -> Option<egui::TextureId> {
         if self.logo.is_none()
             && let Some(pm) = rustgis_engine::render::logo::pixmap(256)
@@ -1371,7 +1371,7 @@ impl RustGisApp {
                     self.ui.pending_open = None;
                     open("project");
                     self.ui.backstage = false;
-                } else if let Some(path) = dialogs::pick_open(&["rgis", "rgisx"], tl!("RustGIS project")) {
+                } else if let Some(path) = dialogs::pick_open(&["rgis", "rgisx"], tl!("GeoForge project")) {
                     let r = self.run("project.open", json!({"path": path}));
                     self.ui.backstage = false;
                     self.map.invalidate();
@@ -1396,7 +1396,7 @@ impl RustGisApp {
             }
             "ui.saveAs" => {
                 let name = format!("{}.rgis", self.session.project.name);
-                if let Some(path) = dialogs::pick_save(&name, &["rgis"], tl!("RustGIS project")) {
+                if let Some(path) = dialogs::pick_save(&name, &["rgis"], tl!("GeoForge project")) {
                     return self.run("project.saveAs", json!({"path": path}));
                 }
             }
@@ -1436,7 +1436,7 @@ impl RustGisApp {
                 if let Some(open) = &self.services.open_async {
                     self.ui.pending_open = Some("report.existingTemplate");
                     open("item");
-                } else if let Some(path) = dialogs::pick_open(&["rgislayout"], tl!("RustGIS layout")) {
+                } else if let Some(path) = dialogs::pick_open(&["rgislayout"], tl!("GeoForge layout")) {
                     return self.run("report.existingTemplate", json!({"path": path}));
                 }
             }
@@ -1463,7 +1463,7 @@ impl RustGisApp {
                 if self.services.download.is_some() {
                     let text = serde_json::to_string_pretty(&l).map_err(|e| e.to_string())?;
                     self.download(&format!("{}.rgislayout", l.name), text.into_bytes());
-                } else if let Some(path) = dialogs::pick_save(&format!("{}.rgislayout", l.name), &["rgislayout"], tl!("RustGIS layout")) {
+                } else if let Some(path) = dialogs::pick_save(&format!("{}.rgislayout", l.name), &["rgislayout"], tl!("GeoForge layout")) {
                     return self.run("layout.save", json!({"layout": li, "path": path}));
                 }
             }
@@ -1474,7 +1474,7 @@ impl RustGisApp {
                     self.ui.pending_picture = None;
                     self.ui.pending_open = None;
                     open("layout");
-                } else if let Some(path) = dialogs::pick_open(&["rgislayout"], tl!("RustGIS layout")) {
+                } else if let Some(path) = dialogs::pick_open(&["rgislayout"], tl!("GeoForge layout")) {
                     return self.run("layout.import", json!({"path": path}));
                 }
             }
@@ -1512,18 +1512,18 @@ impl RustGisApp {
             "ui.openItem" => {
                 let kind = p.get("kind").and_then(Value::as_str).ok_or("kind is required")?;
                 let (cmd, exts, label): (&str, &[&str], &str) = match kind {
-                    "map" => ("map.import", &["rgismap", "rgismpk", "rgis", "rgisx", "rgispkg"], "RustGIS maps and projects"),
-                    "layer" => ("layer.addLayerFile", &["rgislyr"], "RustGIS layer file"),
-                    "styles" => ("style.add", &["rgisstyle"], "RustGIS styles"),
-                    "ramps" => ("ramp.add", &["rgisramp", "xml", "qml", "txt", "clr", "cpt"], "Colour ramps (RustGIS, QGIS, GDAL, GMT)"),
-                    "importStyles" => ("style.import", &["rgislyr", "rgismap", "rgis", "rgisx"], "RustGIS layers, maps and projects"),
-                    "template" => ("project.fromTemplate", &["rgistemplate"], "RustGIS project template"),
-                    "task" => ("task.import", &["rgistask"], "RustGIS task"),
-                    "bookmarks" => ("bookmark.import", &["rgisbookmarks"], "RustGIS bookmarks"),
-                    "report" => ("report.open", &["rgisreport", "rgisrpttemplate"], "RustGIS report or report template"),
-                    "presentation" => ("presentation.import", &["rgispres"], "RustGIS presentation"),
-                    "notebook" => ("notebook.open", &["rgisnb", "ipynb"], "RustGIS or Jupyter notebook"),
-                    "dlPackage" => ("dl.import", &["rgisdlpk"], "RustGIS deep learning package"),
+                    "map" => ("map.import", &["rgismap", "rgismpk", "rgis", "rgisx", "rgispkg"], "GeoForge maps and projects"),
+                    "layer" => ("layer.addLayerFile", &["rgislyr"], "GeoForge layer file"),
+                    "styles" => ("style.add", &["rgisstyle"], "GeoForge styles"),
+                    "ramps" => ("ramp.add", &["rgisramp", "xml", "qml", "txt", "clr", "cpt"], "Colour ramps (GeoForge, QGIS, GDAL, GMT)"),
+                    "importStyles" => ("style.import", &["rgislyr", "rgismap", "rgis", "rgisx"], "GeoForge layers, maps and projects"),
+                    "template" => ("project.fromTemplate", &["rgistemplate"], "GeoForge project template"),
+                    "task" => ("task.import", &["rgistask"], "GeoForge task"),
+                    "bookmarks" => ("bookmark.import", &["rgisbookmarks"], "GeoForge bookmarks"),
+                    "report" => ("report.open", &["rgisreport", "rgisrpttemplate"], "GeoForge report or report template"),
+                    "presentation" => ("presentation.import", &["rgispres"], "GeoForge presentation"),
+                    "notebook" => ("notebook.open", &["rgisnb", "ipynb"], "GeoForge or Jupyter notebook"),
+                    "dlPackage" => ("dl.import", &["rgisdlpk"], "GeoForge deep learning package"),
                     k => return Err(format!("unknown item '{k}'")),
                 };
                 if let Some(open) = &self.services.open_async {
@@ -1970,7 +1970,7 @@ impl RustGisApp {
         let text = if package {
             rustgis_engine::cmd::items::package_text(bytes)?
         } else {
-            std::str::from_utf8(bytes).map_err(|_| "not a RustGIS project".to_string())?.to_string()
+            std::str::from_utf8(bytes).map_err(|_| "not a GeoForge project".to_string())?.to_string()
         };
         let mut p = json!({"text": text});
         if let Some(f) = file.filter(|_| !package) {
@@ -2320,7 +2320,7 @@ impl RustGisApp {
         if let Some(url) = self.ui.open_url.take() {
             ctx.open_url(egui::OpenUrl::new_tab(url));
         }
-        let title = format!("{}{} - RustGIS", self.session.project.name, if self.session.dirty { " •" } else { "" });
+        let title = format!("{}{} - GeoForge", self.session.project.name, if self.session.dirty { " •" } else { "" });
         if title != self.sent_title {
             ctx.send_viewport_cmd(egui::ViewportCommand::Title(title.clone()));
             self.sent_title = title;

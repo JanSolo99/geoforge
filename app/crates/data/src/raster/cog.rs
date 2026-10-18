@@ -238,7 +238,7 @@ pub enum Parse {
     Done(Box<Layout>),
     /// These bytes (first, end) must be read first.
     Need(u64, u64),
-    /// Not a tiled GeoTIFF RustGIS can read a tile at a time (strips, separate band planes…): read
+    /// Not a tiled GeoTIFF GeoForge can read a tile at a time (strips, separate band planes…): read
     /// it whole instead.
     NotTiled(String),
 }

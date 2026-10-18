@@ -23,8 +23,8 @@ A tile service's address: raster tiles with {z}/{x}/{y} (or {-y}, {q}, {bbox-eps
 A value, a field, or two of them joined by + − × ÷. Applies to the selected rows, or every row when none is selected.	Qiymət, sahə və ya + − × ÷ ilə birləşdirilmiş ikisi. Seçilmiş sətirlərə, heç nə seçilməyibsə bütün sətirlərə tətbiq olunur.
 About	Haqqında
 About plugins	Plaginlər haqqında
-About RustGIS	RustGIS haqqında
-About RustGIS.	RustGIS haqqında.
+About GeoForge	GeoForge haqqında
+About GeoForge.	GeoForge haqqında.
 Above	Yuxarı
 Above Left	Yuxarı sol
 Above Right	Yuxarı sağ
@@ -137,7 +137,7 @@ Area of use: within {r}° of the {lon}° meridian	İstifadə sahəsi: {lon}° me
 Area of use: within {r}° of {lon}°, {lat}°	İstifadə sahəsi: {lon}°, {lat}° nöqtəsindən {r}° daxilində
 Area {area}   ·   Perimeter {perimeter}	Sahə {area}   ·   Perimetr {perimeter}
 Areas (name, land use, area)	Ərazilər (ad, torpaq istifadəsi, sahə)
-Ask a question about your data, or describe what to do with the map. The assistant runs RustGIS commands for you; every change can be undone.	Məlumatlarınız haqqında sual verin və ya xəritə ilə nə edilməli olduğunu təsvir edin. Köməkçi sizin üçün RustGIS əmrlərini icra edir; hər dəyişiklik geri alına bilər.
+Ask a question about your data, or describe what to do with the map. The assistant runs GeoForge commands for you; every change can be undone.	Məlumatlarınız haqqında sual verin və ya xəritə ilə nə edilməli olduğunu təsvir edin. Köməkçi sizin üçün GeoForge əmrlərini icra edir; hər dəyişiklik geri alına bilər.
 Ask about the map, or tell it what to do…	Xəritə haqqında soruşun və ya nə edəcəyini deyin…
 Ask about your data, or tell the assistant what to do with the map.	Məlumatlarınız haqqında soruşun və ya köməkçiyə xəritə ilə nə edəcəyini deyin.
 Assistant settings	Köməkçi parametrləri
@@ -654,7 +654,7 @@ Find a place by coordinates.	Koordinatlara görə yer tapın.
 Find and run geoprocessing tools.	Geoemal alətlərini tapın və işə salın.
 Find any command by name (Ctrl+K).	İstənilən əmri adına görə tapın (Ctrl+K).
 Find Place	Yer tap
-Find plugins in the RustGIS plugin registry.	RustGIS plagin reyestrində plagin tapın.
+Find plugins in the GeoForge plugin registry.	GeoForge plagin reyestrində plagin tapın.
 Find Similar	Oxşarları tap
 Find Tools	Alət axtar
 Finish Polygon	Poliqonu bitir
@@ -783,7 +783,7 @@ Import Thumbnail	Miniatürü idxal et
 Import Web Tool	Veb aləti idxal et
 In Beyond	Yaxınlaşma həddi
 In Progress	İcra olunur
-In RustGIS, it can:	RustGIS-də bunları edə bilər:
+In GeoForge, it can:	GeoForge-də bunları edə bilər:
 in progress	icra olunur
 In project	Layihədə
 In use	İstifadədədir
@@ -1080,7 +1080,7 @@ North	Şimal
 North\nArrow	Şimal\noxu
 North Polar Stereographic	Şimal qütb stereoqrafik
 Not sandboxed	Qum qutusundan kənar
-not a RustGIS layout	RustGIS tərtibatı deyil
+not a GeoForge layout	GeoForge tərtibatı deyil
 not needed	lazım deyil
 Not saved yet	Hələ saxlanmayıb
 Notebook	Bloknot
@@ -1110,8 +1110,8 @@ Opacity	Qeyri-şəffaflıq
 Open	Aç
 Open a .rgis project	.rgis layihəsini aç
 open a layout first	əvvəlcə tərtibat açın
-Open a RustGIS or Jupyter notebook.	RustGIS və ya Jupyter bloknotunu açın.
-Open a RustGIS project.	RustGIS layihəsini açın.
+Open a GeoForge or Jupyter notebook.	GeoForge və ya Jupyter bloknotunu açın.
+Open a GeoForge project.	GeoForge layihəsini açın.
 Open an offline area to edit.	Redaktə üçün oflayn ərazi açın.
 Open Custom Template	Fərdi şablonu aç
 Open Custom Template…	Fərdi şablonu aç…
@@ -1128,7 +1128,7 @@ Open the attribute table of the selected layer.	Seçilmiş layın atribut cədv�
 Open the layer's attribute table.	Layın atribut cədvəlini açın.
 Open the layer's table.	Layın cədvəlini açın.
 Open the Release Page	Buraxılış səhifəsini aç
-Open the RustGIS user guide.	RustGIS istifadəçi təlimatını açın.
+Open the GeoForge user guide.	GeoForge istifadəçi təlimatını açın.
 Open the selected layer's table.	Seçilmiş layın cədvəlini açın.
 Open the Symbology pane.	Simvolika panelini açın.
 Open {code} on epsg.io	{code} kodunu epsg.io-da aç
@@ -1207,7 +1207,7 @@ Plugin Manager…	Plagin meneceri…
 Plugin registry	Plagin reyestri
 Plugins	Plaginlər
 Plugins are .rgplugin files. Install only plugins from people you trust.	Plaginlər .rgplugin fayllarıdır. Yalnız etibar etdiyiniz şəxslərin plaginlərini quraşdırın.
-Plugins run in a sandbox: they can't reach your files or the network, and they change the project only through RustGIS's own commands, within the permissions you accept.	Plaginlər qum qutusunda işləyir: onlar fayllarınıza və ya şəbəkəyə çata bilməz və layihəni yalnız RustGIS-in öz əmrləri ilə, qəbul etdiyiniz icazələr daxilində dəyişirlər.
+Plugins run in a sandbox: they can't reach your files or the network, and they change the project only through GeoForge's own commands, within the permissions you accept.	Plaginlər qum qutusunda işləyir: onlar fayllarınıza və ya şəbəkəyə çata bilməz və layihəni yalnız GeoForge-in öz əmrləri ilə, qəbul etdiyiniz icazələr daxilində dəyişirlər.
 PMTiles archive	PMTiles arxivi
 PMTiles File…	PMTiles faylı…
 PNG frames (zip)	PNG kadrları (zip)
@@ -1383,29 +1383,29 @@ Run the task	Tapşırığı işə sal
 Run Tool	Aləti işə sal
 Run {name}	{name} işə sal
 Running…	İşləyir…
-RustGIS	RustGIS
-RustGIS deep learning package	RustGIS dərin öyrənmə paketi
-RustGIS is a free and open-source GIS written in pure Rust. It runs on the desktop and in the browser, and every action is a command you can also run from the command line.	RustGIS təmiz Rust ilə yazılmış azad və açıq mənbəli CİS-dir. O, masaüstündə və brauzerdə işləyir və hər əməliyyat komanda sətrindən də işlədə biləcəyiniz bir komandadır.
-RustGIS layer file	RustGIS lay faylı
-RustGIS layers, maps and projects	RustGIS layları, xəritələri və layihələri
-RustGIS layout	RustGIS tərtibatı
-RustGIS maps and projects	RustGIS xəritələri və layihələri
-RustGIS or Jupyter notebook	RustGIS və ya Jupyter bloknotu
-RustGIS plugin	RustGIS plagini
-RustGIS presentation	RustGIS təqdimatı
-RustGIS project	RustGIS layihəsi
-RustGIS project template	RustGIS layihə şablonu
-RustGIS ran into an internal error last time. The details are in {path}; please attach them to a bug report.	RustGIS ötən dəfə daxili xəta ilə qarşılaşdı. Təfərrüatlar {path} faylındadır; lütfən, onları xəta hesabatına əlavə edin.
-RustGIS ran into an internal error while handling the model's reply, so the request was stopped. Please report it at https://github.com/opengeos/RustGIS/issues.	RustGIS modelin cavabını emal edərkən daxili xəta ilə qarşılaşdı, ona görə sorğu dayandırıldı. Lütfən, bunu https://github.com/opengeos/RustGIS/issues ünvanında bildirin.
-RustGIS report or report template	RustGIS hesabatı və ya hesabat şablonu
-RustGIS styles	RustGIS üslubları
-RustGIS task	RustGIS tapşırığı
-RustGIS {latest} is available.	RustGIS {latest} mövcuddur.
-RustGIS {version} is the latest version.	RustGIS {version} ən son versiyadır.
+GeoForge	GeoForge
+GeoForge deep learning package	GeoForge dərin öyrənmə paketi
+GeoForge is a free and open-source GIS written in pure Rust. It runs on the desktop and in the browser, and every action is a command you can also run from the command line.	GeoForge təmiz Rust ilə yazılmış azad və açıq mənbəli CİS-dir. O, masaüstündə və brauzerdə işləyir və hər əməliyyat komanda sətrindən də işlədə biləcəyiniz bir komandadır.
+GeoForge layer file	GeoForge lay faylı
+GeoForge layers, maps and projects	GeoForge layları, xəritələri və layihələri
+GeoForge layout	GeoForge tərtibatı
+GeoForge maps and projects	GeoForge xəritələri və layihələri
+GeoForge or Jupyter notebook	GeoForge və ya Jupyter bloknotu
+GeoForge plugin	GeoForge plagini
+GeoForge presentation	GeoForge təqdimatı
+GeoForge project	GeoForge layihəsi
+GeoForge project template	GeoForge layihə şablonu
+GeoForge ran into an internal error last time. The details are in {path}; please attach them to a bug report.	GeoForge ötən dəfə daxili xəta ilə qarşılaşdı. Təfərrüatlar {path} faylındadır; lütfən, onları xəta hesabatına əlavə edin.
+GeoForge ran into an internal error while handling the model's reply, so the request was stopped. Please report it at https://github.com/opengeos/RustGIS/issues.	GeoForge modelin cavabını emal edərkən daxili xəta ilə qarşılaşdı, ona görə sorğu dayandırıldı. Lütfən, bunu https://github.com/opengeos/RustGIS/issues ünvanında bildirin.
+GeoForge report or report template	GeoForge hesabatı və ya hesabat şablonu
+GeoForge styles	GeoForge üslubları
+GeoForge task	GeoForge tapşırığı
+GeoForge {latest} is available.	GeoForge {latest} mövcuddur.
+GeoForge {version} is the latest version.	GeoForge {version} ən son versiyadır.
 RUSTGIS_ASSISTANT_MODEL	RUSTGIS_ASSISTANT_MODEL
 RUSTGIS_ASSISTANT_PROVIDER	RUSTGIS_ASSISTANT_PROVIDER
 Sample data (Natural Earth)	Nümunə məlumat (Natural Earth)
-Sample data © Natural Earth (public domain). RustGIS is licensed under Apache-2.0.	Nümunə məlumat © Natural Earth (ictimai mülkiyyət). RustGIS Apache-2.0 lisenziyası altındadır.
+Sample data © Natural Earth (public domain). GeoForge is licensed under Apache-2.0.	Nümunə məlumat © Natural Earth (ictimai mülkiyyət). GeoForge Apache-2.0 lisenziyası altındadır.
 Sample data: Natural Earth (public domain). Licensed under Apache-2.0.	Nümunə məlumat: Natural Earth (ictimai mülkiyyət). Apache-2.0 lisenziyası altındadır.
 Saturation	Doyğunluq
 Save	Saxla
@@ -1470,7 +1470,7 @@ Sections	Bölmələr
 See and set the camera's position and scale.	Kameranın mövqeyinə və miqyasına baxın və onları təyin edin.
 See the map as people with colour vision deficiencies do.	Xəritəni rəng görmə çatışmazlığı olan insanların gördüyü kimi görün.
 See the tools you've run.	İşə saldığınız alətlərə baxın.
-See whether a newer RustGIS has been released.	RustGIS-in daha yeni versiyasının buraxılıb-buraxılmadığını yoxla.
+See whether a newer GeoForge has been released.	GeoForge-in daha yeni versiyasının buraxılıb-buraxılmadığını yoxla.
 Select	Seç
 Select (click)	Seç (klik)
 Select (rectangle)	Seç (düzbucaqlı)
@@ -1657,14 +1657,14 @@ Text	Mətn
 Text Symbol	Mətn simvolu
 The assistant is busy; stop it or wait for it to finish.	Köməkçi məşğuldur; onu dayandırın və ya bitirməsini gözləyin.
 The assistant wants to run this, and {why}:	Köməkçi bunu icra etmək istəyir; bu əməliyyat {why}:
-This plugin runs as a program on your computer, outside RustGIS's sandbox. It can do anything you can: read and change your files, use the network and run other programs. Install it only if you trust its author.	Bu plagin RustGIS-in qum qutusundan kənarda, kompüterinizdə proqram kimi işləyir. Sizin edə bildiyiniz hər şeyi edə bilər: fayllarınızı oxuyub dəyişə, şəbəkədən istifadə edə və başqa proqramlar işə sala bilər. Onu yalnız müəllifinə etibar edirsinizsə quraşdırın.
+This plugin runs as a program on your computer, outside GeoForge's sandbox. It can do anything you can: read and change your files, use the network and run other programs. Install it only if you trust its author.	Bu plagin GeoForge-in qum qutusundan kənarda, kompüterinizdə proqram kimi işləyir. Sizin edə bildiyiniz hər şeyi edə bilər: fayllarınızı oxuyub dəyişə, şəbəkədən istifadə edə və başqa proqramlar işə sala bilər. Onu yalnız müəllifinə etibar edirsinizsə quraşdırın.
 the capture failed unexpectedly	çəkiliş gözlənilmədən uğursuz oldu
 the Help tab always shows	Kömək tabı həmişə göstərilir
 The job covers the map view	İş xəritə görünüşünü əhatə edir
 The key is kept for this session only.	Açar yalnız bu sessiya üçün saxlanılır.
 The layer's file couldn't be read: {error}	Layın faylı oxuna bilmədi: {error}
 the layout export failed unexpectedly	tərtibatın ixracı gözlənilmədən uğursuz oldu
-The list of plugins to browse. Leave it empty for the RustGIS plugin registry.	Baxmaq üçün plaginlərin siyahısı. RustGIS plagin reyestri üçün boş saxlayın.
+The list of plugins to browse. Leave it empty for the GeoForge plugin registry.	Baxmaq üçün plaginlərin siyahısı. GeoForge plagin reyestri üçün boş saxlayın.
 the map has no layers	xəritədə lay yoxdur
 The map is drawn in this coordinate system; layers are projected on the fly.	Xəritə bu koordinat sistemində çəkilir; laylar dərhal proyeksiya olunur.
 The map view as it is now	Xəritə görünüşü indiki halında
@@ -1793,11 +1793,11 @@ Web Tile Layers	Veb kafel layları
 Web Tool	Veb alət
 Website	Veb sayt
 Weights	Çəkilər
-Welcome to RustGIS	RustGIS-ə xoş gəlmisiniz
+Welcome to GeoForge	GeoForge-ə xoş gəlmisiniz
 West	Qərb
 WGS 84 / Globe	WGS 84 / Qlobus
 WGS 84 / Web Mercator	WGS 84 / Web Mercator
-What RustGIS opens with: the World Atlas sample or a blank map.	RustGIS-in nə ilə açılacağı: World Atlas nümunəsi və ya boş xəritə.
+What GeoForge opens with: the World Atlas sample or a blank map.	GeoForge-in nə ilə açılacağı: World Atlas nümunəsi və ya boş xəritə.
 What's near a point	Nöqtənin yaxınlığında nə var
 Where	Where
 Where Clause	Where şərti
@@ -1903,11 +1903,11 @@ The sign-in is kept in the app's settings folder, for your user account only, an
 Sign in with your ChatGPT account.	ChatGPT hesabınızla daxil olun.
 A ChatGPT sign-in can only be used with the OpenAI API.	ChatGPT girişi yalnız OpenAI API ilə istifadə oluna bilər.
 Continue with ChatGPT	ChatGPT ilə davam et
-Eligible requests in RustGIS use your ChatGPT plan. You can manage usage in ChatGPT settings.	RustGIS-dəki uyğun sorğular ChatGPT planınızdan istifadə edir. İstifadəni ChatGPT ayarlarında idarə edə bilərsiniz.
+Eligible requests in GeoForge use your ChatGPT plan. You can manage usage in ChatGPT settings.	GeoForge-dəki uyğun sorğular ChatGPT planınızdan istifadə edir. İstifadəni ChatGPT ayarlarında idarə edə bilərsiniz.
 Got it	Aydındır
 Manage usage	İstifadəni idarə et
 Requests go to the OpenAI API and use your ChatGPT plan.	Sorğular OpenAI API-yə gedir və ChatGPT planınızdan istifadə edir.
-Signed out on this computer, but OpenAI didn't confirm it. You can disconnect RustGIS in ChatGPT's settings.	Bu kompüterdə çıxış edildi, lakin OpenAI bunu təsdiqləmədi. RustGIS-i ChatGPT ayarlarında ayıra bilərsiniz.
+Signed out on this computer, but OpenAI didn't confirm it. You can disconnect GeoForge in ChatGPT's settings.	Bu kompüterdə çıxış edildi, lakin OpenAI bunu təsdiqləmədi. GeoForge-i ChatGPT ayarlarında ayıra bilərsiniz.
 Using ChatGPT plan	ChatGPT planı istifadə olunur
 You're using your ChatGPT plan	ChatGPT planınızdan istifadə edirsiniz
 Use another account	Başqa hesabdan istifadə et

@@ -805,6 +805,35 @@ enum Tool {
         #[arg(long)]
         cellsize: f64,
     },
+    /// Spatial Analyst "IDW": inverse distance weighted interpolation of a point field.
+    Idw {
+        in_features: PathBuf,
+        z_field: String,
+        out_raster: PathBuf,
+        /// Default: the shorter side of the points' extent / 250.
+        #[arg(long)]
+        cellsize: Option<f64>,
+        #[arg(long, default_value_t = 2.0)]
+        power: f64,
+        /// VARIABLE or FIXED.
+        #[arg(long, default_value = "VARIABLE")]
+        search_radius: String,
+        /// Variable: the nearest points used.
+        #[arg(long, default_value_t = 12)]
+        num_points: usize,
+        /// Variable: no point farther than this is used.
+        #[arg(long)]
+        max_distance: Option<f64>,
+        /// Fixed: the radius (default five cells).
+        #[arg(long)]
+        distance: Option<f64>,
+        /// Fixed: a cell with fewer points inside widens the radius a cell at a time.
+        #[arg(long, default_value_t = 0)]
+        min_points: usize,
+        /// The extent environment: xmin ymin xmax ymax.
+        #[arg(long, num_args = 4, value_names = ["XMIN", "YMIN", "XMAX", "YMAX"])]
+        extent: Option<Vec<f64>>,
+    },
     /// Conversion "Point To Raster".
     PointToRaster {
         in_features: PathBuf,
@@ -2452,6 +2481,65 @@ fn main() -> ExitCode {
             let mut r = polygons_to_raster(&features, cellsize, assignment, kind)
                 .ok_or_else(|| Error::Unsupported("no features to rasterize".into()))?;
             r.epsg = epsg;
+            write_raster(&out_raster, &r)
+        })(),
+        Tool::Idw {
+            in_features,
+            z_field,
+            out_raster,
+            cellsize,
+            power,
+            search_radius,
+            num_points,
+            max_distance,
+            distance,
+            min_points,
+            extent,
+        } => (|| {
+            use geoforge_raster::interpolate::{Sample, SearchRadius};
+            let (features, _, epsg, _) = rasterize_input(&in_features, &z_field)?;
+            let mut samples = Vec::new();
+            for (g, z) in &features {
+                if matches!(
+                    g.kind,
+                    geoforge_core::GeometryKind::Point | geoforge_core::GeometryKind::Multipoint
+                ) {
+                    samples.extend(g.xy.iter().map(|c| Sample {
+                        x: c[0],
+                        y: c[1],
+                        z: *z,
+                    }));
+                }
+            }
+            if !(power.is_finite() && power > 0.0)
+                || cellsize.is_some_and(|c| c.is_nan() || c <= 0.0)
+            {
+                return Err(Error::Unsupported(
+                    "power and cell size must be positive".into(),
+                ));
+            }
+            let search = match search_radius.to_ascii_uppercase().as_str() {
+                "VARIABLE" => SearchRadius::Variable {
+                    points: num_points,
+                    max_distance,
+                },
+                "FIXED" => SearchRadius::Fixed {
+                    distance,
+                    min_points,
+                },
+                other => return Err(Error::Unsupported(format!("search radius {other}"))),
+            };
+            let env = geoforge_raster::env::Environment {
+                cell_size: cellsize,
+                extent: extent.map(|v| [v[0], v[1], v[2], v[3]]),
+                ..Default::default()
+            };
+            let r = geoforge_raster::interpolate::idw(&samples, power, search, &env, epsg)
+                .ok_or_else(|| {
+                    Error::Unsupported(
+                        "no output grid (no points with values, or a bad cell size)".into(),
+                    )
+                })?;
             write_raster(&out_raster, &r)
         })(),
         Tool::PointToRaster {

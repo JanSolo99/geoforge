@@ -50,7 +50,7 @@ def test_distances_are_on_the_ground(s):
 
 def test_outputs_that_exist_need_overwrite(s):
     arcpy.analysis.Buffer("Cities", "Twice", "10 Kilometers")
-    with pytest.raises(rustgis.RustGISError, match="already exists"):
+    with pytest.raises(rustgis.GeoForgeError, match="already exists"):
         arcpy.analysis.Buffer("Cities", "Twice", "10 Kilometers")
     arcpy.env.overwriteOutput = True
     arcpy.analysis.Buffer("Cities", "Twice", "10 Kilometers")
@@ -61,9 +61,9 @@ def test_wrong_arguments_are_python_errors(s):
         arcpy.analysis.Buffer("Cities", "X", "1 Kilometers", nonsense=1)
     with pytest.raises(TypeError, match="at most"):
         arcpy.analysis.Clip(*["a"] * 9)
-    with pytest.raises(rustgis.RustGISError, match="unknown distance unit"):
+    with pytest.raises(rustgis.GeoForgeError, match="unknown distance unit"):
         arcpy.analysis.Buffer("Cities", "X", "1 Parsecs")
-    with pytest.raises(rustgis.RustGISError):
+    with pytest.raises(rustgis.GeoForgeError):
         arcpy.analysis.Buffer("No such layer", "X", "1 Kilometers")
 
 
@@ -134,5 +134,14 @@ def test_raster_environments_shape_spatial_analyst_output(s):
     arcpy.env.cellSize = None
     assert s.layer("Coarse").info != plain
     arcpy.env.cellSize = "not a size"
-    with pytest.raises(rustgis.RustGISError, match="cellSize"):
+    with pytest.raises(rustgis.GeoForgeError, match="cellSize"):
         arcpy.sa.Plus("Grid", 1, out_raster="Bad")
+
+
+def test_idw_takes_arcpy_search_radii(s):
+    arcpy.sa.Idw("Cities", "pop_max", 2, 2, arcpy.sa.RadiusVariable(8), out_raster="CitiesIdw")
+    arcpy.sa.Idw("Cities", "pop_max", 2, search_radius=arcpy.sa.RadiusFixed(10, 2), out_raster="CitiesFixed")
+    names = {l["name"] for l in s.layers()}
+    assert {"CitiesIdw", "CitiesFixed"} <= names
+    with pytest.raises(rustgis.GeoForgeError):
+        arcpy.sa.Idw("Cities", "pop_max", 2, 2, "nonsense")

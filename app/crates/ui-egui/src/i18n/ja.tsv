@@ -23,8 +23,8 @@ A tile service's address: raster tiles with {z}/{x}/{y} (or {-y}, {q}, {bbox-eps
 A value, a field, or two of them joined by + − × ÷. Applies to the selected rows, or every row when none is selected.	値、フィールド、またはそれらを + − × ÷ で結合したもの。選択した行に適用され、何も選択されていない場合はすべての行に適用されます。
 About	バージョン情報
 About plugins	プラグインについて
-About RustGIS	RustGIS について
-About RustGIS.	RustGIS について。
+About GeoForge	GeoForge について
+About GeoForge.	GeoForge について。
 Above	上
 Above Left	左上
 Above Right	右上
@@ -137,7 +137,7 @@ Area of use: within {r}° of the {lon}° meridian	使用範囲: {lon}° の経�
 Area of use: within {r}° of {lon}°, {lat}°	使用範囲: {lon}°, {lat}° から {r}° 以内
 Area {area}   ·   Perimeter {perimeter}	面積 {area}   ·   周長 {perimeter}
 Areas (name, land use, area)	エリア (名前、土地利用、面積)
-Ask a question about your data, or describe what to do with the map. The assistant runs RustGIS commands for you; every change can be undone.	データについて質問するか、マップで行いたいことを説明してください。アシスタントが RustGIS のコマンドを代わりに実行します。変更はすべて元に戻せます。
+Ask a question about your data, or describe what to do with the map. The assistant runs GeoForge commands for you; every change can be undone.	データについて質問するか、マップで行いたいことを説明してください。アシスタントが GeoForge のコマンドを代わりに実行します。変更はすべて元に戻せます。
 Ask about the map, or tell it what to do…	マップについて質問するか、操作を指示してください…
 Ask about your data, or tell the assistant what to do with the map.	データについて質問するか、マップで行うことをアシスタントに指示してください。
 Assistant settings	アシスタントの設定
@@ -654,7 +654,7 @@ Find a place by coordinates.	座標で場所を検索します。
 Find and run geoprocessing tools.	ジオプロセシング ツールを検索して実行します。
 Find any command by name (Ctrl+K).	名前で任意のコマンドを検索します（Ctrl+K）。
 Find Place	場所の検索
-Find plugins in the RustGIS plugin registry.	RustGIS プラグイン レジストリでプラグインを探します。
+Find plugins in the GeoForge plugin registry.	GeoForge プラグイン レジストリでプラグインを探します。
 Find Similar	類似の検索
 Find Tools	ツールの検索
 Finish Polygon	ポリゴンを終了
@@ -783,7 +783,7 @@ Import Thumbnail	サムネイルのインポート
 Import Web Tool	Web ツールのインポート
 In Beyond	拡大の限界
 In Progress	進行中
-In RustGIS, it can:	RustGIS 内でできること:
+In GeoForge, it can:	GeoForge 内でできること:
 in progress	進行中
 In project	プロジェクト内
 In use	使用中
@@ -1080,7 +1080,7 @@ North	北
 North\nArrow	方位\n記号
 North Polar Stereographic	北極ステレオ図法
 Not sandboxed	サンドボックス外
-not a RustGIS layout	RustGIS レイアウトではありません
+not a GeoForge layout	GeoForge レイアウトではありません
 not needed	不要
 Not saved yet	未保存
 Notebook	ノートブック
@@ -1110,8 +1110,8 @@ Opacity	不透明度
 Open	開く
 Open a .rgis project	.rgis プロジェクトを開く
 open a layout first	先にレイアウトを開いてください
-Open a RustGIS or Jupyter notebook.	RustGIS または Jupyter のノートブックを開きます。
-Open a RustGIS project.	RustGIS プロジェクトを開きます。
+Open a GeoForge or Jupyter notebook.	GeoForge または Jupyter のノートブックを開きます。
+Open a GeoForge project.	GeoForge プロジェクトを開きます。
 Open an offline area to edit.	編集するオフライン エリアを開きます。
 Open Custom Template	カスタム テンプレートを開く
 Open Custom Template…	カスタム テンプレートを開く…
@@ -1128,7 +1128,7 @@ Open the attribute table of the selected layer.	選択したレイヤーの属�
 Open the layer's attribute table.	レイヤーの属性テーブルを開きます。
 Open the layer's table.	レイヤーのテーブルを開きます。
 Open the Release Page	リリース ページを開く
-Open the RustGIS user guide.	RustGIS ユーザー ガイドを開きます。
+Open the GeoForge user guide.	GeoForge ユーザー ガイドを開きます。
 Open the selected layer's table.	選択したレイヤーのテーブルを開きます。
 Open the Symbology pane.	シンボル ウィンドウを開きます。
 Open {code} on epsg.io	epsg.io で {code} を開く
@@ -1207,7 +1207,7 @@ Plugin Manager…	プラグイン マネージャー…
 Plugin registry	プラグイン レジストリ
 Plugins	プラグイン
 Plugins are .rgplugin files. Install only plugins from people you trust.	プラグインは .rgplugin ファイルです。信頼できる相手のプラグインのみインストールしてください。
-Plugins run in a sandbox: they can't reach your files or the network, and they change the project only through RustGIS's own commands, within the permissions you accept.	プラグインはサンドボックス内で実行されます。ファイルやネットワークにはアクセスできず、プロジェクトの変更は、許可した権限の範囲内で RustGIS 自身のコマンドを通じてのみ行います。
+Plugins run in a sandbox: they can't reach your files or the network, and they change the project only through GeoForge's own commands, within the permissions you accept.	プラグインはサンドボックス内で実行されます。ファイルやネットワークにはアクセスできず、プロジェクトの変更は、許可した権限の範囲内で GeoForge 自身のコマンドを通じてのみ行います。
 PMTiles archive	PMTiles アーカイブ
 PMTiles File…	PMTiles ファイル…
 PNG frames (zip)	PNG フレーム (zip)
@@ -1383,29 +1383,29 @@ Run the task	タスクを実行
 Run Tool	ツールの実行
 Run {name}	{name} を実行
 Running…	実行中…
-RustGIS	RustGIS
-RustGIS deep learning package	RustGIS ディープ ラーニング パッケージ
-RustGIS is a free and open-source GIS written in pure Rust. It runs on the desktop and in the browser, and every action is a command you can also run from the command line.	RustGIS は純粋な Rust で書かれた無料のオープンソース GIS です。デスクトップとブラウザーで動作し、すべての操作はコマンドであり、コマンド ラインからも実行できます。
-RustGIS layer file	RustGIS レイヤー ファイル
-RustGIS layers, maps and projects	RustGIS のレイヤー、マップ、プロジェクト
-RustGIS layout	RustGIS レイアウト
-RustGIS maps and projects	RustGIS のマップとプロジェクト
-RustGIS or Jupyter notebook	RustGIS または Jupyter のノートブック
-RustGIS plugin	RustGIS プラグイン
-RustGIS presentation	RustGIS プレゼンテーション
-RustGIS project	RustGIS プロジェクト
-RustGIS project template	RustGIS プロジェクト テンプレート
-RustGIS ran into an internal error last time. The details are in {path}; please attach them to a bug report.	前回、RustGIS で内部エラーが発生しました。詳細は {path} にあります。バグ報告に添付してください。
-RustGIS ran into an internal error while handling the model's reply, so the request was stopped. Please report it at https://github.com/opengeos/RustGIS/issues.	モデルの応答の処理中に RustGIS で内部エラーが発生したため、リクエストを停止しました。https://github.com/opengeos/RustGIS/issues で報告してください。
-RustGIS report or report template	RustGIS レポートまたはレポート テンプレート
-RustGIS styles	RustGIS スタイル
-RustGIS task	RustGIS タスク
-RustGIS {latest} is available.	RustGIS {latest} が利用できます。
-RustGIS {version} is the latest version.	RustGIS {version} が最新バージョンです。
+GeoForge	GeoForge
+GeoForge deep learning package	GeoForge ディープ ラーニング パッケージ
+GeoForge is a free and open-source GIS written in pure Rust. It runs on the desktop and in the browser, and every action is a command you can also run from the command line.	GeoForge は純粋な Rust で書かれた無料のオープンソース GIS です。デスクトップとブラウザーで動作し、すべての操作はコマンドであり、コマンド ラインからも実行できます。
+GeoForge layer file	GeoForge レイヤー ファイル
+GeoForge layers, maps and projects	GeoForge のレイヤー、マップ、プロジェクト
+GeoForge layout	GeoForge レイアウト
+GeoForge maps and projects	GeoForge のマップとプロジェクト
+GeoForge or Jupyter notebook	GeoForge または Jupyter のノートブック
+GeoForge plugin	GeoForge プラグイン
+GeoForge presentation	GeoForge プレゼンテーション
+GeoForge project	GeoForge プロジェクト
+GeoForge project template	GeoForge プロジェクト テンプレート
+GeoForge ran into an internal error last time. The details are in {path}; please attach them to a bug report.	前回、GeoForge で内部エラーが発生しました。詳細は {path} にあります。バグ報告に添付してください。
+GeoForge ran into an internal error while handling the model's reply, so the request was stopped. Please report it at https://github.com/opengeos/RustGIS/issues.	モデルの応答の処理中に GeoForge で内部エラーが発生したため、リクエストを停止しました。https://github.com/opengeos/RustGIS/issues で報告してください。
+GeoForge report or report template	GeoForge レポートまたはレポート テンプレート
+GeoForge styles	GeoForge スタイル
+GeoForge task	GeoForge タスク
+GeoForge {latest} is available.	GeoForge {latest} が利用できます。
+GeoForge {version} is the latest version.	GeoForge {version} が最新バージョンです。
 RUSTGIS_ASSISTANT_MODEL	RUSTGIS_ASSISTANT_MODEL
 RUSTGIS_ASSISTANT_PROVIDER	RUSTGIS_ASSISTANT_PROVIDER
 Sample data (Natural Earth)	サンプル データ（Natural Earth）
-Sample data © Natural Earth (public domain). RustGIS is licensed under Apache-2.0.	サンプル データ © Natural Earth（パブリック ドメイン）。RustGIS は Apache-2.0 ライセンスで提供されています。
+Sample data © Natural Earth (public domain). GeoForge is licensed under Apache-2.0.	サンプル データ © Natural Earth（パブリック ドメイン）。GeoForge は Apache-2.0 ライセンスで提供されています。
 Sample data: Natural Earth (public domain). Licensed under Apache-2.0.	サンプル データ：Natural Earth（パブリック ドメイン）。Apache-2.0 ライセンス。
 Saturation	彩度
 Save	保存
@@ -1470,7 +1470,7 @@ Sections	セクション
 See and set the camera's position and scale.	カメラの位置と縮尺を表示、設定します。
 See the map as people with colour vision deficiencies do.	色覚特性を持つ人の見え方でマップを表示します。
 See the tools you've run.	実行したツールを表示します。
-See whether a newer RustGIS has been released.	新しい RustGIS がリリースされているか確認します。
+See whether a newer GeoForge has been released.	新しい GeoForge がリリースされているか確認します。
 Select	選択
 Select (click)	選択（クリック）
 Select (rectangle)	選択（四角形）
@@ -1657,14 +1657,14 @@ Text	テキスト
 Text Symbol	テキスト シンボル
 The assistant is busy; stop it or wait for it to finish.	アシスタントは処理中です。停止するか、完了するまでお待ちください。
 The assistant wants to run this, and {why}:	アシスタントが次の操作を実行しようとしています（{why}ため、確認が必要です）:
-This plugin runs as a program on your computer, outside RustGIS's sandbox. It can do anything you can: read and change your files, use the network and run other programs. Install it only if you trust its author.	このプラグインは RustGIS のサンドボックスの外で、コンピューター上のプログラムとして実行されます。ファイルの読み取りや変更、ネットワークの使用、他のプログラムの実行など、あなたができることは何でもできます。作者を信頼できる場合にのみインストールしてください。
+This plugin runs as a program on your computer, outside GeoForge's sandbox. It can do anything you can: read and change your files, use the network and run other programs. Install it only if you trust its author.	このプラグインは GeoForge のサンドボックスの外で、コンピューター上のプログラムとして実行されます。ファイルの読み取りや変更、ネットワークの使用、他のプログラムの実行など、あなたができることは何でもできます。作者を信頼できる場合にのみインストールしてください。
 the capture failed unexpectedly	キャプチャが予期せず失敗しました
 the Help tab always shows	[ヘルプ] タブは常に表示されます
 The job covers the map view	ジョブはマップ ビューを対象とします
 The key is kept for this session only.	キーはこのセッションの間だけ保持されます。
 The layer's file couldn't be read: {error}	レイヤーのファイルを読み込めませんでした: {error}
 the layout export failed unexpectedly	レイアウトのエクスポートが予期せず失敗しました
-The list of plugins to browse. Leave it empty for the RustGIS plugin registry.	参照するプラグインの一覧です。空欄にすると RustGIS プラグイン レジストリを使用します。
+The list of plugins to browse. Leave it empty for the GeoForge plugin registry.	参照するプラグインの一覧です。空欄にすると GeoForge プラグイン レジストリを使用します。
 the map has no layers	マップにレイヤーがありません
 The map is drawn in this coordinate system; layers are projected on the fly.	マップはこの座標系で描画され、レイヤーはその場で投影されます。
 The map view as it is now	現在のマップ ビュー
@@ -1793,11 +1793,11 @@ Web Tile Layers	Web タイル レイヤー
 Web Tool	Web ツール
 Website	ウェブサイト
 Weights	重み
-Welcome to RustGIS	RustGIS へようこそ
+Welcome to GeoForge	GeoForge へようこそ
 West	西
 WGS 84 / Globe	WGS 84 / 地球儀
 WGS 84 / Web Mercator	WGS 84 / Web Mercator
-What RustGIS opens with: the World Atlas sample or a blank map.	RustGIS の起動時に開くもの: World Atlas サンプルまたは空白のマップ。
+What GeoForge opens with: the World Atlas sample or a blank map.	GeoForge の起動時に開くもの: World Atlas サンプルまたは空白のマップ。
 What's near a point	ポイントの近くにあるもの
 Where	条件
 Where Clause	WHERE 句
@@ -1903,11 +1903,11 @@ The sign-in is kept in the app's settings folder, for your user account only, an
 Sign in with your ChatGPT account.	ChatGPT アカウントでサインインしてください。
 A ChatGPT sign-in can only be used with the OpenAI API.	ChatGPT のサインインは OpenAI API でのみ使用できます。
 Continue with ChatGPT	ChatGPT で続ける
-Eligible requests in RustGIS use your ChatGPT plan. You can manage usage in ChatGPT settings.	RustGIS の対象となるリクエストには ChatGPT プランが使われます。使用量は ChatGPT の設定で管理できます。
+Eligible requests in GeoForge use your ChatGPT plan. You can manage usage in ChatGPT settings.	GeoForge の対象となるリクエストには ChatGPT プランが使われます。使用量は ChatGPT の設定で管理できます。
 Got it	OK
 Manage usage	使用量を管理
 Requests go to the OpenAI API and use your ChatGPT plan.	リクエストは OpenAI API に送られ、ChatGPT プランが使われます。
-Signed out on this computer, but OpenAI didn't confirm it. You can disconnect RustGIS in ChatGPT's settings.	このコンピューターではサインアウトしましたが、OpenAI による確認は取れませんでした。ChatGPT の設定で RustGIS の接続を解除できます。
+Signed out on this computer, but OpenAI didn't confirm it. You can disconnect GeoForge in ChatGPT's settings.	このコンピューターではサインアウトしましたが、OpenAI による確認は取れませんでした。ChatGPT の設定で GeoForge の接続を解除できます。
 Using ChatGPT plan	ChatGPT プランを使用中
 You're using your ChatGPT plan	ChatGPT プランを使用しています
 Use another account	別のアカウントを使用

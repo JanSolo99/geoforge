@@ -411,6 +411,16 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         lines' lower-left corner with floor(extent / cell) + 1 cells, unlike Feature To Raster)
         and Polygon To Raster MAXIMUM_COMBINED_AREA, matching ArcGIS; sub-byte results whose
         values run exactly from 1 to the layout's top keep NoData 0
+  - [x] IDW (Spatial Analyst interpolation, ported from RustGIS and rebuilt to ArcGIS's rules in
+        `geoforge-raster::interpolate`; `gf idw`, the app's IDW tool, `arcpy.sa.Idw` with
+        `RadiusVariable`/`RadiusFixed`): grid cell centers start at the points' lower-left corner
+        (`round(w / cell) + 1` cells; a snap raster snaps the points' own extent outward instead);
+        default cell = shorter side / 250; variable radius = the n nearest points but never beyond
+        the output grid's width + height; fixed radius widens a cell size at a time until
+        `min_points` are inside; default fixed distance 5 cells; ~1.5k cells over 8 searches,
+        3 environments and 15 reach cases match Pro 3.7 (`testdata/arcgis-reference/idw.json`,
+        probes in `scripts/research/idw/`). Barriers not done. Next in this family: Natural
+        Neighbor, Spline, Kriging, Trend, Topo to Raster
   - [ ] Raster To Polygon SIMPLIFY: rule worked out for blocky rasters (104 of 122 test rasters exact;
         arcs between nodes, corners displaced diagonally by a from a fixed grid, Douglas-Peucker-like
         split with collapse/clamp, fewest-vertices choice of a) — see `docs/formats/raster-to-polygon-simplify.md`;

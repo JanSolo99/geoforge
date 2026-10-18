@@ -62,7 +62,7 @@ fn fetch_capabilities(url: &str, caps: &str) -> Result<Service, String> {
     rustgis_data::ogc::parse(caps, &bytes).map_err(|e| format!("{url}: {e}"))
 }
 
-/// Leaves out the layers whose addresses a document on the web may not send RustGIS to: the
+/// Leaves out the layers whose addresses a document on the web may not send GeoForge to: the
 /// capabilities are hostile input, and their endpoints and links must not reach into the local
 /// network (unless the service itself is there) or a forbidden address.
 fn vet(mut svc: Service, caps: &str) -> Service {
@@ -77,7 +77,7 @@ fn vet(mut svc: Service, caps: &str) -> Service {
     });
     let dropped = before - svc.layers.len();
     if dropped > 0 {
-        svc.notes.push(format!("{dropped} layers point to addresses RustGIS won't fetch for a service on the web and are left out"));
+        svc.notes.push(format!("{dropped} layers point to addresses GeoForge won't fetch for a service on the web and are left out"));
     }
     svc
 }
@@ -305,7 +305,7 @@ pub(crate) fn coverage_check(name: &str, bytes: &[u8]) -> Result<(), String> {
 }
 
 /// `catalog.search`: a page of a catalogue's (CSW) records matching words and an area, with the
-/// links RustGIS can follow (those pointing where a document on the web may not send it left out).
+/// links GeoForge can follow (those pointing where a document on the web may not send it left out).
 fn catalog_search(s: &mut Session, p: &Value) -> CmdResult {
     let url = url_of(p)?;
     let request = records_request(s, p)?;
@@ -334,7 +334,7 @@ fn catalog_search(s: &mut Session, p: &Value) -> CmdResult {
     let mut out = json!({"matched": page.matched, "count": records.len(), "next": page.next, "records": records, "request": request});
     if dropped > 0 {
         out["notes"] =
-            json!([format!("{dropped} links point to addresses RustGIS won't fetch for a catalogue on the web and are left out")]);
+            json!([format!("{dropped} links point to addresses GeoForge won't fetch for a catalogue on the web and are left out")]);
     }
     Ok(out)
 }

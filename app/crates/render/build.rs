@@ -1,4 +1,4 @@
-//! Fetches the Natural Earth sample data (public domain) that RustGIS embeds for its basemap
+//! Fetches the Natural Earth sample data (public domain) that GeoForge embeds for its basemap
 //! outline and World Atlas sample. The files live in opengeos/rustgis-assets, not in this repo.
 //!
 //! Set `RUSTGIS_DATA_DIR` to a folder holding the files to build offline.

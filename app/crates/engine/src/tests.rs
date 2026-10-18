@@ -3778,7 +3778,7 @@ fn services_list_and_add_layers() {
     let r = s.run("service.add", &json!({"url": api, "layer": "lakes", "text": collections})).unwrap();
     assert_eq!(r["features"], 1);
     assert!(s.map().layer_by_name("Lakes").is_some());
-    // A document on the web can't send RustGIS into the local network.
+    // A document on the web can't send GeoForge into the local network.
     let inward = WMS.replace("https://maps.example.com/wms?", "http://127.0.0.1:8080/wms?");
     let v = s.run("service.layers", &json!({"url": url, "text": inward})).unwrap();
     assert_eq!(v["count"], 0);
@@ -3812,7 +3812,7 @@ fn services_list_and_add_layers() {
 }
 
 /// A WCS coverage (from a local server) becomes a raster of the view, asked for in EPSG:4326 within
-/// its bounds; an error answer is refused. A catalogue's records come with the links RustGIS can
+/// its bounds; an error answer is refused. A catalogue's records come with the links GeoForge can
 /// follow, those pointing inward left out.
 #[test]
 fn wcs_coverages_and_catalogue_records() {
@@ -4444,7 +4444,7 @@ fn osm_and_boundaries() {
     }
 }
 
-/// Search Open Data against a local CKAN site: datasets with their resources (what RustGIS can't
+/// Search Open Data against a local CKAN site: datasets with their resources (what GeoForge can't
 /// add dropped, the best format first), one added by its address; bad requests are refused.
 #[test]
 fn open_data_portal_search_and_add() {

@@ -1,6 +1,6 @@
-//! Python bindings to the RustGIS engine: the native half of the `rustgis` package on PyPI.
+//! Python bindings to the GeoForge engine: the native half of the `rustgis` package on PyPI.
 //!
-//! The surface is deliberately small. Everything RustGIS does is a command with an id and JSON
+//! The surface is deliberately small. Everything GeoForge does is a command with an id and JSON
 //! parameters, so the module exposes `run(id, params_json) -> result_json` and leaves the Pythonic
 //! API (keyword arguments, `geopandas`, Jupyter display) to `python/rustgis/__init__.py`. The few
 //! things that aren't commands are here too: the map as PNG bytes, a layer as GeoJSON, and the
@@ -14,9 +14,9 @@ use pyo3::types::PyBytes;
 use rustgis_engine::{Project, Session};
 use serde_json::Value;
 
-create_exception!(_rustgis, RustGISError, PyException, "A RustGIS command or file operation failed.");
+create_exception!(_rustgis, GeoForgeError, PyException, "A GeoForge command or file operation failed.");
 
-/// One RustGIS session: a project with its maps, layers, undo history and selection.
+/// One GeoForge session: a project with its maps, layers, undo history and selection.
 ///
 /// Usable from any thread (Jupyter delivers a widget's messages on one of its own): every method
 /// holds the GIL throughout, so calls take turns.
@@ -39,7 +39,7 @@ impl Engine {
         } else {
             serde_json::from_str(params).map_err(|e| PyValueError::new_err(format!("parameters aren't JSON: {e}")))?
         };
-        let result = self.session.run(id, &params).map_err(|e| RustGISError::new_err(format!("{id}: {e}")))?;
+        let result = self.session.run(id, &params).map_err(|e| GeoForgeError::new_err(format!("{id}: {e}")))?;
         Ok(result.to_string())
     }
 
@@ -53,7 +53,7 @@ impl Engine {
         height: Option<f64>,
         dpi: Option<f64>,
     ) -> PyResult<Bound<'py, PyBytes>> {
-        let png = rustgis_engine::cmd::share::map_png(&mut self.session, width, height, dpi).map_err(RustGISError::new_err)?;
+        let png = rustgis_engine::cmd::share::map_png(&mut self.session, width, height, dpi).map_err(GeoForgeError::new_err)?;
         Ok(PyBytes::new(py, &png))
     }
 
@@ -63,14 +63,14 @@ impl Engine {
     fn layer_geojson(&self, layer: &str) -> PyResult<String> {
         let map = self.session.map();
         let found = map.layer_by_name(layer).or_else(|| layer.trim().parse::<u32>().ok().and_then(|id| map.layer(id)));
-        let found = found.ok_or_else(|| RustGISError::new_err(format!("no layer named '{layer}'")))?;
+        let found = found.ok_or_else(|| GeoForgeError::new_err(format!("no layer named '{layer}'")))?;
         Ok(rustgis_engine::data::io::to_geojson(&found.dataset).to_string())
     }
 
     /// The project as `.rgis` JSON text, as `project.saveAs` writes it (what `project.openText`
     /// opens).
     fn project_json(&self) -> PyResult<String> {
-        serde_json::to_string(&self.session.project).map_err(|e| RustGISError::new_err(e.to_string()))
+        serde_json::to_string(&self.session.project).map_err(|e| GeoForgeError::new_err(e.to_string()))
     }
 
     /// The notices commands have given since the last call (a file's warnings, a tool's
@@ -90,7 +90,7 @@ fn load_plugins() -> Vec<String> {
 #[pymodule]
 fn _rustgis(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add("__version__", env!("CARGO_PKG_VERSION"))?;
-    m.add("RustGISError", m.py().get_type::<RustGISError>())?;
+    m.add("GeoForgeError", m.py().get_type::<GeoForgeError>())?;
     m.add_class::<Engine>()?;
     m.add_function(wrap_pyfunction!(load_plugins, m)?)?;
     Ok(())
