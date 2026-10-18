@@ -198,6 +198,101 @@ def _search_radius(value: Any) -> Dict[str, Any]:
     raise GeoForgeError(f"search_radius must be RadiusVariable or RadiusFixed, not {value!r}")
 
 
+class RemapValue:
+    """``arcpy.sa.RemapValue([[1, 5], [2, "NODATA"]])``: input value → scale value."""
+
+    def __init__(self, remapTable: Any) -> None:
+        self.table = remapTable
+
+
+class WSTable:
+    """``arcpy.sa.WSTable([[raster, "VALUE", weight], ...])``: the Weighted Sum table."""
+
+    def __init__(self, rasterlist: Any) -> None:
+        self.rows = rasterlist
+
+
+class WOTable:
+    """``arcpy.sa.WOTable([[raster, influence, "VALUE", RemapValue(...)], ...], [from, to, by])``."""
+
+    def __init__(self, in_remap_table: Any, evaluation_scale: Any = None) -> None:
+        self.rows = in_remap_table
+        self.scale = evaluation_scale or [1, 9, 1]
+
+
+class _Fuzzy:
+    """A fuzzification function: its name and the parameters it gives the tool."""
+
+    function = ""
+    names: Tuple[str, ...] = ()
+
+    def __init__(self, *args: Any) -> None:
+        self.values = dict(zip(self.names, args))
+
+    def params(self) -> Dict[str, Any]:
+        return {"function": self.function, **self.values}
+
+
+class FuzzyLinear(_Fuzzy):
+    function, names = "LINEAR", ("minimum", "maximum")
+
+
+class FuzzyGaussian(_Fuzzy):
+    function, names = "GAUSSIAN", ("midpoint", "spread")
+
+
+class FuzzyLarge(_Fuzzy):
+    function, names = "LARGE", ("midpoint", "spread")
+
+
+class FuzzySmall(_Fuzzy):
+    function, names = "SMALL", ("midpoint", "spread")
+
+
+class FuzzyNear(_Fuzzy):
+    function, names = "NEAR", ("midpoint", "spread")
+
+
+class FuzzyMSLarge(_Fuzzy):
+    function, names = "MSLARGE", ("mean_multiplier", "std_multiplier")
+
+
+class FuzzyMSSmall(_Fuzzy):
+    function, names = "MSSMALL", ("mean_multiplier", "std_multiplier")
+
+
+def _raster_list(value: Any) -> str:
+    """Rasters as the tool's semicolon list (layer names, or a path as the layer it adds)."""
+    names = value if isinstance(value, (list, tuple)) else [value]
+    return ";".join(str(_as_layer(session(), v)) for v in names)
+
+
+def _inputs(value: Any) -> Dict[str, Any]:
+    return {"inputs": _raster_list(value)}
+
+
+def _ws_table(value: Any) -> Dict[str, Any]:
+    rows = value.rows if isinstance(value, WSTable) else value
+    return {"inputs": _raster_list([r[0] for r in rows]), "weights": ";".join(str(r[2]) for r in rows)}
+
+
+def _wo_table(value: Any) -> Dict[str, Any]:
+    if not isinstance(value, WOTable):
+        raise GeoForgeError("the Weighted Overlay table is a WOTable")
+    entries = []
+    for row in value.rows:
+        raster, influence, _, remap = row[0], row[1], row[2], row[3]
+        pairs = remap.table if isinstance(remap, RemapValue) else remap
+        entries.append(f"{_as_layer(session(), raster)}:{influence}:" + ",".join(f"{a}={b}" for a, b in pairs))
+    return {"table": ";".join(entries), "evaluation_scale": " ".join(str(x) for x in value.scale)}
+
+
+def _fuzzy_function(value: Any) -> Dict[str, Any]:
+    if not isinstance(value, _Fuzzy):
+        raise GeoForgeError("the fuzzy function is FuzzyLinear, FuzzyGaussian, FuzzyLarge, ...")
+    return value.params()
+
+
 def _flag(true_value: str) -> Callable[[Any], bool]:
     return lambda v: isinstance(v, bool) and v or str(v).upper() == true_value
 
@@ -281,6 +376,14 @@ _TOOLS = [
     _t("sa", "Slope", "slope", ("in_raster", "input"), ("output_measurement", "output_measurement"), ("z_factor", "z_factor"), ("method", None), ("z_unit", None)),
     _t("sa", "Idw", "idw", ("in_point_features", "input"), ("z_field", "z_field"), ("cell_size", "cell_size"), ("power", "power"),
        ("search_radius", _search_radius), ("in_barrier_polyline_features", None)),
+    _t("sa", "CellStatistics", "cell_statistics", ("in_rasters_or_constants", _inputs), ("statistics_type", "statistic"), ("ignore_nodata", "ignore_nodata")),
+    _t("sa", "WeightedSum", "weighted_sum", ("in_weighted_sum_table", _ws_table)),
+    _t("sa", "HighestPosition", "highest_position", ("in_rasters", _inputs)),
+    _t("sa", "LowestPosition", "lowest_position", ("in_rasters", _inputs)),
+    _t("sa", "Combine", "combine", ("in_rasters", _inputs)),
+    _t("sa", "WeightedOverlay", "weighted_overlay", ("in_weighted_overlay_table", _wo_table)),
+    _t("sa", "FuzzyMembership", "fuzzy_membership", ("in_raster", "input"), ("fuzzy_function", _fuzzy_function), ("hedge", "hedge")),
+    _t("sa", "FuzzyOverlay", "fuzzy_overlay", ("in_rasters", _inputs), ("overlay_type", "overlay_type"), ("gamma", "gamma")),
     _t("sa", "Aspect", "aspect", ("in_raster", "input"), ("method", None), ("z_unit", None)),
     _t("sa", "Hillshade", "hillshade", ("in_raster", "input"), ("azimuth", "azimuth"), ("altitude", "altitude"), ("model_shadows", ("model_shadows", _flag("SHADOWS"))), ("z_factor", "z_factor")),
     _t("sa", "Curvature", "curvature", ("in_raster", "input"), ("z_factor", "z_factor"), ("out_profile_curve_raster", ("profile", bool)), ("out_plan_curve_raster", ("plan", bool))),
@@ -497,6 +600,8 @@ _modules = {"analysis": analysis, "management": management, "sa": sa, "conversio
 
 sa.RadiusVariable = RadiusVariable
 sa.RadiusFixed = RadiusFixed
+for _cls in (RemapValue, WSTable, WOTable, FuzzyLinear, FuzzyGaussian, FuzzyLarge, FuzzySmall, FuzzyNear, FuzzyMSLarge, FuzzyMSSmall):
+    setattr(sa, _cls.__name__, _cls)
 
 for _module, _name, _tool, _args, _outs in _TOOLS:
     setattr(_modules[_module], _name, _make(_module, _name, _tool, _args, _outs))

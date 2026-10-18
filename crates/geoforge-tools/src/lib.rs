@@ -4,6 +4,7 @@
 
 mod fieldmap;
 pub mod pycalc;
+pub mod spatstat;
 mod sql;
 mod zm;
 

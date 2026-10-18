@@ -13,6 +13,7 @@ mod geotiff;
 pub mod hydro;
 pub mod interpolate;
 pub mod local;
+pub mod overlay;
 pub mod rasterize;
 pub mod resample;
 pub mod stats;

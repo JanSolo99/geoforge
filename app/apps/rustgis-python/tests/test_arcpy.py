@@ -145,3 +145,20 @@ def test_idw_takes_arcpy_search_radii(s):
     assert {"CitiesIdw", "CitiesFixed"} <= names
     with pytest.raises(rustgis.GeoForgeError):
         arcpy.sa.Idw("Cities", "pop_max", 2, 2, "nonsense")
+
+
+def test_overlay_and_fuzzy_tools(s):
+    arcpy.conversion.PolygonToRaster("Countries", "", "Grid", "CELL_CENTER", cellsize=4)
+    arcpy.sa.Plus("Grid", 3, out_raster="Grid3")
+    arcpy.sa.CellStatistics(["Grid", "Grid3"], "MAXIMUM", "DATA", out_raster="Max")
+    arcpy.sa.WeightedSum(arcpy.sa.WSTable([["Grid", "VALUE", 0.5], ["Grid3", "VALUE", 0.5]]), out_raster="WSum")
+    arcpy.sa.HighestPosition(["Grid", "Grid3"], out_raster="HP")
+    arcpy.sa.Combine(["Grid", "Grid3"], out_raster="Comb")
+    arcpy.sa.FuzzyMembership("Grid", arcpy.sa.FuzzyLinear(0, 200), "SOMEWHAT", out_raster="Fz")
+    arcpy.sa.FuzzyOverlay(["Fz", "Fz"], "GAMMA", 0.5, out_raster="Fo")
+    table = arcpy.sa.WOTable([["Grid", 100, "VALUE", arcpy.sa.RemapValue([[1, 5]])]], [1, 9, 1])
+    arcpy.sa.WeightedOverlay(table, out_raster="Wo")
+    names = {l["name"] for l in s.layers()}
+    assert {"Max", "WSum", "HP", "Comb", "Fz", "Fo", "Wo"} <= names
+    with pytest.raises(rustgis.GeoForgeError):
+        arcpy.sa.FuzzyMembership("Grid", "not a function", out_raster="Bad")

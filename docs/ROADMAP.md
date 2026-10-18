@@ -421,6 +421,19 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         3 environments and 15 reach cases match Pro 3.7 (`testdata/arcgis-reference/idw.json`,
         probes in `scripts/research/idw/`). Barriers not done. Next in this family: Natural
         Neighbor, Spline, Kriging, Trend, Topo to Raster
+  - [x] Overlay and local tools over several rasters (`geoforge-raster::overlay`; `gf cell-statistics`,
+        `weighted-sum`, `highest-position`, `combine`, `fuzzy-membership`, `fuzzy-overlay`; app tools
+        incl. Weighted Overlay; `arcpy.sa.CellStatistics`, `WeightedSum`, `HighestPosition`,
+        `LowestPosition`, `Combine`, `WeightedOverlay`, `FuzzyMembership`, `FuzzyOverlay` and the
+        Fuzzy*/WSTable/WOTable/RemapValue classes), every cell and output type matching Pro 3.7
+        (`testdata/arcgis-reference/overlay.json`, probes in `scripts/research/overlay/`): DATA/NODATA
+        handling, population STD, ties of MAJORITY/MINORITY to the smallest value, MEDIAN of an even
+        count (average in float, lower middle in integer output), Combine numbering by first
+        appearance, Weighted Overlay rounding half up to S8, the seven fuzzy functions and hedges,
+        Fuzzy Overlay AND/OR/PRODUCT/SUM/GAMMA. Integer outputs are typed for the range the inputs'
+        statistics allow (not the values found), values 0..1 giving NoData 16, wide signed input
+        staying S32. Not done: Weighted Overlay RESTRICTED, value fields other than VALUE, the
+        Combine/Weighted Overlay attribute tables, `gf weighted-overlay`
   - [ ] Raster To Polygon SIMPLIFY: rule worked out for blocky rasters (104 of 122 test rasters exact;
         arcs between nodes, corners displaced diagonally by a from a fixed grid, Douglas-Peucker-like
         split with collapse/clamp, fewest-vertices choice of a) — see `docs/formats/raster-to-polygon-simplify.md`;
@@ -498,3 +511,16 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
 
 ## Phase 9 — Advanced
 - [ ] Network analysis, geocoding, spatial statistics, geostatistics, image classification, point clouds (LAS/LAZ)
+  - [ ] Spatial Statistics (0 of 63 at the start of this item)
+    - [x] Measuring Geographic Distributions (`geoforge-tools::spatstat`; `gf mean-center`,
+          `median-center`, `central-feature`, `standard-distance`, `directional-distribution`,
+          `directional-mean`) matched to Pro 3.7 on 37 runs (two point sets, one line set; weights,
+          case fields, dimension field, self potential, 1-3 deviations, orientation-only;
+          `testdata/arcgis-reference/spatstat.json`, probes in `scripts/research/spatstat/`):
+          schemas, case ordering, 361-vertex circles and ellipses, the Rayleigh statistic
+          `2Z(1 + (Z-2)/4n)` with p = exp(-Z). Open: Median Center's stopping rule (Weiszfeld from the
+          mean; ArcGIS takes the same steps but stops at a different one, up to ~10 m apart), the
+          app tools and `arcpy.stats`
+    - [ ] Next: Average Nearest Neighbor, Spatial Autocorrelation (Moran's I), Hot Spot Analysis
+          (Getis-Ord Gi*), Generate Spatial Weights Matrix, Collect Events, Multi-Distance Spatial
+          Cluster Analysis (Ripley's K), Cluster and Outlier Analysis, OLS and GWR

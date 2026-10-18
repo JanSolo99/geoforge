@@ -164,7 +164,7 @@ pub fn common_grid(a: &Raster, b: &Raster) -> Option<(Raster, Raster)> {
 
 impl Raster {
     /// This raster sampled onto another grid (a copy when it is the same grid).
-    fn onto(&self, transform: [f64; 6], cols: usize, rows: usize) -> Raster {
+    pub(crate) fn onto(&self, transform: [f64; 6], cols: usize, rows: usize) -> Raster {
         if (self.transform, self.width, self.height) == (transform, cols, rows) {
             self.clone()
         } else {
@@ -180,6 +180,11 @@ impl Operand {
             Operand::Constant(c) => Operand::Constant(*c),
         }
     }
+}
+
+/// The value range of an integer type.
+pub(crate) fn type_range_of(t: DataType) -> (f64, f64) {
+    type_range(t)
 }
 
 /// The value range of an integer type.

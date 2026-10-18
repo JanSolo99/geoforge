@@ -475,6 +475,77 @@ enum Tool {
         in_features: PathBuf,
         out_feature_class: PathBuf,
     },
+    /// Spatial Statistics "Mean Center".
+    MeanCenter {
+        in_features: PathBuf,
+        out_feature_class: PathBuf,
+        #[arg(long)]
+        weight_field: Option<String>,
+        #[arg(long)]
+        case_field: Option<String>,
+        /// A numeric field whose (weighted) mean is added to the output.
+        #[arg(long)]
+        dimension_field: Option<String>,
+    },
+    /// Spatial Statistics "Median Center" (approximate: ArcGIS's stopping rule is not reproduced).
+    MedianCenter {
+        in_features: PathBuf,
+        out_feature_class: PathBuf,
+        #[arg(long)]
+        weight_field: Option<String>,
+        #[arg(long)]
+        case_field: Option<String>,
+        #[arg(long)]
+        dimension_field: Option<String>,
+    },
+    /// Spatial Statistics "Central Feature".
+    CentralFeature {
+        in_features: PathBuf,
+        out_feature_class: PathBuf,
+        /// EUCLIDEAN_DISTANCE or MANHATTAN_DISTANCE.
+        #[arg(long, default_value = "EUCLIDEAN_DISTANCE")]
+        distance_method: String,
+        #[arg(long)]
+        weight_field: Option<String>,
+        #[arg(long)]
+        self_potential_weight_field: Option<String>,
+        #[arg(long)]
+        case_field: Option<String>,
+    },
+    /// Spatial Statistics "Standard Distance": circles around the mean center.
+    StandardDistance {
+        in_features: PathBuf,
+        out_feature_class: PathBuf,
+        /// 1_STANDARD_DEVIATION, 2_STANDARD_DEVIATIONS or 3_STANDARD_DEVIATIONS.
+        #[arg(long, default_value = "1_STANDARD_DEVIATION")]
+        circle_size: String,
+        #[arg(long)]
+        weight_field: Option<String>,
+        #[arg(long)]
+        case_field: Option<String>,
+    },
+    /// Spatial Statistics "Directional Distribution": standard deviational ellipses.
+    DirectionalDistribution {
+        in_features: PathBuf,
+        out_feature_class: PathBuf,
+        /// 1_STANDARD_DEVIATION, 2_STANDARD_DEVIATIONS or 3_STANDARD_DEVIATIONS.
+        #[arg(long, default_value = "1_STANDARD_DEVIATION")]
+        ellipse_size: String,
+        #[arg(long)]
+        weight_field: Option<String>,
+        #[arg(long)]
+        case_field: Option<String>,
+    },
+    /// Spatial Statistics "Linear Directional Mean" of lines.
+    DirectionalMean {
+        in_features: PathBuf,
+        out_feature_class: PathBuf,
+        /// Fold directions onto 0-180 degrees (ORIENTATION_ONLY).
+        #[arg(long)]
+        orientation_only: bool,
+        #[arg(long)]
+        case_field: Option<String>,
+    },
     /// A point per feature (ArcGIS "Feature To Point").
     FeatureToPoint {
         in_features: PathBuf,
@@ -833,6 +904,60 @@ enum Tool {
         /// The extent environment: xmin ymin xmax ymax.
         #[arg(long, num_args = 4, value_names = ["XMIN", "YMIN", "XMAX", "YMAX"])]
         extent: Option<Vec<f64>>,
+    },
+    /// Spatial Analyst "Cell Statistics" over several rasters.
+    CellStatistics {
+        /// The input rasters, then the output raster.
+        #[arg(required = true, num_args = 2..)]
+        paths: Vec<PathBuf>,
+        /// MEAN, MAJORITY, MAXIMUM, MEDIAN, MINIMUM, MINORITY, RANGE, STD, SUM or VARIETY.
+        #[arg(long, default_value = "MEAN")]
+        statistics_type: String,
+        /// DATA or NODATA.
+        #[arg(long, default_value = "DATA")]
+        ignore_nodata: String,
+    },
+    /// Spatial Analyst "Weighted Sum": raster=weight pairs, then the output raster.
+    WeightedSum {
+        /// `raster.tif=0.5` entries, then the output raster.
+        #[arg(required = true, num_args = 2..)]
+        paths: Vec<String>,
+    },
+    /// Spatial Analyst "Highest Position" (or Lowest with --lowest).
+    HighestPosition {
+        #[arg(required = true, num_args = 2..)]
+        paths: Vec<PathBuf>,
+        #[arg(long)]
+        lowest: bool,
+    },
+    /// Spatial Analyst "Combine": a value per distinct combination.
+    Combine {
+        #[arg(required = true, num_args = 2..)]
+        paths: Vec<PathBuf>,
+    },
+    /// Spatial Analyst "Fuzzy Membership".
+    FuzzyMembership {
+        in_raster: PathBuf,
+        out_raster: PathBuf,
+        /// LINEAR, GAUSSIAN, LARGE, SMALL, NEAR, MSLARGE or MSSMALL.
+        function: String,
+        /// The function's numbers: LINEAR min max; GAUSSIAN/LARGE/SMALL/NEAR midpoint spread;
+        /// MSLARGE/MSSMALL mean-multiplier std-multiplier.
+        #[arg(num_args = 0..=2)]
+        values: Vec<f64>,
+        /// NONE, SOMEWHAT or VERY.
+        #[arg(long, default_value = "NONE")]
+        hedge: String,
+    },
+    /// Spatial Analyst "Fuzzy Overlay" of membership rasters.
+    FuzzyOverlay {
+        #[arg(required = true, num_args = 2..)]
+        paths: Vec<PathBuf>,
+        /// AND, OR, PRODUCT, SUM or GAMMA.
+        #[arg(long, default_value = "AND")]
+        overlay_type: String,
+        #[arg(long)]
+        gamma: Option<f64>,
     },
     /// Conversion "Point To Raster".
     PointToRaster {
@@ -1737,6 +1862,107 @@ fn main() -> ExitCode {
             let out = geoforge_tools::multipart_to_singlepart(fc.as_ref())?;
             write_output(out, &out_feature_class, source_gdb(&in_features).as_deref())
         })(),
+        Tool::MeanCenter {
+            in_features,
+            out_feature_class,
+            weight_field,
+            case_field,
+            dimension_field,
+        } => (|| {
+            let (fc, _) = open_feature_class(&in_features)?;
+            let out = geoforge_tools::spatstat::mean_center(
+                fc.as_ref(),
+                weight_field.as_deref(),
+                case_field.as_deref(),
+                dimension_field.as_deref(),
+            )?;
+            write_output(out, &out_feature_class, source_gdb(&in_features).as_deref())
+        })(),
+        Tool::MedianCenter {
+            in_features,
+            out_feature_class,
+            weight_field,
+            case_field,
+            dimension_field,
+        } => (|| {
+            let (fc, _) = open_feature_class(&in_features)?;
+            let out = geoforge_tools::spatstat::median_center(
+                fc.as_ref(),
+                weight_field.as_deref(),
+                case_field.as_deref(),
+                dimension_field.as_deref(),
+            )?;
+            write_output(out, &out_feature_class, source_gdb(&in_features).as_deref())
+        })(),
+        Tool::CentralFeature {
+            in_features,
+            out_feature_class,
+            distance_method,
+            weight_field,
+            self_potential_weight_field,
+            case_field,
+        } => (|| {
+            let manhattan = match distance_method.to_ascii_uppercase().as_str() {
+                "EUCLIDEAN_DISTANCE" => false,
+                "MANHATTAN_DISTANCE" => true,
+                other => return Err(Error::Unsupported(format!("distance method {other}"))),
+            };
+            let (fc, _) = open_feature_class(&in_features)?;
+            let out = geoforge_tools::spatstat::central_feature(
+                fc.as_ref(),
+                manhattan,
+                weight_field.as_deref(),
+                self_potential_weight_field.as_deref(),
+                case_field.as_deref(),
+            )?;
+            write_output(out, &out_feature_class, source_gdb(&in_features).as_deref())
+        })(),
+        Tool::StandardDistance {
+            in_features,
+            out_feature_class,
+            circle_size,
+            weight_field,
+            case_field,
+        } => (|| {
+            let (fc, _) = open_feature_class(&in_features)?;
+            let out = geoforge_tools::spatstat::standard_distance(
+                fc.as_ref(),
+                &circle_size,
+                weight_field.as_deref(),
+                case_field.as_deref(),
+            )?;
+            write_output(out, &out_feature_class, source_gdb(&in_features).as_deref())
+        })(),
+        Tool::DirectionalDistribution {
+            in_features,
+            out_feature_class,
+            ellipse_size,
+            weight_field,
+            case_field,
+        } => (|| {
+            let (fc, _) = open_feature_class(&in_features)?;
+            let out = geoforge_tools::spatstat::directional_distribution(
+                fc.as_ref(),
+                &ellipse_size,
+                weight_field.as_deref(),
+                case_field.as_deref(),
+            )?;
+            write_output(out, &out_feature_class, source_gdb(&in_features).as_deref())
+        })(),
+        Tool::DirectionalMean {
+            in_features,
+            out_feature_class,
+            orientation_only,
+            case_field,
+        } => (|| {
+            let (fc, _) = open_feature_class(&in_features)?;
+            let out = geoforge_tools::spatstat::linear_directional_mean(
+                fc.as_ref(),
+                orientation_only,
+                case_field.as_deref(),
+            )?;
+            write_output(out, &out_feature_class, source_gdb(&in_features).as_deref())
+        })(),
         Tool::FeatureToPoint {
             in_features,
             out_feature_class,
@@ -2541,6 +2767,163 @@ fn main() -> ExitCode {
                     )
                 })?;
             write_raster(&out_raster, &r)
+        })(),
+        Tool::CellStatistics {
+            paths,
+            statistics_type,
+            ignore_nodata,
+        } => (|| {
+            use geoforge_raster::overlay::*;
+            let (out, ins) = paths
+                .split_last()
+                .ok_or_else(|| Error::Unsupported("no rasters".into()))?;
+            let stat = CellStat::parse(&statistics_type)
+                .ok_or_else(|| Error::Unsupported(format!("statistics type {statistics_type}")))?;
+            let ignore = match ignore_nodata.to_ascii_uppercase().as_str() {
+                "DATA" => true,
+                "NODATA" => false,
+                other => return Err(Error::Unsupported(format!("ignore NoData {other}"))),
+            };
+            let rs: Vec<_> = ins
+                .iter()
+                .map(|p| geoforge_raster::read_geotiff(p))
+                .collect::<Result<_, _>>()?;
+            let refs: Vec<&geoforge_raster::Raster> = rs.iter().collect();
+            let r = cell_statistics(&refs, stat, ignore)
+                .ok_or_else(|| Error::Unsupported("the rasters do not overlap".into()))?;
+            write_raster(out, &r)
+        })(),
+        Tool::WeightedSum { paths } => (|| {
+            let (out, ins) = paths
+                .split_last()
+                .ok_or_else(|| Error::Unsupported("no rasters".into()))?;
+            let mut rs = Vec::new();
+            let mut weights = Vec::new();
+            for e in ins {
+                let (p, w) = e
+                    .rsplit_once('=')
+                    .ok_or_else(|| Error::Unsupported(format!("'{e}': expected raster=weight")))?;
+                weights.push(
+                    w.parse::<f64>()
+                        .map_err(|_| Error::Unsupported(format!("weight '{w}'")))?,
+                );
+                rs.push(geoforge_raster::read_geotiff(std::path::Path::new(p))?);
+            }
+            let refs: Vec<&geoforge_raster::Raster> = rs.iter().collect();
+            let r = geoforge_raster::overlay::weighted_sum(&refs, &weights)
+                .ok_or_else(|| Error::Unsupported("the rasters do not overlap".into()))?;
+            write_raster(std::path::Path::new(out), &r)
+        })(),
+        Tool::HighestPosition { paths, lowest } => (|| {
+            let (out, ins) = paths
+                .split_last()
+                .ok_or_else(|| Error::Unsupported("no rasters".into()))?;
+            let rs: Vec<_> = ins
+                .iter()
+                .map(|p| geoforge_raster::read_geotiff(p))
+                .collect::<Result<_, _>>()?;
+            let refs: Vec<&geoforge_raster::Raster> = rs.iter().collect();
+            let r = geoforge_raster::overlay::position(&refs, !lowest)
+                .ok_or_else(|| Error::Unsupported("the rasters do not overlap".into()))?;
+            write_raster(out, &r)
+        })(),
+        Tool::Combine { paths } => (|| {
+            let (out, ins) = paths
+                .split_last()
+                .ok_or_else(|| Error::Unsupported("no rasters".into()))?;
+            let rs: Vec<_> = ins
+                .iter()
+                .map(|p| geoforge_raster::read_geotiff(p))
+                .collect::<Result<_, _>>()?;
+            let refs: Vec<&geoforge_raster::Raster> = rs.iter().collect();
+            let r = geoforge_raster::overlay::combine(&refs)
+                .ok_or_else(|| Error::Unsupported("the rasters do not overlap".into()))?;
+            write_raster(out, &r)
+        })(),
+        Tool::FuzzyMembership {
+            in_raster,
+            out_raster,
+            function,
+            values,
+            hedge,
+        } => (|| {
+            use geoforge_raster::overlay::*;
+            let v = |i: usize, default: Option<f64>| {
+                values
+                    .get(i)
+                    .copied()
+                    .or(default)
+                    .ok_or_else(|| Error::Unsupported(format!("{function} needs more numbers")))
+            };
+            let class = match function.to_ascii_uppercase().as_str() {
+                "LINEAR" => Fuzzy::Linear {
+                    min: v(0, None)?,
+                    max: v(1, None)?,
+                },
+                "GAUSSIAN" => Fuzzy::Gaussian {
+                    midpoint: v(0, None)?,
+                    spread: v(1, Some(0.1))?,
+                },
+                "LARGE" => Fuzzy::Large {
+                    midpoint: v(0, None)?,
+                    spread: v(1, Some(5.0))?,
+                },
+                "SMALL" => Fuzzy::Small {
+                    midpoint: v(0, None)?,
+                    spread: v(1, Some(5.0))?,
+                },
+                "NEAR" => Fuzzy::Near {
+                    midpoint: v(0, None)?,
+                    spread: v(1, Some(0.1))?,
+                },
+                "MSLARGE" => Fuzzy::MsLarge {
+                    mean_multiplier: v(0, Some(1.0))?,
+                    std_multiplier: v(1, Some(1.0))?,
+                },
+                "MSSMALL" => Fuzzy::MsSmall {
+                    mean_multiplier: v(0, Some(1.0))?,
+                    std_multiplier: v(1, Some(1.0))?,
+                },
+                other => return Err(Error::Unsupported(format!("function {other}"))),
+            };
+            let hedge = match hedge.to_ascii_uppercase().as_str() {
+                "NONE" => Hedge::None,
+                "SOMEWHAT" => Hedge::Somewhat,
+                "VERY" => Hedge::Very,
+                other => return Err(Error::Unsupported(format!("hedge {other}"))),
+            };
+            let r = geoforge_raster::read_geotiff(&in_raster)?;
+            write_raster(&out_raster, &fuzzy_membership(&r, class, hedge))
+        })(),
+        Tool::FuzzyOverlay {
+            paths,
+            overlay_type,
+            gamma,
+        } => (|| {
+            use geoforge_raster::overlay::*;
+            let (out, ins) = paths
+                .split_last()
+                .ok_or_else(|| Error::Unsupported("no rasters".into()))?;
+            let kind = match overlay_type.to_ascii_uppercase().as_str() {
+                "AND" => FuzzyOverlayType::And,
+                "OR" => FuzzyOverlayType::Or,
+                "PRODUCT" => FuzzyOverlayType::Product,
+                "SUM" => FuzzyOverlayType::Sum,
+                "GAMMA" => {
+                    FuzzyOverlayType::Gamma(gamma.filter(|g| (0.0..=1.0).contains(g)).ok_or_else(
+                        || Error::Unsupported("--gamma is a number from 0 to 1".into()),
+                    )?)
+                }
+                other => return Err(Error::Unsupported(format!("overlay type {other}"))),
+            };
+            let rs: Vec<_> = ins
+                .iter()
+                .map(|p| geoforge_raster::read_geotiff(p))
+                .collect::<Result<_, _>>()?;
+            let refs: Vec<&geoforge_raster::Raster> = rs.iter().collect();
+            let r = fuzzy_overlay(&refs, kind)
+                .ok_or_else(|| Error::Unsupported("the rasters do not overlap".into()))?;
+            write_raster(out, &r)
         })(),
         Tool::PointToRaster {
             in_features,

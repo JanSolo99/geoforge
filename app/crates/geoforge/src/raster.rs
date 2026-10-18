@@ -849,6 +849,194 @@ fn point_to_raster(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     finish_rasterized(p, points_to_raster(&features, cell, assignment, kind), format!("{}_Raster", text(p, "input")))
 }
 
+// ---------------------------------------------------------------------------------------------
+// overlay and fuzzy
+
+/// The rasters named in the semicolon list `key`, and the first one's coordinate system.
+fn rasters_in(inp: &dyn Inputs, p: &Json, key: &str) -> Result<(Vec<gfr::Raster>, Crs), String> {
+    let names: Vec<String> = text(p, key).split(';').map(str::trim).filter(|s| !s.is_empty()).map(String::from).collect();
+    if names.is_empty() {
+        return Err("name the input rasters, separated by semicolons".into());
+    }
+    let mut out = Vec::new();
+    let mut crs = Crs::LonLat;
+    for (i, n) in names.iter().enumerate() {
+        let (r, c) = load(inp, n)?;
+        if i == 0 {
+            crs = c;
+        }
+        out.push(r);
+    }
+    Ok((out, crs))
+}
+
+/// Runs `f` over `rasters` on the processing grid; a tool that finds no overlap gives no raster.
+fn overlay_eval(
+    inp: &dyn Inputs,
+    p: &Json,
+    rasters: &[gfr::Raster],
+    crs: Crs,
+    f: &dyn Fn(&[&gfr::Raster]) -> Option<gfr::Raster>,
+) -> Result<gfr::Raster, String> {
+    let refs: Vec<&gfr::Raster> = rasters.iter().collect();
+    if gfr::local::local_grid(&refs).is_none() {
+        return Err("the input rasters do not overlap".into());
+    }
+    let nothing = || gfr::Raster::new(1, 1, gfr::DataType::F32, [0.0, 1.0, 0.0, 1.0, 0.0, -1.0]);
+    eval(inp, p, &refs, crs, Reads::Cropped, Sampling::Nearest, &|r| {
+        let rs: Vec<&gfr::Raster> = r.iter().collect();
+        f(&rs).unwrap_or_else(nothing)
+    })
+}
+
+fn cell_statistics(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let (rs, crs) = rasters_in(inp, p, "inputs")?;
+    let stat =
+        gfr::overlay::CellStat::parse(&choice(p, "statistic", "MEAN")).ok_or_else(|| format!("statistic {}", text(p, "statistic")))?;
+    let ignore = match choice(p, "ignore_nodata", "DATA").as_str() {
+        "DATA" => true,
+        "NODATA" => false,
+        other => return Err(format!("ignore NoData {other}: DATA or NODATA")),
+    };
+    one(p, "CellStatistics".into(), overlay_eval(inp, p, &rs, crs, &|r| gfr::overlay::cell_statistics(r, stat, ignore))?)
+}
+
+fn weighted_sum(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let (rs, crs) = rasters_in(inp, p, "inputs")?;
+    let weights: Vec<f64> = text(p, "weights")
+        .split(';')
+        .map(|w| w.trim().parse::<f64>().map_err(|_| format!("weight '{w}' is not a number")))
+        .collect::<Result<_, _>>()?;
+    if weights.len() != rs.len() {
+        return Err(format!("{} weights for {} rasters", weights.len(), rs.len()));
+    }
+    one(p, "WeightedSum".into(), overlay_eval(inp, p, &rs, crs, &|r| gfr::overlay::weighted_sum(r, &weights))?)
+}
+
+fn position(inp: &dyn Inputs, p: &Json, highest: bool) -> Result<ToolResult, String> {
+    let (rs, crs) = rasters_in(inp, p, "inputs")?;
+    one(
+        p,
+        (if highest { "HighestPosition" } else { "LowestPosition" }).into(),
+        overlay_eval(inp, p, &rs, crs, &|r| gfr::overlay::position(r, highest))?,
+    )
+}
+
+fn highest_position(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    position(inp, p, true)
+}
+
+fn lowest_position(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    position(inp, p, false)
+}
+
+fn combine(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let (rs, crs) = rasters_in(inp, p, "inputs")?;
+    one(p, "Combine".into(), overlay_eval(inp, p, &rs, crs, &gfr::overlay::combine)?)
+}
+
+/// `layer:influence:from=to,from=to` entries separated by semicolons (`to` a number or NODATA).
+fn weighted_overlay(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    use gfr::overlay::{Scale, Weighted};
+    let mut rasters = Vec::new();
+    let mut specs: Vec<(f64, Vec<(f64, Scale)>)> = Vec::new();
+    let mut crs = Crs::LonLat;
+    for (i, entry) in text(p, "table").split(';').map(str::trim).filter(|e| !e.is_empty()).enumerate() {
+        let parts: Vec<&str> = entry.splitn(3, ':').collect();
+        if parts.len() != 3 {
+            return Err(format!("'{entry}': expected layer:influence:from=to,from=to"));
+        }
+        let (r, c) = load(inp, parts[0].trim())?;
+        if i == 0 {
+            crs = c;
+        }
+        let influence: f64 = parts[1].trim().parse().map_err(|_| format!("influence '{}' is not a number", parts[1]))?;
+        let mut remap = Vec::new();
+        for pair in parts[2].split(',').map(str::trim).filter(|s| !s.is_empty()) {
+            let (from, to) = pair.split_once('=').ok_or_else(|| format!("'{pair}': expected from=to"))?;
+            let from: f64 = from.trim().parse().map_err(|_| format!("value '{from}' is not a number"))?;
+            let to = if to.trim().eq_ignore_ascii_case("NODATA") {
+                Scale::NoData
+            } else {
+                Scale::Value(to.trim().parse().map_err(|_| format!("scale value '{to}' is not a number"))?)
+            };
+            remap.push((from, to));
+        }
+        rasters.push(r);
+        specs.push((influence, remap));
+    }
+    if rasters.is_empty() {
+        return Err("fill the table: layer:influence:from=to,from=to".into());
+    }
+    if (specs.iter().map(|s| s.0).sum::<f64>() - 100.0).abs() > 1e-9 {
+        return Err("the influences must add up to 100".into());
+    }
+    let scale: Vec<f64> = text(p, "evaluation_scale")
+        .split(|c: char| c.is_whitespace() || c == ';' || c == ',')
+        .filter(|w| !w.is_empty())
+        .map(|w| w.parse::<f64>().map_err(|_| format!("evaluation scale '{w}'")))
+        .collect::<Result<_, _>>()?;
+    let scale = match scale.as_slice() {
+        [] => (1.0, 9.0),
+        [lo, hi, ..] if lo <= hi => (*lo, *hi),
+        _ => return Err("the evaluation scale is 'from to by', for example 1 9 1".into()),
+    };
+    let out = overlay_eval(inp, p, &rasters, crs, &|r| {
+        let inputs: Vec<Weighted> = r
+            .iter()
+            .zip(&specs)
+            .map(|(raster, (influence, remap))| Weighted { raster, influence: *influence, remap: remap.clone() })
+            .collect();
+        gfr::overlay::weighted_overlay(&inputs, scale)
+    })?;
+    one(p, "WeightedOverlay".into(), out)
+}
+
+fn fuzzy_membership(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    use gfr::overlay::{Fuzzy, Hedge};
+    let (r, crs) = input(inp, p, "input")?;
+    let need = |k: &str| number(p, k).ok_or_else(|| format!("'{k}' is needed for this function"));
+    let class = match choice(p, "function", "LINEAR").as_str() {
+        "LINEAR" => Fuzzy::Linear { min: need("minimum")?, max: need("maximum")? },
+        "GAUSSIAN" => Fuzzy::Gaussian { midpoint: need("midpoint")?, spread: number(p, "spread").unwrap_or(0.1) },
+        "LARGE" => Fuzzy::Large { midpoint: need("midpoint")?, spread: number(p, "spread").unwrap_or(5.0) },
+        "SMALL" => Fuzzy::Small { midpoint: need("midpoint")?, spread: number(p, "spread").unwrap_or(5.0) },
+        "NEAR" => Fuzzy::Near { midpoint: need("midpoint")?, spread: number(p, "spread").unwrap_or(0.1) },
+        "MSLARGE" => Fuzzy::MsLarge {
+            mean_multiplier: number(p, "mean_multiplier").unwrap_or(1.0),
+            std_multiplier: number(p, "std_multiplier").unwrap_or(1.0),
+        },
+        "MSSMALL" => Fuzzy::MsSmall {
+            mean_multiplier: number(p, "mean_multiplier").unwrap_or(1.0),
+            std_multiplier: number(p, "std_multiplier").unwrap_or(1.0),
+        },
+        other => return Err(format!("function {other}")),
+    };
+    let hedge = match choice(p, "hedge", "NONE").as_str() {
+        "NONE" => Hedge::None,
+        "SOMEWHAT" => Hedge::Somewhat,
+        "VERY" => Hedge::Very,
+        other => return Err(format!("hedge {other}")),
+    };
+    // The statistics of MS Large and MS Small are the input's own: fuzzify before any environment.
+    let out = eval(inp, p, &[&r], crs, Reads::Cropped, Sampling::Nearest, &|x| gfr::overlay::fuzzy_membership(&x[0], class, hedge))?;
+    one(p, format!("{}_Fuzzy", text(p, "input")), out)
+}
+
+fn fuzzy_overlay(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    use gfr::overlay::FuzzyOverlayType;
+    let (rs, crs) = rasters_in(inp, p, "inputs")?;
+    let kind = match choice(p, "overlay_type", "AND").as_str() {
+        "AND" => FuzzyOverlayType::And,
+        "OR" => FuzzyOverlayType::Or,
+        "PRODUCT" => FuzzyOverlayType::Product,
+        "SUM" => FuzzyOverlayType::Sum,
+        "GAMMA" => FuzzyOverlayType::Gamma(number(p, "gamma").filter(|g| (0.0..=1.0).contains(g)).ok_or("gamma is a number from 0 to 1")?),
+        other => return Err(format!("overlay type {other}")),
+    };
+    one(p, "FuzzyOverlay".into(), overlay_eval(inp, p, &rs, crs, &|r| gfr::overlay::fuzzy_overlay(r, kind))?)
+}
+
 /// Inverse Distance Weighted interpolation of a point layer's field (Spatial Analyst Idw).
 fn idw(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     use gfr::interpolate::{Sample, SearchRadius};
@@ -916,6 +1104,227 @@ fn rustgis_tools_table(fields: Vec<geoforge_core::Field>, rows: Vec<Vec<geoforge
 }
 
 pub(crate) const DEFS: &[Def] = &[
+    Def {
+        id: "cell_statistics",
+        name: "Cell Statistics",
+        toolbox: "GeoForge › Spatial Analyst › Local",
+        summary: "A statistic of each cell across several rasters (ArcGIS Pro Cell Statistics).",
+        params: &[
+            P {
+                name: "inputs",
+                label: "Input rasters",
+                kind: K::Text,
+                required: true,
+                default: "",
+                help: "Raster layer names separated by semicolons.",
+            },
+            P {
+                name: "statistic",
+                label: "Overlay statistic",
+                kind: K::Choice(&["MEAN", "MAJORITY", "MAXIMUM", "MEDIAN", "MINIMUM", "MINORITY", "RANGE", "STD", "SUM", "VARIETY"]),
+                required: false,
+                default: "\"MEAN\"",
+                help: "",
+            },
+            P {
+                name: "ignore_nodata",
+                label: "Ignore NoData",
+                kind: K::Choice(&["DATA", "NODATA"]),
+                required: false,
+                default: "\"DATA\"",
+                help: "DATA: use the cells that have values. NODATA: a cell with any NoData input is NoData.",
+            },
+            OUTPUT,
+        ],
+        run: cell_statistics,
+    },
+    Def {
+        id: "weighted_sum",
+        name: "Weighted Sum",
+        toolbox: "GeoForge › Spatial Analyst › Overlay",
+        summary: "Weights and adds rasters cell by cell (ArcGIS Pro Weighted Sum).",
+        params: &[
+            P {
+                name: "inputs",
+                label: "Input rasters",
+                kind: K::Text,
+                required: true,
+                default: "",
+                help: "Raster layer names separated by semicolons.",
+            },
+            P {
+                name: "weights",
+                label: "Weights",
+                kind: K::Text,
+                required: true,
+                default: "",
+                help: "One number per raster, separated by semicolons.",
+            },
+            OUTPUT,
+        ],
+        run: weighted_sum,
+    },
+    Def {
+        id: "highest_position",
+        name: "Highest Position",
+        toolbox: "GeoForge › Spatial Analyst › Local",
+        summary: "The position of the raster with the highest value in each cell (ArcGIS Pro Highest Position).",
+        params: &[
+            P {
+                name: "inputs",
+                label: "Input rasters",
+                kind: K::Text,
+                required: true,
+                default: "",
+                help: "Raster layer names separated by semicolons.",
+            },
+            OUTPUT,
+        ],
+        run: highest_position,
+    },
+    Def {
+        id: "lowest_position",
+        name: "Lowest Position",
+        toolbox: "GeoForge › Spatial Analyst › Local",
+        summary: "The position of the raster with the lowest value in each cell (ArcGIS Pro Lowest Position).",
+        params: &[
+            P {
+                name: "inputs",
+                label: "Input rasters",
+                kind: K::Text,
+                required: true,
+                default: "",
+                help: "Raster layer names separated by semicolons.",
+            },
+            OUTPUT,
+        ],
+        run: lowest_position,
+    },
+    Def {
+        id: "combine",
+        name: "Combine",
+        toolbox: "GeoForge › Spatial Analyst › Local",
+        summary: "A new value for each unique combination of the input values (ArcGIS Pro Combine).",
+        params: &[
+            P {
+                name: "inputs",
+                label: "Input rasters",
+                kind: K::Text,
+                required: true,
+                default: "",
+                help: "Raster layer names separated by semicolons.",
+            },
+            OUTPUT,
+        ],
+        run: combine,
+    },
+    Def {
+        id: "weighted_overlay",
+        name: "Weighted Overlay",
+        toolbox: "GeoForge › Spatial Analyst › Overlay",
+        summary: "Overlays rasters on a common scale, each weighted by its influence (ArcGIS Pro Weighted Overlay).",
+        params: &[
+            P {
+                name: "table",
+                label: "Weighted overlay table",
+                kind: K::Text,
+                required: true,
+                default: "",
+                help: "layer:influence:from=to,from=to entries separated by semicolons; `to` is a scale value or NODATA. The influences add up to 100.",
+            },
+            P {
+                name: "evaluation_scale",
+                label: "Evaluation scale",
+                kind: K::Text,
+                required: false,
+                default: "\"1 9 1\"",
+                help: "From, to, by.",
+            },
+            OUTPUT,
+        ],
+        run: weighted_overlay,
+    },
+    Def {
+        id: "fuzzy_membership",
+        name: "Fuzzy Membership",
+        toolbox: "GeoForge › Spatial Analyst › Overlay",
+        summary: "Rescales a raster to 0–1, the strength of membership in a set (ArcGIS Pro Fuzzy Membership).",
+        params: &[
+            RASTER,
+            P {
+                name: "function",
+                label: "Membership type",
+                kind: K::Choice(&["LINEAR", "GAUSSIAN", "LARGE", "SMALL", "NEAR", "MSLARGE", "MSSMALL"]),
+                required: false,
+                default: "\"LINEAR\"",
+                help: "",
+            },
+            P { name: "minimum", label: "Minimum (linear)", kind: K::Number, required: false, default: "", help: "" },
+            P {
+                name: "maximum",
+                label: "Maximum (linear)",
+                kind: K::Number,
+                required: false,
+                default: "",
+                help: "Smaller than the minimum for a decreasing function.",
+            },
+            P { name: "midpoint", label: "Midpoint", kind: K::Number, required: false, default: "", help: "Gaussian, Large, Small, Near." },
+            P {
+                name: "spread",
+                label: "Spread",
+                kind: K::Number,
+                required: false,
+                default: "",
+                help: "Default 0.1 (Gaussian, Near) or 5 (Large, Small).",
+            },
+            P { name: "mean_multiplier", label: "Mean multiplier (MS)", kind: K::Number, required: false, default: "1", help: "" },
+            P {
+                name: "std_multiplier",
+                label: "Standard deviation multiplier (MS)",
+                kind: K::Number,
+                required: false,
+                default: "1",
+                help: "",
+            },
+            P {
+                name: "hedge",
+                label: "Hedge",
+                kind: K::Choice(&["NONE", "SOMEWHAT", "VERY"]),
+                required: false,
+                default: "\"NONE\"",
+                help: "Somewhat: square root. Very: square.",
+            },
+            OUTPUT,
+        ],
+        run: fuzzy_membership,
+    },
+    Def {
+        id: "fuzzy_overlay",
+        name: "Fuzzy Overlay",
+        toolbox: "GeoForge › Spatial Analyst › Overlay",
+        summary: "Combines fuzzy membership rasters (ArcGIS Pro Fuzzy Overlay).",
+        params: &[
+            P {
+                name: "inputs",
+                label: "Input rasters",
+                kind: K::Text,
+                required: true,
+                default: "",
+                help: "Raster layer names separated by semicolons.",
+            },
+            P {
+                name: "overlay_type",
+                label: "Overlay type",
+                kind: K::Choice(&["AND", "OR", "PRODUCT", "SUM", "GAMMA"]),
+                required: false,
+                default: "\"AND\"",
+                help: "",
+            },
+            P { name: "gamma", label: "Gamma", kind: K::Number, required: false, default: "", help: "0 to 1, for GAMMA." },
+            OUTPUT,
+        ],
+        run: fuzzy_overlay,
+    },
     Def {
         id: "idw",
         name: "IDW",

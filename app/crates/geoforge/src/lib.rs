@@ -1589,6 +1589,58 @@ mod tests {
     }
 
     #[test]
+    fn overlay_and_fuzzy_tools_equal_the_engine() {
+        use geoforge_raster::overlay::*;
+        register();
+        let (a, mut inp) = dem("R1");
+        let (_, second) = dem("R2");
+        inp.rasters.extend(second.rasters);
+        // Two copies of the cone: the sum is twice the cone, the mean is the cone.
+        let sum = raster_of(rustgis_analysis::run("geoforge:cell_statistics", &inp, &json!({"inputs": "R1;R2", "statistic": "SUM"})));
+        let want = cell_statistics(&[&a, &a], CellStat::Sum, true).unwrap();
+        assert_eq!((sum.width, sum.height), (want.width, want.height));
+        assert_eq!(sum.bands[0], want.bands[0]);
+        let ws = raster_of(rustgis_analysis::run("geoforge:weighted_sum", &inp, &json!({"inputs": "R1;R2", "weights": "0.5;0.25"})));
+        assert!((ws.get(12, 12).unwrap() - 0.75 * a.get(12, 12).unwrap()).abs() < 1e-3);
+        let hp = raster_of(rustgis_analysis::run("geoforge:highest_position", &inp, &json!({"inputs": "R1;R2"})));
+        assert_eq!(hp.get(12, 12), Some(1.0), "ties go to the first raster");
+        let fz = raster_of(rustgis_analysis::run(
+            "geoforge:fuzzy_membership",
+            &inp,
+            &json!({"input": "R1", "function": "LINEAR", "minimum": 0, "maximum": 100}),
+        ));
+        assert!((fz.get(12, 12).unwrap() - a.get(12, 12).unwrap() / 100.0).abs() < 1e-3);
+        let fo = raster_of(rustgis_analysis::run(
+            "geoforge:fuzzy_overlay",
+            &inp,
+            &json!({"inputs": "R1;R2", "overlay_type": "GAMMA", "gamma": 0.5}),
+        ));
+        assert_eq!((fo.width, fo.height), (24, 24));
+        let wo = raster_of(rustgis_analysis::run("geoforge:weighted_overlay", &inp, &json!({"table": "R1:60:0=1;R2:40:0=1"})));
+        // No cell value is in the remap: all NoData.
+        assert!(wo.bands[0].iter().all(|v| wo.is_nodata(*v)));
+        // The extent environment applies.
+        let small = raster_of(rustgis_analysis::run(
+            "geoforge:cell_statistics",
+            &inp,
+            &json!({"inputs": "R1;R2", "statistic": "MAXIMUM", "extent": "500060 5000060 500300 5000300"}),
+        ));
+        assert_eq!((small.width, small.height), (8, 8));
+        for bad in [
+            json!({"inputs": "R1;nope"}),
+            json!({"inputs": ""}),
+            json!({"inputs": "R1;R2", "statistic": "AVERAGE"}),
+            json!({"inputs": "R1;R2", "ignore_nodata": "MAYBE"}),
+        ] {
+            assert!(rustgis_analysis::run("geoforge:cell_statistics", &inp, &bad).is_err(), "{bad}");
+        }
+        assert!(rustgis_analysis::run("geoforge:weighted_sum", &inp, &json!({"inputs": "R1;R2", "weights": "1"})).is_err());
+        assert!(rustgis_analysis::run("geoforge:weighted_overlay", &inp, &json!({"table": "R1:50:1=1"})).is_err());
+        assert!(rustgis_analysis::run("geoforge:fuzzy_overlay", &inp, &json!({"inputs": "R1;R2", "overlay_type": "GAMMA"})).is_err());
+        assert!(rustgis_analysis::run("geoforge:fuzzy_membership", &inp, &json!({"input": "R1", "function": "LINEAR"})).is_err());
+    }
+
+    #[test]
     fn idw_interpolates_points_to_a_raster() {
         register();
         // Four corners of a square, values 0..3: the middle cell is their mean.
