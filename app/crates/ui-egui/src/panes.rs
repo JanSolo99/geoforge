@@ -1421,11 +1421,17 @@ fn geoprocessing(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
         if q.is_empty() {
             geolibre_section(app, ui);
         }
-        let builtin = rustgis_engine::analysis::TOOLS;
+        // The app's own tools that GeoForge has a counterpart for (matched to ArcGIS) are not listed twice.
+        let builtin: Vec<&'static rustgis_engine::analysis::ToolSpec> = rustgis_engine::analysis::TOOLS
+            .iter()
+            .filter(|t| {
+                !rustgis_engine::analysis::external_tools().iter().any(|x| x.id.eq_ignore_ascii_case(&format!("geoforge:{}", t.id)))
+            })
+            .collect();
         if q.is_empty() {
             // Browsing: one collapsible toolbox per top-level group, like the GeoLibre ones
             // (open: there are only a few built-in tools).
-            ui.label(egui::RichText::new(tl!("GeoForge")).size(11.0).color(t.text_dim));
+            ui.label(egui::RichText::new(tl!("More tools")).size(11.0).color(t.text_dim));
             let mut tops: Vec<&str> = builtin.iter().map(|t| t.toolbox.split(" › ").next().unwrap_or(t.toolbox)).collect();
             tops.sort();
             tops.dedup();

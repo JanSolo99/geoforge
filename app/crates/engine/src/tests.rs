@@ -1817,7 +1817,7 @@ fn analysis_workflows_models_scripts_and_raster_functions() {
     assert!(e.contains("from a file"), "{e}");
     let m = s.run("model.new", &json!({"name": "Replay", "fromHistory": true})).unwrap();
     assert!(m["steps"].as_u64().unwrap() >= 2);
-    let dissolve = s.project.models.last().unwrap().steps.iter().find(|st| st.tool == "dissolve").unwrap();
+    let dissolve = s.project.models.last().unwrap().steps.iter().find(|st| st.tool.rsplit(':').next() == Some("dissolve")).unwrap();
     assert!(dissolve.params["input"].as_str().unwrap().starts_with('%'), "history inputs wire to earlier steps");
     let r = s.run("script.run", &json!({"script": "# zoom then select\nmap.goToXY {\"lon\": 2, \"lat\": 48, \"scale\": 5000000}\nselect.byAttributes {\"layer\": \"Cities\", \"where\": \"pop_max > 1000000\"}"})).unwrap();
     assert_eq!(r["ran"].as_array().unwrap().len(), 2);

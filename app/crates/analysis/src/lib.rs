@@ -252,8 +252,15 @@ pub fn external_source(spec: &ToolSpec) -> Option<&'static str> {
 pub fn tool(id: &str) -> Option<&'static ToolSpec> {
     let by_id = |t: &&ToolSpec| t.id.eq_ignore_ascii_case(id);
     let by_name = |t: &&ToolSpec| t.name.eq_ignore_ascii_case(id);
-    // A built-in tool wins over an external one with the same name.
-    tools().find(by_id).or_else(|| TOOLS.iter().find(by_name)).or_else(|| external_tools().into_iter().find(by_name))
+    // GeoForge's own tool (matched to ArcGIS Pro) wins over an app built-in of the same id, which
+    // wins over other external tools with the same name.
+    let geoforge = format!("geoforge:{id}");
+    external_tools()
+        .into_iter()
+        .find(|t| t.id.eq_ignore_ascii_case(&geoforge))
+        .or_else(|| tools().find(by_id))
+        .or_else(|| TOOLS.iter().find(by_name))
+        .or_else(|| external_tools().into_iter().find(by_name))
 }
 
 /// The runner for external tools; never called (external specs carry the runner's id).
