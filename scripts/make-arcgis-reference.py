@@ -526,6 +526,19 @@ CASES = {
     "eucdir_streams_max": ("gp.EucDirection_sa", [OUT / "streams_hydro.tif"], [150]),
     "eucalloc_streams": ("gp.EucAllocation_sa", [OUT / "streams_hydro.tif"], []),
     "eucalloc_streams_max": ("gp.EucAllocation_sa", [OUT / "streams_hydro.tif"], [150]),
+    "kd_wells": ("gp.KernelDensity_sa", [DATA / "wells.shp", "NONE"], [30]),
+    "kd_wells_depth_r": ("gp.KernelDensity_sa", [DATA / "wells.shp", "DEPTH"], [25, 150, "SQUARE_METERS"]),
+    "kd_wells_default_depth": ("gp.KernelDensity_sa", [DATA / "wells.shp", "DEPTH"], [25]),
+    "kd_wells_expected": ("gp.KernelDensity_sa", [DATA / "wells.shp", "NONE"], [25, 200, "SQUARE_KILOMETERS", "EXPECTED_COUNTS"]),
+    "kd_roads": ("gp.KernelDensity_sa", [DATA / "roads.shp", "NONE"], [25]),
+    "kd_roads_r": ("gp.KernelDensity_sa", [DATA / "roads.shp", "CLASS"], [20, 120, "SQUARE_MAP_UNITS"]),
+    "pd_wells_circle": ("gp.PointDensity_sa", [DATA / "wells.shp", "NONE"], [25, "Circle 100 MAP", "SQUARE_KILOMETERS"]),
+    "pd_wells_depth_rect": ("gp.PointDensity_sa", [DATA / "wells.shp", "DEPTH"], [20, "Rectangle 80 120 MAP", "SQUARE_METERS"]),
+    "pd_wells_annulus_cell": ("gp.PointDensity_sa", [DATA / "wells.shp", "NONE"], [30, "Annulus 2 5 CELL", "SQUARE_METERS"]),
+    "pd_wells_wedge": ("gp.PointDensity_sa", [DATA / "wells.shp", "NONE"], [30, "Wedge 120 90 180 MAP", "SQUARE_METERS"]),
+    "pd_wells_wedge_wrap": ("gp.PointDensity_sa", [DATA / "wells.shp", "NONE"], [30, "Wedge 120 300 60 MAP", "SQUARE_METERS"]),
+    "ld_roads": ("gp.LineDensity_sa", [DATA / "roads.shp", "NONE"], [25, 100, "SQUARE_KILOMETERS"]),
+    "ld_roads_class": ("gp.LineDensity_sa", [DATA / "roads.shp", "CLASS"], [30, 80, "SQUARE_METERS"]),
     "extract_dem_zones": ("gp.ExtractByMask_sa", [RASTER / "dem.tif", RASTER / "zones.tif"], []),
     "extract_dem_mask25": ("gp.ExtractByMask_sa", [RASTER / "dem.tif", RASTER / "zones_25m.tif"], []),
     "extract_dem_mask4m": ("gp.ExtractByMask_sa", [RASTER / "dem.tif", RASTER / "zones_4m.tif"], []),
@@ -575,7 +588,7 @@ RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatist
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",
               "gp.StreamOrder_sa", "gp.FlowLength_sa", "gp.Watershed_sa", "conversion.FeatureToRaster",
-              "conversion.PolygonToRaster", "conversion.PolylineToRaster", "conversion.PointToRaster", "gp.EucDistance_sa", "gp.EucDirection_sa", "gp.EucAllocation_sa", "gp.ExtractByMask_sa",
+              "conversion.PolygonToRaster", "conversion.PolylineToRaster", "conversion.PointToRaster", "gp.EucDistance_sa", "gp.EucDirection_sa", "gp.EucAllocation_sa", "gp.KernelDensity_sa", "gp.PointDensity_sa", "gp.LineDensity_sa", "gp.ExtractByMask_sa",
               "management.Resample", "gp.Viewshed_sa"}
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.

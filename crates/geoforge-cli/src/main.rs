@@ -1017,6 +1017,46 @@ enum Tool {
         #[arg(long)]
         maximum_distance: Option<f64>,
     },
+    /// Spatial Analyst "Kernel Density" of points or lines.
+    KernelDensity {
+        in_features: PathBuf,
+        /// A numeric field, or NONE.
+        population_field: String,
+        out_raster: PathBuf,
+        cell_size: f64,
+        #[arg(long)]
+        search_radius: Option<f64>,
+        #[arg(long, default_value = "SQUARE_KILOMETERS")]
+        area_unit_scale_factor: String,
+        /// DENSITIES or EXPECTED_COUNTS.
+        #[arg(long, default_value = "DENSITIES")]
+        out_cell_values: String,
+    },
+    /// Spatial Analyst "Point Density".
+    PointDensity {
+        in_point_features: PathBuf,
+        /// A numeric field, or NONE.
+        population_field: String,
+        out_raster: PathBuf,
+        cell_size: f64,
+        /// For example "Circle 100 MAP", "Rectangle 80 120 CELL", "Annulus 2 5 CELL",
+        /// "Wedge 120 90 180 MAP".
+        #[arg(long, default_value = "Circle 5 CELL")]
+        neighborhood: String,
+        #[arg(long, default_value = "SQUARE_KILOMETERS")]
+        area_unit_scale_factor: String,
+    },
+    /// Spatial Analyst "Line Density".
+    LineDensity {
+        in_polyline_features: PathBuf,
+        /// A numeric field, or NONE.
+        population_field: String,
+        out_raster: PathBuf,
+        cell_size: f64,
+        search_radius: f64,
+        #[arg(long, default_value = "SQUARE_KILOMETERS")]
+        area_unit_scale_factor: String,
+    },
     /// Spatial Analyst "Extract by Mask".
     ExtractByMask {
         in_raster: PathBuf,
@@ -3155,6 +3195,81 @@ fn main() -> ExitCode {
                 &geoforge_raster::resample::euclidean_allocation(&r, maximum_distance),
             )
         })(),
+        Tool::KernelDensity {
+            in_features,
+            population_field,
+            out_raster,
+            cell_size,
+            search_radius,
+            area_unit_scale_factor,
+            out_cell_values,
+        } => (|| {
+            use geoforge_raster::density;
+            let (features, epsg, kind) = density_input(&in_features, &population_field)?;
+            let area = density::area_unit(&area_unit_scale_factor).map_err(Error::Unsupported)?;
+            let expected = match out_cell_values.to_ascii_uppercase().as_str() {
+                "DENSITIES" => false,
+                "EXPECTED_COUNTS" => true,
+                other => return Err(Error::Unsupported(format!("output cell values {other}"))),
+            };
+            let weighted = !population_field.eq_ignore_ascii_case("NONE");
+            let mut r = match kind {
+                Some(
+                    geoforge_core::GeometryKind::Polyline | geoforge_core::GeometryKind::Polygon,
+                ) => density::kernel_density_lines(
+                    &features,
+                    cell_size,
+                    search_radius,
+                    area,
+                    weighted,
+                ),
+                _ => density::kernel_density_points(
+                    &features,
+                    cell_size,
+                    search_radius,
+                    area,
+                    expected,
+                ),
+            }
+            .map_err(Error::Unsupported)?;
+            r.epsg = epsg;
+            write_raster(&out_raster, &r)
+        })(),
+        Tool::PointDensity {
+            in_point_features,
+            population_field,
+            out_raster,
+            cell_size,
+            neighborhood,
+            area_unit_scale_factor,
+        } => (|| {
+            use geoforge_raster::density;
+            let (features, epsg, _) = density_input(&in_point_features, &population_field)?;
+            let area = density::area_unit(&area_unit_scale_factor).map_err(Error::Unsupported)?;
+            let n = density::parse_neighborhood(&neighborhood, cell_size)
+                .map_err(Error::Unsupported)?;
+            let mut r = density::point_density(&features, cell_size, n, area)
+                .map_err(Error::Unsupported)?;
+            r.epsg = epsg;
+            write_raster(&out_raster, &r)
+        })(),
+        Tool::LineDensity {
+            in_polyline_features,
+            population_field,
+            out_raster,
+            cell_size,
+            search_radius,
+            area_unit_scale_factor,
+        } => (|| {
+            use geoforge_raster::density;
+            let (features, epsg, _) = density_input(&in_polyline_features, &population_field)?;
+            let area = density::area_unit(&area_unit_scale_factor).map_err(Error::Unsupported)?;
+            let weighted = !population_field.eq_ignore_ascii_case("NONE");
+            let mut r = density::line_density(&features, cell_size, search_radius, area, weighted)
+                .map_err(Error::Unsupported)?;
+            r.epsg = epsg;
+            write_raster(&out_raster, &r)
+        })(),
         Tool::ExtractByMask {
             in_raster,
             in_mask_data,
@@ -4782,6 +4897,34 @@ type RasterizeInput = (
 
 /// Shapes with the numeric value of `field` (the OID field included), the kind
 /// of that value, and the EPSG code of the features' coordinate system.
+/// Features with their weights for the density tools: the population field's value,
+/// or 1 for NONE.
+type DensityInput = (
+    Vec<(geoforge_core::Geometry, f64)>,
+    Option<u32>,
+    Option<geoforge_core::GeometryKind>,
+);
+
+fn density_input(path: &Path, field: &str) -> Result<DensityInput> {
+    if !field.eq_ignore_ascii_case("NONE") {
+        let (features, _, epsg, kind) = rasterize_input(path, field)?;
+        return Ok((features, epsg, kind));
+    }
+    let (fc, _) = open_feature_class(path)?;
+    let mut features = Vec::new();
+    for f in fc.features() {
+        if let Some(g) = f?.geometry {
+            features.push((g, 1.0));
+        }
+    }
+    let epsg = fc
+        .spatial_reference_wkt()
+        .and_then(|w| geoforge_proj::Crs::from_wkt(w).ok())
+        .and_then(|c| c.wkid())
+        .map(|(_, latest)| latest);
+    Ok((features, epsg, fc.geometry_kind()))
+}
+
 fn rasterize_input(path: &Path, field: &str) -> Result<RasterizeInput> {
     use geoforge_raster::rasterize::ValueKind;
     let (fc, _) = open_feature_class(path)?;

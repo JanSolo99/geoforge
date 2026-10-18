@@ -23578,6 +23578,196 @@
       "messages": [],
       "fields": [],
       "shapeType": null
+    },
+    "kd_wells": {
+      "tool": "gp.KernelDensity_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "NONE",
+        "<out>",
+        30
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "kd_wells_depth_r": {
+      "tool": "gp.KernelDensity_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "DEPTH",
+        "<out>",
+        25,
+        150,
+        "SQUARE_METERS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "kd_wells_default_depth": {
+      "tool": "gp.KernelDensity_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "DEPTH",
+        "<out>",
+        25
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "kd_wells_expected": {
+      "tool": "gp.KernelDensity_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "NONE",
+        "<out>",
+        25,
+        200,
+        "SQUARE_KILOMETERS",
+        "EXPECTED_COUNTS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "kd_roads": {
+      "tool": "gp.KernelDensity_sa",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "NONE",
+        "<out>",
+        25
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "kd_roads_r": {
+      "tool": "gp.KernelDensity_sa",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "CLASS",
+        "<out>",
+        20,
+        120,
+        "SQUARE_MAP_UNITS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "pd_wells_circle": {
+      "tool": "gp.PointDensity_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "NONE",
+        "<out>",
+        25,
+        "Circle 100 MAP",
+        "SQUARE_KILOMETERS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "pd_wells_depth_rect": {
+      "tool": "gp.PointDensity_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "DEPTH",
+        "<out>",
+        20,
+        "Rectangle 80 120 MAP",
+        "SQUARE_METERS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "pd_wells_annulus_cell": {
+      "tool": "gp.PointDensity_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "NONE",
+        "<out>",
+        30,
+        "Annulus 2 5 CELL",
+        "SQUARE_METERS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "pd_wells_wedge": {
+      "tool": "gp.PointDensity_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "NONE",
+        "<out>",
+        30,
+        "Wedge 120 90 180 MAP",
+        "SQUARE_METERS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "pd_wells_wedge_wrap": {
+      "tool": "gp.PointDensity_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "NONE",
+        "<out>",
+        30,
+        "Wedge 120 300 60 MAP",
+        "SQUARE_METERS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "ld_roads": {
+      "tool": "gp.LineDensity_sa",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "NONE",
+        "<out>",
+        25,
+        100,
+        "SQUARE_KILOMETERS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "ld_roads_class": {
+      "tool": "gp.LineDensity_sa",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "CLASS",
+        "<out>",
+        30,
+        80,
+        "SQUARE_METERS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

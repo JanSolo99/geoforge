@@ -408,6 +408,12 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         distance). Equally near sources: ArcGIS's pick is the first in row-major order for 86% of
         the ties (3% of cells differ in the stream test; rule for the rest unknown); the
         allocation's value attribute table is not written
+  - [x] Kernel Density (points and lines; default radius by Silverman's rule, weighted
+        by the population field, area units, EXPECTED_COUNTS), Point Density (circle, rectangle,
+        annulus, wedge; map or cell units) and Line Density, all matching ArcGIS exactly in 13
+        cases (`gf kernel-density|point-density|line-density`). Point Density's grid starts
+        (w + h) / 798 before the points' corner. Not done: barriers, GEODESIC method (planar
+        only), map units other than meters, the app tools and arcpy entries
   - [x] Point To Raster / Feature To Raster on points: MOST_FREQUENT ties go to the first
         feature; integer fields stay 32-bit (polygons and lines narrow them), COUNT is signed
         8-bit, MEAN of integers single; RANGE and STANDARD_DEVIATION (sample, single, NoData for
