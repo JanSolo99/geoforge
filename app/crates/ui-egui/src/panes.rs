@@ -1466,8 +1466,11 @@ fn geoprocessing(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
         .map(|p| p.name);
     // The file parameter whose Browse was pressed: picked once the form is drawn.
     let mut browse_for = None;
-    for p in spec.params {
-        let label = ui.label(egui::RichText::new(format!("{}{}", tl!(p.label), if p.required { " *" } else { "" })).size(12.0));
+    let mut draw = |ui: &mut Ui, p: &rustgis_engine::analysis::ParamSpec| {
+        let label = ui.label(
+            egui::RichText::new(format!("{}{}", tl!(p.label).trim_end_matches(" (environment)"), if p.required { " *" } else { "" }))
+                .size(12.0),
+        );
         if !p.help.is_empty() {
             label.on_hover_text(p.help);
         }
@@ -1493,7 +1496,7 @@ fn geoprocessing(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
                     }
                 });
                 ui.add_space(4.0);
-                continue;
+                return;
             }
             ParamKind::PolygonLayer => Some(layer_names(Some(GeometryType::Polygon))),
             ParamKind::PointLayer => Some(layer_names(Some(GeometryType::Point))),
@@ -1559,7 +1562,7 @@ fn geoprocessing(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
                     app.gp.values.insert(p.name, on.to_string());
                 }
                 ui.add_space(4.0);
-                continue;
+                return;
             }
             _ => None,
         };
@@ -1619,6 +1622,19 @@ fn geoprocessing(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
             }
         }
         ui.add_space(4.0);
+    };
+    // The environments (cell size, extent, snap raster, mask) sit in their own section, closed
+    // until wanted, as in ArcGIS's tool dialogs.
+    let (envs, plain): (Vec<_>, Vec<_>) = spec.params.iter().partition(|p| p.label.ends_with(" (environment)"));
+    for p in plain {
+        draw(ui, p);
+    }
+    if !envs.is_empty() {
+        egui::CollapsingHeader::new(tl!("Environments")).id_salt(("gp-env", spec.id)).default_open(false).show(ui, |ui| {
+            for p in envs {
+                draw(ui, p);
+            }
+        });
     }
     if let Some(param) = browse_for {
         browse_file(app, spec.id, param);
