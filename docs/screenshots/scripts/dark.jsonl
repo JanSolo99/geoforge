@@ -1,0 +1,5 @@
+{"width":1200,"height":760}
+{"dark":true}
+{"cmd":"ui.tab","params":{"tab":"Analyze"}}
+{"cmd":"ui.pane.geoprocessing"}
+{"shot":"/mnt/media/ArcGIS_Linux/docs/screenshots/geoforge-dark.png"}

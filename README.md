@@ -7,6 +7,24 @@ ArcToolbox-style analysis on them.
 Status: **pre-alpha scaffold.** See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the
 phased plan and [`docs/SPEC.md`](docs/SPEC.md) for the full target scope.
 
+## The app
+
+GeoForge's desktop app (built on the Apache-2.0 RustGIS shell; its source is not published here yet) has an
+ArcGIS-Pro-style ribbon, a Layers pane, a Tools pane that lists the ArcGIS-verified GeoForge tools by
+toolbox, and a Browser pane that opens file geodatabases and GeoPackages in place.
+
+| | |
+|---|---|
+| ![The map](docs/screenshots/geoforge-map.png) | ![The Tools pane](docs/screenshots/geoforge-tools.png) |
+| The map and Layers pane | GeoForge tools by toolbox |
+| ![A tool form](docs/screenshots/geoforge-tool-form.png) | ![Dark theme](docs/screenshots/geoforge-dark.png) |
+| A tool form (Hot Spot Analysis) | Dark theme |
+
+![The Browser pane](docs/screenshots/geoforge-browser.png)
+
+The screenshots are rendered offscreen; the scripts that drive the renderer are in
+[`docs/screenshots/scripts/`](docs/screenshots/scripts/).
+
 ## Layout
 
 | Crate | Purpose |
