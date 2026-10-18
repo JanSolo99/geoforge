@@ -224,3 +224,18 @@ def test_math_functions(s):
     assert {"G_abs", "G_ln", "G_pow", "G_gt", "G_and"} <= names
     with pytest.raises(rustgis.GeoForgeError):
         arcpy.sa.BitwiseAnd("G_ln", 1)
+
+
+def test_block_and_grouping_tools(s):
+    arcpy.conversion.PolygonToRaster("Countries", "", "Grid", "CELL_CENTER", cellsize=4)
+    arcpy.sa.Aggregate("Grid", 2, "MAXIMUM", "EXPAND", "DATA", out_raster="Coarse")
+    arcpy.sa.BlockStatistics("Grid", "Rectangle 3 3 CELL", "MAXIMUM", out_raster="Blocks")
+    arcpy.sa.Slice("Grid", 4, "EQUAL_INTERVAL", out_raster="Zones")
+    arcpy.sa.RegionGroup("Grid", "FOUR", "WITHIN", out_raster="Regions")
+    arcpy.sa.Pick("Zones", ["Grid", "Grid", 5, 6], out_raster="Picked")
+    names = {l["name"] for l in s.layers()}
+    assert {"Coarse", "Blocks", "Zones", "Regions", "Picked"} <= names
+    with pytest.raises(rustgis.GeoForgeError):
+        arcpy.sa.Slice("Grid", 4, "NATURAL_BREAKS", out_raster="Bad")
+    with pytest.raises(rustgis.GeoForgeError):
+        arcpy.sa.Aggregate("Grid", 1, "SUM", out_raster="Bad")

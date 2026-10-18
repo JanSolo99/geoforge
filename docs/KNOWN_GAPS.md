@@ -29,6 +29,7 @@ Update this file when a gap is found or closed.
 | Create Fishnet | Labels output, corner with zero rows/columns |
 | Densify | ANGLE and OFFSET methods, curved segments, Z/M |
 | Generate Points Along Lines | Chainage fields |
+| Slice, Region Group, Expand, Shrink, Majority Filter | Slice: equal area differs on a cell, natural breaks/standard deviation/geometrical interval not done; Region Group: EIGHT numbering order and CROSS; Expand, Shrink, Majority Filter not implemented (probed) |
 | Weighted Overlay | RESTRICTED, value fields other than VALUE, the attribute tables of Combine and Weighted Overlay, `gf weighted-overlay` |
 | Multiple Ring Buffer, Create Thiessen Polygons | Probed against ArcGIS (`scripts/research/construct/probe1.py`); ring and cell ordering not analysed yet |
 | Spatial Statistics | 54 of 63 tools (Generate Spatial Weights Matrix, Collect Events, Ripley's K, Cluster and Outlier Analysis, OLS, GWR, ...); polygon contiguity conceptualizations and weights files in the three pattern tools |

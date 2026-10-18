@@ -5,6 +5,7 @@
 //! row rotation, origin y, column rotation, cell height — negative for north-up),
 //! the NoData value and the coordinate system code.
 
+pub mod blockops;
 pub mod contour;
 pub mod conversion;
 pub mod env;

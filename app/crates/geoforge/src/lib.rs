@@ -1772,6 +1772,52 @@ mod tests {
     }
 
     #[test]
+    fn block_and_grouping_tools_equal_the_engine() {
+        use geoforge_raster::blockops::*;
+        register();
+        let (a, inp) = dem("RB");
+        let agg = raster_of(rustgis_analysis::run(
+            "geoforge:aggregate",
+            &inp,
+            &json!({"input": "RB", "cell_factor": 5, "aggregation_type": "MAXIMUM"}),
+        ));
+        let want = aggregate(&a, 5, AggregateStat::Maximum, true, true).unwrap();
+        assert_eq!((agg.width, agg.height, agg.transform), (want.width, want.height, want.transform));
+        assert_eq!(agg.bands[0], want.bands[0]);
+        let blk = raster_of(rustgis_analysis::run(
+            "geoforge:block_statistics",
+            &inp,
+            &json!({"input": "RB", "neighborhood": "Circle 2 CELL", "statistics_type": "MEAN"}),
+        ));
+        assert_eq!((blk.width, blk.height), (24, 24));
+        let zones =
+            raster_of(rustgis_analysis::run("geoforge:slice", &inp, &json!({"input": "RB", "number_zones": 4, "base_output_zone": 10})));
+        assert_eq!(zones.get(12, 12), Some(13.0), "the cone's top is in the highest zone");
+        let regions = raster_of(rustgis_analysis::run("geoforge:region_group", &inp, &json!({"input": "RB"})));
+        assert_eq!(regions.width, 24);
+        let picked = raster_of(rustgis_analysis::run("geoforge:pick", &inp, &json!({"position": "RB", "inputs": "RB;7"})));
+        assert_eq!(picked.width, 24);
+        for bad in [
+            ("geoforge:aggregate", json!({"input": "RB", "cell_factor": 1})),
+            ("geoforge:aggregate", json!({"input": "RB", "cell_factor": 2.5})),
+            ("geoforge:block_statistics", json!({"input": "RB", "statistics_type": "MAJORITY"})),
+            (
+                "geoforge:slice",
+                json!({"input": "RB", "number_zones": 3, "slice_type": "EQUAL_INTERVAL", "base_output_zone": 1, "output": ""}),
+            ),
+            ("geoforge:region_group", json!({"input": "RB", "number_neighbors": "EIGHT"})),
+            ("geoforge:pick", json!({"position": "RB", "inputs": ""})),
+        ] {
+            let r = rustgis_analysis::run(bad.0, &inp, &bad.1);
+            if bad.0 == "geoforge:slice" {
+                assert!(r.is_ok());
+            } else {
+                assert!(r.is_err(), "{bad:?}");
+            }
+        }
+    }
+
+    #[test]
     fn idw_interpolates_points_to_a_raster() {
         register();
         // Four corners of a square, values 0..3: the middle cell is their mean.

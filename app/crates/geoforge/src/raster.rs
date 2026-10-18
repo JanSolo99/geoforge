@@ -173,6 +173,9 @@ pub(crate) fn takes_environment(id: &str) -> bool {
             | "polyline_to_raster"
             | "point_to_raster"
             | "zonal_statistics_as_table"
+            | "aggregate"
+            | "block_statistics"
+            | "pick"
     )
 }
 
@@ -1157,6 +1160,89 @@ pub(crate) fn math_run(id: &str, inp: &dyn Inputs, p: &Json) -> Option<Result<To
     None
 }
 
+// ---------------------------------------------------------------------------------------------
+// aggregate, block statistics, slice, pick, region group
+
+fn aggregate(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let (r, _) = input(inp, p, "input")?;
+    let factor =
+        number(p, "cell_factor").filter(|f| *f >= 2.0 && f.fract() == 0.0).ok_or("'Cell factor' is a whole number of 2 or more")? as usize;
+    let stat = gfr::blockops::AggregateStat::parse(&choice(p, "aggregation_type", "SUM"))
+        .ok_or_else(|| format!("aggregation type {}", text(p, "aggregation_type")))?;
+    let expand = match choice(p, "extent_handling", "EXPAND").as_str() {
+        "EXPAND" => true,
+        "TRUNCATE" => false,
+        other => return Err(format!("extent handling {other}")),
+    };
+    let ignore = match choice(p, "ignore_nodata", "DATA").as_str() {
+        "DATA" => true,
+        "NODATA" => false,
+        other => return Err(format!("ignore NoData {other}")),
+    };
+    let out = gfr::blockops::aggregate(&r, factor, stat, expand, ignore).ok_or("the raster is smaller than one block")?;
+    one(p, format!("{}_Aggr", base_name(inp, p, "input")), out)
+}
+
+fn block_statistics(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let (r, _) = input(inp, p, "input")?;
+    let nb =
+        gfr::focal::Neighborhood::parse(if text(p, "neighborhood").is_empty() { "Rectangle 3 3 CELL" } else { text(p, "neighborhood") })
+            .ok_or("neighborhood: for example 'Rectangle 3 3 CELL' or 'Circle 2 CELL'")?;
+    let stat = gfr::focal::FocalStatistic::parse(&choice(p, "statistics_type", "MEAN"))
+        .ok_or_else(|| format!("statistic {}", text(p, "statistics_type")))?;
+    if r.data_type.is_float()
+        && matches!(
+            stat,
+            gfr::focal::FocalStatistic::Majority
+                | gfr::focal::FocalStatistic::Minority
+                | gfr::focal::FocalStatistic::Median
+                | gfr::focal::FocalStatistic::Variety
+        )
+    {
+        return Err(format!("{} needs an integer raster", text(p, "statistics_type")));
+    }
+    let ignore = match choice(p, "ignore_nodata", "DATA").as_str() {
+        "DATA" => true,
+        "NODATA" => false,
+        other => return Err(format!("ignore NoData {other}")),
+    };
+    let out = gfr::blockops::block_statistics(&r, nb, stat, ignore).ok_or("neighborhood")?;
+    one(p, format!("{}_Block", base_name(inp, p, "input")), out)
+}
+
+fn slice(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let (r, crs) = input(inp, p, "input")?;
+    let zones = number(p, "number_zones").filter(|z| *z >= 1.0 && z.fract() == 0.0).ok_or("'Number of zones' is a whole number")? as usize;
+    if choice(p, "slice_type", "EQUAL_INTERVAL") != "EQUAL_INTERVAL" {
+        return Err("only EQUAL_INTERVAL is done: equal area, natural breaks and the others are not".into());
+    }
+    let base = number(p, "base_output_zone").unwrap_or(1.0) as i64;
+    let out = eval(inp, p, &[&r], crs, Reads::Cropped, Sampling::Nearest, &|x| {
+        gfr::blockops::slice_equal_interval(&x[0], zones, base).unwrap_or_else(|| x[0].clone())
+    })?;
+    one(p, format!("{}_Slice", base_name(inp, p, "input")), out)
+}
+
+fn pick(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let (pos, _) = input(inp, p, "position")?;
+    let names: Vec<String> = text(p, "inputs").split(';').map(str::trim).filter(|s| !s.is_empty()).map(String::from).collect();
+    if names.is_empty() {
+        return Err("name the rasters or numbers to pick from, separated by semicolons".into());
+    }
+    let ops: Vec<gfr::local::Operand> = names.iter().map(|n| operand(inp, n)).collect::<Result<_, _>>()?;
+    let out = gfr::blockops::pick(&pos, &ops).ok_or("the rasters must share the position raster's grid")?;
+    one(p, format!("{}_Pick", base_name(inp, p, "position")), out)
+}
+
+fn region_group(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let (r, crs) = input(inp, p, "input")?;
+    if choice(p, "number_neighbors", "FOUR") != "FOUR" || choice(p, "zone_connectivity", "WITHIN") != "WITHIN" {
+        return Err("only FOUR neighbors with WITHIN zones are done".into());
+    }
+    let out = eval(inp, p, &[&r], crs, Reads::Cropped, Sampling::Nearest, &|x| gfr::blockops::region_group_four(&x[0]))?;
+    one(p, format!("{}_Region", base_name(inp, p, "input")), out)
+}
+
 /// Inverse Distance Weighted interpolation of a point layer's field (Spatial Analyst Idw).
 fn idw(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     use gfr::interpolate::{Sample, SearchRadius};
@@ -1224,6 +1310,158 @@ fn rustgis_tools_table(fields: Vec<geoforge_core::Field>, rows: Vec<Vec<geoforge
 }
 
 pub(crate) const DEFS: &[Def] = &[
+    Def {
+        id: "aggregate",
+        name: "Aggregate",
+        toolbox: "GeoForge › Spatial Analyst › Generalization",
+        summary: "A coarser raster from blocks of cells, counted from the lower-left corner (ArcGIS Pro Aggregate).",
+        params: &[
+            RASTER,
+            P {
+                name: "cell_factor",
+                label: "Cell factor",
+                kind: K::Number,
+                required: true,
+                default: "",
+                help: "A whole number of 2 or more.",
+            },
+            P {
+                name: "aggregation_type",
+                label: "Aggregation technique",
+                kind: K::Choice(&["SUM", "MEAN", "MEDIAN", "MAXIMUM", "MINIMUM"]),
+                required: false,
+                default: "\"SUM\"",
+                help: "",
+            },
+            P {
+                name: "extent_handling",
+                label: "Extent handling",
+                kind: K::Choice(&["EXPAND", "TRUNCATE"]),
+                required: false,
+                default: "\"EXPAND\"",
+                help: "",
+            },
+            P {
+                name: "ignore_nodata",
+                label: "Ignore NoData in calculations",
+                kind: K::Choice(&["DATA", "NODATA"]),
+                required: false,
+                default: "\"DATA\"",
+                help: "",
+            },
+            OUTPUT,
+        ],
+        run: aggregate,
+    },
+    Def {
+        id: "block_statistics",
+        name: "Block Statistics",
+        toolbox: "GeoForge › Spatial Analyst › Neighborhood",
+        summary: "A statistic of each non-overlapping block, given to all its cells (ArcGIS Pro Block Statistics).",
+        params: &[
+            RASTER,
+            P {
+                name: "neighborhood",
+                label: "Neighborhood",
+                kind: K::Text,
+                required: false,
+                default: "\"Rectangle 3 3 CELL\"",
+                help: "Rectangle w h CELL, Circle r CELL or Annulus r1 r2 CELL.",
+            },
+            P {
+                name: "statistics_type",
+                label: "Statistics type",
+                kind: K::Choice(&["MEAN", "MAJORITY", "MAXIMUM", "MEDIAN", "MINIMUM", "MINORITY", "RANGE", "STD", "SUM", "VARIETY"]),
+                required: false,
+                default: "\"MEAN\"",
+                help: "",
+            },
+            P {
+                name: "ignore_nodata",
+                label: "Ignore NoData in calculations",
+                kind: K::Choice(&["DATA", "NODATA"]),
+                required: false,
+                default: "\"DATA\"",
+                help: "",
+            },
+            OUTPUT,
+        ],
+        run: block_statistics,
+    },
+    Def {
+        id: "slice",
+        name: "Slice",
+        toolbox: "GeoForge › Spatial Analyst › Reclass",
+        summary: "Cuts the values into zones of equal interval (ArcGIS Pro Slice; the other methods are not done).",
+        params: &[
+            RASTER,
+            P { name: "number_zones", label: "Number of output zones", kind: K::Number, required: true, default: "", help: "" },
+            P {
+                name: "slice_type",
+                label: "Slice type",
+                kind: K::Choice(&["EQUAL_INTERVAL"]),
+                required: false,
+                default: "\"EQUAL_INTERVAL\"",
+                help: "",
+            },
+            P {
+                name: "base_output_zone",
+                label: "Base output zone",
+                kind: K::Number,
+                required: false,
+                default: "1",
+                help: "The number of the lowest zone.",
+            },
+            OUTPUT,
+        ],
+        run: slice,
+    },
+    Def {
+        id: "pick",
+        name: "Pick",
+        toolbox: "GeoForge › Spatial Analyst › Local",
+        summary: "Each cell takes its value from the input its position raster names (ArcGIS Pro Pick).",
+        params: &[
+            P { name: "position", label: "Input position raster", kind: K::RasterLayer, required: true, default: "", help: "" },
+            P {
+                name: "inputs",
+                label: "Input rasters or constants",
+                kind: K::Text,
+                required: true,
+                default: "",
+                help: "Raster layers or numbers separated by semicolons; position 1 is the first.",
+            },
+            OUTPUT,
+        ],
+        run: pick,
+    },
+    Def {
+        id: "region_group",
+        name: "Region Group",
+        toolbox: "GeoForge › Spatial Analyst › Generalization",
+        summary: "Numbers the connected regions of equal value (ArcGIS Pro Region Group; four neighbors).",
+        params: &[
+            RASTER,
+            P {
+                name: "number_neighbors",
+                label: "Number of neighbors to use",
+                kind: K::Choice(&["FOUR", "EIGHT"]),
+                required: false,
+                default: "\"FOUR\"",
+                help: "EIGHT is not done.",
+            },
+            P {
+                name: "zone_connectivity",
+                label: "Zone grouping method",
+                kind: K::Choice(&["WITHIN", "CROSS"]),
+                required: false,
+                default: "\"WITHIN\"",
+                help: "CROSS is not done.",
+            },
+            OUTPUT,
+        ],
+        run: region_group,
+    },
     Def {
         id: "cell_statistics",
         name: "Cell Statistics",

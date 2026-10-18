@@ -460,6 +460,14 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         domain or beyond a 32-bit float; integer results are typed for the range the statistics
         allow; Mod is fmod; shifts are 32-bit and wrap. Not done: Plus/Minus/Times/Divide type rules
         beyond the earlier ones (see `local::math_type`), Negate/Abs on constants
+  - [x] Aggregate, Block Statistics, Slice (EQUAL_INTERVAL), Pick and Region Group (FOUR, WITHIN)
+        (`geoforge-raster::blockops`; app tools and `arcpy.sa`) matching Pro 3.7 on 82 runs, grids,
+        types, NoData and values (`testdata/arcgis-reference/blockops.json`): Aggregate counts blocks
+        from the lower-left corner, Block Statistics from the upper-left; an integer raster's range counts
+        one wider for Slice. Not done: Slice's other methods (equal area differs on a cell, natural
+        breaks), Region Group EIGHT (its numbering differs from reading order) and CROSS, Expand, Shrink
+        and Majority Filter (probed in `scripts/research/blockops/probe.py`, rules not worked out), `gf`
+        commands for these
   - [ ] Raster To Polygon SIMPLIFY: rule worked out for blocky rasters (104 of 122 test rasters exact;
         arcs between nodes, corners displaced diagonally by a from a fixed grid, Douglas-Peucker-like
         split with collapse/clamp, fewest-vertices choice of a) — see `docs/formats/raster-to-polygon-simplify.md`;

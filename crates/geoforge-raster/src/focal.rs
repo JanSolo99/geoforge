@@ -162,7 +162,11 @@ fn counts(values: &[f64]) -> Vec<(f64, usize)> {
     out
 }
 
-fn compute(stat: FocalStatistic, values: &mut [f64], center: Option<f64>) -> Option<f64> {
+pub(crate) fn compute(
+    stat: FocalStatistic,
+    values: &mut [f64],
+    center: Option<f64>,
+) -> Option<f64> {
     let n = values.len() as f64;
     Some(match stat {
         FocalStatistic::Mean => values.iter().sum::<f64>() / n,

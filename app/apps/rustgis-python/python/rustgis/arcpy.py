@@ -414,6 +414,11 @@ _TOOLS = [
        ("Conceptualization_of_Spatial_Relationships", "conceptualization"), ("Distance_Method", "distance_method"), ("Standardization", "standardization"),
        ("Distance_Band_or_Threshold_Distance", "distance_band"), ("number_of_neighbors", "number_of_neighbors"), ("Weights_Matrix_File", None),
        ("Apply_False_Discovery_Rate__FDR__Correction", "apply_fdr")),
+    _t("sa", "Aggregate", "aggregate", ("in_raster", "input"), ("cell_factor", "cell_factor"), ("aggregation_type", "aggregation_type"), ("extent_handling", "extent_handling"), ("ignore_nodata", "ignore_nodata")),
+    _t("sa", "BlockStatistics", "block_statistics", ("in_raster", "input"), ("neighborhood", "neighborhood"), ("statistics_type", "statistics_type"), ("ignore_nodata", "ignore_nodata")),
+    _t("sa", "Slice", "slice", ("in_raster", "input"), ("number_zones", "number_zones"), ("slice_type", "slice_type"), ("base_output_zone", "base_output_zone")),
+    _t("sa", "Pick", "pick", ("in_position_raster", "position"), ("in_rasters_or_constants", _inputs)),
+    _t("sa", "RegionGroup", "region_group", ("in_raster", "input"), ("number_neighbors", "number_neighbors"), ("zone_connectivity", "zone_connectivity")),
     # sa
     _t("sa", "Slope", "slope", ("in_raster", "input"), ("output_measurement", "output_measurement"), ("z_factor", "z_factor"), ("method", None), ("z_unit", None)),
     _t("sa", "Idw", "idw", ("in_point_features", "input"), ("z_field", "z_field"), ("cell_size", "cell_size"), ("power", "power"),
