@@ -23768,6 +23768,488 @@
       "messages": [],
       "fields": [],
       "shapeType": null
+    },
+    "expand_classes_1": {
+      "tool": "gp.Expand_sa",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        1,
+        "1;2",
+        "MORPHOLOGICAL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "expand_classes_2": {
+      "tool": "gp.Expand_sa",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        2,
+        "0;3;5",
+        "MORPHOLOGICAL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "expand_classes_dist_3": {
+      "tool": "gp.Expand_sa",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        3,
+        "1;2;5",
+        "DISTANCE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "expand_patches_2": {
+      "tool": "gp.Expand_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        2,
+        "-3;12",
+        "MORPHOLOGICAL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "expand_patches_5": {
+      "tool": "gp.Expand_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        5,
+        "2;7;12",
+        "MORPHOLOGICAL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "expand_patches_dist_2_5": {
+      "tool": "gp.Expand_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        2.5,
+        "2;7;12",
+        "DISTANCE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "expand_patches_dist_1_5": {
+      "tool": "gp.Expand_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        1.5,
+        "-3;7",
+        "DISTANCE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "expand_landuse_4": {
+      "tool": "gp.Expand_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        4,
+        "2",
+        "MORPHOLOGICAL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "expand_zones_dist_12": {
+      "tool": "gp.Expand_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "<out>",
+        12,
+        "7;0",
+        "DISTANCE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "expand_absent_zone": {
+      "tool": "gp.Expand_sa",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        1,
+        "9",
+        "MORPHOLOGICAL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "expand_bad_cells": {
+      "tool": "gp.Expand_sa",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        0,
+        "1",
+        "MORPHOLOGICAL"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000864: Number of cells: The input is not within the defined domain.\r\nERROR 000892: The numeric value is outside of the valid range.",
+        "Failed to execute (Expand)."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "expand_float": {
+      "tool": "gp.Expand_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        1,
+        "1",
+        "MORPHOLOGICAL"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000864: Input raster: The input is not within the defined domain.\r\nERROR 000969: The input raster is not integer type.",
+        "Failed to execute (Expand)."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "shrink_classes_1": {
+      "tool": "gp.Shrink_sa",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        1,
+        "1;2;3",
+        "MORPHOLOGICAL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "shrink_classes_3": {
+      "tool": "gp.Shrink_sa",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        3,
+        "0;4",
+        "MORPHOLOGICAL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "shrink_classes_dist_2": {
+      "tool": "gp.Shrink_sa",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        2,
+        "4",
+        "DISTANCE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "shrink_patches_2": {
+      "tool": "gp.Shrink_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        2,
+        "2;7",
+        "MORPHOLOGICAL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "shrink_patches_dist_3": {
+      "tool": "gp.Shrink_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        3,
+        "0;2;7",
+        "DISTANCE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "shrink_zones_6": {
+      "tool": "gp.Shrink_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "<out>",
+        6,
+        "7;4",
+        "MORPHOLOGICAL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "shrink_landuse_dist_1": {
+      "tool": "gp.Shrink_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        1,
+        "1;3",
+        "DISTANCE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "majority_classes_four": {
+      "tool": "gp.MajorityFilter_sa",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "FOUR",
+        "MAJORITY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "majority_classes_four_half": {
+      "tool": "gp.MajorityFilter_sa",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "FOUR",
+        "HALF"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "majority_classes_eight": {
+      "tool": "gp.MajorityFilter_sa",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "EIGHT",
+        "MAJORITY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "majority_classes_eight_half": {
+      "tool": "gp.MajorityFilter_sa",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "EIGHT",
+        "HALF"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "majority_patches_eight_half": {
+      "tool": "gp.MajorityFilter_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        "EIGHT",
+        "HALF"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "majority_patches_four": {
+      "tool": "gp.MajorityFilter_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        "FOUR",
+        "MAJORITY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "majority_landuse_eight": {
+      "tool": "gp.MajorityFilter_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "EIGHT",
+        "MAJORITY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "majority_float": {
+      "tool": "gp.MajorityFilter_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "EIGHT",
+        "MAJORITY"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000864: Input raster: The input is not within the defined domain.\r\nERROR 000969: The input raster is not integer type.",
+        "Failed to execute (MajorityFilter)."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "regiongroup_classes_eight": {
+      "tool": "gp.RegionGroup_sa",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "EIGHT",
+        "WITHIN",
+        "ADD_LINK"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "regiongroup_classes_four": {
+      "tool": "gp.RegionGroup_sa",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "FOUR",
+        "WITHIN",
+        "ADD_LINK"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "regiongroup_classes_eight_cross": {
+      "tool": "gp.RegionGroup_sa",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "EIGHT",
+        "CROSS",
+        "ADD_LINK"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "regiongroup_patches_eight": {
+      "tool": "gp.RegionGroup_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        "EIGHT",
+        "WITHIN",
+        "ADD_LINK"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "regiongroup_patches_four_cross": {
+      "tool": "gp.RegionGroup_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        "FOUR",
+        "CROSS",
+        "ADD_LINK"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "regiongroup_patches_eight_excluded": {
+      "tool": "gp.RegionGroup_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        "EIGHT",
+        "WITHIN",
+        "ADD_LINK",
+        0
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "regiongroup_zones_four_excluded": {
+      "tool": "gp.RegionGroup_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "<out>",
+        "FOUR",
+        "WITHIN",
+        "NO_LINK",
+        7
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

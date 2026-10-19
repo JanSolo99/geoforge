@@ -478,9 +478,17 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         types, NoData and values (`testdata/arcgis-reference/blockops.json`): Aggregate counts blocks
         from the lower-left corner, Block Statistics from the upper-left; an integer raster's range counts
         one wider for Slice. Not done: Slice's other methods (equal area differs on a cell, natural
-        breaks), Region Group EIGHT (its numbering differs from reading order) and CROSS, Expand, Shrink
-        and Majority Filter (probed in `scripts/research/blockops/probe.py`, rules not worked out), `gf`
-        commands for these
+        breaks), `gf` commands for Aggregate, Block Statistics, Slice and Pick
+  - [x] Expand, Shrink (MORPHOLOGICAL and DISTANCE), Majority Filter (FOUR/EIGHT, MAJORITY/HALF) and
+        Region Group (FOUR/EIGHT, WITHIN/CROSS, excluded value) (`geoforge-raster::generalize`; `gf
+        expand|shrink|majority-filter|region-group`, app tools, `arcpy.sa`) matching Pro 3.7 cell for cell
+        on 34 reference cases (`expand_*`, `shrink_*`, `majority_*`, `regiongroup_*`) and on synthetic
+        probes: number of cells rounds half to even; morphological passes are synchronous with ties to
+        the first value reading the neighbors column by column; DISTANCE ties go to the smallest value;
+        Majority Filter is one pass, NoData is a value, edges mirror, contiguous runs on the ring with
+        ArcGIS's walk order for ties; Region Group numbers by a union-find (union by label count) rather
+        than reading order; output types fit the input range (Region Group: 1 ..= (rows+1)(cols+1)).
+        Not done: Boundary Clean, Thin, the Region Group LINK attribute table
   - [ ] Raster To Polygon SIMPLIFY: rule worked out for blocky rasters (104 of 122 test rasters exact;
         arcs between nodes, corners displaced diagonally by a from a fixed grid, Douglas-Peucker-like
         split with collapse/clamp, fewest-vertices choice of a) — see `docs/formats/raster-to-polygon-simplify.md`;

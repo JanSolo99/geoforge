@@ -418,7 +418,11 @@ _TOOLS = [
     _t("sa", "BlockStatistics", "block_statistics", ("in_raster", "input"), ("neighborhood", "neighborhood"), ("statistics_type", "statistics_type"), ("ignore_nodata", "ignore_nodata")),
     _t("sa", "Slice", "slice", ("in_raster", "input"), ("number_zones", "number_zones"), ("slice_type", "slice_type"), ("base_output_zone", "base_output_zone")),
     _t("sa", "Pick", "pick", ("in_position_raster", "position"), ("in_rasters_or_constants", _inputs)),
-    _t("sa", "RegionGroup", "region_group", ("in_raster", "input"), ("number_neighbors", "number_neighbors"), ("zone_connectivity", "zone_connectivity")),
+    _t("sa", "RegionGroup", "region_group", ("in_raster", "input"), ("number_neighbors", "number_neighbors"), ("zone_connectivity", "zone_connectivity"),
+       ("add_link", None), ("excluded_value", "excluded_value")),
+    _t("sa", "Expand", "expand", ("in_raster", "input"), ("number_cells", "number_cells"), ("zone_values", ("zone_values", _join)), ("expand_method", "method")),
+    _t("sa", "Shrink", "shrink", ("in_raster", "input"), ("number_cells", "number_cells"), ("zone_values", ("zone_values", _join)), ("shrink_method", "method")),
+    _t("sa", "MajorityFilter", "majority_filter", ("in_raster", "input"), ("number_neighbors", "number_neighbors"), ("majority_definition", "majority_definition")),
     # sa
     _t("sa", "Slope", "slope", ("in_raster", "input"), ("output_measurement", "output_measurement"), ("z_factor", "z_factor"), ("method", None), ("z_unit", None)),
     _t("sa", "Idw", "idw", ("in_point_features", "input"), ("z_field", "z_field"), ("cell_size", "cell_size"), ("power", "power"),

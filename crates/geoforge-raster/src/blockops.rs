@@ -14,10 +14,9 @@
 //!   raster's range counts one wider), numbered from `base`. Equal area, natural breaks and the others are not done.
 //! - Pick takes each cell from the input its position raster names (1-based): float with a float
 //!   input, else an integer fitting the inputs' ranges.
-//! - Region Group (FOUR, WITHIN) numbers the connected regions of equal value in the order their first
-//!   cell shows, reading rows from the top: unsigned 8-bit with NoData 255 (wider past 254 regions).
+//! - Region Group: see [`crate::generalize`].
 
-use crate::focal::{FocalStatistic, Neighborhood, compute, type_max};
+use crate::focal::{FocalStatistic, Neighborhood, compute};
 use crate::local::Operand;
 use crate::zonal::integer_output;
 use crate::{DataType, Raster};
@@ -312,56 +311,7 @@ pub fn pick(position: &Raster, inputs: &[Operand]) -> Option<Raster> {
     Some(out)
 }
 
-/// Region Group with four-neighbor connectivity (WITHIN): the regions of equal value numbered from 1.
+/// Region Group with four-neighbor connectivity (WITHIN); see [`crate::generalize::region_group`].
 pub fn region_group_four(input: &Raster) -> Raster {
-    let (w, h) = (input.width, input.height);
-    let mut label = vec![0u32; w * h];
-    let mut count = 0u32;
-    let mut stack = Vec::new();
-    for start in 0..w * h {
-        let Some(v) = input.get(start % w, start / w) else {
-            continue;
-        };
-        if label[start] != 0 {
-            continue;
-        }
-        count += 1;
-        label[start] = count;
-        stack.push(start);
-        while let Some(i) = stack.pop() {
-            let (x, y) = (i % w, i / w);
-            let mut visit = |j: usize| {
-                if label[j] == 0 && input.get(j % w, j / w) == Some(v) {
-                    label[j] = count;
-                    stack.push(j);
-                }
-            };
-            if x > 0 {
-                visit(i - 1);
-            }
-            if x + 1 < w {
-                visit(i + 1);
-            }
-            if y > 0 {
-                visit(i - w);
-            }
-            if y + 1 < h {
-                visit(i + w);
-            }
-        }
-    }
-    let (t, nodata) = if count < 255 {
-        (DataType::U8, 255.0)
-    } else if count < 65_535 {
-        (DataType::U16, 65_535.0)
-    } else {
-        (DataType::U32, type_max(DataType::U32))
-    };
-    let mut out = input.like(t);
-    out.nodata = Some(nodata);
-    out.bands[0] = label
-        .iter()
-        .map(|&l| if l == 0 { nodata } else { l as f64 })
-        .collect();
-    out
+    crate::generalize::region_group(input, false, false, None)
 }

@@ -11,6 +11,7 @@ pub mod conversion;
 pub mod density;
 pub mod env;
 pub mod focal;
+pub mod generalize;
 mod geotiff;
 pub mod hydro;
 pub mod interpolate;

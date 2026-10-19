@@ -177,3 +177,18 @@ write_features("combine_lines", ogr.wkbLineString, [
     line(3, 11, 5, 19, 5), line(4, 11, 7, 16, 7), line(4, 11, 9, 16, 9),
     line(5, 31, 15, 35, 15),
 ])
+
+# Patches for Expand, Shrink, Majority Filter and Region Group: blobs of -3, 2, 7 and
+# 12 on 0 (16-bit signed), single-cell specks, diagonal-only links and NoData holes.
+rng = np.random.default_rng(11)
+yy, xx = np.mgrid[0:40, 0:50]
+patches = np.zeros((40, 50), dtype=np.int16)
+for value, cx, cy, r in [(2, 10, 8, 6), (7, 30, 12, 8), (12, 40, 30, 5), (-3, 15, 28, 7), (2, 26, 30, 4), (7, 45, 5, 3)]:
+    patches[(xx - cx) ** 2 + (yy - cy) ** 2 < r * r] = value
+specks = rng.random((40, 50)) < 0.08
+patches[specks] = rng.choice(np.array([-3, 2, 7, 12], dtype=np.int16), size=int(specks.sum()))
+for i in range(6):
+    patches[20 + i, 2 + i] = 12
+patches[(rng.random((40, 50)) < 0.03)] = -9999
+patches[0:3, 20:24] = -9999
+write("patches_i16.tif", patches, gdal.GDT_Int16, nodata=-9999, cell=30.0)

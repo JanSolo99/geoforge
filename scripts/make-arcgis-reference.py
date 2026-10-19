@@ -581,6 +581,41 @@ CASES = {
     "zonal_majority_shifted": ("gp.ZonalStatistics_sa", [RASTER / "zones_shifted.tif", "Value", RASTER / "dem_int16_packbits.tif"], ["MAJORITY", "DATA"]),
     "zonal_median_4m": ("gp.ZonalStatistics_sa", [RASTER / "zones_4m.tif", "Value", RASTER / "dem_int16_packbits.tif"], ["MEDIAN", "DATA"]),
     "zonal_range_4m": ("gp.ZonalStatistics_sa", [RASTER / "zones_4m.tif", "Value", RASTER / "dem_int16_packbits.tif"], ["RANGE", "NODATA"]),
+    # Expand, Shrink, Majority Filter, Region Group (rules in geoforge-raster::generalize).
+    "expand_classes_1": ("gp.Expand_sa", [RASTER / "landuse_u8.tif"], [1, "1;2", "MORPHOLOGICAL"]),
+    "expand_classes_2": ("gp.Expand_sa", [RASTER / "landuse_u8.tif"], [2, "0;3;5", "MORPHOLOGICAL"]),
+    "expand_classes_dist_3": ("gp.Expand_sa", [RASTER / "landuse_u8.tif"], [3, "1;2;5", "DISTANCE"]),
+    "expand_patches_2": ("gp.Expand_sa", [RASTER / "patches_i16.tif"], [2, "-3;12", "MORPHOLOGICAL"]),
+    "expand_patches_5": ("gp.Expand_sa", [RASTER / "patches_i16.tif"], [5, "2;7;12", "MORPHOLOGICAL"]),
+    "expand_patches_dist_2_5": ("gp.Expand_sa", [RASTER / "patches_i16.tif"], [2.5, "2;7;12", "DISTANCE"]),
+    "expand_patches_dist_1_5": ("gp.Expand_sa", [RASTER / "patches_i16.tif"], [1.5, "-3;7", "DISTANCE"]),
+    "expand_landuse_4": ("gp.Expand_sa", [RASTER / "landuse_u8.tif"], [4, "2", "MORPHOLOGICAL"]),
+    "expand_zones_dist_12": ("gp.Expand_sa", [RASTER / "zones.tif"], [12, "7;0", "DISTANCE"]),
+    "expand_absent_zone": ("gp.Expand_sa", [RASTER / "landuse_u8.tif"], [1, "9", "MORPHOLOGICAL"]),
+    "expand_bad_cells": ("gp.Expand_sa", [RASTER / "landuse_u8.tif"], [0, "1", "MORPHOLOGICAL"]),
+    "expand_float": ("gp.Expand_sa", [RASTER / "dem.tif"], [1, "1", "MORPHOLOGICAL"]),
+    "shrink_classes_1": ("gp.Shrink_sa", [RASTER / "landuse_u8.tif"], [1, "1;2;3", "MORPHOLOGICAL"]),
+    "shrink_classes_3": ("gp.Shrink_sa", [RASTER / "landuse_u8.tif"], [3, "0;4", "MORPHOLOGICAL"]),
+    "shrink_classes_dist_2": ("gp.Shrink_sa", [RASTER / "landuse_u8.tif"], [2, "4", "DISTANCE"]),
+    "shrink_patches_2": ("gp.Shrink_sa", [RASTER / "patches_i16.tif"], [2, "2;7", "MORPHOLOGICAL"]),
+    "shrink_patches_dist_3": ("gp.Shrink_sa", [RASTER / "patches_i16.tif"], [3, "0;2;7", "DISTANCE"]),
+    "shrink_zones_6": ("gp.Shrink_sa", [RASTER / "zones.tif"], [6, "7;4", "MORPHOLOGICAL"]),
+    "shrink_landuse_dist_1": ("gp.Shrink_sa", [RASTER / "landuse_u8.tif"], [1, "1;3", "DISTANCE"]),
+    "majority_classes_four": ("gp.MajorityFilter_sa", [RASTER / "landuse_u8.tif"], ["FOUR", "MAJORITY"]),
+    "majority_classes_four_half": ("gp.MajorityFilter_sa", [RASTER / "landuse_u8.tif"], ["FOUR", "HALF"]),
+    "majority_classes_eight": ("gp.MajorityFilter_sa", [RASTER / "landuse_u8.tif"], ["EIGHT", "MAJORITY"]),
+    "majority_classes_eight_half": ("gp.MajorityFilter_sa", [RASTER / "landuse_u8.tif"], ["EIGHT", "HALF"]),
+    "majority_patches_eight_half": ("gp.MajorityFilter_sa", [RASTER / "patches_i16.tif"], ["EIGHT", "HALF"]),
+    "majority_patches_four": ("gp.MajorityFilter_sa", [RASTER / "patches_i16.tif"], ["FOUR", "MAJORITY"]),
+    "majority_landuse_eight": ("gp.MajorityFilter_sa", [RASTER / "landuse_u8.tif"], ["EIGHT", "MAJORITY"]),
+    "majority_float": ("gp.MajorityFilter_sa", [RASTER / "dem.tif"], ["EIGHT", "MAJORITY"]),
+    "regiongroup_classes_eight": ("gp.RegionGroup_sa", [RASTER / "landuse_u8.tif"], ["EIGHT", "WITHIN", "ADD_LINK"]),
+    "regiongroup_classes_four": ("gp.RegionGroup_sa", [RASTER / "landuse_u8.tif"], ["FOUR", "WITHIN", "ADD_LINK"]),
+    "regiongroup_classes_eight_cross": ("gp.RegionGroup_sa", [RASTER / "landuse_u8.tif"], ["EIGHT", "CROSS", "ADD_LINK"]),
+    "regiongroup_patches_eight": ("gp.RegionGroup_sa", [RASTER / "patches_i16.tif"], ["EIGHT", "WITHIN", "ADD_LINK"]),
+    "regiongroup_patches_four_cross": ("gp.RegionGroup_sa", [RASTER / "patches_i16.tif"], ["FOUR", "CROSS", "ADD_LINK"]),
+    "regiongroup_patches_eight_excluded": ("gp.RegionGroup_sa", [RASTER / "patches_i16.tif"], ["EIGHT", "WITHIN", "ADD_LINK", 0]),
+    "regiongroup_zones_four_excluded": ("gp.RegionGroup_sa", [RASTER / "zones.tif"], ["FOUR", "WITHIN", "NO_LINK", 7]),
 }
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
 RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
@@ -589,7 +624,8 @@ RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatist
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",
               "gp.StreamOrder_sa", "gp.FlowLength_sa", "gp.Watershed_sa", "conversion.FeatureToRaster",
               "conversion.PolygonToRaster", "conversion.PolylineToRaster", "conversion.PointToRaster", "gp.EucDistance_sa", "gp.EucDirection_sa", "gp.EucAllocation_sa", "gp.KernelDensity_sa", "gp.PointDensity_sa", "gp.LineDensity_sa", "gp.ExtractByMask_sa",
-              "management.Resample", "gp.Viewshed_sa"}
+              "management.Resample", "gp.Viewshed_sa", "gp.Expand_sa", "gp.Shrink_sa", "gp.MajorityFilter_sa",
+              "gp.RegionGroup_sa"}
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable"}

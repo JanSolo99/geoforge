@@ -144,7 +144,7 @@ pub fn resample(r: &Raster, cell: f64, technique: Technique) -> Raster {
 
 /// Squared 1-D distance transform (Felzenszwalb–Huttenlocher) of `f` in place;
 /// infinite entries are cells without a source.
-fn edt_1d(f: &mut [f64]) {
+pub(crate) fn edt_1d(f: &mut [f64]) {
     let mut arg = vec![0; f.len()];
     edt_1d_arg(f, &mut arg);
 }

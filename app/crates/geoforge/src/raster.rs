@@ -178,6 +178,9 @@ pub(crate) fn takes_environment(id: &str) -> bool {
             | "aggregate"
             | "block_statistics"
             | "pick"
+            | "expand"
+            | "shrink"
+            | "majority_filter"
     )
 }
 
@@ -1248,11 +1251,66 @@ fn pick(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
 
 fn region_group(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     let (r, crs) = input(inp, p, "input")?;
-    if choice(p, "number_neighbors", "FOUR") != "FOUR" || choice(p, "zone_connectivity", "WITHIN") != "WITHIN" {
-        return Err("only FOUR neighbors with WITHIN zones are done".into());
-    }
-    let out = eval(inp, p, &[&r], crs, Reads::Cropped, Sampling::Nearest, &|x| gfr::blockops::region_group_four(&x[0]))?;
+    let eight = match choice(p, "number_neighbors", "FOUR").as_str() {
+        "FOUR" => false,
+        "EIGHT" => true,
+        other => return Err(format!("number of neighbors {other}")),
+    };
+    let cross = match choice(p, "zone_connectivity", "WITHIN").as_str() {
+        "WITHIN" => false,
+        "CROSS" => true,
+        other => return Err(format!("zone connectivity {other}")),
+    };
+    let excluded = number(p, "excluded_value");
+    let out = eval(inp, p, &[&r], crs, Reads::Cropped, Sampling::Nearest, &|x| {
+        gfr::generalize::region_group(&x[0], eight, cross, excluded)
+    })?;
     one(p, format!("{}_Region", base_name(inp, p, "input")), out)
+}
+
+/// Expand (`grow`) or Shrink.
+fn expand_shrink(inp: &dyn Inputs, p: &Json, grow: bool) -> Result<ToolResult, String> {
+    use gfr::generalize::{Method, number_of_cells};
+    let (r, _) = input(inp, p, "input")?;
+    let n = number_of_cells(number(p, "number_cells").ok_or("'Number of cells' is required")?).map_err(|e| e.0)?;
+    let zones: Vec<f64> = text(p, "zone_values")
+        .split(';')
+        .map(str::trim)
+        .filter(|z| !z.is_empty())
+        .map(|z| z.parse::<f64>().map_err(|_| format!("zone value {z}")))
+        .collect::<Result<_, _>>()?;
+    let method = Method::parse(&choice(p, "method", "MORPHOLOGICAL")).ok_or("method is MORPHOLOGICAL or DISTANCE")?;
+    let out = if grow {
+        gfr::generalize::expand(&r, n, &zones, method)
+    } else {
+        gfr::generalize::shrink(&r, n, &zones, method)
+    }
+    .map_err(|e| e.0)?;
+    one(p, format!("{}_{}", base_name(inp, p, "input"), if grow { "Expand" } else { "Shrink" }), out)
+}
+
+fn expand(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    expand_shrink(inp, p, true)
+}
+
+fn shrink(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    expand_shrink(inp, p, false)
+}
+
+fn majority_filter(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
+    let (r, _) = input(inp, p, "input")?;
+    let eight = match choice(p, "number_neighbors", "FOUR").as_str() {
+        "FOUR" => false,
+        "EIGHT" => true,
+        other => return Err(format!("number of neighbors {other}")),
+    };
+    let half = match choice(p, "majority_definition", "MAJORITY").as_str() {
+        "MAJORITY" => false,
+        "HALF" => true,
+        other => return Err(format!("majority definition {other}")),
+    };
+    let out = gfr::generalize::majority_filter(&r, eight, half).map_err(|e| e.0)?;
+    one(p, format!("{}_Majority", base_name(inp, p, "input")), out)
 }
 
 /// Inverse Distance Weighted interpolation of a point layer's field (Spatial Analyst Idw).
@@ -1451,7 +1509,7 @@ pub(crate) const DEFS: &[Def] = &[
         id: "region_group",
         name: "Region Group",
         toolbox: "GeoForge › Spatial Analyst › Generalization",
-        summary: "Numbers the connected regions of equal value (ArcGIS Pro Region Group; four neighbors).",
+        summary: "Numbers the connected regions (ArcGIS Pro Region Group).",
         params: &[
             RASTER,
             P {
@@ -1460,7 +1518,7 @@ pub(crate) const DEFS: &[Def] = &[
                 kind: K::Choice(&["FOUR", "EIGHT"]),
                 required: false,
                 default: "\"FOUR\"",
-                help: "EIGHT is not done.",
+                help: "",
             },
             P {
                 name: "zone_connectivity",
@@ -1468,11 +1526,116 @@ pub(crate) const DEFS: &[Def] = &[
                 kind: K::Choice(&["WITHIN", "CROSS"]),
                 required: false,
                 default: "\"WITHIN\"",
-                help: "CROSS is not done.",
+                help: "",
+            },
+            P {
+                name: "excluded_value",
+                label: "Excluded value",
+                kind: K::Number,
+                required: false,
+                default: "",
+                help: "Cells of this value join no region (0 in the output).",
             },
             OUTPUT,
         ],
         run: region_group,
+    },
+    Def {
+        id: "expand",
+        name: "Expand",
+        toolbox: "GeoForge › Spatial Analyst › Generalization",
+        summary: "Grows zones by a number of cells (ArcGIS Pro Expand).",
+        params: &[
+            RASTER,
+            P {
+                name: "number_cells",
+                label: "Number of cells",
+                kind: K::Number,
+                required: true,
+                default: "",
+                help: "Rounded half to even; at least 1.",
+            },
+            P {
+                name: "zone_values",
+                label: "Zone values",
+                kind: K::Text,
+                required: true,
+                default: "",
+                help: "Values separated by semicolons.",
+            },
+            P {
+                name: "method",
+                label: "Method",
+                kind: K::Choice(&["MORPHOLOGICAL", "DISTANCE"]),
+                required: false,
+                default: "\"MORPHOLOGICAL\"",
+                help: "",
+            },
+            OUTPUT,
+        ],
+        run: expand,
+    },
+    Def {
+        id: "shrink",
+        name: "Shrink",
+        toolbox: "GeoForge › Spatial Analyst › Generalization",
+        summary: "Shrinks zones by a number of cells (ArcGIS Pro Shrink).",
+        params: &[
+            RASTER,
+            P {
+                name: "number_cells",
+                label: "Number of cells",
+                kind: K::Number,
+                required: true,
+                default: "",
+                help: "Rounded half to even; at least 1.",
+            },
+            P {
+                name: "zone_values",
+                label: "Zone values",
+                kind: K::Text,
+                required: true,
+                default: "",
+                help: "Values separated by semicolons.",
+            },
+            P {
+                name: "method",
+                label: "Method",
+                kind: K::Choice(&["MORPHOLOGICAL", "DISTANCE"]),
+                required: false,
+                default: "\"MORPHOLOGICAL\"",
+                help: "",
+            },
+            OUTPUT,
+        ],
+        run: shrink,
+    },
+    Def {
+        id: "majority_filter",
+        name: "Majority Filter",
+        toolbox: "GeoForge › Spatial Analyst › Generalization",
+        summary: "Replaces cells by the majority of their contiguous neighbors (ArcGIS Pro Majority Filter).",
+        params: &[
+            RASTER,
+            P {
+                name: "number_neighbors",
+                label: "Number of neighbors to use",
+                kind: K::Choice(&["FOUR", "EIGHT"]),
+                required: false,
+                default: "\"FOUR\"",
+                help: "",
+            },
+            P {
+                name: "majority_definition",
+                label: "Replacement threshold",
+                kind: K::Choice(&["MAJORITY", "HALF"]),
+                required: false,
+                default: "\"MAJORITY\"",
+                help: "",
+            },
+            OUTPUT,
+        ],
+        run: majority_filter,
     },
     Def {
         id: "cell_statistics",

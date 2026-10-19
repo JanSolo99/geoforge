@@ -1010,6 +1010,60 @@ enum Tool {
         #[arg(long)]
         maximum_distance: Option<f64>,
     },
+    /// Spatial Analyst "Expand": grow zones by a number of cells.
+    Expand {
+        in_raster: PathBuf,
+        out_raster: PathBuf,
+        /// Cells to expand by (rounded half to even, at least 1).
+        number_cells: f64,
+        /// Zone values, separated by ';'.
+        #[arg(allow_hyphen_values = true)]
+        zone_values: String,
+        /// MORPHOLOGICAL or DISTANCE.
+        #[arg(long, default_value = "MORPHOLOGICAL")]
+        expand_method: String,
+    },
+    /// Spatial Analyst "Shrink": shrink zones by a number of cells.
+    Shrink {
+        in_raster: PathBuf,
+        out_raster: PathBuf,
+        /// Cells to shrink by (rounded half to even, at least 1).
+        number_cells: f64,
+        /// Zone values, separated by ';'.
+        #[arg(allow_hyphen_values = true)]
+        zone_values: String,
+        /// MORPHOLOGICAL or DISTANCE.
+        #[arg(long, default_value = "MORPHOLOGICAL")]
+        shrink_method: String,
+    },
+    /// Spatial Analyst "Majority Filter".
+    MajorityFilter {
+        in_raster: PathBuf,
+        out_raster: PathBuf,
+        /// FOUR or EIGHT.
+        #[arg(long, default_value = "FOUR")]
+        number_neighbors: String,
+        /// MAJORITY or HALF.
+        #[arg(long, default_value = "MAJORITY")]
+        majority_definition: String,
+    },
+    /// Spatial Analyst "Region Group".
+    RegionGroup {
+        in_raster: PathBuf,
+        out_raster: PathBuf,
+        /// FOUR or EIGHT.
+        #[arg(long, default_value = "FOUR")]
+        number_neighbors: String,
+        /// WITHIN or CROSS.
+        #[arg(long, default_value = "WITHIN")]
+        zone_connectivity: String,
+        /// ADD_LINK or NO_LINK (the attribute table is not written).
+        #[arg(long, default_value = "ADD_LINK")]
+        add_link: String,
+        /// Value that joins no region (0 in the output).
+        #[arg(long)]
+        excluded_value: Option<f64>,
+    },
     /// Spatial Analyst "Euclidean Allocation" (value of the nearest source cell).
     EucAllocation {
         in_source_data: PathBuf,
@@ -3184,6 +3238,77 @@ fn main() -> ExitCode {
                 &geoforge_raster::resample::euclidean_direction(&r, maximum_distance),
             )
         })(),
+        Tool::Expand {
+            in_raster,
+            out_raster,
+            number_cells,
+            zone_values,
+            expand_method,
+        } => expand_shrink(
+            true,
+            &in_raster,
+            &out_raster,
+            number_cells,
+            &zone_values,
+            &expand_method,
+        ),
+        Tool::Shrink {
+            in_raster,
+            out_raster,
+            number_cells,
+            zone_values,
+            shrink_method,
+        } => expand_shrink(
+            false,
+            &in_raster,
+            &out_raster,
+            number_cells,
+            &zone_values,
+            &shrink_method,
+        ),
+        Tool::MajorityFilter {
+            in_raster,
+            out_raster,
+            number_neighbors,
+            majority_definition,
+        } => (|| {
+            let eight = eight_neighbors(&number_neighbors)?;
+            let half = match majority_definition.to_ascii_uppercase().as_str() {
+                "MAJORITY" => false,
+                "HALF" => true,
+                other => return Err(Error::Unsupported(format!("majority definition {other}"))),
+            };
+            let r = geoforge_raster::read_geotiff(&in_raster)?;
+            let out = geoforge_raster::generalize::majority_filter(&r, eight, half)
+                .map_err(|e| Error::Unsupported(e.0))?;
+            write_raster(&out_raster, &out)
+        })(),
+        Tool::RegionGroup {
+            in_raster,
+            out_raster,
+            number_neighbors,
+            zone_connectivity,
+            add_link,
+            excluded_value,
+        } => (|| {
+            let eight = eight_neighbors(&number_neighbors)?;
+            let cross = match zone_connectivity.to_ascii_uppercase().as_str() {
+                "WITHIN" => false,
+                "CROSS" => true,
+                other => return Err(Error::Unsupported(format!("zone connectivity {other}"))),
+            };
+            if !matches!(
+                add_link.to_ascii_uppercase().as_str(),
+                "ADD_LINK" | "NO_LINK"
+            ) {
+                return Err(Error::Unsupported(format!("add_link {add_link}")));
+            }
+            let r = geoforge_raster::read_geotiff(&in_raster)?;
+            write_raster_plain(
+                &out_raster,
+                &geoforge_raster::generalize::region_group(&r, eight, cross, excluded_value),
+            )
+        })(),
         Tool::EucAllocation {
             in_source_data,
             out_allocation_raster,
@@ -4808,6 +4933,51 @@ fn buffer_tool(
 
 /// Writes a raster result as GeoTIFF the way ArcGIS writes Spatial Analyst
 /// output: 128×128 tiles, LZW for integer cells, uncompressed floats.
+/// Spatial Analyst Expand (`grow`) or Shrink.
+fn expand_shrink(
+    grow: bool,
+    in_raster: &Path,
+    out_raster: &Path,
+    number_cells: f64,
+    zone_values: &str,
+    method: &str,
+) -> Result<()> {
+    use geoforge_raster::generalize::{Method, expand, number_of_cells, shrink};
+    let method =
+        Method::parse(method).ok_or_else(|| Error::Unsupported(format!("method {method}")))?;
+    let n = number_of_cells(number_cells).map_err(|e| Error::Unsupported(e.0))?;
+    let zones = zone_values
+        .split(';')
+        .map(str::trim)
+        .filter(|z| !z.is_empty())
+        .map(|z| {
+            z.parse::<f64>()
+                .map_err(|_| Error::Unsupported(format!("zone value {z}")))
+        })
+        .collect::<Result<Vec<f64>>>()?;
+    let r = geoforge_raster::read_geotiff(in_raster)?;
+    let out = if grow {
+        expand(&r, n, &zones, method)
+    } else {
+        shrink(&r, n, &zones, method)
+    }
+    .map_err(|e| Error::Unsupported(e.0))?;
+    if method == Method::Distance {
+        write_raster_plain(out_raster, &out)
+    } else {
+        write_raster(out_raster, &out)
+    }
+}
+
+/// FOUR or EIGHT neighbors.
+fn eight_neighbors(s: &str) -> Result<bool> {
+    match s.to_ascii_uppercase().as_str() {
+        "FOUR" => Ok(false),
+        "EIGHT" => Ok(true),
+        other => Err(Error::Unsupported(format!("number of neighbors {other}"))),
+    }
+}
+
 fn write_raster(path: &Path, raster: &geoforge_raster::Raster) -> Result<()> {
     write_raster_with(path, raster, true)
 }
