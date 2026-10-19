@@ -149,7 +149,7 @@ pub fn join_field(
 }
 
 /// A feature class held in memory, so tools can be chained.
-struct Mem(ToolOutput);
+pub(crate) struct Mem(pub(crate) ToolOutput);
 
 impl FeatureClass for Mem {
     fn geometry_kind(&self) -> Option<GeometryKind> {

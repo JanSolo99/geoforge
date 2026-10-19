@@ -1,0 +1,9 @@
+REGION,YEAR,PRODUCT,AMOUNT,UNITS
+north,2020,tea,10.5,3
+north,2020,coffee,20,4
+north,2021,tea,11.25,5
+south,2020,tea,7,2
+south,2020,tea,3,1
+south,2021,coffee,8.5,6
+south,2021,cocoa,2,9
+east,2022,tea,1.5,7

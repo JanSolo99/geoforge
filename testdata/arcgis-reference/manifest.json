@@ -25561,6 +25561,4263 @@
         ]
       ],
       "shapeType": "Polyline"
+    },
+    "env_roads": {
+      "tool": "management.FeatureEnvelopeToPolygon",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "env_roads_multi": {
+      "tool": "management.FeatureEnvelopeToPolygon",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "MULTIPART"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "env_parcels": {
+      "tool": "management.FeatureEnvelopeToPolygon",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "env_holes": {
+      "tool": "management.FeatureEnvelopeToPolygon",
+      "args": [
+        "testdata/planar/holes.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "N",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "env_chain_multi": {
+      "tool": "management.FeatureEnvelopeToPolygon",
+      "args": [
+        "testdata/dm/chain.shp",
+        "<out>",
+        "MULTIPART"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "LINE_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "KIND",
+          "String",
+          10,
+          0,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "env_parts_multi": {
+      "tool": "management.FeatureEnvelopeToPolygon",
+      "args": [
+        "testdata/dm/parts.shp",
+        "<out>",
+        "MULTIPART"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "POLY_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "env_parts": {
+      "tool": "management.FeatureEnvelopeToPolygon",
+      "args": [
+        "testdata/dm/parts.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "POLY_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "slv_chain": {
+      "tool": "management.SplitLine",
+      "args": [
+        "testdata/dm/chain.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "LINE_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "KIND",
+          "String",
+          10,
+          0,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_SEQ",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "slv_roads": {
+      "tool": "management.SplitLine",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_SEQ",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "slv_streams": {
+      "tool": "management.SplitLine",
+      "args": [
+        "testdata/geoproc/streams.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "STREAM_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_SEQ",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "sap_chain_10": {
+      "tool": "management.SplitLineAtPoint",
+      "args": [
+        "testdata/dm/chain.shp",
+        "testdata/dm/pts.shp",
+        "<out>",
+        "10 Meters"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "LINE_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "KIND",
+          "String",
+          10,
+          0,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_SEQ",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "sap_chain_1": {
+      "tool": "management.SplitLineAtPoint",
+      "args": [
+        "testdata/dm/chain.shp",
+        "testdata/dm/pts.shp",
+        "<out>",
+        "1 Meters"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "LINE_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "KIND",
+          "String",
+          10,
+          0,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_SEQ",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "sap_chain_25": {
+      "tool": "management.SplitLineAtPoint",
+      "args": [
+        "testdata/dm/chain.shp",
+        "testdata/dm/pts.shp",
+        "<out>",
+        "25 Meters"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "LINE_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "KIND",
+          "String",
+          10,
+          0,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_SEQ",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "sap_roads_wells_20": {
+      "tool": "management.SplitLineAtPoint",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "20 Meters"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_SEQ",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "sap_streams_wells_40": {
+      "tool": "management.SplitLineAtPoint",
+      "args": [
+        "testdata/geoproc/streams.shp",
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "40 Meters"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "STREAM_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_SEQ",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "epp_area_500": {
+      "tool": "management.EliminatePolygonPart",
+      "args": [
+        "testdata/dm/parts.shp",
+        "<out>",
+        "AREA",
+        500,
+        0,
+        "CONTAINED_ONLY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "POLY_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "epp_area_30": {
+      "tool": "management.EliminatePolygonPart",
+      "args": [
+        "testdata/dm/parts.shp",
+        "<out>",
+        "AREA",
+        30,
+        0,
+        "CONTAINED_ONLY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "POLY_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "epp_area_any_500": {
+      "tool": "management.EliminatePolygonPart",
+      "args": [
+        "testdata/dm/parts.shp",
+        "<out>",
+        "AREA",
+        500,
+        0,
+        "ANY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "POLY_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "epp_area_any_1000": {
+      "tool": "management.EliminatePolygonPart",
+      "args": [
+        "testdata/dm/parts.shp",
+        "<out>",
+        "AREA",
+        1000,
+        0,
+        "ANY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "POLY_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "epp_pct_5": {
+      "tool": "management.EliminatePolygonPart",
+      "args": [
+        "testdata/dm/parts.shp",
+        "<out>",
+        "PERCENT",
+        0,
+        5,
+        "CONTAINED_ONLY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "POLY_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "epp_pct_any_30": {
+      "tool": "management.EliminatePolygonPart",
+      "args": [
+        "testdata/dm/parts.shp",
+        "<out>",
+        "PERCENT",
+        0,
+        30,
+        "ANY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "POLY_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "epp_and": {
+      "tool": "management.EliminatePolygonPart",
+      "args": [
+        "testdata/dm/parts.shp",
+        "<out>",
+        "AREA_AND_PERCENT",
+        500,
+        20,
+        "CONTAINED_ONLY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "POLY_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "epp_or": {
+      "tool": "management.EliminatePolygonPart",
+      "args": [
+        "testdata/dm/parts.shp",
+        "<out>",
+        "AREA_OR_PERCENT",
+        30,
+        10,
+        "CONTAINED_ONLY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "POLY_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "epp_or_any": {
+      "tool": "management.EliminatePolygonPart",
+      "args": [
+        "testdata/dm/parts.shp",
+        "<out>",
+        "AREA_OR_PERCENT",
+        30,
+        10,
+        "ANY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "POLY_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "epp_holes": {
+      "tool": "management.EliminatePolygonPart",
+      "args": [
+        "testdata/planar/holes.shp",
+        "<out>",
+        "AREA",
+        1700,
+        0,
+        "CONTAINED_ONLY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "N",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "xy2l_attr": {
+      "tool": "management.XYToLine",
+      "args": [
+        "testdata/dm/segments.dbf",
+        "<out>",
+        "X1",
+        "Y1",
+        "X2",
+        "Y2",
+        "GEODESIC",
+        "",
+        "testdata/dm/chain.prj",
+        "ATTRIBUTES"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000072: Cannot process feature with OID 3"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "SEG_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "LABEL",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "X1",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "Y1",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "X2",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "Y2",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "BEARING",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "xy2l_id": {
+      "tool": "management.XYToLine",
+      "args": [
+        "testdata/dm/segments.dbf",
+        "<out>",
+        "X1",
+        "Y1",
+        "X2",
+        "Y2",
+        "GEODESIC",
+        "SEG_ID",
+        "testdata/dm/chain.prj",
+        "NO_ATTRIBUTES"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000072: Cannot process feature with OID 3"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "X1",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "Y1",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "X2",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "Y2",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "SEG_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "xy2l_plain": {
+      "tool": "management.XYToLine",
+      "args": [
+        "testdata/dm/segments.dbf",
+        "<out>",
+        "X1",
+        "Y1",
+        "X2",
+        "Y2",
+        "NORMAL_SECTION",
+        "",
+        "testdata/dm/chain.prj",
+        "NO_ATTRIBUTES"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000072: Cannot process feature with OID 3"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "X1",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "Y1",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "X2",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "Y2",
+          "Double",
+          19,
+          18,
+          15
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "std_z": {
+      "tool": "management.StandardizeField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        [
+          [
+            "VALUE"
+          ],
+          [
+            "ZONE"
+          ]
+        ],
+        "<out>",
+        "Z-SCORE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "STAND1",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "STAND2",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "std_minmax": {
+      "tool": "management.StandardizeField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        [
+          [
+            "VALUE",
+            "VMM"
+          ],
+          [
+            "ZONE"
+          ]
+        ],
+        "<out>",
+        "MIN-MAX",
+        0,
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "VMM",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "STAND2",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "std_maxabs": {
+      "tool": "management.StandardizeField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        [
+          [
+            "VALUE"
+          ]
+        ],
+        "<out>",
+        "MAXABS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "STAND1",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "std_robust": {
+      "tool": "management.StandardizeField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        [
+          [
+            "VALUE"
+          ]
+        ],
+        "<out>",
+        "ROBUST"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "STAND1",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "std_default": {
+      "tool": "management.StandardizeField",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        [
+          [
+            "DEPTH"
+          ]
+        ],
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "STAND1",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "tf_log": {
+      "tool": "management.TransformField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        [
+          [
+            "VALUE"
+          ]
+        ],
+        "<out>",
+        "LOG"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "TRAN1",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "tf_sqrt": {
+      "tool": "management.TransformField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        [
+          [
+            "VALUE"
+          ],
+          [
+            "ZONE",
+            "ZSQ"
+          ]
+        ],
+        "<out>",
+        "SQRT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "TRAN1",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZSQ",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "tf_invx": {
+      "tool": "management.TransformField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        [
+          [
+            "VALUE"
+          ]
+        ],
+        "<out>",
+        "INVX"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "TRAN1",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "tf_invsqrt": {
+      "tool": "management.TransformField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        [
+          [
+            "VALUE"
+          ]
+        ],
+        "<out>",
+        "INV_SQRT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "TRAN1",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "tf_invlog": {
+      "tool": "management.TransformField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        [
+          [
+            "ZONE"
+          ]
+        ],
+        "<out>",
+        "INV_LOG"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "TRAN1",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "tf_boxcox_1": {
+      "tool": "management.TransformField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        [
+          [
+            "VALUE"
+          ]
+        ],
+        "<out>",
+        "BOX-COX",
+        0.5
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "TRAN1",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "tf_invboxcox": {
+      "tool": "management.TransformField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        [
+          [
+            "ZONE"
+          ]
+        ],
+        "<out>",
+        "INV_BOX-COX",
+        2
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "TRAN1",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "tf_log_shift": {
+      "tool": "management.TransformField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        [
+          [
+            "VALUE"
+          ]
+        ],
+        "<out>",
+        "LOG",
+        "#",
+        5
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "TRAN1",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "tf_log_zero": {
+      "tool": "management.TransformField",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        [
+          [
+            "DEPTH"
+          ]
+        ],
+        "<out>",
+        "LOG"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "TRAN1",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "rf_equal": {
+      "tool": "management.ReclassifyField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "VALUE",
+        "<out>",
+        "EQUAL_INTERVAL",
+        4
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "RECLASS",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "RECLASS_R",
+          "String",
+          100,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "rf_defined": {
+      "tool": "management.ReclassifyField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "VALUE",
+        "<out>",
+        "DEFINED_INTERVAL",
+        "#",
+        1500
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "RECLASS",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "RECLASS_R",
+          "String",
+          104,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "rf_quantile": {
+      "tool": "management.ReclassifyField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "VALUE",
+        "<out>",
+        "QUANTILE",
+        5
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "RECLASS",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "RECLASS_R",
+          "String",
+          100,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "rf_unique_text": {
+      "tool": "management.ReclassifyField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "NAME",
+        "<out>",
+        "UNIQUE_VALUES",
+        "#",
+        "#",
+        "#",
+        "#",
+        "DESC",
+        "RC"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "RC",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "rf_manual": {
+      "tool": "management.ReclassifyField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "VALUE",
+        "<out>",
+        "MANUAL",
+        "#",
+        "#",
+        "#",
+        [
+          [
+            3000,
+            1
+          ],
+          [
+            6000,
+            2
+          ],
+          [
+            10000,
+            3
+          ]
+        ]
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "RECLASS",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "RECLASS_R",
+          "String",
+          104,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "rf_equal_desc": {
+      "tool": "management.ReclassifyField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "VALUE",
+        "<out>",
+        "EQUAL_INTERVAL",
+        3,
+        "#",
+        "#",
+        "#",
+        "DESC",
+        "CLS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "CLS",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLS_R",
+          "String",
+          100,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "transpose_all": {
+      "tool": "management.TransposeFields",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "VALUE Val;ZONE Zn",
+        "<out>",
+        "FLD",
+        "VAL",
+        "PARCEL_ID;NAME"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "FLD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "VAL",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null
+    },
+    "transpose_sales": {
+      "tool": "management.TransposeFields",
+      "args": [
+        "testdata/dm/sales.dbf",
+        "AMOUNT;UNITS",
+        "<out>",
+        "WHAT",
+        "NUM",
+        "REGION"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "REGION",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "WHAT",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "NUM",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null
+    },
+    "transpose_noattr": {
+      "tool": "management.TransposeFields",
+      "args": [
+        "testdata/dm/sales.dbf",
+        "AMOUNT;UNITS",
+        "<out>",
+        "WHAT",
+        "NUM"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "WHAT",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "NUM",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null
+    },
+    "pivot_sales": {
+      "tool": "management.PivotTable",
+      "args": [
+        "testdata/dm/sales.dbf",
+        "REGION",
+        "PRODUCT",
+        "AMOUNT",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "REGION",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "cocoa",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "coffee",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "tea",
+          "Double",
+          19,
+          18,
+          15
+        ]
+      ],
+      "shapeType": null
+    },
+    "pivot_year": {
+      "tool": "management.PivotTable",
+      "args": [
+        "testdata/dm/sales.dbf",
+        "REGION;YEAR",
+        "PRODUCT",
+        "UNITS",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "REGION",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "YEAR",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "cocoa",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "coffee",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "tea",
+          "Integer",
+          9,
+          9,
+          0
+        ]
+      ],
+      "shapeType": null
+    },
+    "pivot_text": {
+      "tool": "management.PivotTable",
+      "args": [
+        "testdata/dm/sales.dbf",
+        "PRODUCT",
+        "YEAR",
+        "AMOUNT",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "PRODUCT",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "YEAR2020",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "YEAR2021",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "YEAR2022",
+          "Double",
+          19,
+          18,
+          15
+        ]
+      ],
+      "shapeType": null
+    },
+    "epp_pct_any_85": {
+      "tool": "management.EliminatePolygonPart",
+      "args": [
+        "testdata/dm/parts.shp",
+        "<out>",
+        "PERCENT",
+        0,
+        8.5,
+        "ANY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "POLY_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "epp_pct_any_9": {
+      "tool": "management.EliminatePolygonPart",
+      "args": [
+        "testdata/dm/parts.shp",
+        "<out>",
+        "PERCENT",
+        0,
+        9.5,
+        "ANY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "POLY_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "epp_pct_3": {
+      "tool": "management.EliminatePolygonPart",
+      "args": [
+        "testdata/dm/parts.shp",
+        "<out>",
+        "PERCENT",
+        0,
+        4.5,
+        "CONTAINED_ONLY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "POLY_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "tf_log_zone": {
+      "tool": "management.TransformField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        [
+          [
+            "ZONE"
+          ]
+        ],
+        "<out>",
+        "LOG"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "TRAN1",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "tf_sqrt_zone": {
+      "tool": "management.TransformField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        [
+          [
+            "ZONE"
+          ]
+        ],
+        "<out>",
+        "SQRT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "TRAN1",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "tf_boxcox_zone": {
+      "tool": "management.TransformField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        [
+          [
+            "ZONE"
+          ]
+        ],
+        "<out>",
+        "BOX-COX",
+        0.5
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "TRAN1",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "tf_invx_zone": {
+      "tool": "management.TransformField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        [
+          [
+            "ZONE"
+          ]
+        ],
+        "<out>",
+        "INVX"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 110344: The transformation could not be calculated in some rows in the field(s): ZONE",
+        "WARNING 110349: The null values were replaced by zero in the following fields: TRAN1"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "TRAN1",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "tf_invsqrt_shift": {
+      "tool": "management.TransformField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        [
+          [
+            "ZONE"
+          ]
+        ],
+        "<out>",
+        "INV_SQRT",
+        "#",
+        1
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "TRAN1",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "epp_pct_38": {
+      "tool": "management.EliminatePolygonPart",
+      "args": [
+        "testdata/dm/parts.shp",
+        "<out>",
+        "PERCENT",
+        0,
+        3.8,
+        "CONTAINED_ONLY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "POLY_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "cfs_new": {
+      "tool": "management.CalculateFields",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "PYTHON3",
+        [
+          [
+            "NEWF",
+            "!VALUE!+1"
+          ],
+          [
+            "NEWS",
+            "!NAME!.upper()"
+          ]
+        ],
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "NEWF",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "NEWS",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "cfs_existing": {
+      "tool": "management.CalculateFields",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "PYTHON3",
+        [
+          [
+            "ZONE",
+            "!ZONE!+1"
+          ],
+          [
+            "PARCEL_ID",
+            "!ZONE!*100"
+          ]
+        ],
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "cfs_types": {
+      "tool": "management.CalculateFields",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "PYTHON3",
+        [
+          [
+            "A",
+            "!VALUE!*2",
+            "",
+            "DOUBLE"
+          ],
+          [
+            "B",
+            "!PARCEL_ID!*3",
+            "",
+            "LONG"
+          ],
+          [
+            "C",
+            "!ZONE!",
+            "",
+            "SHORT"
+          ],
+          [
+            "D",
+            "!NAME!",
+            "",
+            "TEXT"
+          ],
+          [
+            "E",
+            "!VALUE!",
+            "",
+            "FLOAT"
+          ]
+        ],
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "A",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "B",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "C",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "D",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "E",
+          "Single",
+          13,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "cfs_where": {
+      "tool": "management.CalculateFields",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "PYTHON3",
+        [
+          [
+            "ZONE",
+            "!ZONE!*10",
+            "ZONE > 2"
+          ],
+          [
+            "X",
+            "1",
+            "NAME = 'Lot 3'",
+            "LONG"
+          ]
+        ],
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "X",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "cfs_codeblock": {
+      "tool": "management.CalculateFields",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "PYTHON3",
+        [
+          [
+            "ZONE",
+            "f(!ZONE!)"
+          ],
+          [
+            "NAME",
+            "g(!NAME!)"
+          ]
+        ],
+        "<out>",
+        "def f(x):\n    return x * 7\ndef g(s):\n    return s[::-1]"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "cfs_bad_field": {
+      "tool": "management.CalculateFields",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "PYTHON3",
+        [
+          [
+            "ZONE",
+            "!NOPE!"
+          ]
+        ],
+        "<out>"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 000539: Invalid field NOPE",
+        "ERROR 160145: The field is not nullable.",
+        "Failed to execute (CalculateFields)."
+      ],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

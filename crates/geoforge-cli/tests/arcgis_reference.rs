@@ -10,6 +10,9 @@ use geoforge_core::{FieldType, GeometryKind, Value};
 use geoforge_shapefile::ShapefileReader;
 use geoforge_testkit::{esri_area, esri_length, hausdorff};
 
+#[path = "common/dm_cases.rs"]
+mod dm_cases;
+
 /// The `gf` arguments reproducing each ArcGIS case.
 fn gf_args(case: &str) -> Vec<&'static str> {
     let d = "testdata/geoproc";
@@ -3858,7 +3861,7 @@ fn gf_args(case: &str) -> Vec<&'static str> {
         "ftl_holes" => vec!["feature-to-line", "testdata/planar/holes.shp"],
         "ftl_roads" => vec!["feature-to-line", "testdata/geoproc/roads.shp"],
         "ftl_streams" => vec!["feature-to-line", "testdata/geoproc/streams.shp"],
-        other => panic!("no gf command for case {other}"),
+        other => dm_cases::args(other),
     }
 }
 
@@ -4130,7 +4133,14 @@ fn compare(case: &str, ours: &Path, theirs: &Path, fields: &serde_json::Value) -
 
 /// Vector cases with known differences: the features that differ, or an empty list
 /// when the whole case does. None at the moment.
-const KNOWN_FEATURE_DIFFERENCES: &[(&str, &[usize])] = &[];
+const KNOWN_FEATURE_DIFFERENCES: &[(&str, &[usize])] = &[
+    // MULTIPART envelopes of nested parts: our shapefile writer turns the inner ring into a hole,
+    // ArcGIS keeps it a second exterior ring.
+    ("env_roads_multi", &[2]),
+    // Split Line At Point: ArcGIS lists the pieces of one curved road as 1, 3, 2, 5, 4 (the last
+    // piece before a close pair of splits first); the pieces themselves are equal.
+    ("sap_roads_wells_20", &[12, 13, 14, 15]),
+];
 
 /// Raster cases where some cells are known to differ from ArcGIS, with the most
 /// differing cells allowed: Flow Direction resolves flats differently in places,
@@ -4308,8 +4318,8 @@ fn tools_match_arcgis_output() {
             out_dir.join(format!("{case}.shp"))
         };
         let mut args: Vec<String> = gf_args(case).iter().map(|a| a.to_string()).collect();
-        match args.iter().position(|a| a == "<out>") {
-            Some(i) => args[i] = out.display().to_string(),
+        match args.iter().position(|a| a.contains("<out>")) {
+            Some(i) => args[i] = args[i].replace("<out>", &out.display().to_string()),
             None => args.push(out.display().to_string()),
         }
         let run = Command::new(env!("CARGO_BIN_EXE_gf"))
@@ -4411,9 +4421,10 @@ fn tools_match_arcgis_output() {
         if let Some((_, features)) = KNOWN_FEATURE_DIFFERENCES.iter().find(|k| k.0 == case) {
             diffs.retain(|d| {
                 !features.is_empty()
-                    && !features
-                        .iter()
-                        .any(|f| d.starts_with(&format!("feature {f}:")))
+                    && !features.iter().any(|f| {
+                        d.starts_with(&format!("feature {f}:"))
+                            || d.starts_with(&format!("feature {f} "))
+                    })
             });
         }
         if !diffs.is_empty() {

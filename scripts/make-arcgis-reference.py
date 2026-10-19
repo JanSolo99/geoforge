@@ -72,6 +72,7 @@ TARGET_FIELDS = {
 CLIP = DATA / "clip_areas.shp"
 PLANAR = ROOT / "testdata" / "planar"
 PARCELS = DATA / "parcels.shp"
+DM = ROOT / "testdata" / "dm"
 
 CASES = {
     # name: (tool, args before the output, args after the output)
@@ -647,6 +648,76 @@ CASES = {
     "ftl_holes": ("management.FeatureToLine", [PLANAR / "holes.shp"], []),
     "ftl_roads": ("management.FeatureToLine", [DATA / "roads.shp"], []),
     "ftl_streams": ("management.FeatureToLine", [DATA / "streams.shp"], []),
+    # Data Management breadth tools (testdata/dm: scripts/make-dm-testdata.sh, make-dm-chain.py).
+    "env_roads": ("management.FeatureEnvelopeToPolygon", [DATA / "roads.shp"], []),
+    "env_roads_multi": ("management.FeatureEnvelopeToPolygon", [DATA / "roads.shp"], ["MULTIPART"]),
+    "env_parcels": ("management.FeatureEnvelopeToPolygon", [PARCELS], []),
+    "env_holes": ("management.FeatureEnvelopeToPolygon", [PLANAR / "holes.shp"], []),
+    "env_chain_multi": ("management.FeatureEnvelopeToPolygon", [DM / "chain.shp"], ["MULTIPART"]),
+    "env_parts_multi": ("management.FeatureEnvelopeToPolygon", [DM / "parts.shp"], ["MULTIPART"]),
+    "env_parts": ("management.FeatureEnvelopeToPolygon", [DM / "parts.shp"], []),
+    "slv_chain": ("management.SplitLine", [DM / "chain.shp"], []),
+    "slv_roads": ("management.SplitLine", [DATA / "roads.shp"], []),
+    "slv_streams": ("management.SplitLine", [DATA / "streams.shp"], []),
+    "sap_chain_10": ("management.SplitLineAtPoint", [DM / "chain.shp", DM / "pts.shp"], ["10 Meters"]),
+    "sap_chain_1": ("management.SplitLineAtPoint", [DM / "chain.shp", DM / "pts.shp"], ["1 Meters"]),
+    "sap_chain_25": ("management.SplitLineAtPoint", [DM / "chain.shp", DM / "pts.shp"], ["25 Meters"]),
+    "sap_roads_wells_20": ("management.SplitLineAtPoint", [DATA / "roads.shp", DATA / "wells.shp"], ["20 Meters"]),
+    "sap_streams_wells_40": ("management.SplitLineAtPoint", [DATA / "streams.shp", DATA / "wells.shp"], ["40 Meters"]),
+    "epp_area_500": ("management.EliminatePolygonPart", [DM / "parts.shp"], ["AREA", 500, 0, "CONTAINED_ONLY"]),
+    "epp_area_30": ("management.EliminatePolygonPart", [DM / "parts.shp"], ["AREA", 30, 0, "CONTAINED_ONLY"]),
+    "epp_area_any_500": ("management.EliminatePolygonPart", [DM / "parts.shp"], ["AREA", 500, 0, "ANY"]),
+    "epp_area_any_1000": ("management.EliminatePolygonPart", [DM / "parts.shp"], ["AREA", 1000, 0, "ANY"]),
+    "epp_pct_5": ("management.EliminatePolygonPart", [DM / "parts.shp"], ["PERCENT", 0, 5, "CONTAINED_ONLY"]),
+    "epp_pct_any_30": ("management.EliminatePolygonPart", [DM / "parts.shp"], ["PERCENT", 0, 30, "ANY"]),
+    "epp_pct_any_85": ("management.EliminatePolygonPart", [DM / "parts.shp"], ["PERCENT", 0, 8.5, "ANY"]),
+    "epp_pct_any_9": ("management.EliminatePolygonPart", [DM / "parts.shp"], ["PERCENT", 0, 9.5, "ANY"]),
+    "epp_pct_3": ("management.EliminatePolygonPart", [DM / "parts.shp"], ["PERCENT", 0, 4.5, "CONTAINED_ONLY"]),
+    "epp_pct_38": ("management.EliminatePolygonPart", [DM / "parts.shp"], ["PERCENT", 0, 3.8, "CONTAINED_ONLY"]),
+    "epp_and": ("management.EliminatePolygonPart", [DM / "parts.shp"], ["AREA_AND_PERCENT", 500, 20, "CONTAINED_ONLY"]),
+    "epp_or": ("management.EliminatePolygonPart", [DM / "parts.shp"], ["AREA_OR_PERCENT", 30, 10, "CONTAINED_ONLY"]),
+    "epp_or_any": ("management.EliminatePolygonPart", [DM / "parts.shp"], ["AREA_OR_PERCENT", 30, 10, "ANY"]),
+    "epp_holes": ("management.EliminatePolygonPart", [PLANAR / "holes.shp"], ["AREA", 1700, 0, "CONTAINED_ONLY"]),
+    "xy2l_attr": ("management.XYToLine", [DM / "segments.dbf"], ["X1", "Y1", "X2", "Y2", "GEODESIC", "", DM / "chain.prj", "ATTRIBUTES"]),
+    "xy2l_id": ("management.XYToLine", [DM / "segments.dbf"], ["X1", "Y1", "X2", "Y2", "GEODESIC", "SEG_ID", DM / "chain.prj", "NO_ATTRIBUTES"]),
+    "xy2l_plain": ("management.XYToLine", [DM / "segments.dbf"], ["X1", "Y1", "X2", "Y2", "NORMAL_SECTION", "", DM / "chain.prj", "NO_ATTRIBUTES"]),
+    "cfs_new": ("management.CalculateFields", [PARCELS, "PYTHON3", [["NEWF", "!VALUE!+1"], ["NEWS", "!NAME!.upper()"]]], []),
+    "cfs_existing": ("management.CalculateFields", [PARCELS, "PYTHON3", [["ZONE", "!ZONE!+1"], ["PARCEL_ID", "!ZONE!*100"]]], []),
+    "cfs_types": ("management.CalculateFields", [PARCELS, "PYTHON3", [["A", "!VALUE!*2", "", "DOUBLE"], ["B", "!PARCEL_ID!*3", "", "LONG"], ["C", "!ZONE!", "", "SHORT"], ["D", "!NAME!", "", "TEXT"], ["E", "!VALUE!", "", "FLOAT"]]], []),
+    "cfs_where": ("management.CalculateFields", [PARCELS, "PYTHON3", [["ZONE", "!ZONE!*10", "ZONE > 2"], ["X", "1", "NAME = 'Lot 3'", "LONG"]]], []),
+    "cfs_codeblock": ("management.CalculateFields", [PARCELS, "PYTHON3", [["ZONE", "f(!ZONE!)"], ["NAME", "g(!NAME!)"]]], ["def f(x):\n    return x * 7\ndef g(s):\n    return s[::-1]"]),
+    "cfs_bad_field": ("management.CalculateFields", [PARCELS, "PYTHON3", [["ZONE", "!NOPE!"]]], []),
+    "std_z": ("management.StandardizeField", [PARCELS, [["VALUE"], ["ZONE"]]], ["Z-SCORE"]),
+    "std_minmax": ("management.StandardizeField", [PARCELS, [["VALUE", "VMM"], ["ZONE"]]], ["MIN-MAX", 0, 10]),
+    "std_maxabs": ("management.StandardizeField", [PARCELS, [["VALUE"]]], ["MAXABS"]),
+    "std_robust": ("management.StandardizeField", [PARCELS, [["VALUE"]]], ["ROBUST"]),
+    "std_default": ("management.StandardizeField", [DATA / "wells.shp", [["DEPTH"]]], []),
+    "tf_log": ("management.TransformField", [PARCELS, [["VALUE"]]], ["LOG"]),
+    "tf_sqrt": ("management.TransformField", [PARCELS, [["VALUE"], ["ZONE", "ZSQ"]]], ["SQRT"]),
+    "tf_invx": ("management.TransformField", [PARCELS, [["VALUE"]]], ["INVX"]),
+    "tf_invsqrt": ("management.TransformField", [PARCELS, [["VALUE"]]], ["INV_SQRT"]),
+    "tf_invlog": ("management.TransformField", [PARCELS, [["ZONE"]]], ["INV_LOG"]),
+    "tf_boxcox_1": ("management.TransformField", [PARCELS, [["VALUE"]]], ["BOX-COX", 0.5]),
+    "tf_log_zone": ("management.TransformField", [PARCELS, [["ZONE"]]], ["LOG"]),
+    "tf_sqrt_zone": ("management.TransformField", [PARCELS, [["ZONE"]]], ["SQRT"]),
+    "tf_boxcox_zone": ("management.TransformField", [PARCELS, [["ZONE"]]], ["BOX-COX", 0.5]),
+    "tf_invx_zone": ("management.TransformField", [PARCELS, [["ZONE"]]], ["INVX"]),
+    "tf_invsqrt_shift": ("management.TransformField", [PARCELS, [["ZONE"]]], ["INV_SQRT", "#", 1]),
+    "tf_invboxcox": ("management.TransformField", [PARCELS, [["ZONE"]]], ["INV_BOX-COX", 2]),
+    "tf_log_shift": ("management.TransformField", [PARCELS, [["VALUE"]]], ["LOG", "#", 5]),
+    "tf_log_zero": ("management.TransformField", [DATA / "wells.shp", [["DEPTH"]]], ["LOG"]),
+    "rf_equal": ("management.ReclassifyField", [PARCELS, "VALUE"], ["EQUAL_INTERVAL", 4]),
+    "rf_defined": ("management.ReclassifyField", [PARCELS, "VALUE"], ["DEFINED_INTERVAL", "#", 1500]),
+    "rf_quantile": ("management.ReclassifyField", [PARCELS, "VALUE"], ["QUANTILE", 5]),
+    "rf_unique_text": ("management.ReclassifyField", [PARCELS, "NAME"], ["UNIQUE_VALUES", "#", "#", "#", "#", "DESC", "RC"]),
+    "rf_manual": ("management.ReclassifyField", [PARCELS, "VALUE"], ["MANUAL", "#", "#", "#", [[3000, 1], [6000, 2], [10000, 3]]]),
+    "rf_equal_desc": ("management.ReclassifyField", [PARCELS, "VALUE"], ["EQUAL_INTERVAL", 3, "#", "#", "#", "DESC", "CLS"]),
+    "transpose_all": ("management.TransposeFields", [PARCELS, "VALUE Val;ZONE Zn"], ["FLD", "VAL", "PARCEL_ID;NAME"]),
+    "transpose_sales": ("management.TransposeFields", [DM / "sales.dbf", "AMOUNT;UNITS"], ["WHAT", "NUM", "REGION"]),
+    "transpose_noattr": ("management.TransposeFields", [DM / "sales.dbf", "AMOUNT;UNITS"], ["WHAT", "NUM"]),
+    "pivot_sales": ("management.PivotTable", [DM / "sales.dbf", "REGION", "PRODUCT", "AMOUNT"], []),
+    "pivot_year": ("management.PivotTable", [DM / "sales.dbf", "REGION;YEAR", "PRODUCT", "UNITS"], []),
+    "pivot_text": ("management.PivotTable", [DM / "sales.dbf", "PRODUCT", "YEAR", "AMOUNT"], []),
 }
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
 RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
@@ -661,10 +732,12 @@ WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable"}
 # Tools whose output is a table, written as <name>.dbf.
-TABLE_OUT = {"gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical"}
+TABLE_OUT = {"gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
+             "management.TransposeFields", "management.PivotTable"}
 
 # In-place tools: the index of the input they edit (run on a copy written as the output).
-IN_PLACE = {"management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.AddGeometryAttributes": 0}
+IN_PLACE = {"management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.AddGeometryAttributes": 0,
+            "management.CalculateFields": 0, "management.StandardizeField": 0, "management.TransformField": 0, "management.ReclassifyField": 0}
 
 # Select Layer By Location cases, saved with Copy Features:
 # name: (in_layer, overlap_type, select_features, search_distance, invert)
@@ -730,7 +803,7 @@ def main():
             k = IN_PLACE[tool]
             w.call("run_tool", tool="management.CopyFeatures", args=[str(before[k]), str(out)],
                    env={"overwriteOutput": True})
-            args = [str(out) if i == k else str(a) for i, a in enumerate(before)] + after
+            args = [str(out) if i == k else (a if isinstance(a, (list, int, float)) else str(a)) for i, a in enumerate(before)] + after
         elif tool == "conversion.FeatureClassToFeatureClass":
             # (in_features, out_path, out_name, where_clause, field_mapping)
             args = [str(before[0]), str(out.parent), out.stem] + after

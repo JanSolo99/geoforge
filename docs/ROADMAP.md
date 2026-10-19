@@ -493,6 +493,19 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         registry now has table results (`Outcome::Table`). Not done: Delete Rows and Alter Field (they
         edit their input; shapefiles cannot rename fields), field mappings, GDB table outputs from
         `gf run`
+  - [x] Data Management breadth tools on the shared registry (`geoforge-tools::dm_geometry`,
+        `dm_fields`, `dm_tools`; run with `gf run <id> input=... output=...`), each matching Pro 3.7
+        on 3-9 runs in `manifest.json` (cases `env_*`, `slv_*`, `sap_*`, `epp_*`, `xy2l_*`, `cfs_*`,
+        `std_*`, `tf_*`, `rf_*`, `transpose_*`, `pivot_*`; inputs in `testdata/dm`):
+        Feature Envelope To Polygon, Split Line At Vertices, Split Line At Point, Eliminate Polygon
+        Part, XY To Line, Calculate Fields, Standardize Field, Transform Field, Reclassify Field,
+        Transpose Fields and Pivot Table. Not done: Split Line At Point without a search radius,
+        XY To Line / Bearing Distance To Line geodesics for long lines, Box-Cox by maximum
+        likelihood, Reclassify Field GEOMETRIC_INTERVAL / NATURAL_BREAKS / STANDARD_DEVIATION, Unsplit
+        Line (output order unclear), Alter Field / Alter Fields / Add Incrementing ID Field (they
+        need a geodatabase), Dice, Subdivide Polygon, Generate Rectangles/Transects Along Lines.
+        Known differences: the order of Split Line At Point's pieces on one curved road, and
+        MULTIPART envelopes of nested parts (our shapefile writer turns the inner ring into a hole)
   - [x] Spatial Analyst math functions (`geoforge-raster::mathfn`; `gf math-fn`, 45 app tools,
         `arcpy.sa.Abs` ... `BitwiseRightShift`): Abs, Exp, Exp2, Exp10, Ln, Log2, Log10, Square Root,
         Square, Negate, the trigonometric and hyperbolic functions and their inverses, Round Down/Up,

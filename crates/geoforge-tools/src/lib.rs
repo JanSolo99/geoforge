@@ -3,6 +3,9 @@
 //! and recorded in `testdata/arcgis-reference/manifest.json`.
 
 pub mod construct;
+mod dm_fields;
+mod dm_geometry;
+pub mod dm_tools;
 mod fieldmap;
 pub mod planar;
 pub mod pycalc;
