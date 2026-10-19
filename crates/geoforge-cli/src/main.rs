@@ -58,6 +58,44 @@ enum Tool {
         #[arg(long, default_value = "INPUT")]
         output_type: String,
     },
+    /// Polygon boundaries as lines (ArcGIS "Polygon To Line"): with IDENTIFY_NEIGHBORS (the
+    /// default) shared boundaries are split and get LEFT_FID / RIGHT_FID.
+    PolygonToLine {
+        in_features: PathBuf,
+        out_feature_class: PathBuf,
+        /// IDENTIFY_NEIGHBORS or IGNORE_NEIGHBORS.
+        #[arg(long, default_value = "IDENTIFY_NEIGHBORS")]
+        neighbor_option: String,
+    },
+    /// Polygons from the areas lines or polygon outlines enclose (ArcGIS "Feature To
+    /// Polygon"): `gf feature-to-polygon a [b ...] out`.
+    FeatureToPolygon {
+        /// One or more inputs followed by the output.
+        #[arg(num_args = 2.., required = true)]
+        paths: Vec<PathBuf>,
+        /// XY tolerance, e.g. `0.01 Meters` (default: the coordinate system's).
+        #[arg(long)]
+        cluster_tolerance: Option<String>,
+        /// ATTRIBUTES or NO_ATTRIBUTES.
+        #[arg(long, default_value = "ATTRIBUTES")]
+        attributes: String,
+        /// Points whose attributes the polygons containing them take.
+        #[arg(long)]
+        label_features: Option<PathBuf>,
+    },
+    /// Lines and polygon outlines split where they cross or meet (ArcGIS "Feature To
+    /// Line"): `gf feature-to-line a [b ...] out`.
+    FeatureToLine {
+        /// One or more inputs followed by the output.
+        #[arg(num_args = 2.., required = true)]
+        paths: Vec<PathBuf>,
+        /// XY tolerance, e.g. `0.01 Meters` (default: the coordinate system's).
+        #[arg(long)]
+        cluster_tolerance: Option<String>,
+        /// ATTRIBUTES or NO_ATTRIBUTES.
+        #[arg(long, default_value = "ATTRIBUTES")]
+        attributes: String,
+    },
     /// Planar overlay of polygon inputs (ArcGIS "Union"): `gf union a b ... out`.
     Union {
         /// One or more inputs followed by the output.
@@ -1296,6 +1334,51 @@ fn main() -> ExitCode {
                     .ok_or_else(|| Error::Unsupported(format!("output_type {output_type}")))?,
             };
             overlay_tool(&paths, &out, |i| geoforge_tools::intersect_with(i, &opts))
+        })(),
+        Tool::PolygonToLine {
+            in_features,
+            out_feature_class,
+            neighbor_option,
+        } => (|| {
+            let (fc, _) = open_feature_class(&in_features)?;
+            let out = match neighbor_option.to_ascii_uppercase().as_str() {
+                "IDENTIFY_NEIGHBORS" => {
+                    geoforge_tools::planar::polygon_to_line_neighbors(fc.as_ref())?
+                }
+                "IGNORE_NEIGHBORS" => geoforge_tools::construct::polygon_to_line(fc.as_ref())?,
+                other => return Err(Error::Unsupported(format!("neighbor_option {other}"))),
+            };
+            write_output(out, &out_feature_class, source_gdb(&in_features).as_deref())
+        })(),
+        Tool::FeatureToPolygon {
+            mut paths,
+            cluster_tolerance,
+            attributes,
+            label_features,
+        } => (|| {
+            let out = paths.pop().unwrap();
+            let attributes = attributes_arg(&attributes)?;
+            let labels = label_features
+                .as_deref()
+                .map(open_feature_class)
+                .transpose()?
+                .map(|(f, _)| f);
+            overlay_tool(&paths, &out, |i| {
+                let tol = cluster_tolerance_arg(cluster_tolerance.as_deref(), i)?;
+                geoforge_tools::planar::feature_to_polygon(i, tol, attributes, labels.as_deref())
+            })
+        })(),
+        Tool::FeatureToLine {
+            mut paths,
+            cluster_tolerance,
+            attributes,
+        } => (|| {
+            let out = paths.pop().unwrap();
+            let attributes = attributes_arg(&attributes)?;
+            overlay_tool(&paths, &out, |i| {
+                let tol = cluster_tolerance_arg(cluster_tolerance.as_deref(), i)?;
+                geoforge_tools::planar::feature_to_line(i, tol, attributes)
+            })
         })(),
         Tool::Union {
             mut paths,
@@ -4552,6 +4635,32 @@ fn dataset_name(path: &Path) -> String {
             .map(|s| s.to_string_lossy().into_owned())
             .unwrap_or_default(),
     }
+}
+
+fn attributes_arg(a: &str) -> Result<bool> {
+    match a.to_ascii_uppercase().as_str() {
+        "ATTRIBUTES" => Ok(true),
+        "NO_ATTRIBUTES" => Ok(false),
+        other => Err(Error::Unsupported(format!(
+            "attributes {other}: ATTRIBUTES or NO_ATTRIBUTES"
+        ))),
+    }
+}
+
+/// A cluster tolerance in the first input's coordinate units.
+fn cluster_tolerance_arg(
+    text: Option<&str>,
+    inputs: &[geoforge_tools::NamedInput],
+) -> Result<Option<f64>> {
+    text.map(|t| {
+        geoforge_tools::registry::distance_in_units(
+            t,
+            inputs
+                .first()
+                .and_then(|i| i.features.spatial_reference_wkt()),
+        )
+    })
+    .transpose()
 }
 
 fn overlay_tool(

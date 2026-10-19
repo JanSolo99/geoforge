@@ -453,6 +453,7 @@ dependencies = [
  "geoforge-core",
  "geoforge-geometry",
  "geoforge-proj",
+ "rstar",
 ]
 
 [[package]]

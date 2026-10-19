@@ -3816,6 +3816,48 @@ fn gf_args(case: &str) -> Vec<&'static str> {
             "NO_GAPS",
         ],
         "union_clip_gaps" => vec!["union", "testdata/geoproc/clip_areas.shp"],
+        "p2l_grid" => vec!["polygon-to-line", "testdata/planar/jitter_grid.shp"],
+        "p2l_overlapping" => vec!["polygon-to-line", "testdata/planar/overlapping.shp"],
+        "p2l_holes" => vec!["polygon-to-line", "testdata/planar/holes.shp"],
+        "p2l_nested" => vec!["polygon-to-line", "testdata/planar/nested.shp"],
+        "p2l_parcels" => vec!["polygon-to-line", "testdata/geoproc/parcels.shp"],
+        "p2l_squares" => vec!["polygon-to-line", "testdata/geoproc/squares.shp"],
+        "ftp_grid" => vec!["feature-to-polygon", "testdata/planar/jitter_grid.shp"],
+        "ftp_overlapping" => vec!["feature-to-polygon", "testdata/planar/overlapping.shp"],
+        "ftp_holes" => vec!["feature-to-polygon", "testdata/planar/holes.shp"],
+        "ftp_nested" => vec!["feature-to-polygon", "testdata/planar/nested.shp"],
+        "ftp_lines" => vec!["feature-to-polygon", "testdata/planar/lines.shp"],
+        "ftp_parcels" => vec!["feature-to-polygon", "testdata/geoproc/parcels.shp"],
+        "ftp_parcels_wells" => vec![
+            "feature-to-polygon",
+            "testdata/geoproc/parcels.shp",
+            "<out>",
+            "--label-features",
+            "testdata/geoproc/wells.shp",
+        ],
+        "ftp_parcels_wells_noattr" => vec![
+            "feature-to-polygon",
+            "testdata/geoproc/parcels.shp",
+            "<out>",
+            "--label-features",
+            "testdata/geoproc/wells.shp",
+            "--attributes",
+            "NO_ATTRIBUTES",
+        ],
+        "ftp_roads" => vec!["feature-to-polygon", "testdata/geoproc/roads.shp"],
+        "ftl_lines" => vec!["feature-to-line", "testdata/planar/lines.shp"],
+        "ftl_lines_noattr" => vec![
+            "feature-to-line",
+            "testdata/planar/lines.shp",
+            "<out>",
+            "--attributes",
+            "NO_ATTRIBUTES",
+        ],
+        "ftl_lines_bridges" => vec!["feature-to-line", "testdata/planar/lines_bridges.shp"],
+        "ftl_grid" => vec!["feature-to-line", "testdata/planar/jitter_grid.shp"],
+        "ftl_holes" => vec!["feature-to-line", "testdata/planar/holes.shp"],
+        "ftl_roads" => vec!["feature-to-line", "testdata/geoproc/roads.shp"],
+        "ftl_streams" => vec!["feature-to-line", "testdata/geoproc/streams.shp"],
         other => panic!("no gf command for case {other}"),
     }
 }
@@ -4046,6 +4088,18 @@ fn compare(case: &str, ours: &Path, theirs: &Path, fields: &serde_json::Value) -
             && !KNOWN_ZM_DIFFERENCES.contains(&(case, i))
         {
             diffs.push(format!("feature {i}: {d}"));
+        }
+        // Planar graph tools: the same vertices in the same order (start and direction).
+        if ["p2l_", "ftp_", "ftl_"].iter().any(|p| case.starts_with(p))
+            && (ga.parts != gb.parts
+                || ga.xy.len() != gb.xy.len()
+                || ga.xy.iter().zip(&gb.xy).any(|(p, q)| {
+                    (p[0] - q[0]).abs() > shape_tol || (p[1] - q[1]).abs() > shape_tol
+                }))
+        {
+            diffs.push(format!(
+                "feature {i}: vertices differ (order, start or direction)"
+            ));
         }
         let h = hausdorff(ga, gb);
         if h > shape_tol {

@@ -70,6 +70,7 @@ TARGET_FIELDS = {
 }
 
 CLIP = DATA / "clip_areas.shp"
+PLANAR = ROOT / "testdata" / "planar"
 PARCELS = DATA / "parcels.shp"
 
 CASES = {
@@ -623,6 +624,29 @@ CASES = {
     "regiongroup_patches_four_cross": ("gp.RegionGroup_sa", [RASTER / "patches_i16.tif"], ["FOUR", "CROSS", "ADD_LINK"]),
     "regiongroup_patches_eight_excluded": ("gp.RegionGroup_sa", [RASTER / "patches_i16.tif"], ["EIGHT", "WITHIN", "ADD_LINK", 0]),
     "regiongroup_zones_four_excluded": ("gp.RegionGroup_sa", [RASTER / "zones.tif"], ["FOUR", "WITHIN", "NO_LINK", 7]),
+    # Planar graph tools (testdata/planar: probes from scripts/research/planar).
+    "p2l_grid": ("management.PolygonToLine", [PLANAR / "jitter_grid.shp"], ["IDENTIFY_NEIGHBORS"]),
+    "p2l_overlapping": ("management.PolygonToLine", [PLANAR / "overlapping.shp"], ["IDENTIFY_NEIGHBORS"]),
+    "p2l_holes": ("management.PolygonToLine", [PLANAR / "holes.shp"], ["IDENTIFY_NEIGHBORS"]),
+    "p2l_nested": ("management.PolygonToLine", [PLANAR / "nested.shp"], ["IDENTIFY_NEIGHBORS"]),
+    "p2l_parcels": ("management.PolygonToLine", [PARCELS], ["IDENTIFY_NEIGHBORS"]),
+    "p2l_squares": ("management.PolygonToLine", [DATA / "squares.shp"], ["IDENTIFY_NEIGHBORS"]),
+    "ftp_grid": ("management.FeatureToPolygon", [PLANAR / "jitter_grid.shp"], []),
+    "ftp_overlapping": ("management.FeatureToPolygon", [PLANAR / "overlapping.shp"], []),
+    "ftp_holes": ("management.FeatureToPolygon", [PLANAR / "holes.shp"], []),
+    "ftp_nested": ("management.FeatureToPolygon", [PLANAR / "nested.shp"], []),
+    "ftp_lines": ("management.FeatureToPolygon", [PLANAR / "lines.shp"], []),
+    "ftp_parcels": ("management.FeatureToPolygon", [PARCELS], []),
+    "ftp_parcels_wells": ("management.FeatureToPolygon", [PARCELS], ["", "ATTRIBUTES", DATA / "wells.shp"]),
+    "ftp_parcels_wells_noattr": ("management.FeatureToPolygon", [PARCELS], ["", "NO_ATTRIBUTES", DATA / "wells.shp"]),
+    "ftp_roads": ("management.FeatureToPolygon", [DATA / "roads.shp"], []),
+    "ftl_lines": ("management.FeatureToLine", [PLANAR / "lines.shp"], []),
+    "ftl_lines_noattr": ("management.FeatureToLine", [PLANAR / "lines.shp"], ["", "NO_ATTRIBUTES"]),
+    "ftl_lines_bridges": ("management.FeatureToLine", [PLANAR / "lines_bridges.shp"], []),
+    "ftl_grid": ("management.FeatureToLine", [PLANAR / "jitter_grid.shp"], []),
+    "ftl_holes": ("management.FeatureToLine", [PLANAR / "holes.shp"], []),
+    "ftl_roads": ("management.FeatureToLine", [DATA / "roads.shp"], []),
+    "ftl_streams": ("management.FeatureToLine", [DATA / "streams.shp"], []),
 }
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
 RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",

@@ -24604,6 +24604,963 @@
         ]
       ],
       "shapeType": "Point"
+    },
+    "p2l_grid": {
+      "tool": "management.PolygonToLine",
+      "args": [
+        "testdata/planar/jitter_grid.shp",
+        "<out>",
+        "IDENTIFY_NEIGHBORS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "LEFT_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "RIGHT_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "p2l_overlapping": {
+      "tool": "management.PolygonToLine",
+      "args": [
+        "testdata/planar/overlapping.shp",
+        "<out>",
+        "IDENTIFY_NEIGHBORS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "LEFT_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "RIGHT_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "p2l_holes": {
+      "tool": "management.PolygonToLine",
+      "args": [
+        "testdata/planar/holes.shp",
+        "<out>",
+        "IDENTIFY_NEIGHBORS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "LEFT_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "RIGHT_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "p2l_nested": {
+      "tool": "management.PolygonToLine",
+      "args": [
+        "testdata/planar/nested.shp",
+        "<out>",
+        "IDENTIFY_NEIGHBORS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "LEFT_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "RIGHT_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "p2l_parcels": {
+      "tool": "management.PolygonToLine",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "IDENTIFY_NEIGHBORS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "LEFT_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "RIGHT_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "p2l_squares": {
+      "tool": "management.PolygonToLine",
+      "args": [
+        "testdata/geoproc/squares.shp",
+        "<out>",
+        "IDENTIFY_NEIGHBORS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "LEFT_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "RIGHT_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "ftp_grid": {
+      "tool": "management.FeatureToPolygon",
+      "args": [
+        "testdata/planar/jitter_grid.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_jitter",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "N",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "ftp_overlapping": {
+      "tool": "management.FeatureToPolygon",
+      "args": [
+        "testdata/planar/overlapping.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_overla",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "N",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "ftp_holes": {
+      "tool": "management.FeatureToPolygon",
+      "args": [
+        "testdata/planar/holes.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_holes",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "N",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "ftp_nested": {
+      "tool": "management.FeatureToPolygon",
+      "args": [
+        "testdata/planar/nested.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_nested",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "N",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "ftp_lines": {
+      "tool": "management.FeatureToPolygon",
+      "args": [
+        "testdata/planar/lines.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "ftp_parcels": {
+      "tool": "management.FeatureToPolygon",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_parcel",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "ftp_parcels_wells": {
+      "tool": "management.FeatureToPolygon",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "",
+        "ATTRIBUTES",
+        "testdata/geoproc/wells.shp"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "ftp_parcels_wells_noattr": {
+      "tool": "management.FeatureToPolygon",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "",
+        "NO_ATTRIBUTES",
+        "testdata/geoproc/wells.shp"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "ftp_roads": {
+      "tool": "management.FeatureToPolygon",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "ftl_lines": {
+      "tool": "management.FeatureToLine",
+      "args": [
+        "testdata/planar/lines.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_lines",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "N",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "ftl_lines_noattr": {
+      "tool": "management.FeatureToLine",
+      "args": [
+        "testdata/planar/lines.shp",
+        "<out>",
+        "",
+        "NO_ATTRIBUTES"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "ftl_lines_bridges": {
+      "tool": "management.FeatureToLine",
+      "args": [
+        "testdata/planar/lines_bridges.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_lines_",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "N",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "ftl_grid": {
+      "tool": "management.FeatureToLine",
+      "args": [
+        "testdata/planar/jitter_grid.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_jitter",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "N",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "ftl_holes": {
+      "tool": "management.FeatureToLine",
+      "args": [
+        "testdata/planar/holes.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_holes",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "N",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "ftl_roads": {
+      "tool": "management.FeatureToLine",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_roads",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "ftl_streams": {
+      "tool": "management.FeatureToLine",
+      "args": [
+        "testdata/geoproc/streams.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_stream",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "STREAM_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          80,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
     }
   }
 }

@@ -185,8 +185,19 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       field is created from `--field-type` if missing — matches ArcGIS on 28 expressions.
       Not covered: Arcade/SQL expressions, comprehensions, dictionaries, exceptions, imports
       besides `math`, date arithmetic
-- [ ] Polygon To Line / Feature To Line: ArcGIS's row order is banded (holes first, then outer
-      rings, row of parcels by row) in a way not worked out; LEFT_FID/RIGHT_FID semantics known
+- [x] Planar graph tools (`geoforge-tools::planar`; `gf polygon-to-line`, `gf feature-to-polygon`,
+      `gf feature-to-line`, also on the registry): Polygon To Line IDENTIFY_NEIGHBORS (the default),
+      Feature To Polygon (label features, ATTRIBUTES/NO_ATTRIBUTES, several inputs) and Feature To
+      Line (several inputs, NO_ATTRIBUTES) match Pro 3.7 vertex for vertex on 22 reference runs and
+      ~40 probes (`scripts/research/planar/`). Rules: coordinates within 2√2 × XY tolerance merge
+      at their mean; rows ordered by top-right vertex (y, then x) and then the direction leaving it
+      counterclockwise from west; P2L splits at nodes and ring starts, runs with the lowest-FID
+      bounding polygon on its right, one row per (left, right) pair including polygons it lies in;
+      FTP outer rings start after the top-right vertex, holes placed by an upward monotone-partition
+      sweep and a walk along its diagonals; FTL keeps the first polygon's (else line's) direction
+      on shared stretches, one row per combination of features of each input. Gaps: hole order and
+      start with several holes side by side, an extra split ArcGIS sometimes makes in Feature To
+      Line polygon rings (`docs/KNOWN_GAPS.md`)
 - [x] Select with SQL `where_clause` (comparisons, AND/OR/NOT, IN, LIKE, IS NULL, arithmetic,
       quoted names; BETWEEN rejected with ERROR 000358 as for shapefiles), Summary Statistics
       (sample STD/VARIANCE, unlike Dissolve's population ones; MEDIAN, UNIQUE) and Frequency
@@ -472,7 +483,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         no longer than it stays whole); points along lines walk the parts end to end, strictly
         before the total length, END_POINTS adding the first and last vertex; the fishnet's x-axis
         is the y-axis turned a quarter clockwise, polylines list the rows' lines then the columns'.
-        Not done: IDENTIFY_NEIGHBORS (needs a planar graph), fishnet labels, Densify's ANGLE and
+        Not done: fishnet labels, Densify's ANGLE and
         OFFSET methods and curves, chainage fields, Multiple Ring Buffer and Create Thiessen
         Polygons (probed: `scripts/research/construct/probe1.py`)
   - [x] Table tools on the shared registry (`geoforge-tools::tables`): Copy Rows, Table To Table

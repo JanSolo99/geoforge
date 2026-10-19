@@ -4,6 +4,7 @@
 
 pub mod construct;
 mod fieldmap;
+pub mod planar;
 pub mod pycalc;
 pub mod registry;
 pub mod spatstat;

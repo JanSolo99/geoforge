@@ -9,6 +9,7 @@
 use geoforge_core::{Error, FeatureClass, Result};
 
 use crate::construct::{self, Fishnet, Placement};
+use crate::planar;
 use crate::{TableOutput, ToolOutput, spatstat, tables};
 
 /// What a parameter holds.
@@ -307,7 +308,7 @@ fn meters_per_unit(wkt: &str) -> Option<f64> {
 }
 
 /// A distance as `25`, `25 Meters` or `0.5 Kilometers`, in coordinate units.
-fn distance_in_units(text: &str, wkt: Option<&str>) -> Result<f64> {
+pub fn distance_in_units(text: &str, wkt: Option<&str>) -> Result<f64> {
     let t = text.trim();
     let split = t
         .find(|c: char| c.is_alphabetic() && c != 'e' && c != 'E')
@@ -421,14 +422,80 @@ fn create_fishnet(ctx: &dyn Context) -> Result<ToolOutput> {
 
 fn polygon_to_line(ctx: &dyn Context) -> Result<ToolOutput> {
     let t = find("polygon_to_line").ok_or_else(|| Error::Unsupported("polygon_to_line".into()))?;
-    if text(ctx, t, "neighbor_option").is_some_and(|n| n.eq_ignore_ascii_case("IDENTIFY_NEIGHBORS"))
-    {
-        return Err(Error::Unsupported(
-            "IDENTIFY_NEIGHBORS is not done yet: use IGNORE_NEIGHBORS".into(),
-        ));
-    }
     let fc = ctx.features("input")?;
-    construct::polygon_to_line(fc.as_ref())
+    match text(ctx, t, "neighbor_option") {
+        Some(n) if n.eq_ignore_ascii_case("IGNORE_NEIGHBORS") => {
+            construct::polygon_to_line(fc.as_ref())
+        }
+        Some(n) if !n.eq_ignore_ascii_case("IDENTIFY_NEIGHBORS") => Err(Error::Unsupported(
+            format!("ERROR 000800: neighbor_option {n}: IDENTIFY_NEIGHBORS or IGNORE_NEIGHBORS"),
+        )),
+        _ => planar::polygon_to_line_neighbors(fc.as_ref()),
+    }
+}
+
+/// The dataset name ArcGIS uses in `FID_<name>`: the last path component without extension.
+fn dataset_name(path: &str) -> String {
+    let last = path
+        .rsplit(['/', '\\'])
+        .find(|s| !s.is_empty())
+        .unwrap_or(path);
+    match last.rsplit_once('.') {
+        Some((stem, _)) if !stem.is_empty() => stem.to_string(),
+        _ => last.to_string(),
+    }
+}
+
+/// The cluster tolerance (a distance, in the input's units unless a unit is given).
+fn cluster_tolerance(ctx: &dyn Context, t: &Tool, wkt: Option<&str>) -> Result<Option<f64>> {
+    text(ctx, t, "cluster_tolerance")
+        .map(|c| distance_in_units(&c, wkt))
+        .transpose()
+}
+
+fn attributes_flag(ctx: &dyn Context, t: &Tool) -> Result<bool> {
+    match text(ctx, t, "attributes") {
+        None => Ok(true),
+        Some(a) if a.eq_ignore_ascii_case("ATTRIBUTES") => Ok(true),
+        Some(a) if a.eq_ignore_ascii_case("NO_ATTRIBUTES") => Ok(false),
+        Some(a) => Err(Error::Unsupported(format!(
+            "ERROR 000800: attributes {a}: ATTRIBUTES or NO_ATTRIBUTES"
+        ))),
+    }
+}
+
+fn feature_to_polygon(ctx: &dyn Context) -> Result<ToolOutput> {
+    let t = find("feature_to_polygon")
+        .ok_or_else(|| Error::Unsupported("feature_to_polygon".into()))?;
+    let fc = ctx.features("input")?;
+    let name = dataset_name(&ctx.get("input").unwrap_or_default());
+    let tol = cluster_tolerance(ctx, t, fc.spatial_reference_wkt())?;
+    let labels = match text(ctx, t, "label_features") {
+        Some(_) => Some(ctx.features("label_features")?),
+        None => None,
+    };
+    let inputs = [crate::NamedInput {
+        name,
+        features: fc.as_ref(),
+    }];
+    planar::feature_to_polygon(
+        &inputs,
+        tol,
+        attributes_flag(ctx, t)?,
+        labels.as_ref().map(|l| l.as_ref() as &dyn FeatureClass),
+    )
+}
+
+fn feature_to_line(ctx: &dyn Context) -> Result<ToolOutput> {
+    let t = find("feature_to_line").ok_or_else(|| Error::Unsupported("feature_to_line".into()))?;
+    let fc = ctx.features("input")?;
+    let name = dataset_name(&ctx.get("input").unwrap_or_default());
+    let tol = cluster_tolerance(ctx, t, fc.spatial_reference_wkt())?;
+    let inputs = [crate::NamedInput {
+        name,
+        features: fc.as_ref(),
+    }];
+    planar::feature_to_line(&inputs, tol, attributes_flag(ctx, t)?)
 }
 
 const CONCEPTS: &[&str] = &[
@@ -843,7 +910,7 @@ pub static TOOLS: &[Tool] = &[
         id: "polygon_to_line",
         name: "Polygon To Line",
         toolbox: "Data Management › Features",
-        summary: "The boundaries of polygons as lines (ArcGIS Pro Polygon To Line; IGNORE_NEIGHBORS).",
+        summary: "The boundaries of polygons as lines, split where neighbors meet, with the polygons on their left and right (ArcGIS Pro Polygon To Line).",
         params: &[
             Param {
                 name: "input",
@@ -856,15 +923,93 @@ pub static TOOLS: &[Tool] = &[
             Param {
                 name: "neighbor_option",
                 label: "Identify and store polygon neighboring information",
-                kind: Kind::Choice(&["IGNORE_NEIGHBORS", "IDENTIFY_NEIGHBORS"]),
+                kind: Kind::Choice(&["IDENTIFY_NEIGHBORS", "IGNORE_NEIGHBORS"]),
                 required: false,
-                default: "IGNORE_NEIGHBORS",
-                help: "IDENTIFY_NEIGHBORS is not done yet.",
+                default: "IDENTIFY_NEIGHBORS",
+                help: "IDENTIFY_NEIGHBORS: shared boundaries split, LEFT_FID and RIGHT_FID; IGNORE_NEIGHBORS: each polygon's rings as one line with ORIG_FID.",
             },
         ],
         output_suffix: "Line",
         measures: false,
         run: Runner::Features(polygon_to_line),
+    },
+    Tool {
+        id: "feature_to_polygon",
+        name: "Feature To Polygon",
+        toolbox: "Data Management › Features",
+        summary: "Polygons from the areas enclosed by lines or polygon outlines (ArcGIS Pro Feature To Polygon).",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Features",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "Lines or polygons.",
+            },
+            Param {
+                name: "cluster_tolerance",
+                label: "XY Tolerance",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "Coordinates this close are merged (default: the coordinate system's XY tolerance).",
+            },
+            Param {
+                name: "attributes",
+                label: "Preserve attributes",
+                kind: Kind::Choice(&["ATTRIBUTES", "NO_ATTRIBUTES"]),
+                required: false,
+                default: "ATTRIBUTES",
+                help: "Take the label points' attributes.",
+            },
+            Param {
+                name: "label_features",
+                label: "Label Features",
+                kind: Kind::Features,
+                required: false,
+                default: "",
+                help: "Points whose attributes the polygons containing them take (the first point in a polygon).",
+            },
+        ],
+        output_suffix: "Polygon",
+        measures: false,
+        run: Runner::Features(feature_to_polygon),
+    },
+    Tool {
+        id: "feature_to_line",
+        name: "Feature To Line",
+        toolbox: "Data Management › Features",
+        summary: "Lines and polygon outlines split where they cross or meet (ArcGIS Pro Feature To Line).",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Features",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "Lines or polygons.",
+            },
+            Param {
+                name: "cluster_tolerance",
+                label: "XY Tolerance",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "Coordinates this close are merged (default: the coordinate system's XY tolerance).",
+            },
+            Param {
+                name: "attributes",
+                label: "Preserve attributes",
+                kind: Kind::Choice(&["ATTRIBUTES", "NO_ATTRIBUTES"]),
+                required: false,
+                default: "ATTRIBUTES",
+                help: "Keep FID_<input> and the input's fields (one row per feature on a shared stretch).",
+            },
+        ],
+        output_suffix: "Line",
+        measures: false,
+        run: Runner::Features(feature_to_line),
     },
     Tool {
         id: "average_nearest_neighbor",

@@ -15,8 +15,7 @@
 //!   corner point replaces the cell size. Polylines are the `rows + 1` horizontal lines, then the
 //!   `columns + 1` vertical ones. Labels are not made.
 //! - Polygon To Line (IGNORE_NEIGHBORS): the rings of each polygon as the parts of one line, with
-//!   `ORIG_FID` last. IDENTIFY_NEIGHBORS (which splits shared boundaries and adds LEFT_FID and
-//!   RIGHT_FID) is not done.
+//!   `ORIG_FID` last. IDENTIFY_NEIGHBORS is in [`crate::planar`].
 
 use geoforge_core::{
     Error, Feature, FeatureClass, Field, FieldType, Geometry, GeometryKind, Result, Value,

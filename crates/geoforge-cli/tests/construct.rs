@@ -410,7 +410,7 @@ fn construction_tools_equal_arcgis() {
             s("run"),
             s("polygon_to_line"),
             format!("input={vp}"),
-            s("neighbor_option=IDENTIFY_NEIGHBORS"),
+            s("neighbor_option=SOME_NEIGHBORS"),
             format!("output={}", d.join("x.shp").display()),
         ],
         vec![

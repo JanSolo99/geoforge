@@ -8,6 +8,9 @@ Update this file when a gap is found or closed.
 
 | Tool | Gap | Evidence |
 |---|---|---|
+| Feature To Polygon | With several holes in one polygon side by side (one directly left of another's lowest vertex), the hole order and the vertex a hole starts at can differ (same shapes). Our upward monotone-partition sweep finds diagonals at nearly every ArcGIS entry vertex, but no walk order over them fits all 64 holes of the probe; holes next to removed bridges likewise | `scripts/research/planar/` (probes `hh`, `tri` in the notes), `crates/geoforge-tools/src/planar.rs` (`place_holes`) |
+| Feature To Line (polygon input) | ArcGIS sometimes splits a crossed ring once more at a vertex that is no node (the original start, or the vertex after the top-right one); we never do. No rule found on 13 rings | `scripts/research/planar/README.md` |
+| Polygon To Line / Feature To Polygon / Feature To Line | Z and M are dropped (2D output); a label point lying on a line also adds a second vertex 0.004 m away in one ArcGIS run | `scripts/research/planar/README.md` |
 | Median Center | Weiszfeld from the mean center matches ArcGIS step for step, but ArcGIS stops after a different step (no step-size, objective or scale rule fits 12 cases). Results are up to ~10 m apart | `scripts/research/spatstat/`, `testdata/arcgis-reference/spatstat.json` (tolerance 10 m in `crates/geoforge-cli/tests/spatstat.rs`) |
 | Near / Generate Near Table (geodesic) | Point to line is up to 0.08 % off (ArcGIS treats segments as straight in lon/lat); pairs across the antimeridian are not handled | `docs/ROADMAP.md` (geodesic Near) |
 | Select By Location | Distances still use the UTM zone, not geodesic | ROADMAP |
@@ -26,7 +29,6 @@ Update this file when a gap is found or closed.
 
 | Tool | Missing |
 |---|---|
-| Polygon To Line | `IDENTIFY_NEIGHBORS` (LEFT_FID / RIGHT_FID, shared boundaries split at nodes): needs a planar graph |
 | Create Fishnet | Labels output, corner with zero rows/columns |
 | Densify | ANGLE and OFFSET methods, curved segments, Z/M |
 | Generate Points Along Lines | Chainage fields |
