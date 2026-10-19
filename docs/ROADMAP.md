@@ -416,6 +416,11 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         cases (`gf kernel-density|point-density|line-density`). Point Density's grid starts
         (w + h) / 798 before the points' corner. Not done: barriers, GEODESIC method (planar
         only), map units other than meters, the app tools and arcpy entries
+  - [x] Extract Values to Points (`gf extract-values-to-points`; plain and INTERPOLATE on integer, float
+        and NoData rasters, edges, shapefile NoData as -9999 or 0), 7 cases exact. ArcGIS writes the
+        points grouped by spatial tile (order engine-internal; the probe cases compare by PID). Not
+        done: ADD_ATTRIBUTES ALL joining a raster attribute table, geodatabase NoData (assumed null),
+        the app tool and arcpy entry, points in another coordinate system than the raster
   - [x] Point To Raster / Feature To Raster on points: MOST_FREQUENT ties go to the first
         feature; integer fields stay 32-bit (polygons and lines narrow them), COUNT is signed
         8-bit, MEAN of integers single; RANGE and STANDARD_DEVIATION (sample, single, NoData for

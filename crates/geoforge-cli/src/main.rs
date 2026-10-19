@@ -1111,6 +1111,18 @@ enum Tool {
         #[arg(long, default_value = "SQUARE_KILOMETERS")]
         area_unit_scale_factor: String,
     },
+    /// Spatial Analyst "Extract Values to Points" (RASTERVALU).
+    ExtractValuesToPoints {
+        in_point_features: PathBuf,
+        in_raster: PathBuf,
+        out_point_features: PathBuf,
+        /// NONE or INTERPOLATE (bilinear).
+        #[arg(long, default_value = "NONE")]
+        interpolate_values: String,
+        /// VALUE_ONLY or ALL (the raster's attribute table is not joined).
+        #[arg(long, default_value = "VALUE_ONLY")]
+        add_attributes: String,
+    },
     /// Spatial Analyst "Extract by Mask".
     ExtractByMask {
         in_raster: PathBuf,
@@ -3394,6 +3406,105 @@ fn main() -> ExitCode {
                 .map_err(Error::Unsupported)?;
             r.epsg = epsg;
             write_raster(&out_raster, &r)
+        })(),
+        Tool::ExtractValuesToPoints {
+            in_point_features,
+            in_raster,
+            out_point_features,
+            interpolate_values,
+            add_attributes,
+        } => (|| {
+            let interpolate = match interpolate_values.to_ascii_uppercase().as_str() {
+                "NONE" => false,
+                "INTERPOLATE" => true,
+                other => return Err(Error::Unsupported(format!("interpolate_values {other}"))),
+            };
+            if !matches!(
+                add_attributes.to_ascii_uppercase().as_str(),
+                "VALUE_ONLY" | "ALL"
+            ) {
+                return Err(Error::Unsupported(format!(
+                    "add_attributes {add_attributes}"
+                )));
+            }
+            let raster = geoforge_raster::read_geotiff(&in_raster)?;
+            let (fc, _) = open_feature_class(&in_point_features)?;
+            if fc.geometry_kind() != Some(geoforge_core::GeometryKind::Point) {
+                return Err(Error::Unsupported(
+                    "ERROR 000187: Only supports Geometry type Point.".into(),
+                ));
+            }
+            let mut fields = fc.fields().to_vec();
+            let mut name = "RASTERVALU".to_string();
+            let mut n = 1;
+            while fields.iter().any(|f| f.name.eq_ignore_ascii_case(&name)) {
+                name = format!("RASTERVAL{n}");
+                n += 1;
+            }
+            use geoforge_core::FieldType as Ft;
+            let ty = if raster.data_type.is_float() {
+                if matches!(raster.data_type, geoforge_raster::DataType::F64) {
+                    Ft::Double
+                } else {
+                    Ft::Single
+                }
+            } else if interpolate {
+                Ft::Single
+            } else {
+                Ft::Integer
+            };
+            fields.push(geoforge_core::Field::new(name, ty));
+            let mut features = Vec::new();
+            let mut points = Vec::new();
+            for f in fc.features() {
+                let f = f?;
+                points.push(f.geometry.as_ref().and_then(|g| g.xy.first().copied()));
+                features.push(f);
+            }
+            let shp = out_point_features
+                .extension()
+                .is_some_and(|e| e.eq_ignore_ascii_case("shp"));
+            let values = geoforge_raster::sample::extract_values(
+                &raster,
+                &points
+                    .iter()
+                    .map(|p| p.unwrap_or([f64::NAN; 2]))
+                    .collect::<Vec<_>>(),
+                interpolate,
+            );
+            // A shapefile has no null: NoData is -9999 when the raster declares a NoData
+            // value, else 0.
+            let fill = if raster.nodata.is_some() {
+                -9999.0
+            } else {
+                0.0
+            };
+            for (f, v) in features.iter_mut().zip(values) {
+                let v = v.or(shp.then_some(fill));
+                f.attributes
+                    .resize(fields.len() - 1, geoforge_core::Value::Null);
+                f.attributes.push(match (v, ty) {
+                    (None, _) => geoforge_core::Value::Null,
+                    (Some(v), Ft::Integer) => geoforge_core::Value::Integer(v as i32),
+                    (Some(v), Ft::Single) => geoforge_core::Value::Single(v as f32),
+                    (Some(v), _) => geoforge_core::Value::Double(v),
+                });
+            }
+            let out = geoforge_tools::ToolOutput {
+                kind: geoforge_core::GeometryKind::Point,
+                has_z: fc.has_z(),
+                has_m: fc.has_m(),
+                fields,
+                spatial_reference_wkt: fc.spatial_reference_wkt().map(String::from),
+                features,
+                messages: Vec::new(),
+            };
+            drop(fc);
+            write_output(
+                out,
+                &out_point_features,
+                source_gdb(&in_point_features).as_deref(),
+            )
         })(),
         Tool::ExtractByMask {
             in_raster,

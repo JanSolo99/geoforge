@@ -20,6 +20,7 @@ pub mod mathfn;
 pub mod overlay;
 pub mod rasterize;
 pub mod resample;
+pub mod sample;
 pub mod stats;
 pub mod surface;
 mod writer;

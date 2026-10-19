@@ -3488,6 +3488,56 @@ fn gf_args(case: &str) -> Vec<&'static str> {
             "--area-unit-scale-factor",
             "SQUARE_METERS",
         ],
+        "evp_wells_dem" => vec![
+            "extract-values-to-points",
+            "testdata/geoproc/wells.shp",
+            "testdata/raster/dem.tif",
+            "<out>",
+        ],
+        "evp_wells_dem_interp" => vec![
+            "extract-values-to-points",
+            "testdata/geoproc/wells.shp",
+            "testdata/raster/dem.tif",
+            "<out>",
+            "--interpolate-values",
+            "INTERPOLATE",
+        ],
+        "evp_probe_nodata" => vec![
+            "extract-values-to-points",
+            "testdata/raster/evp_points.shp",
+            "testdata/raster/dem_nodata.tif",
+            "<out>",
+        ],
+        "evp_probe_nodata_interp" => vec![
+            "extract-values-to-points",
+            "testdata/raster/evp_points.shp",
+            "testdata/raster/dem_nodata.tif",
+            "<out>",
+            "--interpolate-values",
+            "INTERPOLATE",
+        ],
+        "evp_probe_classes" => vec![
+            "extract-values-to-points",
+            "testdata/raster/evp_points.shp",
+            "testdata/raster/classes_u8.tif",
+            "<out>",
+        ],
+        "evp_probe_classes_interp" => vec![
+            "extract-values-to-points",
+            "testdata/raster/evp_points.shp",
+            "testdata/raster/classes_u8.tif",
+            "<out>",
+            "--interpolate-values",
+            "INTERPOLATE",
+        ],
+        "evp_probe_f64" => vec![
+            "extract-values-to-points",
+            "testdata/raster/evp_points.shp",
+            "testdata/raster/dem_f64.tif",
+            "<out>",
+            "--interpolate-values",
+            "INTERPOLATE",
+        ],
         "extract_dem_zones" => vec![
             "extract-by-mask",
             "testdata/raster/dem.tif",
@@ -3922,8 +3972,19 @@ fn compare(case: &str, ours: &Path, theirs: &Path, fields: &serde_json::Value) -
         diffs.push(format!("schema: ours {got:?}, ArcGIS {expected:?}"));
     }
 
-    let a: Vec<_> = ours.features().map(Result::unwrap).collect();
-    let b: Vec<_> = theirs.features().map(Result::unwrap).collect();
+    let mut a: Vec<_> = ours.features().map(Result::unwrap).collect();
+    let mut b: Vec<_> = theirs.features().map(Result::unwrap).collect();
+    // Extract Values to Points writes the points grouped by spatial tile (its order is
+    // engine-internal; for one tile, as with the wells, it is the input order): compare
+    // the probe cases by their PID field.
+    if case.starts_with("evp_probe") {
+        let pid = |f: &geoforge_core::Feature| match f.attributes.get(1) {
+            Some(Value::Integer(v)) => *v,
+            _ => 0,
+        };
+        a.sort_by_key(pid);
+        b.sort_by_key(pid);
+    }
     if a.len() != b.len() {
         diffs.push(format!("count: ours {}, ArcGIS {}", a.len(), b.len()));
     }

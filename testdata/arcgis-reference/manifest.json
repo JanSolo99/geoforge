@@ -24250,6 +24250,360 @@
       "messages": [],
       "fields": [],
       "shapeType": null
+    },
+    "evp_wells_dem": {
+      "tool": "gp.ExtractValuesToPoints_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "testdata/raster/dem.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010559: The input feature class does not have a spatial index."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "RASTERVALU",
+          "Single",
+          13,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "evp_wells_dem_interp": {
+      "tool": "gp.ExtractValuesToPoints_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "testdata/raster/dem.tif",
+        "<out>",
+        "INTERPOLATE"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010559: The input feature class does not have a spatial index."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "RASTERVALU",
+          "Single",
+          13,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "evp_probe_nodata": {
+      "tool": "gp.ExtractValuesToPoints_sa",
+      "args": [
+        "testdata/raster/evp_points.shp",
+        "testdata/raster/dem_nodata.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010559: The input feature class does not have a spatial index."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "PID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "RASTERVALU",
+          "Single",
+          13,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "evp_probe_nodata_interp": {
+      "tool": "gp.ExtractValuesToPoints_sa",
+      "args": [
+        "testdata/raster/evp_points.shp",
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "INTERPOLATE"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010559: The input feature class does not have a spatial index."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "PID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "RASTERVALU",
+          "Single",
+          13,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "evp_probe_f64": {
+      "tool": "gp.ExtractValuesToPoints_sa",
+      "args": [
+        "testdata/raster/evp_points.shp",
+        "testdata/raster/dem_f64.tif",
+        "<out>",
+        "INTERPOLATE"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010559: The input feature class does not have a spatial index."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "PID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "RASTERVALU",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "evp_probe_classes": {
+      "tool": "gp.ExtractValuesToPoints_sa",
+      "args": [
+        "testdata/raster/evp_points.shp",
+        "testdata/raster/classes_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010559: The input feature class does not have a spatial index."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "PID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "RASTERVALU",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "evp_probe_classes_interp": {
+      "tool": "gp.ExtractValuesToPoints_sa",
+      "args": [
+        "testdata/raster/evp_points.shp",
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "INTERPOLATE"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010559: The input feature class does not have a spatial index."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "PID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "RASTERVALU",
+          "Single",
+          13,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
     }
   }
 }
