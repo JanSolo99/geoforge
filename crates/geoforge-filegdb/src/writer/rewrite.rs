@@ -6,10 +6,11 @@ use std::path::Path;
 
 use geoforge_core::{Error, Feature, Field, FieldType, Result};
 
-use super::btree::{spatial_entries, write_index};
+use super::btree::{spatial_entries, write_index_for};
 use super::rebuild::read_raw;
 use super::table::TableWriter;
-use super::{to_gdb_field, write_gdbindexes};
+use super::txn;
+use super::{to_gdb_field, write_gdbindexes_for};
 use crate::bytes::err;
 use crate::table::{GdbField, GdbFieldType, Table};
 
@@ -19,18 +20,126 @@ use crate::table::{GdbField, GdbFieldType, Table};
 /// largest OBJECTID the table has had. Fields that match an existing field in name and type
 /// keep their stored definition (defaults, domain, alias); attribute indexes on fields that
 /// remain are rebuilt. Returns the new row count.
+///
+/// The OBJECTID sequence continues where it was (deleted OBJECTIDs are not reused), as in
+/// ArcGIS; [`truncate_table`] starts it again.
 pub fn rewrite_table(
     base: impl AsRef<Path>,
     attribute_fields: &[Field],
     rows: &[(Option<u64>, Feature)],
 ) -> Result<u64> {
+    rewrite(base.as_ref(), attribute_fields, rows, true)
+}
+
+/// Deletes every row of a table and restarts its OBJECTIDs at 1 (`arcpy.management.
+/// TruncateTable`); fields, indexes and the geometry definition stay.
+pub fn truncate_table(base: impl AsRef<Path>) -> Result<()> {
     let base = base.as_ref().with_extension("");
-    let old = Table::open(&base)?;
-    if old.is_version_4() {
-        return Err(Error::Unsupported(
-            "rewriting 64-bit OBJECTID tables (ArcGIS Pro 3.2 format) is not implemented".into(),
-        ));
+    let fields = Table::open(&base)?.fields().to_vec();
+    rewrite(&base, &fields, &[], false).map(|_| ())
+}
+
+/// Adds `field` after the existing fields of a table (`arcpy.management.AddField`); the
+/// existing rows get its default value, or null. Rewrites the table.
+pub fn add_field(base: impl AsRef<Path>, field: &Field) -> Result<()> {
+    let base = base.as_ref().with_extension("");
+    super::validate_field_name(&field.name)?;
+    let table = Table::open(&base)?;
+    if table
+        .all_fields()
+        .iter()
+        .any(|f| f.name.eq_ignore_ascii_case(&field.name))
+    {
+        return Err(Error::Unsupported(format!(
+            "ERROR 000012: {} already exists",
+            field.name
+        )));
     }
+    if !field.nullable && field.default.is_none() && table.row_count() > 0 {
+        return Err(Error::Unsupported(format!(
+            "field {} is not nullable and has no default, but the table has rows",
+            field.name
+        )));
+    }
+    let mut fields = table.fields().to_vec();
+    fields.push(field.clone());
+    let fill = field.default.clone().unwrap_or(geoforge_core::Value::Null);
+    let rows = table
+        .features()
+        .map(|f| {
+            let mut f = f?;
+            f.attributes.push(fill.clone());
+            Ok((Some(f.oid as u64), f))
+        })
+        .collect::<Result<Vec<_>>>()?;
+    drop(table);
+    rewrite(&base, &fields, &rows, true).map(|_| ())
+}
+
+/// Removes fields from a table (`arcpy.management.DeleteField`). OBJECTID, the geometry
+/// and ArcGIS's required `Shape_Length` / `Shape_Area` fields cannot be removed.
+/// Rewrites the table.
+pub fn delete_fields(base: impl AsRef<Path>, names: &[&str]) -> Result<()> {
+    let base = base.as_ref().with_extension("");
+    let table = Table::open(&base)?;
+    let shape = table.shape_field().map(|f| f.name.to_ascii_lowercase());
+    let mut keep = Vec::new();
+    for (i, f) in table.fields().iter().enumerate() {
+        if names.iter().any(|n| n.eq_ignore_ascii_case(&f.name)) {
+            let n = f.name.to_ascii_lowercase();
+            if shape
+                .as_ref()
+                .is_some_and(|s| n == format!("{s}_length") || n == format!("{s}_area"))
+            {
+                return Err(Error::Unsupported(format!(
+                    "ERROR 000370: {} is a required field and cannot be deleted",
+                    f.name
+                )));
+            }
+        } else {
+            keep.push(i);
+        }
+    }
+    for n in names {
+        let known = table
+            .all_fields()
+            .iter()
+            .any(|f| f.name.eq_ignore_ascii_case(n));
+        if !known {
+            return Err(Error::Unsupported(format!("no field {n}")));
+        }
+        if !table
+            .fields()
+            .iter()
+            .any(|f| f.name.eq_ignore_ascii_case(n))
+        {
+            return Err(Error::Unsupported(format!(
+                "ERROR 000370: {n} is a required field and cannot be deleted"
+            )));
+        }
+    }
+    let fields: Vec<Field> = keep.iter().map(|&i| table.fields()[i].clone()).collect();
+    let rows = table
+        .features()
+        .map(|f| {
+            let mut f = f?;
+            f.attributes = keep.iter().map(|&i| f.attributes[i].clone()).collect();
+            Ok((Some(f.oid as u64), f))
+        })
+        .collect::<Result<Vec<_>>>()?;
+    drop(table);
+    rewrite(&base, &fields, &rows, true).map(|_| ())
+}
+
+fn rewrite(
+    base: &Path,
+    attribute_fields: &[Field],
+    rows: &[(Option<u64>, Feature)],
+    keep_max_oid: bool,
+) -> Result<u64> {
+    let base = base.with_extension("");
+    let old = Table::open(&base)?;
+    let v4 = old.is_version_4();
     let is_attribute = |f: &GdbField| {
         !matches!(
             f.field_type,
@@ -87,6 +196,13 @@ pub fn rewrite_table(
         }
     }
 
+    let (geometry_kind, has_z, has_m) = (old.geometry_kind(), old.has_z(), old.has_m());
+    let old_max_oid = old.max_oid();
+    // The index names follow the table's own field names (`FDO_Shape` in ArcGIS's tables).
+    let oid_name = old.oid_field_name().unwrap_or("OBJECTID").to_owned();
+    let shape_name = old
+        .shape_field()
+        .map_or("SHAPE".to_owned(), |f| f.name.clone());
     // Number the rows.
     let mut next = old
         .max_oid()
@@ -105,86 +221,105 @@ pub fn rewrite_table(
     if numbered.windows(2).any(|w| w[0].0 == w[1].0) {
         return Err(err("two rows with the same OBJECTID"));
     }
+    // Rows whose geometry is new or changed get ArcGIS's measures recomputed.
+    let mut changed = std::collections::HashSet::new();
+    if old.shape_field().is_some() {
+        for (oid, f) in &numbered {
+            let same = old.get(*oid)?.is_some_and(|o| o.geometry == f.geometry);
+            if !same {
+                changed.insert(*oid);
+            }
+        }
+    }
 
-    // Write into a scratch directory, then move the files over the old ones.
+    // Write into a scratch directory, then move the files over the old ones, all in one
+    // transaction (a crash leaves the old table).
     let dir = base
         .parent()
-        .ok_or_else(|| err("table path has no directory"))?;
+        .filter(|d| !d.as_os_str().is_empty())
+        .unwrap_or(Path::new("."))
+        .to_path_buf();
     let stem = base
         .file_name()
         .ok_or_else(|| err("table path has no name"))?
         .to_owned();
-    let scratch = dir.join(format!(".gf-rewrite-{}", stem.to_string_lossy()));
-    std::fs::remove_dir_all(&scratch).ok();
-    std::fs::create_dir_all(&scratch).map_err(|e| Error::io(&scratch, e))?;
+    let guard = txn::begin(&dir)?;
+    let scratch = txn::scratch_dir(&dir, &stem.to_string_lossy())?;
     let tmp = scratch.join(&stem);
+    // The old table's handle is closed before its files are moved away.
+    drop(old);
     let result = (|| -> Result<u64> {
-        let mut w = TableWriter::create(
-            &tmp,
-            fields.clone(),
-            old.geometry_kind(),
-            old.has_z(),
-            old.has_m(),
-        )?;
+        let mut w =
+            TableWriter::create_versioned(&tmp, fields.clone(), geometry_kind, has_z, has_m, v4)?;
         for (name, field) in &indexes {
             w.add_index(name, field)?;
         }
         for (oid, f) in &numbered {
+            w.measure_next = changed.contains(oid);
             w.push_at(*oid, f.geometry.as_ref(), &f.attributes)?;
+        }
+        if keep_max_oid {
+            w.reserve_oids(old_max_oid);
         }
         let n = numbered.len() as u64;
         let finished = w.finish()?;
         let mut index_names = Vec::new();
         for ix in &finished.indexes {
-            write_index(
+            write_index_for(
                 &tmp.with_extension(format!("{}.atx", ix.name)),
                 ix.key_size,
                 ix.kind,
                 &ix.entries,
+                v4,
             )?;
             index_names.push((ix.name.clone(), ix.field.clone()));
         }
         match finished.grid {
             Some(grid) => {
-                write_index(
+                write_index_for(
                     &tmp.with_extension("spx"),
                     8,
                     0x40,
                     &spatial_entries(&finished.envelopes, grid),
+                    v4,
                 )?;
-                write_gdbindexes(&tmp.with_extension("gdbindexes"), true, &index_names)?;
+                write_gdbindexes_for(
+                    &tmp.with_extension("gdbindexes"),
+                    &oid_name,
+                    Some(&shape_name),
+                    &index_names,
+                )?;
             }
-            None => write_gdbindexes(&tmp.with_extension("gdbindexes"), false, &index_names)?,
+            None => write_gdbindexes_for(
+                &tmp.with_extension("gdbindexes"),
+                &oid_name,
+                None,
+                &index_names,
+            )?,
+        }
+
+        // Remove what belonged to the old table, then move the new files in.
+        let prefix = format!("{}.", stem.to_string_lossy());
+        for e in std::fs::read_dir(&dir).map_err(|e| Error::io(&dir, e))? {
+            let e = e.map_err(|e| Error::io(&dir, e))?;
+            let name = e.file_name().to_string_lossy().into_owned();
+            let own = name.starts_with(&prefix)
+                && (name.ends_with(".atx")
+                    || ["gdbtable", "gdbtablx", "gdbindexes", "spx", "freelist"]
+                        .iter()
+                        .any(|x| name == format!("{prefix}{x}")));
+            if own {
+                txn::remove_file(&e.path())?;
+            }
+        }
+        for e in std::fs::read_dir(&scratch).map_err(|e| Error::io(&scratch, e))? {
+            let e = e.map_err(|er| Error::io(&scratch, er))?;
+            txn::install(&e.path(), &dir.join(e.file_name()))?;
         }
         Ok(n)
     })();
-    let n = match result {
-        Ok(n) => n,
-        Err(e) => {
-            std::fs::remove_dir_all(&scratch).ok();
-            return Err(e);
-        }
-    };
-
-    // Remove what belonged to the old table, then move the new files in.
-    let prefix = format!("{}.", stem.to_string_lossy());
-    for e in std::fs::read_dir(dir).map_err(|e| Error::io(dir, e))? {
-        let e = e.map_err(|e| Error::io(dir, e))?;
-        let name = e.file_name().to_string_lossy().into_owned();
-        let own = name.starts_with(&prefix)
-            && (name.ends_with(".atx")
-                || ["gdbtable", "gdbtablx", "gdbindexes", "spx", "freelist"]
-                    .iter()
-                    .any(|x| name == format!("{prefix}{x}")));
-        if own {
-            std::fs::remove_file(e.path()).map_err(|er| Error::io(e.path(), er))?;
-        }
-    }
-    for e in std::fs::read_dir(&scratch).map_err(|e| Error::io(&scratch, e))? {
-        let e = e.map_err(|er| Error::io(&scratch, er))?;
-        let to = dir.join(e.file_name());
-        std::fs::rename(e.path(), &to).map_err(|er| Error::io(&to, er))?;
-    }
     std::fs::remove_dir_all(&scratch).ok();
+    let n = result?;
+    guard.commit()?;
     Ok(n)
 }

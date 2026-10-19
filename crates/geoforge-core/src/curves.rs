@@ -431,18 +431,21 @@ fn same_point(a: [f64; 2], b: [f64; 2]) -> bool {
 }
 
 fn circumcenter(a: [f64; 2], b: [f64; 2], c: [f64; 2]) -> Option<[f64; 2]> {
-    let d = 2.0 * (a[0] * (b[1] - c[1]) + b[0] * (c[1] - a[1]) + c[0] * (a[1] - b[1]));
-    let scale = [a, b, c]
+    // Relative to `a`: with absolute coordinates (millions of metres) both the
+    // determinant and a threshold scaled by them would swamp short, flat arcs.
+    let (b, c) = ([b[0] - a[0], b[1] - a[1]], [c[0] - a[0], c[1] - a[1]]);
+    let d = 2.0 * (b[0] * c[1] - b[1] * c[0]);
+    let scale = [b, c]
         .iter()
         .map(|p| p[0].abs().max(p[1].abs()))
-        .fold(1.0, f64::max);
-    if d.abs() <= 1e-12 * scale * scale {
+        .fold(0.0, f64::max);
+    if scale == 0.0 || d.abs() <= 1e-12 * scale * scale {
         return None;
     }
     let sq = |p: [f64; 2]| p[0] * p[0] + p[1] * p[1];
-    let ux = (sq(a) * (b[1] - c[1]) + sq(b) * (c[1] - a[1]) + sq(c) * (a[1] - b[1])) / d;
-    let uy = (sq(a) * (c[0] - b[0]) + sq(b) * (a[0] - c[0]) + sq(c) * (b[0] - a[0])) / d;
-    Some([ux, uy])
+    let ux = (c[1] * sq(b) - b[1] * sq(c)) / d;
+    let uy = (b[0] * sq(c) - c[0] * sq(b)) / d;
+    Some([a[0] + ux, a[1] + uy])
 }
 
 /// Total absolute turning angle along a polyline.

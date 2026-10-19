@@ -31,6 +31,8 @@ pub struct Geodatabase {
 impl Geodatabase {
     pub fn open(dir: impl AsRef<Path>) -> Result<Self> {
         let dir = dir.as_ref().to_path_buf();
+        // An edit that was interrupted is rolled back first (see `writer::recover`).
+        crate::writer::recover(&dir)?;
         let catalog = Table::open(table_path(&dir, 1))?;
         let name_i = field_index(&catalog, "Name")?;
         let mut all = Vec::new();

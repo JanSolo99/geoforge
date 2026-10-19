@@ -149,85 +149,87 @@ pub(super) fn find<'a>(
 /// goes with it (see the module notes). Returns the names of the items removed.
 pub fn delete_item(dir: impl AsRef<Path>, name: &str) -> Result<Vec<String>> {
     let dir = dir.as_ref();
-    let items = load_items(dir)?;
-    let target = find(&items, name, is_class).ok_or_else(|| missing(name))?;
+    super::txn::atomic(dir, || -> Result<Vec<String>> {
+        let items = load_items(dir)?;
+        let target = find(&items, name, is_class).ok_or_else(|| missing(name))?;
 
-    let rels = Table::open(base(dir, 6))?;
-    let (r_origin, r_dest, r_type) = (
-        column(&rels, "OriginID")?,
-        column(&rels, "DestID")?,
-        column(&rels, "Type")?,
-    );
-    let rel_rows: Vec<Feature> = rels.features().collect::<Result<_>>()?;
+        let rels = Table::open(base(dir, 6))?;
+        let (r_origin, r_dest, r_type) = (
+            column(&rels, "OriginID")?,
+            column(&rels, "DestID")?,
+            column(&rels, "Type")?,
+        );
+        let rel_rows: Vec<Feature> = rels.features().collect::<Result<_>>()?;
 
-    // The items that go: the target, a dataset's contents, and the relationship classes that
-    // relate any of them.
-    let mut doomed: HashSet<String> = HashSet::new();
-    doomed.insert(target.uuid.clone());
-    if target.kind == Kind::Dataset {
-        let prefix = format!("{}\\", target.path);
-        for i in items.rows.iter().filter(|i| {
-            i.path.len() > prefix.len() && i.path[..prefix.len()].eq_ignore_ascii_case(&prefix)
-        }) {
-            doomed.insert(i.uuid.clone());
+        // The items that go: the target, a dataset's contents, and the relationship classes that
+        // relate any of them.
+        let mut doomed: HashSet<String> = HashSet::new();
+        doomed.insert(target.uuid.clone());
+        if target.kind == Kind::Dataset {
+            let prefix = format!("{}\\", target.path);
+            for i in items.rows.iter().filter(|i| {
+                i.path.len() > prefix.len() && i.path[..prefix.len()].eq_ignore_ascii_case(&prefix)
+            }) {
+                doomed.insert(i.uuid.clone());
+            }
         }
-    }
-    for r in &rel_rows {
-        let ty = text(&r.attributes[r_type]);
-        let origin = text(&r.attributes[r_origin]);
-        if ty.len() >= REL_RELATED_THROUGH.len()
-            && ty[..REL_RELATED_THROUGH.len()].eq_ignore_ascii_case(REL_RELATED_THROUGH)
-            && doomed.contains(&origin)
-        {
-            doomed.insert(text(&r.attributes[r_dest]));
+        for r in &rel_rows {
+            let ty = text(&r.attributes[r_type]);
+            let origin = text(&r.attributes[r_origin]);
+            if ty.len() >= REL_RELATED_THROUGH.len()
+                && ty[..REL_RELATED_THROUGH.len()].eq_ignore_ascii_case(REL_RELATED_THROUGH)
+                && doomed.contains(&origin)
+            {
+                doomed.insert(text(&r.attributes[r_dest]));
+            }
         }
-    }
-    let gone: Vec<&ItemRow> = items
-        .rows
-        .iter()
-        .filter(|i| doomed.contains(&i.uuid))
-        .collect();
-
-    // The catalog rows of the tables among them.
-    let catalog = Table::open(base(dir, 1))?;
-    let mut tables: Vec<(u64, String)> = Vec::new();
-    for r in catalog.features() {
-        let r = r?;
-        let n = text(&r.attributes[0]);
-        if gone
+        let gone: Vec<&ItemRow> = items
+            .rows
             .iter()
-            .any(|i| i.kind != Kind::Dataset && i.name.eq_ignore_ascii_case(&n))
-        {
-            tables.push((r.oid as u64, n));
-        }
-    }
+            .filter(|i| doomed.contains(&i.uuid))
+            .collect();
 
-    // Unlist the tables first, so nothing lists a table whose item is gone.
-    if !tables.is_empty() {
-        let mut ed = TableEditor::open(base(dir, 1))?;
-        for (oid, _) in &tables {
-            ed.delete(*oid)?;
+        // The catalog rows of the tables among them.
+        let catalog = Table::open(base(dir, 1))?;
+        let mut tables: Vec<(u64, String)> = Vec::new();
+        for r in catalog.features() {
+            let r = r?;
+            let n = text(&r.attributes[0]);
+            if gone
+                .iter()
+                .any(|i| i.kind != Kind::Dataset && i.name.eq_ignore_ascii_case(&n))
+            {
+                tables.push((r.oid as u64, n));
+            }
+        }
+
+        // Unlist the tables first, so nothing lists a table whose item is gone.
+        if !tables.is_empty() {
+            let mut ed = TableEditor::open(base(dir, 1))?;
+            for (oid, _) in &tables {
+                ed.delete(*oid)?;
+            }
+            ed.finish()?;
+        }
+        let mut ed = TableEditor::open(base(dir, 6))?;
+        for r in &rel_rows {
+            if doomed.contains(&text(&r.attributes[r_origin]))
+                || doomed.contains(&text(&r.attributes[r_dest]))
+            {
+                ed.delete(r.row_oid())?;
+            }
         }
         ed.finish()?;
-    }
-    let mut ed = TableEditor::open(base(dir, 6))?;
-    for r in &rel_rows {
-        if doomed.contains(&text(&r.attributes[r_origin]))
-            || doomed.contains(&text(&r.attributes[r_dest]))
-        {
-            ed.delete(r.row_oid())?;
+        let mut ed = TableEditor::open(base(dir, 4))?;
+        for i in &gone {
+            ed.delete(i.row.oid as u64)?;
         }
-    }
-    ed.finish()?;
-    let mut ed = TableEditor::open(base(dir, 4))?;
-    for i in &gone {
-        ed.delete(i.row.oid as u64)?;
-    }
-    ed.finish()?;
-    for (id, _) in &tables {
-        remove_files(dir, *id)?;
-    }
-    Ok(gone.iter().map(|i| i.name.clone()).collect())
+        ed.finish()?;
+        for (id, _) in &tables {
+            remove_files(dir, *id)?;
+        }
+        Ok(gone.iter().map(|i| i.name.clone()).collect())
+    })
 }
 
 trait RowOid {
@@ -250,7 +252,7 @@ fn remove_files(dir: &Path, id: u64) -> Result<()> {
             .to_ascii_lowercase()
             .starts_with(&prefix)
         {
-            std::fs::remove_file(e.path()).map_err(|er| Error::io(e.path(), er))?;
+            super::txn::remove_file(&e.path())?;
         }
     }
     Ok(())
@@ -310,85 +312,87 @@ fn renamed_definition(
 /// (`arcpy.management.Rename`).
 pub fn rename_item(dir: impl AsRef<Path>, old: &str, new: &str) -> Result<()> {
     let dir = dir.as_ref();
-    validate_table_name(new)?;
-    let items = load_items(dir)?;
-    let target = find(&items, old, is_class).ok_or_else(|| missing(old))?;
-    if find(&items, new, is_class).is_some() {
-        return Err(Error::Unsupported(format!(
-            "ERROR 000725: Output Dataset or Feature Class: Dataset {new} already exists."
-        )));
-    }
-    let (old_name, old_path, kind) = (target.name.clone(), target.path.clone(), target.kind);
-    let new_path = match old_path.rfind('\\') {
-        Some(i) => format!("{}{new}", &old_path[..=i]),
-        None => new.to_string(),
-    };
-
-    // Catalog first: a table of the new name must not be listed before its item says so.
-    let catalog = Table::open(base(dir, 1))?;
-    let mut ed = TableEditor::open(base(dir, 1))?;
-    for r in catalog.features() {
-        let mut r = r?;
-        if kind != Kind::Dataset && text(&r.attributes[0]).eq_ignore_ascii_case(&old_name) {
-            r.attributes[0] = Value::String(new.to_string());
-            ed.update(r.oid as u64, &r)?;
+    super::txn::atomic(dir, || -> Result<()> {
+        validate_table_name(new)?;
+        let items = load_items(dir)?;
+        let target = find(&items, old, is_class).ok_or_else(|| missing(old))?;
+        if find(&items, new, is_class).is_some() {
+            return Err(Error::Unsupported(format!(
+                "ERROR 000725: Output Dataset or Feature Class: Dataset {new} already exists."
+            )));
         }
-    }
-    ed.finish()?;
+        let (old_name, old_path, kind) = (target.name.clone(), target.path.clone(), target.kind);
+        let new_path = match old_path.rfind('\\') {
+            Some(i) => format!("{}{new}", &old_path[..=i]),
+            None => new.to_string(),
+        };
 
-    let mut ed = TableEditor::open(base(dir, 4))?;
-    let child_prefix = format!("{old_path}\\");
-    for it in &items.rows {
-        let mut row = it.row.clone();
-        let mut changed = false;
-        if it.uuid == target.uuid {
-            row.attributes[items.c_name] = Value::String(new.to_string());
-            row.attributes[items.c_physical] = Value::String(new.to_uppercase());
-            row.attributes[items.c_path] = Value::String(new_path.clone());
-            let alias = matches!(kind, Kind::FeatureClass | Kind::Table);
-            let def = renamed_definition(
-                &text(&it.row.attributes[items.c_def]),
-                &old_name,
-                &old_path,
-                new,
-                &new_path,
-                alias,
-            );
-            row.attributes[items.c_def] = Value::Xml(def);
-            changed = true;
-        } else if kind == Kind::Dataset
-            && it.path.len() > child_prefix.len()
-            && it.path[..child_prefix.len()].eq_ignore_ascii_case(&child_prefix)
-        {
-            // A feature dataset's children move with it.
-            let moved = format!("{new_path}{}", &it.path[old_path.len()..]);
-            row.attributes[items.c_path] = Value::String(moved.clone());
-            let def = text(&it.row.attributes[items.c_def]).replace(
-                &format!("<CatalogPath>{}</CatalogPath>", it.path),
-                &format!("<CatalogPath>{moved}</CatalogPath>"),
-            );
-            row.attributes[items.c_def] = Value::Xml(def);
-            changed = true;
-        } else if it.kind == Kind::RelationshipClass
-            && matches!(kind, Kind::FeatureClass | Kind::Table)
-        {
-            // Relationship classes name the classes they relate.
-            let def = text(&it.row.attributes[items.c_def]);
-            let new_def = ["OriginClassNames", "DestinationClassNames"]
-                .iter()
-                .fold(def.clone(), |d, block| {
-                    rename_in_block(&d, block, &old_name, new)
-                });
-            if new_def != def {
-                row.attributes[items.c_def] = Value::Xml(new_def);
-                changed = true;
+        // Catalog first: a table of the new name must not be listed before its item says so.
+        let catalog = Table::open(base(dir, 1))?;
+        let mut ed = TableEditor::open(base(dir, 1))?;
+        for r in catalog.features() {
+            let mut r = r?;
+            if kind != Kind::Dataset && text(&r.attributes[0]).eq_ignore_ascii_case(&old_name) {
+                r.attributes[0] = Value::String(new.to_string());
+                ed.update(r.oid as u64, &r)?;
             }
         }
-        if changed {
-            ed.update(it.row.oid as u64, &row)?;
+        ed.finish()?;
+
+        let mut ed = TableEditor::open(base(dir, 4))?;
+        let child_prefix = format!("{old_path}\\");
+        for it in &items.rows {
+            let mut row = it.row.clone();
+            let mut changed = false;
+            if it.uuid == target.uuid {
+                row.attributes[items.c_name] = Value::String(new.to_string());
+                row.attributes[items.c_physical] = Value::String(new.to_uppercase());
+                row.attributes[items.c_path] = Value::String(new_path.clone());
+                let alias = matches!(kind, Kind::FeatureClass | Kind::Table);
+                let def = renamed_definition(
+                    &text(&it.row.attributes[items.c_def]),
+                    &old_name,
+                    &old_path,
+                    new,
+                    &new_path,
+                    alias,
+                );
+                row.attributes[items.c_def] = Value::Xml(def);
+                changed = true;
+            } else if kind == Kind::Dataset
+                && it.path.len() > child_prefix.len()
+                && it.path[..child_prefix.len()].eq_ignore_ascii_case(&child_prefix)
+            {
+                // A feature dataset's children move with it.
+                let moved = format!("{new_path}{}", &it.path[old_path.len()..]);
+                row.attributes[items.c_path] = Value::String(moved.clone());
+                let def = text(&it.row.attributes[items.c_def]).replace(
+                    &format!("<CatalogPath>{}</CatalogPath>", it.path),
+                    &format!("<CatalogPath>{moved}</CatalogPath>"),
+                );
+                row.attributes[items.c_def] = Value::Xml(def);
+                changed = true;
+            } else if it.kind == Kind::RelationshipClass
+                && matches!(kind, Kind::FeatureClass | Kind::Table)
+            {
+                // Relationship classes name the classes they relate.
+                let def = text(&it.row.attributes[items.c_def]);
+                let new_def = ["OriginClassNames", "DestinationClassNames"]
+                    .iter()
+                    .fold(def.clone(), |d, block| {
+                        rename_in_block(&d, block, &old_name, new)
+                    });
+                if new_def != def {
+                    row.attributes[items.c_def] = Value::Xml(new_def);
+                    changed = true;
+                }
+            }
+            if changed {
+                ed.update(it.row.oid as u64, &row)?;
+            }
         }
-    }
-    ed.finish().map(|_| ())
+        ed.finish().map(|_| ())
+    })
 }
 
 /// Replaces `<Name>from</Name>` inside the element `block`.
@@ -414,67 +418,71 @@ fn rename_in_block(xml: &str, block: &str, from: &str, to: &str) -> String {
 /// that use it.
 pub fn rename_domain(dir: impl AsRef<Path>, old: &str, new: &str) -> Result<()> {
     let dir = dir.as_ref();
-    validate_table_name(new)?;
-    let items = load_items(dir)?;
-    let target = find(&items, old, |k| k == Kind::Domain).ok_or_else(|| missing(old))?;
-    if find(&items, new, |k| k == Kind::Domain).is_some() {
-        return Err(Error::Unsupported(format!(
-            "ERROR 000725: Domain {new} already exists."
-        )));
-    }
-    let old_name = target.name.clone();
-    let mut ed = TableEditor::open(base(dir, 4))?;
-    for it in &items.rows {
-        let mut row = it.row.clone();
-        let def = text(&it.row.attributes[items.c_def]);
-        if it.uuid == target.uuid {
-            row.attributes[items.c_name] = Value::String(new.to_string());
-            row.attributes[items.c_physical] = Value::String(new.to_uppercase());
-        } else if !matches!(it.kind, Kind::FeatureClass | Kind::Table) {
-            continue;
+    super::txn::atomic(dir, || -> Result<()> {
+        validate_table_name(new)?;
+        let items = load_items(dir)?;
+        let target = find(&items, old, |k| k == Kind::Domain).ok_or_else(|| missing(old))?;
+        if find(&items, new, |k| k == Kind::Domain).is_some() {
+            return Err(Error::Unsupported(format!(
+                "ERROR 000725: Domain {new} already exists."
+            )));
         }
-        let new_def = replace_all_tags(&def, "DomainName", &old_name, new);
-        if new_def == def && it.uuid != target.uuid {
-            continue;
+        let old_name = target.name.clone();
+        let mut ed = TableEditor::open(base(dir, 4))?;
+        for it in &items.rows {
+            let mut row = it.row.clone();
+            let def = text(&it.row.attributes[items.c_def]);
+            if it.uuid == target.uuid {
+                row.attributes[items.c_name] = Value::String(new.to_string());
+                row.attributes[items.c_physical] = Value::String(new.to_uppercase());
+            } else if !matches!(it.kind, Kind::FeatureClass | Kind::Table) {
+                continue;
+            }
+            let new_def = replace_all_tags(&def, "DomainName", &old_name, new);
+            if new_def == def && it.uuid != target.uuid {
+                continue;
+            }
+            row.attributes[items.c_def] = Value::Xml(new_def);
+            ed.update(it.row.oid as u64, &row)?;
         }
-        row.attributes[items.c_def] = Value::Xml(new_def);
-        ed.update(it.row.oid as u64, &row)?;
-    }
-    ed.finish().map(|_| ())
+        ed.finish().map(|_| ())
+    })
 }
 
 /// Deletes a domain (`arcpy.management.DeleteDomain`); one that fields still use is refused, as
 /// in ArcGIS.
 pub fn delete_domain(dir: impl AsRef<Path>, name: &str) -> Result<()> {
     let dir = dir.as_ref();
-    let items = load_items(dir)?;
-    let target = find(&items, name, |k| k == Kind::Domain).ok_or_else(|| missing(name))?;
-    let rels = Table::open(base(dir, 6))?;
-    let (r_dest, r_type) = (column(&rels, "DestID")?, column(&rels, "Type")?);
-    let rel_rows: Vec<Feature> = rels.features().collect::<Result<_>>()?;
-    let uses = |r: &Feature| {
-        let ty = text(&r.attributes[r_type]);
-        ty.len() >= REL_DOMAIN_IN_DATASET.len()
-            && ty[..REL_DOMAIN_IN_DATASET.len()].eq_ignore_ascii_case(REL_DOMAIN_IN_DATASET)
-            && text(&r.attributes[r_dest]) == target.uuid
-    };
-    if rel_rows.iter().any(uses) {
-        return Err(Error::Unsupported(
-            "ERROR 002630: The domain is being used as a default domain.".into(),
-        ));
-    }
-    let mut ed = TableEditor::open(base(dir, 6))?;
-    let (r_origin, _) = (column(&rels, "OriginID")?, ());
-    for r in &rel_rows {
-        if text(&r.attributes[r_origin]) == target.uuid
-            || text(&r.attributes[r_dest]) == target.uuid
-        {
-            ed.delete(r.row_oid())?;
+    super::txn::atomic(dir, || -> Result<()> {
+        let items = load_items(dir)?;
+        let target = find(&items, name, |k| k == Kind::Domain).ok_or_else(|| missing(name))?;
+        let rels = Table::open(base(dir, 6))?;
+        let (r_dest, r_type) = (column(&rels, "DestID")?, column(&rels, "Type")?);
+        let rel_rows: Vec<Feature> = rels.features().collect::<Result<_>>()?;
+        let uses = |r: &Feature| {
+            let ty = text(&r.attributes[r_type]);
+            ty.len() >= REL_DOMAIN_IN_DATASET.len()
+                && ty[..REL_DOMAIN_IN_DATASET.len()].eq_ignore_ascii_case(REL_DOMAIN_IN_DATASET)
+                && text(&r.attributes[r_dest]) == target.uuid
+        };
+        if rel_rows.iter().any(uses) {
+            return Err(Error::Unsupported(
+                "ERROR 002630: The domain is being used as a default domain.".into(),
+            ));
         }
-    }
-    ed.finish()?;
-    let mut ed = TableEditor::open(base(dir, 4))?;
-    ed.delete(target.row.oid as u64)?;
-    ed.finish()?;
-    Ok(())
+        let mut ed = TableEditor::open(base(dir, 6))?;
+        let (r_origin, _) = (column(&rels, "OriginID")?, ());
+        for r in &rel_rows {
+            if text(&r.attributes[r_origin]) == target.uuid
+                || text(&r.attributes[r_dest]) == target.uuid
+            {
+                ed.delete(r.row_oid())?;
+            }
+        }
+        ed.finish()?;
+        let mut ed = TableEditor::open(base(dir, 4))?;
+        ed.delete(target.row.oid as u64)?;
+        ed.finish()?;
+        Ok(())
+    })
 }

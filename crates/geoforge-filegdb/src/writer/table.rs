@@ -1,4 +1,5 @@
-//! Writes one `.gdbtable` + `.gdbtablx` (version 3: 32-bit OBJECTIDs).
+//! Writes one `.gdbtable` + `.gdbtablx`: version 3 (32-bit OBJECTIDs) or version 4
+//! (64-bit OBJECTIDs, ArcGIS Pro 3.2).
 
 use std::fs::File;
 use std::io::{BufWriter, Seek, SeekFrom, Write};
@@ -54,6 +55,10 @@ pub(crate) struct TableWriter {
     pub subsecond: Vec<String>,
     /// Attribute indexes being collected.
     indexes: Vec<IndexCollector>,
+    /// Version 4 (64-bit OBJECTIDs).
+    v4: bool,
+    /// Whether the next row's measures are recomputed (see [`RowLayout::measures`]).
+    pub measure_next: bool,
 }
 
 /// Keys of one attribute index as rows are written.
@@ -63,7 +68,7 @@ struct IndexCollector {
     /// Position of the field among the values passed to `push`.
     value_at: usize,
     layout: keys::Layout,
-    entries: Vec<(keys::Key, u32)>,
+    entries: Vec<(keys::Key, u64)>,
 }
 
 /// A finished attribute index: sorted `(key bytes, OBJECTID)` pairs.
@@ -72,7 +77,7 @@ pub(crate) struct BuiltIndex {
     pub field: String,
     pub key_size: usize,
     pub kind: u8,
-    pub entries: Vec<(Vec<u8>, u32)>,
+    pub entries: Vec<(Vec<u8>, u64)>,
 }
 
 /// Layer flag bits: geometry type in the low byte, UTF-8 strings, "high precision"
@@ -98,8 +103,20 @@ impl TableWriter {
         has_z: bool,
         has_m: bool,
     ) -> Result<Self> {
+        Self::create_versioned(base, fields, geometry_kind, has_z, has_m, false)
+    }
+
+    /// Like [`TableWriter::create`]; `v4` writes the 64-bit OBJECTID format.
+    pub fn create_versioned(
+        base: &Path,
+        fields: Vec<GdbField>,
+        geometry_kind: Option<GeometryKind>,
+        has_z: bool,
+        has_m: bool,
+        v4: bool,
+    ) -> Result<Self> {
         let path = base.with_extension("gdbtable");
-        let file = File::create(&path).map_err(|e| Error::io(&path, e))?;
+        let file = super::txn::create_file(&path)?;
         let mut out = BufWriter::new(file);
 
         let mut sec = Vec::new();
@@ -114,7 +131,7 @@ impl TableWriter {
                     | GdbFieldType::DateTimeOffset
             )
         });
-        sec.extend_from_slice(&(if pro_3_2 { 6i32 } else { 4 }).to_le_bytes());
+        sec.extend_from_slice(&(if pro_3_2 || v4 { 6i32 } else { 4 }).to_le_bytes());
         sec.extend_from_slice(&layer_flags(geometry_kind, has_z, has_m).to_le_bytes());
         sec.extend_from_slice(&(fields.len() as i16).to_le_bytes());
         let (mut extent_in_sec, mut grid_in_sec) = (None, None);
@@ -122,6 +139,7 @@ impl TableWriter {
             write_field(
                 &mut sec,
                 f,
+                v4,
                 has_z,
                 has_m,
                 &mut extent_in_sec,
@@ -130,7 +148,7 @@ impl TableWriter {
         }
 
         let mut header = [0u8; HEADER_LEN as usize];
-        header[..4].copy_from_slice(&3i32.to_le_bytes());
+        header[..4].copy_from_slice(&(if v4 { 4i32 } else { 3 }).to_le_bytes());
         header[12..16].copy_from_slice(&5i32.to_le_bytes());
         header[32..40].copy_from_slice(&HEADER_LEN.to_le_bytes());
         let io = |e| Error::io(&path, e);
@@ -159,6 +177,8 @@ impl TableWriter {
             row: Vec::new(),
             subsecond: Vec::new(),
             indexes: Vec::new(),
+            v4,
+            measure_next: false,
         })
     }
 
@@ -226,6 +246,14 @@ impl TableWriter {
         self.push(geometry, values)
     }
 
+    /// Makes the table's OBJECTID sequence continue after `max_oid` (the trailing
+    /// OBJECTIDs stay deleted), as when rows at the end of a table have been deleted.
+    pub fn reserve_oids(&mut self, max_oid: u64) {
+        while (self.offsets.len() as u64) < max_oid {
+            self.offsets.push(0);
+        }
+    }
+
     /// Appends a row and returns its OBJECTID. `values` follow the non-OID,
     /// non-geometry fields in order.
     pub fn push(&mut self, geometry: Option<&Geometry>, values: &[Value]) -> Result<u64> {
@@ -237,6 +265,7 @@ impl TableWriter {
                 has_z: self.has_z,
                 has_m: self.has_m,
                 nullable_count: self.nullable_count,
+                measures: std::mem::take(&mut self.measure_next),
             },
             &mut self.subsecond,
             oid,
@@ -262,7 +291,7 @@ impl TableWriter {
                 .get(ix.value_at)
                 .and_then(|v| keys::key_of(&ix.layout, v))
             {
-                ix.entries.push((k, oid as u32));
+                ix.entries.push((k, oid));
             }
         }
         Ok(oid)
@@ -277,14 +306,16 @@ impl TableWriter {
             .out
             .into_inner()
             .map_err(|e| Error::io(&self.path, e.into_error()))?;
-        let rows = self.offsets.iter().filter(|o| **o != 0).count() as u32;
-        let mut h = Vec::new();
-        h.extend_from_slice(&rows.to_le_bytes());
-        h.extend_from_slice(&self.max_row.max(self.field_section_len).to_le_bytes());
-        file.seek(SeekFrom::Start(4)).map_err(io)?;
-        file.write_all(&h).map_err(io)?;
-        file.seek(SeekFrom::Start(24)).map_err(io)?;
-        file.write_all(&self.pos.to_le_bytes()).map_err(io)?;
+        let rows = self.offsets.iter().filter(|o| **o != 0).count() as u64;
+        write_header_counts(
+            &mut file,
+            self.v4,
+            rows,
+            rows < self.offsets.len() as u64,
+            self.max_row.max(self.field_section_len),
+            self.pos,
+        )
+        .map_err(io)?;
         if let (Some(at), false) = (self.extent_at, self.extent.is_empty()) {
             let e = self.extent;
             file.seek(SeekFrom::Start(at)).map_err(io)?;
@@ -315,10 +346,11 @@ impl TableWriter {
             file.write_all(&g.to_le_bytes()).map_err(io)?;
         }
         file.flush().map_err(io)?;
-        write_tablx(
+        write_dense_tablx(
             &self.path.with_extension("gdbtablx"),
             &self.offsets,
-            self.pos,
+            offset_size_for(self.pos),
+            self.v4,
         )?;
         let indexes = self
             .indexes
@@ -355,6 +387,10 @@ pub(crate) struct RowLayout<'a> {
     pub has_z: bool,
     pub has_m: bool,
     pub nullable_count: usize,
+    /// Recompute ArcGIS's `<shape>_Length` / `<shape>_Area` from this row's geometry
+    /// (an edit of an existing table that sets a new geometry); otherwise the values
+    /// given are stored as they are.
+    pub measures: bool,
 }
 
 /// Encodes one row (without its leading size) into `row`; returns the geometry's
@@ -375,6 +411,13 @@ pub(crate) fn encode_row(
     let mut nullable_i = 0;
     let mut vi = 0;
     let mut envelope = None;
+    // ArcGIS's `<shape>_Length` / `<shape>_Area` fields follow the geometry as stored.
+    let measures = if layout.measures {
+        measure_fields(layout.fields)
+    } else {
+        (None, None)
+    };
+    let mut measured: Option<(f64, f64)> = None;
     for f in layout.fields {
         if f.field_type == GdbFieldType::ObjectId {
             continue;
@@ -408,6 +451,9 @@ pub(crate) fn encode_row(
                     .map_err(|e| err(format!("OBJECTID {oid}: {e}")))?;
                     put_varuint(row, blob.len() as u64);
                     row.extend_from_slice(&blob);
+                    if measures != (None, None) {
+                        measured = Some(planar_measures(g, def)?);
+                    }
                     // Index the coordinates as stored (snapped to the resolution).
                     let mut e = g.curve_envelope();
                     let snap = |v: f64, o: f64| ((v - o) * def.xy_scale).round() / def.xy_scale + o;
@@ -423,7 +469,13 @@ pub(crate) fn encode_row(
                 None => false,
             }
         } else {
-            let v = values.get(vi).unwrap_or(&Value::Null);
+            let mut v = values.get(vi).unwrap_or(&Value::Null);
+            let computed;
+            if let Some(which) = [measures.0, measures.1].iter().position(|m| *m == Some(vi)) {
+                let (len, area) = measured.unwrap_or((0.0, 0.0));
+                computed = Value::Double(if which == 0 { len } else { area });
+                v = &computed;
+            }
             vi += 1;
             if v.is_null() {
                 false
@@ -454,30 +506,149 @@ pub(crate) fn encode_row(
     Ok(envelope)
 }
 
-fn write_tablx(path: &Path, offsets: &[u64], file_size: u64) -> Result<()> {
-    let size: usize = if file_size < 1 << 32 {
+/// Positions (among the attribute values) of the length and area fields ArcGIS keeps up
+/// to date: doubles named after the geometry field, `<shape>_Length` and (polygons)
+/// `<shape>_Area` (ArcGIS marks them required, but stores them as nullable).
+fn measure_fields(fields: &[GdbField]) -> (Option<usize>, Option<usize>) {
+    let Some(shape) = fields
+        .iter()
+        .find(|f| f.field_type == GdbFieldType::Geometry)
+    else {
+        return (None, None);
+    };
+    let (mut len, mut area) = (None, None);
+    let mut vi = 0;
+    for f in fields {
+        if matches!(
+            f.field_type,
+            GdbFieldType::ObjectId | GdbFieldType::Geometry
+        ) {
+            continue;
+        }
+        if f.field_type == GdbFieldType::Float64 {
+            let n = f.name.to_ascii_lowercase();
+            let s = shape.name.to_ascii_lowercase();
+            if n == format!("{s}_length") {
+                len = Some(vi);
+            } else if n == format!("{s}_area") {
+                area = Some(vi);
+            }
+        }
+        vi += 1;
+    }
+    (len, area)
+}
+
+/// Planar length (perimeter for polygons) and area of `g` with its coordinates snapped
+/// to the storage resolution, as ArcGIS computes `Shape_Length` and `Shape_Area`.
+fn planar_measures(g: &Geometry, def: &crate::table::GeometryDef) -> Result<(f64, f64)> {
+    if !matches!(g.kind, GeometryKind::Polyline | GeometryKind::Polygon) {
+        return Ok((0.0, 0.0));
+    }
+    // The stored vertices are snapped to the resolution; curve parameters are stored
+    // as they are, so arcs are densified (finely) only after snapping.
+    let snap = |v: f64, o: f64| ((v - o) * def.xy_scale).round() / def.xy_scale + o;
+    let mut snapped = g.clone();
+    for p in &mut snapped.xy {
+        *p = [snap(p[0], def.x_origin), snap(p[1], def.y_origin)];
+    }
+    let lin = if snapped.curves.is_empty() {
+        snapped
+    } else {
+        snapped.densify_curves(1e-4)?
+    };
+    let (mut length, mut area2) = (0.0, 0.0);
+    for r in lin.part_ranges() {
+        let pts = &lin.xy[r];
+        length += pts
+            .windows(2)
+            .map(|w| (w[1][0] - w[0][0]).hypot(w[1][1] - w[0][1]))
+            .sum::<f64>();
+        if g.kind == GeometryKind::Polygon {
+            if let (Some(a), Some(b)) = (pts.first(), pts.last())
+                && a != b
+            {
+                length += (a[0] - b[0]).hypot(a[1] - b[1]);
+            }
+            // Shells are clockwise (negative shoelace), holes counter-clockwise. Relative to
+            // the first vertex, so large coordinates lose no precision.
+            if let Some(&[x0, y0]) = pts.first() {
+                let local: Vec<[f64; 2]> = pts.iter().map(|p| [p[0] - x0, p[1] - y0]).collect();
+                area2 -= geoforge_core::geometry::ring_signed_area2(&local);
+            }
+        }
+    }
+    Ok((length, (area2 / 2.0).abs()))
+}
+
+/// Writes the row counts, maximum row size and file size into a `.gdbtable` header.
+/// Version 3 keeps the row count at offset 4; version 4 has a "rows were deleted" flag
+/// there and the count (64-bit) at offset 16.
+pub(crate) fn write_header_counts(
+    file: &mut File,
+    v4: bool,
+    rows: u64,
+    has_deleted: bool,
+    max_row: u32,
+    file_size: u64,
+) -> std::io::Result<()> {
+    file.seek(SeekFrom::Start(4))?;
+    if v4 {
+        file.write_all(&u32::from(has_deleted).to_le_bytes())?;
+    } else {
+        file.write_all(&(rows as u32).to_le_bytes())?;
+    }
+    file.write_all(&max_row.to_le_bytes())?;
+    if v4 {
+        file.seek(SeekFrom::Start(16))?;
+        file.write_all(&rows.to_le_bytes())?;
+    }
+    file.seek(SeekFrom::Start(24))?;
+    file.write_all(&file_size.to_le_bytes())
+}
+
+/// Bytes per `.gdbtablx` offset for a `.gdbtable` of `file_size` bytes.
+pub(crate) fn offset_size_for(file_size: u64) -> usize {
+    if file_size < 1 << 32 {
         4
     } else if file_size < 1 << 40 {
         5
     } else {
         6
+    }
+}
+
+/// A `.gdbtablx` with every 1024-row block present. `offsets[i]` is the row offset of
+/// OBJECTID `i + 1` (0 = deleted).
+pub(crate) fn write_dense_tablx(path: &Path, offsets: &[u64], size: usize, v4: bool) -> Result<()> {
+    // Version 4 writes no block for an empty table; version 3 always one.
+    let blocks = if v4 {
+        offsets.len().div_ceil(1024)
+    } else {
+        offsets.len().div_ceil(1024).max(1)
     };
-    let blocks = offsets.len().div_ceil(1024).max(1);
-    let mut out = Vec::with_capacity(16 + blocks * 1024 * size + 16);
-    out.extend_from_slice(&3i32.to_le_bytes());
+    let mut out = Vec::with_capacity(16 + blocks * 1024 * size + 20);
+    out.extend_from_slice(&(if v4 { 4i32 } else { 3 }).to_le_bytes());
     out.extend_from_slice(&(blocks as u32).to_le_bytes());
-    out.extend_from_slice(&(offsets.len() as u32).to_le_bytes());
+    out.extend_from_slice(&(if v4 { 0 } else { offsets.len() as u32 }).to_le_bytes());
     out.extend_from_slice(&(size as u32).to_le_bytes());
     for i in 0..blocks * 1024 {
         let o = offsets.get(i).copied().unwrap_or(0);
         out.extend_from_slice(&o.to_le_bytes()[..size]);
     }
-    // Trailer: no block bitmap (all blocks present).
-    out.extend_from_slice(&0u32.to_le_bytes());
-    out.extend_from_slice(&(blocks as u32).to_le_bytes());
-    out.extend_from_slice(&(blocks as u32).to_le_bytes());
-    out.extend_from_slice(&0u32.to_le_bytes());
-    std::fs::write(path, out).map_err(|e| Error::io(path, e))
+    if v4 {
+        // Trailer: OBJECTID count, no sparse map, the last block's number (-1: none).
+        out.extend_from_slice(&(offsets.len() as u64).to_le_bytes());
+        out.extend_from_slice(&0u32.to_le_bytes());
+        out.extend_from_slice(&(blocks as i64 - 1).to_le_bytes());
+    } else {
+        // Trailer: no block bitmap (all blocks present).
+        out.extend_from_slice(&0u32.to_le_bytes());
+        out.extend_from_slice(&(blocks as u32).to_le_bytes());
+        out.extend_from_slice(&(blocks as u32).to_le_bytes());
+        out.extend_from_slice(&0u32.to_le_bytes());
+    }
+    super::txn::write_file(path, &out)
 }
 
 pub(crate) fn put_varuint(out: &mut Vec<u8>, mut v: u64) {
@@ -516,6 +687,7 @@ fn utf16(out: &mut Vec<u8>, s: &str) {
 fn write_field(
     sec: &mut Vec<u8>,
     f: &GdbField,
+    v4: bool,
     layer_z: bool,
     layer_m: bool,
     extent_at: &mut Option<usize>,
@@ -555,7 +727,7 @@ fn write_field(
     let flag = if f.nullable { 5 } else { 4 };
     match f.field_type {
         G::ObjectId => {
-            sec.push(4);
+            sec.push(if v4 { 8 } else { 4 });
             sec.push(2);
         }
         G::String => {

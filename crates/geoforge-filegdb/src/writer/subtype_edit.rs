@@ -642,147 +642,155 @@ fn random_uuid() -> String {
 /// `SetSubtypeField`: makes `field` (a short or long integer) the table's subtype field.
 pub fn set_subtype_field(dir: impl AsRef<Path>, table: &str, field_name: &str) -> Result<()> {
     let dir = dir.as_ref();
-    let t = load_target(dir, table)?;
-    let (name, ftype, _) = field(&t, field_name)?.clone();
-    if !matches!(ftype, GdbFieldType::Int16 | GdbFieldType::Int32) {
-        return Err(bad("ERROR 003911: The field is not of type SHORT | LONG"));
-    }
-    let mut def = t.def.clone();
-    if subtype_field(&def)
-        .as_deref()
-        .is_some_and(|f| f.eq_ignore_ascii_case(&name))
-    {
-        return Ok(());
-    }
-    // The subtype field gets default 0 in the field list, unless it has a default already.
-    let zero = coerce(&Value::BigInteger(0), ftype)?;
-    let has_default = xml_defaults(&t)
-        .iter()
-        .any(|(n, _)| n.eq_ignore_ascii_case(&name));
-    def = change_field_info(
-        &t,
-        &def,
-        &name,
-        Change::Keep,
-        if has_default {
-            DefaultChange::Keep
-        } else {
-            DefaultChange::Set(&zero)
-        },
-    )?;
-    if Document::parse(&def)
-        .map_err(|e| bad(e.to_string()))?
-        .descendants()
-        .any(|n| n.is_element() && n.tag_name().name() == "SubtypeFieldName")
-    {
-        def = set_simple(&def, "SubtypeFieldName", &name);
-    } else {
-        let at = before_root_close(&def);
-        let block = format!(
-            "<SubtypeFieldName>{}</SubtypeFieldName><DefaultSubtypeCode>0</DefaultSubtypeCode><Subtypes xsi:type='typens:ArrayOfSubtype'></Subtypes>",
-            xml_escape(&name)
-        );
-        def = apply(
+    super::txn::atomic(dir, || -> Result<()> {
+        let t = load_target(dir, table)?;
+        let (name, ftype, _) = field(&t, field_name)?.clone();
+        if !matches!(ftype, GdbFieldType::Int16 | GdbFieldType::Int32) {
+            return Err(bad("ERROR 003911: The field is not of type SHORT | LONG"));
+        }
+        let mut def = t.def.clone();
+        if subtype_field(&def)
+            .as_deref()
+            .is_some_and(|f| f.eq_ignore_ascii_case(&name))
+        {
+            return Ok(());
+        }
+        // The subtype field gets default 0 in the field list, unless it has a default already.
+        let zero = coerce(&Value::BigInteger(0), ftype)?;
+        let has_default = xml_defaults(&t)
+            .iter()
+            .any(|(n, _)| n.eq_ignore_ascii_case(&name));
+        def = change_field_info(
+            &t,
             &def,
-            vec![Splice {
-                at: at..at,
-                with: block,
-            }],
-        );
-    }
-    store(dir, &t, def)
+            &name,
+            Change::Keep,
+            if has_default {
+                DefaultChange::Keep
+            } else {
+                DefaultChange::Set(&zero)
+            },
+        )?;
+        if Document::parse(&def)
+            .map_err(|e| bad(e.to_string()))?
+            .descendants()
+            .any(|n| n.is_element() && n.tag_name().name() == "SubtypeFieldName")
+        {
+            def = set_simple(&def, "SubtypeFieldName", &name);
+        } else {
+            let at = before_root_close(&def);
+            let block = format!(
+                "<SubtypeFieldName>{}</SubtypeFieldName><DefaultSubtypeCode>0</DefaultSubtypeCode><Subtypes xsi:type='typens:ArrayOfSubtype'></Subtypes>",
+                xml_escape(&name)
+            );
+            def = apply(
+                &def,
+                vec![Splice {
+                    at: at..at,
+                    with: block,
+                }],
+            );
+        }
+        store(dir, &t, def)
+    })
 }
 
 /// `AddSubtype`: a new subtype that starts with the table's field defaults.
 pub fn add_subtype(dir: impl AsRef<Path>, table: &str, code: i64, name: &str) -> Result<()> {
     let dir = dir.as_ref();
-    let t = load_target(dir, table)?;
-    let key = subtype_field(&t.def).ok_or_else(no_subtype_field)?;
-    code_value(&t, code)?;
-    if subtype_codes(&t.def).contains(&code) {
-        return Err(bad("ERROR 160129: The subtype already exists."));
-    }
-    let mut infos = String::new();
-    for (fname, v) in xml_defaults(&t) {
-        if fname.eq_ignore_ascii_case(&key) {
-            continue;
+    super::txn::atomic(dir, || -> Result<()> {
+        let t = load_target(dir, table)?;
+        let key = subtype_field(&t.def).ok_or_else(no_subtype_field)?;
+        code_value(&t, code)?;
+        if subtype_codes(&t.def).contains(&code) {
+            return Err(bad("ERROR 160129: The subtype already exists."));
         }
-        let ft = field(&t, &fname)?.1;
-        infos += &format!(
-            "<SubtypeFieldInfo xsi:type='typens:SubtypeFieldInfo'><FieldName>{}</FieldName><DefaultValue xsi:type='{}'>{}</DefaultValue></SubtypeFieldInfo>",
-            xml_escape(&fname),
-            xs_type(ft.esri()),
-            value_text(&v).unwrap_or_default()
+        let mut infos = String::new();
+        for (fname, v) in xml_defaults(&t) {
+            if fname.eq_ignore_ascii_case(&key) {
+                continue;
+            }
+            let ft = field(&t, &fname)?.1;
+            infos += &format!(
+                "<SubtypeFieldInfo xsi:type='typens:SubtypeFieldInfo'><FieldName>{}</FieldName><DefaultValue xsi:type='{}'>{}</DefaultValue></SubtypeFieldInfo>",
+                xml_escape(&fname),
+                xs_type(ft.esri()),
+                value_text(&v).unwrap_or_default()
+            );
+        }
+        let block = format!(
+            "<Subtype xsi:type='typens:Subtype'><SubtypeName>{}</SubtypeName><SubtypeCode>{code}</SubtypeCode><FieldInfos xsi:type='typens:ArrayOfSubtypeFieldInfo'>{infos}</FieldInfos></Subtype>",
+            xml_escape(name)
         );
-    }
-    let block = format!(
-        "<Subtype xsi:type='typens:Subtype'><SubtypeName>{}</SubtypeName><SubtypeCode>{code}</SubtypeCode><FieldInfos xsi:type='typens:ArrayOfSubtypeFieldInfo'>{infos}</FieldInfos></Subtype>",
-        xml_escape(name)
-    );
-    let doc = Document::parse(&t.def).map_err(|e| bad(e.to_string()))?;
-    let list = doc
-        .descendants()
-        .find(|n| n.is_element() && n.tag_name().name() == "Subtypes")
-        .ok_or_else(no_subtype_field)?;
-    let def = apply(&t.def, vec![append_child(&t.def, list, &block)]);
-    drop(doc);
-    store(dir, &t, def)
+        let doc = Document::parse(&t.def).map_err(|e| bad(e.to_string()))?;
+        let list = doc
+            .descendants()
+            .find(|n| n.is_element() && n.tag_name().name() == "Subtypes")
+            .ok_or_else(no_subtype_field)?;
+        let def = apply(&t.def, vec![append_child(&t.def, list, &block)]);
+        drop(doc);
+        store(dir, &t, def)
+    })
 }
 
 /// `RemoveSubtype`: removes the subtypes with these codes. The default code moves to the first
 /// subtype left (0 when none is).
 pub fn remove_subtype(dir: impl AsRef<Path>, table: &str, codes: &[i64]) -> Result<()> {
     let dir = dir.as_ref();
-    let t = load_target(dir, table)?;
-    let key = subtype_field(&t.def).ok_or_else(no_subtype_field)?;
-    let have = subtype_codes(&t.def);
-    if codes.is_empty() || codes.iter().any(|c| !have.contains(c)) {
-        return Err(invalid_code());
-    }
-    let doc = Document::parse(&t.def).map_err(|e| bad(e.to_string()))?;
-    let edits: Vec<Splice> = doc
-        .descendants()
-        .filter(|n| n.is_element() && n.tag_name().name() == "Subtype")
-        .filter(|n| {
-            child_text(*n, "SubtypeCode")
-                .and_then(|c| c.parse::<i64>().ok())
-                .is_some_and(|c| codes.contains(&c))
-        })
-        .map(|n| Splice {
-            at: n.range(),
-            with: String::new(),
-        })
-        .collect();
-    let mut def = apply(&t.def, edits);
-    drop(doc);
-    let left: Vec<i64> = have.into_iter().filter(|c| !codes.contains(c)).collect();
-    let current = default_code(&def);
-    if !left.contains(&current) {
-        let new = left.first().copied().unwrap_or(0);
-        def = set_simple(&def, "DefaultSubtypeCode", &new.to_string());
-        let v = code_value(&t, new)?;
-        def = change_field_info(&t, &def, &key, Change::Keep, DefaultChange::Set(&v))?;
-    }
-    store(dir, &t, def)
+    super::txn::atomic(dir, || -> Result<()> {
+        let t = load_target(dir, table)?;
+        let key = subtype_field(&t.def).ok_or_else(no_subtype_field)?;
+        let have = subtype_codes(&t.def);
+        if codes.is_empty() || codes.iter().any(|c| !have.contains(c)) {
+            return Err(invalid_code());
+        }
+        let doc = Document::parse(&t.def).map_err(|e| bad(e.to_string()))?;
+        let edits: Vec<Splice> = doc
+            .descendants()
+            .filter(|n| n.is_element() && n.tag_name().name() == "Subtype")
+            .filter(|n| {
+                child_text(*n, "SubtypeCode")
+                    .and_then(|c| c.parse::<i64>().ok())
+                    .is_some_and(|c| codes.contains(&c))
+            })
+            .map(|n| Splice {
+                at: n.range(),
+                with: String::new(),
+            })
+            .collect();
+        let mut def = apply(&t.def, edits);
+        drop(doc);
+        let left: Vec<i64> = have.into_iter().filter(|c| !codes.contains(c)).collect();
+        let current = default_code(&def);
+        if !left.contains(&current) {
+            let new = left.first().copied().unwrap_or(0);
+            def = set_simple(&def, "DefaultSubtypeCode", &new.to_string());
+            let v = code_value(&t, new)?;
+            def = change_field_info(&t, &def, &key, Change::Keep, DefaultChange::Set(&v))?;
+        }
+        store(dir, &t, def)
+    })
 }
 
 /// `SetDefaultSubtype`.
 pub fn set_default_subtype(dir: impl AsRef<Path>, table: &str, code: i64) -> Result<()> {
     let dir = dir.as_ref();
-    let t = load_target(dir, table)?;
-    let key = subtype_field(&t.def).ok_or_else(no_subtype_field)?;
-    let have = subtype_codes(&t.def);
-    if !have.contains(&code) {
-        let list: Vec<String> = have.iter().map(i64::to_string).collect();
-        return Err(bad(format!(
-            "ERROR 000800: The value is not a member of {}",
-            list.join(" | ")
-        )));
-    }
-    let v = code_value(&t, code)?;
-    let mut def = set_simple(&t.def, "DefaultSubtypeCode", &code.to_string());
-    def = change_field_info(&t, &def, &key, Change::Keep, DefaultChange::Set(&v))?;
-    store(dir, &t, def)
+    super::txn::atomic(dir, || -> Result<()> {
+        let t = load_target(dir, table)?;
+        let key = subtype_field(&t.def).ok_or_else(no_subtype_field)?;
+        let have = subtype_codes(&t.def);
+        if !have.contains(&code) {
+            let list: Vec<String> = have.iter().map(i64::to_string).collect();
+            return Err(bad(format!(
+                "ERROR 000800: The value is not a member of {}",
+                list.join(" | ")
+            )));
+        }
+        let v = code_value(&t, code)?;
+        let mut def = set_simple(&t.def, "DefaultSubtypeCode", &code.to_string());
+        def = change_field_info(&t, &def, &key, Change::Keep, DefaultChange::Set(&v))?;
+        store(dir, &t, def)
+    })
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -969,32 +977,34 @@ pub fn assign_domain_to_field(
     subtype_codes: &[i64],
 ) -> Result<()> {
     let dir = dir.as_ref();
-    let t = load_target(dir, table)?;
-    let (fname, ftype, _) = field(&t, field_name)?.clone();
-    let d = domain_of(dir, domain)?;
-    if !domain_fits(&d, ftype) {
-        return Err(bad("ERROR 000356: Invalid domain type."));
-    }
-    check_codes(&t, subtype_codes)?;
-    let def = if subtype_codes.is_empty() {
-        change_field_info(
-            &t,
-            &t.def,
-            &fname,
-            Change::Set(&d.name),
-            DefaultChange::Keep,
-        )?
-    } else {
-        change_subtype_infos(
-            &t.def,
-            subtype_codes,
-            &fname,
-            Change::Set(&d.name),
-            None,
-            false,
-        )?
-    };
-    store(dir, &t, def)
+    super::txn::atomic(dir, || -> Result<()> {
+        let t = load_target(dir, table)?;
+        let (fname, ftype, _) = field(&t, field_name)?.clone();
+        let d = domain_of(dir, domain)?;
+        if !domain_fits(&d, ftype) {
+            return Err(bad("ERROR 000356: Invalid domain type."));
+        }
+        check_codes(&t, subtype_codes)?;
+        let def = if subtype_codes.is_empty() {
+            change_field_info(
+                &t,
+                &t.def,
+                &fname,
+                Change::Set(&d.name),
+                DefaultChange::Keep,
+            )?
+        } else {
+            change_subtype_infos(
+                &t.def,
+                subtype_codes,
+                &fname,
+                Change::Set(&d.name),
+                None,
+                false,
+            )?
+        };
+        store(dir, &t, def)
+    })
 }
 
 /// `RemoveDomainFromField`.
@@ -1005,15 +1015,17 @@ pub fn remove_domain_from_field(
     subtype_codes: &[i64],
 ) -> Result<()> {
     let dir = dir.as_ref();
-    let t = load_target(dir, table)?;
-    let (fname, _, _) = field(&t, field_name)?.clone();
-    check_codes(&t, subtype_codes)?;
-    let def = if subtype_codes.is_empty() {
-        change_field_info(&t, &t.def, &fname, Change::Remove, DefaultChange::Keep)?
-    } else {
-        change_subtype_infos(&t.def, subtype_codes, &fname, Change::Remove, None, false)?
-    };
-    store(dir, &t, def)
+    super::txn::atomic(dir, || -> Result<()> {
+        let t = load_target(dir, table)?;
+        let (fname, _, _) = field(&t, field_name)?.clone();
+        check_codes(&t, subtype_codes)?;
+        let def = if subtype_codes.is_empty() {
+            change_field_info(&t, &t.def, &fname, Change::Remove, DefaultChange::Keep)?
+        } else {
+            change_subtype_infos(&t.def, subtype_codes, &fname, Change::Remove, None, false)?
+        };
+        store(dir, &t, def)
+    })
 }
 
 /// `AssignDefaultToField`: sets (or with `None`, clears) the default of the field, or of the
@@ -1026,88 +1038,92 @@ pub fn assign_default_to_field(
     subtype_codes: &[i64],
 ) -> Result<()> {
     let dir = dir.as_ref();
-    let t = load_target(dir, table)?;
-    let (fname, ftype, _) = field(&t, field_name)?.clone();
-    check_codes(&t, subtype_codes)?;
-    let v = value.map(|v| coerce(v, ftype)).transpose()?;
-    // The default must be a value the field's domain allows.
-    let doc = Document::parse(&t.def).map_err(|e| bad(e.to_string()))?;
-    let domain_name: Option<String> = if subtype_codes.is_empty() {
-        doc.descendants()
-            .filter(|n| n.is_element() && n.tag_name().name() == "GPFieldInfoEx")
-            .find(|e| child_text(*e, "Name").is_some_and(|n| n.eq_ignore_ascii_case(&fname)))
-            .and_then(|e| child_text(e, "DomainName"))
-    } else {
-        doc.descendants()
-            .filter(|n| n.is_element() && n.tag_name().name() == "Subtype")
-            .filter(|n| {
-                child_text(*n, "SubtypeCode")
-                    .and_then(|c| c.parse::<i64>().ok())
-                    .is_some_and(|c| subtype_codes.contains(&c))
-            })
-            .flat_map(|s| {
-                s.descendants()
-                    .filter(|n| n.is_element() && n.tag_name().name() == "SubtypeFieldInfo")
-                    .collect::<Vec<_>>()
-            })
-            .find(|e| child_text(*e, "FieldName").is_some_and(|n| n.eq_ignore_ascii_case(&fname)))
-            .and_then(|e| child_text(e, "DomainName"))
-    }
-    .filter(|d| !d.is_empty());
-    drop(doc);
-    if let (Some(d), Some(v)) = (domain_name, &v) {
-        let dom = domain_of(dir, &d)?;
-        if !in_domain(&dom, v) {
-            return Err(bad(
-                "ERROR 160080: Default value is invalid within the domain.",
-            ));
+    super::txn::atomic(dir, || -> Result<()> {
+        let t = load_target(dir, table)?;
+        let (fname, ftype, _) = field(&t, field_name)?.clone();
+        check_codes(&t, subtype_codes)?;
+        let v = value.map(|v| coerce(v, ftype)).transpose()?;
+        // The default must be a value the field's domain allows.
+        let doc = Document::parse(&t.def).map_err(|e| bad(e.to_string()))?;
+        let domain_name: Option<String> = if subtype_codes.is_empty() {
+            doc.descendants()
+                .filter(|n| n.is_element() && n.tag_name().name() == "GPFieldInfoEx")
+                .find(|e| child_text(*e, "Name").is_some_and(|n| n.eq_ignore_ascii_case(&fname)))
+                .and_then(|e| child_text(e, "DomainName"))
+        } else {
+            doc.descendants()
+                .filter(|n| n.is_element() && n.tag_name().name() == "Subtype")
+                .filter(|n| {
+                    child_text(*n, "SubtypeCode")
+                        .and_then(|c| c.parse::<i64>().ok())
+                        .is_some_and(|c| subtype_codes.contains(&c))
+                })
+                .flat_map(|s| {
+                    s.descendants()
+                        .filter(|n| n.is_element() && n.tag_name().name() == "SubtypeFieldInfo")
+                        .collect::<Vec<_>>()
+                })
+                .find(|e| {
+                    child_text(*e, "FieldName").is_some_and(|n| n.eq_ignore_ascii_case(&fname))
+                })
+                .and_then(|e| child_text(e, "DomainName"))
         }
-    }
-    if !subtype_codes.is_empty() {
-        let xs = xs_type(ftype.esri());
-        let def = change_subtype_infos(
+        .filter(|d| !d.is_empty());
+        drop(doc);
+        if let (Some(d), Some(v)) = (domain_name, &v) {
+            let dom = domain_of(dir, &d)?;
+            if !in_domain(&dom, v) {
+                return Err(bad(
+                    "ERROR 160080: Default value is invalid within the domain.",
+                ));
+            }
+        }
+        if !subtype_codes.is_empty() {
+            let xs = xs_type(ftype.esri());
+            let def = change_subtype_infos(
+                &t.def,
+                subtype_codes,
+                &fname,
+                Change::Keep,
+                v.as_ref().map(|v| (v, xs)),
+                v.is_none(),
+            )?;
+            return store(dir, &t, def);
+        }
+        let def = change_field_info(
+            &t,
             &t.def,
-            subtype_codes,
             &fname,
             Change::Keep,
-            v.as_ref().map(|v| (v, xs)),
-            v.is_none(),
+            match &v {
+                Some(v) => DefaultChange::Set(v),
+                None => DefaultChange::Remove,
+            },
         )?;
-        return store(dir, &t, def);
-    }
-    let def = change_field_info(
-        &t,
-        &t.def,
-        &fname,
-        Change::Keep,
-        match &v {
-            Some(v) => DefaultChange::Set(v),
-            None => DefaultChange::Remove,
-        },
-    )?;
-    store(dir, &t, def.clone())?;
-    // The table's own field definitions take the defaults the definition now gives.
-    let t = load_target(dir, table)?;
-    let defaults = xml_defaults(&t);
-    let table_file = Table::open(base(dir, t.table_id))?;
-    let mut rows = Vec::new();
-    for r in table_file.features() {
-        let f = r?;
-        rows.push((Some(f.oid as u64), f));
-    }
-    let fields: Vec<geoforge_core::Field> = table_file
-        .fields()
-        .iter()
-        .map(|f| {
-            let mut f = f.clone();
-            f.default = defaults
-                .iter()
-                .find(|(n, _)| n.eq_ignore_ascii_case(&f.name))
-                .map(|(_, v)| v.clone());
-            f
-        })
-        .collect();
-    rewrite_table(base(dir, t.table_id), &fields, &rows)?;
-    let _ = decode_default;
-    Ok(())
+        store(dir, &t, def.clone())?;
+        // The table's own field definitions take the defaults the definition now gives.
+        let t = load_target(dir, table)?;
+        let defaults = xml_defaults(&t);
+        let table_file = Table::open(base(dir, t.table_id))?;
+        let mut rows = Vec::new();
+        for r in table_file.features() {
+            let f = r?;
+            rows.push((Some(f.oid as u64), f));
+        }
+        let fields: Vec<geoforge_core::Field> = table_file
+            .fields()
+            .iter()
+            .map(|f| {
+                let mut f = f.clone();
+                f.default = defaults
+                    .iter()
+                    .find(|(n, _)| n.eq_ignore_ascii_case(&f.name))
+                    .map(|(_, v)| v.clone());
+                f
+            })
+            .collect();
+        rewrite_table(base(dir, t.table_id), &fields, &rows)?;
+        let _ = decode_default;
+        Ok(())
+    })
 }

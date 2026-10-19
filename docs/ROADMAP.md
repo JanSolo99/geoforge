@@ -238,12 +238,25 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
 - [x] Edit rows of an existing table or feature class in place (`TableEditor`: insert, update,
       delete; row space is appended, `.gdbtablx`, spatial index, extent and attribute indexes follow;
       ArcGIS reads, edits and compacts the result)
+- [x] Edits are crash-safe transactions: a rollback journal per geodatabase (`.gf-journal`: originals moved
+      aside, appended tables' length and header kept, synced before each change; commit = deleting the
+      manifest; any later open rolls an unfinished edit back byte for byte). Catalog operations that touch
+      several system tables are one transaction; a dropped editor or a failing rewrite rolls back.
+      `tests/crash_safety.rs` kills a child process at every step of five kinds of edit (8 to 58 steps each)
+- [x] Edits on geodatabases ArcGIS wrote (`testdata/gdb-reference/edit_arcgis.gdb`): `TableEditor::get`,
+      `set_value`, `set_geometry`; `Shape_Length` / `Shape_Area` computed from the stored geometry; 64-bit
+      OBJECTID (v4) tables edited and rewritten (v4 header and `.gdbtablx`, version 2 indexes); `add_field`,
+      `delete_fields`, `delete_rows`, `truncate_table`; rewrites keep the OBJECTID sequence and ArcGIS's index
+      names. GDAL reads every edited table as we do; ArcGIS reads, queries (spatial and attribute index), checks,
+      compacts and edits further, and `gf delete-rows/delete-features/truncate-table/add-field/calculate-field/
+      delete-field` give the same fields, rows, indexes and next OBJECTIDs as the same ArcGIS tools
 - [x] `rewrite_table`: replace the fields and rows of an existing table keeping its file number, geometry
       definition, chosen OBJECTIDs and surviving attribute indexes (the primitive for Add/Delete Field
-      and in-place tools on `.gdb` data); not yet wired into `gf`
+      and in-place tools on `.gdb` data)
 - [x] Editing in place from tools on `.gdb` data (`gf` in-place tools such as Add/Delete Field, Calculate
       Field, Append, Near, Delete Identical go through `rewrite_table`; OBJECTIDs the tool carries through
-      are kept; `tests/gdb_in_place.rs`). Not yet re-verified in ArcGIS for every tool
+      are kept; `tests/gdb_in_place.rs`, `tests/gdb_edit_rows.rs`). Add/Delete/Calculate Field checked against
+      ArcGIS; the other in-place tools not yet
 - [x] Delete and Rename of tables, feature classes, relationship classes, feature datasets and domains
       (`delete_item`, `rename_item`, `delete_domain`, `rename_domain`; `gf delete/rename/delete-domain/
       alter-domain`): catalog, items, relationships, definition XML and files equal ArcGIS's after each
@@ -251,7 +264,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
       compacts the results. A table's deletion takes its relationship classes with it; a domain fields use is
       refused (ERROR 002630)
 - [x] Remove subtypes (`remove_subtype`; ArcGIS has no rename operation)
-- [ ] ArcGIS's `timestamps`, `.freelist` (space reuse) and `.horizon` files; 64-bit OBJECTID (v4) tables
+- [ ] ArcGIS's `timestamps`, `.freelist` (space reuse) and `.horizon` files (64-bit OBJECTID tables: done)
 - [ ] Write: per-vertex missing M values mixed with present ones (encoding unknown)
 - [x] Write: attribute indexes on new tables (`TableBuilder::add_attribute_index`; all indexable field
       types; `.atx` and `.gdbindexes` byte-identical to ArcGIS's, also 300 000-row three-level

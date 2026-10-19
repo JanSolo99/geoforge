@@ -14,6 +14,7 @@ mod rewrite;
 mod subtype_edit;
 mod system_rows;
 mod table;
+mod txn;
 
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -28,13 +29,14 @@ use btree::{spatial_entries, write_index};
 use table::TableWriter;
 
 pub use catalog::{delete_domain, delete_item, rename_domain, rename_item};
-pub use edit::TableEditor;
+pub use edit::{TableEditor, delete_rows};
 pub use rebuild::rebuild_attribute_indexes;
-pub use rewrite::rewrite_table;
+pub use rewrite::{add_field, delete_fields, rewrite_table, truncate_table};
 pub use subtype_edit::{
     add_subtype, assign_default_to_field, assign_domain_to_field, remove_domain_from_field,
     remove_subtype, set_default_subtype, set_subtype_field,
 };
+pub use txn::recover;
 
 const TYPE_FOLDER: &str = "{F3783E6F-65CA-4514-8315-CE3985DAD3B1}";
 const TYPE_WORKSPACE: &str = "{C673FE0F-7280-404F-8532-20755DD8FC06}";
@@ -100,6 +102,9 @@ pub struct GeodatabaseWriter {
     rng: u64,
     /// Set when adding to a geodatabase that already exists.
     existing: Option<Existing>,
+    /// The transaction adding to an existing geodatabase: committed by `finish`; a
+    /// writer dropped before that (or a crash) leaves the geodatabase as it was.
+    txn: Option<txn::Guard>,
 }
 
 /// What an existing geodatabase's catalog holds that new items need to refer to.
@@ -176,6 +181,7 @@ impl GeodatabaseWriter {
             domains: Vec::new(),
             rng: seed | 1,
             existing: None,
+            txn: None,
         })
     }
 
@@ -186,6 +192,7 @@ impl GeodatabaseWriter {
     pub fn open_existing(dir: impl AsRef<Path>) -> Result<Self> {
         use crate::table::Table;
         let dir = dir.as_ref().to_path_buf();
+        let guard = txn::begin(&dir)?;
         let path = |n: u64| dir.join(format!("a{n:08x}"));
         let catalog = Table::open(path(1))?;
         let mut tables = Vec::new();
@@ -283,6 +290,7 @@ impl GeodatabaseWriter {
             spatial_refs: Vec::new(),
             domains: Vec::new(),
             rng: seed | 1,
+            txn: Some(guard),
             existing: Some(Existing {
                 datasets: existing_datasets,
                 classes: existing_classes,
@@ -659,7 +667,7 @@ impl GeodatabaseWriter {
         write_gdbindexes_for(
             &base.with_extension("gdbindexes"),
             "RID",
-            false,
+            None,
             &index_names,
         )?;
         self.tables.push((name.to_owned(), id));
@@ -1212,7 +1220,10 @@ impl GeodatabaseWriter {
             }
             ed.finish()?;
         }
-        Ok(())
+        match self.txn.take() {
+            Some(t) => t.commit(),
+            None => Ok(()),
+        }
     }
 
     /// The UUID of the feature dataset an item lives in.
@@ -1696,16 +1707,18 @@ pub(crate) fn write_gdbindexes(
     spatial: bool,
     attribute: &[(String, String)],
 ) -> Result<()> {
-    write_gdbindexes_for(path, "OBJECTID", spatial, attribute)
+    write_gdbindexes_for(path, "OBJECTID", spatial.then_some("SHAPE"), attribute)
 }
 
-/// `.gdbindexes` of a table whose object ID field is called `oid`.
+/// `.gdbindexes` of a table whose object ID field is called `oid` and whose geometry
+/// field (if it has a spatial index) `shape`.
 pub(crate) fn write_gdbindexes_for(
     path: &Path,
     oid: &str,
-    spatial: bool,
+    shape: Option<&str>,
     attribute: &[(String, String)],
 ) -> Result<()> {
+    let spatial = shape.is_some();
     let mut out = Vec::new();
     let entry = |out: &mut Vec<u8>, name: &str, magic2: i32, magic3: i16, expr: &str| {
         out.extend_from_slice(&(name.encode_utf16().count() as u32).to_le_bytes());
@@ -1722,13 +1735,13 @@ pub(crate) fn write_gdbindexes_for(
     };
     out.extend_from_slice(&(1 + u32::from(spatial) + attribute.len() as u32).to_le_bytes());
     entry(&mut out, &format!("FDO_{oid}"), 16, -1, oid);
-    if spatial {
-        entry(&mut out, "FDO_SHAPE", 4, 0, "SHAPE");
+    if let Some(shape) = shape {
+        entry(&mut out, &format!("FDO_{shape}"), 4, 0, shape);
     }
     for (name, field) in attribute {
         entry(&mut out, name, 2, 0, field);
     }
-    std::fs::write(path, out).map_err(|e| Error::io(path, e))
+    txn::write_file(path, &out)
 }
 
 const WGS84: &str = r#"GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137.0,298.257223563]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]]"#;

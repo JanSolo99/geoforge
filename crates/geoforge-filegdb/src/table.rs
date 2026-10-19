@@ -595,6 +595,16 @@ impl Table {
         self.decode_row(oid, &blob).map(Some)
     }
 
+    /// Decodes the row stored at `offset` of the `.gdbtable` as OBJECTID `oid`.
+    pub(crate) fn read_at(&self, oid: u64, offset: u64) -> Result<Feature> {
+        let io = |e| Error::io(&self.path, e);
+        let mut len = [0u8; 4];
+        self.file.read_exact_at(&mut len, offset).map_err(io)?;
+        let mut blob = vec![0u8; u32::from_le_bytes(len) as usize];
+        self.file.read_exact_at(&mut blob, offset + 4).map_err(io)?;
+        self.decode_row(oid, &blob)
+    }
+
     /// The file offset of row `oid` in the `.gdbtable`, or `None` if it is deleted.
     pub(crate) fn raw_offset(&self, oid: u64) -> Result<Option<u64>> {
         self.tablx.offset(&self.path, oid)

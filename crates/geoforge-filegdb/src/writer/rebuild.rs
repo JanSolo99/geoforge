@@ -5,7 +5,7 @@ use std::path::Path;
 
 use geoforge_core::{Error, Result, Value};
 
-use super::btree::write_index;
+use super::btree::write_index_for;
 use super::keys;
 use crate::bytes::{Reader, err};
 use crate::table::{GdbFieldType, Table};
@@ -84,26 +84,27 @@ pub fn rebuild_attribute_indexes(table_base: impl AsRef<Path>) -> Result<Vec<Str
                 d.name
             ))
         })?;
-        let mut entries: Vec<(keys::Key, u32)> = Vec::new();
+        let mut entries: Vec<(keys::Key, u64)> = Vec::new();
         for r in &rows {
             let mut v = r.attributes.get(at).cloned().unwrap_or(Value::Null);
             if lower && let Value::String(s) = &v {
                 v = Value::String(s.to_lowercase());
             }
             if let Some(k) = keys::key_of(&layout, &v) {
-                entries.push((k, r.oid as u32));
+                entries.push((k, r.oid as u64));
             }
         }
         entries.sort_by(|a, b| a.0.cmp(&b.0).then(a.1.cmp(&b.1)));
-        let encoded: Vec<(Vec<u8>, u32)> = entries
+        let encoded: Vec<(Vec<u8>, u64)> = entries
             .iter()
             .map(|(k, oid)| (keys::encode(&layout, k), *oid))
             .collect();
-        write_index(
+        write_index_for(
             &base.with_extension(format!("{}.atx", d.name)),
             layout.key_size,
             layout.kind,
             &encoded,
+            table.is_version_4(),
         )?;
         written.push(d.name.clone());
     }

@@ -248,6 +248,23 @@ enum Tool {
         #[arg(long)]
         output: Option<PathBuf>,
     },
+    /// Delete rows (ArcGIS "Delete Rows"), in place; with `--where`, only the matching
+    /// rows (as on a table view with that definition query). OBJECTIDs are not reused.
+    DeleteRows {
+        in_rows: PathBuf,
+        /// SQL where clause; the OBJECTID field can be used.
+        #[arg(long = "where")]
+        where_clause: Option<String>,
+    },
+    /// Delete features (ArcGIS "Delete Features"); as `delete-rows`.
+    DeleteFeatures {
+        in_features: PathBuf,
+        #[arg(long = "where")]
+        where_clause: Option<String>,
+    },
+    /// Delete every row of a geodatabase table, restarting its OBJECTIDs at 1
+    /// (ArcGIS "Truncate Table").
+    TruncateTable { in_table: PathBuf },
     /// Fill a field with a Python expression (ArcGIS "Calculate Field", PYTHON3).
     /// Updates the input shapefile in place unless an output is given.
     CalculateField {
@@ -1568,6 +1585,15 @@ fn main() -> ExitCode {
                 None => update_in_place(out, &in_table),
             }
         })(),
+        Tool::DeleteRows {
+            in_rows,
+            where_clause,
+        } => delete_rows_tool(&in_rows, where_clause.as_deref(), false),
+        Tool::DeleteFeatures {
+            in_features,
+            where_clause,
+        } => delete_rows_tool(&in_features, where_clause.as_deref(), false),
+        Tool::TruncateTable { in_table } => delete_rows_tool(&in_table, None, true),
         Tool::CalculateField {
             in_table,
             field,
@@ -5258,4 +5284,72 @@ fn rasterize_input(path: &Path, field: &str) -> Result<RasterizeInput> {
         .and_then(|c| c.wkid())
         .map(|(_, latest)| latest);
     Ok((features, kind, epsg, fc.geometry_kind()))
+}
+
+/// Delete Rows / Delete Features / Truncate Table. Geodatabase tables are edited in place
+/// (one transaction; OBJECTIDs stay, except that Truncate Table restarts them); a
+/// shapefile is rewritten without the rows.
+fn delete_rows_tool(input: &Path, where_clause: Option<&str>, truncate: bool) -> Result<()> {
+    let (fc, _) = open_feature_class(input)?;
+    // The where clause sees the attribute fields and the OBJECTID.
+    let mut fields = fc.fields().to_vec();
+    fields.push(geoforge_core::Field::new(
+        fc.oid_field_name(),
+        geoforge_core::FieldType::BigInteger,
+    ));
+    let clause = where_clause
+        .map(|w| geoforge_tools::WhereClause::parse(w, &fields))
+        .transpose()?;
+    let doomed = |f: &geoforge_core::Feature| {
+        clause.as_ref().is_none_or(|c| {
+            let mut a = f.attributes.clone();
+            a.push(geoforge_core::Value::BigInteger(f.oid));
+            c.matches(&a)
+        })
+    };
+    if let Location::Geodatabase {
+        gdb,
+        item: Some(item),
+    } = locate(input)
+    {
+        drop(fc);
+        let base = Geodatabase::open(&gdb)?.table_base(&item)?;
+        if truncate {
+            geoforge_filegdb::truncate_table(&base)?;
+            println!("Truncated {}/{item}", gdb.display());
+        } else {
+            let n = geoforge_filegdb::delete_rows(&base, doomed)?;
+            println!("Deleted {n} rows from {}/{item}", gdb.display());
+        }
+        return Ok(());
+    }
+    if truncate {
+        return Err(Error::Unsupported(
+            "Truncate Table works on geodatabase tables only".into(),
+        ));
+    }
+    let mut kept = Vec::new();
+    let mut n = 0;
+    for f in fc.features() {
+        let f = f?;
+        if doomed(&f) {
+            n += 1;
+        } else {
+            kept.push(f);
+        }
+    }
+    let out = geoforge_tools::ToolOutput {
+        kind: fc
+            .geometry_kind()
+            .unwrap_or(geoforge_core::GeometryKind::Point),
+        has_z: fc.has_z(),
+        has_m: fc.has_m(),
+        fields: fc.fields().to_vec(),
+        spatial_reference_wkt: fc.spatial_reference_wkt().map(str::to_owned),
+        features: kept,
+        messages: Vec::new(),
+    };
+    drop(fc);
+    eprintln!("Deleting {n} rows");
+    update_in_place(out, input)
 }

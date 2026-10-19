@@ -6,6 +6,9 @@
 //! replaced or deleted row is simply left behind (a `.freelist` that would let ArcGIS
 //! reuse it is removed so it can never point at space we have filled; `Compact`
 //! reclaims it).
+//!
+//! The edit is one transaction (see [`super::txn`]): until [`TableEditor::finish`]
+//! returns, a crash or a dropped editor leaves the table as it was.
 
 use std::fs::{File, OpenOptions};
 use std::io::{Seek, SeekFrom, Write};
@@ -13,16 +16,22 @@ use std::path::{Path, PathBuf};
 
 use geoforge_core::{Envelope, Error, Feature, GeometryKind, Result};
 
-use super::btree::{grid_size, spatial_entries, write_index};
+use super::btree::{grid_size, spatial_entries, write_index_for};
 use super::rebuild::rebuild_attribute_indexes;
-use super::table::{RowLayout, encode_row};
+use super::table::{
+    RowLayout, encode_row, offset_size_for, write_dense_tablx, write_header_counts,
+};
+use super::txn;
 use crate::bytes::err;
 use crate::table::{GdbField, Table};
 
 /// Opens an existing table for editing. Call [`TableEditor::finish`] to write the
-/// changes; dropping the editor without it leaves appended rows unreferenced.
+/// changes; dropping the editor without it rolls them back.
 pub struct TableEditor {
     base: PathBuf,
+    /// The table as opened (reads rows by offset, including rows written since).
+    table: Table,
+
     fields: Vec<GdbField>,
     geometry_kind: Option<GeometryKind>,
     has_z: bool,
@@ -36,32 +45,33 @@ pub struct TableEditor {
     offset_size: usize,
     max_row: u32,
     field_section_len: u32,
+    /// Version 4 table (64-bit OBJECTIDs).
+    v4: bool,
     subsecond: Vec<String>,
     row: Vec<u8>,
     changed: bool,
+    /// Last, so the files are closed before a rollback on drop.
+    txn: Option<txn::Guard>,
 }
 
 impl TableEditor {
     /// `base` is the table's path with or without `.gdbtable`.
     pub fn open(base: impl AsRef<Path>) -> Result<Self> {
         let base = base.as_ref().with_extension("");
+        let dir = base
+            .parent()
+            .filter(|d| !d.as_os_str().is_empty())
+            .unwrap_or(Path::new("."))
+            .to_path_buf();
+        let guard = txn::begin(&dir)?;
         let table = Table::open(&base)?;
-        if table.is_version_4() {
-            return Err(Error::Unsupported(
-                "editing 64-bit OBJECTID tables (ArcGIS Pro 3.2 format) is not implemented".into(),
-            ));
-        }
         let fields = table.all_fields().to_vec();
         let mut offsets = Vec::with_capacity(table.max_oid() as usize);
         for oid in 1..=table.max_oid() {
             offsets.push(table.raw_offset(oid)?.unwrap_or(0));
         }
         let path = base.with_extension("gdbtable");
-        let mut file = OpenOptions::new()
-            .read(true)
-            .write(true)
-            .open(&path)
-            .map_err(|e| Error::io(&path, e))?;
+        let mut file = txn::open_for_append(&path)?;
         let pos = file
             .seek(SeekFrom::End(0))
             .map_err(|e| Error::io(&path, e))?;
@@ -85,8 +95,10 @@ impl TableEditor {
             has_z: table.has_z(),
             has_m: table.has_m(),
             field_section_len: table.field_section_size(),
+            v4: table.is_version_4(),
             fields,
             base,
+            table,
             file,
             pos,
             offsets,
@@ -95,7 +107,62 @@ impl TableEditor {
             subsecond: Vec::new(),
             row: Vec::new(),
             changed: false,
+            txn: Some(guard),
         })
+    }
+
+    /// The attribute fields, in the order `Feature::attributes` follows.
+    pub fn fields(&self) -> &[geoforge_core::Field] {
+        self.table.fields()
+    }
+
+    /// The row with OBJECTID `oid` as it stands in this edit, or `None` if there is none.
+    pub fn get(&self, oid: u64) -> Result<Option<Feature>> {
+        match self.offsets.get((oid as usize).wrapping_sub(1)) {
+            Some(&at) if at != 0 => self.table.read_at(oid, at).map(Some),
+            _ => Ok(None),
+        }
+    }
+
+    /// Sets attribute `field` (case-insensitive name) of row `oid` to `value`.
+    pub fn set_value(&mut self, oid: u64, field: &str, value: geoforge_core::Value) -> Result<()> {
+        let i = self
+            .fields()
+            .iter()
+            .position(|f| f.name.eq_ignore_ascii_case(field))
+            .ok_or_else(|| err(format!("no field {field}")))?;
+        let mut f = self
+            .get(oid)?
+            .ok_or_else(|| err(format!("OBJECTID {oid} does not exist")))?;
+        f.attributes[i] = value;
+        self.update(oid, &f)
+    }
+
+    /// Replaces the geometry of row `oid` (its attributes stay).
+    pub fn set_geometry(
+        &mut self,
+        oid: u64,
+        geometry: Option<geoforge_core::Geometry>,
+    ) -> Result<()> {
+        if geometry.is_some() && self.geometry_kind.is_none() {
+            return Err(Error::Unsupported(
+                "geometry in a table without a geometry field".into(),
+            ));
+        }
+        let mut f = self
+            .get(oid)?
+            .ok_or_else(|| err(format!("OBJECTID {oid} does not exist")))?;
+        f.geometry = geometry;
+        self.update(oid, &f)
+    }
+
+    /// OBJECTIDs of the rows currently in the table, ascending.
+    pub fn oids(&self) -> impl Iterator<Item = u64> + '_ {
+        self.offsets
+            .iter()
+            .enumerate()
+            .filter(|(_, o)| **o != 0)
+            .map(|(i, _)| i as u64 + 1)
     }
 
     /// Rows currently in the table.
@@ -108,7 +175,7 @@ impl TableEditor {
         self.offsets.len() as u64
     }
 
-    fn append(&mut self, oid: u64, f: &Feature) -> Result<()> {
+    fn append(&mut self, oid: u64, f: &Feature, measures: bool) -> Result<()> {
         encode_row(
             &RowLayout {
                 fields: &self.fields,
@@ -116,6 +183,7 @@ impl TableEditor {
                 has_z: self.has_z,
                 has_m: self.has_m,
                 nullable_count: self.nullable_count,
+                measures,
             },
             &mut self.subsecond,
             oid,
@@ -143,7 +211,7 @@ impl TableEditor {
     pub fn insert(&mut self, feature: &Feature) -> Result<u64> {
         let oid = self.offsets.len() as u64 + 1;
         self.offsets.push(0);
-        if let Err(e) = self.append(oid, feature) {
+        if let Err(e) = self.append(oid, feature, true) {
             self.offsets.pop();
             return Err(e);
         }
@@ -153,7 +221,11 @@ impl TableEditor {
     /// Replaces the row with OBJECTID `oid`.
     pub fn update(&mut self, oid: u64, feature: &Feature) -> Result<()> {
         match self.offsets.get(oid as usize - 1) {
-            Some(o) if *o != 0 => self.append(oid, feature),
+            Some(&o) if o != 0 => {
+                // The measures follow a changed geometry; otherwise they stay as given.
+                let changed = self.table.read_at(oid, o)?.geometry != feature.geometry;
+                self.append(oid, feature, changed)
+            }
             _ => Err(err(format!("OBJECTID {oid} does not exist"))),
         }
     }
@@ -172,19 +244,25 @@ impl TableEditor {
 
     /// Writes the header, `.gdbtablx` and indexes. Returns the number of rows.
     pub fn finish(mut self) -> Result<u64> {
+        let guard = self.txn.take().expect("transaction");
         if !self.changed {
-            return Ok(self.row_count());
+            let n = self.row_count();
+            drop(self);
+            guard.commit()?;
+            return Ok(n);
         }
         let path = self.base.with_extension("gdbtable");
         let io = |e| Error::io(&path, e);
-        let rows = self.row_count() as u32;
-        self.file.seek(SeekFrom::Start(4)).map_err(io)?;
-        self.file.write_all(&rows.to_le_bytes()).map_err(io)?;
-        self.file
-            .write_all(&self.max_row.max(self.field_section_len).to_le_bytes())
-            .map_err(io)?;
-        self.file.seek(SeekFrom::Start(24)).map_err(io)?;
-        self.file.write_all(&self.pos.to_le_bytes()).map_err(io)?;
+        let rows = self.row_count();
+        write_header_counts(
+            &mut self.file,
+            self.v4,
+            rows,
+            rows < self.offsets.len() as u64,
+            self.max_row.max(self.field_section_len),
+            self.pos,
+        )
+        .map_err(io)?;
         self.file.flush().map_err(io)?;
         self.file.sync_all().map_err(io)?;
 
@@ -192,15 +270,18 @@ impl TableEditor {
             &self.base.with_extension("gdbtablx"),
             &self.offsets,
             self.offset_size.max(offset_size_for(self.pos)),
+            self.v4,
         )?;
         // A free list would let ArcGIS write into space that now holds rows.
-        std::fs::remove_file(self.base.with_extension("freelist")).ok();
+        txn::remove_file(&self.base.with_extension("freelist"))?;
 
         if let Some(def) = self.fields.iter().find_map(|f| f.geometry.clone()) {
             self.update_spatial_index(&def)?;
         }
         rebuild_attribute_indexes(&self.base)?;
-        Ok(rows as u64)
+        drop(self);
+        guard.commit()?;
+        Ok(rows)
     }
 
     /// Rebuilds the `.spx` from the stored geometries and widens the stored extent.
@@ -260,40 +341,34 @@ impl TableEditor {
             }
         }
         file.flush().map_err(io)?;
-        write_index(
+        write_index_for(
             &self.base.with_extension("spx"),
             8,
             0x40,
             &spatial_entries(&envelopes, grid),
+            self.v4,
         )
     }
 }
 
-fn offset_size_for(file_size: u64) -> usize {
-    if file_size < 1 << 32 {
-        4
-    } else if file_size < 1 << 40 {
-        5
-    } else {
-        6
+/// Deletes the rows of the table at `base` for which `doomed` is true (`arcpy.management.
+/// DeleteRows` / `DeleteFeatures` on a selection); OBJECTIDs are not reused. Returns the
+/// number of rows deleted.
+pub fn delete_rows(
+    base: impl AsRef<Path>,
+    mut doomed: impl FnMut(&Feature) -> bool,
+) -> Result<u64> {
+    let mut ed = TableEditor::open(base)?;
+    let oids: Vec<u64> = ed.oids().collect();
+    let mut n = 0;
+    for oid in oids {
+        if let Some(f) = ed.get(oid)?
+            && doomed(&f)
+        {
+            ed.delete(oid)?;
+            n += 1;
+        }
     }
-}
-
-/// A version 3 `.gdbtablx` with every 1024-row block present.
-fn write_dense_tablx(path: &Path, offsets: &[u64], size: usize) -> Result<()> {
-    let blocks = offsets.len().div_ceil(1024).max(1);
-    let mut out = Vec::with_capacity(16 + blocks * 1024 * size + 16);
-    out.extend_from_slice(&3i32.to_le_bytes());
-    out.extend_from_slice(&(blocks as u32).to_le_bytes());
-    out.extend_from_slice(&(offsets.len() as u32).to_le_bytes());
-    out.extend_from_slice(&(size as u32).to_le_bytes());
-    for i in 0..blocks * 1024 {
-        let o = offsets.get(i).copied().unwrap_or(0);
-        out.extend_from_slice(&o.to_le_bytes()[..size]);
-    }
-    out.extend_from_slice(&0u32.to_le_bytes());
-    out.extend_from_slice(&(blocks as u32).to_le_bytes());
-    out.extend_from_slice(&(blocks as u32).to_le_bytes());
-    out.extend_from_slice(&0u32.to_le_bytes());
-    std::fs::write(path, out).map_err(|e| Error::io(path, e))
+    ed.finish()?;
+    Ok(n)
 }

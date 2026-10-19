@@ -62,8 +62,10 @@ minutes. Geometry: `varuint len + blob`.
 then `offsetSize × 1024 × n1024BlocksPresent` offsets (0 = deleted). Trailer (v3) at
 the end of offsets: `i32 nBitmapWords, i32 n1024BlocksTotal, i32 nPresent, i32 nUseful`
 + bitmap (bit set = block present). FID = row index + 1; with a bitmap, a row's slot
-is `blocksPresentBefore × 1024 + row % 1024`. v4 trailer: `i64 nRows, i32 size,…`
-(sparse map not understood; treat size 0 as dense).
+is `blocksPresentBefore × 1024 + row % 1024`. v4 trailer: `i64 nRows (max OBJECTID), i32 size`, then
+`size` bytes of sparse map; a dense v4 file (as ArcGIS writes it, and GeoForge) has `size = 0` and
+then `i64 lastBlock` (blocks − 1; −1 for an empty table, which has no blocks). The v4 header word at
+offset 4 is 1 when the table has deleted rows, else 0; ArcGIS uses offset size 5 even for small files.
 
 ## Geometry blob
 `varuint geomType` (low byte = shape type, as in shapefiles; general types 50–54 with
@@ -90,9 +92,11 @@ integers: `x = v / xyscale + xorigin`.
 Verified against brute-force scans of every index in the GDAL test data.
 - `.gdbindexes`: `u32 n`, then per index `u32 len, utf16 name, i16, i32, i16, i32,
   u32 len, utf16 expression, i16`. Attribute index file: `aXXXXXXXX.<name>.atx`.
-- Trailer (last 22 bytes v1 / 30 bytes v2): `u8 keySize, u8, i32, u32 depth,
-  u32|i64 count, i32|i64, i32 version`. Pages: 4096 (v1) / 65536 (v2) bytes,
-  numbered from 1. **Page 1 is the root.**
+- Trailer (last 22 bytes v1 / 30 bytes v2): `u8 keySize, u8 kind, i32 1, u32 depth,
+  u32|i64 count, i32|i64 0, i32 version`. Pages: 4096 (v1) / 65536 (v2) bytes,
+  numbered from 1. **Page 1 is the root.** Version 2 belongs to 64-bit OBJECTID tables (their `.spx`
+  and `.atx` alike): `next` and ids are 8 bytes, leaf header `next, u32 n, 8 bytes 0` (20), keys at
+  `20 + 4094 × 8` for 8-byte keys (verified on ArcGIS-written files).
 - Internal page: `next, u32 n`, then `n + 1` child page ids, values at
   `valuesOffset` = max key under each of the first `n` children.
   Leaf page: `next, u32 n, unknown`, OBJECTIDs, values at `valuesOffset`.
@@ -130,6 +134,20 @@ counter table). Row updates append the new row and put the old space on the tabl
 (created on first use); deletes zero the `.gdbtablx` entry. Adding fields or indexes changes the
 table's own `.gdbtable` / `.gdbindexes`; the catalog XML does not list them. See the experiments
 in the session notes.
+
+- `Shape_Length` / `Shape_Area`: ordinary Double fields after the geometry, named after it, nullable in
+  the field section (ArcGIS reports them required). ArcGIS keeps them equal to the planar length (perimeter)
+  and area of the stored geometry (true arcs for curves; checked to 1e-7 on ArcGIS buffers). GeoForge recomputes
+  them when an edit of an existing table inserts a row or changes its geometry, and keeps them otherwise.
+- Delete Rows keeps the OBJECTID sequence (the `.gdbtablx` row count stays); Truncate Table restarts it at 1.
+
+## Editing in GeoForge (crash safety)
+Every edit is a transaction with a rollback journal in `<gdb>/.gf-journal/` (`src/writer/txn.rs`): before a
+file changes for the first time, the manifest records (and syncs) how to undo it: `moved <name> <backup>`
+(the original was moved into the journal), `created <name>`, or `grown <name> <length> <backup>` (rows are
+appended to a `.gdbtable` in place: its length and its header + field section are kept). Commit syncs the files
+and deletes the manifest; a manifest left behind is rolled back, newest entry first, when GeoForge next opens the
+geodatabase. The manifest names the owning process, so a journal of a running process is left alone.
 
 ## Writing (what GeoForge produces)
 Mirrors GDAL's OpenFileGDB writer, which ArcGIS opens: system tables a1–a7 with the
