@@ -504,13 +504,32 @@ const CONCEPTS: &[&str] = &[
     "FIXED_DISTANCE_BAND",
     "ZONE_OF_INDIFFERENCE",
     "K_NEAREST_NEIGHBORS",
+    "CONTIGUITY_EDGES_ONLY",
+    "CONTIGUITY_EDGES_CORNERS",
+    "GET_SPATIAL_WEIGHTS_FROM_FILE",
 ];
 const DISTANCE_METHODS: &[&str] = &["EUCLIDEAN_DISTANCE", "MANHATTAN_DISTANCE"];
+
+const WEIGHTS_FILE: Param = Param {
+    name: "weights_matrix_file",
+    label: "Weights Matrix File",
+    kind: Kind::Text,
+    required: false,
+    default: "",
+    help: "A .swm file, for GET_SPATIAL_WEIGHTS_FROM_FILE.",
+};
 
 fn number_of(ctx: &dyn Context, t: &Tool, name: &str) -> f64 {
     text(ctx, t, name)
         .and_then(|v| v.trim().parse().ok())
         .unwrap_or(0.0)
+}
+
+/// The distance band, or -1 when none is given (the tools' default threshold).
+fn band_of(ctx: &dyn Context, t: &Tool) -> f64 {
+    text(ctx, t, "distance_band")
+        .and_then(|v| v.trim().parse().ok())
+        .unwrap_or(-1.0)
 }
 
 fn distance_method(ctx: &dyn Context, t: &Tool) -> Result<spatstat::DistanceMethod> {
@@ -536,18 +555,34 @@ fn average_nearest_neighbor(ctx: &dyn Context) -> Result<Report> {
     )
 }
 
+/// The weights file a tool names, when its conceptualization asks for one.
+fn weights_file(ctx: &dyn Context, t: &Tool) -> Result<Option<crate::swm::Swm>> {
+    let from_file = text(ctx, t, "conceptualization")
+        .is_some_and(|c| c.eq_ignore_ascii_case("GET_SPATIAL_WEIGHTS_FROM_FILE"));
+    if !from_file {
+        return Ok(None);
+    }
+    let path = text(ctx, t, "weights_matrix_file").ok_or_else(|| {
+        Error::Unsupported("ERROR 000735: Weights Matrix File: value is required".into())
+    })?;
+    crate::swm::Swm::read(std::path::Path::new(&path)).map(Some)
+}
+
 fn spatial_autocorrelation(ctx: &dyn Context) -> Result<Report> {
     let t = find("spatial_autocorrelation")
         .ok_or_else(|| Error::Unsupported("spatial_autocorrelation".into()))?;
     let fc = ctx.features("input")?;
     let row = text(ctx, t, "standardization").is_some_and(|s| s.eq_ignore_ascii_case("ROW"));
+    let k = number_of(ctx, t, "number_of_neighbors").max(1.0) as usize;
+    let swm = weights_file(ctx, t)?;
     spatstat::spatial_autocorrelation(
         fc.as_ref(),
         &text(ctx, t, "field").unwrap_or_default(),
-        concept(ctx, t, 8)?,
+        concept(ctx, t, k)?,
         distance_method(ctx, t)?,
         row,
-        number_of(ctx, t, "distance_band"),
+        band_of(ctx, t),
+        swm.as_ref(),
     )
 }
 
@@ -557,14 +592,128 @@ fn hot_spot_analysis(ctx: &dyn Context) -> Result<ToolOutput> {
     let fc = ctx.features("input")?;
     let k = number_of(ctx, t, "number_of_neighbors").max(1.0) as usize;
     let fdr = text(ctx, t, "apply_fdr").is_some_and(|s| s.eq_ignore_ascii_case("APPLY_FDR"));
+    let swm = weights_file(ctx, t)?;
     spatstat::hot_spot_analysis(
         fc.as_ref(),
         &text(ctx, t, "field").unwrap_or_default(),
         concept(ctx, t, k)?,
         distance_method(ctx, t)?,
-        number_of(ctx, t, "distance_band"),
+        band_of(ctx, t),
         fdr,
+        swm.as_ref(),
     )
+}
+
+fn cluster_and_outlier_analysis(ctx: &dyn Context) -> Result<ToolOutput> {
+    let t = find("cluster_and_outlier_analysis")
+        .ok_or_else(|| Error::Unsupported("cluster_and_outlier_analysis".into()))?;
+    let fc = ctx.features("input")?;
+    let k = number_of(ctx, t, "number_of_neighbors").max(1.0) as usize;
+    let fdr = text(ctx, t, "apply_fdr").is_some_and(|s| s.eq_ignore_ascii_case("APPLY_FDR"));
+    let row = text(ctx, t, "standardization").is_some_and(|s| s.eq_ignore_ascii_case("ROW"));
+    let perms = number_of(ctx, t, "number_of_permutations");
+    if !(0.0..=9999.0).contains(&perms) {
+        return Err(Error::Unsupported(
+            "ERROR 000854: Number of Permutations must be 0 to 9999".into(),
+        ));
+    }
+    let swm = weights_file(ctx, t)?;
+    spatstat::cluster_and_outlier_analysis(
+        fc.as_ref(),
+        &text(ctx, t, "field").unwrap_or_default(),
+        concept(ctx, t, k)?,
+        distance_method(ctx, t)?,
+        row,
+        band_of(ctx, t),
+        swm.as_ref(),
+        fdr,
+        perms as usize,
+    )
+}
+
+fn generate_spatial_weights_matrix(ctx: &dyn Context) -> Result<Report> {
+    use crate::swm;
+    let t = find("generate_spatial_weights_matrix")
+        .ok_or_else(|| Error::Unsupported("generate_spatial_weights_matrix".into()))?;
+    let output = ctx
+        .get("output")
+        .ok_or_else(|| Error::Unsupported("output=<file.swm> is required".into()))?;
+    let output = if output.to_ascii_lowercase().ends_with(".swm") {
+        output
+    } else {
+        format!("{output}.swm")
+    };
+    let fc = ctx.features("input")?;
+    let table = match text(ctx, t, "input_table") {
+        Some(_) => Some(ctx.features("input_table")?),
+        None => None,
+    };
+    let c = text(ctx, t, "conceptualization").unwrap_or_default();
+    let concept = swm::SwmConcept::parse(&c)
+        .ok_or_else(|| Error::Unsupported(format!("conceptualization {c}")))?;
+    let m = text(ctx, t, "distance_method").unwrap_or_default();
+    let method = spatstat::DistanceMethod::parse(&m)
+        .ok_or_else(|| Error::Unsupported(format!("distance method {m}")))?;
+    let opt_num = |name: &str| text(ctx, t, name).and_then(|v| v.trim().parse::<f64>().ok());
+    let count = |name: &str| -> Result<Option<usize>> {
+        match opt_num(name) {
+            Some(v) if !(0.0..=100_000.0).contains(&v) => Err(Error::Unsupported(format!(
+                "ERROR 000854: {name} must be 0 to 100000"
+            ))),
+            Some(v) if v >= 1.0 => Ok(Some(v as usize)),
+            _ => Ok(None),
+        }
+    };
+    let wfield = text(ctx, t, "weight_field");
+    let wm = text(ctx, t, "weighting_method").unwrap_or_default();
+    let weighting = swm::Weighting::parse(&wm, wfield.as_deref()).ok_or_else(|| {
+        Error::Unsupported(format!("weighting method {wm} (FIELD needs weight_field)"))
+    })?;
+    let unit = text(ctx, t, "date_time_interval_type");
+    let input_path = ctx.get("input").unwrap_or_default();
+    let uid = text(ctx, t, "unique_id_field").unwrap_or_default();
+    let tfield = text(ctx, t, "date_time_field");
+    let opt = swm::SwmOptions {
+        unique_id: &uid,
+        concept,
+        method,
+        exponent: opt_num("exponent").unwrap_or(1.0),
+        threshold: opt_num("threshold_distance"),
+        neighbors: count("number_of_neighbors")?,
+        row_standardize: !text(ctx, t, "row_standardization")
+            .is_some_and(|s| s.eq_ignore_ascii_case("NO_STANDARDIZATION")),
+        table: table.as_deref(),
+        time_field: tfield.as_deref(),
+        time_unit: unit.as_deref().and_then(swm::TimeUnit::parse),
+        time_value: opt_num("date_time_interval_value").unwrap_or(0.0),
+        order: count("order")?.unwrap_or(1).min(100),
+        include_focal: text(ctx, t, "include_focal_feature")
+            .is_some_and(|s| s.eq_ignore_ascii_case("INCLUDE_FOCAL")),
+        weighting,
+        adaptive: !text(ctx, t, "kernel_type").is_some_and(|s| s.eq_ignore_ascii_case("FIXED")),
+        adaptive_neighbors: count("adaptive_neighbors")?,
+        bandwidth: opt_num("kernel_bandwidth"),
+        input_path: &input_path,
+    };
+    let (m, messages) = swm::generate_spatial_weights_matrix(fc.as_ref(), &opt)?;
+    m.write(std::path::Path::new(&output))?;
+    Ok(Report {
+        rows: Vec::new(),
+        messages,
+    })
+}
+
+fn convert_spatial_weights_matrix_to_table(ctx: &dyn Context) -> Result<Outcome> {
+    let path = ctx
+        .get("input")
+        .ok_or_else(|| Error::Unsupported("ERROR 000735: input: value is required".into()))?;
+    let m = crate::swm::Swm::read(std::path::Path::new(&path))?;
+    let dbase = ctx
+        .get("output")
+        .is_some_and(|o| o.to_ascii_lowercase().ends_with(".dbf"));
+    Ok(Outcome::Table(
+        crate::swm::convert_spatial_weights_matrix_to_table(&m, dbase),
+    ))
 }
 
 fn where_of(ctx: &dyn Context, t: &Tool) -> Option<String> {
@@ -1043,7 +1192,7 @@ pub static TOOLS: &[Tool] = &[
         id: "spatial_autocorrelation",
         name: "Spatial Autocorrelation (Global Moran's I)",
         toolbox: "Spatial Statistics › Analyzing Patterns",
-        summary: "Whether the values of a field cluster, disperse or are random in space (ArcGIS Pro Spatial Autocorrelation; polygon contiguity is not done).",
+        summary: "Whether the values of a field cluster, disperse or are random in space (ArcGIS Pro Spatial Autocorrelation).",
         params: &[
             INPUT,
             field("field", "Input Field", true, "The numeric field to test."),
@@ -1068,7 +1217,7 @@ pub static TOOLS: &[Tool] = &[
                 label: "Standardization",
                 kind: Kind::Choice(&["NONE", "ROW"]),
                 required: false,
-                default: "NONE",
+                default: "ROW",
                 help: "",
             },
             Param {
@@ -1076,8 +1225,17 @@ pub static TOOLS: &[Tool] = &[
                 label: "Distance Band or Threshold Distance",
                 kind: Kind::Number,
                 required: false,
-                default: "0",
-                help: "In the coordinate system's units; 0 relates every pair for inverse distance.",
+                default: "",
+                help: "In the coordinate system's units; empty: the largest nearest-neighbor distance; 0 relates every pair for inverse distance.",
+            },
+            WEIGHTS_FILE,
+            Param {
+                name: "number_of_neighbors",
+                label: "Number of Neighbors",
+                kind: Kind::Number,
+                required: false,
+                default: "8",
+                help: "For K_NEAREST_NEIGHBORS.",
             },
         ],
         output_suffix: "SpatialAutocorrelation",
@@ -1113,7 +1271,7 @@ pub static TOOLS: &[Tool] = &[
                 label: "Standardization",
                 kind: Kind::Choice(&["NONE", "ROW"]),
                 required: false,
-                default: "NONE",
+                default: "ROW",
                 help: "",
             },
             Param {
@@ -1121,8 +1279,8 @@ pub static TOOLS: &[Tool] = &[
                 label: "Distance Band or Threshold Distance",
                 kind: Kind::Number,
                 required: false,
-                default: "0",
-                help: "In the coordinate system's units; 0 relates every pair for inverse distance.",
+                default: "",
+                help: "In the coordinate system's units; empty: the largest nearest-neighbor distance; 0 relates every pair for inverse distance.",
             },
             Param {
                 name: "number_of_neighbors",
@@ -1140,10 +1298,272 @@ pub static TOOLS: &[Tool] = &[
                 default: "NO_FDR",
                 help: "",
             },
+            WEIGHTS_FILE,
         ],
         output_suffix: "HotSpots",
         measures: true,
         run: Runner::Features(hot_spot_analysis),
+    },
+    Tool {
+        id: "cluster_and_outlier_analysis",
+        name: "Cluster and Outlier Analysis (Anselin Local Moran's I)",
+        toolbox: "Spatial Statistics › Mapping Clusters",
+        summary: "Clusters of high or low values and outliers among their neighbors, as local Moran's I with z-scores and HH/LL/HL/LH types (ArcGIS Pro Cluster and Outlier Analysis).",
+        params: &[
+            INPUT,
+            field("field", "Input Field", true, "The numeric field to test."),
+            Param {
+                name: "conceptualization",
+                label: "Conceptualization of Spatial Relationships",
+                kind: Kind::Choice(CONCEPTS),
+                required: false,
+                default: "INVERSE_DISTANCE",
+                help: "",
+            },
+            Param {
+                name: "distance_method",
+                label: "Distance Method",
+                kind: Kind::Choice(DISTANCE_METHODS),
+                required: false,
+                default: "EUCLIDEAN_DISTANCE",
+                help: "",
+            },
+            Param {
+                name: "standardization",
+                label: "Standardization",
+                kind: Kind::Choice(&["NONE", "ROW"]),
+                required: false,
+                default: "ROW",
+                help: "",
+            },
+            Param {
+                name: "distance_band",
+                label: "Distance Band or Threshold Distance",
+                kind: Kind::Number,
+                required: false,
+                default: "",
+                help: "In the coordinate system's units; empty: the largest nearest-neighbor distance; 0 relates every pair for inverse distance.",
+            },
+            WEIGHTS_FILE,
+            Param {
+                name: "apply_fdr",
+                label: "Apply False Discovery Rate (FDR) Correction",
+                kind: Kind::Choice(&["NO_FDR", "APPLY_FDR"]),
+                required: false,
+                default: "NO_FDR",
+                help: "",
+            },
+            Param {
+                name: "number_of_permutations",
+                label: "Number of Permutations",
+                kind: Kind::Choice(&["0", "99", "199", "499", "999", "9999"]),
+                required: false,
+                default: "499",
+                help: "0 gives analytic p-values; others pseudo p-values of random permutations.",
+            },
+            Param {
+                name: "number_of_neighbors",
+                label: "Number of Neighbors",
+                kind: Kind::Number,
+                required: false,
+                default: "8",
+                help: "For K_NEAREST_NEIGHBORS.",
+            },
+        ],
+        output_suffix: "ClustersOutliers",
+        measures: true,
+        run: Runner::Features(cluster_and_outlier_analysis),
+    },
+    Tool {
+        id: "generate_spatial_weights_matrix",
+        name: "Generate Spatial Weights Matrix",
+        toolbox: "Spatial Statistics › Modeling Spatial Relationships",
+        summary: "Writes a spatial weights matrix file (.swm) of how the features relate (ArcGIS Pro Generate Spatial Weights Matrix; give output=<file.swm>).",
+        params: &[
+            INPUT,
+            Param {
+                name: "unique_id_field",
+                label: "Unique ID Field",
+                kind: Kind::Field {
+                    of: "input",
+                    numeric: true,
+                },
+                required: true,
+                default: "",
+                help: "An integer field with a different value for each feature.",
+            },
+            Param {
+                name: "conceptualization",
+                label: "Conceptualization of Spatial Relationships",
+                kind: Kind::Choice(&[
+                    "INVERSE_DISTANCE",
+                    "FIXED_DISTANCE",
+                    "K_NEAREST_NEIGHBORS",
+                    "CONTIGUITY_EDGES_ONLY",
+                    "CONTIGUITY_EDGES_CORNERS",
+                    "DELAUNAY_TRIANGULATION",
+                    "SPACE_TIME_WINDOW",
+                    "CONVERT_TABLE",
+                ]),
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "distance_method",
+                label: "Distance Method",
+                kind: Kind::Choice(&["EUCLIDEAN", "MANHATTAN"]),
+                required: false,
+                default: "EUCLIDEAN",
+                help: "",
+            },
+            Param {
+                name: "exponent",
+                label: "Exponent",
+                kind: Kind::Number,
+                required: false,
+                default: "1",
+                help: "Inverse distance weights are 1 / distance^exponent.",
+            },
+            Param {
+                name: "threshold_distance",
+                label: "Threshold Distance",
+                kind: Kind::Number,
+                required: false,
+                default: "",
+                help: "Empty: the largest nearest-neighbor distance.",
+            },
+            Param {
+                name: "number_of_neighbors",
+                label: "Number of Neighbors",
+                kind: Kind::Number,
+                required: false,
+                default: "",
+                help: "K nearest neighbors (8 when empty); the least neighbors for distance bands.",
+            },
+            Param {
+                name: "row_standardization",
+                label: "Row Standardization",
+                kind: Kind::Choice(&["ROW_STANDARDIZATION", "NO_STANDARDIZATION"]),
+                required: false,
+                default: "ROW_STANDARDIZATION",
+                help: "",
+            },
+            Param {
+                name: "input_table",
+                label: "Input Table",
+                kind: Kind::Features,
+                required: false,
+                default: "",
+                help: "CONVERT_TABLE: a table of the unique ID field, NID and WEIGHT.",
+            },
+            field(
+                "date_time_field",
+                "Date/Time Field",
+                false,
+                "SPACE_TIME_WINDOW: the date field.",
+            ),
+            Param {
+                name: "date_time_interval_type",
+                label: "Date/Time Interval Type",
+                kind: Kind::Choice(&[
+                    "SECONDS", "MINUTES", "HOURS", "DAYS", "WEEKS", "MONTHS", "YEARS",
+                ]),
+                required: false,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "date_time_interval_value",
+                label: "Date/Time Interval Value",
+                kind: Kind::Number,
+                required: false,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "order",
+                label: "Polygon Contiguity Order",
+                kind: Kind::Number,
+                required: false,
+                default: "1",
+                help: "",
+            },
+            Param {
+                name: "include_focal_feature",
+                label: "Include Focal Feature in Weights",
+                kind: Kind::Choice(&["INCLUDE_FOCAL", "EXCLUDE_FOCAL"]),
+                required: false,
+                default: "EXCLUDE_FOCAL",
+                help: "",
+            },
+            Param {
+                name: "weighting_method",
+                label: "Weighting Scheme",
+                kind: Kind::Choice(&[
+                    "UNWEIGHTED",
+                    "BISQUARE",
+                    "GAUSSIAN",
+                    "TRIANGULAR",
+                    "QUADRATIC",
+                    "FIELD",
+                    "BORDER",
+                ]),
+                required: false,
+                default: "UNWEIGHTED",
+                help: "",
+            },
+            Param {
+                name: "kernel_type",
+                label: "Kernel Bandwidth",
+                kind: Kind::Choice(&["ADAPTIVE", "FIXED"]),
+                required: false,
+                default: "ADAPTIVE",
+                help: "",
+            },
+            Param {
+                name: "adaptive_neighbors",
+                label: "Number of Neighbors for Adaptive Kernel",
+                kind: Kind::Number,
+                required: false,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "kernel_bandwidth",
+                label: "Distance Band",
+                kind: Kind::Number,
+                required: false,
+                default: "",
+                help: "Fixed kernel bandwidth; empty: Silverman's rule.",
+            },
+            field(
+                "weight_field",
+                "Weight Field",
+                true,
+                "FIELD weighting: the weights.",
+            ),
+        ],
+        output_suffix: "swm",
+        measures: true,
+        run: Runner::Report(generate_spatial_weights_matrix),
+    },
+    Tool {
+        id: "convert_spatial_weights_matrix_to_table",
+        name: "Convert Spatial Weights Matrix to Table",
+        toolbox: "Spatial Statistics › Utilities",
+        summary: "A table of the neighbor pairs and weights of a spatial weights matrix file (ArcGIS Pro Convert Spatial Weights Matrix to Table).",
+        params: &[Param {
+            name: "input",
+            label: "Input Spatial Weights Matrix File",
+            kind: Kind::Text,
+            required: true,
+            default: "",
+            help: "A .swm file.",
+        }],
+        output_suffix: "Table",
+        measures: false,
+        run: Runner::Dynamic(convert_spatial_weights_matrix_to_table),
     },
     Tool {
         id: "copy_rows",

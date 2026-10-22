@@ -222,6 +222,7 @@ fn pattern_statistics_equal_arcgis() {
                 vec![
                     s("conceptualization=INVERSE_DISTANCE"),
                     s("standardization=ROW"),
+                    s("distance_band=0"),
                 ],
             ),
             (
@@ -264,7 +265,10 @@ fn pattern_statistics_equal_arcgis() {
             ),
             (
                 "invsq",
-                vec![s("conceptualization=INVERSE_DISTANCE_SQUARED")],
+                vec![
+                    s("conceptualization=INVERSE_DISTANCE_SQUARED"),
+                    s("distance_band=0"),
+                ],
             ),
             (
                 "inv_band",
@@ -330,11 +334,16 @@ fn pattern_statistics_equal_arcgis() {
                 }
             }
         }
-        // Distance bands that are needed but missing are errors.
+        // A fixed band of 0 is an error (with no band at all the default threshold applies; see
+        // spatstat_weights.rs).
         let o = Command::new(env!("CARGO_BIN_EXE_gf"))
             .args(["run", "spatial_autocorrelation"])
             .arg(&input)
-            .args(["field=W", "conceptualization=FIXED_DISTANCE_BAND"])
+            .args([
+                "field=W",
+                "conceptualization=FIXED_DISTANCE_BAND",
+                "distance_band=0",
+            ])
             .output()
             .unwrap();
         assert!(!o.status.success());

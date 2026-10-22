@@ -631,5 +631,17 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
           normal-CDF approximation up to 2e-8 from the exact ones we use. Not done: polygon
           contiguity conceptualizations, spatial weights files, distances under 1 (treated as 1
           for inverse distance, unchecked), FDR checked only where nothing is significant
-    - [ ] Next: Generate Spatial Weights Matrix, Collect Events, Multi-Distance Spatial Cluster
-          Analysis (Ripley's K), Cluster and Outlier Analysis (random permutations), OLS and GWR
+    - [x] Spatial weights (`geoforge-tools::swm`, `docs/formats/swm.md`): the `.swm` file format
+          (read/write, 32- and 64-bit IDs), Generate Spatial Weights Matrix (inverse/fixed distance
+          with exponent, threshold and least neighbors, K nearest, Delaunay = Voronoi clipped to
+          the hull, contiguity edges/corners with orders, space-time window, convert table;
+          bisquare/Gaussian/triangular/Epanechnikov kernels, field and border-length weights,
+          focal feature, row standardization, header and summary messages) and Convert Spatial
+          Weights Matrix to Table matched to Pro 3.7 on 70 files, most byte for byte (neighbor
+          order: ArcGIS's k-d tree built with MSVC `nth_element`; sums: NumPy pairwise).
+          Spatial Autocorrelation, Hot Spot Analysis and the new Cluster and Outlier Analysis
+          (Anselin Local Moran's I) take weights files and polygon contiguity; an empty distance
+          band is the default threshold, 0 relates every pair (`crates/geoforge-cli/tests/spatstat_weights.rs`).
+          Open: KNN tie order on grids, set order in Delaunay/contiguity rows (KNOWN_GAPS)
+    - [ ] Next: Collect Events, Multi-Distance Spatial Cluster Analysis (Ripley's K), OLS and GWR,
+          Generate Network Spatial Weights

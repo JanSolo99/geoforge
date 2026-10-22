@@ -13,6 +13,7 @@ pub mod pycalc;
 pub mod registry;
 pub mod spatstat;
 mod sql;
+pub mod swm;
 pub mod tables;
 mod zm;
 

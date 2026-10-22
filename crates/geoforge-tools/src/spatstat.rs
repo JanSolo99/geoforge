@@ -112,6 +112,7 @@ impl Case {
 /// One input feature as the statistics see it.
 struct Item {
     index: usize,
+    oid: i64,
     xy: [f64; 2],
     weight: f64,
     case: Case,
@@ -142,10 +143,7 @@ fn items(input: &dyn FeatureClass, opt: &Options) -> Result<Vec<Item>> {
     for (index, f) in input.features().enumerate() {
         let f = f?;
         let Some(g) = &f.geometry else { continue };
-        let Some(xy) = (match g.kind {
-            GeometryKind::Point => g.xy.first().copied(),
-            _ => geoforge_geometry::centroid(g)?,
-        }) else {
+        let Some(xy) = crate::swm::center(g)? else {
             continue;
         };
         let weight = match w {
@@ -163,6 +161,7 @@ fn items(input: &dyn FeatureClass, opt: &Options) -> Result<Vec<Item>> {
         });
         out.push(Item {
             index,
+            oid: f.oid,
             xy,
             weight,
             case,
@@ -692,6 +691,7 @@ pub fn linear_directional_mean(
 // Analyzing patterns and mapping clusters
 
 use crate::registry::Report;
+use crate::swm::Swm;
 
 /// A two-sided p-value of a standard normal z-score (ArcGIS's own comes from an approximation that
 /// is up to 2e-8 away from this exact one).
@@ -740,9 +740,13 @@ impl DistanceMethod {
         }
     }
 
-    fn between(self, a: [f64; 2], b: [f64; 2]) -> f64 {
+    pub(crate) fn between(self, a: [f64; 2], b: [f64; 2]) -> f64 {
         match self {
-            DistanceMethod::Euclidean => (a[0] - b[0]).hypot(a[1] - b[1]),
+            // As ArcGIS computes it (not `hypot`, which differs in the last bit).
+            DistanceMethod::Euclidean => {
+                let (dx, dy) = (a[0] - b[0], a[1] - b[1]);
+                (dx * dx + dy * dy).sqrt()
+            }
             DistanceMethod::Manhattan => (a[0] - b[0]).abs() + (a[1] - b[1]).abs(),
         }
     }
@@ -757,6 +761,12 @@ pub enum Concept {
     ZoneOfIndifference,
     /// The `k` nearest neighbors (8 for the autocorrelation tools).
     KNearestNeighbors(usize),
+    /// Polygons sharing a boundary segment.
+    ContiguityEdgesOnly,
+    /// Polygons sharing any boundary point.
+    ContiguityEdgesCorners,
+    /// The weights of a spatial weights matrix file.
+    FromFile,
 }
 
 impl Concept {
@@ -767,6 +777,9 @@ impl Concept {
             "FIXED_DISTANCE_BAND" => Concept::FixedDistanceBand,
             "ZONE_OF_INDIFFERENCE" => Concept::ZoneOfIndifference,
             "K_NEAREST_NEIGHBORS" => Concept::KNearestNeighbors(neighbors),
+            "CONTIGUITY_EDGES_ONLY" => Concept::ContiguityEdgesOnly,
+            "CONTIGUITY_EDGES_CORNERS" => Concept::ContiguityEdgesCorners,
+            "GET_SPATIAL_WEIGHTS_FROM_FILE" => Concept::FromFile,
             _ => return None,
         })
     }
@@ -781,6 +794,72 @@ struct Weights {
 const MAX_FEATURES: usize = 8000;
 
 impl Weights {
+    /// The weights of `items` (the features with values, in input order): from a spatial weights
+    /// matrix file (as stored; its unique ID field ties rows to features), polygon contiguity
+    /// (weight 1), or distances between the features' centers.
+    fn of(
+        input: &dyn FeatureClass,
+        items: &[Item],
+        concept: Concept,
+        method: DistanceMethod,
+        band: f64,
+        swm: Option<&Swm>,
+        raw: bool,
+    ) -> Result<Weights> {
+        match concept {
+            Concept::FromFile => {
+                let swm =
+                    swm.ok_or_else(|| err("ERROR 000735: Weights Matrix File: value is required"))?;
+                let uid = swm.unique_id();
+                let ids: Vec<i64> = if uid.eq_ignore_ascii_case(input.oid_field_name())
+                    || swm.get("MASTERISOID") == Some("True")
+                {
+                    items.iter().map(|i| i.oid).collect()
+                } else {
+                    let k = field_index(input, uid, true)?;
+                    items
+                        .iter()
+                        .map(|i| match i.attrs.get(k) {
+                            Some(Value::SmallInteger(v)) => *v as i64,
+                            Some(Value::Integer(v)) => *v as i64,
+                            Some(Value::BigInteger(v)) => *v,
+                            _ => i64::MIN,
+                        })
+                        .collect()
+                };
+                Ok(Weights {
+                    rows: crate::swm::rows_for(swm, &ids, raw),
+                })
+            }
+            Concept::ContiguityEdgesOnly | Concept::ContiguityEdgesCorners => {
+                if input.geometry_kind() != Some(GeometryKind::Polygon) {
+                    return Err(err(
+                        "ERROR 000842: polygon contiguity needs polygon features",
+                    ));
+                }
+                let geoms: Vec<&Geometry> = items.iter().map(|i| &i.geometry).collect();
+                let tol = crate::swm::xy_tolerance(input.spatial_reference_wkt());
+                let rows =
+                    crate::swm::contiguity(&geoms, concept == Concept::ContiguityEdgesCorners, tol)
+                        .into_iter()
+                        .map(|r| r.into_iter().map(|(j, _)| (j, 1.0)).collect())
+                        .collect();
+                Ok(Weights { rows })
+            }
+            _ => {
+                let pts: Vec<[f64; 2]> = items.iter().map(|i| i.xy).collect();
+                // No band given (negative): ArcGIS's default threshold. A band of 0 relates every
+                // pair for inverse distance.
+                let band = if band < 0.0 && !matches!(concept, Concept::KNearestNeighbors(_)) {
+                    default_threshold(items, method)
+                } else {
+                    band.max(0.0)
+                };
+                Weights::build(&pts, concept, method, band)
+            }
+        }
+    }
+
     /// `band` is the threshold distance (0 for none). Fixed bands and the zone of indifference need
     /// one; inverse distance with none relates every pair.
     fn build(
@@ -854,7 +933,7 @@ impl Weights {
                                     1.0 / (1.0 + (d - band))
                                 }
                             }
-                            Concept::KNearestNeighbors(_) => continue,
+                            _ => continue,
                         };
                         row.push((j, w));
                     }
@@ -967,6 +1046,9 @@ pub fn average_nearest_neighbor(
 
 /// Spatial Autocorrelation (Global Moran's I) of a numeric field: index, expected index, variance,
 /// z-score and p-value (variance under randomization).
+///
+/// With a weights file the weights are used as stored (the standardization parameter is ignored,
+/// as ArcGIS does).
 pub fn spatial_autocorrelation(
     input: &dyn FeatureClass,
     field: &str,
@@ -974,6 +1056,7 @@ pub fn spatial_autocorrelation(
     method: DistanceMethod,
     row_standardized: bool,
     band: f64,
+    swm: Option<&Swm>,
 ) -> Result<Report> {
     let (kept, x) = numeric_values(input, field, None)?;
     let n = x.len();
@@ -982,9 +1065,8 @@ pub fn spatial_autocorrelation(
             "ERROR 001095: at least four features with values are needed",
         ));
     }
-    let pts: Vec<[f64; 2]> = kept.iter().map(|i| i.xy).collect();
-    let mut w = Weights::build(&pts, concept, method, band)?;
-    if row_standardized {
+    let mut w = Weights::of(input, &kept, concept, method, band, swm, false)?;
+    if row_standardized && concept != Concept::FromFile {
         w.row_standardize();
     }
     let nf = n as f64;
@@ -1052,9 +1134,38 @@ fn fdr_critical(p: &[f64], alpha: f64) -> f64 {
     crit
 }
 
+/// The first field of the cluster tools' output: `SOURCE_ID` (the input's feature number), or the
+/// unique ID field of a weights file with its values.
+fn source_ids(
+    input: &dyn FeatureClass,
+    kept: &[Item],
+    concept: Concept,
+    swm: Option<&Swm>,
+) -> Result<(String, Vec<i64>)> {
+    if let (Concept::FromFile, Some(swm)) = (concept, swm) {
+        let uid = swm.unique_id();
+        if uid.eq_ignore_ascii_case(input.oid_field_name()) {
+            return Ok((uid.to_string(), kept.iter().map(|i| i.oid).collect()));
+        }
+        let k = field_index(input, uid, true)?;
+        let name = input.fields()[k].name.clone();
+        let ids = kept
+            .iter()
+            .map(|i| i.attrs.get(k).and_then(number).unwrap_or(0.0) as i64)
+            .collect();
+        return Ok((name, ids));
+    }
+    Ok((
+        "SOURCE_ID".to_string(),
+        kept.iter().map(|i| i.index as i64).collect(),
+    ))
+}
+
 /// Hot Spot Analysis (Getis-Ord Gi*): the features with `SOURCE_ID`, the field, `GiZScore`,
 /// `GiPValue`, `NNeighbors` (the feature counts itself) and `Gi_Bin` (+-3, 2, 1 at 99, 95 and 90 %
 /// confidence, or by the false discovery rate). Row standardization changes nothing for Gi*.
+///
+/// With a weights file the first field is the file's unique ID field instead of `SOURCE_ID`.
 pub fn hot_spot_analysis(
     input: &dyn FeatureClass,
     field: &str,
@@ -1062,6 +1173,7 @@ pub fn hot_spot_analysis(
     method: DistanceMethod,
     band: f64,
     fdr: bool,
+    swm: Option<&Swm>,
 ) -> Result<ToolOutput> {
     let (kept, x) = numeric_values(input, field, None)?;
     let n = x.len();
@@ -1070,8 +1182,7 @@ pub fn hot_spot_analysis(
             "ERROR 001095: at least three features with values are needed",
         ));
     }
-    let pts: Vec<[f64; 2]> = kept.iter().map(|i| i.xy).collect();
-    let w = Weights::build(&pts, concept, method, band)?;
+    let w = Weights::of(input, &kept, concept, method, band, swm, true)?;
     let nf = n as f64;
     let mean = x.iter().sum::<f64>() / nf;
     let s = (x.iter().map(|v| v * v).sum::<f64>() / nf - mean * mean).sqrt();
@@ -1133,8 +1244,9 @@ pub fn hot_spot_analysis(
         if z < 0.0 { -level } else { level }
     };
     let src = &input.fields()[field_index(input, field, true)?];
+    let (id_name, ids) = source_ids(input, &kept, concept, swm)?;
     let mut fields = vec![
-        Field::new("SOURCE_ID", FieldType::Integer),
+        Field::new(id_name, FieldType::Integer),
         double(&src.name),
         double("GiZScore"),
         double("GiPValue"),
@@ -1154,13 +1266,217 @@ pub fn hot_spot_analysis(
             oid: k as i64,
             geometry: Some(it.geometry.clone()),
             attributes: vec![
-                Value::Integer(it.index as i32),
+                Value::Integer(ids[k] as i32),
                 Value::Double(it.attrs.get(idx).and_then(number).unwrap_or(0.0)),
                 Value::Double(zs[k]),
                 Value::Double(ps[k]),
                 Value::Integer(counts[k] as i32),
                 Value::Integer(bin(zs[k], ps[k])),
             ],
+        })
+        .collect();
+    Ok(output(
+        input,
+        input.geometry_kind().unwrap_or(GeometryKind::Point),
+        fields,
+        features,
+    ))
+}
+
+/// The default distance threshold of a feature set: the largest nearest-neighbor distance times
+/// 1.0001, so every feature has a neighbor.
+fn default_threshold(items: &[Item], method: DistanceMethod) -> f64 {
+    let pts: Vec<[f64; 2]> = items.iter().map(|i| i.xy).collect();
+    let mut tree_max = 0.0f64;
+    for i in 0..pts.len() {
+        let d = (0..pts.len())
+            .filter(|j| *j != i)
+            .map(|j| method.between(pts[i], pts[j]))
+            .fold(f64::INFINITY, f64::min);
+        if d.is_finite() {
+            tree_max = tree_max.max(d);
+        }
+    }
+    tree_max * 1.0001
+}
+
+/// A small deterministic random generator (SplitMix64) for the permutation tests.
+struct Rng(u64);
+
+impl Rng {
+    fn next(&mut self) -> u64 {
+        self.0 = self.0.wrapping_add(0x9E37_79B9_7F4A_7C15);
+        let mut z = self.0;
+        z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+        z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+        z ^ (z >> 31)
+    }
+
+    fn below(&mut self, n: usize) -> usize {
+        (self.next() % n as u64) as usize
+    }
+}
+
+/// Cluster and Outlier Analysis (Anselin Local Moran's I): the features with `SOURCE_ID` (or the
+/// weights file's unique ID field), the field, `LMiIndex`, `LMiZScore`, `LMiPValue`, `COType`
+/// (`HH`, `LL`, `HL`, `LH` at 95 % confidence, `NN` without neighbors), `NNeighbors`,
+/// `ZTransform` and `SpatialLag`.
+///
+/// Matched to ArcGIS Pro 3.7 (`testdata/arcgis-reference/spatstat_weights.json`): features
+/// without neighbors are left out of the mean and variance; with `n` features left,
+/// `I = z_i / m2 * sum_j w_ij z_j` with `m2 = sum z^2 / (n-1)`, `E[I] = -w_i / (n-1)` and
+/// `V[I] = w_i2 (n - b2) / (n-1) + (w_i^2 - w_i2) (2 b2 - n) / ((n-1)(n-2)) - E[I]^2`,
+/// `b2 = (n-1) sum z^4 / (sum z^2)^2`. With permutations the p-value is the
+/// pseudo p-value of random permutations of the other values (ArcGIS's are random too, so they
+/// differ run to run).
+#[allow(clippy::too_many_arguments)]
+pub fn cluster_and_outlier_analysis(
+    input: &dyn FeatureClass,
+    field: &str,
+    concept: Concept,
+    method: DistanceMethod,
+    row_standardized: bool,
+    band: f64,
+    swm: Option<&Swm>,
+    fdr: bool,
+    permutations: usize,
+) -> Result<ToolOutput> {
+    let (kept, x) = numeric_values(input, field, None)?;
+    let n_all = x.len();
+    if n_all < 3 {
+        return Err(err(
+            "ERROR 001095: at least three features with values are needed",
+        ));
+    }
+    let mut w = Weights::of(input, &kept, concept, method, band, swm, false)?;
+    if row_standardized && concept != Concept::FromFile {
+        w.row_standardize();
+    }
+    let has = |i: usize| w.rows[i].iter().any(|x| x.1 != 0.0);
+    let active: Vec<usize> = (0..n_all).filter(|i| has(*i)).collect();
+    let n = active.len();
+    if n < 3 {
+        return Err(err("ERROR 000928: no features have neighbors"));
+    }
+    let nf = n as f64;
+    let mean = active.iter().map(|i| x[*i]).sum::<f64>() / nf;
+    let z: Vec<f64> = x.iter().map(|v| v - mean).collect();
+    let s2: f64 = active.iter().map(|i| z[*i] * z[*i]).sum();
+    if s2 == 0.0 {
+        return Err(err("ERROR 001096: every value is the same"));
+    }
+    let s4: f64 = active.iter().map(|i| z[*i].powi(4)).sum();
+    let m2 = s2 / (nf - 1.0);
+    let b2 = (nf - 1.0) * s4 / (s2 * s2);
+    let sd = (s2 / nf).sqrt();
+    let mut rng = Rng(0x0005_EED0_FA11_u64);
+    let mut out_rows: Vec<(f64, f64, f64, bool, f64, f64)> = Vec::with_capacity(n_all);
+    for i in 0..n_all {
+        if !has(i) {
+            out_rows.push((0.0, 0.0, 1.0, false, 0.0, 0.0));
+            continue;
+        }
+        let row = &w.rows[i];
+        let lag: f64 = row.iter().map(|&(j, wij)| wij * z[j]).sum();
+        let index = z[i] / m2 * lag;
+        let sw: f64 = row.iter().map(|x| x.1).sum();
+        let sw2: f64 = row.iter().map(|x| x.1 * x.1).sum();
+        let (zs, p) = if permutations == 0 {
+            let e = -sw / (nf - 1.0);
+            let v = sw2 * (nf - b2) / (nf - 1.0)
+                + (sw * sw - sw2) * (2.0 * b2 - nf) / ((nf - 1.0) * (nf - 2.0))
+                - e * e;
+            let zs = if v > 0.0 { (index - e) / v.sqrt() } else { 0.0 };
+            (zs, p_value(zs))
+        } else {
+            // Conditional permutation: the neighbors' values drawn from the other features.
+            let others: Vec<usize> = active.iter().copied().filter(|j| *j != i).collect();
+            let k = row.len().min(others.len());
+            let mut pool = others.clone();
+            let mut sims = Vec::with_capacity(permutations);
+            for _ in 0..permutations {
+                for t in 0..k {
+                    let r = t + rng.below(pool.len() - t);
+                    pool.swap(t, r);
+                }
+                let l: f64 = row
+                    .iter()
+                    .zip(&pool)
+                    .map(|(&(_, wij), &j)| wij * z[j])
+                    .sum();
+                sims.push(z[i] / m2 * l);
+            }
+            let pm = sims.iter().sum::<f64>() / permutations as f64;
+            let psd = (sims.iter().map(|v| (v - pm).powi(2)).sum::<f64>()
+                / (permutations as f64 - 1.0).max(1.0))
+            .sqrt();
+            let extreme = if index >= pm {
+                sims.iter().filter(|v| **v >= index).count()
+            } else {
+                sims.iter().filter(|v| **v <= index).count()
+            };
+            let zs = if psd > 0.0 { (index - pm) / psd } else { 0.0 };
+            (zs, (extreme + 1) as f64 / (permutations + 1) as f64)
+        };
+        let zt = z[i] / sd;
+        let slag: f64 = row.iter().map(|&(j, wij)| wij * z[j] / sd).sum();
+        out_rows.push((index, zs, p, true, zt, slag));
+    }
+    let ps: Vec<f64> = active.iter().map(|i| out_rows[*i].2).collect();
+    let crit = if fdr { fdr_critical(&ps, 0.05) } else { 0.05 };
+    let idx = field_index(input, field, true)?;
+    let src = &input.fields()[idx];
+    let (id_name, ids) = source_ids(input, &kept, concept, swm)?;
+    let int = |name: &str| {
+        let mut f = Field::new(name, FieldType::Integer);
+        f.precision = 10;
+        f
+    };
+    let mut cotype = Field::new("COType", FieldType::String);
+    cotype.length = 8;
+    let fields = vec![
+        int(&id_name),
+        double(&src.name),
+        double("LMiIndex"),
+        double("LMiZScore"),
+        double("LMiPValue"),
+        cotype,
+        int("NNeighbors"),
+        double("ZTransform"),
+        double("SpatialLag"),
+    ];
+    let features = kept
+        .iter()
+        .enumerate()
+        .map(|(k, it)| {
+            let (index, zs, p, has_nb, zt, slag) = out_rows[k];
+            let co = if !has_nb {
+                "NN"
+            } else if p <= crit && (!fdr || crit > 0.0) {
+                match (zs > 0.0, zt > 0.0) {
+                    (true, true) => "HH",
+                    (true, false) => "LL",
+                    (false, true) => "HL",
+                    (false, false) => "LH",
+                }
+            } else {
+                " "
+            };
+            Feature {
+                oid: k as i64,
+                geometry: Some(it.geometry.clone()),
+                attributes: vec![
+                    Value::Integer(ids[k] as i32),
+                    Value::Double(it.attrs.get(idx).and_then(number).unwrap_or(0.0)),
+                    Value::Double(index),
+                    Value::Double(zs),
+                    Value::Double(p),
+                    Value::String(co.to_string()),
+                    Value::Integer(w.rows[k].len() as i32),
+                    Value::Double(zt),
+                    Value::Double(slag),
+                ],
+            }
         })
         .collect();
     Ok(output(

@@ -12,6 +12,7 @@ geoforge-core.workspace = true
 geoforge-geometry.workspace = true
 geoforge-proj = { workspace = true, optional = true }
 rstar.workspace = true
+spade.workspace = true
 
 [features]
 default = ["proj"]
