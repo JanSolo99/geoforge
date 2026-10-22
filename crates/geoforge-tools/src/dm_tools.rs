@@ -3,7 +3,7 @@
 use geoforge_core::{Error, Result};
 
 use crate::registry::{Context, Kind, Outcome, Param, Runner, Tool, distance_in_units};
-use crate::{TableOutput, ToolOutput, dm_fields, dm_geometry};
+use crate::{TableOutput, ToolOutput, dm_data, dm_fields, dm_geometry};
 
 fn err(msg: impl Into<String>) -> Error {
     Error::Unsupported(msg.into())
@@ -99,6 +99,152 @@ fn list(text: &str) -> Vec<String> {
         .collect()
 }
 
+#[cfg(feature = "proj")]
+fn spatial_reference(spec: &str) -> Result<String> {
+    Ok(geoforge_proj::Crs::parse(spec)?.esri_wkt().to_owned())
+}
+
+#[cfg(not(feature = "proj"))]
+fn spatial_reference(_: &str) -> Result<String> {
+    Err(err("a coordinate system parameter needs the proj feature"))
+}
+
+fn bearing_distance_to_line(ctx: &dyn Context) -> Result<ToolOutput> {
+    #[cfg(not(feature = "proj"))]
+    {
+        let _ = ctx;
+        Err(err("Bearing Distance To Line needs the proj feature"))
+    }
+    #[cfg(feature = "proj")]
+    {
+        let fc = ctx.features("input")?;
+        let need = |n: &str| {
+            ctx.get(n)
+                .ok_or_else(|| err(format!("ERROR 000735: {n}: Value is required")))
+        };
+        let fields = [
+            need("x_field")?,
+            need("y_field")?,
+            need("distance_field")?,
+            need("bearing_field")?,
+        ];
+        let distance_unit =
+            dm_geometry::distance_unit_meters(&get(ctx, "distance_units", "METERS"))
+                .ok_or_else(|| err("ERROR 000067: unknown distance unit"))?;
+        let bearing_unit = dm_geometry::bearing_unit_degrees(&get(ctx, "bearing_units", "DEGREES"))
+            .ok_or_else(|| err("ERROR 000067: unknown bearing unit"))?;
+        let crs = match ctx
+            .get("spatial_reference")
+            .or_else(|| fc.spatial_reference_wkt().map(str::to_owned))
+        {
+            Some(spec) => geoforge_proj::Crs::parse(&spec)?,
+            None => return Err(err("ERROR 000735: Spatial Reference: Value is required")),
+        };
+        let attributes = get(ctx, "attributes", "NO_ATTRIBUTES").eq_ignore_ascii_case("ATTRIBUTES");
+        dm_geometry::bearing_distance_to_line(
+            fc.as_ref(),
+            [&fields[0], &fields[1], &fields[2], &fields[3]],
+            distance_unit,
+            bearing_unit,
+            ctx.get("id_field").as_deref(),
+            &crs,
+            attributes,
+        )
+    }
+}
+
+fn create_feature_class(ctx: &dyn Context) -> Result<ToolOutput> {
+    let template = ctx
+        .get("template")
+        .map(|_| ctx.features("template"))
+        .transpose()?;
+    let awareness = |n: &str| {
+        dm_data::Awareness::parse(&get(ctx, n, "DISABLED"))
+            .ok_or_else(|| err(format!("ERROR 000067: unknown value for {n}")))
+    };
+    let wkt = ctx
+        .get("spatial_reference")
+        .map(|s| spatial_reference(&s))
+        .transpose()?;
+    dm_data::create_feature_class(
+        &get(ctx, "geometry_type", "POINT"),
+        template.as_deref(),
+        awareness("has_m")?,
+        awareness("has_z")?,
+        wkt,
+    )
+}
+
+fn create_table(ctx: &dyn Context) -> Result<Outcome> {
+    let template = ctx
+        .get("template")
+        .map(|_| ctx.features("template"))
+        .transpose()?;
+    Ok(Outcome::Table(dm_data::create_table(template.as_deref())))
+}
+
+/// WKT text with every number cut to 15 significant digits, as ArcGIS writes a coordinate system
+/// it has read from text (0.017453292519943295 becomes 0.0174532925199433).
+fn round_wkt_numbers(wkt: &str) -> String {
+    let mut out = String::with_capacity(wkt.len());
+    let chars: Vec<char> = wkt.chars().collect();
+    let mut i = 0;
+    while i < chars.len() {
+        let c = chars[i];
+        let starts_number = c.is_ascii_digit()
+            && (i == 0 || !chars[i - 1].is_alphanumeric() && chars[i - 1] != '_');
+        if !starts_number {
+            out.push(c);
+            i += 1;
+            continue;
+        }
+        let mut j = i;
+        while j < chars.len()
+            && (chars[j].is_ascii_digit() || matches!(chars[j], '.' | 'e' | 'E' | '-'))
+        {
+            j += 1;
+        }
+        let token: String = chars[i..j].iter().collect();
+        let digits = token.chars().filter(char::is_ascii_digit).count();
+        match token.parse::<f64>() {
+            Ok(v) if digits > 15 => {
+                let mut t = format!("{v:.14e}");
+                // Back to positional notation with up to 15 significant digits.
+                if let Ok(back) = t.parse::<f64>() {
+                    t = format!("{back}");
+                }
+                out.push_str(&t);
+            }
+            _ => out.push_str(&token),
+        }
+        i = j;
+    }
+    out
+}
+
+fn define_projection(ctx: &dyn Context) -> Result<ToolOutput> {
+    let fc = ctx.features("input")?;
+    let spec = ctx
+        .get("coordinate_system")
+        .ok_or_else(|| err("ERROR 000735: Coordinate System: Value is required"))?;
+    // A code gives ArcGIS's own text; a file or WKT is read and written again with 15 digits.
+    let wkt = if spec.trim().parse::<u32>().is_ok() {
+        spatial_reference(&spec)?
+    } else {
+        round_wkt_numbers(&spatial_reference(&spec)?)
+    };
+    dm_data::copy_features(fc.as_ref(), Some(wkt))
+}
+
+fn copy(ctx: &dyn Context) -> Result<Outcome> {
+    let fc = ctx.features("input")?;
+    if fc.geometry_kind().is_some() {
+        dm_data::copy_features(fc.as_ref(), None).map(Outcome::Features)
+    } else {
+        dm_data::copy_table(fc.as_ref()).map(Outcome::Table)
+    }
+}
+
 fn feature_envelope_to_polygon(ctx: &dyn Context) -> Result<ToolOutput> {
     let fc = ctx.features("input")?;
     let multipart = get(ctx, "single_envelope", "SINGLEPART").eq_ignore_ascii_case("MULTIPART");
@@ -184,6 +330,20 @@ fn calculate_fields(ctx: &dyn Context) -> Result<ToolOutput> {
         .collect::<Result<_>>()?;
     let code = ctx.get("code_block").unwrap_or_default();
     dm_fields::calculate_fields(fc.as_ref(), &calculations, &code)
+}
+
+fn calculate_end_time(ctx: &dyn Context) -> Result<ToolOutput> {
+    let fc = ctx.features("input")?;
+    let need = |n: &str| {
+        ctx.get(n)
+            .ok_or_else(|| err(format!("ERROR 000735: {n}: Value is required")))
+    };
+    dm_fields::calculate_end_time(
+        fc.as_ref(),
+        &need("start_field")?,
+        &need("end_field")?,
+        &list(&get(ctx, "fields", "")),
+    )
 }
 
 fn field_list(ctx: &dyn Context) -> Result<Vec<(String, Option<String>)>> {
@@ -603,4 +763,177 @@ pub const PIVOT_TABLE: Tool = Tool {
     output_suffix: "Pivot",
     measures: false,
     run: Runner::Dynamic(pivot_table),
+};
+
+pub const BEARING_DISTANCE_TO_LINE: Tool = Tool {
+    id: "bearing_distance_to_line",
+    name: "Bearing Distance To Line",
+    toolbox: "Data Management › Features",
+    summary: "Lines from a point along a bearing for a distance, from a table (ArcGIS Pro Bearing Distance To Line).",
+    params: &[
+        features("input", "Input Table"),
+        field("x_field", "X Field", true),
+        field("y_field", "Y Field", true),
+        field("distance_field", "Distance Field", true),
+        choice(
+            "distance_units",
+            "Distance Units",
+            &[
+                "METERS",
+                "KILOMETERS",
+                "MILES",
+                "NAUTICAL_MILES",
+                "FEET",
+                "US_SURVEY_FEET",
+                "YARDS",
+            ],
+            "METERS",
+        ),
+        field("bearing_field", "Bearing Field", true),
+        choice(
+            "bearing_units",
+            "Bearing Units",
+            &["DEGREES", "MILS", "RADS", "GRADS"],
+            "DEGREES",
+        ),
+        choice(
+            "line_type",
+            "Line Type",
+            &["GEODESIC", "GREAT_CIRCLE", "RHUMB_LINE", "NORMAL_SECTION"],
+            "GEODESIC",
+        ),
+        field("id_field", "ID Field", false),
+        text(
+            "spatial_reference",
+            "Spatial Reference",
+            false,
+            "",
+            "A factory code, a .prj file or WKT.",
+        ),
+        choice(
+            "attributes",
+            "Preserve attributes",
+            &["NO_ATTRIBUTES", "ATTRIBUTES"],
+            "NO_ATTRIBUTES",
+        ),
+    ],
+    output_suffix: "Lines",
+    measures: false,
+    run: Runner::Features(bearing_distance_to_line),
+};
+
+pub const CREATE_FEATURE_CLASS: Tool = Tool {
+    id: "create_feature_class",
+    name: "Create Feature Class",
+    toolbox: "Data Management › Feature Class",
+    summary: "An empty feature class with a geometry type, fields and coordinate system (ArcGIS Pro Create Feature Class).",
+    params: &[
+        choice(
+            "geometry_type",
+            "Geometry Type",
+            &["POINT", "MULTIPOINT", "POLYGON", "POLYLINE", "MULTIPATCH"],
+            "POINT",
+        ),
+        Param {
+            name: "template",
+            label: "Template Feature Class",
+            kind: Kind::Features,
+            required: false,
+            default: "",
+            help: "Its attribute fields are taken over.",
+        },
+        choice(
+            "has_m",
+            "Has M",
+            &["DISABLED", "ENABLED", "SAME_AS_TEMPLATE"],
+            "DISABLED",
+        ),
+        choice(
+            "has_z",
+            "Has Z",
+            &["DISABLED", "ENABLED", "SAME_AS_TEMPLATE"],
+            "DISABLED",
+        ),
+        text(
+            "spatial_reference",
+            "Spatial Reference",
+            false,
+            "",
+            "A factory code, a .prj file or WKT.",
+        ),
+    ],
+    output_suffix: "New",
+    measures: false,
+    run: Runner::Features(create_feature_class),
+};
+
+pub const CREATE_TABLE: Tool = Tool {
+    id: "create_table",
+    name: "Create Table",
+    toolbox: "Data Management › Table",
+    summary: "An empty table, with the fields of a template (ArcGIS Pro Create Table).",
+    params: &[Param {
+        name: "template",
+        label: "Template Table",
+        kind: Kind::Features,
+        required: false,
+        default: "",
+        help: "Its attribute fields are taken over.",
+    }],
+    output_suffix: "Table",
+    measures: false,
+    run: Runner::Dynamic(create_table),
+};
+
+pub const DEFINE_PROJECTION: Tool = Tool {
+    id: "define_projection",
+    name: "Define Projection",
+    toolbox: "Data Management › Projections and Transformations",
+    summary: "A copy of the input with the coordinate system set, without moving anything (ArcGIS Pro Define Projection).",
+    params: &[
+        features("input", "Input Dataset"),
+        text(
+            "coordinate_system",
+            "Coordinate System",
+            true,
+            "",
+            "A factory code, a .prj file or WKT.",
+        ),
+    ],
+    output_suffix: "Defined",
+    measures: false,
+    run: Runner::Features(define_projection),
+};
+
+pub const COPY: Tool = Tool {
+    id: "copy",
+    name: "Copy",
+    toolbox: "Data Management › General",
+    summary: "Copies a feature class or table as it is (ArcGIS Pro Copy).",
+    params: &[features("input", "Input Dataset")],
+    output_suffix: "Copy",
+    measures: false,
+    run: Runner::Dynamic(copy),
+};
+
+pub const CALCULATE_END_TIME: Tool = Tool {
+    id: "calculate_end_time",
+    name: "Calculate End Time",
+    toolbox: "Data Management › Fields › Date and Time",
+    summary: "Fills an end time field from the start time of the next row (ArcGIS Pro Calculate End Time).",
+    params: &[
+        features("input", "Input Table"),
+        field("start_field", "Start Time Field", true),
+        field("end_field", "End Time Field", true),
+        text(
+            "fields",
+            "Fields",
+            false,
+            "",
+            "Fields that group the rows, separated by semicolons.",
+        ),
+    ],
+    output_suffix: "EndTime",
+    measures: false,
+    run: Runner::Features(calculate_end_time),
 };

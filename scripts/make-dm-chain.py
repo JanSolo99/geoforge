@@ -49,3 +49,22 @@ shapes = [
 with arcpy.da.InsertCursor(polys, ['SHAPE@', 'POLY_ID']) as c:
     for i, rings in shapes:
         c.insertRow([arcpy.Polygon(arcpy.Array([arcpy.Array([arcpy.Point(*p) for p in r]) for r in rings])), i])
+
+# Points without a coordinate system, for Define Projection.
+nop = arcpy.management.CreateFeatureclass(P(out), 'noprj.shp', 'POINT')
+arcpy.management.AddField(nop, 'PT_ID', 'LONG')
+with arcpy.da.InsertCursor(nop, ['SHAPE@XY', 'PT_ID']) as c:
+    for i, xy in enumerate([(500050, 5000000), (500100, 5000100), (500200, 5000200)], 1):
+        c.insertRow([xy, i])
+
+# Points with a start and an end date, for Calculate End Time.
+import datetime as dt
+ev = arcpy.management.CreateFeatureclass(P(out), 'events.shp', 'POINT', spatial_reference=arcpy.SpatialReference(32632))
+for n, t, l in [('NAME', 'TEXT', 10), ('STARTD', 'DATE', None), ('ENDD', 'DATE', None), ('GRP', 'LONG', None)]:
+    arcpy.management.AddField(ev, n, t, field_length=l) if l else arcpy.management.AddField(ev, n, t)
+rows = [('a', dt.datetime(2020, 1, 1), 1), ('a', dt.datetime(2020, 3, 1), 1), ('b', dt.datetime(2020, 2, 1), 2),
+        ('a', dt.datetime(2020, 2, 15), 1), ('b', dt.datetime(2020, 5, 1), 2), ('c', dt.datetime(2021, 1, 1), 3),
+        ('a', dt.datetime(2020, 2, 15), 2), ('b', None, 2)]
+with arcpy.da.InsertCursor(ev, ['SHAPE@XY', 'NAME', 'STARTD', 'GRP']) as c:
+    for i, (n, d, g) in enumerate(rows):
+        c.insertRow([(500000 + i * 10, 5000000), n, d, g])

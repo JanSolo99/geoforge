@@ -637,3 +637,161 @@ pub fn xy_to_line(
         messages,
     })
 }
+
+/// Metres in a distance unit of Bearing Distance To Line.
+pub fn distance_unit_meters(unit: &str) -> Option<f64> {
+    Some(match unit.to_ascii_uppercase().as_str() {
+        "METERS" => 1.0,
+        "KILOMETERS" => 1000.0,
+        "MILES" => 5280.0 * 1200.0 / 3937.0,
+        "NAUTICAL_MILES" => 1852.0,
+        "FEET" => 0.3048,
+        "US_SURVEY_FEET" => 1200.0 / 3937.0,
+        "YARDS" => 0.9144,
+        _ => return None,
+    })
+}
+
+/// Degrees in one bearing unit of Bearing Distance To Line.
+pub fn bearing_unit_degrees(unit: &str) -> Option<f64> {
+    Some(match unit.to_ascii_uppercase().as_str() {
+        "DEGREES" => 1.0,
+        "MILS" => 360.0 / 6400.0,
+        "RADS" => 180.0 / std::f64::consts::PI,
+        "GRADS" => 0.9,
+        _ => return None,
+    })
+}
+
+/// The fields and values Bearing Distance To Line and XY To Line keep (`attributes`: all fields
+/// and `ORIG_FID`; else the coordinate fields and the ID field).
+struct Kept {
+    fields: Vec<Field>,
+    indexes: Vec<usize>,
+}
+
+fn kept_fields(
+    input: &dyn FeatureClass,
+    coordinates: &[usize],
+    id: Option<usize>,
+    attributes: bool,
+) -> Kept {
+    let indexes: Vec<usize> = if attributes {
+        (0..input.fields().len())
+            .filter(|&i| {
+                !matches!(
+                    input.fields()[i].field_type,
+                    FieldType::ObjectId | FieldType::Geometry
+                )
+            })
+            .collect()
+    } else {
+        let mut k = coordinates.to_vec();
+        k.extend(id.filter(|i| !coordinates.contains(i)));
+        k
+    };
+    let mut fields: Vec<Field> = indexes.iter().map(|&i| input.fields()[i].clone()).collect();
+    if attributes {
+        fields.push(Field::new("ORIG_FID", FieldType::Integer));
+    }
+    Kept { fields, indexes }
+}
+
+/// `arcpy.management.BearingDistanceToLine(in_table, out_featureclass, x_field, y_field,
+/// distance_field, distance_units, bearing_field, bearing_units, line_type, id_field,
+/// spatial_reference, attributes)`: the line from each (x, y) along the WGS 84 geodesic of the
+/// bearing and distance (clockwise from north), whatever the line type; as XY To Line, only
+/// straight lines (short ones) are drawn.
+#[cfg(feature = "proj")]
+#[allow(clippy::too_many_arguments)]
+pub fn bearing_distance_to_line(
+    input: &dyn FeatureClass,
+    fields: [&str; 4],
+    distance_unit: f64,
+    bearing_unit: f64,
+    id_field: Option<&str>,
+    crs: &geoforge_proj::Crs,
+    attributes: bool,
+) -> Result<ToolOutput> {
+    let find = |name: &str| {
+        input
+            .fields()
+            .iter()
+            .position(|f| f.name.eq_ignore_ascii_case(name))
+            .ok_or_else(|| {
+                err(format!(
+                    "ERROR 000728: Field {name} does not exist within table"
+                ))
+            })
+    };
+    let idx: Vec<usize> = fields.iter().map(|n| find(n)).collect::<Result<_>>()?;
+    let id = id_field.map(find).transpose()?;
+    let kept = kept_fields(input, &idx, id, attributes);
+    let wgs84 = geoforge_proj::Crs::parse("4326")?;
+    let (to_geographic, from_geographic) = if crs.is_geographic() {
+        (None, None)
+    } else {
+        (
+            Some(geoforge_proj::Transform::new(crs, &wgs84)?),
+            Some(geoforge_proj::Transform::new(&wgs84, crs)?),
+        )
+    };
+    let mut features = Vec::new();
+    let mut messages = Vec::new();
+    for (row, f) in input.features().enumerate() {
+        let f = f?;
+        let oid = if f.oid >= 0 { f.oid } else { row as i64 };
+        let c: Option<Vec<f64>> = idx
+            .iter()
+            .map(|&i| f.attributes.get(i).and_then(number))
+            .collect();
+        let Some(c) = c.filter(|c| c[2] > 0.0) else {
+            messages.push(format!(
+                "WARNING 000072: Cannot process feature with OID {oid}"
+            ));
+            continue;
+        };
+        let mut start = [[c[0], c[1]]];
+        if let Some(t) = &to_geographic {
+            t.apply(&mut start)?;
+        }
+        let mut end = [geoforge_geometry::geodesic::direct(
+            start[0],
+            c[3] * bearing_unit,
+            c[2] * distance_unit,
+        )];
+        if let Some(t) = &from_geographic {
+            t.apply(&mut end)?;
+        }
+        let mut values: Vec<Value> = kept
+            .indexes
+            .iter()
+            .map(|&i| f.attributes[i].clone())
+            .collect();
+        if attributes {
+            values.push(Value::Integer(oid as i32));
+        }
+        features.push(Feature {
+            oid: features.len() as i64,
+            geometry: Some(Geometry {
+                kind: GeometryKind::Polyline,
+                parts: vec![0],
+                part_types: None,
+                xy: vec![[c[0], c[1]], end[0]],
+                z: None,
+                m: None,
+                curves: Vec::new(),
+            }),
+            attributes: values,
+        });
+    }
+    Ok(ToolOutput {
+        kind: GeometryKind::Polyline,
+        has_z: false,
+        has_m: false,
+        fields: kept.fields,
+        spatial_reference_wkt: Some(crs.esri_wkt().to_owned()),
+        features,
+        messages,
+    })
+}

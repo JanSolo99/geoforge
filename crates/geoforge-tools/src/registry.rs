@@ -1306,4 +1306,10 @@ pub static TOOLS: &[Tool] = &[
     crate::dm_tools::RECLASSIFY_FIELD,
     crate::dm_tools::TRANSPOSE_FIELDS,
     crate::dm_tools::PIVOT_TABLE,
+    crate::dm_tools::BEARING_DISTANCE_TO_LINE,
+    crate::dm_tools::CREATE_FEATURE_CLASS,
+    crate::dm_tools::CREATE_TABLE,
+    crate::dm_tools::DEFINE_PROJECTION,
+    crate::dm_tools::COPY,
+    crate::dm_tools::CALCULATE_END_TIME,
 ];

@@ -718,6 +718,37 @@ CASES = {
     "pivot_sales": ("management.PivotTable", [DM / "sales.dbf", "REGION", "PRODUCT", "AMOUNT"], []),
     "pivot_year": ("management.PivotTable", [DM / "sales.dbf", "REGION;YEAR", "PRODUCT", "UNITS"], []),
     "pivot_text": ("management.PivotTable", [DM / "sales.dbf", "PRODUCT", "YEAR", "AMOUNT"], []),
+    "bdl_attr": ("management.BearingDistanceToLine", [DM / "segments.dbf"], ["X1", "Y1", "DIST", "METERS", "BEARING", "DEGREES", "GEODESIC", "SEG_ID", DM / "chain.prj", "ATTRIBUTES"]),
+    "bdl_plain": ("management.BearingDistanceToLine", [DM / "segments.dbf"], ["X1", "Y1", "DIST", "METERS", "BEARING", "DEGREES", "GEODESIC", "", DM / "chain.prj", "NO_ATTRIBUTES"]),
+    "bdl_id": ("management.BearingDistanceToLine", [DM / "segments.dbf"], ["X1", "Y1", "DIST", "METERS", "BEARING", "DEGREES", "GEODESIC", "SEG_ID", DM / "chain.prj", "NO_ATTRIBUTES"]),
+    "bdl_km": ("management.BearingDistanceToLine", [DM / "segments.dbf"], ["X1", "Y1", "D_KM", "KILOMETERS", "BEARING", "DEGREES", "GEODESIC", "SEG_ID", DM / "chain.prj", "ATTRIBUTES"]),
+    "bdl_mi": ("management.BearingDistanceToLine", [DM / "segments.dbf"], ["X1", "Y1", "D_MI", "MILES", "BEARING", "DEGREES", "GEODESIC", "SEG_ID", DM / "chain.prj", "ATTRIBUTES"]),
+    "bdl_nm": ("management.BearingDistanceToLine", [DM / "segments.dbf"], ["X1", "Y1", "D_NM", "NAUTICAL_MILES", "BEARING", "DEGREES", "GEODESIC", "SEG_ID", DM / "chain.prj", "ATTRIBUTES"]),
+    "bdl_ft": ("management.BearingDistanceToLine", [DM / "segments.dbf"], ["X1", "Y1", "D_FT", "FEET", "BEARING", "DEGREES", "GEODESIC", "SEG_ID", DM / "chain.prj", "ATTRIBUTES"]),
+    "bdl_usft": ("management.BearingDistanceToLine", [DM / "segments.dbf"], ["X1", "Y1", "D_USFT", "US_SURVEY_FEET", "BEARING", "DEGREES", "GEODESIC", "SEG_ID", DM / "chain.prj", "ATTRIBUTES"]),
+    "bdl_mils": ("management.BearingDistanceToLine", [DM / "segments.dbf"], ["X1", "Y1", "DIST", "METERS", "B_MIL", "MILS", "GEODESIC", "SEG_ID", DM / "chain.prj", "ATTRIBUTES"]),
+    "bdl_rads": ("management.BearingDistanceToLine", [DM / "segments.dbf"], ["X1", "Y1", "DIST", "METERS", "B_RAD", "RADS", "GEODESIC", "SEG_ID", DM / "chain.prj", "ATTRIBUTES"]),
+    "bdl_grads": ("management.BearingDistanceToLine", [DM / "segments.dbf"], ["X1", "Y1", "DIST", "METERS", "B_GRAD", "GRADS", "GEODESIC", "SEG_ID", DM / "chain.prj", "ATTRIBUTES"]),
+    "cfc_polygon": ("management.CreateFeatureclass", ["POLYGON", "#", "DISABLED", "DISABLED", DM / "chain.prj"], []),
+    "cfc_point_zm": ("management.CreateFeatureclass", ["POINT", "#", "ENABLED", "ENABLED", DM / "chain.prj"], []),
+    "cfc_polyline_m": ("management.CreateFeatureclass", ["POLYLINE", "#", "ENABLED", "DISABLED", DM / "chain.prj"], []),
+    "cfc_polyline_nosr": ("management.CreateFeatureclass", ["POLYLINE"], []),
+    "cfc_multipoint": ("management.CreateFeatureclass", ["MULTIPOINT", "#", "DISABLED", "ENABLED", DM / "chain.prj"], []),
+    "cfc_template": ("management.CreateFeatureclass", ["POLYGON", PARCELS, "DISABLED", "DISABLED", DM / "chain.prj"], []),
+    "cfc_template_same": ("management.CreateFeatureclass", ["POLYLINE", DATA / "roads_zm.shp", "SAME_AS_TEMPLATE", "SAME_AS_TEMPLATE"], []),
+    "ct_default": ("management.CreateTable", [], []),
+    "ct_template": ("management.CreateTable", [PARCELS], []),
+    "defproj_prj": ("management.DefineProjection", [DM / "noprj.shp", DM / "chain.prj"], []),
+    "defproj_wgs84": ("management.DefineProjection", [DM / "noprj.shp", DATA / "wells_wgs84.prj"], []),
+    "defproj_replace": ("management.DefineProjection", [PARCELS, DATA / "wells_wgs84.prj"], []),
+    "copy_parcels": ("management.Copy", [PARCELS], []),
+    "copy_roads_zm": ("management.Copy", [DATA / "roads_zm.shp"], []),
+    "copy_wells": ("management.Copy", [DATA / "wells.shp"], []),
+    "copy_sales": ("management.Copy", [DM / "sales.dbf"], []),
+    "cet_plain": ("management.CalculateEndTime", [DM / "events.shp", "STARTD", "ENDD"], []),
+    "cet_name": ("management.CalculateEndTime", [DM / "events.shp", "STARTD", "ENDD"], ["NAME"]),
+    "cet_name_grp": ("management.CalculateEndTime", [DM / "events.shp", "STARTD", "ENDD"], ["NAME;GRP"]),
+    "cet_grp": ("management.CalculateEndTime", [DM / "events.shp", "STARTD", "ENDD"], ["GRP"]),
 }
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
 RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
@@ -733,11 +764,13 @@ WORKSPACE_OUT = {"analysis.Split"}
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable"}
 # Tools whose output is a table, written as <name>.dbf.
 TABLE_OUT = {"gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
-             "management.TransposeFields", "management.PivotTable"}
+             "management.TransposeFields", "management.PivotTable", "management.CreateTable"}
+# Tools that take the output folder and name rather than a path.
+CREATE_TOOLS = {"management.CreateFeatureclass", "management.CreateTable"}
 
 # In-place tools: the index of the input they edit (run on a copy written as the output).
 IN_PLACE = {"management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.AddGeometryAttributes": 0,
-            "management.CalculateFields": 0, "management.StandardizeField": 0, "management.TransformField": 0, "management.ReclassifyField": 0}
+            "management.CalculateFields": 0, "management.StandardizeField": 0, "management.TransformField": 0, "management.ReclassifyField": 0, "management.DefineProjection": 0, "management.CalculateEndTime": 0}
 
 # Select Layer By Location cases, saved with Copy Features:
 # name: (in_layer, overlap_type, select_features, search_distance, invert)
@@ -804,6 +837,8 @@ def main():
             w.call("run_tool", tool="management.CopyFeatures", args=[str(before[k]), str(out)],
                    env={"overwriteOutput": True})
             args = [str(out) if i == k else (a if isinstance(a, (list, int, float)) else str(a)) for i, a in enumerate(before)] + after
+        elif tool in CREATE_TOOLS:
+            args = [str(out.parent), out.name] + [str(a) if isinstance(a, Path) else a for a in before + after]
         elif tool == "conversion.FeatureClassToFeatureClass":
             # (in_features, out_path, out_name, where_clause, field_mapping)
             args = [str(before[0]), str(out.parent), out.stem] + after

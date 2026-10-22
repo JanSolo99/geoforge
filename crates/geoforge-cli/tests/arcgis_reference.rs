@@ -4417,6 +4417,21 @@ fn tools_match_arcgis_output() {
                 &info["fields"],
             );
         }
+        // Empty outputs (Create Feature Class): the shape type in the header, Z and M included.
+        if case.starts_with("cfc_") && diffs.is_empty() {
+            let code = |p: &Path| {
+                std::fs::read(p)
+                    .ok()
+                    .and_then(|b| b.get(32..36).map(<[u8]>::to_vec))
+            };
+            if code(&out) != code(&reference.join(format!("{case}.shp"))) {
+                diffs.push(format!(
+                    "shape type code: ours {:?}, ArcGIS {:?}",
+                    code(&out),
+                    code(&reference.join(format!("{case}.shp")))
+                ));
+            }
+        }
         // Known gaps: whole cases, or single features, that still differ.
         if let Some((_, features)) = KNOWN_FEATURE_DIFFERENCES.iter().find(|k| k.0 == case) {
             diffs.retain(|d| {

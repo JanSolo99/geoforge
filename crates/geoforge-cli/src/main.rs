@@ -2171,7 +2171,8 @@ fn main() -> ExitCode {
                 registry::Outcome::Features(out) => {
                     let source = registry::Context::get(&ctx, "input")
                         .and_then(|i| source_gdb(Path::new(&i)));
-                    write_output(out, Path::new(&output), source.as_deref())
+                    let own_wkt = !matches!(spec.id, "copy" | "define_projection");
+                    write_output_as(out, Path::new(&output), source.as_deref(), own_wkt)
                 }
                 registry::Outcome::Table(t) => write_table(&t, Path::new(&output)),
                 registry::Outcome::Report(r) => {
@@ -4214,14 +4215,27 @@ fn geodatabase_field_names(fields: &[Field]) -> Vec<String> {
 
 /// Writes a tool's output to a shapefile or `path.gdb/name`, applying the target
 /// format's ArcGIS rules.
-fn write_output(mut out: ToolOutput, output: &Path, source_gdb: Option<&Path>) -> Result<()> {
+fn write_output(out: ToolOutput, output: &Path, source_gdb: Option<&Path>) -> Result<()> {
+    write_output_as(out, output, source_gdb, true)
+}
+
+/// `write_output`; `own_wkt` false keeps the coordinate system's text as it is (Copy and Define
+/// Projection, where ArcGIS copies the text it was given).
+fn write_output_as(
+    mut out: ToolOutput,
+    output: &Path,
+    source_gdb: Option<&Path>,
+    own_wkt: bool,
+) -> Result<()> {
     for m in &out.messages {
         eprintln!("{m}");
     }
     // ArcGIS writes its own WKT of the coordinate system, not the input's text.
-    out.spatial_reference_wkt = out
-        .spatial_reference_wkt
-        .map(|w| geoforge_proj::Crs::from_wkt(&w).map_or(w, |crs| crs.arcgis_wkt()));
+    if own_wkt {
+        out.spatial_reference_wkt = out
+            .spatial_reference_wkt
+            .map(|w| geoforge_proj::Crs::from_wkt(&w).map_or(w, |crs| crs.arcgis_wkt()));
+    }
     if let Some((gpkg, item)) = geopackage_item(output) {
         let name = item
             .ok_or_else(|| Error::Unsupported("name the output table inside the .gpkg".into()))?;

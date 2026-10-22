@@ -577,6 +577,12 @@ pub fn nearest_geodesic(a: &Geometry, b: &Geometry) -> Result<Option<crate::Near
     Ok(best)
 }
 
+/// The point `distance` metres from `from` (longitude, latitude) along the WGS 84 geodesic with
+/// azimuth `azimuth_degrees` (clockwise from north).
+pub fn direct(from: [f64; 2], azimuth_degrees: f64, distance: f64) -> [f64; 2] {
+    Earth::wgs84().direct(from, azimuth_degrees, distance)
+}
+
 /// The azimuth in degrees (clockwise from north, -180..180] at `from` of the geodesic to `to`; 0
 /// when they coincide.
 pub fn azimuth(from: [f64; 2], to: [f64; 2]) -> f64 {

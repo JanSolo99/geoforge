@@ -679,3 +679,67 @@ pub fn pivot_table(
         rows: out_rows,
     })
 }
+
+fn time_key(v: &Value) -> Option<chrono::NaiveDateTime> {
+    match v {
+        Value::Date(d) => Some(*d),
+        Value::DateOnly(d) => d.and_hms_opt(0, 0, 0),
+        _ => None,
+    }
+}
+
+/// `arcpy.management.CalculateEndTime(in_table, start_field, end_field, fields)`: a row ends
+/// where the next row (by start time, then input order, among those with equal `fields`) starts;
+/// the last row of a group ends where it starts. A row without a start sorts first.
+pub fn calculate_end_time(
+    input: &dyn FeatureClass,
+    start_field: &str,
+    end_field: &str,
+    group_fields: &[String],
+) -> Result<ToolOutput> {
+    let mut out = copy_of(input)?;
+    let find = |out: &ToolOutput, n: &str| {
+        out.fields
+            .iter()
+            .position(|f| f.name.eq_ignore_ascii_case(n))
+            .ok_or_else(|| {
+                err(format!(
+                    "ERROR 000728: Field {n} does not exist within table"
+                ))
+            })
+    };
+    let (start, end) = (find(&out, start_field)?, find(&out, end_field)?);
+    let groups: Vec<usize> = group_fields
+        .iter()
+        .map(|n| find(&out, n))
+        .collect::<Result<_>>()?;
+    let key = |f: &geoforge_core::Feature| -> Vec<String> {
+        groups
+            .iter()
+            .map(|&g| value_text(&f.attributes[g]))
+            .collect()
+    };
+    let mut order: Vec<usize> = (0..out.features.len()).collect();
+    order.sort_by(|&a, &b| {
+        let (fa, fb) = (&out.features[a], &out.features[b]);
+        key(fa)
+            .cmp(&key(fb))
+            .then(time_key(&fa.attributes[start]).cmp(&time_key(&fb.attributes[start])))
+            .then(a.cmp(&b))
+    });
+    let mut ends: Vec<(usize, Value)> = Vec::new();
+    for (k, &i) in order.iter().enumerate() {
+        let next = order
+            .get(k + 1)
+            .filter(|&&j| key(&out.features[j]) == key(&out.features[i]));
+        let source = match next {
+            Some(&j) => &out.features[j].attributes[start],
+            None => &out.features[i].attributes[start],
+        };
+        ends.push((i, source.clone()));
+    }
+    for (i, v) in ends {
+        out.features[i].attributes[end] = v;
+    }
+    Ok(out)
+}
