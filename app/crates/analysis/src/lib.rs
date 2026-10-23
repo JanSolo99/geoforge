@@ -233,7 +233,7 @@ pub fn tools() -> impl Iterator<Item = &'static ToolSpec> {
 /// the suite isn't registered).
 pub fn counterpart(builtin: &ToolSpec) -> Option<&'static ToolSpec> {
     let id = legacy::counterpart_id(builtin.id);
-    external_tools_of("geoforge").iter().find(|t| t.id == id)
+    external_tools_of("unigis").iter().find(|t| t.id == id)
 }
 
 /// The suite an external tool comes from, with its runner (`None` for a built-in tool).

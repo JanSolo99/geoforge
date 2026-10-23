@@ -555,7 +555,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
       `ug`), Spatial Analyst (surface, hydrology, focal, local, zonal, reclass, distance, extraction) done; the rest of the
       2,157-tool inventory is not
 - [x] Python bindings: the app's PyO3 package and MCP server dispatch through the registry (`gp.run` with
-      `geoforge:<tool>`), and `rustgis.arcpy` gives it ArcGIS's shape (`arcpy.analysis.Buffer("Cities", "out", "100 Kilometers")`,
+      `unigis:<tool>`), and `rustgis.arcpy` gives it ArcGIS's shape (`arcpy.analysis.Buffer("Cities", "out", "100 Kilometers")`,
       `management`, `conversion`, `sa`; inputs as layer names or paths, outputs written to paths; 10 tests)
 
 ## Phase 7 — Databases & other formats

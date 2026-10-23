@@ -14,7 +14,7 @@ original copyright notices and mark modified files.
   `source::open_path` for the `gdb` extension; not in `EXTENSIONS`, since a geodatabase is a folder.
   Desktop only (not built for wasm32).
 - `crates/geoforge` (`rustgis-geoforge`): registers `geoforge-tools` as the external suite `geoforge`
-  (ids `geoforge:clip`, `erase`, `intersect`, `union`, `symmetrical_difference`, `dissolve`,
+  (ids `unigis:clip`, `erase`, `intersect`, `union`, `symmetrical_difference`, `dissolve`,
   `multipart_to_singlepart`, `feature_to_point`, `select`, `buffer`, `near`, `spatial_join`,
   `select_by_location`, `frequency`, `statistics`, `identity`, `update`, `merge`, `append`,
   `minimum_bounding_geometry`, `feature_vertices_to_points`, `points_to_line`, `sort`, `add_xy`, `add_field`,
@@ -44,7 +44,7 @@ original copyright notices and mark modified files.
   longitude/latitude. Absurd sizes (a contour interval giving over 100,000 levels, a cell size giving over 2^31
   cells, a neighborhood of millions of cells) are refused; the hostile-parameter test covers them.
 - The CLI, Python and MCP surfaces of the app dispatch through `gp.run`, so every registered tool is
-  reachable from them (`rustgis-cli run --cmd 'gp.run={"tool":"geoforge:buffer",...}'`, checked end to end
+  reachable from them (`rustgis-cli run --cmd 'gp.run={"tool":"unigis:buffer",...}'`, checked end to end
   with an export to a `.gdb`). The hostile-parameter test runs every registered UniGIS tool on junk
   parameters and fails if one panics.
 - Next: Check/Repair Geometry, Split, Project (needs a PROJ-free path), Feature Class To Feature Class, and

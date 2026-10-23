@@ -2,7 +2,7 @@
 //!
 //! Modified for UniGIS (not part of upstream RustGIS).
 //!
-//! The tools join the registry as the external suite [`SOURCE`] (ids `geoforge:<name>`), through
+//! The tools join the registry as the external suite [`SOURCE`] (ids `unigis:<name>`), through
 //! [`rustgis_analysis::register_external`]. A tool's layers are converted to UniGIS feature
 //! classes, the engine runs the ArcGIS algorithm (parameters, output schema, row order as
 //! ArcGIS's), and its output comes back as a layer.
@@ -27,10 +27,13 @@ use rustgis_geom::Coord;
 use serde_json::Value as Json;
 
 /// Tool ids get this prefix, so they never clash with the built-in tools.
-pub const PREFIX: &str = "geoforge:";
+pub const PREFIX: &str = "unigis:";
+
+/// The prefix tool ids had before the rename; ids with it still resolve.
+pub const OLD_PREFIX: &str = "unigis:";
 
 /// The key the suite registers its tools under.
-pub const SOURCE: &str = "geoforge";
+pub const SOURCE: &str = "unigis";
 
 /// Esri WKT of the coordinate system layers are held in.
 const WGS84_WKT: &str = "GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]]";
@@ -1543,7 +1546,7 @@ pub fn arcgis_toolbox(raw: &str) -> &'static str {
 
 fn specs() -> Vec<ToolSpec> {
     let own = DEFS.iter().chain(raster::DEFS).chain(extra::DEFS).map(|d| ToolSpec {
-        // Ids are `geoforge:<id>`; leaked once, like the other suites' specs.
+        // Ids are `unigis:<id>`; leaked once, like the other suites' specs.
         id: Box::leak(format!("{PREFIX}{}", d.id).into_boxed_str()),
         name: d.name,
         toolbox: arcgis_toolbox(d.toolbox),
@@ -1670,16 +1673,20 @@ mod tests {
     fn built_in_ids_resolve_to_the_arcgis_tools() {
         register();
         for (old, new) in [
-            ("buffer", "geoforge:buffer"),
-            ("clip", "geoforge:clip"),
-            ("erase", "geoforge:erase"),
-            ("dissolve", "geoforge:dissolve"),
-            ("convexHull", "geoforge:minimum_bounding_geometry"),
-            ("featureToPoint", "geoforge:feature_to_point"),
-            ("selectByLocation", "geoforge:select_by_location"),
-            ("summaryStatistics", "geoforge:statistics"),
-            ("Summary Statistics", "geoforge:statistics"),
+            ("buffer", "unigis:buffer"),
+            ("clip", "unigis:clip"),
+            ("erase", "unigis:erase"),
+            ("dissolve", "unigis:dissolve"),
+            ("convexHull", "unigis:minimum_bounding_geometry"),
+            ("featureToPoint", "unigis:feature_to_point"),
+            ("selectByLocation", "unigis:select_by_location"),
+            ("summaryStatistics", "unigis:statistics"),
+            ("Summary Statistics", "unigis:statistics"),
         ] {
+            assert_eq!(rustgis_analysis::tool(old).map(|t| t.id), Some(new), "{old}");
+        }
+        // Ids from before the rename (`geoforge:`) still resolve.
+        for (old, new) in [("geoforge:buffer", "unigis:buffer"), ("geoforge:hot_spot_analysis", "unigis:hot_spot_analysis")] {
             assert_eq!(rustgis_analysis::tool(old).map(|t| t.id), Some(new), "{old}");
         }
         // The ones without a counterpart stay.
@@ -1769,7 +1776,7 @@ mod tests {
         }
         register();
         let inp = Renamed(points("backing dataset", &[(0.0, 0.0), (1.0, 1.0)]));
-        let out = dataset(rustgis_analysis::run("geoforge:buffer", &inp, &json!({"input": "Displayed layer", "distance": 1})));
+        let out = dataset(rustgis_analysis::run("unigis:buffer", &inp, &json!({"input": "Displayed layer", "distance": 1})));
         assert_eq!(out.features.len(), 1);
     }
 
@@ -1777,18 +1784,18 @@ mod tests {
     fn overlay_tools_run_through_the_registry() {
         register();
         let layers = Layers(vec![square("a", 0.0, 0.0, 2.0), square("b", 1.0, 1.0, 2.0)]);
-        let spec = rustgis_analysis::tool("geoforge:clip").expect("registered");
+        let spec = rustgis_analysis::tool("unigis:clip").expect("registered");
         assert_eq!(spec.name, "Clip");
-        let clip = dataset(rustgis_analysis::run("geoforge:clip", &layers, &json!({"input": "a", "clip": "b"})));
+        let clip = dataset(rustgis_analysis::run("unigis:clip", &layers, &json!({"input": "a", "clip": "b"})));
         assert!((area(&clip) - 1.0).abs() < 1e-9, "{}", area(&clip));
-        let erase = dataset(rustgis_analysis::run("geoforge:erase", &layers, &json!({"input": "a", "erase": "b"})));
+        let erase = dataset(rustgis_analysis::run("unigis:erase", &layers, &json!({"input": "a", "erase": "b"})));
         assert!((area(&erase) - 3.0).abs() < 1e-9);
-        let inter = dataset(rustgis_analysis::run("geoforge:intersect", &layers, &json!({"input": "a", "other": "b"})));
+        let inter = dataset(rustgis_analysis::run("unigis:intersect", &layers, &json!({"input": "a", "other": "b"})));
         assert!((area(&inter) - 1.0).abs() < 1e-9);
         // ArcGIS's schema: FID_<name> per input, then the fields.
         let names: Vec<&str> = inter.fields.iter().map(|f| f.name.as_str()).collect();
         assert_eq!(names, ["FID_a", "NAME", "FID_b", "NAME_1"]);
-        let union = dataset(rustgis_analysis::run("geoforge:union", &layers, &json!({"input": "a", "other": "b"})));
+        let union = dataset(rustgis_analysis::run("unigis:union", &layers, &json!({"input": "a", "other": "b"})));
         assert!((area(&union) - 7.0).abs() < 1e-9);
         assert_eq!(union.features.len(), 3);
     }
@@ -1809,32 +1816,32 @@ mod tests {
         let (_, second) = dem("R2");
         inp.rasters.extend(second.rasters);
         // Two copies of the cone: the sum is twice the cone, the mean is the cone.
-        let sum = raster_of(rustgis_analysis::run("geoforge:cell_statistics", &inp, &json!({"inputs": "R1;R2", "statistic": "SUM"})));
+        let sum = raster_of(rustgis_analysis::run("unigis:cell_statistics", &inp, &json!({"inputs": "R1;R2", "statistic": "SUM"})));
         let want = cell_statistics(&[&a, &a], CellStat::Sum, true).unwrap();
         assert_eq!((sum.width, sum.height), (want.width, want.height));
         assert_eq!(sum.bands[0], want.bands[0]);
-        let ws = raster_of(rustgis_analysis::run("geoforge:weighted_sum", &inp, &json!({"inputs": "R1;R2", "weights": "0.5;0.25"})));
+        let ws = raster_of(rustgis_analysis::run("unigis:weighted_sum", &inp, &json!({"inputs": "R1;R2", "weights": "0.5;0.25"})));
         assert!((ws.get(12, 12).unwrap() - 0.75 * a.get(12, 12).unwrap()).abs() < 1e-3);
-        let hp = raster_of(rustgis_analysis::run("geoforge:highest_position", &inp, &json!({"inputs": "R1;R2"})));
+        let hp = raster_of(rustgis_analysis::run("unigis:highest_position", &inp, &json!({"inputs": "R1;R2"})));
         assert_eq!(hp.get(12, 12), Some(1.0), "ties go to the first raster");
         let fz = raster_of(rustgis_analysis::run(
-            "geoforge:fuzzy_membership",
+            "unigis:fuzzy_membership",
             &inp,
             &json!({"input": "R1", "function": "LINEAR", "minimum": 0, "maximum": 100}),
         ));
         assert!((fz.get(12, 12).unwrap() - a.get(12, 12).unwrap() / 100.0).abs() < 1e-3);
         let fo = raster_of(rustgis_analysis::run(
-            "geoforge:fuzzy_overlay",
+            "unigis:fuzzy_overlay",
             &inp,
             &json!({"inputs": "R1;R2", "overlay_type": "GAMMA", "gamma": 0.5}),
         ));
         assert_eq!((fo.width, fo.height), (24, 24));
-        let wo = raster_of(rustgis_analysis::run("geoforge:weighted_overlay", &inp, &json!({"table": "R1:60:0=1;R2:40:0=1"})));
+        let wo = raster_of(rustgis_analysis::run("unigis:weighted_overlay", &inp, &json!({"table": "R1:60:0=1;R2:40:0=1"})));
         // No cell value is in the remap: all NoData.
         assert!(wo.bands[0].iter().all(|v| wo.is_nodata(*v)));
         // The extent environment applies.
         let small = raster_of(rustgis_analysis::run(
-            "geoforge:cell_statistics",
+            "unigis:cell_statistics",
             &inp,
             &json!({"inputs": "R1;R2", "statistic": "MAXIMUM", "extent": "500060 5000060 500300 5000300"}),
         ));
@@ -1845,12 +1852,12 @@ mod tests {
             json!({"inputs": "R1;R2", "statistic": "AVERAGE"}),
             json!({"inputs": "R1;R2", "ignore_nodata": "MAYBE"}),
         ] {
-            assert!(rustgis_analysis::run("geoforge:cell_statistics", &inp, &bad).is_err(), "{bad}");
+            assert!(rustgis_analysis::run("unigis:cell_statistics", &inp, &bad).is_err(), "{bad}");
         }
-        assert!(rustgis_analysis::run("geoforge:weighted_sum", &inp, &json!({"inputs": "R1;R2", "weights": "1"})).is_err());
-        assert!(rustgis_analysis::run("geoforge:weighted_overlay", &inp, &json!({"table": "R1:50:1=1"})).is_err());
-        assert!(rustgis_analysis::run("geoforge:fuzzy_overlay", &inp, &json!({"inputs": "R1;R2", "overlay_type": "GAMMA"})).is_err());
-        assert!(rustgis_analysis::run("geoforge:fuzzy_membership", &inp, &json!({"input": "R1", "function": "LINEAR"})).is_err());
+        assert!(rustgis_analysis::run("unigis:weighted_sum", &inp, &json!({"inputs": "R1;R2", "weights": "1"})).is_err());
+        assert!(rustgis_analysis::run("unigis:weighted_overlay", &inp, &json!({"table": "R1:50:1=1"})).is_err());
+        assert!(rustgis_analysis::run("unigis:fuzzy_overlay", &inp, &json!({"inputs": "R1;R2", "overlay_type": "GAMMA"})).is_err());
+        assert!(rustgis_analysis::run("unigis:fuzzy_membership", &inp, &json!({"input": "R1", "function": "LINEAR"})).is_err());
     }
 
     #[test]
@@ -1860,32 +1867,32 @@ mod tests {
         let pts: Vec<(f64, f64)> =
             (0..10).map(|i| (10.7 + 0.01 * i as f64 + if i % 2 == 0 { 0.003 } else { -0.003 }, 59.9 + 0.005 * i as f64)).collect();
         let layers = Layers(vec![points("p", &pts)]);
-        let spec = rustgis_analysis::tool("geoforge:mean_center").expect("registered");
+        let spec = rustgis_analysis::tool("unigis:mean_center").expect("registered");
         assert_eq!(spec.toolbox, "Spatial Statistics Tools › Measuring Geographic Distributions");
         assert!(spec.params.iter().any(|p| p.name == "weight_field" && p.kind == K::NumericField));
-        let mean = dataset(rustgis_analysis::run("geoforge:mean_center", &layers, &json!({"input": "p"})));
+        let mean = dataset(rustgis_analysis::run("unigis:mean_center", &layers, &json!({"input": "p"})));
         let Some(Geometry::Point(c)) = &mean.features[0].geometry else { panic!("point") };
         assert!((c.x - 10.745).abs() < 1e-4 && (c.y - 59.9225).abs() < 1e-4, "{c:?}");
         // The weight field and the output name.
         let w =
-            dataset(rustgis_analysis::run("geoforge:mean_center", &layers, &json!({"input": "p", "weight_field": "N", "output": "Heavy"})));
+            dataset(rustgis_analysis::run("unigis:mean_center", &layers, &json!({"input": "p", "weight_field": "N", "output": "Heavy"})));
         assert_eq!(w.name, "Heavy");
         let Some(Geometry::Point(c)) = &w.features[0].geometry else { panic!("point") };
         assert!(c.y > 59.9225, "heavier toward the later points: {c:?}");
         // Circles and ellipses come back as polygons of 361 vertices.
         for tool in ["standard_distance", "directional_distribution"] {
-            let d = dataset(rustgis_analysis::run(&format!("geoforge:{tool}"), &layers, &json!({"input": "p"})));
+            let d = dataset(rustgis_analysis::run(&format!("unigis:{tool}"), &layers, &json!({"input": "p"})));
             let Some(Geometry::Polygon(ps)) = &d.features[0].geometry else { panic!("{tool}: polygon") };
             assert_eq!(ps[0][0].len(), 361, "{tool}");
         }
-        let central = dataset(rustgis_analysis::run("geoforge:central_feature", &layers, &json!({"input": "p"})));
+        let central = dataset(rustgis_analysis::run("unigis:central_feature", &layers, &json!({"input": "p"})));
         assert_eq!(central.features.len(), 1);
         // Bad choices and fields are errors.
-        assert!(rustgis_analysis::run("geoforge:standard_distance", &layers, &json!({"input": "p", "circle_size": "HUGE"})).is_err());
-        assert!(rustgis_analysis::run("geoforge:mean_center", &layers, &json!({"input": "p", "weight_field": "nope"})).is_err());
-        assert!(rustgis_analysis::run("geoforge:mean_center", &layers, &json!({"input": "missing"})).is_err());
+        assert!(rustgis_analysis::run("unigis:standard_distance", &layers, &json!({"input": "p", "circle_size": "HUGE"})).is_err());
+        assert!(rustgis_analysis::run("unigis:mean_center", &layers, &json!({"input": "p", "weight_field": "nope"})).is_err());
+        assert!(rustgis_analysis::run("unigis:mean_center", &layers, &json!({"input": "missing"})).is_err());
         // Lines only for the directional mean.
-        assert!(rustgis_analysis::run("geoforge:directional_mean", &layers, &json!({"input": "p"})).is_err());
+        assert!(rustgis_analysis::run("unigis:directional_mean", &layers, &json!({"input": "p"})).is_err());
     }
 
     #[test]
@@ -1899,11 +1906,11 @@ mod tests {
             f.attrs[0] = Value::Int(if i < 12 { 100 } else { 1 });
         }
         let layers = Layers(vec![d]);
-        let ann = rustgis_analysis::run("geoforge:average_nearest_neighbor", &layers, &json!({"input": "p"})).unwrap();
+        let ann = rustgis_analysis::run("unigis:average_nearest_neighbor", &layers, &json!({"input": "p"})).unwrap();
         assert!(matches!(ann.output, Output::Table(_)));
         assert!(ann.messages.iter().any(|m| m.starts_with("NNRatio")), "{:?}", ann.messages);
         let moran = rustgis_analysis::run(
-            "geoforge:spatial_autocorrelation",
+            "unigis:spatial_autocorrelation",
             &layers,
             &json!({"input": "p", "field": "N", "conceptualization": "K_NEAREST_NEIGHBORS"}),
         )
@@ -1912,7 +1919,7 @@ mod tests {
         assert_eq!(t.features.len(), 5);
         // The clump is a hot spot: its Gi* z-scores are positive.
         let hot = dataset(rustgis_analysis::run(
-            "geoforge:hot_spot_analysis",
+            "unigis:hot_spot_analysis",
             &layers,
             &json!({"input": "p", "field": "N", "conceptualization": "FIXED_DISTANCE_BAND", "distance_band": 1000}),
         ));
@@ -1922,7 +1929,7 @@ mod tests {
         assert!(z[0] > 0.0 && z[20] < z[0], "{z:?}");
         assert!(
             rustgis_analysis::run(
-                "geoforge:hot_spot_analysis",
+                "unigis:hot_spot_analysis",
                 &layers,
                 &json!({"input": "p", "field": "N", "conceptualization": "FIXED_DISTANCE_BAND"})
             )
@@ -1935,13 +1942,13 @@ mod tests {
         use geoforge_raster::mathfn::{Binary, Unary, binary, unary};
         register();
         let (a, inp) = dem("RM");
-        let ln = raster_of(rustgis_analysis::run("geoforge:ln", &inp, &json!({"input": "RM", "in1": "RM"})));
+        let ln = raster_of(rustgis_analysis::run("unigis:ln", &inp, &json!({"input": "RM", "in1": "RM"})));
         let want = unary(Unary::Ln, &a);
         assert_eq!(ln.bands[0], want.bands[0]);
         // Another function of the same raster runs (a layer is added).
-        let neg = rustgis_analysis::run("geoforge:negate", &inp, &json!({"in1": "RM"})).unwrap();
+        let neg = rustgis_analysis::run("unigis:negate", &inp, &json!({"in1": "RM"})).unwrap();
         assert!(matches!(neg.output, Output::Layers(_)));
-        let gt = raster_of(rustgis_analysis::run("geoforge:greater_than", &inp, &json!({"in1": "RM", "in2": "50"})));
+        let gt = raster_of(rustgis_analysis::run("unigis:greater_than", &inp, &json!({"in1": "RM", "in2": "50"})));
         let want = binary(
             Binary::GreaterThan,
             &geoforge_raster::local::Operand::Raster(a.clone()),
@@ -1951,16 +1958,16 @@ mod tests {
         assert_eq!(gt.bands[0], want.bands[0]);
         assert_eq!(gt.data_type, geoforge_raster::DataType::U8);
         let pw = raster_of(rustgis_analysis::run(
-            "geoforge:power",
+            "unigis:power",
             &inp,
             &json!({"in1": "RM", "in2": "2", "extent": "500060 5000060 500300 5000300"}),
         ));
         assert_eq!((pw.width, pw.height), (8, 8));
         // Bitwise operators refuse floats; a constant alone is not a raster.
-        assert!(rustgis_analysis::run("geoforge:bitwise_and", &inp, &json!({"in1": "RM", "in2": "3"})).is_err());
-        assert!(rustgis_analysis::run("geoforge:abs", &inp, &json!({"in1": "5"})).is_err());
-        assert!(rustgis_analysis::run("geoforge:abs", &inp, &json!({"in1": "nope"})).is_err());
-        assert!(rustgis_analysis::tool("geoforge:boolean_xor").is_some());
+        assert!(rustgis_analysis::run("unigis:bitwise_and", &inp, &json!({"in1": "RM", "in2": "3"})).is_err());
+        assert!(rustgis_analysis::run("unigis:abs", &inp, &json!({"in1": "5"})).is_err());
+        assert!(rustgis_analysis::run("unigis:abs", &inp, &json!({"in1": "nope"})).is_err());
+        assert!(rustgis_analysis::tool("unigis:boolean_xor").is_some());
     }
 
     #[test]
@@ -1969,7 +1976,7 @@ mod tests {
         register();
         let (a, inp) = dem("RB");
         let agg = raster_of(rustgis_analysis::run(
-            "geoforge:aggregate",
+            "unigis:aggregate",
             &inp,
             &json!({"input": "RB", "cell_factor": 5, "aggregation_type": "MAXIMUM"}),
         ));
@@ -1977,34 +1984,34 @@ mod tests {
         assert_eq!((agg.width, agg.height, agg.transform), (want.width, want.height, want.transform));
         assert_eq!(agg.bands[0], want.bands[0]);
         let blk = raster_of(rustgis_analysis::run(
-            "geoforge:block_statistics",
+            "unigis:block_statistics",
             &inp,
             &json!({"input": "RB", "neighborhood": "Circle 2 CELL", "statistics_type": "MEAN"}),
         ));
         assert_eq!((blk.width, blk.height), (24, 24));
         let zones =
-            raster_of(rustgis_analysis::run("geoforge:slice", &inp, &json!({"input": "RB", "number_zones": 4, "base_output_zone": 10})));
+            raster_of(rustgis_analysis::run("unigis:slice", &inp, &json!({"input": "RB", "number_zones": 4, "base_output_zone": 10})));
         assert_eq!(zones.get(12, 12), Some(13.0), "the cone's top is in the highest zone");
-        let regions = raster_of(rustgis_analysis::run("geoforge:region_group", &inp, &json!({"input": "RB"})));
+        let regions = raster_of(rustgis_analysis::run("unigis:region_group", &inp, &json!({"input": "RB"})));
         assert_eq!(regions.width, 24);
-        let eight = raster_of(rustgis_analysis::run("geoforge:region_group", &inp, &json!({"input": "RB", "number_neighbors": "EIGHT"})));
+        let eight = raster_of(rustgis_analysis::run("unigis:region_group", &inp, &json!({"input": "RB", "number_neighbors": "EIGHT"})));
         let want = geoforge_raster::generalize::region_group(&a, true, false, None);
         assert_eq!(eight.bands, want.bands);
-        let picked = raster_of(rustgis_analysis::run("geoforge:pick", &inp, &json!({"position": "RB", "inputs": "RB;7"})));
+        let picked = raster_of(rustgis_analysis::run("unigis:pick", &inp, &json!({"position": "RB", "inputs": "RB;7"})));
         assert_eq!(picked.width, 24);
         for bad in [
-            ("geoforge:aggregate", json!({"input": "RB", "cell_factor": 1})),
-            ("geoforge:aggregate", json!({"input": "RB", "cell_factor": 2.5})),
-            ("geoforge:block_statistics", json!({"input": "RB", "statistics_type": "MAJORITY"})),
+            ("unigis:aggregate", json!({"input": "RB", "cell_factor": 1})),
+            ("unigis:aggregate", json!({"input": "RB", "cell_factor": 2.5})),
+            ("unigis:block_statistics", json!({"input": "RB", "statistics_type": "MAJORITY"})),
             (
-                "geoforge:slice",
+                "unigis:slice",
                 json!({"input": "RB", "number_zones": 3, "slice_type": "EQUAL_INTERVAL", "base_output_zone": 1, "output": ""}),
             ),
-            ("geoforge:region_group", json!({"input": "RB", "number_neighbors": "INVALID"})),
-            ("geoforge:pick", json!({"position": "RB", "inputs": ""})),
+            ("unigis:region_group", json!({"input": "RB", "number_neighbors": "INVALID"})),
+            ("unigis:pick", json!({"position": "RB", "inputs": ""})),
         ] {
             let r = rustgis_analysis::run(bad.0, &inp, &bad.1);
-            if bad.0 == "geoforge:slice" {
+            if bad.0 == "unigis:slice" {
                 assert!(r.is_ok());
             } else {
                 assert!(r.is_err(), "{bad:?}");
@@ -2017,7 +2024,7 @@ mod tests {
         register();
         // Four corners of a square, values 0..3: the middle cell is their mean.
         let layers = Layers(vec![points("p", &[(0.0, 0.0), (2.0, 0.0), (0.0, 2.0), (2.0, 2.0)])]);
-        let out = raster_of(rustgis_analysis::run("geoforge:idw", &layers, &json!({"input": "p", "z_field": "N", "cell_size": 1})));
+        let out = raster_of(rustgis_analysis::run("unigis:idw", &layers, &json!({"input": "p", "z_field": "N", "cell_size": 1})));
         // Cell centers 0, 1, 2 from the points' lower-left corner: 3 x 3 cells.
         assert_eq!((out.width, out.height), (3, 3));
         assert!((out.get(1, 1).unwrap() - 1.5).abs() < 1e-6);
@@ -2026,13 +2033,13 @@ mod tests {
         assert_eq!(out.get(2, 0), Some(3.0));
         // A fixed radius that reaches no point leaves NoData.
         let fixed = raster_of(rustgis_analysis::run(
-            "geoforge:idw",
+            "unigis:idw",
             &layers,
             &json!({"input": "p", "z_field": "N", "cell_size": 1, "search_type": "FIXED", "fixed_distance": 0.5}),
         ));
         assert_eq!(fixed.get(1, 1), None);
-        assert!(rustgis_analysis::run("geoforge:idw", &layers, &json!({"input": "p", "z_field": "N", "power": -1})).is_err());
-        assert!(rustgis_analysis::run("geoforge:idw", &layers, &json!({"input": "p", "z_field": "nope"})).is_err());
+        assert!(rustgis_analysis::run("unigis:idw", &layers, &json!({"input": "p", "z_field": "N", "power": -1})).is_err());
+        assert!(rustgis_analysis::run("unigis:idw", &layers, &json!({"input": "p", "z_field": "nope"})).is_err());
     }
 
     /// Ground distance in metres between two lon/lat points (haversine).
@@ -2048,8 +2055,7 @@ mod tests {
         // Sydney and Tromsø: a degree is a very different length in each.
         for (lon, lat) in [(151.2, -33.9), (18.9, 69.6)] {
             let layers = Layers(vec![points("p", &[(lon, lat)])]);
-            let d =
-                dataset(rustgis_analysis::run("geoforge:buffer", &layers, &json!({"input": "p", "distance": 1, "units": "KILOMETERS"})));
+            let d = dataset(rustgis_analysis::run("unigis:buffer", &layers, &json!({"input": "p", "distance": 1, "units": "KILOMETERS"})));
             let Some(Geometry::Polygon(ps)) = &d.features[0].geometry else { panic!("polygon") };
             let c = Coord::new(lon, lat);
             let ring = &ps[0][0];
@@ -2070,7 +2076,7 @@ mod tests {
         // Three continents: one UTM zone would put two of these far from its central meridian.
         let spots = [(151.2, -33.9), (18.9, 69.6), (-118.2, 34.0), (151.3, -33.8)];
         let layers = Layers(vec![points("p", &spots)]);
-        let r = rustgis_analysis::run("geoforge:buffer", &layers, &json!({"input": "p", "distance": 1000})).unwrap();
+        let r = rustgis_analysis::run("unigis:buffer", &layers, &json!({"input": "p", "distance": 1000})).unwrap();
         // Geodesic: exact on the ellipsoid wherever the layer is, whatever its width.
         assert!(!r.messages.iter().any(|m| m.contains("UTM")), "{:?}", r.messages);
         let Output::Layer(d) = r.output else { panic!("layer") };
@@ -2092,7 +2098,7 @@ mod tests {
     fn near_measures_metres_on_the_ellipsoid_and_updates_in_place() {
         register();
         let layers = Layers(vec![points("a", &[(10.0, 50.0)]), points("b", &[(10.0, 50.01), (11.0, 50.0)])]);
-        let r = rustgis_analysis::run("geoforge:near", &layers, &json!({"input": "a", "near": "b", "location": true})).unwrap();
+        let r = rustgis_analysis::run("unigis:near", &layers, &json!({"input": "a", "near": "b", "location": true})).unwrap();
         let Output::Update { layer, dataset } = r.output else { panic!("update") };
         assert_eq!(layer, "a");
         let at = |n: &str| dataset.features[0].attrs[dataset.field_index(n).unwrap()].clone();
@@ -2110,14 +2116,14 @@ mod tests {
         let layers = Layers(vec![points("a", &[(-120.0, 70.0)]), points("b", &[(-100.0, 71.0), (60.0, 80.0)])]);
         // ArcGIS Near (GEODESIC) on the same points.
         let want = 750_149.660_147_738_2;
-        let r = rustgis_analysis::run("geoforge:near", &layers, &json!({"input": "a", "near": "b", "angle": true})).unwrap();
+        let r = rustgis_analysis::run("unigis:near", &layers, &json!({"input": "a", "near": "b", "angle": true})).unwrap();
         let Output::Update { dataset, .. } = r.output else { panic!("update") };
         let at = |n: &str| dataset.features[0].attrs[dataset.field_index(n).unwrap()].clone();
         assert!(matches!(at("NEAR_DIST"), Value::Float(d) if (d - want).abs() < 0.01), "{:?} vs {want}", at("NEAR_DIST"));
         // ArcGIS: azimuth 72.1355 degrees clockwise from north.
         assert!(matches!(at("NEAR_ANGLE"), Value::Float(a) if (a - 72.13552930038288).abs() < 1e-6), "{:?}", at("NEAR_ANGLE"));
         let j = rustgis_analysis::run(
-            "geoforge:spatial_join",
+            "unigis:spatial_join",
             &layers,
             &json!({"input": "a", "other": "b", "match_option": "CLOSEST", "distance_field_name": "D"}),
         )
@@ -2131,17 +2137,17 @@ mod tests {
         register();
         let layers = Layers(vec![points("a", &[(10.0, 50.0), (10.0, 50.5)]), points("b", &[(10.0, 50.001)])]);
         let r = rustgis_analysis::run(
-            "geoforge:select_by_location",
+            "unigis:select_by_location",
             &layers,
             &json!({"input": "a", "other": "b", "overlap_type": "WITHIN_A_DISTANCE", "search_distance": 500}),
         )
         .unwrap();
         let Output::Selection { rows, .. } = r.output else { panic!("selection") };
         assert_eq!(rows, vec![0]);
-        let f = rustgis_analysis::run("geoforge:frequency", &layers, &json!({"input": "a", "fields": "N"})).unwrap();
+        let f = rustgis_analysis::run("unigis:frequency", &layers, &json!({"input": "a", "fields": "N"})).unwrap();
         let Output::Table(t) = f.output else { panic!("table") };
         assert_eq!(t.features.len(), 2);
-        let s = rustgis_analysis::run("geoforge:statistics", &layers, &json!({"input": "a", "statistics": "N SUM"})).unwrap();
+        let s = rustgis_analysis::run("unigis:statistics", &layers, &json!({"input": "a", "statistics": "N SUM"})).unwrap();
         let Output::Table(t) = s.output else { panic!("table") };
         assert_eq!(t.features[0].attrs, vec![Value::Int(2), Value::Float(1.0)]);
     }
@@ -2157,30 +2163,30 @@ mod tests {
             }
             _ => panic!("expected an in-place update"),
         };
-        let d = update("geoforge:add_field", json!({"input": "p", "field_name": "dbl", "field_type": "DOUBLE"}));
+        let d = update("unigis:add_field", json!({"input": "p", "field_name": "dbl", "field_type": "DOUBLE"}));
         assert_eq!(d.fields.last().unwrap().name, "dbl");
-        let d = update("geoforge:calculate_field", json!({"input": "p", "field": "N", "expression": "!N! * 10 + 1"}));
+        let d = update("unigis:calculate_field", json!({"input": "p", "field": "N", "expression": "!N! * 10 + 1"}));
         assert_eq!(d.features.iter().map(|f| f.attrs[0].clone()).collect::<Vec<_>>(), [1, 11, 21, 31].map(Value::Int));
-        let d = update("geoforge:add_xy", json!({"input": "p"}));
+        let d = update("unigis:add_xy", json!({"input": "p"}));
         let names: Vec<&str> = d.fields.iter().map(|f| f.name.as_str()).collect();
         assert_eq!(names, ["N", "POINT_X", "POINT_Y"]);
-        let d = update("geoforge:delete_identical", json!({"input": "p", "fields": "Shape"}));
+        let d = update("unigis:delete_identical", json!({"input": "p", "fields": "Shape"}));
         assert_eq!(d.features.len(), 3, "the repeated location is gone");
-        let d = update("geoforge:delete_field", json!({"input": "p", "fields": "N", "method": "KEEP_FIELDS"}));
+        let d = update("unigis:delete_field", json!({"input": "p", "fields": "N", "method": "KEEP_FIELDS"}));
         assert_eq!(d.fields.len(), 1);
         // Sort puts the largest first; Merge adds the layers up; Find Identical lists the repeats.
         let Output::Layer(sorted) =
-            rustgis_analysis::run("geoforge:sort", &layers, &json!({"input": "p", "sort_fields": "N DESCENDING"})).unwrap().output
+            rustgis_analysis::run("unigis:sort", &layers, &json!({"input": "p", "sort_fields": "N DESCENDING"})).unwrap().output
         else {
             panic!("layer")
         };
         assert_eq!(sorted.features.iter().map(|f| f.attrs[0].clone()).collect::<Vec<_>>(), [3, 2, 1, 0].map(Value::Int));
-        let Output::Layer(m) = rustgis_analysis::run("geoforge:merge", &layers, &json!({"inputs": "p;p"})).unwrap().output else {
+        let Output::Layer(m) = rustgis_analysis::run("unigis:merge", &layers, &json!({"inputs": "p;p"})).unwrap().output else {
             panic!("layer")
         };
         assert_eq!(m.features.len(), 8);
         let Output::Table(t) =
-            rustgis_analysis::run("geoforge:find_identical", &layers, &json!({"input": "p", "fields": "Shape", "only_duplicates": true}))
+            rustgis_analysis::run("unigis:find_identical", &layers, &json!({"input": "p", "fields": "Shape", "only_duplicates": true}))
                 .unwrap()
                 .output
         else {
@@ -2188,7 +2194,7 @@ mod tests {
         };
         assert_eq!(t.features.len(), 2);
         let Output::Layer(v) =
-            rustgis_analysis::run("geoforge:feature_vertices_to_points", &layers, &json!({"input": "a", "point_location": "ALL"}))
+            rustgis_analysis::run("unigis:feature_vertices_to_points", &layers, &json!({"input": "a", "point_location": "ALL"}))
                 .unwrap()
                 .output
         else {
@@ -2263,7 +2269,7 @@ mod tests {
         let (dem_gf, inp) = dem("DEM");
         // Slope: the cells the engine computes, with the input's grid and coordinate system.
         let out = raster_of(rustgis_analysis::run(
-            "geoforge:slope",
+            "unigis:slope",
             &inp,
             &json!({"input": "DEM", "output_measurement": "PERCENT_RISE", "z_factor": 2}),
         ));
@@ -2272,28 +2278,27 @@ mod tests {
         assert_eq!(out.bands[0], want.bands[0]);
         assert_eq!(out.transform, want.transform);
         // Local math with a constant, and a Con on the result.
-        let plus = raster_of(rustgis_analysis::run("geoforge:plus", &inp, &json!({"in1": "DEM", "in2": "10"})));
+        let plus = raster_of(rustgis_analysis::run("unigis:plus", &inp, &json!({"in1": "DEM", "in2": "10"})));
         assert!((plus.bands[0][12 * 24 + 12] - (dem_gf.bands[0][12 * 24 + 12] + 10.0)).abs() < 1e-4);
         // Focal statistics, reclassify and resample run and keep the grid or change it as asked.
         let focal = raster_of(rustgis_analysis::run(
-            "geoforge:focal_statistics",
+            "unigis:focal_statistics",
             &inp,
             &json!({"input": "DEM", "neighborhood": "Rectangle 3 3 CELL", "statistics_type": "MAXIMUM"}),
         ));
         assert_eq!((focal.width, focal.height), (24, 24));
         let rs = raster_of(rustgis_analysis::run(
-            "geoforge:resample",
+            "unigis:resample",
             &inp,
             &json!({"input": "DEM", "cell_size": 60, "resampling_type": "BILINEAR"}),
         ));
         assert_eq!((rs.width, rs.height), (12, 12));
-        let reclass =
-            raster_of(rustgis_analysis::run("geoforge:reclassify", &inp, &json!({"input": "DEM", "remap": "-100 40 1;40 101 2"})));
+        let reclass = raster_of(rustgis_analysis::run("unigis:reclassify", &inp, &json!({"input": "DEM", "remap": "-100 40 1;40 101 2"})));
         assert!(reclass.bands[0].iter().all(|v| [1.0, 2.0].contains(v) || *v == reclass.nodata.unwrap_or(f64::NAN)));
         // Hillshade with shadows and the hydrology chain.
-        let hs = raster_of(rustgis_analysis::run("geoforge:hillshade", &inp, &json!({"input": "DEM", "model_shadows": true})));
+        let hs = raster_of(rustgis_analysis::run("unigis:hillshade", &inp, &json!({"input": "DEM", "model_shadows": true})));
         assert_eq!(hs.width, 24);
-        let filled = rustgis_analysis::run("geoforge:fill", &inp, &json!({"input": "DEM", "output": "Filled"})).unwrap();
+        let filled = rustgis_analysis::run("unigis:fill", &inp, &json!({"input": "DEM", "output": "Filled"})).unwrap();
         assert!(filled.messages[0].starts_with("Filled"));
     }
 
@@ -2304,7 +2309,7 @@ mod tests {
         let (dem_gf, inp) = dem("DEMENV");
         // A coarser cell size and a shifted extent: Slope reads one cell of context, bilinearly.
         let out = raster_of(rustgis_analysis::run(
-            "geoforge:slope",
+            "unigis:slope",
             &inp,
             &json!({"input": "DEMENV", "cell_size": 60, "extent": "500100 5000100 500500 5000500"}),
         ));
@@ -2317,13 +2322,12 @@ mod tests {
         assert_eq!(out.bands[0], want.bands[0]);
         // Local math honours the extent too, and a raster mask turns cells to NoData.
         let plus = raster_of(rustgis_analysis::run(
-            "geoforge:plus",
+            "unigis:plus",
             &inp,
             &json!({"in1": "DEMENV", "in2": "1", "extent": "500060 5000060 500300 5000300"}),
         ));
         assert_eq!((plus.width, plus.height), (8, 8));
-        let masked =
-            raster_of(rustgis_analysis::run("geoforge:fill", &inp, &json!({"input": "DEMENV", "mask": "DEMENV", "cell_size": 30})));
+        let masked = raster_of(rustgis_analysis::run("unigis:fill", &inp, &json!({"input": "DEMENV", "mask": "DEMENV", "cell_size": 30})));
         assert_eq!(masked.width, 24);
         // Bad environment values are errors, not panics.
         for bad in [
@@ -2337,7 +2341,7 @@ mod tests {
         ] {
             let mut p = json!({"input": "DEMENV"});
             p.as_object_mut().unwrap().extend(bad.as_object().unwrap().clone());
-            assert!(rustgis_analysis::run("geoforge:slope", &inp, &p).is_err(), "{p}");
+            assert!(rustgis_analysis::run("unigis:slope", &inp, &p).is_err(), "{p}");
         }
     }
 
@@ -2346,7 +2350,7 @@ mod tests {
         register();
         let (_, inp) = dem("DEM");
         let Output::Layer(c) =
-            rustgis_analysis::run("geoforge:contour", &inp, &json!({"input": "DEM", "contour_interval": 20, "base_contour": 0}))
+            rustgis_analysis::run("unigis:contour", &inp, &json!({"input": "DEM", "contour_interval": 20, "base_contour": 0}))
                 .unwrap()
                 .output
         else {
@@ -2361,7 +2365,7 @@ mod tests {
                 assert!((14.0..16.0).contains(&pt.x) && (44.9..45.3).contains(&pt.y), "{pt:?}");
             }
         }
-        let Output::Layer(pts) = rustgis_analysis::run("geoforge:raster_to_point", &inp, &json!({"input": "DEM"})).unwrap().output else {
+        let Output::Layer(pts) = rustgis_analysis::run("unigis:raster_to_point", &inp, &json!({"input": "DEM"})).unwrap().output else {
             panic!("layer")
         };
         assert_eq!(pts.features.len(), 24 * 24);
@@ -2373,7 +2377,7 @@ mod tests {
     fn a_buffer_over_the_antimeridian_falls_back_to_the_zone() {
         register();
         let layers = Layers(vec![points("p", &[(179.9999, 10.0)])]);
-        let r = rustgis_analysis::run("geoforge:buffer", &layers, &json!({"input": "p", "distance": 5000})).unwrap();
+        let r = rustgis_analysis::run("unigis:buffer", &layers, &json!({"input": "p", "distance": 5000})).unwrap();
         let Output::Layer(d) = r.output else { panic!("layer") };
         assert_eq!(d.features.len(), 1);
     }
@@ -2396,20 +2400,20 @@ mod tests {
         register();
         let layers = Layers(vec![bowtie("bow"), square("sq", 10.0, 50.0, 0.01), square("cut", 10.0, 50.0, 0.005)]);
         // Check Geometry names the self-intersection; Repair Geometry (in place) rebuilds it.
-        let Output::Table(t) = rustgis_analysis::run("geoforge:check_geometry", &layers, &json!({"input": "bow"})).unwrap().output else {
+        let Output::Table(t) = rustgis_analysis::run("unigis:check_geometry", &layers, &json!({"input": "bow"})).unwrap().output else {
             panic!("table")
         };
         assert_eq!(t.fields.iter().map(|f| f.name.as_str()).collect::<Vec<_>>(), ["CLASS", "FEATURE_ID", "PROBLEM"]);
         assert_eq!(t.features.len(), 1);
         let Output::Update { layer, dataset } =
-            rustgis_analysis::run("geoforge:repair_geometry", &layers, &json!({"input": "bow"})).unwrap().output
+            rustgis_analysis::run("unigis:repair_geometry", &layers, &json!({"input": "bow"})).unwrap().output
         else {
             panic!("update")
         };
         assert_eq!((layer.as_str(), dataset.features.len()), ("bow", 1));
         // Add Geometry Attributes: the area is on the ground (about 0.01 deg x 0.01 deg at 50 N), the centroid is a coordinate.
         let Output::Update { dataset: g, .. } = rustgis_analysis::run(
-            "geoforge:add_geometry_attributes",
+            "unigis:add_geometry_attributes",
             &layers,
             &json!({"input": "sq", "properties": "AREA;CENTROID", "area_unit": "SQUARE_KILOMETERS"}),
         )
@@ -2425,9 +2429,7 @@ mod tests {
         assert!((at("CENTROID_X") - 10.005).abs() < 1e-9 && (at("CENTROID_Y") - 50.005).abs() < 1e-9);
         // Split: the square cut by the smaller one, named by the text field's value.
         let Output::Layers(parts) =
-            rustgis_analysis::run("geoforge:split", &layers, &json!({"input": "sq", "other": "cut", "split_field": "NAME"}))
-                .unwrap()
-                .output
+            rustgis_analysis::run("unigis:split", &layers, &json!({"input": "sq", "other": "cut", "split_field": "NAME"})).unwrap().output
         else {
             panic!("layers")
         };
@@ -2441,11 +2443,11 @@ mod tests {
     fn vector_to_raster_and_zonal_table() {
         register();
         let layers = Layers(vec![square("sq", 10.0, 50.0, 0.01)]);
-        let r = raster_of(rustgis_analysis::run("geoforge:polygon_to_raster", &layers, &json!({"input": "sq", "cell_size": 0.001})));
+        let r = raster_of(rustgis_analysis::run("unigis:polygon_to_raster", &layers, &json!({"input": "sq", "cell_size": 0.001})));
         assert_eq!((r.width, r.height, r.epsg), (10, 10, Some(4326)));
         assert!(r.bands[0].iter().all(|v| *v == 1.0));
         // A cell size that would need more cells than a raster may have is refused.
-        let e = rustgis_analysis::run("geoforge:polygon_to_raster", &layers, &json!({"input": "sq", "cell_size": 1e-12})).unwrap_err();
+        let e = rustgis_analysis::run("unigis:polygon_to_raster", &layers, &json!({"input": "sq", "cell_size": 1e-12})).unwrap_err();
         assert!(e.contains("cells"), "{e}");
         // Zonal Statistics as Table: two zones over the cone.
         let (_, inp) = dem("DEM");
@@ -2461,7 +2463,7 @@ mod tests {
         let mut inp = inp;
         inp.rasters.push(("Z".into(), rustgis_data::raster::read_path(&zones_path).unwrap(), zones_path.display().to_string()));
         let Output::Table(t) = rustgis_analysis::run(
-            "geoforge:zonal_statistics_as_table",
+            "unigis:zonal_statistics_as_table",
             &inp,
             &json!({"zones": "Z", "input": "DEM", "statistics_type": "MEAN"}),
         )

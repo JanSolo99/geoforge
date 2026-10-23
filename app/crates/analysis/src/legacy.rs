@@ -1,6 +1,6 @@
 //! One tool list: the built-in tools that an ArcGIS-verified counterpart replaces.
 //!
-//! The application's own tools predate the UniGIS suite (`rustgis-geoforge`, ids `geoforge:*`),
+//! The application's own tools predate the UniGIS suite (`rustgis-geoforge`, ids `unigis:*`),
 //! whose tools are matched to ArcGIS Pro. When both have a tool (Buffer, Clip, Minimum Bounding
 //! Geometry...), only the suite's is listed and run. The built-in ids (saved models, history,
 //! scripts) still resolve, to the suite's tool, and their parameters are translated.
@@ -17,12 +17,15 @@ pub const ALIASES: &[(&str, &str)] = &[
 ];
 
 /// The prefix of the ArcGIS-verified suite's tool ids.
-pub const SUITE_PREFIX: &str = "geoforge:";
+pub const SUITE_PREFIX: &str = "unigis:";
 
-/// The suite's id for a built-in tool id (`buffer` is `geoforge:buffer`; `convexHull` is
-/// `geoforge:minimum_bounding_geometry`).
+/// The suite's id prefix before the rename; ids with it still resolve.
+pub const OLD_SUITE_PREFIX: &str = "geoforge:";
+
+/// The suite's id for a built-in tool id (`buffer` is `unigis:buffer`; `convexHull` is
+/// `unigis:minimum_bounding_geometry`).
 pub fn counterpart_id(id: &str) -> String {
-    let id = id.strip_prefix(SUITE_PREFIX).unwrap_or(id);
+    let id = id.strip_prefix(SUITE_PREFIX).or_else(|| id.strip_prefix(OLD_SUITE_PREFIX)).unwrap_or(id);
     let canonical = ALIASES.iter().find(|(old, _)| old.eq_ignore_ascii_case(id)).map_or(id, |(_, new)| new);
     format!("{SUITE_PREFIX}{canonical}")
 }
@@ -42,7 +45,7 @@ fn upper(p: &mut Map<String, Value>, key: &str) {
 }
 
 /// Parameters written for a built-in tool, in the names of its ArcGIS-verified counterpart
-/// `spec_id` (`geoforge:...`). Parameters already in the counterpart's names pass unchanged.
+/// `spec_id` (`unigis:...`). Parameters already in the counterpart's names pass unchanged.
 pub fn translate_params(spec_id: &str, params: &Value) -> Value {
     let Some(obj) = params.as_object() else { return params.clone() };
     let mut p = obj.clone();

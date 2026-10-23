@@ -33,7 +33,7 @@ from . import Layer, GeoForgeError, Session
 
 __all__ = ["Result", "env", "use", "session", "analysis", "management", "sa", "conversion", "ListTools"]
 
-_PREFIX = "geoforge:"
+_PREFIX = "unigis:"
 
 
 class _Env:
