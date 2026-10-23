@@ -1,26 +1,22 @@
 # Current handoff
 
-Updated: 2026-10-23T04:36:28+00:00; last agent: Codex.
+Updated: 2026-10-23T04:36:58+00:00; last agent: Codex.
 Directory: `/mnt/media/ArcGIS_Linux`.
 Branch: `codex/unigis-docking-and-branding`.
 HEAD before requested commit: `34695ef401afe721e0c3ab432de429c136b8760a`.
 
 ## Current objective and status
 
-User explicitly requested a new Codex branch, commit and push for the existing work.
-On 2026-10-23 user directed "push now", authorizing cancellation of the slow full
-app test build and proceeding with completed checks. Branch exists; commit/push next.
-All 199 reviewed paths are now staged. Staged whitespace check passed and
-staged path set exactly matches the manifest, with no worktree/private-log paths.
-This checkpoint will be staged before commit.
-All 199 prepared file hashes matched at startup. No source changes were lost,
-transferred between worktrees, reset or stashed. `.worktrees/` is excluded.
+Completed requested branch, commit and push. Implementation commit `8853f90`
+contains all 199 reviewed files and was pushed successfully to
+`origin/codex/unigis-docking-and-branding`, with upstream tracking enabled.
+This final documentation checkpoint records that verified push outcome.
 
-Current turn: read required instructions/status/diffs, created branch, reviewed
-prepared scope, passed root precommit gates, and started the full app gate.
-Only new content change this turn is coordinator README clarification: `/cli`
-opens native UI but does not itself change resumed permissions; `/permissions`
-can enable specific approval requests while retaining workspace sandboxing.
+User explicitly directed "push now", authorizing cancellation of the slow full
+app test build and proceeding with completed checks. No source changes were
+lost, reset or stashed. Existing `.worktrees/` remains excluded and preserved.
+Current session created the branch, ran validation, committed and pushed;
+implementation below was inherited from earlier development turns.
 
 ## Implementation being committed (inherited from previous turns)
 
@@ -91,13 +87,10 @@ test results; these 31 tests remain unverified.
 
 ## Next actions
 
-1. Commit the reviewed staged 199-file scope on current Codex branch and push to
-   origin with upstream tracking. User explicitly authorized both and waived
-   waiting for full app CI. Exclude `.worktrees/` and private runtime logs.
-2. Record actual commit/push outcome in this handoff and checkpoint it.
-3. Future validation: finish `cargo xtask ci` (full tests and layers), including
+1. Branch-and-commit task is complete; no additional implementation requested.
+2. Future validation: finish `cargo xtask ci` (full tests and layers), including
    the 31 local-TCP tests. Prior scoped and root checks above passed.
-4. Future docking work: floating windows, arbitrary split groups and attribute
-   table redocking are tracked in KNOWN_GAPS. No unrelated follow-up started.
+3. Future docking work: floating windows, arbitrary split groups and attribute
+   table redocking are tracked in KNOWN_GAPS.
 
 Full CI was terminated at user request; no agents/coordinators launched.
