@@ -13,16 +13,16 @@ ManifestDPIAware true
 !define PUBLISHER "Open Geospatial Solutions"
 !define UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP}"
 
-Name "${APP}"
+Name "UniGIS"
 OutFile "${OUTFILE}"
 InstallDir "$LOCALAPPDATA\Programs\${APP}"
 InstallDirRegKey HKCU "Software\${APP}" "InstallDir"
 
 VIProductVersion "${VERSION4}"
-VIAddVersionKey "ProductName" "${APP}"
+VIAddVersionKey "ProductName" "UniGIS"
 VIAddVersionKey "ProductVersion" "${VERSION}"
 VIAddVersionKey "FileVersion" "${VERSION}"
-VIAddVersionKey "FileDescription" "${APP} ${VERSION} setup"
+VIAddVersionKey "FileDescription" "UniGIS ${VERSION} setup"
 VIAddVersionKey "CompanyName" "${PUBLISHER}"
 VIAddVersionKey "LegalCopyright" "Copyright the RustGIS contributors. Apache-2.0."
 
@@ -35,7 +35,7 @@ VIAddVersionKey "LegalCopyright" "Copyright the RustGIS contributors. Apache-2.0
 !define MUI_UNWELCOMEFINISHPAGE_BITMAP "${SIDEBAR}"
 !define MUI_ABORTWARNING
 !define MUI_FINISHPAGE_RUN "$INSTDIR\rustgis.exe"
-!define MUI_FINISHPAGE_RUN_TEXT "Start ${APP}"
+!define MUI_FINISHPAGE_RUN_TEXT "Start UniGIS"
 
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "${STAGE}\LICENSE"
@@ -65,7 +65,7 @@ Section "Install"
   File /oname=LICENSE.txt "${STAGE}\LICENSE"
   WriteUninstaller "$INSTDIR\uninstall.exe"
 
-  CreateShortcut "$SMPROGRAMS\${APP}.lnk" "$INSTDIR\rustgis.exe"
+  CreateShortcut "$SMPROGRAMS\UniGIS.lnk" "$INSTDIR\rustgis.exe"
 
   ; rustgis-cli from any new terminal.
   InitPluginsDir
@@ -73,11 +73,11 @@ Section "Install"
   nsExec::ExecToLog 'powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$PLUGINSDIR\path.ps1" add "$INSTDIR"'
   Pop $0
   StrCmp $0 0 +2
-    MessageBox MB_OK|MB_ICONEXCLAMATION "${APP} is installed, but rustgis-cli could not be added to your PATH ($0). Run it from $INSTDIR instead." /SD IDOK
+    MessageBox MB_OK|MB_ICONEXCLAMATION "UniGIS is installed, but rustgis-cli could not be added to your PATH ($0). Run it from $INSTDIR instead." /SD IDOK
   !insertmacro RefreshEnvironment
 
   ; Projects open in RustGIS; GeoJSON lists it under Open with.
-  WriteRegStr HKCU "Software\Classes\RustGIS.Project" "" "RustGIS project"
+  WriteRegStr HKCU "Software\Classes\RustGIS.Project" "" "UniGIS project"
   WriteRegStr HKCU "Software\Classes\RustGIS.Project\DefaultIcon" "" '"$INSTDIR\rustgis.exe",0'
   WriteRegStr HKCU "Software\Classes\RustGIS.Project\shell\open\command" "" '"$INSTDIR\rustgis.exe" "%1"'
   WriteRegStr HKCU "Software\Classes\.rgis" "" "RustGIS.Project"
@@ -87,7 +87,7 @@ Section "Install"
 
   ; Apps & features.
   WriteRegStr HKCU "Software\${APP}" "InstallDir" "$INSTDIR"
-  WriteRegStr HKCU "${UNINST_KEY}" "DisplayName" "${APP}"
+  WriteRegStr HKCU "${UNINST_KEY}" "DisplayName" "UniGIS"
   WriteRegStr HKCU "${UNINST_KEY}" "DisplayVersion" "${VERSION}"
   WriteRegStr HKCU "${UNINST_KEY}" "Publisher" "${PUBLISHER}"
   WriteRegStr HKCU "${UNINST_KEY}" "DisplayIcon" '"$INSTDIR\rustgis.exe",0'
@@ -102,7 +102,7 @@ Section "Install"
 SectionEnd
 
 Section "Uninstall"
-  Delete "$SMPROGRAMS\${APP}.lnk"
+  Delete "$SMPROGRAMS\UniGIS.lnk"
 
   InitPluginsDir
   File /oname=$PLUGINSDIR\path.ps1 "${STAGE}\path.ps1"

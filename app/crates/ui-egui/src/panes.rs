@@ -12,100 +12,46 @@ use rustgis_engine::map::{ClassMethod, Layer, Marker, Ramp, RasterRenderer, Rend
 use serde_json::{Value, json};
 
 use crate::theme::{Tokens, c32, regular, rgba, semibold};
-use crate::{LeftPane, RightPane, RustGisApp, icons};
+use crate::{Pane, RustGisApp, icons};
 
 pub fn show(app: &mut RustGisApp, ui: &mut Ui) {
-    let t = Tokens::get(ui.ctx());
-    let frame = egui::Frame::NONE.fill(t.pane).inner_margin(egui::Margin::ZERO);
-    if let Some(left) = app.ui.left {
-        egui::Panel::left("left_pane").resizable(true).default_size(270.0).size_range(200.0..=480.0).frame(frame).show(ui, |ui| {
-            let (title, close) = match left {
-                LeftPane::Contents => ("Contents", "ui.pane.contents"),
-                LeftPane::Catalog => ("Catalog", "ui.pane.catalog"),
-                LeftPane::Sources => ("Data Sources", "ui.pane.sources"),
-            };
-            pane_header(app, ui, tl!(title), close, &t);
-            match left {
-                LeftPane::Contents => contents(app, ui, &t),
-                LeftPane::Catalog => catalog(app, ui, &t),
-                LeftPane::Sources => crate::sourcespane::show(app, ui, &t),
-            }
-        });
-    }
-    if let Some(right) = app.ui.right {
-        egui::Panel::right("right_pane").resizable(true).default_size(320.0).size_range(260.0..=560.0).frame(frame).show(ui, |ui| {
-            let (title, close) = match right {
-                RightPane::Geoprocessing => ("Geoprocessing", "ui.pane.geoprocessing"),
-                RightPane::Symbology => ("Symbology", "ui.pane.symbology"),
-                RightPane::History => ("History", "ui.pane.history"),
-                RightPane::Details => ("Details", "ui.pane.details"),
-                RightPane::Editing => ("Editing", "ui.pane.editing"),
-                RightPane::Design => ("Data Design", "ui.pane.design"),
-                RightPane::Workflows => ("Workflows", "ui.pane.workflows"),
-                RightPane::Script => ("Script", "ui.pane.script"),
-                RightPane::Tasks => ("Tasks", "ui.pane.tasks"),
-                RightPane::Jobs => ("Workflow Manager", "ui.pane.jobs"),
-                RightPane::Profile => ("Profile", "ui.pane.profile"),
-                RightPane::Diagnostics => ("Diagnostic Monitor", "ui.pane.diagnostics"),
-                RightPane::Infographics => ("Infographics", "ui.pane.infographics"),
-                RightPane::Report => ("Report", "ui.pane.report"),
-                RightPane::Presentation => ("Presentation", "ui.pane.presentation"),
-                RightPane::Notebook => ("Notebook", "ui.pane.notebook"),
-                RightPane::Assistant => ("AI Assistant", "ui.pane.assistant"),
-                RightPane::Shares => ("Shared Items", "ui.pane.shares"),
-                RightPane::Sql => ("SQL", "ui.pane.sql"),
-            };
-            pane_header(app, ui, tl!(title), close, &t);
-            // The chat lays out its own scrolling, with the message box kept at the bottom.
-            if right == RightPane::Assistant {
-                crate::assistantpane::show(app, ui, &t);
-                return;
-            }
-            // The SQL pane scrolls its own results sideways.
-            if right == RightPane::Sql {
-                crate::sqlpane::show(app, ui, &t);
-                return;
-            }
-            egui::ScrollArea::vertical().auto_shrink([false, false]).show(ui, |ui| {
-                egui::Frame::NONE.inner_margin(egui::Margin::symmetric(12, 8)).show(ui, |ui| match right {
-                    RightPane::Geoprocessing => geoprocessing(app, ui, &t),
-                    RightPane::Symbology => symbology(app, ui, &t),
-                    RightPane::History => history(app, ui, &t),
-                    RightPane::Details => details(app, ui, &t),
-                    RightPane::Editing => crate::editpanes::editing(app, ui, &t),
-                    RightPane::Design => crate::editpanes::design(app, ui, &t),
-                    RightPane::Workflows => crate::analysispane::workflows(app, ui, &t),
-                    RightPane::Script => crate::analysispane::script(app, ui, &t),
-                    RightPane::Tasks => crate::workspacepanes::tasks(app, ui, &t),
-                    RightPane::Jobs => crate::workspacepanes::jobs(app, ui, &t),
-                    RightPane::Profile => crate::workspacepanes::profile(app, ui, &t),
-                    RightPane::Diagnostics => crate::workspacepanes::diagnostics(app, ui, &t),
-                    RightPane::Infographics => crate::workspacepanes::infographics(app, ui, &t),
-                    RightPane::Report => crate::reportpane::report(app, ui, &t),
-                    RightPane::Presentation => crate::docpanes::presentation(app, ui, &t),
-                    RightPane::Notebook => crate::docpanes::notebook(app, ui, &t),
-                    RightPane::Assistant | RightPane::Sql => {}
-                    RightPane::Shares => crate::docpanes::shares(app, ui, &t),
-                });
-            });
-        });
-    }
+    crate::dock::show(app, ui);
 }
 
-fn pane_header(app: &mut RustGisApp, ui: &mut Ui, title: &str, close: &str, t: &Tokens) {
-    let (r, _) = ui.allocate_exact_size(vec2(ui.available_width(), 34.0), Sense::hover());
-    ui.painter().rect_filled(r, 0.0, t.pane_header);
-    ui.painter().line_segment([pos2(r.min.x, r.max.y - 0.5), pos2(r.max.x, r.max.y - 0.5)], Stroke::new(1.0, t.border));
-    ui.painter().text(pos2(r.min.x + 12.0, r.center().y), Align2::LEFT_CENTER, title, semibold(13.5), t.text);
-    let cr = Rect::from_center_size(pos2(r.max.x - 18.0, r.center().y), vec2(22.0, 22.0));
-    let resp = ui.interact(cr, egui::Id::new(("pane_close", title)), Sense::click());
-    if resp.hovered() {
-        ui.painter().rect_filled(cr, CornerRadius::same(4), t.hover);
+/// The inside of a docked pane, below its title row.
+pub fn body(app: &mut RustGisApp, ui: &mut Ui, pane: Pane, t: &Tokens) {
+    match pane {
+        Pane::Contents => return contents(app, ui, t),
+        Pane::Catalog => return catalog(app, ui, t),
+        Pane::Sources => return crate::sourcespane::show(app, ui, t),
+        // The chat lays out its own scrolling, with the message box kept at the bottom.
+        Pane::Assistant => return crate::assistantpane::show(app, ui, t),
+        // The SQL pane scrolls its own results sideways.
+        Pane::Sql => return crate::sqlpane::show(app, ui, t),
+        _ => {}
     }
-    icons::paint(ui.painter(), cr.shrink(5.0), "close", t.text_dim, t.accent);
-    if resp.on_hover_text(tl!("Close")).clicked() {
-        let _ = app.run(close, Value::Null);
-    }
+    egui::ScrollArea::vertical().id_salt(("pane_scroll", pane.key())).auto_shrink([false, false]).show(ui, |ui| {
+        egui::Frame::NONE.inner_margin(egui::Margin::symmetric(12, 8)).show(ui, |ui| match pane {
+            Pane::Geoprocessing => geoprocessing(app, ui, t),
+            Pane::Symbology => symbology(app, ui, t),
+            Pane::History => history(app, ui, t),
+            Pane::Details => details(app, ui, t),
+            Pane::Editing => crate::editpanes::editing(app, ui, t),
+            Pane::Design => crate::editpanes::design(app, ui, t),
+            Pane::Workflows => crate::analysispane::workflows(app, ui, t),
+            Pane::Script => crate::analysispane::script(app, ui, t),
+            Pane::Tasks => crate::workspacepanes::tasks(app, ui, t),
+            Pane::Jobs => crate::workspacepanes::jobs(app, ui, t),
+            Pane::Profile => crate::workspacepanes::profile(app, ui, t),
+            Pane::Diagnostics => crate::workspacepanes::diagnostics(app, ui, t),
+            Pane::Infographics => crate::workspacepanes::infographics(app, ui, t),
+            Pane::Report => crate::reportpane::report(app, ui, t),
+            Pane::Presentation => crate::docpanes::presentation(app, ui, t),
+            Pane::Notebook => crate::docpanes::notebook(app, ui, t),
+            Pane::Shares => crate::docpanes::shares(app, ui, t),
+            Pane::Contents | Pane::Catalog | Pane::Sources | Pane::Assistant | Pane::Sql => {}
+        });
+    });
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -375,7 +321,7 @@ fn layer_row(app: &mut RustGisApp, ui: &mut Ui, l: &Layer, scale: f64, t: &Token
     }
     if resp.double_clicked() {
         let _ = app.run("layer.select", json!({"layer": l.id}));
-        app.ui.right = Some(RightPane::Symbology);
+        app.ui.dock.open(Pane::Symbology);
     }
     let tip = match &l.raster {
         Some(rl) => match &rl.data {
@@ -442,7 +388,7 @@ fn layer_row(app: &mut RustGisApp, ui: &mut Ui, l: &Layer, scale: f64, t: &Token
             if ui.button(tl!(label)).clicked() {
                 let p = if id.starts_with("ui.") { Value::Null } else { json!({"layer": l.id}) };
                 if id == "ui.pane.symbology" {
-                    app.ui.right = Some(RightPane::Symbology);
+                    app.ui.dock.open(Pane::Symbology);
                 } else {
                     let _ = app.run(id, p);
                 }
@@ -559,15 +505,8 @@ fn catalog(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
                     egui::CollapsingHeader::new(crate::i18n::location(b)).default_open(false).show(ui, |ui| {
                         let in_box: Vec<&rustgis_engine::analysis::ToolSpec> =
                             tools().filter(|x| x.toolbox.split(" › ").next() == Some(b)).collect();
-                        // A large toolbox (the GeoLibre suite) opens one level at a time:
-                        // `GeoLibre › Raster › General`.
-                        if in_box.len() > 40 {
-                            toolbox_levels(app, ui, &in_box, 1, &link);
-                        } else {
-                            for tool in in_box {
-                                link(app, ui, tool);
-                            }
-                        }
+                        // One level at a time: `Analysis Tools › Overlay`, `GeoLibre › Raster › General`.
+                        toolbox_levels(app, ui, &in_box, 1, &link);
                     });
                 }
             });
@@ -1184,9 +1123,9 @@ fn geolibre_uninstall(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
         (false, false) => tl!("Uninstall"),
     };
     let tip = if web {
-        tl!("Unload the GeoLibre tools and stop loading them when GeoForge starts.")
+        tl!("Unload the GeoLibre tools and stop loading them when UniGIS starts.")
     } else {
-        tl!("Delete the GeoLibre runner that GeoForge installed. Install it again at any time.")
+        tl!("Delete the GeoLibre runner that UniGIS installed. Install it again at any time.")
     };
     let text = egui::RichText::new(label).size(11.0);
     let resp = ui.small_button(if app.gp.confirm_uninstall { text.color(t.red) } else { text }).on_hover_text(tip);
@@ -1354,46 +1293,46 @@ fn geoprocessing(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
                 }
             }
         };
-        // GeoForge's ArcGIS-verified tools, by ArcGIS toolbox ("GeoForge › Spatial Analyst › Surface"):
-        // first, as they are the ones that behave like ArcGIS Pro.
-        let geoforge: Vec<&'static rustgis_engine::analysis::ToolSpec> =
-            rustgis_engine::analysis::external_tools_of("geoforge").iter().filter(|x| matches(x)).collect();
-        if !geoforge.is_empty() {
-            ui.label(egui::RichText::new(tl!("GeoForge · ArcGIS Pro tools")).size(11.0).color(t.text_dim));
+        // The tools, one tree by ArcGIS Pro's toolbox and toolset (`Analysis Tools › Overlay`),
+        // first: they are the ones that behave like ArcGIS Pro. The GeoLibre and plugin tools
+        // have toolboxes of their own.
+        let own: Vec<&'static rustgis_engine::analysis::ToolSpec> = rustgis_engine::analysis::tools()
+            .filter(|x| {
+                let source = rustgis_engine::analysis::external_source(x);
+                source != Some("geolibre") && source != Some(rustgis_engine::plugins::tools::SOURCE)
+            })
+            .filter(|x| matches(x))
+            .collect();
+        if !own.is_empty() {
             let level = |tool: &rustgis_engine::analysis::ToolSpec, i: usize| tool.toolbox.split(" › ").nth(i);
-            if q.is_empty() {
-                let mut tops: Vec<&str> = geoforge.iter().filter_map(|x| level(x, 1)).collect();
-                tops.sort();
-                tops.dedup();
-                for top in tops {
-                    let in_top: Vec<_> = geoforge.iter().copied().filter(|x| level(x, 1) == Some(top)).collect();
-                    egui::CollapsingHeader::new(format!("{} ({})", crate::i18n::location(top), in_top.len()))
-                        .id_salt(("gf-box", top))
-                        .default_open(false)
-                        .show(ui, |ui| {
-                            let mut subs: Vec<&str> = in_top.iter().filter_map(|x| level(x, 2)).collect();
-                            subs.sort();
-                            subs.dedup();
-                            for sub in subs {
-                                let in_sub: Vec<_> = in_top.iter().copied().filter(|x| level(x, 2) == Some(sub)).collect();
-                                egui::CollapsingHeader::new(format!("{} ({})", crate::i18n::location(sub), in_sub.len()))
-                                    .id_salt(("gf-box", top, sub))
-                                    .default_open(false)
-                                    .show(ui, |ui| {
-                                        for tool in in_sub {
-                                            row(app, ui, tool);
-                                        }
-                                    });
-                            }
-                            for tool in in_top.iter().copied().filter(|x| level(x, 2).is_none()) {
-                                row(app, ui, tool);
-                            }
-                        });
-                }
-            } else {
-                for tool in &geoforge {
-                    row(app, ui, tool);
-                }
+            let mut tops: Vec<&str> = own.iter().filter_map(|x| level(x, 0)).collect();
+            tops.sort();
+            tops.dedup();
+            for top in tops {
+                let in_top: Vec<_> = own.iter().copied().filter(|x| level(x, 0) == Some(top)).collect();
+                // Searching opens the toolboxes, so the matches show.
+                egui::CollapsingHeader::new(format!("{} ({})", crate::i18n::location(top), in_top.len()))
+                    .id_salt(("gp-box", top))
+                    .open(if q.is_empty() { None } else { Some(true) })
+                    .show(ui, |ui| {
+                        let mut subs: Vec<&str> = in_top.iter().filter_map(|x| level(x, 1)).collect();
+                        subs.sort();
+                        subs.dedup();
+                        for sub in subs {
+                            let in_sub: Vec<_> = in_top.iter().copied().filter(|x| level(x, 1) == Some(sub)).collect();
+                            egui::CollapsingHeader::new(format!("{} ({})", crate::i18n::location(sub), in_sub.len()))
+                                .id_salt(("gp-box", top, sub))
+                                .open(if q.is_empty() { None } else { Some(true) })
+                                .show(ui, |ui| {
+                                    for tool in in_sub {
+                                        row(app, ui, tool);
+                                    }
+                                });
+                        }
+                        for tool in in_top.iter().copied().filter(|x| level(x, 1).is_none()) {
+                            row(app, ui, tool);
+                        }
+                    });
             }
             ui.add_space(6.0);
         }
@@ -1420,49 +1359,6 @@ fn geoprocessing(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
         }
         if q.is_empty() {
             geolibre_section(app, ui);
-        }
-        // The app's own tools that GeoForge has a counterpart for (matched to ArcGIS) are not listed twice.
-        let builtin: Vec<&'static rustgis_engine::analysis::ToolSpec> = rustgis_engine::analysis::TOOLS
-            .iter()
-            .filter(|t| {
-                !rustgis_engine::analysis::external_tools().iter().any(|x| x.id.eq_ignore_ascii_case(&format!("geoforge:{}", t.id)))
-            })
-            .collect();
-        if q.is_empty() {
-            // Browsing: one collapsible toolbox per top-level group, like the GeoLibre ones
-            // (open: there are only a few built-in tools).
-            ui.label(egui::RichText::new(tl!("More tools")).size(11.0).color(t.text_dim));
-            let mut tops: Vec<&str> = builtin.iter().map(|t| t.toolbox.split(" › ").next().unwrap_or(t.toolbox)).collect();
-            tops.sort();
-            tops.dedup();
-            for top in tops {
-                let in_top: Vec<_> = builtin.iter().filter(|x| x.toolbox.split(" › ").next() == Some(top)).collect();
-                egui::CollapsingHeader::new(format!("{} ({})", crate::i18n::location(top), in_top.len()))
-                    .id_salt(("gp-builtin", top))
-                    .default_open(true)
-                    .show(ui, |ui| {
-                        for tool in in_top {
-                            row(app, ui, tool);
-                        }
-                    });
-            }
-            ui.add_space(6.0);
-        } else {
-            // Searching: the matches under their toolbox.
-            let mut boxes: Vec<&str> = builtin.iter().map(|t| t.toolbox).collect();
-            boxes.sort();
-            boxes.dedup();
-            for b in boxes {
-                let found: Vec<_> = builtin.iter().filter(|x| x.toolbox == b && matches(x)).collect();
-                if found.is_empty() {
-                    continue;
-                }
-                ui.label(egui::RichText::new(crate::i18n::location(b)).size(11.0).color(t.text_dim));
-                for tool in found {
-                    row(app, ui, tool);
-                }
-                ui.add_space(6.0);
-            }
         }
         if !q.is_empty() {
             geolibre_section(app, ui);

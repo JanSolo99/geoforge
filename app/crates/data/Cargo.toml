@@ -3,7 +3,7 @@ name = "rustgis-data"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "GeoForge L1: feature model, attribute values, vector I/O (GeoJSON, CSV, Shapefile, GeoPackage, GeoParquet, FlatGeobuf, KML/KMZ, GPX), data providers (GeoParquet, FlatGeobuf, GeoPackage) and rasters (GeoTIFF, ASCII grid)"
+description = "UniGIS L1: feature model, attribute values, vector I/O (GeoJSON, CSV, Shapefile, GeoPackage, GeoParquet, FlatGeobuf, KML/KMZ, GPX), data providers (GeoParquet, FlatGeobuf, GeoPackage) and rasters (GeoTIFF, ASCII grid)"
 
 [lints]
 workspace = true
@@ -36,11 +36,11 @@ image = { workspace = true, features = ["jpeg"] }
 base64 = { workspace = true }
 lz4_flex = { workspace = true }
 ruzstd = { workspace = true }
-# GeoForge's geometry model (the parent repository); pure, so it builds for the browser.
+# UniGIS's geometry model (the parent repository); pure, so it builds for the browser.
 geoforge-core = { path = "../../../crates/geoforge-core" }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-# GeoForge's engine (the parent repository): File Geodatabase reading.
+# UniGIS's engine (the parent repository): File Geodatabase reading.
 geoforge-filegdb = { path = "../../../crates/geoforge-filegdb" }
 rusqlite = { workspace = true }
 postgres = { workspace = true }

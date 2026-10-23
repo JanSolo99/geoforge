@@ -26,7 +26,7 @@ Formats](data-formats.md).
 | ASCII grid (`.asc`, with an optional `.prj`) | Yes | No |
 | Through GDAL: JPEG 2000, ERDAS Imagine, SRTM HGT, DTED, NetCDF, HDF, ENVI, SAGA… | Yes (desktop, when GDAL is installed) | No |
 | Web tiles: XYZ/TMS/WMS rasters, Mapbox Vector Tiles, MapLibre styles, PMTiles and MBTiles archives | Yes | Yes (Analyze › Create Hosted Imagery) |
-| RustGIS project (`.rgis`; older `.rgisx` files open too) | Yes | Yes |
+| UniGIS project (`.rgis`; older `.rgisx` files open too) | Yes | Yes |
 
 Add data with **Home › Add Data** (**From URL…** adds a file by its web address, reading a
 cloud-optimised GeoTIFF, GeoParquet or FlatGeobuf in place, a view at a time, and downloading
@@ -59,10 +59,10 @@ reprojected on the fly as they draw.
 When [GDAL](https://gdal.org) is installed (its `ogr2ogr` and `ogrinfo` programs on the `PATH`,
 or the folder holding them in `RUSTGIS_GDAL_BIN`; GDAL 3.7 or later), the desktop app also opens
 the vector formats GDAL reads: File Geodatabases, DWG, MapInfo TAB, OpenStreetMap XML
-and more. RustGIS doesn't link to GDAL: each layer is converted once, by `ogr2ogr`, into a
+and more. UniGIS doesn't link to GDAL: each layer is converted once, by `ogr2ogr`, into a
 FlatGeobuf with a spatial index in WGS 84 (GDAL reprojects it), kept in the cache folder
 (`~/.cache/rustgis/gdal` on Linux, `~/Library/Caches/RustGIS/gdal` on macOS,
-`%LOCALAPPDATA%\RustGIS\cache\gdal` on Windows, or `RUSTGIS_GDAL_CACHE`). Adding the file again
+`%LOCALAPPDATA%\UniGIS\cache\gdal` on Windows, or `RUSTGIS_GDAL_CACHE`). Adding the file again
 reuses the conversion until the file changes, and large layers stream like any large FlatGeobuf
 (below). Every layer of the file is added; a layer mixing geometry types is
 added as one layer per type. Projects remember the original file and convert it again if the
@@ -100,7 +100,7 @@ WHERE bbox.xmin BETWEEN -83.95 AND -83.89 AND bbox.ymin BETWEEN 35.94 AND 35.98
 ```
 
 The first geometry column becomes the layer's geometry; other columns become its attributes (types
-RustGIS doesn't read, such as dates and lists, as text). A geometry that says its coordinate system
+UniGIS doesn't read, such as dates and lists, as text). A geometry that says its coordinate system
 is converted to longitude/latitude; give `"crs"` (such as `EPSG:2263`) for one that doesn't. A
 result mixing geometry types becomes a layer per type, and rows without a geometry are left out.
 `"database"` opens a DuckDB database (read only) so the query names its tables plainly; the
@@ -112,7 +112,7 @@ column becomes a layer (`"layer"` picks one).
 ### PostgreSQL and PostGIS
 
 **Home › Add Data › Database…** (`layer.addDatabase`) connects to a PostgreSQL database with
-PostGIS and reads its tables live. RustGIS talks to the server itself (nothing else to install;
+PostGIS and reads its tables live. UniGIS talks to the server itself (nothing else to install;
 TLS as libpq does it). `sslmode=prefer` (the default) and `require` encrypt the connection but
 don't check the server's certificate, so they don't protect against a server in the middle:
 use `verify-full` (or `verify-ca`, which here checks the host name too) on networks you don't
@@ -136,7 +136,7 @@ type, and empty tables (such as the TIGER geocoder's) are left out. Features kee
 views: the table's integer primary key, else the row's place in the table (the rows of a view or
 a partitioned table without a key are numbered as read, so theirs can change between views).
 
-The password is kept until RustGIS closes and never written to the project, which names the
+The password is kept until UniGIS closes and never written to the project, which names the
 connection without it. Without one, `PGPASSWORD` or libpq's password file (`~/.pgpass`, or
 `%APPDATA%\postgresql\pgpass.conf`) serve when you add a table. A project keeps a streamed
 table's connection and reads it again when it opens, sending only a password given in this
@@ -153,9 +153,9 @@ reaches DuckDB in its environment (`PGPASSWORD`), never on its command line:
 rustgis-cli run --cmd 'layer.addSql={"sql":"SELECT name, geom FROM roads WHERE lanes > 2","database":"postgres:host=localhost dbname=gis user=postgres","password":"…"}'
 ```
 
-RustGIS doesn't link to DuckDB: it runs `duckdb`, which writes the result as GeoParquet in the
+UniGIS doesn't link to DuckDB: it runs `duckdb`, which writes the result as GeoParquet in the
 cache folder (`~/.cache/rustgis/duckdb` on Linux, `~/Library/Caches/RustGIS/duckdb` on macOS,
-`%LOCALAPPDATA%\RustGIS\cache\duckdb` on Windows, or `RUSTGIS_DUCKDB_CACHE`), sorted along a
+`%LOCALAPPDATA%\UniGIS\cache\duckdb` on Windows, or `RUSTGIS_DUCKDB_CACHE`), sorted along a
 Hilbert curve with a bounding-box covering, so large results stream like any large GeoParquet
 (below). DuckDB Spatial is installed the first time (a download from DuckDB's extension
 repository). A database table is converted once and reused until the file changes; a query runs
@@ -191,7 +191,7 @@ rustgis-cli run --cmd 'stac.search={"collections":"sentinel-2-l2a","bbox":[7.4,4
 
 Assets are added by their web address: one in a cloud store's own protocol (`s3://`) is refused
 with a message saying so, and an item on the web can't point into the local network. A Planetary
-Computer asset (in Azure Blob Storage) is signed first: RustGIS asks the Planetary Computer's
+Computer asset (in Azure Blob Storage) is signed first: UniGIS asks the Planetary Computer's
 token service for its storage container's token and reuses it for half an hour. The token is part
 of the layer's address, so a project saved with one reads it again only while the token lasts
 (about an hour): add the asset again after that. A `?stac=` link opens the web app on an item or a
@@ -245,7 +245,7 @@ without a point.
 
 The geocoder is OpenStreetMap's public [Nominatim](https://nominatim.org) by default, or
 [Photon](https://photon.komoot.io) (`"provider": "photon"`). Their usage policies allow light
-use, so RustGIS sends them at most one request a second and 100 addresses a run; give `"url"` of
+use, so UniGIS sends them at most one request a second and 100 addresses a run; give `"url"` of
 a Nominatim or Photon server of your own for more (up to 10,000, with no wait between requests).
 In the app the requests go out in the background, one at a time, and the layer is added when the
 last answer lands; `layer.geocode` on the command line waits for them.
@@ -285,7 +285,7 @@ the network permission. OpenStreetMap data is © OpenStreetMap contributors (ODb
 ## Open-data portals
 
 **Home › Add Data › Search Open Data…** (`portal.search`) finds datasets by text in an open-data
-portal and lists, for each, the resources RustGIS can add, the best format first:
+portal and lists, for each, the resources UniGIS can add, the best format first:
 
 - **data.gov and CKAN catalogues**: [catalog.data.gov](https://catalog.data.gov) by default, or a
   CKAN site by its address (`https://open.canada.ca/data`, `https://data.gov.uk`…). GeoJSON,
@@ -337,7 +337,7 @@ rustgis-cli run --cmd 's3.connect={"name":"minio","endpoint":"https://minio.exam
   --cmd 's3.list={"url":"s3://my-bucket/rasters/"}' --cmd 'layer.addUrl={"url":"s3://my-bucket/rasters/dem.tif"}'
 ```
 
-Keys are kept until RustGIS closes: never in a project (which keeps the `s3://` address), a
+Keys are kept until UniGIS closes: never in a project (which keeps the `s3://` address), a
 command's result, a notice or the log. **Remember** keeps a connection's name, endpoint and region
 in the app's settings, never its secret; storing secrets in the system keychain isn't supported.
 Keys go only to the endpoint they're for: a signed request that is redirected isn't followed, and
@@ -476,7 +476,7 @@ opens the dialog on a store.
 
 ## Project items
 
-RustGIS saves pieces of a project as files you can share and reuse:
+UniGIS saves pieces of a project as files you can share and reuse:
 
 | Item | Extension | Made with | Opened with |
 | --- | --- | --- | --- |

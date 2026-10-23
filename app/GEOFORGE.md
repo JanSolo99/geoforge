@@ -1,15 +1,15 @@
-# RustGIS inside GeoForge
+# RustGIS inside UniGIS
 
 This directory is a copy of [opengeos/RustGIS](https://github.com/opengeos/RustGIS) (Apache-2.0,
 see `LICENSE`), commit `4616893ccd13ca8fb174874aebe2b0c08e53915f`, taken 2026-10-16. It is its own Cargo workspace: the application
 shell (map view, symbology, labels, layouts, tiles, web app, Python/MCP, assistant).
 
-GeoForge's engine (`../crates`: File Geodatabase, ArcGIS-verified geoprocessing, rasters) is to be
+UniGIS's engine (`../crates`: File Geodatabase, ArcGIS-verified geoprocessing, rasters) is to be
 wired in as the data and analysis backend. Changes we make here stay under Apache-2.0; keep the
 original copyright notices and mark modified files.
 
 ## Wiring status
-- `crates/data/src/source/filegdb.rs` (added by GeoForge): a `FeatureSource` for `.gdb` folders over
+- `crates/data/src/source/filegdb.rs` (added by UniGIS): a `FeatureSource` for `.gdb` folders over
   `geoforge-filegdb` (spatial-index extent reads, curves densified, MultiPatch refused). Reached through
   `source::open_path` for the `gdb` extension; not in `EXTENSIONS`, since a geodatabase is a folder.
   Desktop only (not built for wasm32).
@@ -45,7 +45,7 @@ original copyright notices and mark modified files.
   cells, a neighborhood of millions of cells) are refused; the hostile-parameter test covers them.
 - The CLI, Python and MCP surfaces of the app dispatch through `gp.run`, so every registered tool is
   reachable from them (`rustgis-cli run --cmd 'gp.run={"tool":"geoforge:buffer",...}'`, checked end to end
-  with an export to a `.gdb`). The hostile-parameter test runs every registered GeoForge tool on junk
+  with an export to a `.gdb`). The hostile-parameter test runs every registered UniGIS tool on junk
   parameters and fails if one panics.
 - Next: Check/Repair Geometry, Split, Project (needs a PROJ-free path), Feature Class To Feature Class, and
   the raster tools in the registry.

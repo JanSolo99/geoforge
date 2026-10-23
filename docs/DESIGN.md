@@ -1,4 +1,4 @@
-# GeoForge GUI design direction
+# UniGIS GUI design direction
 
 North star: **ArcGIS Pro**. The app in `app/` is a vendored RustGIS (egui). The goal is "similar but
 different": follow Pro wherever Pro has an opinion (structure, names, workflows), and make our own
@@ -15,7 +15,7 @@ measurement.
 ## 1. Current app inventory
 
 Layout (`docs/screenshots/geoforge-map.png`):
-- Title bar (34 px, `chrome.rs::header`): logo, "GeoForge", Quick Access Toolbar (new/open/save/undo/redo),
+- Title bar (34 px, `chrome.rs::header`): logo, "UniGIS", Quick Access Toolbar (new/open/save/undo/redo),
   centred project and map title, Command Search (Ctrl+K) on the right.
 - Tab strip: a filled rust "Project" button (backstage) then ten tabs: Home, Data, Style, Edit, Analyze,
   View, Publish, Plugins, Settings, Help (`ribbon.rs::TABS`). Contextual tabs are folded into these.
@@ -84,7 +84,7 @@ layout and several non-Pro pane names ("Layers", "Browser", "Tools").
    tab only when a plugin registers one. The existing alias code in `ribbon.rs::current_tab` already
    maps old ids, so saved layouts keep working.
 2. **Pane names**: Contents, Catalog, Geoprocessing, Symbology, Attributes, Properties, History,
-   Notifications; keep GeoForge-specific panes (Assistant, Sql) under their own names.
+   Notifications; keep UniGIS-specific panes (Assistant, Sql) under their own names.
 3. **Docking**: left Contents/Catalog tabbed together, right Geoprocessing/Symbology/Properties tabbed,
    bottom table; panes auto-hide with a pin; pane header with title, a dropdown for the pane's
    modes, pin and close.
@@ -98,7 +98,7 @@ layout and several non-Pro pane names ("Layers", "Browser", "Tools").
 8. **Themes**: Light, Dark and "Pro" (the legacy dark-blue Pro theme, optional later).
 
 ### Deliberately different from RustGIS
-| Area | RustGIS look | GeoForge choice |
+| Area | RustGIS look | UniGIS choice |
 | --- | --- | --- |
 | Palette | cool blue-slate, `#2563EB` accent | neutral greys with Esri-like blue `#0079C1`; the rust brand `#B84A2C` stays only on the logo and the Project tab |
 | Shape | radii 5/8/10, pill search | radii 0/2/4, rectangular search, hairline borders |
@@ -170,7 +170,7 @@ surfaces, accent text and text-on-accent at least 4.5:1, both themes.
 ## 6. First slices
 
 1. **Theme swap** (S). Done. Wire `theme_pro::{light,dark}` behind a setting (`Settings > Appearance >
-   Theme: GeoForge / Classic`), apply `space`/`radius`/`type_size` in `theme::apply`, regenerate
+   Theme: UniGIS / Classic`), apply `space`/`radius`/`type_size` in `theme::apply`, regenerate
    `docs/screenshots` and compare. Tests: the contrast tests plus a screenshot script run. Risk: places
    with hard-coded 5/8/10 radii in `widgets.rs` and `ribbon.rs`; grep and route through `radius::*`.
 2. **Status bar** (S). Done: coordinate format dropdown (map units, decimal degrees, DMS), notifications bell with unread count over the notices queue, spinner and tool name while a background tool or install runs. Add cursor coordinates (map CRS, unit dropdown), a notifications bell with the

@@ -750,7 +750,7 @@ fn mesh(s: &mut Session, p: &Value) -> CmdResult {
     if nc * nr > 1_000_000 {
         return Err("the mesh would be too large; use a larger step".into());
     }
-    let mut obj = format!("# {} surface mesh exported by GeoForge\no {}\n", r.name, r.name.replace(char::is_whitespace, "_"));
+    let mut obj = format!("# {} surface mesh exported by UniGIS\no {}\n", r.name, r.name.replace(char::is_whitespace, "_"));
     let mut ids = vec![0usize; (nc * nr) as usize];
     let mut v = 0usize;
     for j in 0..nr {

@@ -23,8 +23,8 @@ A tile service's address: raster tiles with {z}/{x}/{y} (or {-y}, {q}, {bbox-eps
 A value, a field, or two of them joined by + − × ÷. Applies to the selected rows, or every row when none is selected.	값, 필드 또는 이 둘을 + − × ÷ 로 결합한 식입니다. 선택한 행에 적용되며, 선택한 행이 없으면 모든 행에 적용됩니다.
 About	정보
 About plugins	플러그인 정보
-About GeoForge	GeoForge 정보
-About GeoForge.	GeoForge 정보.
+About UniGIS	UniGIS 정보
+About UniGIS.	UniGIS 정보.
 Above	위
 Above Left	왼쪽 위
 Above Right	오른쪽 위
@@ -137,7 +137,7 @@ Area of use: within {r}° of the {lon}° meridian	사용 범위: {lon}° 경선�
 Area of use: within {r}° of {lon}°, {lat}°	사용 범위: {lon}°, {lat}°에서 {r}° 이내
 Area {area}   ·   Perimeter {perimeter}	면적 {area}   ·   둘레 {perimeter}
 Areas (name, land use, area)	영역(이름, 토지 이용, 면적)
-Ask a question about your data, or describe what to do with the map. The assistant runs GeoForge commands for you; every change can be undone.	데이터에 대해 질문하거나 지도로 할 일을 설명하세요. 어시스턴트가 GeoForge 명령을 대신 실행하며, 모든 변경은 실행 취소할 수 있습니다.
+Ask a question about your data, or describe what to do with the map. The assistant runs UniGIS commands for you; every change can be undone.	데이터에 대해 질문하거나 지도로 할 일을 설명하세요. 어시스턴트가 UniGIS 명령을 대신 실행하며, 모든 변경은 실행 취소할 수 있습니다.
 Ask about the map, or tell it what to do…	지도에 대해 묻거나 할 일을 알려 주세요…
 Ask about your data, or tell the assistant what to do with the map.	데이터에 대해 묻거나 지도로 할 일을 어시스턴트에게 알려 주세요.
 Assistant settings	어시스턴트 설정
@@ -654,7 +654,7 @@ Find a place by coordinates.	좌표로 장소를 찾습니다.
 Find and run geoprocessing tools.	지오프로세싱 도구를 찾아 실행합니다.
 Find any command by name (Ctrl+K).	이름으로 명령을 찾습니다(Ctrl+K).
 Find Place	장소 찾기
-Find plugins in the GeoForge plugin registry.	GeoForge 플러그인 레지스트리에서 플러그인을 찾습니다.
+Find plugins in the UniGIS plugin registry.	UniGIS 플러그인 레지스트리에서 플러그인을 찾습니다.
 Find Similar	유사 항목 찾기
 Find Tools	도구 찾기
 Finish Polygon	폴리곤 완료
@@ -783,7 +783,7 @@ Import Thumbnail	썸네일 가져오기
 Import Web Tool	웹 도구 가져오기
 In Beyond	다음보다 확대 시
 In Progress	진행 중
-In GeoForge, it can:	GeoForge에서 할 수 있는 작업:
+In UniGIS, it can:	GeoForge에서 할 수 있는 작업:
 in progress	진행 중
 In project	프로젝트 내
 In use	사용 중
@@ -1080,7 +1080,7 @@ North	북
 North\nArrow	방위\n표
 North Polar Stereographic	북극 평사도법
 Not sandboxed	샌드박스 밖
-not a GeoForge layout	GeoForge 레이아웃이 아닙니다
+not a UniGIS layout	UniGIS 레이아웃이 아닙니다
 not needed	필요 없음
 Not saved yet	아직 저장되지 않음
 Notebook	노트북
@@ -1110,8 +1110,8 @@ Opacity	불투명도
 Open	열기
 Open a .rgis project	.rgis 프로젝트 열기
 open a layout first	먼저 레이아웃을 여세요
-Open a GeoForge or Jupyter notebook.	GeoForge 또는 Jupyter 노트북을 엽니다.
-Open a GeoForge project.	GeoForge 프로젝트를 엽니다.
+Open a UniGIS or Jupyter notebook.	UniGIS 또는 Jupyter 노트북을 엽니다.
+Open a UniGIS project.	UniGIS 프로젝트를 엽니다.
 Open an offline area to edit.	편집할 오프라인 영역을 엽니다.
 Open Custom Template	사용자 지정 템플릿 열기
 Open Custom Template…	사용자 지정 템플릿 열기…
@@ -1128,7 +1128,7 @@ Open the attribute table of the selected layer.	선택한 레이어의 속성 �
 Open the layer's attribute table.	레이어의 속성 테이블을 엽니다.
 Open the layer's table.	레이어의 테이블을 엽니다.
 Open the Release Page	릴리스 페이지 열기
-Open the GeoForge user guide.	GeoForge 사용자 가이드를 엽니다.
+Open the UniGIS user guide.	UniGIS 사용자 가이드를 엽니다.
 Open the selected layer's table.	선택한 레이어의 테이블을 엽니다.
 Open the Symbology pane.	심볼 창을 엽니다.
 Open {code} on epsg.io	epsg.io에서 {code} 열기
@@ -1207,7 +1207,7 @@ Plugin Manager…	플러그인 관리자…
 Plugin registry	플러그인 레지스트리
 Plugins	플러그인
 Plugins are .rgplugin files. Install only plugins from people you trust.	플러그인은 .rgplugin 파일입니다. 신뢰할 수 있는 사람의 플러그인만 설치하세요.
-Plugins run in a sandbox: they can't reach your files or the network, and they change the project only through GeoForge's own commands, within the permissions you accept.	플러그인은 샌드박스에서 실행됩니다. 파일이나 네트워크에 접근할 수 없으며, 사용자가 허용한 권한 내에서 GeoForge 자체 명령을 통해서만 프로젝트를 변경합니다.
+Plugins run in a sandbox: they can't reach your files or the network, and they change the project only through UniGIS's own commands, within the permissions you accept.	플러그인은 샌드박스에서 실행됩니다. 파일이나 네트워크에 접근할 수 없으며, 사용자가 허용한 권한 내에서 UniGIS 자체 명령을 통해서만 프로젝트를 변경합니다.
 PMTiles archive	PMTiles 아카이브
 PMTiles File…	PMTiles 파일…
 PNG frames (zip)	PNG 프레임(zip)
@@ -1383,29 +1383,29 @@ Run the task	태스크 실행
 Run Tool	도구 실행
 Run {name}	{name} 실행
 Running…	실행 중…
-GeoForge	GeoForge
-GeoForge deep learning package	GeoForge 딥러닝 패키지
-GeoForge is a free and open-source GIS written in pure Rust. It runs on the desktop and in the browser, and every action is a command you can also run from the command line.	GeoForge는 순수 Rust로 작성된 무료 오픈 소스 GIS입니다. 데스크톱과 브라우저에서 실행되며, 모든 작업은 명령줄에서도 실행할 수 있는 명령입니다.
-GeoForge layer file	GeoForge 레이어 파일
-GeoForge layers, maps and projects	GeoForge 레이어, 지도 및 프로젝트
-GeoForge layout	GeoForge 레이아웃
-GeoForge maps and projects	GeoForge 지도 및 프로젝트
-GeoForge or Jupyter notebook	GeoForge 또는 Jupyter 노트북
-GeoForge plugin	GeoForge 플러그인
-GeoForge presentation	GeoForge 프레젠테이션
-GeoForge project	GeoForge 프로젝트
-GeoForge project template	GeoForge 프로젝트 템플릿
-GeoForge ran into an internal error last time. The details are in {path}; please attach them to a bug report.	지난번에 GeoForge에서 내부 오류가 발생했습니다. 자세한 내용은 {path}에 있습니다. 버그 보고서에 첨부해 주세요.
-GeoForge ran into an internal error while handling the model's reply, so the request was stopped. Please report it at https://github.com/opengeos/RustGIS/issues.	모델의 응답을 처리하는 중 GeoForge에서 내부 오류가 발생해 요청을 중지했습니다. https://github.com/opengeos/RustGIS/issues 에서 신고해 주세요.
-GeoForge report or report template	GeoForge 보고서 또는 보고서 템플릿
-GeoForge styles	GeoForge 스타일
-GeoForge task	GeoForge 태스크
-GeoForge {latest} is available.	GeoForge {latest}을(를) 사용할 수 있습니다.
-GeoForge {version} is the latest version.	GeoForge {version}이(가) 최신 버전입니다.
+UniGIS	UniGIS
+UniGIS deep learning package	UniGIS 딥러닝 패키지
+UniGIS is a free and open-source GIS written in pure Rust. It runs on the desktop and in the browser, and every action is a command you can also run from the command line.	GeoForge는 순수 Rust로 작성된 무료 오픈 소스 GIS입니다. 데스크톱과 브라우저에서 실행되며, 모든 작업은 명령줄에서도 실행할 수 있는 명령입니다.
+UniGIS layer file	UniGIS 레이어 파일
+UniGIS layers, maps and projects	UniGIS 레이어, 지도 및 프로젝트
+UniGIS layout	UniGIS 레이아웃
+UniGIS maps and projects	UniGIS 지도 및 프로젝트
+UniGIS or Jupyter notebook	UniGIS 또는 Jupyter 노트북
+UniGIS plugin	UniGIS 플러그인
+UniGIS presentation	UniGIS 프레젠테이션
+UniGIS project	UniGIS 프로젝트
+UniGIS project template	UniGIS 프로젝트 템플릿
+UniGIS ran into an internal error last time. The details are in {path}; please attach them to a bug report.	지난번에 GeoForge에서 내부 오류가 발생했습니다. 자세한 내용은 {path}에 있습니다. 버그 보고서에 첨부해 주세요.
+UniGIS ran into an internal error while handling the model's reply, so the request was stopped. Please report it at https://github.com/opengeos/RustGIS/issues.	모델의 응답을 처리하는 중 GeoForge에서 내부 오류가 발생해 요청을 중지했습니다. https://github.com/opengeos/RustGIS/issues 에서 신고해 주세요.
+UniGIS report or report template	UniGIS 보고서 또는 보고서 템플릿
+UniGIS styles	UniGIS 스타일
+UniGIS task	UniGIS 태스크
+UniGIS {latest} is available.	UniGIS {latest}을(를) 사용할 수 있습니다.
+UniGIS {version} is the latest version.	UniGIS {version}이(가) 최신 버전입니다.
 RUSTGIS_ASSISTANT_MODEL	RUSTGIS_ASSISTANT_MODEL
 RUSTGIS_ASSISTANT_PROVIDER	RUSTGIS_ASSISTANT_PROVIDER
 Sample data (Natural Earth)	샘플 데이터(Natural Earth)
-Sample data © Natural Earth (public domain). GeoForge is licensed under Apache-2.0.	샘플 데이터 © Natural Earth(퍼블릭 도메인). GeoForge는 Apache-2.0 라이선스를 따릅니다.
+Sample data © Natural Earth (public domain). UniGIS is licensed under Apache-2.0.	샘플 데이터 © Natural Earth(퍼블릭 도메인). GeoForge는 Apache-2.0 라이선스를 따릅니다.
 Sample data: Natural Earth (public domain). Licensed under Apache-2.0.	샘플 데이터: Natural Earth(퍼블릭 도메인). Apache-2.0 라이선스.
 Saturation	채도
 Save	저장
@@ -1470,7 +1470,7 @@ Sections	섹션
 See and set the camera's position and scale.	카메라의 위치와 축척을 확인하고 설정합니다.
 See the map as people with colour vision deficiencies do.	색각 이상이 있는 사람이 보는 방식으로 지도를 봅니다.
 See the tools you've run.	실행한 도구를 확인합니다.
-See whether a newer GeoForge has been released.	새 GeoForge가 출시되었는지 확인합니다.
+See whether a newer UniGIS has been released.	새 GeoForge가 출시되었는지 확인합니다.
 Select	선택
 Select (click)	선택(클릭)
 Select (rectangle)	선택(사각형)
@@ -1657,14 +1657,14 @@ Text	텍스트
 Text Symbol	텍스트 심볼
 The assistant is busy; stop it or wait for it to finish.	어시스턴트가 작업 중입니다. 중지하거나 완료될 때까지 기다리세요.
 The assistant wants to run this, and {why}:	어시스턴트가 다음 작업을 실행하려고 합니다. 이 작업은 {why} 작업입니다:
-This plugin runs as a program on your computer, outside GeoForge's sandbox. It can do anything you can: read and change your files, use the network and run other programs. Install it only if you trust its author.	이 플러그인은 GeoForge 샌드박스 밖에서 컴퓨터의 프로그램으로 실행됩니다. 파일 읽기 및 변경, 네트워크 사용, 다른 프로그램 실행 등 사용자가 할 수 있는 모든 작업을 할 수 있습니다. 작성자를 신뢰하는 경우에만 설치하세요.
+This plugin runs as a program on your computer, outside UniGIS's sandbox. It can do anything you can: read and change your files, use the network and run other programs. Install it only if you trust its author.	이 플러그인은 UniGIS 샌드박스 밖에서 컴퓨터의 프로그램으로 실행됩니다. 파일 읽기 및 변경, 네트워크 사용, 다른 프로그램 실행 등 사용자가 할 수 있는 모든 작업을 할 수 있습니다. 작성자를 신뢰하는 경우에만 설치하세요.
 the capture failed unexpectedly	캡처가 예기치 않게 실패했습니다
 the Help tab always shows	도움말 탭은 항상 표시됩니다
 The job covers the map view	작업 범위는 지도 뷰입니다
 The key is kept for this session only.	키는 이 세션 동안만 보관됩니다.
 The layer's file couldn't be read: {error}	레이어 파일을 읽을 수 없습니다: {error}
 the layout export failed unexpectedly	레이아웃 내보내기가 예기치 않게 실패했습니다
-The list of plugins to browse. Leave it empty for the GeoForge plugin registry.	둘러볼 플러그인 목록입니다. 비워 두면 GeoForge 플러그인 레지스트리를 사용합니다.
+The list of plugins to browse. Leave it empty for the UniGIS plugin registry.	둘러볼 플러그인 목록입니다. 비워 두면 UniGIS 플러그인 레지스트리를 사용합니다.
 the map has no layers	지도에 레이어가 없습니다
 The map is drawn in this coordinate system; layers are projected on the fly.	지도는 이 좌표계로 그려지며 레이어는 즉석에서 투영됩니다.
 The map view as it is now	현재 상태의 지도 뷰
@@ -1793,11 +1793,11 @@ Web Tile Layers	웹 타일 레이어
 Web Tool	웹 도구
 Website	웹사이트
 Weights	가중치
-Welcome to GeoForge	GeoForge에 오신 것을 환영합니다
+Welcome to UniGIS	GeoForge에 오신 것을 환영합니다
 West	서
 WGS 84 / Globe	WGS 84 / 지구본
 WGS 84 / Web Mercator	WGS 84 / Web Mercator
-What GeoForge opens with: the World Atlas sample or a blank map.	GeoForge가 시작할 때 여는 것: World Atlas 예제 또는 빈 지도.
+What UniGIS opens with: the World Atlas sample or a blank map.	GeoForge가 시작할 때 여는 것: World Atlas 예제 또는 빈 지도.
 What's near a point	지점 주변에 있는 것
 Where	조건
 Where Clause	WHERE 절
@@ -1903,11 +1903,11 @@ The sign-in is kept in the app's settings folder, for your user account only, an
 Sign in with your ChatGPT account.	ChatGPT 계정으로 로그인하세요.
 A ChatGPT sign-in can only be used with the OpenAI API.	ChatGPT 로그인은 OpenAI API에서만 사용할 수 있습니다.
 Continue with ChatGPT	ChatGPT로 계속
-Eligible requests in GeoForge use your ChatGPT plan. You can manage usage in ChatGPT settings.	GeoForge의 해당 요청은 ChatGPT 요금제를 사용합니다. 사용량은 ChatGPT 설정에서 관리할 수 있습니다.
+Eligible requests in UniGIS use your ChatGPT plan. You can manage usage in ChatGPT settings.	GeoForge의 해당 요청은 ChatGPT 요금제를 사용합니다. 사용량은 ChatGPT 설정에서 관리할 수 있습니다.
 Got it	확인
 Manage usage	사용량 관리
 Requests go to the OpenAI API and use your ChatGPT plan.	요청은 OpenAI API로 전송되며 ChatGPT 요금제를 사용합니다.
-Signed out on this computer, but OpenAI didn't confirm it. You can disconnect GeoForge in ChatGPT's settings.	이 컴퓨터에서 로그아웃했지만 OpenAI가 확인하지 않았습니다. ChatGPT 설정에서 GeoForge 연결을 해제할 수 있습니다.
+Signed out on this computer, but OpenAI didn't confirm it. You can disconnect UniGIS in ChatGPT's settings.	이 컴퓨터에서 로그아웃했지만 OpenAI가 확인하지 않았습니다. ChatGPT 설정에서 UniGIS 연결을 해제할 수 있습니다.
 Using ChatGPT plan	ChatGPT 요금제 사용 중
 You're using your ChatGPT plan	ChatGPT 요금제를 사용하고 있습니다
 Use another account	다른 계정 사용
@@ -1931,3 +1931,17 @@ ChatGPT plan use is unavailable for this account or workspace.	이 계정 또는
 A ChatGPT plan or app usage limit was reached. Review Weekly usage before trying again.	ChatGPT 요금제 또는 앱 사용 한도에 도달했습니다. 다시 시도하기 전에 주간 사용량을 확인하세요.
 ChatGPT usage is temporarily unavailable. Keep your sign-in and try again later.	ChatGPT 사용 정보를 일시적으로 확인할 수 없습니다. 로그인 상태를 유지하고 나중에 다시 시도하세요.
 This ChatGPT account was already saved. Next time, choose it in the list instead of adding it again.	이 ChatGPT 계정은 이미 저장되어 있습니다. 다음에는 다시 추가하지 말고 목록에서 선택하세요.
+
+Dock Left	왼쪽에 도킹
+Dock Right	오른쪽에 도킹
+Dock Bottom	아래쪽에 도킹
+Keep Open	열린 상태 유지
+Auto Hide	자동 숨기기
+Reset Layout	레이아웃 초기화
+Analysis Tools	분석 (도구)
+Cartography Tools	지도 제작 (도구)
+Conversion Tools	변환 (도구)
+Data Management Tools	데이터 관리 (도구)
+Editing Tools	편집 (도구)
+Spatial Analyst Tools	Spatial Analyst (도구)
+Spatial Statistics Tools	Spatial Statistics (도구)

@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "rustgis"
-description = "Python bindings to GeoForge, a fast, free and open-source GIS in pure Rust"
+description = "Python bindings to UniGIS, a fast, free and open-source GIS in pure Rust"
 readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.12"

@@ -1,8 +1,8 @@
-//! The tools of `geoforge_tools::registry` as GeoForge tools: their parameters become tool
+//! The tools of `geoforge_tools::registry` as UniGIS tools: their parameters become tool
 //! parameters and a run reads them through [`Context`]. A tool added to the registry needs no
 //! wrapper here.
 //!
-//! Modified for GeoForge (not part of upstream GeoForge).
+//! Modified for UniGIS (not part of upstream RustGIS).
 
 use geoforge_tools::registry::{self, Context, Kind, Tool};
 use rustgis_analysis::{Inputs, Output, ParamKind as K, ParamSpec as P, ToolResult};
@@ -83,7 +83,7 @@ impl Context for Ctx<'_> {
 pub(crate) fn run(t: &'static Tool, inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     let work = if t.measures {
         let names: Vec<&str> = t.params.iter().filter(|q| q.kind == Kind::Features).map(|q| q.name).collect();
-        let sets: Vec<&rustgis_data::Dataset> = names.iter().filter_map(|n| inp.dataset(text(p, n))).collect();
+        let sets: Vec<&rustgis_data::Dataset> = names.iter().filter_map(|n| crate::dataset_of(inp, p, n).ok()).collect();
         Work::metres(&sets)?
     } else {
         Work::degrees()

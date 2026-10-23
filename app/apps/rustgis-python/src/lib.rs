@@ -1,6 +1,6 @@
-//! Python bindings to the GeoForge engine: the native half of the `rustgis` package on PyPI.
+//! Python bindings to the UniGIS engine: the native half of the `rustgis` package on PyPI.
 //!
-//! The surface is deliberately small. Everything GeoForge does is a command with an id and JSON
+//! The surface is deliberately small. Everything UniGIS does is a command with an id and JSON
 //! parameters, so the module exposes `run(id, params_json) -> result_json` and leaves the Pythonic
 //! API (keyword arguments, `geopandas`, Jupyter display) to `python/rustgis/__init__.py`. The few
 //! things that aren't commands are here too: the map as PNG bytes, a layer as GeoJSON, and the
@@ -14,9 +14,9 @@ use pyo3::types::PyBytes;
 use rustgis_engine::{Project, Session};
 use serde_json::Value;
 
-create_exception!(_rustgis, GeoForgeError, PyException, "A GeoForge command or file operation failed.");
+create_exception!(_rustgis, GeoForgeError, PyException, "A UniGIS command or file operation failed.");
 
-/// One GeoForge session: a project with its maps, layers, undo history and selection.
+/// One UniGIS session: a project with its maps, layers, undo history and selection.
 ///
 /// Usable from any thread (Jupyter delivers a widget's messages on one of its own): every method
 /// holds the GIL throughout, so calls take turns.

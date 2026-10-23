@@ -1,6 +1,6 @@
-//! GeoForge's ArcGIS-verified raster tools (`geoforge-raster`) as GeoForge tools.
+//! UniGIS's ArcGIS-verified raster tools (`geoforge-raster`) as UniGIS tools.
 //!
-//! Modified for GeoForge (not part of upstream GeoForge).
+//! Modified for UniGIS (not part of upstream RustGIS).
 //!
 //! A raster is read from its GeoTIFF (the file it came from, or the bytes a project embeds) so
 //! that the pixel type and NoData value are the file's; a raster from another format is converted
@@ -63,7 +63,7 @@ fn data_type_of(name: &str) -> gfr::DataType {
     }
 }
 
-/// The raster the app holds, as GeoForge's model.
+/// The raster the app holds, as UniGIS's model.
 fn convert(r: &rustgis_data::raster::Raster) -> gfr::Raster {
     let t = &r.transform;
     let band = r.bands.first().map(|b| b.data.iter().map(|v| f64::from(*v)).collect()).unwrap_or_default();
@@ -1141,7 +1141,7 @@ pub(crate) fn math_specs() -> Vec<(&'static str, &'static str, &'static str, &'s
             params.push(OUTPUT);
             params.extend(ENV_PARAMS.iter().cloned());
             let leaked: &'static [P] = Box::leak(params.into_boxed_slice());
-            out.push((*id, *name, "GeoForge › Spatial Analyst › Math", *summary, leaked));
+            out.push((*id, *name, "UniGIS › Spatial Analyst › Math", *summary, leaked));
         }
     }
     out
@@ -1262,9 +1262,8 @@ fn region_group(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
         other => return Err(format!("zone connectivity {other}")),
     };
     let excluded = number(p, "excluded_value");
-    let out = eval(inp, p, &[&r], crs, Reads::Cropped, Sampling::Nearest, &|x| {
-        gfr::generalize::region_group(&x[0], eight, cross, excluded)
-    })?;
+    let out =
+        eval(inp, p, &[&r], crs, Reads::Cropped, Sampling::Nearest, &|x| gfr::generalize::region_group(&x[0], eight, cross, excluded))?;
     one(p, format!("{}_Region", base_name(inp, p, "input")), out)
 }
 
@@ -1280,12 +1279,8 @@ fn expand_shrink(inp: &dyn Inputs, p: &Json, grow: bool) -> Result<ToolResult, S
         .map(|z| z.parse::<f64>().map_err(|_| format!("zone value {z}")))
         .collect::<Result<_, _>>()?;
     let method = Method::parse(&choice(p, "method", "MORPHOLOGICAL")).ok_or("method is MORPHOLOGICAL or DISTANCE")?;
-    let out = if grow {
-        gfr::generalize::expand(&r, n, &zones, method)
-    } else {
-        gfr::generalize::shrink(&r, n, &zones, method)
-    }
-    .map_err(|e| e.0)?;
+    let out = if grow { gfr::generalize::expand(&r, n, &zones, method) } else { gfr::generalize::shrink(&r, n, &zones, method) }
+        .map_err(|e| e.0)?;
     one(p, format!("{}_{}", base_name(inp, p, "input"), if grow { "Expand" } else { "Shrink" }), out)
 }
 
@@ -1383,7 +1378,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "aggregate",
         name: "Aggregate",
-        toolbox: "GeoForge › Spatial Analyst › Generalization",
+        toolbox: "UniGIS › Spatial Analyst › Generalization",
         summary: "A coarser raster from blocks of cells, counted from the lower-left corner (ArcGIS Pro Aggregate).",
         params: &[
             RASTER,
@@ -1426,7 +1421,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "block_statistics",
         name: "Block Statistics",
-        toolbox: "GeoForge › Spatial Analyst › Neighborhood",
+        toolbox: "UniGIS › Spatial Analyst › Neighborhood",
         summary: "A statistic of each non-overlapping block, given to all its cells (ArcGIS Pro Block Statistics).",
         params: &[
             RASTER,
@@ -1461,7 +1456,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "slice",
         name: "Slice",
-        toolbox: "GeoForge › Spatial Analyst › Reclass",
+        toolbox: "UniGIS › Spatial Analyst › Reclass",
         summary: "Cuts the values into zones of equal interval (ArcGIS Pro Slice; the other methods are not done).",
         params: &[
             RASTER,
@@ -1489,7 +1484,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "pick",
         name: "Pick",
-        toolbox: "GeoForge › Spatial Analyst › Local",
+        toolbox: "UniGIS › Spatial Analyst › Local",
         summary: "Each cell takes its value from the input its position raster names (ArcGIS Pro Pick).",
         params: &[
             P { name: "position", label: "Input position raster", kind: K::RasterLayer, required: true, default: "", help: "" },
@@ -1508,7 +1503,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "region_group",
         name: "Region Group",
-        toolbox: "GeoForge › Spatial Analyst › Generalization",
+        toolbox: "UniGIS › Spatial Analyst › Generalization",
         summary: "Numbers the connected regions (ArcGIS Pro Region Group).",
         params: &[
             RASTER,
@@ -1543,7 +1538,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "expand",
         name: "Expand",
-        toolbox: "GeoForge › Spatial Analyst › Generalization",
+        toolbox: "UniGIS › Spatial Analyst › Generalization",
         summary: "Grows zones by a number of cells (ArcGIS Pro Expand).",
         params: &[
             RASTER,
@@ -1578,7 +1573,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "shrink",
         name: "Shrink",
-        toolbox: "GeoForge › Spatial Analyst › Generalization",
+        toolbox: "UniGIS › Spatial Analyst › Generalization",
         summary: "Shrinks zones by a number of cells (ArcGIS Pro Shrink).",
         params: &[
             RASTER,
@@ -1613,7 +1608,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "majority_filter",
         name: "Majority Filter",
-        toolbox: "GeoForge › Spatial Analyst › Generalization",
+        toolbox: "UniGIS › Spatial Analyst › Generalization",
         summary: "Replaces cells by the majority of their contiguous neighbors (ArcGIS Pro Majority Filter).",
         params: &[
             RASTER,
@@ -1640,7 +1635,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "cell_statistics",
         name: "Cell Statistics",
-        toolbox: "GeoForge › Spatial Analyst › Local",
+        toolbox: "UniGIS › Spatial Analyst › Local",
         summary: "A statistic of each cell across several rasters (ArcGIS Pro Cell Statistics).",
         params: &[
             P {
@@ -1674,7 +1669,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "weighted_sum",
         name: "Weighted Sum",
-        toolbox: "GeoForge › Spatial Analyst › Overlay",
+        toolbox: "UniGIS › Spatial Analyst › Overlay",
         summary: "Weights and adds rasters cell by cell (ArcGIS Pro Weighted Sum).",
         params: &[
             P {
@@ -1700,7 +1695,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "highest_position",
         name: "Highest Position",
-        toolbox: "GeoForge › Spatial Analyst › Local",
+        toolbox: "UniGIS › Spatial Analyst › Local",
         summary: "The position of the raster with the highest value in each cell (ArcGIS Pro Highest Position).",
         params: &[
             P {
@@ -1718,7 +1713,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "lowest_position",
         name: "Lowest Position",
-        toolbox: "GeoForge › Spatial Analyst › Local",
+        toolbox: "UniGIS › Spatial Analyst › Local",
         summary: "The position of the raster with the lowest value in each cell (ArcGIS Pro Lowest Position).",
         params: &[
             P {
@@ -1736,7 +1731,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "combine",
         name: "Combine",
-        toolbox: "GeoForge › Spatial Analyst › Local",
+        toolbox: "UniGIS › Spatial Analyst › Local",
         summary: "A new value for each unique combination of the input values (ArcGIS Pro Combine).",
         params: &[
             P {
@@ -1754,7 +1749,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "weighted_overlay",
         name: "Weighted Overlay",
-        toolbox: "GeoForge › Spatial Analyst › Overlay",
+        toolbox: "UniGIS › Spatial Analyst › Overlay",
         summary: "Overlays rasters on a common scale, each weighted by its influence (ArcGIS Pro Weighted Overlay).",
         params: &[
             P {
@@ -1780,7 +1775,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "fuzzy_membership",
         name: "Fuzzy Membership",
-        toolbox: "GeoForge › Spatial Analyst › Overlay",
+        toolbox: "UniGIS › Spatial Analyst › Overlay",
         summary: "Rescales a raster to 0–1, the strength of membership in a set (ArcGIS Pro Fuzzy Membership).",
         params: &[
             RASTER,
@@ -1834,7 +1829,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "fuzzy_overlay",
         name: "Fuzzy Overlay",
-        toolbox: "GeoForge › Spatial Analyst › Overlay",
+        toolbox: "UniGIS › Spatial Analyst › Overlay",
         summary: "Combines fuzzy membership rasters (ArcGIS Pro Fuzzy Overlay).",
         params: &[
             P {
@@ -1861,7 +1856,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "idw",
         name: "IDW",
-        toolbox: "GeoForge › Spatial Analyst › Interpolation",
+        toolbox: "UniGIS › Spatial Analyst › Interpolation",
         summary: "Interpolates a surface from points by inverse distance weighting; the cell size is in degrees (ArcGIS Pro IDW).",
         params: &[
             P { name: "input", label: "Input point features", kind: K::PointLayer, required: true, default: "", help: "" },
@@ -1922,7 +1917,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "slope",
         name: "Slope",
-        toolbox: "GeoForge › Spatial Analyst › Surface",
+        toolbox: "UniGIS › Spatial Analyst › Surface",
         summary: "Steepness of each cell of a surface (ArcGIS Pro Slope).",
         params: &[
             RASTER,
@@ -1942,7 +1937,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "aspect",
         name: "Aspect",
-        toolbox: "GeoForge › Spatial Analyst › Surface",
+        toolbox: "UniGIS › Spatial Analyst › Surface",
         summary: "Compass direction the slope faces (ArcGIS Pro Aspect).",
         params: &[RASTER, OUTPUT],
         run: aspect,
@@ -1950,7 +1945,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "hillshade",
         name: "Hillshade",
-        toolbox: "GeoForge › Spatial Analyst › Surface",
+        toolbox: "UniGIS › Spatial Analyst › Surface",
         summary: "Shaded relief of a surface (ArcGIS Pro Hillshade).",
         params: &[
             RASTER,
@@ -1965,7 +1960,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "curvature",
         name: "Curvature",
-        toolbox: "GeoForge › Spatial Analyst › Surface",
+        toolbox: "UniGIS › Spatial Analyst › Surface",
         summary: "Curvature of a surface, with optional profile and plan curvature (ArcGIS Pro Curvature).",
         params: &[
             RASTER,
@@ -1979,7 +1974,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "contour",
         name: "Contour",
-        toolbox: "GeoForge › Spatial Analyst › Surface",
+        toolbox: "UniGIS › Spatial Analyst › Surface",
         summary: "Lines of equal value of a surface (ArcGIS Pro Contour).",
         params: &[
             RASTER,
@@ -1992,7 +1987,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "fill",
         name: "Fill",
-        toolbox: "GeoForge › Spatial Analyst › Hydrology",
+        toolbox: "UniGIS › Spatial Analyst › Hydrology",
         summary: "Fills sinks in a surface (ArcGIS Pro Fill).",
         params: &[RASTER, P { name: "z_limit", label: "Z limit", kind: K::Number, required: false, default: "", help: "" }, OUTPUT],
         run: fill,
@@ -2000,7 +1995,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "flow_direction",
         name: "Flow Direction",
-        toolbox: "GeoForge › Spatial Analyst › Hydrology",
+        toolbox: "UniGIS › Spatial Analyst › Hydrology",
         summary: "Direction of steepest descent from each cell, D8 (ArcGIS Pro Flow Direction).",
         params: &[
             RASTER,
@@ -2019,7 +2014,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "flow_accumulation",
         name: "Flow Accumulation",
-        toolbox: "GeoForge › Spatial Analyst › Hydrology",
+        toolbox: "UniGIS › Spatial Analyst › Hydrology",
         summary: "Accumulated weight of the cells that flow into each cell (ArcGIS Pro Flow Accumulation).",
         params: &[
             P { name: "input", label: "Flow direction raster", kind: K::RasterLayer, required: true, default: "", help: "" },
@@ -2039,7 +2034,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "basin",
         name: "Basin",
-        toolbox: "GeoForge › Spatial Analyst › Hydrology",
+        toolbox: "UniGIS › Spatial Analyst › Hydrology",
         summary: "Drainage basins (ArcGIS Pro Basin).",
         params: &[P { name: "input", label: "Flow direction raster", kind: K::RasterLayer, required: true, default: "", help: "" }, OUTPUT],
         run: basin,
@@ -2047,7 +2042,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "watershed",
         name: "Watershed",
-        toolbox: "GeoForge › Spatial Analyst › Hydrology",
+        toolbox: "UniGIS › Spatial Analyst › Hydrology",
         summary: "The area draining to pour points (ArcGIS Pro Watershed).",
         params: &[
             P { name: "input", label: "Flow direction raster", kind: K::RasterLayer, required: true, default: "", help: "" },
@@ -2059,7 +2054,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "stream_link",
         name: "Stream Link",
-        toolbox: "GeoForge › Spatial Analyst › Hydrology",
+        toolbox: "UniGIS › Spatial Analyst › Hydrology",
         summary: "Numbers the stretches of a stream network (ArcGIS Pro Stream Link).",
         params: &[
             P { name: "streams", label: "Stream raster", kind: K::RasterLayer, required: true, default: "", help: "" },
@@ -2071,7 +2066,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "stream_order",
         name: "Stream Order",
-        toolbox: "GeoForge › Spatial Analyst › Hydrology",
+        toolbox: "UniGIS › Spatial Analyst › Hydrology",
         summary: "Strahler or Shreve order of stream segments (ArcGIS Pro Stream Order).",
         params: &[
             P { name: "streams", label: "Stream raster", kind: K::RasterLayer, required: true, default: "", help: "" },
@@ -2091,7 +2086,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "flow_length",
         name: "Flow Length",
-        toolbox: "GeoForge › Spatial Analyst › Hydrology",
+        toolbox: "UniGIS › Spatial Analyst › Hydrology",
         summary: "Distance along the flow path, downstream or upstream (ArcGIS Pro Flow Length).",
         params: &[
             P { name: "input", label: "Flow direction raster", kind: K::RasterLayer, required: true, default: "", help: "" },
@@ -2110,7 +2105,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "focal_statistics",
         name: "Focal Statistics",
-        toolbox: "GeoForge › Spatial Analyst › Neighborhood",
+        toolbox: "UniGIS › Spatial Analyst › Neighborhood",
         summary: "A statistic over each cell's neighborhood (ArcGIS Pro Focal Statistics).",
         params: &[
             RASTER,
@@ -2145,7 +2140,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "reclassify",
         name: "Reclassify",
-        toolbox: "GeoForge › Spatial Analyst › Reclass",
+        toolbox: "UniGIS › Spatial Analyst › Reclass",
         summary: "Changes cell values by a table of old to new values (ArcGIS Pro Reclassify).",
         params: &[
             RASTER,
@@ -2165,7 +2160,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "zonal_statistics",
         name: "Zonal Statistics",
-        toolbox: "GeoForge › Spatial Analyst › Zonal",
+        toolbox: "UniGIS › Spatial Analyst › Zonal",
         summary: "A statistic of the values in each zone, as a raster (ArcGIS Pro Zonal Statistics).",
         params: &[
             P { name: "zones", label: "Zone raster", kind: K::RasterLayer, required: true, default: "", help: "" },
@@ -2193,7 +2188,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "resample",
         name: "Resample",
-        toolbox: "GeoForge › Data Management › Raster",
+        toolbox: "UniGIS › Data Management › Raster",
         summary: "Changes the cell size of a raster (ArcGIS Pro Resample).",
         params: &[
             RASTER,
@@ -2220,7 +2215,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "euclidean_distance",
         name: "Euclidean Distance",
-        toolbox: "GeoForge › Spatial Analyst › Distance",
+        toolbox: "UniGIS › Spatial Analyst › Distance",
         summary: "Distance from each cell to the nearest source cell (ArcGIS Pro Euclidean Distance).",
         params: &[
             RASTER,
@@ -2232,7 +2227,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "euclidean_direction",
         name: "Euclidean Direction",
-        toolbox: "GeoForge › Spatial Analyst › Distance",
+        toolbox: "UniGIS › Spatial Analyst › Distance",
         summary: "Azimuth in degrees from each cell to the nearest source cell (ArcGIS Pro Euclidean Direction).",
         params: &[
             RASTER,
@@ -2244,7 +2239,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "euclidean_allocation",
         name: "Euclidean Allocation",
-        toolbox: "GeoForge › Spatial Analyst › Distance",
+        toolbox: "UniGIS › Spatial Analyst › Distance",
         summary: "Value of the nearest source cell for each cell (ArcGIS Pro Euclidean Allocation).",
         params: &[
             RASTER,
@@ -2256,7 +2251,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "extract_by_mask",
         name: "Extract by Mask",
-        toolbox: "GeoForge › Spatial Analyst › Extraction",
+        toolbox: "UniGIS › Spatial Analyst › Extraction",
         summary: "The cells of a raster that fall within a mask raster (ArcGIS Pro Extract by Mask).",
         params: &[RASTER, P { name: "mask", label: "Mask raster", kind: K::RasterLayer, required: true, default: "", help: "" }, OUTPUT],
         run: extract_by_mask,
@@ -2264,7 +2259,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "plus",
         name: "Plus",
-        toolbox: "GeoForge › Spatial Analyst › Math",
+        toolbox: "UniGIS › Spatial Analyst › Math",
         summary: "Adds two rasters or a raster and a number (ArcGIS Pro Plus).",
         params: &[
             P {
@@ -2283,7 +2278,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "minus",
         name: "Minus",
-        toolbox: "GeoForge › Spatial Analyst › Math",
+        toolbox: "UniGIS › Spatial Analyst › Math",
         summary: "Subtracts the second raster or number from the first (ArcGIS Pro Minus).",
         params: &[
             P {
@@ -2302,7 +2297,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "times",
         name: "Times",
-        toolbox: "GeoForge › Spatial Analyst › Math",
+        toolbox: "UniGIS › Spatial Analyst › Math",
         summary: "Multiplies two rasters or a raster and a number (ArcGIS Pro Times).",
         params: &[
             P {
@@ -2321,7 +2316,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "divide",
         name: "Divide",
-        toolbox: "GeoForge › Spatial Analyst › Math",
+        toolbox: "UniGIS › Spatial Analyst › Math",
         summary: "Divides the first raster or number by the second (ArcGIS Pro Divide).",
         params: &[
             P {
@@ -2340,7 +2335,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "int",
         name: "Int",
-        toolbox: "GeoForge › Spatial Analyst › Math",
+        toolbox: "UniGIS › Spatial Analyst › Math",
         summary: "Cell values truncated to integers (ArcGIS Pro Int).",
         params: &[RASTER, OUTPUT],
         run: int,
@@ -2348,7 +2343,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "float",
         name: "Float",
-        toolbox: "GeoForge › Spatial Analyst › Math",
+        toolbox: "UniGIS › Spatial Analyst › Math",
         summary: "Cell values as floating point (ArcGIS Pro Float).",
         params: &[RASTER, OUTPUT],
         run: float,
@@ -2356,7 +2351,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "is_null",
         name: "Is Null",
-        toolbox: "GeoForge › Spatial Analyst › Math",
+        toolbox: "UniGIS › Spatial Analyst › Math",
         summary: "1 where a cell is NoData, else 0 (ArcGIS Pro Is Null).",
         params: &[RASTER, OUTPUT],
         run: is_null,
@@ -2364,7 +2359,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "con",
         name: "Con",
-        toolbox: "GeoForge › Spatial Analyst › Conditional",
+        toolbox: "UniGIS › Spatial Analyst › Conditional",
         summary: "A cell takes the true value where the condition holds, else the false value (ArcGIS Pro Con).",
         params: &[
             P { name: "input", label: "Conditional raster", kind: K::RasterLayer, required: true, default: "", help: "" },
@@ -2378,7 +2373,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "set_null",
         name: "Set Null",
-        toolbox: "GeoForge › Spatial Analyst › Conditional",
+        toolbox: "UniGIS › Spatial Analyst › Conditional",
         summary: "NoData where the condition holds, else the false value (ArcGIS Pro Set Null).",
         params: &[
             P { name: "input", label: "Conditional raster", kind: K::RasterLayer, required: true, default: "", help: "" },
@@ -2391,7 +2386,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "raster_to_point",
         name: "Raster To Point",
-        toolbox: "GeoForge › Conversion › From Raster",
+        toolbox: "UniGIS › Conversion › From Raster",
         summary: "A point at the center of each cell with data (ArcGIS Pro Raster To Point).",
         params: &[RASTER, OUTPUT],
         run: raster_to_point,
@@ -2399,7 +2394,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "raster_to_polygon",
         name: "Raster To Polygon",
-        toolbox: "GeoForge › Conversion › From Raster",
+        toolbox: "UniGIS › Conversion › From Raster",
         summary: "Polygons of connected cells of the same integer value (ArcGIS Pro Raster To Polygon, NO_SIMPLIFY).",
         params: &[RASTER, OUTPUT],
         run: raster_to_polygon,
@@ -2407,7 +2402,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "polygon_to_raster",
         name: "Polygon To Raster",
-        toolbox: "GeoForge › Conversion › To Raster",
+        toolbox: "UniGIS › Conversion › To Raster",
         summary: "Polygons to cells carrying a field's value; the cell size is in degrees (ArcGIS Pro Polygon To Raster).",
         params: &[
             INPUT,
@@ -2435,7 +2430,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "polyline_to_raster",
         name: "Polyline To Raster",
-        toolbox: "GeoForge › Conversion › To Raster",
+        toolbox: "UniGIS › Conversion › To Raster",
         summary: "Lines to cells carrying a field's value; the cell size is in degrees (ArcGIS Pro Polyline To Raster).",
         params: &[
             INPUT,
@@ -2463,7 +2458,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "point_to_raster",
         name: "Point To Raster",
-        toolbox: "GeoForge › Conversion › To Raster",
+        toolbox: "UniGIS › Conversion › To Raster",
         summary: "Points to cells carrying a field's value; the cell size is in degrees (ArcGIS Pro Point To Raster).",
         params: &[
             INPUT,
@@ -2491,7 +2486,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "zonal_statistics_as_table",
         name: "Zonal Statistics as Table",
-        toolbox: "GeoForge › Spatial Analyst › Zonal",
+        toolbox: "UniGIS › Spatial Analyst › Zonal",
         summary: "A table of statistics of the values in each zone (ArcGIS Pro Zonal Statistics as Table).",
         params: &[
             P { name: "zones", label: "Zone raster", kind: K::RasterLayer, required: true, default: "", help: "" },

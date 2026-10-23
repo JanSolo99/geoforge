@@ -3,7 +3,7 @@
 //! ids for scripts and the command line) and geoprocessing tools.
 //!
 //! Plugins run sandboxed (see [`runtime`]): they can't touch files or the network, and they
-//! reach the project only through GeoForge's own commands, within the permissions their
+//! reach the project only through UniGIS's own commands, within the permissions their
 //! manifest declares and the user accepted. The same module runs on the desktop, on the
 //! command line and in the browser.
 //!

@@ -1,7 +1,7 @@
 //! PostGIS: the geometry (and geography) tables of a PostgreSQL database, read live in place
 //! (desktop only).
 //!
-//! GeoForge talks to the server itself (the pure-Rust `postgres` client, TLS through rustls), so
+//! UniGIS talks to the server itself (the pure-Rust `postgres` client, TLS through rustls), so
 //! nothing else needs installing. Extent queries use the column's GiST index (`&&`); the server
 //! converts geometry to longitude/latitude (`ST_Transform`, with the server's own PROJ, so every
 //! coordinate system in its `spatial_ref_sys` works) and curves to lines. A capped read returns an
@@ -423,7 +423,7 @@ fn config(dsn: &str) -> Result<(postgres::Config, Tls)> {
         config.connect_timeout(CONNECT_TIMEOUT);
     }
     if config.get_application_name().is_none() {
-        config.application_name("GeoForge");
+        config.application_name("UniGIS");
     }
     let mode = sslmode.or_else(|| env("PGSSLMODE").map(|m| m.to_ascii_lowercase()));
     let tls = match mode.as_deref() {
@@ -630,7 +630,7 @@ pub struct PostgisSource {
     /// The expression of each column read: the id, the geometry (as WKB, longitude/latitude),
     /// then the fields.
     select: Vec<String>,
-    /// Converts a request's extent to the table's coordinates, when GeoForge knows the coordinate
+    /// Converts a request's extent to the table's coordinates, when UniGIS knows the coordinate
     /// system itself; else the server does.
     reproject: Option<Reproject>,
 }
@@ -641,7 +641,7 @@ impl std::fmt::Debug for PostgisSource {
     }
 }
 
-/// How a column of a PostgreSQL type is read: cast to a type GeoForge has, or as text. `None`
+/// How a column of a PostgreSQL type is read: cast to a type UniGIS has, or as text. `None`
 /// leaves it out (other geometry, rasters, binary).
 fn field_cast(ty: &str) -> Option<(FieldType, &'static str)> {
     match ty {
@@ -748,7 +748,7 @@ impl PostgisSource {
         let family = family.or(table.declared_family());
         let reproject = match srid {
             0 | 4326 => Some(Reproject::from_crs(Crs::LonLat, &mut Vec::new())),
-            // A coordinate system GeoForge can't convert itself is left to the server.
+            // A coordinate system UniGIS can't convert itself is left to the server.
             s => u32::try_from(s).ok().and_then(Crs::from_epsg).map(|c| Reproject::from_crs(c, &mut Vec::new())).filter(|r| !r.is_lonlat()),
         };
         let mut src = PostgisSource {

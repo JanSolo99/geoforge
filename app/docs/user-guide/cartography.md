@@ -57,7 +57,7 @@ ramps with the `ramp.add` command (`{"path": "ramps.rgisramp"}`, or the JSON its
 **Add Color Ramp File** also reads the color ramp files other tools write, so a palette from
 QGIS, GDAL, GMT or a tool like Phosphor can be added without converting it first:
 
-| Format | Extension | What RustGIS reads |
+| Format | Extension | What UniGIS reads |
 | --- | --- | --- |
 | QGIS style | `.xml` | Every gradient ramp (discrete ones as steps) and preset ramp (as a qualitative ramp) in a Style Manager export, with its name. ColorBrewer, cpt-city and random ramps hold no colors and are skipped. |
 | QGIS layer style | `.qml` | The layer's color ramp, or a raster's color map. |

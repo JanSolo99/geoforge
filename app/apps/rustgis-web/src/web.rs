@@ -191,7 +191,7 @@ pub fn start() {
             match result {
                 Ok(()) => el.remove(),
                 Err(e) => {
-                    el.set_inner_html(&format!("<p>GeoForge failed to start: {e:?}</p><p>A browser with WebGPU or WebGL2 is required.</p>"))
+                    el.set_inner_html(&format!("<p>UniGIS failed to start: {e:?}</p><p>A browser with WebGPU or WebGL2 is required.</p>"))
                 }
             }
         }
@@ -599,10 +599,10 @@ fn services(inbox: Inbox, font_inbox: Inbox, notes: Notes, ctx: egui::Context, e
                 let exts: Vec<&str> = exts.split(',').filter(|e| !e.is_empty()).collect();
                 if exts.is_empty() { rfd::AsyncFileDialog::new() } else { rfd::AsyncFileDialog::new().add_filter(exts.join(", "), &exts) }
             } else if purpose == "project" {
-                rfd::AsyncFileDialog::new().add_filter("GeoForge project", &["rgis", "rgisx"])
+                rfd::AsyncFileDialog::new().add_filter("UniGIS project", &["rgis", "rgisx"])
             } else if purpose == "item" {
                 rfd::AsyncFileDialog::new().add_filter(
-                    "GeoForge items",
+                    "UniGIS items",
                     &[
                         "rgismap",
                         "rgismpk",
@@ -620,9 +620,9 @@ fn services(inbox: Inbox, font_inbox: Inbox, notes: Notes, ctx: egui::Context, e
             } else if purpose == "ramp" {
                 rfd::AsyncFileDialog::new().add_filter("Colour ramps", &["rgisramp", "xml", "qml", "txt", "clr", "cpt"])
             } else if purpose == "layout" {
-                rfd::AsyncFileDialog::new().add_filter("GeoForge layout", &["rgislayout"])
+                rfd::AsyncFileDialog::new().add_filter("UniGIS layout", &["rgislayout"])
             } else if purpose == "plugin" {
-                rfd::AsyncFileDialog::new().add_filter("GeoForge plugin", &["rgplugin"])
+                rfd::AsyncFileDialog::new().add_filter("UniGIS plugin", &["rgplugin"])
             } else if purpose == "text" {
                 rfd::AsyncFileDialog::new()
                     .add_filter("Delimited text and spreadsheets", &["csv", "tsv", "txt", "xlsx", "xlsm", "xlsb", "xls", "ods"])

@@ -16,7 +16,7 @@ Open **Plugins › Plugin Manager**:
   against the SHA-256 the registry published, and shows what the plugin may do before it loads.
 - **Installed** lists your plugins: turn them on or off, update them, or uninstall them.
 - **Settings** installs a `.rgplugin` file. You can also drop the file on the window. It also
-  sets the registry address (empty means the RustGIS registry). On the desktop, it can load a
+  sets the registry address (empty means the UniGIS registry). On the desktop, it can load a
   plugin from its folder while you develop it.
 
 A plugin's commands and tools appear on the **Plugins** tab, in a group named after the
@@ -46,8 +46,8 @@ rustgis-cli run --plugin ./dev-plugin/ --sample --cmd 'plugin:my-plugin/hello'  
 ## Safety
 
 Plugins run in a sandbox: an interpreter (`wasmi`) with no access to files, the network, the
-clock or anything else outside the module. A plugin reaches RustGIS only through the requests
-described below, and RustGIS checks each one:
+clock or anything else outside the module. A plugin reaches UniGIS only through the requests
+described below, and UniGIS checks each one:
 
 - Every plugin can **read the map**: its layers, their features and the view.
 - With the **`edit`** permission, it can change the project. It can run commands that edit it and
@@ -72,7 +72,7 @@ that traps, panics or returns garbage produces an error message, never a crash.
 
 The registry is curated: plugins are reviewed before they are listed, and packages are
 hash-pinned. A `blocklist.json` beside the registry withdraws a plugin (every version, or one
-package) from every install. RustGIS checks it when you browse the registry and at startup.
+package) from every install. UniGIS checks it when you browse the registry and at startup.
 
 ## Writing a plugin
 
@@ -112,7 +112,7 @@ cargo build --release --target wasm32-unknown-unknown
 ```json
 {
   "id": "hello-rustgis",
-  "name": "Hello RustGIS",
+  "name": "Hello UniGIS",
   "version": "0.1.0",
   "description": "What it does, in a sentence or two.",
   "author": "You",
@@ -140,10 +140,10 @@ cargo build --release --target wasm32-unknown-unknown
 
 - `id`: lower-case letters, digits and hyphens. Commands and tools get ids
   `plugin:<id>/<command>`, which the ribbon, command search, scripts and `rustgis-cli` use.
-- `version` and `minRustgisVersion` look like `1.2.3`. RustGIS refuses a plugin that needs a
+- `version` and `minRustgisVersion` look like `1.2.3`. UniGIS refuses a plugin that needs a
   newer RustGIS.
 - `permissions`: `edit`, `files` and `network` (see [Safety](#safety)). Ask only for what you use.
-- `commands[].icon`: the name of one of RustGIS's own icons (`stats`, `zoom_full`, `bookmark`,
+- `commands[].icon`: the name of one of UniGIS's own icons (`stats`, `zoom_full`, `bookmark`,
   `buffer`…), or a puzzle piece when it isn't one.
 - Tool parameter `kind`s: `layer`, `vectorLayer`, `polygonLayer`, `pointLayer`, `field`,
   `numericField`, `number`, `text`, `choice` (with `choices`), `bool` and `file` (see
@@ -165,13 +165,13 @@ The plugin needs the `files` permission:
 
 - The Tools pane shows a path box with a **Browse** button. `extensions` (without the dot; up
   to 16) filters the file picker; leave it out for any file.
-- On the desktop and the command line the value is a path, and RustGIS reads the file. In the
+- On the desktop and the command line the value is a path, and UniGIS reads the file. In the
   web app, which has no paths, the user picks the file and its contents go with the run. A
   script can do the same with `{"name": "run.nc", "data": base64}`.
 - The tool gets the file in the request's `files`, by parameter name, as
   `{"name": "run.nc", "data": base64}`. The parameter itself holds just the file name.
 - Files are at most 64 MB. The Geoprocessing history keeps the file's name, not its contents.
-- RustGIS versions before file parameters refuse a plugin that has one, so set
+- UniGIS versions before file parameters refuse a plugin that has one, so set
   `minRustgisVersion` to the first version with them.
 
 ### Translations
@@ -190,7 +190,7 @@ English strings and their translations, written exactly as they appear in `plugi
 - It covers the plugin's name and description, command labels and help, tool names, summaries
   and toolboxes, parameter labels and `choice` values, and the tab, group and menu labels. A
   string with no translation shows in English.
-- RustGIS's interface languages are `de`, `es`, `fr`, `it`, `nl`, `pt`, `ru`, `tr`, `az`, `id`,
+- UniGIS's interface languages are `de`, `es`, `fr`, `it`, `nl`, `pt`, `ru`, `tr`, `az`, `id`,
   `vi`, `zh`, `ja` and `ko`. A code with a region matches its language: `zh-CN` serves `zh`.
 - The registry copies the name and description translations into `registry.json`, so the
   Plugin Manager lists plugins in the interface language before they are installed.
@@ -225,7 +225,7 @@ can hide it like any other. Declare it in `plugin.json`:
   Tools pane), or a dropdown `menu` whose `items` are command ids or `tool:<id>`.
 - A tab has 1 to 8 groups, a group has 1 to 16 items, and a menu has 1 to 32 entries. Every
   entry must name one of the plugin's own commands or tools.
-- The label can't be the name of one of RustGIS's tabs (Map, Insert, Analysis, Plugins…). The
+- The label can't be the name of one of UniGIS's tabs (Map, Insert, Analysis, Plugins…). The
   `i18n` translations apply to the tab, group and menu labels too.
 
 [Map Explorer](https://github.com/opengeos/rustgis-plugins/tree/main/plugins/map-explorer) is
@@ -233,11 +233,11 @@ an example.
 
 ### What a plugin can ask for
 
-Inside a request, `host::call(op, params)` sends one of these to RustGIS:
+Inside a request, `host::call(op, params)` sends one of these to UniGIS:
 
 | Request | Answer |
 |---|---|
-| `host.info` | RustGIS's version, the ABI, the plugin's id and permissions |
+| `host.info` | UniGIS's version, the ABI, the plugin's id and permissions |
 | `host.layers` | `[{id, name, raster, visible, geometry, features, selected, active, fields: [{name, type}]}]` |
 | `host.features` `{layer, selected?, limit?}` | the layer's features as GeoJSON; each feature has its `row` |
 | `host.view` | `{center: [lon, lat], scale, projection}` |
@@ -247,7 +247,7 @@ Inside a request, `host::call(op, params)` sends one of these to RustGIS:
 | any command id (`layer.zoomTo`, `select.byAttributes`, `layer.symbology`…) | what the command returns, within the plugin's permissions |
 
 In the web app a command can't wait for a download, so where `layer.addUrl` has to download a
-file whole it answers `{"pending": true, "url": …}` there: RustGIS downloads the data off the
+file whole it answers `{"pending": true, "url": …}` there: UniGIS downloads the data off the
 frame and adds the layer when it lands, as **Home › Add Data › From URL** does. A PMTiles
 archive, a cloud-optimised GeoTIFF or a FlatGeobuf or GeoParquet read in place is added at once,
 as elsewhere.
@@ -256,7 +256,7 @@ as elsewhere.
 
 Tools work differently. A tool receives its layer parameters' features as GeoJSON (only the
 selected features when a layer has a selection), and its `file` parameters' files. It returns new layers, standalone tables or a
-selection, plus messages for the Geoprocessing history. RustGIS adds the results as it does for
+selection, plus messages for the Geoprocessing history. UniGIS adds the results as it does for
 built-in tools, with undo. Tools can log, but they make no host requests.
 
 In the desktop app a plugin tool runs in the background, so the map and the rest of the window
@@ -280,7 +280,7 @@ The module is `wasm32` with no imports except these three, in module `rustgis`:
 The module exports:
 
 - `memory`.
-- `rustgis_alloc(len: i32) -> i32`, which returns room for `len` bytes. RustGIS writes the
+- `rustgis_alloc(len: i32) -> i32`, which returns room for `len` bytes. UniGIS writes the
   request there.
 - `rustgis_call(ptr: i32, len: i32) -> i64`, which handles the request and returns
   `reply_ptr << 32 | reply_len`. The reply is `{"ok": value}` or `{"error": "text"}`.
@@ -326,7 +326,7 @@ web app.
   plugin's folder. `run` can name a program per platform (`windows`, `macos`, `linux`, and
   `default` for the rest). There is no `entry`.
 - Commands, tools, tabs, translations and permissions work as for WebAssembly plugins.
-  Permissions still decide which host requests RustGIS answers, but they don't limit what the
+  Permissions still decide which host requests UniGIS answers, but they don't limit what the
   program itself can do.
 - A `.rgplugin` holds the plugin's files (the manifest, scripts, executables). Installing it
   unpacks them to `unpacked/<id>/` in the plugins folder, keeping executables executable. A
@@ -338,16 +338,16 @@ web app.
 Each command or tool call starts the program once. It speaks the [ABI](#the-abi-version-1)'s
 requests and replies over its standard input and output, one JSON object per line:
 
-1. RustGIS writes the request: `{"abi", "kind", "id", "params", "layers", "files", "lang"}`, as
+1. UniGIS writes the request: `{"abi", "kind", "id", "params", "layers", "files", "lang"}`, as
    a WebAssembly module gets it.
 2. The program writes lines:
    - `{"call": {"op": "...", "params": {...}}}`: a [host request](#what-a-plugin-can-ask-for).
-     RustGIS answers with one line, `{"ok": value}` or `{"error": "text"}`.
+     UniGIS answers with one line, `{"ok": value}` or `{"error": "text"}`.
    - `{"log": "text"}`: a line for the log (and a tool's run messages).
    - `{"progress": "text"}`: what a tool is doing now, shown while it runs and not kept in its
      messages: a line per step of a long run, say.
    - Last, `{"ok": value}` or `{"error": "text"}`: the result.
-3. RustGIS then closes the program's input; a program still running a few seconds later is
+3. UniGIS then closes the program's input; a program still running a few seconds later is
    stopped.
 
 Output lines that aren't protocol messages are logged and skipped, since libraries print (even
@@ -363,7 +363,7 @@ import sys
 
 
 def call(op, params):
-    """Sends a request to RustGIS and returns its answer."""
+    """Sends a request to UniGIS and returns its answer."""
     print(json.dumps({"call": {"op": op, "params": params}}), flush=True)
     reply = json.loads(sys.stdin.readline())
     if "error" in reply:
@@ -390,7 +390,7 @@ print(json.dumps(result), flush=True)
 
 ### Python environments
 
-A Python plugin can have RustGIS make its environment, so its users don't install Python or
+A Python plugin can have UniGIS make its environment, so its users don't install Python or
 any package themselves:
 
 ```json
@@ -400,11 +400,11 @@ any package themselves:
 ```
 
 - `python` in `run` is then that environment's interpreter, on every platform.
-- RustGIS makes the environment when the plugin is installed: in the background in the desktop
+- UniGIS makes the environment when the plugin is installed: in the background in the desktop
   app (the Plugin Manager shows how it's going, and a **Prepare** button makes it again), and
   before the command returns in `rustgis-cli plugins install` and `get`.
   `rustgis-cli plugins prepare <id>` and the `plugin.prepare` command make it on demand.
-- It uses [uv](https://github.com/astral-sh/uv), which RustGIS downloads once (a pinned version,
+- It uses [uv](https://github.com/astral-sh/uv), which UniGIS downloads once (a pinned version,
   checked against its pinned SHA-256; `RUSTGIS_UV` names one to use instead, which is then
   trusted as it is, unchecked). uv installs a standalone Python of the version asked for and
   the packages in the requirements file, from PyPI. Pythons and uv's cache are shared in

@@ -1,6 +1,6 @@
 //! Open-data portals searched by text: CKAN catalogues (data.gov's own catalogue, and any CKAN
 //! site such as open.canada.ca), Socrata's discovery API (every Socrata site, or one) and ArcGIS
-//! Hub. A search names datasets and the geospatial resources each offers: files GeoForge reads by
+//! Hub. A search names datasets and the geospatial resources each offers: files UniGIS reads by
 //! address (GeoJSON, KML, zipped Shapefiles, GeoParquet…) and services it adds (WMS, WFS, ArcGIS
 //! REST). Requests are built and answers read here; the fetching is the caller's.
 
@@ -41,7 +41,7 @@ pub struct Portal {
     pub domain: Option<String>,
 }
 
-/// What a resource is to GeoForge: a file read by address, or a service of a type.
+/// What a resource is to UniGIS: a file read by address, or a service of a type.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Use {
     File,
@@ -52,7 +52,7 @@ pub enum Use {
     },
 }
 
-/// A dataset's resource GeoForge can add.
+/// A dataset's resource UniGIS can add.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Resource {
     /// What it is, as people say it (`GeoJSON`, `Shapefile`, `ArcGIS REST`…).
@@ -189,7 +189,7 @@ impl Portal {
     }
 
     /// The datasets in a search's answer (`from`: the search's address, which the resources' own
-    /// addresses are judged against), with the resources GeoForge can add; datasets without one are
+    /// addresses are judged against), with the resources UniGIS can add; datasets without one are
     /// left out, as are those outside `bbox` when they say where they are.
     pub fn parse(&self, from: &str, bytes: &[u8], bbox: Option<[f64; 4]>) -> Result<Vec<Dataset>, String> {
         let v: Value = serde_json::from_slice(bytes).map_err(|_| format!("{}: the answer isn't JSON", self.label()))?;
@@ -278,7 +278,7 @@ fn rank(format: &str) -> usize {
         .unwrap_or(usize::MAX)
 }
 
-/// What a resource is, from its format label, media type and address; `None` for what GeoForge
+/// What a resource is, from its format label, media type and address; `None` for what UniGIS
 /// doesn't add (web pages, PDFs, plain JSON…).
 pub fn classify(format: &str, media: &str, url: &str) -> Option<Resource> {
     let url = url.trim();

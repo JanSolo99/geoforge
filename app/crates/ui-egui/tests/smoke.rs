@@ -15,6 +15,27 @@ fn harness() -> egui_kittest::Harness<'static, RustGisApp> {
     )
 }
 
+#[test]
+fn catalog_title_drags_to_the_right_dock() {
+    use rustgis_ui_egui::{Pane, Site};
+    let mut h = harness();
+    h.state_mut().run("ui.pane.catalog", json!({})).unwrap();
+    h.step();
+    let start = h.query_all_by_label("Catalog").find(|node| node.rect().min.y > 150.0).expect("Catalog pane tab").rect().center();
+    h.hover_at(start);
+    h.drag_at(start);
+    h.step();
+    let end = egui::pos2(1350.0, 450.0);
+    h.hover_at(end);
+    h.step();
+    assert_eq!(h.state().ui.dock.dragging(), Some(Pane::Catalog));
+    h.drop_at(end);
+    h.step();
+    assert_eq!(h.state().ui.dock.site_of(Pane::Catalog), Some(Site::Right));
+    assert!(h.state().ui.dock.is_open(Pane::Catalog));
+    assert!(h.state().ui.dock.is_docked(Pane::Contents));
+}
+
 #[cfg(not(target_arch = "wasm32"))]
 #[test]
 fn mcp_relay_early_start_wakes_queued_request_and_updates_ui() {
@@ -262,7 +283,7 @@ fn plugins_install_from_a_file_after_a_prompt() {
     }
     // The Tools pane has an Uninstall of its own when a GeoLibre runner is installed on this
     // machine: closed, the only one is the plugin's.
-    h.state_mut().ui.right = None;
+    h.state_mut().ui.dock.close_site(rustgis_ui_egui::Site::Right);
     h.state_mut().run("ui.plugins", json!({"open": true, "tab": "installed"})).unwrap();
     h.step();
     h.get_by_label("Uninstall").click();
@@ -559,7 +580,7 @@ fn delimited_text_dialog_lists_the_picked_files_columns() {
     assert_eq!(h.state().dialogs.open, Some("addCsv"));
     assert_eq!(h.state().dialogs.list, ["name", "east", "north"]);
     assert_eq!(h.state().dialogs.mode, ";", "the separator found");
-    assert!(h.state().dialogs.a.is_empty(), "east isn't a name GeoForge finds by itself");
+    assert!(h.state().dialogs.a.is_empty(), "east isn't a name UniGIS finds by itself");
     {
         let d = &mut h.state_mut().dialogs;
         (d.a, d.b, d.text) = ("east".into(), "north".into(), "EPSG:2263".into());

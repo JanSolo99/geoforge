@@ -3,7 +3,7 @@ name = "rustgis-geoforge"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "GeoForge's ArcGIS-verified geoprocessing tools (geoforge-tools) as GeoForge tools"
+description = "UniGIS's ArcGIS-verified geoprocessing tools (geoforge-tools) as UniGIS tools"
 
 [lints]
 workspace = true

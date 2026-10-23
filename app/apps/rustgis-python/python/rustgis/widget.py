@@ -1,6 +1,6 @@
-"""The GeoForge app in a Jupyter notebook: an anywidget around a :class:`~rustgis.Session`.
+"""The UniGIS app in a Jupyter notebook: an anywidget around a :class:`~rustgis.Session`.
 
-The widget shows the GeoForge web app (ribbon, panes, map) in the cell, kept in step with the
+The widget shows the UniGIS web app (ribbon, panes, map) in the cell, kept in step with the
 Python session through the project: what Python adds or styles appears in the app, and what is
 done in the app (an edit, a new layer, a pan) is back in the session for Python to read.
 """
@@ -36,7 +36,7 @@ _EMBEDDABLE = {
 
 
 class Map(anywidget.AnyWidget):
-    """The GeoForge app in a notebook cell, driven from Python.
+    """The UniGIS app in a notebook cell, driven from Python.
 
     Args:
         session: The session to show; a new one when left out.
@@ -92,7 +92,7 @@ class Map(anywidget.AnyWidget):
     # Commands ------------------------------------------------------------------------------
 
     def run(self, command: str, params: Optional[Dict[str, Any]] = None, /, **kwargs: Any) -> Any:
-        """Runs a GeoForge command by id, then shows the result in the app.
+        """Runs a UniGIS command by id, then shows the result in the app.
 
         Args:
             command: The command id, e.g. ``"layer.symbology"``.

@@ -23,8 +23,8 @@ A tile service's address: raster tiles with {z}/{x}/{y} (or {-y}, {q}, {bbox-eps
 A value, a field, or two of them joined by + − × ÷. Applies to the selected rows, or every row when none is selected.	Sebuah nilai, kolom, atau dua di antaranya yang digabung dengan + − × ÷. Berlaku untuk baris terpilih, atau semua baris jika tidak ada yang dipilih.
 About	Tentang
 About plugins	Tentang plugin
-About GeoForge	Tentang GeoForge
-About GeoForge.	Tentang GeoForge.
+About UniGIS	Tentang UniGIS
+About UniGIS.	Tentang UniGIS.
 Above	Atas
 Above Left	Kiri Atas
 Above Right	Kanan Atas
@@ -137,7 +137,7 @@ Area of use: within {r}° of the {lon}° meridian	Area penggunaan: dalam {r}° d
 Area of use: within {r}° of {lon}°, {lat}°	Area penggunaan: dalam {r}° dari {lon}°, {lat}°
 Area {area}   ·   Perimeter {perimeter}	Luas {area}   ·   Keliling {perimeter}
 Areas (name, land use, area)	Area (nama, penggunaan lahan, luas)
-Ask a question about your data, or describe what to do with the map. The assistant runs GeoForge commands for you; every change can be undone.	Ajukan pertanyaan tentang data Anda, atau jelaskan apa yang harus dilakukan pada peta. Asisten menjalankan perintah GeoForge untuk Anda; setiap perubahan dapat diurungkan.
+Ask a question about your data, or describe what to do with the map. The assistant runs UniGIS commands for you; every change can be undone.	Ajukan pertanyaan tentang data Anda, atau jelaskan apa yang harus dilakukan pada peta. Asisten menjalankan perintah UniGIS untuk Anda; setiap perubahan dapat diurungkan.
 Ask about the map, or tell it what to do…	Tanyakan tentang peta, atau beri tahu apa yang harus dilakukan…
 Ask about your data, or tell the assistant what to do with the map.	Tanyakan tentang data Anda, atau beri tahu asisten apa yang harus dilakukan pada peta.
 Assistant settings	Pengaturan asisten
@@ -654,7 +654,7 @@ Find a place by coordinates.	Temukan tempat berdasarkan koordinat.
 Find and run geoprocessing tools.	Temukan dan jalankan alat geoprosesing.
 Find any command by name (Ctrl+K).	Temukan perintah apa pun berdasarkan nama (Ctrl+K).
 Find Place	Cari Tempat
-Find plugins in the GeoForge plugin registry.	Temukan plugin di registri plugin GeoForge.
+Find plugins in the UniGIS plugin registry.	Temukan plugin di registri plugin UniGIS.
 Find Similar	Cari yang Mirip
 Find Tools	Cari Alat
 Finish Polygon	Selesaikan Poligon
@@ -783,7 +783,7 @@ Import Thumbnail	Impor Thumbnail
 Import Web Tool	Impor Alat Web
 In Beyond	Perbesar Melewati
 In Progress	Sedang Berjalan
-In GeoForge, it can:	Di GeoForge, plugin ini dapat:
+In UniGIS, it can:	Di UniGIS, plugin ini dapat:
 in progress	sedang berjalan
 In project	Dalam proyek
 In use	Digunakan
@@ -1080,7 +1080,7 @@ North	Utara
 North\nArrow	Panah\nUtara
 North Polar Stereographic	Stereografis Kutub Utara
 Not sandboxed	Tanpa sandbox
-not a GeoForge layout	bukan tata letak GeoForge
+not a UniGIS layout	bukan tata letak UniGIS
 not needed	tidak diperlukan
 Not saved yet	Belum disimpan
 Notebook	Notebook
@@ -1110,8 +1110,8 @@ Opacity	Opasitas
 Open	Buka
 Open a .rgis project	Buka proyek .rgis
 open a layout first	buka tata letak terlebih dahulu
-Open a GeoForge or Jupyter notebook.	Buka notebook GeoForge atau Jupyter.
-Open a GeoForge project.	Buka proyek GeoForge.
+Open a UniGIS or Jupyter notebook.	Buka notebook UniGIS atau Jupyter.
+Open a UniGIS project.	Buka proyek UniGIS.
 Open an offline area to edit.	Buka area offline untuk disunting.
 Open Custom Template	Buka Templat Kustom
 Open Custom Template…	Buka Templat Kustom…
@@ -1128,7 +1128,7 @@ Open the attribute table of the selected layer.	Buka tabel atribut layer terpili
 Open the layer's attribute table.	Buka tabel atribut layer.
 Open the layer's table.	Buka tabel layer.
 Open the Release Page	Buka Halaman Rilis
-Open the GeoForge user guide.	Buka panduan pengguna GeoForge.
+Open the UniGIS user guide.	Buka panduan pengguna UniGIS.
 Open the selected layer's table.	Buka tabel layer terpilih.
 Open the Symbology pane.	Buka panel Simbologi.
 Open {code} on epsg.io	Buka {code} di epsg.io
@@ -1207,7 +1207,7 @@ Plugin Manager…	Pengelola Plugin…
 Plugin registry	Registri plugin
 Plugins	Plugin
 Plugins are .rgplugin files. Install only plugins from people you trust.	Plugin adalah file .rgplugin. Pasang hanya plugin dari orang yang Anda percaya.
-Plugins run in a sandbox: they can't reach your files or the network, and they change the project only through GeoForge's own commands, within the permissions you accept.	Plugin berjalan di sandbox: plugin tidak dapat mengakses file Anda atau jaringan, dan hanya mengubah proyek melalui perintah GeoForge sendiri, dalam batas izin yang Anda setujui.
+Plugins run in a sandbox: they can't reach your files or the network, and they change the project only through UniGIS's own commands, within the permissions you accept.	Plugin berjalan di sandbox: plugin tidak dapat mengakses file Anda atau jaringan, dan hanya mengubah proyek melalui perintah UniGIS sendiri, dalam batas izin yang Anda setujui.
 PMTiles archive	Arsip PMTiles
 PMTiles File…	Berkas PMTiles…
 PNG frames (zip)	Bingkai PNG (zip)
@@ -1383,29 +1383,29 @@ Run the task	Jalankan tugas
 Run Tool	Jalankan Alat
 Run {name}	Jalankan {name}
 Running…	Berjalan…
-GeoForge	GeoForge
-GeoForge deep learning package	Paket deep learning GeoForge
-GeoForge is a free and open-source GIS written in pure Rust. It runs on the desktop and in the browser, and every action is a command you can also run from the command line.	GeoForge adalah SIG bebas dan sumber terbuka yang ditulis dalam Rust murni. Aplikasi ini berjalan di desktop dan di peramban, dan setiap tindakan adalah perintah yang juga dapat Anda jalankan dari baris perintah.
-GeoForge layer file	File layer GeoForge
-GeoForge layers, maps and projects	Layer, peta, dan proyek GeoForge
-GeoForge layout	Tata letak GeoForge
-GeoForge maps and projects	Peta dan proyek GeoForge
-GeoForge or Jupyter notebook	Notebook GeoForge atau Jupyter
-GeoForge plugin	Plugin GeoForge
-GeoForge presentation	Presentasi GeoForge
-GeoForge project	Proyek GeoForge
-GeoForge project template	Templat proyek GeoForge
-GeoForge ran into an internal error last time. The details are in {path}; please attach them to a bug report.	GeoForge mengalami kesalahan internal terakhir kali. Detailnya ada di {path}; lampirkan ke laporan bug.
-GeoForge ran into an internal error while handling the model's reply, so the request was stopped. Please report it at https://github.com/opengeos/RustGIS/issues.	GeoForge mengalami kesalahan internal saat memproses balasan model, jadi permintaan dihentikan. Laporkan di https://github.com/opengeos/RustGIS/issues.
-GeoForge report or report template	Laporan atau templat laporan GeoForge
-GeoForge styles	Gaya GeoForge
-GeoForge task	Tugas GeoForge
-GeoForge {latest} is available.	GeoForge {latest} tersedia.
-GeoForge {version} is the latest version.	GeoForge {version} adalah versi terbaru.
+UniGIS	UniGIS
+UniGIS deep learning package	Paket deep learning UniGIS
+UniGIS is a free and open-source GIS written in pure Rust. It runs on the desktop and in the browser, and every action is a command you can also run from the command line.	UniGIS adalah SIG bebas dan sumber terbuka yang ditulis dalam Rust murni. Aplikasi ini berjalan di desktop dan di peramban, dan setiap tindakan adalah perintah yang juga dapat Anda jalankan dari baris perintah.
+UniGIS layer file	File layer UniGIS
+UniGIS layers, maps and projects	Layer, peta, dan proyek UniGIS
+UniGIS layout	Tata letak UniGIS
+UniGIS maps and projects	Peta dan proyek UniGIS
+UniGIS or Jupyter notebook	Notebook UniGIS atau Jupyter
+UniGIS plugin	Plugin UniGIS
+UniGIS presentation	Presentasi UniGIS
+UniGIS project	Proyek UniGIS
+UniGIS project template	Templat proyek UniGIS
+UniGIS ran into an internal error last time. The details are in {path}; please attach them to a bug report.	UniGIS mengalami kesalahan internal terakhir kali. Detailnya ada di {path}; lampirkan ke laporan bug.
+UniGIS ran into an internal error while handling the model's reply, so the request was stopped. Please report it at https://github.com/opengeos/RustGIS/issues.	UniGIS mengalami kesalahan internal saat memproses balasan model, jadi permintaan dihentikan. Laporkan di https://github.com/opengeos/RustGIS/issues.
+UniGIS report or report template	Laporan atau templat laporan UniGIS
+UniGIS styles	Gaya UniGIS
+UniGIS task	Tugas UniGIS
+UniGIS {latest} is available.	UniGIS {latest} tersedia.
+UniGIS {version} is the latest version.	UniGIS {version} adalah versi terbaru.
 RUSTGIS_ASSISTANT_MODEL	RUSTGIS_ASSISTANT_MODEL
 RUSTGIS_ASSISTANT_PROVIDER	RUSTGIS_ASSISTANT_PROVIDER
 Sample data (Natural Earth)	Data contoh (Natural Earth)
-Sample data © Natural Earth (public domain). GeoForge is licensed under Apache-2.0.	Data contoh © Natural Earth (domain publik). GeoForge dilisensikan di bawah Apache-2.0.
+Sample data © Natural Earth (public domain). UniGIS is licensed under Apache-2.0.	Data contoh © Natural Earth (domain publik). UniGIS dilisensikan di bawah Apache-2.0.
 Sample data: Natural Earth (public domain). Licensed under Apache-2.0.	Data contoh: Natural Earth (domain publik). Dilisensikan di bawah Apache-2.0.
 Saturation	Saturasi
 Save	Simpan
@@ -1470,7 +1470,7 @@ Sections	Bagian
 See and set the camera's position and scale.	Lihat dan atur posisi serta skala kamera.
 See the map as people with colour vision deficiencies do.	Lihat peta seperti yang dilihat penyandang gangguan penglihatan warna.
 See the tools you've run.	Lihat alat yang telah Anda jalankan.
-See whether a newer GeoForge has been released.	Periksa apakah GeoForge yang lebih baru telah dirilis.
+See whether a newer UniGIS has been released.	Periksa apakah UniGIS yang lebih baru telah dirilis.
 Select	Pilih
 Select (click)	Pilih (klik)
 Select (rectangle)	Pilih (persegi)
@@ -1657,14 +1657,14 @@ Text	Teks
 Text Symbol	Simbol Teks
 The assistant is busy; stop it or wait for it to finish.	Asisten sedang sibuk; hentikan atau tunggu hingga selesai.
 The assistant wants to run this, and {why}:	Asisten ingin menjalankan tindakan berikut, yang {why}:
-This plugin runs as a program on your computer, outside GeoForge's sandbox. It can do anything you can: read and change your files, use the network and run other programs. Install it only if you trust its author.	Plugin ini berjalan sebagai program di komputer Anda, di luar sandbox GeoForge. Plugin ini dapat melakukan apa pun yang dapat Anda lakukan: membaca dan mengubah file Anda, menggunakan jaringan, dan menjalankan program lain. Pasang hanya jika Anda memercayai pembuatnya.
+This plugin runs as a program on your computer, outside UniGIS's sandbox. It can do anything you can: read and change your files, use the network and run other programs. Install it only if you trust its author.	Plugin ini berjalan sebagai program di komputer Anda, di luar sandbox UniGIS. Plugin ini dapat melakukan apa pun yang dapat Anda lakukan: membaca dan mengubah file Anda, menggunakan jaringan, dan menjalankan program lain. Pasang hanya jika Anda memercayai pembuatnya.
 the capture failed unexpectedly	penangkapan gagal secara tak terduga
 the Help tab always shows	tab Bantuan selalu ditampilkan
 The job covers the map view	Pekerjaan mencakup tampilan peta
 The key is kept for this session only.	Kunci hanya disimpan untuk sesi ini.
 The layer's file couldn't be read: {error}	Berkas layer tidak dapat dibaca: {error}
 the layout export failed unexpectedly	ekspor tata letak gagal secara tak terduga
-The list of plugins to browse. Leave it empty for the GeoForge plugin registry.	Daftar plugin untuk dijelajahi. Biarkan kosong untuk registri plugin GeoForge.
+The list of plugins to browse. Leave it empty for the UniGIS plugin registry.	Daftar plugin untuk dijelajahi. Biarkan kosong untuk registri plugin UniGIS.
 the map has no layers	peta tidak memiliki layer
 The map is drawn in this coordinate system; layers are projected on the fly.	Peta digambar dalam sistem koordinat ini; lapisan diproyeksikan secara langsung.
 The map view as it is now	Tampilan peta seperti sekarang
@@ -1793,11 +1793,11 @@ Web Tile Layers	Layer Ubin Web
 Web Tool	Alat Web
 Website	Situs web
 Weights	Bobot
-Welcome to GeoForge	Selamat datang di GeoForge
+Welcome to UniGIS	Selamat datang di UniGIS
 West	Barat
 WGS 84 / Globe	WGS 84 / Globe
 WGS 84 / Web Mercator	WGS 84 / Web Mercator
-What GeoForge opens with: the World Atlas sample or a blank map.	Apa yang dibuka GeoForge: contoh World Atlas atau peta kosong.
+What UniGIS opens with: the World Atlas sample or a blank map.	Apa yang dibuka UniGIS: contoh World Atlas atau peta kosong.
 What's near a point	Apa yang ada di dekat suatu titik
 Where	Where
 Where Clause	Klausa Where
@@ -1903,11 +1903,11 @@ The sign-in is kept in the app's settings folder, for your user account only, an
 Sign in with your ChatGPT account.	Masuk dengan akun ChatGPT Anda.
 A ChatGPT sign-in can only be used with the OpenAI API.	Masuk dengan ChatGPT hanya dapat digunakan dengan API OpenAI.
 Continue with ChatGPT	Lanjutkan dengan ChatGPT
-Eligible requests in GeoForge use your ChatGPT plan. You can manage usage in ChatGPT settings.	Permintaan yang memenuhi syarat di GeoForge menggunakan paket ChatGPT Anda. Anda dapat mengelola penggunaan di pengaturan ChatGPT.
+Eligible requests in UniGIS use your ChatGPT plan. You can manage usage in ChatGPT settings.	Permintaan yang memenuhi syarat di UniGIS menggunakan paket ChatGPT Anda. Anda dapat mengelola penggunaan di pengaturan ChatGPT.
 Got it	Mengerti
 Manage usage	Kelola penggunaan
 Requests go to the OpenAI API and use your ChatGPT plan.	Permintaan dikirim ke API OpenAI dan menggunakan paket ChatGPT Anda.
-Signed out on this computer, but OpenAI didn't confirm it. You can disconnect GeoForge in ChatGPT's settings.	Keluar di komputer ini, tetapi OpenAI tidak mengonfirmasinya. Anda dapat memutus GeoForge di pengaturan ChatGPT.
+Signed out on this computer, but OpenAI didn't confirm it. You can disconnect UniGIS in ChatGPT's settings.	Keluar di komputer ini, tetapi OpenAI tidak mengonfirmasinya. Anda dapat memutus UniGIS di pengaturan ChatGPT.
 Using ChatGPT plan	Menggunakan paket ChatGPT
 You're using your ChatGPT plan	Anda menggunakan paket ChatGPT Anda
 Use another account	Gunakan akun lain
@@ -1931,3 +1931,17 @@ ChatGPT plan use is unavailable for this account or workspace.	Penggunaan paket 
 A ChatGPT plan or app usage limit was reached. Review Weekly usage before trying again.	Batas penggunaan paket ChatGPT atau aplikasi telah tercapai. Tinjau penggunaan mingguan sebelum mencoba lagi.
 ChatGPT usage is temporarily unavailable. Keep your sign-in and try again later.	Penggunaan ChatGPT untuk sementara tidak tersedia. Pertahankan sesi masuk Anda dan coba lagi nanti.
 This ChatGPT account was already saved. Next time, choose it in the list instead of adding it again.	Akun ChatGPT ini sudah tersimpan. Lain kali, pilih dari daftar alih-alih menambahkannya lagi.
+
+Dock Left	Tambatkan di kiri
+Dock Right	Tambatkan di kanan
+Dock Bottom	Tambatkan di bawah
+Keep Open	Tetap terbuka
+Auto Hide	Sembunyikan otomatis
+Reset Layout	Atur ulang tata letak
+Analysis Tools	Analisis (Alat)
+Cartography Tools	Kartografi (Alat)
+Conversion Tools	Konversi (Alat)
+Data Management Tools	Manajemen Data (Alat)
+Editing Tools	Penyuntingan (Alat)
+Spatial Analyst Tools	Spatial Analyst (Alat)
+Spatial Statistics Tools	Spatial Statistics (Alat)

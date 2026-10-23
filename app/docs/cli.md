@@ -75,12 +75,12 @@ command the assistant ran to standard error. Commands that read or write files o
 network are declined unless you pass `--yes`; plugin commands, scripts, tasks, models and
 replacing the project are always declined here. `--trace log.txt` appends each request and response
 body (never the headers, which carry the key) to a file. `--login` signs in with ChatGPT in
-the browser, so `--provider chatgpt` uses your ChatGPT plan (`--another-account` registers RustGIS
+the browser, so `--provider chatgpt` uses your ChatGPT plan (`--another-account` registers UniGIS
 for a different account), and `--logout` signs out; see [Signing in with ChatGPT](user-guide/assistant.md#signing-in-with-chatgpt).
 
 ## Serving AI agents
 
-`mcp` runs RustGIS as a Model Context Protocol server for agents such as Claude Code, Cursor and
+`mcp` runs UniGIS as a Model Context Protocol server for agents such as Claude Code, Cursor and
 VS Code, which then run commands, look at the map and search the documentation themselves:
 
 ```sh

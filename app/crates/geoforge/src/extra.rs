@@ -1,7 +1,7 @@
-//! More GeoForge vector tools for the GeoForge registry: geometry attributes, geometry checking and
+//! More UniGIS vector tools for the UniGIS registry: geometry attributes, geometry checking and
 //! repair, and Split.
 //!
-//! Modified for GeoForge (not part of upstream GeoForge).
+//! Modified for UniGIS (not part of upstream RustGIS).
 
 use geoforge_tools as tools;
 use rustgis_analysis::{Inputs, Output, OutputLayer, ParamKind as K, ParamSpec as P, ToolResult};
@@ -155,7 +155,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "add_geometry_attributes",
         name: "Add Geometry Attributes",
-        toolbox: "GeoForge › Data Management › Features",
+        toolbox: "UniGIS › Data Management › Features",
         summary: "Adds area, length, coordinates, counts and more as fields, in place (ArcGIS Pro Add Geometry Attributes). Lengths and areas are measured on the ground.",
         params: &[
             INPUT,
@@ -197,7 +197,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "check_geometry",
         name: "Check Geometry",
-        toolbox: "GeoForge › Data Management › Features",
+        toolbox: "UniGIS › Data Management › Features",
         summary: "A table of the features with geometry problems (ArcGIS Pro Check Geometry).",
         params: &[
             INPUT,
@@ -216,7 +216,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "repair_geometry",
         name: "Repair Geometry",
-        toolbox: "GeoForge › Data Management › Features",
+        toolbox: "UniGIS › Data Management › Features",
         summary: "Repairs the geometry problems of a layer, in place (ArcGIS Pro Repair Geometry).",
         params: &[
             INPUT,
@@ -242,7 +242,7 @@ pub(crate) const DEFS: &[Def] = &[
     Def {
         id: "split",
         name: "Split",
-        toolbox: "GeoForge › Analysis › Extract",
+        toolbox: "UniGIS › Analysis › Extract",
         summary: "One layer per value of a text field of the split features, each clipped by them (ArcGIS Pro Split).",
         params: &[
             INPUT,

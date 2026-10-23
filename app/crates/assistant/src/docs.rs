@@ -1,4 +1,4 @@
-//! The GeoForge documentation (`docs/`), built in, so an agent can look up how GeoForge works
+//! The UniGIS documentation (`docs/`), built in, so an agent can look up how UniGIS works
 //! without a network: search it by words, then read a page or one of its sections.
 
 use serde_json::{Value, json};

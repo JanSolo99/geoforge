@@ -3,7 +3,7 @@
 [![PyPI](https://img.shields.io/pypi/v/rustgis.svg)](https://pypi.org/project/rustgis/)
 [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/opengeos/RustGIS/blob/main/apps/rustgis-python/examples/getting-started.ipynb)
 
-The `rustgis` package runs the RustGIS engine inside Python, headless. It opens data and
+The `rustgis` package runs the UniGIS engine inside Python, headless. It opens data and
 projects, runs any command and geoprocessing tool, styles layers, renders maps and saves projects
 that the desktop app opens as they are. There is no app to install and no server to run: the
 engine is a native module built for Windows, macOS and Linux, for Python 3.12 and later.
@@ -33,7 +33,7 @@ use a `Map`.
 
 ## The app in a notebook
 
-`rustgis.Map` shows the RustGIS app (ribbon, panes, map) in the cell, kept in step with its
+`rustgis.Map` shows the UniGIS app (ribbon, panes, map) in the cell, kept in step with its
 session: what Python adds or styles appears in the app, and what you do in the app (an edit, a new
 layer, a pan) is back in the session for Python to read. It needs
 [anywidget](https://anywidget.dev), and works in JupyterLab, Notebook, VS Code and Colab.
@@ -75,7 +75,7 @@ address your data stays on your machine. Point `url=` only at a copy of the app 
 
 ## Commands
 
-Every action in RustGIS is a command with an id and JSON parameters: the same ids the ribbon,
+Every action in UniGIS is a command with an id and JSON parameters: the same ids the ribbon,
 the [command line](cli.md) and the [AI Assistant](user-guide/assistant.md) use.
 `Session.run(id, ...)` runs any of them, with the parameters as keyword arguments, a dict, or
 both. It returns the command's result and raises `rustgis.RustGISError` when the command fails.
@@ -119,4 +119,4 @@ pip install ./apps/rustgis-python                   # or: cd apps/rustgis-python
 python -m pytest apps/rustgis-python/tests
 ```
 
-Its version is the RustGIS version, and each release publishes wheels to PyPI.
+Its version is the UniGIS version, and each release publishes wheels to PyPI.

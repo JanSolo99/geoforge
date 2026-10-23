@@ -193,7 +193,7 @@ fn tab_strip(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
             app.ui.backstage = true;
         }
         ui.add_space(6.0);
-        // GeoForge's tabs, then plugins' own tabs; the user can hide any of them.
+        // UniGIS's tabs, then plugins' own tabs; the user can hide any of them.
         let mut tabs: Vec<(String, String)> = TABS.iter().map(|t| (t.to_string(), tl!(*t).to_string())).collect();
         tabs.extend(plugin_tabs(app));
         tabs.retain(|(id, _)| !app.ui.hidden_tabs.iter().any(|h| h == id));
@@ -506,7 +506,7 @@ fn home_tab(app: &mut RustGisApp, ui: &mut Ui) {
                 "Counts, totals and top categories of what's in view.",
                 "ui.pane.infographics",
                 Value::Null,
-                app.ui.right == Some(RightPane::Infographics),
+                app.ui.dock.is_open(RightPane::Infographics),
             );
         });
     });
@@ -722,7 +722,7 @@ fn project_group(app: &mut RustGisApp, ui: &mut Ui) {
     group(ui, "Project", |ui| {
         big(ui, app, "new_map", "New\nMap", "Add a new map to the project.", "map.new", Value::Null, false, false);
         big(ui, app, "toolbox", "Toolbox", "Browse the geoprocessing toolbox.", "ui.pane.geoprocessing", Value::Null, false, false);
-        big(ui, app, "open", "Import\nProject", "Open a GeoForge project.", "ui.open", Value::Null, false, false);
+        big(ui, app, "open", "Import\nProject", "Open a UniGIS project.", "ui.open", Value::Null, false, false);
         big_menu(ui, app, "new_layout", "New\nLayout", "Add a page layout for printing and exporting the map.", |ui, app| {
             for (id, label, w, h) in rustgis_engine::map::layout::PAGES {
                 let text = format!("{} ({w:.0} × {h:.0} mm)", tl!(*label));
@@ -890,7 +890,7 @@ fn report_group(app: &mut RustGisApp, ui: &mut Ui) {
                 "Preview and set up the report.",
                 "ui.pane.report",
                 Value::Null,
-                app.ui.right == Some(RightPane::Report),
+                app.ui.dock.is_open(RightPane::Report),
             );
         });
         small(
@@ -944,7 +944,7 @@ fn presentation_group(app: &mut RustGisApp, ui: &mut Ui) {
                 "Preview, edit and play the presentation.",
                 "ui.pane.presentation",
                 Value::Null,
-                app.ui.right == Some(RightPane::Presentation),
+                app.ui.dock.is_open(RightPane::Presentation),
             );
         });
     });
@@ -954,16 +954,7 @@ fn notebook_group(app: &mut RustGisApp, ui: &mut Ui) {
     group(ui, "Notebook", |ui| {
         big(ui, app, "python", "New\nNotebook", "A notebook of text and command cells.", "ui.newNotebook", Value::Null, false, false);
         col(ui, |ui| {
-            small(
-                ui,
-                app,
-                "open",
-                "Add and Open",
-                "Open a GeoForge or Jupyter notebook.",
-                "ui.openItem",
-                json!({"kind": "notebook"}),
-                false,
-            );
+            small(ui, app, "open", "Add and Open", "Open a UniGIS or Jupyter notebook.", "ui.openItem", json!({"kind": "notebook"}), false);
             small(
                 ui,
                 app,
@@ -972,7 +963,7 @@ fn notebook_group(app: &mut RustGisApp, ui: &mut Ui) {
                 "Edit and run the notebook.",
                 "ui.pane.notebook",
                 Value::Null,
-                app.ui.right == Some(RightPane::Notebook),
+                app.ui.dock.is_open(RightPane::Notebook),
             );
         });
     });
@@ -1167,7 +1158,7 @@ fn analysis_groups(app: &mut RustGisApp, ui: &mut Ui) {
             "See the tools you've run.",
             "ui.pane.history",
             Value::Null,
-            app.ui.right == Some(RightPane::History),
+            app.ui.dock.is_open(RightPane::History),
             false,
         );
         big(
@@ -1178,7 +1169,7 @@ fn analysis_groups(app: &mut RustGisApp, ui: &mut Ui) {
             "Find and run geoprocessing tools.",
             "ui.pane.geoprocessing",
             Value::Null,
-            app.ui.right == Some(RightPane::Geoprocessing),
+            app.ui.dock.is_open(RightPane::Geoprocessing),
             false,
         );
         big(
@@ -1201,7 +1192,7 @@ fn analysis_groups(app: &mut RustGisApp, ui: &mut Ui) {
                 "Run commands from text, one per line.",
                 "ui.pane.script",
                 Value::Null,
-                app.ui.right == Some(RightPane::Script),
+                app.ui.dock.is_open(RightPane::Script),
             );
             small(
                 ui,
@@ -1211,7 +1202,7 @@ fn analysis_groups(app: &mut RustGisApp, ui: &mut Ui) {
                 "Query files, web addresses and databases with DuckDB Spatial; add results to the map.",
                 "ui.pane.sql",
                 Value::Null,
-                app.ui.right == Some(RightPane::Sql),
+                app.ui.dock.is_open(RightPane::Sql),
             );
         });
         // A column holds three controls at most; a fourth overflows into the group label.
@@ -1245,7 +1236,7 @@ fn analysis_groups(app: &mut RustGisApp, ui: &mut Ui) {
             "Ask about your data, or tell the assistant what to do with the map.",
             "ui.pane.assistant",
             Value::Null,
-            app.ui.right == Some(RightPane::Assistant),
+            app.ui.dock.is_open(RightPane::Assistant),
             false,
         );
     });
@@ -1370,7 +1361,7 @@ fn view_tab(app: &mut RustGisApp, ui: &mut Ui) {
             app,
             "symbology",
             "Classic\nTheme",
-            "Switch between the GeoForge (ArcGIS Pro style) and the classic look.",
+            "Switch between the UniGIS (ArcGIS Pro style) and the classic look.",
             "ui.themeStyle",
             Value::Null,
             classic,
@@ -1591,7 +1582,7 @@ fn view_tab(app: &mut RustGisApp, ui: &mut Ui) {
             "Show or hide the Contents pane.",
             "ui.pane.contents",
             Value::Null,
-            app.ui.left == Some(crate::LeftPane::Contents),
+            app.ui.dock.is_open(crate::LeftPane::Contents),
             false,
         );
         big(
@@ -1602,7 +1593,7 @@ fn view_tab(app: &mut RustGisApp, ui: &mut Ui) {
             "Show or hide the Catalog pane.",
             "ui.pane.catalog",
             Value::Null,
-            app.ui.left == Some(crate::LeftPane::Catalog),
+            app.ui.dock.is_open(crate::LeftPane::Catalog),
             false,
         );
         big(
@@ -1613,7 +1604,7 @@ fn view_tab(app: &mut RustGisApp, ui: &mut Ui) {
             "Show or hide the Data Sources pane: favourites, recent data, saved services, databases and STAC APIs, and a library of public sources.",
             "ui.pane.sources",
             Value::Null,
-            app.ui.left == Some(crate::LeftPane::Sources),
+            app.ui.dock.is_open(crate::LeftPane::Sources),
             false,
         );
         big(
@@ -1624,7 +1615,7 @@ fn view_tab(app: &mut RustGisApp, ui: &mut Ui) {
             "Show or hide the Tools pane.",
             "ui.pane.geoprocessing",
             Value::Null,
-            app.ui.right == Some(RightPane::Geoprocessing),
+            app.ui.dock.is_open(RightPane::Geoprocessing),
             false,
         );
         col(ui, |ui| {
@@ -1636,7 +1627,7 @@ fn view_tab(app: &mut RustGisApp, ui: &mut Ui) {
                 "Show the Symbology pane for the selected layer.",
                 "ui.pane.symbology",
                 Value::Null,
-                app.ui.right == Some(RightPane::Symbology),
+                app.ui.dock.is_open(RightPane::Symbology),
             );
             small(
                 ui,
@@ -1646,7 +1637,7 @@ fn view_tab(app: &mut RustGisApp, ui: &mut Ui) {
                 "Geoprocessing history.",
                 "ui.pane.history",
                 Value::Null,
-                app.ui.right == Some(RightPane::History),
+                app.ui.dock.is_open(RightPane::History),
             );
             small(
                 ui,
@@ -1656,7 +1647,7 @@ fn view_tab(app: &mut RustGisApp, ui: &mut Ui) {
                 "Details of the selected layer.",
                 "ui.pane.details",
                 Value::Null,
-                app.ui.right == Some(RightPane::Details),
+                app.ui.dock.is_open(RightPane::Details),
             );
         });
         col(ui, |ui| {
@@ -1668,7 +1659,7 @@ fn view_tab(app: &mut RustGisApp, ui: &mut Ui) {
                 "Show or hide the AI Assistant.",
                 "ui.pane.assistant",
                 Value::Null,
-                app.ui.right == Some(RightPane::Assistant),
+                app.ui.dock.is_open(RightPane::Assistant),
             );
         });
         small(
@@ -1747,7 +1738,7 @@ fn view_tab(app: &mut RustGisApp, ui: &mut Ui) {
                 Value::Null,
                 app.ws.catalog_view,
             );
-            small(ui, app, "run", "Tasks", "Step through a task.", "ui.pane.tasks", Value::Null, app.ui.right == Some(RightPane::Tasks));
+            small(ui, app, "run", "Tasks", "Step through a task.", "ui.pane.tasks", Value::Null, app.ui.dock.is_open(RightPane::Tasks));
             small(
                 ui,
                 app,
@@ -1756,7 +1747,7 @@ fn view_tab(app: &mut RustGisApp, ui: &mut Ui) {
                 "Track jobs and their status.",
                 "ui.pane.jobs",
                 Value::Null,
-                app.ui.right == Some(RightPane::Jobs),
+                app.ui.dock.is_open(RightPane::Jobs),
             );
         });
         col(ui, |ui| {
@@ -1817,7 +1808,7 @@ fn view_tab(app: &mut RustGisApp, ui: &mut Ui) {
             "Elevation profiles along lines, cross sections and more.",
             "ui.pane.profile",
             Value::Null,
-            app.ui.right == Some(RightPane::Profile),
+            app.ui.dock.is_open(RightPane::Profile),
             false,
         );
     });
@@ -1879,7 +1870,7 @@ fn active_layer(app: &RustGisApp) -> Option<&rustgis_engine::map::Layer> {
 
 fn edit_tab(app: &mut RustGisApp, ui: &mut Ui) {
     let editing = app.session.map().editing.clone();
-    let pane = app.ui.right == Some(RightPane::Editing);
+    let pane = app.ui.dock.is_open(RightPane::Editing);
     group(ui, "Manage Edits", |ui| {
         big(ui, app, "edit", "Edit", "Turn editing on or off for the map.", "edit.enable", Value::Null, editing.settings.enabled, false);
         big(ui, app, "save", "Save", "Save the project with your edits.", "ui.save", Value::Null, false, false);
@@ -1904,7 +1895,7 @@ fn edit_tab(app: &mut RustGisApp, ui: &mut Ui) {
                 menu_item(ui, app, "settings", "Topology Options…", "ui.pane.editing", Value::Null);
                 if ui.button(tl!("Error Inspector (validate)")).clicked() {
                     let _ = app.run("topology.validate", Value::Null);
-                    app.ui.right = Some(RightPane::Editing);
+                    app.ui.dock.open(RightPane::Editing);
                     ui.close();
                 }
             });
@@ -2221,7 +2212,7 @@ fn share_groups(app: &mut RustGisApp, ui: &mut Ui) {
                 "Shares made, with Manage tools to update them.",
                 "ui.pane.shares",
                 Value::Null,
-                app.ui.right == Some(RightPane::Shares),
+                app.ui.dock.is_open(RightPane::Shares),
             );
             small(
                 ui,
@@ -2559,7 +2550,7 @@ fn plugins_tab(app: &mut RustGisApp, ui: &mut Ui) {
                 app,
                 "search",
                 "Browse Plugins",
-                "Find plugins in the GeoForge plugin registry.",
+                "Find plugins in the UniGIS plugin registry.",
                 "ui.plugins",
                 json!({"open": true, "tab": "browse"}),
                 false,
@@ -2647,7 +2638,7 @@ fn plugin_tab(app: &mut RustGisApp, ui: &mut Ui, plugin: &str) {
 fn settings_tab(app: &mut RustGisApp, ui: &mut Ui) {
     group(ui, "Customize", |ui| {
         let hidden = app.ui.hidden_tabs.clone();
-        // GeoForge's tabs and plugins' tabs.
+        // UniGIS's tabs and plugins' tabs.
         let mut all: Vec<(String, String)> =
             TABS.iter().filter(|t| !FIXED_TABS.contains(*t)).map(|t| (t.to_string(), tl!(*t).to_string())).collect();
         all.extend(plugin_tabs(app));
@@ -2681,7 +2672,7 @@ fn start_project_menu(app: &mut RustGisApp, ui: &mut Ui) {
     let blank = app.ui.start_blank;
     let current = if blank { tl!("Blank Map") } else { tl!("World Atlas") };
     let label = format!("{}\n{current}", tl!("Start With"));
-    big_menu(ui, app, "map", &label, "What GeoForge opens with: the World Atlas sample or a blank map.", move |ui, app| {
+    big_menu(ui, app, "map", &label, "What UniGIS opens with: the World Atlas sample or a blank map.", move |ui, app| {
         for (b, name) in [(false, tl!("World Atlas")), (true, tl!("Blank Map"))] {
             if ui.add(egui::Button::selectable(blank == b, name)).clicked() {
                 let _ = app.run("ui.startup", json!({"blank": b}));
@@ -2764,22 +2755,22 @@ fn help_tab(app: &mut RustGisApp, ui: &mut Ui) {
             "Frame rate, draw time, data size and memory.",
             "ui.pane.diagnostics",
             Value::Null,
-            app.ui.right == Some(RightPane::Diagnostics),
+            app.ui.dock.is_open(RightPane::Diagnostics),
             false,
         );
     });
     group(ui, "Learn", |ui| {
-        big(ui, app, "help", "Learning\nResources", "Open the GeoForge user guide.", "ui.learn", Value::Null, false, false);
+        big(ui, app, "help", "Learning\nResources", "Open the UniGIS user guide.", "ui.learn", Value::Null, false, false);
     });
     group(ui, "Help", |ui| {
-        big(ui, app, "help", "About", "About GeoForge.", "ui.about", Value::Null, false, false);
+        big(ui, app, "help", "About", "About UniGIS.", "ui.about", Value::Null, false, false);
         if !cfg!(target_arch = "wasm32") {
             big(
                 ui,
                 app,
                 "update",
                 "Check for\nUpdates",
-                "See whether a newer GeoForge has been released.",
+                "See whether a newer UniGIS has been released.",
                 "ui.checkUpdate",
                 Value::Null,
                 false,
@@ -3226,7 +3217,7 @@ fn drawing_group(app: &mut RustGisApp, ui: &mut Ui, layer: &rustgis_engine::map:
             "Open the Symbology pane.",
             "ui.pane.symbology",
             Value::Null,
-            app.ui.right == Some(RightPane::Symbology),
+            app.ui.dock.is_open(RightPane::Symbology),
             false,
         );
         let numeric: Vec<String> = layer.dataset.fields.iter().filter(|f| f.ty.is_numeric()).map(|f| f.name.clone()).collect();
@@ -3305,7 +3296,7 @@ fn layer_group(app: &mut RustGisApp, ui: &mut Ui, layer: &rustgis_engine::map::L
                     "Open the Symbology pane.",
                     "ui.pane.symbology",
                     Value::Null,
-                    app.ui.right == Some(RightPane::Symbology),
+                    app.ui.dock.is_open(RightPane::Symbology),
                 );
             } else {
                 small(ui, app, "table", "Attribute Table", "Open the layer's table.", "table.open", Value::Null, false);
@@ -3393,7 +3384,7 @@ fn raster_style_groups(app: &mut RustGisApp, ui: &mut Ui) {
             }
             ui.separator();
             if ui.button(tl!("Symbology Pane…")).clicked() {
-                app.ui.right = Some(RightPane::Symbology);
+                app.ui.dock.open(RightPane::Symbology);
                 ui.close();
             }
         });
@@ -3540,7 +3531,7 @@ fn raster_data_groups(app: &mut RustGisApp, ui: &mut Ui) {
             "Size, bands, statistics and coordinate system.",
             "ui.pane.details",
             Value::Null,
-            app.ui.right == Some(RightPane::Details),
+            app.ui.dock.is_open(RightPane::Details),
             false,
         );
     });
@@ -3704,7 +3695,7 @@ fn feature_data_groups(app: &mut RustGisApp, ui: &mut Ui) {
     group(ui, "Data Design", |ui| {
         big(ui, app, "field", "Fields", "Add a field.", "ui.dialog", json!({"name": "addField"}), false, false);
         big(ui, app, "calculate", "Calculate", "Calculate field values.", "ui.dialog", json!({"name": "calculateField"}), false, false);
-        let open = app.ui.right == Some(RightPane::Design);
+        let open = app.ui.dock.is_open(RightPane::Design);
         col(ui, |ui| {
             small(
                 ui,

@@ -23,8 +23,8 @@ A tile service's address: raster tiles with {z}/{x}/{y} (or {-y}, {q}, {bbox-eps
 A value, a field, or two of them joined by + − × ÷. Applies to the selected rows, or every row when none is selected.	Một giá trị, một trường, hoặc hai trong số đó nối bằng + − × ÷. Áp dụng cho các hàng được chọn, hoặc mọi hàng nếu không có hàng nào được chọn.
 About	Giới thiệu
 About plugins	Giới thiệu về plugin
-About GeoForge	Giới thiệu GeoForge
-About GeoForge.	Giới thiệu GeoForge.
+About UniGIS	Giới thiệu UniGIS
+About UniGIS.	Giới thiệu UniGIS.
 Above	Trên
 Above Left	Trên trái
 Above Right	Trên phải
@@ -137,7 +137,7 @@ Area of use: within {r}° of the {lon}° meridian	Phạm vi sử dụng: trong v
 Area of use: within {r}° of {lon}°, {lat}°	Phạm vi sử dụng: trong vòng {r}° quanh {lon}°, {lat}°
 Area {area}   ·   Perimeter {perimeter}	Diện tích {area}   ·   Chu vi {perimeter}
 Areas (name, land use, area)	Vùng (tên, sử dụng đất, diện tích)
-Ask a question about your data, or describe what to do with the map. The assistant runs GeoForge commands for you; every change can be undone.	Đặt câu hỏi về dữ liệu của bạn, hoặc mô tả việc cần làm với bản đồ. Trợ lý sẽ chạy các lệnh GeoForge cho bạn; mọi thay đổi đều có thể hoàn tác.
+Ask a question about your data, or describe what to do with the map. The assistant runs UniGIS commands for you; every change can be undone.	Đặt câu hỏi về dữ liệu của bạn, hoặc mô tả việc cần làm với bản đồ. Trợ lý sẽ chạy các lệnh UniGIS cho bạn; mọi thay đổi đều có thể hoàn tác.
 Ask about the map, or tell it what to do…	Hỏi về bản đồ, hoặc bảo nó cần làm gì…
 Ask about your data, or tell the assistant what to do with the map.	Hỏi về dữ liệu của bạn, hoặc bảo trợ lý cần làm gì với bản đồ.
 Assistant settings	Cài đặt trợ lý
@@ -654,7 +654,7 @@ Find a place by coordinates.	Tìm một địa điểm theo tọa độ.
 Find and run geoprocessing tools.	Tìm và chạy công cụ xử lý không gian.
 Find any command by name (Ctrl+K).	Tìm bất kỳ lệnh nào theo tên (Ctrl+K).
 Find Place	Tìm địa điểm
-Find plugins in the GeoForge plugin registry.	Tìm plugin trong kho plugin GeoForge.
+Find plugins in the UniGIS plugin registry.	Tìm plugin trong kho plugin UniGIS.
 Find Similar	Tìm tương tự
 Find Tools	Tìm công cụ
 Finish Polygon	Hoàn tất vùng
@@ -783,7 +783,7 @@ Import Thumbnail	Nhập ảnh thu nhỏ
 Import Web Tool	Nhập công cụ web
 In Beyond	Khi phóng to hơn
 In Progress	Đang thực hiện
-In GeoForge, it can:	Trong GeoForge, nó có thể:
+In UniGIS, it can:	Trong UniGIS, nó có thể:
 in progress	đang thực hiện
 In project	Trong dự án
 In use	Đang dùng
@@ -1080,7 +1080,7 @@ North	Bắc
 North\nArrow	Mũi tên\nchỉ bắc
 North Polar Stereographic	Phép chiếu nổi cực Bắc
 Not sandboxed	Không có hộp cát
-not a GeoForge layout	không phải bố cục GeoForge
+not a UniGIS layout	không phải bố cục UniGIS
 not needed	không cần
 Not saved yet	Chưa lưu
 Notebook	Sổ tay
@@ -1110,8 +1110,8 @@ Opacity	Độ mờ đục
 Open	Mở
 Open a .rgis project	Mở dự án .rgis
 open a layout first	hãy mở một bố cục trước
-Open a GeoForge or Jupyter notebook.	Mở sổ tay GeoForge hoặc Jupyter.
-Open a GeoForge project.	Mở một dự án GeoForge.
+Open a UniGIS or Jupyter notebook.	Mở sổ tay UniGIS hoặc Jupyter.
+Open a UniGIS project.	Mở một dự án UniGIS.
 Open an offline area to edit.	Mở một khu vực ngoại tuyến để chỉnh sửa.
 Open Custom Template	Mở mẫu tùy chỉnh
 Open Custom Template…	Mở mẫu tùy chỉnh…
@@ -1128,7 +1128,7 @@ Open the attribute table of the selected layer.	Mở bảng thuộc tính của 
 Open the layer's attribute table.	Mở bảng thuộc tính của lớp.
 Open the layer's table.	Mở bảng của lớp.
 Open the Release Page	Mở trang phát hành
-Open the GeoForge user guide.	Mở hướng dẫn sử dụng GeoForge.
+Open the UniGIS user guide.	Mở hướng dẫn sử dụng UniGIS.
 Open the selected layer's table.	Mở bảng của lớp được chọn.
 Open the Symbology pane.	Mở ngăn Ký hiệu.
 Open {code} on epsg.io	Mở {code} trên epsg.io
@@ -1207,7 +1207,7 @@ Plugin Manager…	Trình quản lý plugin…
 Plugin registry	Kho plugin
 Plugins	Plugin
 Plugins are .rgplugin files. Install only plugins from people you trust.	Plugin là các tệp .rgplugin. Chỉ cài đặt plugin từ những người bạn tin tưởng.
-Plugins run in a sandbox: they can't reach your files or the network, and they change the project only through GeoForge's own commands, within the permissions you accept.	Plugin chạy trong hộp cát: chúng không thể truy cập tệp của bạn hay mạng, và chỉ thay đổi dự án thông qua các lệnh của chính GeoForge, trong phạm vi quyền bạn chấp nhận.
+Plugins run in a sandbox: they can't reach your files or the network, and they change the project only through UniGIS's own commands, within the permissions you accept.	Plugin chạy trong hộp cát: chúng không thể truy cập tệp của bạn hay mạng, và chỉ thay đổi dự án thông qua các lệnh của chính UniGIS, trong phạm vi quyền bạn chấp nhận.
 PMTiles archive	Kho PMTiles
 PMTiles File…	Tệp PMTiles…
 PNG frames (zip)	Khung hình PNG (zip)
@@ -1383,29 +1383,29 @@ Run the task	Chạy nhiệm vụ
 Run Tool	Chạy công cụ
 Run {name}	Chạy {name}
 Running…	Đang chạy…
-GeoForge	GeoForge
-GeoForge deep learning package	Gói học sâu GeoForge
-GeoForge is a free and open-source GIS written in pure Rust. It runs on the desktop and in the browser, and every action is a command you can also run from the command line.	GeoForge là một GIS miễn phí và mã nguồn mở viết bằng Rust thuần. Nó chạy trên máy tính và trong trình duyệt, và mọi thao tác đều là một lệnh mà bạn cũng có thể chạy từ dòng lệnh.
-GeoForge layer file	Tệp lớp GeoForge
-GeoForge layers, maps and projects	Lớp, bản đồ và dự án GeoForge
-GeoForge layout	Bố cục GeoForge
-GeoForge maps and projects	Bản đồ và dự án GeoForge
-GeoForge or Jupyter notebook	Sổ tay GeoForge hoặc Jupyter
-GeoForge plugin	Plugin GeoForge
-GeoForge presentation	Bản trình bày GeoForge
-GeoForge project	Dự án GeoForge
-GeoForge project template	Mẫu dự án GeoForge
-GeoForge ran into an internal error last time. The details are in {path}; please attach them to a bug report.	Lần trước GeoForge gặp lỗi nội bộ. Chi tiết nằm trong {path}; hãy đính kèm vào báo cáo lỗi.
-GeoForge ran into an internal error while handling the model's reply, so the request was stopped. Please report it at https://github.com/opengeos/RustGIS/issues.	GeoForge gặp lỗi nội bộ khi xử lý phản hồi của mô hình nên yêu cầu đã bị dừng. Hãy báo lỗi tại https://github.com/opengeos/RustGIS/issues.
-GeoForge report or report template	Báo cáo hoặc mẫu báo cáo GeoForge
-GeoForge styles	Kiểu GeoForge
-GeoForge task	Nhiệm vụ GeoForge
-GeoForge {latest} is available.	Đã có GeoForge {latest}.
-GeoForge {version} is the latest version.	GeoForge {version} là phiên bản mới nhất.
+UniGIS	UniGIS
+UniGIS deep learning package	Gói học sâu UniGIS
+UniGIS is a free and open-source GIS written in pure Rust. It runs on the desktop and in the browser, and every action is a command you can also run from the command line.	UniGIS là một GIS miễn phí và mã nguồn mở viết bằng Rust thuần. Nó chạy trên máy tính và trong trình duyệt, và mọi thao tác đều là một lệnh mà bạn cũng có thể chạy từ dòng lệnh.
+UniGIS layer file	Tệp lớp UniGIS
+UniGIS layers, maps and projects	Lớp, bản đồ và dự án UniGIS
+UniGIS layout	Bố cục UniGIS
+UniGIS maps and projects	Bản đồ và dự án UniGIS
+UniGIS or Jupyter notebook	Sổ tay UniGIS hoặc Jupyter
+UniGIS plugin	Plugin UniGIS
+UniGIS presentation	Bản trình bày UniGIS
+UniGIS project	Dự án UniGIS
+UniGIS project template	Mẫu dự án UniGIS
+UniGIS ran into an internal error last time. The details are in {path}; please attach them to a bug report.	Lần trước UniGIS gặp lỗi nội bộ. Chi tiết nằm trong {path}; hãy đính kèm vào báo cáo lỗi.
+UniGIS ran into an internal error while handling the model's reply, so the request was stopped. Please report it at https://github.com/opengeos/RustGIS/issues.	UniGIS gặp lỗi nội bộ khi xử lý phản hồi của mô hình nên yêu cầu đã bị dừng. Hãy báo lỗi tại https://github.com/opengeos/RustGIS/issues.
+UniGIS report or report template	Báo cáo hoặc mẫu báo cáo UniGIS
+UniGIS styles	Kiểu UniGIS
+UniGIS task	Nhiệm vụ UniGIS
+UniGIS {latest} is available.	Đã có UniGIS {latest}.
+UniGIS {version} is the latest version.	UniGIS {version} là phiên bản mới nhất.
 RUSTGIS_ASSISTANT_MODEL	RUSTGIS_ASSISTANT_MODEL
 RUSTGIS_ASSISTANT_PROVIDER	RUSTGIS_ASSISTANT_PROVIDER
 Sample data (Natural Earth)	Dữ liệu mẫu (Natural Earth)
-Sample data © Natural Earth (public domain). GeoForge is licensed under Apache-2.0.	Dữ liệu mẫu © Natural Earth (phạm vi công cộng). GeoForge được cấp phép theo Apache-2.0.
+Sample data © Natural Earth (public domain). UniGIS is licensed under Apache-2.0.	Dữ liệu mẫu © Natural Earth (phạm vi công cộng). UniGIS được cấp phép theo Apache-2.0.
 Sample data: Natural Earth (public domain). Licensed under Apache-2.0.	Dữ liệu mẫu: Natural Earth (phạm vi công cộng). Cấp phép theo Apache-2.0.
 Saturation	Độ bão hòa
 Save	Lưu
@@ -1470,7 +1470,7 @@ Sections	Phần
 See and set the camera's position and scale.	Xem và đặt vị trí và tỷ lệ của máy ảnh.
 See the map as people with colour vision deficiencies do.	Xem bản đồ như người bị khiếm khuyết thị giác màu.
 See the tools you've run.	Xem các công cụ bạn đã chạy.
-See whether a newer GeoForge has been released.	Kiểm tra xem đã có bản GeoForge mới hơn chưa.
+See whether a newer UniGIS has been released.	Kiểm tra xem đã có bản UniGIS mới hơn chưa.
 Select	Chọn
 Select (click)	Chọn (nhấp)
 Select (rectangle)	Chọn (hình chữ nhật)
@@ -1657,14 +1657,14 @@ Text	Văn bản
 Text Symbol	Ký hiệu văn bản
 The assistant is busy; stop it or wait for it to finish.	Trợ lý đang bận; hãy dừng nó hoặc đợi nó hoàn tất.
 The assistant wants to run this, and {why}:	Trợ lý muốn chạy thao tác sau, cần bạn cho phép vì {why}:
-This plugin runs as a program on your computer, outside GeoForge's sandbox. It can do anything you can: read and change your files, use the network and run other programs. Install it only if you trust its author.	Plugin này chạy như một chương trình trên máy tính của bạn, bên ngoài hộp cát của GeoForge. Nó có thể làm mọi việc bạn làm được: đọc và thay đổi tệp của bạn, dùng mạng và chạy các chương trình khác. Chỉ cài đặt nếu bạn tin tưởng tác giả của nó.
+This plugin runs as a program on your computer, outside UniGIS's sandbox. It can do anything you can: read and change your files, use the network and run other programs. Install it only if you trust its author.	Plugin này chạy như một chương trình trên máy tính của bạn, bên ngoài hộp cát của UniGIS. Nó có thể làm mọi việc bạn làm được: đọc và thay đổi tệp của bạn, dùng mạng và chạy các chương trình khác. Chỉ cài đặt nếu bạn tin tưởng tác giả của nó.
 the capture failed unexpectedly	chụp thất bại ngoài dự kiến
 the Help tab always shows	thẻ Trợ giúp luôn hiển thị
 The job covers the map view	Tác vụ bao phủ khung nhìn bản đồ
 The key is kept for this session only.	Khóa chỉ được giữ trong phiên này.
 The layer's file couldn't be read: {error}	Không thể đọc tệp của lớp: {error}
 the layout export failed unexpectedly	xuất bố cục thất bại ngoài dự kiến
-The list of plugins to browse. Leave it empty for the GeoForge plugin registry.	Danh sách plugin để duyệt. Để trống để dùng kho plugin GeoForge.
+The list of plugins to browse. Leave it empty for the UniGIS plugin registry.	Danh sách plugin để duyệt. Để trống để dùng kho plugin UniGIS.
 the map has no layers	bản đồ không có lớp nào
 The map is drawn in this coordinate system; layers are projected on the fly.	Bản đồ được vẽ trong hệ tọa độ này; các lớp được chiếu tức thời.
 The map view as it is now	Khung nhìn bản đồ như hiện tại
@@ -1793,11 +1793,11 @@ Web Tile Layers	Lớp ô bản đồ web
 Web Tool	Công cụ web
 Website	Trang web
 Weights	Trọng số
-Welcome to GeoForge	Chào mừng đến với GeoForge
+Welcome to UniGIS	Chào mừng đến với UniGIS
 West	Tây
 WGS 84 / Globe	WGS 84 / Quả địa cầu
 WGS 84 / Web Mercator	WGS 84 / Web Mercator
-What GeoForge opens with: the World Atlas sample or a blank map.	GeoForge mở với gì: mẫu World Atlas hoặc một bản đồ trống.
+What UniGIS opens with: the World Atlas sample or a blank map.	UniGIS mở với gì: mẫu World Atlas hoặc một bản đồ trống.
 What's near a point	Những gì gần một điểm
 Where	Điều kiện
 Where Clause	Mệnh đề WHERE
@@ -1903,11 +1903,11 @@ The sign-in is kept in the app's settings folder, for your user account only, an
 Sign in with your ChatGPT account.	Hãy đăng nhập bằng tài khoản ChatGPT của bạn.
 A ChatGPT sign-in can only be used with the OpenAI API.	Đăng nhập ChatGPT chỉ có thể dùng với API của OpenAI.
 Continue with ChatGPT	Tiếp tục với ChatGPT
-Eligible requests in GeoForge use your ChatGPT plan. You can manage usage in ChatGPT settings.	Các yêu cầu đủ điều kiện trong GeoForge dùng gói ChatGPT của bạn. Bạn có thể quản lý mức sử dụng trong cài đặt ChatGPT.
+Eligible requests in UniGIS use your ChatGPT plan. You can manage usage in ChatGPT settings.	Các yêu cầu đủ điều kiện trong UniGIS dùng gói ChatGPT của bạn. Bạn có thể quản lý mức sử dụng trong cài đặt ChatGPT.
 Got it	Đã hiểu
 Manage usage	Quản lý mức sử dụng
 Requests go to the OpenAI API and use your ChatGPT plan.	Các yêu cầu được gửi tới API của OpenAI và dùng gói ChatGPT của bạn.
-Signed out on this computer, but OpenAI didn't confirm it. You can disconnect GeoForge in ChatGPT's settings.	Đã đăng xuất trên máy tính này, nhưng OpenAI chưa xác nhận. Bạn có thể ngắt kết nối GeoForge trong cài đặt ChatGPT.
+Signed out on this computer, but OpenAI didn't confirm it. You can disconnect UniGIS in ChatGPT's settings.	Đã đăng xuất trên máy tính này, nhưng OpenAI chưa xác nhận. Bạn có thể ngắt kết nối UniGIS trong cài đặt ChatGPT.
 Using ChatGPT plan	Đang dùng gói ChatGPT
 You're using your ChatGPT plan	Bạn đang dùng gói ChatGPT của mình
 Use another account	Dùng tài khoản khác
@@ -1931,3 +1931,17 @@ ChatGPT plan use is unavailable for this account or workspace.	Không thể sử
 A ChatGPT plan or app usage limit was reached. Review Weekly usage before trying again.	Đã đạt giới hạn sử dụng của gói ChatGPT hoặc ứng dụng. Xem mức sử dụng hằng tuần trước khi thử lại.
 ChatGPT usage is temporarily unavailable. Keep your sign-in and try again later.	Tạm thời không thể sử dụng ChatGPT. Giữ phiên đăng nhập và thử lại sau.
 This ChatGPT account was already saved. Next time, choose it in the list instead of adding it again.	Tài khoản ChatGPT này đã được lưu. Lần sau, hãy chọn nó trong danh sách thay vì thêm lại.
+
+Dock Left	Neo bên trái
+Dock Right	Neo bên phải
+Dock Bottom	Neo phía dưới
+Keep Open	Giữ mở
+Auto Hide	Tự động ẩn
+Reset Layout	Đặt lại bố cục
+Analysis Tools	Phân tích (Công cụ)
+Cartography Tools	Bản đồ học (Công cụ)
+Conversion Tools	Chuyển đổi (Công cụ)
+Data Management Tools	Quản lý dữ liệu (Công cụ)
+Editing Tools	Chỉnh sửa (Công cụ)
+Spatial Analyst Tools	Spatial Analyst (Công cụ)
+Spatial Statistics Tools	Spatial Statistics (Công cụ)

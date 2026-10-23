@@ -79,7 +79,7 @@ pub fn commands() -> Vec<C> {
         .params(r#"{"layer"?, "name"?: string}"#),
         C::new("style.add", "Add Style", "Style › Styles", |s, p| {
             let text = read_text(p)?;
-            let items: Vec<StyleItem> = serde_json::from_str(&text).map_err(|e| format!("not a GeoForge style file: {e}"))?;
+            let items: Vec<StyleItem> = serde_json::from_str(&text).map_err(|e| format!("not a UniGIS style file: {e}"))?;
             let mut n = 0;
             for it in items.into_iter().take(1000) {
                 add_style(s, it);
@@ -122,7 +122,7 @@ pub fn commands() -> Vec<C> {
         // Custom colour ramps.
         C::new("ramp.add", "Add Color Ramps", "Style › Styles", |s, p| {
             let text = read_text(p)?;
-            // GeoForge's own files, QGIS styles, GDAL colour-relief text and GMT palettes.
+            // UniGIS's own files, QGIS styles, GDAL colour-relief text and GMT palettes.
             let format = match ps(p, "format") {
                 Some(f) => Some(RampFormat::from_name(f).ok_or_else(|| format!("unknown colour ramp format '{f}'"))?),
                 None => None,
@@ -172,7 +172,7 @@ pub fn commands() -> Vec<C> {
         .params(r#"{"path": "*.rgistemplate", "name"?: template name}"#),
         C::new("project.fromTemplate", "Open Custom Template", "Data › Project", |s, p| {
             let text = read_text(p)?;
-            let mut proj = Project::from_json(&text).map_err(|e| e.replace("GeoForge project", "GeoForge template"))?;
+            let mut proj = Project::from_json(&text).map_err(|e| e.replace("UniGIS project", "UniGIS template"))?;
             proj.name = ps(p, "name").map(str::trim).filter(|n| !n.is_empty()).unwrap_or("Untitled").chars().take(200).collect();
             super::project::reset_to(s, proj);
             s.path = None;
@@ -260,7 +260,7 @@ pub fn commands() -> Vec<C> {
         .params(r#"{"task"?: name, "path": "*.rgistask"}"#),
         C::new("task.import", "Import Task", "Data › Project", |s, p| {
             let text = read_text(p)?;
-            let t: Task = serde_json::from_str(&text).map_err(|e| format!("not a GeoForge task: {e}"))?;
+            let t: Task = serde_json::from_str(&text).map_err(|e| format!("not a UniGIS task: {e}"))?;
             // A task from a file is someone else's: it may not read or write files, or run scripts.
             if let Some((i, st)) = t.steps.iter().enumerate().find(|(_, st)| touches_files(&st.command, &st.params)) {
                 return Err(format!("step {} ({}) reads or writes files or runs a script, which imported tasks can't do", i + 1, st.command));
@@ -292,7 +292,7 @@ pub(crate) fn read_text(p: &Value) -> Result<String, String> {
         if bytes.starts_with(b"PK") {
             return package_text(&bytes);
         }
-        return String::from_utf8(bytes).map_err(|_| "not a GeoForge file".to_string());
+        return String::from_utf8(bytes).map_err(|_| "not a UniGIS file".to_string());
     }
     match (ps(p, "text"), ps(p, "path")) {
         (Some(t), _) if t.len() as u64 <= MAX_FILE => Ok(t.to_string()),
@@ -307,7 +307,7 @@ pub(crate) fn read_text(p: &Value) -> Result<String, String> {
             if bytes.starts_with(b"PK") {
                 return package_text(&bytes);
             }
-            String::from_utf8(bytes).map_err(|_| format!("{path} isn't a GeoForge file"))
+            String::from_utf8(bytes).map_err(|_| format!("{path} isn't a UniGIS file"))
         }
         (None, None) => Err("path or text is required".into()),
     }
@@ -357,7 +357,7 @@ fn import_maps(s: &mut Session, p: &Value) -> CmdResult {
     let text = read_text(p)?;
     let maps: Vec<Map> = match serde_json::from_str::<Map>(&text) {
         Ok(m) => vec![m],
-        Err(_) => Project::from_json(&text).map_err(|_| "not a GeoForge map file, project or package".to_string())?.maps,
+        Err(_) => Project::from_json(&text).map_err(|_| "not a UniGIS map file, project or package".to_string())?.maps,
     };
     let mut names = Vec::new();
     for mut m in maps.into_iter().take(100) {
@@ -399,7 +399,7 @@ fn import_styles(s: &mut Session, p: &Value) -> CmdResult {
         m.layers
     } else {
         Project::from_json(&text)
-            .map_err(|_| "not a GeoForge layer file, map file or project".to_string())?
+            .map_err(|_| "not a UniGIS layer file, map file or project".to_string())?
             .maps
             .into_iter()
             .flat_map(|m| m.layers)
@@ -454,7 +454,7 @@ fn package_project(s: &Session) -> Result<Vec<u8>, String> {
     }
     let text = serde_json::to_string(&p).map_err(|e| e.to_string())?;
     let readme =
-        format!("{} — a GeoForge project package.\nOpen it with GeoForge (Project › Open), or unzip it for {}.rgis.\n", p.name, p.name);
+        format!("{} — a UniGIS project package.\nOpen it with UniGIS (Project › Open), or unzip it for {}.rgis.\n", p.name, p.name);
     rustgis_data::zip::write(&[
         (format!("{}.{}", safe(&p.name), crate::project::EXTENSION), text.into_bytes()),
         ("README.txt".into(), readme.into_bytes()),
@@ -485,7 +485,7 @@ fn package_map(s: &Session, mobile: bool, tol: f64) -> Result<Vec<u8>, String> {
     }
     let text = serde_json::to_string(&m).map_err(|e| e.to_string())?;
     let kind = if mobile { "mobile map package" } else { "map package" };
-    let readme = format!("{} — a GeoForge {kind}.\nAdd it to a project with Data › Import.\n", m.name);
+    let readme = format!("{} — a UniGIS {kind}.\nAdd it to a project with Data › Import.\n", m.name);
     rustgis_data::zip::write(&[(format!("{}.rgismap", safe(&m.name)), text.into_bytes()), ("README.txt".into(), readme.into_bytes())])
 }
 
@@ -672,7 +672,7 @@ fn obj_text(s: &Session, p: &Value) -> Result<String, String> {
         ((m.x - origin.x) * k, (m.y - origin.y) * k)
     };
     let name = l.name.replace(char::is_whitespace, "_");
-    let mut obj = format!("# {name} exported by GeoForge\no {name}\n");
+    let mut obj = format!("# {name} exported by UniGIS\no {name}\n");
     let mut v = 0usize; // vertices written
     let rows = l.visible_rows();
     for (row, ft) in l.dataset.features.iter().enumerate() {
@@ -793,24 +793,24 @@ fn obj_text(s: &Session, p: &Value) -> Result<String, String> {
 
 /// The kinds of item [`item_bytes`] writes: (kind, extension, label).
 pub const ITEMS: &[(&str, &str, &str)] = &[
-    ("map", "rgismap", "GeoForge map file"),
-    ("layer", "rgislyr", "GeoForge layer file"),
-    ("styles", "rgisstyle", "GeoForge styles"),
-    ("ramps", "rgisramp", "GeoForge colour ramps"),
-    ("template", "rgistemplate", "GeoForge project template"),
-    ("projectPackage", "rgispkg", "GeoForge project package"),
-    ("mapPackage", "rgismpk", "GeoForge map package"),
-    ("mobilePackage", "rgismpk", "GeoForge mobile map package"),
-    ("gpPackage", "rgisgpk", "GeoForge results package"),
-    ("task", "rgistask", "GeoForge task"),
-    ("bookmarks", "rgisbookmarks", "GeoForge bookmarks"),
+    ("map", "rgismap", "UniGIS map file"),
+    ("layer", "rgislyr", "UniGIS layer file"),
+    ("styles", "rgisstyle", "UniGIS styles"),
+    ("ramps", "rgisramp", "UniGIS colour ramps"),
+    ("template", "rgistemplate", "UniGIS project template"),
+    ("projectPackage", "rgispkg", "UniGIS project package"),
+    ("mapPackage", "rgismpk", "UniGIS map package"),
+    ("mobilePackage", "rgismpk", "UniGIS mobile map package"),
+    ("gpPackage", "rgisgpk", "UniGIS results package"),
+    ("task", "rgistask", "UniGIS task"),
+    ("bookmarks", "rgisbookmarks", "UniGIS bookmarks"),
     ("obj", "obj", "Wavefront OBJ"),
-    ("report", "rgisreport", "GeoForge report"),
-    ("reportTemplate", "rgisrpttemplate", "GeoForge report template"),
-    ("presentation", "rgispres", "GeoForge presentation"),
-    ("notebook", "rgisnb", "GeoForge notebook"),
+    ("report", "rgisreport", "UniGIS report"),
+    ("reportTemplate", "rgisrpttemplate", "UniGIS report template"),
+    ("presentation", "rgispres", "UniGIS presentation"),
+    ("notebook", "rgisnb", "UniGIS notebook"),
     ("jupyter", "ipynb", "Jupyter notebook"),
-    ("dlPackage", "rgisdlpk", "GeoForge deep learning package"),
+    ("dlPackage", "rgisdlpk", "UniGIS deep learning package"),
     ("hostedImagery", "zip", "Web map tiles"),
     ("webMap", "html", "Web map"),
     ("webLayer", "zip", "Web layer"),

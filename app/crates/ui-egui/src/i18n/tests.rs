@@ -46,11 +46,11 @@ fn plugin_strings_use_the_plugins_translations() {
     let pkg = plugins::Package::from_zip(&plugins::testing::package("i18n-fallback", &[])).unwrap();
     plugins::load(pkg, "test").unwrap();
     let de = Lang::from_code("de").unwrap();
-    // Not in GeoForge's catalog: the plugin's `i18n` has it.
+    // Not in UniGIS's catalog: the plugin's `i18n` has it.
     assert_eq!(tr(de, "Hello"), "Hallo");
     assert_eq!(tr(Lang::EN, "Hello"), "Hello");
     assert_eq!(tr(Lang::from_code("fr").unwrap(), "Hello"), "Hello");
-    // GeoForge's own catalog comes first.
+    // UniGIS's own catalog comes first.
     assert_eq!(tr(de, "Open"), de.0.catalog().get("Open").copied().unwrap_or("Open"));
     plugins::unload("i18n-fallback");
 }

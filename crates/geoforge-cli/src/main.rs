@@ -1,4 +1,4 @@
-//! `gf`: GeoForge geoprocessing tools from the command line. Tool names and
+//! `gf`: UniGIS geoprocessing tools from the command line. Tool names and
 //! behavior follow their ArcGIS Pro counterparts.
 //!
 //! Datasets are addressed the way ArcGIS does: `roads.shp`, `city.gdb`,
@@ -14,7 +14,7 @@ use geoforge_shapefile::{ShapefileReader, ShapefileWriter};
 use geoforge_tools::{Dissolve, ToolOutput};
 
 #[derive(Parser)]
-#[command(name = "gf", version, about = "GeoForge geoprocessing tools")]
+#[command(name = "gf", version, about = "UniGIS geoprocessing tools")]
 struct Cli {
     #[command(subcommand)]
     tool: Tool,

@@ -4,7 +4,7 @@
 
 **Analyze › AI Assistant** (also View › Windows, or Command Search) opens a chat pane. Ask a
 question about your data or say what to do with the map, and the assistant answers by running
-RustGIS commands and geoprocessing tools for you:
+UniGIS commands and geoprocessing tools for you:
 
 - "Which 5 countries have the largest GDP?" reads the Countries table and answers.
 - "Label the cities with their names, and zoom to Tokyo."
@@ -47,19 +47,19 @@ skip steps.
 With a ChatGPT plan you can use the assistant without an API key, through OpenAI's
 [Sign in with ChatGPT for open-source apps](https://developers.openai.com/siwc/token-sharing-open-source).
 Choose **ChatGPT (sign in)** and click **Continue with ChatGPT**: your browser opens OpenAI's
-sign-in page, where you approve RustGIS using your plan (the first time, OpenAI registers RustGIS
+sign-in page, where you approve UniGIS using your plan (the first time, OpenAI registers UniGIS
 as an app of your account; you can rename it there). Afterwards the settings show the account's
 email, **Using ChatGPT plan**, and a **Weekly usage** link to
 [your ChatGPT usage settings](https://chatgpt.com/settings/usage?tab=overview), where you can see and limit
-what RustGIS uses or disconnect it. **Sign out** clears local tokens and attempts to revoke the
-remote session. If OpenAI does not confirm revocation, RustGIS says so; disconnect RustGIS in
+what UniGIS uses or disconnect it. **Sign out** clears local tokens and attempts to revoke the
+remote session. If OpenAI does not confirm revocation, UniGIS says so; disconnect UniGIS in
 ChatGPT settings to ensure that remote access ends. The registration remains for signing in again.
 The account picker retains separate registrations, even when their emails match. **Use another
 account** adds a registration; choose an existing one to reuse its issued client ID. From the command line:
 
 ```sh
 rustgis-cli ask --login                 # continue with ChatGPT in the browser
-rustgis-cli ask --login --another-account  # or register RustGIS for another account
+rustgis-cli ask --login --another-account  # or register UniGIS for another account
 rustgis-cli ask --sample --provider chatgpt "Zoom to Tokyo"
 rustgis-cli ask --accounts              # list saved registrations
 rustgis-cli ask --account oaiapp_...      # select one by its issued client id
@@ -82,21 +82,21 @@ Plus has a five-hour usage limit shared across apps using the plan. Team/Busines
 and Edu workspace policy may block plan usage. Eligibility and model catalogs depend on the
 selected account and workspace.
 
-Weekly usage opens ChatGPT's settings page. RustGIS does not show a live percentage: there is
+Weekly usage opens ChatGPT's settings page. UniGIS does not show a live percentage: there is
 no documented usage endpoint, and the tested live responses supplied no rate-limit headers.
 
 ## Privacy
 
-Requests go from RustGIS straight to the provider you chose, with your key. They carry your
+Requests go from UniGIS straight to the provider you chose, with your key. They carry your
 messages, the map's layer names, fields and extent, and any rows the assistant reads to answer
 you; nothing goes anywhere else. A key typed in the settings is used for the session only unless
 you tick **Remember the key on this computer**, which saves it unencrypted in the app's
 preferences (in the browser's storage on the web); keys from the environment are never saved.
 A ChatGPT sign-in is kept in `chatgpt-auth.json` in the app's settings folder (owner-only on
 macOS and Linux; on Windows, protected like the rest of your user profile), never in the
-preferences or a project file, and its tokens are never logged; RustGIS renews them as they expire.
+preferences or a project file, and its tokens are never logged; UniGIS renews them as they expire.
 The ChatGPT provider's address is fixed, so only the OpenAI API receives them. Renewals are
-serialized across RustGIS processes (a refresh token can be used only once).
+serialized across UniGIS processes (a refresh token can be used only once).
 Plain HTTP is only used for servers on your computer or local network.
 
 In the web app, the browser calls the provider directly. Anthropic, OpenAI, Gemini and

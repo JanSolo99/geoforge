@@ -219,7 +219,7 @@ fn signed_in(app: &mut RustGisApp, c: &chatgpt::Credentials, ctx: &egui::Context
     app.assistant.account = Some(c.account());
     app.assistant.login_error = None;
     let saved = chatgpt::accounts().unwrap_or_default();
-    // "Use another account" with an account already saved registers GeoForge for it again.
+    // "Use another account" with an account already saved registers UniGIS for it again.
     app.assistant.duplicate = saved.iter().any(|a| a.subject == c.subject && a.client_id != c.client_id);
     app.assistant.accounts = Some(saved);
     // The first sign-in says that the plan is now used (once).
@@ -383,7 +383,7 @@ pub fn poll(app: &mut RustGisApp, ctx: &egui::Context) {
         app.assistant.signout = None;
         if r.is_err() {
             app.assistant.login_error = Some(
-                tl!("Signed out on this computer, but OpenAI didn't confirm it. You can disconnect GeoForge in ChatGPT's settings.").into(),
+                tl!("Signed out on this computer, but OpenAI didn't confirm it. You can disconnect UniGIS in ChatGPT's settings.").into(),
             );
         }
     }
@@ -805,7 +805,7 @@ fn plan_notice(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
         egui::Frame::group(ui.style()).show(ui, |ui| {
             ui.label(RichText::new(tl!("You're using your ChatGPT plan")).font(semibold(12.5)));
             ui.label(
-                RichText::new(tl!("Eligible requests in GeoForge use your ChatGPT plan. You can manage usage in ChatGPT settings."))
+                RichText::new(tl!("Eligible requests in UniGIS use your ChatGPT plan. You can manage usage in ChatGPT settings."))
                     .small()
                     .color(t.text_dim),
             );
@@ -926,7 +926,7 @@ fn composer(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens, busy: bool, ctx: &egu
 fn transcript(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens, ctx: &egui::Context) {
     let Some(agent) = app.assistant.agent.as_ref() else { return };
     if agent.transcript.is_empty() {
-        ui.label(RichText::new(tl!("Ask a question about your data, or describe what to do with the map. The assistant runs GeoForge commands for you; every change can be undone.")).color(t.text_dim));
+        ui.label(RichText::new(tl!("Ask a question about your data, or describe what to do with the map. The assistant runs UniGIS commands for you; every change can be undone.")).color(t.text_dim));
         ui.add_space(8.0);
         let mut chosen = None;
         for s in SUGGESTIONS {
@@ -1466,7 +1466,7 @@ mod tests {
         for _ in 0..6 {
             h.step();
         }
-        egui::containers::panel::PanelState::load(&h.ctx, egui::Id::new("right_pane")).unwrap().size().x
+        egui::containers::panel::PanelState::load(&h.ctx, egui::Id::new("dock_right")).unwrap().size().x
     }
 
     #[test]

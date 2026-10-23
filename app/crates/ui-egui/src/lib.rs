@@ -1,4 +1,4 @@
-//! L6: the GeoForge desktop front end, built around a ribbon (Map, Insert, Analysis, Edit, Imagery, Style,
+//! L6: the UniGIS desktop front end, built around a ribbon (Map, Insert, Analysis, Edit, Imagery, Style,
 //! View, Share), the Contents and Catalog panes, a Geoprocessing pane, the map view, the
 //! attribute table and the status bar.
 //!
@@ -15,6 +15,7 @@ mod catalogsui;
 mod chrome;
 mod cswui;
 mod dialogs;
+mod dock;
 mod docpanes;
 mod editpanes;
 mod geocodeui;
@@ -201,44 +202,18 @@ pub(crate) fn fetch_into(url: &str) -> Slot<Result<Vec<u8>, String>> {
     slot
 }
 
-/// Panes on the left of the map.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum LeftPane {
-    Contents,
-    Catalog,
-    Sources,
-}
-
-/// Panes on the right of the map.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum RightPane {
-    Geoprocessing,
-    Symbology,
-    History,
-    Details,
-    Editing,
-    Design,
-    Workflows,
-    Script,
-    Tasks,
-    Jobs,
-    Profile,
-    Diagnostics,
-    Infographics,
-    Report,
-    Presentation,
-    Notebook,
-    Assistant,
-    Shares,
-    Sql,
-}
+/// Panes that were docked on the left by default (a pane can be docked anywhere).
+pub type LeftPane = Pane;
+/// Panes that were docked on the right by default.
+pub type RightPane = Pane;
+pub use dock::{Pane, Site};
 
 pub struct UiState {
     pub tab: String,
     pub backstage: bool,
     pub backstage_page: &'static str,
-    pub left: Option<LeftPane>,
-    pub right: Option<RightPane>,
+    /// Where the panes are docked.
+    pub dock: dock::Dock,
     pub dark: bool,
     /// The theme follows the system's light or dark setting until the user picks one.
     pub dark_follows_system: bool,
@@ -274,7 +249,7 @@ pub struct UiState {
     /// Extra Quick Access Toolbar commands.
     pub quick_access: Vec<String>,
     /// Saved pane arrangements: (name, left pane, right pane, tab).
-    pub pane_sets: Vec<(String, Option<LeftPane>, Option<RightPane>, String)>,
+    pub pane_sets: Vec<(String, dock::Layout, String)>,
     /// The command an item picked in the browser opens with (web).
     pub pending_open: Option<&'static str>,
     /// The file the project was last saved or opened as (web), which Save downloads again.
@@ -337,8 +312,7 @@ impl Default for UiState {
             tab: "Map".into(),
             backstage: false,
             backstage_page: "open",
-            left: Some(LeftPane::Contents),
-            right: None,
+            dock: dock::Dock::default(),
             dark: false,
             dark_follows_system: true,
             language: i18n::AUTO.into(),
@@ -485,6 +459,7 @@ impl RustGisApp {
 
     pub fn with_services(mut self, services: Services) -> Self {
         self.services = services;
+        dock::restore(&mut self);
         if let Some(lang) = self.services.load_pref.as_ref().and_then(|load| load("language")) {
             self.ui.language = lang;
         }
@@ -708,7 +683,7 @@ impl RustGisApp {
             return r;
         }
         if lower.ends_with(".rgislayout") {
-            let text = std::str::from_utf8(bytes).map_err(|_| "not a GeoForge layout".to_string())?;
+            let text = std::str::from_utf8(bytes).map_err(|_| "not a UniGIS layout".to_string())?;
             return self.run("layout.import", json!({"text": text}));
         }
         // A layout picture needs the layout still open.
@@ -742,7 +717,7 @@ impl RustGisApp {
             return self.run("layer.addDataBytes", p);
         }
         let Ok(text) = std::str::from_utf8(bytes) else {
-            let e = crate::i18n::fmt("{name} is not a text file: GeoForge opens GeoJSON, CSV, GeoTIFF and .rgis here", &[("name", name)]);
+            let e = crate::i18n::fmt("{name} is not a text file: UniGIS opens GeoJSON, CSV, GeoTIFF and .rgis here", &[("name", name)]);
             self.session.notify(e.clone(), true);
             return Err(e);
         };
@@ -810,7 +785,7 @@ impl RustGisApp {
         }
     }
 
-    /// The GeoForge logo as a texture (rasterised once from `rustgis_render::logo`).
+    /// The UniGIS logo as a texture (rasterised once from `rustgis_render::logo`).
     pub fn logo(&mut self, ctx: &egui::Context) -> Option<egui::TextureId> {
         if self.logo.is_none()
             && let Some(pm) = rustgis_engine::render::logo::pixmap(256)
@@ -911,11 +886,11 @@ impl RustGisApp {
     }
 
     fn run_ui(&mut self, id: &str, p: &Value) -> Result<Value, String> {
-        let toggle_right = |ui: &mut UiState, pane: RightPane| ui.right = if ui.right == Some(pane) { None } else { Some(pane) };
+        let toggle_right = |ui: &mut UiState, pane: Pane| ui.dock.toggle(pane);
         match id {
-            "ui.pane.contents" => self.ui.left = if self.ui.left == Some(LeftPane::Contents) { None } else { Some(LeftPane::Contents) },
-            "ui.pane.catalog" => self.ui.left = if self.ui.left == Some(LeftPane::Catalog) { None } else { Some(LeftPane::Catalog) },
-            "ui.pane.sources" => self.ui.left = if self.ui.left == Some(LeftPane::Sources) { None } else { Some(LeftPane::Sources) },
+            "ui.pane.contents" => toggle_right(&mut self.ui, Pane::Contents),
+            "ui.pane.catalog" => toggle_right(&mut self.ui, Pane::Catalog),
+            "ui.pane.sources" => toggle_right(&mut self.ui, Pane::Sources),
             "ui.pane.geoprocessing" => toggle_right(&mut self.ui, RightPane::Geoprocessing),
             "ui.pane.symbology" => {
                 if self.session.active_layer.is_none() {
@@ -931,7 +906,7 @@ impl RustGisApp {
             // The SQL pane; with "sql" (and "database"), opened on that query, run with "run".
             "ui.pane.sql" => match p.get("sql").and_then(Value::as_str) {
                 Some(sql) => {
-                    self.ui.right = Some(RightPane::Sql);
+                    self.ui.dock.open(RightPane::Sql);
                     self.ui.sql.text = sql.chars().take(12_000).collect();
                     if let Some(d) = p.get("database").and_then(Value::as_str) {
                         self.ui.sql.database = d.to_string();
@@ -952,7 +927,7 @@ impl RustGisApp {
                         self.workflow.section = id;
                         self.workflow.result = None;
                         self.workflow.error = None;
-                        self.ui.right = Some(RightPane::Workflows);
+                        self.ui.dock.open(RightPane::Workflows);
                     }
                     None => toggle_right(&mut self.ui, RightPane::Workflows),
                 }
@@ -964,7 +939,7 @@ impl RustGisApp {
                 if let Some(id) = p.get("table").and_then(Value::as_u64).and_then(|id| u32::try_from(id).ok()) {
                     self.gp.pick_table(id, &self.session);
                 }
-                self.ui.right = Some(RightPane::Geoprocessing);
+                self.ui.dock.open(RightPane::Geoprocessing);
             }
             "ui.language" => {
                 let code = p.get("code").and_then(Value::as_str).unwrap_or(i18n::AUTO);
@@ -1382,7 +1357,7 @@ impl RustGisApp {
                     self.ui.pending_open = None;
                     open("project");
                     self.ui.backstage = false;
-                } else if let Some(path) = dialogs::pick_open(&["rgis", "rgisx"], tl!("GeoForge project")) {
+                } else if let Some(path) = dialogs::pick_open(&["rgis", "rgisx"], tl!("UniGIS project")) {
                     let r = self.run("project.open", json!({"path": path}));
                     self.ui.backstage = false;
                     self.map.invalidate();
@@ -1407,7 +1382,7 @@ impl RustGisApp {
             }
             "ui.saveAs" => {
                 let name = format!("{}.rgis", self.session.project.name);
-                if let Some(path) = dialogs::pick_save(&name, &["rgis"], tl!("GeoForge project")) {
+                if let Some(path) = dialogs::pick_save(&name, &["rgis"], tl!("UniGIS project")) {
                     return self.run("project.saveAs", json!({"path": path}));
                 }
             }
@@ -1439,7 +1414,7 @@ impl RustGisApp {
             "ui.newReport" => {
                 let r = self.run("report.new", Value::Null);
                 if r.is_ok() {
-                    self.ui.right = Some(RightPane::Report);
+                    self.ui.dock.open(RightPane::Report);
                 }
                 return r;
             }
@@ -1447,7 +1422,7 @@ impl RustGisApp {
                 if let Some(open) = &self.services.open_async {
                     self.ui.pending_open = Some("report.existingTemplate");
                     open("item");
-                } else if let Some(path) = dialogs::pick_open(&["rgislayout"], tl!("GeoForge layout")) {
+                } else if let Some(path) = dialogs::pick_open(&["rgislayout"], tl!("UniGIS layout")) {
                     return self.run("report.existingTemplate", json!({"path": path}));
                 }
             }
@@ -1474,7 +1449,7 @@ impl RustGisApp {
                 if self.services.download.is_some() {
                     let text = serde_json::to_string_pretty(&l).map_err(|e| e.to_string())?;
                     self.download(&format!("{}.rgislayout", l.name), text.into_bytes());
-                } else if let Some(path) = dialogs::pick_save(&format!("{}.rgislayout", l.name), &["rgislayout"], tl!("GeoForge layout")) {
+                } else if let Some(path) = dialogs::pick_save(&format!("{}.rgislayout", l.name), &["rgislayout"], tl!("UniGIS layout")) {
                     return self.run("layout.save", json!({"layout": li, "path": path}));
                 }
             }
@@ -1485,7 +1460,7 @@ impl RustGisApp {
                     self.ui.pending_picture = None;
                     self.ui.pending_open = None;
                     open("layout");
-                } else if let Some(path) = dialogs::pick_open(&["rgislayout"], tl!("GeoForge layout")) {
+                } else if let Some(path) = dialogs::pick_open(&["rgislayout"], tl!("UniGIS layout")) {
                     return self.run("layout.import", json!({"path": path}));
                 }
             }
@@ -1523,18 +1498,18 @@ impl RustGisApp {
             "ui.openItem" => {
                 let kind = p.get("kind").and_then(Value::as_str).ok_or("kind is required")?;
                 let (cmd, exts, label): (&str, &[&str], &str) = match kind {
-                    "map" => ("map.import", &["rgismap", "rgismpk", "rgis", "rgisx", "rgispkg"], "GeoForge maps and projects"),
-                    "layer" => ("layer.addLayerFile", &["rgislyr"], "GeoForge layer file"),
-                    "styles" => ("style.add", &["rgisstyle"], "GeoForge styles"),
-                    "ramps" => ("ramp.add", &["rgisramp", "xml", "qml", "txt", "clr", "cpt"], "Colour ramps (GeoForge, QGIS, GDAL, GMT)"),
-                    "importStyles" => ("style.import", &["rgislyr", "rgismap", "rgis", "rgisx"], "GeoForge layers, maps and projects"),
-                    "template" => ("project.fromTemplate", &["rgistemplate"], "GeoForge project template"),
-                    "task" => ("task.import", &["rgistask"], "GeoForge task"),
-                    "bookmarks" => ("bookmark.import", &["rgisbookmarks"], "GeoForge bookmarks"),
-                    "report" => ("report.open", &["rgisreport", "rgisrpttemplate"], "GeoForge report or report template"),
-                    "presentation" => ("presentation.import", &["rgispres"], "GeoForge presentation"),
-                    "notebook" => ("notebook.open", &["rgisnb", "ipynb"], "GeoForge or Jupyter notebook"),
-                    "dlPackage" => ("dl.import", &["rgisdlpk"], "GeoForge deep learning package"),
+                    "map" => ("map.import", &["rgismap", "rgismpk", "rgis", "rgisx", "rgispkg"], "UniGIS maps and projects"),
+                    "layer" => ("layer.addLayerFile", &["rgislyr"], "UniGIS layer file"),
+                    "styles" => ("style.add", &["rgisstyle"], "UniGIS styles"),
+                    "ramps" => ("ramp.add", &["rgisramp", "xml", "qml", "txt", "clr", "cpt"], "Colour ramps (UniGIS, QGIS, GDAL, GMT)"),
+                    "importStyles" => ("style.import", &["rgislyr", "rgismap", "rgis", "rgisx"], "UniGIS layers, maps and projects"),
+                    "template" => ("project.fromTemplate", &["rgistemplate"], "UniGIS project template"),
+                    "task" => ("task.import", &["rgistask"], "UniGIS task"),
+                    "bookmarks" => ("bookmark.import", &["rgisbookmarks"], "UniGIS bookmarks"),
+                    "report" => ("report.open", &["rgisreport", "rgisrpttemplate"], "UniGIS report or report template"),
+                    "presentation" => ("presentation.import", &["rgispres"], "UniGIS presentation"),
+                    "notebook" => ("notebook.open", &["rgisnb", "ipynb"], "UniGIS or Jupyter notebook"),
+                    "dlPackage" => ("dl.import", &["rgisdlpk"], "UniGIS deep learning package"),
                     k => return Err(format!("unknown item '{k}'")),
                 };
                 if let Some(open) = &self.services.open_async {
@@ -1598,7 +1573,7 @@ impl RustGisApp {
             // `{"ask": text}` opens the pane and sends the text.
             "ui.pane.assistant" => match p.get("ask").and_then(Value::as_str).map(str::trim).filter(|t| !t.is_empty()) {
                 Some(text) => {
-                    self.ui.right = Some(RightPane::Assistant);
+                    self.ui.dock.open(RightPane::Assistant);
                     self.assistant.queued = Some(text.to_string());
                 }
                 None => toggle_right(&mut self.ui, RightPane::Assistant),
@@ -1641,7 +1616,7 @@ impl RustGisApp {
                 };
                 let r = self.run(cmd, Value::Null);
                 if r.is_ok() {
-                    self.ui.right = Some(pane);
+                    self.ui.dock.open(pane);
                 }
                 return r;
             }
@@ -1658,7 +1633,7 @@ impl RustGisApp {
             "ui.presentationVideo" => {
                 // In the browser a video is a web address, typed in the pane.
                 if self.services.open_async.is_some() {
-                    self.ui.right = Some(RightPane::Presentation);
+                    self.ui.dock.open(RightPane::Presentation);
                 } else if let Some(path) = dialogs::pick_open(&["mp4", "webm", "ogv", "mov"], tl!("Videos")) {
                     return self.run("presentation.videoPage", json!({"source": path}));
                 }
@@ -1703,13 +1678,36 @@ impl RustGisApp {
                     ),
                 };
             }
+            // Moves a pane: `{"pane": "catalog", "site": "bottom"}` (optional `"autoHide"` sets the
+            // side's auto-hide); `{"reset": true}` restores the default arrangement.
+            "ui.dock" => {
+                if p.get("reset").and_then(Value::as_bool) == Some(true) {
+                    self.ui.dock.set_layout(dock::Layout::default());
+                    return Ok(Value::Null);
+                }
+                let pane =
+                    p.get("pane").and_then(Value::as_str).and_then(Pane::from_key).ok_or("name a pane (\"catalog\", \"history\", …)")?;
+                let site = match p.get("site").and_then(Value::as_str) {
+                    Some(s) => Some(Site::from_key(s).ok_or("site is left, right or bottom")?),
+                    None => self.ui.dock.site_of(pane),
+                };
+                if let Some(site) = site {
+                    self.ui.dock.layout.dock(pane, site, p.get("index").and_then(Value::as_u64).map(|i| i as usize));
+                    if let Some(h) = p.get("autoHide").and_then(Value::as_bool) {
+                        self.ui.dock.layout.set_auto_hide(site, h);
+                    }
+                } else {
+                    self.ui.dock.open(pane);
+                }
+            }
             "ui.paneSet" => {
                 if let Some(n) = p.get("save").and_then(Value::as_str) {
                     self.ui.pane_sets.retain(|x| x.0 != n);
-                    self.ui.pane_sets.push((n.to_string(), self.ui.left, self.ui.right, self.ui.tab.clone()));
+                    self.ui.pane_sets.push((n.to_string(), self.ui.dock.layout.clone(), self.ui.tab.clone()));
                 } else if let Some(n) = p.get("load").and_then(Value::as_str) {
                     let set = self.ui.pane_sets.iter().find(|x| x.0 == n).cloned().ok_or_else(|| format!("no pane set '{n}'"))?;
-                    (self.ui.left, self.ui.right, self.ui.tab) = (set.1, set.2, ribbon::current_tab(&set.3).to_string());
+                    self.ui.dock.set_layout(set.1);
+                    self.ui.tab = ribbon::current_tab(&set.2).to_string();
                 } else {
                     return Err("save or load a pane set by name".into());
                 }
@@ -1981,7 +1979,7 @@ impl RustGisApp {
         let text = if package {
             rustgis_engine::cmd::items::package_text(bytes)?
         } else {
-            std::str::from_utf8(bytes).map_err(|_| "not a GeoForge project".to_string())?.to_string()
+            std::str::from_utf8(bytes).map_err(|_| "not a UniGIS project".to_string())?.to_string()
         };
         let mut p = json!({"text": text});
         if let Some(f) = file.filter(|_| !package) {
@@ -2314,6 +2312,8 @@ impl RustGisApp {
             egui::CentralPanel::default().frame(egui::Frame::NONE.fill(t.canvas)).show(ui, |ui| {
                 mapview::show(self, ui);
             });
+            dock::drag_overlay(self, &ctx);
+            dock::persist(self);
         }
         dialogs::show(self, &ctx);
         mapview::confirm_delete(self, &ctx);
@@ -2331,7 +2331,7 @@ impl RustGisApp {
         if let Some(url) = self.ui.open_url.take() {
             ctx.open_url(egui::OpenUrl::new_tab(url));
         }
-        let title = format!("{}{} - GeoForge", self.session.project.name, if self.session.dirty { " •" } else { "" });
+        let title = format!("{}{} - UniGIS", self.session.project.name, if self.session.dirty { " •" } else { "" });
         if title != self.sent_title {
             ctx.send_viewport_cmd(egui::ViewportCommand::Title(title.clone()));
             self.sent_title = title;

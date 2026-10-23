@@ -1,6 +1,6 @@
 # Architecture
 
-RustGIS is a layered Cargo workspace. Lower layers never depend on the UI, which keeps the
+UniGIS is a layered Cargo workspace. Lower layers never depend on the UI, which keeps the
 engine scriptable and the front end swappable.
 
 | Layer | Crate | Job |

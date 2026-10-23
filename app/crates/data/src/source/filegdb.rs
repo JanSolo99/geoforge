@@ -1,6 +1,6 @@
-//! File Geodatabases (`.gdb` folders) read in place through GeoForge's `geoforge-filegdb`.
+//! File Geodatabases (`.gdb` folders) read in place through UniGIS's `geoforge-filegdb`.
 //!
-//! Modified for GeoForge (not part of upstream GeoForge).
+//! Modified for UniGIS (not part of upstream RustGIS).
 //!
 //! `open` picks a feature class or table by name (default: the first feature class); a read asks
 //! the table's spatial index (`.spx`) for the rows near the extent, then reads just those rows.
@@ -10,14 +10,13 @@
 
 use std::path::Path;
 
-use geoforge_core::{Envelope, Geometry as GfGeometry, GeometryKind, Value as GfValue};
+use geoforge_core::{Envelope, GeometryKind, Value as GfValue};
 use geoforge_filegdb::{Geodatabase, Table};
 
 pub use super::gfshape::{from_geoforge, to_geoforge};
 use super::{Batch, FeatureSource, Reproject, Request, SourceInfo, clamp_limit, stride};
-use crate::io::group_rings;
 use crate::{DataError, Dataset, Feature, Field, FieldType, Geometry, GeometryType, Result, Value};
-use rustgis_geom::{Coord, Extent};
+use rustgis_geom::Extent;
 
 fn bad(msg: impl std::fmt::Display) -> DataError {
     DataError::Format(format!("File Geodatabase: {msg}"))
@@ -329,6 +328,7 @@ pub fn write(ds: &Dataset, gdb: &Path, name: Option<&str>) -> Result<usize> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rustgis_geom::Coord;
 
     fn reference() -> Option<std::path::PathBuf> {
         let p = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../testdata/gdb-reference/buffers.gdb");

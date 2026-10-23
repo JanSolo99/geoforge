@@ -3,7 +3,7 @@ name = "rustgis-ui-egui"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "GeoForge L6: the ribbon egui front end (ribbon, panes, map view); swappable"
+description = "UniGIS L6: the ribbon egui front end (ribbon, panes, map view); swappable"
 
 [lints]
 workspace = true
@@ -28,7 +28,7 @@ image = { workspace = true, features = ["jpeg"] }
 rfd = { workspace = true }
 
 [features]
-# GeoForge's ArcGIS-verified tools in the Tools pane (the app enables this through the engine).
+# UniGIS's ArcGIS-verified tools in the Tools pane (the app enables this through the engine).
 geoforge = ["rustgis-engine/geoforge"]
 
 [dev-dependencies]

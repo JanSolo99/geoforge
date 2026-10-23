@@ -7,7 +7,7 @@ license.workspace = true
 # can't reach outside the package directory) and the wheels.
 license-file = "../../LICENSE"
 publish = false
-description = "Python bindings to the GeoForge engine (the `rustgis` package on PyPI)"
+description = "Python bindings to the UniGIS engine (the `rustgis` package on PyPI)"
 
 [lints]
 workspace = true

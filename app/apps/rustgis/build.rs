@@ -47,13 +47,13 @@ BEGIN
   BEGIN
     BLOCK "040904B0"
     BEGIN
-      VALUE "CompanyName", "The GeoForge contributors"
-      VALUE "FileDescription", "GeoForge"
+      VALUE "CompanyName", "The UniGIS contributors"
+      VALUE "FileDescription", "UniGIS"
       VALUE "FileVersion", "{version}"
       VALUE "InternalName", "rustgis"
-      VALUE "LegalCopyright", "Copyright the GeoForge contributors. Apache-2.0."
+      VALUE "LegalCopyright", "Copyright the UniGIS contributors. Apache-2.0."
       VALUE "OriginalFilename", "rustgis.exe"
-      VALUE "ProductName", "GeoForge"
+      VALUE "ProductName", "UniGIS"
       VALUE "ProductVersion", "{version}"
     END
   END

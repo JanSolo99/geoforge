@@ -1,8 +1,8 @@
-//! GeoForge design tokens, "Pro" palette: neutral greys and an Esri-style blue accent, plus the
+//! UniGIS design tokens, "Pro" palette: neutral greys and an Esri-style blue accent, plus the
 //! spacing, radius and type scale from `docs/DESIGN.md`. In use unless the classic theme is chosen
 //! (`theme::pro`). Colours are approximations of ArcGIS Pro's
 //! look from public screenshots and documentation, not measured values.
-//! Added by GeoForge.
+//! Added by UniGIS.
 
 use crate::theme::{CONTEXT, Tokens};
 use egui::Color32;

@@ -1,9 +1,9 @@
-# RustGIS
+# UniGIS
 
 **A fast, free and open-source GIS in pure Rust for mapping, analyzing and sharing geospatial
 data.**
 
-RustGIS runs natively on Windows, macOS and Linux, and in your web browser. Your data stays on
+UniGIS runs natively on Windows, macOS and Linux, and in your web browser. Your data stays on
 your machine unless you send it to an AI model you choose, and every action is a command you can
 script from the command line, a notebook or the AI Assistant.
 
@@ -12,7 +12,7 @@ script from the command line, a notebook or the AI Assistant.
 [Get started](getting-started.md){ .md-button }
 [Compare](comparison/index.md){ .md-button }
 
-[![RustGIS with the Home tab of the ribbon open over a world map in the Equal Earth projection, countries shaded by population](https://assets.rustgis.app/images/hero.webp)](https://assets.rustgis.app/images/hero.webp){ target="_blank" rel="noopener" title="Open the full-size image" }
+[![UniGIS with the Home tab of the ribbon open over a world map in the Equal Earth projection, countries shaded by population](https://assets.rustgis.app/images/hero.webp)](https://assets.rustgis.app/images/hero.webp){ target="_blank" rel="noopener" title="Open the full-size image" }
 
 ## Highlights
 
@@ -46,7 +46,7 @@ script from the command line, a notebook or the AI Assistant.
 
 -   **AI Assistant**
 
-    Ask about your data or tell the map what to do. The assistant runs RustGIS commands with the
+    Ask about your data or tell the map what to do. The assistant runs UniGIS commands with the
     model you choose, and every change can be undone.
     [AI Assistant](user-guide/assistant.md)
 

@@ -1,4 +1,14 @@
-# GeoForge — notes for Claude
+# UniGIS — notes for Claude
+
+## Shared Claude / Codex workflow
+
+Follow `AGENTS.md` for the shared startup, checkpoint, and handoff rules. Read
+`docs/HANDOFF.md` before continuing work, including when resuming an older chat.
+Apply these rules automatically; the user should not need to request a handoff.
+The shared terminal entry point is `./scripts/agents`; usage is documented in
+`tools/agent-coordinator/README.md`. If launched through it, use the supplied
+request and prior run logs to recover context. Do not launch it recursively.
+Keep all existing project guidance below in effect.
 
 - **The target is ArcGIS Pro, not QGIS.** Tool names, parameters, defaults, outputs and workflows follow the ArcGIS Pro tool reference and arcpy. When ArcGIS and QGIS/GDAL behave differently, match ArcGIS.
 - GDAL is used **only in tests** to check that we read and write files correctly. It is never a runtime dependency and never the reference for how a tool should behave.

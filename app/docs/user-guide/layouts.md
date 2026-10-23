@@ -70,6 +70,6 @@ previews, edits and plays it.
   **Save As Presentation File** keeps it to import into other projects.
 
 **Analyze › New Notebook** starts a notebook of text and command cells; **Add and Open** opens a
-RustGIS (`.rgisnb`) or Jupyter (`.ipynb`) notebook. A command cell runs one command per line
+UniGIS (`.rgisnb`) or Jupyter (`.ipynb`) notebook. A command cell runs one command per line
 (`id {json}`, as in scripts) and shows each command's result beneath it. Notebooks save in
 either format.

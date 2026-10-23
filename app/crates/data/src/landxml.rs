@@ -72,7 +72,7 @@ pub fn read(file_name: &str, bytes: &[u8], crs: Option<Crs>) -> Result<Vec<(Data
     match (crs, file_crs) {
         (Some(_), _) => {}
         (None, Some(code)) => report.messages.push(format!(
-            "the file's coordinate system, EPSG:{code}, isn't one GeoForge converts (give \"crs\" as a WKT or another code): coordinates are kept as they are"
+            "the file's coordinate system, EPSG:{code}, isn't one UniGIS converts (give \"crs\" as a WKT or another code): coordinates are kept as they are"
         )),
         (None, None) => report
             .messages

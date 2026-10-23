@@ -23,8 +23,8 @@ A tile service's address: raster tiles with {z}/{x}/{y} (or {-y}, {q}, {bbox-eps
 A value, a field, or two of them joined by + − × ÷. Applies to the selected rows, or every row when none is selected.	მნიშვნელობა, ველი ან ორი მათგანი, შეერთებული + − × ÷ ნიშნებით. ვრცელდება მონიშნულ სტრიქონებზე, მონიშვნის გარეშე კი ყველა სტრიქონზე.
 About	შესახებ
 About plugins	დანამატების შესახებ
-About GeoForge	GeoForge-ის შესახებ
-About GeoForge.	GeoForge-ის შესახებ.
+About UniGIS	UniGIS-ის შესახებ
+About UniGIS.	UniGIS-ის შესახებ.
 Above	ზემოთ
 Above Left	ზემოთ მარცხნივ
 Above Right	ზემოთ მარჯვნივ
@@ -137,7 +137,7 @@ Area of use: within {r}° of the {lon}° meridian	გამოყენები
 Area of use: within {r}° of {lon}°, {lat}°	გამოყენების არეალი: {lon}°, {lat}°-დან {r}°-ის ფარგლებში
 Area {area}   ·   Perimeter {perimeter}	ფართობი {area}   ·   პერიმეტრი {perimeter}
 Areas (name, land use, area)	არეები (სახელი, მიწის გამოყენება, ფართობი)
-Ask a question about your data, or describe what to do with the map. The assistant runs GeoForge commands for you; every change can be undone.	დასვით შეკითხვა თქვენი მონაცემების შესახებ ან აღწერეთ, რა უნდა გაკეთდეს რუკაზე. ასისტენტი GeoForge-ის ბრძანებებს თავად გაუშვებს; ყველა ცვლილების გაუქმება შესაძლებელია.
+Ask a question about your data, or describe what to do with the map. The assistant runs UniGIS commands for you; every change can be undone.	დასვით შეკითხვა თქვენი მონაცემების შესახებ ან აღწერეთ, რა უნდა გაკეთდეს რუკაზე. ასისტენტი UniGIS-ის ბრძანებებს თავად გაუშვებს; ყველა ცვლილების გაუქმება შესაძლებელია.
 Ask about the map, or tell it what to do…	დასვით შეკითხვა რუკის შესახებ ან მიუთითეთ, რა გააკეთოს…
 Ask about your data, or tell the assistant what to do with the map.	დასვით შეკითხვა თქვენი მონაცემების შესახებ ან უთხარით ასისტენტს, რა გააკეთოს რუკაზე.
 Assistant settings	ასისტენტის პარამეტრები
@@ -654,7 +654,7 @@ Find a place by coordinates.	ადგილის პოვნა კოორ�
 Find and run geoprocessing tools.	გეოდამუშავების ხელსაწყოების პოვნა და გაშვება.
 Find any command by name (Ctrl+K).	ნებისმიერი ბრძანების პოვნა სახელით (Ctrl+K).
 Find Place	ადგილის პოვნა
-Find plugins in the GeoForge plugin registry.	დანამატების პოვნა GeoForge-ის დანამატების რეესტრში.
+Find plugins in the UniGIS plugin registry.	დანამატების პოვნა UniGIS-ის დანამატების რეესტრში.
 Find Similar	მსგავსის პოვნა
 Find Tools	ხელსაწყოების პოვნა
 Finish Polygon	პოლიგონის დასრულება
@@ -783,7 +783,7 @@ Import Thumbnail	მინიატურის იმპორტი
 Import Web Tool	ვებ ხელსაწყოს იმპორტი
 In Beyond	შორს, მის მიღმა
 In Progress	მიმდინარეობს
-In GeoForge, it can:	GeoForge-ში მას შეუძლია:
+In UniGIS, it can:	UniGIS-ში მას შეუძლია:
 in progress	მიმდინარეობს
 In project	პროექტში
 In use	გამოიყენება
@@ -1080,7 +1080,7 @@ North	ჩრდილოეთი
 North\nArrow	ჩრდილოეთის\nისარი
 North Polar Stereographic	ჩრდილოეთის პოლარული სტერეოგრაფიული
 Not sandboxed	იზოლაციის გარეშე
-not a GeoForge layout	ეს GeoForge-ის განლაგება არ არის
+not a UniGIS layout	ეს UniGIS-ის განლაგება არ არის
 not needed	საჭირო არ არის
 Not saved yet	ჯერ არ არის შენახული
 Notebook	რვეული
@@ -1110,8 +1110,8 @@ Opacity	გამჭვირვალობა
 Open	გახსნა
 Open a .rgis project	.rgis პროექტის გახსნა
 open a layout first	ჯერ გახსენით განლაგება
-Open a GeoForge or Jupyter notebook.	GeoForge-ის ან Jupyter-ის რვეულის გახსნა.
-Open a GeoForge project.	GeoForge-ის პროექტის გახსნა.
+Open a UniGIS or Jupyter notebook.	UniGIS-ის ან Jupyter-ის რვეულის გახსნა.
+Open a UniGIS project.	UniGIS-ის პროექტის გახსნა.
 Open an offline area to edit.	ოფლაინ არეალის გახსნა სარედაქტიროდ.
 Open Custom Template	მორგებული შაბლონის გახსნა
 Open Custom Template…	მორგებული შაბლონის გახსნა…
@@ -1128,7 +1128,7 @@ Open the attribute table of the selected layer.	არჩეული ფენ�
 Open the layer's attribute table.	ფენის ატრიბუტების ცხრილის გახსნა.
 Open the layer's table.	ფენის ცხრილის გახსნა.
 Open the Release Page	რელიზის გვერდის გახსნა
-Open the GeoForge user guide.	GeoForge-ის მომხმარებლის სახელმძღვანელოს გახსნა.
+Open the UniGIS user guide.	UniGIS-ის მომხმარებლის სახელმძღვანელოს გახსნა.
 Open the selected layer's table.	არჩეული ფენის ცხრილის გახსნა.
 Open the Symbology pane.	სიმბოლიზაციის პანელის გახსნა.
 Open {code} on epsg.io	{code}-ის გახსნა epsg.io-ზე
@@ -1207,7 +1207,7 @@ Plugin Manager…	დანამატების მენეჯერი…
 Plugin registry	დანამატების რეესტრი
 Plugins	დანამატები
 Plugins are .rgplugin files. Install only plugins from people you trust.	დანამატები .rgplugin ფაილებია. დააყენეთ მხოლოდ იმ ადამიანების დანამატები, ვისაც ენდობით.
-Plugins run in a sandbox: they can't reach your files or the network, and they change the project only through GeoForge's own commands, within the permissions you accept.	დანამატები იზოლირებულ გარემოში მუშაობს: ისინი ვერ წვდებიან თქვენს ფაილებსა და ქსელს. პროექტს ცვლიან მხოლოდ GeoForge-ის საკუთარი ბრძანებებით, თქვენ მიერ მიღებული ნებართვების ფარგლებში.
+Plugins run in a sandbox: they can't reach your files or the network, and they change the project only through UniGIS's own commands, within the permissions you accept.	დანამატები იზოლირებულ გარემოში მუშაობს: ისინი ვერ წვდებიან თქვენს ფაილებსა და ქსელს. პროექტს ცვლიან მხოლოდ UniGIS-ის საკუთარი ბრძანებებით, თქვენ მიერ მიღებული ნებართვების ფარგლებში.
 PMTiles archive	PMTiles არქივი
 PMTiles File…	PMTiles ფაილი…
 PNG frames (zip)	PNG კადრები (zip)
@@ -1383,29 +1383,29 @@ Run the task	ამოცანის გაშვება
 Run Tool	ხელსაწყოს გაშვება
 Run {name}	{name}-ის გაშვება
 Running…	მიმდინარეობს გაშვება…
-GeoForge	GeoForge
-GeoForge deep learning package	GeoForge-ის ღრმა სწავლების პაკეტი
-GeoForge is a free and open-source GIS written in pure Rust. It runs on the desktop and in the browser, and every action is a command you can also run from the command line.	GeoForge არის უფასო, ღია კოდის GIS, სუფთა Rust-ზე დაწერილი. ის მუშაობს დესკტოპზე და ბრაუზერში. ყოველი მოქმედება ბრძანებაა, რომლის გაშვებაც ბრძანებათა ხაზიდანაც შეიძლება.
-GeoForge layer file	GeoForge-ის ფენის ფაილი
-GeoForge layers, maps and projects	GeoForge-ის ფენები, რუკები და პროექტები
-GeoForge layout	GeoForge-ის განლაგება
-GeoForge maps and projects	GeoForge-ის რუკები და პროექტები
-GeoForge or Jupyter notebook	GeoForge-ის ან Jupyter-ის რვეული
-GeoForge plugin	GeoForge-ის დანამატი
-GeoForge presentation	GeoForge-ის პრეზენტაცია
-GeoForge project	GeoForge-ის პროექტი
-GeoForge project template	GeoForge-ის პროექტის შაბლონი
-GeoForge ran into an internal error last time. The details are in {path}; please attach them to a bug report.	GeoForge-ს ბოლოს შიდა შეცდომა შეექმნა. დეტალები იხილეთ აქ: {path}; გთხოვთ, დაურთოთ ისინი შეცდომის შეტყობინებას.
-GeoForge ran into an internal error while handling the model's reply, so the request was stopped. Please report it at https://github.com/opengeos/RustGIS/issues.	GeoForge-ს მოდელის პასუხის დამუშავებისას შიდა შეცდომა შეექმნა, ამიტომ მოთხოვნა შეწყდა. გთხოვთ, შეატყობინოთ აქ: https://github.com/opengeos/RustGIS/issues.
-GeoForge report or report template	GeoForge-ის ანგარიში ან ანგარიშის შაბლონი
-GeoForge styles	GeoForge-ის სტილები
-GeoForge task	GeoForge-ის ამოცანა
-GeoForge {latest} is available.	ხელმისაწვდომია GeoForge {latest}.
-GeoForge {version} is the latest version.	GeoForge {version} უახლესი ვერსიაა.
+UniGIS	UniGIS
+UniGIS deep learning package	UniGIS-ის ღრმა სწავლების პაკეტი
+UniGIS is a free and open-source GIS written in pure Rust. It runs on the desktop and in the browser, and every action is a command you can also run from the command line.	UniGIS არის უფასო, ღია კოდის GIS, სუფთა Rust-ზე დაწერილი. ის მუშაობს დესკტოპზე და ბრაუზერში. ყოველი მოქმედება ბრძანებაა, რომლის გაშვებაც ბრძანებათა ხაზიდანაც შეიძლება.
+UniGIS layer file	UniGIS-ის ფენის ფაილი
+UniGIS layers, maps and projects	UniGIS-ის ფენები, რუკები და პროექტები
+UniGIS layout	UniGIS-ის განლაგება
+UniGIS maps and projects	UniGIS-ის რუკები და პროექტები
+UniGIS or Jupyter notebook	UniGIS-ის ან Jupyter-ის რვეული
+UniGIS plugin	UniGIS-ის დანამატი
+UniGIS presentation	UniGIS-ის პრეზენტაცია
+UniGIS project	UniGIS-ის პროექტი
+UniGIS project template	UniGIS-ის პროექტის შაბლონი
+UniGIS ran into an internal error last time. The details are in {path}; please attach them to a bug report.	UniGIS-ს ბოლოს შიდა შეცდომა შეექმნა. დეტალები იხილეთ აქ: {path}; გთხოვთ, დაურთოთ ისინი შეცდომის შეტყობინებას.
+UniGIS ran into an internal error while handling the model's reply, so the request was stopped. Please report it at https://github.com/opengeos/RustGIS/issues.	UniGIS-ს მოდელის პასუხის დამუშავებისას შიდა შეცდომა შეექმნა, ამიტომ მოთხოვნა შეწყდა. გთხოვთ, შეატყობინოთ აქ: https://github.com/opengeos/RustGIS/issues.
+UniGIS report or report template	UniGIS-ის ანგარიში ან ანგარიშის შაბლონი
+UniGIS styles	UniGIS-ის სტილები
+UniGIS task	UniGIS-ის ამოცანა
+UniGIS {latest} is available.	ხელმისაწვდომია UniGIS {latest}.
+UniGIS {version} is the latest version.	UniGIS {version} უახლესი ვერსიაა.
 RUSTGIS_ASSISTANT_MODEL	RUSTGIS_ASSISTANT_MODEL
 RUSTGIS_ASSISTANT_PROVIDER	RUSTGIS_ASSISTANT_PROVIDER
 Sample data (Natural Earth)	სანიმუშო მონაცემები (Natural Earth)
-Sample data © Natural Earth (public domain). GeoForge is licensed under Apache-2.0.	სანიმუშო მონაცემები © Natural Earth (საჯარო დომენი). GeoForge ლიცენზირებულია Apache-2.0-ით.
+Sample data © Natural Earth (public domain). UniGIS is licensed under Apache-2.0.	სანიმუშო მონაცემები © Natural Earth (საჯარო დომენი). UniGIS ლიცენზირებულია Apache-2.0-ით.
 Sample data: Natural Earth (public domain). Licensed under Apache-2.0.	სანიმუშო მონაცემები: Natural Earth (საჯარო დომენი). ლიცენზია: Apache-2.0.
 Saturation	ნაჯერობა
 Save	შენახვა
@@ -1470,7 +1470,7 @@ Sections	სექციები
 See and set the camera's position and scale.	კამერის პოზიციისა და მასშტაბის ნახვა და დაყენება.
 See the map as people with colour vision deficiencies do.	რუკის ნახვა ისე, როგორც ფერთა აღქმის დარღვევის მქონე ადამიანები ხედავენ.
 See the tools you've run.	თქვენ მიერ გაშვებული ხელსაწყოების ნახვა.
-See whether a newer GeoForge has been released.	შემოწმება, გამოვიდა თუ არა GeoForge-ის უფრო ახალი ვერსია.
+See whether a newer UniGIS has been released.	შემოწმება, გამოვიდა თუ არა UniGIS-ის უფრო ახალი ვერსია.
 Select	მონიშვნა
 Select (click)	მონიშვნა (დაწკაპუნებით)
 Select (rectangle)	მონიშვნა (მართკუთხედით)
@@ -1657,14 +1657,14 @@ Text	ტექსტი
 Text Symbol	ტექსტის სიმბოლო
 The assistant is busy; stop it or wait for it to finish.	ასისტენტი დაკავებულია; შეაჩერეთ ან დაელოდეთ დასრულებას.
 The assistant wants to run this, and {why}:	ასისტენტს სურს ამის გაშვება და მიზეზი ასეთია: {why}:
-This plugin runs as a program on your computer, outside GeoForge's sandbox. It can do anything you can: read and change your files, use the network and run other programs. Install it only if you trust its author.	ეს დანამატი მუშაობს როგორც პროგრამა თქვენს კომპიუტერზე, GeoForge-ის იზოლირებული გარემოს გარეთ. მას შეუძლია ყველაფერი, რაც თქვენ შეგიძლიათ: თქვენი ფაილების წაკითხვა და შეცვლა, ქსელის გამოყენება და სხვა პროგრამების გაშვება. დააინსტალირეთ მხოლოდ მაშინ, თუ მის ავტორს ენდობით.
+This plugin runs as a program on your computer, outside UniGIS's sandbox. It can do anything you can: read and change your files, use the network and run other programs. Install it only if you trust its author.	ეს დანამატი მუშაობს როგორც პროგრამა თქვენს კომპიუტერზე, UniGIS-ის იზოლირებული გარემოს გარეთ. მას შეუძლია ყველაფერი, რაც თქვენ შეგიძლიათ: თქვენი ფაილების წაკითხვა და შეცვლა, ქსელის გამოყენება და სხვა პროგრამების გაშვება. დააინსტალირეთ მხოლოდ მაშინ, თუ მის ავტორს ენდობით.
 the capture failed unexpectedly	გადაღება მოულოდნელად ჩავარდა
 the Help tab always shows	დახმარების ჩანართი ყოველთვის ჩანს
 The job covers the map view	სამუშაო მოიცავს რუკის ხედს
 The key is kept for this session only.	გასაღები ინახება მხოლოდ ამ სესიისთვის.
 The layer's file couldn't be read: {error}	ფენის ფაილის წაკითხვა ვერ მოხერხდა: {error}
 the layout export failed unexpectedly	განლაგების ექსპორტი მოულოდნელად ჩავარდა
-The list of plugins to browse. Leave it empty for the GeoForge plugin registry.	დანამატების სია დასათვალიერებლად. დატოვეთ ცარიელი GeoForge-ის დანამატების რეესტრისთვის.
+The list of plugins to browse. Leave it empty for the UniGIS plugin registry.	დანამატების სია დასათვალიერებლად. დატოვეთ ცარიელი UniGIS-ის დანამატების რეესტრისთვის.
 the map has no layers	რუკას ფენები არ აქვს
 The map is drawn in this coordinate system; layers are projected on the fly.	რუკა ამ კოორდინატთა სისტემაშია დახატული; ფენები პროექცირდება ფრენისას.
 The map view as it is now	რუკის ხედი ახლა როგორიც არის
@@ -1793,11 +1793,11 @@ Web Tile Layers	ვებ ფილების ფენები
 Web Tool	ვებ ხელსაწყო
 Website	ვებსაიტი
 Weights	წონები
-Welcome to GeoForge	მოგესალმებით GeoForge-ში
+Welcome to UniGIS	მოგესალმებით UniGIS-ში
 West	დასავლეთი
 WGS 84 / Globe	WGS 84 / გლობუსი
 WGS 84 / Web Mercator	WGS 84 / ვებ მერკატორი
-What GeoForge opens with: the World Atlas sample or a blank map.	რას გახსნის GeoForge გაშვებისას: World Atlas-ის ნიმუშს ან ცარიელ რუკას.
+What UniGIS opens with: the World Atlas sample or a blank map.	რას გახსნის UniGIS გაშვებისას: World Atlas-ის ნიმუშს ან ცარიელ რუკას.
 What's near a point	რა არის წერტილის ახლოს
 Where	სად
 Where Clause	Where პირობა
@@ -1903,11 +1903,11 @@ The sign-in is kept in the app's settings folder, for your user account only, an
 Sign in with your ChatGPT account.	შედით თქვენი ChatGPT ანგარიშით.
 A ChatGPT sign-in can only be used with the OpenAI API.	ChatGPT-ით შესვლის გამოყენება მხოლოდ OpenAI API-სთან შეიძლება.
 Continue with ChatGPT	გაგრძელება ChatGPT-ით
-Eligible requests in GeoForge use your ChatGPT plan. You can manage usage in ChatGPT settings.	GeoForge-ის შესაბამისი მოთხოვნები თქვენს ChatGPT გეგმას იყენებს. გამოყენების მართვა ChatGPT-ის პარამეტრებშია შესაძლებელი.
+Eligible requests in UniGIS use your ChatGPT plan. You can manage usage in ChatGPT settings.	UniGIS-ის შესაბამისი მოთხოვნები თქვენს ChatGPT გეგმას იყენებს. გამოყენების მართვა ChatGPT-ის პარამეტრებშია შესაძლებელი.
 Got it	გასაგებია
 Manage usage	გამოყენების მართვა
 Requests go to the OpenAI API and use your ChatGPT plan.	მოთხოვნები OpenAI API-ს მიეწოდება და თქვენს ChatGPT გეგმას იყენებს.
-Signed out on this computer, but OpenAI didn't confirm it. You can disconnect GeoForge in ChatGPT's settings.	ამ კომპიუტერზე გამოსვლა შესრულდა, მაგრამ OpenAI-მ ეს არ დაადასტურა. GeoForge-ის გათიშვა ChatGPT-ის პარამეტრებში შეგიძლიათ.
+Signed out on this computer, but OpenAI didn't confirm it. You can disconnect UniGIS in ChatGPT's settings.	ამ კომპიუტერზე გამოსვლა შესრულდა, მაგრამ OpenAI-მ ეს არ დაადასტურა. UniGIS-ის გათიშვა ChatGPT-ის პარამეტრებში შეგიძლიათ.
 Using ChatGPT plan	გამოიყენება ChatGPT გეგმა
 You're using your ChatGPT plan	თქვენ იყენებთ თქვენს ChatGPT გეგმას
 Use another account	სხვა ანგარიშის გამოყენება
@@ -1931,3 +1931,17 @@ ChatGPT plan use is unavailable for this account or workspace.	ამ ანგ�
 A ChatGPT plan or app usage limit was reached. Review Weekly usage before trying again.	მიღწეულია ChatGPT-ის გეგმის ან აპის გამოყენების ლიმიტი. ხელახლა ცდამდე გადახედეთ კვირის გამოყენებას.
 ChatGPT usage is temporarily unavailable. Keep your sign-in and try again later.	ChatGPT-ის გამოყენება დროებით მიუწვდომელია. შეინარჩუნეთ შესვლა და მოგვიანებით სცადეთ.
 This ChatGPT account was already saved. Next time, choose it in the list instead of adding it again.	ეს ChatGPT ანგარიში უკვე შენახულია. შემდეგ ჯერზე ხელახლა დამატების ნაცვლად აირჩიეთ სიიდან.
+
+Dock Left	მარცხნივ მიმაგრება
+Dock Right	მარჯვნივ მიმაგრება
+Dock Bottom	ქვემოთ მიმაგრება
+Keep Open	ღიად დატოვება
+Auto Hide	ავტომატური დამალვა
+Reset Layout	განლაგების აღდგენა
+Analysis Tools	ანალიზი (ხელსაწყოები)
+Cartography Tools	კარტოგრაფია (ხელსაწყოები)
+Conversion Tools	გარდაქმნა (ხელსაწყოები)
+Data Management Tools	მონაცემთა მართვა (ხელსაწყოები)
+Editing Tools	რედაქტირება (ხელსაწყოები)
+Spatial Analyst Tools	Spatial Analyst (ხელსაწყოები)
+Spatial Statistics Tools	Spatial Statistics (ხელსაწყოები)

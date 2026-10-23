@@ -23,8 +23,8 @@ A tile service's address: raster tiles with {z}/{x}/{y} (or {-y}, {q}, {bbox-eps
 A value, a field, or two of them joined by + − × ÷. Applies to the selected rows, or every row when none is selected.	Bir değer, bir alan veya + − × ÷ ile birleştirilmiş iki tanesi. Seçili satırlara, hiçbiri seçili değilse tüm satırlara uygulanır.
 About	Hakkında
 About plugins	Eklentiler hakkında
-About GeoForge	GeoForge Hakkında
-About GeoForge.	GeoForge hakkında.
+About UniGIS	UniGIS Hakkında
+About UniGIS.	UniGIS hakkında.
 Above	Üst
 Above Left	Sol Üst
 Above Right	Sağ Üst
@@ -137,7 +137,7 @@ Area of use: within {r}° of the {lon}° meridian	Kullanım alanı: {lon}° meri
 Area of use: within {r}° of {lon}°, {lat}°	Kullanım alanı: {lon}°, {lat}° noktasının {r}° yakını
 Area {area}   ·   Perimeter {perimeter}	Alan {area}   ·   Çevre {perimeter}
 Areas (name, land use, area)	Alanlar (ad, arazi kullanımı, alan)
-Ask a question about your data, or describe what to do with the map. The assistant runs GeoForge commands for you; every change can be undone.	Verileriniz hakkında bir soru sorun ya da haritayla ne yapılacağını anlatın. Asistan GeoForge komutlarını sizin için çalıştırır; her değişiklik geri alınabilir.
+Ask a question about your data, or describe what to do with the map. The assistant runs UniGIS commands for you; every change can be undone.	Verileriniz hakkında bir soru sorun ya da haritayla ne yapılacağını anlatın. Asistan UniGIS komutlarını sizin için çalıştırır; her değişiklik geri alınabilir.
 Ask about the map, or tell it what to do…	Harita hakkında sorun ya da ne yapacağını söyleyin…
 Ask about your data, or tell the assistant what to do with the map.	Verileriniz hakkında sorun ya da asistana haritayla ne yapacağını söyleyin.
 Assistant settings	Asistan ayarları
@@ -654,7 +654,7 @@ Find a place by coordinates.	Koordinatlarla bir yer bul.
 Find and run geoprocessing tools.	Coğrafi işleme araçlarını bul ve çalıştır.
 Find any command by name (Ctrl+K).	Herhangi bir komutu adıyla bul (Ctrl+K).
 Find Place	Yer Bul
-Find plugins in the GeoForge plugin registry.	GeoForge eklenti kayıt defterinde eklenti bulun.
+Find plugins in the UniGIS plugin registry.	UniGIS eklenti kayıt defterinde eklenti bulun.
 Find Similar	Benzerlerini Bul
 Find Tools	Araç Bul
 Finish Polygon	Poligonu Bitir
@@ -783,7 +783,7 @@ Import Thumbnail	Küçük Resmi İçe Aktar
 Import Web Tool	Web Aracını İçe Aktar
 In Beyond	Ötesinde Açık
 In Progress	Devam Ediyor
-In GeoForge, it can:	GeoForge'te şunları yapabilir:
+In UniGIS, it can:	UniGIS'te şunları yapabilir:
 in progress	devam ediyor
 In project	Projede
 In use	Kullanımda
@@ -1080,7 +1080,7 @@ North	Kuzey
 North\nArrow	Kuzey\nOku
 North Polar Stereographic	Kuzey Kutup Stereografik
 Not sandboxed	Korumalı alan dışında
-not a GeoForge layout	bir GeoForge sayfa düzeni değil
+not a UniGIS layout	bir UniGIS sayfa düzeni değil
 not needed	gerekmiyor
 Not saved yet	Henüz kaydedilmedi
 Notebook	Not Defteri
@@ -1110,8 +1110,8 @@ Opacity	Opaklık
 Open	Aç
 Open a .rgis project	Bir .rgis projesi aç
 open a layout first	önce bir sayfa düzeni açın
-Open a GeoForge or Jupyter notebook.	Bir GeoForge veya Jupyter not defteri aç.
-Open a GeoForge project.	Bir GeoForge projesi aç.
+Open a UniGIS or Jupyter notebook.	Bir UniGIS veya Jupyter not defteri aç.
+Open a UniGIS project.	Bir UniGIS projesi aç.
 Open an offline area to edit.	Düzenlemek için bir çevrimdışı alan aç.
 Open Custom Template	Özel Şablon Aç
 Open Custom Template…	Özel Şablon Aç…
@@ -1128,7 +1128,7 @@ Open the attribute table of the selected layer.	Seçili katmanın öznitelik tab
 Open the layer's attribute table.	Katmanın öznitelik tablosunu aç.
 Open the layer's table.	Katmanın tablosunu aç.
 Open the Release Page	Sürüm Sayfasını Aç
-Open the GeoForge user guide.	GeoForge kullanıcı kılavuzunu aç.
+Open the UniGIS user guide.	UniGIS kullanıcı kılavuzunu aç.
 Open the selected layer's table.	Seçili katmanın tablosunu aç.
 Open the Symbology pane.	Semboloji panelini aç.
 Open {code} on epsg.io	{code} kodunu epsg.io'da aç
@@ -1207,7 +1207,7 @@ Plugin Manager…	Eklenti Yöneticisi…
 Plugin registry	Eklenti kayıt defteri
 Plugins	Eklentiler
 Plugins are .rgplugin files. Install only plugins from people you trust.	Eklentiler .rgplugin dosyalarıdır. Yalnızca güvendiğiniz kişilerin eklentilerini yükleyin.
-Plugins run in a sandbox: they can't reach your files or the network, and they change the project only through GeoForge's own commands, within the permissions you accept.	Eklentiler bir korumalı alanda çalışır: dosyalarınıza veya ağa erişemezler ve projeyi yalnızca GeoForge'in kendi komutlarıyla, kabul ettiğiniz izinler dahilinde değiştirirler.
+Plugins run in a sandbox: they can't reach your files or the network, and they change the project only through UniGIS's own commands, within the permissions you accept.	Eklentiler bir korumalı alanda çalışır: dosyalarınıza veya ağa erişemezler ve projeyi yalnızca UniGIS'in kendi komutlarıyla, kabul ettiğiniz izinler dahilinde değiştirirler.
 PMTiles archive	PMTiles arşivi
 PMTiles File…	PMTiles Dosyası…
 PNG frames (zip)	PNG kareleri (zip)
@@ -1383,29 +1383,29 @@ Run the task	Görevi çalıştır
 Run Tool	Aracı Çalıştır
 Run {name}	Çalıştır: {name}
 Running…	Çalışıyor…
-GeoForge	GeoForge
-GeoForge deep learning package	GeoForge derin öğrenme paketi
-GeoForge is a free and open-source GIS written in pure Rust. It runs on the desktop and in the browser, and every action is a command you can also run from the command line.	GeoForge, saf Rust ile yazılmış özgür ve açık kaynaklı bir CBS'dir. Masaüstünde ve tarayıcıda çalışır ve her işlem komut satırından da çalıştırabileceğiniz bir komuttur.
-GeoForge layer file	GeoForge katman dosyası
-GeoForge layers, maps and projects	GeoForge katmanları, haritaları ve projeleri
-GeoForge layout	GeoForge sayfa düzeni
-GeoForge maps and projects	GeoForge haritaları ve projeleri
-GeoForge or Jupyter notebook	GeoForge veya Jupyter not defteri
-GeoForge plugin	GeoForge eklentisi
-GeoForge presentation	GeoForge sunumu
-GeoForge project	GeoForge projesi
-GeoForge project template	GeoForge proje şablonu
-GeoForge ran into an internal error last time. The details are in {path}; please attach them to a bug report.	GeoForge son seferde dahili bir hatayla karşılaştı. Ayrıntılar {path} dosyasında; lütfen bir hata raporuna ekleyin.
-GeoForge ran into an internal error while handling the model's reply, so the request was stopped. Please report it at https://github.com/opengeos/RustGIS/issues.	GeoForge modelin yanıtını işlerken dahili bir hatayla karşılaştı, bu yüzden istek durduruldu. Lütfen https://github.com/opengeos/RustGIS/issues adresinden bildirin.
-GeoForge report or report template	GeoForge raporu veya rapor şablonu
-GeoForge styles	GeoForge stilleri
-GeoForge task	GeoForge görevi
-GeoForge {latest} is available.	GeoForge {latest} kullanılabilir.
-GeoForge {version} is the latest version.	GeoForge {version} en son sürüm.
+UniGIS	UniGIS
+UniGIS deep learning package	UniGIS derin öğrenme paketi
+UniGIS is a free and open-source GIS written in pure Rust. It runs on the desktop and in the browser, and every action is a command you can also run from the command line.	UniGIS, saf Rust ile yazılmış özgür ve açık kaynaklı bir CBS'dir. Masaüstünde ve tarayıcıda çalışır ve her işlem komut satırından da çalıştırabileceğiniz bir komuttur.
+UniGIS layer file	UniGIS katman dosyası
+UniGIS layers, maps and projects	UniGIS katmanları, haritaları ve projeleri
+UniGIS layout	UniGIS sayfa düzeni
+UniGIS maps and projects	UniGIS haritaları ve projeleri
+UniGIS or Jupyter notebook	UniGIS veya Jupyter not defteri
+UniGIS plugin	UniGIS eklentisi
+UniGIS presentation	UniGIS sunumu
+UniGIS project	UniGIS projesi
+UniGIS project template	UniGIS proje şablonu
+UniGIS ran into an internal error last time. The details are in {path}; please attach them to a bug report.	UniGIS son seferde dahili bir hatayla karşılaştı. Ayrıntılar {path} dosyasında; lütfen bir hata raporuna ekleyin.
+UniGIS ran into an internal error while handling the model's reply, so the request was stopped. Please report it at https://github.com/opengeos/RustGIS/issues.	UniGIS modelin yanıtını işlerken dahili bir hatayla karşılaştı, bu yüzden istek durduruldu. Lütfen https://github.com/opengeos/RustGIS/issues adresinden bildirin.
+UniGIS report or report template	UniGIS raporu veya rapor şablonu
+UniGIS styles	UniGIS stilleri
+UniGIS task	UniGIS görevi
+UniGIS {latest} is available.	UniGIS {latest} kullanılabilir.
+UniGIS {version} is the latest version.	UniGIS {version} en son sürüm.
 RUSTGIS_ASSISTANT_MODEL	RUSTGIS_ASSISTANT_MODEL
 RUSTGIS_ASSISTANT_PROVIDER	RUSTGIS_ASSISTANT_PROVIDER
 Sample data (Natural Earth)	Örnek veri (Natural Earth)
-Sample data © Natural Earth (public domain). GeoForge is licensed under Apache-2.0.	Örnek veri © Natural Earth (kamu malı). GeoForge, Apache-2.0 ile lisanslanmıştır.
+Sample data © Natural Earth (public domain). UniGIS is licensed under Apache-2.0.	Örnek veri © Natural Earth (kamu malı). UniGIS, Apache-2.0 ile lisanslanmıştır.
 Sample data: Natural Earth (public domain). Licensed under Apache-2.0.	Örnek veri: Natural Earth (kamu malı). Apache-2.0 ile lisanslanmıştır.
 Saturation	Doygunluk
 Save	Kaydet
@@ -1470,7 +1470,7 @@ Sections	Bölümler
 See and set the camera's position and scale.	Kameranın konumunu ve ölçeğini gör ve ayarla.
 See the map as people with colour vision deficiencies do.	Haritayı renk görme eksikliği olan kişilerin gördüğü gibi gör.
 See the tools you've run.	Çalıştırdığınız araçları görün.
-See whether a newer GeoForge has been released.	Daha yeni bir GeoForge sürümü yayımlanıp yayımlanmadığını denetle.
+See whether a newer UniGIS has been released.	Daha yeni bir UniGIS sürümü yayımlanıp yayımlanmadığını denetle.
 Select	Seç
 Select (click)	Seç (tıklama)
 Select (rectangle)	Seç (dikdörtgen)
@@ -1657,14 +1657,14 @@ Text	Metin
 Text Symbol	Metin Sembolü
 The assistant is busy; stop it or wait for it to finish.	Asistan meşgul; durdurun veya bitirmesini bekleyin.
 The assistant wants to run this, and {why}:	Asistan şunu çalıştırmak istiyor; bu işlem {why}:
-This plugin runs as a program on your computer, outside GeoForge's sandbox. It can do anything you can: read and change your files, use the network and run other programs. Install it only if you trust its author.	Bu eklenti, GeoForge'in korumalı alanının dışında, bilgisayarınızda bir program olarak çalışır. Sizin yapabildiğiniz her şeyi yapabilir: dosyalarınızı okuyup değiştirebilir, ağı kullanabilir ve başka programlar çalıştırabilir. Yalnızca yazarına güveniyorsanız yükleyin.
+This plugin runs as a program on your computer, outside UniGIS's sandbox. It can do anything you can: read and change your files, use the network and run other programs. Install it only if you trust its author.	Bu eklenti, UniGIS'in korumalı alanının dışında, bilgisayarınızda bir program olarak çalışır. Sizin yapabildiğiniz her şeyi yapabilir: dosyalarınızı okuyup değiştirebilir, ağı kullanabilir ve başka programlar çalıştırabilir. Yalnızca yazarına güveniyorsanız yükleyin.
 the capture failed unexpectedly	yakalama beklenmedik şekilde başarısız oldu
 the Help tab always shows	Yardım sekmesi her zaman görünür
 The job covers the map view	İş harita görünümünü kapsar
 The key is kept for this session only.	Anahtar yalnızca bu oturum için saklanır.
 The layer's file couldn't be read: {error}	Katmanın dosyası okunamadı: {error}
 the layout export failed unexpectedly	sayfa düzeni dışa aktarımı beklenmedik şekilde başarısız oldu
-The list of plugins to browse. Leave it empty for the GeoForge plugin registry.	Göz atılacak eklenti listesi. GeoForge eklenti kayıt defteri için boş bırakın.
+The list of plugins to browse. Leave it empty for the UniGIS plugin registry.	Göz atılacak eklenti listesi. UniGIS eklenti kayıt defteri için boş bırakın.
 the map has no layers	haritada katman yok
 The map is drawn in this coordinate system; layers are projected on the fly.	Harita bu koordinat sisteminde çizilir; katmanlar anında projekte edilir.
 The map view as it is now	Harita görünümünün şu anki hali
@@ -1793,11 +1793,11 @@ Web Tile Layers	Web Karo Katmanları
 Web Tool	Web Aracı
 Website	Web sitesi
 Weights	Ağırlıklar
-Welcome to GeoForge	GeoForge'e hoş geldiniz
+Welcome to UniGIS	UniGIS'e hoş geldiniz
 West	Batı
 WGS 84 / Globe	WGS 84 / Küre
 WGS 84 / Web Mercator	WGS 84 / Web Mercator
-What GeoForge opens with: the World Atlas sample or a blank map.	GeoForge'in neyle açılacağı: World Atlas örneği ya da boş bir harita.
+What UniGIS opens with: the World Atlas sample or a blank map.	UniGIS'in neyle açılacağı: World Atlas örneği ya da boş bir harita.
 What's near a point	Bir noktanın yakınında ne var
 Where	Koşul
 Where Clause	Where Yan Tümcesi
@@ -1903,11 +1903,11 @@ The sign-in is kept in the app's settings folder, for your user account only, an
 Sign in with your ChatGPT account.	ChatGPT hesabınızla oturum açın.
 A ChatGPT sign-in can only be used with the OpenAI API.	ChatGPT oturumu yalnızca OpenAI API ile kullanılabilir.
 Continue with ChatGPT	ChatGPT ile devam et
-Eligible requests in GeoForge use your ChatGPT plan. You can manage usage in ChatGPT settings.	GeoForge'teki uygun istekler ChatGPT planınızı kullanır. Kullanımı ChatGPT ayarlarından yönetebilirsiniz.
+Eligible requests in UniGIS use your ChatGPT plan. You can manage usage in ChatGPT settings.	UniGIS'teki uygun istekler ChatGPT planınızı kullanır. Kullanımı ChatGPT ayarlarından yönetebilirsiniz.
 Got it	Anladım
 Manage usage	Kullanımı yönet
 Requests go to the OpenAI API and use your ChatGPT plan.	İstekler OpenAI API'ye gider ve ChatGPT planınızı kullanır.
-Signed out on this computer, but OpenAI didn't confirm it. You can disconnect GeoForge in ChatGPT's settings.	Bu bilgisayarda oturum kapatıldı, ancak OpenAI bunu onaylamadı. GeoForge'in bağlantısını ChatGPT ayarlarından kesebilirsiniz.
+Signed out on this computer, but OpenAI didn't confirm it. You can disconnect UniGIS in ChatGPT's settings.	Bu bilgisayarda oturum kapatıldı, ancak OpenAI bunu onaylamadı. UniGIS'in bağlantısını ChatGPT ayarlarından kesebilirsiniz.
 Using ChatGPT plan	ChatGPT planı kullanılıyor
 You're using your ChatGPT plan	ChatGPT planınızı kullanıyorsunuz
 Use another account	Başka bir hesap kullan
@@ -1931,3 +1931,17 @@ ChatGPT plan use is unavailable for this account or workspace.	Bu hesap veya ça
 A ChatGPT plan or app usage limit was reached. Review Weekly usage before trying again.	ChatGPT planı veya uygulama kullanım sınırına ulaşıldı. Yeniden denemeden önce haftalık kullanımı inceleyin.
 ChatGPT usage is temporarily unavailable. Keep your sign-in and try again later.	ChatGPT kullanımı geçici olarak sağlanamıyor. Oturumunuzu koruyun ve daha sonra yeniden deneyin.
 This ChatGPT account was already saved. Next time, choose it in the list instead of adding it again.	Bu ChatGPT hesabı zaten kayıtlıydı. Bir dahaki sefere yeniden eklemek yerine listeden seçin.
+
+Dock Left	Sola sabitle
+Dock Right	Sağa sabitle
+Dock Bottom	Alta sabitle
+Keep Open	Açık tut
+Auto Hide	Otomatik gizle
+Reset Layout	Düzeni sıfırla
+Analysis Tools	Analiz (Araçlar)
+Cartography Tools	Kartografya (Araçlar)
+Conversion Tools	Dönüştürme (Araçlar)
+Data Management Tools	Veri Yönetimi (Araçlar)
+Editing Tools	Düzenleme (Araçlar)
+Spatial Analyst Tools	Spatial Analyst (Araçlar)
+Spatial Statistics Tools	Spatial Statistics (Araçlar)

@@ -255,7 +255,7 @@ pub fn show(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
                             icons::paint(ui.painter(), r, "add_folder", t.icon, t.accent);
                             if ui.link(&f).on_hover_text(tl!("Browse it in the Catalog")).clicked() {
                                 app.table.folder = Some(std::path::PathBuf::from(&f));
-                                app.ui.left = Some(crate::LeftPane::Catalog);
+                                app.ui.dock.open(crate::Pane::Catalog);
                             }
                         });
                     }

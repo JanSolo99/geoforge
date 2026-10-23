@@ -259,7 +259,8 @@ fn geoprocessing_and_reading_data() {
     let mut s = sample();
     let t = |name: &str, args: Value| ToolCall { id: "x".into(), name: name.into(), args };
     let found = tools::run(&mut s, &t("search_tools", json!({"query": "buffer"}))).unwrap_or_default();
-    assert!(found.contains("\"buffer\""), "{found}");
+    let listed: Value = serde_json::from_str(&found).unwrap();
+    assert!(listed["tools"].as_array().unwrap().iter().any(|tool| tool["name"] == "Buffer"), "{found}");
     let desc = tools::run(&mut s, &t("describe_tool", json!({"tool": "buffer"}))).unwrap_or_default();
     assert!(desc.contains("distance"), "{desc}");
     let before = s.map().layers.len();
@@ -402,7 +403,7 @@ fn anthropic_format() {
     assert!(req.headers.iter().any(|(k, v)| k == "x-api-key" && v == "k"));
     assert!(req.headers.iter().any(|(k, _)| k == "anthropic-version"));
     let b = body(&req);
-    assert!(b["system"].as_str().is_some_and(|t| t.contains("GeoForge")));
+    assert!(b["system"].as_str().is_some_and(|t| t.contains("UniGIS")));
     assert_eq!(b["fallbacks"], "default");
     assert!(b["tools"][0]["input_schema"].is_object());
     let reply = json!({"content": [
@@ -1201,14 +1202,14 @@ fn chatgpt_authorization_page() {
     };
     let params = |url: &str| chatgpt::query_params(url.split_once('?').map_or("", |(_, q)| q));
     let get = |p: &[(String, String)], k: &str| p.iter().find(|(n, _)| n == k).map(|(_, v)| v.clone());
-    // A first sign-in registers GeoForge, without hints.
+    // A first sign-in registers UniGIS, without hints.
     let url = chatgpt::authorize_url(&a);
     assert!(url.starts_with("https://auth.openai.com/api/accounts/authorize?"));
     let p = params(&url);
     for (k, v) in [
         ("response_type", "code"),
         ("client_id", "dynamic_agent_client"),
-        ("agent_name_hint", "GeoForge"),
+        ("agent_name_hint", "UniGIS"),
         ("ext_agent_host_id", "urn:uuid:00000000-0000-4000-8000-000000000000"),
         ("redirect_uri", "http://127.0.0.1:1455/auth/callback"),
         ("scope", "openid profile email offline_access resource.invoke chatgpt.tokens.use.direct"),

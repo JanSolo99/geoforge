@@ -1,11 +1,11 @@
 # Become a Sponsor
 
-RustGIS is free and open-source software, released under the
+UniGIS is free and open-source software, released under the
 [Apache License 2.0](https://github.com/opengeos/RustGIS/blob/main/LICENSE) and developed in
 the open. There is no paid tier, no seat licence and no telemetry in the app: everything on this
 site is available to everyone, for good.
 
-That model only works if the work behind it is sustainable. If RustGIS saves you or your team
+That model only works if the work behind it is sustainable. If UniGIS saves you or your team
 time, sponsorship is the most direct way to keep it moving.
 
 [Sponsor on GitHub](https://github.com/sponsors/giswqs){ .md-button .md-button--primary }
@@ -18,7 +18,7 @@ time, sponsorship is the most direct way to keep it moving.
 | **[GitHub Sponsors](https://github.com/sponsors/giswqs)** | Monthly or one-time sponsorship, billed through your existing GitHub account. | Individuals and organizations that want recurring support, and companies that can expense it alongside other GitHub spend. |
 | **[Buy Me a Coffee](https://buymeacoffee.com/giswqs)** | A quick one-off contribution, no account required. | A small thank-you for a feature or bug fix that helped you. |
 
-Both go to [Qiusheng Wu](https://github.com/giswqs), the maintainer of RustGIS and the wider
+Both go to [Qiusheng Wu](https://github.com/giswqs), the maintainer of UniGIS and the wider
 [opengeos](https://github.com/opengeos) ecosystem, including [GeoLibre](https://geolibre.app).
 
 ## What your sponsorship supports
@@ -39,11 +39,11 @@ Both go to [Qiusheng Wu](https://github.com/giswqs), the maintainer of RustGIS a
 
 ## Sponsoring as an organization
 
-If your team depends on RustGIS and you would like to discuss a larger or invoiced sponsorship,
+If your team depends on UniGIS and you would like to discuss a larger or invoiced sponsorship,
 please [open an issue](https://github.com/opengeos/RustGIS/issues/new/choose) to get in touch.
 Grant-funded and institutional support is welcome too.
 
-## Other ways to support RustGIS
+## Other ways to support UniGIS
 
 Sponsorship is not the only currency, and none of these cost anything:
 
@@ -53,16 +53,16 @@ Sponsorship is not the only currency, and none of these cost anything:
   worth a great deal.
 - **Contribute code or plugins**: see [Contributing](contributing.md) and
   [Plugins](plugins.md#writing-a-plugin).
-- **Translate the interface**: RustGIS ships in 16 languages; see [Languages](i18n.md) to add or
+- **Translate the interface**: UniGIS ships in 16 languages; see [Languages](i18n.md) to add or
   improve one.
 
 ## Thank you
 
-Every sponsor, contributor, bug reporter and tester has helped make RustGIS what it is. Thank
+Every sponsor, contributor, bug reporter and tester has helped make UniGIS what it is. Thank
 you.
 
 ## See also
 
-- [User Guide](user-guide/index.md): what RustGIS can do today.
-- [Comparison](comparison/index.md): RustGIS beside GeoLibre, QGIS and ArcGIS.
+- [User Guide](user-guide/index.md): what UniGIS can do today.
+- [Comparison](comparison/index.md): UniGIS beside GeoLibre, QGIS and ArcGIS.
 - [Contributing](contributing.md): the development setup and quality gate.

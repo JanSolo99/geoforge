@@ -41,7 +41,7 @@ Ocean, Atlas, Blank), which need no network, and web tile layers over them:
   window); in the web app added with Add Data and held in memory for the session (a project keeps
   the layer, and asks for the file again).
 - **Map styles**: a MapLibre style document (`style.json`), with its vector and raster sources.
-  RustGIS draws background, fill, line, circle and raster layers, point labels with their icons
+  UniGIS draws background, fill, line, circle and raster layers, point labels with their icons
   from the style's sprite (SDF icons in their `icon-color`), and fill patterns; it evaluates the
   style's expressions and zoom functions. Line labels and shields along roads, line patterns,
   hillshade and 3D extrusion are not drawn (extrusions draw flat). A label shows the lines of
@@ -63,7 +63,7 @@ tiles are reprojected. From scripts: `map.addTiles`, `map.removeTiles`, `map.set
 
 The world outline and the World Atlas sample's countries come in two worldviews: Natural
 Earth's default borders, and China's (Natural Earth's China point of view: Taiwan, Aksai Chin
-and South Tibet are part of China). RustGIS picks China's when the system's time zone is
+and South Tibet are part of China). UniGIS picks China's when the system's time zone is
 mainland China's (such as `Asia/Shanghai`) or its first locale is `zh-CN`; nothing is looked up
 over the network. Choose one in **Settings › Language › Worldview**, set `RUSTGIS_WORLDVIEW`
 (`default` or `china`), or pass `--worldview` to `rustgis-cli`. An untouched sample project
@@ -74,7 +74,7 @@ switches its countries at once; others keep the layer they have.
 The flat map is drawn in Web Mercator by default. **View › Projection** switches it to another
 projection, and clicking the coordinate system in the status bar opens the **Coordinate
 System** dialog, which also takes a projected EPSG code (such as `3035`, `32633` for UTM zone
-33N or `2056` for Switzerland). A code whose projection method or datum grid RustGIS can't use
+33N or `2056` for Switzerland). A code whose projection method or datum grid UniGIS can't use
 (Polyconic such as `5880`, Cassini, oblique Mercator, or a NAD27 code that needs a grid) is refused
 with the reason, rather than drawn in another projection:
 
@@ -94,7 +94,7 @@ their hemisphere poleward of 30°, regional ones their region, transverse Mercat
 and scale, and the choice is saved with the map (`map.projection` from the command line). A
 raster already in the map's coordinate system draws without being reprojected. To open every new
 session in a projection, set it in **Settings › Start-up › Projection**. Robinson, Equal
-Earth, Natural Earth, Winkel Tripel and Eckert IV are computed by RustGIS itself on a sphere,
+Earth, Natural Earth, Winkel Tripel and Eckert IV are computed by UniGIS itself on a sphere,
 so EPSG:8857 (Equal Earth) works too.
 
 ## Globe

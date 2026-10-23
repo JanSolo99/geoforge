@@ -11,6 +11,7 @@
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
 
 pub mod convert;
+pub mod legacy;
 pub mod network;
 pub mod neural;
 pub mod rasterops;
@@ -48,7 +49,7 @@ pub enum ParamKind {
     VectorLayer,
     /// On or off.
     Bool,
-    /// A file path typed by the user (for data GeoForge doesn't open as a layer, such as LiDAR).
+    /// A file path typed by the user (for data UniGIS doesn't open as a layer, such as LiDAR).
     Path,
 }
 
@@ -222,9 +223,17 @@ pub fn reload_external_of(key: &str) {
     }
 }
 
-/// Every tool: the built-in ones, then the external ones.
+/// Every tool, once: the built-in ones that have no ArcGIS-verified counterpart (see [`legacy`]),
+/// then the external ones.
 pub fn tools() -> impl Iterator<Item = &'static ToolSpec> {
-    TOOLS.iter().chain(external_tools())
+    TOOLS.iter().filter(|t| counterpart(t).is_none()).chain(external_tools())
+}
+
+/// The ArcGIS-verified tool that replaces a built-in one (none when it has no counterpart, or
+/// the suite isn't registered).
+pub fn counterpart(builtin: &ToolSpec) -> Option<&'static ToolSpec> {
+    let id = legacy::counterpart_id(builtin.id);
+    external_tools_of("geoforge").iter().find(|t| t.id == id)
 }
 
 /// The suite an external tool comes from, with its runner (`None` for a built-in tool).
@@ -252,15 +261,14 @@ pub fn external_source(spec: &ToolSpec) -> Option<&'static str> {
 pub fn tool(id: &str) -> Option<&'static ToolSpec> {
     let by_id = |t: &&ToolSpec| t.id.eq_ignore_ascii_case(id);
     let by_name = |t: &&ToolSpec| t.name.eq_ignore_ascii_case(id);
-    // GeoForge's own tool (matched to ArcGIS Pro) wins over an app built-in of the same id, which
-    // wins over other external tools with the same name.
-    let geoforge = format!("geoforge:{id}");
+    // The ArcGIS-verified tool (UniGIS suite) wins over the built-in tool it replaced, however
+    // that is named (see `legacy`); then ids, then names.
+    let geoforge = legacy::counterpart_id(id);
     external_tools()
         .into_iter()
         .find(|t| t.id.eq_ignore_ascii_case(&geoforge))
         .or_else(|| tools().find(by_id))
-        .or_else(|| TOOLS.iter().find(by_name))
-        .or_else(|| external_tools().into_iter().find(by_name))
+        .or_else(|| tools().find(by_name))
 }
 
 /// The runner for external tools; never called (external specs carry the runner's id).
@@ -272,6 +280,8 @@ pub fn external_placeholder(_: &dyn Inputs, _: &Value) -> Result<ToolResult, Str
 /// [`run`] does this first; a host that runs an external tool another way (the browser's
 /// asynchronous runner) does it too, so both check parameters the same way.
 pub fn resolve_params(spec: &ToolSpec, params: &Value) -> Result<Value, String> {
+    // Parameters written for the built-in tool this one replaced.
+    let params = legacy::translate_params(spec.id, params);
     let mut p = params.as_object().cloned().unwrap_or_default();
     for ps in spec.params {
         if !p.contains_key(ps.name)
@@ -290,7 +300,22 @@ pub fn resolve_params(spec: &ToolSpec, params: &Value) -> Result<Value, String> 
 /// Runs a tool with JSON parameters, filling defaults and checking required ones.
 pub fn run(id: &str, inputs: &dyn Inputs, params: &Value) -> Result<ToolResult, String> {
     let spec = tool(id).ok_or_else(|| format!("no tool '{id}'"))?;
-    let p = resolve_params(spec, params)?;
+    let mut params = params.clone();
+    // Explicit legacy ids retain their defaults; the canonical tool uses ArcGIS defaults.
+    if legacy::ALIASES.iter().any(|(old, _)| old.eq_ignore_ascii_case(id))
+        && let Some(builtin) = TOOLS.iter().find(|t| t.id.eq_ignore_ascii_case(id) && t.id != spec.id)
+        && let Some(p) = params.as_object_mut()
+    {
+        for ps in builtin.params.iter().filter(|p| !p.default.is_empty()) {
+            if let Ok(default) = serde_json::from_str(ps.default) {
+                p.entry(ps.name).or_insert(default);
+            }
+        }
+        if id.eq_ignore_ascii_case("featureToPoint") {
+            p.entry("point_location").or_insert_with(|| "INSIDE".into());
+        }
+    }
+    let p = resolve_params(spec, &params)?;
     // A bug in a tool must not take the app down.
     std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| match source_of(spec) {
         Some((_, runner)) => runner(spec, inputs, &p),

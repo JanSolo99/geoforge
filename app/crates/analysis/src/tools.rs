@@ -15,7 +15,7 @@ pub static TOOLS: &[ToolSpec] = &[
     ToolSpec {
         id: "buffer",
         name: "Buffer",
-        toolbox: "Analysis › Proximity",
+        toolbox: "Analysis Tools › Proximity",
         summary: "Creates polygons around input features at a given distance.",
         params: &[
             P { name: "input", label: "Input Features", kind: K::Layer, required: true, default: "", help: "" },
@@ -29,7 +29,7 @@ pub static TOOLS: &[ToolSpec] = &[
     ToolSpec {
         id: "clip",
         name: "Clip",
-        toolbox: "Analysis › Extract",
+        toolbox: "Analysis Tools › Extract",
         summary: "Extracts the parts of input features that fall inside clip polygons.",
         params: &[
             P { name: "input", label: "Input Features", kind: K::Layer, required: true, default: "", help: "" },
@@ -41,7 +41,7 @@ pub static TOOLS: &[ToolSpec] = &[
     ToolSpec {
         id: "erase",
         name: "Erase",
-        toolbox: "Analysis › Overlay",
+        toolbox: "Analysis Tools › Overlay",
         summary: "Removes the parts of polygon features that overlap erase polygons.",
         params: &[
             P { name: "input", label: "Input Features", kind: K::PolygonLayer, required: true, default: "", help: "" },
@@ -53,7 +53,7 @@ pub static TOOLS: &[ToolSpec] = &[
     ToolSpec {
         id: "dissolve",
         name: "Dissolve",
-        toolbox: "Data Management › Generalization",
+        toolbox: "Data Management Tools › Generalization",
         summary: "Merges polygons that share a field value into one feature per value.",
         params: &[
             P { name: "input", label: "Input Features", kind: K::PolygonLayer, required: true, default: "", help: "" },
@@ -65,7 +65,7 @@ pub static TOOLS: &[ToolSpec] = &[
     ToolSpec {
         id: "convexHull",
         name: "Minimum Bounding Geometry",
-        toolbox: "Data Management › Features",
+        toolbox: "Data Management Tools › Features",
         summary: "Encloses each feature, or all features, in its convex hull.",
         params: &[
             P { name: "input", label: "Input Features", kind: K::Layer, required: true, default: "", help: "" },
@@ -77,7 +77,7 @@ pub static TOOLS: &[ToolSpec] = &[
     ToolSpec {
         id: "featureToPoint",
         name: "Feature To Point",
-        toolbox: "Data Management › Features",
+        toolbox: "Data Management Tools › Features",
         summary: "Creates a point inside each input feature.",
         params: &[
             P { name: "input", label: "Input Features", kind: K::Layer, required: true, default: "", help: "" },
@@ -88,7 +88,7 @@ pub static TOOLS: &[ToolSpec] = &[
     ToolSpec {
         id: "xyTableToPoint",
         name: "XY Table To Point",
-        toolbox: "Data Management › Features",
+        toolbox: "Data Management Tools › Features",
         summary: "Creates points from a table's x and y coordinate fields.",
         params: &[
             P { name: "input", label: "Input Table", kind: K::Layer, required: true, default: "", help: "" },
@@ -123,7 +123,7 @@ pub static TOOLS: &[ToolSpec] = &[
     ToolSpec {
         id: "simplify",
         name: "Simplify",
-        toolbox: "Cartography › Generalization",
+        toolbox: "Cartography Tools › Generalization",
         summary: "Removes vertices that deviate less than a tolerance (Douglas–Peucker).",
         params: &[
             P { name: "input", label: "Input Features", kind: K::Layer, required: true, default: "", help: "" },
@@ -135,7 +135,7 @@ pub static TOOLS: &[ToolSpec] = &[
     ToolSpec {
         id: "selectByLocation",
         name: "Select Layer By Location",
-        toolbox: "Data Management › Layers and Table Views",
+        toolbox: "Data Management Tools › Layers and Table Views",
         summary: "Selects features that intersect features in another layer.",
         params: &[
             P { name: "input", label: "Input Features", kind: K::Layer, required: true, default: "", help: "" },
@@ -148,7 +148,7 @@ pub static TOOLS: &[ToolSpec] = &[
     ToolSpec {
         id: "selectByAttributes",
         name: "Select Layer By Attribute",
-        toolbox: "Data Management › Layers and Table Views",
+        toolbox: "Data Management Tools › Layers and Table Views",
         summary: "Selects features with a SQL where clause, e.g. pop_est > 1000000.",
         params: &[
             P { name: "input", label: "Input Rows", kind: K::Layer, required: true, default: "", help: "" },
@@ -159,7 +159,7 @@ pub static TOOLS: &[ToolSpec] = &[
     ToolSpec {
         id: "countPoints",
         name: "Summarize Within",
-        toolbox: "Analysis › Summarize",
+        toolbox: "Analysis Tools › Statistics",
         summary: "Counts the points that fall inside each polygon.",
         params: &[
             P { name: "polygons", label: "Input Polygons", kind: K::PolygonLayer, required: true, default: "", help: "" },
@@ -171,7 +171,7 @@ pub static TOOLS: &[ToolSpec] = &[
     ToolSpec {
         id: "calculateGeometry",
         name: "Calculate Geometry Attributes",
-        toolbox: "Data Management › Features",
+        toolbox: "Data Management Tools › Fields",
         summary: "Adds geodesic area (km²), length (km) or centroid coordinates as fields.",
         params: &[P { name: "input", label: "Input Features", kind: K::Layer, required: true, default: "", help: "" }],
         run: calculate_geometry,
@@ -179,7 +179,7 @@ pub static TOOLS: &[ToolSpec] = &[
     ToolSpec {
         id: "summaryStatistics",
         name: "Summary Statistics",
-        toolbox: "Analysis › Statistics",
+        toolbox: "Analysis Tools › Statistics",
         summary: "Count, sum, mean, min, max and standard deviation of a field, optionally per case field.",
         params: &[
             P { name: "input", label: "Input Table", kind: K::Layer, required: true, default: "", help: "" },
@@ -191,7 +191,7 @@ pub static TOOLS: &[ToolSpec] = &[
     ToolSpec {
         id: "exportFeatures",
         name: "Export Features",
-        toolbox: "Conversion",
+        toolbox: "Conversion Tools › To Geodatabase",
         summary: "Copies the (selected) features of a layer to a new layer.",
         params: &[
             P { name: "input", label: "Input Features", kind: K::Layer, required: true, default: "", help: "" },

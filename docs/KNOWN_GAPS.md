@@ -1,6 +1,6 @@
 # Known gaps
 
-Where GeoForge differs from ArcGIS Pro 3.7 or leaves a documented behaviour out. Each line says what
+Where UniGIS differs from ArcGIS Pro 3.7 or leaves a documented behaviour out. Each line says what
 is missing, what we do instead, and where the evidence is. Fix these before claiming a tool is done.
 Update this file when a gap is found or closed.
 
@@ -27,12 +27,13 @@ Update this file when a gap is found or closed.
 | Cluster and Outlier Analysis | Permutation p-values and z-scores are random in ArcGIS too (two runs differ); ours use a fixed seed. Tests use 0 permutations | `scripts/research/spatstat/weights/probe_p8.py` (`p99`, `p99b`) |
 | Multi-Distance Spatial Cluster Analysis | Ripley's edge correction matches while no circle around a feature reaches a corner of the study area; beyond that ArcGIS weighs pairs more than the exact share of the circle inside (no corner formula tried fits). SIMULATE_OUTER_BOUNDARY_VALUES and REDUCE_ANALYSIS_AREA are not done (mirroring across the rectangle's edges and shrinking it by the distance do not fit ArcGIS's values); confidence envelopes are random in ArcGIS too | `testdata/arcgis-reference/spatstat_ripley.json` (`exact_rows`, `big_sim`, `big_red`), `scripts/research/spatstat/weights/probe_ripley.py` |
 | Ordinary Least Squares | ArcGIS's t, F and chi-squared p-values come from approximations (up to 1.5e-6 apart, e.g. 0.019377 vs exact 0.019378; tiny ones like 1e-16 vs 6e-18); ours are exact. The PDF report and the app's two tables (only messages) are not done | `testdata/arcgis-reference/spatstat_ols.json`, `crates/geoforge-cli/tests/spatstat_ols.rs` |
-| File geodatabase editing | Freed row space is not put on a `.freelist` (ArcGIS reuses it; the file grows until Compact) and the `timestamps` file is not updated (an ArcGIS session that has the geodatabase open may not notice an edit until it is reopened). The rollback journal (`.gf-journal`) is GeoForge's: after a crash, open the geodatabase once with `gf` (any read) before ArcGIS, or ArcGIS may see a half-applied edit. ArcGIS's own `.lock` files are not honoured. Version 2 (64-bit OBJECTID) index files are checked against ArcGIS's only as one-page trees | `crates/geoforge-filegdb/tests/crash_safety.rs`, `edit_arcgis.rs` |
+| File geodatabase editing | Freed row space is not put on a `.freelist` (ArcGIS reuses it; the file grows until Compact) and the `timestamps` file is not updated (an ArcGIS session that has the geodatabase open may not notice an edit until it is reopened). The rollback journal (`.gf-journal`) is UniGIS's: after a crash, open the geodatabase once with `gf` (any read) before ArcGIS, or ArcGIS may see a half-applied edit. ArcGIS's own `.lock` files are not honoured. Version 2 (64-bit OBJECTID) index files are checked against ArcGIS's only as one-page trees | `crates/geoforge-filegdb/tests/crash_safety.rs`, `edit_arcgis.rs` |
 
 ## Not implemented
 
 | Tool | Missing |
 |---|---|
+| Desktop pane layout | Floating windows and arbitrary split groups are not implemented; the attribute table remains a separate bottom view. Panes support left/right/bottom tab groups, drag/drop, auto-hide and saved arrangements (`app/crates/ui-egui/src/dock.rs`) |
 | Create Fishnet | Labels output, corner with zero rows/columns |
 | Densify | ANGLE and OFFSET methods, curved segments, Z/M |
 | Generate Points Along Lines | Chainage fields |

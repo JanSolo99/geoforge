@@ -1,6 +1,6 @@
 # Privacy
 
-The RustGIS desktop app and command line collect no analytics, telemetry or usage data. Your
+The UniGIS desktop app and command line collect no analytics, telemetry or usage data. Your
 geospatial data and projects stay on your device unless you choose to share or export them.
 
 ## Website analytics

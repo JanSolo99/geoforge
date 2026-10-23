@@ -1,13 +1,13 @@
-//! GeoForge's ArcGIS-verified geoprocessing tools (`geoforge-tools`) as GeoForge tools.
+//! UniGIS's ArcGIS-verified geoprocessing tools (`geoforge-tools`) as UniGIS tools.
 //!
-//! Modified for GeoForge (not part of upstream GeoForge).
+//! Modified for UniGIS (not part of upstream RustGIS).
 //!
 //! The tools join the registry as the external suite [`SOURCE`] (ids `geoforge:<name>`), through
-//! [`rustgis_analysis::register_external`]. A tool's layers are converted to GeoForge feature
+//! [`rustgis_analysis::register_external`]. A tool's layers are converted to UniGIS feature
 //! classes, the engine runs the ArcGIS algorithm (parameters, output schema, row order as
 //! ArcGIS's), and its output comes back as a layer.
 //!
-//! Layers in GeoForge are WGS 84 longitude/latitude. Tools that only relate shapes (Clip, Erase,
+//! Layers in UniGIS are WGS 84 longitude/latitude. Tools that only relate shapes (Clip, Erase,
 //! Intersect, ...) run on them as they are, with ArcGIS's geographic XY tolerance. Tools that
 //! measure (Buffer, Near, search distances) run in the UTM zone of the data, as ArcGIS does on
 //! projected data, in metres, and their results are projected back: see [`Work`].
@@ -123,7 +123,7 @@ impl Work {
 // ---------------------------------------------------------------------------------------------
 // conversions
 
-/// A layer (or its selected rows) as a GeoForge feature class.
+/// A layer (or its selected rows) as a UniGIS feature class.
 struct Fc {
     wkt: String,
     kind: Option<gf::GeometryKind>,
@@ -282,11 +282,22 @@ fn flag(p: &Json, k: &str) -> bool {
 /// A layer as a feature class in `work`'s coordinate system. As in ArcGIS, a layer with a
 /// selection is read as its selected features unless `whole`.
 fn layer_in<'a>(inp: &'a dyn Inputs, p: &Json, k: &str, work: &Work, whole: bool) -> Result<(&'a Dataset, Fc), String> {
-    let name = text(p, k);
-    let ds = inp.dataset(name).ok_or_else(|| format!("no layer named '{name}'"))?;
-    let sel = inp.selection(name);
+    let ds = dataset_of(inp, p, k)?;
+    // The project layer can have a different name from its backing dataset.
+    let sel = inp.selection(text(p, k));
     let rows: Vec<usize> = if sel.is_empty() || whole { (0..ds.features.len()).collect() } else { sel.to_vec() };
     Ok((ds, to_fc(ds, &rows, work)))
+}
+
+/// The layer or table parameter `k` names. A number is a standalone table's id (names can
+/// repeat), and only that; text is a name.
+fn dataset_of<'a>(inp: &'a dyn Inputs, p: &Json, k: &str) -> Result<&'a Dataset, String> {
+    if let Some(n) = p.get(k).filter(|v| v.is_number()) {
+        let table = n.as_u64().and_then(|id| u32::try_from(id).ok()).and_then(|id| inp.table(id));
+        return table.ok_or_else(|| format!("no standalone table with id {n}"));
+    }
+    let name = text(p, k);
+    inp.dataset(name).ok_or_else(|| format!("no layer named '{name}'"))
 }
 
 fn layer<'a>(inp: &'a dyn Inputs, p: &Json, k: &str) -> Result<(&'a Dataset, Fc), String> {
@@ -295,12 +306,7 @@ fn layer<'a>(inp: &'a dyn Inputs, p: &Json, k: &str) -> Result<(&'a Dataset, Fc)
 
 /// The datasets named by parameters `keys`.
 fn datasets<'a>(inp: &'a dyn Inputs, p: &Json, keys: &[&str]) -> Result<Vec<&'a Dataset>, String> {
-    keys.iter()
-        .map(|k| {
-            let name = text(p, k);
-            inp.dataset(name).ok_or_else(|| format!("no layer named '{name}'"))
-        })
-        .collect()
+    keys.iter().map(|k| dataset_of(inp, p, k)).collect()
 }
 
 fn out_name(p: &Json, default: String) -> String {
@@ -828,7 +834,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "clip",
         name: "Clip",
-        toolbox: "GeoForge › Analysis › Extract",
+        toolbox: "UniGIS › Analysis › Extract",
         summary: "Cuts the input features out with polygons (ArcGIS Pro Clip).",
         params: &[INPUT, P { name: "clip", label: "Clip Features", kind: K::PolygonLayer, required: true, default: "", help: "" }, OUTPUT],
         run: clip,
@@ -836,7 +842,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "erase",
         name: "Erase",
-        toolbox: "GeoForge › Analysis › Overlay",
+        toolbox: "UniGIS › Analysis › Overlay",
         summary: "Keeps the parts of the input outside the erase polygons (ArcGIS Pro Erase).",
         params: &[
             INPUT,
@@ -848,7 +854,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "intersect",
         name: "Intersect",
-        toolbox: "GeoForge › Analysis › Overlay",
+        toolbox: "UniGIS › Analysis › Overlay",
         summary: "The parts where both layers overlap, with both layers' attributes (ArcGIS Pro Intersect).",
         params: &[INPUT, OTHER, OUTPUT],
         run: intersect,
@@ -856,7 +862,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "union",
         name: "Union",
-        toolbox: "GeoForge › Analysis › Overlay",
+        toolbox: "UniGIS › Analysis › Overlay",
         summary: "All of both polygon layers, split where they overlap (ArcGIS Pro Union).",
         params: &[INPUT, OTHER, OUTPUT],
         run: union,
@@ -864,7 +870,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "symmetrical_difference",
         name: "Symmetrical Difference",
-        toolbox: "GeoForge › Analysis › Overlay",
+        toolbox: "UniGIS › Analysis › Overlay",
         summary: "The parts of two polygon layers that do not overlap (ArcGIS Pro Symmetrical Difference).",
         params: &[INPUT, OTHER, OUTPUT],
         run: symmetrical_difference,
@@ -872,7 +878,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "dissolve",
         name: "Dissolve",
-        toolbox: "GeoForge › Data Management › Generalization",
+        toolbox: "UniGIS › Data Management › Generalization",
         summary: "Merges features that share values in the dissolve fields (ArcGIS Pro Dissolve).",
         params: &[
             INPUT,
@@ -892,7 +898,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "multipart_to_singlepart",
         name: "Multipart To Singlepart",
-        toolbox: "GeoForge › Data Management › Features",
+        toolbox: "UniGIS › Data Management › Features",
         summary: "One feature per part (ArcGIS Pro Multipart To Singlepart).",
         params: &[INPUT, OUTPUT],
         run: multipart_to_singlepart,
@@ -900,7 +906,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "feature_to_point",
         name: "Feature To Point",
-        toolbox: "GeoForge › Data Management › Features",
+        toolbox: "UniGIS › Data Management › Features",
         summary: "A point for each feature, at its centroid or inside it (ArcGIS Pro Feature To Point).",
         params: &[
             INPUT,
@@ -919,7 +925,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "select",
         name: "Select",
-        toolbox: "GeoForge › Analysis › Extract",
+        toolbox: "UniGIS › Analysis › Extract",
         summary: "Features that match an SQL expression (ArcGIS Pro Select).",
         params: &[
             INPUT,
@@ -938,7 +944,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "buffer",
         name: "Buffer",
-        toolbox: "GeoForge › Analysis › Proximity",
+        toolbox: "UniGIS › Analysis › Proximity",
         summary: "Zones around features, measured on the ground in the data's UTM zone (ArcGIS Pro Buffer, planar).",
         params: &[
             INPUT,
@@ -976,7 +982,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "near",
         name: "Near",
-        toolbox: "GeoForge › Analysis › Proximity",
+        toolbox: "UniGIS › Analysis › Proximity",
         summary: "Adds the distance (m, on the ellipsoid) and ID of the nearest feature to the input layer (ArcGIS Pro Near with GEODESIC, in place).",
         params: &[
             INPUT,
@@ -1012,7 +1018,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "spatial_join",
         name: "Spatial Join",
-        toolbox: "GeoForge › Analysis › Overlay",
+        toolbox: "UniGIS › Analysis › Overlay",
         summary: "Joins attributes of one layer to another by location (ArcGIS Pro Spatial Join).",
         params: &[
             INPUT,
@@ -1059,7 +1065,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "select_by_location",
         name: "Select Layer By Location",
-        toolbox: "GeoForge › Data Management › Layers and Table Views",
+        toolbox: "UniGIS › Data Management › Layers and Table Views",
         summary: "Selects the features of a layer related to features of another (ArcGIS Pro Select Layer By Location).",
         params: &[
             INPUT,
@@ -1095,7 +1101,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "frequency",
         name: "Frequency",
-        toolbox: "GeoForge › Analysis › Statistics",
+        toolbox: "UniGIS › Analysis › Statistics",
         summary: "A table of how often each combination of field values occurs (ArcGIS Pro Frequency).",
         params: &[
             INPUT,
@@ -1122,7 +1128,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "statistics",
         name: "Summary Statistics",
-        toolbox: "GeoForge › Analysis › Statistics",
+        toolbox: "UniGIS › Analysis › Statistics",
         summary: "Statistics of fields, per case field (ArcGIS Pro Summary Statistics).",
         params: &[
             INPUT,
@@ -1149,7 +1155,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "identity",
         name: "Identity",
-        toolbox: "GeoForge › Analysis › Overlay",
+        toolbox: "UniGIS › Analysis › Overlay",
         summary: "Splits the input where identity polygons overlap it, keeping all input (ArcGIS Pro Identity).",
         params: &[
             INPUT,
@@ -1177,7 +1183,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "update",
         name: "Update",
-        toolbox: "GeoForge › Analysis › Overlay",
+        toolbox: "UniGIS › Analysis › Overlay",
         summary: "The input with the update polygons laid over it (ArcGIS Pro Update).",
         params: &[INPUT, OTHER, OUTPUT],
         run: update,
@@ -1185,7 +1191,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "merge",
         name: "Merge",
-        toolbox: "GeoForge › Data Management › General",
+        toolbox: "UniGIS › Data Management › General",
         summary: "Combines layers into one, matching fields by name (ArcGIS Pro Merge).",
         params: &[
             P {
@@ -1211,7 +1217,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "append",
         name: "Append",
-        toolbox: "GeoForge › Data Management › General",
+        toolbox: "UniGIS › Data Management › General",
         summary: "Adds features of other layers to a target layer, which is updated (ArcGIS Pro Append).",
         params: &[
             P {
@@ -1237,7 +1243,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "minimum_bounding_geometry",
         name: "Minimum Bounding Geometry",
-        toolbox: "GeoForge › Data Management › Features",
+        toolbox: "UniGIS › Data Management › Features",
         summary: "A polygon around each feature or group (ArcGIS Pro Minimum Bounding Geometry).",
         params: &[
             INPUT,
@@ -1280,7 +1286,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "feature_vertices_to_points",
         name: "Feature Vertices To Points",
-        toolbox: "GeoForge › Data Management › Features",
+        toolbox: "UniGIS › Data Management › Features",
         summary: "Points at the vertices, ends, middle or dangles of lines and polygons (ArcGIS Pro Feature Vertices To Points).",
         params: &[
             INPUT,
@@ -1299,7 +1305,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "points_to_line",
         name: "Points To Line",
-        toolbox: "GeoForge › Data Management › Features",
+        toolbox: "UniGIS › Data Management › Features",
         summary: "Connects points into lines, by line field and sort field (ArcGIS Pro Points To Line).",
         params: &[
             INPUT,
@@ -1313,7 +1319,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "sort",
         name: "Sort",
-        toolbox: "GeoForge › Data Management › General",
+        toolbox: "UniGIS › Data Management › General",
         summary: "Reorders features by fields or by position (ArcGIS Pro Sort).",
         params: &[
             INPUT,
@@ -1340,7 +1346,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "add_xy",
         name: "Add XY Coordinates",
-        toolbox: "GeoForge › Data Management › Features",
+        toolbox: "UniGIS › Data Management › Features",
         summary: "Adds POINT_X and POINT_Y to the layer, in place (ArcGIS Pro Add XY Coordinates).",
         params: &[INPUT],
         run: add_xy,
@@ -1348,7 +1354,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "add_field",
         name: "Add Field",
-        toolbox: "GeoForge › Data Management › Fields",
+        toolbox: "UniGIS › Data Management › Fields",
         summary: "Adds a field to the layer, in place (ArcGIS Pro Add Field).",
         params: &[
             INPUT,
@@ -1370,7 +1376,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "delete_field",
         name: "Delete Field",
-        toolbox: "GeoForge › Data Management › Fields",
+        toolbox: "UniGIS › Data Management › Fields",
         summary: "Removes fields from the layer, in place (ArcGIS Pro Delete Field).",
         params: &[
             INPUT,
@@ -1389,7 +1395,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "calculate_field",
         name: "Calculate Field",
-        toolbox: "GeoForge › Data Management › Fields",
+        toolbox: "UniGIS › Data Management › Fields",
         summary: "Fills a field from a Python expression using !FIELD! values, in place (ArcGIS Pro Calculate Field, PYTHON3).",
         params: &[
             INPUT,
@@ -1417,7 +1423,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "delete_identical",
         name: "Delete Identical",
-        toolbox: "GeoForge › Data Management › General",
+        toolbox: "UniGIS › Data Management › General",
         summary: "Removes features that repeat the values or shape of an earlier one, in place (ArcGIS Pro Delete Identical).",
         params: &[
             INPUT,
@@ -1443,7 +1449,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "find_identical",
         name: "Find Identical",
-        toolbox: "GeoForge › Data Management › General",
+        toolbox: "UniGIS › Data Management › General",
         summary: "A table of features that share values or shape (ArcGIS Pro Find Identical).",
         params: &[
             INPUT,
@@ -1470,7 +1476,7 @@ const DEFS: &[Def] = &[
     Def {
         id: "generate_near_table",
         name: "Generate Near Table",
-        toolbox: "GeoForge › Analysis › Proximity",
+        toolbox: "UniGIS › Analysis › Proximity",
         summary: "A table of the nearest features and their distances in metres (ArcGIS Pro Generate Near Table).",
         params: &[
             INPUT,
@@ -1493,12 +1499,54 @@ const DEFS: &[Def] = &[
     },
 ];
 
+/// The toolbox of a tool as ArcGIS Pro's tool reference names it: `Analysis Tools › Overlay`,
+/// `Spatial Analyst Tools › Surface`. The suite's sources say `UniGIS › Analysis › Overlay` or
+/// (shared registry) `Analysis › Overlay`; there is one toolbox tree, so the suite is not a level.
+pub fn arcgis_toolbox(raw: &str) -> &'static str {
+    let raw = raw.strip_prefix("UniGIS › ").or_else(|| raw.strip_prefix("GeoForge › ")).unwrap_or(raw);
+    let mut parts: Vec<&str> = raw.split(" › ").collect();
+    // ArcGIS's toolsets: `Table` (not `Tables`); Data Engineering sits directly in the toolbox;
+    // `Fields › Date and Time` is `Fields`.
+    for p in parts.iter_mut().skip(1) {
+        if *p == "Tables" {
+            *p = "Table";
+        }
+    }
+    if parts.len() == 3 && parts[0] == "Data Management" && parts[1] == "Fields" {
+        if parts[2] == "Data Engineering" {
+            parts.remove(1);
+        } else {
+            parts.truncate(2);
+        }
+    }
+    let top = match parts[0] {
+        "Analysis" => "Analysis Tools",
+        "Data Management" => "Data Management Tools",
+        "Conversion" => "Conversion Tools",
+        "Spatial Analyst" => "Spatial Analyst Tools",
+        "Spatial Statistics" => "Spatial Statistics Tools",
+        "Cartography" => "Cartography Tools",
+        "Editing" => "Editing Tools",
+        other => other,
+    };
+    static CACHE: std::sync::Mutex<Vec<(String, &'static str)>> = std::sync::Mutex::new(Vec::new());
+    parts[0] = top;
+    let name = parts.join(" › ");
+    let mut cache = CACHE.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    if let Some((_, s)) = cache.iter().find(|(k, _)| *k == name) {
+        return s;
+    }
+    let leaked: &'static str = Box::leak(name.clone().into_boxed_str());
+    cache.push((name, leaked));
+    leaked
+}
+
 fn specs() -> Vec<ToolSpec> {
     let own = DEFS.iter().chain(raster::DEFS).chain(extra::DEFS).map(|d| ToolSpec {
         // Ids are `geoforge:<id>`; leaked once, like the other suites' specs.
         id: Box::leak(format!("{PREFIX}{}", d.id).into_boxed_str()),
         name: d.name,
-        toolbox: d.toolbox,
+        toolbox: arcgis_toolbox(d.toolbox),
         summary: d.summary,
         params: raster::params_of(d),
         run: rustgis_analysis::external_placeholder,
@@ -1507,7 +1555,7 @@ fn specs() -> Vec<ToolSpec> {
     let maths = raster::math_specs().into_iter().map(|(id, name, toolbox, summary, params)| ToolSpec {
         id: Box::leak(format!("{PREFIX}{id}").into_boxed_str()),
         name,
-        toolbox,
+        toolbox: arcgis_toolbox(toolbox),
         summary,
         params,
         run: rustgis_analysis::external_placeholder,
@@ -1515,7 +1563,7 @@ fn specs() -> Vec<ToolSpec> {
     let shared = tools::registry::TOOLS.iter().map(|t| ToolSpec {
         id: Box::leak(format!("{PREFIX}{}", t.id).into_boxed_str()),
         name: t.name,
-        toolbox: Box::leak(format!("GeoForge › {}", t.toolbox).into_boxed_str()),
+        toolbox: arcgis_toolbox(t.toolbox),
         summary: t.summary,
         params: reg::params_of(t),
         run: rustgis_analysis::external_placeholder,
@@ -1579,6 +1627,150 @@ mod tests {
             Output::Layer(d) => d,
             _ => panic!("expected a layer"),
         }
+    }
+
+    #[test]
+    fn one_tool_list() {
+        register();
+        let all: Vec<&ToolSpec> = rustgis_analysis::tools().collect();
+        // No tool twice: not by id, not by name (every name is one ArcGIS tool).
+        let mut ids: Vec<String> = all.iter().map(|t| t.id.to_lowercase()).collect();
+        let mut names: Vec<String> = all.iter().map(|t| t.name.to_lowercase()).collect();
+        for v in [&mut ids, &mut names] {
+            v.sort();
+            let before = v.len();
+            v.dedup();
+            assert_eq!(v.len(), before, "a tool is listed twice");
+        }
+        // The built-in tools with a counterpart are gone from the list; the others stay.
+        for t in rustgis_analysis::TOOLS {
+            assert_eq!(all.iter().any(|x| std::ptr::eq(*x, t)), rustgis_analysis::counterpart(t).is_none(), "{}", t.id);
+        }
+        // Every tool is in exactly one toolset of an ArcGIS toolbox; no toolbox of the suite's own.
+        let boxes = [
+            "Analysis Tools",
+            "Cartography Tools",
+            "Conversion Tools",
+            "Data Management Tools",
+            "Editing Tools",
+            "Spatial Analyst Tools",
+            "Spatial Statistics Tools",
+        ];
+        for t in &all {
+            let top = t.toolbox.split(" › ").next().unwrap_or("");
+            assert!(boxes.contains(&top), "{} is in '{}'", t.id, t.toolbox);
+            assert!(!t.toolbox.contains("UniGIS") && !t.toolbox.contains("Tables"), "{} is in '{}'", t.id, t.toolbox);
+            assert!(t.toolbox.split(" › ").count() <= 3, "{} is in '{}'", t.id, t.toolbox);
+        }
+        assert_eq!(rustgis_analysis::tool("Buffer").map(|t| t.toolbox), Some("Analysis Tools › Proximity"));
+        assert_eq!(rustgis_analysis::tool("Summarize Within").map(|t| t.toolbox), Some("Analysis Tools › Statistics"));
+    }
+
+    #[test]
+    fn built_in_ids_resolve_to_the_arcgis_tools() {
+        register();
+        for (old, new) in [
+            ("buffer", "geoforge:buffer"),
+            ("clip", "geoforge:clip"),
+            ("erase", "geoforge:erase"),
+            ("dissolve", "geoforge:dissolve"),
+            ("convexHull", "geoforge:minimum_bounding_geometry"),
+            ("featureToPoint", "geoforge:feature_to_point"),
+            ("selectByLocation", "geoforge:select_by_location"),
+            ("summaryStatistics", "geoforge:statistics"),
+            ("Summary Statistics", "geoforge:statistics"),
+        ] {
+            assert_eq!(rustgis_analysis::tool(old).map(|t| t.id), Some(new), "{old}");
+        }
+        // The ones without a counterpart stay.
+        for id in ["countPoints", "simplify", "selectByAttributes", "xyTableToPoint", "exportFeatures", "calculateGeometry"] {
+            assert_eq!(rustgis_analysis::tool(id).map(|t| t.id), Some(id), "{id}");
+        }
+    }
+
+    #[test]
+    fn built_in_parameters_still_run() {
+        register();
+        let mut pts = Dataset::new("pts", GeometryType::Point, vec![Field::new("N", FieldType::Integer)]);
+        for (i, (x, y)) in [(0.5, 0.5), (1.5, 1.5), (9.0, 9.0)].into_iter().enumerate() {
+            pts.push(Some(Geometry::Point(Coord::new(x, y))), vec![Value::Int(i as i64 + 1)]);
+        }
+        let layers = Layers(vec![square("a", 0.0, 0.0, 2.0), pts]);
+        // Select Layer By Location: `select`, `invert` Yes/No.
+        let sel = |p: Json| match rustgis_analysis::run("selectByLocation", &layers, &p).unwrap().output {
+            Output::Selection { rows, .. } => rows,
+            _ => panic!("expected a selection"),
+        };
+        assert_eq!(sel(json!({"input": "pts", "select": "a"})), [0, 1]);
+        assert_eq!(sel(json!({"input": "pts", "select": "a", "invert": "Yes"})), [2]);
+        // Summary Statistics: `field`, `case`.
+        let Output::Table(t) = rustgis_analysis::run("summaryStatistics", &layers, &json!({"input": "pts", "field": "N"})).unwrap().output
+        else {
+            panic!("expected a table")
+        };
+        let at = |name: &str| t.value(0, t.field_index(name).unwrap()).clone();
+        assert_eq!((at("COUNT_N"), at("SUM_N")), (Value::Int(3), Value::Float(6.0)));
+        // Minimum Bounding Geometry: `group` All.
+        let hull = dataset(rustgis_analysis::run("convexHull", &layers, &json!({"input": "pts", "group": "All"})));
+        assert_eq!(hull.features.len(), 1);
+        assert!(matches!(hull.geometry_type, GeometryType::Polygon));
+        let hull = dataset(rustgis_analysis::run("convexHull", &layers, &json!({"input": "pts"})));
+        assert_eq!(hull.features.len(), 1);
+        // Dissolve: `field`; Buffer: capitalised units and dissolve.
+        let d = dataset(rustgis_analysis::run("dissolve", &layers, &json!({"input": "a", "field": "NAME"})));
+        assert_eq!(d.features.len(), 1);
+        let b = dataset(rustgis_analysis::run(
+            "buffer",
+            &layers,
+            &json!({"input": "pts", "distance": 1, "units": "Kilometers", "dissolve": "All"}),
+        ));
+        assert_eq!(b.features.len(), 1);
+    }
+
+    #[test]
+    fn standalone_tables_are_reached_by_id() {
+        register();
+        struct WithTable(Dataset);
+        impl Inputs for WithTable {
+            fn dataset(&self, _: &str) -> Option<&Dataset> {
+                None
+            }
+            fn table(&self, id: u32) -> Option<&Dataset> {
+                (id == 7).then_some(&self.0)
+            }
+            fn selection(&self, _: &str) -> &[usize] {
+                &[]
+            }
+        }
+        let mut t = Dataset::new("counts", GeometryType::None, vec![Field::new("v", FieldType::Integer)]);
+        t.push_next(None, vec![Value::Int(40)]);
+        t.push_next(None, vec![Value::Int(2)]);
+        let r = rustgis_analysis::run("summaryStatistics", &WithTable(t), &json!({"input": 7, "field": "v"})).unwrap();
+        let Output::Table(out) = r.output else { panic!("expected a table") };
+        assert_eq!(out.value(0, out.field_index("SUM_v").unwrap()), &Value::Float(42.0));
+        let none = rustgis_analysis::run(
+            "summaryStatistics",
+            &WithTable(Dataset::new("x", GeometryType::None, vec![])),
+            &json!({"input": 8, "field": "v"}),
+        );
+        assert!(none.is_err());
+    }
+
+    #[test]
+    fn renamed_layers_keep_their_selection() {
+        struct Renamed(Dataset);
+        impl Inputs for Renamed {
+            fn dataset(&self, name: &str) -> Option<&Dataset> {
+                (name == "Displayed layer").then_some(&self.0)
+            }
+            fn selection(&self, name: &str) -> &[usize] {
+                if name == "Displayed layer" { &[1] } else { &[] }
+            }
+        }
+        register();
+        let inp = Renamed(points("backing dataset", &[(0.0, 0.0), (1.0, 1.0)]));
+        let out = dataset(rustgis_analysis::run("geoforge:buffer", &inp, &json!({"input": "Displayed layer", "distance": 1})));
+        assert_eq!(out.features.len(), 1);
     }
 
     #[test]
@@ -1669,7 +1861,7 @@ mod tests {
             (0..10).map(|i| (10.7 + 0.01 * i as f64 + if i % 2 == 0 { 0.003 } else { -0.003 }, 59.9 + 0.005 * i as f64)).collect();
         let layers = Layers(vec![points("p", &pts)]);
         let spec = rustgis_analysis::tool("geoforge:mean_center").expect("registered");
-        assert_eq!(spec.toolbox, "GeoForge › Spatial Statistics › Measuring Geographic Distributions");
+        assert_eq!(spec.toolbox, "Spatial Statistics Tools › Measuring Geographic Distributions");
         assert!(spec.params.iter().any(|p| p.name == "weight_field" && p.kind == K::NumericField));
         let mean = dataset(rustgis_analysis::run("geoforge:mean_center", &layers, &json!({"input": "p"})));
         let Some(Geometry::Point(c)) = &mean.features[0].geometry else { panic!("point") };
@@ -1734,7 +1926,7 @@ mod tests {
                 &layers,
                 &json!({"input": "p", "field": "N", "conceptualization": "FIXED_DISTANCE_BAND"})
             )
-            .is_err()
+            .is_ok()
         );
     }
 
@@ -1795,6 +1987,9 @@ mod tests {
         assert_eq!(zones.get(12, 12), Some(13.0), "the cone's top is in the highest zone");
         let regions = raster_of(rustgis_analysis::run("geoforge:region_group", &inp, &json!({"input": "RB"})));
         assert_eq!(regions.width, 24);
+        let eight = raster_of(rustgis_analysis::run("geoforge:region_group", &inp, &json!({"input": "RB", "number_neighbors": "EIGHT"})));
+        let want = geoforge_raster::generalize::region_group(&a, true, false, None);
+        assert_eq!(eight.bands, want.bands);
         let picked = raster_of(rustgis_analysis::run("geoforge:pick", &inp, &json!({"position": "RB", "inputs": "RB;7"})));
         assert_eq!(picked.width, 24);
         for bad in [
@@ -1805,7 +2000,7 @@ mod tests {
                 "geoforge:slice",
                 json!({"input": "RB", "number_zones": 3, "slice_type": "EQUAL_INTERVAL", "base_output_zone": 1, "output": ""}),
             ),
-            ("geoforge:region_group", json!({"input": "RB", "number_neighbors": "EIGHT"})),
+            ("geoforge:region_group", json!({"input": "RB", "number_neighbors": "INVALID"})),
             ("geoforge:pick", json!({"position": "RB", "inputs": ""})),
         ] {
             let r = rustgis_analysis::run(bad.0, &inp, &bad.1);

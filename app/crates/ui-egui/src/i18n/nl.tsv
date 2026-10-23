@@ -23,8 +23,8 @@ A tile service's address: raster tiles with {z}/{x}/{y} (or {-y}, {q}, {bbox-eps
 A value, a field, or two of them joined by + − × ÷. Applies to the selected rows, or every row when none is selected.	Een waarde, een veld of twee daarvan verbonden door + − × ÷. Geldt voor de geselecteerde rijen, of voor alle rijen als er geen geselecteerd zijn.
 About	Over
 About plugins	Over plugins
-About GeoForge	Over GeoForge
-About GeoForge.	Over GeoForge.
+About UniGIS	Over UniGIS
+About UniGIS.	Over UniGIS.
 Above	Boven
 Above Left	Linksboven
 Above Right	Rechtsboven
@@ -137,7 +137,7 @@ Area of use: within {r}° of the {lon}° meridian	Toepassingsgebied: binnen {r}�
 Area of use: within {r}° of {lon}°, {lat}°	Toepassingsgebied: binnen {r}° van {lon}°, {lat}°
 Area {area}   ·   Perimeter {perimeter}	Oppervlakte {area}   ·   Omtrek {perimeter}
 Areas (name, land use, area)	Gebieden (naam, landgebruik, oppervlakte)
-Ask a question about your data, or describe what to do with the map. The assistant runs GeoForge commands for you; every change can be undone.	Stel een vraag over je gegevens, of beschrijf wat er met de kaart moet gebeuren. De assistent voert GeoForge-opdrachten voor je uit; elke wijziging kan ongedaan worden gemaakt.
+Ask a question about your data, or describe what to do with the map. The assistant runs UniGIS commands for you; every change can be undone.	Stel een vraag over je gegevens, of beschrijf wat er met de kaart moet gebeuren. De assistent voert UniGIS-opdrachten voor je uit; elke wijziging kan ongedaan worden gemaakt.
 Ask about the map, or tell it what to do…	Stel een vraag over de kaart, of zeg wat er moet gebeuren…
 Ask about your data, or tell the assistant what to do with the map.	Stel een vraag over je gegevens, of vertel de assistent wat er met de kaart moet gebeuren.
 Assistant settings	Instellingen van de assistent
@@ -654,7 +654,7 @@ Find a place by coordinates.	Een plaats zoeken op coördinaten.
 Find and run geoprocessing tools.	Geoverwerkingsgereedschappen zoeken en uitvoeren.
 Find any command by name (Ctrl+K).	Elke opdracht op naam zoeken (Ctrl+K).
 Find Place	Plaats zoeken
-Find plugins in the GeoForge plugin registry.	Plugins zoeken in het GeoForge-pluginregister.
+Find plugins in the UniGIS plugin registry.	Plugins zoeken in het UniGIS-pluginregister.
 Find Similar	Vergelijkbare zoeken
 Find Tools	Gereedschappen zoeken
 Finish Polygon	Polygoon voltooien
@@ -783,7 +783,7 @@ Import Thumbnail	Miniatuur importeren
 Import Web Tool	Webtool importeren
 In Beyond	Ingezoomd voorbij
 In Progress	Bezig
-In GeoForge, it can:	In GeoForge kan hij:
+In UniGIS, it can:	In UniGIS kan hij:
 in progress	bezig
 In project	In project
 In use	In gebruik
@@ -1080,7 +1080,7 @@ North	Noord
 North\nArrow	Noord-\npijl
 North Polar Stereographic	Polair stereografisch noord
 Not sandboxed	Niet in sandbox
-not a GeoForge layout	geen GeoForge-lay-out
+not a UniGIS layout	geen UniGIS-lay-out
 not needed	niet nodig
 Not saved yet	Nog niet opgeslagen
 Notebook	Notebook
@@ -1110,8 +1110,8 @@ Opacity	Dekking
 Open	Openen
 Open a .rgis project	Een .rgis-project openen
 open a layout first	open eerst een lay-out
-Open a GeoForge or Jupyter notebook.	Een GeoForge- of Jupyter-notebook openen.
-Open a GeoForge project.	Een GeoForge-project openen.
+Open a UniGIS or Jupyter notebook.	Een UniGIS- of Jupyter-notebook openen.
+Open a UniGIS project.	Een UniGIS-project openen.
 Open an offline area to edit.	Een offline gebied openen om te bewerken.
 Open Custom Template	Aangepast sjabloon openen
 Open Custom Template…	Aangepast sjabloon openen…
@@ -1128,7 +1128,7 @@ Open the attribute table of the selected layer.	De attributentabel van de gesele
 Open the layer's attribute table.	De attributentabel van de laag openen.
 Open the layer's table.	De tabel van de laag openen.
 Open the Release Page	Releasepagina openen
-Open the GeoForge user guide.	De GeoForge-gebruikershandleiding openen.
+Open the UniGIS user guide.	De UniGIS-gebruikershandleiding openen.
 Open the selected layer's table.	De tabel van de geselecteerde laag openen.
 Open the Symbology pane.	Het symbologievenster openen.
 Open {code} on epsg.io	{code} openen op epsg.io
@@ -1207,7 +1207,7 @@ Plugin Manager…	Pluginbeheer…
 Plugin registry	Pluginregister
 Plugins	Plugins
 Plugins are .rgplugin files. Install only plugins from people you trust.	Plugins zijn .rgplugin-bestanden. Installeer alleen plugins van mensen die je vertrouwt.
-Plugins run in a sandbox: they can't reach your files or the network, and they change the project only through GeoForge's own commands, within the permissions you accept.	Plugins draaien in een sandbox: ze kunnen niet bij je bestanden of het netwerk, en ze wijzigen het project alleen via de eigen opdrachten van GeoForge, binnen de rechten die je accepteert.
+Plugins run in a sandbox: they can't reach your files or the network, and they change the project only through UniGIS's own commands, within the permissions you accept.	Plugins draaien in een sandbox: ze kunnen niet bij je bestanden of het netwerk, en ze wijzigen het project alleen via de eigen opdrachten van UniGIS, binnen de rechten die je accepteert.
 PMTiles archive	PMTiles-archief
 PMTiles File…	PMTiles-bestand…
 PNG frames (zip)	PNG-frames (zip)
@@ -1383,29 +1383,29 @@ Run the task	De taak uitvoeren
 Run Tool	Gereedschap uitvoeren
 Run {name}	{name} uitvoeren
 Running…	Bezig…
-GeoForge	GeoForge
-GeoForge deep learning package	GeoForge-deep learning-pakket
-GeoForge is a free and open-source GIS written in pure Rust. It runs on the desktop and in the browser, and every action is a command you can also run from the command line.	GeoForge is een vrij en opensource GIS in puur Rust. Het draait op de desktop en in de browser, en elke actie is een opdracht die u ook vanaf de opdrachtregel kunt uitvoeren.
-GeoForge layer file	GeoForge-laagbestand
-GeoForge layers, maps and projects	GeoForge-lagen, -kaarten en -projecten
-GeoForge layout	GeoForge-lay-out
-GeoForge maps and projects	GeoForge-kaarten en -projecten
-GeoForge or Jupyter notebook	GeoForge- of Jupyter-notebook
-GeoForge plugin	GeoForge-plugin
-GeoForge presentation	GeoForge-presentatie
-GeoForge project	GeoForge-project
-GeoForge project template	GeoForge-projectsjabloon
-GeoForge ran into an internal error last time. The details are in {path}; please attach them to a bug report.	GeoForge liep de vorige keer tegen een interne fout aan. De details staan in {path}; voeg ze toe aan een foutmelding.
-GeoForge ran into an internal error while handling the model's reply, so the request was stopped. Please report it at https://github.com/opengeos/RustGIS/issues.	GeoForge liep tegen een interne fout aan bij het verwerken van het antwoord van het model, dus het verzoek is gestopt. Meld het op https://github.com/opengeos/RustGIS/issues.
-GeoForge report or report template	GeoForge-rapport of -rapportsjabloon
-GeoForge styles	GeoForge-stijlen
-GeoForge task	GeoForge-taak
-GeoForge {latest} is available.	GeoForge {latest} is beschikbaar.
-GeoForge {version} is the latest version.	GeoForge {version} is de nieuwste versie.
+UniGIS	UniGIS
+UniGIS deep learning package	UniGIS-deep learning-pakket
+UniGIS is a free and open-source GIS written in pure Rust. It runs on the desktop and in the browser, and every action is a command you can also run from the command line.	UniGIS is een vrij en opensource GIS in puur Rust. Het draait op de desktop en in de browser, en elke actie is een opdracht die u ook vanaf de opdrachtregel kunt uitvoeren.
+UniGIS layer file	UniGIS-laagbestand
+UniGIS layers, maps and projects	UniGIS-lagen, -kaarten en -projecten
+UniGIS layout	UniGIS-lay-out
+UniGIS maps and projects	UniGIS-kaarten en -projecten
+UniGIS or Jupyter notebook	UniGIS- of Jupyter-notebook
+UniGIS plugin	UniGIS-plugin
+UniGIS presentation	UniGIS-presentatie
+UniGIS project	UniGIS-project
+UniGIS project template	UniGIS-projectsjabloon
+UniGIS ran into an internal error last time. The details are in {path}; please attach them to a bug report.	UniGIS liep de vorige keer tegen een interne fout aan. De details staan in {path}; voeg ze toe aan een foutmelding.
+UniGIS ran into an internal error while handling the model's reply, so the request was stopped. Please report it at https://github.com/opengeos/RustGIS/issues.	UniGIS liep tegen een interne fout aan bij het verwerken van het antwoord van het model, dus het verzoek is gestopt. Meld het op https://github.com/opengeos/RustGIS/issues.
+UniGIS report or report template	UniGIS-rapport of -rapportsjabloon
+UniGIS styles	UniGIS-stijlen
+UniGIS task	UniGIS-taak
+UniGIS {latest} is available.	UniGIS {latest} is beschikbaar.
+UniGIS {version} is the latest version.	UniGIS {version} is de nieuwste versie.
 RUSTGIS_ASSISTANT_MODEL	RUSTGIS_ASSISTANT_MODEL
 RUSTGIS_ASSISTANT_PROVIDER	RUSTGIS_ASSISTANT_PROVIDER
 Sample data (Natural Earth)	Voorbeeldgegevens (Natural Earth)
-Sample data © Natural Earth (public domain). GeoForge is licensed under Apache-2.0.	Voorbeeldgegevens © Natural Earth (publiek domein). GeoForge valt onder de Apache-2.0-licentie.
+Sample data © Natural Earth (public domain). UniGIS is licensed under Apache-2.0.	Voorbeeldgegevens © Natural Earth (publiek domein). UniGIS valt onder de Apache-2.0-licentie.
 Sample data: Natural Earth (public domain). Licensed under Apache-2.0.	Voorbeeldgegevens: Natural Earth (publiek domein). Licentie Apache-2.0.
 Saturation	Verzadiging
 Save	Opslaan
@@ -1470,7 +1470,7 @@ Sections	Secties
 See and set the camera's position and scale.	De positie en schaal van de camera bekijken en instellen.
 See the map as people with colour vision deficiencies do.	De kaart zien zoals mensen met een kleurenzichtstoornis.
 See the tools you've run.	De uitgevoerde gereedschappen bekijken.
-See whether a newer GeoForge has been released.	Controleren of er een nieuwere GeoForge is uitgebracht.
+See whether a newer UniGIS has been released.	Controleren of er een nieuwere UniGIS is uitgebracht.
 Select	Selecteren
 Select (click)	Selecteren (klik)
 Select (rectangle)	Selecteren (rechthoek)
@@ -1657,14 +1657,14 @@ Text	Tekst
 Text Symbol	Tekstsymbool
 The assistant is busy; stop it or wait for it to finish.	De assistent is bezig; stop hem of wacht tot hij klaar is.
 The assistant wants to run this, and {why}:	De assistent wil het volgende uitvoeren, en {why}:
-This plugin runs as a program on your computer, outside GeoForge's sandbox. It can do anything you can: read and change your files, use the network and run other programs. Install it only if you trust its author.	Deze plugin draait als programma op je computer, buiten de sandbox van GeoForge. Hij kan alles wat jij kunt: je bestanden lezen en wijzigen, het netwerk gebruiken en andere programma's starten. Installeer hem alleen als je de maker vertrouwt.
+This plugin runs as a program on your computer, outside UniGIS's sandbox. It can do anything you can: read and change your files, use the network and run other programs. Install it only if you trust its author.	Deze plugin draait als programma op je computer, buiten de sandbox van UniGIS. Hij kan alles wat jij kunt: je bestanden lezen en wijzigen, het netwerk gebruiken en andere programma's starten. Installeer hem alleen als je de maker vertrouwt.
 the capture failed unexpectedly	het vastleggen is onverwacht mislukt
 the Help tab always shows	het tabblad Help wordt altijd getoond
 The job covers the map view	De job beslaat de kaartweergave
 The key is kept for this session only.	De sleutel wordt alleen voor deze sessie bewaard.
 The layer's file couldn't be read: {error}	Het bestand van de laag kon niet worden gelezen: {error}
 the layout export failed unexpectedly	het exporteren van de lay-out is onverwacht mislukt
-The list of plugins to browse. Leave it empty for the GeoForge plugin registry.	De lijst met plugins om door te bladeren. Laat leeg voor het GeoForge-pluginregister.
+The list of plugins to browse. Leave it empty for the UniGIS plugin registry.	De lijst met plugins om door te bladeren. Laat leeg voor het UniGIS-pluginregister.
 the map has no layers	de kaart heeft geen lagen
 The map is drawn in this coordinate system; layers are projected on the fly.	De kaart wordt in dit coördinatenstelsel getekend; lagen worden direct geprojecteerd.
 The map view as it is now	De kaartweergave zoals ze nu is
@@ -1793,11 +1793,11 @@ Web Tile Layers	Webtegellagen
 Web Tool	Webtool
 Website	Website
 Weights	Gewichten
-Welcome to GeoForge	Welkom bij GeoForge
+Welcome to UniGIS	Welkom bij UniGIS
 West	West
 WGS 84 / Globe	WGS 84 / Wereldbol
 WGS 84 / Web Mercator	WGS 84 / Web Mercator
-What GeoForge opens with: the World Atlas sample or a blank map.	Waarmee GeoForge opent: het voorbeeld World Atlas of een lege kaart.
+What UniGIS opens with: the World Atlas sample or a blank map.	Waarmee UniGIS opent: het voorbeeld World Atlas of een lege kaart.
 What's near a point	Wat er bij een punt in de buurt is
 Where	Waar
 Where Clause	Where-clausule
@@ -1903,11 +1903,11 @@ The sign-in is kept in the app's settings folder, for your user account only, an
 Sign in with your ChatGPT account.	Meld u aan met uw ChatGPT-account.
 A ChatGPT sign-in can only be used with the OpenAI API.	Een ChatGPT-aanmelding kan alleen met de OpenAI-API worden gebruikt.
 Continue with ChatGPT	Doorgaan met ChatGPT
-Eligible requests in GeoForge use your ChatGPT plan. You can manage usage in ChatGPT settings.	Geschikte verzoeken in GeoForge gebruiken je ChatGPT-abonnement. Je kunt het gebruik beheren in de instellingen van ChatGPT.
+Eligible requests in UniGIS use your ChatGPT plan. You can manage usage in ChatGPT settings.	Geschikte verzoeken in UniGIS gebruiken je ChatGPT-abonnement. Je kunt het gebruik beheren in de instellingen van ChatGPT.
 Got it	Begrepen
 Manage usage	Gebruik beheren
 Requests go to the OpenAI API and use your ChatGPT plan.	Verzoeken gaan naar de OpenAI-API en gebruiken je ChatGPT-abonnement.
-Signed out on this computer, but OpenAI didn't confirm it. You can disconnect GeoForge in ChatGPT's settings.	Afgemeld op deze computer, maar OpenAI heeft het niet bevestigd. Je kunt GeoForge ontkoppelen in de instellingen van ChatGPT.
+Signed out on this computer, but OpenAI didn't confirm it. You can disconnect UniGIS in ChatGPT's settings.	Afgemeld op deze computer, maar OpenAI heeft het niet bevestigd. Je kunt UniGIS ontkoppelen in de instellingen van ChatGPT.
 Using ChatGPT plan	ChatGPT-abonnement in gebruik
 You're using your ChatGPT plan	Je gebruikt je ChatGPT-abonnement
 Use another account	Ander account gebruiken
@@ -1931,3 +1931,17 @@ ChatGPT plan use is unavailable for this account or workspace.	Gebruik van een C
 A ChatGPT plan or app usage limit was reached. Review Weekly usage before trying again.	Een gebruikslimiet van het ChatGPT-abonnement of de app is bereikt. Bekijk het wekelijkse gebruik voordat je het opnieuw probeert.
 ChatGPT usage is temporarily unavailable. Keep your sign-in and try again later.	ChatGPT-gebruik is tijdelijk niet beschikbaar. Blijf aangemeld en probeer het later opnieuw.
 This ChatGPT account was already saved. Next time, choose it in the list instead of adding it again.	Dit ChatGPT-account was al opgeslagen. Kies het de volgende keer in de lijst in plaats van het opnieuw toe te voegen.
+
+Dock Left	Links vastzetten
+Dock Right	Rechts vastzetten
+Dock Bottom	Onderaan vastzetten
+Keep Open	Open houden
+Auto Hide	Automatisch verbergen
+Reset Layout	Indeling herstellen
+Analysis Tools	Analyse (Gereedschappen)
+Cartography Tools	Cartografie (Gereedschappen)
+Conversion Tools	Conversie (Gereedschappen)
+Data Management Tools	Gegevensbeheer (Gereedschappen)
+Editing Tools	Bewerken (Gereedschappen)
+Spatial Analyst Tools	Spatial Analyst (Gereedschappen)
+Spatial Statistics Tools	Spatial Statistics (Gereedschappen)

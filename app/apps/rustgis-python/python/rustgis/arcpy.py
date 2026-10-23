@@ -1,6 +1,6 @@
-"""An arcpy-shaped API over GeoForge's ArcGIS-verified geoprocessing tools.
+"""An arcpy-shaped API over UniGIS's ArcGIS-verified geoprocessing tools.
 
-Modified for GeoForge (not part of upstream GeoForge).
+Modified for UniGIS (not part of upstream RustGIS).
 
 The tools keep ArcGIS Pro's names, positional parameters and keywords, so code written against
 ``arcpy.analysis``, ``arcpy.management``, ``arcpy.sa`` and ``arcpy.conversion`` carries over:
@@ -640,9 +640,9 @@ def _make(module: str, name: str, tool: str, args: Tuple[Arg, ...], outputs: Tup
     call.__name__ = name
     call.__qualname__ = f"{module}.{name}"
     call.__doc__ = (
-        f"ArcGIS Pro ``{name}`` (GeoForge tool ``{tool}``).\n\nParameters, in order: "
+        f"ArcGIS Pro ``{name}`` (UniGIS tool ``{tool}``).\n\nParameters, in order: "
         + ", ".join(arg_names)
-        + ". Parameters ArcGIS has and GeoForge does not use are accepted and ignored."
+        + ". Parameters ArcGIS has and UniGIS does not use are accepted and ignored."
     )
     return call
 

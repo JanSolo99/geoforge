@@ -1,4 +1,4 @@
-//! A Model Context Protocol server: GeoForge for any MCP client (Claude Code, Claude Desktop,
+//! A Model Context Protocol server: UniGIS for any MCP client (Claude Code, Claude Desktop,
 //! Cursor, VS Code…). The client's model drives a session through the assistant's tools
 //! ([`crate::tools`]), sees the map as an image and reads the built-in documentation
 //! ([`crate::docs`]).
@@ -28,12 +28,12 @@ pub const MAX_BATCH: usize = 16;
 const MAX_VIEW: f64 = 2048.0;
 
 /// What the model is told about the server when it connects.
-const INSTRUCTIONS: &str = "GeoForge is a desktop GIS. This server holds one GeoForge project in memory and acts on it.\n\
+const INSTRUCTIONS: &str = "UniGIS is a desktop GIS. This server holds one UniGIS project in memory and acts on it.\n\
 - list_layers shows the map. view_map shows it as an image: look after changing it.\n\
 - Every action is a command: search_commands finds one, run_command runs it (navigation, layers, symbology, labels, selection, editing, layouts, export…).\n\
 - Geoprocessing: search_tools, then describe_tool for its parameters, then run_tool; its output is a new layer.\n\
 - read_features reads attribute rows, with a where clause.\n\
-- search_docs and read_doc look things up in the GeoForge documentation.\n\
+- search_docs and read_doc look things up in the UniGIS documentation.\n\
 Open data with the layer.addData command ({\"path\": …}) and save with project.saveAs ({\"path\": \"*.rgis\"}); \
 file and network access works only when the server was started with --yes.";
 
@@ -172,7 +172,7 @@ impl Server {
         let (id, params) = tools::target(call)?;
         if user_only(&id) && !PROJECT_COMMANDS.contains(&id.as_str()) && !matches!(id.as_str(), "edit.undo" | "edit.redo") {
             return Some(format!(
-                "'{id}' is reserved to the user (plugin management, scripts, tasks, models and the GeoLibre runner); run it in GeoForge itself"
+                "'{id}' is reserved to the user (plugin management, scripts, tasks, models and the GeoLibre runner); run it in UniGIS itself"
             ));
         }
         let why = if id.starts_with(rustgis_engine::plugins::PREFIX) {
@@ -198,7 +198,7 @@ fn initialize(params: &Value) -> Value {
     json!({
         "protocolVersion": version,
         "capabilities": {"tools": {"listChanged": false}, "resources": {"listChanged": false}},
-        "serverInfo": {"name": "rustgis", "title": "GeoForge", "version": env!("CARGO_PKG_VERSION")},
+        "serverInfo": {"name": "rustgis", "title": "UniGIS", "version": env!("CARGO_PKG_VERSION")},
         "instructions": INSTRUCTIONS,
     })
 }
@@ -216,7 +216,7 @@ fn tool_list() -> Vec<Value> {
         .into_iter()
         .map(|d| {
             let description = if d.name == "run_command" {
-                "Run a GeoForge command by id with JSON parameters (see search_commands for ids and parameters). Each run is one undo step (edit.undo undoes it). Commands that read or write files or use the network run only when the server was started with --yes."
+                "Run a UniGIS command by id with JSON parameters (see search_commands for ids and parameters). Each run is one undo step (edit.undo undoes it). Commands that read or write files or use the network run only when the server was started with --yes."
             } else {
                 d.description
             };
@@ -237,7 +237,7 @@ fn tool_list() -> Vec<Value> {
     }));
     out.push(json!({
         "name": "search_docs",
-        "description": "Search the GeoForge documentation (user guide, command line, plugins, installation…) by words. Returns the best matching sections: page, section, address and a snippet; read_doc reads one.",
+        "description": "Search the UniGIS documentation (user guide, command line, plugins, installation…) by words. Returns the best matching sections: page, section, address and a snippet; read_doc reads one.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -251,7 +251,7 @@ fn tool_list() -> Vec<Value> {
     let pages: Vec<&str> = docs::PAGES.iter().map(|p| p.path).collect();
     out.push(json!({
         "name": "read_doc",
-        "description": format!("Read a GeoForge documentation page as Markdown, or one section of it. Pages: {}.", pages.join(", ")),
+        "description": format!("Read a UniGIS documentation page as Markdown, or one section of it. Pages: {}.", pages.join(", ")),
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -279,7 +279,7 @@ fn resource_list() -> Vec<Value> {
                 "uri": format!("rustgis://docs/{}", p.path),
                 "name": p.path,
                 "title": p.title(),
-                "description": format!("GeoForge documentation: {} ({})", p.title(), p.url()),
+                "description": format!("UniGIS documentation: {} ({})", p.title(), p.url()),
                 "mimeType": "text/markdown",
             })
         })

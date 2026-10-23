@@ -2,7 +2,7 @@
 
 ## Install with an agent
 
-Point your agent at the [RustGIS skill](https://github.com/opengeos/RustGIS/blob/main/skills/rustgis/SKILL.md)
+Point your agent at the [UniGIS skill](https://github.com/opengeos/RustGIS/blob/main/skills/rustgis/SKILL.md)
 and ask it to install RustGIS. The skill picks the platform, installs the app and `rustgis-cli`,
 checks the release checksum, and registers the MCP server. The same skill is how an agent manages
 the desktop app that is already open.
@@ -15,24 +15,24 @@ builds of the desktop app and `rustgis-cli`. The same files, grouped by platform
 
 | Platform | File |
 | --- | --- |
-| Windows x64 (installer, no admin rights) | `RustGIS-<version>-windows-x86_64-setup.exe` |
-| Windows x64 (installer for all users) | `RustGIS-<version>-windows-x86_64.msi` |
-| Windows x64 (no install) | `RustGIS-<version>-windows-x86_64-portable.zip` (unzip and run `rustgis.exe`) |
-| Windows x64 (Microsoft Store package) | `RustGIS-<version>-windows-x86_64.msix` |
-| macOS Apple Silicon | `RustGIS-<version>-macos-aarch64.dmg` |
-| macOS Intel | `RustGIS-<version>-macos-x86_64.dmg` |
+| Windows x64 (installer, no admin rights) | `UniGIS-<version>-windows-x86_64-setup.exe` |
+| Windows x64 (installer for all users) | `UniGIS-<version>-windows-x86_64.msi` |
+| Windows x64 (no install) | `UniGIS-<version>-windows-x86_64-portable.zip` (unzip and run `rustgis.exe`) |
+| Windows x64 (Microsoft Store package) | `UniGIS-<version>-windows-x86_64.msix` |
+| macOS Apple Silicon | `UniGIS-<version>-macos-aarch64.dmg` |
+| macOS Intel | `UniGIS-<version>-macos-x86_64.dmg` |
 | Linux x64 / arm64 (Debian, Ubuntu) | `rustgis_<version>_amd64.deb` / `rustgis_<version>_arm64.deb` |
 | Linux x64 / arm64 (Fedora, RHEL, openSUSE) | `rustgis-<version>-1.x86_64.rpm` / `rustgis-<version>-1.aarch64.rpm` |
-| Linux x64 / arm64 (any distribution, no install) | `RustGIS-<version>-linux-x86_64.AppImage` / `RustGIS-<version>-linux-aarch64.AppImage` |
-| Linux x64 / arm64 (other) | `RustGIS-<version>-linux-x86_64.tar.gz` / `RustGIS-<version>-linux-aarch64.tar.gz` |
+| Linux x64 / arm64 (any distribution, no install) | `UniGIS-<version>-linux-x86_64.AppImage` / `UniGIS-<version>-linux-aarch64.AppImage` |
+| Linux x64 / arm64 (other) | `UniGIS-<version>-linux-x86_64.tar.gz` / `UniGIS-<version>-linux-aarch64.tar.gz` |
 
 On macOS the command line tool is a separate `rustgis-cli-<version>-macos-<arch>.tar.gz`;
 the other packages include it (the Windows installers and the MSIX add `rustgis-cli` to every
 new terminal). `SHA256SUMS` lists the checksum of every file.
 
-On Windows, `setup.exe` installs for your account in `%LOCALAPPDATA%\Programs\RustGIS` and needs
+On Windows, `setup.exe` installs for your account in `%LOCALAPPDATA%\Programs\UniGIS` and needs
 no admin rights; the `.msi` installs for every user in `Program Files` and suits managed
-deployment (`msiexec /i RustGIS-<version>-windows-x86_64.msi /qn`). Both add a Start menu
+deployment (`msiexec /i UniGIS-<version>-windows-x86_64.msi /qn`). Both add a Start menu
 entry, open `.rgis` projects and uninstall from **Settings › Apps**.
 
 The `.msix` is the package submitted to the Microsoft Store, which signs it. It is unsigned
@@ -42,13 +42,13 @@ portable zip instead.
 The macOS DMG and command line tool are signed with a Developer ID and notarized by Apple, so
 they open without a warning. From the release after 0.1.0, the notarization ticket is also
 stapled to RustGIS.app, so it opens even when the Mac cannot reach Apple's servers. If macOS
-says Apple could not verify RustGIS 0.1.0, connect to the internet and open it again, or run
+says Apple could not verify UniGIS 0.1.0, connect to the internet and open it again, or run
 `xattr -dr com.apple.quarantine /Applications/RustGIS.app`. The Windows builds are not yet
 signed: choose **More info › Run anyway** if SmartScreen warns about an unknown publisher.
 
 ## Package managers
 
-RustGIS is also published to these package managers, which keep it up to date:
+UniGIS is also published to these package managers, which keep it up to date:
 
 | Platform | Command |
 | --- | --- |
@@ -65,11 +65,11 @@ managers shortly after it is published (winget after Microsoft's review).
 
 ## From source
 
-RustGIS builds from source with a recent stable Rust toolchain (1.90 or later).
+UniGIS builds from source with a recent stable Rust toolchain (1.90 or later).
 
 ```sh
 git clone https://github.com/opengeos/RustGIS.git
-cd RustGIS
+cd UniGIS
 cargo run --release -p rustgis            # the desktop app
 cargo build --release -p rustgis-cli      # the command line tool
 ```
@@ -93,7 +93,7 @@ RUSTGIS_DATA_DIR=/path/to/data cargo build --release
 
 ## Web app
 
-RustGIS also runs in the browser, compiled to WebAssembly: open
+UniGIS also runs in the browser, compiled to WebAssembly: open
 **[web.rustgis.app](https://web.rustgis.app)**. It is the same app with three differences:
 
 - **Open** and **Add Data** use the browser's file picker, and you can drop files on the page.
@@ -182,20 +182,20 @@ stale cache.
 
 ## Fonts
 
-RustGIS uses an installed sans-serif when it finds one (Segoe UI, San Francisco, Inter, Noto
+UniGIS uses an installed sans-serif when it finds one (Segoe UI, San Francisco, Inter, Noto
 Sans, Open Sans or DejaVu Sans) and falls back to a built-in face. Set
 `RUSTGIS_BUILTIN_FONTS=1` to always use the built-in face.
 
-## If RustGIS closes unexpectedly
+## If UniGIS closes unexpectedly
 
 The desktop app writes its internal errors to `crash.log` in its settings folder: one that closed
 the app, and also one it recovered from (an error in the AI Assistant, for example, stops the
-request and says so in the chat instead of closing the app). The folder is `%APPDATA%\RustGIS` on
+request and says so in the chat instead of closing the app). The folder is `%APPDATA%\UniGIS` on
 Windows, `~/Library/Application Support/RustGIS` on macOS, and `$XDG_CONFIG_HOME/rustgis` on
 Linux (`~/.config/rustgis` when that isn't set). The next launch moves the log to
 `crash-last.log` and names the file in a notice.
 
 Attach it to a [bug report](https://github.com/opengeos/RustGIS/issues/new?template=bug_report.yml).
-It holds the version, the operating system, the error message and where in RustGIS it happened.
-An error message can quote what RustGIS was working on, such as a file path or a layer name, so
+It holds the version, the operating system, the error message and where in UniGIS it happened.
+An error message can quote what UniGIS was working on, such as a file path or a layer name, so
 read the log first and remove anything you don't want to share.

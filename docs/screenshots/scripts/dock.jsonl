@@ -1,0 +1,10 @@
+{"width":1300,"height":780}
+{"cmd":"ui.pane.catalog"}
+{"cmd":"ui.pane.geoprocessing"}
+{"cmd":"ui.pane.history"}
+{"cmd":"ui.dock","params":{"pane":"catalog","site":"bottom"}}
+{"steps":4}
+{"shot":"/mnt/media/ArcGIS_Linux/docs/screenshots/geoforge-dock.png"}
+{"cmd":"ui.dock","params":{"pane":"history","site":"right","autoHide":true}}
+{"steps":4}
+{"shot":"/mnt/media/ArcGIS_Linux/docs/screenshots/geoforge-dock-autohide.png"}

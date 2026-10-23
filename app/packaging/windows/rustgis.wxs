@@ -8,11 +8,11 @@
 -->
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
   <!-- The UpgradeCode never changes: a new version replaces the installed one. -->
-  <Package Name="RustGIS" Manufacturer="Open Geospatial Solutions" Version="$(var.Version)"
+  <Package Name="UniGIS" Manufacturer="Open Geospatial Solutions" Version="$(var.Version)"
     UpgradeCode="B8624035-B7AF-41E7-BCAC-7C59DE885053" Scope="perMachine" Language="1033">
     <!-- Same-version upgrades too: a pre-release (0.2.0-rc.1) and its release share 0.2.0. -->
     <MajorUpgrade AllowSameVersionUpgrades="yes"
-      DowngradeErrorMessage="A newer version of RustGIS is already installed." />
+      DowngradeErrorMessage="A newer version of UniGIS is already installed." />
     <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
 
     <Icon Id="rustgis.ico" SourceFile="$(var.Icon)" />
@@ -25,10 +25,10 @@
     </StandardDirectory>
     <StandardDirectory Id="ProgramMenuFolder" />
 
-    <Feature Id="Main" Title="RustGIS">
+    <Feature Id="Main" Title="UniGIS">
       <Component Directory="INSTALLFOLDER">
         <File Id="rustgis.exe" Source="$(var.Stage)\rustgis.exe" KeyPath="yes" />
-        <ProgId Id="RustGIS.Project" Description="RustGIS project" Icon="rustgis.exe" IconIndex="0">
+        <ProgId Id="RustGIS.Project" Description="UniGIS project" Icon="rustgis.exe" IconIndex="0">
           <Extension Id="rgis">
             <Verb Id="open" TargetFile="rustgis.exe" Argument="&quot;%1&quot;" />
           </Extension>
@@ -46,7 +46,7 @@
       </Component>
       <!-- A shortcut needs a registry key path (ICE43). -->
       <Component Id="StartMenuShortcut" Directory="ProgramMenuFolder">
-        <Shortcut Id="StartMenuShortcut" Name="RustGIS" Description="Desktop GIS with a ribbon workflow"
+        <Shortcut Id="StartMenuShortcut" Name="UniGIS" Description="Desktop GIS with a ribbon workflow"
           Target="[#rustgis.exe]" WorkingDirectory="INSTALLFOLDER" />
         <RegistryValue Root="HKCU" Key="Software\RustGIS" Name="StartMenuShortcut" Type="integer" Value="1"
           KeyPath="yes" />

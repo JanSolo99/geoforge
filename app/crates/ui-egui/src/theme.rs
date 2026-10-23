@@ -4,12 +4,12 @@ use std::sync::Arc;
 
 use egui::{Color32, CornerRadius, FontData, FontDefinitions, FontFamily, FontId, Stroke, Visuals};
 
-/// GeoForge brand colour (the Project tab and the logo) and its lighter tint.
+/// UniGIS brand colour (the Project tab and the logo) and its lighter tint.
 pub const BRAND: Color32 = Color32::from_rgb(0xB8, 0x4A, 0x2C);
 pub const BRAND_DARK: Color32 = Color32::from_rgb(0x96, 0x3A, 0x22);
 static PRO: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(true);
 
-/// Whether the GeoForge (ArcGIS Pro style) theme is in use rather than the classic one.
+/// Whether the UniGIS (ArcGIS Pro style) theme is in use rather than the classic one.
 pub fn pro() -> bool {
     PRO.load(std::sync::atomic::Ordering::Relaxed)
 }
@@ -58,7 +58,7 @@ pub struct Tokens {
 }
 
 impl Tokens {
-    /// The GeoForge (ArcGIS Pro style) palette unless the classic one is chosen.
+    /// The UniGIS (ArcGIS Pro style) palette unless the classic one is chosen.
     pub fn light() -> Self {
         if pro() { crate::theme_pro::light() } else { Self::classic_light() }
     }

@@ -3,7 +3,7 @@ name = "rustgis-engine"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-description = "GeoForge L4: session, undo, command registry, ribbon feature catalog, sample project"
+description = "UniGIS L4: session, undo, command registry, ribbon feature catalog, sample project"
 
 [lints]
 workspace = true
@@ -26,7 +26,7 @@ iana-time-zone = { version = "0.1", features = ["fallback"] }
 sys-locale = { version = "0.3", features = ["js"] }
 # The GeoLibre tool suite (native only: its tools read and write files).
 rustgis-geolibre = { workspace = true, optional = true }
-# GeoForge's ArcGIS-verified tools (desktop only: reads File Geodatabases, links PROJ).
+# UniGIS's ArcGIS-verified tools (desktop only: reads File Geodatabases, links PROJ).
 rustgis-geoforge = { workspace = true, optional = true }
 
 [features]

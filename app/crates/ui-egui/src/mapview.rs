@@ -872,7 +872,7 @@ fn overlays(app: &mut RustGisApp, ui: &mut Ui, p: &egui::Painter, rect: Rect, t:
     let editing = &app.session.map().editing;
     if editing.settings.enabled
         && editing.settings.show_vertices
-        && (app.session.tool.creates() || app.ui.right == Some(crate::RightPane::Editing))
+        && (app.session.tool.creates() || app.ui.dock.is_open(crate::RightPane::Editing))
     {
         let mut verts: Vec<Coord> = Vec::new();
         for l in app.session.map().layers.iter().filter(|l| !l.selection.is_empty() && !l.is_raster() && !l.graphics) {

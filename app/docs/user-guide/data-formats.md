@@ -1,6 +1,6 @@
 # Supported Data Formats
 
-This page lists the data formats RustGIS reads and writes, how to add each one, and the main
+This page lists the data formats UniGIS reads and writes, how to add each one, and the main
 limits. [Data](data.md) covers adding data, large files and rasters in more detail; [Maps and
 Basemaps](maps.md#basemaps) covers web tile layers.
 
@@ -129,9 +129,9 @@ through its CRS extension); one that can't answers with an error, which is shown
 The same dialog's **Catalogue search (CSW)** type searches a CSW 2.0.2 catalogue (GeoNetwork,
 pycsw, geocat.ch…) by words anywhere in its records and, if you like, the map's area
 (`catalog.search`). Its records are listed 20 at a time (**More** asks for the next), with their
-titles, abstracts (on hover) and bounds (**Zoom**), and a button per link RustGIS can follow: a WMS,
+titles, abstracts (on hover) and bounds (**Zoom**), and a button per link UniGIS can follow: a WMS,
 WMTS, WFS, WCS, OGC API or ArcGIS service connects in the dialog, a download is added as From URL…
-does. Links pointing where a document on the web may not send RustGIS (the local network) are left
+does. Links pointing where a document on the web may not send UniGIS (the local network) are left
 out.
 
 ## PostgreSQL and PostGIS
@@ -192,7 +192,7 @@ databases](data.md#sql-queries-and-duckdb-databases).
 | Web map, OGC API Features, MapLibre style | Publish › Share As | Open-format files that need no server: see [Sharing](sharing.md). |
 | Raster tiles | Analyze › Create Hosted Imagery | |
 
-## RustGIS files
+## UniGIS files
 
 | File | Extension | Notes |
 | --- | --- | --- |

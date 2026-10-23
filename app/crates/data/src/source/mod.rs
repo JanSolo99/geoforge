@@ -14,11 +14,11 @@ pub(crate) mod external;
 pub mod fgb;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod filegdb;
-pub mod gfshape;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod gdal;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod geojson;
+pub mod gfshape;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod gpkg;
 mod gpkg_blob;
@@ -150,7 +150,7 @@ pub fn open_path(path: &Path, layer: Option<&str>) -> Result<Box<dyn FeatureSour
         "las" | "laz" => Ok(Box::new(lidar::LidarSource::open_path(path, &name)?)),
         #[cfg(not(target_arch = "wasm32"))]
         "gpkg" => Ok(Box::new(gpkg::GpkgSource::open(path, layer)?)),
-        // A File Geodatabase is a folder (`Dir.gdb`), read through GeoForge's engine.
+        // A File Geodatabase is a folder (`Dir.gdb`), read through UniGIS's engine.
         #[cfg(not(target_arch = "wasm32"))]
         "gdb" => Ok(Box::new(filegdb::FileGdbSource::open(path, layer)?)),
         // Only large GeoJSON files are read in place (see `geojson`); `is_source_name` leaves

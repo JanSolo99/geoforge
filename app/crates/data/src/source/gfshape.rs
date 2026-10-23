@@ -1,8 +1,8 @@
-//! Conversion between the map's geometry model and GeoForge's shapes (`geoforge-core`); shared by
-//! the File Geodatabase source and the GeoForge tools, and free of file access so it builds for
+//! Conversion between the map's geometry model and UniGIS's shapes (`geoforge-core`); shared by
+//! the File Geodatabase source and the UniGIS tools, and free of file access so it builds for
 //! the browser too.
 //!
-//! Modified for GeoForge (not part of upstream GeoForge).
+//! Modified for UniGIS (not part of upstream RustGIS).
 
 use geoforge_core::{Geometry as GfGeometry, GeometryKind};
 
@@ -13,7 +13,7 @@ use rustgis_geom::Coord;
 /// Largest angle between densified points of an arc, in radians.
 const ARC_STEP: f64 = 0.05;
 
-/// The map's geometry model from a GeoForge shape (curves densified); `None` for MultiPatch and for a shape with no
+/// The map's geometry model from a UniGIS shape (curves densified); `None` for MultiPatch and for a shape with no
 /// vertices.
 pub fn from_geoforge(g: &GfGeometry) -> Option<Geometry> {
     let dense;
@@ -69,7 +69,7 @@ fn oriented(ring: &[Coord], outer: bool) -> Vec<[f64; 2]> {
     pts
 }
 
-/// GeoForge's shape from the map's geometry; `None` when there is nothing to draw.
+/// UniGIS's shape from the map's geometry; `None` when there is nothing to draw.
 pub fn to_geoforge(g: &Geometry) -> Option<GfGeometry> {
     let mut out = GfGeometry::point(0.0, 0.0);
     out.xy.clear();
@@ -108,4 +108,3 @@ fn signed_area(r: &[Coord]) -> f64 {
     }
     s
 }
-

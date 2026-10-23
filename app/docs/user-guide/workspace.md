@@ -24,7 +24,7 @@ Tools for working across maps and views, and for setting up the app the way you 
 - **Language**: **Settings › Language** switches the interface among
   [16 languages](../i18n.md) and chooses the [worldview](maps.md#worldview) of the built-in
   borders.
-- **Start-up**: **Settings › Start-up** sets what RustGIS opens with: **Start With** the World
+- **Start-up**: **Settings › Start-up** sets what UniGIS opens with: **Start With** the World
   Atlas sample or a blank map, the **Projection** the map opens in (a preset or a supported projected
   EPSG code, such as `3010`), and the **Extent** it opens on (the full extent, or **Use Current
   View** to keep the view you are looking at). The choices are remembered on this computer, or

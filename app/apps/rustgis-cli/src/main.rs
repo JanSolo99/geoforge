@@ -1,4 +1,4 @@
-//! GeoForge on the command line. Every command the ribbon runs is available here by id.
+//! UniGIS on the command line. Every command the ribbon runs is available here by id.
 //!
 //! ```text
 //! rustgis-cli commands                                  # list command ids and parameters
@@ -172,9 +172,7 @@ fn ask(s: &mut Session, args: &[String]) -> Result<(), String> {
         if let Some(r) = chatgpt::sign_out()?
             && let Err(e) = chatgpt::revoke(&r)
         {
-            eprintln!(
-                "signed out on this computer, but OpenAI didn't confirm it ({e}); disconnect GeoForge in ChatGPT's settings if needed"
-            );
+            eprintln!("signed out on this computer, but OpenAI didn't confirm it ({e}); disconnect UniGIS in ChatGPT's settings if needed");
             return Ok(());
         }
         eprintln!("signed out of ChatGPT");
@@ -194,7 +192,7 @@ fn ask(s: &mut Session, args: &[String]) -> Result<(), String> {
             return Err(rustgis_assistant::Error::new(rustgis_assistant::Recovery::Consent, "").to_string());
         }
         let who = if c.email.is_empty() { "your ChatGPT account" } else { c.email.as_str() };
-        eprintln!("signed in as {who}; GeoForge now uses your ChatGPT plan (manage usage at {})", chatgpt::USAGE_URL);
+        eprintln!("signed in as {who}; UniGIS now uses your ChatGPT plan (manage usage at {})", chatgpt::USAGE_URL);
         return Ok(());
     }
     // A signed-in account's requests renew its tokens as needed.
@@ -318,11 +316,11 @@ fn attach(port: u16, allow_access: bool) -> Result<(), String> {
     // attach message is what proves this is the user's own client, so nothing is pasted.
     let token = rustgis_assistant::relay::read_token(port)?;
     let mut stream = std::net::TcpStream::connect(("127.0.0.1", port))
-        .map_err(|e| format!("nothing is listening on 127.0.0.1:{port} ({e}); start GeoForge's MCP Relay command first"))?;
+        .map_err(|e| format!("nothing is listening on 127.0.0.1:{port} ({e}); start UniGIS's MCP Relay command first"))?;
     let hello = json!({"jsonrpc": "2.0", "method": "rustgis/attach", "params": {"access": allow_access, "token": token}});
     writeln!(stream, "{hello}").map_err(|e| format!("telling the app what --yes allows: {e}"))?;
     eprintln!(
-        "rustgis-cli: MCP server ready (the open GeoForge app at 127.0.0.1:{port}; file and network access {})",
+        "rustgis-cli: MCP server ready (the open UniGIS app at 127.0.0.1:{port}; file and network access {})",
         if allow_access { "allowed" } else { "off, --yes allows it" }
     );
     let mut input = std::io::BufReader::new(stream.try_clone().map_err(|e| format!("opening the app's replies: {e}"))?);
@@ -347,7 +345,7 @@ fn attach(port: u16, allow_access: bool) -> Result<(), String> {
         }
         let reply = match rustgis_assistant::framing::read_message(&mut input, rustgis_assistant::framing::Oversize::Stop) {
             Ok(Some(reply)) => reply,
-            Ok(None) => return Err("the GeoForge app closed the relay".into()),
+            Ok(None) => return Err("the UniGIS app closed the relay".into()),
             Err(why) => return Err(format!("the app's reply: {why}")),
         };
         writeln!(stdout, "{reply}").and_then(|()| stdout.flush()).map_err(|e| format!("writing to standard output: {e}"))?;

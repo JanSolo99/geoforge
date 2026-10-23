@@ -157,9 +157,9 @@ pub fn commands() -> Vec<C> {
         C::new("locator.find", "Find Place", "Home › Inspect", find).params(r#"{"locator"?: shared item name or *.rgisloc path (default: the last locator), "text": search text, "limit"?: 1..100, "zoom"?: bool (go to the best match)}"#),
         C::new("model.import", "Import Web Tool", "Analyze › Geoprocessing", |s, p| {
             let text = super::items::read_text(p)?;
-            let v: Value = serde_json::from_str(&text).map_err(|e| format!("not a GeoForge web tool: {e}"))?;
+            let v: Value = serde_json::from_str(&text).map_err(|e| format!("not a UniGIS web tool: {e}"))?;
             let name = v["name"].as_str().unwrap_or("Tool").chars().take(200).collect::<String>();
-            let steps = v.get("steps").cloned().ok_or("not a GeoForge web tool (no steps)")?;
+            let steps = v.get("steps").cloned().ok_or("not a UniGIS web tool (no steps)")?;
             s.run("model.new", &json!({"name": name, "steps": steps, "imported": true}))
         })
         .params(r#"{"path"?: "*.rgistool", "text"?: tool JSON, "data"?: base64 file}"#),
@@ -214,7 +214,7 @@ pub fn share_bytes(s: &mut Session, kind: &str, p: &Value) -> Result<(String, Ve
                         .map(move |(k, v)| json!({"step": i + 1, "tool": st.tool, "name": k, "default": v}))
                 })
                 .collect();
-            let tool = json!({"format": "GeoForge web tool", "version": 1, "name": m.name, "steps": m.steps, "parameters": params});
+            let tool = json!({"format": "UniGIS web tool", "version": 1, "name": m.name, "steps": m.steps, "parameters": params});
             Ok((m.name.clone(), serde_json::to_vec_pretty(&tool).map_err(|e| e.to_string())?, m.name.clone()))
         }
         "webScene" => {
@@ -732,7 +732,7 @@ fn find(s: &mut Session, p: &Value) -> CmdResult {
             .ok_or("share a locator first (Share As › Locator)")?,
     };
     let body = super::items::read_text(&json!({"path": path}))?;
-    let loc: Locator = serde_json::from_str(&body).map_err(|e| format!("not a GeoForge locator: {e}"))?;
+    let loc: Locator = serde_json::from_str(&body).map_err(|e| format!("not a UniGIS locator: {e}"))?;
     let limit = p.get("limit").and_then(Value::as_u64).unwrap_or(10).clamp(1, 100) as usize;
     // Exact, then prefix, then word prefix, then anywhere.
     let mut hits: Vec<(u8, &(String, f64, f64))> = loc
@@ -952,7 +952,7 @@ fn gltf(m: &Map) -> Result<Vec<u8>, String> {
     }
     let n = nodes.len();
     let doc = json!({
-        "asset": {"version": "2.0", "generator": "GeoForge"},
+        "asset": {"version": "2.0", "generator": "UniGIS"},
         "scene": 0,
         "scenes": [{"name": m.name, "nodes": (0..n).collect::<Vec<_>>()}],
         "nodes": nodes,

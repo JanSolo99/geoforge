@@ -5,7 +5,7 @@ The verified inventory of ArcGIS Pro's tools, formats and arcpy API (from the of
 documented algorithms of the hard-to-replicate tools.
 
 See [`GAP_ANALYSIS.md`](GAP_ANALYSIS.md) (and `gap_list.csv`) for everything ArcGIS Pro has that
-GeoForge does not yet, with difficulty, verifiability against ArcGIS, a recommended order and an
+UniGIS does not yet, with difficulty, verifiability against ArcGIS, a recommended order and an
 ENVI-parity outlook.
 
 **Policy.** The goal is a native, open-source Linux replica of ArcGIS Pro with all of its features.
@@ -656,3 +656,34 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
           Pro 3.7 (`crates/geoforge-cli/tests/spatstat_events.rs`)
     - [ ] Next: GWR, Incremental Spatial Autocorrelation, Calculate Distance Band from Neighbor
           Count, Generate Network Spatial Weights
+
+## Shared agent workflow
+
+- [x] Shared Claude Code / Codex startup and checkpoint instructions (`AGENTS.md`,
+      referenced by `CLAUDE.md`), with current task state in [`HANDOFF.md`](HANDOFF.md).
+      Sequential sessions use the same checkout; agents checkpoint at milestones
+      and inspect the working tree when resuming.
+- [x] Local coordinator (`scripts/agents`): shared terminal prompt, per-provider
+      session resumption, run logs and handoff snapshots, repository lock, and a
+      single fallback to the other CLI on a recognized usage-limit failure.
+      Native CLI escape for interactive approvals; offline integration coverage.
+
+## Current desktop integration (2026-10-23)
+
+- [x] Dockable panes: left/right/bottom groups, tab dragging and drop previews,
+      auto-hide, scrollable tab headers, and saved layout preferences. Reopening
+      panes preserves tab order; pointer-drag and preference round-trip tests pass.
+      The attribute table remains a separate bottom view; floating windows and
+      arbitrary split groups are not implemented.
+- [x] Unified tool catalog: one ArcGIS toolbox/toolset tree with verified tool
+      replacements, legacy ids and parameter translation. Aliases retain old
+      defaults; selections survive renamed layers. Registry and integration tests pass.
+- [x] UniGIS display branding: desktop, browser/PWA, assistant, translations,
+      dialogs, and current documentation. Existing crate names, tool ids, Python
+      exception names, file extensions and storage paths remain compatible.
+
+Validation: scoped native tests (281 distinct passed; 31 TCP-listener tests blocked
+by the sandbox, 1 existing ignored), clippy for the changed app layers and desktop/web
+entry points with `-D warnings`, wasm web check, formatting and layer checks pass.
+GDAL provider tests pass using a writable temporary cache; no runtime GDAL behavior
+was added or changed. Exact commands and limits are recorded in `HANDOFF.md`.

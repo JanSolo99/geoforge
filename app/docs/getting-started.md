@@ -3,7 +3,7 @@
 ## Open the app
 
 - **In the browser**: open [web.rustgis.app](https://web.rustgis.app). Nothing to install.
-- **On the desktop**: [install](installation.md) RustGIS and start it. It opens the World Atlas
+- **On the desktop**: [install](installation.md) UniGIS and start it. It opens the World Atlas
   sample: countries, cities, rivers and lakes from Natural Earth.
 - **From source**:
 
@@ -51,5 +51,5 @@ your ChatGPT account, Gemini, OpenRouter, a local Ollama, or any OpenAI-compatib
 ## Next steps
 
 - The [User Guide](user-guide/index.md) walks through every part of the app.
-- [Command Line](cli.md) shows how to script RustGIS with `rustgis-cli`.
+- [Command Line](cli.md) shows how to script UniGIS with `rustgis-cli`.
 - [Plugins](plugins.md) shows how to add tools from the plugin registry, or write your own.

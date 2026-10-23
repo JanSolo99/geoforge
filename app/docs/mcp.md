@@ -1,8 +1,8 @@
 # MCP Server
 
-`rustgis-cli mcp` runs RustGIS as a [Model Context Protocol](https://modelcontextprotocol.io)
+`rustgis-cli mcp` runs UniGIS as a [Model Context Protocol](https://modelcontextprotocol.io)
 server, so an AI agent such as Claude Code, Claude Desktop, Cursor, VS Code or Codex can make
-maps with it. The agent opens data, runs any RustGIS command or geoprocessing tool, reads
+maps with it. The agent opens data, runs any UniGIS command or geoprocessing tool, reads
 attribute tables, looks at the map as an image and looks things up in this documentation.
 
 ```sh
@@ -163,7 +163,7 @@ These behavioral tests in `crates/assistant/src/relay.rs` check the requirements
 | --- | --- |
 | `list_layers` | The map: its layers (name, type, feature count, fields, visibility, selection), basemap, centre and scale |
 | `view_map` | The map as a PNG image, at the current view |
-| `search_commands` | Finds RustGIS commands by words: their ids, ribbon locations and parameters |
+| `search_commands` | Finds UniGIS commands by words: their ids, ribbon locations and parameters |
 | `run_command` | Runs a command by id with JSON parameters; each run is one undo step. The result names the layers it added (`layersAdded`) and what the command said beside it (`notices`), including any parameters it ignored (`layer.moveDown ignores 'steps' (it reads layer)`) |
 | `search_tools` | Finds geoprocessing tools by words |
 | `describe_tool` | A geoprocessing tool's parameters |

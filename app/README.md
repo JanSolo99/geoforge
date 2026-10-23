@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="https://assets.rustgis.app/images/logo.svg" alt="RustGIS logo: a rust-coloured cog framing a segmented globe with an orbit" width="160">
+  <img src="https://assets.rustgis.app/images/logo.svg" alt="UniGIS logo: a rust-coloured cog framing a segmented globe with an orbit" width="160">
 </p>
 
-<h1 align="center">RustGIS</h1>
+<h1 align="center">UniGIS</h1>
 
 <p align="center">
   <b>A fast, free and open-source GIS in pure Rust for mapping, analyzing and sharing geospatial data.</b><br>
@@ -20,16 +20,16 @@
 </p>
 
 <p align="center">
-  <a href="https://web.rustgis.app"><img alt="Launch the RustGIS web app" src="https://img.shields.io/badge/Launch-web%20app-b84a2c?style=for-the-badge&logo=webassembly&logoColor=white" height="36"></a>
+  <a href="https://web.rustgis.app"><img alt="Launch the UniGIS web app" src="https://img.shields.io/badge/Launch-web%20app-b84a2c?style=for-the-badge&logo=webassembly&logoColor=white" height="36"></a>
   <a href="https://github.com/opengeos/RustGIS/releases/latest"><img alt="Download the desktop app" src="https://img.shields.io/badge/Download-desktop%20app-2563eb?style=for-the-badge&logo=github&logoColor=white" height="36"></a>
   <a href="https://rustgis.app"><img alt="Read the documentation" src="https://img.shields.io/badge/Read-the%20docs-0e9384?style=for-the-badge&logo=materialformkdocs&logoColor=white" height="36"></a>
 </p>
 
 <p align="center">
-  <img src="https://assets.rustgis.app/images/hero.webp" alt="RustGIS with the Home tab of the ribbon open. The Layers pane lists Cities, Rivers, Lakes and Countries with their legends; the map shows the world in the Equal Earth projection, countries shaded by population, sized city dots and country labels." width="100%">
+  <img src="https://assets.rustgis.app/images/hero.webp" alt="UniGIS with the Home tab of the ribbon open. The Layers pane lists Cities, Rivers, Lakes and Countries with their legends; the map shows the world in the Equal Earth projection, countries shaded by population, sized city dots and country labels." width="100%">
 </p>
 
-## Why RustGIS
+## Why UniGIS
 
 - **Fast and small.** One native program, drawn on the GPU, with no runtime to install and no
   server to run.
@@ -51,7 +51,7 @@
 <table>
 <tr>
 <td width="50%" valign="top"><img src="https://assets.rustgis.app/images/symbology-table.webp" alt="The Style tab with the Symbology pane showing graduated colours and colour schemes; the larger African countries are selected in cyan on the map and highlighted in the attribute table below" width="100%"><p align="center"><sub><b>Symbology and tables.</b> Selecting a layer opens its contextual tabs: symbology, effects, labeling and data. Selection is synced between the map and the attribute table.</sub></p></td>
-<td width="50%" valign="top"><img src="https://assets.rustgis.app/images/assistant.webp" alt="The AI Assistant pane: asked for the five most populous African countries, it read the Countries table, selected them and zoomed to them" width="100%"><p align="center"><sub><b>AI Assistant.</b> Ask about your data or tell the map what to do. The assistant runs RustGIS commands for you, and each change can be undone.</sub></p></td>
+<td width="50%" valign="top"><img src="https://assets.rustgis.app/images/assistant.webp" alt="The AI Assistant pane: asked for the five most populous African countries, it read the Countries table, selected them and zoomed to them" width="100%"><p align="center"><sub><b>AI Assistant.</b> Ask about your data or tell the map what to do. The assistant runs UniGIS commands for you, and each change can be undone.</sub></p></td>
 </tr>
 <tr>
 <td width="50%" valign="top"><img src="https://assets.rustgis.app/images/buffer-history.webp" alt="The Analyze tab with a gallery of geoprocessing tools and the Tools pane showing Buffer; dissolved 300 km buffers around African cities" width="100%"><p align="center"><sub><b>Analysis.</b> A tool gallery, the Tools pane and a run history, guided workflows, ModelBuilder, and 1,000+ GeoLibre and Whitebox tools.</sub></p></td>
@@ -63,15 +63,15 @@
 </tr>
 <tr>
 <td width="50%" valign="top"><img src="https://assets.rustgis.app/images/layout.webp" alt="A landscape A4 page layout with a map frame, title, legend, north arrow and scale bar, and the Publish tab open" width="100%"><p align="center"><sub><b>Layouts.</b> Map frames, legends, scale bars, grids, map series and PDF export, plus reports and presentations.</sub></p></td>
-<td width="50%" valign="top"><img src="https://assets.rustgis.app/images/plugins.webp" alt="The Plugin Manager browsing the plugin registry, listing Basemaps, Hello RustGIS, Map Explorer and Vector Toolkit with their permissions" width="100%"><p align="center"><sub><b>Plugins.</b> Browse and install sandboxed plugins from <a href="https://plugins.rustgis.app">plugins.rustgis.app</a>, each showing the permissions it asks for.</sub></p></td>
+<td width="50%" valign="top"><img src="https://assets.rustgis.app/images/plugins.webp" alt="The Plugin Manager browsing the plugin registry, listing Basemaps, Hello UniGIS, Map Explorer and Vector Toolkit with their permissions" width="100%"><p align="center"><sub><b>Plugins.</b> Browse and install sandboxed plugins from <a href="https://plugins.rustgis.app">plugins.rustgis.app</a>, each showing the permissions it asks for.</sub></p></td>
 </tr>
 <tr>
-<td width="50%" valign="top"><img src="https://assets.rustgis.app/images/dark.webp" alt="RustGIS in dark mode with the View tab open over a map of Europe on the Midnight basemap" width="100%"><p align="center"><sub><b>Dark mode</b> and the View tab: effects, scene settings, panes and linked views.</sub></p></td>
+<td width="50%" valign="top"><img src="https://assets.rustgis.app/images/dark.webp" alt="UniGIS in dark mode with the View tab open over a map of Europe on the Midnight basemap" width="100%"><p align="center"><sub><b>Dark mode</b> and the View tab: effects, scene settings, panes and linked views.</sub></p></td>
 <td width="50%" valign="top"><img src="https://assets.rustgis.app/images/backstage.webp" alt="The Project backstage with cards to start a blank map, the World Atlas sample, or open a project" width="100%"><p align="center"><sub><b>Projects.</b> Start blank, from the World Atlas sample, or open a <code>.rgis</code> project.</sub></p></td>
 </tr>
 </table>
 
-Every screenshot is RustGIS itself, rendered offscreen by `cargo run -p rustgis-ui-egui --example ui_shot`.
+Every screenshot is UniGIS itself, rendered offscreen by `cargo run -p rustgis-ui-egui --example ui_shot`.
 
 ## Features
 
@@ -93,10 +93,10 @@ Every screenshot is RustGIS itself, rendered offscreen by `cargo run -p rustgis-
 | **Interface** | Command search (Ctrl+K), keyboard shortcuts, dark mode, a customizable ribbon and Quick Access Toolbar, linked side-by-side maps, 16 languages |
 
 The [user guide](https://rustgis.app/user-guide/) covers each area in detail,
-[Comparison](https://rustgis.app/comparison/) sets RustGIS beside GeoLibre, QGIS and ArcGIS, and
+[Comparison](https://rustgis.app/comparison/) sets UniGIS beside GeoLibre, QGIS and ArcGIS, and
 [ROADMAP.md](ROADMAP.md) lists what's next.
 
-## Get RustGIS
+## Get UniGIS
 
 - **Web app**: open **[web.rustgis.app](https://web.rustgis.app)**. The same ribbon and tools,
   with the browser's file picker for data and projects, and downloads for Save and Export.
@@ -126,7 +126,7 @@ rustgis-cli run --sample \
   --cmd 'layer.symbology={"layer":"Countries_Summarize","type":"graduated","field":"point_count"}' \
   --cmd 'share.exportMap={"path":"out.png","dpi":192}' --save atlas.rgis
 rustgis-cli ask --sample "Which 5 countries have the largest GDP?"
-claude mcp add rustgis -- rustgis-cli mcp --sample   # RustGIS as an MCP server for AI agents
+claude mcp add rustgis -- rustgis-cli mcp --sample   # UniGIS as an MCP server for AI agents
 ```
 
 See [Command Line](docs/cli.md) for more.
@@ -168,7 +168,7 @@ agent notes: [AGENTS.md](AGENTS.md).
 
 ## Sponsor
 
-RustGIS is free and open source, and stays that way. If it is useful to you or your team, sponsorship is the most direct way to keep development, hosting and cross-platform distribution going.
+UniGIS is free and open source, and stays that way. If it is useful to you or your team, sponsorship is the most direct way to keep development, hosting and cross-platform distribution going.
 
 - [**GitHub Sponsors**](https://github.com/sponsors/giswqs): monthly or one-time, billed through your GitHub account.
 - [**Buy Me a Coffee**](https://buymeacoffee.com/giswqs): a quick one-off contribution, no account required.

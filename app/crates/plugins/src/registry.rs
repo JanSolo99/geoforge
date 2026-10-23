@@ -200,7 +200,7 @@ pub fn fetch(url: &str, limit: usize) -> Result<Vec<u8>, String> {
         .build()
         .into();
     let mut resp =
-        agent.get(url).header("User-Agent", concat!("GeoForge/", env!("CARGO_PKG_VERSION"))).call().map_err(|e| format!("{url}: {e}"))?;
+        agent.get(url).header("User-Agent", concat!("UniGIS/", env!("CARGO_PKG_VERSION"))).call().map_err(|e| format!("{url}: {e}"))?;
     let mut buf = Vec::new();
     resp.body_mut().with_config().limit(limit as u64 + 1).reader().read_to_end(&mut buf).map_err(|e| format!("{url}: {e}"))?;
     if buf.len() > limit {
