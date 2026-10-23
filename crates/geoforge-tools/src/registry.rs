@@ -631,6 +631,105 @@ fn cluster_and_outlier_analysis(ctx: &dyn Context) -> Result<ToolOutput> {
     )
 }
 
+fn multi_distance_spatial_clustering(ctx: &dyn Context) -> Result<Outcome> {
+    use geoforge_core::{Field, FieldType, Value};
+    let t = find("multi_distance_spatial_clustering")
+        .ok_or_else(|| Error::Unsupported("multi_distance_spatial_clustering".into()))?;
+    let fc = ctx.features("input")?;
+    let bands = number_of(ctx, t, "number_of_distance_bands");
+    let perms: usize = match text(ctx, t, "compute_confidence_envelope")
+        .unwrap_or_default()
+        .to_ascii_uppercase()
+        .as_str()
+    {
+        "9_PERMUTATIONS" => 9,
+        "99_PERMUTATIONS" => 99,
+        "999_PERMUTATIONS" => 999,
+        _ => 0,
+    };
+    let boundary = match text(ctx, t, "boundary_correction_method")
+        .unwrap_or_default()
+        .to_ascii_uppercase()
+        .as_str()
+    {
+        "RIPLEY_EDGE_CORRECTION_FORMULA" => spatstat::KBoundary::Ripley,
+        "" | "NONE" => spatstat::KBoundary::None,
+        other => {
+            return Err(Error::Unsupported(format!(
+                "boundary correction {other} is not done (NONE, RIPLEY_EDGE_CORRECTION_FORMULA)"
+            )));
+        }
+    };
+    let user_area = text(ctx, t, "study_area_method")
+        .is_some_and(|m| m.eq_ignore_ascii_case("USER_PROVIDED_STUDY_AREA_FEATURE_CLASS"));
+    let area = if user_area {
+        let sa = ctx.features("study_area_feature_class")?;
+        let mut g: Option<geoforge_core::Geometry> = None;
+        for f in sa.features() {
+            if let Some(geom) = f?.geometry {
+                g = Some(match g {
+                    None => geom,
+                    Some(mut acc) => {
+                        let off = acc.xy.len() as u32;
+                        let parts: Vec<u32> = if geom.parts.is_empty() {
+                            vec![0]
+                        } else {
+                            geom.parts.clone()
+                        };
+                        if acc.parts.is_empty() {
+                            acc.parts.push(0);
+                        }
+                        acc.parts.extend(parts.iter().map(|p| p + off));
+                        acc.xy.extend(geom.xy);
+                        acc
+                    }
+                });
+            }
+        }
+        Some(g.ok_or_else(|| Error::Unsupported("the study area has no polygon".into()))?)
+    } else {
+        None
+    };
+    let opt = |name: &str| text(ctx, t, name).and_then(|v| v.trim().parse::<f64>().ok());
+    let wf = text(ctx, t, "weight_field");
+    let (rows, _messages) = spatstat::ripleys_k(
+        fc.as_ref(),
+        bands.max(0.0) as usize,
+        perms,
+        wf.as_deref(),
+        opt("beginning_distance"),
+        opt("distance_increment"),
+        boundary,
+        area.as_ref(),
+    )?;
+    let dbase = ctx
+        .get("output")
+        .is_some_and(|o| o.to_ascii_lowercase().ends_with(".dbf"));
+    let mut fields = Vec::new();
+    if dbase {
+        let mut f = Field::new("Field1", FieldType::Integer);
+        f.precision = 10;
+        fields.push(f);
+    }
+    let mut names = vec!["ExpectedK", "ObservedK", "DiffK"];
+    if perms > 0 {
+        names.extend(["LwConfEnv", "HiConfEnv"]);
+    }
+    fields.extend(names.iter().map(|n| Field::new(*n, FieldType::Double)));
+    let rows = rows
+        .into_iter()
+        .map(|r| {
+            let mut v = Vec::new();
+            if dbase {
+                v.push(Value::Integer(0));
+            }
+            v.extend(r[..names.len()].iter().map(|x| Value::Double(*x)));
+            v
+        })
+        .collect();
+    Ok(Outcome::Table(TableOutput { fields, rows }))
+}
+
 fn generate_spatial_weights_matrix(ctx: &dyn Context) -> Result<Report> {
     use crate::swm;
     let t = find("generate_spatial_weights_matrix")
@@ -1373,6 +1472,83 @@ pub static TOOLS: &[Tool] = &[
         output_suffix: "ClustersOutliers",
         measures: true,
         run: Runner::Features(cluster_and_outlier_analysis),
+    },
+    Tool {
+        id: "multi_distance_spatial_clustering",
+        name: "Multi-Distance Spatial Cluster Analysis (Ripley's k-function)",
+        toolbox: "Spatial Statistics › Analyzing Patterns",
+        summary: "Whether features cluster or disperse at a range of distances, as Ripley's L(d) per distance band (ArcGIS Pro Multi-Distance Spatial Cluster Analysis).",
+        params: &[
+            INPUT,
+            Param {
+                name: "number_of_distance_bands",
+                label: "Number of Distance Bands",
+                kind: Kind::Number,
+                required: false,
+                default: "10",
+                help: "",
+            },
+            Param {
+                name: "compute_confidence_envelope",
+                label: "Compute Confidence Envelope",
+                kind: Kind::Choice(&[
+                    "0_PERMUTATIONS_-_NO_CONFIDENCE_ENVELOPE",
+                    "9_PERMUTATIONS",
+                    "99_PERMUTATIONS",
+                    "999_PERMUTATIONS",
+                ]),
+                required: false,
+                default: "0_PERMUTATIONS_-_NO_CONFIDENCE_ENVELOPE",
+                help: "",
+            },
+            WEIGHT,
+            Param {
+                name: "beginning_distance",
+                label: "Beginning Distance",
+                kind: Kind::Number,
+                required: false,
+                default: "",
+                help: "Empty: one increment.",
+            },
+            Param {
+                name: "distance_increment",
+                label: "Distance Increment",
+                kind: Kind::Number,
+                required: false,
+                default: "",
+                help: "Empty: a quarter of the study area's longer side over the number of bands.",
+            },
+            Param {
+                name: "boundary_correction_method",
+                label: "Boundary Correction Method",
+                kind: Kind::Choice(&["NONE", "RIPLEY_EDGE_CORRECTION_FORMULA"]),
+                required: false,
+                default: "NONE",
+                help: "",
+            },
+            Param {
+                name: "study_area_method",
+                label: "Study Area Method",
+                kind: Kind::Choice(&[
+                    "MINIMUM_ENCLOSING_RECTANGLE",
+                    "USER_PROVIDED_STUDY_AREA_FEATURE_CLASS",
+                ]),
+                required: false,
+                default: "MINIMUM_ENCLOSING_RECTANGLE",
+                help: "",
+            },
+            Param {
+                name: "study_area_feature_class",
+                label: "Study Area Feature Class",
+                kind: Kind::Features,
+                required: false,
+                default: "",
+                help: "",
+            },
+        ],
+        output_suffix: "KFunction",
+        measures: true,
+        run: Runner::Dynamic(multi_distance_spatial_clustering),
     },
     Tool {
         id: "generate_spatial_weights_matrix",

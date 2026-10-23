@@ -643,5 +643,8 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
           (Anselin Local Moran's I) take weights files and polygon contiguity; an empty distance
           band is the default threshold, 0 relates every pair (`crates/geoforge-cli/tests/spatstat_weights.rs`).
           Open: KNN tie order on grids, set order in Delaunay/contiguity rows (KNOWN_GAPS)
-    - [ ] Next: Collect Events, Multi-Distance Spatial Cluster Analysis (Ripley's K), OLS and GWR,
-          Generate Network Spatial Weights
+    - [x] Multi-Distance Spatial Cluster Analysis (Ripley's L(d); weights, beginning distance and
+          increment, minimum enclosing rectangle or study area polygon, Ripley's edge correction
+          up to the corner case) matched to Pro 3.7 (`crates/geoforge-cli/tests/spatstat_ripley.rs`).
+          Not done: simulated outer boundary and reduced analysis area corrections
+    - [ ] Next: Collect Events, OLS and GWR, Generate Network Spatial Weights

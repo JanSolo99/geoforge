@@ -1487,6 +1487,282 @@ pub fn cluster_and_outlier_analysis(
     ))
 }
 
+// ---------------------------------------------------------------------------------------------
+// Multi-Distance Spatial Cluster Analysis (Ripley's K)
+
+/// Ripley's edge correction and the study area of Multi-Distance Spatial Cluster Analysis.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum KBoundary {
+    None,
+    /// Ripley's edge correction formula: each pair counts `1 / (share of the circle through the
+    /// neighbor that lies inside the study area)`.
+    Ripley,
+}
+
+/// Rings of a polygon as point lists.
+fn rings_of(g: &Geometry) -> Vec<Vec<[f64; 2]>> {
+    let n = g.xy.len();
+    let mut starts: Vec<usize> = g.parts.iter().map(|p| *p as usize).collect();
+    if starts.is_empty() {
+        starts.push(0);
+    }
+    starts
+        .iter()
+        .enumerate()
+        .map(|(k, &s)| g.xy[s..starts.get(k + 1).copied().unwrap_or(n)].to_vec())
+        .collect()
+}
+
+fn inside_rings(p: [f64; 2], rings: &[Vec<[f64; 2]>]) -> bool {
+    let mut inside = false;
+    for r in rings {
+        for w in r.windows(2) {
+            let (a, b) = (w[0], w[1]);
+            if (a[1] > p[1]) != (b[1] > p[1])
+                && p[0] < a[0] + (p[1] - a[1]) * (b[0] - a[0]) / (b[1] - a[1])
+            {
+                inside = !inside;
+            }
+        }
+    }
+    inside
+}
+
+/// The share of the circle around `c` of radius `r` inside the polygon rings.
+fn circle_inside(c: [f64; 2], r: f64, rings: &[Vec<[f64; 2]>]) -> f64 {
+    let tau = std::f64::consts::TAU;
+    let mut angles: Vec<f64> = Vec::new();
+    for ring in rings {
+        for w in ring.windows(2) {
+            let (a, b) = (w[0], w[1]);
+            let d = [b[0] - a[0], b[1] - a[1]];
+            let f = [a[0] - c[0], a[1] - c[1]];
+            let qa = d[0] * d[0] + d[1] * d[1];
+            if qa == 0.0 {
+                continue;
+            }
+            let qb = 2.0 * (f[0] * d[0] + f[1] * d[1]);
+            let qc = f[0] * f[0] + f[1] * f[1] - r * r;
+            let disc = qb * qb - 4.0 * qa * qc;
+            if disc < 0.0 {
+                continue;
+            }
+            let sq = disc.sqrt();
+            for t in [(-qb - sq) / (2.0 * qa), (-qb + sq) / (2.0 * qa)] {
+                if (0.0..=1.0).contains(&t) {
+                    let x = f[0] + t * d[0];
+                    let y = f[1] + t * d[1];
+                    angles.push(y.atan2(x).rem_euclid(tau));
+                }
+            }
+        }
+    }
+    if angles.is_empty() {
+        return if inside_rings([c[0] + r, c[1]], rings) {
+            1.0
+        } else {
+            0.0
+        };
+    }
+    angles.sort_by(|a, b| a.total_cmp(b));
+    let mut inside = 0.0;
+    for k in 0..angles.len() {
+        let a0 = angles[k];
+        let a1 = if k + 1 < angles.len() {
+            angles[k + 1]
+        } else {
+            angles[0] + tau
+        };
+        if a1 - a0 <= 0.0 {
+            continue;
+        }
+        let m = (a0 + a1) / 2.0;
+        if inside_rings([c[0] + r * m.cos(), c[1] + r * m.sin()], rings) {
+            inside += a1 - a0;
+        }
+    }
+    inside / tau
+}
+
+/// Multi-Distance Spatial Cluster Analysis (Ripley's k-function, as L(d)): one row per distance
+/// band with `ExpectedK` (the distance), `ObservedK`, `DiffK` and, with permutations,
+/// `LwConfEnv`/`HiConfEnv`.
+///
+/// Matched to ArcGIS Pro 3.7 (`testdata/arcgis-reference/spatstat_ripley.json`):
+/// `L(d) = sqrt(A sum_{i != j} k_ij / (pi n (n-1)))` with `A` the area of the minimum-area
+/// enclosing rectangle of the features (or of the study area polygon); with weights
+/// `sum w_i w_j k_ij / (W^2 - sum w^2)` replaces `sum k_ij / (n (n-1))`. The default increment is
+/// a quarter of the rectangle's longer side (rounded to 0.001) divided by the number of bands, and
+/// the first band is one increment unless given. Confidence envelopes come from random
+/// permutations (random in ArcGIS too).
+#[allow(clippy::too_many_arguments)]
+pub fn ripleys_k(
+    input: &dyn FeatureClass,
+    bands: usize,
+    permutations: usize,
+    weight: Option<&str>,
+    begin: Option<f64>,
+    increment: Option<f64>,
+    boundary: KBoundary,
+    study_area: Option<&Geometry>,
+) -> Result<(Vec<[f64; 5]>, Vec<String>)> {
+    if bands == 0 || bands > 100 {
+        return Err(err(
+            "ERROR 000854: Number of Distance Bands must be 1 to 100",
+        ));
+    }
+    let all = items(input, &Options { weight, case: None })?;
+    let n = all.len();
+    if n < 3 {
+        return Err(err("ERROR 001095: at least three features are needed"));
+    }
+    let pts: Vec<[f64; 2]> = all.iter().map(|i| i.xy).collect();
+    let weights: Option<Vec<f64>> = weight
+        .filter(|w| !w.is_empty())
+        .map(|_| all.iter().map(|i| i.weight).collect());
+    // The study area: its rings, area and enclosing rectangle.
+    let area_geom: Geometry = match study_area {
+        Some(g) => g.clone(),
+        None => {
+            let mut g = Geometry::point(0.0, 0.0);
+            g.kind = GeometryKind::Multipoint;
+            g.xy = pts.clone();
+            geoforge_geometry::bounding(
+                [&g],
+                geoforge_geometry::BoundingKind::RectangleByArea,
+                0.0,
+            )?
+            .ok_or_else(|| err("no bounding rectangle"))?
+            .geometry
+        }
+    };
+    let mer = geoforge_geometry::bounding(
+        [&area_geom],
+        geoforge_geometry::BoundingKind::RectangleByArea,
+        0.0,
+    )?
+    .ok_or_else(|| err("no bounding rectangle"))?;
+    let rings = rings_of(&area_geom);
+    let area = match study_area {
+        Some(_) => rings
+            .iter()
+            .map(|r| {
+                r.windows(2)
+                    .map(|w| w[0][0] * w[1][1] - w[1][0] * w[0][1])
+                    .sum::<f64>()
+                    / 2.0
+            })
+            .sum::<f64>()
+            .abs(),
+        None => mer.width * mer.length,
+    };
+    if area <= 0.0 {
+        return Err(err("ERROR 001095: the features cover no area"));
+    }
+    let longest = (mer.length * 1000.0).round() / 1000.0;
+    let inc = increment
+        .filter(|v| *v > 0.0)
+        .unwrap_or(longest / 4.0 / bands as f64);
+    let first = begin.filter(|v| *v > 0.0).unwrap_or(inc);
+    let dists: Vec<f64> = (0..bands).map(|k| first + k as f64 * inc).collect();
+    let l_of = |pts: &[[f64; 2]], w: Option<&[f64]>| -> Vec<f64> {
+        let nn = pts.len();
+        let mut sums = vec![0.0; dists.len()];
+        let dmax = *dists.last().unwrap();
+        for i in 0..nn {
+            for j in 0..nn {
+                if i == j {
+                    continue;
+                }
+                let d = DistanceMethod::Euclidean.between(pts[i], pts[j]);
+                if d > dmax {
+                    continue;
+                }
+                let mut v = w.map_or(1.0, |w| w[i] * w[j]);
+                if boundary == KBoundary::Ripley && d > 0.0 {
+                    let share = circle_inside(pts[i], d, &rings);
+                    if share > 0.0 {
+                        v /= share;
+                    }
+                }
+                for (k, dk) in dists.iter().enumerate() {
+                    if d <= *dk {
+                        sums[k] += v;
+                    }
+                }
+            }
+        }
+        let norm = match w {
+            Some(w) => {
+                let t: f64 = w.iter().sum();
+                t * t - w.iter().map(|x| x * x).sum::<f64>()
+            }
+            None => nn as f64 * (nn as f64 - 1.0),
+        };
+        sums.iter()
+            .map(|s| (area * s / (std::f64::consts::PI * norm)).sqrt())
+            .collect()
+    };
+    let observed = l_of(&pts, weights.as_deref());
+    let mut env: Option<(Vec<f64>, Vec<f64>)> = None;
+    if permutations > 0 {
+        let mut rng = Rng(0x00C0_FFEE_u64);
+        let e = &area_geom.envelope();
+        let (mut lo, mut hi) = (vec![f64::INFINITY; bands], vec![f64::NEG_INFINITY; bands]);
+        for _ in 0..permutations {
+            let ls = match &weights {
+                // Weighted: the weights shuffled over the same locations.
+                Some(w) => {
+                    let mut w = w.clone();
+                    for t in (1..w.len()).rev() {
+                        w.swap(t, rng.below(t + 1));
+                    }
+                    l_of(&pts, Some(&w))
+                }
+                None => {
+                    let mut sim = Vec::with_capacity(n);
+                    let mut guard = 0;
+                    while sim.len() < n && guard < 1000 * n {
+                        guard += 1;
+                        let x = e.xmin + (rng.next() as f64 / u64::MAX as f64) * (e.xmax - e.xmin);
+                        let y = e.ymin + (rng.next() as f64 / u64::MAX as f64) * (e.ymax - e.ymin);
+                        if inside_rings([x, y], &rings) {
+                            sim.push([x, y]);
+                        }
+                    }
+                    l_of(&sim, None)
+                }
+            };
+            for k in 0..bands {
+                lo[k] = lo[k].min(ls[k]);
+                hi[k] = hi[k].max(ls[k]);
+            }
+        }
+        env = Some((lo, hi));
+    }
+    let rows: Vec<[f64; 5]> = (0..bands)
+        .map(|k| {
+            let (l, h) = env
+                .as_ref()
+                .map_or((f64::NAN, f64::NAN), |e| (e.0[k], e.1[k]));
+            [dists[k], observed[k], observed[k] - dists[k], l, h]
+        })
+        .collect();
+    let mut messages = vec![
+        " k-Function Summary ".to_string(),
+        "Distance L(d)   Diff  ".to_string(),
+    ];
+    for r in &rows {
+        messages.push(format!(
+            "{:<9}{:<7}{:<6}",
+            format!("{:.2}", r[0]),
+            format!("{:.2}", r[1]),
+            format!("{:.2}", r[2])
+        ));
+    }
+    Ok((rows, messages))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
