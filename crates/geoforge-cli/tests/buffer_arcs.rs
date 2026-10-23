@@ -87,7 +87,7 @@ fn buffers_into_geodatabase_have_arcs_like_arcgis() {
     let reference = Geodatabase::open(root().join("testdata/gdb-reference/buffers.gdb")).unwrap();
     for (name, source, args) in cases {
         let gdb = dir.join(format!("{name}.gdb"));
-        let run = Command::new(env!("CARGO_BIN_EXE_gf"))
+        let run = Command::new(env!("CARGO_BIN_EXE_ug"))
             .arg("buffer")
             .arg(root().join(format!("testdata/geoproc/{source}.shp")))
             .arg(gdb.join(name))

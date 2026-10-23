@@ -1,4 +1,4 @@
-//! `gf run` arguments of the Data Management breadth cases (see scripts/make-arcgis-reference.py).
+//! `ug run` arguments of the Data Management breadth cases (see scripts/make-arcgis-reference.py).
 
 pub fn args(case: &str) -> Vec<&'static str> {
     match case {

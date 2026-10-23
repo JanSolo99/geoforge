@@ -29,7 +29,7 @@ fn input(name: &str) -> String {
 }
 
 fn gf(args: &[String]) -> String {
-    let out = Command::new(env!("CARGO_BIN_EXE_gf"))
+    let out = Command::new(env!("CARGO_BIN_EXE_ug"))
         .args(args)
         .output()
         .unwrap();

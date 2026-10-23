@@ -1,4 +1,4 @@
-//! `gf delete-rows`, `delete-features`, `truncate-table` and the in-place tools (Add Field,
+//! `ug delete-rows`, `delete-features`, `truncate-table` and the in-place tools (Add Field,
 //! Calculate Field, Delete Field, Append) on a geodatabase ArcGIS Pro 3.7 wrote
 //! (`testdata/gdb-reference/edit_arcgis.gdb`), checked with our reader and GDAL.
 
@@ -14,7 +14,7 @@ fn root() -> PathBuf {
 }
 
 fn gf(args: &[&str]) -> String {
-    let out = Command::new(env!("CARGO_BIN_EXE_gf"))
+    let out = Command::new(env!("CARGO_BIN_EXE_ug"))
         .args(args)
         .output()
         .unwrap();
@@ -179,7 +179,7 @@ fn delete_rows_and_in_place_tools_on_an_arcgis_geodatabase() {
     let n = shapefile_count(&shp);
     assert!(n > 0);
     assert!(
-        Command::new(env!("CARGO_BIN_EXE_gf"))
+        Command::new(env!("CARGO_BIN_EXE_ug"))
             .args(["truncate-table", shp.to_str().unwrap()])
             .output()
             .unwrap()

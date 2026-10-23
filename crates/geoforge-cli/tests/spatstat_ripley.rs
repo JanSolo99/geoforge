@@ -43,7 +43,7 @@ fn k_function_equals_arcgis() {
                 None => x.to_string(),
             });
         }
-        let o = Command::new(env!("CARGO_BIN_EXE_gf"))
+        let o = Command::new(env!("CARGO_BIN_EXE_ug"))
             .args(&a)
             .output()
             .unwrap();

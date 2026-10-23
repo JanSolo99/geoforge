@@ -3,7 +3,7 @@
 `helpers.py` is exec'd in the arcpy session (`arcgis_python`, or `tools/arcgis-bridge/run_code.py`)
 to build small shapefiles (UTM 32N, offsets from 500000/5000000) and dump tool outputs; the dumps
 are in `probes/p*.json` (`{case: {in, out}}`, coordinates relative to the offset). `run.py` runs
-`gf` on the same inputs and compares vertex by vertex (`cmp.py`); it expects the probe shapefiles
+`ug` on the same inputs and compares vertex by vertex (`cmp.py`); it expects the probe shapefiles
 in a `pg/` folder next to it. `ph.py` / `ph3.py` replay the Feature To Polygon hole placement
 (sweep diagonals and walk variants) against the dumps.
 

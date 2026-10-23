@@ -1,4 +1,4 @@
-//! End to end: `gf copy-features` every feature class of the test geodatabases to a
+//! End to end: `ug copy-features` every feature class of the test geodatabases to a
 //! shapefile, then check the output against the source and against GDAL.
 
 use std::path::{Path, PathBuf};
@@ -114,7 +114,7 @@ fn geodatabase_feature_classes_export_to_shapefile() {
                 entry.name
             );
             let out = out_dir.join(format!("{exported}_{failures}.shp"));
-            let run = Command::new(env!("CARGO_BIN_EXE_gf"))
+            let run = Command::new(env!("CARGO_BIN_EXE_ug"))
                 .arg("copy-features")
                 .arg(gdb_path.join(&entry.name))
                 .arg(&out)

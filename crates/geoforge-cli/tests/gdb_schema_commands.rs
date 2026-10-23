@@ -1,4 +1,4 @@
-//! `gf` commands that edit a geodatabase's schema: subtypes, domains and defaults of fields, and
+//! `ug` commands that edit a geodatabase's schema: subtypes, domains and defaults of fields, and
 //! relationship classes.
 
 use std::path::{Path, PathBuf};
@@ -11,7 +11,7 @@ fn root() -> PathBuf {
 }
 
 fn gf(args: &[&str]) -> Output {
-    Command::new(env!("CARGO_BIN_EXE_gf"))
+    Command::new(env!("CARGO_BIN_EXE_ug"))
         .args(args)
         .output()
         .unwrap()

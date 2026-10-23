@@ -35,7 +35,7 @@ them are in [`docs/screenshots/scripts/`](docs/screenshots/scripts/).
 | `geoforge-filegdb` | `.gdb` (FileGDB) read/write |
 | `geoforge-proj` | CRS + transformations |
 | `geoforge-raster` | Raster model, GeoTIFF, map algebra |
-| `geoforge-cli` | `gf` command-line tool |
+| `geoforge-cli` | `ug` command-line tool |
 | `geoforge-testkit` | Test helpers: compare our readers with GDAL |
 
 ## Build
@@ -49,6 +49,6 @@ Requires Rust ≥ 1.85. Tests use GDAL's `ogrinfo` as an oracle when it is insta
 run `scripts/fetch-testdata.sh` for the larger third-party corpora.
 
 ```sh
-gf describe data/roads.shp
-gf copy-features data/roads.shp out/roads_copy.shp
+ug describe data/roads.shp
+ug copy-features data/roads.shp out/roads_copy.shp
 ```

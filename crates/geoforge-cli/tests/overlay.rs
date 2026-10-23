@@ -42,7 +42,7 @@ fn write(dir: &Path, name: &str, rows: &Value, t: DataType) -> PathBuf {
 }
 
 fn run(args: &[&str]) {
-    let out = Command::new(env!("CARGO_BIN_EXE_gf"))
+    let out = Command::new(env!("CARGO_BIN_EXE_ug"))
         .args(args)
         .output()
         .unwrap();
@@ -154,7 +154,7 @@ fn overlay_commands_equal_arcgis() {
         vec!["fuzzy-membership", a, "x.tif", "LINEAR", "3"],
         vec!["weighted-sum", a, b],
     ] {
-        let r = Command::new(env!("CARGO_BIN_EXE_gf"))
+        let r = Command::new(env!("CARGO_BIN_EXE_ug"))
             .args(&bad)
             .output()
             .unwrap();
@@ -218,7 +218,7 @@ fn math_fn_command_equals_arcgis() {
         vec!["math-fn", "BitwiseAnd", f, "1", "x.tif"],
         vec!["math-fn", "Power", f, "x.tif"],
     ] {
-        let out = Command::new(env!("CARGO_BIN_EXE_gf"))
+        let out = Command::new(env!("CARGO_BIN_EXE_ug"))
             .args(&bad)
             .output()
             .unwrap();

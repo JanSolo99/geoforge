@@ -9,7 +9,7 @@ Method for the mechanical checks: every row of gap_list.csv was split on " / ", 
 | Claim in GAP_ANALYSIS.md | Verified |
 |---|---|
 | "roughly 2,000 geoprocessing tools" | 2,157 tool rows across 45 toolbox CSVs (2,027 listed in the tool-reference TOC across 44 toolboxes, plus 130 found only via toolbox history pages or the ModelBuilder overview; includes 33 deprecated). Several tools appear in two toolboxes (Slope in Spatial Analyst, 3D Analyst; Plus/Minus/Con in Spatial Analyst and Image Analyst), 2,033 distinct arcpy function names. See README.md. |
-| "GeoForge has about 80" | 82 `gf` commands; they map to 84 done + 21 partial tool rows (incl. duplicate toolbox rows). |
+| "GeoForge has about 80" | 82 `ug` commands; they map to 84 done + 21 partial tool rows (incl. duplicate toolbox rows). |
 | "Spatial Analyst (about 250 tools, about 25 done)" | 237 rows (236 in TOC), 24 done, 5 partial. |
 | "Image Analyst (about 170 raster functions plus ~60 tools)" | Image Analyst toolbox has 153 tool rows (not ~60). The raster-function list has 187 functions (raster_functions.csv). |
 | "Spatial Statistics (~60)" | 61 in TOC (63 incl. 2 deprecated: Grouping Analysis, old Geographically Weighted Regression). |
@@ -153,12 +153,12 @@ Method for the mechanical checks: every row of gap_list.csv was split on " / ", 
 
 ## D. Status errors (stale or wrong relative to the repository)
 
-Compared against `gf --help` and docs/ROADMAP.md (as read at the start of this task), using the same status rule as the CSVs.
+Compared against `ug --help` and docs/ROADMAP.md (as read at the start of this task), using the same status rule as the CSVs.
 
 | Entry | gap_list.csv | Should be |
 |---|---|---|
 | Split | partial | done (ROADMAP: Split matches ArcGIS) |
-| Update | partial | done (`gf update`) |
+| Update | partial | done (`ug update`) |
 | Append | partial | done (with field mapping) |
 | Add Spatial Index | partial | done (shapefile) |
 | Near, Generate Near Table | done | partial (planar only, no geodesic) |
@@ -168,7 +168,7 @@ Compared against `gf --help` and docs/ROADMAP.md (as read at the start of this t
 | Resample | done | partial (square cells only) |
 | Export Table | done | partial (to .csv/.gpkg only) |
 | Flow Direction, Flow Length | done | partial (flats approximated; unweighted only) |
-| Stream Order | missing ("Stream To Feature / Stream Order (Shreve)") | done (`gf stream-order`) |
+| Stream Order | missing ("Stream To Feature / Stream Order (Shreve)") | done (`ug stream-order`) |
 | Reclassify | partial | done |
 | Create Folder, Create Feature Dataset | partial | missing (ROADMAP: feature datasets in writer not done; no gf command) |
 | Select Layer By Attribute | partial | missing (gf `select` implements Analysis > Select, a different tool) |

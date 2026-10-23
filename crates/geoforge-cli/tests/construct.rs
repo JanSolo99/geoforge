@@ -1,4 +1,4 @@
-//! Densify, Generate Points Along Lines, Create Fishnet and Polygon To Line (run through `gf run`)
+//! Densify, Generate Points Along Lines, Create Fishnet and Polygon To Line (run through `ug run`)
 //! against ArcGIS Pro 3.7 (testdata/arcgis-reference/construct.json).
 
 use std::path::{Path, PathBuf};
@@ -359,7 +359,7 @@ fn construction_tools_equal_arcgis() {
         let mut a = vec![s("run"), tool.to_string()];
         a.extend(args.iter().cloned());
         a.push(format!("output={}", out.display()));
-        let o = Command::new(env!("CARGO_BIN_EXE_gf"))
+        let o = Command::new(env!("CARGO_BIN_EXE_ug"))
             .args(&a)
             .output()
             .unwrap();
@@ -425,7 +425,7 @@ fn construction_tools_equal_arcgis() {
             format!("output={}", d.join("x.shp").display()),
         ],
     ] {
-        let o = Command::new(env!("CARGO_BIN_EXE_gf"))
+        let o = Command::new(env!("CARGO_BIN_EXE_ug"))
             .args(&bad)
             .output()
             .unwrap();

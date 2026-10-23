@@ -1,5 +1,5 @@
 import json,sys,subprocess,os,glob
-GF='/mnt/media/ArcGIS_Linux/target/debug/gf'
+GF='/mnt/media/ArcGIS_Linux/target/debug/ug'
 X0,Y0=500000,5000000
 PG='pg'
 def gf_out(args, out):

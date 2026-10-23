@@ -1,4 +1,4 @@
-//! `gf idw` against the ArcGIS Idw run on the same 16 points (testdata/arcgis-reference/idw.json).
+//! `ug idw` against the ArcGIS Idw run on the same 16 points (testdata/arcgis-reference/idw.json).
 
 use std::path::Path;
 use std::process::Command;
@@ -65,7 +65,7 @@ fn idw_command_equals_arcgis() {
         ),
     ] {
         let out = d.join(format!("{name}.tif"));
-        let r = Command::new(env!("CARGO_BIN_EXE_gf"))
+        let r = Command::new(env!("CARGO_BIN_EXE_ug"))
             .arg("idw")
             .arg(&shp)
             .arg("V")
@@ -101,7 +101,7 @@ fn idw_command_equals_arcgis() {
         }
     }
     // Bad parameters are errors.
-    let bad = Command::new(env!("CARGO_BIN_EXE_gf"))
+    let bad = Command::new(env!("CARGO_BIN_EXE_ug"))
         .arg("idw")
         .arg(&shp)
         .arg("V")

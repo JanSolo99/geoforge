@@ -13,7 +13,7 @@ use geoforge_testkit::{esri_area, esri_length, hausdorff};
 #[path = "common/dm_cases.rs"]
 mod dm_cases;
 
-/// The `gf` arguments reproducing each ArcGIS case.
+/// The `ug` arguments reproducing each ArcGIS case.
 fn gf_args(case: &str) -> Vec<&'static str> {
     let d = "testdata/geoproc";
     let _ = d;
@@ -4322,7 +4322,7 @@ fn tools_match_arcgis_output() {
             Some(i) => args[i] = args[i].replace("<out>", &out.display().to_string()),
             None => args.push(out.display().to_string()),
         }
-        let run = Command::new(env!("CARGO_BIN_EXE_gf"))
+        let run = Command::new(env!("CARGO_BIN_EXE_ug"))
             .current_dir(&root)
             .args(&args)
             .output()

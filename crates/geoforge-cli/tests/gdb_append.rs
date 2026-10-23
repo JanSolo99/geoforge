@@ -1,5 +1,5 @@
-//! `gf` adds its outputs to a geodatabase that already exists: one written by an earlier
-//! `gf` run, and one ArcGIS created.
+//! `ug` adds its outputs to a geodatabase that already exists: one written by an earlier
+//! `ug` run, and one ArcGIS created.
 
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -11,7 +11,7 @@ fn root() -> PathBuf {
 }
 
 fn gf(args: &[&std::ffi::OsStr]) -> std::process::Output {
-    Command::new(env!("CARGO_BIN_EXE_gf"))
+    Command::new(env!("CARGO_BIN_EXE_ug"))
         .args(args)
         .output()
         .unwrap()

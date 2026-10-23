@@ -14,7 +14,7 @@ fn collect_events_equals_arcgis() {
     let r: Json =
         serde_json::from_slice(&std::fs::read(root.join("spatstat_events.json")).unwrap()).unwrap();
     let out = std::env::temp_dir().join(format!("gf-events-{}.shp", std::process::id()));
-    let o = Command::new(env!("CARGO_BIN_EXE_gf"))
+    let o = Command::new(env!("CARGO_BIN_EXE_ug"))
         .args(["run", "collect_events"])
         .arg(format!(
             "input={}",

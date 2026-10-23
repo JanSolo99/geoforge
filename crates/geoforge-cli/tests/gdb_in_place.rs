@@ -12,7 +12,7 @@ fn root() -> PathBuf {
 }
 
 fn gf(args: &[&str]) {
-    let out = Command::new(env!("CARGO_BIN_EXE_gf"))
+    let out = Command::new(env!("CARGO_BIN_EXE_ug"))
         .args(args)
         .output()
         .unwrap();

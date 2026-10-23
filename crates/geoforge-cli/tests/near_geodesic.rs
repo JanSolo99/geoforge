@@ -1,4 +1,4 @@
-//! `gf near` and `gf generate-near-table` with `--method GEODESIC` on longitude/latitude data, against
+//! `ug near` and `ug generate-near-table` with `--method GEODESIC` on longitude/latitude data, against
 //! the ArcGIS values (point to point: 181171.41 m, azimuth 22.54 degrees).
 
 use std::path::PathBuf;
@@ -43,7 +43,7 @@ fn geodesic_method_measures_on_the_ellipsoid() {
         shapefile(&d, "b", 11.0, 51.5),
     );
     let table = d.join("t.dbf");
-    let r = Command::new(env!("CARGO_BIN_EXE_gf"))
+    let r = Command::new(env!("CARGO_BIN_EXE_ug"))
         .arg("generate-near-table")
         .arg(&a)
         .arg(&b)
@@ -76,7 +76,7 @@ fn geodesic_method_measures_on_the_ellipsoid() {
         (value(&dump, "NEAR_ANGLE") - 22.539376658454792).abs() < 1e-6,
         "{dump}"
     );
-    // `gf near` with a radius in kilometres: found at 200 km, not at 100 km (distance -1).
+    // `ug near` with a radius in kilometres: found at 200 km, not at 100 km (distance -1).
     for (radius, found) in [("200 Kilometers", true), ("100 Kilometers", false)] {
         let copy = d.join(format!("c{}.shp", radius.len()));
         let ogr = Command::new("ogr2ogr")
@@ -86,7 +86,7 @@ fn geodesic_method_measures_on_the_ellipsoid() {
             .output()
             .unwrap();
         assert!(ogr.status.success());
-        let r = Command::new(env!("CARGO_BIN_EXE_gf"))
+        let r = Command::new(env!("CARGO_BIN_EXE_ug"))
             .arg("near")
             .arg(&copy)
             .arg(&b)
@@ -109,7 +109,7 @@ fn geodesic_method_measures_on_the_ellipsoid() {
             assert!((dist - 181_171.41024908726).abs() < 1e-3);
         }
     }
-    let bad = Command::new(env!("CARGO_BIN_EXE_gf"))
+    let bad = Command::new(env!("CARGO_BIN_EXE_ug"))
         .arg("near")
         .arg(&a)
         .arg(&b)

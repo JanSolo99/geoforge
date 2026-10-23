@@ -10,7 +10,7 @@ use geoforge_shapefile::dbf::DbfReader;
 use serde_json::Value as Json;
 
 fn gf(args: &[String]) -> String {
-    let o = Command::new(env!("CARGO_BIN_EXE_gf"))
+    let o = Command::new(env!("CARGO_BIN_EXE_ug"))
         .args(args)
         .output()
         .unwrap();

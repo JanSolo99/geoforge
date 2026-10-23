@@ -20,7 +20,7 @@ structural blockers come first, because most of the rest depends on them:
 3. **The raster stack** (cell size / extent / mask / snap environments, Project Raster, Mosaic,
    Clip, multi-band, pyramids and statistics, more raster formats).
 
-Built in thin vertical slices: each phase ends with something usable from `gf`
+Built in thin vertical slices: each phase ends with something usable from `ug`
 and verified against GDAL/OGR output on real data.
 
 ## Phase 0 — Foundations
@@ -35,10 +35,10 @@ and verified against GDAL/OGR output on real data.
 - [x] `.dbf` (dBASE III/IV, field types C/N/F/L/D/M), `.cpg` / LDID encodings
 - [x] `.prj` WKT1 passthrough
 - [x] Writer: ArcGIS field-name rules, null substitution, clockwise shells, 2 GB limit
-- [x] `gf describe` (arcpy.Describe) and `gf copy-features` (Copy Features)
+- [x] `ug describe` (arcpy.Describe) and `ug copy-features` (Copy Features)
 - [x] Field mapping, null handling and value formatting verified against ArcGIS Pro 3.7
       through the ArcGIS bridge; `.dbf` output is byte-identical to ArcGIS's for the same input
-- [x] `.sbn/.sbx` spatial index: written with every shapefile and by `gf add-spatial-index`,
+- [x] `.sbn/.sbx` spatial index: written with every shapefile and by `ug add-spatial-index`,
       byte-identical to ArcGIS's on all reference outputs (format in docs/formats)
 - [ ] `.shp.xml` metadata
 - [x] DOS and Mac code pages in `.dbf` by language driver ID (437, 737, 850, 852, 857,
@@ -66,7 +66,7 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       at the north pole and keep the south pole as interior point; CCW flag on hole arcs. Matches
       ArcGIS's vertices and arcs (`testdata/gdb-reference/buffers.gdb`); open: where ArcGIS starts
       a polygon ring (its seam can split an arc), one 2° stretch of a 60 m dissolve kept as vertices
-- [x] Buffer: geodesic for geographic data (`BufferDistance::Geodesic`, `geoforge_geometry::buffer_geodesic`; `gf buffer
+- [x] Buffer: geodesic for geographic data (`BufferDistance::Geodesic`, `geoforge_geometry::buffer_geodesic`; `ug buffer
       in out "1 Kilometers"` on a geographic system; a plain number or degrees stays planar in degrees, as in
       ArcGIS). Points are the exact geodesic circle on WGS 84 (starts north, clockwise, 223 steps at 1 km) with
       ArcGIS's distance-tiered chord deviation; lines and polygons are built from the planar pieces with every offset
@@ -93,27 +93,27 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
         are straight in longitude/latitude, so pairs across the antimeridian are not handled. The app's Near, Generate
         Near Table and Spatial Join use it (Select By Location distances still use the UTM zone).
 - [x] Select Layer By Location (all 13 planar overlap types, search distance, invert;
-      `gf select-by-location` writes the selection) and Append (TEST/NO_TEST, fields by
+      `ug select-by-location` writes the selection) and Append (TEST/NO_TEST, fields by
       name, other geometry types skipped with WARNING 000594) — match ArcGIS
 - [x] Split (one shapefile per text value, named after it; ERROR 003911 for non-text
       fields) and Near with several near feature classes (`NEAR_FC`) — match ArcGIS
 - [x] Spatial Join merge rules (First, Last, Join, Sum, Mean, Median, Mode, Min, Max,
-      StdDev, Count, Range; `gf spatial-join --merge-rule FIELD=RULE[:DELIM]`): output types
+      StdDev, Count, Range; `ug spatial-join --merge-rule FIELD=RULE[:DELIM]`): output types
       kept (integers rounded), numeric rules give text fields null, Count writes text, Mode
       ties go to the smallest value, sample standard deviation; Join text too long for its
       field empties that field and the rest of the row (WARNING 001156) — match ArcGIS
-- [x] Spatial Join with a full field mapping string (`gf spatial-join --field-mapping`): output
+- [x] Spatial Join with a full field mapping string (`ug spatial-join --field-mapping`): output
       names, types (Long/Short/Float/Double/Text), lengths, text start/end positions, merge rules
       and several source fields per output (first non-listed-null source wins under First),
       values converted as ArcGIS does (doubles round to integers, text that is not a number
       reads as 0, numbers become text, text cut to the length) — matches ArcGIS; visible/alias
       are ignored for shapefile output as in ArcGIS
-- [x] Merge with a field mapping (`gf merge ... --field-mapping`): output fields as mapped, each
+- [x] Merge with a field mapping (`ug merge ... --field-mapping`): output fields as mapped, each
       input contributing its own source field (found by table name), values converted to the
       output type — matches ArcGIS
 - [x] Append with a field mapping (`--field-mapping`, NO_TEST): target fields take the first source
       belonging to the appended input, converted to the target's type — matches ArcGIS
-- [x] Feature Class To Feature Class (`gf feature-class-to-feature-class`, where clause and field
+- [x] Feature Class To Feature Class (`ug feature-class-to-feature-class`, where clause and field
       mapping) — matches ArcGIS
 - [ ] Date outputs in field mappings; Merge/Append mappings with merge rules over several rows
 - [ ] Split into a geodatabase (needs adding to an existing one); selection types other than
@@ -163,21 +163,21 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       DANGLE_LEN), Minimum Bounding Geometry (envelope, convex hull, rectangles by area/width,
       circle; NONE/ALL/LIST; MBG_FIELDS; straight lines widened 1 unit each side), Add XY
       Coordinates — match ArcGIS
-- [x] Symmetrical Difference (`gf symmetrical-difference`): Union's one-input-only rows in its
+- [x] Symmetrical Difference (`ug symmetrical-difference`): Union's one-input-only rows in its
       order, minus slivers narrower than the XY tolerance and vertices within it of their
       neighbours' line (spikes included) — matches ArcGIS. Union itself still keeps such slivers
-- [x] Update (`gf update`, BORDERS): Erase's rows followed by the update polygons carrying the
+- [x] Update (`ug update`, BORDERS): Erase's rows followed by the update polygons carrying the
       same-named fields — matches ArcGIS; NO_BORDERS not implemented
-- [x] Sort (`gf sort in out "ZONE DESCENDING;VALUE ASCENDING"`): field keys (numbers by value, text by
+- [x] Sort (`ug sort in out "ZONE DESCENDING;VALUE ASCENDING"`): field keys (numbers by value, text by
       bytes, ties in input order) and `Shape` with UR/UL/LR/LL (the envelope corner's y then x),
       `ORIG_FID` added — matches ArcGIS on 12 cases
-- [x] Delete Identical (`gf delete-identical`, in place or `--output`): first of each group kept in
+- [x] Delete Identical (`ug delete-identical`, in place or `--output`): first of each group kept in
       input order, FIDs closed up, "N duplicate(s) from M group(s) deleted." — matches ArcGIS
 - [x] Add Field (TEXT/SHORT/LONG/FLOAT/DOUBLE/DATE with precision, scale, length; names fixed up with
       WARNING 000304; an existing name warns, ERROR 000012 for another type) and Delete Field
       (DELETE_FIELDS/KEEP_FIELDS; the last field stays, ERROR 002557) for shapefiles, in place or
       `--output` — match ArcGIS on 15 cases; Alter Field, Calculate Field still to do
-- [x] Calculate Field (`gf calculate-field`, PYTHON3): a Python-subset interpreter (`pycalc`:
+- [x] Calculate Field (`ug calculate-field`, PYTHON3): a Python-subset interpreter (`pycalc`:
       arithmetic with Python semantics, comparisons, conditional expressions, str methods and
       slicing, `%` / `format` / f-string formatting, `math`, common builtins, a code block with
       `def`/`if`/`for`/`while`) with `!FIELD!` values; integers round half to even into integer
@@ -185,8 +185,8 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       field is created from `--field-type` if missing — matches ArcGIS on 28 expressions.
       Not covered: Arcade/SQL expressions, comprehensions, dictionaries, exceptions, imports
       besides `math`, date arithmetic
-- [x] Planar graph tools (`geoforge-tools::planar`; `gf polygon-to-line`, `gf feature-to-polygon`,
-      `gf feature-to-line`, also on the registry): Polygon To Line IDENTIFY_NEIGHBORS (the default),
+- [x] Planar graph tools (`geoforge-tools::planar`; `ug polygon-to-line`, `ug feature-to-polygon`,
+      `ug feature-to-line`, also on the registry): Polygon To Line IDENTIFY_NEIGHBORS (the default),
       Feature To Polygon (label features, ATTRIBUTES/NO_ATTRIBUTES, several inputs) and Feature To
       Line (several inputs, NO_ATTRIBUTES) match Pro 3.7 vertex for vertex on 22 reference runs and
       ~40 probes (`scripts/research/planar/`). Rules: coordinates within 2√2 × XY tolerance merge
@@ -227,7 +227,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
       Pro 3.2 BigInteger/DateOnly/TimeOnly/TimestampOffset, high-precision dates, UTF-8/16
 - [x] Read: geometry blobs for all types incl. Z/M, MultiPatch (incl. Triangles), true curves
       (circular arc, Bézier, elliptic arc kept as Esri segments)
-- [x] Oracle: 137 of 145 test tables match GDAL; `gf describe` / `gf copy-features` from `.gdb`
+- [x] Oracle: 137 of 145 test tables match GDAL; `ug describe` / `ug copy-features` from `.gdb`
 - [x] Curve densification (`Geometry::densify_curves`); shapefile export densifies like ArcGIS
 - [ ] Compressed (`.cdf`) tables
 - [x] Domains (214 checked against GDAL), field domains, relationship classes (16 checked);
@@ -244,7 +244,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
 - [x] Write: add to an existing geodatabase — tables, feature classes, domains: `GeodatabaseWriter::open_existing`
       appends rows to `GDB_SystemCatalog`, `GDB_SpatialRefs`, `GDB_Items` and `GDB_ItemRelationships`
       and rebuilds their indexes (the rebuild reproduces ArcGIS's `.atx` files byte for byte);
-      `gf` tool outputs now go into an existing `.gdb`. Checked in ArcGIS: it lists, describes and
+      `ug` tool outputs now go into an existing `.gdb`. Checked in ArcGIS: it lists, describes and
       reads the new items, creates further items in the same geodatabase, indexes, edits and compacts
 - [x] Edit rows of an existing table or feature class in place (`TableEditor`: insert, update,
       delete; row space is appended, `.gdbtablx`, spatial index, extent and attribute indexes follow;
@@ -259,17 +259,17 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
       OBJECTID (v4) tables edited and rewritten (v4 header and `.gdbtablx`, version 2 indexes); `add_field`,
       `delete_fields`, `delete_rows`, `truncate_table`; rewrites keep the OBJECTID sequence and ArcGIS's index
       names. GDAL reads every edited table as we do; ArcGIS reads, queries (spatial and attribute index), checks,
-      compacts and edits further, and `gf delete-rows/delete-features/truncate-table/add-field/calculate-field/
+      compacts and edits further, and `ug delete-rows/delete-features/truncate-table/add-field/calculate-field/
       delete-field` give the same fields, rows, indexes and next OBJECTIDs as the same ArcGIS tools
 - [x] `rewrite_table`: replace the fields and rows of an existing table keeping its file number, geometry
       definition, chosen OBJECTIDs and surviving attribute indexes (the primitive for Add/Delete Field
       and in-place tools on `.gdb` data)
-- [x] Editing in place from tools on `.gdb` data (`gf` in-place tools such as Add/Delete Field, Calculate
+- [x] Editing in place from tools on `.gdb` data (`ug` in-place tools such as Add/Delete Field, Calculate
       Field, Append, Near, Delete Identical go through `rewrite_table`; OBJECTIDs the tool carries through
       are kept; `tests/gdb_in_place.rs`, `tests/gdb_edit_rows.rs`). Add/Delete/Calculate Field checked against
       ArcGIS; the other in-place tools not yet
 - [x] Delete and Rename of tables, feature classes, relationship classes, feature datasets and domains
-      (`delete_item`, `rename_item`, `delete_domain`, `rename_domain`; `gf delete/rename/delete-domain/
+      (`delete_item`, `rename_item`, `delete_domain`, `rename_domain`; `ug delete/rename/delete-domain/
       alter-domain`): catalog, items, relationships, definition XML and files equal ArcGIS's after each
       operation (`testdata/gdb-reference/catalog_ops`, `scripts/gdb-snapshot.py`); ArcGIS reads, edits and
       compacts the results. A table's deletion takes its relationship classes with it; a domain fields use is
@@ -282,8 +282,8 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
       trees) — the page layout (shared boundary children, bottom-up page numbers) is documented
 - [x] Write: feature datasets (`create_feature_dataset`, `create_feature_class_in`; new or existing geodatabase;
       items, `\ds\name` paths, `DatasetInFeatureDataset` relationships and the dataset's registered
-      coordinate system as ArcGIS writes them; classes take the dataset's XY domain; `gf create-feature-dataset`,
-      outputs to `city.gdb/Ds/name`); ArcGIS lists, reads, edits and deletes in them. `gf` projects an output to
+      coordinate system as ArcGIS writes them; classes take the dataset's XY domain; `ug create-feature-dataset`,
+      outputs to `city.gdb/Ds/name`); ArcGIS lists, reads, edits and deletes in them. `ug` projects an output to
       the dataset's coordinate system, and the class takes ArcGIS's own XY domain for that system
 - [x] Write: subtypes and field defaults (`create_table_with_subtypes`; subtype field, default subtype,
       per-subtype domains and defaults; the `Subtypes` element equals ArcGIS's character for character, the subtype
@@ -296,7 +296,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
       keys (ArcGIS derives names when the destination keys are left out: not reproduced)
 - [x] Edit subtypes, field domains and defaults of existing tables (`set_subtype_field`, `add_subtype`,
       `remove_subtype`, `set_default_subtype`, `assign/remove_domain_from_field`, `assign_default_to_field`;
-      `gf set-subtype-field` ... `gf assign-default-to-field`): definition XML, domain links and the table's own
+      `ug set-subtype-field` ... `ug assign-default-to-field`): definition XML, domain links and the table's own
       defaults equal ArcGIS's after 12 operations (`testdata/gdb-reference/subtype_ops`); ArcGIS applies them
 - [x] Written geodatabases open in ArcGIS Pro 3.7: Describe, counts, domains, Check Geometry
       (no problems beyond those already in the source data), Copy Features out of them
@@ -308,12 +308,12 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
 ## Phase 4 — CRS
 - [x] PROJ binding (`geoforge-proj` on the `proj` crate, system PROJ >= 9.6.2 or built from
       source): CRSs from factory codes (EPSG, then Esri), `.prj` files or WKT; Esri WKT out
-- [x] Project tool (`gf project in out 4326`): vertices transformed by PROJ, Z/M kept — matches
+- [x] Project tool (`ug project in out 4326`): vertices transformed by PROJ, Z/M kept — matches
       ArcGIS to ~1e-13° / sub-mm on WGS 84 ↔ UTM / Web Mercator; output `.prj` is ArcGIS's
       regenerated WKT, which every tool now writes (ArcGIS does not copy the input's text)
 - [x] Project `transform_method`: ArcGIS's transformation names (`A + B` chains, either direction)
       found through PROJ's EPSG/Esri aliases and applied between the geographic systems
-      (`gf project --transform-method`); ED50 ↔ WGS 84 / ETRS89 Helmert methods match ArcGIS on
+      (`ug project --transform-method`); ED50 ↔ WGS 84 / ETRS89 Helmert methods match ArcGIS on
       geographic and projected data. Without a method PROJ's pick agreed with ArcGIS's default
       in the reference case
 - [ ] Project: Esri-only methods PROJ has no alias for (e.g. `ED_1950_To_WGS_1984_NGA_7PAR`),
@@ -437,10 +437,10 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
   - [x] Kernel Density (points and lines; default radius by Silverman's rule, weighted
         by the population field, area units, EXPECTED_COUNTS), Point Density (circle, rectangle,
         annulus, wedge; map or cell units) and Line Density, all matching ArcGIS exactly in 13
-        cases (`gf kernel-density|point-density|line-density`). Point Density's grid starts
+        cases (`ug kernel-density|point-density|line-density`). Point Density's grid starts
         (w + h) / 798 before the points' corner. Not done: barriers, GEODESIC method (planar
         only), map units other than meters, the app tools and arcpy entries
-  - [x] Extract Values to Points (`gf extract-values-to-points`; plain and INTERPOLATE on integer, float
+  - [x] Extract Values to Points (`ug extract-values-to-points`; plain and INTERPOLATE on integer, float
         and NoData rasters, edges, shapefile NoData as -9999 or 0), 7 cases exact. ArcGIS writes the
         points grouped by spatial tile (order engine-internal; the probe cases compare by PID). Not
         done: ADD_ATTRIBUTES ALL joining a raster attribute table, geodatabase NoData (assumed null),
@@ -454,7 +454,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         and Polygon To Raster MAXIMUM_COMBINED_AREA, matching ArcGIS; sub-byte results whose
         values run exactly from 1 to the layout's top keep NoData 0
   - [x] IDW (Spatial Analyst interpolation, ported from RustGIS and rebuilt to ArcGIS's rules in
-        `geoforge-raster::interpolate`; `gf idw`, the app's IDW tool, `arcpy.sa.Idw` with
+        `geoforge-raster::interpolate`; `ug idw`, the app's IDW tool, `arcpy.sa.Idw` with
         `RadiusVariable`/`RadiusFixed`): grid cell centers start at the points' lower-left corner
         (`round(w / cell) + 1` cells; a snap raster snaps the points' own extent outward instead);
         default cell = shorter side / 250; variable radius = the n nearest points but never beyond
@@ -463,7 +463,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         3 environments and 15 reach cases match Pro 3.7 (`testdata/arcgis-reference/idw.json`,
         probes in `scripts/research/idw/`). Barriers not done. Next in this family: Natural
         Neighbor, Spline, Kriging, Trend, Topo to Raster
-  - [x] Overlay and local tools over several rasters (`geoforge-raster::overlay`; `gf cell-statistics`,
+  - [x] Overlay and local tools over several rasters (`geoforge-raster::overlay`; `ug cell-statistics`,
         `weighted-sum`, `highest-position`, `combine`, `fuzzy-membership`, `fuzzy-overlay`; app tools
         incl. Weighted Overlay; `arcpy.sa.CellStatistics`, `WeightedSum`, `HighestPosition`,
         `LowestPosition`, `Combine`, `WeightedOverlay`, `FuzzyMembership`, `FuzzyOverlay` and the
@@ -475,7 +475,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         Fuzzy Overlay AND/OR/PRODUCT/SUM/GAMMA. Integer outputs are typed for the range the inputs'
         statistics allow (not the values found), values 0..1 giving NoData 16, wide signed input
         staying S32. Not done: Weighted Overlay RESTRICTED, value fields other than VALUE, the
-        Combine/Weighted Overlay attribute tables, `gf weighted-overlay`
+        Combine/Weighted Overlay attribute tables, `ug weighted-overlay`
   - [x] Construction tools on the shared registry (`geoforge-tools::construct`): Densify, Generate
         Points Along Lines, Create Fishnet and Polygon To Line (IGNORE_NEIGHBORS), 24 runs matching
         Pro 3.7 (`testdata/arcgis-reference/construct.json`, probes in `scripts/research/construct/`):
@@ -492,9 +492,9 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         (`testdata/arcgis-reference/tables.json`, `crates/geoforge-cli/tests/tables.rs`). The
         registry now has table results (`Outcome::Table`). Not done: Delete Rows and Alter Field (they
         edit their input; shapefiles cannot rename fields), field mappings, GDB table outputs from
-        `gf run`
+        `ug run`
   - [x] Data Management breadth tools on the shared registry (`geoforge-tools::dm_geometry`,
-        `dm_fields`, `dm_tools`; run with `gf run <id> input=... output=...`), each matching Pro 3.7
+        `dm_fields`, `dm_tools`; run with `ug run <id> input=... output=...`), each matching Pro 3.7
         on 3-9 runs in `manifest.json` (cases `env_*`, `slv_*`, `sap_*`, `epp_*`, `xy2l_*`, `cfs_*`,
         `std_*`, `tf_*`, `rf_*`, `transpose_*`, `pivot_*`; inputs in `testdata/dm`):
         Feature Envelope To Polygon, Split Line At Vertices, Split Line At Point, Eliminate Polygon
@@ -507,7 +507,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         need a geodatabase), Dice, Subdivide Polygon, Generate Rectangles/Transects Along Lines.
         Known differences: the order of Split Line At Point's pieces on one curved road, and
         MULTIPART envelopes of nested parts (our shapefile writer turns the inner ring into a hole)
-  - [x] Spatial Analyst math functions (`geoforge-raster::mathfn`; `gf math-fn`, 45 app tools,
+  - [x] Spatial Analyst math functions (`geoforge-raster::mathfn`; `ug math-fn`, 45 app tools,
         `arcpy.sa.Abs` ... `BitwiseRightShift`): Abs, Exp, Exp2, Exp10, Ln, Log2, Log10, Square Root,
         Square, Negate, the trigonometric and hyperbolic functions and their inverses, Round Down/Up,
         Boolean Not, Bitwise Not, Power, Mod, ATan2, the six relational and three Boolean operators,
@@ -521,7 +521,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         types, NoData and values (`testdata/arcgis-reference/blockops.json`): Aggregate counts blocks
         from the lower-left corner, Block Statistics from the upper-left; an integer raster's range counts
         one wider for Slice. Not done: Slice's other methods (equal area differs on a cell, natural
-        breaks), `gf` commands for Aggregate, Block Statistics, Slice and Pick
+        breaks), `ug` commands for Aggregate, Block Statistics, Slice and Pick
   - [x] Expand, Shrink (MORPHOLOGICAL and DISTANCE), Majority Filter (FOUR/EIGHT, MAJORITY/HALF) and
         Region Group (FOUR/EIGHT, WITHIN/CROSS, excluded value) (`geoforge-raster::generalize`; `gf
         expand|shrink|majority-filter|region-group`, app tools, `arcpy.sa`) matching Pro 3.7 cell for cell
@@ -552,7 +552,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
       runs, environments (cell size, extent, mask, snap) as first-class settings
 - [~] Port tools by toolbox: Analysis (Clip, Erase, Intersect, Union, Identity, Update, Symmetrical Difference, Buffer, Near,
       Spatial Join, Select, Split, Frequency, Statistics), Data Management (fields, features, geodatabase schema tools via
-      `gf`), Spatial Analyst (surface, hydrology, focal, local, zonal, reclass, distance, extraction) done; the rest of the
+      `ug`), Spatial Analyst (surface, hydrology, focal, local, zonal, reclass, distance, extraction) done; the rest of the
       2,157-tool inventory is not
 - [x] Python bindings: the app's PyO3 package and MCP server dispatch through the registry (`gp.run` with
       `geoforge:<tool>`), and `rustgis.arcpy` gives it ArcGIS's shape (`arcpy.analysis.Buffer("Cities", "out", "100 Kilometers")`,
@@ -574,7 +574,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         for row against Python's sqlite3 at page sizes 512, 4096 and 65536
   - [x] GeoPackage feature and attribute tables read as ArcGIS reads them (`main.` names, 64-bit
         ObjectID, SQLite types → ArcGIS field types, Esri ring orientation keeping start
-        vertices, empty points), usable as input to every `gf` tool; tools that ArcGIS refuses
+        vertices, empty points), usable as input to every `ug` tool; tools that ArcGIS refuses
         to run from 64-bit ObjectIDs into shapefiles fail the same way
         (`docs/formats/geopackage.md`)
   - [x] Shapefile output: Date Only fields fail with ERROR 000308; empty points written as
@@ -583,7 +583,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         b-trees, overflow pages, automatic indexes, schema beyond page 1, lock-byte page; passes
         `PRAGMA integrity_check` at page sizes 512–65536 and SQLite keeps editing the files;
         2 million rows in 0.18 s (≈ 8× SQLite's own bulk insert), with an index 0.53 s (≈ 3×)
-  - [x] GeoPackage writing as ArcGIS does (`gf <tool> ... out.gpkg/name`): ArcGIS's schema for a
+  - [x] GeoPackage writing as ArcGIS does (`ug <tool> ... out.gpkg/name`): ArcGIS's schema for a
         new file, feature tables with its column definitions and checks, OBJECTID from 1,
         little-endian blobs without envelope (MULTIPOLYGON/MULTILINESTRING, OGC ring order),
         coordinates snapped to ArcGIS's XY domain, Esri WKT and WKT2 spatial reference rows,
@@ -592,7 +592,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         files. Adding a table rewrites the file. 1 million points in 0.5 s (GDAL: 1.3 s)
   - [x] ArcGIS XY domains: geographic, Mercator variants, Plate Carrée exact, Transverse
         Mercator's y origin exact (x approximate)
-  - [x] Export Table into a GeoPackage (`gf export-table in out.gpkg/name`): attribute tables
+  - [x] Export Table into a GeoPackage (`ug export-table in out.gpkg/name`): attribute tables
         equal row for row to ArcGIS's (`testdata/gpkg/arcgis_tables.gpkg`)
   - [x] Table outputs (Frequency, Statistics, Summary/Near tables, ...) into a GeoPackage:
         Frequency and Statistics tables equal ArcGIS's (`testdata/gpkg/arcgis_stat_tables.gpkg`)
@@ -610,7 +610,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
 ## Phase 9 — Advanced
 - [ ] Network analysis, geocoding, spatial statistics, geostatistics, image classification, point clouds (LAS/LAZ)
   - [ ] Spatial Statistics (0 of 63 at the start of this item)
-    - [x] Measuring Geographic Distributions (`geoforge-tools::spatstat`; `gf mean-center`,
+    - [x] Measuring Geographic Distributions (`geoforge-tools::spatstat`; `ug mean-center`,
           `median-center`, `central-feature`, `standard-distance`, `directional-distribution`,
           `directional-mean`) matched to Pro 3.7 on 37 runs (two point sets, one line set; weights,
           case fields, dimension field, self potential, 1-3 deviations, orientation-only;
@@ -626,7 +626,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
           feature counts itself at weight 1, row standardization changes nothing; bins by p-value
           0.01/0.05/0.10; BH false discovery rate) matching Pro 3.7 on 2 point sets x 44 runs
           (`testdata/arcgis-reference/spatstat_patterns.json`, `crates/geoforge-cli/tests/spatstat_patterns.rs`).
-          Tools that give values rather than features return a `registry::Report` (`gf run` prints
+          Tools that give values rather than features return a `registry::Report` (`ug run` prints
           it, the app shows a table and messages, arcpy `getOutput(i)`); ArcGIS's p-values are a
           normal-CDF approximation up to 2e-8 from the exact ones we use. Not done: polygon
           contiguity conceptualizations, spatial weights files, distances under 1 (treated as 1

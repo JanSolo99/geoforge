@@ -14,7 +14,7 @@
 
 # GeoForge gap analysis against ArcGIS Pro 3.x (with an ENVI parity outlook)
 
-Basis: repo state at commit f6a8aff (about 32k lines Rust; 80 `gf` commands; crates core, shapefile, filegdb, geometry, tools, raster, proj, gpkg, json, csv, cli, testkit). ArcGIS tool lists are from knowledge of the Pro 3.x reference (not re-confirmed online). Rows are line items; one row may group several closely related tools, so the counts below are of items, not of individual tools (ArcGIS Pro has roughly 2,000 geoprocessing tools; GeoForge has about 80).
+Basis: repo state at commit f6a8aff (about 32k lines Rust; 80 `ug` commands; crates core, shapefile, filegdb, geometry, tools, raster, proj, gpkg, json, csv, cli, testkit). ArcGIS tool lists are from knowledge of the Pro 3.x reference (not re-confirmed online). Rows are line items; one row may group several closely related tools, so the counts below are of items, not of individual tools (ArcGIS Pro has roughly 2,000 geoprocessing tools; GeoForge has about 80).
 
 ## (a) Executive summary
 
@@ -825,4 +825,4 @@ Practical plan for ENVI: put the ENVI format and tasks naming layer next to the 
 | Date-time/time zone behaviors, Python builtin differences in Calculate Field (arcpy sandbox) | Edge-case semantics | Keep growing the test list (28 expressions today); Arcade and VBScript: Arcade only if requested |
 | Floating-point summation order differences (statistics, zonal means) | Order of accumulation | Compare with relative tolerance 1e-9..1e-12 |
 
-Global policy suggestion: (1) classify every tool as Exact (byte/value-level), Tolerant (documented tolerance), Equivalent (same function, different algorithm; tested on properties) or Out-of-scope; record in the tool registry and surface it in `gf describe-tool`. (2) Keep the black-box rule from CLAUDE.md: never decompile; all behaviour from outputs. (3) Add optional-feature crates for licensed or heavy dependencies (ECW/MrSID, ONNX, HDF5) so the core stays dependency-light.
+Global policy suggestion: (1) classify every tool as Exact (byte/value-level), Tolerant (documented tolerance), Equivalent (same function, different algorithm; tested on properties) or Out-of-scope; record in the tool registry and surface it in `ug describe-tool`. (2) Keep the black-box rule from CLAUDE.md: never decompile; all behaviour from outputs. (3) Add optional-feature crates for licensed or heavy dependencies (ECW/MrSID, ONNX, HDF5) so the core stays dependency-light.

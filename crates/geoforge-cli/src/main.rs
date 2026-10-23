@@ -1,4 +1,4 @@
-//! `gf`: UniGIS geoprocessing tools from the command line. Tool names and
+//! `ug`: UniGIS geoprocessing tools from the command line. Tool names and
 //! behavior follow their ArcGIS Pro counterparts.
 //!
 //! Datasets are addressed the way ArcGIS does: `roads.shp`, `city.gdb`,
@@ -14,7 +14,7 @@ use geoforge_shapefile::{ShapefileReader, ShapefileWriter};
 use geoforge_tools::{Dissolve, ToolOutput};
 
 #[derive(Parser)]
-#[command(name = "gf", version, about = "UniGIS geoprocessing tools")]
+#[command(name = "ug", version, about = "UniGIS geoprocessing tools")]
 struct Cli {
     #[command(subcommand)]
     tool: Tool,
@@ -46,7 +46,7 @@ enum Tool {
         clip_features: PathBuf,
         out_feature_class: PathBuf,
     },
-    /// Geometric intersection of inputs (ArcGIS "Intersect"): `gf intersect a b ... out`.
+    /// Geometric intersection of inputs (ArcGIS "Intersect"): `ug intersect a b ... out`.
     Intersect {
         /// Two or more inputs followed by the output.
         #[arg(num_args = 3.., required = true)]
@@ -68,7 +68,7 @@ enum Tool {
         neighbor_option: String,
     },
     /// Polygons from the areas lines or polygon outlines enclose (ArcGIS "Feature To
-    /// Polygon"): `gf feature-to-polygon a [b ...] out`.
+    /// Polygon"): `ug feature-to-polygon a [b ...] out`.
     FeatureToPolygon {
         /// One or more inputs followed by the output.
         #[arg(num_args = 2.., required = true)]
@@ -84,7 +84,7 @@ enum Tool {
         label_features: Option<PathBuf>,
     },
     /// Lines and polygon outlines split where they cross or meet (ArcGIS "Feature To
-    /// Line"): `gf feature-to-line a [b ...] out`.
+    /// Line"): `ug feature-to-line a [b ...] out`.
     FeatureToLine {
         /// One or more inputs followed by the output.
         #[arg(num_args = 2.., required = true)]
@@ -96,7 +96,7 @@ enum Tool {
         #[arg(long, default_value = "ATTRIBUTES")]
         attributes: String,
     },
-    /// Planar overlay of polygon inputs (ArcGIS "Union"): `gf union a b ... out`.
+    /// Planar overlay of polygon inputs (ArcGIS "Union"): `ug union a b ... out`.
     Union {
         /// One or more inputs followed by the output.
         #[arg(num_args = 2.., required = true)]
@@ -109,13 +109,13 @@ enum Tool {
         gaps: String,
     },
     /// The parts of two polygon inputs the other does not cover (ArcGIS "Symmetrical
-    /// Difference"): `gf symmetrical-difference in update out`.
+    /// Difference"): `ug symmetrical-difference in update out`.
     SymmetricalDifference {
         in_features: PathBuf,
         update_features: PathBuf,
         out_feature_class: PathBuf,
     },
-    /// Replace the area update polygons cover (ArcGIS "Update"): `gf update in update out`.
+    /// Replace the area update polygons cover (ArcGIS "Update"): `ug update in update out`.
     Update {
         in_features: PathBuf,
         update_features: PathBuf,
@@ -141,7 +141,7 @@ enum Tool {
         relationship: String,
     },
     /// Combine inputs of the same geometry type into one (ArcGIS "Merge"):
-    /// `gf merge a b ... out`.
+    /// `ug merge a b ... out`.
     Merge {
         /// One or more inputs followed by the output.
         #[arg(num_args = 2.., required = true)]
@@ -223,7 +223,7 @@ enum Tool {
         invert_spatial_relationship: String,
     },
     /// Add the features of inputs to an existing target (ArcGIS "Append"):
-    /// `gf append a b ... target`. Updates the target shapefile in place.
+    /// `ug append a b ... target`. Updates the target shapefile in place.
     Append {
         /// One or more inputs followed by the target.
         #[arg(num_args = 2.., required = true)]
@@ -530,9 +530,9 @@ enum Tool {
         in_features: PathBuf,
         out_feature_class: PathBuf,
     },
-    /// Run a tool of the shared registry: `gf run mean_center input=a.shp output=out.shp weight_field=W`.
+    /// Run a tool of the shared registry: `ug run mean_center input=a.shp output=out.shp weight_field=W`.
     Run {
-        /// The tool's id (see `gf tools`).
+        /// The tool's id (see `ug tools`).
         tool: String,
         /// `name=value` pairs; layers are paths, `output` is the result's path.
         args: Vec<String>,
@@ -703,7 +703,7 @@ enum Tool {
         transform_method: Option<String>,
     },
     /// Write the `.sbn`/`.sbx` spatial index of a shapefile (ArcGIS "Add Spatial
-    /// Index"); gf writes one with every shapefile anyway.
+    /// Index"); ug writes one with every shapefile anyway.
     AddSpatialIndex { in_features: PathBuf },
     /// Spatial Analyst "Slope" (planar) of a GeoTIFF elevation raster.
     Slope {
@@ -970,7 +970,7 @@ enum Tool {
         extent: Option<Vec<f64>>,
     },
     /// Spatial Analyst math function (Abs, Exp, Ln, Sin, ..., Power, Mod, EqualTo, BooleanAnd, Diff,
-    /// BitwiseAnd, ...): `gf math-fn Power dem.tif 2 out.tif`; operands are rasters or numbers.
+    /// BitwiseAnd, ...): `ug math-fn Power dem.tif 2 out.tif`; operands are rasters or numbers.
     MathFn {
         function: String,
         /// One or two operands, then the output raster.
@@ -2131,7 +2131,7 @@ fn main() -> ExitCode {
         Tool::Run { tool, args } => (|| {
             use geoforge_tools::registry;
             let spec = registry::find(&tool)
-                .ok_or_else(|| Error::Unsupported(format!("no tool '{tool}' (see `gf tools`)")))?;
+                .ok_or_else(|| Error::Unsupported(format!("no tool '{tool}' (see `ug tools`)")))?;
             let mut map = std::collections::HashMap::new();
             for a in &args {
                 let (k, v) = a

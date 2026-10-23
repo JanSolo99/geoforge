@@ -1,4 +1,4 @@
-//! End to end: `gf copy-features` every test shapefile and geodatabase feature
+//! End to end: `ug copy-features` every test shapefile and geodatabase feature
 //! class into a new .gdb, then check the copy against the source, against GDAL,
 //! and that its spatial index never misses a feature.
 
@@ -88,7 +88,7 @@ fn copies_into_new_geodatabases() {
             .display()
             .to_string();
         let gdb = out_dir.join(format!("{n}.gdb"));
-        let run = Command::new(env!("CARGO_BIN_EXE_gf"))
+        let run = Command::new(env!("CARGO_BIN_EXE_ug"))
             .arg("copy-features")
             .arg(src_path)
             .arg(gdb.join("copy"))

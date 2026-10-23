@@ -1,4 +1,4 @@
-//! `gf buffer` on geographic data: a distance in a linear unit is measured on the ellipsoid (ArcGIS's
+//! `ug buffer` on geographic data: a distance in a linear unit is measured on the ellipsoid (ArcGIS's
 //! geodesic buffer); a plain number or degrees is planar in degrees.
 
 use std::path::{Path, PathBuf};
@@ -49,7 +49,7 @@ fn linear_distances_on_geographic_data_are_geodesic() {
     let shp = root().join("testdata/shp/point.shp");
     let run = |dist: &str, name: &str| {
         let out = d.join(name);
-        let r = Command::new(env!("CARGO_BIN_EXE_gf"))
+        let r = Command::new(env!("CARGO_BIN_EXE_ug"))
             .args(["buffer"])
             .arg(&shp)
             .arg(&out)

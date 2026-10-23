@@ -1,4 +1,4 @@
-//! `gf delete` / `gf rename` on shapefiles (all sidecar files, nothing else) and geodatabase items.
+//! `ug delete` / `ug rename` on shapefiles (all sidecar files, nothing else) and geodatabase items.
 
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
@@ -10,7 +10,7 @@ fn root() -> PathBuf {
 }
 
 fn gf(args: &[&str]) -> Output {
-    Command::new(env!("CARGO_BIN_EXE_gf"))
+    Command::new(env!("CARGO_BIN_EXE_ug"))
         .args(args)
         .output()
         .unwrap()

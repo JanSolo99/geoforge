@@ -1,4 +1,4 @@
-//! Copy Rows, Table To Table, Join Field, Add Fields and Get Count (through `gf run`) against ArcGIS
+//! Copy Rows, Table To Table, Join Field, Add Fields and Get Count (through `ug run`) against ArcGIS
 //! Pro 3.7 (testdata/arcgis-reference/tables.json).
 
 use std::path::{Path, PathBuf};
@@ -28,7 +28,7 @@ fn ogr(dir: &Path, name: &str, features: &str, ext: &str, geometry: bool) -> Pat
 }
 
 fn run(args: &[String]) -> std::process::Output {
-    Command::new(env!("CARGO_BIN_EXE_gf"))
+    Command::new(env!("CARGO_BIN_EXE_ug"))
         .args(args)
         .output()
         .unwrap()

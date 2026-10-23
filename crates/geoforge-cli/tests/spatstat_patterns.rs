@@ -42,7 +42,7 @@ fn shapefile(dir: &Path, name: &str, ds: &Json) -> PathBuf {
 }
 
 fn run(args: &[String]) -> String {
-    let out = Command::new(env!("CARGO_BIN_EXE_gf"))
+    let out = Command::new(env!("CARGO_BIN_EXE_ug"))
         .args(args)
         .output()
         .unwrap();
@@ -336,7 +336,7 @@ fn pattern_statistics_equal_arcgis() {
         }
         // A fixed band of 0 is an error (with no band at all the default threshold applies; see
         // spatstat_weights.rs).
-        let o = Command::new(env!("CARGO_BIN_EXE_gf"))
+        let o = Command::new(env!("CARGO_BIN_EXE_ug"))
             .args(["run", "spatial_autocorrelation"])
             .arg(&input)
             .args([

@@ -163,7 +163,7 @@ fn compare(key: &str, out: &Path, want: &Json, tolerance: f64) -> Vec<String> {
 }
 
 fn run(args: &[String]) {
-    let out = Command::new(env!("CARGO_BIN_EXE_gf"))
+    let out = Command::new(env!("CARGO_BIN_EXE_ug"))
         .args(args)
         .output()
         .unwrap();
@@ -369,13 +369,13 @@ fn run_command_uses_the_registry() {
             "input=missing.shp".into(),
         ],
     ] {
-        let r = Command::new(env!("CARGO_BIN_EXE_gf"))
+        let r = Command::new(env!("CARGO_BIN_EXE_ug"))
             .args(&bad)
             .output()
             .unwrap();
         assert!(!r.status.success(), "{bad:?}");
     }
-    let list = Command::new(env!("CARGO_BIN_EXE_gf"))
+    let list = Command::new(env!("CARGO_BIN_EXE_ug"))
         .arg("tools")
         .output()
         .unwrap();

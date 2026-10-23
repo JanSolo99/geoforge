@@ -1,7 +1,7 @@
 //! One description of each tool, shared by every front end.
 //!
 //! A [`Tool`] carries the ArcGIS name, toolbox, summary and typed parameters of a geoprocessing
-//! tool together with the function that runs it. The command line (`gf run`), the application's Tools
+//! tool together with the function that runs it. The command line (`ug run`), the application's Tools
 //! pane and the MCP/Python bindings are built from this list, so a tool added here shows up in all
 //! of them without its own wiring (older tools still have a command and an application wrapper of
 //! their own).

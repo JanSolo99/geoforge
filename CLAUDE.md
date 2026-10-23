@@ -21,8 +21,8 @@ Keep all existing project guidance below in effect.
 
 ## Working conventions (established so far)
 - Status and next steps: `docs/ROADMAP.md`. Format findings: `docs/formats/` (FileGDB spec corrections, ArcGIS shapefile behavior).
-- Crates: `core` (geometry model, FeatureClass trait, curves), `shapefile`, `filegdb` (read + write), `geometry` (overlay/buffer on `geo`), `tools` (ArcGIS tools → `ToolOutput`), `cli` (`gf`), `testkit`.
+- Crates: `core` (geometry model, FeatureClass trait, curves), `shapefile`, `filegdb` (read + write), `geometry` (overlay/buffer on `geo`), `tools` (ArcGIS tools → `ToolOutput`), `cli` (`ug`), `testkit`.
 - ArcGIS Pro 3.7 runs here under Wine (GE-Proton, `~/.wine`). The `arcgis` MCP server (`tools/arcgis-bridge/`) runs tools, Describe and arcpy code; in `arcgis_python` wrap Linux paths with `P('/path')`. Use it to settle any ArcGIS behavior question before implementing. If the MCP server misbehaves (e.g. replies out of step after a suspend), run arcpy code from a file with `uv run -q --with "mcp>=2" python tools/arcgis-bridge/run_code.py code.py`. Black-box only: never decompile Esri binaries.
-- New geoprocessing tool workflow: add cases to `scripts/make-arcgis-reference.py`, run it (`uv run --with "mcp>=2" python scripts/make-arcgis-reference.py`), study the outputs (schema, row order, values), implement in `geoforge-tools`, add the `gf` command and the case to `crates/geoforge-cli/tests/arcgis_reference.rs`. Comparisons use ArcGIS's 0.001 m XY tolerance (buffers: 0.2 m / 0.01%).
+- New geoprocessing tool workflow: add cases to `scripts/make-arcgis-reference.py`, run it (`uv run --with "mcp>=2" python scripts/make-arcgis-reference.py`), study the outputs (schema, row order, values), implement in `geoforge-tools`, add the `ug` command and the case to `crates/geoforge-cli/tests/arcgis_reference.rs`. Comparisons use ArcGIS's 0.001 m XY tolerance (buffers: 0.2 m / 0.01%).
 - GDAL (`ogrinfo`) is the oracle for file formats only. CI has an older GDAL (3.8); tests gate on `gdal_version()` where needed.
 - The shell is zsh: quote globs that may not match, and use `${=var}` to split words.

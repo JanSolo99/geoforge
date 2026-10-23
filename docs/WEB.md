@@ -40,5 +40,5 @@ NETLIFY_AUTH_TOKEN=... NETLIFY_SITE_ID=... scripts/deploy-netlify.sh --prod   # 
 
 Maps, symbology, tables, layouts, the Tools pane and the GeoForge tools that do not need the file
 system (shapefiles and GeoPackages are opened from the file picker). File geodatabase browsing and
-the `gf` command line are desktop only. The build uses the `web` Cargo profile (single codegen unit,
+the `ug` command line are desktop only. The build uses the `web` Cargo profile (single codegen unit,
 fat LTO), so expect 15 to 40 minutes and about 8 GB of memory to compile it.

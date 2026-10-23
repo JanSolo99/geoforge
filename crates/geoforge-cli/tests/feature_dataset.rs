@@ -1,4 +1,4 @@
-//! `gf create-feature-dataset` and tool outputs written into a feature dataset (`city.gdb/Ds/name`).
+//! `ug create-feature-dataset` and tool outputs written into a feature dataset (`city.gdb/Ds/name`).
 
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -10,7 +10,7 @@ fn root() -> PathBuf {
 }
 
 fn gf(args: &[&str]) -> std::process::Output {
-    Command::new(env!("CARGO_BIN_EXE_gf"))
+    Command::new(env!("CARGO_BIN_EXE_ug"))
         .args(args)
         .output()
         .unwrap()

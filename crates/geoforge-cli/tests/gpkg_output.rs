@@ -1,4 +1,4 @@
-//! `gf` writing GeoPackages as ArcGIS Pro 3.7 does: the parcels, roads and wells
+//! `ug` writing GeoPackages as ArcGIS Pro 3.7 does: the parcels, roads and wells
 //! shapefiles copied into one GeoPackage must equal, table by table and row by
 //! row, testdata/gpkg/arcgis_wells.gpkg (made by ArcGIS's Copy Features into a
 //! GeoPackage from Create SQLite Database) apart from gpkg_contents.last_change,
@@ -19,7 +19,7 @@ fn copy_features_into_geopackage_like_arcgis() {
     std::fs::create_dir_all(&dir).unwrap();
     let out = dir.join("out.gpkg");
     for layer in ["parcels", "roads", "wells"] {
-        let run = Command::new(env!("CARGO_BIN_EXE_gf"))
+        let run = Command::new(env!("CARGO_BIN_EXE_ug"))
             .arg("copy-features")
             .arg(root().join(format!("testdata/geoproc/{layer}.shp")))
             .arg(out.join(layer))
@@ -88,7 +88,7 @@ fn export_table_into_geopackage_like_arcgis() {
     std::fs::create_dir_all(&dir).unwrap();
     let out = dir.join("out.gpkg");
     for layer in ["parcels", "roads", "wells"] {
-        let run = Command::new(env!("CARGO_BIN_EXE_gf"))
+        let run = Command::new(env!("CARGO_BIN_EXE_ug"))
             .arg("export-table")
             .arg(root().join(format!("testdata/geoproc/{layer}.shp")))
             .arg(out.join(format!("{layer}_tab")))
@@ -175,7 +175,7 @@ fn statistics_tables_into_geopackage_like_arcgis() {
         ),
     ];
     for (name, args) in runs {
-        let mut cmd = Command::new(env!("CARGO_BIN_EXE_gf"));
+        let mut cmd = Command::new(env!("CARGO_BIN_EXE_ug"));
         for a in args {
             if *a == "<out>" {
                 cmd.arg(out.join(name));
@@ -256,7 +256,7 @@ fn statistics_tables_into_geodatabase_like_arcgis() {
     // A new geodatabase takes one table per run here: write each to its own and compare.
     for (name, args) in runs {
         let gdb = dir.join(format!("{name}.gdb"));
-        let mut cmd = Command::new(env!("CARGO_BIN_EXE_gf"));
+        let mut cmd = Command::new(env!("CARGO_BIN_EXE_ug"));
         for a in args {
             if *a == "<out>" {
                 cmd.arg(gdb.join(name));

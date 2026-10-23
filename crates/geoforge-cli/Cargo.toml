@@ -1,13 +1,13 @@
 [package]
 name = "geoforge-cli"
-description = "Command-line front end (gf)"
+description = "Command-line front end (ug)"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
 
 [[bin]]
-name = "gf"
+name = "ug"
 path = "src/main.rs"
 
 [dependencies]
