@@ -164,6 +164,19 @@ fn filegdb_matches_gdal() {
                 Ok(t) => diff_table(path, &entry.name, &t).unwrap_or_else(|e| vec![e]),
                 Err(e) => vec![format!("cannot open: {e}")],
             };
+            // GDAL before 3.9 reads some newer tables (the utility network ones) as
+            // having no fields at all: nothing to compare.
+            if !gdal_reads_pro_3_2
+                && diffs
+                    .iter()
+                    .any(|d| d.starts_with("fields: ours") && d.ends_with("GDAL []"))
+            {
+                eprintln!(
+                    "~ {label} / {}: skipped (GDAL too old to read its fields)",
+                    entry.name
+                );
+                continue;
+            }
             if !diffs.is_empty() {
                 failures += 1;
                 eprintln!("✗ {label} / {}: {} differences", entry.name, diffs.len());
