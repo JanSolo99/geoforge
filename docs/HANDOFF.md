@@ -26,6 +26,14 @@ name `geoforge`, pref value "geoforge" for theme_style, "GeoForge" in some strin
 exception names, data paths). Next: confirm app tests, commit, push, then fix remaining
 "GeoForge" text if wanted.
 
+Final state (2026-10-24): the crate rename (927eae2) and the GeoForge text sweep (feb5014) are
+committed and pushed on `main`; the tree is clean except the ignored `.worktrees/`. GitHub CI
+and the Netlify web deploy both succeeded for feb5014. Kept on purpose: `geoforge:` legacy id
+prefix, `GeoForgeError` Python alias, `.gf-journal` and its magic string, GitHub repo name, the
+`geoforge` theme_style pref value. Not run: full `cargo xtask ci` locally (CI on GitHub passed).
+Next: the user may add the Netlify secrets or import the `web-dist` branch; otherwise resume tool
+development from `docs/KNOWN_GAPS.md` and `docs/ROADMAP.md`.
+
 Earlier request: allow rules (option 3) so the coordinator stops blocking git/cargo commands,
 then merge the branch into `main` and rename `gf` to `ug` (with tool ids). Writing
 `.claude/settings.local.json` was itself refused by this mode (a session cannot change its own
