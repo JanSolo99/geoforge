@@ -1,0 +1,20 @@
+[package]
+name = "unigis-geometry"
+description = "Geometry engine: overlay, buffer and friends with ArcGIS semantics"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[dependencies]
+unigis-core.workspace = true
+geo.workspace = true
+rstar.workspace = true
+i_overlay.workspace = true
+geographiclib-rs.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true
+
+[lints]
+workspace = true

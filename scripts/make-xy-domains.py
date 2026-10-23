@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Collects the XY domain ArcGIS Pro gives each coordinate system by default, for
-crates/geoforge-filegdb/src/xy_domains.tsv.gz.
+crates/unigis-filegdb/src/xy_domains.tsv.gz.
 
 ArcGIS derives the origin from its own projection engine's idea of where each system is defined (web
 Mercator to about 89 degrees, sinusoidal to 89.84, ...), which cannot be reproduced from a formula; this
@@ -56,7 +56,7 @@ lines = [
 ]
 for name, (xo, yo, res, tol) in sorted(by_name.items()):
     lines.append("\t".join([name, short(xo), short(yo), "" if res == "0.0001" else res, "" if tol == "0.001" else tol]))
-out = root / "crates/geoforge-filegdb/src/xy_domains.tsv.gz"
+out = root / "crates/unigis-filegdb/src/xy_domains.tsv.gz"
 with gzip.GzipFile(out, "wb", mtime=0) as f:
     f.write(("\n".join(lines) + "\n").encode())
 print(f"{len(by_name)} systems -> {out} ({out.stat().st_size} bytes)")

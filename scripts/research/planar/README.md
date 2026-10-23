@@ -7,7 +7,7 @@ are in `probes/p*.json` (`{case: {in, out}}`, coordinates relative to the offset
 in a `pg/` folder next to it. `ph.py` / `ph3.py` replay the Feature To Polygon hole placement
 (sweep diagonals and walk variants) against the dumps.
 
-Findings (implemented in `crates/geoforge-tools/src/planar.rs`):
+Findings (implemented in `crates/unigis-tools/src/planar.rs`):
 
 - Coordinates within 2√2 × XY tolerance merge at their mean (0.0028 m merges, 0.0029 m does not;
   probes `c*`, `e*`).

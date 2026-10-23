@@ -590,7 +590,7 @@ CASES = {
     "zonal_majority_shifted": ("gp.ZonalStatistics_sa", [RASTER / "zones_shifted.tif", "Value", RASTER / "dem_int16_packbits.tif"], ["MAJORITY", "DATA"]),
     "zonal_median_4m": ("gp.ZonalStatistics_sa", [RASTER / "zones_4m.tif", "Value", RASTER / "dem_int16_packbits.tif"], ["MEDIAN", "DATA"]),
     "zonal_range_4m": ("gp.ZonalStatistics_sa", [RASTER / "zones_4m.tif", "Value", RASTER / "dem_int16_packbits.tif"], ["RANGE", "NODATA"]),
-    # Expand, Shrink, Majority Filter, Region Group (rules in geoforge-raster::generalize).
+    # Expand, Shrink, Majority Filter, Region Group (rules in unigis-raster::generalize).
     "expand_classes_1": ("gp.Expand_sa", [RASTER / "landuse_u8.tif"], [1, "1;2", "MORPHOLOGICAL"]),
     "expand_classes_2": ("gp.Expand_sa", [RASTER / "landuse_u8.tif"], [2, "0;3;5", "MORPHOLOGICAL"]),
     "expand_classes_dist_3": ("gp.Expand_sa", [RASTER / "landuse_u8.tif"], [3, "1;2;5", "DISTANCE"]),

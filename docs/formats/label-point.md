@@ -69,12 +69,12 @@ only scored 277 of 289 matchable cases, against 289 of 289 for 2-D distance.
   +1/8192 (2^-13) to the outputs. The shapefile output does not. Compare with a tolerance
   of 1e-3.
 - If there are no candidates (degenerate input), return C.
-- The current `inside_point` in `crates/geoforge-geometry/src/bounding.rs` (centroid if
+- The current `inside_point` in `crates/unigis-geometry/src/bounding.rs` (centroid if
   inside, else a horizontal scan) should be replaced by this rule. Those hypotheses
   (horizontal scans, widest slab, plain centroid-if-inside, and polylabel) are ruled out.
 
 ## Verification in this repository
-`inside_point` in `crates/geoforge-geometry/src/bounding.rs` implements this rule; the
+`inside_point` in `crates/unigis-geometry/src/bounding.rs` implements this rule; the
 reference case `f2p_label_polys_inside` (298 random polygons, `testdata/geoproc/label_polys.shp`)
 and the older Feature To Point cases match ArcGIS. The two degenerate inputs (4 and 298 of the
 original set) are left out.

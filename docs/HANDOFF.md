@@ -14,7 +14,19 @@ Open user decisions: merge the branch into `main` (CI and the web-dist build the
 whether to rename the internal `geoforge-*`/`rustgis-*` crate names and the `gf` binary
 (kept stable so far).
 
-Latest user request: allow rules (option 3) so the coordinator stops blocking git/cargo commands,
+Update (later in the same session): the branch was fast-forward merged into `main` and pushed;
+permission file `.claude/settings.local.json` exists now; `gf` was renamed to `ug` (commit
+5cb8162) and the suite's tool ids to `unigis:<tool>` with `geoforge:<tool>` still resolving
+(51661c4). In progress (uncommitted): crate rename `geoforge-*` -> `unigis-*` (dirs under
+`crates/`, `app/crates/geoforge` -> `app/crates/unigis`, package `rustgis-unigis`, engine
+feature `unigis`, `app/GEOFORGE.md` -> `app/UNIGIS.md`, screenshots `unigis-*.png`). Root
+workspace check, clippy and tests passed; app check and wasm check passed; app tests were
+running. Kept on purpose: `.gf-journal` directory name, the journal MAGIC string, GitHub repo
+name `geoforge`, pref value "geoforge" for theme_style, "GeoForge" in some strings (Python
+exception names, data paths). Next: confirm app tests, commit, push, then fix remaining
+"GeoForge" text if wanted.
+
+Earlier request: allow rules (option 3) so the coordinator stops blocking git/cargo commands,
 then merge the branch into `main` and rename `gf` to `ug` (with tool ids). Writing
 `.claude/settings.local.json` was itself refused by this mode (a session cannot change its own
 permissions), so the user must create it (proposed content given in the chat reply). Nothing was

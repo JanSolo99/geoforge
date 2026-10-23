@@ -1,0 +1,19 @@
+[package]
+name = "rustgis-unigis"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "UniGIS's ArcGIS-verified geoprocessing tools (unigis-tools) as UniGIS tools"
+
+[lints]
+workspace = true
+
+[dependencies]
+rustgis-geom = { workspace = true }
+rustgis-data = { workspace = true }
+rustgis-analysis = { workspace = true }
+serde_json = { workspace = true }
+unigis-core = { path = "../../../crates/unigis-core" }
+unigis-raster = { path = "../../../crates/unigis-raster" }
+unigis-geometry = { path = "../../../crates/unigis-geometry" }
+unigis-tools = { path = "../../../crates/unigis-tools", default-features = false }

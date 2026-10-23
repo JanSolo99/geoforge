@@ -9,17 +9,17 @@ rust-version = "1.88"
 publish = false
 
 [workspace.dependencies]
-geoforge-core = { path = "crates/geoforge-core" }
-geoforge-shapefile = { path = "crates/geoforge-shapefile" }
-geoforge-filegdb = { path = "crates/geoforge-filegdb" }
-geoforge-proj = { path = "crates/geoforge-proj" }
-geoforge-raster = { path = "crates/geoforge-raster" }
-geoforge-testkit = { path = "crates/geoforge-testkit" }
-geoforge-geometry = { path = "crates/geoforge-geometry" }
-geoforge-tools = { path = "crates/geoforge-tools" }
-geoforge-json = { path = "crates/geoforge-json" }
-geoforge-csv = { path = "crates/geoforge-csv" }
-geoforge-gpkg = { path = "crates/geoforge-gpkg" }
+unigis-core = { path = "crates/unigis-core" }
+unigis-shapefile = { path = "crates/unigis-shapefile" }
+unigis-filegdb = { path = "crates/unigis-filegdb" }
+unigis-proj = { path = "crates/unigis-proj" }
+unigis-raster = { path = "crates/unigis-raster" }
+unigis-testkit = { path = "crates/unigis-testkit" }
+unigis-geometry = { path = "crates/unigis-geometry" }
+unigis-tools = { path = "crates/unigis-tools" }
+unigis-json = { path = "crates/unigis-json" }
+unigis-csv = { path = "crates/unigis-csv" }
+unigis-gpkg = { path = "crates/unigis-gpkg" }
 thiserror = "2"
 chrono = { version = "0.4", default-features = false, features = ["std", "clock"] }
 encoding_rs = "0.8"

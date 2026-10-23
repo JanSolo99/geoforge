@@ -29,7 +29,7 @@ rfd = { workspace = true }
 
 [features]
 # UniGIS's ArcGIS-verified tools in the Tools pane (the app enables this through the engine).
-geoforge = ["rustgis-engine/geoforge"]
+unigis = ["rustgis-engine/unigis"]
 
 [dev-dependencies]
 rustgis-plugins = { workspace = true, features = ["testing"] }

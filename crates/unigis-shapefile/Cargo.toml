@@ -1,0 +1,19 @@
+[package]
+name = "unigis-shapefile"
+description = "Esri Shapefile (.shp/.shx/.dbf/.prj) reader and writer"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[dependencies]
+unigis-core.workspace = true
+thiserror.workspace = true
+encoding_rs.workspace = true
+chrono.workspace = true
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+unigis-testkit.workspace = true

@@ -27,7 +27,7 @@ application shell. Nothing stops us reusing the idea of a shell later.
    GUI, CLI, Python and agents all dispatch through it. Ours should add what ArcGIS needs
    (parameter direction, data types, dependencies, environments, messages, history).
 2. **Hostile-parameter test**: run every tool with junk parameters and require no panic. Cheap,
-   catches crashes. Add to `geoforge-tools` once the registry exists.
+   catches crashes. Add to `unigis-tools` once the registry exists.
 3. **No-panic policy** (`deny(unwrap_used)` in non-test code, `unsafe_code = "forbid"`).
 4. **Layering check** in CI (`cargo xtask layers`) to enforce crate dependency rules.
 5. **MCP server exposing the tools** with built-in docs, and a PyO3 package (`maturin`) over the

@@ -10,6 +10,6 @@ description = "UniGIS command line: run commands and geoprocessing, render maps,
 workspace = true
 
 [dependencies]
-rustgis-engine = { workspace = true, features = ["geolibre", "geoforge"] }
+rustgis-engine = { workspace = true, features = ["geolibre", "unigis"] }
 serde_json = { workspace = true }
 rustgis-assistant = { workspace = true }

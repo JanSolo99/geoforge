@@ -1,0 +1,21 @@
+[package]
+name = "unigis-raster"
+description = "Raster model, GeoTIFF I/O, and map algebra"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[dependencies]
+unigis-core.workspace = true
+tiff.workspace = true
+weezl.workspace = true
+flate2.workspace = true
+rstar.workspace = true
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true
+unigis-testkit.workspace = true

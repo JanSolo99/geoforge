@@ -16,12 +16,12 @@ from `app/`.
 
 | | |
 |---|---|
-| ![The map](docs/screenshots/geoforge-map.png) | ![The Tools pane](docs/screenshots/geoforge-tools.png) |
+| ![The map](docs/screenshots/unigis-map.png) | ![The Tools pane](docs/screenshots/unigis-tools.png) |
 | The map and Contents pane | Unified geoprocessing toolboxes |
-| ![A tool form](docs/screenshots/geoforge-tool-form.png) | ![Dark theme](docs/screenshots/geoforge-dark.png) |
+| ![A tool form](docs/screenshots/unigis-tool-form.png) | ![Dark theme](docs/screenshots/unigis-dark.png) |
 | A tool form (Hot Spot Analysis) | Dark theme |
 
-![The Catalog pane](docs/screenshots/geoforge-browser.png)
+![The Catalog pane](docs/screenshots/unigis-browser.png)
 
 The screenshots are rendered offscreen by `app/crates/ui-egui/examples/ui_shot.rs`; the scripts that make
 them are in [`docs/screenshots/scripts/`](docs/screenshots/scripts/).
@@ -30,13 +30,13 @@ them are in [`docs/screenshots/scripts/`](docs/screenshots/scripts/).
 
 | Crate | Purpose |
 |---|---|
-| `geoforge-core` | Geometry model, Esri field types, shared errors |
-| `geoforge-shapefile` | `.shp/.shx/.dbf/.prj/.cpg` read/write |
-| `geoforge-filegdb` | `.gdb` (FileGDB) read/write |
-| `geoforge-proj` | CRS + transformations |
-| `geoforge-raster` | Raster model, GeoTIFF, map algebra |
-| `geoforge-cli` | `ug` command-line tool |
-| `geoforge-testkit` | Test helpers: compare our readers with GDAL |
+| `unigis-core` | Geometry model, Esri field types, shared errors |
+| `unigis-shapefile` | `.shp/.shx/.dbf/.prj/.cpg` read/write |
+| `unigis-filegdb` | `.gdb` (FileGDB) read/write |
+| `unigis-proj` | CRS + transformations |
+| `unigis-raster` | Raster model, GeoTIFF, map algebra |
+| `unigis-cli` | `ug` command-line tool |
+| `unigis-testkit` | Test helpers: compare our readers with GDAL |
 
 ## Build
 

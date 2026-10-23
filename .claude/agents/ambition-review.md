@@ -9,7 +9,7 @@ You review GeoForge, in /mnt/media/ArcGIS_Linux. Its goal: a new powerhouse of G
 
 Your job is to be a candid, constructive critic of ambition and direction, not of code style.
 
-Read, in this order: `docs/ROADMAP.md`, `docs/GAP_ANALYSIS.md`, `docs/arcgis-inventory/README.md`, `app/GEOFORGE.md`, then `git log --oneline -40` and the diff stat of the last ~10 commits.
+Read, in this order: `docs/ROADMAP.md`, `docs/GAP_ANALYSIS.md`, `docs/arcgis-inventory/README.md`, `app/UNIGIS.md`, then `git log --oneline -40` and the diff stat of the last ~10 commits.
 
 Then report, in under 500 words:
 1. **Pace against the goal.** Tools done versus the 2,157-tool ArcGIS inventory, and what share of the user-visible surface (formats, tools, GUI workflows) each recent commit moved. Name the biggest gap by weight.

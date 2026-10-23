@@ -336,140 +336,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "geoforge-cli"
-version = "0.0.1"
-dependencies = [
- "chrono",
- "clap",
- "geoforge-core",
- "geoforge-csv",
- "geoforge-filegdb",
- "geoforge-geometry",
- "geoforge-gpkg",
- "geoforge-json",
- "geoforge-proj",
- "geoforge-raster",
- "geoforge-shapefile",
- "geoforge-testkit",
- "geoforge-tools",
- "geographiclib-rs",
- "serde_json",
-]
-
-[[package]]
-name = "geoforge-core"
-version = "0.0.1"
-dependencies = [
- "chrono",
- "thiserror",
-]
-
-[[package]]
-name = "geoforge-csv"
-version = "0.0.1"
-dependencies = [
- "geoforge-core",
-]
-
-[[package]]
-name = "geoforge-filegdb"
-version = "0.0.1"
-dependencies = [
- "chrono",
- "flate2",
- "geoforge-core",
- "geoforge-testkit",
- "roxmltree",
- "serde_json",
- "thiserror",
-]
-
-[[package]]
-name = "geoforge-geometry"
-version = "0.0.1"
-dependencies = [
- "geo",
- "geoforge-core",
- "geographiclib-rs",
- "i_overlay",
- "rstar",
- "serde_json",
-]
-
-[[package]]
-name = "geoforge-gpkg"
-version = "0.0.1"
-dependencies = [
- "chrono",
- "geoforge-core",
- "geoforge-testkit",
- "serde_json",
-]
-
-[[package]]
-name = "geoforge-json"
-version = "0.0.1"
-dependencies = [
- "chrono",
- "geoforge-core",
- "serde_json",
-]
-
-[[package]]
-name = "geoforge-proj"
-version = "0.0.1"
-dependencies = [
- "geoforge-core",
- "proj",
- "proj-sys",
-]
-
-[[package]]
-name = "geoforge-raster"
-version = "0.0.1"
-dependencies = [
- "flate2",
- "geoforge-core",
- "geoforge-testkit",
- "rstar",
- "serde_json",
- "tiff",
- "weezl",
-]
-
-[[package]]
-name = "geoforge-shapefile"
-version = "0.0.1"
-dependencies = [
- "chrono",
- "encoding_rs",
- "geoforge-core",
- "geoforge-testkit",
- "thiserror",
-]
-
-[[package]]
-name = "geoforge-testkit"
-version = "0.0.1"
-dependencies = [
- "chrono",
- "geoforge-core",
- "serde_json",
-]
-
-[[package]]
-name = "geoforge-tools"
-version = "0.0.1"
-dependencies = [
- "chrono",
- "geoforge-core",
- "geoforge-geometry",
- "geoforge-proj",
- "rstar",
- "spade",
-]
-
-[[package]]
 name = "geographiclib-rs"
 version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1009,6 +875,140 @@ name = "unicode-ident"
 version = "1.0.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d245f478577f809a851594d02313b640fb437e0bb33866753cff937863096954"
+
+[[package]]
+name = "unigis-cli"
+version = "0.0.1"
+dependencies = [
+ "chrono",
+ "clap",
+ "geographiclib-rs",
+ "serde_json",
+ "unigis-core",
+ "unigis-csv",
+ "unigis-filegdb",
+ "unigis-geometry",
+ "unigis-gpkg",
+ "unigis-json",
+ "unigis-proj",
+ "unigis-raster",
+ "unigis-shapefile",
+ "unigis-testkit",
+ "unigis-tools",
+]
+
+[[package]]
+name = "unigis-core"
+version = "0.0.1"
+dependencies = [
+ "chrono",
+ "thiserror",
+]
+
+[[package]]
+name = "unigis-csv"
+version = "0.0.1"
+dependencies = [
+ "unigis-core",
+]
+
+[[package]]
+name = "unigis-filegdb"
+version = "0.0.1"
+dependencies = [
+ "chrono",
+ "flate2",
+ "roxmltree",
+ "serde_json",
+ "thiserror",
+ "unigis-core",
+ "unigis-testkit",
+]
+
+[[package]]
+name = "unigis-geometry"
+version = "0.0.1"
+dependencies = [
+ "geo",
+ "geographiclib-rs",
+ "i_overlay",
+ "rstar",
+ "serde_json",
+ "unigis-core",
+]
+
+[[package]]
+name = "unigis-gpkg"
+version = "0.0.1"
+dependencies = [
+ "chrono",
+ "serde_json",
+ "unigis-core",
+ "unigis-testkit",
+]
+
+[[package]]
+name = "unigis-json"
+version = "0.0.1"
+dependencies = [
+ "chrono",
+ "serde_json",
+ "unigis-core",
+]
+
+[[package]]
+name = "unigis-proj"
+version = "0.0.1"
+dependencies = [
+ "proj",
+ "proj-sys",
+ "unigis-core",
+]
+
+[[package]]
+name = "unigis-raster"
+version = "0.0.1"
+dependencies = [
+ "flate2",
+ "rstar",
+ "serde_json",
+ "tiff",
+ "unigis-core",
+ "unigis-testkit",
+ "weezl",
+]
+
+[[package]]
+name = "unigis-shapefile"
+version = "0.0.1"
+dependencies = [
+ "chrono",
+ "encoding_rs",
+ "thiserror",
+ "unigis-core",
+ "unigis-testkit",
+]
+
+[[package]]
+name = "unigis-testkit"
+version = "0.0.1"
+dependencies = [
+ "chrono",
+ "serde_json",
+ "unigis-core",
+]
+
+[[package]]
+name = "unigis-tools"
+version = "0.0.1"
+dependencies = [
+ "chrono",
+ "rstar",
+ "spade",
+ "unigis-core",
+ "unigis-geometry",
+ "unigis-proj",
+]
 
 [[package]]
 name = "utf8parse"

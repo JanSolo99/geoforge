@@ -703,7 +703,7 @@ Status: done / partial / missing. Difficulty S (days) / M (1-2 weeks) / L (weeks
 Ranking criteria: user value (frequency of use in ArcGIS workflows), dependency (unblocks others), verifiability (Pro under Wine yields deterministic output), cost.
 
 ### Stage 0 - foundations (do before widening)
-1. Existing-GDB edit support in `geoforge-filegdb` (rewrite system tables and indexes; add table/feature class/field to an existing GDB; update/delete rows; .atx writing; compaction). Unblocks Add Field/Calculate Field/Join Field/Define Projection/Delete Rows/domain+subtype tools on gdb.
+1. Existing-GDB edit support in `unigis-filegdb` (rewrite system tables and indexes; add table/feature class/field to an existing GDB; update/delete rows; .atx writing; compaction). Unblocks Add Field/Calculate Field/Join Field/Define Projection/Delete Rows/domain+subtype tools on gdb.
 2. Tool trait, parameter model, messages (ERROR/WARNING codes), environments (workspace, overwriteOutput, extent, cellSize, snapRaster, mask, outputCoordinateSystem, scratchGDB), layer/selection model (Make Feature Layer, selections, definition queries).
 3. Raster foundation: multi-band model everywhere, environments (cell size/extent/mask/snap), Esri .aux.xml statistics/histograms, pyramids/overviews, COG, ESRI ASCII/BIL/IMG/ESRI Grid readers.
 4. Python bindings (PyO3) exposing tools, cursors (arcpy.da), geometry objects and Raster class: allows running arcpy-style scripts and enables direct differential testing against the arcpy bridge using identical scripts.

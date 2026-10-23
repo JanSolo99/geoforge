@@ -2,7 +2,7 @@
 
 Worked out black-box by writing files with ArcGIS Pro 3.7 (Generate Spatial Weights Matrix) on small
 inputs and reading the bytes; probes in `scripts/research/spatstat/weights/`, reader/writer in
-`crates/geoforge-tools/src/swm.rs`.
+`crates/unigis-tools/src/swm.rs`.
 
 ## Layout
 

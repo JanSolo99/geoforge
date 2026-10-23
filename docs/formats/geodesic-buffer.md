@@ -1,7 +1,7 @@
 # Geodesic Buffer (ArcGIS Pro 3.7, geographic input, distance in a linear unit)
 
-Observed through the bridge; implemented in `crates/geoforge-geometry/src/geodesic.rs`, checked on 25 cases
-(`testdata/arcgis-reference/geodesic_buffers.json`, `crates/geoforge-geometry/tests/geodesic_buffer.rs`).
+Observed through the bridge; implemented in `crates/unigis-geometry/src/geodesic.rs`, checked on 25 cases
+(`testdata/arcgis-reference/geodesic_buffers.json`, `crates/unigis-geometry/tests/geodesic_buffer.rs`).
 
 - A plain number, or a distance in degrees, is a planar buffer in degrees (the existing planar rule with the
   geographic deviation). Only a linear unit gives the geodesic buffer. `BUFF_DIST` keeps the distance as given.

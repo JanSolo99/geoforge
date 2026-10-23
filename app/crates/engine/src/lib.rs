@@ -394,8 +394,8 @@ impl Session {
         // Cheap: the suite's tools load the first time a tool list is needed.
         #[cfg(feature = "geolibre")]
         rustgis_geolibre::register();
-        #[cfg(feature = "geoforge")]
-        rustgis_geoforge::register();
+        #[cfg(feature = "unigis")]
+        rustgis_unigis::register();
         rustgis_plugins::tools::register();
         // FlatGeobuf and GeoParquet by their web address are read through the tile fetchers.
         render::rustgis_tiles::remote::install();

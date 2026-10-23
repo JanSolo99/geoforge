@@ -1885,58 +1885,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "geoforge-core"
-version = "0.0.1"
-dependencies = [
- "chrono",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "geoforge-filegdb"
-version = "0.0.1"
-dependencies = [
- "chrono",
- "flate2",
- "geoforge-core",
- "roxmltree 0.20.0",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "geoforge-geometry"
-version = "0.0.1"
-dependencies = [
- "geo",
- "geoforge-core",
- "geographiclib-rs",
- "i_overlay",
- "rstar",
-]
-
-[[package]]
-name = "geoforge-raster"
-version = "0.0.1"
-dependencies = [
- "flate2",
- "geoforge-core",
- "rstar",
- "tiff",
- "weezl",
-]
-
-[[package]]
-name = "geoforge-tools"
-version = "0.0.1"
-dependencies = [
- "chrono",
- "geoforge-core",
- "geoforge-geometry",
- "rstar",
- "spade",
-]
-
-[[package]]
 name = "geographiclib-rs"
 version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4091,8 +4039,6 @@ dependencies = [
  "crs-definitions",
  "csv",
  "flatgeobuf",
- "geoforge-core",
- "geoforge-filegdb",
  "geozero",
  "image",
  "laz",
@@ -4112,6 +4058,8 @@ dependencies = [
  "thiserror 2.0.21",
  "tiff",
  "tokio-postgres-rustls",
+ "unigis-core",
+ "unigis-filegdb",
  "webpki-roots",
  "zstd 0.13.3",
 ]
@@ -4126,31 +4074,17 @@ dependencies = [
  "rusqlite",
  "rustgis-analysis",
  "rustgis-data",
- "rustgis-geoforge",
  "rustgis-geolibre",
  "rustgis-geom",
  "rustgis-map",
  "rustgis-plugins",
  "rustgis-render",
+ "rustgis-unigis",
  "serde",
  "serde_json",
  "sys-locale",
  "tiny-skia",
  "web-time",
-]
-
-[[package]]
-name = "rustgis-geoforge"
-version = "0.2.0"
-dependencies = [
- "geoforge-core",
- "geoforge-geometry",
- "geoforge-raster",
- "geoforge-tools",
- "rustgis-analysis",
- "rustgis-data",
- "rustgis-geom",
- "serde_json",
 ]
 
 [[package]]
@@ -4271,6 +4205,20 @@ dependencies = [
  "serde_json",
  "sys-locale",
  "web-time",
+]
+
+[[package]]
+name = "rustgis-unigis"
+version = "0.2.0"
+dependencies = [
+ "rustgis-analysis",
+ "rustgis-data",
+ "rustgis-geom",
+ "serde_json",
+ "unigis-core",
+ "unigis-geometry",
+ "unigis-raster",
+ "unigis-tools",
 ]
 
 [[package]]
@@ -5252,6 +5200,58 @@ name = "unicode-width"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b4ac048d71ede7ee76d585517add45da530660ef4390e49b098733c6e897f254"
+
+[[package]]
+name = "unigis-core"
+version = "0.0.1"
+dependencies = [
+ "chrono",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "unigis-filegdb"
+version = "0.0.1"
+dependencies = [
+ "chrono",
+ "flate2",
+ "roxmltree 0.20.0",
+ "thiserror 2.0.21",
+ "unigis-core",
+]
+
+[[package]]
+name = "unigis-geometry"
+version = "0.0.1"
+dependencies = [
+ "geo",
+ "geographiclib-rs",
+ "i_overlay",
+ "rstar",
+ "unigis-core",
+]
+
+[[package]]
+name = "unigis-raster"
+version = "0.0.1"
+dependencies = [
+ "flate2",
+ "rstar",
+ "tiff",
+ "unigis-core",
+ "weezl",
+]
+
+[[package]]
+name = "unigis-tools"
+version = "0.0.1"
+dependencies = [
+ "chrono",
+ "rstar",
+ "spade",
+ "unigis-core",
+ "unigis-geometry",
+]
 
 [[package]]
 name = "untrusted"

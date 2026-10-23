@@ -1,4 +1,4 @@
-//! File Geodatabases (`.gdb` folders) read in place through UniGIS's `geoforge-filegdb`.
+//! File Geodatabases (`.gdb` folders) read in place through UniGIS's `unigis-filegdb`.
 //!
 //! Modified for UniGIS (not part of upstream RustGIS).
 //!
@@ -10,8 +10,8 @@
 
 use std::path::Path;
 
-use geoforge_core::{Envelope, GeometryKind, Value as GfValue};
-use geoforge_filegdb::{Geodatabase, Table};
+use unigis_core::{Envelope, GeometryKind, Value as GfValue};
+use unigis_filegdb::{Geodatabase, Table};
 
 pub use super::gfshape::{from_geoforge, to_geoforge};
 use super::{Batch, FeatureSource, Reproject, Request, SourceInfo, clamp_limit, stride};
@@ -111,8 +111,8 @@ fn path_has_spx(_path: &Path, gdb: &Geodatabase, name: &str) -> bool {
     gdb.table_base(name).is_ok_and(|b| b.with_extension("spx").is_file())
 }
 
-fn field_type(t: geoforge_core::FieldType) -> FieldType {
-    use geoforge_core::FieldType as G;
+fn field_type(t: unigis_core::FieldType) -> FieldType {
+    use unigis_core::FieldType as G;
     match t {
         G::SmallInteger | G::Integer | G::BigInteger => FieldType::Integer,
         G::Single | G::Double => FieldType::Double,
@@ -153,7 +153,7 @@ impl FeatureSource for FileGdbSource {
         let (mut oids, from_index) = self.candidates(env.as_ref());
         let mut skipped = 0;
         // Without a spatial index, or with an extent, the row's own envelope decides.
-        let meets = |f: &geoforge_core::Feature| match (&env, &f.geometry) {
+        let meets = |f: &unigis_core::Feature| match (&env, &f.geometry) {
             (None, _) => true,
             (Some(e), Some(g)) => {
                 let b = g.envelope();
@@ -161,7 +161,7 @@ impl FeatureSource for FileGdbSource {
             }
             (Some(_), None) => false,
         };
-        let mut rows: Vec<geoforge_core::Feature> = Vec::new();
+        let mut rows: Vec<unigis_core::Feature> = Vec::new();
         let matched;
         let complete;
         if env.is_none() || from_index {
@@ -239,8 +239,8 @@ pub fn layers(gdb: &Path) -> Result<Vec<String>> {
 /// File Geodatabase `gdb`, creating the geodatabase if it doesn't exist and replacing a class of
 /// that name. Coordinates are WGS 84, as the map holds them. Returns the number of features.
 pub fn write(ds: &Dataset, gdb: &Path, name: Option<&str>) -> Result<usize> {
-    use geoforge_core::{Feature as GfFeature, Field as GfField, FieldType as GfType, Value as GfValue};
-    use geoforge_filegdb::GeodatabaseWriter;
+    use unigis_core::{Feature as GfFeature, Field as GfField, FieldType as GfType, Value as GfValue};
+    use unigis_filegdb::GeodatabaseWriter;
     let mut table = gdb_name(name.unwrap_or(&ds.name), 160);
     if table.to_ascii_uppercase().starts_with("GDB_") {
         table.insert(0, 'T');
@@ -252,7 +252,7 @@ pub fn write(ds: &Dataset, gdb: &Path, name: Option<&str>) -> Result<usize> {
     if exists {
         // Replacing a class of the same name, as every other writer replaces its file.
         if Geodatabase::open(gdb).map_err(bad)?.entries().iter().any(|e| e.name.eq_ignore_ascii_case(&table)) {
-            geoforge_filegdb::delete_item(gdb, &table).map_err(bad)?;
+            unigis_filegdb::delete_item(gdb, &table).map_err(bad)?;
         }
     }
     // Fields: names the geodatabase accepts, unique, and a type that holds every value.

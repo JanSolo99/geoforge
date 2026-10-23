@@ -27,10 +27,10 @@ and verified against GDAL/OGR output on real data.
 - [x] Cargo workspace, crate layout
 - [x] CI (fmt, clippy, test) on GitHub Actions
 - [x] Test-data corpus: `testdata/shp` (committed, `scripts/make-testdata.sh`) + `testdata/large` (`scripts/fetch-testdata.sh`)
-- [x] `geoforge-testkit`: oracle tests comparing our reads with `ogrinfo` (JSON attributes + ISO WKT geometry)
+- [x] `unigis-testkit`: oracle tests comparing our reads with `ogrinfo` (JSON attributes + ISO WKT geometry)
 
 ## Phase 1 — Shapefile (complete spec)
-- [x] Esri-layout geometry model in `geoforge-core` (flat coords + part offsets, Z/M, MultiPatch part types)
+- [x] Esri-layout geometry model in `unigis-core` (flat coords + part offsets, Z/M, MultiPatch part types)
 - [x] `.shp/.shx` all 14 shape types incl. Z/M and MultiPatch; empty points; missing/corrupt `.shx` recovery
 - [x] `.dbf` (dBASE III/IV, field types C/N/F/L/D/M), `.cpg` / LDID encodings
 - [x] `.prj` WKT1 passthrough
@@ -46,8 +46,8 @@ and verified against GDAL/OGR output on real data.
       them); memo fields read as GDAL does (block number) — ArcGIS cannot open such files
 
 ## Phase 2 — Geometry engine
-Overlay is delegated to `geo` (i_overlay); `geoforge-geometry` adds Esri semantics and
-`geoforge-tools` the ArcGIS tools. Each tool is checked against ArcGIS Pro output stored
+Overlay is delegated to `geo` (i_overlay); `unigis-geometry` adds Esri semantics and
+`unigis-tools` the ArcGIS tools. Each tool is checked against ArcGIS Pro output stored
 in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`).
 - [x] Clip (points, lines, polygons; clip features dissolved; Z/M restored) — matches
       ArcGIS within its 0.001 m XY tolerance
@@ -66,7 +66,7 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       at the north pole and keep the south pole as interior point; CCW flag on hole arcs. Matches
       ArcGIS's vertices and arcs (`testdata/gdb-reference/buffers.gdb`); open: where ArcGIS starts
       a polygon ring (its seam can split an arc), one 2° stretch of a 60 m dissolve kept as vertices
-- [x] Buffer: geodesic for geographic data (`BufferDistance::Geodesic`, `geoforge_geometry::buffer_geodesic`; `ug buffer
+- [x] Buffer: geodesic for geographic data (`BufferDistance::Geodesic`, `unigis_geometry::buffer_geodesic`; `ug buffer
       in out "1 Kilometers"` on a geographic system; a plain number or degrees stays planar in degrees, as in
       ArcGIS). Points are the exact geodesic circle on WGS 84 (starts north, clockwise, 223 steps at 1 km) with
       ArcGIS's distance-tiered chord deviation; lines and polygons are built from the planar pieces with every offset
@@ -87,7 +87,7 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       CONTAINS/WITHIN with Esri's boundary rule, CLOSEST, distance field) — match ArcGIS
       (distances to ~1e-9 m; ArcGIS computes on its own grid)
   - [x] Geodesic Near / Generate Near Table (`--method GEODESIC`) and Spatial Join `CLOSEST_GEODESIC` /
-        `WITHIN_A_DISTANCE_GEODESIC` on longitude/latitude data (`geoforge-geometry::nearest_geodesic`; metres on WGS 84,
+        `WITHIN_A_DISTANCE_GEODESIC` on longitude/latitude data (`unigis-geometry::nearest_geodesic`; metres on WGS 84,
         azimuth angles): equal to ArcGIS between points and for polygons; ArcGIS finds the closest point on a plain line
         only approximately, so line cases differ by up to 0.08 % in distance (`tests/near_geodesic.rs`, 54 cases). Segments
         are straight in longitude/latitude, so pairs across the antimeridian are not handled. The app's Near, Generate
@@ -185,7 +185,7 @@ in `testdata/arcgis-reference/` (regenerate: `scripts/make-arcgis-reference.py`)
       field is created from `--field-type` if missing — matches ArcGIS on 28 expressions.
       Not covered: Arcade/SQL expressions, comprehensions, dictionaries, exceptions, imports
       besides `math`, date arithmetic
-- [x] Planar graph tools (`geoforge-tools::planar`; `ug polygon-to-line`, `ug feature-to-polygon`,
+- [x] Planar graph tools (`unigis-tools::planar`; `ug polygon-to-line`, `ug feature-to-polygon`,
       `ug feature-to-line`, also on the registry): Polygon To Line IDENTIFY_NEIGHBORS (the default),
       Feature To Polygon (label features, ATTRIBUTES/NO_ATTRIBUTES, several inputs) and Feature To
       Line (several inputs, NO_ATTRIBUTES) match Pro 3.7 vertex for vertex on 22 reference runs and
@@ -306,7 +306,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
       projection engine, so it is a table, not a formula; a system ArcGIS does not know keeps the fixed origin
 
 ## Phase 4 — CRS
-- [x] PROJ binding (`geoforge-proj` on the `proj` crate, system PROJ >= 9.6.2 or built from
+- [x] PROJ binding (`unigis-proj` on the `proj` crate, system PROJ >= 9.6.2 or built from
       source): CRSs from factory codes (EPSG, then Esri), `.prj` files or WKT; Esri WKT out
 - [x] Project tool (`ug project in out 4326`): vertices transformed by PROJ, Z/M kept — matches
       ArcGIS to ~1e-13° / sub-mm on WGS 84 ↔ UTM / Web Mercator; output `.prj` is ArcGIS's
@@ -382,7 +382,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
   - [x] Con/Set Null on any grids with the same type rule over the true/false values; Con's
         grid comes from the condition and true rasters only (the false raster is sampled onto
         it), Set Null's from the condition and false rasters, matching ArcGIS
-  - [x] Cell size/snap/extent/mask environments (`geoforge-raster::env`, matched cell-for-cell to ArcGIS on 23 runs in
+  - [x] Cell size/snap/extent/mask environments (`unigis-raster::env`, matched cell-for-cell to ArcGIS on 23 runs in
         `tests/raster_env.rs`; observed rules in the module docs; app tools take `cell_size`/`extent`/`snap_raster`/`mask`,
         `arcpy.env.cellSize/extent/snapRaster/mask`; Euclidean Distance, Extract By Mask, Zonal and the vector conversions ignore them)
 - [ ] Hillshade, slope, aspect, curvature, contours, viewshed, hydrology (fill/flow dir/accumulation/watershed)
@@ -454,7 +454,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         and Polygon To Raster MAXIMUM_COMBINED_AREA, matching ArcGIS; sub-byte results whose
         values run exactly from 1 to the layout's top keep NoData 0
   - [x] IDW (Spatial Analyst interpolation, ported from RustGIS and rebuilt to ArcGIS's rules in
-        `geoforge-raster::interpolate`; `ug idw`, the app's IDW tool, `arcpy.sa.Idw` with
+        `unigis-raster::interpolate`; `ug idw`, the app's IDW tool, `arcpy.sa.Idw` with
         `RadiusVariable`/`RadiusFixed`): grid cell centers start at the points' lower-left corner
         (`round(w / cell) + 1` cells; a snap raster snaps the points' own extent outward instead);
         default cell = shorter side / 250; variable radius = the n nearest points but never beyond
@@ -463,7 +463,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         3 environments and 15 reach cases match Pro 3.7 (`testdata/arcgis-reference/idw.json`,
         probes in `scripts/research/idw/`). Barriers not done. Next in this family: Natural
         Neighbor, Spline, Kriging, Trend, Topo to Raster
-  - [x] Overlay and local tools over several rasters (`geoforge-raster::overlay`; `ug cell-statistics`,
+  - [x] Overlay and local tools over several rasters (`unigis-raster::overlay`; `ug cell-statistics`,
         `weighted-sum`, `highest-position`, `combine`, `fuzzy-membership`, `fuzzy-overlay`; app tools
         incl. Weighted Overlay; `arcpy.sa.CellStatistics`, `WeightedSum`, `HighestPosition`,
         `LowestPosition`, `Combine`, `WeightedOverlay`, `FuzzyMembership`, `FuzzyOverlay` and the
@@ -476,7 +476,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         statistics allow (not the values found), values 0..1 giving NoData 16, wide signed input
         staying S32. Not done: Weighted Overlay RESTRICTED, value fields other than VALUE, the
         Combine/Weighted Overlay attribute tables, `ug weighted-overlay`
-  - [x] Construction tools on the shared registry (`geoforge-tools::construct`): Densify, Generate
+  - [x] Construction tools on the shared registry (`unigis-tools::construct`): Densify, Generate
         Points Along Lines, Create Fishnet and Polygon To Line (IGNORE_NEIGHBORS), 24 runs matching
         Pro 3.7 (`testdata/arcgis-reference/construct.json`, probes in `scripts/research/construct/`):
         a segment longer than the distance is cut into floor(length / distance) + 1 equal parts (one
@@ -486,14 +486,14 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         Not done: fishnet labels, Densify's ANGLE and
         OFFSET methods and curves, chainage fields, Multiple Ring Buffer and Create Thiessen
         Polygons (probed: `scripts/research/construct/probe1.py`)
-  - [x] Table tools on the shared registry (`geoforge-tools::tables`): Copy Rows, Table To Table
+  - [x] Table tools on the shared registry (`unigis-tools::tables`): Copy Rows, Table To Table
         (where clause), Join Field (all or named fields, `_1` renaming, first match, nulls where
         unmatched; features or tables), Add Fields and Get Count matching Pro 3.7 on 9 runs
-        (`testdata/arcgis-reference/tables.json`, `crates/geoforge-cli/tests/tables.rs`). The
+        (`testdata/arcgis-reference/tables.json`, `crates/unigis-cli/tests/tables.rs`). The
         registry now has table results (`Outcome::Table`). Not done: Delete Rows and Alter Field (they
         edit their input; shapefiles cannot rename fields), field mappings, GDB table outputs from
         `ug run`
-  - [x] Data Management breadth tools on the shared registry (`geoforge-tools::dm_geometry`,
+  - [x] Data Management breadth tools on the shared registry (`unigis-tools::dm_geometry`,
         `dm_fields`, `dm_tools`; run with `ug run <id> input=... output=...`), each matching Pro 3.7
         on 3-9 runs in `manifest.json` (cases `env_*`, `slv_*`, `sap_*`, `epp_*`, `xy2l_*`, `cfs_*`,
         `std_*`, `tf_*`, `rf_*`, `transpose_*`, `pivot_*`; inputs in `testdata/dm`):
@@ -507,7 +507,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         need a geodatabase), Dice, Subdivide Polygon, Generate Rectangles/Transects Along Lines.
         Known differences: the order of Split Line At Point's pieces on one curved road, and
         MULTIPART envelopes of nested parts (our shapefile writer turns the inner ring into a hole)
-  - [x] Spatial Analyst math functions (`geoforge-raster::mathfn`; `ug math-fn`, 45 app tools,
+  - [x] Spatial Analyst math functions (`unigis-raster::mathfn`; `ug math-fn`, 45 app tools,
         `arcpy.sa.Abs` ... `BitwiseRightShift`): Abs, Exp, Exp2, Exp10, Ln, Log2, Log10, Square Root,
         Square, Negate, the trigonometric and hyperbolic functions and their inverses, Round Down/Up,
         Boolean Not, Bitwise Not, Power, Mod, ATan2, the six relational and three Boolean operators,
@@ -517,13 +517,13 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         allow; Mod is fmod; shifts are 32-bit and wrap. Not done: Plus/Minus/Times/Divide type rules
         beyond the earlier ones (see `local::math_type`), Negate/Abs on constants
   - [x] Aggregate, Block Statistics, Slice (EQUAL_INTERVAL), Pick and Region Group (FOUR, WITHIN)
-        (`geoforge-raster::blockops`; app tools and `arcpy.sa`) matching Pro 3.7 on 82 runs, grids,
+        (`unigis-raster::blockops`; app tools and `arcpy.sa`) matching Pro 3.7 on 82 runs, grids,
         types, NoData and values (`testdata/arcgis-reference/blockops.json`): Aggregate counts blocks
         from the lower-left corner, Block Statistics from the upper-left; an integer raster's range counts
         one wider for Slice. Not done: Slice's other methods (equal area differs on a cell, natural
         breaks), `ug` commands for Aggregate, Block Statistics, Slice and Pick
   - [x] Expand, Shrink (MORPHOLOGICAL and DISTANCE), Majority Filter (FOUR/EIGHT, MAJORITY/HALF) and
-        Region Group (FOUR/EIGHT, WITHIN/CROSS, excluded value) (`geoforge-raster::generalize`; `gf
+        Region Group (FOUR/EIGHT, WITHIN/CROSS, excluded value) (`unigis-raster::generalize`; `gf
         expand|shrink|majority-filter|region-group`, app tools, `arcpy.sa`) matching Pro 3.7 cell for cell
         on 34 reference cases (`expand_*`, `shrink_*`, `majority_*`, `regiongroup_*`) and on synthetic
         probes: number of cells rounds half to even; morphological passes are synchronous with ties to
@@ -546,7 +546,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         about 12% on an integer DEM's large flats
 
 ## Phase 6 — Toolbox framework
-- [~] Tool registry: the app's `ToolSpec` registry (`app/crates/geoforge`) holds ~65 ArcGIS-verified tools with typed
+- [~] Tool registry: the app's `ToolSpec` registry (`app/crates/unigis`) holds ~65 ArcGIS-verified tools with typed
       parameters (layer, field, number, choice, text, bool), required/default checking, a hostile-parameter test over
       every tool, and geoprocessing history/undo from the RustGIS engine. Not yet: progress and cancellation for long
       runs, environments (cell size, extent, mask, snap) as first-class settings
@@ -560,16 +560,16 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
 
 ## Phase 7 — Databases & other formats
 - [x] Features To JSON: Esri JSON and GeoJSON written byte for byte as ArcGIS writes them
-      (`geoforge-json`: `%.17g` coordinates, field-scale-dependent number forms, formatted
+      (`unigis-json`: `%.17g` coordinates, field-scale-dependent number forms, formatted
       header with a one-line features array, wkid/latestWkid through PROJ's identify)
 - [x] JSON To Features: Esri JSON (field types kept, the OID becomes an empty field,
       Shape_Length/Shape_Area added at 0 as ArcGIS's geodatabase detour leaves them) and GeoJSON
       (one geometry type, numbers as doubles, text(254), always 3D) — match ArcGIS
-- [x] CSV (`geoforge-csv`): tables read with ArcGIS's type inference (Long / Double /
+- [x] CSV (`unigis-csv`): tables read with ArcGIS's type inference (Long / Double /
       Text(254), usable by every tool), Export Table to `.csv` byte-identical to ArcGIS's (BOM,
       CRLF, `%.15f` doubles, RFC 4180 quoting), XY Table To Point (Z field, coordinate system)
 - [ ] GeoPackage / SpatiaLite, PostGIS, KML, GML, DXF, E00, ERDAS IMG, JPEG2000
-  - [x] Own read-only SQLite reader (`geoforge-gpkg::sqlite`): header, table b-trees, overflow
+  - [x] Own read-only SQLite reader (`unigis-gpkg::sqlite`): header, table b-trees, overflow
         pages, records with type affinity, CREATE TABLE columns and rowid aliases; checked row
         for row against Python's sqlite3 at page sizes 512, 4096 and 65536
   - [x] GeoPackage feature and attribute tables read as ArcGIS reads them (`main.` names, 64-bit
@@ -579,7 +579,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         (`docs/formats/geopackage.md`)
   - [x] Shapefile output: Date Only fields fail with ERROR 000308; empty points written as
         −DBL_MAX as ArcGIS does
-  - [x] Own SQLite writer (`geoforge-gpkg::sqlite_writer`): bulk-loaded table and index
+  - [x] Own SQLite writer (`unigis-gpkg::sqlite_writer`): bulk-loaded table and index
         b-trees, overflow pages, automatic indexes, schema beyond page 1, lock-byte page; passes
         `PRAGMA integrity_check` at page sizes 512–65536 and SQLite keeps editing the files;
         2 million rows in 0.18 s (≈ 8× SQLite's own bulk insert), with an index 0.53 s (≈ 3×)
@@ -604,13 +604,13 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
 - [ ] wgpu-based 2D map renderer (symbology, labeling, raster stretch)
 - [ ] Desktop app shell: `app/` (vendored RustGIS, egui) is the shell. File Geodatabase `FeatureSource`
       and File Geodatabase output done (`app/crates/data/src/source/filegdb.rs`), our overlay/proximity tools
-      registered in its `ToolSpec` registry (`app/crates/geoforge`, vector and raster tools); next: more tools
+      registered in its `ToolSpec` registry (`app/crates/unigis`, vector and raster tools); next: more tools
 - [ ] Layout view + PDF/PNG/TIFF export; 3D scene view
 
 ## Phase 9 — Advanced
 - [ ] Network analysis, geocoding, spatial statistics, geostatistics, image classification, point clouds (LAS/LAZ)
   - [ ] Spatial Statistics (0 of 63 at the start of this item)
-    - [x] Measuring Geographic Distributions (`geoforge-tools::spatstat`; `ug mean-center`,
+    - [x] Measuring Geographic Distributions (`unigis-tools::spatstat`; `ug mean-center`,
           `median-center`, `central-feature`, `standard-distance`, `directional-distribution`,
           `directional-mean`) matched to Pro 3.7 on 37 runs (two point sets, one line set; weights,
           case fields, dimension field, self potential, 1-3 deviations, orientation-only;
@@ -625,13 +625,13 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
           1/(1+(d-band)), 8 nearest neighbors; row standardization) and Hot Spot Analysis (Gi*; the
           feature counts itself at weight 1, row standardization changes nothing; bins by p-value
           0.01/0.05/0.10; BH false discovery rate) matching Pro 3.7 on 2 point sets x 44 runs
-          (`testdata/arcgis-reference/spatstat_patterns.json`, `crates/geoforge-cli/tests/spatstat_patterns.rs`).
+          (`testdata/arcgis-reference/spatstat_patterns.json`, `crates/unigis-cli/tests/spatstat_patterns.rs`).
           Tools that give values rather than features return a `registry::Report` (`ug run` prints
           it, the app shows a table and messages, arcpy `getOutput(i)`); ArcGIS's p-values are a
           normal-CDF approximation up to 2e-8 from the exact ones we use. Not done: polygon
           contiguity conceptualizations, spatial weights files, distances under 1 (treated as 1
           for inverse distance, unchecked), FDR checked only where nothing is significant
-    - [x] Spatial weights (`geoforge-tools::swm`, `docs/formats/swm.md`): the `.swm` file format
+    - [x] Spatial weights (`unigis-tools::swm`, `docs/formats/swm.md`): the `.swm` file format
           (read/write, 32- and 64-bit IDs), Generate Spatial Weights Matrix (inverse/fixed distance
           with exponent, threshold and least neighbors, K nearest, Delaunay = Voronoi clipped to
           the hull, contiguity edges/corners with orders, space-time window, convert table;
@@ -641,19 +641,19 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
           order: ArcGIS's k-d tree built with MSVC `nth_element`; sums: NumPy pairwise).
           Spatial Autocorrelation, Hot Spot Analysis and the new Cluster and Outlier Analysis
           (Anselin Local Moran's I) take weights files and polygon contiguity; an empty distance
-          band is the default threshold, 0 relates every pair (`crates/geoforge-cli/tests/spatstat_weights.rs`).
+          band is the default threshold, 0 relates every pair (`crates/unigis-cli/tests/spatstat_weights.rs`).
           Open: KNN tie order on grids, set order in Delaunay/contiguity rows (KNOWN_GAPS)
     - [x] Multi-Distance Spatial Cluster Analysis (Ripley's L(d); weights, beginning distance and
           increment, minimum enclosing rectangle or study area polygon, Ripley's edge correction
-          up to the corner case) matched to Pro 3.7 (`crates/geoforge-cli/tests/spatstat_ripley.rs`).
+          up to the corner case) matched to Pro 3.7 (`crates/unigis-cli/tests/spatstat_ripley.rs`).
           Not done: simulated outer boundary and reduced analysis area corrections
-    - [x] Ordinary Least Squares (`geoforge-tools::regression`): coefficients with standard and
+    - [x] Ordinary Least Squares (`unigis-tools::regression`): coefficients with standard and
           White HC0 robust errors, standardized coefficients, the diagnostic table (AIC/AICc, R2,
           F, Wald, Koenker BP, Jarque-Bera, sigma2 with ArcGIS's definitions), Estimated /
           Residual / StdResid per feature and Spatial Autocorrelation of the residuals matched to
-          Pro 3.7 (`crates/geoforge-cli/tests/spatstat_ols.rs`); the report file is not written
+          Pro 3.7 (`crates/unigis-cli/tests/spatstat_ols.rs`); the report file is not written
     - [x] Collect Events (exact-location counts in x, y order, `Id` for shapefiles) matched to
-          Pro 3.7 (`crates/geoforge-cli/tests/spatstat_events.rs`)
+          Pro 3.7 (`crates/unigis-cli/tests/spatstat_events.rs`)
     - [ ] Next: GWR, Incremental Spatial Autocorrelation, Calculate Distance Band from Neighbor
           Count, Generate Network Spatial Weights
 

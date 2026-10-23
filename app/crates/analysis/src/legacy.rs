@@ -1,6 +1,6 @@
 //! One tool list: the built-in tools that an ArcGIS-verified counterpart replaces.
 //!
-//! The application's own tools predate the UniGIS suite (`rustgis-geoforge`, ids `unigis:*`),
+//! The application's own tools predate the UniGIS suite (`rustgis-unigis`, ids `unigis:*`),
 //! whose tools are matched to ArcGIS Pro. When both have a tool (Buffer, Clip, Minimum Bounding
 //! Geometry...), only the suite's is listed and run. The built-in ids (saved models, history,
 //! scripts) still resolve, to the suite's tool, and their parameters are translated.

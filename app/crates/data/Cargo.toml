@@ -37,11 +37,11 @@ base64 = { workspace = true }
 lz4_flex = { workspace = true }
 ruzstd = { workspace = true }
 # UniGIS's geometry model (the parent repository); pure, so it builds for the browser.
-geoforge-core = { path = "../../../crates/geoforge-core" }
+unigis-core = { path = "../../../crates/unigis-core" }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 # UniGIS's engine (the parent repository): File Geodatabase reading.
-geoforge-filegdb = { path = "../../../crates/geoforge-filegdb" }
+unigis-filegdb = { path = "../../../crates/unigis-filegdb" }
 rusqlite = { workspace = true }
 postgres = { workspace = true }
 tokio-postgres-rustls = { workspace = true }

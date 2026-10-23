@@ -1,6 +1,6 @@
 # File Geodatabase format notes
 
-Working notes for `geoforge-filegdb`. Derived from Even Rouault's reverse-engineered
+Working notes for `unigis-filegdb`. Derived from Even Rouault's reverse-engineered
 specification, https://github.com/rouault/dump_gdbtable/wiki/FGDB-Spec (CC-BY-SA 3.0),
 and checked against GDAL's OpenFileGDB driver output. Clean-room: no Esri SDK code.
 

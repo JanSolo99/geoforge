@@ -4,18 +4,18 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 publish = false
-default-run = "geoforge"
+default-run = "unigis"
 description = "UniGIS desktop app"
 
 [[bin]]
-name = "geoforge"
+name = "unigis"
 path = "src/main.rs"
 
 [lints]
 workspace = true
 
 [dependencies]
-rustgis-engine = { workspace = true, features = ["geolibre", "geoforge"] }
+rustgis-engine = { workspace = true, features = ["geolibre", "unigis"] }
 rustgis-ui-egui = { workspace = true }
 eframe = { workspace = true, features = ["default_fonts", "links", "wgpu", "accesskit", "wayland", "x11"] }
 egui = { workspace = true }

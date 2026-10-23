@@ -50,7 +50,7 @@ Observed black-box with `testdata/gpkg/sample.gpkg` (written by GDAL,
 
 - New file: GeoPackage 1.4 (`application_id` GPKG, `user_version` 10400), page size 4096,
   with all gpkg_* tables (tile and metadata ones too), the tile-matrix triggers,
-  `sqlite_sequence`, and spatial references -1, 0 and 4326 (`crates/geoforge-gpkg/src/base.rs`).
+  `sqlite_sequence`, and spatial references -1, 0 and 4326 (`crates/unigis-gpkg/src/base.rs`).
 - Feature table: `CREATE TABLE [t] ([OBJECTID] INTEGER primary key autoincrement not null,
   [Shape] MULTIPOLYGON, ...)` with a type check per column:
 

@@ -14,7 +14,7 @@ measurement.
 
 ## 1. Current app inventory
 
-Layout (`docs/screenshots/geoforge-map.png`):
+Layout (`docs/screenshots/unigis-map.png`):
 - Title bar (34 px, `chrome.rs::header`): logo, "UniGIS", Quick Access Toolbar (new/open/save/undo/redo),
   centred project and map title, Command Search (Ctrl+K) on the right.
 - Tab strip: a filled rust "Project" button (backstage) then ten tabs: Home, Data, Style, Edit, Analyze,

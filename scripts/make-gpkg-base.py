@@ -1,4 +1,4 @@
-"""Generates crates/geoforge-gpkg/src/base.rs from testdata/gpkg/arcgis_empty.gpkg
+"""Generates crates/unigis-gpkg/src/base.rs from testdata/gpkg/arcgis_empty.gpkg
 (an empty GeoPackage made by ArcGIS Pro's Create SQLite Database): the schema in
 creation order and the rows ArcGIS puts in a new GeoPackage.
 
@@ -49,4 +49,4 @@ out += ["", "/// The spatial index ArcGIS creates with a feature table, in schem
 for t, n, sql in con.execute("SELECT type, name, sql FROM sqlite_master WHERE (name LIKE 'rtree_wells%' OR (tbl_name='wells' AND type='trigger')) ORDER BY rowid"):
     out.append(f'    ("{t}", r#"{n.replace("wells", "{t}")}"#, r#"{sql.replace("wells", "{t}")}"#),')
 out.append("];")
-(ROOT / "crates" / "geoforge-gpkg" / "src" / "base.rs").write_text("\n".join(out) + "\n")
+(ROOT / "crates" / "unigis-gpkg" / "src" / "base.rs").write_text("\n".join(out) + "\n")

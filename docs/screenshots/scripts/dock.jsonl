@@ -4,7 +4,7 @@
 {"cmd":"ui.pane.history"}
 {"cmd":"ui.dock","params":{"pane":"catalog","site":"bottom"}}
 {"steps":4}
-{"shot":"/mnt/media/ArcGIS_Linux/docs/screenshots/geoforge-dock.png"}
+{"shot":"/mnt/media/ArcGIS_Linux/docs/screenshots/unigis-dock.png"}
 {"cmd":"ui.dock","params":{"pane":"history","site":"right","autoHide":true}}
 {"steps":4}
-{"shot":"/mnt/media/ArcGIS_Linux/docs/screenshots/geoforge-dock-autohide.png"}
+{"shot":"/mnt/media/ArcGIS_Linux/docs/screenshots/unigis-dock-autohide.png"}

@@ -1,0 +1,18 @@
+[package]
+name = "unigis-gpkg"
+description = "GeoPackage reader, with its own read-only SQLite file reader"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[dependencies]
+unigis-core.workspace = true
+chrono.workspace = true
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+unigis-testkit.workspace = true
+serde_json.workspace = true

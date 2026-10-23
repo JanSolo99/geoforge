@@ -27,11 +27,11 @@ sys-locale = { version = "0.3", features = ["js"] }
 # The GeoLibre tool suite (native only: its tools read and write files).
 rustgis-geolibre = { workspace = true, optional = true }
 # UniGIS's ArcGIS-verified tools (desktop only: reads File Geodatabases, links PROJ).
-rustgis-geoforge = { workspace = true, optional = true }
+rustgis-unigis = { workspace = true, optional = true }
 
 [features]
 geolibre = ["dep:rustgis-geolibre"]
-geoforge = ["dep:rustgis-geoforge"]
+unigis = ["dep:rustgis-unigis"]
 
 [dev-dependencies]
 # Writing sample GeoPackages.

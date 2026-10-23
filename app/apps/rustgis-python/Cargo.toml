@@ -20,7 +20,7 @@ test = false
 doctest = false
 
 [dependencies]
-rustgis-engine = { workspace = true, features = ["geolibre", "geoforge"] }
+rustgis-engine = { workspace = true, features = ["geolibre", "unigis"] }
 serde_json = { workspace = true }
 pyo3 = { version = "0.29", features = ["abi3-py312", "generate-import-lib"] }
 

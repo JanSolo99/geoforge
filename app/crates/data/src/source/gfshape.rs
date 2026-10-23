@@ -1,10 +1,10 @@
-//! Conversion between the map's geometry model and UniGIS's shapes (`geoforge-core`); shared by
+//! Conversion between the map's geometry model and UniGIS's shapes (`unigis-core`); shared by
 //! the File Geodatabase source and the UniGIS tools, and free of file access so it builds for
 //! the browser too.
 //!
 //! Modified for UniGIS (not part of upstream RustGIS).
 
-use geoforge_core::{Geometry as GfGeometry, GeometryKind};
+use unigis_core::{Geometry as GfGeometry, GeometryKind};
 
 use crate::Geometry;
 use crate::io::group_rings;
