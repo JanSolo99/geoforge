@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: web-netlify
@@ -34,6 +34,18 @@ jobs:
           echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
       - name: Build the web app
         run: scripts/build-web.sh
+      - name: Publish the built site to the web-dist branch
+        if: github.ref == 'refs/heads/main'
+        run: |
+          set -euo pipefail
+          sed 's|publish = "app/dist/web"|publish = "."|' netlify.toml > app/dist/web/netlify.toml
+          cd app/dist/web
+          git init -q -b web-dist
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Web build of ${GITHUB_SHA::7}"
+          git push -q --force "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" web-dist
       - name: Deploy to Netlify
         if: github.ref == 'refs/heads/main'
         env:

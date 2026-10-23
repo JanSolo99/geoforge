@@ -17,6 +17,14 @@ publishes it to production. (Netlify's own build image cannot take this build: w
 the WebAssembly needs several GB of memory and a long compile, so it is built in CI and Netlify
 only hosts the finished files; `netlify.toml` carries the headers.)
 
+## Without tokens: import the repository
+
+Every push to `main` also force-pushes the finished site to the `web-dist` branch. In Netlify use
+Add new site › Import an existing project › GitHub › `geoforge`, set **Branch to deploy** to
+`web-dist`, leave the build command empty and the publish directory as `.`. Netlify then only
+hosts the files (the branch carries its own `netlify.toml`); each push to `main` redeploys it
+once the build above finishes. The token and secret steps are then not needed.
+
 ## By hand
 
 ```sh
