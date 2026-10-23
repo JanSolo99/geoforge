@@ -1,4 +1,4 @@
-//! Oracle tests: compare what a GeoForge reader returns with what GDAL's `ogrinfo`
+//! Oracle tests: compare what a UniGIS reader returns with what GDAL's `ogrinfo`
 //! reports for the same file.
 //!
 //! GDAL is invoked as a subprocess, so it is only needed when tests run. Attributes

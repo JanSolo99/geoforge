@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Builds the GeoForge web app into app/dist/web (needs: rustup target add wasm32-unknown-unknown,
+# Builds the UniGIS web app into app/dist/web (needs: rustup target add wasm32-unknown-unknown,
 # and `trunk` 0.21 on PATH, or TRUNK=/path/to/trunk).
 set -euo pipefail
 cd "$(dirname "$0")/../app"

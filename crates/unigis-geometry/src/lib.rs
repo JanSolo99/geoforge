@@ -1,4 +1,4 @@
-//! GeoForge geometry engine. Boolean overlay is delegated to `geo` (i_overlay);
+//! UniGIS geometry engine. Boolean overlay is delegated to `geo` (i_overlay);
 //! this crate supplies Esri semantics on top: ring rules, multipart results, and
 //! buffers densified exactly the way ArcGIS densifies arcs.
 

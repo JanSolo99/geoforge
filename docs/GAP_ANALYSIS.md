@@ -12,13 +12,13 @@
 > re-check an item against ArcGIS Pro (the bridge) before building it. The machine-readable
 > list is [`gap_list.csv`](gap_list.csv).
 
-# GeoForge gap analysis against ArcGIS Pro 3.x (with an ENVI parity outlook)
+# UniGIS gap analysis against ArcGIS Pro 3.x (with an ENVI parity outlook)
 
-Basis: repo state at commit f6a8aff (about 32k lines Rust; 80 `ug` commands; crates core, shapefile, filegdb, geometry, tools, raster, proj, gpkg, json, csv, cli, testkit). ArcGIS tool lists are from knowledge of the Pro 3.x reference (not re-confirmed online). Rows are line items; one row may group several closely related tools, so the counts below are of items, not of individual tools (ArcGIS Pro has roughly 2,000 geoprocessing tools; GeoForge has about 80).
+Basis: repo state at commit f6a8aff (about 32k lines Rust; 80 `ug` commands; crates core, shapefile, filegdb, geometry, tools, raster, proj, gpkg, json, csv, cli, testkit). ArcGIS tool lists are from knowledge of the Pro 3.x reference (not re-confirmed online). Rows are line items; one row may group several closely related tools, so the counts below are of items, not of individual tools (ArcGIS Pro has roughly 2,000 geoprocessing tools; UniGIS has about 80).
 
 ## (a) Executive summary
 
-- GeoForge today is a deep, ArcGIS-verified slice: vector overlay/proximity/statistics tools on shapefile, new file geodatabase and GeoPackage output, Project, JSON/CSV conversion, and a first Spatial Analyst raster core (map algebra basics, focal/zonal, surface, D8 hydrology, rasterization), all compared against Pro 3.7 under Wine. Quality per tool is high (byte-identical dbf/sbn/JSON/CSV in places); breadth is under 5 percent of the tool surface.
+- UniGIS today is a deep, ArcGIS-verified slice: vector overlay/proximity/statistics tools on shapefile, new file geodatabase and GeoPackage output, Project, JSON/CSV conversion, and a first Spatial Analyst raster core (map algebra basics, focal/zonal, surface, D8 hydrology, rasterization), all compared against Pro 3.7 under Wine. Quality per tool is high (byte-identical dbf/sbn/JSON/CSV in places); breadth is under 5 percent of the tool surface.
 - Catalogued items: 469 (58 done, 27 partial, 384 missing). By tool count the missing mass is dominated by: Spatial Analyst (about 250 tools, about 25 done), Image Analyst (about 170 raster functions plus ~60 tools), Spatial Statistics (~60), Network Analyst, 3D Analyst, Geostatistical Analyst, Conversion, Data Management admin (~hundreds), Cartography, and application-level features (map/layout/ModelBuilder/Portal).
 - The three structural blockers, in order, are: (1) editing an EXISTING file geodatabase (insert/update/delete rows, add fields, indexes, subtypes, relationship classes, feature datasets) and attribute/schema writes for non-shapefile outputs; (2) the Tool framework (typed params, environments, layers/selections, messages, history) and Python bindings, without which each tool is a bespoke CLI command; (3) a raster stack beyond GeoTIFF (environments cell size/extent/mask/snap, Project Raster, Mosaic, Clip, multi-band, pyramids, Esri Grid/IMG/NetCDF).
 - Highest verifiability ratio: vector and table tools, Spatial Analyst, Spatial Statistics, Linear Referencing, 3D Analyst geometry, format round trips. Low or none: deep learning, labeling, rendering pixels, geocoding/online services, Portal, enterprise geodatabase/versioning, random-based tools (EBK, random forest, K-means init).
@@ -207,7 +207,7 @@ Status: done / partial / missing. Difficulty S (days) / M (1-2 weeks) / L (weeks
 | Create Domain / Add Coded Value To Domain / Table To Domain / Domain To Table | missing | M | Y | P2 | domains read; write needs existing-GDB edit |
 | Assign Domain To Field | missing | S | Y | P2 |  |
 | Add Subtype / Set Subtype Field / Remove Subtype | missing | M | Y | P2 | XML parse only so far |
-| Table Compare / Feature Compare / Raster Compare / File Compare | missing | M | Y | P2 | Data Comparison; useful for GeoForge testing itself |
+| Table Compare / Feature Compare / Raster Compare / File Compare | missing | M | Y | P2 | Data Comparison; useful for UniGIS testing itself |
 | Detect Feature Changes | missing | L | Y | P3 |  |
 | Create Relationship Class etc. | missing | M | Y | P2 |  |
 | Pivot Table / Transpose Fields | missing | M | Y | P2 |  |
@@ -641,7 +641,7 @@ Status: done / partial / missing. Difficulty S (days) / M (1-2 weeks) / L (weeks
 
 | Tool / feature | Status | Diff | Verifiable | Prio | Notes |
 |---|---|---|---|---|---|
-| Python bindings (PyO3 `geoforge` module, arcpy-like) | missing | L | Y | P1 | Phase 6; makes Python scripts portable |
+| Python bindings (PyO3 `unigis` module, arcpy-like) | missing | L | Y | P1 | Phase 6; makes Python scripts portable |
 | arcpy.da.SearchCursor / UpdateCursor / InsertCursor / Editor | missing | M | Y | P1 | needs gdb edit; shp via existing |
 | arcpy.da.Describe, arcpy.Describe, arcpy.ListFields | partial | M | Y | P1 | CLI describe exists |
 | arcpy.ListFeatureClasses/ListTables/ListDatasets/ListRasters/ListWorkspaces/Walk | missing | S | Y | P1 |  |
@@ -741,7 +741,7 @@ Ranking criteria: user value (frequency of use in ArcGIS workflows), dependency 
 29. Compute Spectral Index (NDVI, etc.) / Band Arithmetic / Principal Components / Maximum Likelihood Classification (deterministic image analysis subset)
 30. Convert Coordinate Notation + Create Spatial Reference + Linear Referencing core (Create Routes, Locate Features Along Routes, Make Route Event Layer)
 
-### Stage 2 (next ~60): GDB admin (domains, subtypes, relationship classes, attribute indexes, compact), Table Compare/Feature Compare (also GeoForge's own test tooling), Split Line At Point, Eliminate, Simplify/Smooth Line/Polygon, Cut Fill/Surface Volume, Viewshed exactness, Flow Direction MFD/DINF, Stream To Feature, mobile geodatabase and SpatiaLite, KML/KMZ, DXF, NetCDF3 and GRIB, LAS/LAZ I/O and LAS Dataset To Raster, TIN read/write and TIN To Raster, GWR, DBSCAN, Create Space Time Cube, metadata (.shp.xml, FGDC/ISO), .lyrx/.aprx CIM reading.
+### Stage 2 (next ~60): GDB admin (domains, subtypes, relationship classes, attribute indexes, compact), Table Compare/Feature Compare (also UniGIS's own test tooling), Split Line At Point, Eliminate, Simplify/Smooth Line/Polygon, Cut Fill/Surface Volume, Viewshed exactness, Flow Direction MFD/DINF, Stream To Feature, mobile geodatabase and SpatiaLite, KML/KMZ, DXF, NetCDF3 and GRIB, LAS/LAZ I/O and LAS Dataset To Raster, TIN read/write and TIN To Raster, GWR, DBSCAN, Create Space Time Cube, metadata (.shp.xml, FGDC/ISO), .lyrx/.aprx CIM reading.
 ### Stage 3: Arcade, topology, Network Analyst (own router first, verified on small networks), geostatistical kriging family, solar radiation, ModelBuilder, 2D renderer, arcpy.mp, mosaic datasets, CRF.
 ### Stage 4 / policy-bound: deep learning, geocoding, labeling quality, Orthomapping/SfM, enterprise GDB/versioning/Utility Network, Portal publishing, DWG/MrSID/ECW.
 

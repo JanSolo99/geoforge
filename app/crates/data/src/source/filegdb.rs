@@ -13,7 +13,7 @@ use std::path::Path;
 use unigis_core::{Envelope, GeometryKind, Value as GfValue};
 use unigis_filegdb::{Geodatabase, Table};
 
-pub use super::gfshape::{from_geoforge, to_geoforge};
+pub use super::gfshape::{from_unigis, to_unigis};
 use super::{Batch, FeatureSource, Reproject, Request, SourceInfo, clamp_limit, stride};
 use crate::{DataError, Dataset, Feature, Field, FieldType, Geometry, GeometryType, Result, Value};
 use rustgis_geom::Extent;
@@ -196,7 +196,7 @@ impl FeatureSource for FileGdbSource {
         let mut features = Vec::with_capacity(rows.len());
         for f in rows {
             let g = match (&f.geometry, has_geometry) {
-                (Some(g), true) => match from_geoforge(g).and_then(|g| self.reproject.geometry(g)) {
+                (Some(g), true) => match from_unigis(g).and_then(|g| self.reproject.geometry(g)) {
                     Some(g) => Some(g),
                     None => {
                         skipped += 1;
@@ -312,7 +312,7 @@ pub fn write(ds: &Dataset, gdb: &Path, name: Option<&str>) -> Result<usize> {
                 (Value::Bool(b), _) => GfValue::SmallInteger(i16::from(*b)),
             })
             .collect();
-        let mut geometry = f.geometry.as_ref().and_then(to_geoforge);
+        let mut geometry = f.geometry.as_ref().and_then(to_unigis);
         // A class of multipoints holds its single points as one-point multipoints.
         if let Some(g) = geometry.as_mut().filter(|_| kind == Some(GeometryKind::Multipoint)) {
             g.kind = GeometryKind::Multipoint;

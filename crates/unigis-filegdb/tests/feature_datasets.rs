@@ -1,4 +1,4 @@
-//! Feature datasets written by GeoForge: items, paths and relationships as ArcGIS Pro writes them
+//! Feature datasets written by UniGIS: items, paths and relationships as ArcGIS Pro writes them
 //! (testdata/gdb-reference/catalog_ops/before.json: dataset `ds` with class `inds`), the class takes the
 //! dataset's coordinate system, and GDAL / our reader see the class inside the dataset.
 

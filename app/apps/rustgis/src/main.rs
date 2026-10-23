@@ -19,9 +19,9 @@ mod prefs {
 
     pub fn dir() -> Option<PathBuf> {
         if cfg!(target_os = "windows") {
-            std::env::var_os("APPDATA").map(|d| PathBuf::from(d).join("GeoForge"))
+            std::env::var_os("APPDATA").map(|d| PathBuf::from(d).join("UniGIS"))
         } else if cfg!(target_os = "macos") {
-            std::env::var_os("HOME").map(|h| PathBuf::from(h).join("Library/Application Support/GeoForge"))
+            std::env::var_os("HOME").map(|h| PathBuf::from(h).join("Library/Application Support/UniGIS"))
         } else {
             std::env::var_os("XDG_CONFIG_HOME")
                 .map(PathBuf::from)
@@ -202,7 +202,7 @@ fn main() -> eframe::Result {
     app.session.dirty = false;
     let mut viewport = egui::ViewportBuilder::default()
         .with_title("UniGIS")
-        .with_app_id("org.rustgis.GeoForge")
+        .with_app_id("org.rustgis.UniGIS")
         .with_inner_size([1480.0, 920.0])
         .with_min_inner_size([900.0, 560.0])
         .with_drag_and_drop(true);

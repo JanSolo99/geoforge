@@ -9,7 +9,7 @@ Method for the mechanical checks: every row of gap_list.csv was split on " / ", 
 | Claim in GAP_ANALYSIS.md | Verified |
 |---|---|
 | "roughly 2,000 geoprocessing tools" | 2,157 tool rows across 45 toolbox CSVs (2,027 listed in the tool-reference TOC across 44 toolboxes, plus 130 found only via toolbox history pages or the ModelBuilder overview; includes 33 deprecated). Several tools appear in two toolboxes (Slope in Spatial Analyst, 3D Analyst; Plus/Minus/Con in Spatial Analyst and Image Analyst), 2,033 distinct arcpy function names. See README.md. |
-| "GeoForge has about 80" | 82 `ug` commands; they map to 84 done + 21 partial tool rows (incl. duplicate toolbox rows). |
+| "UniGIS has about 80" | 82 `ug` commands; they map to 84 done + 21 partial tool rows (incl. duplicate toolbox rows). |
 | "Spatial Analyst (about 250 tools, about 25 done)" | 237 rows (236 in TOC), 24 done, 5 partial. |
 | "Image Analyst (about 170 raster functions plus ~60 tools)" | Image Analyst toolbox has 153 tool rows (not ~60). The raster-function list has 187 functions (raster_functions.csv). |
 | "Spatial Statistics (~60)" | 61 in TOC (63 incl. 2 deprecated: Grouping Analysis, old Geographically Weighted Regression). |

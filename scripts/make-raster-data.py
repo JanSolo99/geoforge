@@ -1,5 +1,5 @@
 """Writes the test rasters in testdata/raster/ with GDAL (test-data generation only;
-GeoForge reads them without GDAL): a synthetic DEM in UTM 33N in several GeoTIFF
+UniGIS reads them without GDAL): a synthetic DEM in UTM 33N in several GeoTIFF
 encodings, plus small integer rasters.
 
     python3 scripts/make-raster-data.py

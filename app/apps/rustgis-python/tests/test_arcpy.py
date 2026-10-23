@@ -50,7 +50,7 @@ def test_distances_are_on_the_ground(s):
 
 def test_outputs_that_exist_need_overwrite(s):
     arcpy.analysis.Buffer("Cities", "Twice", "10 Kilometers")
-    with pytest.raises(rustgis.GeoForgeError, match="already exists"):
+    with pytest.raises(rustgis.UniGISError, match="already exists"):
         arcpy.analysis.Buffer("Cities", "Twice", "10 Kilometers")
     arcpy.env.overwriteOutput = True
     arcpy.analysis.Buffer("Cities", "Twice", "10 Kilometers")
@@ -61,9 +61,9 @@ def test_wrong_arguments_are_python_errors(s):
         arcpy.analysis.Buffer("Cities", "X", "1 Kilometers", nonsense=1)
     with pytest.raises(TypeError, match="at most"):
         arcpy.analysis.Clip(*["a"] * 9)
-    with pytest.raises(rustgis.GeoForgeError, match="unknown distance unit"):
+    with pytest.raises(rustgis.UniGISError, match="unknown distance unit"):
         arcpy.analysis.Buffer("Cities", "X", "1 Parsecs")
-    with pytest.raises(rustgis.GeoForgeError):
+    with pytest.raises(rustgis.UniGISError):
         arcpy.analysis.Buffer("No such layer", "X", "1 Kilometers")
 
 
@@ -134,7 +134,7 @@ def test_raster_environments_shape_spatial_analyst_output(s):
     arcpy.env.cellSize = None
     assert s.layer("Coarse").info != plain
     arcpy.env.cellSize = "not a size"
-    with pytest.raises(rustgis.GeoForgeError, match="cellSize"):
+    with pytest.raises(rustgis.UniGISError, match="cellSize"):
         arcpy.sa.Plus("Grid", 1, out_raster="Bad")
 
 
@@ -143,7 +143,7 @@ def test_idw_takes_arcpy_search_radii(s):
     arcpy.sa.Idw("Cities", "pop_max", 2, search_radius=arcpy.sa.RadiusFixed(10, 2), out_raster="CitiesFixed")
     names = {l["name"] for l in s.layers()}
     assert {"CitiesIdw", "CitiesFixed"} <= names
-    with pytest.raises(rustgis.GeoForgeError):
+    with pytest.raises(rustgis.UniGISError):
         arcpy.sa.Idw("Cities", "pop_max", 2, 2, "nonsense")
 
 
@@ -160,7 +160,7 @@ def test_overlay_and_fuzzy_tools(s):
     arcpy.sa.WeightedOverlay(table, out_raster="Wo")
     names = {l["name"] for l in s.layers()}
     assert {"Max", "WSum", "HP", "Comb", "Fz", "Fo", "Wo"} <= names
-    with pytest.raises(rustgis.GeoForgeError):
+    with pytest.raises(rustgis.UniGISError):
         arcpy.sa.FuzzyMembership("Grid", "not a function", out_raster="Bad")
 
 
@@ -175,7 +175,7 @@ def test_spatial_statistics_tools(s):
     names = {l["name"] for l in s.layers()}
     assert {"CityCenter", "CitySD", "CityEllipse", "CityHub", "CityMedian"} <= names
     assert count(s, "CityCenter") == 1
-    with pytest.raises(rustgis.GeoForgeError):
+    with pytest.raises(rustgis.UniGISError):
         arcpy.stats.StandardDistance("Italian", "Bad", "HUGE")
 
 
@@ -189,7 +189,7 @@ def test_construction_tools(s):
     assert count(s, "Dense") == 20
     arcpy.management.GeneratePointsAlongLines("NetLines", "Along", "DISTANCE", "0.5", None, "END_POINTS")
     assert count(s, "Along") > 20
-    with pytest.raises(rustgis.GeoForgeError):
+    with pytest.raises(rustgis.UniGISError):
         arcpy.management.PolygonToLine("Net", "Bad", "IDENTIFY_NEIGHBORS")
 
 
@@ -222,7 +222,7 @@ def test_math_functions(s):
     arcpy.sa.BooleanAnd("Grid", "G_gt", out_raster="G_and")
     names = {l["name"] for l in s.layers()}
     assert {"G_abs", "G_ln", "G_pow", "G_gt", "G_and"} <= names
-    with pytest.raises(rustgis.GeoForgeError):
+    with pytest.raises(rustgis.UniGISError):
         arcpy.sa.BitwiseAnd("G_ln", 1)
 
 
@@ -235,7 +235,7 @@ def test_block_and_grouping_tools(s):
     arcpy.sa.Pick("Zones", ["Grid", "Grid", 5, 6], out_raster="Picked")
     names = {l["name"] for l in s.layers()}
     assert {"Coarse", "Blocks", "Zones", "Regions", "Picked"} <= names
-    with pytest.raises(rustgis.GeoForgeError):
+    with pytest.raises(rustgis.UniGISError):
         arcpy.sa.Slice("Grid", 4, "NATURAL_BREAKS", out_raster="Bad")
-    with pytest.raises(rustgis.GeoForgeError):
+    with pytest.raises(rustgis.UniGISError):
         arcpy.sa.Aggregate("Grid", 1, "SUM", out_raster="Bad")

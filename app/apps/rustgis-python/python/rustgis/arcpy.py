@@ -29,7 +29,7 @@ import os
 import re
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
 
-from . import Layer, GeoForgeError, Session
+from . import Layer, UniGISError, Session
 
 __all__ = ["Result", "env", "use", "session", "analysis", "management", "sa", "conversion", "ListTools"]
 
@@ -147,7 +147,7 @@ def _distance(value: Any) -> Dict[str, Any]:
     if not unit or unit in ("UNKNOWN",):
         return {"distance": number}
     if unit not in _UNITS:
-        raise GeoForgeError(f"unknown distance unit '{m.group(2)}'")
+        raise UniGISError(f"unknown distance unit '{m.group(2)}'")
     return {"distance": number, "units": _UNITS[unit]}
 
 
@@ -195,7 +195,7 @@ def _search_radius(value: Any) -> Dict[str, Any]:
     word = str(value).upper()
     if word in ("VARIABLE", "FIXED"):
         return {"search_type": word}
-    raise GeoForgeError(f"search_radius must be RadiusVariable or RadiusFixed, not {value!r}")
+    raise UniGISError(f"search_radius must be RadiusVariable or RadiusFixed, not {value!r}")
 
 
 class RemapValue:
@@ -278,7 +278,7 @@ def _ws_table(value: Any) -> Dict[str, Any]:
 
 def _wo_table(value: Any) -> Dict[str, Any]:
     if not isinstance(value, WOTable):
-        raise GeoForgeError("the Weighted Overlay table is a WOTable")
+        raise UniGISError("the Weighted Overlay table is a WOTable")
     entries = []
     for row in value.rows:
         raster, influence, _, remap = row[0], row[1], row[2], row[3]
@@ -289,7 +289,7 @@ def _wo_table(value: Any) -> Dict[str, Any]:
 
 def _fuzzy_function(value: Any) -> Dict[str, Any]:
     if not isinstance(value, _Fuzzy):
-        raise GeoForgeError("the fuzzy function is FuzzyLinear, FuzzyGaussian, FuzzyLarge, ...")
+        raise UniGISError("the fuzzy function is FuzzyLinear, FuzzyGaussian, FuzzyLarge, ...")
     return value.params()
 
 
@@ -516,7 +516,7 @@ def _env_params(s: Session, tool: str, module: str) -> Dict[str, Any]:
         try:
             out["cell_size"] = float(env.cellSize)
         except (TypeError, ValueError):
-            raise GeoForgeError(f"env.cellSize must be a number, not {env.cellSize!r}") from None
+            raise UniGISError(f"env.cellSize must be a number, not {env.cellSize!r}") from None
     e = env.extent
     if e not in (None, ""):
         if hasattr(e, "XMin"):
@@ -578,7 +578,7 @@ def _make(module: str, name: str, tool: str, args: Tuple[Arg, ...], outputs: Tup
                 if key == "@pair":
                     names = [_as_layer(s, x) for x in (v if isinstance(v, (list, tuple)) else [v])]
                     if len(names) != 2:
-                        raise GeoForgeError(f"{name} takes two input layers here")
+                        raise UniGISError(f"{name} takes two input layers here")
                     params["input"], params["other"] = names
                     continue
                 params[key] = conv(v)
@@ -611,7 +611,7 @@ def _make(module: str, name: str, tool: str, args: Tuple[Arg, ...], outputs: Tup
                     writes.append((layer, path))
         if "output" in params and "output" in {a for a in params} and not env.overwriteOutput:
             if any(l.get("name") == params["output"] for l in s.layers()):
-                raise GeoForgeError(f"ERROR 000258: Output {params['output']} already exists")
+                raise UniGISError(f"ERROR 000258: Output {params['output']} already exists")
         for k, v in _env_params(s, tool, module).items():
             params.setdefault(k, v)
         before = {l.get("id"): l.get("name") for l in s.layers()}

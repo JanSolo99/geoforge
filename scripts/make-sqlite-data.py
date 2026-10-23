@@ -1,5 +1,5 @@
 """Writes SQLite test databases in testdata/gpkg/ with Python's sqlite3, plus a
-JSON dump of every table (the oracle for GeoForge's own SQLite reader).
+JSON dump of every table (the oracle for UniGIS's own SQLite reader).
 
     python3 scripts/make-sqlite-data.py
 """

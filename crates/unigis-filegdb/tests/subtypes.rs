@@ -1,4 +1,4 @@
-//! Subtypes and field defaults written by GeoForge read back as ArcGIS Pro's do
+//! Subtypes and field defaults written by UniGIS read back as ArcGIS Pro's do
 //! (testdata/gdb-reference/subtypes.gdb: table `base` with subtype field `kind`, subtypes Road (1) and
 //! Rail (2, default), per-subtype domains and defaults on `lanes` and `name`, and field defaults).
 

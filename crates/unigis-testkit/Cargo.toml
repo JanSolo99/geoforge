@@ -1,6 +1,6 @@
 [package]
 name = "unigis-testkit"
-description = "Test helpers: compare GeoForge readers against GDAL (ogrinfo) output"
+description = "Test helpers: compare UniGIS readers against GDAL (ogrinfo) output"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

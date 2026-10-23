@@ -1,4 +1,4 @@
-//! Compares GeoForge's geoprocessing tools with ArcGIS Pro's output on the same
+//! Compares UniGIS's geoprocessing tools with ArcGIS Pro's output on the same
 //! inputs. The ArcGIS results live in `testdata/arcgis-reference/` (regenerate with
 //! `scripts/make-arcgis-reference.py` through the ArcGIS bridge), so this test runs
 //! anywhere, including CI.

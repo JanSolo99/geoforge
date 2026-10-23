@@ -323,7 +323,7 @@ class Coordinator:
         return 0 if result["status"] == "completed" else 1
 
     def repl(self, lock_fd):
-        print(f"GeoForge agent coordinator — {self.root}\n{HELP}")
+        print(f"UniGIS agent coordinator — {self.root}\n{HELP}")
         while True:
             try:
                 line = input(f"{self.state['agent']}> ").strip()

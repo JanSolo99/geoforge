@@ -31,7 +31,7 @@ struct Scratch(PathBuf);
 impl Scratch {
     fn new(ext: &str) -> Scratch {
         static N: AtomicU64 = AtomicU64::new(0);
-        let name = format!("geoforge-{}-{}.{ext}", std::process::id(), N.fetch_add(1, Ordering::Relaxed));
+        let name = format!("unigis-{}-{}.{ext}", std::process::id(), N.fetch_add(1, Ordering::Relaxed));
         Scratch(std::env::temp_dir().join(name))
     }
 }

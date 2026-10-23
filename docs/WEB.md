@@ -1,7 +1,7 @@
-# GeoForge in the browser (Netlify)
+# UniGIS in the browser (Netlify)
 
 The app compiles to WebAssembly (`app/apps/rustgis-web`, eframe + WebGPU/WebGL2, built with
-[Trunk](https://trunkrs.dev)) and includes GeoForge's ArcGIS-verified tools, so everything you can
+[Trunk](https://trunkrs.dev)) and includes UniGIS's ArcGIS-verified tools, so everything you can
 click on the desktop can be tried from a URL. Data stays in the browser tab.
 
 ## One-time setup
@@ -38,7 +38,7 @@ NETLIFY_AUTH_TOKEN=... NETLIFY_SITE_ID=... scripts/deploy-netlify.sh --prod   # 
 
 ## What works in the browser
 
-Maps, symbology, tables, layouts, the Tools pane and the GeoForge tools that do not need the file
+Maps, symbology, tables, layouts, the Tools pane and the UniGIS tools that do not need the file
 system (shapefiles and GeoPackages are opened from the file picker). File geodatabase browsing and
 the `ug` command line are desktop only. The build uses the `web` Cargo profile (single codegen unit,
 fat LTO), so expect 15 to 40 minutes and about 8 GB of memory to compile it.

@@ -1,7 +1,7 @@
 # ArcGIS bridge (MCP)
 
 Lets Claude Code drive the ArcGIS Pro installed on this machine (under Wine/GE-Proton)
-so GeoForge can be checked against real ArcGIS behavior: run geoprocessing tools on
+so UniGIS can be checked against real ArcGIS behavior: run geoprocessing tools on
 test data, `Describe` datasets, run arcpy snippets.
 
 Black-box only: it runs tools and returns their results. It never inspects ArcGIS

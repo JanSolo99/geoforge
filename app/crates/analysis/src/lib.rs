@@ -263,10 +263,10 @@ pub fn tool(id: &str) -> Option<&'static ToolSpec> {
     let by_name = |t: &&ToolSpec| t.name.eq_ignore_ascii_case(id);
     // The ArcGIS-verified tool (UniGIS suite) wins over the built-in tool it replaced, however
     // that is named (see `legacy`); then ids, then names.
-    let geoforge = legacy::counterpart_id(id);
+    let suite_id = legacy::counterpart_id(id);
     external_tools()
         .into_iter()
-        .find(|t| t.id.eq_ignore_ascii_case(&geoforge))
+        .find(|t| t.id.eq_ignore_ascii_case(&suite_id))
         .or_else(|| tools().find(by_id))
         .or_else(|| tools().find(by_name))
 }

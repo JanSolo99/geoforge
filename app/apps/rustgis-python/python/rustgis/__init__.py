@@ -21,10 +21,12 @@ import os
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 from ._rustgis import Engine as _Engine
-from ._rustgis import GeoForgeError, __version__
+from ._rustgis import UniGISError, __version__
+
+GeoForgeError = UniGISError  # the name before the rename
 from ._rustgis import load_plugins as _load_plugins
 
-__all__ = ["Layer", "Map", "GeoForgeError", "Session", "__version__", "load_plugins"]
+__all__ = ["Layer", "Map", "UniGISError", "GeoForgeError", "Session", "__version__", "load_plugins"]
 
 PathLike = Union[str, "os.PathLike[str]"]
 
@@ -81,12 +83,12 @@ class Layer:
         """The layer's summary: id, type, feature count, fields, renderer, visibility.
 
         Raises:
-            GeoForgeError: When the map has no layer of this name.
+            UniGISError: When the map has no layer of this name.
         """
         for layer in self.session.layers():
             if layer.get("name") == self.name or str(layer.get("id")) == self.name:
                 return layer
-        raise GeoForgeError(f"no layer named '{self.name}'")
+        raise UniGISError(f"no layer named '{self.name}'")
 
     def to_geojson(self) -> Dict[str, Any]:
         """The layer's features as a GeoJSON FeatureCollection, in longitude and latitude.
@@ -171,7 +173,7 @@ class Session:
             The command's result, decoded from JSON (``None`` for commands that return nothing).
 
         Raises:
-            GeoForgeError: When the command fails; the message says why.
+            UniGISError: When the command fails; the message says why.
         """
         merged: Dict[str, Any] = dict(params or {})
         merged.update(kwargs)
@@ -342,7 +344,7 @@ class Session:
     def __repr__(self) -> str:
         try:
             names = [layer["name"] for layer in self.layers()]
-        except GeoForgeError:
+        except UniGISError:
             names = []
         return f"Session(layers={names!r})"
 

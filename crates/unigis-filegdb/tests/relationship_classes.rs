@@ -1,4 +1,4 @@
-//! Relationship classes written by GeoForge read back, and link their classes, as ArcGIS Pro's do
+//! Relationship classes written by UniGIS read back, and link their classes, as ArcGIS Pro's do
 //! (testdata/gdb-reference/catalog_ops/before.gdb: `rc`, one to many from `tbl` to `loose` on `k`).
 
 use std::path::{Path, PathBuf};

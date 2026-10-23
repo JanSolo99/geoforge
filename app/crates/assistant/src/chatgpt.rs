@@ -622,9 +622,9 @@ mod native {
     /// The settings folder the desktop app keeps its preferences in.
     pub fn settings_dir() -> Option<PathBuf> {
         if cfg!(target_os = "windows") {
-            std::env::var_os("APPDATA").map(|d| PathBuf::from(d).join("GeoForge"))
+            std::env::var_os("APPDATA").map(|d| PathBuf::from(d).join("UniGIS"))
         } else if cfg!(target_os = "macos") {
-            std::env::var_os("HOME").map(|h| PathBuf::from(h).join("Library/Application Support/GeoForge"))
+            std::env::var_os("HOME").map(|h| PathBuf::from(h).join("Library/Application Support/UniGIS"))
         } else {
             std::env::var_os("XDG_CONFIG_HOME")
                 .map(PathBuf::from)

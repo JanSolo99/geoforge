@@ -427,7 +427,7 @@ File formats (raster),LAS/LAZ/zLAS/E57,missing,L,Y,P1
 File formats (raster),"DEM formats: DTED, USGS DEM, SDTS",missing,M,Y,P3
 File formats (raster),"NITF / SRTM HGT / SAR (Sentinel SAFE, TerraSAR, Radarsat) , Landsat/Sentinel-2 metadata readers",missing,L,P,P3
 File formats (raster),"Raster function templates (.rft.xml), Raster types",missing,L,Y,P3
-arcpy API (Python bindings),"Python bindings (PyO3 `geoforge` module, arcpy-like)",missing,L,Y,P1
+arcpy API (Python bindings),"Python bindings (PyO3 `unigis` module, arcpy-like)",missing,L,Y,P1
 arcpy API (Python bindings),arcpy.da.SearchCursor / UpdateCursor / InsertCursor / Editor,missing,M,Y,P1
 arcpy API (Python bindings),"arcpy.da.Describe, arcpy.Describe, arcpy.ListFields",partial,M,Y,P1
 arcpy API (Python bindings),arcpy.ListFeatureClasses/ListTables/ListDatasets/ListRasters/ListWorkspaces/Walk,missing,S,Y,P1

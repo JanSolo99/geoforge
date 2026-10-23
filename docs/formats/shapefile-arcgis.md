@@ -1,6 +1,6 @@
 # Shapefile behavior of ArcGIS Pro 3.7
 
-Observed through the ArcGIS bridge (`tools/arcgis-bridge`); GeoForge matches it.
+Observed through the ArcGIS bridge (`tools/arcgis-bridge`); UniGIS matches it.
 
 ## Reading `.dbf` fields
 | dBASE | ArcGIS type | precision / scale reported |
@@ -44,7 +44,7 @@ one full-circle arc). Writing a shapefile densifies them:
   clockwise (exact match: 36 up to r = 10 m, 39 at 30 m, 71, 223, 703, 2222 at 100 m–100 km);
 - partial arcs (bends, corners, caps) follow a rule we have not pinned down: a 90°
   polygon corner gets 10 segments, a 90° line bend 9, a 180° cap 18, a 170° bend 6
-  (r = 10 m). GeoForge spaces partial arcs evenly with the circle rule; shapes agree
+  (r = 10 m). UniGIS spaces partial arcs evenly with the circle rule; shapes agree
   within 0.2 m.
 - FLAT line ends are the ROUND buffer minus the end half-discs, even where other
   parts of the line's buffer reach into them.
@@ -53,21 +53,21 @@ one full-circle arc). Writing a shapefile densifies them:
 ArcGIS writes a feature without a shape (Copy Features, Repair Geometry's KEEP_NULL)
 not as a type-0 null record but as an empty record of the layer's type: for a
 polyline or polygon, the type, a NaN bounding box and zero parts and points (44
-bytes). arcpy reads both as `None`. GeoForge reads such a record as an empty
+bytes). arcpy reads both as `None`. UniGIS reads such a record as an empty
 geometry and still writes nulls as type 0.
 
 ## Code pages and memo fields
 Without a `.cpg`, ArcGIS decodes `.dbf` text by the language driver ID (byte 29),
-including DOS code pages (437, 850, 852, 865, 866 checked); GeoForge uses GDAL's
+including DOS code pages (437, 850, 852, 865, 866 checked); UniGIS uses GDAL's
 LDID table (`ENCODING_FROM_LDID`), which agrees. A `.cpg` takes precedence.
 ArcGIS cannot open a shapefile whose `.dbf` has a memo (`M`) field, whatever the
-version byte (0x03 or 0x83): "cannot open". GDAL and GeoForge read the field as
+version byte (0x03 or 0x83): "cannot open". GDAL and UniGIS read the field as
 text holding the `.dbt` block number; the memo text itself is not read.
 
 ## Spatial index (`.sbn` / `.sbx`)
 Worked out from the files ArcGIS writes (its tool outputs and `AddSpatialIndex` on
 point sets of 1–5000 features) with shapelib's `sbnsearch.c` as the outline.
-GeoForge's writer reproduces ArcGIS's files byte for byte on every reference output
+UniGIS's writer reproduces ArcGIS's files byte for byte on every reference output
 and on 10k-polygon / 20k-point sets.
 - Header (100 bytes): `0x0000270A`, `-400`, 16 zero bytes, file length in 16-bit
   words, record count (null shapes included), the extent as big-endian doubles

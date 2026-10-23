@@ -60,9 +60,9 @@ fn unmatched<const N: usize>(a: &[[f64; N]], b: &[[f64; N]], tol: f64) -> (usize
 
 /// Known differences: (case, arcs only in one output, vertices only in one output).
 /// ArcGIS keeps a 2° stretch of one 60 m circle as four plain vertices where the
-/// union meets another circle's chord; GeoForge makes it part of an arc.
+/// union meets another circle's chord; UniGIS makes it part of an arc.
 /// Where ArcGIS starts a polygon buffer's ring can fall inside a corner arc, which it
-/// then stores as two arcs; the rule is not known, GeoForge starts rings at an arc's end.
+/// then stores as two arcs; the rule is not known, UniGIS starts rings at an arc's end.
 const KNOWN: &[(&str, usize, usize)] = &[
     ("wells_60_all", 2, 5),
     ("parcels_10", 2, 2),

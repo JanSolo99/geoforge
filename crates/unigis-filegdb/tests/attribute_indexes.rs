@@ -1,4 +1,4 @@
-//! Attribute indexes written by GeoForge equal those ArcGIS Pro writes
+//! Attribute indexes written by UniGIS equal those ArcGIS Pro writes
 //! (testdata/gdb-reference/atx.gdb: table `t` with an index on every field type).
 
 use std::path::{Path, PathBuf};

@@ -1,4 +1,4 @@
-//! Core types shared by every GeoForge crate.
+//! Core types shared by every UniGIS crate.
 //!
 //! The geometry model mirrors Esri's internal layout (flat coordinate arrays plus
 //! part offsets), which is what both Shapefile and File Geodatabase store on disk.

@@ -15,7 +15,7 @@ const ARC_STEP: f64 = 0.05;
 
 /// The map's geometry model from a UniGIS shape (curves densified); `None` for MultiPatch and for a shape with no
 /// vertices.
-pub fn from_geoforge(g: &GfGeometry) -> Option<Geometry> {
+pub fn from_unigis(g: &GfGeometry) -> Option<Geometry> {
     let dense;
     let g = if g.has_curves() {
         dense = g.densify_curves(ARC_STEP).ok()?;
@@ -70,7 +70,7 @@ fn oriented(ring: &[Coord], outer: bool) -> Vec<[f64; 2]> {
 }
 
 /// UniGIS's shape from the map's geometry; `None` when there is nothing to draw.
-pub fn to_geoforge(g: &Geometry) -> Option<GfGeometry> {
+pub fn to_unigis(g: &Geometry) -> Option<GfGeometry> {
     let mut out = GfGeometry::point(0.0, 0.0);
     out.xy.clear();
     match g {

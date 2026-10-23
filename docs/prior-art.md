@@ -8,7 +8,7 @@ A QGIS-style desktop/web/CLI GIS with an ArcGIS-like ribbon, built on `geo`, egu
 tiny-skia. Layers: geom, data, map/analysis, render, engine (session, undo, command registry),
 assistant (LLM agent), ui-egui. Apps: desktop, CLI, WebAssembly, PyO3 Python package, MCP server.
 
-## How it differs from GeoForge
+## How it differs from UniGIS
 - **No File Geodatabase at all** (no `.gdb` read or write). Shapefile/GeoPackage/GeoParquet/etc.
   Formats GDAL knows are reached by shelling out to GDAL programs when installed.
 - **Thin native geoprocessing**: `crates/analysis` is ~3k lines (about 15 tools: Buffer, Clip,

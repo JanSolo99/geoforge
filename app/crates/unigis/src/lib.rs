@@ -19,7 +19,7 @@ mod reg;
 
 use rustgis_analysis::{Inputs, Output, ParamKind as K, ParamSpec as P, ToolResult, ToolSpec};
 use rustgis_data::raster::{Crs, Transformer};
-use rustgis_data::source::gfshape::{from_geoforge, to_geoforge as to_gf_geometry};
+use rustgis_data::source::gfshape::{from_unigis, to_unigis as to_gf_geometry};
 use rustgis_data::{Dataset, Field, FieldType, Geometry, GeometryType, Value};
 use rustgis_geom::Coord;
 use serde_json::Value as Json;
@@ -265,7 +265,7 @@ fn to_dataset(out: tools::ToolOutput, name: String, work: &Work) -> Dataset {
         .collect();
     let mut ds = Dataset::new(name, geometry_type, fields);
     for f in out.features {
-        let g = f.geometry.as_ref().and_then(from_geoforge).and_then(|g| work.geometry(&g, Work::back));
+        let g = f.geometry.as_ref().and_then(from_unigis).and_then(|g| work.geometry(&g, Work::back));
         ds.push_next(g, f.attributes.into_iter().map(from_gf_value).collect());
     }
     ds

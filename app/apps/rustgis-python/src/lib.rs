@@ -14,7 +14,7 @@ use pyo3::types::PyBytes;
 use rustgis_engine::{Project, Session};
 use serde_json::Value;
 
-create_exception!(_rustgis, GeoForgeError, PyException, "A UniGIS command or file operation failed.");
+create_exception!(_rustgis, UniGISError, PyException, "A UniGIS command or file operation failed.");
 
 /// One UniGIS session: a project with its maps, layers, undo history and selection.
 ///
@@ -39,7 +39,7 @@ impl Engine {
         } else {
             serde_json::from_str(params).map_err(|e| PyValueError::new_err(format!("parameters aren't JSON: {e}")))?
         };
-        let result = self.session.run(id, &params).map_err(|e| GeoForgeError::new_err(format!("{id}: {e}")))?;
+        let result = self.session.run(id, &params).map_err(|e| UniGISError::new_err(format!("{id}: {e}")))?;
         Ok(result.to_string())
     }
 
@@ -53,7 +53,7 @@ impl Engine {
         height: Option<f64>,
         dpi: Option<f64>,
     ) -> PyResult<Bound<'py, PyBytes>> {
-        let png = rustgis_engine::cmd::share::map_png(&mut self.session, width, height, dpi).map_err(GeoForgeError::new_err)?;
+        let png = rustgis_engine::cmd::share::map_png(&mut self.session, width, height, dpi).map_err(UniGISError::new_err)?;
         Ok(PyBytes::new(py, &png))
     }
 
@@ -63,14 +63,14 @@ impl Engine {
     fn layer_geojson(&self, layer: &str) -> PyResult<String> {
         let map = self.session.map();
         let found = map.layer_by_name(layer).or_else(|| layer.trim().parse::<u32>().ok().and_then(|id| map.layer(id)));
-        let found = found.ok_or_else(|| GeoForgeError::new_err(format!("no layer named '{layer}'")))?;
+        let found = found.ok_or_else(|| UniGISError::new_err(format!("no layer named '{layer}'")))?;
         Ok(rustgis_engine::data::io::to_geojson(&found.dataset).to_string())
     }
 
     /// The project as `.rgis` JSON text, as `project.saveAs` writes it (what `project.openText`
     /// opens).
     fn project_json(&self) -> PyResult<String> {
-        serde_json::to_string(&self.session.project).map_err(|e| GeoForgeError::new_err(e.to_string()))
+        serde_json::to_string(&self.session.project).map_err(|e| UniGISError::new_err(e.to_string()))
     }
 
     /// The notices commands have given since the last call (a file's warnings, a tool's
@@ -90,7 +90,8 @@ fn load_plugins() -> Vec<String> {
 #[pymodule]
 fn _rustgis(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add("__version__", env!("CARGO_PKG_VERSION"))?;
-    m.add("GeoForgeError", m.py().get_type::<GeoForgeError>())?;
+    m.add("UniGISError", m.py().get_type::<UniGISError>())?;
+    m.add("GeoForgeError", m.py().get_type::<UniGISError>())?; // the name before the rename
     m.add_class::<Engine>()?;
     m.add_function(wrap_pyfunction!(load_plugins, m)?)?;
     Ok(())

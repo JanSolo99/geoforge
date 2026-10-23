@@ -1,4 +1,4 @@
-# GeoForge in the browser (the eframe web runner in app/apps/rustgis-web, built with Trunk).
+# UniGIS in the browser (the eframe web runner in app/apps/rustgis-web, built with Trunk).
 # The WebAssembly build is too heavy for Netlify's build image, so it is built in CI or locally
 # (scripts/build-web.sh) and the finished site is deployed:
 #   .github/workflows/web-netlify.yml   on every push to main

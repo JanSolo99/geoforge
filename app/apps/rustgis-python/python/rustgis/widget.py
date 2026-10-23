@@ -17,7 +17,7 @@ from urllib.parse import quote
 import anywidget
 import traitlets
 
-from . import Layer, PathLike, GeoForgeError, Session
+from . import Layer, PathLike, UniGISError, Session
 
 #: The web app the widget shows; ``RUSTGIS_WEB_URL`` points it at another build (a local
 #: ``trunk serve``, a self-hosted copy).
@@ -103,7 +103,7 @@ class Map(anywidget.AnyWidget):
             The command's result, decoded from JSON.
 
         Raises:
-            GeoForgeError: When the command fails.
+            UniGISError: When the command fails.
         """
         try:
             return self._session.run(command, params, **kwargs)
@@ -291,7 +291,7 @@ class Map(anywidget.AnyWidget):
         """Sends the session's project to the app, when it changed."""
         try:
             text = self._session.project_json()
-        except GeoForgeError as e:
+        except UniGISError as e:
             self._hold([(f"couldn't show the project in the app: {e}", True)])
             return
         self._project = text
@@ -325,7 +325,7 @@ class Map(anywidget.AnyWidget):
             self._hold(self._session.notices())
             try:
                 self._session.run("project.openText", text=text)
-            except GeoForgeError as e:
+            except UniGISError as e:
                 self._hold([(f"the app's project couldn't be read: {e}", True)])
                 return
             finally:

@@ -8,5 +8,5 @@ Icon=rustgis
 Terminal=false
 Categories=Science;Geography;Education;
 MimeType=application/x-rustgis-project;application/geo+json;
-StartupWMClass=org.rustgis.GeoForge
+StartupWMClass=org.rustgis.UniGIS
 Keywords=GIS;map;geospatial;GeoJSON;shapefile;

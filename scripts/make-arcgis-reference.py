@@ -6,7 +6,7 @@ ArcGIS bridge (tools/arcgis-bridge). Needs ArcGIS Pro on this machine:
 With case names, only those cases are rerun and the rest of the manifest is kept.
 
 Each case writes a shapefile and records ArcGIS's messages and output schema in
-manifest.json, which the Rust tests compare GeoForge against.
+manifest.json, which the Rust tests compare UniGIS against.
 """
 
 import json

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Snapshot of a file geodatabase's catalog as JSON (read through GDAL, the oracle), for comparing
-what ArcGIS and GeoForge leave behind after Delete / Rename (crates/unigis-filegdb/tests/catalog_ops.rs).
+what ArcGIS and UniGIS leave behind after Delete / Rename (crates/unigis-filegdb/tests/catalog_ops.rs).
 
     gdb-snapshot.py X.gdb > X.json
 

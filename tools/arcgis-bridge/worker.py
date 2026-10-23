@@ -1,4 +1,4 @@
-"""arcpy worker for the GeoForge ArcGIS bridge.
+"""arcpy worker for the UniGIS ArcGIS bridge.
 
 Runs inside ArcGIS Pro's Python (arcgispro-py3) under Wine. Reads one JSON request
 per line on stdin and writes one JSON response per line on stdout. Standard library

@@ -14,7 +14,7 @@
 //! point. A crash before it leaves a manifest that the next open rolls back (in reverse
 //! order), restoring the geodatabase byte for byte; a crash after it leaves the new state.
 //! ArcGIS itself knows nothing of the journal, so after a crash the geodatabase should be
-//! opened once by GeoForge (any read or edit does it, or [`recover`]) before ArcGIS uses it.
+//! opened once by UniGIS (any read or edit does it, or [`recover`]) before ArcGIS uses it.
 //!
 //! Transactions nest: an operation started while another one on the same geodatabase is
 //! active (in the same thread) joins it, so a catalog operation that edits several system

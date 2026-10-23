@@ -783,7 +783,7 @@ Import Thumbnail	썸네일 가져오기
 Import Web Tool	웹 도구 가져오기
 In Beyond	다음보다 확대 시
 In Progress	진행 중
-In UniGIS, it can:	GeoForge에서 할 수 있는 작업:
+In UniGIS, it can:	UniGIS에서 할 수 있는 작업:
 in progress	진행 중
 In project	프로젝트 내
 In use	사용 중
@@ -1385,7 +1385,7 @@ Run {name}	{name} 실행
 Running…	실행 중…
 UniGIS	UniGIS
 UniGIS deep learning package	UniGIS 딥러닝 패키지
-UniGIS is a free and open-source GIS written in pure Rust. It runs on the desktop and in the browser, and every action is a command you can also run from the command line.	GeoForge는 순수 Rust로 작성된 무료 오픈 소스 GIS입니다. 데스크톱과 브라우저에서 실행되며, 모든 작업은 명령줄에서도 실행할 수 있는 명령입니다.
+UniGIS is a free and open-source GIS written in pure Rust. It runs on the desktop and in the browser, and every action is a command you can also run from the command line.	UniGIS는 순수 Rust로 작성된 무료 오픈 소스 GIS입니다. 데스크톱과 브라우저에서 실행되며, 모든 작업은 명령줄에서도 실행할 수 있는 명령입니다.
 UniGIS layer file	UniGIS 레이어 파일
 UniGIS layers, maps and projects	UniGIS 레이어, 지도 및 프로젝트
 UniGIS layout	UniGIS 레이아웃
@@ -1395,8 +1395,8 @@ UniGIS plugin	UniGIS 플러그인
 UniGIS presentation	UniGIS 프레젠테이션
 UniGIS project	UniGIS 프로젝트
 UniGIS project template	UniGIS 프로젝트 템플릿
-UniGIS ran into an internal error last time. The details are in {path}; please attach them to a bug report.	지난번에 GeoForge에서 내부 오류가 발생했습니다. 자세한 내용은 {path}에 있습니다. 버그 보고서에 첨부해 주세요.
-UniGIS ran into an internal error while handling the model's reply, so the request was stopped. Please report it at https://github.com/opengeos/RustGIS/issues.	모델의 응답을 처리하는 중 GeoForge에서 내부 오류가 발생해 요청을 중지했습니다. https://github.com/opengeos/RustGIS/issues 에서 신고해 주세요.
+UniGIS ran into an internal error last time. The details are in {path}; please attach them to a bug report.	지난번에 UniGIS에서 내부 오류가 발생했습니다. 자세한 내용은 {path}에 있습니다. 버그 보고서에 첨부해 주세요.
+UniGIS ran into an internal error while handling the model's reply, so the request was stopped. Please report it at https://github.com/opengeos/RustGIS/issues.	모델의 응답을 처리하는 중 UniGIS에서 내부 오류가 발생해 요청을 중지했습니다. https://github.com/opengeos/RustGIS/issues 에서 신고해 주세요.
 UniGIS report or report template	UniGIS 보고서 또는 보고서 템플릿
 UniGIS styles	UniGIS 스타일
 UniGIS task	UniGIS 태스크
@@ -1405,7 +1405,7 @@ UniGIS {version} is the latest version.	UniGIS {version}이(가) 최신 버전�
 RUSTGIS_ASSISTANT_MODEL	RUSTGIS_ASSISTANT_MODEL
 RUSTGIS_ASSISTANT_PROVIDER	RUSTGIS_ASSISTANT_PROVIDER
 Sample data (Natural Earth)	샘플 데이터(Natural Earth)
-Sample data © Natural Earth (public domain). UniGIS is licensed under Apache-2.0.	샘플 데이터 © Natural Earth(퍼블릭 도메인). GeoForge는 Apache-2.0 라이선스를 따릅니다.
+Sample data © Natural Earth (public domain). UniGIS is licensed under Apache-2.0.	샘플 데이터 © Natural Earth(퍼블릭 도메인). UniGIS는 Apache-2.0 라이선스를 따릅니다.
 Sample data: Natural Earth (public domain). Licensed under Apache-2.0.	샘플 데이터: Natural Earth(퍼블릭 도메인). Apache-2.0 라이선스.
 Saturation	채도
 Save	저장
@@ -1470,7 +1470,7 @@ Sections	섹션
 See and set the camera's position and scale.	카메라의 위치와 축척을 확인하고 설정합니다.
 See the map as people with colour vision deficiencies do.	색각 이상이 있는 사람이 보는 방식으로 지도를 봅니다.
 See the tools you've run.	실행한 도구를 확인합니다.
-See whether a newer UniGIS has been released.	새 GeoForge가 출시되었는지 확인합니다.
+See whether a newer UniGIS has been released.	새 UniGIS가 출시되었는지 확인합니다.
 Select	선택
 Select (click)	선택(클릭)
 Select (rectangle)	선택(사각형)
@@ -1793,11 +1793,11 @@ Web Tile Layers	웹 타일 레이어
 Web Tool	웹 도구
 Website	웹사이트
 Weights	가중치
-Welcome to UniGIS	GeoForge에 오신 것을 환영합니다
+Welcome to UniGIS	UniGIS에 오신 것을 환영합니다
 West	서
 WGS 84 / Globe	WGS 84 / 지구본
 WGS 84 / Web Mercator	WGS 84 / Web Mercator
-What UniGIS opens with: the World Atlas sample or a blank map.	GeoForge가 시작할 때 여는 것: World Atlas 예제 또는 빈 지도.
+What UniGIS opens with: the World Atlas sample or a blank map.	UniGIS가 시작할 때 여는 것: World Atlas 예제 또는 빈 지도.
 What's near a point	지점 주변에 있는 것
 Where	조건
 Where Clause	WHERE 절
@@ -1903,7 +1903,7 @@ The sign-in is kept in the app's settings folder, for your user account only, an
 Sign in with your ChatGPT account.	ChatGPT 계정으로 로그인하세요.
 A ChatGPT sign-in can only be used with the OpenAI API.	ChatGPT 로그인은 OpenAI API에서만 사용할 수 있습니다.
 Continue with ChatGPT	ChatGPT로 계속
-Eligible requests in UniGIS use your ChatGPT plan. You can manage usage in ChatGPT settings.	GeoForge의 해당 요청은 ChatGPT 요금제를 사용합니다. 사용량은 ChatGPT 설정에서 관리할 수 있습니다.
+Eligible requests in UniGIS use your ChatGPT plan. You can manage usage in ChatGPT settings.	UniGIS의 해당 요청은 ChatGPT 요금제를 사용합니다. 사용량은 ChatGPT 설정에서 관리할 수 있습니다.
 Got it	확인
 Manage usage	사용량 관리
 Requests go to the OpenAI API and use your ChatGPT plan.	요청은 OpenAI API로 전송되며 ChatGPT 요금제를 사용합니다.

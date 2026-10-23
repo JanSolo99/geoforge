@@ -63,7 +63,7 @@ then `offsetSize × 1024 × n1024BlocksPresent` offsets (0 = deleted). Trailer (
 the end of offsets: `i32 nBitmapWords, i32 n1024BlocksTotal, i32 nPresent, i32 nUseful`
 + bitmap (bit set = block present). FID = row index + 1; with a bitmap, a row's slot
 is `blocksPresentBefore × 1024 + row % 1024`. v4 trailer: `i64 nRows (max OBJECTID), i32 size`, then
-`size` bytes of sparse map; a dense v4 file (as ArcGIS writes it, and GeoForge) has `size = 0` and
+`size` bytes of sparse map; a dense v4 file (as ArcGIS writes it, and UniGIS) has `size = 0` and
 then `i64 lastBlock` (blocks − 1; −1 for an empty table, which has no blocks). The v4 header word at
 offset 4 is 1 when the table has deleted rows, else 0; ArcGIS uses offset size 5 even for small files.
 
@@ -137,19 +137,19 @@ in the session notes.
 
 - `Shape_Length` / `Shape_Area`: ordinary Double fields after the geometry, named after it, nullable in
   the field section (ArcGIS reports them required). ArcGIS keeps them equal to the planar length (perimeter)
-  and area of the stored geometry (true arcs for curves; checked to 1e-7 on ArcGIS buffers). GeoForge recomputes
+  and area of the stored geometry (true arcs for curves; checked to 1e-7 on ArcGIS buffers). UniGIS recomputes
   them when an edit of an existing table inserts a row or changes its geometry, and keeps them otherwise.
 - Delete Rows keeps the OBJECTID sequence (the `.gdbtablx` row count stays); Truncate Table restarts it at 1.
 
-## Editing in GeoForge (crash safety)
+## Editing in UniGIS (crash safety)
 Every edit is a transaction with a rollback journal in `<gdb>/.gf-journal/` (`src/writer/txn.rs`): before a
 file changes for the first time, the manifest records (and syncs) how to undo it: `moved <name> <backup>`
 (the original was moved into the journal), `created <name>`, or `grown <name> <length> <backup>` (rows are
 appended to a `.gdbtable` in place: its length and its header + field section are kept). Commit syncs the files
-and deletes the manifest; a manifest left behind is rolled back, newest entry first, when GeoForge next opens the
+and deletes the manifest; a manifest left behind is rolled back, newest entry first, when UniGIS next opens the
 geodatabase. The manifest names the owning process, so a journal of a running process is left alone.
 
-## Writing (what GeoForge produces)
+## Writing (what UniGIS produces)
 Mirrors GDAL's OpenFileGDB writer, which ArcGIS opens: system tables a1–a7 with the
 fixed rows in `src/writer/system_rows.rs`, `gdb` = `05 00 00 00 DE AD BE EF`,
 `timestamps` = 400 × `FF`, field section at offset 40, layer flags `0x100 | 0x200 |

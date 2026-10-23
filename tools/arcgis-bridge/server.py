@@ -4,7 +4,7 @@
 # ///
 """MCP server exposing ArcGIS Pro (arcpy) running under Wine on this machine.
 
-GeoForge uses it as a black-box oracle: run ArcGIS geoprocessing tools on test data
+UniGIS uses it as a black-box oracle: run ArcGIS geoprocessing tools on test data
 and compare their outputs with ours. It never inspects ArcGIS internals.
 
 Configuration (environment variables):

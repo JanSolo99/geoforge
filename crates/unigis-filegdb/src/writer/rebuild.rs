@@ -45,7 +45,7 @@ pub(super) fn read_raw(path: &Path) -> Result<Vec<RawIndex>> {
 /// names of the indexes written.
 pub fn rebuild_attribute_indexes(table_base: impl AsRef<Path>) -> Result<Vec<String>> {
     let base = table_base.as_ref();
-    // Tables written by GeoForge's own system-table writer have no index file.
+    // Tables written by UniGIS's own system-table writer have no index file.
     if !base.with_extension("gdbindexes").is_file() {
         return Ok(Vec::new());
     }
