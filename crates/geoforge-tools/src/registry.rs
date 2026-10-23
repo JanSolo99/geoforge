@@ -72,6 +72,8 @@ pub enum Outcome {
     Features(ToolOutput),
     Table(TableOutput),
     Report(Report),
+    /// Features plus tables, each written where the named parameter says (when it is given).
+    FeaturesAndTables(ToolOutput, Vec<(&'static str, TableOutput)>),
 }
 
 pub struct Tool {
@@ -728,6 +730,61 @@ fn multi_distance_spatial_clustering(ctx: &dyn Context) -> Result<Outcome> {
         })
         .collect();
     Ok(Outcome::Table(TableOutput { fields, rows }))
+}
+
+fn ordinary_least_squares(ctx: &dyn Context) -> Result<Outcome> {
+    let t = find("ordinary_least_squares")
+        .ok_or_else(|| Error::Unsupported("ordinary_least_squares".into()))?;
+    let fc = ctx.features("input")?;
+    let ex: Vec<String> = text(ctx, t, "explanatory_variables")
+        .unwrap_or_default()
+        .split([';', ','])
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+        .collect();
+    let dbf = |name: &str| {
+        ctx.get(name)
+            .is_some_and(|o| o.to_ascii_lowercase().ends_with(".dbf"))
+    };
+    let coef_dbf = dbf("coefficient_output_table");
+    let diag_dbf = dbf("diagnostic_output_table");
+    let mut r = crate::regression::ordinary_least_squares(
+        fc.as_ref(),
+        &text(ctx, t, "unique_id_field").unwrap_or_default(),
+        &text(ctx, t, "dependent_variable").unwrap_or_default(),
+        &ex,
+        coef_dbf,
+    )?;
+    if diag_dbf != coef_dbf {
+        // Field1 follows each table's own format.
+        let other = crate::regression::ordinary_least_squares(
+            fc.as_ref(),
+            &text(ctx, t, "unique_id_field").unwrap_or_default(),
+            &text(ctx, t, "dependent_variable").unwrap_or_default(),
+            &ex,
+            diag_dbf,
+        )?;
+        r.diagnostics = other.diagnostics;
+    }
+    let mut features = r.features;
+    features.messages = r.messages;
+    Ok(Outcome::FeaturesAndTables(
+        features,
+        vec![
+            ("coefficient_output_table", r.coefficients),
+            ("diagnostic_output_table", r.diagnostics),
+        ],
+    ))
+}
+
+fn collect_events(ctx: &dyn Context) -> Result<ToolOutput> {
+    let fc = ctx.features("input")?;
+    let shp = ctx
+        .get("output")
+        .is_none_or(|o| o.to_ascii_lowercase().ends_with(".shp"));
+    let (mut out, max) = spatstat::collect_events(fc.as_ref(), shp)?;
+    out.messages.push(format!("Max count: {max}"));
+    Ok(out)
 }
 
 fn generate_spatial_weights_matrix(ctx: &dyn Context) -> Result<Report> {
@@ -1549,6 +1606,74 @@ pub static TOOLS: &[Tool] = &[
         output_suffix: "KFunction",
         measures: true,
         run: Runner::Dynamic(multi_distance_spatial_clustering),
+    },
+    Tool {
+        id: "ordinary_least_squares",
+        name: "Ordinary Least Squares (OLS)",
+        toolbox: "Spatial Statistics › Modeling Spatial Relationships",
+        summary: "A global linear regression with coefficient and diagnostic tables and residuals per feature (ArcGIS Pro Ordinary Least Squares).",
+        params: &[
+            INPUT,
+            Param {
+                name: "unique_id_field",
+                label: "Unique ID Field",
+                kind: Kind::Field {
+                    of: "input",
+                    numeric: true,
+                },
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "dependent_variable",
+                label: "Dependent Variable",
+                kind: Kind::Field {
+                    of: "input",
+                    numeric: true,
+                },
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "explanatory_variables",
+                label: "Explanatory Variables",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+                help: "Numeric fields separated by ;.",
+            },
+            Param {
+                name: "coefficient_output_table",
+                label: "Coefficient Output Table",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "diagnostic_output_table",
+                label: "Diagnostic Output Table",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "",
+            },
+        ],
+        output_suffix: "OLS",
+        measures: false,
+        run: Runner::Dynamic(ordinary_least_squares),
+    },
+    Tool {
+        id: "collect_events",
+        name: "Collect Events",
+        toolbox: "Spatial Statistics › Utilities",
+        summary: "One point per location with ICOUNT, the number of incidents there (ArcGIS Pro Collect Events).",
+        params: &[INPUT],
+        output_suffix: "CollectEvents",
+        measures: false,
+        run: Runner::Features(collect_events),
     },
     Tool {
         id: "generate_spatial_weights_matrix",

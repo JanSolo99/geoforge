@@ -1932,6 +1932,8 @@ dependencies = [
  "chrono",
  "geoforge-core",
  "geoforge-geometry",
+ "rstar",
+ "spade",
 ]
 
 [[package]]

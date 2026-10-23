@@ -1487,6 +1487,58 @@ pub fn cluster_and_outlier_analysis(
     ))
 }
 
+/// Collect Events: one point per distinct location (exact coordinates), with `ICOUNT`, the number
+/// of input points there, in order of x then y (ArcGIS Pro 3.7, `testdata/arcgis-reference/spatstat_events.json`).
+/// Shapefiles get ArcGIS's `Id` field (0) first. Also returns the largest count.
+pub fn collect_events(input: &dyn FeatureClass, shapefile: bool) -> Result<(ToolOutput, i64)> {
+    if !matches!(
+        input.geometry_kind(),
+        Some(GeometryKind::Point | GeometryKind::Multipoint)
+    ) {
+        return Err(err("ERROR 000816: Collect Events needs points"));
+    }
+    let mut counts: std::collections::BTreeMap<(u64, u64), ([f64; 2], i64)> =
+        std::collections::BTreeMap::new();
+    // Order by x then y: map the doubles to keys that sort like them.
+    let key = |v: f64| {
+        let b = v.to_bits();
+        if b >> 63 == 1 { !b } else { b | (1 << 63) }
+    };
+    for f in input.features() {
+        let f = f?;
+        let Some(g) = &f.geometry else { continue };
+        for p in &g.xy {
+            let e = counts.entry((key(p[0]), key(p[1]))).or_insert((*p, 0));
+            e.1 += 1;
+        }
+    }
+    let mut fields = Vec::new();
+    if shapefile {
+        fields.push(id_field());
+    }
+    let mut ic = Field::new("ICOUNT", FieldType::Integer);
+    ic.precision = 10;
+    fields.push(ic);
+    let max = counts.values().map(|v| v.1).max().unwrap_or(0);
+    let features = counts
+        .into_values()
+        .enumerate()
+        .map(|(k, (p, c))| {
+            let mut attributes = Vec::new();
+            if shapefile {
+                attributes.push(Value::Integer(0));
+            }
+            attributes.push(Value::Integer(c as i32));
+            Feature {
+                oid: k as i64,
+                geometry: Some(Geometry::point(p[0], p[1])),
+                attributes,
+            }
+        })
+        .collect();
+    Ok((output(input, GeometryKind::Point, fields, features), max))
+}
+
 // ---------------------------------------------------------------------------------------------
 // Multi-Distance Spatial Cluster Analysis (Ripley's K)
 

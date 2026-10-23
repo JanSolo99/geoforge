@@ -2175,6 +2175,17 @@ fn main() -> ExitCode {
                     write_output_as(out, Path::new(&output), source.as_deref(), own_wkt)
                 }
                 registry::Outcome::Table(t) => write_table(&t, Path::new(&output)),
+                registry::Outcome::FeaturesAndTables(out, tables) => {
+                    let source = registry::Context::get(&ctx, "input")
+                        .and_then(|i| source_gdb(Path::new(&i)));
+                    write_output(out, Path::new(&output), source.as_deref())?;
+                    for (param, t) in tables {
+                        if let Some(p) = registry::Context::get(&ctx, param) {
+                            write_table(&t, Path::new(&p))?;
+                        }
+                    }
+                    Ok(())
+                }
                 registry::Outcome::Report(r) => {
                     for (name, v) in &r.rows {
                         println!("{name}: {v}");

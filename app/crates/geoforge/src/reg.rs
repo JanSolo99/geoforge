@@ -93,6 +93,9 @@ pub(crate) fn run(t: &'static Tool, inp: &dyn Inputs, p: &Json) -> Result<ToolRe
     let default = first.map_or_else(|| t.output_suffix.to_string(), |n| format!("{n}_{}", t.output_suffix));
     match registry::run(t, &ctx).map_err(|e| e.to_string())? {
         registry::Outcome::Features(out) => finish_in(out, out_name(p, default), &work),
+        // The tables (OLS coefficients and diagnostics) are not added to the map; their values
+        // are in the messages.
+        registry::Outcome::FeaturesAndTables(out, _) => finish_in(out, out_name(p, default), &work),
         registry::Outcome::Table(table) => {
             let ds = crate::table_dataset(table, out_name(p, default));
             let m = vec![format!("{}: {} rows", ds.name, ds.features.len())];

@@ -647,4 +647,12 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
           increment, minimum enclosing rectangle or study area polygon, Ripley's edge correction
           up to the corner case) matched to Pro 3.7 (`crates/geoforge-cli/tests/spatstat_ripley.rs`).
           Not done: simulated outer boundary and reduced analysis area corrections
-    - [ ] Next: Collect Events, OLS and GWR, Generate Network Spatial Weights
+    - [x] Ordinary Least Squares (`geoforge-tools::regression`): coefficients with standard and
+          White HC0 robust errors, standardized coefficients, the diagnostic table (AIC/AICc, R2,
+          F, Wald, Koenker BP, Jarque-Bera, sigma2 with ArcGIS's definitions), Estimated /
+          Residual / StdResid per feature and Spatial Autocorrelation of the residuals matched to
+          Pro 3.7 (`crates/geoforge-cli/tests/spatstat_ols.rs`); the report file is not written
+    - [x] Collect Events (exact-location counts in x, y order, `Id` for shapefiles) matched to
+          Pro 3.7 (`crates/geoforge-cli/tests/spatstat_events.rs`)
+    - [ ] Next: GWR, Incremental Spatial Autocorrelation, Calculate Distance Band from Neighbor
+          Count, Generate Network Spatial Weights
