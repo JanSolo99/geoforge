@@ -399,7 +399,11 @@ impl DbfWriter {
                     let s = if kind == b'F' {
                         scientific(n, width)
                     } else {
+                        // A number too wide for its decimals is written in scientific
+                        // notation, as ArcGIS does for the X1/Y1 fields of XY To Line.
                         Some(fixed(n, f.decimals))
+                            .filter(|s| s.len() <= width)
+                            .or_else(|| scientific(n, width))
                     };
                     match s.filter(|s| s.len() <= width) {
                         Some(s) => {
