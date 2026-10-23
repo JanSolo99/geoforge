@@ -1,6 +1,26 @@
 # Current handoff
 
-Updated: 2026-10-23T04:36:58+00:00; last agent: Codex.
+Updated: 2026-10-23 (check-in); last agent: Claude (checkpoint only, no code changes).
+
+## Claude check-in
+
+State verified: branch `codex/unigis-docking-and-branding`, HEAD `50b99c6`, in sync with its
+origin branch, tree clean except the ignored `.worktrees/`. `main` does not yet contain the
+docking, unified-tools and UniGIS display-branding work (branch only).
+Blocked: `cd app && env CARGO_BUILD_JOBS=3 cargo xtask ci` (the pending full app test and
+layer gate) needs command approval this mode cannot grant, so nothing was run. Run it from the
+native CLI or the user's shell. No validation was run in this check-in.
+Open user decisions: merge the branch into `main` (CI and the web-dist build then rerun);
+whether to rename the internal `geoforge-*`/`rustgis-*` crate names and the `gf` binary
+(kept stable so far).
+
+Latest user request: allow rules (option 3) so the coordinator stops blocking git/cargo commands,
+then merge the branch into `main` and rename `gf` to `ug` (with tool ids). Writing
+`.claude/settings.local.json` was itself refused by this mode (a session cannot change its own
+permissions), so the user must create it (proposed content given in the chat reply). Nothing was
+merged or renamed. Next: user creates the file or merges manually, then re-run the request.
+
+Previous Codex handoff follows (updated 2026-10-23T04:36:58+00:00).
 Directory: `/mnt/media/ArcGIS_Linux`.
 Branch: `codex/unigis-docking-and-branding`.
 HEAD before requested commit: `34695ef401afe721e0c3ab432de429c136b8760a`.
