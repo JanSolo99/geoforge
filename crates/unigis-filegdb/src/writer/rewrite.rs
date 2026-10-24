@@ -189,14 +189,14 @@ fn rewrite(
 /// attribute fields, as [`Table::all_fields`] lists them) and `rows`. `renames` lists
 /// (old, new) names of attribute fields whose attribute indexes follow them.
 /// A change to a table's attribute index list (name, field).
-pub(super) type IndexEdit = dyn Fn(&mut Vec<(String, String)>);
+pub(super) type IndexEdit<'a> = dyn Fn(&mut Vec<(String, String)>) + 'a;
 
 pub(super) fn rewrite_core(
     base: &Path,
     old: Table,
     fields: Vec<GdbField>,
     renames: &[(String, String)],
-    edit_indexes: &IndexEdit,
+    edit_indexes: &IndexEdit<'_>,
     rows: &[(Option<u64>, Feature)],
     keep_max_oid: bool,
 ) -> Result<u64> {

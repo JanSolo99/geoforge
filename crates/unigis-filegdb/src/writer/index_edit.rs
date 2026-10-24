@@ -17,7 +17,7 @@ use super::rewrite::{IndexEdit, rewrite_core};
 use super::subtype_edit::{bad, field, load_target};
 use crate::table::{GdbFieldType, Table};
 
-fn rewrite_with(dir: &Path, table: &str, edit: &dyn Fn(&mut Vec<(String, String)>)) -> Result<()> {
+fn rewrite_with(dir: &Path, table: &str, edit: &IndexEdit<'_>) -> Result<()> {
     let t = load_target(dir, table)?;
     let tab_base = base(dir, t.table_id);
     let old = Table::open(&tab_base)?;
