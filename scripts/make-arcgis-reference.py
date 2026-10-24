@@ -809,6 +809,13 @@ CASES = {
     "nibble_data": ("gp.Nibble_sa", [RASTER / "landuse_u8.tif", RASTER / "nibble_mask_i16.tif"], ["DATA_ONLY", "PRESERVE_NODATA"]),
     "nibble_process": ("gp.Nibble_sa", [RASTER / "landuse_u8.tif", RASTER / "nibble_mask_i16.tif"], ["ALL_VALUES", "PROCESS_NODATA"]),
     "nibble_i16": ("gp.Nibble_sa", [RASTER / "patches_i16.tif", RASTER / "nibble_mask_i16.tif"], ["ALL_VALUES", "PRESERVE_NODATA"]),
+    "rbt_dem": ("gp.ReclassByTable_sa", [RASTER / "dem.tif", RASTER / "rbt_dem.dbf", "FROMV", "TOV", "OUTV"], ["DATA"]),
+    "rbt_dem_nodata": ("gp.ReclassByTable_sa", [RASTER / "dem.tif", RASTER / "rbt_dem.dbf", "FROMV", "TOV", "OUTV"], ["NODATA"]),
+    "rbt_int": ("gp.ReclassByTable_sa", [RASTER / "landuse_u8.tif", RASTER / "rbt_int.dbf", "FROMV", "TOV", "OUTV"], ["DATA"]),
+    "rbt_int_nodata": ("gp.ReclassByTable_sa", [RASTER / "landuse_u8.tif", RASTER / "rbt_int.dbf", "FROMV", "TOV", "OUTV"], ["NODATA"]),
+    "rbt_floatout": ("gp.ReclassByTable_sa", [RASTER / "dem.tif", RASTER / "rbt_float_out.dbf", "FROMV", "TOV", "OUTV"], ["DATA"]),
+    "rbt_negative": ("gp.ReclassByTable_sa", [RASTER / "dem.tif", RASTER / "rbt_negative.dbf", "FROMV", "TOV", "OUTV"], ["DATA"]),
+    "rbt_i16": ("gp.ReclassByTable_sa", [RASTER / "patches_i16.tif", RASTER / "rbt_int.dbf", "FROMV", "TOV", "OUTV"], ["DATA"]),
     "sap_chain_10":("management.SplitLineAtPoint", [DM / "chain.shp", DM / "pts.shp"], ["10 Meters"]),
     "sap_chain_1": ("management.SplitLineAtPoint", [DM / "chain.shp", DM / "pts.shp"], ["1 Meters"]),
     "sap_chain_25": ("management.SplitLineAtPoint", [DM / "chain.shp", DM / "pts.shp"], ["25 Meters"]),
@@ -909,7 +916,7 @@ RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatist
               "conversion.PolygonToRaster", "conversion.PolylineToRaster", "conversion.PointToRaster", "gp.EucDistance_sa", "gp.EucDirection_sa", "gp.EucAllocation_sa", "gp.KernelDensity_sa", "gp.PointDensity_sa", "gp.LineDensity_sa", "gp.ExtractByMask_sa",
               "management.Resample", "gp.Viewshed_sa", "gp.Expand_sa", "gp.Shrink_sa", "gp.MajorityFilter_sa",
               "gp.RegionGroup_sa", "gp.BlockStatistics_sa",
-              "gp.CostDistance_sa", "gp.CostBackLink_sa", "gp.CostAllocation_sa", "gp.CostPath_sa", "gp.Corridor_sa", "gp.Filter_sa", "gp.Nibble_sa"}
+              "gp.CostDistance_sa", "gp.CostBackLink_sa", "gp.CostAllocation_sa", "gp.CostPath_sa", "gp.Corridor_sa", "gp.Filter_sa", "gp.Nibble_sa", "gp.ReclassByTable_sa"}
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable"}

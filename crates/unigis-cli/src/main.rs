@@ -926,6 +926,21 @@ enum Tool {
         #[arg(long, default_value = "DATA")]
         missing_values: String,
     },
+    /// Spatial Analyst "Reclass by Table": the remap read from the from, to and output fields of a table.
+    ReclassByTable {
+        in_raster: PathBuf,
+        in_remap_table: PathBuf,
+        out_raster: PathBuf,
+        #[arg(long)]
+        from_value_field: String,
+        #[arg(long)]
+        to_value_field: String,
+        #[arg(long)]
+        output_value_field: String,
+        /// DATA (keep unmatched values) or NODATA.
+        #[arg(long, default_value = "DATA")]
+        missing_values: String,
+    },
     /// Spatial Analyst "Zonal Statistics".
     ZonalStatistics {
         in_zone_data: PathBuf,
@@ -3190,6 +3205,70 @@ fn main() -> ExitCode {
                 &unigis_raster::zonal::reclassify(&input, &entries, keep),
             )
         })(),
+        Tool::ReclassByTable {
+            in_raster,
+            in_remap_table,
+            out_raster,
+            from_value_field,
+            to_value_field,
+            output_value_field,
+            missing_values,
+        } => (|| {
+            let (table, _) = open_feature_class(&in_remap_table)?;
+            let find = |name: &str| {
+                table
+                    .fields()
+                    .iter()
+                    .position(|f| f.name.eq_ignore_ascii_case(name))
+                    .ok_or_else(|| {
+                        Error::Unsupported(format!(
+                            "ERROR 000728: Field {name} does not exist within table"
+                        ))
+                    })
+            };
+            let (a, b, c) = (
+                find(&from_value_field)?,
+                find(&to_value_field)?,
+                find(&output_value_field)?,
+            );
+            if !matches!(
+                table.fields()[c].field_type,
+                FieldType::SmallInteger | FieldType::Integer
+            ) {
+                return Err(Error::Unsupported(
+                    "ERROR 000864: Output value field: The input is not within the defined domain.\nERROR 003911: The field is not of type SHORT | LONG".into(),
+                ));
+            }
+            let number = |v: &Value| match v {
+                Value::SmallInteger(n) => Some(f64::from(*n)),
+                Value::Integer(n) => Some(f64::from(*n)),
+                Value::Single(n) => Some(f64::from(*n)),
+                Value::Double(n) => Some(*n),
+                _ => None,
+            };
+            let mut entries = Vec::new();
+            for f in table.features() {
+                let f = f?;
+                if let (Some(from), Some(to)) = (number(&f.attributes[a]), number(&f.attributes[b]))
+                {
+                    entries.push(unigis_raster::zonal::Remap {
+                        from,
+                        to,
+                        new: number(&f.attributes[c]),
+                    });
+                }
+            }
+            let keep = match missing_values.to_ascii_uppercase().as_str() {
+                "DATA" => true,
+                "NODATA" => false,
+                other => return Err(Error::Unsupported(format!("missing_values {other}"))),
+            };
+            let input = unigis_raster::read_geotiff(&in_raster)?;
+            write_raster_plain(
+                &out_raster,
+                &unigis_raster::zonal::reclassify_table(&input, &entries, keep),
+            )
+        })(),
         Tool::ZonalStatistics {
             in_zone_data,
             in_value_raster,
@@ -4605,6 +4684,12 @@ fn open_feature_class(path: &Path) -> Result<(Box<dyn FeatureClass>, &'static st
         return Ok((Box::new(unigis_csv::CsvTable::open(path)?), "TextFile"));
     }
     match locate(path) {
+        Location::Shapefile(p)
+            if p.extension().is_some_and(|e| e.eq_ignore_ascii_case("dbf"))
+                && !p.with_extension("shp").exists() =>
+        {
+            Ok((Box::new(unigis_shapefile::DbfTable::open(p)?), "Table"))
+        }
         Location::Shapefile(p) => Ok((Box::new(ShapefileReader::open(p)?), "ShapeFile")),
         Location::Geodatabase {
             gdb,

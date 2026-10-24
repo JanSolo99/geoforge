@@ -4373,6 +4373,22 @@ fn tools_match_arcgis_output() {
                 v.extend(["--maximum-distance".into(), m.to_string()]);
             }
             v
+        } else if info["tool"] == "gp.ReclassByTable_sa" {
+            let a = &info["args"];
+            vec![
+                "reclass-by-table".into(),
+                a[0].as_str().unwrap().into(),
+                a[1].as_str().unwrap().into(),
+                "<out>".into(),
+                "--from-value-field".into(),
+                a[2].as_str().unwrap().into(),
+                "--to-value-field".into(),
+                a[3].as_str().unwrap().into(),
+                "--output-value-field".into(),
+                a[4].as_str().unwrap().into(),
+                "--missing-values".into(),
+                a[6].as_str().unwrap().into(),
+            ]
         } else if info["tool"] == "gp.Filter_sa" {
             let a = &info["args"];
             vec![

@@ -712,3 +712,4 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - Cost Distance, Cost Back Link and Cost Allocation (`ug cost-distance`, `cost-back-link`, `cost-allocation`): 14 ArcGIS cases, distances exact; see KNOWN_GAPS for ties.
 - Corridor, Filter (LOW/HIGH, `ug filter`) and Nibble (`ug nibble`; ties take the smallest value): 15 ArcGIS cases.
 - Add/Remove Attribute Index for file geodatabase tables (`ug add-index`, `remove-index`; single field, file for file equal to ArcGIS on 20 operations). Spatial index add/remove and multi-field indexes are not done.
+- Reclass by Table (`ug reclass-by-table`; integer output field required, float fractions are truncated): 7 ArcGIS cases. `ug` now reads a stand-alone .dbf as a table.

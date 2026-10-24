@@ -13,7 +13,7 @@ use std::path::Path;
 use unigis_core::Result;
 
 use super::catalog::base;
-use super::rewrite::rewrite_core;
+use super::rewrite::{IndexEdit, rewrite_core};
 use super::subtype_edit::{bad, field, load_target};
 use crate::table::{GdbFieldType, Table};
 

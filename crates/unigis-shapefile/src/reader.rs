@@ -211,3 +211,69 @@ impl FeatureClass for ShapefileReader {
         Box::new(ShapefileReader::features(self))
     }
 }
+
+/// A stand-alone `.dbf` table (no `.shp`), as ArcGIS reads one.
+pub struct DbfTable {
+    dbf: DbfReader,
+    fields: Vec<Field>,
+}
+
+impl DbfTable {
+    pub fn open(path: impl AsRef<Path>) -> Result<Self> {
+        let path = path.as_ref();
+        let cpg = std::fs::read(path.with_extension("cpg"))
+            .ok()
+            .map(|b| String::from_utf8_lossy(&b).trim().to_owned());
+        let dbf = DbfReader::open(path, cpg.as_deref())?;
+        let fields = dbf.header().fields.iter().map(|f| f.to_field()).collect();
+        Ok(Self { dbf, fields })
+    }
+}
+
+impl FeatureClass for DbfTable {
+    fn geometry_kind(&self) -> Option<GeometryKind> {
+        None
+    }
+
+    fn has_z(&self) -> bool {
+        false
+    }
+
+    fn has_m(&self) -> bool {
+        false
+    }
+
+    fn fields(&self) -> &[Field] {
+        &self.fields
+    }
+
+    fn oid_field_name(&self) -> &str {
+        "OID"
+    }
+
+    fn shape_field_name(&self) -> &str {
+        ""
+    }
+
+    fn spatial_reference_wkt(&self) -> Option<&str> {
+        None
+    }
+
+    fn stored_extent(&self) -> Option<Envelope> {
+        None
+    }
+
+    fn features(&self) -> Box<dyn Iterator<Item = Result<Feature>> + '_> {
+        Box::new(
+            (0..self.dbf.num_records()).filter_map(move |i| match self.dbf.read(i) {
+                Ok((_, true)) => None,
+                Ok((values, false)) => Some(Ok(Feature {
+                    oid: i64::from(i),
+                    geometry: None,
+                    attributes: values,
+                })),
+                Err(e) => Some(Err(e)),
+            }),
+        )
+    }
+}

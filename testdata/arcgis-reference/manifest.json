@@ -36334,6 +36334,122 @@
       "messages": [],
       "fields": [],
       "shapeType": null
+    },
+    "rbt_dem": {
+      "tool": "gp.ReclassByTable_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/rbt_dem.dbf",
+        "FROMV",
+        "TOV",
+        "OUTV",
+        "<out>",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "rbt_dem_nodata": {
+      "tool": "gp.ReclassByTable_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/rbt_dem.dbf",
+        "FROMV",
+        "TOV",
+        "OUTV",
+        "<out>",
+        "NODATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "rbt_int": {
+      "tool": "gp.ReclassByTable_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "testdata/raster/rbt_int.dbf",
+        "FROMV",
+        "TOV",
+        "OUTV",
+        "<out>",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "rbt_int_nodata": {
+      "tool": "gp.ReclassByTable_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "testdata/raster/rbt_int.dbf",
+        "FROMV",
+        "TOV",
+        "OUTV",
+        "<out>",
+        "NODATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "rbt_negative": {
+      "tool": "gp.ReclassByTable_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/rbt_negative.dbf",
+        "FROMV",
+        "TOV",
+        "OUTV",
+        "<out>",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "rbt_i16": {
+      "tool": "gp.ReclassByTable_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "testdata/raster/rbt_int.dbf",
+        "FROMV",
+        "TOV",
+        "OUTV",
+        "<out>",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "rbt_floatout": {
+      "tool": "gp.ReclassByTable_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/rbt_float_out.dbf",
+        "FROMV",
+        "TOV",
+        "OUTV",
+        "<out>",
+        "DATA"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000864: Output value field: The input is not within the defined domain.\r\nERROR 003911: The field is not of type SHORT | LONG",
+        "Failed to execute (ReclassByTable)."
+      ],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

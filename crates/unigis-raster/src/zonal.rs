@@ -116,6 +116,28 @@ pub fn parse_remap(text: &str) -> Option<Vec<Remap>> {
 /// Spatial Analyst Reclassify on cell values. The first matching entry wins;
 /// unmatched cells keep their value (`keep_missing`, DATA) or become NoData.
 pub fn reclassify(input: &Raster, remap: &[Remap], keep_missing: bool) -> Raster {
+    reclassify_with(
+        input,
+        remap,
+        keep_missing,
+        is_eight_bit(input.data_type),
+        false,
+    )
+}
+
+/// Reclass by Table: as [`reclassify`], but the output type is always chosen as for 8-bit input
+/// and the fractional values it keeps are truncated, not rounded.
+pub fn reclassify_table(input: &Raster, remap: &[Remap], keep_missing: bool) -> Raster {
+    reclassify_with(input, remap, keep_missing, true, true)
+}
+
+fn reclassify_with(
+    input: &Raster,
+    remap: &[Remap],
+    keep_missing: bool,
+    eight_bit_rules: bool,
+    truncate_kept: bool,
+) -> Raster {
     let values: Vec<Option<f64>> = input.bands[0]
         .iter()
         .map(|&v| {
@@ -124,12 +146,12 @@ pub fn reclassify(input: &Raster, remap: &[Remap], keep_missing: bool) -> Raster
             }
             match remap.iter().find(|r| v >= r.from && v <= r.to) {
                 Some(r) => r.new,
-                None if keep_missing => Some(v),
+                None if keep_missing => Some(if truncate_kept { v.trunc() } else { v }),
                 None => None,
             }
         })
         .collect();
-    integer_raster(input, &values, is_eight_bit(input.data_type))
+    integer_raster(input, &values, eight_bit_rules)
 }
 
 /// Zonal statistic types.

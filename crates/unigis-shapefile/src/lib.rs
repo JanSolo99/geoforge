@@ -12,7 +12,7 @@ mod writer;
 
 use std::path::{Path, PathBuf};
 
-pub use reader::ShapefileReader;
+pub use reader::{DbfTable, ShapefileReader};
 pub use shape_type::ShapeType;
 pub use writer::{MAX_FILE_BYTES, ShapefileWriter, validate_field_names};
 
