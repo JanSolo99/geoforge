@@ -255,6 +255,12 @@ fn split_line_at_vertices(ctx: &dyn Context) -> Result<ToolOutput> {
     dm_geometry::split_line_at_vertices(ctx.features("input")?.as_ref())
 }
 
+fn dice(ctx: &dyn Context) -> Result<ToolOutput> {
+    let limit = num(ctx, "vertex_limit")
+        .ok_or_else(|| err("ERROR 000735: Vertex Limit: Value is required"))?;
+    dm_geometry::dice(ctx.features("input")?.as_ref(), limit.max(0.0) as usize)
+}
+
 fn unsplit_line(ctx: &dyn Context) -> Result<ToolOutput> {
     let fields = list(&get(ctx, "dissolve_field", ""));
     dm_geometry::unsplit_line(ctx.features("input")?.as_ref(), &fields)
@@ -487,6 +493,25 @@ pub const SPLIT_LINE_AT_VERTICES: Tool = Tool {
     output_suffix: "Split",
     measures: false,
     run: Runner::Features(split_line_at_vertices),
+};
+
+pub const DICE: Tool = Tool {
+    id: "dice",
+    name: "Dice",
+    toolbox: "Data Management › Generalization",
+    summary: "Divides lines and polygons with more vertices than the limit into smaller features (ArcGIS Pro Dice).",
+    params: &[
+        features("input", "Input Features"),
+        number(
+            "vertex_limit",
+            "Vertex Limit",
+            "",
+            "The most vertices a feature may keep; at least 10.",
+        ),
+    ],
+    output_suffix: "Dice",
+    measures: false,
+    run: Runner::Features(dice),
 };
 
 pub const UNSPLIT_LINE: Tool = Tool {

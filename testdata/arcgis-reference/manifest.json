@@ -32613,6 +32613,771 @@
         ]
       ],
       "shapeType": "Polyline"
+    },
+    "dice_lines_10": {
+      "tool": "management.Dice",
+      "args": [
+        "testdata/dm/dice_lines.shp",
+        "<out>",
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "dice_lines_15": {
+      "tool": "management.Dice",
+      "args": [
+        "testdata/dm/dice_lines.shp",
+        "<out>",
+        15
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "dice_multi_10": {
+      "tool": "management.Dice",
+      "args": [
+        "testdata/dm/dice_multi.shp",
+        "<out>",
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          10,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "dice_multi_16": {
+      "tool": "management.Dice",
+      "args": [
+        "testdata/dm/dice_multi.shp",
+        "<out>",
+        16
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          10,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "dice_polys_129": {
+      "tool": "management.Dice",
+      "args": [
+        "testdata/dm/dice_polys.shp",
+        "<out>",
+        129
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          10,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "dice_polys_100": {
+      "tool": "management.Dice",
+      "args": [
+        "testdata/dm/dice_polys.shp",
+        "<out>",
+        100
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          10,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "dice_polys_80": {
+      "tool": "management.Dice",
+      "args": [
+        "testdata/dm/dice_polys.shp",
+        "<out>",
+        80
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          10,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "dice_polys_64": {
+      "tool": "management.Dice",
+      "args": [
+        "testdata/dm/dice_polys.shp",
+        "<out>",
+        64
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          10,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "dice_polys_50": {
+      "tool": "management.Dice",
+      "args": [
+        "testdata/dm/dice_polys.shp",
+        "<out>",
+        50
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          10,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "dice_polys_40": {
+      "tool": "management.Dice",
+      "args": [
+        "testdata/dm/dice_polys.shp",
+        "<out>",
+        40
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          10,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "dice_polys_33": {
+      "tool": "management.Dice",
+      "args": [
+        "testdata/dm/dice_polys.shp",
+        "<out>",
+        33
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          10,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "dice_polys_25": {
+      "tool": "management.Dice",
+      "args": [
+        "testdata/dm/dice_polys.shp",
+        "<out>",
+        25
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          10,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "dice_polys_20": {
+      "tool": "management.Dice",
+      "args": [
+        "testdata/dm/dice_polys.shp",
+        "<out>",
+        20
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          10,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "dice_polys_15": {
+      "tool": "management.Dice",
+      "args": [
+        "testdata/dm/dice_polys.shp",
+        "<out>",
+        15
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          10,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "dice_polys_12": {
+      "tool": "management.Dice",
+      "args": [
+        "testdata/dm/dice_polys.shp",
+        "<out>",
+        12
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          10,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "dice_polys_10": {
+      "tool": "management.Dice",
+      "args": [
+        "testdata/dm/dice_polys.shp",
+        "<out>",
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          10,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "dice_multipoly_10": {
+      "tool": "management.Dice",
+      "args": [
+        "testdata/dm/dice_multipoly.shp",
+        "<out>",
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          10,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "dice_multipoly_20": {
+      "tool": "management.Dice",
+      "args": [
+        "testdata/dm/dice_multipoly.shp",
+        "<out>",
+        20
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          10,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "dice_multipoly_30": {
+      "tool": "management.Dice",
+      "args": [
+        "testdata/dm/dice_multipoly.shp",
+        "<out>",
+        30
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          10,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
     }
   }
 }

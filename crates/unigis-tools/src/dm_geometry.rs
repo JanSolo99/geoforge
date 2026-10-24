@@ -796,6 +796,200 @@ pub fn bearing_distance_to_line(
     })
 }
 
+/// `arcpy.management.Dice(in_features, out_feature_class, vertex_limit)`.
+///
+/// A feature with at most `vertex_limit` vertices is copied as it is. Otherwise:
+/// - A line is cut part by part (a multipart line over the limit becomes one feature per part): a part over the
+///   limit gets `n = ceil(segments / (limit - 1))` pieces of `ceil(segments / n)` segments each
+///   (the last one shorter), consecutive and sharing their end vertices.
+/// - A polygon is cut by a recursive median split of its extent. A cell with more than
+///   `vertex_limit` of the polygon's original vertices (inclusive of its borders) is split at the
+///   coordinate of its upper median vertex, across its longer side (a cell is split across x unless it
+///   is higher than wide by more than 0.125), and each half is intersected with the polygon.
+///   The upper (greater coordinate) half comes first in the output. A polygon over the limit is
+///   cut part by part (an exterior ring with its holes), like a line.
+///
+/// Every piece keeps the feature's attributes. The cell side that ArcGIS picks for cells holding
+/// few vertices (11 to 18 with limits around 10) is not always the longer one; see KNOWN_GAPS.
+pub fn dice(input: &dyn FeatureClass, vertex_limit: usize) -> Result<ToolOutput> {
+    if vertex_limit < 10 {
+        return Err(err("ERROR 001033: The minimum vertex limit is 10."));
+    }
+    let kind = kind_of(input)?;
+    if !matches!(kind, GeometryKind::Polyline | GeometryKind::Polygon) {
+        return Err(err(
+            "ERROR 000735: Input Features: the geometry is not of type polyline or polygon",
+        ));
+    }
+    let mut features: Vec<Feature> = Vec::new();
+    let mut emit = |g: Geometry, attributes: &[Value]| {
+        features.push(Feature {
+            oid: features.len() as i64,
+            geometry: Some(g),
+            attributes: attributes.to_vec(),
+        });
+    };
+    for f in input.features() {
+        let f = f?;
+        let Some(g) = f.geometry.clone() else {
+            continue;
+        };
+        if kind == GeometryKind::Polyline {
+            if g.xy.len() <= vertex_limit {
+                emit(g, &f.attributes);
+                continue;
+            }
+            for r in g.part_ranges() {
+                for piece in dice_line_part(&g, &r, vertex_limit) {
+                    emit(piece, &f.attributes);
+                }
+            }
+        } else {
+            // Rings without their closing vertices.
+            let total: usize = g.part_ranges().map(|r| r.len().saturating_sub(1)).sum();
+            if total <= vertex_limit {
+                emit(g, &f.attributes);
+                continue;
+            }
+            for (exterior, holes) in polygon_parts(&g) {
+                let rings: Vec<_> = std::iter::once(exterior).chain(holes).collect();
+                let mut part = Geometry {
+                    kind: GeometryKind::Polygon,
+                    parts: Vec::new(),
+                    part_types: None,
+                    xy: Vec::new(),
+                    z: None,
+                    m: None,
+                    curves: Vec::new(),
+                };
+                for r in rings {
+                    part.parts.push(part.xy.len() as u32);
+                    part.xy.extend_from_slice(&g.xy[r]);
+                }
+                for piece in dice_polygon(&part, vertex_limit)? {
+                    emit(piece, &f.attributes);
+                }
+            }
+        }
+    }
+    Ok(new_output(input, kind, input.fields().to_vec(), features))
+}
+
+fn line_piece(g: &Geometry, r: &std::ops::Range<usize>, from: usize, to: usize) -> Geometry {
+    let range = r.start + from..r.start + to + 1;
+    Geometry {
+        kind: GeometryKind::Polyline,
+        parts: vec![0],
+        part_types: None,
+        xy: g.xy[range.clone()].to_vec(),
+        z: g.z.as_ref().map(|z| z[range.clone()].to_vec()),
+        m: g.m.as_ref().map(|m| m[range].to_vec()),
+        curves: Vec::new(),
+    }
+}
+
+fn dice_line_part(g: &Geometry, r: &std::ops::Range<usize>, limit: usize) -> Vec<Geometry> {
+    let segments = r.len().saturating_sub(1);
+    if r.len() <= limit {
+        return vec![line_piece(g, r, 0, segments)];
+    }
+    let pieces = segments.div_ceil(limit - 1);
+    let size = segments.div_ceil(pieces);
+    (0..segments)
+        .step_by(size)
+        .map(|from| line_piece(g, r, from, (from + size).min(segments)))
+        .collect()
+}
+
+fn dice_polygon(g: &Geometry, limit: usize) -> Result<Vec<Geometry>> {
+    // The original vertices, without each ring's closing vertex.
+    let vertices: Vec<[f64; 2]> = g
+        .part_ranges()
+        .flat_map(|r| {
+            let n = if g.xy[r.start] == g.xy[r.end - 1] {
+                r.len() - 1
+            } else {
+                r.len()
+            };
+            g.xy[r.start..r.start + n].to_vec()
+        })
+        .collect();
+    let Some(root) = bounds(&vertices) else {
+        return Ok(vec![g.clone()]);
+    };
+    let mut out = Vec::new();
+    // The first cell splits across x unless it is higher than wide by more than 0.125 (extents
+    // 0.116 apart still split across x, 0.163 apart split across y).
+    let first = root[3] - root[1] - (root[2] - root[0]) <= 0.125;
+    dice_cell(g, &vertices, limit, root, root, first, &mut out)?;
+    Ok(out)
+}
+
+fn dice_cell(
+    piece: &Geometry,
+    vertices: &[[f64; 2]],
+    limit: usize,
+    cell: [f64; 4],
+    root: [f64; 4],
+    first_x: bool,
+    out: &mut Vec<Geometry>,
+) -> Result<()> {
+    let inside: Vec<[f64; 2]> = vertices
+        .iter()
+        .copied()
+        .filter(|p| p[0] >= cell[0] && p[0] <= cell[2] && p[1] >= cell[1] && p[1] <= cell[3])
+        .collect();
+    if inside.len() <= limit {
+        out.push(piece.clone());
+        return Ok(());
+    }
+    let (w, h) = (cell[2] - cell[0], cell[3] - cell[1]);
+    let across_x = if cell == root {
+        first_x
+    } else {
+        h - w <= 0.125
+    };
+    let axis = usize::from(!across_x);
+    let mut values: Vec<f64> = inside.iter().map(|p| p[axis]).collect();
+    values.sort_by(f64::total_cmp);
+    let cut = values[values.len() / 2];
+    let (low, high) = if across_x {
+        (
+            [cell[0], cell[1], cut, cell[3]],
+            [cut, cell[1], cell[2], cell[3]],
+        )
+    } else {
+        (
+            [cell[0], cell[1], cell[2], cut],
+            [cell[0], cut, cell[2], cell[3]],
+        )
+    };
+    let mut halves = Vec::new();
+    for half in [high, low] {
+        // Cell sides on the outer border reach past the polygon.
+        let pad = |v: f64, edge: f64, sign: f64| if v == edge { v + sign } else { v };
+        let clip = rect([
+            pad(half[0], cell[0], -1.0),
+            pad(half[1], cell[1], -1.0),
+            pad(half[2], cell[2], 1.0),
+            pad(half[3], cell[3], 1.0),
+        ]);
+        if let Some(p) = unigis_geometry::intersection(piece, &clip)?
+            && p.xy.len() >= 3
+        {
+            halves.push((p, half));
+        }
+    }
+    if halves.len() < 2 {
+        out.push(piece.clone());
+        return Ok(());
+    }
+    for (p, half) in halves {
+        dice_cell(&p, vertices, limit, half, root, first_x, out)?;
+    }
+    Ok(())
+}
+
 /// Piece ends (piece, is the end) by (group, rounded node).
 type NodeEnds = std::collections::HashMap<(usize, (i64, i64)), Vec<(usize, bool)>>;
 

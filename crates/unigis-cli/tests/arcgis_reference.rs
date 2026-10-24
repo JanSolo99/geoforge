@@ -4140,6 +4140,21 @@ const KNOWN_FEATURE_DIFFERENCES: &[(&str, &[usize])] = &[
     // Split Line At Point: ArcGIS lists the pieces of one curved road as 1, 3, 2, 5, 4 (the last
     // piece before a close pair of splits first); the pieces themselves are equal.
     ("sap_roads_wells_20", &[12, 13, 14, 15]),
+    // Dice of polygons: where a half-cell holds a neck of zero width, ArcGIS keeps one ring and
+    // we make two parts.
+    ("dice_polys_64", &[4]),
+    ("dice_polys_50", &[5]),
+    ("dice_polys_40", &[6]),
+    // Dice of polygons with cells of 11 to 18 vertices: ArcGIS does not always cut across the
+    // longer side (about 10 of 41 cuts in the probes); the whole feature list differs.
+    ("dice_polys_33", &[]),
+    ("dice_polys_25", &[]),
+    ("dice_polys_20", &[]),
+    ("dice_polys_15", &[]),
+    ("dice_polys_12", &[]),
+    ("dice_polys_10", &[]),
+    ("dice_multipoly_10", &[]),
+    ("dice_multipoly_20", &[]),
 ];
 
 /// Raster cases where some cells are known to differ from ArcGIS, with the most
