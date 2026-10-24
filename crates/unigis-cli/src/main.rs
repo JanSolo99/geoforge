@@ -380,6 +380,27 @@ enum Tool {
         #[arg(long, default_value = "")]
         subtype_code: String,
     },
+    /// Rename a field, change its alias, type, length or nullability, in place on a table of a
+    /// file geodatabase (ArcGIS "Alter Field"). A type change needs an empty table.
+    AlterField {
+        in_table: PathBuf,
+        field: String,
+        #[arg(long)]
+        new_field_name: Option<String>,
+        #[arg(long)]
+        new_field_alias: Option<String>,
+        /// TEXT, FLOAT, DOUBLE, SHORT, LONG, BIGINTEGER, DATE, DATEONLY, TIMEONLY, BLOB or GUID.
+        #[arg(long)]
+        field_type: Option<String>,
+        #[arg(long)]
+        field_length: Option<u32>,
+        /// NULLABLE or NON_NULLABLE.
+        #[arg(long)]
+        field_is_nullable: Option<String>,
+        /// CLEAR_ALIAS or NOT_CLEAR_ALIAS.
+        #[arg(long)]
+        clear_field_alias: Option<String>,
+    },
     /// Assign a default value to a field, or to it within subtypes; no value clears it (ArcGIS
     /// "Assign Default To Field").
     AssignDefaultToField {
@@ -1776,6 +1797,66 @@ fn main() -> ExitCode {
                 &table,
                 &field_name,
                 &codes(&subtype_code)?,
+            )
+        })(),
+        Tool::AlterField {
+            in_table,
+            field,
+            new_field_name,
+            new_field_alias,
+            field_type,
+            field_length,
+            field_is_nullable,
+            clear_field_alias,
+        } => (|| {
+            let (gdb, table) = gdb_table(&in_table)?;
+            let new_type = match field_type
+                .as_deref()
+                .map(str::trim)
+                .filter(|t| !t.is_empty() && *t != "#")
+                .map(str::to_ascii_uppercase)
+                .as_deref()
+            {
+                None => None,
+                Some("TEXT") => Some(FieldType::String),
+                Some("FLOAT") => Some(FieldType::Single),
+                Some("DOUBLE") => Some(FieldType::Double),
+                Some("SHORT") => Some(FieldType::SmallInteger),
+                Some("LONG") => Some(FieldType::Integer),
+                Some("BIGINTEGER") => Some(FieldType::BigInteger),
+                Some("DATE") => Some(FieldType::Date),
+                Some("DATEONLY") => Some(FieldType::DateOnly),
+                Some("TIMEONLY") => Some(FieldType::TimeOnly),
+                Some("TIMESTAMPOFFSET") => Some(FieldType::TimestampOffset),
+                Some("BLOB") => Some(FieldType::Blob),
+                Some("GUID") => Some(FieldType::Guid),
+                Some(other) => return Err(Error::Unsupported(format!("field type {other}"))),
+            };
+            let nullable = match field_is_nullable
+                .as_deref()
+                .map(str::to_ascii_uppercase)
+                .as_deref()
+            {
+                None | Some("") | Some("#") => None,
+                Some("NULLABLE") => Some(true),
+                Some("NON_NULLABLE") => Some(false),
+                Some(other) => return Err(Error::Unsupported(format!("nullable {other}"))),
+            };
+            let clear_alias = clear_field_alias
+                .as_deref()
+                .is_some_and(|c| c.eq_ignore_ascii_case("CLEAR_ALIAS"));
+            unigis_filegdb::alter_field(
+                &gdb,
+                &table,
+                &field,
+                &unigis_filegdb::FieldAlteration {
+                    new_name: new_field_name.as_deref(),
+                    alias: new_field_alias.as_deref(),
+                    clear_alias,
+                    new_type,
+                    length: field_length,
+                    nullable,
+                },
             )
         })(),
         Tool::AssignDefaultToField {

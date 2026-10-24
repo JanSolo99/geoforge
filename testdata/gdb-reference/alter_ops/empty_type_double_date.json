@@ -1,0 +1,173 @@
+{
+ "fields": {
+  "parcels": [
+   [
+    "PARCEL_ID",
+    "Integer",
+    null,
+    true,
+    null,
+    null
+   ],
+   [
+    "NAME",
+    "String",
+    20,
+    true,
+    null,
+    null
+   ],
+   [
+    "VALUE",
+    "Real",
+    null,
+    true,
+    null,
+    null
+   ],
+   [
+    "ZONE",
+    "Integer",
+    null,
+    true,
+    null,
+    "zones"
+   ],
+   [
+    "Shape_Length",
+    "Real",
+    null,
+    true,
+    null,
+    null
+   ],
+   [
+    "Shape_Area",
+    "Real",
+    null,
+    true,
+    null,
+    null
+   ]
+  ],
+  "emptyt": [
+   [
+    "A",
+    "String",
+    10,
+    true,
+    null,
+    null
+   ],
+   [
+    "B",
+    "Integer",
+    null,
+    true,
+    null,
+    null
+   ],
+   [
+    "C",
+    "DateTime",
+    null,
+    true,
+    null,
+    null
+   ]
+  ]
+ },
+ "rows": {
+  "parcels": "Shape,PARCEL_ID,NAME,VALUE,ZONE,Shape_Length,Shape_Area\n\"MULTIPOLYGON (((500002.0 5000002.0,500002.0 5000098.0,500098.0 5000098.0,500098.0 5000002.0,500002.0 5000002.0)))\",1,Lot 1,8597.94,1,384,9216\n\"MULTIPOLYGON (((500102.0 5000002.0,500102.0 5000098.0,500198.0 5000098.0,500198.0 5000002.0,500102.0 5000002.0)))\",2,Lot 2,3943.01,2,384,9216\n\"MULTIPOLYGON (((500202.0 5000002.0,500202.0 5000098.0,500298.0 5000098.0,500298.0 5000002.0,500202.0 5000002.0)))\",3,Lot 3,4805.88,3,384,9216\n\"MULTIPOLYGON (((500302.0 5000002.0,500302.0 5000098.0,500398.0 5000098.0,500398.0 5000002.0,500302.0 5000002.0)))\",4,Lot 4,1889.5,0,384,9216\n\"MULTIPOLYGON (((500402.0 5000002.0,500402.0 5000098.0,500498.0 5000098.0,500498.0 5000002.0,500402.0 5000002.0),(500430.0 5000030.0,500460.0 5000030.0,500460.0 5000060.0,500430.0 5000060.0,500430.0 5000030.0)))\",5,Lot 5,1754.62,1,504,8316\n\"MULTIPOLYGON (((500502.0 5000002.0,500502.0 5000098.0,500598.0 5000098.0,500598.0 5000002.0,500502.0 5000002.0)))\",6,Lot 6,5900.9,2,384,9216\n\"MULTIPOLYGON (((500002.0 5000102.0,500002.0 5000198.0,500098.0 5000198.0,500098.0 5000102.0,500002.0 5000102.0)))\",7,Lot 7,6047.8,3,384,9216\n\"MULTIPOLYGON (((500102.0 5000102.0,500102.0 5000198.0,500145.0 5000198.0,500145.0 5000102.0,500102.0 5000102.0)),((500155.0 5000102.0,500155.0 5000198.0,500198.0 5000198.0,500198.0 5000102.0,500155.0 5000102.0)))\",8,Lot 8,8502.57,0,556,8256\n\"MULTIPOLYGON (((500202.0 5000102.0,500202.0 5000198.0,500298.0 5000198.0,500298.0 5000102.0,500202.0 5000102.0)))\",9,Lot 9,8658.8,1,384,9216\n\"MULTIPOLYGON (((500302.0 5000102.0,500302.0 5000198.0,500398.0 5000198.0,500398.0 5000102.0,500302.0 5000102.0),(500330.0 5000130.0,500360.0 5000130.0,500360.0 5000160.0,500330.0 5000160.0,500330.0 5000130.0)))\",10,Lot 10,5607.71,2,504,8316\n\"MULTIPOLYGON (((500402.0 5000102.0,500402.0 5000198.0,500498.0 5000198.0,500498.0 5000102.0,500402.0 5000102.0)))\",11,Lot 11,349.8,3,384,9216\n\"MULTIPOLYGON (((500502.0 5000102.0,500502.0 5000198.0,500598.0 5000198.0,500598.0 5000102.0,500502.0 5000102.0)))\",12,Lot 12,1823.35,0,384,9216\n\"MULTIPOLYGON (((500002.0 5000202.0,500002.0 5000298.0,500098.0 5000298.0,500098.0 5000202.0,500002.0 5000202.0)))\",13,Lot 13,3349.07,1,384,9216\n\"MULTIPOLYGON (((500102.0 5000202.0,500102.0 5000298.0,500198.0 5000298.0,500198.0 5000202.0,500102.0 5000202.0)))\",14,Lot 14,551.72,2,384,9216\n\"MULTIPOLYGON (((500202.0 5000202.0,500202.0 5000298.0,500298.0 5000298.0,500298.0 5000202.0,500202.0 5000202.0),(500230.0 5000230.0,500260.0 5000230.0,500260.0 5000260.0,500230.0 5000260.0,500230.0 5000230.0)))\",15,Lot 15,7231.69,3,504,8316\n\"MULTIPOLYGON (((500302.0 5000202.0,500302.0 5000298.0,500398.0 5000298.0,500398.0 5000202.0,500302.0 5000202.0)))\",16,Lot 16,7713.37,0,384,9216\n\"MULTIPOLYGON (((500402.0 5000202.0,500402.0 5000298.0,500498.0 5000298.0,500498.0 5000202.0,500402.0 5000202.0)))\",17,Lot 17,2079.62,1,384,9216\n\"MULTIPOLYGON (((500502.0 5000202.0,500502.0 5000298.0,500598.0 5000298.0,500598.0 5000202.0,500502.0 5000202.0)))\",18,Lot 18,6374.34,2,384,9216\n\"MULTIPOLYGON (((500002.0 5000302.0,500002.0 5000398.0,500098.0 5000398.0,500098.0 5000302.0,500002.0 5000302.0)))\",19,Lot 19,9856.91,3,384,9216\n\"MULTIPOLYGON (((500102.0 5000302.0,500102.0 5000398.0,500198.0 5000398.0,500198.0 5000302.0,500102.0 5000302.0),(500130.0 5000330.0,500160.0 5000330.0,500160.0 5000360.0,500130.0 5000360.0,500130.0 5000330.0)))\",20,Lot 20,5741.45,0,504,8316\n\"MULTIPOLYGON (((500202.0 5000302.0,500202.0 5000398.0,500298.0 5000398.0,500298.0 5000302.0,500202.0 5000302.0)))\",21,Lot 21,3292.7,1,384,9216\n\"MULTIPOLYGON (((500302.0 5000302.0,500302.0 5000398.0,500398.0 5000398.0,500398.0 5000302.0,500302.0 5000302.0)))\",22,Lot 22,7372.38,2,384,9216\n\"MULTIPOLYGON (((500402.0 5000302.0,500402.0 5000398.0,500498.0 5000398.0,500498.0 5000302.0,500402.0 5000302.0)))\",23,Lot 23,589.95,3,384,9216\n\"MULTIPOLYGON (((500502.0 5000302.0,500502.0 5000398.0,500598.0 5000398.0,500598.0 5000302.0,500502.0 5000302.0)))\",24,Lot 24,5026.57,0,384,9216\n\"MULTIPOLYGON (((500002.0 5000402.0,500002.0 5000498.0,500098.0 5000498.0,500098.0 5000402.0,500002.0 5000402.0),(500030.0 5000430.0,500060.0 5000430.0,500060.0 5000460.0,500030.0 5000460.0,500030.0 5000430.0)))\",25,Lot 25,551.57,1,504,8316\n\"MULTIPOLYGON (((500102.0 5000402.0,500102.0 5000498.0,500198.0 5000498.0,500198.0 5000402.0,500102.0 5000402.0)))\",26,Lot 26,509.26,2,384,9216\n\"MULTIPOLYGON (((500202.0 5000402.0,500202.0 5000498.0,500298.0 5000498.0,500298.0 5000402.0,500202.0 5000402.0)))\",27,Lot 27,8614.3,3,384,9216\n\"MULTIPOLYGON (((500302.0 5000402.0,500302.0 5000498.0,500398.0 5000498.0,500398.0 5000402.0,500302.0 5000402.0)))\",28,Lot 28,4259.07,0,384,9216\n\"MULTIPOLYGON (((500402.0 5000402.0,500402.0 5000498.0,500498.0 5000498.0,500498.0 5000402.0,500402.0 5000402.0)))\",29,Lot 29,2129.19,1,384,9216\n\"MULTIPOLYGON (((500502.0 5000402.0,500502.0 5000498.0,500598.0 5000498.0,500598.0 5000402.0,500502.0 5000402.0),(500530.0 5000430.0,500560.0 5000430.0,500560.0 5000460.0,500530.0 5000460.0,500530.0 5000430.0)))\",30,Lot 30,3577.05,2,504,8316\n\"MULTIPOLYGON (((500002.0 5000502.0,500002.0 5000598.0,500098.0 5000598.0,500098.0 5000502.0,500002.0 5000502.0)))\",31,Lot 31,4236.06,3,384,9216\n\"MULTIPOLYGON (((500102.0 5000502.0,500102.0 5000598.0,500198.0 5000598.0,500198.0 5000502.0,500102.0 5000502.0)))\",32,Lot 32,7996.89,0,384,9216\n\"MULTIPOLYGON (((500202.0 5000502.0,500202.0 5000598.0,500298.0 5000598.0,500298.0 5000502.0,500202.0 5000502.0)))\",33,Lot 33,6212.11,1,384,9216\n\"MULTIPOLYGON (((500302.0 5000502.0,500302.0 5000598.0,500398.0 5000598.0,500398.0 5000502.0,500302.0 5000502.0)))\",34,Lot 34,6903.47,2,384,9216\n\"MULTIPOLYGON (((500402.0 5000502.0,500402.0 5000598.0,500498.0 5000598.0,500498.0 5000502.0,500402.0 5000502.0),(500430.0 5000530.0,500460.0 5000530.0,500460.0 5000560.0,500430.0 5000560.0,500430.0 5000530.0)))\",35,Lot 35,7780.04,3,504,8316\n\"MULTIPOLYGON (((500502.0 5000502.0,500502.0 5000598.0,500598.0 5000598.0,500598.0 5000502.0,500502.0 5000502.0)))\",36,Lot 36,2107.39,0,384,9216\n",
+  "emptyt": "A,B,C\n"
+ },
+ "defaults": {
+  "parcels": [
+   [
+    "PARCEL_ID",
+    null
+   ],
+   [
+    "NAME",
+    "'unnamed'"
+   ],
+   [
+    "VALUE",
+    null
+   ],
+   [
+    "ZONE",
+    null
+   ],
+   [
+    "Shape_Length",
+    "FILEGEODATABASE_SHAPE_LENGTH"
+   ],
+   [
+    "Shape_Area",
+    "FILEGEODATABASE_SHAPE_AREA"
+   ]
+  ],
+  "emptyt": [
+   [
+    "A",
+    null
+   ],
+   [
+    "B",
+    null
+   ],
+   [
+    "C",
+    null
+   ]
+  ]
+ },
+ "items": [
+  {
+   "name": "Workspace",
+   "physical": "WORKSPACE",
+   "path": "",
+   "type": "C673FE0F",
+   "definition": "<DEWorkspacexsi:type='typens:DEWorkspace'xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'xmlns:xs='http://www.w3.org/2001/XMLSchema'xmlns:typens='http://www.esri.com/schemas/ArcGIS/10.8'><CatalogPath>\\</CatalogPath><Name></Name><ChildrenExpanded>false</ChildrenExpanded><WorkspaceType>esriLocalDatabaseWorkspace</WorkspaceType><WorkspaceFactoryProgID></WorkspaceFactoryProgID><ConnectionString></ConnectionString><ConnectionInfoxsi:nil='true'/><Domainsxsi:type='typens:ArrayOfDomain'></Domains><MajorVersion>3</MajorVersion><MinorVersion>0</MinorVersion><BugfixVersion>0</BugfixVersion><Realm></Realm><MaxAttributeRuleID>0</MaxAttributeRuleID></DEWorkspace>"
+  },
+  {
+   "name": "zones",
+   "physical": "ZONES",
+   "path": "",
+   "type": "8C368B12",
+   "definition": "<GPCodedValueDomain2xsi:type='typens:GPCodedValueDomain2'xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'xmlns:xs='http://www.w3.org/2001/XMLSchema'xmlns:typens='http://www.esri.com/schemas/ArcGIS/10.8'><DomainName>zones</DomainName><FieldType>esriFieldTypeInteger</FieldType><MergePolicy>esriMPTDefaultValue</MergePolicy><SplitPolicy>esriSPTDefaultValue</SplitPolicy><Description>zonecodes</Description><Owner></Owner><CodedValuesxsi:type='typens:ArrayOfCodedValue'><CodedValuexsi:type='typens:CodedValue'><Name>one</Name><Codexsi:type='xs:int'>1</Code></CodedValue><CodedValuexsi:type='typens:CodedValue'><Name>two</Name><Codexsi:type='xs:int'>2</Code></CodedValue></CodedValues></GPCodedValueDomain2>"
+  },
+  {
+   "name": "",
+   "physical": "",
+   "path": "\\",
+   "type": "F3783E6F",
+   "definition": ""
+  },
+  {
+   "name": "emptyt",
+   "physical": "EMPTYT",
+   "path": "\\emptyt",
+   "type": "CD06BC3B",
+   "definition": "<DETableInfoxsi:type='typens:DETableInfo'xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'xmlns:xs='http://www.w3.org/2001/XMLSchema'xmlns:typens='http://www.esri.com/schemas/ArcGIS/10.8'><CatalogPath>\\emptyt</CatalogPath><Name>emptyt</Name><ChildrenExpanded>false</ChildrenExpanded><DatasetType>esriDTTable</DatasetType><DSID>5</DSID><Versioned>false</Versioned><CanVersion>false</CanVersion><ConfigurationKeyword></ConfigurationKeyword><RequiredGeodatabaseClientVersion>10.0</RequiredGeodatabaseClientVersion><HasOID>true</HasOID><OIDFieldName>OBJECTID</OIDFieldName><GPFieldInfoExsxsi:type='typens:ArrayOfGPFieldInfoEx'><GPFieldInfoExxsi:type='typens:GPFieldInfoEx'><Name>OBJECTID</Name><FieldType>esriFieldTypeOID</FieldType><IsNullable>false</IsNullable><Required>true</Required><Editable>false</Editable></GPFieldInfoEx><GPFieldInfoExxsi:type='typens:GPFieldInfoEx'><Name>C</Name><AliasName>Cee</AliasName><FieldType>esriFieldTypeDate</FieldType><IsNullable>true</IsNullable></GPFieldInfoEx></GPFieldInfoExs><CLSID>{7A566981-C114-11D2-8A28-006097AFF44E}</CLSID><EXTCLSID></EXTCLSID><RelationshipClassNamesxsi:type='typens:Names'></RelationshipClassNames><AliasName></AliasName><ModelName></ModelName><HasGlobalID>false</HasGlobalID><GlobalIDFieldName></GlobalIDFieldName><RasterFieldName></RasterFieldName><ExtensionPropertiesxsi:type='typens:PropertySet'><PropertyArrayxsi:type='typens:ArrayOfPropertySetProperty'></PropertyArray></ExtensionProperties><ControllerMembershipsxsi:type='typens:ArrayOfControllerMembership'></ControllerMemberships><EditorTrackingEnabled>false</EditorTrackingEnabled><CreatorFieldName></CreatorFieldName><CreatedAtFieldName></CreatedAtFieldName><EditorFieldName></EditorFieldName><EditedAtFieldName></EditedAtFieldName><IsTimeInUTC>true</IsTimeInUTC><ChangeTracked>false</ChangeTracked><FieldFilteringEnabled>false</FieldFilteringEnabled><FilteredFieldNamesxsi:type='typens:Names'></FilteredFieldNames><ReplicaTracked>false</ReplicaTracked></DETableInfo>"
+  },
+  {
+   "name": "parcels",
+   "physical": "PARCELS",
+   "path": "\\parcels",
+   "type": "70737809",
+   "definition": "<DEFeatureClassInfoxsi:type='typens:DEFeatureClassInfo'xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'xmlns:xs='http://www.w3.org/2001/XMLSchema'xmlns:typens='http://www.esri.com/schemas/ArcGIS/10.8'><CatalogPath>\\parcels</CatalogPath><Name>parcels</Name><ChildrenExpanded>false</ChildrenExpanded><DatasetType>esriDTFeatureClass</DatasetType><DSID>4</DSID><Versioned>false</Versioned><CanVersion>false</CanVersion><ConfigurationKeyword></ConfigurationKeyword><RequiredGeodatabaseClientVersion>10.0</RequiredGeodatabaseClientVersion><HasOID>true</HasOID><OIDFieldName>OBJECTID</OIDFieldName><GPFieldInfoExsxsi:type='typens:ArrayOfGPFieldInfoEx'><GPFieldInfoExxsi:type='typens:GPFieldInfoEx'><Name>OBJECTID</Name><FieldType>esriFieldTypeOID</FieldType><IsNullable>false</IsNullable><Required>true</Required><Editable>false</Editable></GPFieldInfoEx><GPFieldInfoExxsi:type='typens:GPFieldInfoEx'><Name>Shape</Name><FieldType>esriFieldTypeGeometry</FieldType><IsNullable>true</IsNullable><Required>true</Required></GPFieldInfoEx><GPFieldInfoExxsi:type='typens:GPFieldInfoEx'><Name>PARCEL_ID</Name><AliasName>PARCEL_ID</AliasName><FieldType>esriFieldTypeInteger</FieldType><IsNullable>true</IsNullable></GPFieldInfoEx><GPFieldInfoExxsi:type='typens:GPFieldInfoEx'><Name>NAME</Name><AliasName>NAME</AliasName><FieldType>esriFieldTypeString</FieldType><DefaultValueString>unnamed</DefaultValueString><IsNullable>true</IsNullable></GPFieldInfoEx><GPFieldInfoExxsi:type='typens:GPFieldInfoEx'><Name>VALUE</Name><AliasName>VALUE</AliasName><FieldType>esriFieldTypeDouble</FieldType><IsNullable>true</IsNullable></GPFieldInfoEx><GPFieldInfoExxsi:type='typens:GPFieldInfoEx'><Name>ZONE</Name><AliasName>ZONE</AliasName><DomainName>zones</DomainName><FieldType>esriFieldTypeInteger</FieldType><IsNullable>true</IsNullable></GPFieldInfoEx><GPFieldInfoExxsi:type='typens:GPFieldInfoEx'><Name>Shape_Length</Name><FieldType>esriFieldTypeDouble</FieldType><IsNullable>true</IsNullable><Required>true</Required><Editable>false</Editable></GPFieldInfoEx><GPFieldInfoExxsi:type='typens:GPFieldInfoEx'><Name>Shape_Area</Name><FieldType>esriFieldTypeDouble</FieldType><IsNullable>true</IsNullable><Required>true</Required><Editable>false</Editable></GPFieldInfoEx></GPFieldInfoExs><CLSID>{52353152-891A-11D0-BEC6-00805F7C4268}</CLSID><EXTCLSID></EXTCLSID><RelationshipClassNamesxsi:type='typens:Names'></RelationshipClassNames><AliasName></AliasName><ModelName></ModelName><HasGlobalID>false</HasGlobalID><GlobalIDFieldName></GlobalIDFieldName><RasterFieldName></RasterFieldName><ExtensionPropertiesxsi:type='typens:PropertySet'><PropertyArrayxsi:type='typens:ArrayOfPropertySetProperty'></PropertyArray></ExtensionProperties><ControllerMembershipsxsi:type='typens:ArrayOfControllerMembership'></ControllerMemberships><EditorTrackingEnabled>false</EditorTrackingEnabled><CreatorFieldName></CreatorFieldName><CreatedAtFieldName></CreatedAtFieldName><EditorFieldName></EditorFieldName><EditedAtFieldName></EditedAtFieldName><IsTimeInUTC>true</IsTimeInUTC><FeatureType>esriFTSimple</FeatureType><ShapeType>esriGeometryPolygon</ShapeType><ShapeFieldName>Shape</ShapeFieldName><HasM>false</HasM><HasZ>false</HasZ><HasSpatialIndex>true</HasSpatialIndex><AreaFieldName>Shape_Area</AreaFieldName><LengthFieldName>Shape_Length</LengthFieldName><Extentxsi:type='typens:EnvelopeN'><XMin>500002</XMin><YMin>5000002</YMin><XMax>500598</XMax><YMax>5000598</YMax><SpatialReferencexsi:type='typens:ProjectedCoordinateSystem'><WKT>PROJCS[&quot;WGS_1984_UTM_Zone_33N&quot;,GEOGCS[&quot;GCS_WGS_1984&quot;,DATUM[&quot;D_WGS_1984&quot;,SPHEROID[&quot;WGS_1984&quot;,6378137.0,298.257223563]],PRIMEM[&quot;Greenwich&quot;,0.0],UNIT[&quot;Degree&quot;,0.0174532925199433]],PROJECTION[&quot;Transverse_Mercator&quot;],PARAMETER[&quot;False_Easting&quot;,500000.0],PARAMETER[&quot;False_Northing&quot;,0.0],PARAMETER[&quot;Central_Meridian&quot;,15.0],PARAMETER[&quot;Scale_Factor&quot;,0.9996],PARAMETER[&quot;Latitude_Of_Origin&quot;,0.0],UNIT[&quot;Meter&quot;,1.0],AUTHORITY[&quot;EPSG&quot;,32633]]</WKT><XOrigin>-5120900</XOrigin><YOrigin>-9998100</YOrigin><XYScale>10000</XYScale><ZOrigin>-100000</ZOrigin><ZScale>10000</ZScale><MOrigin>-100000</MOrigin><MScale>10000</MScale><XYTolerance>0.001</XYTolerance><ZTolerance>0.001</ZTolerance><MTolerance>0.001</MTolerance><HighPrecision>true</HighPrecision><WKID>32633</WKID><LatestWKID>32633</LatestWKID></SpatialReference></Extent><SpatialReferencexsi:type='typens:ProjectedCoordinateSystem'><WKT>PROJCS[&quot;WGS_1984_UTM_Zone_33N&quot;,GEOGCS[&quot;GCS_WGS_1984&quot;,DATUM[&quot;D_WGS_1984&quot;,SPHEROID[&quot;WGS_1984&quot;,6378137.0,298.257223563]],PRIMEM[&quot;Greenwich&quot;,0.0],UNIT[&quot;Degree&quot;,0.0174532925199433]],PROJECTION[&quot;Transverse_Mercator&quot;],PARAMETER[&quot;False_Easting&quot;,500000.0],PARAMETER[&quot;False_Northing&quot;,0.0],PARAMETER[&quot;Central_Meridian&quot;,15.0],PARAMETER[&quot;Scale_Factor&quot;,0.9996],PARAMETER[&quot;Latitude_Of_Origin&quot;,0.0],UNIT[&quot;Meter&quot;,1.0],AUTHORITY[&quot;EPSG&quot;,32633]]</WKT><XOrigin>-5120900</XOrigin><YOrigin>-9998100</YOrigin><XYScale>10000</XYScale><ZOrigin>-100000</ZOrigin><ZScale>10000</ZScale><MOrigin>-100000</MOrigin><MScale>10000</MScale><XYTolerance>0.001</XYTolerance><ZTolerance>0.001</ZTolerance><MTolerance>0.001</MTolerance><HighPrecision>true</HighPrecision><WKID>32633</WKID><LatestWKID>32633</LatestWKID></SpatialReference><ChangeTracked>false</ChangeTracked><FieldFilteringEnabled>false</FieldFilteringEnabled><FilteredFieldNamesxsi:type='typens:Names'></FilteredFieldNames><ReplicaTracked>false</ReplicaTracked></DEFeatureClassInfo>"
+  }
+ ],
+ "rels": [
+  "\\ -> \\emptyt : DC78F1AB",
+  "\\ -> \\parcels : DC78F1AB",
+  "\\parcels -> zones : 17E08ADB"
+ ],
+ "catalog": [
+  "emptyt",
+  "parcels"
+ ],
+ "tables": 11
+}

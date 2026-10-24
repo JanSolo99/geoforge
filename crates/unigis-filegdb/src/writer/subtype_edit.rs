@@ -29,19 +29,19 @@ use super::{REL_DOMAIN_IN_DATASET, esri_type_name, relationship_values};
 use crate::schema::{Domain, DomainKind};
 use crate::table::{GdbFieldType, Table, decode_default};
 
-fn bad(msg: impl Into<String>) -> Error {
+pub(super) fn bad(msg: impl Into<String>) -> Error {
     Error::Unsupported(msg.into())
 }
 
 // ---------------------------------------------------------------------------------------------
 // XML splicing
 
-struct Splice {
-    at: Range<usize>,
-    with: String,
+pub(super) struct Splice {
+    pub(super) at: Range<usize>,
+    pub(super) with: String,
 }
 
-fn apply(xml: &str, mut edits: Vec<Splice>) -> String {
+pub(super) fn apply(xml: &str, mut edits: Vec<Splice>) -> String {
     edits.sort_by_key(|e| std::cmp::Reverse(e.at.start));
     let mut out = xml.to_string();
     for e in edits {
@@ -50,22 +50,22 @@ fn apply(xml: &str, mut edits: Vec<Splice>) -> String {
     out
 }
 
-fn child<'a>(n: Node<'a, 'a>, name: &str) -> Option<Node<'a, 'a>> {
+pub(super) fn child<'a>(n: Node<'a, 'a>, name: &str) -> Option<Node<'a, 'a>> {
     n.children()
         .find(|c| c.is_element() && c.tag_name().name() == name)
 }
 
-fn child_text(n: Node, name: &str) -> Option<String> {
+pub(super) fn child_text(n: Node, name: &str) -> Option<String> {
     child(n, name).map(|c| c.text().unwrap_or("").trim().to_string())
 }
 
-fn children<'a>(n: Node<'a, 'a>, name: &'a str) -> impl Iterator<Item = Node<'a, 'a>> {
+pub(super) fn children<'a>(n: Node<'a, 'a>, name: &'a str) -> impl Iterator<Item = Node<'a, 'a>> {
     n.children()
         .filter(move |c| c.is_element() && c.tag_name().name() == name)
 }
 
 /// `xml` with `new` added as the last content of the element `n`.
-fn append_child(xml: &str, n: Node, new: &str) -> Splice {
+pub(super) fn append_child(xml: &str, n: Node, new: &str) -> Splice {
     let r = n.range();
     let slice = &xml[r.clone()];
     let tag = n.tag_name().name();
@@ -84,7 +84,7 @@ fn append_child(xml: &str, n: Node, new: &str) -> Splice {
     }
 }
 
-fn xml_escape(s: &str) -> String {
+pub(super) fn xml_escape(s: &str) -> String {
     s.replace('&', "&amp;")
         .replace('<', "&lt;")
         .replace('>', "&gt;")
@@ -98,12 +98,12 @@ fn before_root_close(xml: &str) -> usize {
 // ---------------------------------------------------------------------------------------------
 // the table being edited
 
-struct Target {
-    item: ItemRow,
-    table_id: u64,
+pub(super) struct Target {
+    pub(super) item: ItemRow,
+    pub(super) table_id: u64,
     /// (name, type) of every field, in table order.
-    fields: Vec<(String, GdbFieldType, bool)>,
-    def: String,
+    pub(super) fields: Vec<(String, GdbFieldType, bool)>,
+    pub(super) def: String,
 }
 
 fn xs_type(t: FieldType) -> &'static str {
@@ -175,7 +175,7 @@ fn default_element(v: &Value) -> String {
     }
 }
 
-fn load_target(dir: &Path, table: &str) -> Result<Target> {
+pub(super) fn load_target(dir: &Path, table: &str) -> Result<Target> {
     let items = load_items(dir)?;
     let item = find(&items, table, |k| {
         matches!(k, Kind::FeatureClass | Kind::Table)
@@ -212,7 +212,7 @@ fn load_target(dir: &Path, table: &str) -> Result<Target> {
     })
 }
 
-fn field<'a>(t: &'a Target, name: &str) -> Result<&'a (String, GdbFieldType, bool)> {
+pub(super) fn field<'a>(t: &'a Target, name: &str) -> Result<&'a (String, GdbFieldType, bool)> {
     t.fields
         .iter()
         .find(|f| f.0.eq_ignore_ascii_case(name))
@@ -537,7 +537,7 @@ fn set_simple(xml: &str, tag: &str, value: &str) -> String {
     }
 }
 
-fn store(dir: &Path, t: &Target, def: String) -> Result<()> {
+pub(super) fn store(dir: &Path, t: &Target, def: String) -> Result<()> {
     let items = load_items(dir)?;
     let mut row: Feature = t.item.row.clone();
     row.attributes[items.c_def] = Value::Xml(def.clone());

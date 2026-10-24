@@ -131,6 +131,13 @@ pub fn delete_fields(base: impl AsRef<Path>, names: &[&str]) -> Result<()> {
     rewrite(&base, &fields, &rows, true).map(|_| ())
 }
 
+fn is_attribute(f: &GdbField) -> bool {
+    !matches!(
+        f.field_type,
+        GdbFieldType::ObjectId | GdbFieldType::Geometry
+    )
+}
+
 fn rewrite(
     base: &Path,
     attribute_fields: &[Field],
@@ -139,13 +146,6 @@ fn rewrite(
 ) -> Result<u64> {
     let base = base.with_extension("");
     let old = Table::open(&base)?;
-    let v4 = old.is_version_4();
-    let is_attribute = |f: &GdbField| {
-        !matches!(
-            f.field_type,
-            GdbFieldType::ObjectId | GdbFieldType::Geometry
-        )
-    };
     let mut fields: Vec<GdbField> = old
         .all_fields()
         .iter()
@@ -182,16 +182,35 @@ fn rewrite(
             None => to_gdb_field(f)?,
         });
     }
+    rewrite_core(&base, old, fields, &[], rows, keep_max_oid)
+}
+
+/// Writes the table again with `fields` (the object ID and geometry fields followed by the
+/// attribute fields, as [`Table::all_fields`] lists them) and `rows`. `renames` lists
+/// (old, new) names of attribute fields whose attribute indexes follow them.
+pub(super) fn rewrite_core(
+    base: &Path,
+    old: Table,
+    fields: Vec<GdbField>,
+    renames: &[(String, String)],
+    rows: &[(Option<u64>, Feature)],
+    keep_max_oid: bool,
+) -> Result<u64> {
+    let v4 = old.is_version_4();
     // Attribute indexes whose field is still there.
     let mut indexes: Vec<(String, String)> = Vec::new();
     let index_file = base.with_extension("gdbindexes");
     if index_file.is_file() {
         for d in read_raw(&index_file)?.into_iter().filter(|d| d.flag == 2) {
+            let field = renames
+                .iter()
+                .find(|(old, _)| old.eq_ignore_ascii_case(&d.expression))
+                .map_or(d.expression.clone(), |(_, new)| new.clone());
             if fields
                 .iter()
-                .any(|f| is_attribute(f) && f.name.eq_ignore_ascii_case(&d.expression))
+                .any(|f| is_attribute(f) && f.name.eq_ignore_ascii_case(&field))
             {
-                indexes.push((d.name, d.expression));
+                indexes.push((d.name, field));
             }
         }
     }

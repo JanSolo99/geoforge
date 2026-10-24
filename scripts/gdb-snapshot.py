@@ -29,7 +29,28 @@ def defaults(gdb):
         return {}
     return {l["name"]: [[f["name"], f.get("defaultValue")] for f in l.get("fields", [])] for l in layers if not l["name"].startswith("GDB_")}
 
+def fields_and_rows(gdb):
+    """Per user table: its fields as GDAL reads them (name, type, width, nullable, alias, domain)
+    and its rows as CSV (alter-field comparisons)."""
+    out = subprocess.run(["ogrinfo", "-json", "-so", "-al", gdb, "-oo", "LIST_ALL_TABLES=YES"], capture_output=True, text=True).stdout
+    try:
+        layers = json.loads(out)["layers"]
+    except (ValueError, KeyError):
+        return {}, {}
+    fields, rows = {}, {}
+    for l in layers:
+        if l["name"].startswith("GDB_"):
+            continue
+        fields[l["name"]] = [[f["name"], f["type"], f.get("width"), f.get("nullable"), f.get("alternativeName"), f.get("domainName")]
+                             for f in l.get("fields", [])]
+        rows[l["name"]] = subprocess.run(["ogr2ogr", "-f", "CSV", "/vsistdout/", gdb, l["name"], "-oo", "LIST_ALL_TABLES=YES",
+                                          "-lco", "GEOMETRY=AS_WKT"], capture_output=True, text=True).stdout
+    return fields, rows
+
+_fields, _rows = fields_and_rows(gdb)
 snap = {
+    "fields": _fields,
+    "rows": _rows,
     "defaults": defaults(gdb),
     "items": sorted(
         ({"name": i["Name"], "physical": i["PhysicalName"], "path": i["Path"], "type": i["Type"][1:9],

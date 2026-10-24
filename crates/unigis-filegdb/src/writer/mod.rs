@@ -4,6 +4,7 @@
 //! ArcGIS opens): system tables `a00000001`–`a00000007`, `gdb` and `timestamps`
 //! files, user tables from `a00000009` with an OBJECTID and spatial index.
 
+mod alter;
 mod btree;
 mod catalog;
 mod edit;
@@ -28,6 +29,7 @@ use crate::table::{GdbField, GdbFieldType, GeometryDef};
 use btree::{spatial_entries, write_index};
 use table::TableWriter;
 
+pub use alter::{FieldAlteration, alter_field, geodatabase_field_name};
 pub use catalog::{delete_domain, delete_item, rename_domain, rename_item};
 pub use edit::{TableEditor, delete_rows};
 pub use rebuild::rebuild_attribute_indexes;

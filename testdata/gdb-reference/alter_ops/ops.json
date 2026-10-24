@@ -1,0 +1,180 @@
+{
+ "arcgis": {
+  "alias": "ok",
+  "alias_and_clear": "Failed to execute. Parameters are not valid. | ERROR 001656: Cannot specify field alias and clear alias parameters simultaneously. | ERROR 001656: Cannot specify field alias and clear alias parameters simultaneously. | Failed to execute (AlterField).",
+  "clear_alias": "ok",
+  "empty_len_down": "ok",
+  "empty_nonnull": "ok",
+  "empty_rename_type_alias": "ok",
+  "empty_type_double_date": "ok",
+  "empty_type_long_guid": "ok",
+  "empty_type_long_text": "ok",
+  "empty_type_long_text_len": "ok",
+  "empty_type_text_long": "ok",
+  "len_down_populated": "ERROR 001624: Failed to alter field length. | Failed to execute (AlterField).",
+  "len_up": "ok",
+  "nonnull_populated": "ERROR 001625: Failed to alter field is nullable. | Failed to execute (AlterField).",
+  "rename": "ok",
+  "rename_alias": "ok",
+  "rename_badchars": "ok",
+  "rename_case": "ok",
+  "rename_digit": "Failed to execute. Parameters are not valid. | ERROR 000310: The Field name must not start with a number | ERROR 000310: The Field name must not start with a number | Failed to execute (AlterField).",
+  "rename_domain": "ok",
+  "rename_dup": "ERROR 002598: Name: \"zone\" already exists. | Failed to execute (AlterField).",
+  "rename_missing": "Failed to execute. Parameters are not valid. | ERROR 000728: Field NOPE does not exist within table | Failed to execute (AlterField).",
+  "rename_oid": "ok",
+  "rename_reserved": "ok",
+  "rename_shape": "ok",
+  "rename_shape_area": "ok",
+  "type_populated": "ERROR 001658: Cannot alter field types on populated tables. | Failed to execute (AlterField).",
+  "type_same_populated": "ok"
+ },
+ "ops": {
+  "alias": {
+   "alias": "Value alias",
+   "field": "VALUE",
+   "table": "parcels"
+  },
+  "alias_and_clear": {
+   "alias": "x",
+   "clear": "CLEAR_ALIAS",
+   "field": "C",
+   "table": "emptyt"
+  },
+  "clear_alias": {
+   "clear": "CLEAR_ALIAS",
+   "field": "C",
+   "table": "emptyt"
+  },
+  "empty_len_down": {
+   "field": "A",
+   "length": 3,
+   "table": "emptyt"
+  },
+  "empty_nonnull": {
+   "field": "A",
+   "nullable": "NON_NULLABLE",
+   "table": "emptyt"
+  },
+  "empty_rename_type_alias": {
+   "alias": "Aye",
+   "field": "A",
+   "new_name": "AA",
+   "table": "emptyt",
+   "type": "SHORT"
+  },
+  "empty_type_double_date": {
+   "field": "C",
+   "table": "emptyt",
+   "type": "DATE"
+  },
+  "empty_type_long_guid": {
+   "field": "B",
+   "table": "emptyt",
+   "type": "GUID"
+  },
+  "empty_type_long_text": {
+   "field": "B",
+   "table": "emptyt",
+   "type": "TEXT"
+  },
+  "empty_type_long_text_len": {
+   "field": "B",
+   "length": 30,
+   "table": "emptyt",
+   "type": "TEXT"
+  },
+  "empty_type_text_long": {
+   "field": "A",
+   "table": "emptyt",
+   "type": "LONG"
+  },
+  "len_down_populated": {
+   "field": "NAME",
+   "length": 5,
+   "table": "parcels"
+  },
+  "len_up": {
+   "field": "NAME",
+   "length": 40,
+   "table": "parcels"
+  },
+  "nonnull_populated": {
+   "field": "VALUE",
+   "nullable": "NON_NULLABLE",
+   "table": "parcels"
+  },
+  "rename": {
+   "field": "NAME",
+   "new_name": "LABEL",
+   "table": "parcels"
+  },
+  "rename_alias": {
+   "alias": "Parcel id",
+   "field": "PARCEL_ID",
+   "new_name": "PID",
+   "table": "parcels"
+  },
+  "rename_badchars": {
+   "field": "VALUE",
+   "new_name": "the value",
+   "table": "parcels"
+  },
+  "rename_case": {
+   "field": "NAME",
+   "new_name": "name",
+   "table": "parcels"
+  },
+  "rename_digit": {
+   "field": "VALUE",
+   "new_name": "1val",
+   "table": "parcels"
+  },
+  "rename_domain": {
+   "field": "ZONE",
+   "new_name": "ZONE_ID",
+   "table": "parcels"
+  },
+  "rename_dup": {
+   "field": "NAME",
+   "new_name": "zone",
+   "table": "parcels"
+  },
+  "rename_missing": {
+   "field": "NOPE",
+   "new_name": "X",
+   "table": "parcels"
+  },
+  "rename_oid": {
+   "field": "OBJECTID",
+   "new_name": "OID2",
+   "table": "parcels"
+  },
+  "rename_reserved": {
+   "field": "VALUE",
+   "new_name": "select",
+   "table": "parcels"
+  },
+  "rename_shape": {
+   "field": "Shape",
+   "new_name": "Geom",
+   "table": "parcels"
+  },
+  "rename_shape_area": {
+   "field": "Shape_Area",
+   "new_name": "SA",
+   "table": "parcels"
+  },
+  "type_populated": {
+   "field": "VALUE",
+   "length": 20,
+   "table": "parcels",
+   "type": "TEXT"
+  },
+  "type_same_populated": {
+   "field": "ZONE",
+   "table": "parcels",
+   "type": "LONG"
+  }
+ }
+}
