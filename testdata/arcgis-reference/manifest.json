@@ -36580,6 +36580,428 @@
       ],
       "fields": [],
       "shapeType": null
+    },
+    "slice_ei5": {
+      "tool": "gp.Slice_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        5,
+        "EQUAL_INTERVAL",
+        1
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "slice",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "number_zones": 5,
+          "slice_type": "EQUAL_INTERVAL",
+          "base_output_zone": 1
+        }
+      }
+    },
+    "slice_ei7_base3": {
+      "tool": "gp.Slice_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        7,
+        "EQUAL_INTERVAL",
+        3
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "slice",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "number_zones": 7,
+          "slice_type": "EQUAL_INTERVAL",
+          "base_output_zone": 3
+        }
+      }
+    },
+    "slice_ea5": {
+      "tool": "gp.Slice_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        5,
+        "EQUAL_AREA",
+        1
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "slice",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "number_zones": 5,
+          "slice_type": "EQUAL_AREA",
+          "base_output_zone": 1
+        }
+      }
+    },
+    "slice_ea4_nodata": {
+      "tool": "gp.Slice_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        4,
+        "EQUAL_AREA",
+        1
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "slice",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "number_zones": 4,
+          "slice_type": "EQUAL_AREA",
+          "base_output_zone": 1
+        }
+      }
+    },
+    "slice_ei3_nodata": {
+      "tool": "gp.Slice_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        3,
+        "EQUAL_INTERVAL",
+        1
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "slice",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "number_zones": 3,
+          "slice_type": "EQUAL_INTERVAL",
+          "base_output_zone": 1
+        }
+      }
+    },
+    "slice_ei4_i16": {
+      "tool": "gp.Slice_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        4,
+        "EQUAL_INTERVAL",
+        1
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "slice",
+        "params": {
+          "input": "testdata/raster/patches_i16.tif",
+          "output": "<out>",
+          "number_zones": 4,
+          "slice_type": "EQUAL_INTERVAL",
+          "base_output_zone": 1
+        }
+      }
+    },
+    "ebattr_gt": {
+      "tool": "gp.ExtractByAttributes_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "VALUE > 250",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "extract_by_attributes",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "where_clause": "VALUE > 250",
+          "output": "<out>"
+        }
+      }
+    },
+    "ebattr_range": {
+      "tool": "gp.ExtractByAttributes_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "VALUE >= 220 AND VALUE <= 260",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "extract_by_attributes",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "where_clause": "VALUE >= 220 AND VALUE <= 260",
+          "output": "<out>"
+        }
+      }
+    },
+    "ebattr_int": {
+      "tool": "gp.ExtractByAttributes_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "VALUE = 2 OR VALUE = 3",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "extract_by_attributes",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "where_clause": "VALUE = 2 OR VALUE = 3",
+          "output": "<out>"
+        }
+      }
+    },
+    "ebattr_nodata": {
+      "tool": "gp.ExtractByAttributes_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "VALUE < 240",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "extract_by_attributes",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "where_clause": "VALUE < 240",
+          "output": "<out>"
+        }
+      }
+    },
+    "ebrect_in": {
+      "tool": "gp.ExtractByRectangle_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "500203 5000305 500796 5000893",
+        "<out>",
+        "INSIDE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "extract_by_rectangle",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "rectangle": "500203 5000305 500796 5000893",
+          "output": "<out>",
+          "extraction_area": "INSIDE"
+        }
+      }
+    },
+    "ebrect_out": {
+      "tool": "gp.ExtractByRectangle_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "500203 5000305 500796 5000893",
+        "<out>",
+        "OUTSIDE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "extract_by_rectangle",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "rectangle": "500203 5000305 500796 5000893",
+          "output": "<out>",
+          "extraction_area": "OUTSIDE"
+        }
+      }
+    },
+    "ebrect_int": {
+      "tool": "gp.ExtractByRectangle_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "500200 5000400 500600 5001000",
+        "<out>",
+        "INSIDE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "extract_by_rectangle",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "rectangle": "500200 5000400 500600 5001000",
+          "output": "<out>",
+          "extraction_area": "INSIDE"
+        }
+      }
+    },
+    "ebcirc_in": {
+      "tool": "gp.ExtractByCircle_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "500600 5000600",
+        250,
+        "<out>",
+        "INSIDE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "extract_by_circle",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "center_point": "500600 5000600",
+          "radius": 250,
+          "output": "<out>",
+          "extraction_area": "INSIDE"
+        }
+      }
+    },
+    "ebcirc_out": {
+      "tool": "gp.ExtractByCircle_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "500600 5000600",
+        250,
+        "<out>",
+        "OUTSIDE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "extract_by_circle",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "center_point": "500600 5000600",
+          "radius": 250,
+          "output": "<out>",
+          "extraction_area": "OUTSIDE"
+        }
+      }
+    },
+    "ebcirc_int": {
+      "tool": "gp.ExtractByCircle_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "500400 5000800",
+        183,
+        "<out>",
+        "INSIDE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "extract_by_circle",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "center_point": "500400 5000800",
+          "radius": 183,
+          "output": "<out>",
+          "extraction_area": "INSIDE"
+        }
+      }
+    },
+    "lookup_value": {
+      "tool": "gp.Lookup_sa",
+      "args": [
+        "testdata/raster/zt_landuse.tif",
+        "Value",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "lookup",
+        "params": {
+          "input": "testdata/raster/zt_landuse.tif",
+          "lookup_field": "Value",
+          "output": "<out>"
+        }
+      }
+    },
+    "lookup_count": {
+      "tool": "gp.Lookup_sa",
+      "args": [
+        "testdata/raster/zt_landuse.tif",
+        "COUNT",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "lookup",
+        "params": {
+          "input": "testdata/raster/zt_landuse.tif",
+          "lookup_field": "COUNT",
+          "output": "<out>"
+        }
+      }
+    },
+    "lookup_zones_count": {
+      "tool": "gp.Lookup_sa",
+      "args": [
+        "testdata/raster/zt_zones25.tif",
+        "COUNT",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "lookup",
+        "params": {
+          "input": "testdata/raster/zt_zones25.tif",
+          "lookup_field": "COUNT",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

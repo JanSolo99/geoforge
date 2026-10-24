@@ -4164,6 +4164,13 @@ const KNOWN_FEATURE_DIFFERENCES: &[(&str, &[usize])] = &[
 const KNOWN_RASTER_DIFFERENCES: &[(&str, usize)] = &[
     // Cost Back Link: cells where two equally cheap paths meet and ArcGIS picks one by a rule not found.
     ("cback_int", 15),
+    // Slice: ArcGIS puts a few cells just below a class boundary into the class above (it
+    // bins the values; the rule was not found).
+    ("slice_ei5", 10),
+    ("slice_ei7_base3", 9),
+    ("slice_ei3_nodata", 5),
+    ("slice_ea5", 10),
+    ("slice_ea4_nodata", 13),
     ("viewshed_hill", 199),
     ("viewshed_two", 309),
     ("viewshed_hill_z2", 199),
@@ -4344,7 +4351,10 @@ fn tools_match_arcgis_output() {
             // A tool of the registry: `ug run <id> name=value ...` from the manifest's parameters.
             let mut v: Vec<String> = vec!["run".into(), run["tool"].as_str().unwrap().into()];
             for (name, value) in run["params"].as_object().unwrap() {
-                v.push(format!("{name}={}", value.as_str().unwrap()));
+                let value = value
+                    .as_str()
+                    .map_or_else(|| value.to_string(), str::to_string);
+                v.push(format!("{name}={value}"));
             }
             v
         } else if info["tool"] == "gp.BlockStatistics_sa" {

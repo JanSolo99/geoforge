@@ -440,12 +440,19 @@ pub fn extract_by_mask(input: &Raster, mask: &Raster) -> Option<Raster> {
             (!mask.is_nodata(mask.bands[0][i]) && !values.is_nodata(v)).then_some(v)
         })
         .collect();
-    if input.data_type.is_float() {
+    Some(typed_cells(&values, &cells, input.data_type))
+}
+
+/// A raster like `grid` holding `cells` (None = NoData) with the type ArcGIS gives an extraction
+/// from a raster of type `input`: 32-bit float for float input, else the smallest integer type
+/// holding the values.
+pub(crate) fn typed_cells(grid: &Raster, cells: &[Option<f64>], input: DataType) -> Raster {
+    if input.is_float() {
         let nodata = f32::MIN as f64;
-        let mut out = values.like(DataType::F32);
+        let mut out = grid.like(DataType::F32);
         out.nodata = Some(nodata);
         out.bands[0] = cells.iter().map(|v| v.unwrap_or(nodata)).collect();
-        return Some(out);
+        return out;
     }
     let (min, max) = cells
         .iter()
@@ -458,12 +465,12 @@ pub fn extract_by_mask(input: &Raster, mask: &Raster) -> Option<Raster> {
     } else {
         (0.0, 0.0)
     };
-    let eight = matches!(input.data_type, DataType::U8 | DataType::I8);
+    let eight = matches!(input, DataType::U8 | DataType::I8);
     let (t, nodata) = crate::zonal::integer_output(min, max, eight);
-    let mut out = values.like(t);
+    let mut out = grid.like(t);
     out.nodata = Some(nodata);
     out.bands[0] = cells.iter().map(|v| v.unwrap_or(nodata)).collect();
-    Some(out)
+    out
 }
 
 /// Nearest-neighbor copy of `r` onto a north-up grid given by its transform and

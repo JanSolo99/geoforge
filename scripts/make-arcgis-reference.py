@@ -816,6 +816,25 @@ CASES = {
     "rbt_floatout": ("gp.ReclassByTable_sa", [RASTER / "dem.tif", RASTER / "rbt_float_out.dbf", "FROMV", "TOV", "OUTV"], ["DATA"]),
     "rbt_negative": ("gp.ReclassByTable_sa", [RASTER / "dem.tif", RASTER / "rbt_negative.dbf", "FROMV", "TOV", "OUTV"], ["DATA"]),
     "rbt_i16": ("gp.ReclassByTable_sa", [RASTER / "patches_i16.tif", RASTER / "rbt_int.dbf", "FROMV", "TOV", "OUTV"], ["DATA"]),
+    "slice_ei5": ("gp.Slice_sa", [RASTER / "dem.tif"], [5, "EQUAL_INTERVAL", 1]),
+    "slice_ei7_base3": ("gp.Slice_sa", [RASTER / "dem.tif"], [7, "EQUAL_INTERVAL", 3]),
+    "slice_ea5": ("gp.Slice_sa", [RASTER / "dem.tif"], [5, "EQUAL_AREA", 1]),
+    "slice_ea4_nodata": ("gp.Slice_sa", [RASTER / "dem_nodata.tif"], [4, "EQUAL_AREA", 1]),
+    "slice_ei3_nodata": ("gp.Slice_sa", [RASTER / "dem_nodata.tif"], [3, "EQUAL_INTERVAL", 1]),
+    "slice_ei4_i16": ("gp.Slice_sa", [RASTER / "patches_i16.tif"], [4, "EQUAL_INTERVAL", 1]),
+    "ebattr_gt": ("gp.ExtractByAttributes_sa", [RASTER / "dem.tif"] + ["VALUE > 250"], []),
+    "ebattr_range": ("gp.ExtractByAttributes_sa", [RASTER / "dem.tif"] + ["VALUE >= 220 AND VALUE <= 260"], []),
+    "ebattr_int": ("gp.ExtractByAttributes_sa", [RASTER / "landuse_u8.tif"] + ["VALUE = 2 OR VALUE = 3"], []),
+    "ebattr_nodata": ("gp.ExtractByAttributes_sa", [RASTER / "dem_nodata.tif"] + ["VALUE < 240"], []),
+    "ebrect_in": ("gp.ExtractByRectangle_sa", [RASTER / "dem.tif", "500203 5000305 500796 5000893"], ["INSIDE"]),
+    "ebrect_out": ("gp.ExtractByRectangle_sa", [RASTER / "dem.tif", "500203 5000305 500796 5000893"], ["OUTSIDE"]),
+    "ebrect_int": ("gp.ExtractByRectangle_sa", [RASTER / "landuse_u8.tif", "500200 5000400 500600 5001000"], ["INSIDE"]),
+    "ebcirc_in": ("gp.ExtractByCircle_sa", [RASTER / "dem.tif", "500600 5000600", 250], ["INSIDE"]),
+    "ebcirc_out": ("gp.ExtractByCircle_sa", [RASTER / "dem.tif", "500600 5000600", 250], ["OUTSIDE"]),
+    "ebcirc_int": ("gp.ExtractByCircle_sa", [RASTER / "landuse_u8.tif", "500400 5000800", 183], ["INSIDE"]),
+    "lookup_value": ("gp.Lookup_sa", [RASTER / "zt_landuse.tif"] + ["Value"], []),
+    "lookup_count": ("gp.Lookup_sa", [RASTER / "zt_landuse.tif"] + ["COUNT"], []),
+    "lookup_zones_count": ("gp.Lookup_sa", [RASTER / "zt_zones25.tif"] + ["COUNT"], []),
     "sap_chain_10":("management.SplitLineAtPoint", [DM / "chain.shp", DM / "pts.shp"], ["10 Meters"]),
     "sap_chain_1": ("management.SplitLineAtPoint", [DM / "chain.shp", DM / "pts.shp"], ["1 Meters"]),
     "sap_chain_25": ("management.SplitLineAtPoint", [DM / "chain.shp", DM / "pts.shp"], ["25 Meters"]),
@@ -913,6 +932,11 @@ CASES = {
 RUN = {
     "gp.Nibble_sa": ("nibble", ["input", "mask", "output", "values", "nodata"]),
     "gp.Filter_sa": ("filter", ["input", "output", "filter_type", "ignore_nodata"]),
+    "gp.Slice_sa": ("slice", ["input", "output", "number_zones", "slice_type", "base_output_zone"]),
+    "gp.ExtractByAttributes_sa": ("extract_by_attributes", ["input", "where_clause", "output"]),
+    "gp.ExtractByRectangle_sa": ("extract_by_rectangle", ["input", "rectangle", "output", "extraction_area"]),
+    "gp.ExtractByCircle_sa": ("extract_by_circle", ["input", "center_point", "radius", "output", "extraction_area"]),
+    "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
 }
 
 
@@ -933,7 +957,8 @@ RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatist
               "conversion.PolygonToRaster", "conversion.PolylineToRaster", "conversion.PointToRaster", "gp.EucDistance_sa", "gp.EucDirection_sa", "gp.EucAllocation_sa", "gp.KernelDensity_sa", "gp.PointDensity_sa", "gp.LineDensity_sa", "gp.ExtractByMask_sa",
               "management.Resample", "gp.Viewshed_sa", "gp.Expand_sa", "gp.Shrink_sa", "gp.MajorityFilter_sa",
               "gp.RegionGroup_sa", "gp.BlockStatistics_sa",
-              "gp.CostDistance_sa", "gp.CostBackLink_sa", "gp.CostAllocation_sa", "gp.CostPath_sa", "gp.Corridor_sa", "gp.Filter_sa", "gp.Nibble_sa", "gp.ReclassByTable_sa"}
+              "gp.CostDistance_sa", "gp.CostBackLink_sa", "gp.CostAllocation_sa", "gp.CostPath_sa", "gp.Corridor_sa", "gp.Filter_sa", "gp.Nibble_sa", "gp.ReclassByTable_sa",
+              "gp.Slice_sa", "gp.ExtractByAttributes_sa", "gp.ExtractByRectangle_sa", "gp.ExtractByCircle_sa", "gp.Lookup_sa"}
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable"}
@@ -1011,7 +1036,7 @@ def main():
     for name, (tool, before, after) in CASES.items():
         if only and name not in only:
             continue
-        if tool in ("gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa"):
+        if tool in ("gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa", "gp.Lookup_sa"):
             # These tools treat an integer raster as discrete only when it has an attribute table
             # (without one ZonalHistogram bins the values into 256 classes) and name columns after
             # its value field: build the tables first. The inputs are copies (zt_*, tab_*) because

@@ -6074,6 +6074,30 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
                 .ok_or_else(|| Error::Unsupported(format!("{name} is required")))?;
             unigis_raster::read_geotiff(Path::new(&path))
         }
+        fn attribute_table(&self, name: &str) -> Result<Vec<(String, Vec<f64>)>> {
+            let path = self
+                .get(name)
+                .ok_or_else(|| Error::Unsupported(format!("{name} is required")))?;
+            let (table, _) = open_feature_class(Path::new(&format!("{path}.vat.dbf")))?;
+            let mut columns: Vec<(String, Vec<f64>)> = table
+                .fields()
+                .iter()
+                .map(|f| (f.name.clone(), Vec::new()))
+                .collect();
+            for f in table.features() {
+                let f = f?;
+                for (column, value) in columns.iter_mut().zip(&f.attributes) {
+                    column.1.push(match value {
+                        Value::SmallInteger(n) => f64::from(*n),
+                        Value::Integer(n) => f64::from(*n),
+                        Value::Single(n) => f64::from(*n),
+                        Value::Double(n) => *n,
+                        _ => f64::NAN,
+                    });
+                }
+            }
+            Ok(columns)
+        }
     }
     let out = registry::run(spec, &Args(map))?;
     write_raster_with(Path::new(&output), &out.raster, out.statistics)
