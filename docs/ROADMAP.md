@@ -707,3 +707,5 @@ no sandbox skip/filter flags. Formatting, full workspace/all-targets clippy with
 `-D warnings`, layer checks and the separate wasm web check pass. Root workspace
 validation passes 173 tests (5 ignored). GDAL provider checks use a writable
 cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md`.
+
+- Zonal Histogram and Tabulate Area (Spatial Analyst, `ug zonal-histogram`, `ug tabulate-area`): 12 ArcGIS cases; Zonal Geometry still to do (see KNOWN_GAPS).

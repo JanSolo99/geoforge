@@ -25,6 +25,7 @@ pub mod stats;
 pub mod surface;
 mod writer;
 pub mod zonal;
+pub mod zonal_tables;
 
 pub use geotiff::{Compression, read_geotiff, write_geotiff};
 pub use writer::{OverviewResampling, WriteOptions, write_geotiff_with};

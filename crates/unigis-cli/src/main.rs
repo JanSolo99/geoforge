@@ -1346,6 +1346,30 @@ enum Tool {
         #[arg(long, default_value = "ALL")]
         statistics_type: String,
     },
+    /// Spatial Analyst "Zonal Histogram": a row per value, a column per zone (.dbf or geodatabase table).
+    ZonalHistogram {
+        in_zone_data: PathBuf,
+        in_value_raster: PathBuf,
+        out_table: PathBuf,
+        /// The zone field (its name starts the column names).
+        #[arg(long, default_value = "Value")]
+        zone_field: String,
+    },
+    /// Spatial Analyst "Tabulate Area": the area of each class in each zone.
+    TabulateArea {
+        in_zone_data: PathBuf,
+        in_class_data: PathBuf,
+        out_table: PathBuf,
+        #[arg(long, default_value = "Value")]
+        zone_field: String,
+        #[arg(long, default_value = "Value")]
+        class_field: String,
+        #[arg(long)]
+        processing_cell_size: Option<f64>,
+        /// One row per zone and class (CLASSES_AS_ROWS).
+        #[arg(long)]
+        classes_as_rows: bool,
+    },
     /// Spatial Analyst "Viewshed" (approximate): how many observer points see
     /// each cell; observers' OFFSETA field (default 1) is their height.
     Viewshed {
@@ -4065,6 +4089,42 @@ fn main() -> ExitCode {
             let (fields, rows) = unigis_raster::zonal::zonal_table(&zones, &values, &stats, ignore);
             write_table(&unigis_tools::TableOutput { fields, rows }, &out_table)
         })(),
+        Tool::ZonalHistogram {
+            in_zone_data,
+            in_value_raster,
+            out_table,
+            zone_field,
+        } => (|| {
+            let zones = unigis_raster::read_geotiff(&in_zone_data)?;
+            let values = unigis_raster::read_geotiff(&in_value_raster)?;
+            let prefix = raster_field_name(&in_zone_data, &zone_field);
+            let (fields, rows) =
+                unigis_raster::zonal_tables::zonal_histogram(&zones, &values, &prefix)
+                    .map_err(Error::Unsupported)?;
+            write_table(&unigis_tools::TableOutput { fields, rows }, &out_table)
+        })(),
+        Tool::TabulateArea {
+            in_zone_data,
+            in_class_data,
+            out_table,
+            zone_field,
+            class_field,
+            processing_cell_size,
+            classes_as_rows,
+        } => (|| {
+            let zones = unigis_raster::read_geotiff(&in_zone_data)?;
+            let classes = unigis_raster::read_geotiff(&in_class_data)?;
+            let (fields, rows) = unigis_raster::zonal_tables::tabulate_area(
+                &zones,
+                &classes,
+                processing_cell_size,
+                classes_as_rows,
+                &raster_field_name(&in_zone_data, &zone_field),
+                &raster_field_name(&in_class_data, &class_field),
+            )
+            .map_err(Error::Unsupported)?;
+            write_table(&unigis_tools::TableOutput { fields, rows }, &out_table)
+        })(),
         Tool::Viewshed {
             in_raster,
             in_observer_features,
@@ -5442,6 +5502,20 @@ fn merge_tool(
         .transpose()?;
     let out = unigis_tools::merge_with(&merge_inputs, add, field_map.as_deref())?;
     write_output(out, output, source_gdb(&inputs[0]).as_deref())
+}
+
+/// A raster's value field as its attribute table (`<raster>.vat.dbf`) spells it, else as given.
+fn raster_field_name(raster: &Path, field: &str) -> String {
+    let vat = PathBuf::from(format!("{}.vat.dbf", raster.display()));
+    open_feature_class(&vat)
+        .ok()
+        .and_then(|(fc, _)| {
+            fc.fields()
+                .iter()
+                .find(|f| f.name.eq_ignore_ascii_case(field))
+                .map(|f| f.name.clone())
+        })
+        .unwrap_or_else(|| field.to_owned())
 }
 
 /// The split policy keyword of Create Domain / Alter Domain.

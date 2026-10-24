@@ -1,0 +1,292 @@
+{
+ "arcgis": {
+  "add_a": "ok",
+  "add_a_desc": "ok",
+  "add_a_unique": "ok",
+  "add_ab": "ok",
+  "add_b": "ok",
+  "add_badname": "ok",
+  "add_c": "ok",
+  "add_dup_field": "ok",
+  "add_dup_name": "Failed to execute. Parameters are not valid. | ERROR 000192: Invalid value for Index Name | Failed to execute (AddIndex).",
+  "add_longname": "ok",
+  "add_missing_field": "Failed to execute. Parameters are not valid. | ERROR 000728: Field NOPE does not exist within table | Failed to execute (AddIndex).",
+  "add_noname": "Failed to execute. Parameters are not valid. | ERROR 000530: Value is required | Failed to execute (AddIndex).",
+  "add_oid": "Failed to execute. Parameters are not valid. | ERROR 003911: The field is not of type SHORT | LONG | BIGINTEGER | FLOAT | DOUBLE | TEXT | DATE | DATEONLY | TIMEONLY | TIMESTAMPOFFSET | GUID | GLOBALID | Failed to execute (AddIndex).",
+  "add_parcel_unique": "ok",
+  "add_shape": "Failed to execute. Parameters are not valid. | ERROR 003911: The field is not of type SHORT | LONG | BIGINTEGER | FLOAT | DOUBLE | TEXT | DATE | DATEONLY | TIMEONLY | TIMESTAMPOFFSET | GUID | GLOBALID | Failed to execute (AddIndex).",
+  "add_spatial": "ok",
+  "add_spatial_grid": "ok",
+  "add_spatial_grid3": "ok",
+  "add_spatial_table": "Failed to execute. Parameters are not valid. | ERROR 000732: Input Features: Dataset Z:\\mnt\\media\\ArcGIS_Linux\\target\\index_ops\\add_spatial_table_0542d5.gdb\\tbl does not exist or is not supported | Failed to execute (AddSpatialIndex).",
+  "add_zone_unique": "ok",
+  "rm_missing": "Failed to execute. Parameters are not valid. | ERROR 000192: Invalid value for Index Name or Indexed Item | Failed to execute (RemoveIndex).",
+  "rm_name": "ok",
+  "rm_oid": "Failed to execute. Parameters are not valid. | ERROR 000192: Invalid value for Index Name or Indexed Item | Failed to execute (RemoveIndex).",
+  "rm_spatial": "ok",
+  "rm_spatial_by_name": "Failed to execute. Parameters are not valid. | ERROR 000192: Invalid value for Index Name or Indexed Item | Failed to execute (RemoveIndex).",
+  "rm_spatial_table": "Failed to execute. Parameters are not valid. | ERROR 000732: Input Features: Dataset Z:\\mnt\\media\\ArcGIS_Linux\\target\\index_ops\\rm_spatial_table_c3c34f.gdb\\tbl does not exist or is not supported | Failed to execute (RemoveSpatialIndex)."
+ },
+ "ops": {
+  "add_a": {
+   "dir": "add_a_272461.gdb",
+   "spec": [
+    "AddIndex",
+    "tbl",
+    [
+     "A"
+    ],
+    "idx_a"
+   ]
+  },
+  "add_a_desc": {
+   "dir": "add_a_desc_81d0b0.gdb",
+   "spec": [
+    "AddIndex",
+    "tbl",
+    [
+     "A"
+    ],
+    "idx_ad",
+    "NON_UNIQUE",
+    "NON_ASCENDING"
+   ]
+  },
+  "add_a_unique": {
+   "dir": "add_a_unique_76d31a.gdb",
+   "spec": [
+    "AddIndex",
+    "tbl",
+    [
+     "A"
+    ],
+    "idx_au",
+    "UNIQUE"
+   ]
+  },
+  "add_ab": {
+   "dir": "add_ab_8a71a3.gdb",
+   "spec": [
+    "AddIndex",
+    "tbl",
+    [
+     "A",
+     "B"
+    ],
+    "idx_ab"
+   ]
+  },
+  "add_b": {
+   "dir": "add_b_d02024.gdb",
+   "spec": [
+    "AddIndex",
+    "tbl",
+    [
+     "B"
+    ],
+    "idx_b"
+   ]
+  },
+  "add_badname": {
+   "dir": "add_badname_865f2f.gdb",
+   "spec": [
+    "AddIndex",
+    "tbl",
+    [
+     "A"
+    ],
+    "bad name"
+   ]
+  },
+  "add_c": {
+   "dir": "add_c_e5b155.gdb",
+   "spec": [
+    "AddIndex",
+    "tbl",
+    [
+     "C"
+    ],
+    "idx_c"
+   ]
+  },
+  "add_dup_field": {
+   "dir": "add_dup_field_c18d1d.gdb",
+   "spec": [
+    "AddIndex",
+    "parcels",
+    [
+     "NAME"
+    ],
+    "idx_name2"
+   ]
+  },
+  "add_dup_name": {
+   "dir": "add_dup_name_619ef8.gdb",
+   "spec": [
+    "AddIndex",
+    "parcels",
+    [
+     "PARCEL_ID"
+    ],
+    "idx_name"
+   ]
+  },
+  "add_longname": {
+   "dir": "add_longname_c2448f.gdb",
+   "spec": [
+    "AddIndex",
+    "tbl",
+    [
+     "A"
+    ],
+    "idx_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+   ]
+  },
+  "add_missing_field": {
+   "dir": "add_missing_field_e76c52.gdb",
+   "spec": [
+    "AddIndex",
+    "tbl",
+    [
+     "NOPE"
+    ],
+    "idx_x"
+   ]
+  },
+  "add_noname": {
+   "dir": "add_noname_bb9285.gdb",
+   "spec": [
+    "AddIndex",
+    "tbl",
+    [
+     "A"
+    ],
+    ""
+   ]
+  },
+  "add_oid": {
+   "dir": "add_oid_acf3c9.gdb",
+   "spec": [
+    "AddIndex",
+    "tbl",
+    [
+     "OBJECTID"
+    ],
+    "idx_oid"
+   ]
+  },
+  "add_parcel_unique": {
+   "dir": "add_parcel_unique_20758e.gdb",
+   "spec": [
+    "AddIndex",
+    "parcels",
+    [
+     "PARCEL_ID"
+    ],
+    "idx_pid",
+    "UNIQUE"
+   ]
+  },
+  "add_shape": {
+   "dir": "add_shape_9b1f6f.gdb",
+   "spec": [
+    "AddIndex",
+    "parcels",
+    [
+     "Shape"
+    ],
+    "idx_shape"
+   ]
+  },
+  "add_spatial": {
+   "dir": "add_spatial_94fc05.gdb",
+   "spec": [
+    "AddSpatialIndex",
+    "parcels"
+   ]
+  },
+  "add_spatial_grid": {
+   "dir": "add_spatial_grid_3a645d.gdb",
+   "spec": [
+    "AddSpatialIndex",
+    "parcels",
+    50
+   ]
+  },
+  "add_spatial_grid3": {
+   "dir": "add_spatial_grid3_c1e1a9.gdb",
+   "spec": [
+    "AddSpatialIndex",
+    "parcels",
+    50,
+    200,
+    800
+   ]
+  },
+  "add_spatial_table": {
+   "dir": "add_spatial_table_0542d5.gdb",
+   "spec": [
+    "AddSpatialIndex",
+    "tbl"
+   ]
+  },
+  "add_zone_unique": {
+   "dir": "add_zone_unique_e01d49.gdb",
+   "spec": [
+    "AddIndex",
+    "parcels",
+    [
+     "ZONE"
+    ],
+    "idx_zu",
+    "UNIQUE"
+   ]
+  },
+  "rm_missing": {
+   "dir": "rm_missing_fea68a.gdb",
+   "spec": [
+    "RemoveIndex",
+    "parcels",
+    "nope"
+   ]
+  },
+  "rm_name": {
+   "dir": "rm_name_ec31cf.gdb",
+   "spec": [
+    "RemoveIndex",
+    "parcels",
+    "idx_name"
+   ]
+  },
+  "rm_oid": {
+   "dir": "rm_oid_d584c0.gdb",
+   "spec": [
+    "RemoveIndex",
+    "parcels",
+    "FDO_OBJECTID"
+   ]
+  },
+  "rm_spatial": {
+   "dir": "rm_spatial_b0b592.gdb",
+   "spec": [
+    "RemoveSpatialIndex",
+    "parcels"
+   ]
+  },
+  "rm_spatial_by_name": {
+   "dir": "rm_spatial_by_name_60076f.gdb",
+   "spec": [
+    "RemoveIndex",
+    "parcels",
+    "FDO_Shape"
+   ]
+  },
+  "rm_spatial_table": {
+   "dir": "rm_spatial_table_c3c34f.gdb",
+   "spec": [
+    "RemoveSpatialIndex",
+    "tbl"
+   ]
+  }
+ }
+}

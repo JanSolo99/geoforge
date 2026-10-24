@@ -758,6 +758,23 @@ CASES = {
     "blk_rect_zero": ("gp.BlockStatistics_sa", [RASTER / "landuse_u8.tif"], ["Rectangle 0 3 CELL", "SUM", "DATA"]),
     "blk_f64": ("gp.BlockStatistics_sa", [RASTER / "dem_f64.tif"], ["Rectangle 3 3 CELL", "MEAN", "DATA"]),
     "blk_u16": ("gp.BlockStatistics_sa", [RASTER / "rgb_pixel_u8.tif"], ["Rectangle 3 3 CELL", "MAXIMUM", "DATA"]),
+    "zh_i32_i16": ("gp.ZonalHistogram_sa", [RASTER / "tab_zones_i32.tif", "Value", RASTER / "tab_classes_i16.tif"], []),
+    "zh_i32_f32": ("gp.ZonalHistogram_sa", [RASTER / "tab_zones_i32.tif", "Value", RASTER / "tab_values_f32.tif"], []),
+    "zh_zones25_landuse": ("gp.ZonalHistogram_sa", [RASTER / "zt_zones25.tif", "Value", RASTER / "zt_landuse.tif"], []),
+    "zh_landuse_zones4": ("gp.ZonalHistogram_sa", [RASTER / "zt_landuse.tif", "Value", RASTER / "zt_zones4.tif"], []),
+    "zh_classes_landuse": ("gp.ZonalHistogram_sa", [RASTER / "zt_classes.tif", "Value", RASTER / "zt_landuse.tif"], []),
+    "ta_i32_i16": ("gp.TabulateArea_sa", [RASTER / "tab_zones_i32.tif", "Value", RASTER / "tab_classes_i16.tif", "Value"], []),
+    "ta_i32_i16_rows": ("gp.TabulateArea_sa", [RASTER / "tab_zones_i32.tif", "Value", RASTER / "tab_classes_i16.tif", "Value"], ["", "CLASSES_AS_ROWS"]),
+    "ta_i32_i16_cell60": ("gp.TabulateArea_sa", [RASTER / "tab_zones_i32.tif", "Value", RASTER / "tab_classes_i16.tif", "Value"], [60]),
+    "ta_i32_i16_cell20": ("gp.TabulateArea_sa", [RASTER / "tab_zones_i32.tif", "Value", RASTER / "tab_classes_i16.tif", "Value"], [20]),
+    "ta_zones25_landuse": ("gp.TabulateArea_sa", [RASTER / "zt_zones25.tif", "Value", RASTER / "zt_landuse.tif", "Value"], []),
+    "ta_landuse_zones4": ("gp.TabulateArea_sa", [RASTER / "zt_landuse.tif", "Value", RASTER / "zt_zones4.tif", "Value"], []),
+    "ta_classes_landuse_rows": ("gp.TabulateArea_sa", [RASTER / "zt_classes.tif", "Value", RASTER / "zt_landuse.tif", "Value"], ["", "CLASSES_AS_ROWS"]),
+    "zgt_i32": ("gp.ZonalGeometryAsTable_sa", [RASTER / "tab_zones_i32.tif", "Value"], []),
+    "zgt_zones25": ("gp.ZonalGeometryAsTable_sa", [RASTER / "zt_zones25.tif", "Value"], []),
+    "zgt_landuse": ("gp.ZonalGeometryAsTable_sa", [RASTER / "zt_landuse.tif", "Value"], []),
+    "zgt_classes": ("gp.ZonalGeometryAsTable_sa", [RASTER / "zt_classes.tif", "Value"], []),
+    "zgt_zones4": ("gp.ZonalGeometryAsTable_sa", [RASTER / "zt_zones4.tif", "Value"], []),
     "sap_chain_10":("management.SplitLineAtPoint", [DM / "chain.shp", DM / "pts.shp"], ["10 Meters"]),
     "sap_chain_1": ("management.SplitLineAtPoint", [DM / "chain.shp", DM / "pts.shp"], ["1 Meters"]),
     "sap_chain_25": ("management.SplitLineAtPoint", [DM / "chain.shp", DM / "pts.shp"], ["25 Meters"]),
@@ -862,7 +879,7 @@ WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable"}
 # Tools whose output is a table, written as <name>.dbf.
-TABLE_OUT = {"gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
+TABLE_OUT = {"gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa", "gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
              "management.TransposeFields", "management.PivotTable", "management.CreateTable"}
 # Tools that take the output folder and name rather than a path.
 CREATE_TOOLS = {"management.CreateFeatureclass", "management.CreateTable"}
@@ -922,6 +939,14 @@ def main():
     for name, (tool, before, after) in CASES.items():
         if only and name not in only:
             continue
+        if tool in ("gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa"):
+            # These tools treat an integer raster as discrete only when it has an attribute table
+            # (without one ZonalHistogram bins the values into 256 classes) and name columns after
+            # its value field: build the tables first. The inputs are copies (zt_*, tab_*) because
+            # the sidecar files change what other tools infer from a raster.
+            for a in before:
+                if isinstance(a, Path) and a.suffix == ".tif":
+                    w.call("python", code=f"arcpy.management.BuildRasterAttributeTable(r'{win(a)}', 'Overwrite')")
         out = OUT / (f"{name}.dbf" if tool in TABLE_OUT else f"{name}.shp")
         if tool in RASTER_OUT:
             out = OUT / f"{name}.tif"

@@ -4309,6 +4309,9 @@ fn tools_match_arcgis_output() {
         {
             continue;
         }
+        if info["tool"] == "gp.ZonalGeometryAsTable_sa" {
+            continue; // not done yet
+        }
         // Workspace tools (Split) write into a folder.
         // Table tools (Check Geometry) write a .dbf.
         let table = reference.join(format!("{case}.dbf")).exists()
@@ -4345,6 +4348,35 @@ fn tools_match_arcgis_output() {
                 "--ignore-nodata".into(),
                 a[4].as_str().unwrap().into(),
             ]
+        } else if info["tool"] == "gp.ZonalHistogram_sa" {
+            let a = &info["args"];
+            vec![
+                "zonal-histogram".into(),
+                a[0].as_str().unwrap().into(),
+                a[2].as_str().unwrap().into(),
+                "<out>".into(),
+                "--zone-field".into(),
+                a[1].as_str().unwrap().into(),
+            ]
+        } else if info["tool"] == "gp.TabulateArea_sa" {
+            let a = &info["args"];
+            let mut v: Vec<String> = vec![
+                "tabulate-area".into(),
+                a[0].as_str().unwrap().into(),
+                a[2].as_str().unwrap().into(),
+                "<out>".into(),
+                "--zone-field".into(),
+                a[1].as_str().unwrap().into(),
+                "--class-field".into(),
+                a[3].as_str().unwrap().into(),
+            ];
+            if let Some(c) = a.get(5).and_then(|c| c.as_f64()) {
+                v.extend(["--processing-cell-size".into(), c.to_string()]);
+            }
+            if a.get(6).and_then(|c| c.as_str()) == Some("CLASSES_AS_ROWS") {
+                v.push("--classes-as-rows".into());
+            }
+            v
         } else {
             gf_args(case).iter().map(|a| a.to_string()).collect()
         };
