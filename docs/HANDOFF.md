@@ -1,16 +1,46 @@
 # Current handoff
 
-Updated: 2026-10-24T03:32:01+00:00; last agent: Codex.
+Updated: 2026-10-24T04:48:50+00:00; last agent: Codex.
 Workspace `/mnt/media/ArcGIS_Linux`; branch `main`.
-Implementation HEAD at this checkpoint: `61c1d81`; a handoff-only commit follows.
+Aggregate slice based on `11f9fce`; this handoff is included in its local commit.
 
 ## User objective / status
 
-Completed coordinator full-access configuration, Block Statistics development,
-full validation and separate local commit checkpoints. User explicitly authorizes
+Completed this continuation: `ug aggregate`, end-to-end ArcGIS comparisons,
+root validation and a local commit checkpoint. Earlier coordinator full-access
+configuration and Block Statistics work remain complete. User explicitly authorizes
 frequent local commits of validated slices to keep independent revert points.
-No push requested in this continuation; none performed. No builds/tests remain
-running. No real agent or coordinator was launched by Codex.
+No push requested in this continuation; none performed. Current validation state
+is recorded below. No real agent or coordinator was launched by Codex.
+
+## Completed Aggregate slice (this continuation)
+
+Added `ug aggregate IN_RASTER OUT_RASTER CELL_FACTOR`, using the existing native
+engine; options `--aggregation-type`, `--extent-handling`, `--ignore-nodata`.
+SUM/EXPAND/DATA defaults match existing app behavior. Single-band only: the native
+engine reads band 0, so CLI refuses multiband input rather than discarding bands.
+Factors must be whole numbers 2..2147483647; invalid options and empty TRUNCATE
+outputs fail before writing. Native/app source unchanged.
+
+Files: `crates/unigis-cli/src/main.rs`, new `tests/aggregate.rs`, roadmap/known gaps.
+The test executes all 40 saved ArcGIS Aggregate JSON cases from `blockops.json`:
+float/integer, five statistics, DATA/NODATA, EXPAND/TRUNCATE. Compares grids,
+pixel type, NoData and every cell after CLI/GeoTIFF round trip; also checks defaults,
+invalid arguments, multiband refusal and no partial raster on failure.
+
+Validation PASSED on final source:
+- `cargo fmt --all --check`
+- `cargo clippy --workspace --all-targets -j3`: no warnings
+- `cargo test --workspace -j3`: 173 passed, 0 failed, 5 ignored, 77 result groups
+- `cargo test -p unigis-cli --test aggregate -j3`: 1 passed, all 40 comparisons
+- `target/debug/ug aggregate --help` and `git diff --check`: passed
+Logs: `/tmp/unigis-aggregate-cli-test.log`,
+`/tmp/unigis-aggregate-root-{clippy,tests}.log`.
+No builds/tests running. No app CI rerun needed for this CLI-only slice.
+Initial compilation caught clap's i64 range bound (fixed); JSON decimal rounding
+of f32::MIN required comparing expected NoData at the pixel's actual precision.
+Integer comparisons remain exact. No new live ArcGIS probes were required;
+existing black-box oracle data and generator remain unchanged.
 
 ## Completed commits
 
@@ -77,6 +107,7 @@ tracked `tools/arcgis-bridge/__pycache__/server.cpython-312.pyc`, `.worktrees/`,
 
 1. Restart an already-running coordinator once to use the new policy; user action,
    not a reason for an agent to launch another coordinator or session.
-2. Continue tool development from roadmap/known gaps (Slice, Boundary Clean/Thin,
-   remaining Block Statistics limits), with frequent validated local commits.
+2. Continue roadmap gaps: Slice/Pick CLI, verified multiband Aggregate support,
+   Boundary Clean/Thin or remaining Block Statistics limits. Keep small validated
+   local commits; this continuation leaves no unfinished implementation edits.
 3. Push only when requested. Keep unrelated files above out of future commits.

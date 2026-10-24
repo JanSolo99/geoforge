@@ -848,6 +848,23 @@ enum Tool {
         #[arg(long, default_value = "DATA")]
         ignore_nodata: String,
     },
+    /// Spatial Analyst "Aggregate": combine blocks into coarser raster cells.
+    Aggregate {
+        in_raster: PathBuf,
+        out_raster: PathBuf,
+        /// Whole number of input cells per output cell edge (at least 2).
+        #[arg(value_parser = clap::value_parser!(u32).range(2..=i32::MAX as i64))]
+        cell_factor: u32,
+        /// SUM, MAXIMUM, MEAN, MEDIAN or MINIMUM.
+        #[arg(long, default_value = "SUM")]
+        aggregation_type: String,
+        /// EXPAND keeps partial edge blocks; TRUNCATE drops them.
+        #[arg(long, default_value = "EXPAND")]
+        extent_handling: String,
+        /// DATA (ignore NoData) or NODATA.
+        #[arg(long, default_value = "DATA")]
+        ignore_nodata: String,
+    },
     /// Spatial Analyst "Block Statistics": assign each block's statistic to all its cells.
     BlockStatistics {
         in_raster: PathBuf,
@@ -2927,6 +2944,43 @@ fn main() -> ExitCode {
             }
             let input = unigis_raster::read_geotiff(&in_raster)?;
             let out = unigis_raster::focal::focal_statistics(&input, nbr, stat, ignore);
+            write_raster(&out_raster, &out)
+        })(),
+        Tool::Aggregate {
+            in_raster,
+            out_raster,
+            cell_factor,
+            aggregation_type,
+            extent_handling,
+            ignore_nodata,
+        } => (|| {
+            use unigis_raster::blockops::{AggregateStat, aggregate};
+            let stat = AggregateStat::parse(&aggregation_type).ok_or_else(|| {
+                Error::Unsupported(format!("aggregation type {aggregation_type}"))
+            })?;
+            let expand = match extent_handling.to_ascii_uppercase().as_str() {
+                "EXPAND" => true,
+                "TRUNCATE" => false,
+                other => return Err(Error::Unsupported(format!("extent handling {other}"))),
+            };
+            let ignore = match ignore_nodata.to_ascii_uppercase().as_str() {
+                "DATA" => true,
+                "NODATA" => false,
+                other => return Err(Error::Unsupported(format!("ignore_nodata {other}"))),
+            };
+            let input = unigis_raster::read_geotiff(&in_raster)?;
+            if input.bands.len() != 1 {
+                return Err(Error::Unsupported(
+                    "Aggregate currently requires a single-band raster".into(),
+                ));
+            }
+            let out =
+                aggregate(&input, cell_factor as usize, stat, expand, ignore).ok_or_else(|| {
+                    Error::Unsupported(
+                        "Aggregate produces no output cells; reduce cell_factor or use EXPAND"
+                            .into(),
+                    )
+                })?;
             write_raster(&out_raster, &out)
         })(),
         Tool::BlockStatistics {

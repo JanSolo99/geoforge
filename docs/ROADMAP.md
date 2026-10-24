@@ -522,7 +522,12 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         types, NoData and values (`testdata/arcgis-reference/blockops.json`): Aggregate counts blocks
         from the lower-left corner, Block Statistics from the upper-left; an integer raster's range counts
         one wider for Slice. Not done: Slice's other methods (equal area differs on a cell, natural
-        breaks), `ug` commands for Aggregate, Slice and Pick
+        breaks), `ug` commands for Slice and Pick
+  - [x] `ug aggregate`: SUM/MAXIMUM/MEAN/MEDIAN/MINIMUM, EXPAND/TRUNCATE and
+        DATA/NODATA over single-band GeoTIFFs. CLI output grids, pixel types,
+        NoData and every cell match all 40 saved ArcGIS Aggregate probes;
+        omitted options reproduce SUM/EXPAND/DATA. Multiband input is refused
+        pending verified support (`crates/unigis-cli/tests/aggregate.rs`).
   - [x] Block Statistics follow-up: 74 GeoTIFF comparisons against Pro 3.7 cover
         integer pixel types/NoData, negative integer storage, lower median,
         multiband output, circular/annular masks, DATA/NODATA and MAP rounding.
@@ -696,5 +701,5 @@ Validation (2026-10-24): full app `cargo xtask ci` passes (716 tests passed,
 10 ignored, zero failures), including local-server tests with full host access;
 no sandbox skip/filter flags. Formatting, full workspace/all-targets clippy with
 `-D warnings`, layer checks and the separate wasm web check pass. Root workspace
-validation passes 172 tests (5 ignored). GDAL provider checks use a writable
+validation passes 173 tests (5 ignored). GDAL provider checks use a writable
 cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md`.
