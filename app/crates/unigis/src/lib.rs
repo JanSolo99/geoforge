@@ -1986,6 +1986,12 @@ mod tests {
             &json!({"input": "RB", "neighborhood": "Circle 2 CELL", "statistics_type": "MEAN"}),
         ));
         assert_eq!((blk.width, blk.height), (24, 24));
+        let map_block = raster_of(rustgis_analysis::run(
+            "unigis:block_statistics",
+            &inp,
+            &json!({"input": "RB", "neighborhood": format!("Circle {} MAP", 2.0 * a.cell_width()), "statistics_type": "MEAN"}),
+        ));
+        assert_eq!(map_block.bands, blk.bands, "MAP and CELL wrappers agree");
         let zones =
             raster_of(rustgis_analysis::run("unigis:slice", &inp, &json!({"input": "RB", "number_zones": 4, "base_output_zone": 10})));
         assert_eq!(zones.get(12, 12), Some(13.0), "the cone's top is in the highest zone");
@@ -2217,7 +2223,7 @@ mod tests {
         fn raster(&self, layer: &str) -> Option<rustgis_analysis::RasterInput<'_>> {
             self.rasters.iter().find(|(n, ..)| n == layer).map(|(_, r, path)| rustgis_analysis::RasterInput {
                 raster: r,
-                path: Some(path.as_str()),
+                path: (!path.is_empty()).then_some(path.as_str()),
                 embedded: None,
             })
         }
@@ -2258,6 +2264,30 @@ mod tests {
         let out = unigis_raster::read_geotiff(&path).unwrap();
         std::fs::remove_file(&path).ok();
         out
+    }
+
+    #[test]
+    fn in_memory_multiband_block_statistics_equal_arcgis() {
+        register();
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../..");
+        let source = rustgis_data::raster::read_path(&root.join("testdata/raster/rgb_pixel_u8.tif")).unwrap();
+        assert_eq!(source.bands.len(), 3);
+        let expected = unigis_raster::read_geotiff(&root.join("testdata/arcgis-reference/blk_u16.tif")).unwrap();
+        // Neither input identifies a readable GeoTIFF: conversion must use the app's pixels.
+        for path in ["", "memory-rgb.png"] {
+            let inputs = WithRasters { layers: Layers(vec![]), rasters: vec![("RGB".into(), source.clone(), path.into())] };
+            let got = raster_of(rustgis_analysis::run(
+                "unigis:block_statistics",
+                &inputs,
+                &json!({"input": "RGB", "neighborhood": "Rectangle 3 3 CELL", "statistics_type": "MAXIMUM"}),
+            ));
+            assert_eq!(got.bands.len(), 3, "{path}: all RGB bands survive conversion");
+            assert_eq!((got.width, got.height, got.epsg), (expected.width, expected.height, expected.epsg));
+            assert_eq!(got.transform, expected.transform);
+            assert_eq!(got.data_type, expected.data_type);
+            assert_eq!(got.nodata, expected.nodata);
+            assert_eq!(got.bands, expected.bands, "{path}: every cell in every band matches ArcGIS");
+        }
     }
 
     #[test]

@@ -66,7 +66,7 @@ fn data_type_of(name: &str) -> gfr::DataType {
 /// The raster the app holds, as UniGIS's model.
 fn convert(r: &rustgis_data::raster::Raster) -> gfr::Raster {
     let t = &r.transform;
-    let band = r.bands.first().map(|b| b.data.iter().map(|v| f64::from(*v)).collect()).unwrap_or_default();
+    let bands = r.bands.iter().map(|b| b.data.iter().map(|v| f64::from(*v)).collect()).collect();
     gfr::Raster {
         width: r.width as usize,
         height: r.height as usize,
@@ -78,7 +78,7 @@ fn convert(r: &rustgis_data::raster::Raster) -> gfr::Raster {
             c => Some(u32::from(c)),
         },
         statistics: None,
-        bands: vec![band],
+        bands,
     }
 }
 
@@ -1200,22 +1200,13 @@ fn aggregate(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
 
 fn block_statistics(inp: &dyn Inputs, p: &Json) -> Result<ToolResult, String> {
     let (r, _) = input(inp, p, "input")?;
-    let nb =
-        gfr::focal::Neighborhood::parse(if text(p, "neighborhood").is_empty() { "Rectangle 3 3 CELL" } else { text(p, "neighborhood") })
-            .ok_or("neighborhood: for example 'Rectangle 3 3 CELL' or 'Circle 2 CELL'")?;
+    let nb = gfr::blockops::block_neighborhood(
+        if text(p, "neighborhood").is_empty() { "Rectangle 3 3 CELL" } else { text(p, "neighborhood") },
+        r.cell_width(), r.cell_height(),
+    ).ok_or("neighborhood: use Rectangle W H CELL|MAP, Circle R CELL|MAP or Annulus R1 R2 CELL|MAP; circular MAP neighborhoods require square cells")?;
     let stat = gfr::focal::FocalStatistic::parse(&choice(p, "statistics_type", "MEAN"))
         .ok_or_else(|| format!("statistic {}", text(p, "statistics_type")))?;
-    if r.data_type.is_float()
-        && matches!(
-            stat,
-            gfr::focal::FocalStatistic::Majority
-                | gfr::focal::FocalStatistic::Minority
-                | gfr::focal::FocalStatistic::Median
-                | gfr::focal::FocalStatistic::Variety
-        )
-    {
-        return Err(format!("{} needs an integer raster", text(p, "statistics_type")));
-    }
+    gfr::blockops::block_check(stat, r.data_type)?;
     let ignore = match choice(p, "ignore_nodata", "DATA").as_str() {
         "DATA" => true,
         "NODATA" => false,
@@ -1431,7 +1422,7 @@ pub(crate) const DEFS: &[Def] = &[
                 kind: K::Text,
                 required: false,
                 default: "\"Rectangle 3 3 CELL\"",
-                help: "Rectangle w h CELL, Circle r CELL or Annulus r1 r2 CELL.",
+                help: "Rectangle W H CELL|MAP, Circle R CELL|MAP or Annulus R1 R2 CELL|MAP. Circular MAP neighborhoods require square cells.",
             },
             P {
                 name: "statistics_type",
