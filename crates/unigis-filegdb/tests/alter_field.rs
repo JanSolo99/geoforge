@@ -46,10 +46,12 @@ fn field_type(name: &str) -> FieldType {
     }
 }
 
-/// The first `ERROR nnnnnn` code of a message.
-fn code(message: &str) -> Option<String> {
-    let at = message.find("ERROR ")?;
-    Some(message[at..].chars().take(12).collect())
+/// Every `ERROR nnnnnn` code of a message.
+fn codes(message: &str) -> Vec<String> {
+    message
+        .match_indices("ERROR ")
+        .map(|(at, _)| message[at..].chars().take(12).collect())
+        .collect()
 }
 
 #[test]
@@ -76,12 +78,47 @@ fn alter_field_equals_arcgis() {
             length: a.get("length").and_then(Json::as_u64).map(|l| l as u32),
             nullable: text("nullable").map(|n| n == "NULLABLE"),
         };
-        let result = g::alter_field(
-            &work,
-            text("table").unwrap(),
-            text("field").unwrap(),
-            &alteration,
-        );
+        let result = if let Some(rows) = a.get("rows").and_then(Json::as_array) {
+            // Alter Fields: `field, new name, alias, type, length, nullable, clear` per row.
+            let cells: Vec<Vec<Option<String>>> = rows
+                .iter()
+                .map(|r| {
+                    (0..7)
+                        .map(|i| match &r[i] {
+                            Json::String(s) => Some(s.clone()),
+                            Json::Number(n) => Some(n.to_string()),
+                            _ => None,
+                        })
+                        .collect()
+                })
+                .collect();
+            let rows: Vec<(&str, g::FieldAlteration)> = cells
+                .iter()
+                .map(|c| {
+                    // `#` skips a cell, except for the alias, which is kept literally.
+                    let get = |i: usize| c[i].as_deref().filter(|v| i == 2 || *v != "#");
+                    (
+                        get(0).unwrap(),
+                        g::FieldAlteration {
+                            new_name: get(1),
+                            alias: get(2),
+                            clear_alias: get(6).is_some(),
+                            new_type: get(3).map(field_type),
+                            length: get(4).and_then(|l| l.parse().ok()),
+                            nullable: get(5).map(|n| n == "NULLABLE"),
+                        },
+                    )
+                })
+                .collect();
+            g::alter_fields(&work, text("table").unwrap(), &rows)
+        } else {
+            g::alter_field(
+                &work,
+                text("table").unwrap(),
+                text("field").unwrap(),
+                &alteration,
+            )
+        };
         let ours = snapshot(&work);
         std::fs::remove_dir_all(&work).ok();
         let Some(ours) = ours else { return };
@@ -102,7 +139,8 @@ fn alter_field_equals_arcgis() {
                     continue;
                 }
                 Err(e) => {
-                    if code(&e.to_string()) != code(arcgis) {
+                    let ours = e.to_string();
+                    if !codes(arcgis).iter().any(|c| ours.contains(c.as_str())) {
                         failures.push(format!("{op}: error {e}, ArcGIS {arcgis}"));
                     }
                 }

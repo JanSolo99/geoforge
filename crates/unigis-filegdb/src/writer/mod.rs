@@ -29,7 +29,7 @@ use crate::table::{GdbField, GdbFieldType, GeometryDef};
 use btree::{spatial_entries, write_index};
 use table::TableWriter;
 
-pub use alter::{FieldAlteration, alter_field, geodatabase_field_name};
+pub use alter::{FieldAlteration, alter_field, alter_fields, geodatabase_field_name};
 pub use catalog::{delete_domain, delete_item, rename_domain, rename_item};
 pub use edit::{TableEditor, delete_rows};
 pub use rebuild::rebuild_attribute_indexes;

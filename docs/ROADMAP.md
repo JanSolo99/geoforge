@@ -500,12 +500,12 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         Feature Envelope To Polygon, Split Line At Vertices, Split Line At Point, Eliminate Polygon
         Part, XY To Line, Calculate Fields, Standardize Field, Transform Field, Reclassify Field,
         Transpose Fields and Pivot Table, then Bearing Distance To Line (geodesic, short lines),
-        Create Feature Class, Create Table, Define Projection, Copy, Calculate End Time, Unsplit Line, Alter Field (file geodatabase tables, in place; `ug alter-field`) and Dice (lines exact, polygons with small cells
+        Create Feature Class, Create Table, Define Projection, Copy, Calculate End Time, Unsplit Line, Alter Field and Alter Fields (file geodatabase tables, in place; `ug alter-field`, `ug alter-fields`) and Dice (lines exact, polygons with small cells
         partly: see KNOWN_GAPS)
         (unjoined lines first, then joined ones; multipart and reversed pieces unchecked). Not done: Split Line At Point without a search radius,
         XY To Line / Bearing Distance To Line geodesics for long lines, Box-Cox by maximum
-        likelihood, Reclassify Field GEOMETRIC_INTERVAL / NATURAL_BREAKS / STANDARD_DEVIATION, Alter Fields / Add Incrementing ID Field (they
-        need a geodatabase), Subdivide Polygon, Generate Rectangles/Transects Along Lines.
+        likelihood, Reclassify Field GEOMETRIC_INTERVAL / NATURAL_BREAKS / STANDARD_DEVIATION, Add Incrementing ID Field (ArcGIS accepts it only on
+        enterprise geodatabases), Subdivide Polygon, Generate Rectangles/Transects Along Lines.
         Known differences: the order of Split Line At Point's pieces on one curved road, and
         MULTIPART envelopes of nested parts (our shapefile writer turns the inner ring into a hole)
   - [x] Spatial Analyst math functions (`unigis-raster::mathfn`; `ug math-fn`, 45 app tools,

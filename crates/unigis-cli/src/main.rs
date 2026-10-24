@@ -401,6 +401,13 @@ enum Tool {
         #[arg(long)]
         clear_field_alias: Option<String>,
     },
+    /// Alter several fields in order (ArcGIS "Alter Fields"): each `--field` is
+    /// `name|new name|new alias|type|length|nullable|clear alias`; empty or `#` skips a part.
+    AlterFields {
+        in_table: PathBuf,
+        #[arg(long = "field", required = true)]
+        fields: Vec<String>,
+    },
     /// Assign a default value to a field, or to it within subtypes; no value clears it (ArcGIS
     /// "Assign Default To Field").
     AssignDefaultToField {
@@ -1810,54 +1817,53 @@ fn main() -> ExitCode {
             clear_field_alias,
         } => (|| {
             let (gdb, table) = gdb_table(&in_table)?;
-            let new_type = match field_type
-                .as_deref()
-                .map(str::trim)
-                .filter(|t| !t.is_empty() && *t != "#")
-                .map(str::to_ascii_uppercase)
-                .as_deref()
-            {
-                None => None,
-                Some("TEXT") => Some(FieldType::String),
-                Some("FLOAT") => Some(FieldType::Single),
-                Some("DOUBLE") => Some(FieldType::Double),
-                Some("SHORT") => Some(FieldType::SmallInteger),
-                Some("LONG") => Some(FieldType::Integer),
-                Some("BIGINTEGER") => Some(FieldType::BigInteger),
-                Some("DATE") => Some(FieldType::Date),
-                Some("DATEONLY") => Some(FieldType::DateOnly),
-                Some("TIMEONLY") => Some(FieldType::TimeOnly),
-                Some("TIMESTAMPOFFSET") => Some(FieldType::TimestampOffset),
-                Some("BLOB") => Some(FieldType::Blob),
-                Some("GUID") => Some(FieldType::Guid),
-                Some(other) => return Err(Error::Unsupported(format!("field type {other}"))),
-            };
-            let nullable = match field_is_nullable
-                .as_deref()
-                .map(str::to_ascii_uppercase)
-                .as_deref()
-            {
-                None | Some("") | Some("#") => None,
-                Some("NULLABLE") => Some(true),
-                Some("NON_NULLABLE") => Some(false),
-                Some(other) => return Err(Error::Unsupported(format!("nullable {other}"))),
-            };
-            let clear_alias = clear_field_alias
-                .as_deref()
-                .is_some_and(|c| c.eq_ignore_ascii_case("CLEAR_ALIAS"));
             unigis_filegdb::alter_field(
                 &gdb,
                 &table,
                 &field,
                 &unigis_filegdb::FieldAlteration {
                     new_name: new_field_name.as_deref(),
-                    alias: new_field_alias.as_deref(),
-                    clear_alias,
-                    new_type,
+                    alias: new_field_alias.as_deref().filter(|a| *a != "#"),
+                    clear_alias: clear_field_alias
+                        .as_deref()
+                        .is_some_and(|c| c.eq_ignore_ascii_case("CLEAR_ALIAS")),
+                    new_type: alter_field_type(field_type.as_deref())?,
                     length: field_length,
-                    nullable,
+                    nullable: alter_nullable(field_is_nullable.as_deref())?,
                 },
             )
+        })(),
+        Tool::AlterFields { in_table, fields } => (|| {
+            let (gdb, table) = gdb_table(&in_table)?;
+            // `field|new name|new alias|type|length|nullable|clear alias`, empty or `#` to skip.
+            let specs: Vec<Vec<Option<&str>>> = fields
+                .iter()
+                .map(|f| {
+                    f.split('|')
+                        .map(str::trim)
+                        .map(|p| Some(p).filter(|p| !p.is_empty() && *p != "#"))
+                        .collect()
+                })
+                .collect();
+            let mut rows = Vec::new();
+            for spec in &specs {
+                let part = |i: usize| spec.get(i).copied().flatten();
+                let name = part(0).ok_or_else(|| {
+                    Error::Unsupported("ERROR 000735: Field Name: Value is required".into())
+                })?;
+                rows.push((
+                    name,
+                    unigis_filegdb::FieldAlteration {
+                        new_name: part(1),
+                        alias: part(2),
+                        clear_alias: part(6).is_some_and(|c| c.eq_ignore_ascii_case("CLEAR_ALIAS")),
+                        new_type: alter_field_type(part(3))?,
+                        length: part(4).and_then(|l| l.parse().ok()),
+                        nullable: alter_nullable(part(5))?,
+                    },
+                ));
+            }
+            unigis_filegdb::alter_fields(&gdb, &table, &rows)
         })(),
         Tool::AssignDefaultToField {
             in_table,
@@ -5102,6 +5108,43 @@ fn merge_tool(
         .transpose()?;
     let out = unigis_tools::merge_with(&merge_inputs, add, field_map.as_deref())?;
     write_output(out, output, source_gdb(&inputs[0]).as_deref())
+}
+
+/// The field type keyword of Alter Field.
+fn alter_field_type(keyword: Option<&str>) -> Result<Option<FieldType>, Error> {
+    Ok(
+        match keyword
+            .map(str::trim)
+            .filter(|t| !t.is_empty() && *t != "#")
+            .map(str::to_ascii_uppercase)
+            .as_deref()
+        {
+            None => None,
+            Some("TEXT") => Some(FieldType::String),
+            Some("FLOAT") => Some(FieldType::Single),
+            Some("DOUBLE") => Some(FieldType::Double),
+            Some("SHORT") => Some(FieldType::SmallInteger),
+            Some("LONG") => Some(FieldType::Integer),
+            Some("BIGINTEGER") => Some(FieldType::BigInteger),
+            Some("DATE") => Some(FieldType::Date),
+            Some("DATEONLY") => Some(FieldType::DateOnly),
+            Some("TIMEONLY") => Some(FieldType::TimeOnly),
+            Some("TIMESTAMPOFFSET") => Some(FieldType::TimestampOffset),
+            Some("BLOB") => Some(FieldType::Blob),
+            Some("GUID") => Some(FieldType::Guid),
+            Some(other) => return Err(Error::Unsupported(format!("field type {other}"))),
+        },
+    )
+}
+
+/// `NULLABLE` / `NON_NULLABLE` of Alter Field.
+fn alter_nullable(keyword: Option<&str>) -> Result<Option<bool>, Error> {
+    Ok(match keyword.map(str::to_ascii_uppercase).as_deref() {
+        None | Some("") | Some("#") => None,
+        Some("NULLABLE") => Some(true),
+        Some("NON_NULLABLE") => Some(false),
+        Some(other) => return Err(Error::Unsupported(format!("nullable {other}"))),
+    })
 }
 
 fn dissolve_tool(

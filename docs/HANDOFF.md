@@ -34,6 +34,18 @@ prefix, `GeoForgeError` Python alias, `.gf-journal` and its magic string, GitHub
 Next: the user may add the Netlify secrets or import the `web-dist` branch; otherwise resume tool
 development from `docs/KNOWN_GAPS.md` and `docs/ROADMAP.md`.
 
+Session of 2026-10-24 (user away, "focus on tool development as long as possible"): permissions for
+git push, uv run, ogrinfo, the arcgis bridge and many shell tools were added to
+`.claude/settings.local.json`. Done and pushed: Unsplit Line (597430e, 5 reference cases), Dice
+(1277cb5; lines exact; polygons match for cells of more than ~20 vertices, the rest recorded in
+`KNOWN_GAPS.md` and `KNOWN_FEATURE_DIFFERENCES`), Alter Field for file geodatabase tables (3aa84cd;
+`ug alter-field`, `unigis_filegdb::alter_field`, 28 operations compared with ArcGIS state in
+`crates/unigis-filegdb/tests/alter_field.rs`, `testdata/gdb-reference/alter_ops`). Research notes:
+`scripts/research/unsplit/README.md`. `scripts/gdb-snapshot.py` now also snapshots fields and rows.
+Not done / ideas next: Alter Fields (batch), Add Incrementing ID Field, Subdivide Polygon, Generate
+Rectangles/Transects, Generate Tessellation, the app/arcpy entries for these tools, and the Dice
+small-cell cut rule. Full `cargo xtask ci` not run locally this session.
+
 Earlier request: allow rules (option 3) so the coordinator stops blocking git/cargo commands,
 then merge the branch into `main` and rename `gf` to `ug` (with tool ids). Writing
 `.claude/settings.local.json` was itself refused by this mode (a session cannot change its own

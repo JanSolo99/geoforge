@@ -11,6 +11,13 @@
   "empty_type_long_text": "ok",
   "empty_type_long_text_len": "ok",
   "empty_type_text_long": "ok",
+  "fields_chain": "Failed to execute. Parameters are not valid. | ERROR 000728: Field A2 does not exist within table | Failed to execute (AlterFields).",
+  "fields_missing": "ERROR 000622: Failed to execute (AlterFields). Parameters are not valid. | ERROR 000728: Field NOPE does not exist within table | Failed to execute (AlterFields).",
+  "fields_notype": "ok",
+  "fields_notype_populated": "ERROR 001658: Cannot alter field types on populated tables. | Failed to execute (AlterFields).",
+  "fields_ok": "ok",
+  "fields_partial": "ERROR 002598: Name: \"C\" already exists. | Failed to execute (AlterFields).",
+  "fields_types": "ok",
   "len_down_populated": "ERROR 001624: Failed to alter field length. | Failed to execute (AlterField).",
   "len_up": "ok",
   "nonnull_populated": "ERROR 001625: Failed to alter field is nullable. | Failed to execute (AlterField).",
@@ -88,6 +95,110 @@
    "field": "A",
    "table": "emptyt",
    "type": "LONG"
+  },
+  "fields_chain": {
+   "rows": [
+    [
+     "A",
+     "A2",
+     "#",
+     "TEXT"
+    ],
+    [
+     "A2",
+     "A3",
+     "#",
+     "TEXT"
+    ]
+   ],
+   "table": "emptyt"
+  },
+  "fields_missing": {
+   "rows": [
+    [
+     "NAME",
+     "N2",
+     "#",
+     "TEXT"
+    ],
+    [
+     "NOPE",
+     "X"
+    ]
+   ],
+   "table": "parcels"
+  },
+  "fields_notype": {
+   "rows": [
+    [
+     "A",
+     "AA",
+     "Aye"
+    ]
+   ],
+   "table": "emptyt"
+  },
+  "fields_notype_populated": {
+   "rows": [
+    [
+     "NAME",
+     "LABEL",
+     "L"
+    ]
+   ],
+   "table": "parcels"
+  },
+  "fields_ok": {
+   "rows": [
+    [
+     "NAME",
+     "LABEL",
+     "L",
+     "TEXT"
+    ],
+    [
+     "VALUE",
+     "AMT",
+     "x",
+     "DOUBLE"
+    ]
+   ],
+   "table": "parcels"
+  },
+  "fields_partial": {
+   "rows": [
+    [
+     "A",
+     "A3",
+     "#",
+     "TEXT"
+    ],
+    [
+     "B",
+     "C",
+     "#",
+     "LONG"
+    ]
+   ],
+   "table": "emptyt"
+  },
+  "fields_types": {
+   "rows": [
+    [
+     "A",
+     "AA",
+     "Aye",
+     "LONG"
+    ],
+    [
+     "B",
+     "BB",
+     "Bee",
+     "TEXT",
+     12
+    ]
+   ],
+   "table": "emptyt"
   },
   "len_down_populated": {
    "field": "NAME",

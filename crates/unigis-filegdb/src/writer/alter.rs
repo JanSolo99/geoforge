@@ -73,6 +73,37 @@ pub fn geodatabase_field_name(name: &str) -> Result<String> {
     Ok(out)
 }
 
+/// `arcpy.management.AlterFields`: the alterations in order, each one as [`alter_field`] (one that
+/// fails leaves the earlier ones in place). Every field must exist before anything is changed.
+/// A row that gives no type means LONG and one that gives no length 255 (the value table's
+/// defaults in ArcGIS); an alias of `#` is taken literally.
+pub fn alter_fields(
+    dir: impl AsRef<Path>,
+    table: &str,
+    rows: &[(&str, FieldAlteration)],
+) -> Result<()> {
+    let dir = dir.as_ref();
+    let t = load_target(dir, table)?;
+    for (name, _) in rows {
+        field(&t, name).map_err(|_| {
+            bad(format!(
+                "ERROR 000622: Failed to execute (AlterFields). Parameters are not valid. | \
+                 ERROR 000728: Field {name} does not exist within table"
+            ))
+        })?;
+    }
+    for (name, alteration) in rows {
+        // A row without a type alters the field to LONG (the value table's default), which only
+        // an empty table, or a field that is a long already, accepts.
+        let mut alteration = alteration.clone();
+        alteration.new_type.get_or_insert(FieldType::Integer);
+        // ... and one without a length means 255 (matters for text only).
+        alteration.length.get_or_insert(255);
+        alter_field(dir, table, name, &alteration)?;
+    }
+    Ok(())
+}
+
 /// Alters the field `field_name` of the table `table` of the geodatabase at `dir`.
 pub fn alter_field(
     dir: impl AsRef<Path>,
@@ -86,7 +117,9 @@ pub fn alter_field(
             "ERROR 001656: Cannot specify field alias and clear alias parameters simultaneously.",
         ));
     }
-    super::txn::atomic(dir, || -> Result<()> {
+    // ArcGIS makes the other changes before it finds that the new name exists.
+    let name_taken = super::txn::atomic(dir, || -> Result<Option<unigis_core::Error>> {
+        let mut name_taken = None;
         let t = load_target(dir, table)?;
         let (current, _, _) = field(&t, field_name)?.clone();
         let tab_base = base(dir, t.table_id);
@@ -116,12 +149,13 @@ pub fn alter_field(
             let new = new.as_str();
             if !special && !new.eq_ignore_ascii_case(&current) {
                 if fields.iter().any(|f| f.name.eq_ignore_ascii_case(new)) {
-                    return Err(bad(format!(
+                    name_taken = Some(bad(format!(
                         "ERROR 002598: Name: \"{new}\" already exists."
                     )));
+                } else {
+                    super::validate_field_name(new)?;
+                    name = new.to_owned();
                 }
-                super::validate_field_name(new)?;
-                name = new.to_owned();
             }
         }
 
@@ -165,7 +199,7 @@ pub fn alter_field(
         g.name = name.clone();
         if alteration.clear_alias {
             g.alias = None;
-        } else if let Some(alias) = alteration.alias.filter(|a| !a.is_empty() && *a != "#") {
+        } else if let Some(alias) = alteration.alias.filter(|a| !a.is_empty()) {
             g.alias = Some(alias.to_owned()).filter(|a| *a != name);
         }
         let new_type = g.field_type;
@@ -189,8 +223,9 @@ pub fn alter_field(
         if def != t.def {
             store(dir, &t, def)?;
         }
-        Ok(())
-    })
+        Ok(name_taken)
+    })?;
+    name_taken.map_or(Ok(()), Err)
 }
 
 /// The item definition with the field's `GPFieldInfoEx` entry (and subtype references) changed.
@@ -227,7 +262,7 @@ fn alter_definition(
         .descendants()
         .find(|n| n.is_element() && n.tag_name().name() == "GPFieldInfoExs");
     let esri = esri_type_name(new_type);
-    let alias_given = alteration.alias.filter(|a| !a.is_empty() && *a != "#");
+    let alias_given = alteration.alias.filter(|a| !a.is_empty());
     if let Some(list) = list {
         let entry = children(list, "GPFieldInfoEx")
             .find(|e| child_text(*e, "Name").is_some_and(|n| n.eq_ignore_ascii_case(current)));
