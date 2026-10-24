@@ -36068,6 +36068,86 @@
       "messages": [],
       "fields": [],
       "shapeType": null
+    },
+    "corridor_basic": {
+      "tool": "gp.Corridor_sa",
+      "args": [
+        "testdata/arcgis-reference/cdist_basic.tif",
+        "testdata/arcgis-reference/cdist_one_f32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "corridor_int": {
+      "tool": "gp.Corridor_sa",
+      "args": [
+        "testdata/arcgis-reference/cdist_int.tif",
+        "testdata/arcgis-reference/cdist_max.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "cpath_each_cell": {
+      "tool": "gp.CostPath_sa",
+      "args": [
+        "testdata/raster/cost_dest_i16.tif",
+        "testdata/arcgis-reference/cdist_basic.tif",
+        "testdata/arcgis-reference/cback_basic.tif",
+        "<out>",
+        "EACH_CELL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "cpath_each_zone": {
+      "tool": "gp.CostPath_sa",
+      "args": [
+        "testdata/raster/cost_dest_i16.tif",
+        "testdata/arcgis-reference/cdist_basic.tif",
+        "testdata/arcgis-reference/cback_basic.tif",
+        "<out>",
+        "EACH_ZONE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "cpath_best": {
+      "tool": "gp.CostPath_sa",
+      "args": [
+        "testdata/raster/cost_dest_i16.tif",
+        "testdata/arcgis-reference/cdist_basic.tif",
+        "testdata/arcgis-reference/cback_basic.tif",
+        "<out>",
+        "BEST_SINGLE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "cpath_const": {
+      "tool": "gp.CostPath_sa",
+      "args": [
+        "testdata/raster/cost_dest_i16.tif",
+        "testdata/arcgis-reference/cdist_const.tif",
+        "testdata/arcgis-reference/cback_const.tif",
+        "<out>",
+        "EACH_CELL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

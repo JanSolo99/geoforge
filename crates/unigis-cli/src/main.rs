@@ -1373,6 +1373,12 @@ enum Tool {
         #[arg(long)]
         maximum_distance: Option<f64>,
     },
+    /// Spatial Analyst "Corridor": the sum of two accumulated cost rasters.
+    Corridor {
+        in_distance_raster1: PathBuf,
+        in_distance_raster2: PathBuf,
+        out_raster: PathBuf,
+    },
     /// Spatial Analyst "Zonal Histogram": a row per value, a column per zone (.dbf or geodatabase table).
     ZonalHistogram {
         in_zone_data: PathBuf,
@@ -4161,6 +4167,17 @@ fn main() -> ExitCode {
                 &out_allocation_raster,
                 &unigis_raster::cost::allocation_raster(&cost, &source, &result),
             )
+        })(),
+        Tool::Corridor {
+            in_distance_raster1,
+            in_distance_raster2,
+            out_raster,
+        } => (|| {
+            let a = unigis_raster::read_geotiff(&in_distance_raster1)?;
+            let b = unigis_raster::read_geotiff(&in_distance_raster2)?;
+            let out = unigis_raster::cost::corridor(&a, &b)
+                .ok_or_else(|| Error::Unsupported("the rasters must share a grid".into()))?;
+            write_raster(&out_raster, &out)
         })(),
         Tool::ZonalHistogram {
             in_zone_data,

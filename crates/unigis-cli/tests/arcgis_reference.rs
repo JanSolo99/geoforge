@@ -4311,7 +4311,10 @@ fn tools_match_arcgis_output() {
         {
             continue;
         }
-        if info["tool"] == "gp.ZonalGeometryAsTable_sa" {
+        if matches!(
+            info["tool"].as_str(),
+            Some("gp.ZonalGeometryAsTable_sa" | "gp.CostPath_sa")
+        ) {
             continue; // not done yet
         }
         // Workspace tools (Split) write into a folder.
@@ -4370,6 +4373,14 @@ fn tools_match_arcgis_output() {
                 v.extend(["--maximum-distance".into(), m.to_string()]);
             }
             v
+        } else if info["tool"] == "gp.Corridor_sa" {
+            let a = &info["args"];
+            vec![
+                "corridor".into(),
+                a[0].as_str().unwrap().into(),
+                a[1].as_str().unwrap().into(),
+                "<out>".into(),
+            ]
         } else if info["tool"] == "gp.ZonalHistogram_sa" {
             let a = &info["args"];
             vec![

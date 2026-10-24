@@ -203,3 +203,26 @@ pub fn allocation_raster(like: &Raster, source: &Raster, r: &CostResult) -> Rast
     out.bands[0] = cells.iter().map(|v| v.unwrap_or(nodata)).collect();
     out
 }
+
+/// Spatial Analyst Corridor: the sum of two accumulated cost rasters on the same grid (32-bit
+/// float, NoData where either has none; ArcGIS's NoData is the lowest float).
+pub fn corridor(a: &Raster, b: &Raster) -> Option<Raster> {
+    if (a.width, a.height) != (b.width, b.height) {
+        return None;
+    }
+    let nodata = f32::MIN as f64;
+    let mut out = a.like(DataType::F32);
+    out.nodata = Some(nodata);
+    out.bands[0] = a.bands[0]
+        .iter()
+        .zip(&b.bands[0])
+        .map(|(x, y)| {
+            if a.is_nodata(*x) || b.is_nodata(*y) {
+                nodata
+            } else {
+                DataType::F32.store(x + y)
+            }
+        })
+        .collect();
+    Some(out)
+}
