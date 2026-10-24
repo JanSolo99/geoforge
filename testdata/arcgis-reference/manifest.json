@@ -32437,6 +32437,182 @@
         ]
       ],
       "shapeType": "Point"
+    },
+    "usl_none": {
+      "tool": "management.UnsplitLine",
+      "args": [
+        "testdata/dm/chain_split.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "usl_kind": {
+      "tool": "management.UnsplitLine",
+      "args": [
+        "testdata/dm/chain_split.shp",
+        "<out>",
+        "KIND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "KIND",
+          "String",
+          10,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "usl_class": {
+      "tool": "management.UnsplitLine",
+      "args": [
+        "testdata/dm/chain_split.shp",
+        "<out>",
+        "CLASS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "usl_kind_class": {
+      "tool": "management.UnsplitLine",
+      "args": [
+        "testdata/dm/chain_split.shp",
+        "<out>",
+        "KIND;CLASS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "KIND",
+          "String",
+          10,
+          0,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
+    },
+    "usl_line_id": {
+      "tool": "management.UnsplitLine",
+      "args": [
+        "testdata/dm/chain_split.shp",
+        "<out>",
+        "LINE_ID"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "LINE_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline"
     }
   }
 }

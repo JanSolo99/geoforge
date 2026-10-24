@@ -2019,6 +2019,7 @@ pub static TOOLS: &[Tool] = &[
     crate::dm_tools::FEATURE_ENVELOPE_TO_POLYGON,
     crate::dm_tools::SPLIT_LINE_AT_VERTICES,
     crate::dm_tools::SPLIT_LINE_AT_POINT,
+    crate::dm_tools::UNSPLIT_LINE,
     crate::dm_tools::ELIMINATE_POLYGON_PART,
     crate::dm_tools::XY_TO_LINE,
     crate::dm_tools::CALCULATE_FIELDS,

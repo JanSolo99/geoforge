@@ -500,10 +500,10 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         Feature Envelope To Polygon, Split Line At Vertices, Split Line At Point, Eliminate Polygon
         Part, XY To Line, Calculate Fields, Standardize Field, Transform Field, Reclassify Field,
         Transpose Fields and Pivot Table, then Bearing Distance To Line (geodesic, short lines),
-        Create Feature Class, Create Table, Define Projection, Copy and Calculate End Time. Not done: Split Line At Point without a search radius,
+        Create Feature Class, Create Table, Define Projection, Copy, Calculate End Time and Unsplit Line
+        (unjoined lines first, then joined ones; multipart and reversed pieces unchecked). Not done: Split Line At Point without a search radius,
         XY To Line / Bearing Distance To Line geodesics for long lines, Box-Cox by maximum
-        likelihood, Reclassify Field GEOMETRIC_INTERVAL / NATURAL_BREAKS / STANDARD_DEVIATION, Unsplit
-        Line (output order unclear), Alter Field / Alter Fields / Add Incrementing ID Field (they
+        likelihood, Reclassify Field GEOMETRIC_INTERVAL / NATURAL_BREAKS / STANDARD_DEVIATION, Alter Field / Alter Fields / Add Incrementing ID Field (they
         need a geodatabase), Dice, Subdivide Polygon, Generate Rectangles/Transects Along Lines.
         Known differences: the order of Split Line At Point's pieces on one curved road, and
         MULTIPART envelopes of nested parts (our shapefile writer turns the inner ring into a hole)

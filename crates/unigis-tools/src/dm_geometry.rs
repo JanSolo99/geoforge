@@ -795,3 +795,136 @@ pub fn bearing_distance_to_line(
         messages,
     })
 }
+
+/// Piece ends (piece, is the end) by (group, rounded node).
+type NodeEnds = std::collections::HashMap<(usize, (i64, i64)), Vec<(usize, bool)>>;
+
+/// `arcpy.management.UnsplitLine(in_features, out_feature_class, dissolve_field)`.
+///
+/// Within each group of equal dissolve-field values, lines are joined where exactly two line ends
+/// meet at a point (three or more ends make a junction that stays split; a closed ring stays
+/// whole). Only the dissolve fields are kept. ArcGIS lists the lines that were not joined to any
+/// other first (in input order), then the joined ones in the order of their first piece.
+pub fn unsplit_line(input: &dyn FeatureClass, dissolve_fields: &[String]) -> Result<ToolOutput> {
+    require_plain_lines(input)?;
+    if input.has_z() || input.has_m() {
+        return Err(err("Unsplit Line with Z or M values is not supported"));
+    }
+    let keys: Vec<usize> = dissolve_fields
+        .iter()
+        .map(|name| {
+            input
+                .fields()
+                .iter()
+                .position(|f| f.name.eq_ignore_ascii_case(name))
+                .ok_or_else(|| {
+                    err(format!(
+                        "ERROR 000728: Field {name} does not exist within table"
+                    ))
+                })
+        })
+        .collect::<Result<_>>()?;
+
+    // Every part of every feature is a piece (in input order) with its group key.
+    let mut group_keys: Vec<Vec<Value>> = Vec::new();
+    let mut pieces: Vec<(usize, Vec<[f64; 2]>)> = Vec::new();
+    for f in input.features() {
+        let f = f?;
+        let Some(g) = &f.geometry else { continue };
+        let key: Vec<Value> = keys.iter().map(|&i| f.attributes[i].clone()).collect();
+        let group = group_keys
+            .iter()
+            .position(|k| *k == key)
+            .unwrap_or_else(|| {
+                group_keys.push(key);
+                group_keys.len() - 1
+            });
+        for r in g.part_ranges() {
+            if r.len() >= 2 {
+                pieces.push((group, g.xy[r].to_vec()));
+            }
+        }
+    }
+
+    let node = |p: [f64; 2]| ((p[0] / 1e-3).round() as i64, (p[1] / 1e-3).round() as i64);
+    // The piece ends (piece, is the end) at each node, per group.
+    let mut at_node: NodeEnds = std::collections::HashMap::new();
+    for (i, (key, xy)) in pieces.iter().enumerate() {
+        let (a, b) = (node(xy[0]), node(xy[xy.len() - 1]));
+        at_node.entry((*key, a)).or_default().push((i, false));
+        at_node.entry((*key, b)).or_default().push((i, true));
+    }
+    // The only other piece end at the node of piece `i`'s end, when exactly two ends meet there.
+    let partner = |i: usize, end: bool| -> Option<(usize, bool)> {
+        let xy = &pieces[i].1;
+        let p = if end { xy[xy.len() - 1] } else { xy[0] };
+        let ends = at_node.get(&(pieces[i].0, node(p)))?;
+        match ends.as_slice() {
+            [x, y] if *x == (i, end) && y.0 != i => Some(*y),
+            [x, y] if *y == (i, end) && x.0 != i => Some(*x),
+            _ => None,
+        }
+    };
+
+    let mut used = vec![false; pieces.len()];
+    let mut joined: Vec<(usize, Vec<[f64; 2]>)> = Vec::new();
+    let mut single: Vec<(usize, Vec<[f64; 2]>)> = Vec::new();
+    for first in 0..pieces.len() {
+        if used[first] {
+            continue;
+        }
+        used[first] = true;
+        let mut line = pieces[first].1.clone();
+        let mut count = 1;
+        // Forward from the end, then backward from the start.
+        for forward in [true, false] {
+            let (mut cur, mut end) = (first, forward);
+            while let Some((next, next_end)) = partner(cur, end) {
+                if used[next] {
+                    break;
+                }
+                used[next] = true;
+                count += 1;
+                let mut xy = pieces[next].1.clone();
+                // Leave the next piece through its other end.
+                if forward == next_end {
+                    xy.reverse();
+                }
+                if forward {
+                    line.extend_from_slice(&xy[1..]);
+                } else {
+                    xy.pop();
+                    xy.extend_from_slice(&line);
+                    line = xy;
+                }
+                (cur, end) = (next, !next_end);
+            }
+        }
+        if count == 1 {
+            single.push((first, line));
+        } else {
+            joined.push((first, line));
+        }
+    }
+
+    let fields: Vec<Field> = keys.iter().map(|&i| input.fields()[i].clone()).collect();
+    let features = single
+        .into_iter()
+        .chain(joined)
+        .enumerate()
+        .map(|(n, (first, xy))| Feature {
+            oid: n as i64,
+            geometry: Some(Geometry {
+                kind: GeometryKind::Polyline,
+                parts: vec![0],
+                part_types: None,
+                xy,
+                z: None,
+                m: None,
+                curves: Vec::new(),
+            }),
+            attributes: group_keys[pieces[first].0].clone(),
+        })
+        .collect();
+    Ok(new_output(input, GeometryKind::Polyline, fields, features))
+}

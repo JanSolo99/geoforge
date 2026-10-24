@@ -255,6 +255,11 @@ fn split_line_at_vertices(ctx: &dyn Context) -> Result<ToolOutput> {
     dm_geometry::split_line_at_vertices(ctx.features("input")?.as_ref())
 }
 
+fn unsplit_line(ctx: &dyn Context) -> Result<ToolOutput> {
+    let fields = list(&get(ctx, "dissolve_field", ""));
+    dm_geometry::unsplit_line(ctx.features("input")?.as_ref(), &fields)
+}
+
 fn split_line_at_point(ctx: &dyn Context) -> Result<ToolOutput> {
     let fc = ctx.features("input")?;
     let points = ctx.features("points")?;
@@ -482,6 +487,26 @@ pub const SPLIT_LINE_AT_VERTICES: Tool = Tool {
     output_suffix: "Split",
     measures: false,
     run: Runner::Features(split_line_at_vertices),
+};
+
+pub const UNSPLIT_LINE: Tool = Tool {
+    id: "unsplit_line",
+    name: "Unsplit Line",
+    toolbox: "Data Management › Features",
+    summary: "Merges lines that meet end to end where no other line ends, per dissolve field value (ArcGIS Pro Unsplit Line).",
+    params: &[
+        features("input", "Input Features"),
+        text(
+            "dissolve_field",
+            "Dissolve Field(s)",
+            false,
+            "",
+            "Field names separated by `;`. Lines are only merged when they share these values.",
+        ),
+    ],
+    output_suffix: "Unsplit",
+    measures: false,
+    run: Runner::Features(unsplit_line),
 };
 
 pub const SPLIT_LINE_AT_POINT: Tool = Tool {
