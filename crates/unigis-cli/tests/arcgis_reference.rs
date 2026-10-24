@@ -4332,7 +4332,22 @@ fn tools_match_arcgis_output() {
         } else {
             out_dir.join(format!("{case}.shp"))
         };
-        let mut args: Vec<String> = gf_args(case).iter().map(|a| a.to_string()).collect();
+        let mut args: Vec<String> = if info["tool"] == "gp.BlockStatistics_sa" {
+            let a = &info["args"];
+            vec![
+                "block-statistics".into(),
+                a[0].as_str().unwrap().into(),
+                "<out>".into(),
+                "--neighborhood".into(),
+                a[2].as_str().unwrap().into(),
+                "--statistics-type".into(),
+                a[3].as_str().unwrap().into(),
+                "--ignore-nodata".into(),
+                a[4].as_str().unwrap().into(),
+            ]
+        } else {
+            gf_args(case).iter().map(|a| a.to_string()).collect()
+        };
         match args.iter().position(|a| a.contains("<out>")) {
             Some(i) => args[i] = args[i].replace("<out>", &out.display().to_string()),
             None => args.push(out.display().to_string()),

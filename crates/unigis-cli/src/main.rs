@@ -848,6 +848,20 @@ enum Tool {
         #[arg(long, default_value = "DATA")]
         ignore_nodata: String,
     },
+    /// Spatial Analyst "Block Statistics": assign each block's statistic to all its cells.
+    BlockStatistics {
+        in_raster: PathBuf,
+        out_raster: PathBuf,
+        /// Rectangle W H CELL|MAP, Circle R CELL|MAP or Annulus R1 R2 CELL|MAP.
+        #[arg(long, default_value = "Rectangle 3 3 CELL")]
+        neighborhood: String,
+        /// MEAN, MAJORITY, MAXIMUM, MEDIAN, MINIMUM, MINORITY, RANGE, STD, SUM, VARIETY.
+        #[arg(long, default_value = "MEAN")]
+        statistics_type: String,
+        /// DATA (ignore NoData) or NODATA.
+        #[arg(long, default_value = "DATA")]
+        ignore_nodata: String,
+    },
     /// Spatial Analyst "Fill": remove sinks from an elevation raster.
     Fill {
         in_surface_raster: PathBuf,
@@ -2913,6 +2927,34 @@ fn main() -> ExitCode {
             }
             let input = unigis_raster::read_geotiff(&in_raster)?;
             let out = unigis_raster::focal::focal_statistics(&input, nbr, stat, ignore);
+            write_raster(&out_raster, &out)
+        })(),
+        Tool::BlockStatistics {
+            in_raster,
+            out_raster,
+            neighborhood,
+            statistics_type,
+            ignore_nodata,
+        } => (|| {
+            use unigis_raster::blockops::{block_check, block_neighborhood, block_statistics};
+            use unigis_raster::focal::FocalStatistic;
+            let input = unigis_raster::read_geotiff(&in_raster)?;
+            let nbr = block_neighborhood(&neighborhood, input.cell_width(), input.cell_height())
+                .ok_or_else(|| {
+                    Error::Unsupported(format!(
+                        "ERROR 000628: Cannot set input into parameter neighborhood: {neighborhood}"
+                    ))
+                })?;
+            let stat = FocalStatistic::parse(&statistics_type)
+                .ok_or_else(|| Error::Unsupported(format!("statistic {statistics_type}")))?;
+            block_check(stat, input.data_type).map_err(Error::Unsupported)?;
+            let ignore = match ignore_nodata.to_ascii_uppercase().as_str() {
+                "DATA" => true,
+                "NODATA" => false,
+                other => return Err(Error::Unsupported(format!("ignore_nodata {other}"))),
+            };
+            let out = block_statistics(&input, nbr, stat, ignore)
+                .ok_or_else(|| Error::Unsupported("Block Statistics neighborhood".into()))?;
             write_raster(&out_raster, &out)
         })(),
         Tool::Fill {

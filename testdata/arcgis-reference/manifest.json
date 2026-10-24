@@ -33378,6 +33378,1077 @@
         ]
       ],
       "shapeType": "Polygon"
+    },
+    "blk_u8_mean": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 3 4 CELL",
+        "MEAN",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_u8_majority": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 3 4 CELL",
+        "MAJORITY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010666: Some majority or minority statistics type results are not unique."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_u8_maximum": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 3 4 CELL",
+        "MAXIMUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_u8_median": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 3 4 CELL",
+        "MEDIAN",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_u8_minimum": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 3 4 CELL",
+        "MINIMUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_u8_minority": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 3 4 CELL",
+        "MINORITY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010666: Some majority or minority statistics type results are not unique."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_u8_range": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 3 4 CELL",
+        "RANGE",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_u8_std": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 3 4 CELL",
+        "STD",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_u8_sum": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 3 4 CELL",
+        "SUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_u8_variety": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 3 4 CELL",
+        "VARIETY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_i16_mean": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        "Rectangle 5 3 CELL",
+        "MEAN",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_i16_majority": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        "Rectangle 5 3 CELL",
+        "MAJORITY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010666: Some majority or minority statistics type results are not unique."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_i16_maximum": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        "Rectangle 5 3 CELL",
+        "MAXIMUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_i16_median": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        "Rectangle 5 3 CELL",
+        "MEDIAN",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_i16_minimum": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        "Rectangle 5 3 CELL",
+        "MINIMUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_i16_minority": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        "Rectangle 5 3 CELL",
+        "MINORITY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010666: Some majority or minority statistics type results are not unique."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_i16_range": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        "Rectangle 5 3 CELL",
+        "RANGE",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_i16_std": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        "Rectangle 5 3 CELL",
+        "STD",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_i16_sum": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        "Rectangle 5 3 CELL",
+        "SUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_i16_variety": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        "Rectangle 5 3 CELL",
+        "VARIETY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_f32_mean": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "Rectangle 4 4 CELL",
+        "MEAN",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_nod_mean": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "Rectangle 3 3 CELL",
+        "MEAN",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_f32_maximum": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "Rectangle 4 4 CELL",
+        "MAXIMUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_nod_maximum": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "Rectangle 3 3 CELL",
+        "MAXIMUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_f32_minimum": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "Rectangle 4 4 CELL",
+        "MINIMUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_nod_minimum": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "Rectangle 3 3 CELL",
+        "MINIMUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_f32_range": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "Rectangle 4 4 CELL",
+        "RANGE",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_nod_range": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "Rectangle 3 3 CELL",
+        "RANGE",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_f32_std": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "Rectangle 4 4 CELL",
+        "STD",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_nod_std": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "Rectangle 3 3 CELL",
+        "STD",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_f32_sum": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "Rectangle 4 4 CELL",
+        "SUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_nod_sum": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "Rectangle 3 3 CELL",
+        "SUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_nod_strict_mean": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "Rectangle 3 3 CELL",
+        "MEAN",
+        "NODATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_nod_strict_max": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "Rectangle 4 4 CELL",
+        "MAXIMUM",
+        "NODATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_u8_circle2_mean": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Circle 2 CELL",
+        "MEAN",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_u8_circle3_maj": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Circle 3 CELL",
+        "MAJORITY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_u8_annulus_sum": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Annulus 1 3 CELL",
+        "SUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_u8_map_max": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 90 120 MAP",
+        "MAXIMUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_i16_nodata_maj": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        "Rectangle 3 3 CELL",
+        "MAJORITY",
+        "NODATA"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010666: Some majority or minority statistics type results are not unique."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_u8_1x1": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 1 1 CELL",
+        "MEAN",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_u8_big": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 7 9 CELL",
+        "MEDIAN",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_classes_maj": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "Rectangle 3 3 CELL",
+        "MAJORITY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010666: Some majority or minority statistics type results are not unique."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_classes_min": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "Rectangle 4 2 CELL",
+        "MINORITY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010666: Some majority or minority statistics type results are not unique."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_var_1": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 1 1 CELL",
+        "VARIETY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_var_2": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 2 2 CELL",
+        "VARIETY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_var_3": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 3 3 CELL",
+        "VARIETY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_var_4": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 4 4 CELL",
+        "VARIETY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_var_5": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 5 5 CELL",
+        "VARIETY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_var_6": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 6 6 CELL",
+        "VARIETY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_var_8": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 8 8 CELL",
+        "VARIETY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_var_16": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 16 16 CELL",
+        "VARIETY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_i32_mean": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem_bigtiff_i32.tif",
+        "<out>",
+        "Rectangle 4 3 CELL",
+        "MEAN",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_i32_majority": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem_bigtiff_i32.tif",
+        "<out>",
+        "Rectangle 4 3 CELL",
+        "MAJORITY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010666: Some majority or minority statistics type results are not unique."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_i32_maximum": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem_bigtiff_i32.tif",
+        "<out>",
+        "Rectangle 4 3 CELL",
+        "MAXIMUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_i32_median": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem_bigtiff_i32.tif",
+        "<out>",
+        "Rectangle 4 3 CELL",
+        "MEDIAN",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_i32_minimum": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem_bigtiff_i32.tif",
+        "<out>",
+        "Rectangle 4 3 CELL",
+        "MINIMUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_i32_minority": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem_bigtiff_i32.tif",
+        "<out>",
+        "Rectangle 4 3 CELL",
+        "MINORITY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010666: Some majority or minority statistics type results are not unique."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_i32_range": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem_bigtiff_i32.tif",
+        "<out>",
+        "Rectangle 4 3 CELL",
+        "RANGE",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_i32_std": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem_bigtiff_i32.tif",
+        "<out>",
+        "Rectangle 4 3 CELL",
+        "STD",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_i32_sum": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem_bigtiff_i32.tif",
+        "<out>",
+        "Rectangle 4 3 CELL",
+        "SUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_i32_variety": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem_bigtiff_i32.tif",
+        "<out>",
+        "Rectangle 4 3 CELL",
+        "VARIETY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_i16_var_circle": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        "Circle 3 CELL",
+        "VARIETY",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_f32_circle_mean": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "Circle 4 CELL",
+        "MEAN",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_f32_annulus_std": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "Annulus 2 4 CELL",
+        "STD",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_f32_circle_strict": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "Circle 2 CELL",
+        "SUM",
+        "NODATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_map_rect_odd": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 100 130 MAP",
+        "MAXIMUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_map_rect_half": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 75 45 MAP",
+        "SUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_map_circle_15": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Circle 45 MAP",
+        "SUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_map_circle_25": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Circle 75 MAP",
+        "SUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_map_circle_33": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Circle 100 MAP",
+        "SUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_map_annulus": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Annulus 30 75 MAP",
+        "SUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_circle_frac": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Circle 2.5 CELL",
+        "SUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_rect_zero": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Rectangle 0 3 CELL",
+        "SUM",
+        "DATA"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 000622: Failed to execute (Block Statistics). Parameters are not valid.",
+        "ERROR 000628: Cannot set input into parameter neighborhood."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_f64": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/dem_f64.tif",
+        "<out>",
+        "Rectangle 3 3 CELL",
+        "MEAN",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "blk_u16": {
+      "tool": "gp.BlockStatistics_sa",
+      "args": [
+        "testdata/raster/rgb_pixel_u8.tif",
+        "<out>",
+        "Rectangle 3 3 CELL",
+        "MAXIMUM",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

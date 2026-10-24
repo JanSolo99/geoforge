@@ -77,9 +77,15 @@ fn geodatabase_items() {
     let item = |n: &str| g.join(n).to_str().unwrap().to_owned();
     assert!(gf(&["rename", &item("tbl"), "tbl2"]).status.success());
     assert!(
-        gf(&["alter-domain", g.to_str().unwrap(), "dom", "dom2"])
-            .status
-            .success()
+        gf(&[
+            "alter-domain",
+            g.to_str().unwrap(),
+            "dom",
+            "--new-domain-name",
+            "dom2"
+        ])
+        .status
+        .success()
     );
     let out = gf(&["delete", &item("tbl2")]);
     assert!(out.status.success());

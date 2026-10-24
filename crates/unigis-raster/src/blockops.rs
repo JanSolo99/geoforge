@@ -130,6 +130,157 @@ pub fn aggregate(
     Some(out)
 }
 
+/// Why Block Statistics refuses `stat` on a raster of type `t`: ArcGIS only offers the counting
+/// statistics for integer rasters (error 000864).
+pub fn block_check(stat: FocalStatistic, t: DataType) -> Result<(), String> {
+    if t.is_float()
+        && matches!(
+            stat,
+            FocalStatistic::Majority
+                | FocalStatistic::Median
+                | FocalStatistic::Minority
+                | FocalStatistic::Variety
+        )
+    {
+        return Err(
+            "ERROR 000864: Statistics type: The input is not within the defined domain.".to_owned(),
+        );
+    }
+    Ok(())
+}
+
+/// The cell type and NoData of Block Statistics' output (observed on GeoTIFF probes):
+/// MEAN and STD (and everything on float input) are 32-bit float, SUM is 32-bit signed, RANGE is
+/// the unsigned type of the input's width, VARIETY is as small as its largest count allows and
+/// the rest keep the input type with the lowest value (signed) or the highest (unsigned) as NoData.
+fn block_output(stat: FocalStatistic, t: DataType, cells: usize) -> Option<(DataType, f64)> {
+    block_check(stat, t).ok()?;
+    let float_out = (DataType::F32, f32::MAX as f64);
+    if t.is_float() || matches!(stat, FocalStatistic::Mean | FocalStatistic::Std) {
+        return Some(float_out);
+    }
+    let natural = |t: DataType| match t {
+        DataType::U8 => (t, u8::MAX as f64),
+        DataType::U16 => (t, u16::MAX as f64),
+        DataType::U32 => (t, u32::MAX as f64),
+        DataType::I8 => (t, i8::MIN as f64),
+        DataType::I16 => (t, i16::MIN as f64),
+        _ => (t, i32::MIN as f64),
+    };
+    Some(match stat {
+        FocalStatistic::Sum => (DataType::I32, i32::MAX as f64),
+        FocalStatistic::Range => natural(match t {
+            DataType::I8 => DataType::U8,
+            DataType::I16 => DataType::U16,
+            DataType::I32 => DataType::U32,
+            other => other,
+        }),
+        FocalStatistic::Variety => match cells {
+            // A single cell and 15 cells are special: NoData 16.
+            1 | 15 => (DataType::U8, 16.0),
+            0..=14 => (DataType::U8, 15.0),
+            16..=127 => (DataType::I8, -128.0),
+            128..=255 => (DataType::U8, 255.0),
+            _ => (DataType::U16, 65535.0),
+        },
+        _ => natural(t),
+    })
+}
+
+/// A statistic stored in the output type: integers as ArcGIS does, `trunc(v + 0.5)`, which also
+/// moves negative values up by one when they are whole (-3 becomes -2).
+fn store_block(t: DataType, v: f64) -> f64 {
+    if t.is_float() {
+        t.store(v)
+    } else {
+        let (lo, hi) = match t {
+            DataType::U8 => (0.0, u8::MAX as f64),
+            DataType::I8 => (i8::MIN as f64, i8::MAX as f64),
+            DataType::U16 => (0.0, u16::MAX as f64),
+            DataType::I16 => (i16::MIN as f64, i16::MAX as f64),
+            DataType::U32 => (0.0, u32::MAX as f64),
+            _ => (i32::MIN as f64, i32::MAX as f64),
+        };
+        (v + 0.5).trunc().clamp(lo, hi)
+    }
+}
+
+/// Parse a Block Statistics neighborhood, converting map distances to cells.
+/// Rectangles round each map dimension to the nearest cell; circles truncate
+/// their radius, while annuli round it (ArcGIS Pro 3.7 reference probes).
+/// Circular map neighborhoods currently require square raster cells.
+pub fn block_neighborhood(text: &str, cell_width: f64, cell_height: f64) -> Option<Neighborhood> {
+    let parts: Vec<_> = text.split_whitespace().collect();
+    let map = match parts.last()?.to_ascii_uppercase().as_str() {
+        "CELL" => false,
+        "MAP" => true,
+        _ => return None,
+    };
+    if map
+        && (![cell_width, cell_height]
+            .iter()
+            .all(|v| v.is_finite() && *v > 0.0))
+    {
+        return None;
+    }
+    let num = |i: usize| {
+        let n = parts.get(i)?.parse::<f64>().ok()?;
+        (n.is_finite() && n >= 0.0).then_some(n)
+    };
+    let radius = |i, round: bool| {
+        let n = num(i)?;
+        if map {
+            if (cell_width - cell_height).abs() > 1e-9 * cell_width.max(cell_height) {
+                return None;
+            }
+            Some(if round {
+                (n / cell_width).round()
+            } else {
+                (n / cell_width).floor()
+            })
+        } else {
+            Some(n.floor())
+        }
+    };
+    let nb = match parts.first()?.to_ascii_uppercase().as_str() {
+        "RECTANGLE" if parts.len() == 4 => {
+            let (w, h) = (num(1)?, num(2)?);
+            if w <= 0.0 || h <= 0.0 {
+                return None;
+            }
+            let (w, h) = if map {
+                (
+                    (w / cell_width).round().max(1.0),
+                    (h / cell_height).round().max(1.0),
+                )
+            } else {
+                (w.floor(), h.floor())
+            };
+            if w < 1.0 || h < 1.0 {
+                return None;
+            }
+            Neighborhood::Rectangle {
+                width: w as usize,
+                height: h as usize,
+            }
+        }
+        "CIRCLE" if parts.len() == 3 => Neighborhood::Circle {
+            radius: radius(1, false)?,
+        },
+        "ANNULUS" if parts.len() == 4 => {
+            if num(1)? >= num(2)? {
+                return None;
+            }
+            Neighborhood::Annulus {
+                inner: radius(1, true)?,
+                outer: radius(2, true)?,
+            }
+        }
+        _ => return None,
+    };
+    (nb.cell_count() <= 4_000_000).then_some(nb)
+}
+
 /// Block Statistics (`ignore_nodata`: DATA).
 pub fn block_statistics(
     input: &Raster,
@@ -166,51 +317,48 @@ pub fn block_statistics(
         }
         _ => return None,
     };
-    let float = input.data_type.is_float();
-    let (t, nodata) = match stat {
-        FocalStatistic::Mean | FocalStatistic::Std => (DataType::F32, f32::MAX as f64),
-        _ if float => (DataType::F32, f32::MAX as f64),
-        FocalStatistic::Sum => (DataType::I32, i32::MAX as f64),
-        FocalStatistic::Range => (DataType::U32, u32::MAX as f64),
-        FocalStatistic::Variety => {
-            let bits = [1u32, 2, 4, 8]
-                .into_iter()
-                .find(|b| mask.len() < (1usize << b) - 1)
-                .unwrap_or(8);
-            (DataType::U8, ((1u32 << bits) - 1) as f64)
-        }
-        _ => (DataType::I32, i32::MIN as f64),
-    };
+    let (t, nodata) = block_output(stat, input.data_type, mask.len())?;
     let mut out = input.like(t);
     out.nodata = Some(nodata);
+    out.bands = Vec::with_capacity(input.bands.len());
     let (w, h) = (input.width, input.height);
     let mut values = Vec::new();
-    for r0 in (0..h).step_by(bh) {
-        for c0 in (0..w).step_by(bw) {
-            values.clear();
-            let mut missing = false;
-            for &(x, y) in &mask {
-                let (c, r) = (c0 + x, r0 + y);
-                if c >= w || r >= h {
-                    missing = true;
-                    continue;
+    for band in &input.bands {
+        let mut cells = vec![nodata; w * h];
+        for r0 in (0..h).step_by(bh) {
+            for c0 in (0..w).step_by(bw) {
+                values.clear();
+                let mut missing = false;
+                for &(x, y) in &mask {
+                    let (c, r) = (c0 + x, r0 + y);
+                    if c >= w || r >= h {
+                        missing = true;
+                        continue;
+                    }
+                    let v = band[r * w + c];
+                    if input.is_nodata(v) {
+                        missing = true;
+                    } else {
+                        values.push(v);
+                    }
                 }
-                match input.get(c, r) {
-                    Some(v) => values.push(v),
-                    None => missing = true,
-                }
-            }
-            let v = if values.is_empty() || (missing && !ignore_nodata) {
-                nodata
-            } else {
-                t.store(compute(stat, &mut values, None)?)
-            };
-            for r in r0..(r0 + bh).min(h) {
-                for c in c0..(c0 + bw).min(w) {
-                    out.bands[0][r * w + c] = v;
+                let v = if values.is_empty() || (missing && !ignore_nodata) {
+                    nodata
+                } else if stat == FocalStatistic::Median && !input.data_type.is_float() {
+                    // Integer data: the lower of the two middle values.
+                    values.sort_by(f64::total_cmp);
+                    store_block(t, values[(values.len() - 1) / 2])
+                } else {
+                    store_block(t, compute(stat, &mut values, None)?)
+                };
+                for r in r0..(r0 + bh).min(h) {
+                    for c in c0..(c0 + bw).min(w) {
+                        cells[r * w + c] = v;
+                    }
                 }
             }
         }
+        out.bands.push(cells);
     }
     Some(out)
 }
