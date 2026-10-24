@@ -36160,7 +36160,16 @@
       "status": "succeeded",
       "messages": [],
       "fields": [],
-      "shapeType": null
+      "shapeType": null,
+      "run": {
+        "tool": "filter",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "filter_type": "LOW",
+          "ignore_nodata": "DATA"
+        }
+      }
     },
     "filter_low_nodata": {
       "tool": "gp.Filter_sa",
@@ -36173,7 +36182,16 @@
       "status": "succeeded",
       "messages": [],
       "fields": [],
-      "shapeType": null
+      "shapeType": null,
+      "run": {
+        "tool": "filter",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "filter_type": "LOW",
+          "ignore_nodata": "DATA"
+        }
+      }
     },
     "filter_low_nodata_strict": {
       "tool": "gp.Filter_sa",
@@ -36186,7 +36204,16 @@
       "status": "succeeded",
       "messages": [],
       "fields": [],
-      "shapeType": null
+      "shapeType": null,
+      "run": {
+        "tool": "filter",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "filter_type": "LOW",
+          "ignore_nodata": "NODATA"
+        }
+      }
     },
     "filter_low_landuse": {
       "tool": "gp.Filter_sa",
@@ -36199,7 +36226,16 @@
       "status": "succeeded",
       "messages": [],
       "fields": [],
-      "shapeType": null
+      "shapeType": null,
+      "run": {
+        "tool": "filter",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "output": "<out>",
+          "filter_type": "LOW",
+          "ignore_nodata": "DATA"
+        }
+      }
     },
     "filter_low_i16": {
       "tool": "gp.Filter_sa",
@@ -36212,7 +36248,16 @@
       "status": "succeeded",
       "messages": [],
       "fields": [],
-      "shapeType": null
+      "shapeType": null,
+      "run": {
+        "tool": "filter",
+        "params": {
+          "input": "testdata/raster/patches_i16.tif",
+          "output": "<out>",
+          "filter_type": "LOW",
+          "ignore_nodata": "DATA"
+        }
+      }
     },
     "filter_high_dem": {
       "tool": "gp.Filter_sa",
@@ -36225,7 +36270,16 @@
       "status": "succeeded",
       "messages": [],
       "fields": [],
-      "shapeType": null
+      "shapeType": null,
+      "run": {
+        "tool": "filter",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "filter_type": "HIGH",
+          "ignore_nodata": "DATA"
+        }
+      }
     },
     "filter_high_nodata": {
       "tool": "gp.Filter_sa",
@@ -36238,7 +36292,16 @@
       "status": "succeeded",
       "messages": [],
       "fields": [],
-      "shapeType": null
+      "shapeType": null,
+      "run": {
+        "tool": "filter",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "filter_type": "HIGH",
+          "ignore_nodata": "DATA"
+        }
+      }
     },
     "filter_high_nodata_strict": {
       "tool": "gp.Filter_sa",
@@ -36251,7 +36314,16 @@
       "status": "succeeded",
       "messages": [],
       "fields": [],
-      "shapeType": null
+      "shapeType": null,
+      "run": {
+        "tool": "filter",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "filter_type": "HIGH",
+          "ignore_nodata": "NODATA"
+        }
+      }
     },
     "filter_high_landuse": {
       "tool": "gp.Filter_sa",
@@ -36264,7 +36336,16 @@
       "status": "succeeded",
       "messages": [],
       "fields": [],
-      "shapeType": null
+      "shapeType": null,
+      "run": {
+        "tool": "filter",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "output": "<out>",
+          "filter_type": "HIGH",
+          "ignore_nodata": "DATA"
+        }
+      }
     },
     "filter_high_i16": {
       "tool": "gp.Filter_sa",
@@ -36277,7 +36358,16 @@
       "status": "succeeded",
       "messages": [],
       "fields": [],
-      "shapeType": null
+      "shapeType": null,
+      "run": {
+        "tool": "filter",
+        "params": {
+          "input": "testdata/raster/patches_i16.tif",
+          "output": "<out>",
+          "filter_type": "HIGH",
+          "ignore_nodata": "DATA"
+        }
+      }
     },
     "nibble_all": {
       "tool": "gp.Nibble_sa",
@@ -36291,7 +36381,17 @@
       "status": "succeeded",
       "messages": [],
       "fields": [],
-      "shapeType": null
+      "shapeType": null,
+      "run": {
+        "tool": "nibble",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "mask": "testdata/raster/nibble_mask_i16.tif",
+          "output": "<out>",
+          "values": "ALL_VALUES",
+          "nodata": "PRESERVE_NODATA"
+        }
+      }
     },
     "nibble_data": {
       "tool": "gp.Nibble_sa",
@@ -36305,7 +36405,17 @@
       "status": "succeeded",
       "messages": [],
       "fields": [],
-      "shapeType": null
+      "shapeType": null,
+      "run": {
+        "tool": "nibble",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "mask": "testdata/raster/nibble_mask_i16.tif",
+          "output": "<out>",
+          "values": "DATA_ONLY",
+          "nodata": "PRESERVE_NODATA"
+        }
+      }
     },
     "nibble_process": {
       "tool": "gp.Nibble_sa",
@@ -36319,7 +36429,17 @@
       "status": "succeeded",
       "messages": [],
       "fields": [],
-      "shapeType": null
+      "shapeType": null,
+      "run": {
+        "tool": "nibble",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "mask": "testdata/raster/nibble_mask_i16.tif",
+          "output": "<out>",
+          "values": "ALL_VALUES",
+          "nodata": "PROCESS_NODATA"
+        }
+      }
     },
     "nibble_i16": {
       "tool": "gp.Nibble_sa",
@@ -36333,7 +36453,17 @@
       "status": "succeeded",
       "messages": [],
       "fields": [],
-      "shapeType": null
+      "shapeType": null,
+      "run": {
+        "tool": "nibble",
+        "params": {
+          "input": "testdata/raster/patches_i16.tif",
+          "mask": "testdata/raster/nibble_mask_i16.tif",
+          "output": "<out>",
+          "values": "ALL_VALUES",
+          "nodata": "PRESERVE_NODATA"
+        }
+      }
     },
     "rbt_dem": {
       "tool": "gp.ReclassByTable_sa",

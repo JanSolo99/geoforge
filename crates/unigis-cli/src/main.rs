@@ -1406,29 +1406,6 @@ enum Tool {
         in_distance_raster2: PathBuf,
         out_raster: PathBuf,
     },
-    /// Spatial Analyst "Filter": a 3x3 low-pass (mean) or high-pass filter.
-    Filter {
-        in_raster: PathBuf,
-        out_raster: PathBuf,
-        /// LOW or HIGH.
-        #[arg(long, default_value = "LOW")]
-        filter_type: String,
-        /// DATA or NODATA.
-        #[arg(long, default_value = "DATA")]
-        ignore_nodata: String,
-    },
-    /// Spatial Analyst "Nibble": fill the cells the mask has no value for from the nearest others.
-    Nibble {
-        in_raster: PathBuf,
-        in_mask_raster: PathBuf,
-        out_raster: PathBuf,
-        /// ALL_VALUES or DATA_ONLY.
-        #[arg(long, default_value = "ALL_VALUES")]
-        nibble_values: String,
-        /// PRESERVE_NODATA or PROCESS_NODATA.
-        #[arg(long, default_value = "PRESERVE_NODATA")]
-        nibble_nodata: String,
-    },
     /// Spatial Analyst "Zonal Histogram": a row per value, a column per zone (.dbf or geodatabase table).
     ZonalHistogram {
         in_zone_data: PathBuf,
@@ -2592,6 +2569,23 @@ fn main() -> ExitCode {
             write_output(out, &out_feature_class, source_gdb(&in_features).as_deref())
         })(),
         Tool::Tools => {
+            for t in unigis_raster::registry::TOOLS {
+                println!("{}  {}  [Spatial Analyst]", t.id, t.name);
+                for p in t.params {
+                    println!(
+                        "    {}{}  {}{}",
+                        p.name,
+                        if p.required { " *" } else { "" },
+                        p.label,
+                        if p.default.is_empty() {
+                            String::new()
+                        } else {
+                            format!(" (default {})", p.default)
+                        }
+                    );
+                }
+                println!("    output *  Output path");
+            }
             for t in unigis_tools::registry::TOOLS {
                 println!("{}  {}  [{}]", t.id, t.name, t.toolbox);
                 for p in t.params {
@@ -2613,6 +2607,9 @@ fn main() -> ExitCode {
         }
         Tool::Run { tool, args } => (|| {
             use unigis_tools::registry;
+            if let Some(spec) = unigis_raster::registry::find(&tool) {
+                return run_raster_tool(spec, &args);
+            }
             let spec = registry::find(&tool)
                 .ok_or_else(|| Error::Unsupported(format!("no tool '{tool}' (see `ug tools`)")))?;
             let mut map = std::collections::HashMap::new();
@@ -4312,40 +4309,6 @@ fn main() -> ExitCode {
             let out = unigis_raster::cost::corridor(&a, &b)
                 .ok_or_else(|| Error::Unsupported("the rasters must share a grid".into()))?;
             write_raster(&out_raster, &out)
-        })(),
-        Tool::Filter {
-            in_raster,
-            out_raster,
-            filter_type,
-            ignore_nodata,
-        } => (|| {
-            let low = match filter_type.to_ascii_uppercase().as_str() {
-                "LOW" => true,
-                "HIGH" => false,
-                other => return Err(Error::Unsupported(format!("filter type {other}"))),
-            };
-            let r = unigis_raster::read_geotiff(&in_raster)?;
-            let out =
-                unigis_raster::focal::filter(&r, low, ignore_nodata.eq_ignore_ascii_case("DATA"));
-            write_raster(&out_raster, &out)
-        })(),
-        Tool::Nibble {
-            in_raster,
-            in_mask_raster,
-            out_raster,
-            nibble_values,
-            nibble_nodata,
-        } => (|| {
-            let r = unigis_raster::read_geotiff(&in_raster)?;
-            let m = unigis_raster::read_geotiff(&in_mask_raster)?;
-            let out = unigis_raster::resample::nibble(
-                &r,
-                &m,
-                nibble_values.eq_ignore_ascii_case("DATA_ONLY"),
-                !nibble_nodata.eq_ignore_ascii_case("PROCESS_NODATA"),
-            )
-            .ok_or_else(|| Error::Unsupported("the rasters must share a grid".into()))?;
-            write_raster_plain(&out_raster, &out)
         })(),
         Tool::ZonalHistogram {
             in_zone_data,
@@ -6075,6 +6038,45 @@ fn eight_neighbors(s: &str) -> Result<bool> {
         "EIGHT" => Ok(true),
         other => Err(Error::Unsupported(format!("number of neighbors {other}"))),
     }
+}
+
+/// `ug run` for a tool of the raster registry: `name=value` pairs, rasters as GeoTIFF paths.
+fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Result<()> {
+    use unigis_raster::registry;
+    let mut map = std::collections::HashMap::new();
+    for a in args {
+        let (k, v) = a
+            .split_once('=')
+            .ok_or_else(|| Error::Unsupported(format!("'{a}': expected name=value")))?;
+        if k != "output" && !spec.params.iter().any(|p| p.name == k) {
+            return Err(Error::Unsupported(format!(
+                "{}: no parameter '{k}'",
+                spec.id
+            )));
+        }
+        map.insert(k.to_string(), v.to_string());
+    }
+    let output = map
+        .get("output")
+        .cloned()
+        .ok_or_else(|| Error::Unsupported("output=<path> is required".into()))?;
+    struct Args(std::collections::HashMap<String, String>);
+    impl registry::Context for Args {
+        fn get(&self, name: &str) -> Option<String> {
+            self.0
+                .get(name)
+                .map(|v| v.trim().to_string())
+                .filter(|v| !v.is_empty())
+        }
+        fn raster(&self, name: &str) -> Result<unigis_raster::Raster> {
+            let path = self
+                .get(name)
+                .ok_or_else(|| Error::Unsupported(format!("{name} is required")))?;
+            unigis_raster::read_geotiff(Path::new(&path))
+        }
+    }
+    let out = registry::run(spec, &Args(map))?;
+    write_raster_with(Path::new(&output), &out.raster, out.statistics)
 }
 
 fn write_raster(path: &Path, raster: &unigis_raster::Raster) -> Result<()> {

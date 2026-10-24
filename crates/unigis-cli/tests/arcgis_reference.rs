@@ -4340,7 +4340,14 @@ fn tools_match_arcgis_output() {
         } else {
             out_dir.join(format!("{case}.shp"))
         };
-        let mut args: Vec<String> = if info["tool"] == "gp.BlockStatistics_sa" {
+        let mut args: Vec<String> = if let Some(run) = info.get("run") {
+            // A tool of the registry: `ug run <id> name=value ...` from the manifest's parameters.
+            let mut v: Vec<String> = vec!["run".into(), run["tool"].as_str().unwrap().into()];
+            for (name, value) in run["params"].as_object().unwrap() {
+                v.push(format!("{name}={}", value.as_str().unwrap()));
+            }
+            v
+        } else if info["tool"] == "gp.BlockStatistics_sa" {
             let a = &info["args"];
             vec![
                 "block-statistics".into(),
@@ -4388,29 +4395,6 @@ fn tools_match_arcgis_output() {
                 a[4].as_str().unwrap().into(),
                 "--missing-values".into(),
                 a[6].as_str().unwrap().into(),
-            ]
-        } else if info["tool"] == "gp.Filter_sa" {
-            let a = &info["args"];
-            vec![
-                "filter".into(),
-                a[0].as_str().unwrap().into(),
-                "<out>".into(),
-                "--filter-type".into(),
-                a[2].as_str().unwrap().into(),
-                "--ignore-nodata".into(),
-                a[3].as_str().unwrap().into(),
-            ]
-        } else if info["tool"] == "gp.Nibble_sa" {
-            let a = &info["args"];
-            vec![
-                "nibble".into(),
-                a[0].as_str().unwrap().into(),
-                a[1].as_str().unwrap().into(),
-                "<out>".into(),
-                "--nibble-values".into(),
-                a[3].as_str().unwrap().into(),
-                "--nibble-nodata".into(),
-                a[4].as_str().unwrap().into(),
             ]
         } else if info["tool"] == "gp.Corridor_sa" {
             let a = &info["args"];

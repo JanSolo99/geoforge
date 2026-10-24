@@ -907,6 +907,23 @@ CASES = {
     "cet_name_grp": ("management.CalculateEndTime", [DM / "events.shp", "STARTD", "ENDD"], ["NAME;GRP"]),
     "cet_grp": ("management.CalculateEndTime", [DM / "events.shp", "STARTD", "ENDD"], ["GRP"]),
 }
+# Tools run through the registry (`ug run <id> name=value ...`): the ArcGIS tool and the registry
+# parameter each of its arguments goes to (`output` for the result, None to leave one out). A new
+# tool in the raster registry needs only a line here; the reference test builds the command from it.
+RUN = {
+    "gp.Nibble_sa": ("nibble", ["input", "mask", "output", "values", "nodata"]),
+    "gp.Filter_sa": ("filter", ["input", "output", "filter_type", "ignore_nodata"]),
+}
+
+
+def run_spec(tool, args):
+    """The `run` entry of a manifest case: registry id and parameters (None and empty are left out)."""
+    if tool not in RUN:
+        return None
+    rid, names = RUN[tool]
+    return {"tool": rid, "params": {n: a for n, a in zip(names, args) if n and a not in (None, "")}}
+
+
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
 RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
               "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa",
@@ -955,8 +972,21 @@ SELECT = {
 }
 
 
+def annotate():
+    """Adds the `run` entries to the manifest without running ArcGIS."""
+    path = OUT / "manifest.json"
+    manifest = json.loads(path.read_text())
+    for case in manifest["cases"].values():
+        spec = run_spec(case["tool"], case["args"])
+        if spec:
+            case["run"] = spec
+    path.write_text(json.dumps(manifest, indent=2) + "\n")
+
+
 def main():
     import fnmatch
+    if sys.argv[1:] == ["--annotate"]:
+        return annotate()
     # Arguments may be glob patterns, such as `blk_*`.
     only = {n for a in sys.argv[1:] for n in (fnmatch.filter([*CASES, *SELECT], a) or [a])}
     unknown = only - set(CASES) - set(SELECT)
@@ -1039,6 +1069,9 @@ def main():
             "fields": [[f["name"], f["type"], f["length"], f["precision"], f["scale"]] for f in d.get("fields", [])],
             "shapeType": d.get("shapeType"),
         }
+        spec = run_spec(tool, manifest["cases"][name]["args"])
+        if spec:
+            manifest["cases"][name]["run"] = spec
         print(f"{name}: {r.get('status')} {manifest['cases'][name]['messages']}")
     for name, (layer, overlap, select, distance, invert) in SELECT.items():
         if only and name not in only:
