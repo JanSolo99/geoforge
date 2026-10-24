@@ -1,148 +1,82 @@
 # Current handoff
 
-Updated: 2026-10-23 (check-in); last agent: Claude (checkpoint only, no code changes).
+Updated: 2026-10-24T03:32:01+00:00; last agent: Codex.
+Workspace `/mnt/media/ArcGIS_Linux`; branch `main`.
+Implementation HEAD at this checkpoint: `61c1d81`; a handoff-only commit follows.
 
-## Claude check-in
+## User objective / status
 
-State verified: branch `codex/unigis-docking-and-branding`, HEAD `50b99c6`, in sync with its
-origin branch, tree clean except the ignored `.worktrees/`. `main` does not yet contain the
-docking, unified-tools and UniGIS display-branding work (branch only).
-Blocked: `cd app && env CARGO_BUILD_JOBS=3 cargo xtask ci` (the pending full app test and
-layer gate) needs command approval this mode cannot grant, so nothing was run. Run it from the
-native CLI or the user's shell. No validation was run in this check-in.
-Open user decisions: merge the branch into `main` (CI and the web-dist build then rerun);
-whether to rename the internal `geoforge-*`/`rustgis-*` crate names and the `gf` binary
-(kept stable so far).
+Completed coordinator full-access configuration, Block Statistics development,
+full validation and separate local commit checkpoints. User explicitly authorizes
+frequent local commits of validated slices to keep independent revert points.
+No push requested in this continuation; none performed. No builds/tests remain
+running. No real agent or coordinator was launched by Codex.
 
-Update (later in the same session): the branch was fast-forward merged into `main` and pushed;
-permission file `.claude/settings.local.json` exists now; `gf` was renamed to `ug` (commit
-5cb8162) and the suite's tool ids to `unigis:<tool>` with `geoforge:<tool>` still resolving
-(51661c4). In progress (uncommitted): crate rename `geoforge-*` -> `unigis-*` (dirs under
-`crates/`, `app/crates/geoforge` -> `app/crates/unigis`, package `rustgis-unigis`, engine
-feature `unigis`, `app/GEOFORGE.md` -> `app/UNIGIS.md`, screenshots `unigis-*.png`). Root
-workspace check, clippy and tests passed; app check and wasm check passed; app tests were
-running. Kept on purpose: `.gf-journal` directory name, the journal MAGIC string, GitHub repo
-name `geoforge`, pref value "geoforge" for theme_style, "GeoForge" in some strings (Python
-exception names, data paths). Next: confirm app tests, commit, push, then fix remaining
-"GeoForge" text if wanted.
+## Completed commits
 
-Final state (2026-10-24): the crate rename (927eae2) and the GeoForge text sweep (feb5014) are
-committed and pushed on `main`; the tree is clean except the ignored `.worktrees/`. GitHub CI
-and the Netlify web deploy both succeeded for feb5014. Kept on purpose: `geoforge:` legacy id
-prefix, `GeoForgeError` Python alias, `.gf-journal` and its magic string, GitHub repo name, the
-`geoforge` theme_style pref value. Not run: full `cargo xtask ci` locally (CI on GitHub passed).
-Next: the user may add the Netlify secrets or import the `web-dist` branch; otherwise resume tool
-development from `docs/KNOWN_GAPS.md` and `docs/ROADMAP.md`.
+- `ddfbcbf`: full-access coordinator flags in every fresh/resumed and
+  streamed/native mode; README and offline regression coverage.
+- `9bce76a`: native Block Statistics behavior, `ug block-statistics`, 75 ArcGIS
+  probes (74 successful TIFFs plus zero-width rejection), generator/manifest,
+  reference files and tests; 398 reviewed paths. Also corrects the inherited
+  Alter Domain test to its existing `--new-domain-name` option.
+- `f608a4c`: explicitly disable Claude's separate sandbox on each launch.
+- `61c1d81`: app CELL/MAP Block Statistics and shared validation, retain every
+  in-memory/non-TIFF raster band, wrapper regressions, roadmap/known gaps and
+  durable probe documentation. Five reviewed source/docs paths.
 
-Session of 2026-10-24 (user away, "focus on tool development as long as possible"): permissions for
-git push, uv run, ogrinfo, the arcgis bridge and many shell tools were added to
-`.claude/settings.local.json`. Done and pushed: Unsplit Line (597430e, 5 reference cases), Dice
-(1277cb5; lines exact; polygons match for cells of more than ~20 vertices, the rest recorded in
-`KNOWN_GAPS.md` and `KNOWN_FEATURE_DIFFERENCES`), Alter Field for file geodatabase tables (3aa84cd;
-`ug alter-field`, `unigis_filegdb::alter_field`, 28 operations compared with ArcGIS state in
-`crates/unigis-filegdb/tests/alter_field.rs`, `testdata/gdb-reference/alter_ops`). Research notes:
-`scripts/research/unsplit/README.md`. `scripts/gdb-snapshot.py` now also snapshots fields and rows.
-Not done / ideas next: Alter Fields (batch), Add Incrementing ID Field, Subdivide Polygon, Generate
-Rectangles/Transects, Generate Tessellation, the app/arcpy entries for these tools, and the Dice
-small-cell cut rule. Full `cargo xtask ci` not run locally this session.
+Coordinator launch policy:
+- Claude: `--dangerously-skip-permissions --settings '{"sandbox":{"enabled":false}}'`
+- Codex: `--dangerously-bypass-approvals-and-sandbox`
+Applies to both native `/cli` and streamed turns, fresh and resumed sessions.
+A coordinator already running must restart once to load its new Python code:
+exit native CLI, `/quit`, then `./scripts/agents`. Do not launch one here.
+Current session has full access, confirmed by real local TCP and self-cleaning
+Git metadata write probes. Earlier EPERM/EROFS reports are resolved; no more
+permission setup is needed in this session. No global auth/config was changed.
 
-Earlier request: allow rules (option 3) so the coordinator stops blocking git/cargo commands,
-then merge the branch into `main` and rename `gf` to `ug` (with tool ids). Writing
-`.claude/settings.local.json` was itself refused by this mode (a session cannot change its own
-permissions), so the user must create it (proposed content given in the chat reply). Nothing was
-merged or renamed. Next: user creates the file or merges manually, then re-run the request.
+## Validation evidence
 
-Previous Codex handoff follows (updated 2026-10-23T04:36:58+00:00).
-Directory: `/mnt/media/ArcGIS_Linux`.
-Branch: `codex/unigis-docking-and-branding`.
-HEAD before requested commit: `34695ef401afe721e0c3ab432de429c136b8760a`.
+Full app gate PASSED, exit 0, on the committed Rust source content:
+from `app/`, `env CARGO_BUILD_JOBS=3 XDG_CACHE_HOME=/tmp/unigis-blockstats-cache cargo xtask ci`.
+Log `/tmp/unigis-full-app-ci.log`: 716 tests passed, 0 failed, 10 ignored,
+29 result groups; fmt, full workspace/all-targets clippy with `-D warnings`,
+tests and layers all passed. No filter/skip flags; local-server tests ran with
+full host access. Compilation/linking was slow on disk; it finished successfully.
+No overlapping Cargo builds; at most 3 jobs.
 
-## Current objective and status
+Root/native `9bce76a` content passed fmt, workspace/all-targets clippy, and
+`cargo test --workspace --no-fail-fast -j3`: 172 tests, 0 failed, 5 ignored,
+76 result groups. Logs `/tmp/unigis-blockstats-root-{clippy,tests}.log`.
+Includes all CLI probes and all 74 TIFF/all-band comparisons.
 
-Completed requested branch, commit and push. Implementation commit `8853f90`
-contains all 199 reviewed files and was pushed successfully to
-`origin/codex/unigis-docking-and-branding`, with upstream tracking enabled.
-This final documentation checkpoint records that verified push outcome.
+Additional app checks passed on same adapter content: 26 package tests,
+package clippy with `-D warnings`, wasm web check and layers:
+`/tmp/unigis-multiband-{tests,clippy,wasm,layers}.log`.
+The RGB fallback regression failed before the fix (1 band instead of 3), then
+passed for pathless and non-TIFF inputs against every ArcGIS output cell.
 
-User explicitly directed "push now", authorizing cancellation of the slow full
-app test build and proceeding with completed checks. No source changes were
-lost, reset or stashed. Existing `.worktrees/` remains excluded and preserved.
-Current session created the branch, ran validation, committed and pushed;
-implementation below was inherited from earlier development turns.
+Coordinator: `python3 -m unittest discover -s tools/agent-coordinator -p 'test_*.py' -v`
+passed all 6 tests, including 8 launch combinations, fallback/resumption,
+locks/interruption and Claude sandbox override. Log
+`/tmp/unigis-coordinator-full-access-tests.log`. Installed CLI help accepted
+full-access/resume/settings syntax without launching model sessions.
+Python AST/fixture checks and staged/working-tree whitespace checks passed.
 
-## Implementation being committed (inherited from previous turns)
+Durable findings/limits: `scripts/research/blockstats/README.md`,
+`docs/KNOWN_GAPS.md`, `docs/ROADMAP.md`. Full-access flags checked against
+installed CLI help, official OpenAI security docs and Claude sandbox docs.
 
-- Dockable pane groups at left/right/bottom, tabs, drag/drop previews, auto-hide
-  and saved layouts (`app/crates/ui-egui/src/dock.rs`, UI integration). Fixes for
-  tab order, context-menu persistence, scrolling and active-tab indicator clipping.
-  Real pointer-drag, layout model and preference restore regression tests.
-- Unified ArcGIS toolbox/toolset tree, verified replacements for overlapping tools,
-  preserved aliases/defaults and selection on renamed layers
-  (`app/crates/analysis/src/{lib.rs,tools.rs,legacy.rs}`, geoforge wrapper crate).
-  Corrected stale test expectations and compared EIGHT-neighbor regions to engine.
-- UniGIS display branding throughout app/web/PWA/assistant/translations/packaging,
-  Python/CLI descriptions and docs. Stable package names, binaries, tool ids,
-  Python exception names, formats, credential/settings/cache paths and URLs kept.
-- Updated roadmap, known gaps, README/design and all seven local screenshots.
-  Screenshot scripts no longer click unavailable city.gdb. Filenames stay stable.
-- Shared Claude/Codex coordinator (`scripts/agents`, tools/agent-coordinator),
-  AGENTS/CLAUDE workflow guidance and this handoff. Coordinator code inherited;
-  it has five offline integration tests passed in its original setup session.
+## Preserved unrelated work / next actions
 
-Recovery evidence: Claude’s agents `a6ed447ac536dd96e` (docking) and
-`add2aa420c0ca26f5` (unified catalog) stopped on session limits. Their logs are under
-`/home/jansolo/.claude/projects/-mnt-media-ArcGIS-Linux/8cc37833-14c8-4e27-9f20-9eec36aff1a8/`.
-Rebrand/fixes/validation were completed by Codex afterward.
+Only inherited unrelated changes remain outside these checkpoints:
+tracked `tools/arcgis-bridge/__pycache__/server.cpython-312.pyc`, `.worktrees/`,
+`scripts/research/unsplit/{gdbindexes_dump,index_files}.py`,
+`testdata/gdb-reference/index_base.gdb/`, `index_ops_manifest.json`, and
+`testdata/raster/BlockSt_dem_nod2.*`. They were not staged, reset or discarded.
 
-## Current precommit validation
-
-All Cargo builds/tests are sequential, at most 3 jobs.
-
-- Root `cargo fmt --all && cargo clippy --workspace --all-targets -j3`: passed
-  (`/tmp/unigis-precommit-root-clippy.log`).
-- Root approved `cargo test --workspace -j3`: passed, 168 tests, zero failures,
-  5 ignored (`/tmp/unigis-precommit-root-tests.log`).
-- App approved `env CARGO_BUILD_JOBS=3 XDG_CACHE_HOME=/tmp/unigis-precommit-cache cargo xtask ci`:
-  **cancelled at user request** after more than 33 minutes,
-  `/tmp/unigis-precommit-app-ci.log`. Formatting and full workspace clippy with
-  `-D warnings` passed; full workspace tests were still building, with no test
-  results. Full test suite and subsequent layer gate did not complete.
-- `git diff --check`: passed. Git author configuration is available.
-
-Previous scoped validation (not the full precommit gate): 281 distinct native tests
-passed, 31 local-TCP tests were sandbox-blocked and filtered, 1 ignored. Clippy for
-changed packages/all targets, final wasm web check, layer check, root CLI check,
-packaging XML/plist/PWA, 15 translation catalogs and 6 Python AST checks passed.
-These results are recorded in `/tmp/unigis-verified-tests.log`,
-`/tmp/unigis-gdal-tests.log`, `/tmp/unigis-clippy.log`,
-`/tmp/unigis-ui-final-clippy.log`, `/tmp/unigis-wasm-final.log`,
-`/tmp/unigis-cli-check.log` and `/tmp/unigis-layers.log`.
-
-Screenshots rendered and inspected using existing software Vulkan:
-`VK_DRIVER_FILES=/usr/lib/chromium/vk_swiftshader_icd.json WGPU_BACKEND=vulkan cargo run -q -j3 --features rustgis-ui-egui/geoforge -p rustgis-ui-egui --example ui_shot -- ../docs/screenshots/scripts/dock.jsonl`
-then built executable with tools/form/map/dark/browser scripts. Logs:
-`/tmp/unigis-screenshots.log`, `/tmp/unigis-other-screenshots.log`. No software
-installed; Windows/macOS installer labels structurally checked, not built.
-
-## Permissions finding
-
-User was already in native CLI; earlier agent repeatedly directing them to `/cli`
-was incorrect. Native UI can still have approval_policy=never. User has now enabled
-approval review, and protected Git operations and test execution succeeded via
-`require_escalated`. No launcher/config changes or sandbox bypass were made.
-
-The 31 TCP tests use local 127.0.0.1 mock servers (downloads/services/S3/STAC etc.)
-and MCP relay checks (authentication, timeout, cleanup and command delivery).
-Previous failures occurred before those behaviors ran. They were not deleted or
-permanently disabled. The approved full app test attempt was cancelled before
-test results; these 31 tests remain unverified.
-
-## Next actions
-
-1. Branch-and-commit task is complete; no additional implementation requested.
-2. Future validation: finish `cargo xtask ci` (full tests and layers), including
-   the 31 local-TCP tests. Prior scoped and root checks above passed.
-3. Future docking work: floating windows, arbitrary split groups and attribute
-   table redocking are tracked in KNOWN_GAPS.
-
-Full CI was terminated at user request; no agents/coordinators launched.
+1. Restart an already-running coordinator once to use the new policy; user action,
+   not a reason for an agent to launch another coordinator or session.
+2. Continue tool development from roadmap/known gaps (Slice, Boundary Clean/Thin,
+   remaining Block Statistics limits), with frequent validated local commits.
+3. Push only when requested. Keep unrelated files above out of future commits.
