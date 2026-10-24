@@ -46,6 +46,27 @@ fn field_type(name: &str) -> FieldType {
     }
 }
 
+/// The rows CSV with `500002.0` written as `500002`: GDAL before 3.9 prints whole coordinates
+/// without the fraction, so the stored snapshots (made with a newer GDAL) are compared this way.
+fn plain_numbers(rows: &Json) -> String {
+    let chars: Vec<char> = rows.to_string().chars().collect();
+    let mut out = String::with_capacity(chars.len());
+    let mut i = 0;
+    while i < chars.len() {
+        let whole = i > 0 && chars[i - 1].is_ascii_digit();
+        let zero_fraction = chars[i] == '.'
+            && chars.get(i + 1) == Some(&'0')
+            && !chars.get(i + 2).is_some_and(char::is_ascii_digit);
+        if whole && zero_fraction {
+            i += 2;
+        } else {
+            out.push(chars[i]);
+            i += 1;
+        }
+    }
+    out
+}
+
 /// Every `ERROR nnnnnn` code of a message.
 fn codes(message: &str) -> Vec<String> {
     message
@@ -147,7 +168,12 @@ fn alter_field_equals_arcgis() {
             }
         }
         for key in ["fields", "rows", "defaults", "catalog", "rels", "tables"] {
-            if ours[key] != want[key] {
+            let same = if key == "rows" {
+                plain_numbers(&ours[key]) == plain_numbers(&want[key])
+            } else {
+                ours[key] == want[key]
+            };
+            if !same {
                 failures.push(format!(
                     "{op}: {key} differ\n ours:   {}\n ArcGIS: {}",
                     ours[key].to_string().chars().take(900).collect::<String>(),

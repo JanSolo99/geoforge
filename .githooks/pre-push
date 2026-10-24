@@ -1,0 +1,3 @@
+#!/bin/sh
+# Blocks a push that CI would reject. Skip once with `git push --no-verify`.
+exec "$(dirname "$0")/../scripts/check"

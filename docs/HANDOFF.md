@@ -94,3 +94,9 @@ reuse). Not done: source cost multiplier/start cost/resistance/capacity/directio
 Path Distance.
 Memory note: a user report of a crash during long Python search loops; keep probes bounded
 (`ulimit -v`, timeouts, background tasks) and do not run many parallel monitors.
+
+## CI gate (read before pushing)
+
+- CI failures since 08bf5dc had two causes: a compile error in f5d6076 (`IndexEdit` alias, fixed in 5b84264) and `alter_field` comparing rows text that older GDAL (CI has 3.8) prints as `500002` where the stored snapshots have `500002.0` (test now normalizes).
+- `scripts/check` runs what CI runs (fmt --check, clippy -D warnings, tests, 3 jobs). `.githooks/pre-push` calls it; enable once per clone with `git config core.hooksPath .githooks` (already set here). Skip with `git push --no-verify` only for doc-only commits.
+- Tests comparing GDAL text output must not depend on GDAL version formatting; gate on `gdal_version()` or normalize.
