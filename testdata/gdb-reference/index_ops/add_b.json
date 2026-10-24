@@ -1,0 +1,26 @@
+{
+ "a0000000b": {
+  "gdbindexes": {
+   "fnv": "d118a9540e10cb59",
+   "size": 162
+  },
+  "idx_name.atx": {
+   "fnv": "33a80753dad4d135",
+   "size": 4118
+  },
+  "spx": {
+   "fnv": "33444173b5828858",
+   "size": 4118
+  }
+ },
+ "a0000000c": {
+  "gdbindexes": {
+   "fnv": "3e3308d742fdf303",
+   "size": 100
+  },
+  "idx_b.atx": {
+   "fnv": "fb0dbbd07b4842a9",
+   "size": 4118
+  }
+ }
+}

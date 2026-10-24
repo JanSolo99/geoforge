@@ -380,6 +380,18 @@ enum Tool {
         #[arg(long, default_value = "")]
         subtype_code: String,
     },
+    /// Add an attribute index on a field of a file geodatabase table (ArcGIS "Add Attribute Index"; UNIQUE and
+    /// ASCENDING make no difference there, one field only).
+    AddIndex {
+        in_table: PathBuf,
+        field: String,
+        index_name: String,
+    },
+    /// Remove an attribute index of a file geodatabase table by name (ArcGIS "Remove Attribute Index").
+    RemoveIndex {
+        in_table: PathBuf,
+        index_name: String,
+    },
     /// Rename a field, change its alias, type, length or nullability, in place on a table of a
     /// file geodatabase (ArcGIS "Alter Field"). A type change needs an empty table.
     AlterField {
@@ -2007,6 +2019,26 @@ fn main() -> ExitCode {
                 &field_name,
                 &codes(&subtype_code)?,
             )
+        })(),
+        Tool::AddIndex {
+            in_table,
+            field,
+            index_name,
+        } => (|| {
+            let (gdb, table) = gdb_table(&in_table)?;
+            if field.contains(';') {
+                return Err(Error::Unsupported(
+                    "indexes on several fields are not done".into(),
+                ));
+            }
+            unigis_filegdb::add_attribute_index(&gdb, &table, &field, &index_name)
+        })(),
+        Tool::RemoveIndex {
+            in_table,
+            index_name,
+        } => (|| {
+            let (gdb, table) = gdb_table(&in_table)?;
+            unigis_filegdb::remove_attribute_index(&gdb, &table, &index_name)
         })(),
         Tool::AlterField {
             in_table,

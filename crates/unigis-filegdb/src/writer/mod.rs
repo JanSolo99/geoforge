@@ -10,6 +10,7 @@ mod catalog;
 mod domain_edit;
 mod edit;
 mod geometry;
+mod index_edit;
 mod keys;
 mod rebuild;
 mod rewrite;
@@ -38,6 +39,7 @@ pub use domain_edit::{
     table_to_domain,
 };
 pub use edit::{TableEditor, delete_rows};
+pub use index_edit::{add_attribute_index, remove_attribute_index};
 pub use rebuild::rebuild_attribute_indexes;
 pub use rewrite::{add_field, delete_fields, rewrite_table, truncate_table};
 pub use subtype_edit::{

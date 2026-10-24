@@ -217,7 +217,7 @@ pub fn alter_field(
                 Ok((Some(f.oid as u64), f))
             })
             .collect::<Result<Vec<_>>>()?;
-        rewrite_core(&tab_base, old, fields, &renames, &rows, true)?;
+        rewrite_core(&tab_base, old, fields, &renames, &|_| {}, &rows, true)?;
 
         let def = alter_definition(&t, &current, &name, alteration, new_type, new_nullable)?;
         if def != t.def {

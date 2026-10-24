@@ -1,0 +1,30 @@
+{
+ "a0000000b": {
+  "gdbindexes": {
+   "fnv": "d118a9540e10cb59",
+   "size": 162
+  },
+  "idx_name.atx": {
+   "fnv": "33a80753dad4d135",
+   "size": 4118
+  },
+  "spx": {
+   "fnv": "33444173b5828858",
+   "size": 4118
+  }
+ },
+ "a0000000c": {
+  "gdbindexes": {
+   "fnv": "623fb01986c615ba",
+   "size": 110
+  },
+  "idx_ab.A.atx": {
+   "fnv": "f71f3b5c6780fe0d",
+   "size": 4118
+  },
+  "idx_ab.B.atx": {
+   "fnv": "fb0dbbd07b4842a9",
+   "size": 4118
+  }
+ }
+}

@@ -182,7 +182,7 @@ fn rewrite(
             None => to_gdb_field(f)?,
         });
     }
-    rewrite_core(&base, old, fields, &[], rows, keep_max_oid)
+    rewrite_core(&base, old, fields, &[], &|_| {}, rows, keep_max_oid)
 }
 
 /// Writes the table again with `fields` (the object ID and geometry fields followed by the
@@ -193,6 +193,7 @@ pub(super) fn rewrite_core(
     old: Table,
     fields: Vec<GdbField>,
     renames: &[(String, String)],
+    edit_indexes: &dyn Fn(&mut Vec<(String, String)>),
     rows: &[(Option<u64>, Feature)],
     keep_max_oid: bool,
 ) -> Result<u64> {
@@ -215,6 +216,7 @@ pub(super) fn rewrite_core(
         }
     }
 
+    edit_indexes(&mut indexes);
     let (geometry_kind, has_z, has_m) = (old.geometry_kind(), old.has_z(), old.has_m());
     let old_max_oid = old.max_oid();
     // The index names follow the table's own field names (`FDO_Shape` in ArcGIS's tables).
