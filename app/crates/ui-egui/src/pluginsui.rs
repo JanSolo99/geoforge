@@ -1,8 +1,9 @@
 //! The Plugin Manager: installed plugins, the plugin registry, installing from a file.
 //!
 //! Downloads run off the frame (a thread on the desktop, the browser's fetch on the web) and
-//! land in slots that [`poll`] checks each frame. Every install shows what the plugin may do
-//! before it is loaded. The desktop keeps installed packages in its plugins folder; the web
+//! land in slots that [`poll`] checks each frame. User-selected installs show permissions
+//! before loading; first startup also loads the pinned default Basemaps package. The desktop
+//! keeps installed packages in its plugins folder; the web
 //! app remembers registry installs (and small packages from files) in its preferences and
 //! loads them again on the next visit.
 
@@ -49,6 +50,7 @@ fn yes() -> bool {
 type Download = Slot<Result<Vec<u8>, String>>;
 
 enum Job {
+    DefaultBasemaps { saved: Saved, slot: Download },
     Registry { url: String, slot: Download },
     Blocklist { registry: String, slot: Download },
     Download { entry: Box<Entry>, slot: Download },
@@ -271,6 +273,30 @@ fn saved(app: &RustGisApp) -> Vec<Saved> {
     app.services.load_pref.as_ref().and_then(|l| l("plugins_web")).and_then(|t| serde_json::from_str(&t).ok()).unwrap_or_default()
 }
 
+// Pin the official package: startup never accepts arbitrary registry code or
+// changes permissions when a newer version is published. Updates use the manager.
+const BASEMAPS_URL: &str = "https://packages.rustgis.app/basemaps/basemaps-0.1.2.rgplugin";
+const BASEMAPS_SHA: &str = "bd9b0817158424aa8ab6bff958067a1a4948199595097eb0ed16a4219f209cb6";
+const BASEMAPS_READY: &str = "basemaps_initialized";
+
+/// Install the default plugin once. An offline failure retries next launch;
+/// after success, disabling or uninstalling it remains the user's choice.
+pub fn load_basemaps(app: &mut RustGisApp) {
+    let initialized = app.services.load_pref.as_ref().and_then(|load| load(BASEMAPS_READY)).as_deref() == Some("true");
+    if initialized || app.plugins.jobs.iter().any(|j| matches!(j, Job::DefaultBasemaps { .. })) {
+        return;
+    }
+    if rp::get("basemaps").is_some() || (keeps_prefs() && saved(app).iter().any(|s| s.id == "basemaps")) {
+        if let Some(save) = &app.services.save_pref {
+            save(BASEMAPS_READY, "true");
+        }
+        return;
+    }
+    let saved = Saved { id: "basemaps".into(), sha256: BASEMAPS_SHA.into(), url: Some(BASEMAPS_URL.into()), data: None, enabled: true };
+    let slot = fetch(app, BASEMAPS_URL, rp::package::MAX_PACKAGE, None);
+    app.plugins.jobs.push(Job::DefaultBasemaps { saved, slot });
+}
+
 fn save(app: &RustGisApp, list: &[Saved]) {
     if let (Some(s), Ok(text)) = (&app.services.save_pref, serde_json::to_string(list)) {
         s("plugins_web", &text);
@@ -310,7 +336,7 @@ pub fn restore(app: &mut RustGisApp) {
     app.plugins.jobs.push(Job::Blocklist { registry, slot });
 }
 
-fn finish_restore(app: &mut RustGisApp, s: &Saved, got: Result<Vec<u8>, String>) {
+fn finish_restore(app: &mut RustGisApp, s: &Saved, got: Result<Vec<u8>, String>) -> bool {
     let r = got.and_then(|bytes| {
         let sha = rp::package::sha256_hex(&bytes);
         if !sha.eq_ignore_ascii_case(&s.sha256) {
@@ -324,9 +350,13 @@ fn finish_restore(app: &mut RustGisApp, s: &Saved, got: Result<Vec<u8>, String>)
     match r {
         Ok(p) if !s.enabled => {
             let _ = rp::set_enabled(&p.manifest.id, false);
+            true
         }
-        Ok(_) => {}
-        Err(e) => app.session.notify(e, true),
+        Ok(_) => true,
+        Err(e) => {
+            app.session.notify(e, true);
+            false
+        }
     }
 }
 
@@ -490,6 +520,20 @@ pub fn poll(app: &mut RustGisApp, ctx: &egui::Context) {
     let mut waiting = Vec::new();
     for job in jobs {
         match job {
+            Job::DefaultBasemaps { saved, slot } => match take(&slot) {
+                None => waiting.push(Job::DefaultBasemaps { saved, slot }),
+                Some(r) => {
+                    if finish_restore(app, &saved, r) {
+                        update_saved(app, |list| {
+                            list.retain(|s| s.id != saved.id);
+                            list.push(saved);
+                        });
+                        if let Some(save) = &app.services.save_pref {
+                            save(BASEMAPS_READY, "true");
+                        }
+                    }
+                }
+            },
             Job::Registry { url, slot } => match take(&slot) {
                 None => waiting.push(Job::Registry { url, slot }),
                 Some(r) => {
@@ -523,7 +567,9 @@ pub fn poll(app: &mut RustGisApp, ctx: &egui::Context) {
             },
             Job::Restore { saved, slot } => match take(&slot) {
                 None => waiting.push(Job::Restore { saved, slot }),
-                Some(r) => finish_restore(app, &saved, r),
+                Some(r) => {
+                    finish_restore(app, &saved, r);
+                }
             },
         }
     }
@@ -970,5 +1016,71 @@ pub fn show(app: &mut RustGisApp, ctx: &egui::Context) {
     if !open {
         app.plugins.open = false;
         app.plugins.message = None;
+    }
+}
+
+#[cfg(test)]
+mod startup_tests {
+    use super::*;
+    use std::collections::HashMap;
+
+    #[test]
+    fn default_plugin_download_retries_and_remembers_success() {
+        let prefs = Arc::new(Mutex::new(HashMap::<String, String>::new()));
+        let requests = Arc::new(Mutex::new(Vec::<(String, Download)>::new()));
+        let (load, save, fetches) = (prefs.clone(), prefs.clone(), requests.clone());
+        let mut app = RustGisApp::with_sample().with_services(crate::Services {
+            load_pref: Some(Box::new(move |k| load.lock().unwrap().get(k).cloned())),
+            save_pref: Some(Box::new(move |k, v| {
+                save.lock().unwrap().insert(k.into(), v.into());
+            })),
+            fetch: Some(Box::new(move |url, slot| {
+                fetches.lock().unwrap().push((url.into(), slot));
+            })),
+            ..Default::default()
+        });
+        load_basemaps(&mut app);
+        load_basemaps(&mut app);
+        assert_eq!(requests.lock().unwrap().len(), 1, "one pending download");
+        let (url, slot) = requests.lock().unwrap()[0].clone();
+        assert_eq!(url, BASEMAPS_URL);
+        *slot.lock().unwrap() = Some(Ok(b"changed package".to_vec()));
+        poll(&mut app, &egui::Context::default());
+        assert!(!prefs.lock().unwrap().contains_key(BASEMAPS_READY), "bad hash must not count as installed");
+        assert!(app.plugins.confirm.is_none(), "the pinned default needs no install dialog");
+        load_basemaps(&mut app);
+        assert_eq!(requests.lock().unwrap().len(), 2, "a failed install can retry");
+        app.plugins.jobs.clear();
+
+        // Exercise the successful install/cache path with our own tiny plugin,
+        // so the test is offline and never writes into the user's plugin folder.
+        let dir = std::env::temp_dir().join(format!("unigis-default-plugin-{}", std::process::id()));
+        rp::store::set_dir(Some(dir.clone()));
+        let bytes = rp::testing::package("default-basemap-test", &[]);
+        let saved = Saved {
+            id: "default-basemap-test".into(),
+            sha256: rp::package::sha256_hex(&bytes),
+            url: Some(BASEMAPS_URL.into()),
+            data: None,
+            enabled: true,
+        };
+        let slot = Arc::new(Mutex::new(Some(Ok(bytes))));
+        app.plugins.jobs.push(Job::DefaultBasemaps { saved, slot });
+        poll(&mut app, &egui::Context::default());
+        assert_eq!(prefs.lock().unwrap().get(BASEMAPS_READY).map(String::as_str), Some("true"));
+        assert!(dir.join("default-basemap-test.rgplugin").exists());
+        rp::unload("default-basemap-test");
+        load_basemaps(&mut app);
+        assert!(app.plugins.jobs.is_empty(), "uninstall after initialization is respected");
+        prefs.lock().unwrap().remove(BASEMAPS_READY);
+        let pkg = Package::from_zip(&rp::testing::package("basemaps", &[])).unwrap();
+        rp::load(pkg, "startup test").unwrap();
+        rp::set_enabled("basemaps", false).unwrap();
+        load_basemaps(&mut app);
+        assert!(!rp::get("basemaps").unwrap().enabled, "an existing disabled plugin stays disabled");
+        assert!(app.plugins.jobs.is_empty(), "an existing plugin is not replaced by the default version");
+        rp::unload("basemaps");
+        rp::store::set_dir(None);
+        std::fs::remove_dir_all(dir).unwrap();
     }
 }

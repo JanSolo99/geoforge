@@ -158,7 +158,7 @@ online. Nothing is downloaded from an app store, and it updates itself from web.
 To remove it, delete it like any other app: long-press the icon on a phone or tablet, or use
 **Uninstall** in the app window's menu on a computer.
 
-Offline, the installed app opens the World Atlas sample and the files you open, but not basemap
+Offline, the installed app can show its built-in world outline, the World Atlas sample and local files, but not uncached basemap
 tiles, web data, plugins or the AI Assistant, which need the network. When a new version has been
 published while the app is open, a notice offers to reload into it; otherwise the next launch
 picks it up. Two things to know on iPhone and iPad: iOS gives a web page less memory than a

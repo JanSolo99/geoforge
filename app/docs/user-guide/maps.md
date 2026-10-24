@@ -47,8 +47,12 @@ Ocean, Atlas, Blank), which need no network, and web tile layers over them:
   hillshade and 3D extrusion are not drawn (extrusions draw flat). A label shows the lines of
   its text that the map's font can draw: a style's "Syria / سوريا" shows as "Syria".
 
-Add one with **Add Tile Layer…** at the bottom of the Basemap gallery, or install the
-[Basemaps plugin](https://plugins.rustgis.app/catalog/basemaps/) for a tab of public basemaps.
+The initial map uses **OpenStreetMap**. Tiles load over the network; the built-in world outline
+remains available offline. The [Basemaps plugin](https://plugins.rustgis.app/catalog/basemaps/)
+downloads automatically on first launch and adds a tab of public basemaps. Once installed, it is
+remembered; you can disable or uninstall it in the Plugin Manager. If the first download fails,
+the app retries on the next launch. Add other tile layers with **Add Tile Layer…** at the bottom
+of the Basemap gallery.
 The gallery lists the map's tile layers: show or hide them, change their opacity and order, or
 remove them. Overlays (labels, roads) stay on top of the basemaps; choosing a built-in basemap
 removes the web basemaps but keeps the overlays. Tile layers are saved with the project, and

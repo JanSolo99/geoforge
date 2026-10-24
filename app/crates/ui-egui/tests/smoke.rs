@@ -447,9 +447,25 @@ fn start_up_preferences() {
             save_pref: Some(Box::new(move |k, v| {
                 save.lock().unwrap().insert(k.to_string(), v.to_string());
             })),
+            fetch: Some(Box::new(|_, slot| *slot.lock().unwrap() = Some(Err("offline test".into())))),
             ..Default::default()
         }
     };
+    let mut fresh = RustGisApp::with_sample().with_services(services());
+    fresh.start(&Default::default()).unwrap();
+    assert!(fresh.session.map().layers.is_empty(), "the default view must not cover OSM with sample polygons");
+    let tiles = &fresh.session.map().tiles;
+    assert_eq!(tiles.len(), 1);
+    assert_eq!(tiles[0].url, "https://tile.openstreetmap.org/{z}/{x}/{y}.png");
+    assert_eq!(tiles[0].attribution, "© OpenStreetMap contributors");
+    assert_eq!(tiles[0].max_zoom, 19);
+    assert!(tiles[0].visible && !tiles[0].overlay);
+    assert!(!fresh.session.dirty && !fresh.session.can_undo());
+    store.lock().unwrap().insert("start_project".into(), "sample".into());
+    let mut sample = RustGisApp::with_sample().with_services(services());
+    sample.start(&Default::default()).unwrap();
+    assert!(!sample.session.map().layers.is_empty(), "explicit sample preference is preserved");
+    store.lock().unwrap().remove("start_project");
     let mut app = RustGisApp::with_sample().with_services(services());
     assert!(app.run("ui.startup", json!({"projection": "nope"})).is_err());
     let r = app.run("ui.startup", json!({"blank": true, "projection": "epsg:3010"})).unwrap();

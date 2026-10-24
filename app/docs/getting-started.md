@@ -3,17 +3,20 @@
 ## Open the app
 
 - **In the browser**: open [web.rustgis.app](https://web.rustgis.app). Nothing to install.
-- **On the desktop**: [install](installation.md) UniGIS and start it. It opens the World Atlas
-  sample: countries, cities, rivers and lakes from Natural Earth.
+- **On the desktop**: [install](installation.md) UniGIS and start it. It opens a new map with
+  OpenStreetMap. The Basemaps plugin loads automatically for more map choices.
 - **From source**:
 
 ```sh
-cargo run --release -p rustgis                  # opens the World Atlas sample
+cargo run --release -p rustgis                  # opens a new map with OpenStreetMap
 cargo run --release -p rustgis -- places.geojson
 cargo run --release -p rustgis -- atlas.rgis   # a saved project
 ```
 
 ## Five minutes with the World Atlas
+
+Choose **Project › New › World Atlas** (or start from source with `-- --sample`) to explore
+the sample countries, cities, rivers and lakes from Natural Earth.
 
 1. **Explore.** Drag to pan, scroll to zoom, and click a country to see its attributes in a
    pop-up. Press ++home++ for the full extent, or pick a place from **Home › Bookmarks**.

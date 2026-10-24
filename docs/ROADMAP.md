@@ -685,6 +685,10 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
 
 ## Current desktop integration (2026-10-23)
 
+- [x] Startup defaults to a new map with OpenStreetMap. The official Basemaps plugin
+      installs in the background on first launch, with a pinned package hash and
+      persistent desktop/browser storage. Existing sample preferences, projection/
+      extent settings and saved projects are preserved; later plugin removal is respected.
 - [x] Dockable panes: left/right/bottom groups, tab dragging and drop previews,
       auto-hide, scrollable tab headers, and saved layout preferences. Reopening
       panes preserves tab order; pointer-drag and preference round-trip tests pass.

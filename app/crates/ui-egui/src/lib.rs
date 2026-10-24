@@ -317,7 +317,7 @@ impl Default for UiState {
             dark_follows_system: true,
             language: i18n::AUTO.into(),
             worldview: i18n::AUTO.into(),
-            start_blank: false,
+            start_blank: true,
             start_projection: String::new(),
             start_projection_input: String::new(),
             start_extent: None,
@@ -470,7 +470,7 @@ impl RustGisApp {
             self.ui.worldview = w.trim().to_ascii_lowercase();
         }
         self.apply_worldview();
-        self.ui.start_blank = self.services.load_pref.as_ref().and_then(|load| load("start_project")).as_deref() == Some("blank");
+        self.ui.start_blank = self.services.load_pref.as_ref().and_then(|load| load("start_project")).as_deref() != Some("sample");
         // A stored projection this version can't use means Web Mercator.
         if let Some(code) = self.services.load_pref.as_ref().and_then(|load| load("start_projection"))
             && let Ok(p) = rustgis_engine::map::Projection::from_code(&code)
@@ -833,6 +833,17 @@ impl RustGisApp {
     pub fn start(&mut self, overrides: &Start) -> Result<(), String> {
         if overrides.blank.unwrap_or(self.ui.start_blank) {
             self.run("project.new", Value::Null)?;
+        }
+        pluginsui::load_basemaps(self);
+        if self.session.map().tiles.iter().all(|t| t.overlay) {
+            self.run(
+                "map.addTiles",
+                json!({
+                    "id": "osm", "name": "OpenStreetMap", "kind": "raster",
+                    "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                    "attribution": "© OpenStreetMap contributors", "maxZoom": 19,
+                }),
+            )?;
         }
         let code = overrides.projection.clone().unwrap_or_else(|| self.ui.start_projection.clone());
         let mut result = Ok(());

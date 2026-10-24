@@ -17,7 +17,10 @@ fn main() {
         script.lines().filter(|l| !l.trim().is_empty()).map(|l| serde_json::from_str(l).expect("json line")).collect();
     let w = lines.iter().find_map(|l| l.get("width").and_then(|v| v.as_f64())).unwrap_or(1480.0) as f32;
     let h = lines.iter().find_map(|l| l.get("height").and_then(|v| v.as_f64())).unwrap_or(900.0) as f32;
-    let app = RustGisApp::with_sample();
+    let mut app = RustGisApp::with_sample();
+    if lines.iter().any(|l| l.get("startup").and_then(|v| v.as_bool()) == Some(true)) {
+        app.start(&Default::default()).expect("startup");
+    }
     let mut harness = egui_kittest::Harness::builder()
         .with_size(egui::vec2(w, h))
         .with_pixels_per_point(2.0)

@@ -57,7 +57,7 @@ Pull requests run CI on Linux only; pushes to `main` add macOS and Windows. Labe
 paths, file dialogs).
 
 ## Looking at the app
-- `cargo run --release -p rustgis` (opens the World Atlas sample).
+- `cargo run --release -p rustgis` (opens OpenStreetMap; add `-- --sample` for World Atlas).
 - Headless screenshots: `cargo run --release -p rustgis-ui-egui --example ui_shot -- script.jsonl`
   (see the example header). For UI work, look at the PNG.
 - CLI: `rustgis-cli run --sample --cmd 'gp.run={"tool":"buffer","params":{"input":"Cities","distance":100}}' --cmd 'share.exportMap={"path":"out.png"}'`.
