@@ -4162,6 +4162,8 @@ const KNOWN_FEATURE_DIFFERENCES: &[(&str, &[usize])] = &[
 /// Hillshade shadows differ for cells within centimeters of the horizon, and
 /// and Viewshed where sight lines graze the terrain (about 1% of cells).
 const KNOWN_RASTER_DIFFERENCES: &[(&str, usize)] = &[
+    // Cost Back Link: cells where two equally cheap paths meet and ArcGIS picks one by a rule not found.
+    ("cback_int", 15),
     ("viewshed_hill", 199),
     ("viewshed_two", 309),
     ("viewshed_hill_z2", 199),
@@ -4348,6 +4350,26 @@ fn tools_match_arcgis_output() {
                 "--ignore-nodata".into(),
                 a[4].as_str().unwrap().into(),
             ]
+        } else if matches!(
+            info["tool"].as_str(),
+            Some("gp.CostDistance_sa" | "gp.CostBackLink_sa" | "gp.CostAllocation_sa")
+        ) {
+            let a = &info["args"];
+            let command = match info["tool"].as_str().unwrap() {
+                "gp.CostDistance_sa" => "cost-distance",
+                "gp.CostBackLink_sa" => "cost-back-link",
+                _ => "cost-allocation",
+            };
+            let mut v: Vec<String> = vec![
+                command.into(),
+                a[0].as_str().unwrap().into(),
+                a[1].as_str().unwrap().into(),
+                "<out>".into(),
+            ];
+            if let Some(m) = a.get(3).and_then(|m| m.as_f64()) {
+                v.extend(["--maximum-distance".into(), m.to_string()]);
+            }
+            v
         } else if info["tool"] == "gp.ZonalHistogram_sa" {
             let a = &info["args"];
             vec![

@@ -82,3 +82,15 @@ probe, not implemented: ArcGIS ignores UNIQUE/ASCENDING in file geodatabases, mu
 make one entry and one .atx per field), `scripts/research/unsplit/{gdbindexes_dump,index_files}.py`.
 Block Statistics reference cases `blk_*` exist in `scripts/make-arcgis-reference.py` (Codex's
 9bce76a implements them).
+
+## Claude session, later 2026-10-24 (Zonal tables, cost distance)
+
+Pushed: Zonal Histogram + Tabulate Area (0c50756; Zonal Geometry as table not done, THICKNESS rule
+unknown, see KNOWN_GAPS). Cost Distance / Cost Back Link / Cost Allocation committed (`crates/unigis-raster/src/cost.rs`, `ug
+cost-distance|cost-back-link|cost-allocation`, cases `cdist_*`, `cback_*`, `calloc_*`): distances and
+allocation exact; Back Link ties differ on 15 cells (`cback_int` in KNOWN_RASTER_DIFFERENCES; the tie
+search script `scripts/research/blockstats/cost_ties.py` is too slow to finish, make it smaller before
+reuse). Not done: source cost multiplier/start cost/resistance/capacity/direction, Cost Path, Corridor,
+Path Distance.
+Memory note: a user report of a crash during long Python search loops; keep probes bounded
+(`ulimit -v`, timeouts, background tasks) and do not run many parallel monitors.

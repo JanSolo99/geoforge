@@ -775,6 +775,20 @@ CASES = {
     "zgt_landuse": ("gp.ZonalGeometryAsTable_sa", [RASTER / "zt_landuse.tif", "Value"], []),
     "zgt_classes": ("gp.ZonalGeometryAsTable_sa", [RASTER / "zt_classes.tif", "Value"], []),
     "zgt_zones4": ("gp.ZonalGeometryAsTable_sa", [RASTER / "zt_zones4.tif", "Value"], []),
+    "cdist_basic": ("gp.CostDistance_sa", [RASTER / "cost_src_i16.tif", RASTER / "cost_f32.tif"], []),
+    "cdist_int": ("gp.CostDistance_sa", [RASTER / "cost_src_i16.tif", RASTER / "cost_int16.tif"], []),
+    "cdist_const": ("gp.CostDistance_sa", [RASTER / "cost_src_one.tif", RASTER / "cost_const1.tif"], []),
+    "cdist_max": ("gp.CostDistance_sa", [RASTER / "cost_src_i16.tif", RASTER / "cost_f32.tif"], [400]),
+    "cdist_max_int": ("gp.CostDistance_sa", [RASTER / "cost_src_i16.tif", RASTER / "cost_int16.tif"], [300]),
+    "cdist_one_f32": ("gp.CostDistance_sa", [RASTER / "cost_src_one.tif", RASTER / "cost_f32.tif"], []),
+    "cback_basic": ("gp.CostBackLink_sa", [RASTER / "cost_src_i16.tif", RASTER / "cost_f32.tif"], []),
+    "cback_const": ("gp.CostBackLink_sa", [RASTER / "cost_src_one.tif", RASTER / "cost_const1.tif"], []),
+    "cback_int": ("gp.CostBackLink_sa", [RASTER / "cost_src_i16.tif", RASTER / "cost_int16.tif"], []),
+    "cback_max": ("gp.CostBackLink_sa", [RASTER / "cost_src_i16.tif", RASTER / "cost_f32.tif"], [400]),
+    "calloc_basic": ("gp.CostAllocation_sa", [RASTER / "cost_src_i16.tif", RASTER / "cost_f32.tif"], []),
+    "calloc_const": ("gp.CostAllocation_sa", [RASTER / "cost_src_one.tif", RASTER / "cost_const1.tif"], []),
+    "calloc_int": ("gp.CostAllocation_sa", [RASTER / "cost_src_i16.tif", RASTER / "cost_int16.tif"], []),
+    "calloc_max": ("gp.CostAllocation_sa", [RASTER / "cost_src_i16.tif", RASTER / "cost_f32.tif"], [400]),
     "sap_chain_10":("management.SplitLineAtPoint", [DM / "chain.shp", DM / "pts.shp"], ["10 Meters"]),
     "sap_chain_1": ("management.SplitLineAtPoint", [DM / "chain.shp", DM / "pts.shp"], ["1 Meters"]),
     "sap_chain_25": ("management.SplitLineAtPoint", [DM / "chain.shp", DM / "pts.shp"], ["25 Meters"]),
@@ -874,7 +888,8 @@ RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatist
               "gp.StreamOrder_sa", "gp.FlowLength_sa", "gp.Watershed_sa", "conversion.FeatureToRaster",
               "conversion.PolygonToRaster", "conversion.PolylineToRaster", "conversion.PointToRaster", "gp.EucDistance_sa", "gp.EucDirection_sa", "gp.EucAllocation_sa", "gp.KernelDensity_sa", "gp.PointDensity_sa", "gp.LineDensity_sa", "gp.ExtractByMask_sa",
               "management.Resample", "gp.Viewshed_sa", "gp.Expand_sa", "gp.Shrink_sa", "gp.MajorityFilter_sa",
-              "gp.RegionGroup_sa", "gp.BlockStatistics_sa"}
+              "gp.RegionGroup_sa", "gp.BlockStatistics_sa",
+              "gp.CostDistance_sa", "gp.CostBackLink_sa", "gp.CostAllocation_sa", "gp.CostPath_sa", "gp.Corridor_sa"}
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable"}

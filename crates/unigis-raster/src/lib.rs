@@ -8,6 +8,7 @@
 pub mod blockops;
 pub mod contour;
 pub mod conversion;
+pub mod cost;
 pub mod density;
 pub mod env;
 pub mod focal;

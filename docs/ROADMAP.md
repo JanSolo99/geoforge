@@ -709,3 +709,4 @@ validation passes 173 tests (5 ignored). GDAL provider checks use a writable
 cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md`.
 
 - Zonal Histogram and Tabulate Area (Spatial Analyst, `ug zonal-histogram`, `ug tabulate-area`): 12 ArcGIS cases; Zonal Geometry still to do (see KNOWN_GAPS).
+- Cost Distance, Cost Back Link and Cost Allocation (`ug cost-distance`, `cost-back-link`, `cost-allocation`): 14 ArcGIS cases, distances exact; see KNOWN_GAPS for ties.

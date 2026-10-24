@@ -35888,6 +35888,186 @@
         ]
       ],
       "shapeType": null
+    },
+    "cdist_basic": {
+      "tool": "gp.CostDistance_sa",
+      "args": [
+        "testdata/raster/cost_src_i16.tif",
+        "testdata/raster/cost_f32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "cdist_int": {
+      "tool": "gp.CostDistance_sa",
+      "args": [
+        "testdata/raster/cost_src_i16.tif",
+        "testdata/raster/cost_int16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010780: Some sources are located on masked cells and will not be processed."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "cdist_const": {
+      "tool": "gp.CostDistance_sa",
+      "args": [
+        "testdata/raster/cost_src_one.tif",
+        "testdata/raster/cost_const1.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "cdist_max": {
+      "tool": "gp.CostDistance_sa",
+      "args": [
+        "testdata/raster/cost_src_i16.tif",
+        "testdata/raster/cost_f32.tif",
+        "<out>",
+        400
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "cdist_max_int": {
+      "tool": "gp.CostDistance_sa",
+      "args": [
+        "testdata/raster/cost_src_i16.tif",
+        "testdata/raster/cost_int16.tif",
+        "<out>",
+        300
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010780: Some sources are located on masked cells and will not be processed."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "cdist_one_f32": {
+      "tool": "gp.CostDistance_sa",
+      "args": [
+        "testdata/raster/cost_src_one.tif",
+        "testdata/raster/cost_f32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "cback_basic": {
+      "tool": "gp.CostBackLink_sa",
+      "args": [
+        "testdata/raster/cost_src_i16.tif",
+        "testdata/raster/cost_f32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "cback_const": {
+      "tool": "gp.CostBackLink_sa",
+      "args": [
+        "testdata/raster/cost_src_one.tif",
+        "testdata/raster/cost_const1.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "cback_int": {
+      "tool": "gp.CostBackLink_sa",
+      "args": [
+        "testdata/raster/cost_src_i16.tif",
+        "testdata/raster/cost_int16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010780: Some sources are located on masked cells and will not be processed."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "cback_max": {
+      "tool": "gp.CostBackLink_sa",
+      "args": [
+        "testdata/raster/cost_src_i16.tif",
+        "testdata/raster/cost_f32.tif",
+        "<out>",
+        400
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "calloc_basic": {
+      "tool": "gp.CostAllocation_sa",
+      "args": [
+        "testdata/raster/cost_src_i16.tif",
+        "testdata/raster/cost_f32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "calloc_const": {
+      "tool": "gp.CostAllocation_sa",
+      "args": [
+        "testdata/raster/cost_src_one.tif",
+        "testdata/raster/cost_const1.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "calloc_int": {
+      "tool": "gp.CostAllocation_sa",
+      "args": [
+        "testdata/raster/cost_src_i16.tif",
+        "testdata/raster/cost_int16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010780: Some sources are located on masked cells and will not be processed."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "calloc_max": {
+      "tool": "gp.CostAllocation_sa",
+      "args": [
+        "testdata/raster/cost_src_i16.tif",
+        "testdata/raster/cost_f32.tif",
+        "<out>",
+        400
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

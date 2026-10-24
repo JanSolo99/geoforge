@@ -1346,6 +1346,33 @@ enum Tool {
         #[arg(long, default_value = "ALL")]
         statistics_type: String,
     },
+    /// Spatial Analyst "Cost Distance": the least accumulated cost from the source cells over a cost raster.
+    CostDistance {
+        in_source_data: PathBuf,
+        in_cost_raster: PathBuf,
+        out_distance_raster: PathBuf,
+        #[arg(long)]
+        maximum_distance: Option<f64>,
+        /// Also write the back link raster here.
+        #[arg(long)]
+        out_backlink_raster: Option<PathBuf>,
+    },
+    /// Spatial Analyst "Cost Back Link": the direction (1 east, clockwise to 8) to the cheapest path's previous cell.
+    CostBackLink {
+        in_source_data: PathBuf,
+        in_cost_raster: PathBuf,
+        out_backlink_raster: PathBuf,
+        #[arg(long)]
+        maximum_distance: Option<f64>,
+    },
+    /// Spatial Analyst "Cost Allocation": the source each cell is cheapest to reach from.
+    CostAllocation {
+        in_source_data: PathBuf,
+        in_cost_raster: PathBuf,
+        out_allocation_raster: PathBuf,
+        #[arg(long)]
+        maximum_distance: Option<f64>,
+    },
     /// Spatial Analyst "Zonal Histogram": a row per value, a column per zone (.dbf or geodatabase table).
     ZonalHistogram {
         in_zone_data: PathBuf,
@@ -4089,6 +4116,52 @@ fn main() -> ExitCode {
             let (fields, rows) = unigis_raster::zonal::zonal_table(&zones, &values, &stats, ignore);
             write_table(&unigis_tools::TableOutput { fields, rows }, &out_table)
         })(),
+        Tool::CostDistance {
+            in_source_data,
+            in_cost_raster,
+            out_distance_raster,
+            maximum_distance,
+            out_backlink_raster,
+        } => (|| {
+            let (source, cost, result) =
+                run_cost(&in_source_data, &in_cost_raster, maximum_distance)?;
+            write_raster_plain(
+                &out_distance_raster,
+                &unigis_raster::cost::distance_raster(&cost, &result),
+            )?;
+            if let Some(path) = out_backlink_raster {
+                write_raster_plain(
+                    &path,
+                    &unigis_raster::cost::back_link_raster(&source, &result),
+                )?;
+            }
+            Ok(())
+        })(),
+        Tool::CostBackLink {
+            in_source_data,
+            in_cost_raster,
+            out_backlink_raster,
+            maximum_distance,
+        } => (|| {
+            let (source, _, result) = run_cost(&in_source_data, &in_cost_raster, maximum_distance)?;
+            write_raster_plain(
+                &out_backlink_raster,
+                &unigis_raster::cost::back_link_raster(&source, &result),
+            )
+        })(),
+        Tool::CostAllocation {
+            in_source_data,
+            in_cost_raster,
+            out_allocation_raster,
+            maximum_distance,
+        } => (|| {
+            let (source, cost, result) =
+                run_cost(&in_source_data, &in_cost_raster, maximum_distance)?;
+            write_raster_plain(
+                &out_allocation_raster,
+                &unigis_raster::cost::allocation_raster(&cost, &source, &result),
+            )
+        })(),
         Tool::ZonalHistogram {
             in_zone_data,
             in_value_raster,
@@ -5502,6 +5575,33 @@ fn merge_tool(
         .transpose()?;
     let out = unigis_tools::merge_with(&merge_inputs, add, field_map.as_deref())?;
     write_output(out, output, source_gdb(&inputs[0]).as_deref())
+}
+
+/// Reads the source and cost rasters of a cost distance tool and runs it.
+fn run_cost(
+    source: &Path,
+    cost: &Path,
+    max_distance: Option<f64>,
+) -> Result<
+    (
+        unigis_raster::Raster,
+        unigis_raster::Raster,
+        unigis_raster::cost::CostResult,
+    ),
+    Error,
+> {
+    let source = unigis_raster::read_geotiff(source)?;
+    let cost = unigis_raster::read_geotiff(cost)?;
+    let result =
+        unigis_raster::cost::cost_distance(&source, &cost, max_distance).ok_or_else(|| {
+            Error::Unsupported("the source and cost rasters must share a grid".into())
+        })?;
+    if result.masked_sources > 0 {
+        eprintln!(
+            "WARNING 010780: Some sources are located on masked cells and will not be processed."
+        );
+    }
+    Ok((source, cost, result))
 }
 
 /// A raster's value field as its attribute table (`<raster>.vat.dbf`) spells it, else as given.
