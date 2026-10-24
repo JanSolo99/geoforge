@@ -30,7 +30,7 @@ HELP = """Type a task to send it to the selected agent.
 /auto on|off           Switch once on a reported usage limit (default: on)
 /status                Show sessions, last run, and workspace
 /handoff               Show the shared handoff
-/cli [AGENT]           Open the native CLI for interactive permissions/tools
+/cli [AGENT]           Open the native CLI with full access and interactive tools
 /quit                  Exit; sessions and progress remain on disk
 Ctrl-C stops the current turn and its process group; it does not switch agents.
 """
@@ -124,23 +124,23 @@ class Coordinator:
             raise RuntimeError(f"{agent} is not installed or is not on PATH.")
         session = self.state["sessions"].get(agent)
         if agent == "claude":
-            command = [executable]
+            command = [executable, "--dangerously-skip-permissions"]
             if session:
                 command += ["--resume", session]
             else:
                 session = str(uuid.uuid4())
                 command += ["--session-id", session]
             if not native:
-                command += ["-p", "--verbose", "--output-format", "stream-json",
-                            "--permission-mode", "acceptEdits"]
+                command += ["-p", "--verbose", "--output-format", "stream-json"]
             command += ["--", prompt]
             return command, session
-        command = [executable, "-C", str(self.root)]
+        command = [executable, "-C", str(self.root),
+                   "--dangerously-bypass-approvals-and-sandbox"]
         if native:
             if session:
                 command += ["resume", session]
         else:
-            command += ["-a", "never", "-s", "workspace-write", "exec"]
+            command += ["exec"]
             if session:
                 command += ["resume", session]
             command += ["--json"]

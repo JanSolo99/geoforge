@@ -45,9 +45,39 @@ class CoordinatorTests(unittest.TestCase):
         with self.coordinator.lock() as fd, contextlib.redirect_stdout(io.StringIO()):
             return self.coordinator.turn(task, fd, fallback)
 
+    def test_full_access_for_new_resumed_streamed_and_native_commands(self):
+        self.coordinator.load()
+        flags = {
+            "claude": "--dangerously-skip-permissions",
+            "codex": "--dangerously-bypass-approvals-and-sandbox",
+        }
+        sessions = {"claude": CLAUDE_ID, "codex": CODEX_ID}
+        for agent in module.AGENTS:
+            for native in (False, True):
+                for resumed in (False, True):
+                    with self.subTest(agent=agent, native=native, resumed=resumed):
+                        self.coordinator.state["sessions"] = {agent: sessions[agent]} if resumed else {}
+                        executable = str(self.bin / agent)
+                        with patch.object(module.shutil, "which", return_value=executable):
+                            command, session = self.coordinator.command(agent, "Continue", native)
+                        self.assertEqual(command[0], executable)
+                        self.assertIn(flags[agent], command[:command.index("--")])
+                        self.assertNotIn("workspace-write", command)
+                        self.assertNotIn("acceptEdits", command)
+                        self.assertEqual(command[-2:], ["--", "Continue"])
+                        if resumed:
+                            self.assertEqual(session, sessions[agent])
+                            self.assertIn(sessions[agent], command)
+                        if agent == "codex":
+                            self.assertEqual("exec" in command, not native)
+                            self.assertEqual("--json" in command, not native)
+                        else:
+                            self.assertEqual("-p" in command, not native)
+
     def test_partial_work_survives_limit_switch_and_both_sessions_resume(self):
         claude = self.executable("claude", f'''
 import json, pathlib, sys
+assert '--dangerously-skip-permissions' in sys.argv
 pathlib.Path('partial.txt').write_text('preserved')
 sid = sys.argv[sys.argv.index('--session-id') + 1] if '--session-id' in sys.argv else sys.argv[sys.argv.index('--resume') + 1]
 print(json.dumps({{'type': 'system', 'subtype': 'init', 'session_id': sid}}))
@@ -57,6 +87,7 @@ sys.exit(1)
 ''')
         codex = self.executable("codex", f'''
 import json, pathlib, sys
+assert '--dangerously-bypass-approvals-and-sandbox' in sys.argv
 assert pathlib.Path('partial.txt').read_text() == 'preserved'
 prompt = sys.argv[-1]
 assert 'Latest user request:' in prompt
