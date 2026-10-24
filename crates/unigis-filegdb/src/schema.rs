@@ -185,6 +185,12 @@ pub(crate) fn typed_value(raw: &str, t: FieldType) -> Value {
     parsed.unwrap_or_else(|| Value::String(raw.to_owned()))
 }
 
+/// A domain from its item definition XML.
+pub(crate) fn parse_domain_xml(xml: &str) -> Option<Domain> {
+    let doc = Document::parse(xml).ok()?;
+    parse_domain(doc.root_element())
+}
+
 fn parse_domain(root: Node) -> Option<Domain> {
     let field_type = esri_field_type(text(root, "FieldType")?.trim())?;
     let split_policy = match text(root, "SplitPolicy").as_deref() {

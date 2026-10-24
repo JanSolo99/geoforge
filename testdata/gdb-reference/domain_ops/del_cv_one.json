@@ -1,0 +1,128 @@
+{
+ "fields": {
+  "uses": [
+   [
+    "ZONE",
+    "Integer",
+    null,
+    true,
+    null,
+    "zones"
+   ],
+   [
+    "DEPTH",
+    "Real",
+    null,
+    true,
+    null,
+    "depth"
+   ]
+  ],
+  "codes": [
+   [
+    "CODE",
+    "Integer",
+    null,
+    true,
+    null,
+    null
+   ],
+   [
+    "DESCR",
+    "String",
+    50,
+    true,
+    null,
+    null
+   ]
+  ]
+ },
+ "rows": {
+  "uses": "ZONE,DEPTH\n",
+  "codes": "CODE,DESCR\n10,ten\n20,twenty\n1,uno\n"
+ },
+ "defaults": {
+  "uses": [
+   [
+    "ZONE",
+    null
+   ],
+   [
+    "DEPTH",
+    null
+   ]
+  ],
+  "codes": [
+   [
+    "CODE",
+    null
+   ],
+   [
+    "DESCR",
+    null
+   ]
+  ]
+ },
+ "items": [
+  {
+   "name": "Workspace",
+   "physical": "WORKSPACE",
+   "path": "",
+   "type": "C673FE0F",
+   "definition": "<DEWorkspacexsi:type='typens:DEWorkspace'xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'xmlns:xs='http://www.w3.org/2001/XMLSchema'xmlns:typens='http://www.esri.com/schemas/ArcGIS/10.8'><CatalogPath>\\</CatalogPath><Name></Name><ChildrenExpanded>false</ChildrenExpanded><WorkspaceType>esriLocalDatabaseWorkspace</WorkspaceType><WorkspaceFactoryProgID></WorkspaceFactoryProgID><ConnectionString></ConnectionString><ConnectionInfoxsi:nil='true'/><Domainsxsi:type='typens:ArrayOfDomain'></Domains><MajorVersion>3</MajorVersion><MinorVersion>0</MinorVersion><BugfixVersion>0</BugfixVersion><Realm></Realm><MaxAttributeRuleID>0</MaxAttributeRuleID></DEWorkspace>"
+  },
+  {
+   "name": "depth",
+   "physical": "DEPTH",
+   "path": "",
+   "type": "C29DA988",
+   "definition": "<GPRangeDomain2xsi:type='typens:GPRangeDomain2'xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'xmlns:xs='http://www.w3.org/2001/XMLSchema'xmlns:typens='http://www.esri.com/schemas/ArcGIS/10.8'><DomainName>depth</DomainName><FieldType>esriFieldTypeDouble</FieldType><MergePolicy>esriMPTAreaWeighted</MergePolicy><SplitPolicy>esriSPTGeometryRatio</SplitPolicy><Description>depthrange</Description><Owner></Owner><MaxValuexsi:type='xs:double'>100.5</MaxValue><MinValuexsi:type='xs:double'>0</MinValue></GPRangeDomain2>"
+  },
+  {
+   "name": "status",
+   "physical": "STATUS",
+   "path": "",
+   "type": "8C368B12",
+   "definition": "<GPCodedValueDomain2xsi:type='typens:GPCodedValueDomain2'xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'xmlns:xs='http://www.w3.org/2001/XMLSchema'xmlns:typens='http://www.esri.com/schemas/ArcGIS/10.8'><DomainName>status</DomainName><FieldType>esriFieldTypeString</FieldType><MergePolicy>esriMPTDefaultValue</MergePolicy><SplitPolicy>esriSPTDuplicate</SplitPolicy><Description>statustext</Description><Owner></Owner><CodedValuesxsi:type='typens:ArrayOfCodedValue'><CodedValuexsi:type='typens:CodedValue'><Name>Beta</Name><Codexsi:type='xs:string'>b</Code></CodedValue><CodedValuexsi:type='typens:CodedValue'><Name>Alpha</Name><Codexsi:type='xs:string'>a</Code></CodedValue><CodedValuexsi:type='typens:CodedValue'><Name>Gamma</Name><Codexsi:type='xs:string'>c</Code></CodedValue></CodedValues></GPCodedValueDomain2>"
+  },
+  {
+   "name": "zones",
+   "physical": "ZONES",
+   "path": "",
+   "type": "8C368B12",
+   "definition": "<GPCodedValueDomain2xsi:type='typens:GPCodedValueDomain2'xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'xmlns:xs='http://www.w3.org/2001/XMLSchema'xmlns:typens='http://www.esri.com/schemas/ArcGIS/10.8'><DomainName>zones</DomainName><FieldType>esriFieldTypeInteger</FieldType><MergePolicy>esriMPTDefaultValue</MergePolicy><SplitPolicy>esriSPTDefaultValue</SplitPolicy><Description>zonecodes</Description><Owner></Owner><CodedValuesxsi:type='typens:ArrayOfCodedValue'><CodedValuexsi:type='typens:CodedValue'><Name>three</Name><Codexsi:type='xs:int'>3</Code></CodedValue><CodedValuexsi:type='typens:CodedValue'><Name>two</Name><Codexsi:type='xs:int'>2</Code></CodedValue></CodedValues></GPCodedValueDomain2>"
+  },
+  {
+   "name": "",
+   "physical": "",
+   "path": "\\",
+   "type": "F3783E6F",
+   "definition": ""
+  },
+  {
+   "name": "codes",
+   "physical": "CODES",
+   "path": "\\codes",
+   "type": "CD06BC3B",
+   "definition": "<DETableInfoxsi:type='typens:DETableInfo'xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'xmlns:xs='http://www.w3.org/2001/XMLSchema'xmlns:typens='http://www.esri.com/schemas/ArcGIS/10.8'><CatalogPath>\\codes</CatalogPath><Name>codes</Name><ChildrenExpanded>false</ChildrenExpanded><DatasetType>esriDTTable</DatasetType><DSID>7</DSID><Versioned>false</Versioned><CanVersion>false</CanVersion><ConfigurationKeyword></ConfigurationKeyword><RequiredGeodatabaseClientVersion>10.0</RequiredGeodatabaseClientVersion><HasOID>true</HasOID><OIDFieldName>OBJECTID</OIDFieldName><GPFieldInfoExsxsi:type='typens:ArrayOfGPFieldInfoEx'><GPFieldInfoExxsi:type='typens:GPFieldInfoEx'><Name>OBJECTID</Name><FieldType>esriFieldTypeOID</FieldType><IsNullable>false</IsNullable><Required>true</Required><Editable>false</Editable></GPFieldInfoEx></GPFieldInfoExs><CLSID>{7A566981-C114-11D2-8A28-006097AFF44E}</CLSID><EXTCLSID></EXTCLSID><RelationshipClassNamesxsi:type='typens:Names'></RelationshipClassNames><AliasName></AliasName><ModelName></ModelName><HasGlobalID>false</HasGlobalID><GlobalIDFieldName></GlobalIDFieldName><RasterFieldName></RasterFieldName><ExtensionPropertiesxsi:type='typens:PropertySet'><PropertyArrayxsi:type='typens:ArrayOfPropertySetProperty'></PropertyArray></ExtensionProperties><ControllerMembershipsxsi:type='typens:ArrayOfControllerMembership'></ControllerMemberships><EditorTrackingEnabled>false</EditorTrackingEnabled><CreatorFieldName></CreatorFieldName><CreatedAtFieldName></CreatedAtFieldName><EditorFieldName></EditorFieldName><EditedAtFieldName></EditedAtFieldName><IsTimeInUTC>true</IsTimeInUTC><ChangeTracked>false</ChangeTracked><FieldFilteringEnabled>false</FieldFilteringEnabled><FilteredFieldNamesxsi:type='typens:Names'></FilteredFieldNames><ReplicaTracked>false</ReplicaTracked></DETableInfo>"
+  },
+  {
+   "name": "uses",
+   "physical": "USES",
+   "path": "\\uses",
+   "type": "CD06BC3B",
+   "definition": "<DETableInfoxsi:type='typens:DETableInfo'xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'xmlns:xs='http://www.w3.org/2001/XMLSchema'xmlns:typens='http://www.esri.com/schemas/ArcGIS/10.8'><CatalogPath>\\uses</CatalogPath><Name>uses</Name><ChildrenExpanded>false</ChildrenExpanded><DatasetType>esriDTTable</DatasetType><DSID>6</DSID><Versioned>false</Versioned><CanVersion>false</CanVersion><ConfigurationKeyword></ConfigurationKeyword><RequiredGeodatabaseClientVersion>10.0</RequiredGeodatabaseClientVersion><HasOID>true</HasOID><OIDFieldName>OBJECTID</OIDFieldName><GPFieldInfoExsxsi:type='typens:ArrayOfGPFieldInfoEx'><GPFieldInfoExxsi:type='typens:GPFieldInfoEx'><Name>OBJECTID</Name><FieldType>esriFieldTypeOID</FieldType><IsNullable>false</IsNullable><Required>true</Required><Editable>false</Editable></GPFieldInfoEx><GPFieldInfoExxsi:type='typens:GPFieldInfoEx'><Name>ZONE</Name><DomainName>zones</DomainName><FieldType>esriFieldTypeInteger</FieldType><IsNullable>true</IsNullable></GPFieldInfoEx><GPFieldInfoExxsi:type='typens:GPFieldInfoEx'><Name>DEPTH</Name><DomainName>depth</DomainName><FieldType>esriFieldTypeDouble</FieldType><IsNullable>true</IsNullable></GPFieldInfoEx></GPFieldInfoExs><CLSID>{7A566981-C114-11D2-8A28-006097AFF44E}</CLSID><EXTCLSID></EXTCLSID><RelationshipClassNamesxsi:type='typens:Names'></RelationshipClassNames><AliasName></AliasName><ModelName></ModelName><HasGlobalID>false</HasGlobalID><GlobalIDFieldName></GlobalIDFieldName><RasterFieldName></RasterFieldName><ExtensionPropertiesxsi:type='typens:PropertySet'><PropertyArrayxsi:type='typens:ArrayOfPropertySetProperty'></PropertyArray></ExtensionProperties><ControllerMembershipsxsi:type='typens:ArrayOfControllerMembership'></ControllerMemberships><EditorTrackingEnabled>false</EditorTrackingEnabled><CreatorFieldName></CreatorFieldName><CreatedAtFieldName></CreatedAtFieldName><EditorFieldName></EditorFieldName><EditedAtFieldName></EditedAtFieldName><IsTimeInUTC>true</IsTimeInUTC><ChangeTracked>false</ChangeTracked><FieldFilteringEnabled>false</FieldFilteringEnabled><FilteredFieldNamesxsi:type='typens:Names'></FilteredFieldNames><ReplicaTracked>false</ReplicaTracked></DETableInfo>"
+  }
+ ],
+ "rels": [
+  "\\ -> \\codes : DC78F1AB",
+  "\\ -> \\uses : DC78F1AB",
+  "\\uses -> depth : 17E08ADB",
+  "\\uses -> zones : 17E08ADB"
+ ],
+ "catalog": [
+  "codes",
+  "uses"
+ ],
+ "tables": 11
+}

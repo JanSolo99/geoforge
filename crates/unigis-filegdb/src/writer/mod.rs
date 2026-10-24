@@ -7,6 +7,7 @@
 mod alter;
 mod btree;
 mod catalog;
+mod domain_edit;
 mod edit;
 mod geometry;
 mod keys;
@@ -31,6 +32,11 @@ use table::TableWriter;
 
 pub use alter::{FieldAlteration, alter_field, alter_fields, geodatabase_field_name};
 pub use catalog::{delete_domain, delete_item, rename_domain, rename_item};
+pub use domain_edit::{
+    add_coded_value, alter_coded_value_description, alter_domain, create_domain,
+    delete_coded_values, domain_rows, parse_domain_value, set_value_for_range, sort_coded_values,
+    table_to_domain,
+};
 pub use edit::{TableEditor, delete_rows};
 pub use rebuild::rebuild_attribute_indexes;
 pub use rewrite::{add_field, delete_fields, rewrite_table, truncate_table};
@@ -1763,7 +1769,7 @@ const WORKSPACE_XML: &str = r#"<?xml version="1.0" encoding="UTF-8"?>
   <BugfixVersion>0</BugfixVersion>
 </DEWorkspace>"#;
 
-fn xml_escape(s: &str) -> String {
+pub(super) fn xml_escape(s: &str) -> String {
     s.replace('&', "&amp;")
         .replace('<', "&lt;")
         .replace('>', "&gt;")
@@ -1960,7 +1966,7 @@ fn subtypes_xml(st: &Subtypes) -> String {
 }
 
 /// `GPCodedValueDomain2` / `GPRangeDomain2` XML, as ArcGIS writes it.
-fn domain_xml(d: &Domain) -> String {
+pub(super) fn domain_xml(d: &Domain) -> String {
     let (xs, esri) = match d.field_type {
         FieldType::SmallInteger => ("xs:short", "esriFieldTypeSmallInteger"),
         FieldType::Integer => ("xs:int", "esriFieldTypeInteger"),
@@ -1968,6 +1974,8 @@ fn domain_xml(d: &Domain) -> String {
         FieldType::Single => ("xs:float", "esriFieldTypeSingle"),
         FieldType::Double => ("xs:double", "esriFieldTypeDouble"),
         FieldType::Date => ("xs:dateTime", "esriFieldTypeDate"),
+        FieldType::DateOnly => ("xs:date", "esriFieldTypeDateOnly"),
+        FieldType::TimeOnly => ("xs:time", "esriFieldTypeTimeOnly"),
         _ => ("xs:string", "esriFieldTypeString"),
     };
     let text = |v: &Value| match v {
@@ -1994,31 +2002,32 @@ fn domain_xml(d: &Domain) -> String {
         DomainKind::Coded(_) => "GPCodedValueDomain2",
         DomainKind::Range { .. } => "GPRangeDomain2",
     };
+    // ArcGIS Pro 3.7's form: no declaration, a plain root element, single-quoted attributes.
     let mut x = format!(
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<typens:{root} xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xmlns:typens=\"http://www.esri.com/schemas/ArcGIS/10.3\" xsi:type=\"typens:{root}\">\n  <DomainName>{}</DomainName>\n  <FieldType>{esri}</FieldType>\n  <MergePolicy>{merge}</MergePolicy>\n  <SplitPolicy>{split}</SplitPolicy>\n  <Description>{}</Description>\n  <Owner></Owner>\n",
+        "<{root} xsi:type='typens:{root}' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:xs='http://www.w3.org/2001/XMLSchema' xmlns:typens='http://www.esri.com/schemas/ArcGIS/10.8'><DomainName>{}</DomainName><FieldType>{esri}</FieldType><MergePolicy>{merge}</MergePolicy><SplitPolicy>{split}</SplitPolicy><Description>{}</Description><Owner></Owner>",
         xml_escape(&d.name),
         xml_escape(&d.description),
     );
     match &d.kind {
         DomainKind::Coded(values) => {
-            x += "  <CodedValues xsi:type=\"typens:ArrayOfCodedValue\">\n";
+            x += "<CodedValues xsi:type='typens:ArrayOfCodedValue'>";
             for (code, name) in values {
                 x += &format!(
-                    "    <CodedValue xsi:type=\"typens:CodedValue\">\n      <Name>{}</Name>\n      <Code xsi:type=\"{xs}\">{}</Code>\n    </CodedValue>\n",
+                    "<CodedValue xsi:type='typens:CodedValue'><Name>{}</Name><Code xsi:type='{xs}'>{}</Code></CodedValue>",
                     xml_escape(name),
                     xml_escape(&text(code))
                 );
             }
-            x += "  </CodedValues>\n";
+            x += "</CodedValues>";
         }
         DomainKind::Range { min, max } => {
             x += &format!(
-                "  <MaxValue xsi:type=\"{xs}\">{}</MaxValue>\n  <MinValue xsi:type=\"{xs}\">{}</MinValue>\n",
+                "<MaxValue xsi:type='{xs}'>{}</MaxValue><MinValue xsi:type='{xs}'>{}</MinValue>",
                 xml_escape(&text(max)),
                 xml_escape(&text(min))
             );
         }
     }
-    x += &format!("</typens:{root}>\n");
+    x += &format!("</{root}>");
     x
 }

@@ -1,0 +1,458 @@
+{
+ "arcgis": {
+  "add_cv_badtype": "Failed to execute. Parameters are not valid. | ERROR 000378: Invalid Long type. | Failed to execute (AddCodedValueToDomain).",
+  "add_cv_dup_code": "ok",
+  "add_cv_dup_desc": "ok",
+  "add_cv_long": "ok",
+  "add_cv_missing_domain": "Failed to execute. Parameters are not valid. | ERROR 000800: The value is not a member of status | zones. | Failed to execute (AddCodedValueToDomain).",
+  "add_cv_range": "Failed to execute. Parameters are not valid. | ERROR 000800: The value is not a member of status | zones. | Failed to execute (AddCodedValueToDomain).",
+  "add_cv_text": "ok",
+  "alter_cv_desc": "ok",
+  "alter_cv_missing": "Failed to execute. Parameters are not valid. | ERROR 000800: The value is not a member of 1 | 2 | 3. | Failed to execute (AlterCodedValueDescription).",
+  "alter_domain_all": "ok",
+  "alter_domain_desc": "ok",
+  "alter_domain_name": "ok",
+  "alter_domain_owner": "ok",
+  "alter_domain_policies": "ok",
+  "create_badname": "ok",
+  "create_coded_big": "ok",
+  "create_coded_dateonly": "ok",
+  "create_coded_float": "ok",
+  "create_coded_short": "ok",
+  "create_coded_text": "ok",
+  "create_dup": "Failed to execute. Parameters are not valid. | ERROR 000111: Domain already exists. | Failed to execute (CreateDomain).",
+  "create_nodesc": "ok",
+  "create_range_date": "ok",
+  "create_range_double_policies": "ok",
+  "create_range_long": "ok",
+  "del_cv_missing": "Failed to execute. Parameters are not valid. | ERROR 000192: Invalid value for Code Value | Failed to execute (DeleteCodedValueFromDomain).",
+  "del_cv_one": "ok",
+  "del_cv_text": "ok",
+  "del_cv_two": "ok",
+  "domain_to_table": "ok",
+  "domain_to_table_range": "ok",
+  "domain_to_table_text": "ok",
+  "range_on_coded": "ERROR 000375: Invalid range domain. | Failed to execute (SetValueForRangeDomain).",
+  "range_set": "ok",
+  "range_swapped": "ok",
+  "sort_code_asc": "ok",
+  "sort_code_desc": "ok",
+  "sort_desc_asc": "ok",
+  "sort_desc_desc": "ok",
+  "table_to_domain_append": "ERROR 000980: Domain value 1 description uno already exists as description one. | Failed to execute (TableToDomain).",
+  "table_to_domain_new": "ok",
+  "table_to_domain_replace": "ok"
+ },
+ "ops": {
+  "add_cv_badtype": {
+   "args": [
+    "zones",
+    "x",
+    "bad"
+   ],
+   "dir": "add_cv_badtype_31aba4.gdb",
+   "tool": "AddCodedValueToDomain"
+  },
+  "add_cv_dup_code": {
+   "args": [
+    "zones",
+    1,
+    "uno"
+   ],
+   "dir": "add_cv_dup_code_d2bb5c.gdb",
+   "tool": "AddCodedValueToDomain"
+  },
+  "add_cv_dup_desc": {
+   "args": [
+    "zones",
+    9,
+    "one"
+   ],
+   "dir": "add_cv_dup_desc_24825e.gdb",
+   "tool": "AddCodedValueToDomain"
+  },
+  "add_cv_long": {
+   "args": [
+    "zones",
+    4,
+    "four"
+   ],
+   "dir": "add_cv_long_ad9121.gdb",
+   "tool": "AddCodedValueToDomain"
+  },
+  "add_cv_missing_domain": {
+   "args": [
+    "nope",
+    1,
+    "x"
+   ],
+   "dir": "add_cv_missing_domain_9783f7.gdb",
+   "tool": "AddCodedValueToDomain"
+  },
+  "add_cv_range": {
+   "args": [
+    "depth",
+    5,
+    "x"
+   ],
+   "dir": "add_cv_range_721679.gdb",
+   "tool": "AddCodedValueToDomain"
+  },
+  "add_cv_text": {
+   "args": [
+    "status",
+    "d",
+    "Delta"
+   ],
+   "dir": "add_cv_text_1a7e12.gdb",
+   "tool": "AddCodedValueToDomain"
+  },
+  "alter_cv_desc": {
+   "args": [
+    "zones",
+    2,
+    "deux"
+   ],
+   "dir": "alter_cv_desc_75ce43.gdb",
+   "tool": "AlterCodedValueDescription"
+  },
+  "alter_cv_missing": {
+   "args": [
+    "zones",
+    55,
+    "x"
+   ],
+   "dir": "alter_cv_missing_64ee08.gdb",
+   "tool": "AlterCodedValueDescription"
+  },
+  "alter_domain_all": {
+   "args": [
+    "status",
+    "status2",
+    "new desc",
+    "DEFAULT",
+    null
+   ],
+   "dir": "alter_domain_all_8ac8f8.gdb",
+   "tool": "AlterDomain"
+  },
+  "alter_domain_desc": {
+   "args": [
+    "zones",
+    null,
+    "a better description"
+   ],
+   "dir": "alter_domain_desc_7f691b.gdb",
+   "tool": "AlterDomain"
+  },
+  "alter_domain_name": {
+   "args": [
+    "zones",
+    "zones2"
+   ],
+   "dir": "alter_domain_name_694f61.gdb",
+   "tool": "AlterDomain"
+  },
+  "alter_domain_owner": {
+   "args": [
+    "zones",
+    null,
+    null,
+    null,
+    null,
+    "someone"
+   ],
+   "dir": "alter_domain_owner_5a4714.gdb",
+   "tool": "AlterDomain"
+  },
+  "alter_domain_policies": {
+   "args": [
+    "depth",
+    null,
+    null,
+    "DUPLICATE",
+    "SUM_VALUES"
+   ],
+   "dir": "alter_domain_policies_54ac1b.gdb",
+   "tool": "AlterDomain"
+  },
+  "create_badname": {
+   "args": [
+    "bad name",
+    "x",
+    "LONG",
+    "CODED"
+   ],
+   "dir": "create_badname_345118.gdb",
+   "tool": "CreateDomain"
+  },
+  "create_coded_big": {
+   "args": [
+    "new7",
+    "big",
+    "BIGINTEGER",
+    "CODED"
+   ],
+   "dir": "create_coded_big_2017a0.gdb",
+   "tool": "CreateDomain"
+  },
+  "create_coded_dateonly": {
+   "args": [
+    "new8",
+    "do",
+    "DATEONLY",
+    "CODED"
+   ],
+   "dir": "create_coded_dateonly_af28f0.gdb",
+   "tool": "CreateDomain"
+  },
+  "create_coded_float": {
+   "args": [
+    "new4",
+    "f",
+    "FLOAT",
+    "CODED"
+   ],
+   "dir": "create_coded_float_d090cc.gdb",
+   "tool": "CreateDomain"
+  },
+  "create_coded_short": {
+   "args": [
+    "new3",
+    "",
+    "SHORT",
+    "CODED"
+   ],
+   "dir": "create_coded_short_31ca14.gdb",
+   "tool": "CreateDomain"
+  },
+  "create_coded_text": {
+   "args": [
+    "new1",
+    "a new domain",
+    "TEXT",
+    "CODED"
+   ],
+   "dir": "create_coded_text_402a03.gdb",
+   "tool": "CreateDomain"
+  },
+  "create_dup": {
+   "args": [
+    "zones",
+    "again",
+    "LONG",
+    "CODED"
+   ],
+   "dir": "create_dup_c50a2f.gdb",
+   "tool": "CreateDomain"
+  },
+  "create_nodesc": {
+   "args": [
+    "new9",
+    null,
+    "LONG",
+    "RANGE"
+   ],
+   "dir": "create_nodesc_1f748f.gdb",
+   "tool": "CreateDomain"
+  },
+  "create_range_date": {
+   "args": [
+    "new6",
+    "dates",
+    "DATE",
+    "RANGE"
+   ],
+   "dir": "create_range_date_230866.gdb",
+   "tool": "CreateDomain"
+  },
+  "create_range_double_policies": {
+   "args": [
+    "new5",
+    "d",
+    "DOUBLE",
+    "RANGE",
+    "DUPLICATE",
+    "SUM_VALUES"
+   ],
+   "dir": "create_range_double_policies_59b29d.gdb",
+   "tool": "CreateDomain"
+  },
+  "create_range_long": {
+   "args": [
+    "new2",
+    "range",
+    "LONG",
+    "RANGE"
+   ],
+   "dir": "create_range_long_658b97.gdb",
+   "tool": "CreateDomain"
+  },
+  "del_cv_missing": {
+   "args": [
+    "zones",
+    77
+   ],
+   "dir": "del_cv_missing_744ae1.gdb",
+   "tool": "DeleteCodedValueFromDomain"
+  },
+  "del_cv_one": {
+   "args": [
+    "zones",
+    1
+   ],
+   "dir": "del_cv_one_ecde2e.gdb",
+   "tool": "DeleteCodedValueFromDomain"
+  },
+  "del_cv_text": {
+   "args": [
+    "status",
+    "b"
+   ],
+   "dir": "del_cv_text_90673d.gdb",
+   "tool": "DeleteCodedValueFromDomain"
+  },
+  "del_cv_two": {
+   "args": [
+    "zones",
+    [
+     1,
+     2
+    ]
+   ],
+   "dir": "del_cv_two_e8ba5c.gdb",
+   "tool": "DeleteCodedValueFromDomain"
+  },
+  "domain_to_table": {
+   "args": [
+    "zones",
+    "zt",
+    "CODE",
+    "DESCR"
+   ],
+   "dir": "domain_to_table_a9b36a.gdb",
+   "tool": "DomainToTable"
+  },
+  "domain_to_table_range": {
+   "args": [
+    "depth",
+    "rt",
+    "C",
+    "D"
+   ],
+   "dir": "domain_to_table_range_a84833.gdb",
+   "tool": "DomainToTable"
+  },
+  "domain_to_table_text": {
+   "args": [
+    "status",
+    "st",
+    "C",
+    "D"
+   ],
+   "dir": "domain_to_table_text_7bcaa1.gdb",
+   "tool": "DomainToTable"
+  },
+  "range_on_coded": {
+   "args": [
+    "zones",
+    1,
+    2
+   ],
+   "dir": "range_on_coded_6de813.gdb",
+   "tool": "SetValueForRangeDomain"
+  },
+  "range_set": {
+   "args": [
+    "depth",
+    -5,
+    5
+   ],
+   "dir": "range_set_98e882.gdb",
+   "tool": "SetValueForRangeDomain"
+  },
+  "range_swapped": {
+   "args": [
+    "depth",
+    9,
+    3
+   ],
+   "dir": "range_swapped_7f814c.gdb",
+   "tool": "SetValueForRangeDomain"
+  },
+  "sort_code_asc": {
+   "args": [
+    "zones",
+    "CODE",
+    "ASCENDING"
+   ],
+   "dir": "sort_code_asc_75370f.gdb",
+   "tool": "SortCodedValueDomain"
+  },
+  "sort_code_desc": {
+   "args": [
+    "status",
+    "CODE",
+    "DESCENDING"
+   ],
+   "dir": "sort_code_desc_7ea4be.gdb",
+   "tool": "SortCodedValueDomain"
+  },
+  "sort_desc_asc": {
+   "args": [
+    "status",
+    "DESCRIPTION",
+    "ASCENDING"
+   ],
+   "dir": "sort_desc_asc_9678b7.gdb",
+   "tool": "SortCodedValueDomain"
+  },
+  "sort_desc_desc": {
+   "args": [
+    "zones",
+    "DESCRIPTION",
+    "DESCENDING"
+   ],
+   "dir": "sort_desc_desc_207dd5.gdb",
+   "tool": "SortCodedValueDomain"
+  },
+  "table_to_domain_append": {
+   "args": [
+    "codes",
+    "CODE",
+    "DESCR",
+    null,
+    "zones",
+    "zone codes",
+    "APPEND"
+   ],
+   "dir": "table_to_domain_append_dd2052.gdb",
+   "tool": "TableToDomain"
+  },
+  "table_to_domain_new": {
+   "args": [
+    "codes",
+    "CODE",
+    "DESCR",
+    null,
+    "fromtab",
+    "from table"
+   ],
+   "dir": "table_to_domain_new_9c8b7d.gdb",
+   "tool": "TableToDomain"
+  },
+  "table_to_domain_replace": {
+   "args": [
+    "codes",
+    "CODE",
+    "DESCR",
+    null,
+    "zones",
+    "zone codes",
+    "REPLACE"
+   ],
+   "dir": "table_to_domain_replace_22b71a.gdb",
+   "tool": "TableToDomain"
+  }
+ }
+}

@@ -500,7 +500,7 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         Feature Envelope To Polygon, Split Line At Vertices, Split Line At Point, Eliminate Polygon
         Part, XY To Line, Calculate Fields, Standardize Field, Transform Field, Reclassify Field,
         Transpose Fields and Pivot Table, then Bearing Distance To Line (geodesic, short lines),
-        Create Feature Class, Create Table, Define Projection, Copy, Calculate End Time, Unsplit Line, Alter Field and Alter Fields (file geodatabase tables, in place; `ug alter-field`, `ug alter-fields`) and Dice (lines exact, polygons with small cells
+        Create Feature Class, Create Table, Define Projection, Copy, Calculate End Time, Unsplit Line, Alter Field and Alter Fields (file geodatabase tables, in place; `ug alter-field`, `ug alter-fields`), the domain tools Create Domain, Add/Delete Coded Value, Alter Coded Value Description, Set Value For Range Domain, Sort Coded Value Domain, Alter Domain, Domain To Table and Table To Domain (file geodatabase; 42 operations compared with ArcGIS state in `crates/unigis-filegdb/tests/domain_ops.rs`) and Dice (lines exact, polygons with small cells
         partly: see KNOWN_GAPS)
         (unjoined lines first, then joined ones; multipart and reversed pieces unchecked). Not done: Split Line At Point without a search radius,
         XY To Line / Bearing Distance To Line geodesics for long lines, Box-Cox by maximum

@@ -458,11 +458,102 @@ enum Tool {
         in_workspace: PathBuf,
         domain_name: String,
     },
-    /// Rename a domain of a file geodatabase, and in the fields that use it (ArcGIS "Alter Domain").
+    /// Rename a domain of a file geodatabase (also in the fields that use it), or change its
+    /// description, split or merge policy or owner (ArcGIS "Alter Domain").
     AlterDomain {
         in_workspace: PathBuf,
         domain_name: String,
-        new_domain_name: String,
+        #[arg(long)]
+        new_domain_name: Option<String>,
+        #[arg(long)]
+        new_domain_description: Option<String>,
+        /// DEFAULT, DUPLICATE or GEOMETRY_RATIO.
+        #[arg(long)]
+        split_policy: Option<String>,
+        /// DEFAULT, SUM_VALUES or AREA_WEIGHTED.
+        #[arg(long)]
+        merge_policy: Option<String>,
+        #[arg(long)]
+        new_domain_owner: Option<String>,
+    },
+    /// Create an empty coded domain or a range domain in a file geodatabase (ArcGIS "Create Domain").
+    CreateDomain {
+        in_workspace: PathBuf,
+        domain_name: String,
+        #[arg(long, default_value = "")]
+        domain_description: String,
+        /// TEXT, FLOAT, DOUBLE, SHORT, LONG, DATE, BIGINTEGER, DATEONLY or TIMEONLY.
+        field_type: String,
+        /// CODED or RANGE.
+        #[arg(long, default_value = "CODED")]
+        domain_type: String,
+        /// DEFAULT, DUPLICATE or GEOMETRY_RATIO.
+        #[arg(long, default_value = "DEFAULT")]
+        split_policy: String,
+        /// DEFAULT, SUM_VALUES or AREA_WEIGHTED.
+        #[arg(long, default_value = "DEFAULT")]
+        merge_policy: String,
+    },
+    /// Add a code and its description to a coded domain; an existing code gets the description (ArcGIS "Add Coded Value To Domain").
+    AddCodedValueToDomain {
+        in_workspace: PathBuf,
+        domain_name: String,
+        code: String,
+        code_description: String,
+    },
+    /// Delete codes (separated by `;`) from a coded domain (ArcGIS "Delete Coded Value From Domain").
+    DeleteCodedValueFromDomain {
+        in_workspace: PathBuf,
+        domain_name: String,
+        code: String,
+    },
+    /// Change the description of a code of a coded domain (ArcGIS "Alter Coded Value Description").
+    AlterCodedValueDescription {
+        in_workspace: PathBuf,
+        domain_name: String,
+        code: String,
+        new_description: String,
+    },
+    /// Set the bounds of a range domain (ArcGIS "Set Value For Range Domain").
+    SetValueForRangeDomain {
+        in_workspace: PathBuf,
+        domain_name: String,
+        min_value: String,
+        max_value: String,
+    },
+    /// Sort the values of a coded domain (ArcGIS "Sort Coded Value Domain").
+    SortCodedValueDomain {
+        in_workspace: PathBuf,
+        domain_name: String,
+        /// CODE or DESCRIPTION.
+        #[arg(default_value = "CODE")]
+        sort_by: String,
+        /// ASCENDING or DESCENDING.
+        #[arg(default_value = "ASCENDING")]
+        sort_order: String,
+    },
+    /// Write the values of a domain to a table (ArcGIS "Domain To Table"); a range domain gives
+    /// the rows `Min value` and `Max value`.
+    DomainToTable {
+        in_workspace: PathBuf,
+        domain_name: String,
+        out_table: PathBuf,
+        code_field: String,
+        description_field: String,
+    },
+    /// Make or update a coded domain from the code and description fields of a table (ArcGIS
+    /// "Table To Domain").
+    TableToDomain {
+        in_table: PathBuf,
+        code_field: String,
+        description_field: String,
+        in_workspace: PathBuf,
+        domain_name: String,
+        #[arg(long, default_value = "")]
+        domain_description: String,
+        /// APPEND or REPLACE.
+        #[arg(long, default_value = "APPEND")]
+        update_option: String,
     },
     /// Features matching an SQL expression (ArcGIS "Select").
     Select {
@@ -1959,7 +2050,154 @@ fn main() -> ExitCode {
             in_workspace,
             domain_name,
             new_domain_name,
-        } => unigis_filegdb::rename_domain(&in_workspace, &domain_name, &new_domain_name),
+            new_domain_description,
+            split_policy,
+            merge_policy,
+            new_domain_owner,
+        } => (|| {
+            unigis_filegdb::alter_domain(
+                &in_workspace,
+                &domain_name,
+                new_domain_name.as_deref(),
+                new_domain_description.as_deref(),
+                domain_split_policy(split_policy.as_deref())?,
+                domain_merge_policy(merge_policy.as_deref())?,
+                new_domain_owner.as_deref(),
+            )
+        })(),
+        Tool::CreateDomain {
+            in_workspace,
+            domain_name,
+            domain_description,
+            field_type,
+            domain_type,
+            split_policy,
+            merge_policy,
+        } => (|| {
+            let ty = alter_field_type(Some(&field_type))?.ok_or_else(|| {
+                Error::Unsupported("ERROR 000735: Field Type: Value is required".into())
+            })?;
+            let range = match domain_type.to_ascii_uppercase().as_str() {
+                "CODED" => false,
+                "RANGE" => true,
+                other => return Err(Error::Unsupported(format!("domain type {other}"))),
+            };
+            unigis_filegdb::create_domain(
+                &in_workspace,
+                &domain_name,
+                &domain_description,
+                ty,
+                range,
+                domain_split_policy(Some(&split_policy))?
+                    .unwrap_or(unigis_filegdb::SplitPolicy::DefaultValue),
+                domain_merge_policy(Some(&merge_policy))?
+                    .unwrap_or(unigis_filegdb::MergePolicy::DefaultValue),
+            )
+        })(),
+        Tool::AddCodedValueToDomain {
+            in_workspace,
+            domain_name,
+            code,
+            code_description,
+        } => unigis_filegdb::add_coded_value(&in_workspace, &domain_name, &code, &code_description),
+        Tool::DeleteCodedValueFromDomain {
+            in_workspace,
+            domain_name,
+            code,
+        } => unigis_filegdb::delete_coded_values(&in_workspace, &domain_name, &code),
+        Tool::AlterCodedValueDescription {
+            in_workspace,
+            domain_name,
+            code,
+            new_description,
+        } => unigis_filegdb::alter_coded_value_description(
+            &in_workspace,
+            &domain_name,
+            &code,
+            &new_description,
+        ),
+        Tool::SetValueForRangeDomain {
+            in_workspace,
+            domain_name,
+            min_value,
+            max_value,
+        } => {
+            unigis_filegdb::set_value_for_range(&in_workspace, &domain_name, &min_value, &max_value)
+        }
+        Tool::SortCodedValueDomain {
+            in_workspace,
+            domain_name,
+            sort_by,
+            sort_order,
+        } => unigis_filegdb::sort_coded_values(
+            &in_workspace,
+            &domain_name,
+            !sort_by.eq_ignore_ascii_case("DESCRIPTION"),
+            !sort_order.eq_ignore_ascii_case("DESCENDING"),
+        ),
+        Tool::DomainToTable {
+            in_workspace,
+            domain_name,
+            out_table,
+            code_field,
+            description_field,
+        } => (|| {
+            let (field_type, rows) = unigis_filegdb::domain_rows(&in_workspace, &domain_name)?;
+            let mut description = Field::new(&description_field, FieldType::String);
+            description.length = 255;
+            write_table(
+                &unigis_tools::TableOutput {
+                    fields: vec![Field::new(&code_field, field_type), description],
+                    rows: rows
+                        .into_iter()
+                        .map(|(code, d)| vec![code, Value::String(d)])
+                        .collect(),
+                },
+                &out_table,
+            )
+        })(),
+        Tool::TableToDomain {
+            in_table,
+            code_field,
+            description_field,
+            in_workspace,
+            domain_name,
+            domain_description,
+            update_option,
+        } => (|| {
+            let (table, _) = open_feature_class(&in_table)?;
+            let find = |name: &str| {
+                table
+                    .fields()
+                    .iter()
+                    .position(|f| f.name.eq_ignore_ascii_case(name))
+                    .ok_or_else(|| {
+                        Error::Unsupported(format!(
+                            "ERROR 000728: Field {name} does not exist within table"
+                        ))
+                    })
+            };
+            let (c, d) = (find(&code_field)?, find(&description_field)?);
+            let field_type = table.fields()[c].field_type;
+            let mut values = Vec::new();
+            for f in table.features() {
+                let f = f?;
+                let desc = match &f.attributes[d] {
+                    Value::String(s) => s.clone(),
+                    Value::Null => String::new(),
+                    other => format!("{other:?}"),
+                };
+                values.push((f.attributes[c].clone(), desc));
+            }
+            unigis_filegdb::table_to_domain(
+                &in_workspace,
+                &domain_name,
+                &domain_description,
+                field_type,
+                &values,
+                update_option.eq_ignore_ascii_case("REPLACE"),
+            )
+        })(),
         Tool::DeleteIdentical {
             in_dataset,
             fields,
@@ -5108,6 +5346,32 @@ fn merge_tool(
         .transpose()?;
     let out = unigis_tools::merge_with(&merge_inputs, add, field_map.as_deref())?;
     write_output(out, output, source_gdb(&inputs[0]).as_deref())
+}
+
+/// The split policy keyword of Create Domain / Alter Domain.
+fn domain_split_policy(
+    keyword: Option<&str>,
+) -> Result<Option<unigis_filegdb::SplitPolicy>, Error> {
+    Ok(match keyword.map(str::to_ascii_uppercase).as_deref() {
+        None | Some("") | Some("#") => None,
+        Some("DEFAULT") => Some(unigis_filegdb::SplitPolicy::DefaultValue),
+        Some("DUPLICATE") => Some(unigis_filegdb::SplitPolicy::Duplicate),
+        Some("GEOMETRY_RATIO") => Some(unigis_filegdb::SplitPolicy::GeometryRatio),
+        Some(other) => return Err(Error::Unsupported(format!("split policy {other}"))),
+    })
+}
+
+/// The merge policy keyword of Create Domain / Alter Domain.
+fn domain_merge_policy(
+    keyword: Option<&str>,
+) -> Result<Option<unigis_filegdb::MergePolicy>, Error> {
+    Ok(match keyword.map(str::to_ascii_uppercase).as_deref() {
+        None | Some("") | Some("#") => None,
+        Some("DEFAULT") => Some(unigis_filegdb::MergePolicy::DefaultValue),
+        Some("SUM_VALUES") => Some(unigis_filegdb::MergePolicy::SumValues),
+        Some("AREA_WEIGHTED") => Some(unigis_filegdb::MergePolicy::AreaWeighted),
+        Some(other) => return Err(Error::Unsupported(format!("merge policy {other}"))),
+    })
 }
 
 /// The field type keyword of Alter Field.

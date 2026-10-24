@@ -18,9 +18,11 @@ pub use schema::{
 };
 pub use table::{GdbField, GdbFieldType, GeometryDef, Table, compare_values};
 pub use writer::{
-    FieldAlteration, GeodatabaseWriter, TableBuilder, TableEditor, add_field, add_subtype,
-    alter_field, alter_fields, assign_default_to_field, assign_domain_to_field, delete_domain,
-    delete_fields, delete_item, delete_rows, geodatabase_field_name, rebuild_attribute_indexes,
-    recover, remove_domain_from_field, remove_subtype, rename_domain, rename_item, rewrite_table,
-    set_default_subtype, set_subtype_field, truncate_table,
+    FieldAlteration, GeodatabaseWriter, TableBuilder, TableEditor, add_coded_value, add_field,
+    add_subtype, alter_coded_value_description, alter_domain, alter_field, alter_fields,
+    assign_default_to_field, assign_domain_to_field, create_domain, delete_coded_values,
+    delete_domain, delete_fields, delete_item, delete_rows, domain_rows, geodatabase_field_name,
+    parse_domain_value, rebuild_attribute_indexes, recover, remove_domain_from_field,
+    remove_subtype, rename_domain, rename_item, rewrite_table, set_default_subtype,
+    set_subtype_field, set_value_for_range, sort_coded_values, table_to_domain, truncate_table,
 };
