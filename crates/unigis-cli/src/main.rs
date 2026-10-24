@@ -1379,6 +1379,29 @@ enum Tool {
         in_distance_raster2: PathBuf,
         out_raster: PathBuf,
     },
+    /// Spatial Analyst "Filter": a 3x3 low-pass (mean) or high-pass filter.
+    Filter {
+        in_raster: PathBuf,
+        out_raster: PathBuf,
+        /// LOW or HIGH.
+        #[arg(long, default_value = "LOW")]
+        filter_type: String,
+        /// DATA or NODATA.
+        #[arg(long, default_value = "DATA")]
+        ignore_nodata: String,
+    },
+    /// Spatial Analyst "Nibble": fill the cells the mask has no value for from the nearest others.
+    Nibble {
+        in_raster: PathBuf,
+        in_mask_raster: PathBuf,
+        out_raster: PathBuf,
+        /// ALL_VALUES or DATA_ONLY.
+        #[arg(long, default_value = "ALL_VALUES")]
+        nibble_values: String,
+        /// PRESERVE_NODATA or PROCESS_NODATA.
+        #[arg(long, default_value = "PRESERVE_NODATA")]
+        nibble_nodata: String,
+    },
     /// Spatial Analyst "Zonal Histogram": a row per value, a column per zone (.dbf or geodatabase table).
     ZonalHistogram {
         in_zone_data: PathBuf,
@@ -4178,6 +4201,40 @@ fn main() -> ExitCode {
             let out = unigis_raster::cost::corridor(&a, &b)
                 .ok_or_else(|| Error::Unsupported("the rasters must share a grid".into()))?;
             write_raster(&out_raster, &out)
+        })(),
+        Tool::Filter {
+            in_raster,
+            out_raster,
+            filter_type,
+            ignore_nodata,
+        } => (|| {
+            let low = match filter_type.to_ascii_uppercase().as_str() {
+                "LOW" => true,
+                "HIGH" => false,
+                other => return Err(Error::Unsupported(format!("filter type {other}"))),
+            };
+            let r = unigis_raster::read_geotiff(&in_raster)?;
+            let out =
+                unigis_raster::focal::filter(&r, low, ignore_nodata.eq_ignore_ascii_case("DATA"));
+            write_raster(&out_raster, &out)
+        })(),
+        Tool::Nibble {
+            in_raster,
+            in_mask_raster,
+            out_raster,
+            nibble_values,
+            nibble_nodata,
+        } => (|| {
+            let r = unigis_raster::read_geotiff(&in_raster)?;
+            let m = unigis_raster::read_geotiff(&in_mask_raster)?;
+            let out = unigis_raster::resample::nibble(
+                &r,
+                &m,
+                nibble_values.eq_ignore_ascii_case("DATA_ONLY"),
+                !nibble_nodata.eq_ignore_ascii_case("PROCESS_NODATA"),
+            )
+            .ok_or_else(|| Error::Unsupported("the rasters must share a grid".into()))?;
+            write_raster_plain(&out_raster, &out)
         })(),
         Tool::ZonalHistogram {
             in_zone_data,

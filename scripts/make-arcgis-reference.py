@@ -795,6 +795,20 @@ CASES = {
     "cpath_each_zone": ("gp.CostPath_sa", [RASTER / "cost_dest_i16.tif", OUT / "cdist_basic.tif", OUT / "cback_basic.tif"], ["EACH_ZONE"]),
     "cpath_best": ("gp.CostPath_sa", [RASTER / "cost_dest_i16.tif", OUT / "cdist_basic.tif", OUT / "cback_basic.tif"], ["BEST_SINGLE"]),
     "cpath_const": ("gp.CostPath_sa", [RASTER / "cost_dest_i16.tif", OUT / "cdist_const.tif", OUT / "cback_const.tif"], ["EACH_CELL"]),
+    "filter_low_dem": ("gp.Filter_sa", [RASTER / "dem.tif"], ["LOW", "DATA"]),
+    "filter_low_nodata": ("gp.Filter_sa", [RASTER / "dem_nodata.tif"], ["LOW", "DATA"]),
+    "filter_low_nodata_strict": ("gp.Filter_sa", [RASTER / "dem_nodata.tif"], ["LOW", "NODATA"]),
+    "filter_low_landuse": ("gp.Filter_sa", [RASTER / "landuse_u8.tif"], ["LOW", "DATA"]),
+    "filter_low_i16": ("gp.Filter_sa", [RASTER / "patches_i16.tif"], ["LOW", "DATA"]),
+    "filter_high_dem": ("gp.Filter_sa", [RASTER / "dem.tif"], ["HIGH", "DATA"]),
+    "filter_high_nodata": ("gp.Filter_sa", [RASTER / "dem_nodata.tif"], ["HIGH", "DATA"]),
+    "filter_high_nodata_strict": ("gp.Filter_sa", [RASTER / "dem_nodata.tif"], ["HIGH", "NODATA"]),
+    "filter_high_landuse": ("gp.Filter_sa", [RASTER / "landuse_u8.tif"], ["HIGH", "DATA"]),
+    "filter_high_i16": ("gp.Filter_sa", [RASTER / "patches_i16.tif"], ["HIGH", "DATA"]),
+    "nibble_all": ("gp.Nibble_sa", [RASTER / "landuse_u8.tif", RASTER / "nibble_mask_i16.tif"], ["ALL_VALUES", "PRESERVE_NODATA"]),
+    "nibble_data": ("gp.Nibble_sa", [RASTER / "landuse_u8.tif", RASTER / "nibble_mask_i16.tif"], ["DATA_ONLY", "PRESERVE_NODATA"]),
+    "nibble_process": ("gp.Nibble_sa", [RASTER / "landuse_u8.tif", RASTER / "nibble_mask_i16.tif"], ["ALL_VALUES", "PROCESS_NODATA"]),
+    "nibble_i16": ("gp.Nibble_sa", [RASTER / "patches_i16.tif", RASTER / "nibble_mask_i16.tif"], ["ALL_VALUES", "PRESERVE_NODATA"]),
     "sap_chain_10":("management.SplitLineAtPoint", [DM / "chain.shp", DM / "pts.shp"], ["10 Meters"]),
     "sap_chain_1": ("management.SplitLineAtPoint", [DM / "chain.shp", DM / "pts.shp"], ["1 Meters"]),
     "sap_chain_25": ("management.SplitLineAtPoint", [DM / "chain.shp", DM / "pts.shp"], ["25 Meters"]),
@@ -895,7 +909,7 @@ RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatist
               "conversion.PolygonToRaster", "conversion.PolylineToRaster", "conversion.PointToRaster", "gp.EucDistance_sa", "gp.EucDirection_sa", "gp.EucAllocation_sa", "gp.KernelDensity_sa", "gp.PointDensity_sa", "gp.LineDensity_sa", "gp.ExtractByMask_sa",
               "management.Resample", "gp.Viewshed_sa", "gp.Expand_sa", "gp.Shrink_sa", "gp.MajorityFilter_sa",
               "gp.RegionGroup_sa", "gp.BlockStatistics_sa",
-              "gp.CostDistance_sa", "gp.CostBackLink_sa", "gp.CostAllocation_sa", "gp.CostPath_sa", "gp.Corridor_sa"}
+              "gp.CostDistance_sa", "gp.CostBackLink_sa", "gp.CostAllocation_sa", "gp.CostPath_sa", "gp.Corridor_sa", "gp.Filter_sa", "gp.Nibble_sa"}
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable"}

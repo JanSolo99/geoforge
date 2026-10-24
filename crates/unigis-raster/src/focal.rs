@@ -259,3 +259,52 @@ pub fn focal_statistics(
     }
     out
 }
+
+/// Spatial Analyst Filter: `low` is the 3x3 mean, otherwise the high-pass kernel
+/// `-0.7 -1 -0.7 / -1 6.8 -1 / -0.7 -1 -0.7`. The output is 32-bit float. With `ignore_nodata`
+/// (DATA) the cells with values count (a mean divides by how many there are, the high-pass sum
+/// is not rescaled) and a cell without value is filled from its neighbours when it has any;
+/// otherwise a cell with a missing neighbour (or beyond the raster) or without value is NoData.
+pub fn filter(input: &Raster, low: bool, ignore_nodata: bool) -> Raster {
+    const HIGH: [[f64; 3]; 3] = [[-0.7, -1.0, -0.7], [-1.0, 6.8, -1.0], [-0.7, -1.0, -0.7]];
+    let nodata = f32::MAX as f64;
+    let mut out = input.like(DataType::F32);
+    out.nodata = Some(nodata);
+    let (w, h) = (input.width as isize, input.height as isize);
+    for row in 0..h {
+        for col in 0..w {
+            let (mut sum, mut count, mut missing) = (0.0, 0usize, false);
+            for i in 0..3isize {
+                for j in 0..3isize {
+                    let (r, c) = (row + i - 1, col + j - 1);
+                    let v = if r < 0 || c < 0 || r >= h || c >= w {
+                        None
+                    } else {
+                        input.get(c as usize, r as usize)
+                    };
+                    match v {
+                        Some(v) => {
+                            sum += if low {
+                                v
+                            } else {
+                                HIGH[i as usize][j as usize] * v
+                            };
+                            count += 1;
+                        }
+                        None => missing = true,
+                    }
+                }
+            }
+            let centre_missing = input.get(col as usize, row as usize).is_none();
+            let v = if count == 0 || (!ignore_nodata && (missing || centre_missing)) {
+                None
+            } else if low {
+                Some(sum / count as f64)
+            } else {
+                Some(sum)
+            };
+            out.bands[0][(row * w + col) as usize] = v.map_or(nodata, |v| DataType::F32.store(v));
+        }
+    }
+    out
+}

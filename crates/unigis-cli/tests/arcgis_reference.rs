@@ -4373,6 +4373,29 @@ fn tools_match_arcgis_output() {
                 v.extend(["--maximum-distance".into(), m.to_string()]);
             }
             v
+        } else if info["tool"] == "gp.Filter_sa" {
+            let a = &info["args"];
+            vec![
+                "filter".into(),
+                a[0].as_str().unwrap().into(),
+                "<out>".into(),
+                "--filter-type".into(),
+                a[2].as_str().unwrap().into(),
+                "--ignore-nodata".into(),
+                a[3].as_str().unwrap().into(),
+            ]
+        } else if info["tool"] == "gp.Nibble_sa" {
+            let a = &info["args"];
+            vec![
+                "nibble".into(),
+                a[0].as_str().unwrap().into(),
+                a[1].as_str().unwrap().into(),
+                "<out>".into(),
+                "--nibble-values".into(),
+                a[3].as_str().unwrap().into(),
+                "--nibble-nodata".into(),
+                a[4].as_str().unwrap().into(),
+            ]
         } else if info["tool"] == "gp.Corridor_sa" {
             let a = &info["args"];
             vec![

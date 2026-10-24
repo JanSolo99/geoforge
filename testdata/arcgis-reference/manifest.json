@@ -36148,6 +36148,192 @@
       "messages": [],
       "fields": [],
       "shapeType": null
+    },
+    "filter_low_dem": {
+      "tool": "gp.Filter_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "LOW",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "filter_low_nodata": {
+      "tool": "gp.Filter_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "LOW",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "filter_low_nodata_strict": {
+      "tool": "gp.Filter_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "LOW",
+        "NODATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "filter_low_landuse": {
+      "tool": "gp.Filter_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "LOW",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "filter_low_i16": {
+      "tool": "gp.Filter_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        "LOW",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "filter_high_dem": {
+      "tool": "gp.Filter_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "HIGH",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "filter_high_nodata": {
+      "tool": "gp.Filter_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "HIGH",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "filter_high_nodata_strict": {
+      "tool": "gp.Filter_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "HIGH",
+        "NODATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "filter_high_landuse": {
+      "tool": "gp.Filter_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "HIGH",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "filter_high_i16": {
+      "tool": "gp.Filter_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        "HIGH",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "nibble_all": {
+      "tool": "gp.Nibble_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "testdata/raster/nibble_mask_i16.tif",
+        "<out>",
+        "ALL_VALUES",
+        "PRESERVE_NODATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "nibble_data": {
+      "tool": "gp.Nibble_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "testdata/raster/nibble_mask_i16.tif",
+        "<out>",
+        "DATA_ONLY",
+        "PRESERVE_NODATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "nibble_process": {
+      "tool": "gp.Nibble_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "testdata/raster/nibble_mask_i16.tif",
+        "<out>",
+        "ALL_VALUES",
+        "PROCESS_NODATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
+    },
+    "nibble_i16": {
+      "tool": "gp.Nibble_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "testdata/raster/nibble_mask_i16.tif",
+        "<out>",
+        "ALL_VALUES",
+        "PRESERVE_NODATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null
     }
   }
 }

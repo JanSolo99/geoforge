@@ -532,3 +532,84 @@ fn common_grid(other: &Raster, snap: &Raster, cell: f64) -> Option<([f64; 6], us
     let transform = [t[0] + cell * c0, cell, 0.0, t[3] - cell * r0, 0.0, -cell];
     Some((transform, (c1 - c0) as usize, (r1 - r0) as usize))
 }
+
+/// Spatial Analyst Nibble: the cells of `mask` that have no value take the value of the nearest
+/// cell of `input` that lies under a mask value (input cells without value stay so with `preserve_nodata`) (Euclidean, ties as in Euclidean Allocation); the
+/// others keep theirs. With `data_only`, input cells without value are no source and the nibbled
+/// cells fill from the nearest cell with data; otherwise they are sources whose NoData spreads.
+pub fn nibble(
+    input: &Raster,
+    mask: &Raster,
+    data_only: bool,
+    preserve_nodata: bool,
+) -> Option<Raster> {
+    if (input.width, input.height) != (mask.width, mask.height) {
+        return None;
+    }
+    let n = input.width * input.height;
+    let mut source = input.like(input.data_type);
+    // Sources: unmasked cells; a marker value stands for input NoData when it counts as a source.
+    let marker = f64::NEG_INFINITY;
+    source.nodata = Some(f64::INFINITY);
+    source.bands[0] = (0..n)
+        .map(|i| {
+            if mask.is_nodata(mask.bands[0][i]) {
+                f64::INFINITY
+            } else if input.is_nodata(input.bands[0][i]) {
+                if data_only { f64::INFINITY } else { marker }
+            } else {
+                input.bands[0][i]
+            }
+        })
+        .collect();
+    let near = nearest_sources(&source);
+    let nodata = input.nodata;
+    let mut out = input.clone();
+    for i in 0..n {
+        if !mask.is_nodata(mask.bands[0][i])
+            || (preserve_nodata && input.is_nodata(input.bands[0][i]))
+        {
+            continue;
+        }
+        // Among equally near sources ArcGIS takes the smallest value (NoData counts as the smallest).
+        let best = near[i].map(|(sx, sy)| {
+            let (row, col) = ((i / input.width) as i64, (i % input.width) as i64);
+            let d2 = (sx as i64 - col).pow(2) + (sy as i64 - row).pow(2);
+            let reach = (d2 as f64).sqrt().ceil() as i64;
+            let value = |r: usize, c: usize| source.bands[0][r * input.width + c];
+            let mut pick = (sy, sx);
+            for r in (row - reach).max(0)..=(row + reach).min(input.height as i64 - 1) {
+                for c in (col - reach).max(0)..=(col + reach).min(input.width as i64 - 1) {
+                    let v = value(r as usize, c as usize);
+                    if (c - col).pow(2) + (r - row).pow(2) == d2
+                        && v != f64::INFINITY
+                        && v < value(pick.0, pick.1)
+                    {
+                        pick = (r as usize, c as usize);
+                    }
+                }
+            }
+            (pick.1, pick.0)
+        });
+        let v = best.map(|(sx, sy)| source.bands[0][sy * input.width + sx]);
+        out.bands[0][i] = match (v, nodata) {
+            (Some(v), Some(nd)) if v == marker => nd,
+            (Some(v), _) => v,
+            (None, Some(nd)) => nd,
+            (None, None) => 0.0,
+        };
+    }
+    // The output's NoData is the highest value of the cell type.
+    if let Some(nd) = nodata {
+        let new = crate::focal::type_max(input.data_type);
+        if new != nd {
+            for v in &mut out.bands[0] {
+                if *v == nd {
+                    *v = new;
+                }
+            }
+            out.nodata = Some(new);
+        }
+    }
+    Some(out)
+}
