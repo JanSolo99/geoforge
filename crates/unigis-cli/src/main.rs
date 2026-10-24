@@ -6074,6 +6074,9 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
                 .ok_or_else(|| Error::Unsupported(format!("{name} is required")))?;
             unigis_raster::read_geotiff(Path::new(&path))
         }
+        fn raster_at(&self, path: &str) -> Result<unigis_raster::Raster> {
+            unigis_raster::read_geotiff(Path::new(path))
+        }
         fn attribute_table(&self, name: &str) -> Result<Vec<(String, Vec<f64>)>> {
             let path = self
                 .get(name)
@@ -6100,7 +6103,11 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
         }
     }
     let out = registry::run(spec, &Args(map))?;
-    write_raster_with(Path::new(&output), &out.raster, out.statistics)
+    if out.zero_count {
+        write_raster_basin(Path::new(&output), &out.raster)
+    } else {
+        write_raster_with(Path::new(&output), &out.raster, out.statistics)
+    }
 }
 
 fn write_raster(path: &Path, raster: &unigis_raster::Raster) -> Result<()> {

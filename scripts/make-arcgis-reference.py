@@ -835,6 +835,22 @@ CASES = {
     "lookup_value": ("gp.Lookup_sa", [RASTER / "zt_landuse.tif"] + ["Value"], []),
     "lookup_count": ("gp.Lookup_sa", [RASTER / "zt_landuse.tif"] + ["COUNT"], []),
     "lookup_zones_count": ("gp.Lookup_sa", [RASTER / "zt_zones25.tif"] + ["COUNT"], []),
+    "sink_hydro": ("gp.Sink_sa", [OUT / "flowdir_hydro_raw.tif"], []),
+    "sink_filled": ("gp.Sink_sa", [OUT / "flowdir_hydro_filled.tif"], []),
+    "pick_const": ("gp.Pick_sa", [RASTER / "landuse_u8.tif", "10;20;30;40;50"], []),
+    "pick_float": ("gp.Pick_sa", [RASTER / "landuse_u8.tif", "1.5;2.5;3.5;4.5;5.5"], []),
+    "pick_raster": ("gp.Pick_sa", [RASTER / "landuse_u8.tif", str(RASTER / "patches_i16.tif") + ";7;" + str(RASTER / "classes_u8.tif")], []),
+    "flip_dem": ("management.Flip", [RASTER / "dem.tif"], []),
+    "flip_landuse": ("management.Flip", [RASTER / "landuse_u8.tif"], []),
+    "mirror_dem": ("management.Mirror", [RASTER / "dem.tif"], []),
+    "mirror_nodata": ("management.Mirror", [RASTER / "dem_nodata.tif"], []),
+    "shift_dem": ("management.Shift", [RASTER / "dem.tif"], [25, -35]),
+    "shift_landuse": ("management.Shift", [RASTER / "landuse_u8.tif"], [-12.5, 7]),
+    "rclip_rect": ("management.Clip", [RASTER / "dem.tif", "500203 5000305 500796 5000893"], ["", "", "NONE", "NO_MAINTAIN_EXTENT"]),
+    "rclip_rect_int": ("management.Clip", [RASTER / "landuse_u8.tif", "500100 5000500 500400 5001000"], ["", "", "NONE", "NO_MAINTAIN_EXTENT"]),
+    "rclip_rect_maintain": ("management.Clip", [RASTER / "dem.tif", "500203 5000305 500796 5000893"], ["", "", "NONE", "MAINTAIN_EXTENT"]),
+    "rclip_rect_nodata": ("management.Clip", [RASTER / "dem_nodata.tif", "500203 5000305 500796 5000893"], ["", "-5", "NONE", "NO_MAINTAIN_EXTENT"]),
+    "rclip_beyond": ("management.Clip", [RASTER / "landuse_u8.tif", "499900 5000900 500300 5001400"], ["", "", "NONE", "NO_MAINTAIN_EXTENT"]),
     "sap_chain_10":("management.SplitLineAtPoint", [DM / "chain.shp", DM / "pts.shp"], ["10 Meters"]),
     "sap_chain_1": ("management.SplitLineAtPoint", [DM / "chain.shp", DM / "pts.shp"], ["1 Meters"]),
     "sap_chain_25": ("management.SplitLineAtPoint", [DM / "chain.shp", DM / "pts.shp"], ["25 Meters"]),
@@ -936,6 +952,12 @@ RUN = {
     "gp.ExtractByAttributes_sa": ("extract_by_attributes", ["input", "where_clause", "output"]),
     "gp.ExtractByRectangle_sa": ("extract_by_rectangle", ["input", "rectangle", "output", "extraction_area"]),
     "gp.ExtractByCircle_sa": ("extract_by_circle", ["input", "center_point", "radius", "output", "extraction_area"]),
+    "gp.Sink_sa": ("sink", ["input", "output"]),
+    "gp.Pick_sa": ("pick", ["position", "items", "output"]),
+    "management.Flip": ("flip", ["input", "output"]),
+    "management.Mirror": ("mirror", ["input", "output"]),
+    "management.Shift": ("shift", ["input", "output", "x_value", "y_value"]),
+    "management.Clip": ("clip_raster", ["input", "rectangle", "output", None, "nodata_value", "clipping_geometry", "maintain_extent"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
 }
 
@@ -958,6 +980,7 @@ RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatist
               "management.Resample", "gp.Viewshed_sa", "gp.Expand_sa", "gp.Shrink_sa", "gp.MajorityFilter_sa",
               "gp.RegionGroup_sa", "gp.BlockStatistics_sa",
               "gp.CostDistance_sa", "gp.CostBackLink_sa", "gp.CostAllocation_sa", "gp.CostPath_sa", "gp.Corridor_sa", "gp.Filter_sa", "gp.Nibble_sa", "gp.ReclassByTable_sa",
+              "gp.Sink_sa", "gp.Pick_sa", "management.Flip", "management.Mirror", "management.Shift", "management.Clip",
               "gp.Slice_sa", "gp.ExtractByAttributes_sa", "gp.ExtractByRectangle_sa", "gp.ExtractByCircle_sa", "gp.Lookup_sa"}
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.

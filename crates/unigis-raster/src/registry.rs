@@ -36,6 +36,8 @@ pub trait Context {
     fn get(&self, name: &str) -> Option<String>;
     /// The raster the parameter names.
     fn raster(&self, name: &str) -> Result<Raster>;
+    /// The raster at `path`.
+    fn raster_at(&self, path: &str) -> Result<Raster>;
     /// The numeric columns (name, values) of the attribute table (`.vat.dbf`) of the raster the
     /// parameter names.
     fn attribute_table(&self, name: &str) -> Result<Vec<(String, Vec<f64>)>>;
@@ -45,6 +47,8 @@ pub trait Context {
 pub struct Output {
     pub raster: Raster,
     pub statistics: bool,
+    /// ArcGIS writes a STATISTICS_COUNT of 0 (Basin, Sink).
+    pub zero_count: bool,
 }
 
 pub struct Tool {
@@ -143,16 +147,14 @@ fn nibble(ctx: &dyn Context) -> Result<Output> {
     Ok(Output {
         raster,
         statistics: false,
+        zero_count: false,
     })
 }
 
 fn filter(ctx: &dyn Context) -> Result<Output> {
     let low = choice(ctx, "filter", "filter_type").eq_ignore_ascii_case("LOW");
     let data = choice(ctx, "filter", "ignore_nodata").eq_ignore_ascii_case("DATA");
-    Ok(Output {
-        raster: crate::focal::filter(&ctx.raster("input")?, low, data),
-        statistics: true,
-    })
+    with_statistics(crate::focal::filter(&ctx.raster("input")?, low, data), true)
 }
 
 fn parse_numbers(text: &str, count: usize, label: &str) -> Result<Vec<f64>> {
@@ -175,7 +177,11 @@ fn inside(ctx: &dyn Context, tool: &str) -> bool {
 }
 
 fn with_statistics(raster: Raster, statistics: bool) -> Result<Output> {
-    Ok(Output { raster, statistics })
+    Ok(Output {
+        raster,
+        statistics,
+        zero_count: false,
+    })
 }
 
 fn extract_by_rectangle(ctx: &dyn Context) -> Result<Output> {
@@ -277,9 +283,169 @@ fn lookup(ctx: &dyn Context) -> Result<Output> {
     )
 }
 
+fn pick(ctx: &dyn Context) -> Result<Output> {
+    let position = ctx.raster("position")?;
+    let mut items = Vec::new();
+    for item in ctx.get("items").unwrap_or_default().split(';') {
+        let item = item.trim();
+        items.push(match crate::local::Operand::constant(item) {
+            Some(c) => c,
+            None => crate::local::Operand::Raster(ctx.raster_at(item)?),
+        });
+    }
+    let raster = crate::local::pick(&position, &items)
+        .ok_or_else(|| Error::Unsupported("the rasters do not overlap".into()))?;
+    with_statistics(raster, true)
+}
+
+fn sink(ctx: &dyn Context) -> Result<Output> {
+    Ok(Output {
+        zero_count: true,
+        ..with_statistics(crate::hydro::sink(&ctx.raster("input")?), true)?
+    })
+}
+
+fn flip(ctx: &dyn Context) -> Result<Output> {
+    with_statistics(crate::extract::flip(&ctx.raster("input")?), true)
+}
+
+fn mirror(ctx: &dyn Context) -> Result<Output> {
+    with_statistics(crate::extract::mirror(&ctx.raster("input")?), true)
+}
+
+fn number(ctx: &dyn Context, name: &str) -> f64 {
+    ctx.get(name).and_then(|v| v.parse().ok()).unwrap_or(0.0)
+}
+
+fn shift(ctx: &dyn Context) -> Result<Output> {
+    let raster = crate::extract::shift(
+        &ctx.raster("input")?,
+        number(ctx, "x_value"),
+        number(ctx, "y_value"),
+    );
+    with_statistics(raster, true)
+}
+
+fn clip_raster(ctx: &dyn Context) -> Result<Output> {
+    let r = parse_numbers(&ctx.get("rectangle").unwrap_or_default(), 4, "Rectangle")?;
+    if !choice(ctx, "clip_raster", "clipping_geometry").eq_ignore_ascii_case("NONE") {
+        return Err(Error::Unsupported(
+            "clipping to geometry is not supported yet".into(),
+        ));
+    }
+    let nodata = ctx.get("nodata_value").and_then(|v| v.parse().ok());
+    let maintain =
+        choice(ctx, "clip_raster", "maintain_extent").eq_ignore_ascii_case("MAINTAIN_EXTENT");
+    let raster = crate::extract::clip_rectangle(
+        &ctx.raster("input")?,
+        (r[0], r[1], r[2], r[3]),
+        nodata,
+        maintain,
+    )
+    .ok_or_else(|| {
+        Error::Unsupported("ERROR 000008: the rectangle does not overlap the raster".into())
+    })?;
+    with_statistics(raster, true)
+}
+
 const EXTRACTION_AREA: &[&str] = &["INSIDE", "OUTSIDE"];
 
 pub static TOOLS: &[Tool] = &[
+    Tool {
+        id: "pick",
+        name: "Pick",
+        summary: "Each cell takes the value of the item its position raster value selects.",
+        params: &[
+            raster("position", "Input Position Raster", true),
+            Param {
+                name: "items",
+                label: "Input Rasters or Constant Values",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+        ],
+        run: pick,
+    },
+    Tool {
+        id: "sink",
+        name: "Sink",
+        summary: "The cells of a flow direction raster that drain only into each other.",
+        params: &[raster("input", "Input Flow Direction Raster", true)],
+        run: sink,
+    },
+    Tool {
+        id: "flip",
+        name: "Flip",
+        summary: "Reverses the rows of a raster.",
+        params: &[raster("input", "Input Raster", true)],
+        run: flip,
+    },
+    Tool {
+        id: "mirror",
+        name: "Mirror",
+        summary: "Reverses the columns of a raster.",
+        params: &[raster("input", "Input Raster", true)],
+        run: mirror,
+    },
+    Tool {
+        id: "shift",
+        name: "Shift",
+        summary: "Moves a raster by an offset.",
+        params: &[
+            raster("input", "Input Raster", true),
+            Param {
+                name: "x_value",
+                label: "X Value",
+                kind: Kind::Number,
+                required: true,
+                default: "",
+            },
+            Param {
+                name: "y_value",
+                label: "Y Value",
+                kind: Kind::Number,
+                required: true,
+                default: "",
+            },
+        ],
+        run: shift,
+    },
+    Tool {
+        id: "clip_raster",
+        name: "Clip",
+        summary: "Cuts a raster to a rectangle.",
+        params: &[
+            raster("input", "Input Raster", true),
+            Param {
+                name: "rectangle",
+                label: "Rectangle",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            Param {
+                name: "nodata_value",
+                label: "NoData Value",
+                kind: Kind::Number,
+                required: false,
+                default: "",
+            },
+            option(
+                "clipping_geometry",
+                "Use Input Features for Clipping Geometry",
+                &["NONE", "ClippingGeometry"],
+                "NONE",
+            ),
+            option(
+                "maintain_extent",
+                "Maintain Clipping Extent",
+                &["NO_MAINTAIN_EXTENT", "MAINTAIN_EXTENT"],
+                "NO_MAINTAIN_EXTENT",
+            ),
+        ],
+        run: clip_raster,
+    },
     Tool {
         id: "extract_by_rectangle",
         name: "Extract by Rectangle",

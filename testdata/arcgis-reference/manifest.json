@@ -37002,6 +37002,349 @@
           "output": "<out>"
         }
       }
+    },
+    "sink_hydro": {
+      "tool": "gp.Sink_sa",
+      "args": [
+        "testdata/arcgis-reference/flowdir_hydro_raw.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "sink",
+        "params": {
+          "input": "testdata/arcgis-reference/flowdir_hydro_raw.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "sink_filled": {
+      "tool": "gp.Sink_sa",
+      "args": [
+        "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "sink",
+        "params": {
+          "input": "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "pick_const": {
+      "tool": "gp.Pick_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "10;20;30;40;50",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "pick",
+        "params": {
+          "position": "testdata/raster/landuse_u8.tif",
+          "items": "10;20;30;40;50",
+          "output": "<out>"
+        }
+      }
+    },
+    "pick_float": {
+      "tool": "gp.Pick_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "1.5;2.5;3.5;4.5;5.5",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "pick",
+        "params": {
+          "position": "testdata/raster/landuse_u8.tif",
+          "items": "1.5;2.5;3.5;4.5;5.5",
+          "output": "<out>"
+        }
+      }
+    },
+    "pick_raster": {
+      "tool": "gp.Pick_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "testdata/raster/patches_i16.tif;7;testdata/raster/classes_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "pick",
+        "params": {
+          "position": "testdata/raster/landuse_u8.tif",
+          "items": "testdata/raster/patches_i16.tif;7;testdata/raster/classes_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "flip_dem": {
+      "tool": "management.Flip",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "flip",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "flip_landuse": {
+      "tool": "management.Flip",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "flip",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "mirror_dem": {
+      "tool": "management.Mirror",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "mirror",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "mirror_nodata": {
+      "tool": "management.Mirror",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "mirror",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "shift_dem": {
+      "tool": "management.Shift",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        25,
+        -35
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "shift",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "x_value": 25,
+          "y_value": -35
+        }
+      }
+    },
+    "shift_landuse": {
+      "tool": "management.Shift",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        -12.5,
+        7
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "shift",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "output": "<out>",
+          "x_value": -12.5,
+          "y_value": 7
+        }
+      }
+    },
+    "rclip_rect": {
+      "tool": "management.Clip",
+      "args": [
+        "testdata/raster/dem.tif",
+        "500203 5000305 500796 5000893",
+        "<out>",
+        "",
+        "",
+        "NONE",
+        "NO_MAINTAIN_EXTENT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "clip_raster",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "rectangle": "500203 5000305 500796 5000893",
+          "output": "<out>",
+          "clipping_geometry": "NONE",
+          "maintain_extent": "NO_MAINTAIN_EXTENT"
+        }
+      }
+    },
+    "rclip_rect_int": {
+      "tool": "management.Clip",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "500100 5000500 500400 5001000",
+        "<out>",
+        "",
+        "",
+        "NONE",
+        "NO_MAINTAIN_EXTENT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "clip_raster",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "rectangle": "500100 5000500 500400 5001000",
+          "output": "<out>",
+          "clipping_geometry": "NONE",
+          "maintain_extent": "NO_MAINTAIN_EXTENT"
+        }
+      }
+    },
+    "rclip_rect_maintain": {
+      "tool": "management.Clip",
+      "args": [
+        "testdata/raster/dem.tif",
+        "500203 5000305 500796 5000893",
+        "<out>",
+        "",
+        "",
+        "NONE",
+        "MAINTAIN_EXTENT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "clip_raster",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "rectangle": "500203 5000305 500796 5000893",
+          "output": "<out>",
+          "clipping_geometry": "NONE",
+          "maintain_extent": "MAINTAIN_EXTENT"
+        }
+      }
+    },
+    "rclip_rect_nodata": {
+      "tool": "management.Clip",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "500203 5000305 500796 5000893",
+        "<out>",
+        "",
+        "-5",
+        "NONE",
+        "NO_MAINTAIN_EXTENT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "clip_raster",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "rectangle": "500203 5000305 500796 5000893",
+          "output": "<out>",
+          "nodata_value": "-5",
+          "clipping_geometry": "NONE",
+          "maintain_extent": "NO_MAINTAIN_EXTENT"
+        }
+      }
+    },
+    "rclip_beyond": {
+      "tool": "management.Clip",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "499900 5000900 500300 5001400",
+        "<out>",
+        "",
+        "",
+        "NONE",
+        "NO_MAINTAIN_EXTENT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "clip_raster",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "rectangle": "499900 5000900 500300 5001400",
+          "output": "<out>",
+          "clipping_geometry": "NONE",
+          "maintain_extent": "NO_MAINTAIN_EXTENT"
+        }
+      }
     }
   }
 }

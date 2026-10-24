@@ -114,6 +114,12 @@ pub fn write_aux_statistics_count(
     let mut name = raster_path.as_os_str().to_owned();
     name.push(".aux.xml");
     let path = std::path::PathBuf::from(name);
+    // The tools that write a different count (Basin, Sink) report a standard deviation of 1 for
+    // identical values (observed).
+    let mut s = s;
+    if count.is_some() && s.std_dev == 0.0 {
+        s.std_dev = 1.0;
+    }
     std::fs::write(&path, aux_xml(&s, count.unwrap_or(s.count))).map_err(|e| Error::io(&path, e))
 }
 

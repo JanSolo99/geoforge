@@ -384,6 +384,48 @@ fn downstream_cells(directions: &Raster) -> Vec<Option<usize>> {
         .collect()
 }
 
+/// Spatial Analyst Sink: the cells that drain only into each other (flow directions forming a
+/// loop), numbered from 1 in raster order of each loop's first cell; every other cell is NoData.
+pub fn sink(directions: &Raster) -> Raster {
+    let down = downstream_cells(directions);
+    let n = down.len();
+    // 0 = unseen, 1 = on the current path, 2 = done.
+    let mut state = vec![0u8; n];
+    let mut id = vec![0u32; n];
+    let mut next = 0;
+    for start in 0..n {
+        let mut path = Vec::new();
+        let mut at = Some(start);
+        while let Some(i) = at {
+            if state[i] != 0 {
+                break;
+            }
+            state[i] = 1;
+            path.push(i);
+            at = down[i];
+        }
+        if let Some(i) = at.filter(|&i| state[i] == 1) {
+            // `i` is on this path: the loop runs from it to the path's end.
+            next += 1;
+            let from = path.iter().position(|&p| p == i).unwrap_or(0);
+            for &p in &path[from..] {
+                id[p] = next;
+            }
+        }
+        for p in path {
+            state[p] = 2;
+        }
+    }
+    let nodata = -2_147_483_647.0;
+    let mut out = directions.like(crate::DataType::I32);
+    out.nodata = Some(nodata);
+    out.bands[0] = id
+        .iter()
+        .map(|&v| if v == 0 { nodata } else { f64::from(v) })
+        .collect();
+    out
+}
+
 /// Cells in an order where every cell comes after all cells flowing into it.
 fn upstream_first(down: &[Option<usize>], valid: &[bool]) -> Vec<usize> {
     let mut inflow = vec![0u32; down.len()];

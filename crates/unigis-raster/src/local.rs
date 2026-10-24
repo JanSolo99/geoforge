@@ -485,3 +485,37 @@ pub fn set_null(
         .collect();
     Some(conditional_raster(&condition, &[&if_false], values))
 }
+
+/// Pick: each cell takes the value of the `position`-th (counting from 1) of `items`; a position
+/// of 0, past the last item or NoData gives NoData. The grid is the [`local_grid`] of the position
+/// raster and the item rasters; the type is the one Con gives, but fractional constants make
+/// 64-bit float.
+pub fn pick(position: &Raster, items: &[Operand]) -> Option<Raster> {
+    let mut on_grid = vec![position];
+    on_grid.extend(items.iter().filter_map(|o| o.raster()));
+    let grid = local_grid(&on_grid)?;
+    let position = position.onto(grid.0, grid.1, grid.2);
+    let items: Vec<Operand> = items.iter().map(|o| o.onto(grid)).collect();
+    let n = position.width * position.height;
+    let values: Vec<Option<f64>> = (0..n)
+        .map(|i| {
+            let p = position.bands[0][i];
+            if position.is_nodata(p) || p < 1.0 {
+                return None;
+            }
+            items.get(p as usize - 1)?.get(i)
+        })
+        .collect();
+    if items
+        .iter()
+        .any(|o| matches!(o, Operand::Constant(c) if c.fract() != 0.0))
+    {
+        let nodata = f64::MIN;
+        let mut out = position.like(DataType::F64);
+        out.nodata = Some(nodata);
+        out.bands[0] = values.iter().map(|v| v.unwrap_or(nodata)).collect();
+        return Some(out);
+    }
+    let refs: Vec<&Operand> = items.iter().collect();
+    Some(conditional_raster(&position, &refs, values))
+}
