@@ -565,14 +565,14 @@ pub fn nibble(
     let near = nearest_sources(&source);
     let nodata = input.nodata;
     let mut out = input.clone();
-    for i in 0..n {
+    for (i, nearest) in near.iter().enumerate() {
         if !mask.is_nodata(mask.bands[0][i])
             || (preserve_nodata && input.is_nodata(input.bands[0][i]))
         {
             continue;
         }
         // Among equally near sources ArcGIS takes the smallest value (NoData counts as the smallest).
-        let best = near[i].map(|(sx, sy)| {
+        let best = nearest.map(|(sx, sy)| {
             let (row, col) = ((i / input.width) as i64, (i % input.width) as i64);
             let d2 = (sx as i64 - col).pow(2) + (sy as i64 - row).pow(2);
             let reach = (d2 as f64).sqrt().ceil() as i64;
