@@ -73,11 +73,14 @@ class CoordinatorTests(unittest.TestCase):
                             self.assertEqual("--json" in command, not native)
                         else:
                             self.assertEqual("-p" in command, not native)
+                            settings = json.loads(command[command.index("--settings") + 1])
+                            self.assertIs(settings["sandbox"]["enabled"], False)
 
     def test_partial_work_survives_limit_switch_and_both_sessions_resume(self):
         claude = self.executable("claude", f'''
 import json, pathlib, sys
 assert '--dangerously-skip-permissions' in sys.argv
+assert json.loads(sys.argv[sys.argv.index('--settings') + 1])['sandbox']['enabled'] is False
 pathlib.Path('partial.txt').write_text('preserved')
 sid = sys.argv[sys.argv.index('--session-id') + 1] if '--session-id' in sys.argv else sys.argv[sys.argv.index('--resume') + 1]
 print(json.dumps({{'type': 'system', 'subtype': 'init', 'session_id': sid}}))

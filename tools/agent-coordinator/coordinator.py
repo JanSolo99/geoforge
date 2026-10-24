@@ -124,7 +124,8 @@ class Coordinator:
             raise RuntimeError(f"{agent} is not installed or is not on PATH.")
         session = self.state["sessions"].get(agent)
         if agent == "claude":
-            command = [executable, "--dangerously-skip-permissions"]
+            command = [executable, "--dangerously-skip-permissions",
+                       "--settings", '{"sandbox":{"enabled":false}}']
             if session:
                 command += ["--resume", session]
             else:

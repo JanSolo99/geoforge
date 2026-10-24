@@ -63,13 +63,15 @@ response; assess the agent's report to determine whether the task is complete.
 All coordinator launches explicitly use full access, as requested for this
 workspace:
 
-- Claude: `--dangerously-skip-permissions`.
+- Claude: `--dangerously-skip-permissions --settings '{"sandbox":{"enabled":false}}'`.
 - Codex: `--dangerously-bypass-approvals-and-sandbox`.
 
 These flags apply to fresh and resumed sessions, both streamed turns and native
 `/cli` sessions. The coordinator no longer forces Codex's `workspace-write`
-sandbox or Claude's `acceptEdits` mode. CLI permission prompts are bypassed;
-Codex's sandbox is disabled. Authentication and provider configuration still
+sandbox or Claude's `acceptEdits` mode. CLI permission prompts and both providers'
+sandboxes are disabled. Claude's separate sandbox setting is explicitly overridden
+for the launch ([Claude sandbox documentation](https://code.claude.com/docs/en/sandboxing)).
+Authentication and provider configuration still
 come from the installed CLIs.
 
 Native interfaces remain available for their interactive tools and UI:
