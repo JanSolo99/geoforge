@@ -43,14 +43,21 @@ Get ArcGIS tools done faster: (1) triage cheap tools in batches, (2) generate th
 - Raster Clip: window = cells touched by the rectangle (snapped out left/bottom, down from the top); MAINTAIN_EXTENT stretches the
   cells to the rectangle; float NoData +3.4e38; clipping to geometry not implemented. Zonal Fill not done (its output grid is odd).
 
+## Dashboard
+
+`docs/dashboard.html` (open in a browser; self-contained) shows coverage of the 2028 ArcGIS Pro tools (list from
+`arcpy.ListTools()` saved in `docs/dashboard/arcgis_tools.json`), per-toolbox bars, CI runs, commits, next actions and known gaps.
+Rebuild: `python3 scripts/dashboard/build.py [--ci]`; `.githooks/post-commit` does it after each commit. Names are matched
+loosely (lowercase alphanumerics): a tool counts as "verified" when an ArcGIS reference case exists, "implemented" when it is in
+a registry, a `ug` command or an alias. First reading: 234 of 2028 (11.5%).
+
 ## Next actions
 
-1. Wait for/inspect `target/check2.log` (full gate run on commit "Add Multiple Ring Buffer"); push when green
-   (the pre-push hook runs the gate again).
-2. Update ROADMAP lines for the new tools (done below if present) and keep going in batches: next families to probe are
-   vector/table tools missing from `ug tools` (Polygon Neighbors, Tabulate Intersection, Count Overlapping Features,
-   Create Thiessen Polygons, Integrate, Smooth/Simplify, Subdivide Polygon) and Spatial Analyst Zonal Fill, Combinatorial
-   And/Or/Xor, Reclass by ASCII file, Raster To ASCII/Float, Copy Raster, Mosaic.
+1. CI is green on the pushed registry work (run 40146927019). Keep going in batches: vector/table tools missing from `ug tools`
+   (Polygon Neighbors, Tabulate Intersection, Count Overlapping Features, Create Thiessen Polygons, Integrate, Smooth/Simplify,
+   Subdivide Polygon) and Spatial Analyst Zonal Fill, Combinatorial And/Or/Xor, Reclass by ASCII file, Raster To ASCII/Float,
+   Copy Raster, Mosaic. Biggest toolboxes by missing count: management (435), sa (236), ia (150), 3d (145).
+2. `/remote-control` is a Claude Code slash command: the user has to type it in the interactive session; it cannot be set from a run.
 
 ## Claude session 2026-10-24 (pushed before the Basemaps work)
 
