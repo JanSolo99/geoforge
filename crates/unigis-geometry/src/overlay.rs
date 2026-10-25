@@ -366,3 +366,83 @@ pub fn paths_geometry(paths: Vec<Vec<[f64; 2]>>) -> Option<Geometry> {
     }
     Some(g)
 }
+
+/// Cuts a polygon into strips of equal area with lines parallel to the X axis, from the bottom up
+/// (ArcGIS Subdivide Polygon, equal parts / equal areas). Each strip is one geometry (several
+/// parts when the polygon is not convex). With `parts` the strips all have area / parts; with
+/// `target` they have that area, and the top one the remainder.
+pub fn horizontal_strips(
+    g: &Geometry,
+    parts: Option<usize>,
+    target: Option<f64>,
+) -> Result<Vec<Geometry>> {
+    use geo::{Area, BoundingRect, Coord, Rect};
+    if g.kind != GeometryKind::Polygon {
+        return Err(Error::Unsupported("subdividing non-polygons".into()));
+    }
+    let mp = to_multipolygon(&linear(g)?);
+    let total = mp.unsigned_area();
+    let Some(bb) = mp.bounding_rect() else {
+        return Ok(Vec::new());
+    };
+    let strip_area = match (parts, target) {
+        (Some(n), _) if n > 0 => total / n as f64,
+        (_, Some(t)) if t > 0.0 => t,
+        _ => {
+            return Err(Error::Unsupported(
+                "a number of parts or an area is required".into(),
+            ));
+        }
+    };
+    let n = match parts {
+        Some(n) if n > 0 => n,
+        _ => (total / strip_area - 1e-9).ceil().max(1.0) as usize,
+    };
+    let below = |y: f64| -> f64 {
+        let r = Rect::new(
+            Coord {
+                x: bb.min().x - 1.0,
+                y: bb.min().y - 1.0,
+            },
+            Coord {
+                x: bb.max().x + 1.0,
+                y,
+            },
+        )
+        .to_polygon();
+        mp.intersection(&MultiPolygon(vec![r])).unsigned_area()
+    };
+    let mut levels = vec![bb.min().y - 1.0];
+    for k in 1..n {
+        let want = strip_area * k as f64;
+        let (mut lo, mut hi) = (bb.min().y, bb.max().y);
+        for _ in 0..80 {
+            let mid = (lo + hi) / 2.0;
+            if below(mid) < want {
+                lo = mid;
+            } else {
+                hi = mid;
+            }
+        }
+        levels.push((lo + hi) / 2.0);
+    }
+    levels.push(bb.max().y + 1.0);
+    let mut out = Vec::new();
+    for w in levels.windows(2) {
+        let r = Rect::new(
+            Coord {
+                x: bb.min().x - 1.0,
+                y: w[0],
+            },
+            Coord {
+                x: bb.max().x + 1.0,
+                y: w[1],
+            },
+        )
+        .to_polygon();
+        if let Some(piece) = from_multipolygon(&mp.intersection(&MultiPolygon(vec![r]))) {
+            out.push(piece);
+        }
+    }
+    Ok(out)
+}

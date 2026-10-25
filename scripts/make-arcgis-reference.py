@@ -1002,6 +1002,7 @@ RUN = {
     "management.GeneratePointsAlongLines": ("generate_points_along_lines", ["input", "output", "point_placement", "distance", "percentage", "include_end_points", "add_chainage_fields"]),
     "analysis.MultipleRingBuffer": ("multiple_ring_buffer", ["input", "output", "distances", "buffer_unit", "field_name", "dissolve_option", "outside_polygons_only"]),
     "management.CopyRows": ("copy_rows", ["input", "output"]),
+    "management.SubdividePolygon": ("subdivide_polygon", ["input", "output", "method", "number_of_areas", "target_area"]),
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
     "analysis.CountOverlappingFeatures": ("count_overlapping_features", ["input", "output", "minimum_overlap_count"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),

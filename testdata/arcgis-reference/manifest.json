@@ -39166,7 +39166,16 @@
           0
         ]
       ],
-      "shapeType": "Polygon"
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "subdivide_polygon",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "method": "NUMBER_OF_EQUAL_PARTS",
+          "number_of_areas": 4
+        }
+      }
     },
     "pn_squares": {
       "tool": "analysis.PolygonNeighbors",
@@ -39396,7 +39405,16 @@
           0
         ]
       ],
-      "shapeType": "Polygon"
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "subdivide_polygon",
+        "params": {
+          "input": "testdata/geoproc/squares.shp",
+          "output": "<out>",
+          "method": "NUMBER_OF_EQUAL_PARTS",
+          "number_of_areas": 3
+        }
+      }
     },
     "sbd_clip_4": {
       "tool": "management.SubdividePolygon",
@@ -39431,7 +39449,16 @@
           0
         ]
       ],
-      "shapeType": "Polygon"
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "subdivide_polygon",
+        "params": {
+          "input": "testdata/geoproc/clip_areas.shp",
+          "output": "<out>",
+          "method": "NUMBER_OF_EQUAL_PARTS",
+          "number_of_areas": 4
+        }
+      }
     },
     "sbd_clip_area": {
       "tool": "management.SubdividePolygon",
@@ -39467,7 +39494,16 @@
           0
         ]
       ],
-      "shapeType": "Polygon"
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "subdivide_polygon",
+        "params": {
+          "input": "testdata/geoproc/clip_areas.shp",
+          "output": "<out>",
+          "method": "EQUAL_AREAS",
+          "target_area": 5000
+        }
+      }
     }
   }
 }

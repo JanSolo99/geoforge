@@ -49,10 +49,10 @@ Get ArcGIS tools done faster: (1) triage cheap tools in batches, (2) generate th
   and Count Overlapping Features (`count_overlapping_features`, single input only; rows ordered by count ascending) in
   `crates/unigis-tools/src/neighbors.rs`; cases `pn_squares*`, `cof_clip` pass `arcgis_reference`.
   ArcGIS rejects two inputs of unequal shape type (`cof_squares_clip` failed, removed).
-- Subdivide Polygon probed, NOT implemented: cases `sbd_*` are in `PENDING_CASES` ("sbd_"). Findings: output keeps the input
-  fields (AREA_ID on clip_areas); squares are cut into strips parallel to X (cuts at y = k/n of the height); a 220x320
-  polygon with a hole is cut perpendicular to the long axis into equal-AREA strips (hole subtracted); EQUAL_AREAS with
-  target area 5000 gives 30 pieces. Rule for direction on irregular polygons (oriented envelope?) still to be probed.
+- Subdivide Polygon (`subdivide_polygon`, NUMBER_OF_EQUAL_PARTS and EQUAL_AREAS only) implemented and passing `sbd_*`.
+  Probed rule (corrects the earlier guess): ArcGIS always cuts with lines parallel to the X axis, from the bottom up, into
+  equal-area strips whatever the polygon's shape or rotation; one feature per strip (multipart if split); EQUAL_AREAS gives
+  ceil(area/target) strips, the top one the remainder. Other methods (STACKED_BLOCKS, split angle, width) not done.
 - `NOTES.md` (untracked, from another agent) describes decompiling ArcGIS DLLs with Ghidra/REA. CLAUDE.md says black-box only
   (never decompile Esri binaries); I did not take part in that and did not touch it. Decide with the user before using it.
 

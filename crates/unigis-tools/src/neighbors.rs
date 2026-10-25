@@ -249,3 +249,100 @@ pub const COUNT_OVERLAPPING_FEATURES: Tool = Tool {
     measures: true,
     run: Runner::Features(count_overlapping),
 };
+
+/// Subdivide Polygon: each polygon cut into strips of equal area by lines parallel to the X
+/// axis, from the bottom up, whatever the shape (observed); the strips keep the polygon's
+/// attributes.
+fn subdivide_polygon(ctx: &dyn Context) -> Result<ToolOutput> {
+    let fc = ctx.features("input")?;
+    if fc.geometry_kind() != Some(GeometryKind::Polygon) {
+        return Err(err(
+            "ERROR 000368: Invalid input data: polygons are required",
+        ));
+    }
+    let method = ctx
+        .get("method")
+        .unwrap_or_else(|| "NUMBER_OF_EQUAL_PARTS".into());
+    let (parts, target) = if method.eq_ignore_ascii_case("NUMBER_OF_EQUAL_PARTS") {
+        let n: usize = ctx
+            .get("number_of_areas")
+            .and_then(|v| v.trim().parse().ok())
+            .ok_or_else(|| err("ERROR 000735: Number of Areas: Value is required"))?;
+        (Some(n), None)
+    } else if method.eq_ignore_ascii_case("EQUAL_AREAS") {
+        let a: f64 = ctx
+            .get("target_area")
+            .and_then(|v| v.trim().parse().ok())
+            .ok_or_else(|| err("ERROR 000735: Target Area: Value is required"))?;
+        (None, Some(a))
+    } else {
+        return Err(err(format!(
+            "subdivision method {method} is not supported yet"
+        )));
+    };
+    let mut features = Vec::new();
+    for f in fc.features() {
+        let f = f?;
+        let Some(g) = &f.geometry else { continue };
+        for piece in unigis_geometry::horizontal_strips(g, parts, target)? {
+            features.push(Feature {
+                oid: features.len() as i64,
+                geometry: Some(piece),
+                attributes: f.attributes.clone(),
+            });
+        }
+    }
+    Ok(ToolOutput {
+        kind: GeometryKind::Polygon,
+        has_z: false,
+        has_m: false,
+        fields: fc.fields().to_vec(),
+        spatial_reference_wkt: fc.spatial_reference_wkt().map(str::to_owned),
+        features,
+        messages: Vec::new(),
+    })
+}
+
+pub const SUBDIVIDE_POLYGON: Tool = Tool {
+    id: "subdivide_polygon",
+    name: "Subdivide Polygon",
+    toolbox: "Data Management › Features",
+    summary: "Cuts polygons into strips of equal area (ArcGIS Pro Subdivide Polygon).",
+    params: &[
+        Param {
+            name: "input",
+            label: "Input Polygons",
+            kind: Kind::Features,
+            required: true,
+            default: "",
+            help: "",
+        },
+        Param {
+            name: "method",
+            label: "Subdivision Method",
+            kind: Kind::Choice(&["NUMBER_OF_EQUAL_PARTS", "EQUAL_AREAS"]),
+            required: false,
+            default: "NUMBER_OF_EQUAL_PARTS",
+            help: "",
+        },
+        Param {
+            name: "number_of_areas",
+            label: "Number of Areas",
+            kind: Kind::Number,
+            required: false,
+            default: "",
+            help: "",
+        },
+        Param {
+            name: "target_area",
+            label: "Target Area",
+            kind: Kind::Number,
+            required: false,
+            default: "",
+            help: "",
+        },
+    ],
+    output_suffix: "Subdivided",
+    measures: true,
+    run: Runner::Features(subdivide_polygon),
+};
