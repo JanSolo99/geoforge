@@ -4030,6 +4030,23 @@ fn compare(case: &str, ours: &Path, theirs: &Path, fields: &serde_json::Value) -
         a.sort_by_key(pid);
         b.sort_by_key(pid);
     }
+    // The Pairwise tools run in parallel and list their features in no fixed order: compare by
+    // attribute values.
+    if case.starts_with("pwerase_") || case.starts_with("pwint_") || case.starts_with("pwdis_") {
+        // Features with equal attributes (the parts of a single-part dissolve) by lower-left corner.
+        let key = |f: &unigis_core::Feature| {
+            let corner = f.geometry.as_ref().map_or((0, 0), |g| {
+                let min = |i: usize| g.xy.iter().map(|p| p[i]).fold(f64::INFINITY, f64::min);
+                (
+                    (min(0) * 100.0).round() as i64,
+                    (min(1) * 100.0).round() as i64,
+                )
+            });
+            format!("{:?}{corner:?}", f.attributes)
+        };
+        a.sort_by_key(key);
+        b.sort_by_key(key);
+    }
     if a.len() != b.len() {
         diffs.push(format!("count: ours {}, ArcGIS {}", a.len(), b.len()));
     }
@@ -4037,7 +4054,8 @@ fn compare(case: &str, ours: &Path, theirs: &Path, fields: &serde_json::Value) -
     // than that are the same point to ArcGIS). Buffers are densified differently
     // (vertex placement on arcs), so compare shape within 2 × the 0.1 m deviation.
     // Circles are densified arcs, like buffers.
-    let is_buffer = case.starts_with("buffer") || case.ends_with("_circle");
+    let is_buffer =
+        case.starts_with("buffer") || case.starts_with("pwbuf_") || case.ends_with("_circle");
     // Intersect of three or more inputs runs as a cascade of overlays, each of
     // which may move a vertex within the tolerance: allow two steps.
     let cascade = case.starts_with("intersect_tri") || case.starts_with("intersect_3");
@@ -4161,6 +4179,9 @@ const KNOWN_FEATURE_DIFFERENCES: &[(&str, &[usize])] = &[
 /// differing cells allowed: Flow Direction resolves flats differently in places,
 /// Hillshade shadows differ for cells within centimeters of the horizon, and
 /// and Viewshed where sight lines graze the terrain (about 1% of cells).
+/// Reference cases (by name prefix) of tools not implemented yet; remove the prefix with the tool.
+const PENDING_CASES: &[&str] = &["cr_", "fenv_", "mrb_", "gpal_"];
+
 const KNOWN_RASTER_DIFFERENCES: &[(&str, usize)] = &[
     // Cost Back Link: cells where two equally cheap paths meet and ArcGIS picks one by a rule not found.
     ("cback_int", 15),
@@ -4321,7 +4342,8 @@ fn tools_match_arcgis_output() {
         if matches!(
             info["tool"].as_str(),
             Some("gp.ZonalGeometryAsTable_sa" | "gp.CostPath_sa")
-        ) {
+        ) || PENDING_CASES.iter().any(|p| case.starts_with(p))
+        {
             continue; // not done yet
         }
         // Workspace tools (Split) write into a folder.

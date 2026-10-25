@@ -13,6 +13,8 @@ use unigis_filegdb::Geodatabase;
 use unigis_shapefile::{ShapefileReader, ShapefileWriter};
 use unigis_tools::{Dissolve, ToolOutput};
 
+mod aliases;
+
 #[derive(Parser)]
 #[command(name = "ug", version, about = "UniGIS geoprocessing tools")]
 struct Cli {
@@ -57,6 +59,9 @@ enum Tool {
         /// INPUT (lowest input dimension), LINE or POINT.
         #[arg(long, default_value = "INPUT")]
         output_type: String,
+        /// One feature per combination of input features, its pieces merged (Pairwise Intersect).
+        #[arg(long, hide = true)]
+        merge_pieces: bool,
     },
     /// Polygon boundaries as lines (ArcGIS "Polygon To Line"): with IDENTIFY_NEIGHBORS (the
     /// default) shared boundaries are split and get LEFT_FID / RIGHT_FID.
@@ -1517,11 +1522,15 @@ enum Tool {
         /// Fields for dissolve_option LIST (repeatable).
         #[arg(long = "dissolve-field")]
         dissolve_fields: Vec<String>,
+        /// Largest angle of an arc segment in degrees for line and polygon input (Pairwise
+        /// Buffer uses 3.75).
+        #[arg(long, hide = true)]
+        max_arc_angle: Option<f64>,
     },
 }
 
 fn main() -> ExitCode {
-    let tool = Cli::parse().tool;
+    let tool = Cli::parse_from(aliases::rewrite(std::env::args().collect())).tool;
     if let Err(e) = check_64bit_oids(&tool) {
         eprintln!("ERROR: {e}");
         return ExitCode::FAILURE;
@@ -1560,6 +1569,7 @@ fn main() -> ExitCode {
             mut paths,
             join_attributes,
             output_type,
+            merge_pieces,
         } => (|| {
             let out = paths.pop().unwrap();
             let opts = unigis_tools::IntersectOptions {
@@ -1567,7 +1577,30 @@ fn main() -> ExitCode {
                 output_type: unigis_tools::OutputType::parse(&output_type)
                     .ok_or_else(|| Error::Unsupported(format!("output_type {output_type}")))?,
             };
-            overlay_tool(&paths, &out, |i| unigis_tools::intersect_with(i, &opts))
+            overlay_tool(&paths, &out, |i| {
+                let mut out = unigis_tools::intersect_with(i, &opts)?;
+                if merge_pieces {
+                    merge_pieces_with_equal_attributes(&mut out)?;
+                    // Pairwise Intersect with POINT output finds no points where lines cross polygons
+                    // (observed).
+                    let polygons = paths.iter().any(|p| {
+                        open_feature_class(p).is_ok_and(|(fc, _)| {
+                            fc.geometry_kind() == Some(unigis_core::GeometryKind::Polygon)
+                        })
+                    });
+                    if polygons
+                        && output_type.eq_ignore_ascii_case("POINT")
+                        && matches!(
+                            out.kind,
+                            unigis_core::GeometryKind::Point
+                                | unigis_core::GeometryKind::Multipoint
+                        )
+                    {
+                        out.features.clear();
+                    }
+                }
+                Ok(out)
+            })
         })(),
         Tool::PolygonToLine {
             in_features,
@@ -4452,15 +4485,32 @@ fn main() -> ExitCode {
             line_end_type,
             dissolve_option,
             dissolve_fields,
-        } => buffer_tool(
-            &in_features,
-            &out_feature_class,
-            &buffer_distance,
-            &line_side,
-            &line_end_type,
-            &dissolve_option,
-            dissolve_fields,
-        ),
+            max_arc_angle,
+        } => {
+            if let Some(degrees) = max_arc_angle {
+                let points = open_feature_class(&in_features).is_ok_and(|(fc, _)| {
+                    matches!(
+                        fc.geometry_kind(),
+                        Some(
+                            unigis_core::GeometryKind::Point
+                                | unigis_core::GeometryKind::Multipoint
+                        )
+                    )
+                });
+                if !points {
+                    unigis_core::curves::set_arc_angle_step(degrees.to_radians());
+                }
+            }
+            buffer_tool(
+                &in_features,
+                &out_feature_class,
+                &buffer_distance,
+                &line_side,
+                &line_end_type,
+                &dissolve_option,
+                dissolve_fields,
+            )
+        }
     };
     match result {
         Ok(()) => ExitCode::SUCCESS,
@@ -5939,6 +5989,37 @@ fn buffer_distance(text: &str, wkt: Option<&str>) -> Result<unigis_tools::Buffer
             text, wkt,
         )?)),
     }
+}
+
+/// Merges the features that have the same attribute values (the pieces of one pair of input
+/// features) into one, in the order of their first piece.
+fn merge_pieces_with_equal_attributes(out: &mut ToolOutput) -> Result<()> {
+    if !matches!(
+        out.kind,
+        unigis_core::GeometryKind::Polygon | unigis_core::GeometryKind::Polyline
+    ) {
+        return Ok(());
+    }
+    let mut groups: Vec<(String, Vec<Feature>)> = Vec::new();
+    for f in std::mem::take(&mut out.features) {
+        let key = format!("{:?}", f.attributes);
+        match groups.iter_mut().find(|g| g.0 == key) {
+            Some(g) => g.1.push(f),
+            None => groups.push((key, vec![f])),
+        }
+    }
+    for (_, pieces) in groups {
+        if pieces.len() == 1 && out.kind == unigis_core::GeometryKind::Polygon {
+            out.features.extend(pieces);
+            continue;
+        }
+        let geometry =
+            unigis_geometry::dissolve(pieces.iter().filter_map(|f| f.geometry.as_ref()))?;
+        let mut first = pieces.into_iter().next().expect("a group has a piece");
+        first.geometry = geometry.or(first.geometry);
+        out.features.push(first);
+    }
+    Ok(())
 }
 
 fn buffer_tool(

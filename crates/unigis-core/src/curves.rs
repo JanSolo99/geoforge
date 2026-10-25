@@ -22,13 +22,31 @@ pub const ELLIPSE_COMPLETE: u32 = 0x2000;
 /// Default angular step when densifying: one vertex per degree of arc.
 pub const DEFAULT_MAX_ANGLE_STEP: f64 = PI / 180.0;
 
+/// 0 stands for the default.
+static ARC_ANGLE_STEP: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+
+/// The largest angle one segment of an arc may span (10° unless [`set_arc_angle_step`] says
+/// otherwise).
+pub fn arc_angle_step() -> f64 {
+    match f64::from_bits(ARC_ANGLE_STEP.load(std::sync::atomic::Ordering::Relaxed)) {
+        step if step > 0.0 => step,
+        _ => PI / 18.0,
+    }
+}
+
+/// Sets the largest angle of an arc segment, for tools that densify more finely (Pairwise Buffer
+/// of lines and polygons uses 3.75°).
+pub fn set_arc_angle_step(radians: f64) {
+    ARC_ANGLE_STEP.store(radians.to_bits(), std::sync::atomic::Ordering::Relaxed);
+}
+
 /// Number of straight segments ArcGIS uses for an arc of `sweep` radians and
 /// `radius`: at most 10° per segment, and no point of the chord more than
 /// `max_deviation` from the arc. Observed in ArcGIS Pro 3.7 shapefile output
 /// (36 segments up to r = 10 m, then 39, 71, 223, 703, 2222 for 30 m … 100 km
 /// with a deviation of 0.1 m).
 pub fn arcgis_arc_segments(sweep: f64, radius: f64, max_deviation: f64) -> usize {
-    let by_angle = (sweep.abs() / (PI / 18.0) - 1e-9).ceil();
+    let by_angle = (sweep.abs() / arc_angle_step() - 1e-9).ceil();
     let by_deviation = if radius > max_deviation && max_deviation > 0.0 {
         (sweep.abs() / (2.0 * (1.0 - max_deviation / radius).acos()) - 1e-9).ceil()
     } else {

@@ -37345,6 +37345,1847 @@
           "maintain_extent": "NO_MAINTAIN_EXTENT"
         }
       }
+    },
+    "pwbuf_roads_25": {
+      "tool": "analysis.PairwiseBuffer",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "25 Meters"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "pairwise_buffer",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "output": "<out>",
+          "distance": "25 Meters"
+        }
+      }
+    },
+    "pwbuf_roads_25_all": {
+      "tool": "analysis.PairwiseBuffer",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "25 Meters",
+        "ALL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "pairwise_buffer",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "output": "<out>",
+          "distance": "25 Meters",
+          "dissolve_option": "ALL"
+        }
+      }
+    },
+    "pwbuf_parcels_10": {
+      "tool": "analysis.PairwiseBuffer",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "10 Meters"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "pairwise_buffer",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "distance": "10 Meters"
+        }
+      }
+    },
+    "pwbuf_parcels_zone": {
+      "tool": "analysis.PairwiseBuffer",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "10 Meters",
+        "LIST",
+        "ZONE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "pairwise_buffer",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "distance": "10 Meters",
+          "dissolve_option": "LIST",
+          "dissolve_field": "ZONE"
+        }
+      }
+    },
+    "pwbuf_wells_30": {
+      "tool": "analysis.PairwiseBuffer",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "30 Meters"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "pairwise_buffer",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "output": "<out>",
+          "distance": "30 Meters"
+        }
+      }
+    },
+    "pwdis_parcels": {
+      "tool": "analysis.PairwiseDissolve",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "pairwise_dissolve",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>"
+        }
+      }
+    },
+    "pwdis_parcels_zone": {
+      "tool": "analysis.PairwiseDissolve",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "ZONE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "pairwise_dissolve",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "dissolve_field": "ZONE"
+        }
+      }
+    },
+    "pwdis_parcels_zone_stats": {
+      "tool": "analysis.PairwiseDissolve",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "ZONE",
+        "VALUE SUM;VALUE MEAN"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "SUM_VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "MEAN_VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "pairwise_dissolve",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "dissolve_field": "ZONE",
+          "statistics_fields": "VALUE SUM;VALUE MEAN"
+        }
+      }
+    },
+    "pwdis_parcels_single": {
+      "tool": "analysis.PairwiseDissolve",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "ZONE",
+        "",
+        "SINGLE_PART"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "pairwise_dissolve",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "dissolve_field": "ZONE",
+          "multi_part": "SINGLE_PART"
+        }
+      }
+    },
+    "pwint_parcels_clip": {
+      "tool": "analysis.PairwiseIntersect",
+      "args": [
+        "testdata/geoproc/parcels.shp;testdata/geoproc/clip_areas.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_parcel",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "FID_clip_a",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "pairwise_intersect",
+        "params": {
+          "inputs": "testdata/geoproc/parcels.shp;testdata/geoproc/clip_areas.shp",
+          "output": "<out>"
+        }
+      }
+    },
+    "pwint_roads_parcels": {
+      "tool": "analysis.PairwiseIntersect",
+      "args": [
+        "testdata/geoproc/roads.shp;testdata/geoproc/parcels.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_roads",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "FID_parcel",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "pairwise_intersect",
+        "params": {
+          "inputs": "testdata/geoproc/roads.shp;testdata/geoproc/parcels.shp",
+          "output": "<out>"
+        }
+      }
+    },
+    "pwint_roads_parcels_point": {
+      "tool": "analysis.PairwiseIntersect",
+      "args": [
+        "testdata/geoproc/roads.shp;testdata/geoproc/parcels.shp",
+        "<out>",
+        "ALL",
+        "",
+        "POINT"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000117: Warning empty output generated."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_roads",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "FID_parcel",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Multipoint",
+      "run": {
+        "tool": "pairwise_intersect",
+        "params": {
+          "inputs": "testdata/geoproc/roads.shp;testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "join_attributes": "ALL",
+          "output_type": "POINT"
+        }
+      }
+    },
+    "pwint_wells_parcels": {
+      "tool": "analysis.PairwiseIntersect",
+      "args": [
+        "testdata/geoproc/wells.shp;testdata/geoproc/parcels.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "FID_wells",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "FID_parcel",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "pairwise_intersect",
+        "params": {
+          "inputs": "testdata/geoproc/wells.shp;testdata/geoproc/parcels.shp",
+          "output": "<out>"
+        }
+      }
+    },
+    "pwint_parcels_clip_nofid": {
+      "tool": "analysis.PairwiseIntersect",
+      "args": [
+        "testdata/geoproc/parcels.shp;testdata/geoproc/clip_areas.shp",
+        "<out>",
+        "NO_FID"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "pairwise_intersect",
+        "params": {
+          "inputs": "testdata/geoproc/parcels.shp;testdata/geoproc/clip_areas.shp",
+          "output": "<out>",
+          "join_attributes": "NO_FID"
+        }
+      }
+    },
+    "pwclip_parcels": {
+      "tool": "analysis.PairwiseClip",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "testdata/geoproc/clip_areas.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "pairwise_clip",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "clip_features": "testdata/geoproc/clip_areas.shp",
+          "output": "<out>"
+        }
+      }
+    },
+    "pwclip_roads": {
+      "tool": "analysis.PairwiseClip",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "testdata/geoproc/clip_areas.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "pairwise_clip",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "clip_features": "testdata/geoproc/clip_areas.shp",
+          "output": "<out>"
+        }
+      }
+    },
+    "pwclip_wells": {
+      "tool": "analysis.PairwiseClip",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "testdata/geoproc/clip_areas.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "pairwise_clip",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "clip_features": "testdata/geoproc/clip_areas.shp",
+          "output": "<out>"
+        }
+      }
+    },
+    "pwerase_parcels": {
+      "tool": "analysis.PairwiseErase",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "testdata/geoproc/clip_areas.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "pairwise_erase",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "erase_features": "testdata/geoproc/clip_areas.shp",
+          "output": "<out>"
+        }
+      }
+    },
+    "pwerase_roads": {
+      "tool": "analysis.PairwiseErase",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "testdata/geoproc/clip_areas.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "pairwise_erase",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "erase_features": "testdata/geoproc/clip_areas.shp",
+          "output": "<out>"
+        }
+      }
+    },
+    "cr_sales": {
+      "tool": "management.CopyRows",
+      "args": [
+        "testdata/dm/sales.dbf",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "REGION",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "YEAR",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "PRODUCT",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "AMOUNT",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "UNITS",
+          "Integer",
+          9,
+          9,
+          0
+        ]
+      ],
+      "shapeType": null
+    },
+    "cr_parcels": {
+      "tool": "management.CopyRows",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": null
+    },
+    "fenv_parcels": {
+      "tool": "management.FeatureEnvelopeToPolygon",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "fenv_roads": {
+      "tool": "management.FeatureEnvelopeToPolygon",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "fenv_wells": {
+      "tool": "management.FeatureEnvelopeToPolygon",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 003917: The feature class geometry is not of type multipoint | polyline | polygon",
+        "Failed to execute (FeatureEnvelopeToPolygon)."
+      ],
+      "fields": [],
+      "shapeType": null
+    },
+    "fenv_roads_single": {
+      "tool": "management.FeatureEnvelopeToPolygon",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "SINGLEPART"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "mrb_wells": {
+      "tool": "analysis.MultipleRingBuffer",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "50;100",
+        "Meters"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "distance",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "mrb_wells_all": {
+      "tool": "analysis.MultipleRingBuffer",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "50;100",
+        "Meters",
+        "dist",
+        "ALL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "dist",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "mrb_parcels_outside": {
+      "tool": "analysis.MultipleRingBuffer",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "10;30",
+        "Meters",
+        "dist",
+        "ALL",
+        "OUTSIDE_ONLY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "dist",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "mrb_roads": {
+      "tool": "analysis.MultipleRingBuffer",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "20;40;60",
+        "Meters"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "distance",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "gpal_roads_50": {
+      "tool": "management.GeneratePointsAlongLines",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "DISTANCE",
+        "50 Meters",
+        "",
+        "NO_END_POINTS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "gpal_roads_50_end": {
+      "tool": "management.GeneratePointsAlongLines",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "DISTANCE",
+        "50 Meters",
+        "",
+        "END_POINTS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "gpal_roads_pct": {
+      "tool": "management.GeneratePointsAlongLines",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "PERCENTAGE",
+        "",
+        25,
+        "NO_END_POINTS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Point"
+    },
+    "gpal_streams_80_chain": {
+      "tool": "management.GeneratePointsAlongLines",
+      "args": [
+        "testdata/geoproc/streams.shp",
+        "<out>",
+        "DISTANCE",
+        "80 Meters",
+        "",
+        "END_POINTS",
+        "ADD_CHAINAGE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_LEN",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_SEQ",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "STREAM_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          80,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point"
     }
   }
 }
