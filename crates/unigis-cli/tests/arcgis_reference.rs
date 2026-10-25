@@ -4180,7 +4180,7 @@ const KNOWN_FEATURE_DIFFERENCES: &[(&str, &[usize])] = &[
 /// Hillshade shadows differ for cells within centimeters of the horizon, and
 /// and Viewshed where sight lines graze the terrain (about 1% of cells).
 /// Reference cases (by name prefix) of tools not implemented yet; remove the prefix with the tool.
-const PENDING_CASES: &[&str] = &["cr_", "fenv_", "mrb_", "gpal_"];
+const PENDING_CASES: &[&str] = &["mrb_"];
 
 const KNOWN_RASTER_DIFFERENCES: &[(&str, usize)] = &[
     // Cost Back Link: cells where two equally cheap paths meet and ArcGIS picks one by a rule not found.

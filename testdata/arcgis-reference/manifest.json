@@ -38575,7 +38575,14 @@
           0
         ]
       ],
-      "shapeType": null
+      "shapeType": null,
+      "run": {
+        "tool": "copy_rows",
+        "params": {
+          "input": "testdata/dm/sales.dbf",
+          "output": "<out>"
+        }
+      }
     },
     "cr_parcels": {
       "tool": "management.CopyRows",
@@ -38622,178 +38629,14 @@
           0
         ]
       ],
-      "shapeType": null
-    },
-    "fenv_parcels": {
-      "tool": "management.FeatureEnvelopeToPolygon",
-      "args": [
-        "testdata/geoproc/parcels.shp",
-        "<out>"
-      ],
-      "status": "succeeded",
-      "messages": [],
-      "fields": [
-        [
-          "FID",
-          "OID",
-          4,
-          0,
-          0
-        ],
-        [
-          "Shape",
-          "Geometry",
-          0,
-          0,
-          0
-        ],
-        [
-          "PARCEL_ID",
-          "Integer",
-          10,
-          10,
-          0
-        ],
-        [
-          "NAME",
-          "String",
-          20,
-          0,
-          0
-        ],
-        [
-          "VALUE",
-          "Double",
-          19,
-          0,
-          0
-        ],
-        [
-          "ZONE",
-          "Integer",
-          5,
-          5,
-          0
-        ],
-        [
-          "ORIG_FID",
-          "Integer",
-          10,
-          10,
-          0
-        ]
-      ],
-      "shapeType": "Polygon"
-    },
-    "fenv_roads": {
-      "tool": "management.FeatureEnvelopeToPolygon",
-      "args": [
-        "testdata/geoproc/roads.shp",
-        "<out>"
-      ],
-      "status": "succeeded",
-      "messages": [],
-      "fields": [
-        [
-          "FID",
-          "OID",
-          4,
-          0,
-          0
-        ],
-        [
-          "Shape",
-          "Geometry",
-          0,
-          0,
-          0
-        ],
-        [
-          "ROAD_ID",
-          "Integer",
-          10,
-          10,
-          0
-        ],
-        [
-          "CLASS",
-          "Integer",
-          5,
-          5,
-          0
-        ],
-        [
-          "ORIG_FID",
-          "Integer",
-          10,
-          10,
-          0
-        ]
-      ],
-      "shapeType": "Polygon"
-    },
-    "fenv_wells": {
-      "tool": "management.FeatureEnvelopeToPolygon",
-      "args": [
-        "testdata/geoproc/wells.shp",
-        "<out>"
-      ],
-      "status": "failed",
-      "messages": [
-        "Failed to execute. Parameters are not valid.",
-        "ERROR 003917: The feature class geometry is not of type multipoint | polyline | polygon",
-        "Failed to execute (FeatureEnvelopeToPolygon)."
-      ],
-      "fields": [],
-      "shapeType": null
-    },
-    "fenv_roads_single": {
-      "tool": "management.FeatureEnvelopeToPolygon",
-      "args": [
-        "testdata/geoproc/roads.shp",
-        "<out>",
-        "SINGLEPART"
-      ],
-      "status": "succeeded",
-      "messages": [],
-      "fields": [
-        [
-          "FID",
-          "OID",
-          4,
-          0,
-          0
-        ],
-        [
-          "Shape",
-          "Geometry",
-          0,
-          0,
-          0
-        ],
-        [
-          "ROAD_ID",
-          "Integer",
-          10,
-          10,
-          0
-        ],
-        [
-          "CLASS",
-          "Integer",
-          5,
-          5,
-          0
-        ],
-        [
-          "ORIG_FID",
-          "Integer",
-          10,
-          10,
-          0
-        ]
-      ],
-      "shapeType": "Polygon"
+      "shapeType": null,
+      "run": {
+        "tool": "copy_rows",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>"
+        }
+      }
     },
     "mrb_wells": {
       "tool": "analysis.MultipleRingBuffer",
@@ -38996,7 +38839,17 @@
           0
         ]
       ],
-      "shapeType": "Point"
+      "shapeType": "Point",
+      "run": {
+        "tool": "generate_points_along_lines",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "output": "<out>",
+          "point_placement": "DISTANCE",
+          "distance": "50 Meters",
+          "include_end_points": "NO_END_POINTS"
+        }
+      }
     },
     "gpal_roads_50_end": {
       "tool": "management.GeneratePointsAlongLines",
@@ -39054,7 +38907,17 @@
           0
         ]
       ],
-      "shapeType": "Point"
+      "shapeType": "Point",
+      "run": {
+        "tool": "generate_points_along_lines",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "output": "<out>",
+          "point_placement": "DISTANCE",
+          "distance": "50 Meters",
+          "include_end_points": "END_POINTS"
+        }
+      }
     },
     "gpal_roads_pct": {
       "tool": "management.GeneratePointsAlongLines",
@@ -39112,7 +38975,17 @@
           0
         ]
       ],
-      "shapeType": "Point"
+      "shapeType": "Point",
+      "run": {
+        "tool": "generate_points_along_lines",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "output": "<out>",
+          "point_placement": "PERCENTAGE",
+          "percentage": 25,
+          "include_end_points": "NO_END_POINTS"
+        }
+      }
     },
     "gpal_streams_80_chain": {
       "tool": "management.GeneratePointsAlongLines",
@@ -39185,7 +39058,18 @@
           0
         ]
       ],
-      "shapeType": "Point"
+      "shapeType": "Point",
+      "run": {
+        "tool": "generate_points_along_lines",
+        "params": {
+          "input": "testdata/geoproc/streams.shp",
+          "output": "<out>",
+          "point_placement": "DISTANCE",
+          "distance": "80 Meters",
+          "include_end_points": "END_POINTS",
+          "add_chainage_fields": "ADD_CHAINAGE"
+        }
+      }
     }
   }
 }

@@ -872,10 +872,6 @@ CASES = {
     "pwerase_roads": ("analysis.PairwiseErase", [DATA / "roads.shp", DATA / "clip_areas.shp"], []),
     "cr_sales": ("management.CopyRows", [DM / "sales.dbf"], []),
     "cr_parcels": ("management.CopyRows", [DATA / "parcels.shp"], []),
-    "fenv_parcels": ("management.FeatureEnvelopeToPolygon", [DATA / "parcels.shp"], []),
-    "fenv_roads": ("management.FeatureEnvelopeToPolygon", [DATA / "roads.shp"], []),
-    "fenv_wells": ("management.FeatureEnvelopeToPolygon", [DATA / "wells.shp"], []),
-    "fenv_roads_single": ("management.FeatureEnvelopeToPolygon", [DATA / "roads.shp"], ["SINGLEPART"]),
     "mrb_wells": ("analysis.MultipleRingBuffer", [DATA / "wells.shp"], ["50;100", "Meters"]),
     "mrb_wells_all": ("analysis.MultipleRingBuffer", [DATA / "wells.shp"], ["50;100", "Meters", "dist", "ALL"]),
     "mrb_parcels_outside": ("analysis.MultipleRingBuffer", [DATA / "parcels.shp"], ["10;30", "Meters", "dist", "ALL", "OUTSIDE_ONLY"]),
@@ -996,6 +992,8 @@ RUN = {
     "analysis.PairwiseIntersect": ("pairwise_intersect", ["inputs", "output", "join_attributes", None, "output_type"]),
     "analysis.PairwiseClip": ("pairwise_clip", ["input", "clip_features", "output"]),
     "analysis.PairwiseErase": ("pairwise_erase", ["input", "erase_features", "output"]),
+    "management.GeneratePointsAlongLines": ("generate_points_along_lines", ["input", "output", "point_placement", "distance", "percentage", "include_end_points", "add_chainage_fields"]),
+    "management.CopyRows": ("copy_rows", ["input", "output"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
 }
 

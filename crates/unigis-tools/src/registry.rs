@@ -384,7 +384,9 @@ fn generate_points_along_lines(ctx: &dyn Context) -> Result<ToolOutput> {
         };
     let ends =
         text(ctx, t, "include_end_points").is_some_and(|p| p.eq_ignore_ascii_case("END_POINTS"));
-    construct::generate_points_along_lines(fc.as_ref(), placement, ends)
+    let chainage =
+        text(ctx, t, "add_chainage_fields").is_some_and(|p| p.eq_ignore_ascii_case("ADD_CHAINAGE"));
+    construct::generate_points_along_lines(fc.as_ref(), placement, ends, chainage)
 }
 
 fn create_fishnet(ctx: &dyn Context) -> Result<ToolOutput> {
@@ -879,7 +881,14 @@ fn where_of(ctx: &dyn Context, t: &Tool) -> Option<String> {
 fn copy_rows(ctx: &dyn Context) -> Result<Outcome> {
     let t = find("copy_rows").ok_or_else(|| Error::Unsupported("copy_rows".into()))?;
     let fc = ctx.features("input")?;
-    tables::copy_rows(fc.as_ref(), where_of(ctx, t).as_deref()).map(Outcome::Table)
+    let mut table = tables::copy_rows(fc.as_ref(), where_of(ctx, t).as_deref())?;
+    // Copy Rows writes decimal fields at most 19 characters wide (observed on a dBASE source).
+    for f in &mut table.fields {
+        if f.field_type == unigis_core::FieldType::Double && f.precision > 0 {
+            f.precision = f.precision.min(19 - u32::from(f.scale > 0));
+        }
+    }
+    Ok(Outcome::Table(table))
 }
 
 fn table_to_table(ctx: &dyn Context) -> Result<Outcome> {
@@ -1122,6 +1131,14 @@ pub static TOOLS: &[Tool] = &[
                 required: false,
                 default: "NO_END_POINTS",
                 help: "",
+            },
+            Param {
+                name: "add_chainage_fields",
+                label: "Add Chainage Fields",
+                kind: Kind::Choice(&["NO_CHAINAGE", "ADD_CHAINAGE"]),
+                required: false,
+                default: "NO_CHAINAGE",
+                help: "Adds ORIG_LEN (distance along the line) and ORIG_SEQ (number along the line).",
             },
         ],
         output_suffix: "Points",

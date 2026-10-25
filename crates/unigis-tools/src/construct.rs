@@ -138,6 +138,7 @@ pub fn generate_points_along_lines(
     input: &dyn FeatureClass,
     placement: Placement,
     end_points: bool,
+    chainage: bool,
 ) -> Result<ToolOutput> {
     require_lines_or_polygons(input)?;
     let step_ok = match placement {
@@ -150,6 +151,11 @@ pub fn generate_points_along_lines(
         ));
     }
     let mut fields = vec![id_field(), Field::new("ORIG_FID", FieldType::Integer)];
+    if chainage {
+        // The distance of the point from the start of the line, and its number along the line.
+        fields.push(Field::new("ORIG_LEN", FieldType::Double));
+        fields.push(Field::new("ORIG_SEQ", FieldType::Integer));
+    }
     for f in input.fields() {
         push_unique(&mut fields, f.clone());
     }
@@ -170,9 +176,9 @@ pub fn generate_points_along_lines(
             Placement::Distance(d) => d,
             Placement::Percentage(p) => total * p / 100.0,
         };
-        let mut points: Vec<[f64; 2]> = Vec::new();
+        let mut points: Vec<([f64; 2], f64)> = Vec::new();
         if end_points && let Some(p) = runs.iter().find_map(|r| r.first()) {
-            points.push(*p);
+            points.push((*p, 0.0));
         }
         // Positions along the parts laid end to end.
         let mut next = step;
@@ -187,10 +193,13 @@ pub fn generate_points_along_lines(
                     } else {
                         ((next - before) / len).clamp(0.0, 1.0)
                     };
-                    points.push([
-                        w[0][0] + (w[1][0] - w[0][0]) * t,
-                        w[0][1] + (w[1][1] - w[0][1]) * t,
-                    ]);
+                    points.push((
+                        [
+                            w[0][0] + (w[1][0] - w[0][0]) * t,
+                            w[0][1] + (w[1][1] - w[0][1]) * t,
+                        ],
+                        next,
+                    ));
                     next += step;
                     if step <= 0.0 {
                         break 'walk;
@@ -200,16 +209,19 @@ pub fn generate_points_along_lines(
             }
         }
         if end_points && let Some(p) = runs.iter().rev().find_map(|r| r.last()) {
-            points.push(*p);
+            points.push((*p, total));
         }
-        for p in points {
+        for (seq, (p, along)) in points.into_iter().enumerate() {
+            let mut attributes = vec![Value::Integer(0), Value::Integer(f.oid as i32)];
+            if chainage {
+                attributes.push(Value::Double(along));
+                attributes.push(Value::Integer(seq as i32 + 1));
+            }
+            attributes.extend(f.attributes.iter().cloned());
             features.push(Feature {
                 oid: features.len() as i64,
                 geometry: Some(Geometry::point(p[0], p[1])),
-                attributes: [Value::Integer(0), Value::Integer(f.oid as i32)]
-                    .into_iter()
-                    .chain(f.attributes.iter().cloned())
-                    .collect(),
+                attributes,
             });
         }
     }
