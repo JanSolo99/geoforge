@@ -713,3 +713,5 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - Corridor, Filter (LOW/HIGH, `ug filter`) and Nibble (`ug nibble`; ties take the smallest value): 15 ArcGIS cases.
 - Add/Remove Attribute Index for file geodatabase tables (`ug add-index`, `remove-index`; single field, file for file equal to ArcGIS on 20 operations). Spatial index add/remove and multi-field indexes are not done.
 - Reclass by Table (`ug reclass-by-table`; integer output field required, float fractions are truncated): 7 ArcGIS cases. `ug` now reads a stand-alone .dbf as a table.
+- Raster registry (`ug run <id>`; `RUN` in the reference script drives the test): Nibble and Filter moved to it; added Slice (equal interval/area; ~10 boundary cells differ), Extract by Attributes/Rectangle/Circle, Lookup, Sink, Pick, Flip, Mirror, Shift and Clip (rectangle) with 40+ ArcGIS cases.
+- Pairwise Buffer/Dissolve/Intersect/Clip/Erase (aliases of the classic tools, `crates/unigis-cli/src/aliases.rs`), Multiple Ring Buffer, Generate Points Along Lines chainage fields, Copy Rows field widths: ArcGIS cases `pw*`, `mrb_*`, `gpal_*`, `cr_*`.

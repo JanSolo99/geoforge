@@ -57,3 +57,11 @@ Update this file when a gap is found or closed.
 - Rust speed is claimed, not measured: no benchmarks against ArcGIS or GDAL yet.
 - The app has never been launched as a window in a test environment (`xvfb-run` missing); screenshots
   come from the offscreen harness `app/crates/ui-egui/examples/ui_shot.rs`.
+
+## Raster registry and Pairwise tools (2026-10-25)
+
+- Slice: about 10 cells per case just below a class boundary go into the upper class in ArcGIS (rule not found); no `.vat.dbf`; only EQUAL_INTERVAL and EQUAL_AREA.
+- Clip (raster): rectangle only, no clipping geometry.
+- Multiple Ring Buffer: dissolve ALL only; arc density differs a little at 30 m around polygons (0.05% area).
+- Pairwise tools: output order is not reproduced (compared unordered); Pairwise Buffer line/polygon arcs use a fixed 3.75 degree step, and the rule for large radii is not checked.
+

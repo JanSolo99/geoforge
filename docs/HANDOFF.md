@@ -1,75 +1,56 @@
 # Current handoff
 
-Updated: 2026-10-24T05:56:32+00:00; last agent: Codex.
-Workspace `/mnt/media/ArcGIS_Linux`; branch `main`; starting HEAD `f71f5c1` (pushed).
+Updated: 2026-10-25; last agent: Claude. Workspace `/mnt/media/ArcGIS_Linux`; branch `main`.
 
-## User objective / implementation
+## Objective (user: "do 1 to 5" of the speed-up plan)
 
-User wants Basemaps automatically loaded and OpenStreetMap on the initial map.
-Implemented in `app/crates/ui-egui/src/{lib,pluginsui}.rs`:
-- Default startup is a new map with OSM tiles, attribution and max zoom 19.
-  Explicit sample preferences/--sample, projection/extent settings and opened
-  project files retain their behavior. Startup is clean, with no undo entry.
-- Pinned official Basemaps 0.1.2 downloads off the UI thread on first launch;
-  existing plugin store (desktop) / preferences (web) remember it. Successful
-  initialization marker respects later disabling/uninstalling. Failures retry
-  next launch; existing installed/disabled plugin versions are not replaced.
-- Package URL https://packages.rustgis.app/basemaps/basemaps-0.1.2.rgplugin,
-  SHA256 bd9b0817158424aa8ab6bff958067a1a4948199595097eb0ed16a4219f209cb6.
-  Downloaded/inspected manifest: id basemaps, WASM, edit/network permissions.
-  No third-party code/assets vendored into repo.
-- Regression coverage: `tests/smoke.rs` (startup defaults/preferences) and
-  `pluginsui::startup_tests` (hash check, retry, caching, disabled/removal behavior).
-  `examples/ui_shot.rs` gains optional `startup` script flag. Docs/roadmap updated.
+Get ArcGIS tools done faster: (1) triage cheap tools in batches, (2) generate the plumbing,
+(3) probe ArcGIS in bulk, (4) parallelize, (5) use CI as the gate.
 
-## Validation / findings
+## Done this session
 
-PASSED on the final runtime source and screenshot example content:
-- App `cargo fmt --all --check`.
-- `cargo test -p rustgis-ui-egui start_up_preferences -j3`: 1 passed.
-- `cargo test -p rustgis-ui-egui --lib default_plugin_download_retries_and_remembers_success -j3`: 1 passed.
-- Full app `env CARGO_BUILD_JOBS=3 XDG_CACHE_HOME=/tmp/unigis-blockstats-cache cargo xtask ci`:
-  exit 0, 717 passed, 0 failed, 10 ignored, 29 result groups, layers ok;
-  full workspace/all-targets clippy -D warnings and formatting passed.
-  Log `/tmp/unigis-basemap-app-ci.log`.
-- Headless screenshot executed built `app/target/debug/examples/ui_shot` with
-  RUSTGIS_PLUGINS_DIR=/tmp/unigis-basemap-shot-plugins and the cache env above;
-  scripts `/tmp/unigis-basemap{,-startup}-shot.jsonl`. Inspected
-  `/tmp/unigis-basemaps-startup-loaded.png` and `/tmp/unigis-basemaps-london.png`:
-  plugin auto-installs without dialog, tab appears, world and street tiles render.
-  Temporary store contains verified 65,048-byte basemaps.rgplugin.
+- (5) CI: `scripts/check` + `.githooks/pre-push`; CI green again (run 40139811823). See "CI gate" below.
+- (2) Plumbing: a tool needs **no clap command and no test branch** any more.
+  - Raster tools: `crates/unigis-raster/src/registry.rs` (`TOOLS`: id, params, `run(&dyn Context) -> Output`).
+    `ug run <id> name=value ... output=out.tif` runs them (`run_raster_tool` in `crates/unigis-cli/src/main.rs`).
+  - Vector/table tools: the existing `unigis-tools` registry (`ug run`, `ug tools` lists both).
+  - Aliases (a Pairwise tool is an existing command under another name): `crates/unigis-cli/src/aliases.rs`
+    rewrites `ug run pairwise_buffer ...` to the `ug buffer ...` command line.
+  - Reference test: `scripts/make-arcgis-reference.py` has `RUN = {arcgis tool: (registry id, [param name per
+    argument])}`; the manifest case gets a `run` entry (`--annotate` adds it to existing cases without ArcGIS)
+    and `arcgis_reference.rs` builds `ug run ...` from it. New tool = registry entry + one `RUN` line + cases.
+  - Check `ug tools` BEFORE probing: Copy Rows, Table To Table, Join Field, Feature Envelope To Polygon,
+    Generate Points Along Lines etc. already existed (snake_case ids; grep for CamelCase misses them).
+- (3) Bulk probing: write many cases, run `uv run -q --with "mcp>=2" python scripts/make-arcgis-reference.py 'glob*' ...`
+  once, inspect with `scripts/research/sa_batch/{summary,show}.py`, implement against the saved outputs.
+  `PENDING_CASES` in `arcgis_reference.rs` skips cases of tools not implemented yet (empty now).
+- (1) Tools added (all with ArcGIS reference cases, test passes): Slice, Extract by Attributes/Rectangle/Circle,
+  Lookup, Sink, Pick, Flip, Mirror, Shift, Clip (raster, rectangle only), Pairwise Buffer/Dissolve/Intersect/Clip/Erase,
+  Multiple Ring Buffer, Generate Points Along Lines chainage fields, Copy Rows width fix.
+- (4) Parallel work is NOT launched: the coordinator rules forbid starting agents from here. The registry/alias/`RUN`
+  structure means separate worktrees no longer collide in `main.rs`/`arcgis_reference.rs`; the user can run
+  `./scripts/agents` per family (raster, vector overlay, geodatabase editing, conversion) in separate worktrees.
 
-False lead corrected: low-zoom OSM is unlabelled and was mistaken for the Paper
-backdrop. Pixel checks show OSM water (170,211,223), land (242,239,233), distinct
-from Paper (221,228,234)/(246,245,241). Generic curl requests got block PNGs;
-requests using the actual app's identifying UA returned the valid world tile.
-No renderer or tile-fetch changes needed. Extra `inspectTiles` diagnostics were
-added to the example then fully removed, restoring its first-CI-tested content.
-A redundant scoped example build (36901) and repeat CI (15449) were stopped with
-SIGINT, exit 130. These are not claimed as passed; original full CI is complete
-and covers final source. Avoid switching package/workspace feature graphs for
-follow-up builds: it caused long redundant rebuilds on the HDD.
+## Known differences recorded this session
 
-Browser gate PASSED: `cargo check --target wasm32-unknown-unknown -p rustgis-web -j3`
-(log `/tmp/unigis-basemap-wasm.log`). Committed with this checkpoint.
-No agents/coordinators launched. Builds sequential, max 3 jobs.
-
-## Prior work / preserved edits
-
-Aggregate CLI `f71f5c1` pushed to origin/main, verified remote SHA. Root fmt/clippy/
-tests passed 173 tests, 5 ignored; root source unchanged in this task.
-User authorizes frequent validated local commits; no new push requested.
-Handoff push-status edit inherited and reconciled. Preserve/exclude unrelated:
-tracked `tools/arcgis-bridge/__pycache__/server.cpython-312.pyc`, `.worktrees/`,
-`scripts/research/unsplit/{gdbindexes_dump,index_files}.py`,
-`testdata/gdb-reference/index_base.gdb/`, `index_ops_manifest.json`, and
-`testdata/raster/BlockSt_dem_nod2.*`.
+- Slice: ArcGIS puts ~10 cells just below a class boundary into the class above (rule not found), allowed per case in
+  `KNOWN_RASTER_DIFFERENCES`; Slice's `.vat.dbf` is not written; NATURAL_BREAKS etc. not implemented.
+- Multiple Ring Buffer: dissolve ALL only; around parcels the 30 m ring has 0.05% less area in ArcGIS
+  (`mrb_parcels_outside` feature 1 in `KNOWN_FEATURE_DIFFERENCES`). Pairwise Buffer draws lines and polygons with a 3.75 degree
+  arc step (`--max-arc-angle`, `unigis_core::curves::set_arc_angle_step`), points as Buffer does.
+- Pairwise Intersect/Erase/Dissolve list features in no fixed order: the test compares them by attributes and lower-left corner.
+  Pairwise Intersect merges the pieces of one pair of features; POINT output of lines x polygons is empty.
+- Raster Clip: window = cells touched by the rectangle (snapped out left/bottom, down from the top); MAINTAIN_EXTENT stretches the
+  cells to the rectangle; float NoData +3.4e38; clipping to geometry not implemented. Zonal Fill not done (its output grid is odd).
 
 ## Next actions
 
-1. Finish browser check and final diff/whitespace review.
-2. Commit only startup/plugin implementation, regression coverage, example and docs.
-3. Report local commit and verified behavior; push only if requested.
+1. Wait for/inspect `target/check2.log` (full gate run on commit "Add Multiple Ring Buffer"); push when green
+   (the pre-push hook runs the gate again).
+2. Update ROADMAP lines for the new tools (done below if present) and keep going in batches: next families to probe are
+   vector/table tools missing from `ug tools` (Polygon Neighbors, Tabulate Intersection, Count Overlapping Features,
+   Create Thiessen Polygons, Integrate, Smooth/Simplify, Subdivide Polygon) and Spatial Analyst Zonal Fill, Combinatorial
+   And/Or/Xor, Reclass by ASCII file, Raster To ASCII/Float, Copy Raster, Mosaic.
 
 ## Claude session 2026-10-24 (pushed before the Basemaps work)
 
