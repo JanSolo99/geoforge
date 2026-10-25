@@ -987,3 +987,138 @@ pub const CALCULATE_END_TIME: Tool = Tool {
     measures: false,
     run: Runner::Features(calculate_end_time),
 };
+
+/// Multiple Ring Buffer: the buffers of all features at each distance, dissolved, as rings (each
+/// buffer without the previous one). ArcGIS draws the arcs with 96 segments to the circle, whatever
+/// the radius (observed).
+fn multiple_ring_buffer(ctx: &dyn Context) -> Result<ToolOutput> {
+    use unigis_core::{Feature, Field, FieldType, GeometryKind, Value};
+
+    let fc = ctx.features("input")?;
+    let dissolve = ctx
+        .get("dissolve_option")
+        .unwrap_or_else(|| "ALL".to_string());
+    if !dissolve.eq_ignore_ascii_case("ALL") {
+        return Err(err("dissolve_option NONE is not supported yet"));
+    }
+    let wkt = fc.spatial_reference_wkt().map(str::to_owned);
+    let unit = ctx
+        .get("buffer_unit")
+        .filter(|u| !u.eq_ignore_ascii_case("DEFAULT"))
+        .unwrap_or_default();
+    let mut distances: Vec<(f64, f64)> = Vec::new();
+    for d in ctx.get("distances").unwrap_or_default().split(';') {
+        let d = d.trim();
+        if d.is_empty() {
+            continue;
+        }
+        let shown: f64 = d
+            .parse()
+            .map_err(|_| err(format!("ERROR 000094: '{d}' is not a distance")))?;
+        distances.push((
+            shown,
+            distance_in_units(&format!("{d} {unit}"), wkt.as_deref())?,
+        ));
+    }
+    distances.sort_by(|a, b| a.0.total_cmp(&b.0));
+    distances.dedup_by(|a, b| a.0 == b.0);
+    if distances.is_empty() {
+        return Err(err("ERROR 000735: Distances: Value is required"));
+    }
+    let outside_only = ctx
+        .get("outside_polygons_only")
+        .is_some_and(|v| v.eq_ignore_ascii_case("OUTSIDE_ONLY"))
+        && fc.geometry_kind() == Some(GeometryKind::Polygon);
+    let field_name = ctx.get("field_name").unwrap_or_else(|| "distance".into());
+
+    let previous = unigis_core::curves::arc_angle_step();
+    unigis_core::curves::set_arc_angle_step(std::f64::consts::PI / 48.0);
+    let rings = (|| -> Result<Vec<(f64, unigis_core::Geometry)>> {
+        let mut rings = Vec::new();
+        let mut inner: Option<unigis_core::Geometry> = if outside_only {
+            let all: Vec<_> = fc
+                .features()
+                .filter_map(|f| f.map(|f| f.geometry).transpose())
+                .collect::<Result<_>>()?;
+            unigis_geometry::dissolve(all.iter())?
+        } else {
+            None
+        };
+        for (shown, distance) in distances {
+            let out = crate::buffer(
+                fc.as_ref(),
+                crate::BufferDistance::Linear(distance),
+                unigis_geometry::LineEnd::Round,
+                unigis_geometry::LineSide::Full,
+                crate::Dissolve::All,
+            )?;
+            let Some(whole) = out.features.into_iter().find_map(|f| f.geometry) else {
+                continue;
+            };
+            let ring = match &inner {
+                Some(inner) => {
+                    let area = unigis_geometry::ClipArea::new([inner])?;
+                    unigis_geometry::erase(&whole, &area)?
+                }
+                None => Some(whole.clone()),
+            };
+            if let Some(ring) = ring {
+                rings.push((shown, ring));
+            }
+            inner = Some(whole);
+        }
+        Ok(rings)
+    })();
+    unigis_core::curves::set_arc_angle_step(previous);
+    Ok(ToolOutput {
+        kind: GeometryKind::Polygon,
+        has_z: false,
+        has_m: false,
+        fields: vec![Field::new(field_name, FieldType::Double)],
+        spatial_reference_wkt: wkt,
+        features: rings?
+            .into_iter()
+            .enumerate()
+            .map(|(i, (shown, geometry))| Feature {
+                oid: i as i64,
+                geometry: Some(geometry),
+                attributes: vec![Value::Double(shown)],
+            })
+            .collect(),
+        messages: Vec::new(),
+    })
+}
+
+pub const MULTIPLE_RING_BUFFER: Tool = Tool {
+    id: "multiple_ring_buffer",
+    name: "Multiple Ring Buffer",
+    toolbox: "Analysis › Proximity",
+    summary: "Buffers at several distances, each as a ring around the previous one (ArcGIS Pro Multiple Ring Buffer).",
+    params: &[
+        features("input", "Input Features"),
+        text(
+            "distances",
+            "Distances",
+            true,
+            "",
+            "Semicolon-separated, e.g. `50;100`.",
+        ),
+        text("buffer_unit", "Buffer Unit", false, "", "e.g. Meters."),
+        text("field_name", "Field Name", false, "distance", ""),
+        choice(
+            "dissolve_option",
+            "Dissolve Option",
+            &["ALL", "NONE"],
+            "ALL",
+        ),
+        choice(
+            "outside_polygons_only",
+            "Outside Polygons Only",
+            &["FULL", "OUTSIDE_ONLY"],
+            "FULL",
+        ),
+    ],
+    output_suffix: "Buffer",
+    measures: true,
+    run: Runner::Features(multiple_ring_buffer),
+};

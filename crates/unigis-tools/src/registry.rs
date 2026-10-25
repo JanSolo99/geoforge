@@ -2051,5 +2051,6 @@ pub static TOOLS: &[Tool] = &[
     crate::dm_tools::CREATE_TABLE,
     crate::dm_tools::DEFINE_PROJECTION,
     crate::dm_tools::COPY,
+    crate::dm_tools::MULTIPLE_RING_BUFFER,
     crate::dm_tools::CALCULATE_END_TIME,
 ];

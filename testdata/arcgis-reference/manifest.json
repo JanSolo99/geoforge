@@ -38671,7 +38671,16 @@
           0
         ]
       ],
-      "shapeType": "Polygon"
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "multiple_ring_buffer",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "output": "<out>",
+          "distances": "50;100",
+          "buffer_unit": "Meters"
+        }
+      }
     },
     "mrb_wells_all": {
       "tool": "analysis.MultipleRingBuffer",
@@ -38708,7 +38717,18 @@
           0
         ]
       ],
-      "shapeType": "Polygon"
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "multiple_ring_buffer",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "output": "<out>",
+          "distances": "50;100",
+          "buffer_unit": "Meters",
+          "field_name": "dist",
+          "dissolve_option": "ALL"
+        }
+      }
     },
     "mrb_parcels_outside": {
       "tool": "analysis.MultipleRingBuffer",
@@ -38746,7 +38766,19 @@
           0
         ]
       ],
-      "shapeType": "Polygon"
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "multiple_ring_buffer",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "distances": "10;30",
+          "buffer_unit": "Meters",
+          "field_name": "dist",
+          "dissolve_option": "ALL",
+          "outside_polygons_only": "OUTSIDE_ONLY"
+        }
+      }
     },
     "mrb_roads": {
       "tool": "analysis.MultipleRingBuffer",
@@ -38781,7 +38813,16 @@
           0
         ]
       ],
-      "shapeType": "Polygon"
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "multiple_ring_buffer",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "output": "<out>",
+          "distances": "20;40;60",
+          "buffer_unit": "Meters"
+        }
+      }
     },
     "gpal_roads_50": {
       "tool": "management.GeneratePointsAlongLines",

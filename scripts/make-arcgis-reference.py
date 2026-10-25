@@ -993,6 +993,7 @@ RUN = {
     "analysis.PairwiseClip": ("pairwise_clip", ["input", "clip_features", "output"]),
     "analysis.PairwiseErase": ("pairwise_erase", ["input", "erase_features", "output"]),
     "management.GeneratePointsAlongLines": ("generate_points_along_lines", ["input", "output", "point_placement", "distance", "percentage", "include_end_points", "add_chainage_fields"]),
+    "analysis.MultipleRingBuffer": ("multiple_ring_buffer", ["input", "output", "distances", "buffer_unit", "field_name", "dissolve_option", "outside_polygons_only"]),
     "management.CopyRows": ("copy_rows", ["input", "output"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
 }

@@ -4054,8 +4054,10 @@ fn compare(case: &str, ours: &Path, theirs: &Path, fields: &serde_json::Value) -
     // than that are the same point to ArcGIS). Buffers are densified differently
     // (vertex placement on arcs), so compare shape within 2 × the 0.1 m deviation.
     // Circles are densified arcs, like buffers.
-    let is_buffer =
-        case.starts_with("buffer") || case.starts_with("pwbuf_") || case.ends_with("_circle");
+    let is_buffer = case.starts_with("buffer")
+        || case.starts_with("pwbuf_")
+        || case.starts_with("mrb_")
+        || case.ends_with("_circle");
     // Intersect of three or more inputs runs as a cascade of overlays, each of
     // which may move a vertex within the tolerance: allow two steps.
     let cascade = case.starts_with("intersect_tri") || case.starts_with("intersect_3");
@@ -4155,6 +4157,9 @@ const KNOWN_FEATURE_DIFFERENCES: &[(&str, &[usize])] = &[
     // MULTIPART envelopes of nested parts: our shapefile writer turns the inner ring into a hole,
     // ArcGIS keeps it a second exterior ring.
     ("env_roads_multi", &[2]),
+    // Multiple Ring Buffer around parcels: the 30 m ring has 0.05% less area in ArcGIS (its arcs
+    // there are drawn with fewer segments than the 3.75 degree step we use).
+    ("mrb_parcels_outside", &[1]),
     // Split Line At Point: ArcGIS lists the pieces of one curved road as 1, 3, 2, 5, 4 (the last
     // piece before a close pair of splits first); the pieces themselves are equal.
     ("sap_roads_wells_20", &[12, 13, 14, 15]),
@@ -4180,7 +4185,7 @@ const KNOWN_FEATURE_DIFFERENCES: &[(&str, &[usize])] = &[
 /// Hillshade shadows differ for cells within centimeters of the horizon, and
 /// and Viewshed where sight lines graze the terrain (about 1% of cells).
 /// Reference cases (by name prefix) of tools not implemented yet; remove the prefix with the tool.
-const PENDING_CASES: &[&str] = &["mrb_"];
+const PENDING_CASES: &[&str] = &[];
 
 const KNOWN_RASTER_DIFFERENCES: &[(&str, usize)] = &[
     // Cost Back Link: cells where two equally cheap paths meet and ArcGIS picks one by a rule not found.
