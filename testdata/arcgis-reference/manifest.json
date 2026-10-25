@@ -39111,6 +39111,363 @@
           "add_chainage_fields": "ADD_CHAINAGE"
         }
       }
+    },
+    "sbd_parcels_4": {
+      "tool": "management.SubdividePolygon",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "NUMBER_OF_EQUAL_PARTS",
+        4
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "pn_squares": {
+      "tool": "analysis.PolygonNeighbors",
+      "args": [
+        "testdata/geoproc/squares.shp",
+        "<out>",
+        "SQ_ID",
+        "NO_AREA_OVERLAP",
+        "BOTH_SIDES"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "src_SQ_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "nbr_SQ_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "LENGTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "NODE_COUNT",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "polygon_neighbors",
+        "params": {
+          "input": "testdata/geoproc/squares.shp",
+          "output": "<out>",
+          "fields": "SQ_ID",
+          "area_overlap": "NO_AREA_OVERLAP",
+          "both_sides": "BOTH_SIDES"
+        }
+      }
+    },
+    "pn_squares_area": {
+      "tool": "analysis.PolygonNeighbors",
+      "args": [
+        "testdata/geoproc/squares.shp",
+        "<out>",
+        "SQ_ID;NAME",
+        "AREA_OVERLAP",
+        "BOTH_SIDES"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "src_SQ_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "nbr_SQ_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "src_NAME",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "nbr_NAME",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "AREA",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LENGTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "NODE_COUNT",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "polygon_neighbors",
+        "params": {
+          "input": "testdata/geoproc/squares.shp",
+          "output": "<out>",
+          "fields": "SQ_ID;NAME",
+          "area_overlap": "AREA_OVERLAP",
+          "both_sides": "BOTH_SIDES"
+        }
+      }
+    },
+    "cof_clip": {
+      "tool": "analysis.CountOverlappingFeatures",
+      "args": [
+        "testdata/geoproc/clip_areas.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "COUNT_",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COUNT_FC",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "count_overlapping_features",
+        "params": {
+          "input": "testdata/geoproc/clip_areas.shp",
+          "output": "<out>"
+        }
+      }
+    },
+    "sbd_squares_3": {
+      "tool": "management.SubdividePolygon",
+      "args": [
+        "testdata/geoproc/squares.shp",
+        "<out>",
+        "NUMBER_OF_EQUAL_PARTS",
+        3
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "SQ_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          80,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sbd_clip_4": {
+      "tool": "management.SubdividePolygon",
+      "args": [
+        "testdata/geoproc/clip_areas.shp",
+        "<out>",
+        "NUMBER_OF_EQUAL_PARTS",
+        4
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
+    },
+    "sbd_clip_area": {
+      "tool": "management.SubdividePolygon",
+      "args": [
+        "testdata/geoproc/clip_areas.shp",
+        "<out>",
+        "EQUAL_AREAS",
+        "",
+        5000
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon"
     }
   }
 }

@@ -876,6 +876,13 @@ CASES = {
     "mrb_wells_all": ("analysis.MultipleRingBuffer", [DATA / "wells.shp"], ["50;100", "Meters", "dist", "ALL"]),
     "mrb_parcels_outside": ("analysis.MultipleRingBuffer", [DATA / "parcels.shp"], ["10;30", "Meters", "dist", "ALL", "OUTSIDE_ONLY"]),
     "mrb_roads": ("analysis.MultipleRingBuffer", [DATA / "roads.shp"], ["20;40;60", "Meters"]),
+    "pn_squares": ("analysis.PolygonNeighbors", [DATA / "squares.shp"], ["SQ_ID", "NO_AREA_OVERLAP", "BOTH_SIDES"]),
+    "pn_squares_area": ("analysis.PolygonNeighbors", [DATA / "squares.shp"], ["SQ_ID;NAME", "AREA_OVERLAP", "BOTH_SIDES"]),
+    "cof_clip": ("analysis.CountOverlappingFeatures", [str(DATA / "clip_areas.shp")], []),
+    "sbd_squares_3": ("management.SubdividePolygon", [DATA / "squares.shp"], ["NUMBER_OF_EQUAL_PARTS", 3]),
+    "sbd_clip_4": ("management.SubdividePolygon", [DATA / "clip_areas.shp"], ["NUMBER_OF_EQUAL_PARTS", 4]),
+    "sbd_clip_area": ("management.SubdividePolygon", [DATA / "clip_areas.shp"], ["EQUAL_AREAS", "", 5000]),
+    "sbd_parcels_4": ("management.SubdividePolygon", [DATA / "parcels.shp"], ["NUMBER_OF_EQUAL_PARTS", 4]),
     "gpal_roads_50": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "NO_END_POINTS"]),
     "gpal_roads_50_end": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "END_POINTS"]),
     "gpal_roads_pct": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["PERCENTAGE", "", 25, "NO_END_POINTS"]),
@@ -995,6 +1002,8 @@ RUN = {
     "management.GeneratePointsAlongLines": ("generate_points_along_lines", ["input", "output", "point_placement", "distance", "percentage", "include_end_points", "add_chainage_fields"]),
     "analysis.MultipleRingBuffer": ("multiple_ring_buffer", ["input", "output", "distances", "buffer_unit", "field_name", "dissolve_option", "outside_polygons_only"]),
     "management.CopyRows": ("copy_rows", ["input", "output"]),
+    "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
+    "analysis.CountOverlappingFeatures": ("count_overlapping_features", ["input", "output", "minimum_overlap_count"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
 }
 
@@ -1024,7 +1033,7 @@ WORKSPACE_OUT = {"analysis.Split"}
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable"}
 # Tools whose output is a table, written as <name>.dbf.
 TABLE_OUT = {"management.CopyRows", "gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa", "gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
-             "management.TransposeFields", "management.PivotTable", "management.CreateTable"}
+             "management.TransposeFields", "management.PivotTable", "management.CreateTable", "analysis.PolygonNeighbors"}
 # Tools that take the output folder and name rather than a path.
 CREATE_TOOLS = {"management.CreateFeatureclass", "management.CreateTable"}
 

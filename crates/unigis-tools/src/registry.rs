@@ -2053,4 +2053,6 @@ pub static TOOLS: &[Tool] = &[
     crate::dm_tools::COPY,
     crate::dm_tools::MULTIPLE_RING_BUFFER,
     crate::dm_tools::CALCULATE_END_TIME,
+    crate::neighbors::POLYGON_NEIGHBORS,
+    crate::neighbors::COUNT_OVERLAPPING_FEATURES,
 ];

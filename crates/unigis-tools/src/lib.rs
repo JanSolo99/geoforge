@@ -8,6 +8,7 @@ mod dm_fields;
 mod dm_geometry;
 pub mod dm_tools;
 mod fieldmap;
+pub mod neighbors;
 pub mod planar;
 pub mod pycalc;
 pub mod registry;
