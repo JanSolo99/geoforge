@@ -992,6 +992,17 @@ CASES = {
 # Tools run through the registry (`ug run <id> name=value ...`): the ArcGIS tool and the registry
 # parameter each of its arguments goes to (`output` for the result, None to leave one out). A new
 # tool in the raster registry needs only a line here; the reference test builds the command from it.
+# Spatial Analyst Math tools on one raster: (ArcGIS tool, registry id)
+UNARY = [("Abs", "abs"), ("Negate", "negate"), ("Square", "square"), ("SquareRoot", "square_root"), ("Exp", "exp"),
+         ("Exp2", "exp2"), ("Exp10", "exp10"), ("Ln", "ln"), ("Log2", "log2"), ("Log10", "log10"), ("Sin", "sin"),
+         ("Cos", "cos"), ("Tan", "tan"), ("ASin", "asin"), ("ACos", "acos"), ("ATan", "atan"), ("SinH", "sinh"),
+         ("CosH", "cosh"), ("TanH", "tanh"), ("ASinH", "asinh"), ("ACosH", "acosh"), ("ATanH", "atanh"),
+         ("RoundDown", "round_down"), ("RoundUp", "round_up"), ("BooleanNot", "boolean_not")]
+for _tool, _id in UNARY:
+    for _in in ("dem", "dem_int16_packbits", "landuse_u8"):
+        CASES[f"um_{_id}_{_in}"] = (f"gp.{_tool}_sa", [RASTER / f"{_in}.tif"], [])
+
+
 RUN = {
     "gp.Nibble_sa": ("nibble", ["input", "mask", "output", "values", "nodata"]),
     "gp.Filter_sa": ("filter", ["input", "output", "filter_type", "ignore_nodata"]),
@@ -1017,6 +1028,7 @@ RUN = {
     "analysis.TabulateIntersection": ("tabulate_intersection", ["input", "zone_fields", "class_features", "output", "class_fields", "sum_fields", "xy_tolerance", "output_units"]),
     "analysis.CreateThiessenPolygons": ("create_thiessen_polygons", ["input", "output", "fields_to_copy"]),
     "cartography.SimplifyLine": ("simplify_line", ["input", "output", "algorithm", "tolerance"]),
+    **{f"gp.{t}_sa": (i, ["input", "output"]) for t, i in UNARY},
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
     "analysis.CountOverlappingFeatures": ("count_overlapping_features", ["input", "output", "minimum_overlap_count"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
@@ -1032,7 +1044,7 @@ def run_spec(tool, args):
 
 
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
-RASTER_OUT = {"gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
+RASTER_OUT = {*[f"gp.{t}_sa" for t, _ in UNARY], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
               "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa",
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",

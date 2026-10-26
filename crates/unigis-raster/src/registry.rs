@@ -305,6 +305,54 @@ fn sink(ctx: &dyn Context) -> Result<Output> {
     })
 }
 
+/// One-raster math tools (`unary_tool!(fn name, id, ArcGIS name, op)`).
+macro_rules! unary_fn {
+    ($f:ident, $op:ident) => {
+        fn $f(ctx: &dyn Context) -> Result<Output> {
+            with_statistics(
+                crate::local::unary(crate::local::UnaryOp::$op, &ctx.raster("input")?),
+                true,
+            )
+        }
+    };
+}
+macro_rules! unary_tool {
+    ($f:ident, $id:literal, $name:literal) => {
+        Tool {
+            id: $id,
+            name: $name,
+            summary: "Spatial Analyst Math tool on one raster.",
+            params: &[raster("input", "Input Raster", true)],
+            run: $f,
+        }
+    };
+}
+unary_fn!(abs_tool, Abs);
+unary_fn!(negate_tool, Negate);
+unary_fn!(square_tool, Square);
+unary_fn!(square_root_tool, Sqrt);
+unary_fn!(exp_tool, Exp);
+unary_fn!(exp2_tool, Exp2);
+unary_fn!(exp10_tool, Exp10);
+unary_fn!(ln_tool, Ln);
+unary_fn!(log2_tool, Log2);
+unary_fn!(log10_tool, Log10);
+unary_fn!(sin_tool, Sin);
+unary_fn!(cos_tool, Cos);
+unary_fn!(tan_tool, Tan);
+unary_fn!(asin_tool, ASin);
+unary_fn!(acos_tool, ACos);
+unary_fn!(atan_tool, ATan);
+unary_fn!(sinh_tool, SinH);
+unary_fn!(cosh_tool, CosH);
+unary_fn!(tanh_tool, TanH);
+unary_fn!(asinh_tool, ASinH);
+unary_fn!(acosh_tool, ACosH);
+unary_fn!(atanh_tool, ATanH);
+unary_fn!(round_down_tool, RoundDown);
+unary_fn!(round_up_tool, RoundUp);
+unary_fn!(boolean_not_tool, BooleanNot);
+
 fn flip(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::extract::flip(&ctx.raster("input")?), true)
 }
@@ -374,6 +422,31 @@ pub static TOOLS: &[Tool] = &[
         params: &[raster("input", "Input Flow Direction Raster", true)],
         run: sink,
     },
+    unary_tool!(abs_tool, "abs", "Abs"),
+    unary_tool!(negate_tool, "negate", "Negate"),
+    unary_tool!(square_tool, "square", "Square"),
+    unary_tool!(square_root_tool, "square_root", "Square Root"),
+    unary_tool!(exp_tool, "exp", "Exp"),
+    unary_tool!(exp2_tool, "exp2", "Exp2"),
+    unary_tool!(exp10_tool, "exp10", "Exp10"),
+    unary_tool!(ln_tool, "ln", "Ln"),
+    unary_tool!(log2_tool, "log2", "Log2"),
+    unary_tool!(log10_tool, "log10", "Log10"),
+    unary_tool!(sin_tool, "sin", "Sin"),
+    unary_tool!(cos_tool, "cos", "Cos"),
+    unary_tool!(tan_tool, "tan", "Tan"),
+    unary_tool!(asin_tool, "asin", "ASin"),
+    unary_tool!(acos_tool, "acos", "ACos"),
+    unary_tool!(atan_tool, "atan", "ATan"),
+    unary_tool!(sinh_tool, "sinh", "SinH"),
+    unary_tool!(cosh_tool, "cosh", "CosH"),
+    unary_tool!(tanh_tool, "tanh", "TanH"),
+    unary_tool!(asinh_tool, "asinh", "ASinH"),
+    unary_tool!(acosh_tool, "acosh", "ACosH"),
+    unary_tool!(atanh_tool, "atanh", "ATanH"),
+    unary_tool!(round_down_tool, "round_down", "Round Down"),
+    unary_tool!(round_up_tool, "round_up", "Round Up"),
+    unary_tool!(boolean_not_tool, "boolean_not", "Boolean Not"),
     Tool {
         id: "flip",
         name: "Flip",

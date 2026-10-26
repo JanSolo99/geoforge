@@ -519,3 +519,117 @@ pub fn pick(position: &Raster, items: &[Operand]) -> Option<Raster> {
     let refs: Vec<&Operand> = items.iter().collect();
     Some(conditional_raster(&position, &refs, values))
 }
+
+/// Single-raster math tools (Spatial Analyst Math toolset).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UnaryOp {
+    Abs,
+    Negate,
+    Square,
+    Sqrt,
+    Exp,
+    Exp2,
+    Exp10,
+    Ln,
+    Log2,
+    Log10,
+    Sin,
+    Cos,
+    Tan,
+    ASin,
+    ACos,
+    ATan,
+    SinH,
+    CosH,
+    TanH,
+    ASinH,
+    ACosH,
+    ATanH,
+    RoundDown,
+    RoundUp,
+    BooleanNot,
+}
+
+/// The unsigned type of the width of `t`, and its NoData (the maximum).
+fn unsigned_of(t: DataType) -> (DataType, f64) {
+    match t {
+        DataType::U8 | DataType::I8 => (DataType::U8, 255.0),
+        DataType::U16 | DataType::I16 => (DataType::U16, f64::from(u16::MAX)),
+        _ => (DataType::U32, f64::from(u32::MAX)),
+    }
+}
+
+/// A signed type that holds the result, and its NoData (the minimum).
+fn signed_for(t: DataType) -> (DataType, f64) {
+    match t {
+        DataType::U8 | DataType::I8 | DataType::I16 => (DataType::I16, f64::from(i16::MIN)),
+        _ => (DataType::I32, f64::from(i32::MIN)),
+    }
+}
+
+/// Applies a one-raster math tool. Float results and the trigonometric, logarithmic and
+/// exponential functions give 32-bit float with NoData where the result is not a finite number
+/// (as 32-bit float); integer Abs keeps the width but is unsigned, Negate gives a signed type and
+/// Square a wider one; Round Down / Up give float; Boolean Not gives 8-bit with NoData 2
+/// (observed).
+pub fn unary(op: UnaryOp, r: &Raster) -> Raster {
+    let values = || r.bands[0].iter().map(|&v| (!r.is_nodata(v)).then_some(v));
+    let float_fn = |f: fn(f64) -> f64| {
+        float_raster(
+            r,
+            values().map(|v| {
+                v.map(f)
+                    .filter(|x| x.is_finite() && (*x as f32).is_finite())
+            }),
+        )
+    };
+    let integer = !r.data_type.is_float();
+    match op {
+        UnaryOp::Abs if integer => {
+            let (t, nodata) = unsigned_of(r.data_type);
+            typed_raster(r, values().map(|v| v.map(f64::abs)), t, nodata)
+        }
+        UnaryOp::Negate if integer => {
+            let (t, nodata) = signed_for(r.data_type);
+            typed_raster(r, values().map(|v| v.map(|x| -x)), t, nodata)
+        }
+        UnaryOp::Square if integer => {
+            let (t, nodata) = match r.data_type {
+                DataType::U8 | DataType::I8 => (DataType::U16, f64::from(u16::MAX)),
+                DataType::U16 | DataType::I16 => (DataType::I32, -2147483647.0), // not i32::MIN (observed)
+                _ => (DataType::F32, f32::MIN as f64),
+            };
+            typed_raster(r, values().map(|v| v.map(|x| x * x)), t, nodata)
+        }
+        UnaryOp::BooleanNot => typed_raster(
+            r,
+            values().map(|v| v.map(|x| f64::from(x == 0.0))),
+            DataType::U8,
+            2.0,
+        ),
+        UnaryOp::Abs => float_fn(f64::abs),
+        UnaryOp::Negate => float_fn(|x| -x),
+        UnaryOp::Square => float_fn(|x| x * x),
+        UnaryOp::Sqrt => float_fn(f64::sqrt),
+        UnaryOp::Exp => float_fn(f64::exp),
+        UnaryOp::Exp2 => float_fn(f64::exp2),
+        UnaryOp::Exp10 => float_fn(|x| 10f64.powf(x)),
+        UnaryOp::Ln => float_fn(f64::ln),
+        UnaryOp::Log2 => float_fn(f64::log2),
+        UnaryOp::Log10 => float_fn(f64::log10),
+        UnaryOp::Sin => float_fn(f64::sin),
+        UnaryOp::Cos => float_fn(f64::cos),
+        UnaryOp::Tan => float_fn(f64::tan),
+        UnaryOp::ASin => float_fn(f64::asin),
+        UnaryOp::ACos => float_fn(f64::acos),
+        UnaryOp::ATan => float_fn(f64::atan),
+        UnaryOp::SinH => float_fn(f64::sinh),
+        UnaryOp::CosH => float_fn(f64::cosh),
+        UnaryOp::TanH => float_fn(f64::tanh),
+        UnaryOp::ASinH => float_fn(f64::asinh),
+        UnaryOp::ACosH => float_fn(f64::acosh),
+        UnaryOp::ATanH => float_fn(f64::atanh),
+        UnaryOp::RoundDown => float_fn(f64::floor),
+        UnaryOp::RoundUp => float_fn(f64::ceil),
+    }
+}

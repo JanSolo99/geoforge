@@ -66,6 +66,11 @@ Get ArcGIS tools done faster: (1) triage cheap tools in batches, (2) generate th
 - Simplify Line POINT_REMOVE (`simplify_line`, cases `sl_*`, passing): same vertices as plain Douglas-Peucker (dist > tol keeps);
   output adds InLine_FID, MaxSimpTol, MinSimpTol (= tolerance). ArcGIS also writes `<out>_Pnt.shp` (collapsed points; we do not write it: empty in
   the probes). Not done: BEND_SIMPLIFY, polygons (Simplify Polygon), barriers, error resolving (topology repair).
+- Spatial Analyst single-raster Math tools (25: Abs, Negate, Square, Square Root, Exp/Exp2/Exp10, Ln/Log2/Log10, Sin..ATanH, Round Down/Up,
+  Boolean Not) as `unary` in `unigis-raster/src/local.rs` + `unary_tool!` entries in the raster registry; 75 cases `um_*` (3 inputs each)
+  all pass. Rules: float functions give F32 with NoData where not finite as f32; integer Abs -> unsigned same width; Negate -> signed
+  (U8/S16 -> S16); Square U8 -> U16, S16 -> S32 with NoData -2147483647 (not i32::MIN); Round Down/Up always F32; Boolean Not U8 NoData 2.
+  Not probed: S32/U16 inputs of Abs/Negate/Square. Next in this family: Power, Mod, Boolean And/Or/Xor, comparison tools, Bitwise.
 - `NOTES.md` (untracked, from another agent) describes decompiling ArcGIS DLLs with Ghidra/REA. CLAUDE.md says black-box only
   (never decompile Esri binaries); I did not take part in that and did not touch it. Decide with the user before using it.
 
