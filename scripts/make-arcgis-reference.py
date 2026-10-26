@@ -1003,6 +1003,22 @@ for _tool, _id in UNARY:
         CASES[f"um_{_id}_{_in}"] = (f"gp.{_tool}_sa", [RASTER / f"{_in}.tif"], [])
 
 
+# Two-operand Spatial Analyst Math tools: (ArcGIS tool, registry id)
+BINARY = [("Power", "power"), ("Mod", "mod"), ("BooleanAnd", "boolean_and"), ("BooleanOr", "boolean_or"),
+          ("BooleanXOr", "boolean_xor"), ("EqualTo", "equal_to"), ("GreaterThan", "greater_than"),
+          ("GreaterThanEqual", "greater_than_equal"), ("LessThan", "less_than"), ("LessThanEqual", "less_than_equal"),
+          ("NotEqual", "not_equal"), ("BitwiseAnd", "bitwise_and"), ("BitwiseOr", "bitwise_or"),
+          ("BitwiseXOr", "bitwise_xor"), ("BitwiseLeftShift", "bitwise_left_shift"),
+          ("BitwiseRightShift", "bitwise_right_shift")]
+_OPERANDS = {"dem_i16": ("dem.tif", "dem_int16_packbits.tif"), "i16_u8": ("dem_int16_packbits.tif", "landuse_u8.tif"),
+             "u8_u8": ("landuse_u8.tif", "landuse_u8.tif"), "u8_c2": ("landuse_u8.tif", "2"),
+             "dem_c200": ("dem.tif", "200"), "i16_c200": ("dem_int16_packbits.tif", "200"),
+             "u8_c05": ("landuse_u8.tif", "0.5"), "c7_i16": ("7", "dem_int16_packbits.tif")}
+for _tool, _id in BINARY:
+    for _k, _ops in _OPERANDS.items():
+        CASES[f"bm_{_id}_{_k}"] = (f"gp.{_tool}_sa", [RASTER / o if o.endswith(".tif") else o for o in _ops], [])
+
+
 RUN = {
     "gp.Nibble_sa": ("nibble", ["input", "mask", "output", "values", "nodata"]),
     "gp.Filter_sa": ("filter", ["input", "output", "filter_type", "ignore_nodata"]),
@@ -1029,6 +1045,7 @@ RUN = {
     "analysis.CreateThiessenPolygons": ("create_thiessen_polygons", ["input", "output", "fields_to_copy"]),
     "cartography.SimplifyLine": ("simplify_line", ["input", "output", "algorithm", "tolerance"]),
     **{f"gp.{t}_sa": (i, ["input", "output"]) for t, i in UNARY},
+    **{f"gp.{t}_sa": (i, ["in1", "in2", "output"]) for t, i in BINARY},
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
     "analysis.CountOverlappingFeatures": ("count_overlapping_features", ["input", "output", "minimum_overlap_count"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
@@ -1044,7 +1061,7 @@ def run_spec(tool, args):
 
 
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
-RASTER_OUT = {*[f"gp.{t}_sa" for t, _ in UNARY], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
+RASTER_OUT = {*[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
               "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa",
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",

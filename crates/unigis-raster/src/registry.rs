@@ -353,6 +353,70 @@ unary_fn!(round_down_tool, RoundDown);
 unary_fn!(round_up_tool, RoundUp);
 unary_fn!(boolean_not_tool, BooleanNot);
 
+fn operand(ctx: &dyn Context, name: &str) -> Result<crate::local::Operand> {
+    let text = ctx.get(name).unwrap_or_default();
+    Ok(match crate::local::Operand::constant(&text) {
+        Some(c) => c,
+        None => crate::local::Operand::Raster(ctx.raster_at(text.trim())?),
+    })
+}
+
+macro_rules! binary_fn {
+    ($f:ident, $op:ident) => {
+        fn $f(ctx: &dyn Context) -> Result<Output> {
+            let raster = crate::local::binary(
+                crate::local::BinaryOp::$op,
+                &operand(ctx, "in1")?,
+                &operand(ctx, "in2")?,
+            )
+            .ok_or_else(|| Error::Unsupported("at least one input must be a raster".into()))?;
+            with_statistics(raster, true)
+        }
+    };
+}
+macro_rules! binary_tool {
+    ($f:ident, $id:literal, $name:literal) => {
+        Tool {
+            id: $id,
+            name: $name,
+            summary: "Spatial Analyst Math tool on two rasters or constants.",
+            params: &[
+                Param {
+                    name: "in1",
+                    label: "Input Raster Or Constant Value 1",
+                    kind: Kind::Text,
+                    required: true,
+                    default: "",
+                },
+                Param {
+                    name: "in2",
+                    label: "Input Raster Or Constant Value 2",
+                    kind: Kind::Text,
+                    required: true,
+                    default: "",
+                },
+            ],
+            run: $f,
+        }
+    };
+}
+binary_fn!(power_tool, Power);
+binary_fn!(mod_tool, Mod);
+binary_fn!(boolean_and_tool, BooleanAnd);
+binary_fn!(boolean_or_tool, BooleanOr);
+binary_fn!(boolean_xor_tool, BooleanXor);
+binary_fn!(equal_to_tool, EqualTo);
+binary_fn!(greater_than_tool, GreaterThan);
+binary_fn!(greater_than_equal_tool, GreaterThanEqual);
+binary_fn!(less_than_tool, LessThan);
+binary_fn!(less_than_equal_tool, LessThanEqual);
+binary_fn!(not_equal_tool, NotEqual);
+binary_fn!(bitwise_and_tool, BitwiseAnd);
+binary_fn!(bitwise_or_tool, BitwiseOr);
+binary_fn!(bitwise_xor_tool, BitwiseXor);
+binary_fn!(bitwise_left_shift_tool, BitwiseLeftShift);
+binary_fn!(bitwise_right_shift_tool, BitwiseRightShift);
+
 fn flip(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::extract::flip(&ctx.raster("input")?), true)
 }
@@ -447,6 +511,34 @@ pub static TOOLS: &[Tool] = &[
     unary_tool!(round_down_tool, "round_down", "Round Down"),
     unary_tool!(round_up_tool, "round_up", "Round Up"),
     unary_tool!(boolean_not_tool, "boolean_not", "Boolean Not"),
+    binary_tool!(power_tool, "power", "Power"),
+    binary_tool!(mod_tool, "mod", "Mod"),
+    binary_tool!(boolean_and_tool, "boolean_and", "Boolean And"),
+    binary_tool!(boolean_or_tool, "boolean_or", "Boolean Or"),
+    binary_tool!(boolean_xor_tool, "boolean_xor", "Boolean XOr"),
+    binary_tool!(equal_to_tool, "equal_to", "Equal To"),
+    binary_tool!(greater_than_tool, "greater_than", "Greater Than"),
+    binary_tool!(
+        greater_than_equal_tool,
+        "greater_than_equal",
+        "Greater Than Equal"
+    ),
+    binary_tool!(less_than_tool, "less_than", "Less Than"),
+    binary_tool!(less_than_equal_tool, "less_than_equal", "Less Than Equal"),
+    binary_tool!(not_equal_tool, "not_equal", "Not Equal"),
+    binary_tool!(bitwise_and_tool, "bitwise_and", "Bitwise And"),
+    binary_tool!(bitwise_or_tool, "bitwise_or", "Bitwise Or"),
+    binary_tool!(bitwise_xor_tool, "bitwise_xor", "Bitwise XOr"),
+    binary_tool!(
+        bitwise_left_shift_tool,
+        "bitwise_left_shift",
+        "Bitwise Left Shift"
+    ),
+    binary_tool!(
+        bitwise_right_shift_tool,
+        "bitwise_right_shift",
+        "Bitwise Right Shift"
+    ),
     Tool {
         id: "flip",
         name: "Flip",

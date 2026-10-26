@@ -633,3 +633,131 @@ pub fn unary(op: UnaryOp, r: &Raster) -> Raster {
         UnaryOp::RoundUp => float_fn(f64::ceil),
     }
 }
+
+/// Two-operand math tools (Spatial Analyst Math toolset, besides Plus, Minus, Times, Divide).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BinaryOp {
+    Power,
+    Mod,
+    BooleanAnd,
+    BooleanOr,
+    BooleanXor,
+    EqualTo,
+    GreaterThan,
+    GreaterThanEqual,
+    LessThan,
+    LessThanEqual,
+    NotEqual,
+    BitwiseAnd,
+    BitwiseOr,
+    BitwiseXor,
+    BitwiseLeftShift,
+    BitwiseRightShift,
+}
+
+/// The type of an integer Mod: from the operands' value ranges when ArcGIS knows both (stored
+/// statistics, constants), else the wider of their types (signed if either is) (observed).
+fn mod_type(a: &Operand, b: &Operand) -> (DataType, f64) {
+    if let (Some(ra), Some(rb)) = (a.known_range(), b.known_range()) {
+        let reach = rb.0.abs().max(rb.1.abs()) - 1.0;
+        let lo = if ra.0 < 0.0 { -(-ra.0).min(reach) } else { 0.0 };
+        // A constant dividend does not narrow the range: the divisor alone sets it (observed).
+        let hi = if a.raster().is_none() {
+            reach
+        } else if ra.1 > 0.0 {
+            ra.1.min(reach)
+        } else {
+            0.0
+        };
+        return crate::zonal::integer_output(lo, hi, true);
+    }
+    let (ta, tb) = (a.integer_type(), b.integer_type());
+    let width = |t: DataType| match t {
+        DataType::U8 | DataType::I8 => 8,
+        DataType::U16 | DataType::I16 => 16,
+        _ => 32,
+    };
+    let signed = |t: DataType| matches!(t, DataType::I8 | DataType::I16 | DataType::I32);
+    let w = width(ta).max(width(tb));
+    // Which operand is the dividend decides the sign: a constant divisor does not make it
+    // signed, a signed raster does.
+    let signed_result = signed(ta) || (signed(tb) && b.raster().is_some());
+    match (signed_result, w) {
+        (false, 8) => (DataType::U8, 255.0),
+        (false, 16) => (DataType::U16, f64::from(u16::MAX)),
+        (false, _) => (DataType::U32, f64::from(u32::MAX)),
+        (true, 8 | 16) => (DataType::I16, f64::from(i16::MIN)),
+        (true, _) => (DataType::I32, f64::from(i32::MIN)),
+    }
+}
+
+/// Applies a two-operand math tool: Power gives 32-bit float; comparisons and Boolean tools
+/// give 8-bit 0/1 (nonzero is true) with NoData 255; Bitwise tools truncate to integers and give
+/// 32-bit integers (shifts by the count modulo 32); Mod is the C remainder (sign of the
+/// dividend) and is float only if an operand is. NoData where an operand is, on division by zero,
+/// and where a float result is not finite.
+pub fn binary(op: BinaryOp, a: &Operand, b: &Operand) -> Option<Raster> {
+    let (a, b) = match (a, b) {
+        (Operand::Raster(ra), Operand::Raster(rb)) => {
+            let (ra, rb) = common_grid(ra, rb)?;
+            (Operand::Raster(ra), Operand::Raster(rb))
+        }
+        _ => (a.clone(), b.clone()),
+    };
+    let (a, b) = (&a, &b);
+    let g = grid(&[a, b])?;
+    let n = g.width * g.height;
+    let pair = |i: usize| Some((a.get(i)?, b.get(i)?));
+    let truth = |v: bool| Some(f64::from(v));
+    let int = |v: f64| v.trunc() as i64 as i32;
+    let finite = |v: f64| Some(v).filter(|v| v.is_finite() && (*v as f32).is_finite());
+    let bool_raster = |f: &dyn Fn(f64, f64) -> Option<f64>| {
+        typed_raster(
+            g,
+            (0..n).map(|i| pair(i).and_then(|(x, y)| f(x, y))),
+            DataType::U8,
+            255.0,
+        )
+    };
+    let bits = |f: &dyn Fn(i32, i32) -> i32| {
+        typed_raster(
+            g,
+            (0..n).map(|i| pair(i).map(|(x, y)| f64::from(f(int(x), int(y))))),
+            DataType::I32,
+            f64::from(i32::MIN),
+        )
+    };
+    Some(match op {
+        BinaryOp::Power => float_raster(
+            g,
+            (0..n).map(|i| pair(i).and_then(|(x, y)| finite(x.powf(y)))),
+        ),
+        BinaryOp::Mod => {
+            let float = a.is_float() || b.is_float();
+            let values = (0..n).map(|i| {
+                let (x, y) = pair(i)?;
+                (y != 0.0).then(|| x % y)
+            });
+            if float {
+                float_raster(g, values)
+            } else {
+                let (t, nodata) = mod_type(a, b);
+                typed_raster(g, values, t, nodata)
+            }
+        }
+        BinaryOp::BooleanAnd => bool_raster(&|x, y| truth(x != 0.0 && y != 0.0)),
+        BinaryOp::BooleanOr => bool_raster(&|x, y| truth(x != 0.0 || y != 0.0)),
+        BinaryOp::BooleanXor => bool_raster(&|x, y| truth((x != 0.0) != (y != 0.0))),
+        BinaryOp::EqualTo => bool_raster(&|x, y| truth(x == y)),
+        BinaryOp::GreaterThan => bool_raster(&|x, y| truth(x > y)),
+        BinaryOp::GreaterThanEqual => bool_raster(&|x, y| truth(x >= y)),
+        BinaryOp::LessThan => bool_raster(&|x, y| truth(x < y)),
+        BinaryOp::LessThanEqual => bool_raster(&|x, y| truth(x <= y)),
+        BinaryOp::NotEqual => bool_raster(&|x, y| truth(x != y)),
+        BinaryOp::BitwiseAnd => bits(&|x, y| x & y),
+        BinaryOp::BitwiseOr => bits(&|x, y| x | y),
+        BinaryOp::BitwiseXor => bits(&|x, y| x ^ y),
+        BinaryOp::BitwiseLeftShift => bits(&|x, y| x.wrapping_shl(y as u32)),
+        BinaryOp::BitwiseRightShift => bits(&|x, y| x.wrapping_shr(y as u32)),
+    })
+}

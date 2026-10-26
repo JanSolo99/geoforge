@@ -71,6 +71,13 @@ Get ArcGIS tools done faster: (1) triage cheap tools in batches, (2) generate th
   all pass. Rules: float functions give F32 with NoData where not finite as f32; integer Abs -> unsigned same width; Negate -> signed
   (U8/S16 -> S16); Square U8 -> U16, S16 -> S32 with NoData -2147483647 (not i32::MIN); Round Down/Up always F32; Boolean Not U8 NoData 2.
   Not probed: S32/U16 inputs of Abs/Negate/Square. Next in this family: Power, Mod, Boolean And/Or/Xor, comparison tools, Bitwise.
+- Two-operand Math tools (16: Power, Mod, Boolean And/Or/XOr, Equal To, Greater/Less Than (Equal), Not Equal, Bitwise And/Or/XOr/Left/Right
+  Shift) as `binary` in `local.rs`, operands are rasters or constants (`in1`, `in2`); 128 cases `bm_*` (8 operand pairs each) pass.
+  Rules: Power F32 (non-finite -> NoData); comparisons/Boolean U8 NoData 255 (nonzero true); Bitwise truncates to int, S32, shift count
+  mod 32; Mod = C remainder (sign of dividend), float if an operand is, integer type from the operands' stored statistics when both known
+  (`mod_type`, constant dividend: divisor alone sets the range), else the wider type (signed if the dividend raster or divisor raster is).
+  Not probed: negative-valued stats inputs for Mod beyond Negate, U16/S32 operands, Mod type when one operand lacks statistics but is
+  signed 32-bit. Next: Combinatorial And/Or/Xor, Zonal Fill, Raster To ASCII/Float, Copy Raster, Mosaic, Reclass by ASCII file.
 - `NOTES.md` (untracked, from another agent) describes decompiling ArcGIS DLLs with Ghidra/REA. CLAUDE.md says black-box only
   (never decompile Esri binaries); I did not take part in that and did not touch it. Decide with the user before using it.
 
