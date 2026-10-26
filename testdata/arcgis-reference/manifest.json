@@ -39802,6 +39802,181 @@
           "output": "<out>"
         }
       }
+    },
+    "th_wells": {
+      "tool": "analysis.CreateThiessenPolygons",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "ONLY_FID"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "Input_FID",
+          "Integer",
+          9,
+          9,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "create_thiessen_polygons",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "output": "<out>",
+          "fields_to_copy": "ONLY_FID"
+        }
+      }
+    },
+    "th_wells_all": {
+      "tool": "analysis.CreateThiessenPolygons",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "ALL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "Input_FID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "create_thiessen_polygons",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "output": "<out>",
+          "fields_to_copy": "ALL"
+        }
+      }
+    },
+    "th_pts": {
+      "tool": "analysis.CreateThiessenPolygons",
+      "args": [
+        "testdata/dm/pts.shp",
+        "<out>",
+        "ALL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "Input_FID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "Id_1",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "PT_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "create_thiessen_polygons",
+        "params": {
+          "input": "testdata/dm/pts.shp",
+          "output": "<out>",
+          "fields_to_copy": "ALL"
+        }
+      }
     }
   }
 }

@@ -4042,7 +4042,11 @@ fn compare(case: &str, ours: &Path, theirs: &Path, fields: &serde_json::Value) -
     }
     // The Pairwise tools run in parallel and list their features in no fixed order: compare by
     // attribute values.
-    if case.starts_with("pwerase_") || case.starts_with("pwint_") || case.starts_with("pwdis_") {
+    if case.starts_with("pwerase_")
+        || case.starts_with("pwint_")
+        || case.starts_with("pwdis_")
+        || case.starts_with("th_")
+    {
         // Features with equal attributes (the parts of a single-part dissolve) by lower-left corner.
         let key = |f: &unigis_core::Feature| {
             let corner = f.geometry.as_ref().map_or((0, 0), |g| {

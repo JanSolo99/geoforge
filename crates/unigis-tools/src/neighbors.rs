@@ -586,3 +586,143 @@ pub const TABULATE_INTERSECTION: Tool = Tool {
     measures: true,
     run: Runner::Dynamic(tabulate_intersection),
 };
+
+/// Create Thiessen Polygons: the area closer to each point than to any other, inside the extent
+/// of the points grown by 4.9945% of its width and height on each side (observed). The polygons
+/// are listed in input order (ArcGIS's own order is a spatial one, not reproduced).
+fn create_thiessen_polygons(ctx: &dyn Context) -> Result<ToolOutput> {
+    let fc = ctx.features("input")?;
+    if fc.geometry_kind() != Some(GeometryKind::Point) {
+        return Err(err("ERROR 000368: Invalid input data: points are required"));
+    }
+    let all = ctx
+        .get("fields_to_copy")
+        .is_some_and(|v| v.eq_ignore_ascii_case("ALL"));
+    let rows: Vec<Feature> = fc.features().collect::<Result<_>>()?;
+    let points: Vec<[f64; 2]> = rows
+        .iter()
+        .filter_map(|f| f.geometry.as_ref().map(|g| [g.xy[0][0], g.xy[0][1]]))
+        .collect();
+    if points.len() != rows.len() || points.is_empty() {
+        return Err(err(
+            "ERROR 000735: Input Features: a feature has no geometry",
+        ));
+    }
+    let (mut x0, mut y0, mut x1, mut y1) = (f64::MAX, f64::MAX, f64::MIN, f64::MIN);
+    for p in &points {
+        x0 = x0.min(p[0]);
+        x1 = x1.max(p[0]);
+        y0 = y0.min(p[1]);
+        y1 = y1.max(p[1]);
+    }
+    let grow = 0.049945;
+    let (dx, dy) = ((x1 - x0) * grow, (y1 - y0) * grow);
+    let frame = vec![
+        [x0 - dx, y0 - dy],
+        [x0 - dx, y1 + dy],
+        [x1 + dx, y1 + dy],
+        [x1 + dx, y0 - dy],
+    ];
+    // A default "Id" field comes first (shapefile output; a copied "Id" becomes "Id_1").
+    let mut id = Field::new("Id", FieldType::Integer);
+    id.length = 6;
+    id.precision = 6;
+    let mut fields = vec![id, integer_field("Input_FID")];
+    if all {
+        for f in fc.fields() {
+            let mut f = f.clone();
+            if f.name.eq_ignore_ascii_case("Id") {
+                f.name = "Id_1".into();
+            }
+            fields.push(f);
+        }
+    }
+    let mut features = Vec::new();
+    for (i, p) in points.iter().enumerate() {
+        let mut cell = frame.clone();
+        for (j, q) in points.iter().enumerate() {
+            if i == j || q == p {
+                continue;
+            }
+            // Keep the side of the bisector that holds `p`: n . x <= c.
+            let n = [q[0] - p[0], q[1] - p[1]];
+            let c = (n[0] * (p[0] + q[0]) + n[1] * (p[1] + q[1])) / 2.0;
+            cell = clip_half_plane(&cell, n, c);
+            if cell.len() < 3 {
+                break;
+            }
+        }
+        if cell.len() < 3 {
+            continue;
+        }
+        let mut xy = cell.clone();
+        xy.push(cell[0]);
+        let mut attributes = vec![Value::Integer(0), Value::Integer(rows[i].oid as i32)];
+        if all {
+            attributes.extend(rows[i].attributes.iter().cloned());
+        }
+        features.push(Feature {
+            oid: features.len() as i64,
+            geometry: unigis_geometry::paths_geometry(vec![xy]).map(|mut g| {
+                g.kind = GeometryKind::Polygon;
+                g
+            }),
+            attributes,
+        });
+    }
+    Ok(ToolOutput {
+        kind: GeometryKind::Polygon,
+        has_z: false,
+        has_m: false,
+        fields,
+        spatial_reference_wkt: fc.spatial_reference_wkt().map(str::to_owned),
+        features,
+        messages: Vec::new(),
+    })
+}
+
+/// The part of the convex polygon `poly` where `n . x <= c`.
+fn clip_half_plane(poly: &[[f64; 2]], n: [f64; 2], c: f64) -> Vec<[f64; 2]> {
+    let side = |p: [f64; 2]| n[0] * p[0] + n[1] * p[1] - c;
+    let mut out = Vec::with_capacity(poly.len() + 1);
+    for k in 0..poly.len() {
+        let (a, b) = (poly[k], poly[(k + 1) % poly.len()]);
+        let (sa, sb) = (side(a), side(b));
+        if sa <= 0.0 {
+            out.push(a);
+        }
+        if (sa < 0.0 && sb > 0.0) || (sa > 0.0 && sb < 0.0) {
+            let t = sa / (sa - sb);
+            out.push([a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1])]);
+        }
+    }
+    out
+}
+
+pub const CREATE_THIESSEN_POLYGONS: Tool = Tool {
+    id: "create_thiessen_polygons",
+    name: "Create Thiessen Polygons",
+    toolbox: "Analysis › Proximity",
+    summary: "Proximity polygons around points (ArcGIS Pro Create Thiessen Polygons).",
+    params: &[
+        Param {
+            name: "input",
+            label: "Input Features",
+            kind: Kind::Features,
+            required: true,
+            default: "",
+            help: "",
+        },
+        Param {
+            name: "fields_to_copy",
+            label: "Output Fields",
+            kind: Kind::Choice(&["ONLY_FID", "ALL"]),
+            required: false,
+            default: "ONLY_FID",
+            help: "",
+        },
+    ],
+    output_suffix: "Thiessen",
+    measures: true,
+    run: Runner::Features(create_thiessen_polygons),
+};

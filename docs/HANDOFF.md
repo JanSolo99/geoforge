@@ -59,6 +59,10 @@ Get ArcGIS tools done faster: (1) triage cheap tools in batches, (2) generate th
   plus PERCENTAGE = amount / zone group area (polygon classes) or / total class length (line classes: observed, the zone's
   share rule for lines is a guess). Not done: sum_fields, xy_tolerance, point classes. ArcGIS measures on its coordinate grid:
   the test compares `ti_` tables to 2e-5 relative / 1e-3 absolute.
+- Create Thiessen Polygons (`create_thiessen_polygons`, cases `th_*`, passing): Voronoi cells (half-plane clipping, O(n^2)) inside the
+  points' extent grown by 4.9945% of width/height per side (observed on 3 datasets); fields: default `Id`, `Input_FID` (input FID),
+  with ALL the input fields (`Id` -> `Id_1`). ArcGIS lists the polygons in an internal spatial order that is NOT reproduced (we list
+  input order; the test sorts `th_` cases by attributes). Not done: the Extent environment, duplicate points, geodesic/GCS input.
 - `NOTES.md` (untracked, from another agent) describes decompiling ArcGIS DLLs with Ghidra/REA. CLAUDE.md says black-box only
   (never decompile Esri binaries); I did not take part in that and did not touch it. Decide with the user before using it.
 

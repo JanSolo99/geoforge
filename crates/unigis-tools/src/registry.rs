@@ -2055,6 +2055,7 @@ pub static TOOLS: &[Tool] = &[
     crate::dm_tools::CALCULATE_END_TIME,
     crate::neighbors::SUBDIVIDE_POLYGON,
     crate::neighbors::TABULATE_INTERSECTION,
+    crate::neighbors::CREATE_THIESSEN_POLYGONS,
     crate::neighbors::POLYGON_NEIGHBORS,
     crate::neighbors::COUNT_OVERLAPPING_FEATURES,
 ];
