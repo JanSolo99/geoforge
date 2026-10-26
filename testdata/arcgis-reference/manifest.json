@@ -39977,6 +39977,231 @@
           "fields_to_copy": "ALL"
         }
       }
+    },
+    "sl_streams_5": {
+      "tool": "cartography.SimplifyLine",
+      "args": [
+        "testdata/geoproc/streams.shp",
+        "<out>",
+        "POINT_REMOVE",
+        "5 Meters",
+        "RESOLVE_ERRORS",
+        "KEEP_COLLAPSED_POINTS",
+        "CHECK"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "STREAM_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "InLine_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MaxSimpTol",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "MinSimpTol",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "simplify_line",
+        "params": {
+          "input": "testdata/geoproc/streams.shp",
+          "output": "<out>",
+          "algorithm": "POINT_REMOVE",
+          "tolerance": "5 Meters"
+        }
+      }
+    },
+    "sl_roads_5": {
+      "tool": "cartography.SimplifyLine",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "POINT_REMOVE",
+        "5 Meters",
+        "RESOLVE_ERRORS",
+        "KEEP_COLLAPSED_POINTS",
+        "CHECK"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "InLine_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MaxSimpTol",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "MinSimpTol",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "simplify_line",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "output": "<out>",
+          "algorithm": "POINT_REMOVE",
+          "tolerance": "5 Meters"
+        }
+      }
+    },
+    "sl_roads_20": {
+      "tool": "cartography.SimplifyLine",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "POINT_REMOVE",
+        "20 Meters",
+        "RESOLVE_ERRORS",
+        "KEEP_COLLAPSED_POINTS",
+        "CHECK"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "InLine_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MaxSimpTol",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "MinSimpTol",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "simplify_line",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "output": "<out>",
+          "algorithm": "POINT_REMOVE",
+          "tolerance": "20 Meters"
+        }
+      }
     }
   }
 }

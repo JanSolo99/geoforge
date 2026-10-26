@@ -726,3 +726,138 @@ pub const CREATE_THIESSEN_POLYGONS: Tool = Tool {
     measures: true,
     run: Runner::Features(create_thiessen_polygons),
 };
+
+/// Douglas-Peucker on one path: keeps the vertex farthest from the chord while it is more than
+/// `tol` away (ArcGIS Simplify Line, POINT_REMOVE: the same vertices, observed).
+fn douglas_peucker(path: &[[f64; 2]], tol: f64, keep: &mut Vec<bool>, lo: usize, hi: usize) {
+    if hi <= lo + 1 {
+        return;
+    }
+    let (a, b) = (path[lo], path[hi]);
+    let (dx, dy) = (b[0] - a[0], b[1] - a[1]);
+    let len = dx.hypot(dy);
+    let (mut best, mut at) = (-1.0, lo);
+    for (i, p) in path.iter().enumerate().take(hi).skip(lo + 1) {
+        let d = if len == 0.0 {
+            (p[0] - a[0]).hypot(p[1] - a[1])
+        } else {
+            (dy * (p[0] - a[0]) - dx * (p[1] - a[1])).abs() / len
+        };
+        if d > best {
+            best = d;
+            at = i;
+        }
+    }
+    if best > tol {
+        keep[at] = true;
+        douglas_peucker(path, tol, keep, lo, at);
+        douglas_peucker(path, tol, keep, at, hi);
+    }
+}
+
+/// Simplify Line with POINT_REMOVE: each part loses the vertices within the tolerance of the
+/// line through the kept ones. The output adds InLine_FID, MaxSimpTol and MinSimpTol.
+fn simplify_line(ctx: &dyn Context) -> Result<ToolOutput> {
+    let fc = ctx.features("input")?;
+    if fc.geometry_kind() != Some(GeometryKind::Polyline) {
+        return Err(err("ERROR 000368: Invalid input data: lines are required"));
+    }
+    let algorithm = ctx
+        .get("algorithm")
+        .unwrap_or_else(|| "POINT_REMOVE".into());
+    if !algorithm.eq_ignore_ascii_case("POINT_REMOVE") {
+        return Err(err(format!("algorithm {algorithm} is not supported yet")));
+    }
+    let tolerance = crate::registry::distance_in_units(
+        &ctx.get("tolerance")
+            .ok_or_else(|| err("ERROR 000735: Simplification Tolerance: Value is required"))?,
+        fc.spatial_reference_wkt(),
+    )?;
+    let mut fields = fc.fields().to_vec();
+    fields.push(integer_field("InLine_FID"));
+    for name in ["MaxSimpTol", "MinSimpTol"] {
+        let mut f = Field::new(name, FieldType::Double);
+        f.precision = 18;
+        f.scale = 11;
+        fields.push(f);
+    }
+    let mut features = Vec::new();
+    for f in fc.features() {
+        let f = f?;
+        let Some(mut g) = f.geometry else { continue };
+        let mut xy = Vec::new();
+        let mut parts = Vec::new();
+        for r in g.part_ranges().collect::<Vec<_>>() {
+            let path = &g.xy[r];
+            let mut keep = vec![false; path.len()];
+            if let Some(first) = keep.first_mut() {
+                *first = true;
+            }
+            if let Some(last) = keep.last_mut() {
+                *last = true;
+            }
+            douglas_peucker(path, tolerance, &mut keep, 0, path.len() - 1);
+            parts.push(xy.len() as u32);
+            xy.extend(path.iter().zip(&keep).filter(|(_, k)| **k).map(|(p, _)| *p));
+        }
+        g.xy = xy;
+        g.parts = parts;
+        g.z = None;
+        g.m = None;
+        g.curves = Vec::new();
+        let mut attributes = f.attributes.clone();
+        attributes.push(Value::Integer(f.oid as i32));
+        attributes.push(Value::Double(tolerance));
+        attributes.push(Value::Double(tolerance));
+        features.push(Feature {
+            oid: features.len() as i64,
+            geometry: Some(g),
+            attributes,
+        });
+    }
+    Ok(ToolOutput {
+        kind: GeometryKind::Polyline,
+        has_z: false,
+        has_m: false,
+        fields,
+        spatial_reference_wkt: fc.spatial_reference_wkt().map(str::to_owned),
+        features,
+        messages: Vec::new(),
+    })
+}
+
+pub const SIMPLIFY_LINE: Tool = Tool {
+    id: "simplify_line",
+    name: "Simplify Line",
+    toolbox: "Cartography › Generalization",
+    summary: "Removes vertices from lines within a tolerance (ArcGIS Pro Simplify Line, POINT_REMOVE).",
+    params: &[
+        Param {
+            name: "input",
+            label: "Input Features",
+            kind: Kind::Features,
+            required: true,
+            default: "",
+            help: "",
+        },
+        Param {
+            name: "algorithm",
+            label: "Simplification Algorithm",
+            kind: Kind::Choice(&["POINT_REMOVE", "BEND_SIMPLIFY"]),
+            required: false,
+            default: "POINT_REMOVE",
+            help: "",
+        },
+        Param {
+            name: "tolerance",
+            label: "Simplification Tolerance",
+            kind: Kind::Text,
+            required: true,
+            default: "",
+            help: "e.g. 5 Meters.",
+        },
+    ],
+    output_suffix: "Simplified",
+    measures: true,
+    run: Runner::Features(simplify_line),
+};
