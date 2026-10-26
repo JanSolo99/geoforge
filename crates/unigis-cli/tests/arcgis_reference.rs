@@ -3939,9 +3939,19 @@ fn compare_tables(ours: &Path, theirs: &Path, fields: &serde_json::Value) -> Vec
     if a.len() != b.len() {
         diffs.push(format!("count: ours {}, ArcGIS {}", a.len(), b.len()));
     }
-    // Paths (CLASS) compare by file name, numbers within the usual noise.
+    // Paths (CLASS) compare by file name, numbers within the usual noise. Tabulate Intersection
+    // measures on ArcGIS's coordinate grid: areas agree to about 1e-5 relative.
+    let loose = theirs
+        .file_stem()
+        .is_some_and(|n| n.to_string_lossy().starts_with("ti_"));
+    let close = |x: &Value, y: &Value| match (x, y) {
+        (Value::Double(p), Value::Double(q)) if loose => {
+            (p - q).abs() <= (2e-5 * p.abs().max(q.abs())).max(1e-3)
+        }
+        _ => same_value(x, y),
+    };
     for (i, (ra, rb)) in a.iter().zip(&b).enumerate() {
-        if ra.len() != rb.len() || ra.iter().zip(rb).any(|(x, y)| !same_value(x, y)) {
+        if ra.len() != rb.len() || ra.iter().zip(rb).any(|(x, y)| !close(x, y)) {
             diffs.push(format!("row {i}: ours {ra:?}, ArcGIS {rb:?}"));
         }
     }

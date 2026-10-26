@@ -53,6 +53,12 @@ Get ArcGIS tools done faster: (1) triage cheap tools in batches, (2) generate th
   Probed rule (corrects the earlier guess): ArcGIS always cuts with lines parallel to the X axis, from the bottom up, into
   equal-area strips whatever the polygon's shape or rotation; one feature per strip (multipart if split); EQUAL_AREAS gives
   ceil(area/target) strips, the top one the remainder. Other methods (STACKED_BLOCKS, split angle, width) not done.
+- Tabulate Intersection (`tabulate_intersection`, in `neighbors.rs`; cases `ti_*`) implemented: zone features grouped and dissolved
+  by zone fields, class features grouped by class fields but NOT dissolved (overlapping class features count twice, observed
+  with no class fields); rows sorted by zone then class values, zero intersections omitted; AREA (or LENGTH for line classes)
+  plus PERCENTAGE = amount / zone group area (polygon classes) or / total class length (line classes: observed, the zone's
+  share rule for lines is a guess). Not done: sum_fields, xy_tolerance, point classes. ArcGIS measures on its coordinate grid:
+  the test compares `ti_` tables to 2e-5 relative / 1e-3 absolute.
 - `NOTES.md` (untracked, from another agent) describes decompiling ArcGIS DLLs with Ghidra/REA. CLAUDE.md says black-box only
   (never decompile Esri binaries); I did not take part in that and did not touch it. Decide with the user before using it.
 

@@ -39504,6 +39504,304 @@
           "target_area": 5000
         }
       }
+    },
+    "ti_parcels_clip": {
+      "tool": "analysis.TabulateIntersection",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "ZONE",
+        "testdata/geoproc/clip_areas.shp",
+        "<out>",
+        "AREA_ID"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "AREA",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "PERCENTAGE",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "tabulate_intersection",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "zone_fields": "ZONE",
+          "class_features": "testdata/geoproc/clip_areas.shp",
+          "output": "<out>",
+          "class_fields": "AREA_ID"
+        }
+      }
+    },
+    "ti_clip_parcels": {
+      "tool": "analysis.TabulateIntersection",
+      "args": [
+        "testdata/geoproc/clip_areas.shp",
+        "AREA_ID",
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "ZONE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "AREA",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "PERCENTAGE",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "tabulate_intersection",
+        "params": {
+          "input": "testdata/geoproc/clip_areas.shp",
+          "zone_fields": "AREA_ID",
+          "class_features": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "class_fields": "ZONE"
+        }
+      }
+    },
+    "ti_clip_roads": {
+      "tool": "analysis.TabulateIntersection",
+      "args": [
+        "testdata/geoproc/clip_areas.shp",
+        "AREA_ID",
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "",
+        "",
+        "",
+        "METERS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "LENGTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "PERCENTAGE",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "tabulate_intersection",
+        "params": {
+          "input": "testdata/geoproc/clip_areas.shp",
+          "zone_fields": "AREA_ID",
+          "class_features": "testdata/geoproc/roads.shp",
+          "output": "<out>",
+          "output_units": "METERS"
+        }
+      }
+    },
+    "ti_multi": {
+      "tool": "analysis.TabulateIntersection",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "ZONE;NAME",
+        "testdata/geoproc/clip_areas.shp",
+        "<out>",
+        "AREA_ID",
+        "",
+        "",
+        "SQUARE_METERS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "AREA",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "PERCENTAGE",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "tabulate_intersection",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "zone_fields": "ZONE;NAME",
+          "class_features": "testdata/geoproc/clip_areas.shp",
+          "output": "<out>",
+          "class_fields": "AREA_ID",
+          "output_units": "SQUARE_METERS"
+        }
+      }
+    },
+    "ti_nofields": {
+      "tool": "analysis.TabulateIntersection",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "ZONE",
+        "testdata/geoproc/clip_areas.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "AREA",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "PERCENTAGE",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "tabulate_intersection",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "zone_fields": "ZONE",
+          "class_features": "testdata/geoproc/clip_areas.shp",
+          "output": "<out>"
+        }
+      }
     }
   }
 }
