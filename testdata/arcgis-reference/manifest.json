@@ -56763,6 +56763,114 @@
           "output": "<out>"
         }
       }
+    },
+    "um64_abs_f64_cached": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_types/f64_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_types/f64_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "um64_abs_f64_nd_cached": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_types/f64_nd_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_types/f64_nd_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "um64_negate_f64_cached": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_types/f64_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_types/f64_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "um64_negate_f64_nd_cached": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_types/f64_nd_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_types/f64_nd_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "um64_square_f64_cached": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_types/f64_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_types/f64_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "um64_square_f64_nd_cached": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_types/f64_nd_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_types/f64_nd_cached.tif",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

@@ -1,0 +1,344 @@
+[
+  {
+    "input": "i16_tiny",
+    "tool": "Abs",
+    "status": "succeeded",
+    "type": "U8",
+    "nodata": 15.0,
+    "values": [
+      [
+        0,
+        1,
+        2
+      ],
+      [
+        3,
+        4,
+        5
+      ]
+    ]
+  },
+  {
+    "input": "i16_tiny",
+    "tool": "Negate",
+    "status": "succeeded",
+    "type": "S8",
+    "nodata": -128.0,
+    "values": [
+      [
+        0,
+        -1,
+        -2
+      ],
+      [
+        -3,
+        -4,
+        -5
+      ]
+    ]
+  },
+  {
+    "input": "i16_tiny",
+    "tool": "Square",
+    "status": "succeeded",
+    "type": "S8",
+    "nodata": -128.0,
+    "values": [
+      [
+        0,
+        1,
+        4
+      ],
+      [
+        9,
+        16,
+        25
+      ]
+    ]
+  },
+  {
+    "input": "i16_bit",
+    "tool": "Abs",
+    "status": "succeeded",
+    "type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        0,
+        1,
+        0
+      ],
+      [
+        1,
+        0,
+        1
+      ]
+    ]
+  },
+  {
+    "input": "i16_bit",
+    "tool": "Negate",
+    "status": "succeeded",
+    "type": "S8",
+    "nodata": -128.0,
+    "values": [
+      [
+        0,
+        -1,
+        0
+      ],
+      [
+        -1,
+        0,
+        -1
+      ]
+    ]
+  },
+  {
+    "input": "i16_bit",
+    "tool": "Square",
+    "status": "succeeded",
+    "type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        0,
+        1,
+        0
+      ],
+      [
+        1,
+        0,
+        1
+      ]
+    ]
+  },
+  {
+    "input": "i16_negative",
+    "tool": "Abs",
+    "status": "succeeded",
+    "type": "U8",
+    "nodata": 15.0,
+    "values": [
+      [
+        5,
+        4,
+        3
+      ],
+      [
+        2,
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "input": "i16_negative",
+    "tool": "Negate",
+    "status": "succeeded",
+    "type": "U8",
+    "nodata": 15.0,
+    "values": [
+      [
+        5,
+        4,
+        3
+      ],
+      [
+        2,
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "input": "i16_negative",
+    "tool": "Square",
+    "status": "succeeded",
+    "type": "S8",
+    "nodata": -128.0,
+    "values": [
+      [
+        25,
+        16,
+        9
+      ],
+      [
+        4,
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "input": "f64_cached",
+    "tool": "Abs",
+    "status": "succeeded",
+    "type": "F32",
+    "nodata": -3.4028234663852886e+38,
+    "values": [
+      [
+        0.10000000149011612,
+        1.25,
+        32768.5
+      ],
+      [
+        16777218.0,
+        4000000000.0,
+        3.5
+      ]
+    ]
+  },
+  {
+    "input": "f64_cached",
+    "tool": "Negate",
+    "status": "succeeded",
+    "type": "F32",
+    "nodata": -3.4028234663852886e+38,
+    "values": [
+      [
+        -0.10000000149011612,
+        1.25,
+        -32768.5
+      ],
+      [
+        -16777218.0,
+        -4000000000.0,
+        -3.5
+      ]
+    ]
+  },
+  {
+    "input": "f64_cached",
+    "tool": "Square",
+    "status": "succeeded",
+    "type": "F32",
+    "nodata": -3.4028234663852886e+38,
+    "values": [
+      [
+        0.009999999776482582,
+        1.5625,
+        1073774592.0
+      ],
+      [
+        281475010265088.0,
+        1.5999999748907991e+19,
+        12.25
+      ]
+    ]
+  },
+  {
+    "input": "f64_nd_cached",
+    "tool": "Abs",
+    "status": "succeeded",
+    "type": "F32",
+    "nodata": -3.4028234663852886e+38,
+    "values": [
+      [
+        0.10000000149011612,
+        -3.4028234663852886e+38,
+        32768.5
+      ],
+      [
+        16777218.0,
+        4000000000.0,
+        3.5
+      ]
+    ]
+  },
+  {
+    "input": "f64_nd_cached",
+    "tool": "Negate",
+    "status": "succeeded",
+    "type": "F32",
+    "nodata": -3.4028234663852886e+38,
+    "values": [
+      [
+        -0.10000000149011612,
+        -3.4028234663852886e+38,
+        -32768.5
+      ],
+      [
+        -16777218.0,
+        -4000000000.0,
+        -3.5
+      ]
+    ]
+  },
+  {
+    "input": "f64_nd_cached",
+    "tool": "Square",
+    "status": "succeeded",
+    "type": "F32",
+    "nodata": -3.4028234663852886e+38,
+    "values": [
+      [
+        0.009999999776482582,
+        -3.4028234663852886e+38,
+        1073774592.0
+      ],
+      [
+        281475010265088.0,
+        1.5999999748907991e+19,
+        12.25
+      ]
+    ]
+  },
+  {
+    "input": "f64_extreme",
+    "tool": "Abs",
+    "status": "succeeded",
+    "type": "F64",
+    "nodata": -1.7976931348623157e+308,
+    "values": [
+      [
+        0.1,
+        0.1,
+        1e+200
+      ],
+      [
+        1e+200,
+        1e+308,
+        1e+308
+      ]
+    ]
+  },
+  {
+    "input": "f64_extreme",
+    "tool": "Negate",
+    "status": "succeeded",
+    "type": "F64",
+    "nodata": -1.7976931348623157e+308,
+    "values": [
+      [
+        -0.1,
+        0.1,
+        -1e+200
+      ],
+      [
+        1e+200,
+        -1e+308,
+        1e+308
+      ]
+    ]
+  },
+  {
+    "input": "f64_extreme",
+    "tool": "Square",
+    "status": "succeeded",
+    "type": "F64",
+    "nodata": -1.7976931348623157e+308,
+    "values": [
+      [
+        0.010000000000000002,
+        0.010000000000000002,
+        -1.7976931348623157e+308
+      ],
+      [
+        -1.7976931348623157e+308,
+        -1.7976931348623157e+308,
+        -1.7976931348623157e+308
+      ]
+    ]
+  }
+]

@@ -734,4 +734,4 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 
 - [x] Equal To / Greater Than / Less Than Frequency (`ug run *_frequency`): exact source-precision comparisons, duplicate counts, both band modes, value-band broadcast, missing/extra comparison bands, ArcGIS count types/NoData and empty-band statistics.63 saved cases plus CLI refusal preservation; empty Rank/Popularity lists now return a parameter error instead of panicking. Limits: `scripts/research/frequency/README.md`.
 
-- [x] Abs / Negate / Square preserve Float64 cells and the F64 NoData marker instead of narrowing to Float32; six exact ArcGIS cases cover tagged and untagged double inputs. Wider integer/statistics-dependent behavior remains a separate documented slice.
+- [x] Abs / Negate / Square preserve uncached Float64 cells and the F64 NoData marker; cached Float64 inputs follow ArcGIS narrowing to Float32. Twelve exact ArcGIS cases cover tagged/untagged and cached/uncached doubles. Wider integer/statistics-dependent behavior remains a separate documented slice.

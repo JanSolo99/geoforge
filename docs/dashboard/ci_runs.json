@@ -1,11 +1,11 @@
 {
-  "fetched": "2026-10-27T19:58:15+00:00",
+  "fetched": "2026-10-27T20:11:20+00:00",
   "runs": [
     {
-      "conclusion": "",
+      "conclusion": "success",
       "createdAt": "2026-10-27T19:51:24Z",
       "displayTitle": "Add three raster frequency tools with ArcGIS band and count semantics",
-      "status": "in_progress",
+      "status": "completed",
       "url": "https://github.com/JanSolo99/geoforge/actions/runs/40572839516"
     },
     {

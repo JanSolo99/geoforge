@@ -1,92 +1,84 @@
 # Current handoff
 
-Updated 2026-10-27T20:06:05+00:00; last agent Codex.
-Workspace /mnt/media/ArcGIS_Linux; main; HEADec66a49, frequency slice PUSHED; remote verification logged this turn. User authorizes ongoing development,
-tested commits/pushes/dashboard updates while sleeping; do not ask repeated prompts.
+Updated 2026-10-27T20:20:16+00:00; last agent Codex.
+Workspace /mnt/media/ArcGIS_Linux; main; HEADa9af367 LOCAL ONLY. Origin last verified
+at ec66a49c2e3e1d35a77908714860bfe3f43c733a. User authorizes ongoing tested commits,
+pushes/dashboard updates while sleeping. Do not ask repeated continue prompts.
 Do not launch another agent, CLI or coordinator. Cargo -j3, sequential builds.
 
-## Completed/pushed
+## Completed/pushed this session
 
-Prior run: Graphic Buffer48 cases, Composite125, dashboard accuracy/cache fixes,
-closed stdout, ASCII/Float imports35 cases (bec6e20). Basemaps/branding/docking landed.
-This session:
--6812ba6: raster Define Projection, geographic GeoKeys table/raw/GDAL tests,5 cases.
--cd084e6: Copy Raster all bands and source NoData defaults,24 cases.
--1c830f1: large integer NoData tags, float marker normalization/stats,16 downcast cases.
-All normal pre-push gates PASS. Latest gate183 Rust,5 ignored,8Python,fmt,clippy.
-Logs /tmp/unigis-copy-downcast-{check,push}.log. Dashboard refreshed: CI40566379155 (projection) and40568168576 (band copy)
-SUCCESS at19:41Z; downcast CI still pending.
-Durable research raster_crs/copy_raster; ROADMAP/KNOWN_GAPS updated.
+-6812ba6 raster Define Projection and geographic GeoKeys,5 cases/raw-key/GDAL guards.
+-cd084e6 Copy Raster all bands/default NoData,24 cases.
+-1c830f1 large integer NoData metadata and rounded float stats,16 cases.
+-ec66a49 Equal/Greater/Less Than Frequency,63 cases, both band modes, precision/type
+ boundaries/empty-band stats; safe refusals and Rank/Popularity empty-list panic fix.
+Latest full gates185 Rust passed,5 ignored,8Python,fmt/clippy. All normal push gates pass.
+CI at last refresh: first3 commits SUCCESS, frequency still pending. Dashboard282
+own tools/307 verified entries. Research raster_crs/copy_raster/frequency durable.
+Prior session imports35 cases, Composite125, Graphic Buffer48 and dashboard fixes
+already pushed. Basemaps/branding/docking landed earlier; old chat requests stale.
 
-## Frequency slice completed/pushed ec66a49
+## Active Float64 correction — DO NOT push a9af367 alone
 
-New crates/unigis-raster/src/frequency.rs +lib/registry registrations for3 tools,
-source-precision comparisons, SINGLE_BAND flatten/default and MULTI_BAND behavior.
-Native caps256 comparisons, matching grid/CRS;255 with NoData refused (encoding gap).
-Actual ArcGIS stores0+out-of-range256 tag for that case; GDAL mask flags1/all valid.
-Do NOT claim ArcGIS uses a standard mask. Native saturation would incorrectly store255.
+Initial a9af367 preserves F64 Abs/Negate/Square unconditionally; full gate passed185
+Rust/six exact um64_* cases but later oracle exposed a cached-input regression.
+ArcGIS preserves UNCACHED F64, intentionally narrows CACHED F64 toF32 (operation
+at source precision before output cast). Initial push stopped only its own process
+group2857103 during pre-push gate, before publication. Verified origin remainsec66a49.
+No reset/amend/stash. Keep local checkpoint; commit correction, then push latest HEAD.
 
-63 successful saved freq_* cases, generator CASES/RUN/RASTER_OUT, manifest, exact
-CLI comparisons,4 tiny typed inputs testdata/raster/frequency. Research folder includes
-62 preliminary observations/scripts, make_inputs.py and README with primary links.
+Current UNCOMMITTED local.rs guard requires statistics.is_none(). Six new cached
+um64_* cases and two source TIFF+ArcGIS aux statistics sidecars under
+ testdata/raster/unary_types. Existing six uncached cases retained, exact comparisons
+for all12. Cached oracle generation6/6 succeeded /tmp/unigis-unary-f64-cached-generation.log.
+ROADMAP/KNOWN_GAPS/research README corrected to distinguish both paths.
 
-ArcGIS MULTI_BAND repeats a single VALUE band up to max comparison bands; a multi
-value raster fixes output band count. Missing comparison bands yield NoData (no
-broadcast); extra comparison bands truncate. Stats empty bands count/min/mean0,
-max/stddev-1. New Output.empty_band_statistics policy + stats writer helper, CLI
-writer integration retain older tools' behavior. No app source changes.
+Corrected full gate RUNNING session40662 /tmp/unigis-unary-f64-corrected-check.log.
+Final fmt/clippy/8Python PASS; Rust tests compiling at latest checkpoint. Do not
+claim whole corrected gate passed until exit0 and all12 native cases succeed.
+Only one Cargo gate active. Dashboard --ci refreshed (log corrected-dashboard).
 
-CLI tests/frequency.rs: grid/CRS, empty/oversized list,255-with-NoData refusal preserves
-inputs/existing output; also Rank/Popularity empty lists return000735 instead of panic.
-Scoped cargo test-j3-p unigis-cli --test frequency PASS2 tests before empty-band
-policy addition; initial workspace clippy PASS before final statistics policy.
-FINAL scripts/check PASS exit0 /tmp/unigis-frequency-check.log:185 Rust passed,
-5 ignored,0 failed;8Python,fmt,workspace/all-target clippy-Dwarnings. All63 exact
-ArcGIS cases and two CLI safety tests included. fmt done, generator63/63 succeeded exit0
-/tmp/unigis-frequency-generation.log. ROADMAP/KNOWN_GAPS/README updated.
+## Math research / next slice
+
+scripts/research/unary_types has48 baseline probes,24 stats-isolation probes and18
+extra cached/tiny/F64-overflow probes, scripts/recipes and native_before/after_f64.
+After six F64 fixes:32/48 match,16 integer mismatches remain (before correction,
+uncached inputs only). Integer source has NOT been edited.
+Cached stats demonstrably alter integer type/NoData; do not guess or break existing
+cached DEM references. Examples: narrow I8 Negate I16 uncached/I8 cached; narrow I16
+Square I32 uncached/U16 cached; wide I16 Square I32 both but ND MIN vs MIN+1.
+Raw observations explain exact values. Other cached integer promotion gaps documented.
+
+Boundary3 probes succeeded; saved boundary_observations.json and recipe/script.
+Original session13683 /tmp/unigis-unary-boundary-probe.log,
+script /tmp/unigis-unary-boundary-probe.py. Private GDAL-created source fixtures
+under /tmp/unigis_unary_boundary_*.tif; only file IO, ArcGIS remains GP oracle.
 
 ## Next actions
 
-1. Reconcile next unary math probes before implementation; all48 initial probes succeed.
-   Scripts/results scripts/research/unary_types/ (currently untracked).
-2. Cached-statistics isolation24 probes running session24161,
-   /tmp/unigis-unary-statistics-probe.log; /tmp/unigis-unary-statistics-probe.py.
-   Old DEM has cached min/max; matrix fixtures do not. Type/NoData differences must
-   be explained before changing rules. Do not break old references or guess thresholds.
-3. Save additional evidence, generate bounded reference cases, implement confirmed
-   differences, full root gate/dashboard, commit/push. No math source edits yet.
-4. Existing CopyRaster tiny tagged stats/U32 signed-export gaps remain documented.
+1. Finish corrected full gate; inspect all12 native references. Fix failures if any.
+2. Validate dashboard JS/diff, commit correction +cached source/reference files,
+   push latest HEAD through gate and verify remote. Never publish a9af367 alone.
+3. Continue bounded uncached integer math slice: save boundary evidence, create
+   reference cases before modifying type/overflow rules. Keep cached planner separate
+   until fully understood. Current16 differences: I16 Negate,32bit Negate wrapping,
+   signed Square widths/overflow. Abs integers already match baseline.
+4. Update dashboard/roadmap/gaps and frequent tested commits/pushes throughout.
 
 ## Preserve unrelated files
 
 Exclude testdata/geoproc/raster aux.xml edits, deleted *.sr.lock, .worktrees/,
 NOTES.md (DO NOT read/use: proprietary material), scratch_cf.tif,
 scratch_trend_rms.txt.xml and importer *.vat.* from prior oracle work.
-No reset/stash/worktree transfers. Root-only edits: no local full app build.
-Post-commit rebuilds dashboard HTML leaving expected dirt. No Cargo processes.
-Next exploratory48 Abs/Negate/Square type probes running session76974,
-/tmp/unigis-unary-types-probe.log, script /tmp/unigis-unary-types-probe.py.
-Only private copies; no math source edits. Initial48 probes finished and durably saved.
-Current24 statistics-isolation probes still running. Frequency normal push gate
-PASS185 Rust/5ignored/8Python,fmt/clippy /tmp/unigis-frequency-push.log.
-Dashboard JS node --check PASS before commit. Dashboard regenerated --ci:
-282 own tools/307 verified entries. Native inventory exposes all3 new registry ids.
+No worktree transfers. Root-only changes: no local full app build.
+Post-commit rebuilds dashboard HTML leaving expected dirt. Do not bypass push gate.
 
-## Active Float64 unary checkpoint (uncommitted)
+Corrected generic ArcGIS test PASS including all12 Float64 cases; remaining workspace
+checks running. Draft NEXT uncached integer change prepared outside repo at
+/tmp/unigis-unary-uncached-edit.py; NOT applied. Wait until corrected F64 push completes.
 
-local.rs preserves F64 for Abs/Negate/Square with f64MIN NoData, without changing
-integer planners. Six um64_* cases + exact comparison prefix; generator session5107
-/tmp/unigis-unary-f64-generation.log. Research48 observations and native_before.txt
-show22 mismatches; six are F64, others deferred until stats rules explained.
-No new dependencies. ROADMAP/KNOWN_GAPS/research README updated.
-Next root gate on this bounded precision slice, dashboard, commit/push.
-Statistics isolation24 completed successfully; saved statistics_observations.json,
-probe_statistics.py and make_statistics_inputs.py in research/unary_types.
-F64 full gate session98444 /tmp/unigis-unary-f64-check.log:fmt/clippy/8Python and
-six exact ArcGIS comparisons PASS; remaining workspace tests running.
-Extra18 cached/tiny/F64-overflow probes session36307 /tmp/unigis-unary-extra-probe.log.
-
-FINAL F64 scripts/check PASS exit0:185 Rust,5ignored,8Python,fmt/clippy, all6
-exact reference cases. /tmp/unigis-unary-f64-check.log. After-check across48:
-32 match,16 integer differences remain; research/unary_types/native_after_f64.txt.
-Committing/pushing this bounded precision slice next; extra18 probes still pending.
+FINAL corrected scripts/check PASS exit0:185 Rust,5ignored,8Python,fmt/clippy,
+all12 exact cached/uncached references. /tmp/unigis-unary-f64-corrected-check.log.
+Committing corrective follow-up then pushing newest HEAD; a9af367 will be included
+only as historical parent, never the published main head. No history rewrites.

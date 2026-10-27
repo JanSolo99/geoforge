@@ -11,10 +11,14 @@ signed Square widths/overflow and cached-statistics-dependent type decisions.
 The24 statistics-isolation probes all succeeded (statistics_observations.json); do not replace the integer
 planner with a guess or break the existing cached DEM references.
 
-This first bounded fix preserves F64 for Abs/Negate/Square (previously all narrowed
-to F32). F64 NoData is -f64MAX, tagged source cells map to it, and valid values retain
-their full precision. Six um64_* saved cases compare every cell exactly alongside
-type/grid/CRS/NoData/statistics. F32 and integer behavior remains a separate slice.
+This bounded fix preserves F64 for uncached Abs/Negate/Square inputs (previously
+all narrowed to F32). F64 NoData is -f64MAX. The additional cached-input probe
+caught an initial overbroad guard before publication: ArcGIS intentionally narrows
+cached F64 to F32, performing the operation at source precision before output cast.
+The corrected guard checks stored statistics. Twelve um64_* cases compare exact
+cells, type/grid/CRS/NoData/statistics across both paths and tagged/untagged inputs.
+F32 and integer planners remain separate. Cached fixtures include ArcGIS-produced
+statistics sidecars; do not omit them when copying or regenerating inputs.
 
 Regenerate just this checkpoint's references:
 
@@ -31,3 +35,12 @@ the ArcGIS bridge. Cached I8 narrow Negate usesI8 while uncached usesI16; cached
 I16 narrow Square usesU16 while uncached usesI32. Cached wide I16 Square staysI32
 but uses NoData -2147483647 instead of -2147483648. Cached-statistics-dependent
 output selection is confirmed; its general planner is still a separate task.
+
+extra_observations.json contains18 further successes (cached tiny integers, cached
+F64 and extreme uncached F64). Extreme F64 Square overflows become NoData as in
+the native finite filter. Cached input prototypes live under /tmp/unigis_unary_extra*.
+
+Three exact boundary probes in boundary_observations.json confirm signed Square
+46340 remains data,46341 overflows to NoData; unsigned Square65535 remains data,
+65536 overflows. Uncached U32 Negate wraps through signed32, including2^31 and
+2^32-1. Run make_boundary_inputs.py then probe_boundaries.py to reproduce.

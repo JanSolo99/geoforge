@@ -568,7 +568,7 @@ fn signed_for(t: DataType) -> (DataType, f64) {
     }
 }
 
-/// Applies a one-raster math tool. Abs/Negate/Square preserve F64 input precision.
+/// Applies a one-raster math tool. Abs/Negate/Square preserve uncached F64 input precision.
 /// Other float results and the trigonometric, logarithmic and exponential functions give 32-bit float with NoData where the result is not a finite number
 /// (as 32-bit float); integer Abs keeps the width but is unsigned, Negate gives a signed type and
 /// Square a wider one; Round Down / Up give float; Boolean Not gives 8-bit with NoData 2
@@ -586,7 +586,9 @@ pub fn unary(op: UnaryOp, r: &Raster) -> Raster {
     };
     let integer = !r.data_type.is_float();
     match op {
-        UnaryOp::Abs | UnaryOp::Negate | UnaryOp::Square if r.data_type == DataType::F64 => {
+        UnaryOp::Abs | UnaryOp::Negate | UnaryOp::Square
+            if r.data_type == DataType::F64 && r.statistics.is_none() =>
+        {
             let operation: fn(f64) -> f64 = match op {
                 UnaryOp::Abs => f64::abs,
                 UnaryOp::Negate => |x| -x,
