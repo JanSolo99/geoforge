@@ -236,6 +236,98 @@ pub fn generate_points_along_lines(
     })
 }
 
+/// Generate Transects Along Lines: a `length` long line across the input every `interval` along
+/// it (and, with `end_points`, at its start and end, listed last). The transect is perpendicular
+/// to the segment at that place, drawn from its lower to its upper side: the left normal of the
+/// travel direction, turned so that it does not point down (observed).
+pub fn generate_transects_along_lines(
+    input: &dyn FeatureClass,
+    interval: f64,
+    length: f64,
+    end_points: bool,
+) -> Result<ToolOutput> {
+    if input.geometry_kind() != Some(GeometryKind::Polyline) {
+        return Err(err("ERROR 000368: Invalid input data: lines are required"));
+    }
+    if !(interval.is_finite() && interval > 0.0 && length.is_finite() && length > 0.0) {
+        return Err(err(
+            "ERROR 000800: the interval and the length must be greater than zero",
+        ));
+    }
+    let mut features = Vec::new();
+    for f in input.features() {
+        let f = f?;
+        let Some(g) = &f.geometry else { continue };
+        let runs = parts(g);
+        // (start of the segment along the line, length, from, to)
+        let mut segments = Vec::new();
+        let mut total = 0.0;
+        for r in &runs {
+            for w in r.windows(2) {
+                let len = (w[1][0] - w[0][0]).hypot(w[1][1] - w[0][1]);
+                if len > 0.0 {
+                    segments.push((total, len, w[0], w[1]));
+                    total += len;
+                }
+            }
+        }
+        if segments.is_empty() {
+            continue;
+        }
+        let at = |d: f64| -> ([f64; 2], [f64; 2]) {
+            let seg = segments
+                .iter()
+                .find(|s| d <= s.0 + s.1)
+                .unwrap_or(&segments[segments.len() - 1]);
+            let t = ((d - seg.0) / seg.1).clamp(0.0, 1.0);
+            let dir = [(seg.3[0] - seg.2[0]) / seg.1, (seg.3[1] - seg.2[1]) / seg.1];
+            (
+                [
+                    seg.2[0] + (seg.3[0] - seg.2[0]) * t,
+                    seg.2[1] + (seg.3[1] - seg.2[1]) * t,
+                ],
+                dir,
+            )
+        };
+        let mut distances = Vec::new();
+        let mut d = interval;
+        while d < total - 1e-9 * total.max(1.0) {
+            distances.push(d);
+            d += interval;
+        }
+        if end_points {
+            distances.push(0.0);
+            distances.push(total);
+        }
+        for d in distances {
+            let (p, dir) = at(d);
+            let mut n = [-dir[1], dir[0]];
+            if n[1] < 0.0 || (n[1] == 0.0 && n[0] < 0.0) {
+                n = [-n[0], -n[1]];
+            }
+            let h = length / 2.0;
+            let line = unigis_geometry::paths_geometry(vec![vec![
+                [p[0] - n[0] * h, p[1] - n[1] * h],
+                [p[0] + n[0] * h, p[1] + n[1] * h],
+            ]]);
+            features.push(Feature {
+                oid: features.len() as i64,
+                geometry: line,
+                attributes: vec![Value::Integer(0), Value::Integer(f.oid as i32)],
+            });
+        }
+    }
+    Ok(ToolOutput {
+        kind: GeometryKind::Polyline,
+        has_z: false,
+        has_m: false,
+        fields: vec![id_field(), Field::new("ORIG_FID", FieldType::Integer)],
+        spatial_reference_wkt: input.spatial_reference_wkt().map(str::to_owned),
+        features,
+        messages: Vec::new(),
+    })
+}
+
 /// What Create Fishnet needs: the origin, the second point of the y-axis and either the cell size
 /// with the cell counts or an opposite corner with them.
 #[derive(Debug, Clone, Copy)]

@@ -389,6 +389,27 @@ fn generate_points_along_lines(ctx: &dyn Context) -> Result<ToolOutput> {
     construct::generate_points_along_lines(fc.as_ref(), placement, ends, chainage)
 }
 
+fn generate_transects_along_lines(ctx: &dyn Context) -> Result<ToolOutput> {
+    let t = find("generate_transects_along_lines")
+        .ok_or_else(|| Error::Unsupported("generate_transects_along_lines".into()))?;
+    let fc = ctx.features("input")?;
+    let wkt = fc.spatial_reference_wkt();
+    let get = |name: &str, label: &str| -> Result<f64> {
+        let v = text(ctx, t, name).ok_or_else(|| {
+            Error::Unsupported(format!("ERROR 000735: {label}: value is required"))
+        })?;
+        distance_in_units(&v, wkt)
+    };
+    let ends =
+        text(ctx, t, "include_end_points").is_some_and(|p| p.eq_ignore_ascii_case("END_POINTS"));
+    construct::generate_transects_along_lines(
+        fc.as_ref(),
+        get("interval", "Interval")?,
+        get("transect_length", "Transect Length")?,
+        ends,
+    )
+}
+
 fn create_fishnet(ctx: &dyn Context) -> Result<ToolOutput> {
     let t = find("create_fishnet").ok_or_else(|| Error::Unsupported("create_fishnet".into()))?;
     let num = |k: &str| {
@@ -1157,6 +1178,49 @@ pub static TOOLS: &[Tool] = &[
         output_suffix: "Points",
         measures: true,
         run: Runner::Features(generate_points_along_lines),
+    },
+    Tool {
+        id: "generate_transects_along_lines",
+        name: "Generate Transects Along Lines",
+        toolbox: "Data Management › Features",
+        summary: "Lines across lines at regular intervals (ArcGIS Pro Generate Transects Along Lines).",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Features",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "Lines.",
+            },
+            Param {
+                name: "interval",
+                label: "Interval",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+                help: "For example `100 Meters`.",
+            },
+            Param {
+                name: "transect_length",
+                label: "Transect Length",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+                help: "For example `20 Meters`.",
+            },
+            Param {
+                name: "include_end_points",
+                label: "Include End Points",
+                kind: Kind::Choice(&["NO_END_POINTS", "END_POINTS"]),
+                required: false,
+                default: "NO_END_POINTS",
+                help: "",
+            },
+        ],
+        output_suffix: "Transects",
+        measures: true,
+        run: Runner::Features(generate_transects_along_lines),
     },
     Tool {
         id: "create_fishnet",

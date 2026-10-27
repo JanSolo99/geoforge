@@ -92,6 +92,7 @@ Get ArcGIS tools done faster: (1) triage cheap tools in batches, (2) generate th
   In List. Remaining sa gaps are listed by the dashboard (`python3 scripts/dashboard/build.py`, page "missing").
 - Table Select (`table_select` = Copy Rows with an SQL where, same 19-wide decimal cap; cases `tsel_*`) passes.
 - Export Features = alias of Feature Class To Feature Class (where clause, field mapping; sort_field falls through to an error); cases `ef_*`.
+- Generate Transects Along Lines (`generate_transects_along_lines`, `gt_*` pass): every `interval` along the line (end points listed last), 2-point line of the given length, normal = left normal flipped to point up (y>=0), first vertex on the lower side; fields Id, ORIG_FID. Probed not done: Generate Rectangles Along Lines (fields PageNumber, GroupId, SeqId, Previous, Next, Angle), Grid Index Features (PageName, PageNumber).
 - `NOTES.md` (untracked, from another agent) describes decompiling ArcGIS DLLs with Ghidra/REA. CLAUDE.md says black-box only
   (never decompile Esri binaries); I did not take part in that and did not touch it. Decide with the user before using it.
 

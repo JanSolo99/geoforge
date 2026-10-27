@@ -44967,6 +44967,163 @@
           "output": "<out>"
         }
       }
+    },
+    "gt_roads_100": {
+      "tool": "management.GenerateTransectsAlongLines",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "100 Meters",
+        "20 Meters",
+        "NO_END_POINTS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "generate_transects_along_lines",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "output": "<out>",
+          "interval": "100 Meters",
+          "transect_length": "20 Meters",
+          "include_end_points": "NO_END_POINTS"
+        }
+      }
+    },
+    "gt_roads_80_end": {
+      "tool": "management.GenerateTransectsAlongLines",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "80 Meters",
+        "30 Meters",
+        "END_POINTS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "generate_transects_along_lines",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "output": "<out>",
+          "interval": "80 Meters",
+          "transect_length": "30 Meters",
+          "include_end_points": "END_POINTS"
+        }
+      }
+    },
+    "gt_streams_50": {
+      "tool": "management.GenerateTransectsAlongLines",
+      "args": [
+        "testdata/geoproc/streams.shp",
+        "<out>",
+        "50 Meters",
+        "10 Meters"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "generate_transects_along_lines",
+        "params": {
+          "input": "testdata/geoproc/streams.shp",
+          "output": "<out>",
+          "interval": "50 Meters",
+          "transect_length": "10 Meters"
+        }
+      }
     }
   }
 }
