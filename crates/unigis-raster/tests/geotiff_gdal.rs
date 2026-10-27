@@ -427,3 +427,26 @@ fn epsg_geographic_keys_outside_the_old_numeric_range() {
     }
     std::fs::remove_dir_all(dir).unwrap();
 }
+
+/// A NoData tag is metadata; it need not fit the integer cell representation.
+#[test]
+fn integer_nodata_tags_preserve_values_outside_i64_range() {
+    let dir = tempdir("large-integer-nodata");
+    let mut raster = unigis_raster::Raster::new(2, 2, DataType::I16, [0., 1., 0., 2., 0., -1.]);
+    raster.bands[0] = vec![0., 1., 2., 3.];
+    for (i, nodata) in [3.4e38, 1.79e308, -1.79e308].into_iter().enumerate() {
+        raster.nodata = Some(nodata);
+        let out = dir.join(format!("{i}.tif"));
+        write_geotiff(&out, &raster, Compression::None).unwrap();
+        let back = read_geotiff(&out).unwrap();
+        assert_eq!(back.nodata, Some(nodata));
+        assert_eq!(back.bands, raster.bands);
+        if gdal_available() {
+            assert_eq!(
+                gdal_json(&out)["bands"][0]["noDataValue"].as_f64(),
+                Some(nodata)
+            );
+        }
+    }
+    std::fs::remove_dir_all(dir).unwrap();
+}

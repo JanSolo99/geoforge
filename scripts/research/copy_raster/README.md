@@ -37,12 +37,19 @@ worker was cancelled. Compact probes record band counts, shape and eight samples
 per band, while the saved TIFF references retain all cells.
 
 Scope remains GeoTIFF; colormaps/pyramids/histograms/covariances, scaling flags and
-nondefault storage/statistics environments are not implemented. Existing float
-to signed16 NoData behavior is still a documented gap in docs/KNOWN_GAPS.md.
+nondefault storage/statistics environments are not implemented. Unverified storage flags and tagged-input differences are recorded in docs/KNOWN_GAPS.md.
 
-Additional exploratory downcasts are preserved in `downcast_observations.json`
-(16 cases, not yet saved in the reference manifest). ArcGIS uses Infinity for
-untagged F64-to-F32 NoData and keeps3.4e38/1.79e308 tags on integer output.
-The integer writer still clamps those large tags to i64; a subsequent slice should
-fix and test it. Float conversion also requires normalizing output NoData before
-computing statistics (I32/U32 default marker rounds to2147483648 in F32).
+Downcast probes in `downcast_observations.json` now have16 saved `cprcast_*` cases.
+Regenerate with `make-arcgis-reference.py 'cprcast_*'`. They cover every source type
+to F32 and signed16; Infinity (stored as the string "inf" in strict JSON) is the observed F64-to-F32 default marker. F32/F64
+to signed16 retain3.4e38/1.79e308 tags even though those cannot be stored as cells.
+`downcast_native_before.txt` records the four original mismatches: the writer
+saturated huge tags to i64MAX, and I32/U32-to-F32 statistics failed to exclude the
+rounded marker2147483648. NoData is now normalized before statistics, and integer
+metadata beyond i64 is serialized without saturation. GDAL/native file tests cover
+large positive/negative sentinels separately from the ArcGIS operation oracle.
+
+Further tagged-input probes remain outside this slice: ArcGIS writes statistics
+for tiny single-band NoData inputs (unlike the saved large DEM case), and U32
+NoData metadata exports through signed32. Native Copy Raster still differs there;
+see KNOWN_GAPS. This does not change the saved downcast/default-input results.

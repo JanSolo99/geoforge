@@ -561,8 +561,12 @@ pub(crate) fn format_nodata(v: f64, data_type: DataType) -> String {
     } else if data_type.is_float() {
         // Shortest text of the stored value, read back exactly.
         format!("{}", data_type.store(v))
-    } else {
+    } else if v.is_finite() && v >= i64::MIN as f64 && v < i64::MAX as f64 {
         format!("{}", v as i64)
+    } else {
+        // ArcGIS can retain a floating sentinel far outside integer storage
+        // (e.g. 3.4e38 on signed16 output). Do not saturate that metadata to i64.
+        format!("{v}")
     }
 }
 

@@ -729,3 +729,5 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Raster Define Projection (`ug run define_projection`): EPSG assignment/replacement without changing cells or grid, five ArcGIS cases and multiband/in-place/failure safety tests. GeoTIFF geographic keys now recognize GDA2020 and other geographic EPSG identifiers outside 4000..4999; raw-key and GDAL format checks cover both geographic and projected systems. Limits: `scripts/research/raster_crs/README.md`.
 
 - [x] Copy Raster retains every band and applies pixel conversion to each; 24 additional ArcGIS cases cover RGB layouts, all eight source pixel types, NoData defaults outside integer storage ranges, and first/later-band NoData statistics. Exact all-band cell comparisons prevent silent band loss. Research: `scripts/research/copy_raster/README.md`.
+
+- [x] Copy Raster downcasts: 16 additional ArcGIS cases cover all eight types to F32/I16. Large float NoData metadata survives integer output, and statistics exclude the rounded F32 marker correctly. A GeoTIFF/GDAL regression checks tags beyond the i64 range.

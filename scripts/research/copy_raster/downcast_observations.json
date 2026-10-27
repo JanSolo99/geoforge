@@ -285,7 +285,7 @@
     "status": "succeeded",
     "bands": 1,
     "type": "F32",
-    "nodata": Infinity,
+    "nodata": "inf",
     "values": [
       [
         0.10000000149011612,

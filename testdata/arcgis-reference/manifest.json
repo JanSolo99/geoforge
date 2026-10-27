@@ -54901,6 +54901,406 @@
           "output": "<out>"
         }
       }
+    },
+    "cprcast_u8_f32": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "32_BIT_FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "output": "<out>",
+          "pixel_type": "32_BIT_FLOAT"
+        }
+      }
+    },
+    "cprcast_u8_i16": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "16_BIT_SIGNED"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "output": "<out>",
+          "pixel_type": "16_BIT_SIGNED"
+        }
+      }
+    },
+    "cprcast_i8_f32": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/i8.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "32_BIT_FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/i8.tif",
+          "output": "<out>",
+          "pixel_type": "32_BIT_FLOAT"
+        }
+      }
+    },
+    "cprcast_i8_i16": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/i8.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "16_BIT_SIGNED"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/i8.tif",
+          "output": "<out>",
+          "pixel_type": "16_BIT_SIGNED"
+        }
+      }
+    },
+    "cprcast_u16_f32": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/u16.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "32_BIT_FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u16.tif",
+          "output": "<out>",
+          "pixel_type": "32_BIT_FLOAT"
+        }
+      }
+    },
+    "cprcast_u16_i16": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/u16.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "16_BIT_SIGNED"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u16.tif",
+          "output": "<out>",
+          "pixel_type": "16_BIT_SIGNED"
+        }
+      }
+    },
+    "cprcast_i16_f32": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/i16.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "32_BIT_FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/i16.tif",
+          "output": "<out>",
+          "pixel_type": "32_BIT_FLOAT"
+        }
+      }
+    },
+    "cprcast_i16_i16": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/i16.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "16_BIT_SIGNED"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/i16.tif",
+          "output": "<out>",
+          "pixel_type": "16_BIT_SIGNED"
+        }
+      }
+    },
+    "cprcast_u32_f32": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/u32.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "32_BIT_FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u32.tif",
+          "output": "<out>",
+          "pixel_type": "32_BIT_FLOAT"
+        }
+      }
+    },
+    "cprcast_u32_i16": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/u32.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "16_BIT_SIGNED"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u32.tif",
+          "output": "<out>",
+          "pixel_type": "16_BIT_SIGNED"
+        }
+      }
+    },
+    "cprcast_i32_f32": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/i32.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "32_BIT_FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/i32.tif",
+          "output": "<out>",
+          "pixel_type": "32_BIT_FLOAT"
+        }
+      }
+    },
+    "cprcast_i32_i16": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/i32.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "16_BIT_SIGNED"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/i32.tif",
+          "output": "<out>",
+          "pixel_type": "16_BIT_SIGNED"
+        }
+      }
+    },
+    "cprcast_f32_f32": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/f32.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "32_BIT_FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/f32.tif",
+          "output": "<out>",
+          "pixel_type": "32_BIT_FLOAT"
+        }
+      }
+    },
+    "cprcast_f32_i16": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/f32.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "16_BIT_SIGNED"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/f32.tif",
+          "output": "<out>",
+          "pixel_type": "16_BIT_SIGNED"
+        }
+      }
+    },
+    "cprcast_f64_f32": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/f64.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "32_BIT_FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/f64.tif",
+          "output": "<out>",
+          "pixel_type": "32_BIT_FLOAT"
+        }
+      }
+    },
+    "cprcast_f64_i16": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/f64.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "16_BIT_SIGNED"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/f64.tif",
+          "output": "<out>",
+          "pixel_type": "16_BIT_SIGNED"
+        }
+      }
     }
   }
 }

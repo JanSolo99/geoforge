@@ -289,7 +289,7 @@ pub fn clip_rectangle(
 pub fn copy_raster(input: &Raster, pixel_type: Option<DataType>, nodata: Option<f64>) -> Raster {
     let t = pixel_type.unwrap_or(input.data_type);
     let out_nodata = nodata.or(input.nodata).unwrap_or(match input.data_type {
-        DataType::F32 if t == DataType::F64 => 3.4e38,
+        DataType::F32 if t != DataType::F32 => 3.4e38,
         DataType::F32 => f64::from(3.4e38_f32),
         DataType::F64 => 1.79e308,
         DataType::U8 | DataType::I8 => 256.0,
@@ -297,6 +297,13 @@ pub fn copy_raster(input: &Raster, pixel_type: Option<DataType>, nodata: Option<
         DataType::I16 => f64::from(i16::MAX),
         DataType::U32 | DataType::I32 => f64::from(i32::MAX),
     });
+    // Statistics must use the same sentinel the floating TIFF actually stores.
+    // For example, the I32 default rounds from 2147483647 to 2147483648 in F32.
+    let out_nodata = if t.is_float() {
+        t.store(out_nodata)
+    } else {
+        out_nodata
+    };
     let mut out = input.like(t);
     out.nodata = Some(out_nodata);
     out.bands = input

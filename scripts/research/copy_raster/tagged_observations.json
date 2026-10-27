@@ -1,0 +1,210 @@
+[
+  {
+    "source": "nd_u8",
+    "pixel_type": "",
+    "status": "succeeded",
+    "bands": 1,
+    "type": "U8",
+    "nodata": 127.0,
+    "values": [
+      [
+        0,
+        127,
+        128
+      ],
+      [
+        255,
+        3,
+        4
+      ]
+    ],
+    "statistics": {
+      "MINIMUM": "0",
+      "MAXIMUM": "255",
+      "MEAN": "78",
+      "COUNT": "5.000000"
+    }
+  },
+  {
+    "source": "nd_i8",
+    "pixel_type": "",
+    "status": "succeeded",
+    "bands": 1,
+    "type": "S8",
+    "nodata": -1.0,
+    "values": [
+      [
+        -128,
+        -1,
+        0
+      ],
+      [
+        1,
+        126,
+        127
+      ]
+    ],
+    "statistics": {
+      "MINIMUM": "-128",
+      "MAXIMUM": "127",
+      "MEAN": "25.2",
+      "COUNT": "5.000000"
+    }
+  },
+  {
+    "source": "nd_u16",
+    "pixel_type": "",
+    "status": "succeeded",
+    "bands": 1,
+    "type": "U16",
+    "nodata": 32767.0,
+    "values": [
+      [
+        0,
+        32767,
+        32768
+      ],
+      [
+        65535,
+        1,
+        2
+      ]
+    ],
+    "statistics": {
+      "MINIMUM": "0",
+      "MAXIMUM": "65535",
+      "MEAN": "19661.2",
+      "COUNT": "5.000000"
+    }
+  },
+  {
+    "source": "nd_i16",
+    "pixel_type": "",
+    "status": "succeeded",
+    "bands": 1,
+    "type": "S16",
+    "nodata": -1.0,
+    "values": [
+      [
+        -32768,
+        -1,
+        0
+      ],
+      [
+        32767,
+        100,
+        200
+      ]
+    ],
+    "statistics": {
+      "MINIMUM": "-32768",
+      "MAXIMUM": "32767",
+      "MEAN": "59.8",
+      "COUNT": "5.000000"
+    }
+  },
+  {
+    "source": "nd_u32",
+    "pixel_type": "",
+    "status": "succeeded",
+    "bands": 1,
+    "type": "U32",
+    "nodata": -2147483648.0,
+    "values": [
+      [
+        1,
+        2147483648,
+        4294967294
+      ],
+      [
+        16777217,
+        4000000000,
+        3
+      ]
+    ],
+    "statistics": {
+      "MINIMUM": "1",
+      "MAXIMUM": "4294967294",
+      "MEAN": "1743204693.8333",
+      "COUNT": "6.000000"
+    }
+  },
+  {
+    "source": "nd_i32",
+    "pixel_type": "",
+    "status": "succeeded",
+    "bands": 1,
+    "type": "S32",
+    "nodata": -1.0,
+    "values": [
+      [
+        -2147483648,
+        -1,
+        0
+      ],
+      [
+        2147483647,
+        16777217,
+        1
+      ]
+    ],
+    "statistics": {
+      "MINIMUM": "-2147483648",
+      "MAXIMUM": "2147483647",
+      "MEAN": "3355443.4",
+      "COUNT": "5.000000"
+    }
+  },
+  {
+    "source": "nd_f32",
+    "pixel_type": "",
+    "status": "succeeded",
+    "bands": 1,
+    "type": "F32",
+    "nodata": -1.25,
+    "values": [
+      [
+        0.10000000149011612,
+        -1.25,
+        32768.5
+      ],
+      [
+        16777216.0,
+        4000000000.0,
+        3.5
+      ]
+    ],
+    "statistics": {
+      "MINIMUM": "0.10000000149012",
+      "MAXIMUM": "4000000000",
+      "MEAN": "803361997.62",
+      "COUNT": "5.000000"
+    }
+  },
+  {
+    "source": "nd_f64",
+    "pixel_type": "",
+    "status": "succeeded",
+    "bands": 1,
+    "type": "F64",
+    "nodata": -1.25,
+    "values": [
+      [
+        0.1,
+        -1.25,
+        32768.5
+      ],
+      [
+        16777217.25,
+        4000000000.125,
+        3.5
+      ]
+    ],
+    "statistics": {
+      "MINIMUM": "0.1",
+      "MAXIMUM": "4000000000.125",
+      "MEAN": "803361997.895",
+      "COUNT": "5.000000"
+    }
+  }
+]
