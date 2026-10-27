@@ -46338,6 +46338,138 @@
           "output": "<out>"
         }
       }
+    },
+    "tophat_dem": {
+      "tool": "gp.TopHatTransform_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "top_hat_transform",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "tophat_dem_valley": {
+      "tool": "gp.TopHatTransform_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "Rectangle 3 3 CELL",
+        "VALLEY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "top_hat_transform",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "neighborhood": "Rectangle 3 3 CELL",
+          "analysis_type": "VALLEY"
+        }
+      }
+    },
+    "tophat_dem_ridge_rect": {
+      "tool": "gp.TopHatTransform_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "Rectangle 5 3 CELL",
+        "RIDGE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "top_hat_transform",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "neighborhood": "Rectangle 5 3 CELL",
+          "analysis_type": "RIDGE"
+        }
+      }
+    },
+    "tophat_dem_annulus": {
+      "tool": "gp.TopHatTransform_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "Annulus 1 3 CELL",
+        "VALLEY"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000864: Neighborhood: The input is not within the defined domain.\r\nERROR 010385: Invalid neighborhood type.",
+        "Failed to execute (TopHatTransform)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "top_hat_transform",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "neighborhood": "Annulus 1 3 CELL",
+          "analysis_type": "VALLEY"
+        }
+      }
+    },
+    "tophat_nodata": {
+      "tool": "gp.TopHatTransform_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "Circle 2 CELL",
+        "RIDGE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "top_hat_transform",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "neighborhood": "Circle 2 CELL",
+          "analysis_type": "RIDGE"
+        }
+      }
+    },
+    "tophat_u8": {
+      "tool": "gp.TopHatTransform_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Circle 2 CELL",
+        "VALLEY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "top_hat_transform",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "output": "<out>",
+          "neighborhood": "Circle 2 CELL",
+          "analysis_type": "VALLEY"
+        }
+      }
     }
   }
 }

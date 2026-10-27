@@ -345,3 +345,71 @@ pub fn topographic_position_index(input: &Raster, neighborhood: Option<Neighborh
     }
     out
 }
+
+/// Min or max over the cells of `offsets` that lie in the raster and have data (`None` if none).
+fn extreme(
+    values: &[Option<f64>],
+    width: usize,
+    height: usize,
+    offsets: &[(isize, isize)],
+    col: usize,
+    row: usize,
+    take_max: bool,
+) -> Option<f64> {
+    let mut best: Option<f64> = None;
+    for &(dx, dy) in offsets {
+        let (x, y) = (col as isize + dx, row as isize + dy);
+        if x < 0 || y < 0 || x >= width as isize || y >= height as isize {
+            continue;
+        }
+        if let Some(v) = values[y as usize * width + x as usize] {
+            best = Some(match best {
+                Some(b) if take_max => b.max(v),
+                Some(b) => b.min(v),
+                None => v,
+            });
+        }
+    }
+    best
+}
+
+/// Top Hat Transform: the cell minus its morphological opening (RIDGE) or the closing minus the
+/// cell (VALLEY), the opening being an erosion (minimum) then a dilation (maximum) over the
+/// neighborhood, cells outside the raster ignored. The default neighborhood is a circle of
+/// radius 3 (observed). 32-bit float, NoData +3.4028235e38.
+pub fn top_hat_transform(
+    input: &Raster,
+    neighborhood: Option<Neighborhood>,
+    valley: bool,
+) -> Raster {
+    let offsets = neighborhood
+        .unwrap_or(Neighborhood::Circle { radius: 3.0 })
+        .offsets();
+    let (w, h) = (input.width, input.height);
+    let data: Vec<Option<f64>> = (0..w * h).map(|i| input.get(i % w, i / w)).collect();
+    let pass = |from: &[Option<f64>], take_max: bool| -> Vec<Option<f64>> {
+        (0..w * h)
+            .map(|i| extreme(from, w, h, &offsets, i % w, i / w, take_max))
+            .collect()
+    };
+    // Opening: erode then dilate; closing: dilate then erode.
+    // The intermediate raster keeps the input's NoData cells.
+    let first: Vec<Option<f64>> = pass(&data, valley)
+        .into_iter()
+        .zip(&data)
+        .map(|(f, z)| z.and(f))
+        .collect();
+    let second = pass(&first, !valley);
+    let nodata = f64::from(f32::MAX);
+    let mut out = input.like(DataType::F32);
+    out.nodata = Some(nodata);
+    out.bands[0] = data
+        .iter()
+        .zip(&second)
+        .map(|(z, m)| match (z, m) {
+            (Some(z), Some(m)) => DataType::F32.store(if valley { *m - *z } else { *z - *m }),
+            _ => nodata,
+        })
+        .collect();
+    out
+}

@@ -610,6 +610,30 @@ fn topographic_position_index(ctx: &dyn Context) -> Result<Output> {
     )
 }
 
+fn top_hat_transform(ctx: &dyn Context) -> Result<Output> {
+    let neighborhood = match ctx.get("neighborhood") {
+        None => None,
+        Some(text) => Some(crate::focal::Neighborhood::parse(&text).ok_or_else(|| {
+            Error::Unsupported(format!(
+                "ERROR 000094: Neighborhood: '{text}' is not understood"
+            ))
+        })?),
+    };
+    if matches!(
+        neighborhood,
+        Some(crate::focal::Neighborhood::Annulus { .. })
+    ) {
+        return Err(Error::Unsupported(
+            "ERROR 000864: Neighborhood: The input is not within the defined domain.".into(),
+        ));
+    }
+    let valley = choice(ctx, "top_hat_transform", "analysis_type").eq_ignore_ascii_case("VALLEY");
+    with_statistics(
+        crate::focal::top_hat_transform(&ctx.raster("input")?, neighborhood, valley),
+        true,
+    )
+}
+
 fn test_tool(ctx: &dyn Context) -> Result<Output> {
     let clause = crate::local::ValueClause::parse(&ctx.get("where_clause").unwrap_or_default())
         .ok_or_else(|| Error::Unsupported("ERROR 000358: Invalid expression".into()))?;
@@ -879,6 +903,28 @@ pub static TOOLS: &[Tool] = &[
             },
         ],
         run: topographic_position_index,
+    },
+    Tool {
+        id: "top_hat_transform",
+        name: "Top Hat Transform",
+        summary: "Ridge or valley structures of a surface (morphological top hat).",
+        params: &[
+            raster("input", "Input Raster", true),
+            Param {
+                name: "neighborhood",
+                label: "Neighborhood",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+            },
+            option(
+                "analysis_type",
+                "Analysis Type",
+                &["RIDGE", "VALLEY"],
+                "RIDGE",
+            ),
+        ],
+        run: top_hat_transform,
     },
     Tool {
         id: "test",
