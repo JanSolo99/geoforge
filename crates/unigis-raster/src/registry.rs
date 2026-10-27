@@ -441,6 +441,40 @@ combinatorial_fn!(combinatorial_and_tool, And);
 combinatorial_fn!(combinatorial_or_tool, Or);
 combinatorial_fn!(combinatorial_xor_tool, Xor);
 
+/// Reclass by ASCII File: the remap file has one `value : new` or `from to : new` per line. A
+/// `NODATA` new value is read as 0 (observed).
+fn reclass_by_ascii_file(ctx: &dyn Context) -> Result<Output> {
+    let path = ctx.get("remap_file").unwrap_or_default();
+    let text = std::fs::read_to_string(&path)
+        .map_err(|e| Error::Unsupported(format!("ERROR 000732: {path}: {e}")))?;
+    let mut remap = Vec::new();
+    for line in text.lines().map(str::trim).filter(|l| !l.is_empty()) {
+        let bad = || Error::Unsupported(format!("ERROR 000094: bad remap line '{line}'"));
+        let (lhs, rhs) = line.split_once(':').ok_or_else(bad)?;
+        let nums: Vec<f64> = lhs
+            .split_whitespace()
+            .map(|t| t.parse().map_err(|_| bad()))
+            .collect::<Result<_>>()?;
+        let new = rhs.trim().parse().unwrap_or(0.0);
+        let (from, to) = match nums[..] {
+            [v] => (v, v),
+            [a, b] => (a, b),
+            _ => return Err(bad()),
+        };
+        remap.push(crate::zonal::Remap {
+            from,
+            to,
+            new: Some(new),
+        });
+    }
+    let keep =
+        !choice(ctx, "reclass_by_ascii_file", "missing_values").eq_ignore_ascii_case("NODATA");
+    with_statistics(
+        crate::zonal::reclassify_ascii(&ctx.raster("input")?, &remap, keep),
+        false,
+    )
+}
+
 fn flip(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::extract::flip(&ctx.raster("input")?), true)
 }
@@ -601,6 +635,28 @@ pub static TOOLS: &[Tool] = &[
             raster("in2", "Input Raster 2", true),
         ],
         run: combinatorial_xor_tool,
+    },
+    Tool {
+        id: "reclass_by_ascii_file",
+        name: "Reclass by ASCII File",
+        summary: "Reclassifies values from a remap text file.",
+        params: &[
+            raster("input", "Input Raster", true),
+            Param {
+                name: "remap_file",
+                label: "Input ASCII Remap File",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            option(
+                "missing_values",
+                "Missing Values",
+                &["DATA", "NODATA"],
+                "DATA",
+            ),
+        ],
+        run: reclass_by_ascii_file,
     },
     Tool {
         id: "flip",

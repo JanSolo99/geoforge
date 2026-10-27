@@ -125,6 +125,18 @@ pub fn reclassify(input: &Raster, remap: &[Remap], keep_missing: bool) -> Raster
     )
 }
 
+/// Reclass by ASCII File: as [`reclassify`], but with NODATA for missing values the output type
+/// is chosen as for 8-bit input whatever the input (observed on a float raster).
+pub fn reclassify_ascii(input: &Raster, remap: &[Remap], keep_missing: bool) -> Raster {
+    reclassify_with(
+        input,
+        remap,
+        keep_missing,
+        !keep_missing || is_eight_bit(input.data_type),
+        false,
+    )
+}
+
 /// Reclass by Table: as [`reclassify`], but the output type is always chosen as for 8-bit input
 /// and the fractional values it keeps are truncated, not rounded.
 pub fn reclassify_table(input: &Raster, remap: &[Remap], keep_missing: bool) -> Raster {

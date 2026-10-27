@@ -913,6 +913,10 @@ CASES = {
     "gix_wells_all": ("cartography.GridIndexFeatures", [DATA / "wells.shp"], ["NO_INTERSECTFEATURE", "NO_USEPAGEUNIT", "", "200 Meters", "100 Meters"]),
     "gix_wells": ("cartography.GridIndexFeatures", [DATA / "wells.shp"], ["INTERSECTFEATURE", "NO_USEPAGEUNIT", "", "90 Meters", "90 Meters"]),
     "gix_roads": ("cartography.GridIndexFeatures", [DATA / "roads.shp"], ["INTERSECTFEATURE", "NO_USEPAGEUNIT", "", "120 Meters", "120 Meters"]),
+    "rba_dem": ("gp.ReclassByASCIIFile_sa", [RASTER / "dem.tif", RASTER / "remap_ascii1.txt"], ["DATA"]),
+    "rba_dem_nodata": ("gp.ReclassByASCIIFile_sa", [RASTER / "dem.tif", RASTER / "remap_ascii1.txt"], ["NODATA"]),
+    "rba_int": ("gp.ReclassByASCIIFile_sa", [RASTER / "landuse_u8.tif", RASTER / "remap_ascii2.txt"], ["DATA"]),
+    "rba_int_nodata": ("gp.ReclassByASCIIFile_sa", [RASTER / "landuse_u8.tif", RASTER / "remap_ascii2.txt"], ["NODATA"]),
     "gpal_roads_50": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "NO_END_POINTS"]),
     "gpal_roads_50_end": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "END_POINTS"]),
     "gpal_roads_pct": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["PERCENTAGE", "", 25, "NO_END_POINTS"]),
@@ -1079,6 +1083,7 @@ RUN = {
     "conversion.ExportFeatures": ("export_features", ["input", "output", "where_clause", None, "field_mapping", "sort_field"]),
     "management.GenerateTransectsAlongLines": ("generate_transects_along_lines", ["input", "output", "interval", "transect_length", "include_end_points"]),
     "cartography.GridIndexFeatures": ("grid_index_features", ["input", "output", "intersect_feature", None, None, "polygon_width", "polygon_height"]),
+    "gp.ReclassByASCIIFile_sa": ("reclass_by_ascii_file", ["input", "remap_file", "output", "missing_values"]),
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
     "analysis.CountOverlappingFeatures": ("count_overlapping_features", ["input", "output", "minimum_overlap_count"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
@@ -1094,7 +1099,7 @@ def run_spec(tool, args):
 
 
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
-RASTER_OUT = {*[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
+RASTER_OUT = {"gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
               "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa",
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",

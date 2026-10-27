@@ -45344,6 +45344,94 @@
           "polygon_height": "120 Meters"
         }
       }
+    },
+    "rba_dem": {
+      "tool": "gp.ReclassByASCIIFile_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/remap_ascii1.txt",
+        "<out>",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "reclass_by_ascii_file",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "remap_file": "testdata/raster/remap_ascii1.txt",
+          "output": "<out>",
+          "missing_values": "DATA"
+        }
+      }
+    },
+    "rba_dem_nodata": {
+      "tool": "gp.ReclassByASCIIFile_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/remap_ascii1.txt",
+        "<out>",
+        "NODATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "reclass_by_ascii_file",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "remap_file": "testdata/raster/remap_ascii1.txt",
+          "output": "<out>",
+          "missing_values": "NODATA"
+        }
+      }
+    },
+    "rba_int": {
+      "tool": "gp.ReclassByASCIIFile_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "testdata/raster/remap_ascii2.txt",
+        "<out>",
+        "DATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "reclass_by_ascii_file",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "remap_file": "testdata/raster/remap_ascii2.txt",
+          "output": "<out>",
+          "missing_values": "DATA"
+        }
+      }
+    },
+    "rba_int_nodata": {
+      "tool": "gp.ReclassByASCIIFile_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "testdata/raster/remap_ascii2.txt",
+        "<out>",
+        "NODATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "reclass_by_ascii_file",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "remap_file": "testdata/raster/remap_ascii2.txt",
+          "output": "<out>",
+          "missing_values": "NODATA"
+        }
+      }
     }
   }
 }
