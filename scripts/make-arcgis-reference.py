@@ -12,6 +12,7 @@ manifest.json, which the Rust tests compare UniGIS against.
 import json
 import shutil
 import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -999,6 +1000,41 @@ CASES = {
     "sw_parcels_wells_only": ("analysis.SummarizeWithin", [DATA / "parcels.shp", DATA / "wells.shp"], ["ONLY_INTERSECTING"]),
     "sn_parcels_wells": ("analysis.SummarizeNearby", [DATA / "parcels.shp", DATA / "wells.shp"], ["STRAIGHT_LINE", "100", "Meters"]),
     "sn_parcels_wells_close": ("analysis.SummarizeNearby", [DATA / "parcels.shp", DATA / "wells.shp"], ["STRAIGHT_LINE", "10", "Meters"]),
+    "ascimp_small_integer": ("conversion.ASCIIToRaster", [RASTER / "grid_import/small.asc"], ["INTEGER"]),
+    "ascimp_small_float": ("conversion.ASCIIToRaster", [RASTER / "grid_import/small.asc"], ["FLOAT"]),
+    "ascimp_signed_integer": ("conversion.ASCIIToRaster", [RASTER / "grid_import/signed.asc"], ["INTEGER"]),
+    "ascimp_signed_float": ("conversion.ASCIIToRaster", [RASTER / "grid_import/signed.asc"], ["FLOAT"]),
+    "ascimp_float_integer": ("conversion.ASCIIToRaster", [RASTER / "grid_import/float.asc"], ["INTEGER"]),
+    "ascimp_float_float": ("conversion.ASCIIToRaster", [RASTER / "grid_import/float.asc"], ["FLOAT"]),
+    "ascimp_wide_integer": ("conversion.ASCIIToRaster", [RASTER / "grid_import/wide.asc"], ["INTEGER"]),
+    "ascimp_wide_float": ("conversion.ASCIIToRaster", [RASTER / "grid_import/wide.asc"], ["FLOAT"]),
+    "ascimp_center_integer": ("conversion.ASCIIToRaster", [RASTER / "grid_import/center.asc"], ["INTEGER"]),
+    "ascimp_center_float": ("conversion.ASCIIToRaster", [RASTER / "grid_import/center.asc"], ["FLOAT"]),
+    "ascimp_no_nd_integer": ("conversion.ASCIIToRaster", [RASTER / "grid_import/no_nd.asc"], ["INTEGER"]),
+    "ascimp_no_nd_float": ("conversion.ASCIIToRaster", [RASTER / "grid_import/no_nd.asc"], ["FLOAT"]),
+    "ascimp_short_integer": ("conversion.ASCIIToRaster", [RASTER / "grid_import/short.asc"], ["INTEGER"]),
+    "ascimp_short_float": ("conversion.ASCIIToRaster", [RASTER / "grid_import/short.asc"], ["FLOAT"]),
+    "ascimp_extra_integer": ("conversion.ASCIIToRaster", [RASTER / "grid_import/extra.asc"], ["INTEGER"]),
+    "ascimp_extra_float": ("conversion.ASCIIToRaster", [RASTER / "grid_import/extra.asc"], ["FLOAT"]),
+    "ascimp_near_integer": ("conversion.ASCIIToRaster", [RASTER / "grid_import/near.asc"], ["INTEGER"]),
+    "ascimp_near_float": ("conversion.ASCIIToRaster", [RASTER / "grid_import/near.asc"], ["FLOAT"]),
+    "ascimp_near_header_integer": ("conversion.ASCIIToRaster", [RASTER / "grid_import/near_header.asc"], ["INTEGER"]),
+    "ascimp_near_header_float": ("conversion.ASCIIToRaster", [RASTER / "grid_import/near_header.asc"], ["FLOAT"]),
+    "ascimp_all_nd_integer": ("conversion.ASCIIToRaster", [RASTER / "grid_import/all_nd.asc"], ["INTEGER"]),
+    "ascimp_all_nd_float": ("conversion.ASCIIToRaster", [RASTER / "grid_import/all_nd.asc"], ["FLOAT"]),
+    "ascimp_default": ("conversion.ASCIIToRaster", [RASTER / "grid_import/small.asc"], []),
+    "ascimp_existing_dem": ("conversion.ASCIIToRaster", [OUT / "r2a_dem.asc"], ["FLOAT"]),
+    "fltimp_missing_header": ("conversion.FloatToRaster", [RASTER / "grid_import/missing_header.flt"], []),
+    "fltimp_little": ("conversion.FloatToRaster", [RASTER / "grid_import/little.flt"], []),
+    "fltimp_big": ("conversion.FloatToRaster", [RASTER / "grid_import/big.flt"], []),
+    "fltimp_float_no_byteorder": ("conversion.FloatToRaster", [RASTER / "grid_import/float_no_byteorder.flt"], []),
+    "fltimp_float_no_nd": ("conversion.FloatToRaster", [RASTER / "grid_import/float_no_nd.flt"], []),
+    "fltimp_float_center": ("conversion.FloatToRaster", [RASTER / "grid_import/float_center.flt"], []),
+    "fltimp_float_near_header": ("conversion.FloatToRaster", [RASTER / "grid_import/float_near_header.flt"], []),
+    "fltimp_float_short": ("conversion.FloatToRaster", [RASTER / "grid_import/float_short.flt"], []),
+    "fltimp_float_extra": ("conversion.FloatToRaster", [RASTER / "grid_import/float_extra.flt"], []),
+    "fltimp_all_nd": ("conversion.FloatToRaster", [RASTER / "grid_import/all_nd.flt"], []),
+    "fltimp_existing_dem": ("conversion.FloatToRaster", [OUT / "r2f_dem.flt"], []),
     "cbands_oor_u8_u8": ("management.CompositeBands", [f"{RASTER / 'composite_matrix/u8.tif'};{RASTER / 'composite_matrix/oor_u8.tif'}"], []),
     "cbands_oor_u8_f64": ("management.CompositeBands", [f"{RASTER / 'composite_matrix/f64.tif'};{RASTER / 'composite_matrix/oor_u8.tif'}"], []),
     "cbands_oor_i8_i8": ("management.CompositeBands", [f"{RASTER / 'composite_matrix/i8.tif'};{RASTER / 'composite_matrix/oor_i8.tif'}"], []),
@@ -1356,6 +1392,8 @@ RUN = {
     "gp.CreateConstantRaster_sa": ("create_constant_raster", ["constant", "output", "data_type", "cell_size", "extent"]),
     "analysis.SummarizeWithin": ("summarize_within", ["input", "sum_features", "output", "keep_all", "summary_fields", "add_shape_sum", "shape_unit"]),
     "analysis.SummarizeNearby": ("summarize_nearby", ["input", "sum_features", "output", "near_type", "distances", "distance_unit"]),
+    "conversion.ASCIIToRaster": ("ascii_to_raster", ["input", "output", "data_type"]),
+    "conversion.FloatToRaster": ("float_to_raster", ["input", "output"]),
     "management.CompositeBands": ("composite_bands", ["inputs", "output"]),
     "analysis.GraphicBuffer": ("graphic_buffer", ["input", "output", "distance", "line_caps", "line_joins", "miter_limit"]),
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
@@ -1373,7 +1411,7 @@ def run_spec(tool, args):
 
 
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
-RASTER_OUT = {"management.CompositeBands", "gp.CreateConstantRaster_sa", "gp.InList_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
+RASTER_OUT = {"conversion.ASCIIToRaster", "conversion.FloatToRaster", "management.CompositeBands", "gp.CreateConstantRaster_sa", "gp.InList_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
               "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa",
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",
@@ -1506,7 +1544,21 @@ def main():
             # These tools write only to a geodatabase or memory: run into memory, then copy.
             mem = f"memory/{name}"
             args = [mem if a == str(out) else a for a in args]
-        r = w.call("run_tool", tool=tool, args=args, env={"overwriteOutput": True})
+        if tool in {"conversion.ASCIIToRaster", "conversion.FloatToRaster"}:
+            # A failed FloatToRaster can delete its input .hdr. Never let an
+            # oracle run mutate the checked-in source fixture or its sidecars.
+            source = Path(before[0])
+            with tempfile.TemporaryDirectory(prefix="unigis-grid-reference-") as temporary:
+                copied = Path(temporary) / source.name
+                shutil.copy2(source, copied)
+                for suffix in (".hdr", ".HDR", ".prj", ".PRJ"):
+                    sidecar = source.with_suffix(suffix)
+                    if sidecar.is_file():
+                        shutil.copy2(sidecar, copied.with_suffix(suffix))
+                safe_args = [str(copied) if a == str(source) else a for a in args]
+                r = w.call("run_tool", tool=tool, args=safe_args, env={"overwriteOutput": True})
+        else:
+            r = w.call("run_tool", tool=tool, args=args, env={"overwriteOutput": True})
         if tool in MEMORY_OUT and r.get("status") == "succeeded":
             r2 = w.call("run_tool", tool="management.CopyFeatures", args=[mem, str(out)], env={"overwriteOutput": True})
             w.call("python", code=f"arcpy.management.Delete('{mem}')")

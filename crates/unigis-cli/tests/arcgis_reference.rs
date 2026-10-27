@@ -4283,7 +4283,11 @@ fn compare_rasters(case: &str, ours: &Path, arcgis: &Path) -> Vec<String> {
                 let y = (!b.is_nodata(right[cell])).then_some(right[cell]);
                 let same = match (x, y) {
                     (Some(x), Some(y)) => {
-                        if b.data_type.is_float() && !case.starts_with("cbands_") {
+                        if b.data_type.is_float()
+                            && !["cbands_", "ascimp_", "fltimp_"]
+                                .iter()
+                                .any(|p| case.starts_with(p))
+                        {
                             (x - y).abs() <= 1e-5 * y.abs().max(1.0)
                         } else {
                             x == y

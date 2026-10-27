@@ -53597,6 +53597,694 @@
           "output": "<out>"
         }
       }
+    },
+    "ascimp_small_integer": {
+      "tool": "conversion.ASCIIToRaster",
+      "args": [
+        "testdata/raster/grid_import/small.asc",
+        "<out>",
+        "INTEGER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ascii_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/small.asc",
+          "output": "<out>",
+          "data_type": "INTEGER"
+        }
+      }
+    },
+    "ascimp_small_float": {
+      "tool": "conversion.ASCIIToRaster",
+      "args": [
+        "testdata/raster/grid_import/small.asc",
+        "<out>",
+        "FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ascii_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/small.asc",
+          "output": "<out>",
+          "data_type": "FLOAT"
+        }
+      }
+    },
+    "ascimp_signed_integer": {
+      "tool": "conversion.ASCIIToRaster",
+      "args": [
+        "testdata/raster/grid_import/signed.asc",
+        "<out>",
+        "INTEGER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ascii_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/signed.asc",
+          "output": "<out>",
+          "data_type": "INTEGER"
+        }
+      }
+    },
+    "ascimp_signed_float": {
+      "tool": "conversion.ASCIIToRaster",
+      "args": [
+        "testdata/raster/grid_import/signed.asc",
+        "<out>",
+        "FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ascii_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/signed.asc",
+          "output": "<out>",
+          "data_type": "FLOAT"
+        }
+      }
+    },
+    "ascimp_float_integer": {
+      "tool": "conversion.ASCIIToRaster",
+      "args": [
+        "testdata/raster/grid_import/float.asc",
+        "<out>",
+        "INTEGER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ascii_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/float.asc",
+          "output": "<out>",
+          "data_type": "INTEGER"
+        }
+      }
+    },
+    "ascimp_float_float": {
+      "tool": "conversion.ASCIIToRaster",
+      "args": [
+        "testdata/raster/grid_import/float.asc",
+        "<out>",
+        "FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ascii_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/float.asc",
+          "output": "<out>",
+          "data_type": "FLOAT"
+        }
+      }
+    },
+    "ascimp_wide_integer": {
+      "tool": "conversion.ASCIIToRaster",
+      "args": [
+        "testdata/raster/grid_import/wide.asc",
+        "<out>",
+        "INTEGER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ascii_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/wide.asc",
+          "output": "<out>",
+          "data_type": "INTEGER"
+        }
+      }
+    },
+    "ascimp_wide_float": {
+      "tool": "conversion.ASCIIToRaster",
+      "args": [
+        "testdata/raster/grid_import/wide.asc",
+        "<out>",
+        "FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ascii_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/wide.asc",
+          "output": "<out>",
+          "data_type": "FLOAT"
+        }
+      }
+    },
+    "ascimp_center_integer": {
+      "tool": "conversion.ASCIIToRaster",
+      "args": [
+        "testdata/raster/grid_import/center.asc",
+        "<out>",
+        "INTEGER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ascii_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/center.asc",
+          "output": "<out>",
+          "data_type": "INTEGER"
+        }
+      }
+    },
+    "ascimp_center_float": {
+      "tool": "conversion.ASCIIToRaster",
+      "args": [
+        "testdata/raster/grid_import/center.asc",
+        "<out>",
+        "FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ascii_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/center.asc",
+          "output": "<out>",
+          "data_type": "FLOAT"
+        }
+      }
+    },
+    "ascimp_no_nd_integer": {
+      "tool": "conversion.ASCIIToRaster",
+      "args": [
+        "testdata/raster/grid_import/no_nd.asc",
+        "<out>",
+        "INTEGER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ascii_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/no_nd.asc",
+          "output": "<out>",
+          "data_type": "INTEGER"
+        }
+      }
+    },
+    "ascimp_no_nd_float": {
+      "tool": "conversion.ASCIIToRaster",
+      "args": [
+        "testdata/raster/grid_import/no_nd.asc",
+        "<out>",
+        "FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ascii_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/no_nd.asc",
+          "output": "<out>",
+          "data_type": "FLOAT"
+        }
+      }
+    },
+    "ascimp_short_integer": {
+      "tool": "conversion.ASCIIToRaster",
+      "args": [
+        "testdata/raster/grid_import/short.asc",
+        "<out>",
+        "INTEGER"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 010067: Error in executing grid expression. ",
+        "Failed to execute (ASCIIToRaster)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ascii_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/short.asc",
+          "output": "<out>",
+          "data_type": "INTEGER"
+        }
+      }
+    },
+    "ascimp_short_float": {
+      "tool": "conversion.ASCIIToRaster",
+      "args": [
+        "testdata/raster/grid_import/short.asc",
+        "<out>",
+        "FLOAT"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 010067: Error in executing grid expression. ",
+        "Failed to execute (ASCIIToRaster)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ascii_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/short.asc",
+          "output": "<out>",
+          "data_type": "FLOAT"
+        }
+      }
+    },
+    "ascimp_extra_integer": {
+      "tool": "conversion.ASCIIToRaster",
+      "args": [
+        "testdata/raster/grid_import/extra.asc",
+        "<out>",
+        "INTEGER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ascii_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/extra.asc",
+          "output": "<out>",
+          "data_type": "INTEGER"
+        }
+      }
+    },
+    "ascimp_extra_float": {
+      "tool": "conversion.ASCIIToRaster",
+      "args": [
+        "testdata/raster/grid_import/extra.asc",
+        "<out>",
+        "FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ascii_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/extra.asc",
+          "output": "<out>",
+          "data_type": "FLOAT"
+        }
+      }
+    },
+    "ascimp_near_integer": {
+      "tool": "conversion.ASCIIToRaster",
+      "args": [
+        "testdata/raster/grid_import/near.asc",
+        "<out>",
+        "INTEGER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ascii_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/near.asc",
+          "output": "<out>",
+          "data_type": "INTEGER"
+        }
+      }
+    },
+    "ascimp_near_float": {
+      "tool": "conversion.ASCIIToRaster",
+      "args": [
+        "testdata/raster/grid_import/near.asc",
+        "<out>",
+        "FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ascii_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/near.asc",
+          "output": "<out>",
+          "data_type": "FLOAT"
+        }
+      }
+    },
+    "ascimp_near_header_integer": {
+      "tool": "conversion.ASCIIToRaster",
+      "args": [
+        "testdata/raster/grid_import/near_header.asc",
+        "<out>",
+        "INTEGER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ascii_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/near_header.asc",
+          "output": "<out>",
+          "data_type": "INTEGER"
+        }
+      }
+    },
+    "ascimp_near_header_float": {
+      "tool": "conversion.ASCIIToRaster",
+      "args": [
+        "testdata/raster/grid_import/near_header.asc",
+        "<out>",
+        "FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ascii_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/near_header.asc",
+          "output": "<out>",
+          "data_type": "FLOAT"
+        }
+      }
+    },
+    "ascimp_all_nd_integer": {
+      "tool": "conversion.ASCIIToRaster",
+      "args": [
+        "testdata/raster/grid_import/all_nd.asc",
+        "<out>",
+        "INTEGER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ascii_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/all_nd.asc",
+          "output": "<out>",
+          "data_type": "INTEGER"
+        }
+      }
+    },
+    "ascimp_all_nd_float": {
+      "tool": "conversion.ASCIIToRaster",
+      "args": [
+        "testdata/raster/grid_import/all_nd.asc",
+        "<out>",
+        "FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ascii_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/all_nd.asc",
+          "output": "<out>",
+          "data_type": "FLOAT"
+        }
+      }
+    },
+    "ascimp_default": {
+      "tool": "conversion.ASCIIToRaster",
+      "args": [
+        "testdata/raster/grid_import/small.asc",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ascii_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/small.asc",
+          "output": "<out>"
+        }
+      }
+    },
+    "ascimp_existing_dem": {
+      "tool": "conversion.ASCIIToRaster",
+      "args": [
+        "testdata/arcgis-reference/r2a_dem.asc",
+        "<out>",
+        "FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ascii_to_raster",
+        "params": {
+          "input": "testdata/arcgis-reference/r2a_dem.asc",
+          "output": "<out>",
+          "data_type": "FLOAT"
+        }
+      }
+    },
+    "fltimp_little": {
+      "tool": "conversion.FloatToRaster",
+      "args": [
+        "testdata/raster/grid_import/little.flt",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "float_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/little.flt",
+          "output": "<out>"
+        }
+      }
+    },
+    "fltimp_big": {
+      "tool": "conversion.FloatToRaster",
+      "args": [
+        "testdata/raster/grid_import/big.flt",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "float_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/big.flt",
+          "output": "<out>"
+        }
+      }
+    },
+    "fltimp_float_no_byteorder": {
+      "tool": "conversion.FloatToRaster",
+      "args": [
+        "testdata/raster/grid_import/float_no_byteorder.flt",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "float_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/float_no_byteorder.flt",
+          "output": "<out>"
+        }
+      }
+    },
+    "fltimp_float_no_nd": {
+      "tool": "conversion.FloatToRaster",
+      "args": [
+        "testdata/raster/grid_import/float_no_nd.flt",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "float_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/float_no_nd.flt",
+          "output": "<out>"
+        }
+      }
+    },
+    "fltimp_float_center": {
+      "tool": "conversion.FloatToRaster",
+      "args": [
+        "testdata/raster/grid_import/float_center.flt",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "float_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/float_center.flt",
+          "output": "<out>"
+        }
+      }
+    },
+    "fltimp_float_near_header": {
+      "tool": "conversion.FloatToRaster",
+      "args": [
+        "testdata/raster/grid_import/float_near_header.flt",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "float_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/float_near_header.flt",
+          "output": "<out>"
+        }
+      }
+    },
+    "fltimp_float_short": {
+      "tool": "conversion.FloatToRaster",
+      "args": [
+        "testdata/raster/grid_import/float_short.flt",
+        "<out>"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 010067: Error in executing grid expression. ",
+        "Failed to execute (FloatToRaster)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "float_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/float_short.flt",
+          "output": "<out>"
+        }
+      }
+    },
+    "fltimp_float_extra": {
+      "tool": "conversion.FloatToRaster",
+      "args": [
+        "testdata/raster/grid_import/float_extra.flt",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "float_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/float_extra.flt",
+          "output": "<out>"
+        }
+      }
+    },
+    "fltimp_all_nd": {
+      "tool": "conversion.FloatToRaster",
+      "args": [
+        "testdata/raster/grid_import/all_nd.flt",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "float_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/all_nd.flt",
+          "output": "<out>"
+        }
+      }
+    },
+    "fltimp_existing_dem": {
+      "tool": "conversion.FloatToRaster",
+      "args": [
+        "testdata/arcgis-reference/r2f_dem.flt",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "float_to_raster",
+        "params": {
+          "input": "testdata/arcgis-reference/r2f_dem.flt",
+          "output": "<out>"
+        }
+      }
+    },
+    "fltimp_missing_header": {
+      "tool": "conversion.FloatToRaster",
+      "args": [
+        "testdata/raster/grid_import/missing_header.flt",
+        "<out>"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 010062: File /tmp/unigis-grid-reference-xtrxeus_/missing_header.hdr cannot be found.",
+        "Failed to execute (FloatToRaster)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "float_to_raster",
+        "params": {
+          "input": "testdata/raster/grid_import/missing_header.flt",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

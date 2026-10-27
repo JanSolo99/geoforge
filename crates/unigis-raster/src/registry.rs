@@ -801,7 +801,58 @@ fn composite_bands(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::composite::composite_bands(&inputs)?, true)
 }
 
+fn ascii_to_raster(ctx: &dyn Context) -> Result<Output> {
+    let input = ctx.get("input").unwrap_or_default();
+    let integer = choice(ctx, "ascii_to_raster", "data_type").eq_ignore_ascii_case("INTEGER");
+    with_statistics(
+        crate::grid_import::ascii_to_raster(std::path::Path::new(&input), integer)?,
+        true,
+    )
+}
+
+fn float_to_raster(ctx: &dyn Context) -> Result<Output> {
+    let input = ctx.get("input").unwrap_or_default();
+    with_statistics(
+        crate::grid_import::float_to_raster(std::path::Path::new(&input))?,
+        true,
+    )
+}
+
 pub static TOOLS: &[Tool] = &[
+    Tool {
+        id: "ascii_to_raster",
+        name: "ASCII To Raster",
+        summary: "Imports an Esri ASCII grid as a signed integer or floating-point raster.",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input ASCII Raster File",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            option(
+                "data_type",
+                "Output Data Type",
+                &["INTEGER", "FLOAT"],
+                "INTEGER",
+            ),
+        ],
+        run: ascii_to_raster,
+    },
+    Tool {
+        id: "float_to_raster",
+        name: "Float To Raster",
+        summary: "Imports an IEEE float32 .flt file with its .hdr header (little or big endian).",
+        params: &[Param {
+            name: "input",
+            label: "Input Floating Point Raster File",
+            kind: Kind::Text,
+            required: true,
+            default: "",
+        }],
+        run: float_to_raster,
+    },
     Tool {
         id: "composite_bands",
         name: "Composite Bands",

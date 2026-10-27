@@ -1,0 +1,644 @@
+[
+  {
+    "case": "ascii_small_INTEGER",
+    "status": "succeeded",
+    "pixelType": "S32",
+    "nodata": -2147483647.0,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        -2147483647,
+        0,
+        1
+      ],
+      [
+        127,
+        128,
+        255
+      ]
+    ]
+  },
+  {
+    "case": "ascii_small_FLOAT",
+    "status": "succeeded",
+    "pixelType": "F32",
+    "nodata": -3.4028234663852886e+38,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        -3.4028234663852886e+38,
+        0.0,
+        1.0
+      ],
+      [
+        127.0,
+        128.0,
+        255.0
+      ]
+    ]
+  },
+  {
+    "case": "ascii_signed_INTEGER",
+    "status": "succeeded",
+    "pixelType": "S32",
+    "nodata": -2147483647.0,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        -2147483647,
+        -6,
+        -1
+      ],
+      [
+        0,
+        255,
+        32767
+      ]
+    ]
+  },
+  {
+    "case": "ascii_signed_FLOAT",
+    "status": "succeeded",
+    "pixelType": "F32",
+    "nodata": -3.4028234663852886e+38,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        -3.4028234663852886e+38,
+        -6.0,
+        -1.0
+      ],
+      [
+        0.0,
+        255.0,
+        32767.0
+      ]
+    ]
+  },
+  {
+    "case": "ascii_float_INTEGER",
+    "status": "succeeded",
+    "pixelType": "S32",
+    "nodata": -2147483647.0,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        -2147483647,
+        -6,
+        0
+      ],
+      [
+        1,
+        2,
+        16777217
+      ]
+    ]
+  },
+  {
+    "case": "ascii_float_FLOAT",
+    "status": "succeeded",
+    "pixelType": "F32",
+    "nodata": -3.4028234663852886e+38,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        -3.4028234663852886e+38,
+        -6.699999809265137,
+        0.10000000149011612
+      ],
+      [
+        1.25,
+        2.5,
+        16777218.0
+      ]
+    ]
+  },
+  {
+    "case": "ascii_wide_INTEGER",
+    "status": "succeeded",
+    "pixelType": "S32",
+    "nodata": -2147483647.0,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        -2147483647,
+        -2147483648,
+        2147483647
+      ],
+      [
+        16777217,
+        65535,
+        3
+      ]
+    ]
+  },
+  {
+    "case": "ascii_wide_FLOAT",
+    "status": "succeeded",
+    "pixelType": "F32",
+    "nodata": -3.4028234663852886e+38,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        -3.4028234663852886e+38,
+        -2147483648.0,
+        2147483648.0
+      ],
+      [
+        16777216.0,
+        65535.0,
+        3.0
+      ]
+    ]
+  },
+  {
+    "case": "ascii_center_INTEGER",
+    "status": "succeeded",
+    "pixelType": "S32",
+    "nodata": -2147483647.0,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        -2147483647,
+        0,
+        1
+      ],
+      [
+        127,
+        128,
+        255
+      ]
+    ]
+  },
+  {
+    "case": "ascii_center_FLOAT",
+    "status": "succeeded",
+    "pixelType": "F32",
+    "nodata": -3.4028234663852886e+38,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        -3.4028234663852886e+38,
+        0.0,
+        1.0
+      ],
+      [
+        127.0,
+        128.0,
+        255.0
+      ]
+    ]
+  },
+  {
+    "case": "ascii_no_nd_INTEGER",
+    "status": "succeeded",
+    "pixelType": "S32",
+    "nodata": -2147483647.0,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        1,
+        2,
+        3
+      ],
+      [
+        4,
+        -2147483647,
+        6
+      ]
+    ]
+  },
+  {
+    "case": "ascii_no_nd_FLOAT",
+    "status": "succeeded",
+    "pixelType": "F32",
+    "nodata": -3.4028234663852886e+38,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        1.0,
+        2.0,
+        3.0
+      ],
+      [
+        4.0,
+        -3.4028234663852886e+38,
+        6.0
+      ]
+    ]
+  },
+  {
+    "case": "ascii_short_INTEGER",
+    "status": "failed",
+    "error": "ERROR 010067: Error in executing grid expression. \nFailed to execute (ASCIIToRaster).\n"
+  },
+  {
+    "case": "ascii_short_FLOAT",
+    "status": "failed",
+    "error": "ERROR 010067: Error in executing grid expression. \nFailed to execute (ASCIIToRaster).\n"
+  },
+  {
+    "case": "ascii_extra_INTEGER",
+    "status": "succeeded",
+    "pixelType": "S32",
+    "nodata": -2147483647.0,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        1,
+        2,
+        3
+      ],
+      [
+        4,
+        5,
+        6
+      ]
+    ]
+  },
+  {
+    "case": "ascii_extra_FLOAT",
+    "status": "succeeded",
+    "pixelType": "F32",
+    "nodata": -3.4028234663852886e+38,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        1.0,
+        2.0,
+        3.0
+      ],
+      [
+        4.0,
+        5.0,
+        6.0
+      ]
+    ]
+  },
+  {
+    "case": "ascii_existing_dem",
+    "status": "succeeded",
+    "pixelType": "F32",
+    "nodata": -3.4028234663852886e+38,
+    "epsg": 0,
+    "rows": 120,
+    "cols": 150
+  },
+  {
+    "case": "float_existing_dem",
+    "status": "succeeded",
+    "pixelType": "F32",
+    "nodata": -3.4028234663852886e+38,
+    "epsg": 0,
+    "rows": 120,
+    "cols": 150
+  },
+  {
+    "case": "float_little",
+    "status": "succeeded",
+    "pixelType": "F32",
+    "nodata": -3.4028234663852886e+38,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        -3.4028234663852886e+38,
+        -6.699999809265137,
+        0.10000000149011612
+      ],
+      [
+        1.25,
+        2.5,
+        16777218.0
+      ]
+    ]
+  },
+  {
+    "case": "float_big",
+    "status": "succeeded",
+    "pixelType": "F32",
+    "nodata": -3.4028234663852886e+38,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        -3.4028234663852886e+38,
+        -6.699999809265137,
+        0.10000000149011612
+      ],
+      [
+        1.25,
+        2.5,
+        16777218.0
+      ]
+    ]
+  },
+  {
+    "case": "ascii_near_INTEGER",
+    "status": "succeeded",
+    "pixelType": "S32",
+    "nodata": -2147483647.0,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        -9999,
+        -9998,
+        -9999
+      ],
+      [
+        0,
+        1,
+        2
+      ]
+    ]
+  },
+  {
+    "case": "ascii_near_FLOAT",
+    "status": "succeeded",
+    "pixelType": "F32",
+    "nodata": -3.4028234663852886e+38,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        -9999.0,
+        -9999.0,
+        -9999.099609375
+      ],
+      [
+        0.0,
+        1.0,
+        2.0
+      ]
+    ]
+  },
+  {
+    "case": "ascii_near_header_INTEGER",
+    "status": "succeeded",
+    "pixelType": "S32",
+    "nodata": -2147483647.0,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        -9999,
+        -2147483647,
+        -9999
+      ],
+      [
+        1,
+        2,
+        3
+      ]
+    ]
+  },
+  {
+    "case": "ascii_near_header_FLOAT",
+    "status": "succeeded",
+    "pixelType": "F32",
+    "nodata": -3.4028234663852886e+38,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        -9999.0,
+        -3.4028234663852886e+38,
+        -9999.0
+      ],
+      [
+        1.0,
+        2.0,
+        3.0
+      ]
+    ]
+  },
+  {
+    "case": "float_no_byteorder",
+    "status": "succeeded",
+    "pixelType": "F32",
+    "nodata": -3.4028234663852886e+38,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        -3.4028234663852886e+38,
+        -6.699999809265137,
+        0.10000000149011612
+      ],
+      [
+        1.25,
+        2.5,
+        16777218.0
+      ]
+    ]
+  },
+  {
+    "case": "float_no_nd",
+    "status": "succeeded",
+    "pixelType": "F32",
+    "nodata": -3.4028234663852886e+38,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        -3.4028234663852886e+38,
+        -6.699999809265137,
+        0.10000000149011612
+      ],
+      [
+        1.25,
+        2.5,
+        16777218.0
+      ]
+    ]
+  },
+  {
+    "case": "float_center",
+    "status": "succeeded",
+    "pixelType": "F32",
+    "nodata": -3.4028234663852886e+38,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        -3.4028234663852886e+38,
+        -6.699999809265137,
+        0.10000000149011612
+      ],
+      [
+        1.25,
+        2.5,
+        16777218.0
+      ]
+    ]
+  },
+  {
+    "case": "float_near_header",
+    "status": "succeeded",
+    "pixelType": "F32",
+    "nodata": -3.4028234663852886e+38,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        -3.4028234663852886e+38,
+        -6.699999809265137,
+        0.10000000149011612
+      ],
+      [
+        1.25,
+        2.5,
+        16777218.0
+      ]
+    ]
+  },
+  {
+    "case": "float_short",
+    "status": "failed",
+    "error": "ERROR 010067: Error in executing grid expression. \nFailed to execute (FloatToRaster).\n"
+  },
+  {
+    "case": "float_extra",
+    "status": "succeeded",
+    "pixelType": "F32",
+    "nodata": -3.4028234663852886e+38,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        -3.4028234663852886e+38,
+        -6.699999809265137,
+        0.10000000149011612
+      ],
+      [
+        1.25,
+        2.5,
+        16777218.0
+      ]
+    ]
+  },
+  {
+    "case": "ascii_all_nd_INTEGER",
+    "status": "succeeded",
+    "pixelType": "S32",
+    "nodata": -2147483647.0,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        -2147483647,
+        -2147483647,
+        -2147483647
+      ],
+      [
+        -2147483647,
+        -2147483647,
+        -2147483647
+      ]
+    ]
+  },
+  {
+    "case": "ascii_all_nd_FLOAT",
+    "status": "succeeded",
+    "pixelType": "F32",
+    "nodata": -3.4028234663852886e+38,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        -3.4028234663852886e+38,
+        -3.4028234663852886e+38,
+        -3.4028234663852886e+38
+      ],
+      [
+        -3.4028234663852886e+38,
+        -3.4028234663852886e+38,
+        -3.4028234663852886e+38
+      ]
+    ]
+  },
+  {
+    "case": "ascii_default",
+    "status": "succeeded",
+    "pixelType": "S32",
+    "nodata": -2147483647.0,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        -2147483647,
+        0,
+        1
+      ],
+      [
+        127,
+        128,
+        255
+      ]
+    ]
+  },
+  {
+    "case": "float_all_nd",
+    "status": "succeeded",
+    "pixelType": "F32",
+    "nodata": -3.4028234663852886e+38,
+    "epsg": 0,
+    "rows": 2,
+    "cols": 3,
+    "values": [
+      [
+        -3.4028234663852886e+38,
+        -3.4028234663852886e+38,
+        -3.4028234663852886e+38
+      ],
+      [
+        -3.4028234663852886e+38,
+        -3.4028234663852886e+38,
+        -3.4028234663852886e+38
+      ]
+    ]
+  }
+]

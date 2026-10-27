@@ -16,6 +16,7 @@ pub mod extract;
 pub mod focal;
 pub mod generalize;
 mod geotiff;
+pub mod grid_import;
 pub mod hydro;
 pub mod interpolate;
 pub mod local;

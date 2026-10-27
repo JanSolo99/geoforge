@@ -1,109 +1,90 @@
 # Current handoff
 
-Updated: 2026-10-27T15:49:16+00:00; last agent Codex.
-Workspace /mnt/media/ArcGIS_Linux, branch main, HEAD bab1f21 (CLI stdout fix), follows eeffa40 NoData fix. Both commits PUSHED, exit0.
-Prior remote
- d29a79ab0a4ba2944d446ade71f80ed9c40b5639. User authorizes ongoing commits/pushes.
+Updated 2026-10-27T16:17:37+00:00; last agent Codex.
+Workspace /mnt/media/ArcGIS_Linux; branch main; HEAD a646c78, PUSHED/verified
+ a646c78aae9bfd94ac13e049370fc150bfe8caf3. User authorizes ongoing commits/pushes.
 Do not launch another agent, CLI session or coordinator.
 
 ## Objective
 
-Sustained development, tested commits/pushes and dashboard updates while user sleeps,
+Keep developing, testing, committing, pushing and updating dashboard while user sleeps,
 without repeated continue prompts, until unable. Prior Claude usage-limit run recovered
 from .git/agent-coordinator/20261027T101238-693a3583/. Basemaps/branding/docking already
-landed; old chat requests are stale. Continue current root-engine development.
+landed; old chat requests are stale. Current work is root native engine/CLI breadth.
 
 ## Completed and pushed this Codex run
 
-- d66383c: finish inherited Graphic Buffer caps/joins/holes (10 ArcGIS cases).
-- ebc2d2d: dashboard implementation-aware reference coverage.
-- cdc23aa: erosion/zero polygons, field replacement, miter bevel fallback (28 cases).
-- c3abd4a: numeric/text distances, unit conversion and geographic/malformed-text
-  guards (48 cases, 3 refusal tests). Limits in graphic_buffer/README.md.
-- 735d4f3: persistent cached CI/timestamp/latest gaps; 8 dashboard tests.
-- d29a79a: Composite Bands, 86 saved cases, all-band statistics/comparison and
-  corruption regression. Full gate/push passed 178 tests +8 Python, fmt/clippy.
-All pushed checkpoints have SUCCESS GitHub CI, including d29a79a:
-https://github.com/JanSolo99/geoforge/actions/runs/40522528614
+- d66383c / cdc23aa / c3abd4a: finish inherited Graphic Buffer, caps/joins/holes,
+  miter-limit bevel fallback, erosion/zero polygons, numeric field replacement,
+  numeric/text distances, units and safety guards. 48 ArcGIS cases +3 refusal tests.
+- ebc2d2d / 735d4f3: accurate dashboard reference coverage; cached CI survives
+  offline hooks, fetch timestamp/latest gaps, 8 Python tests.
+- d29a79a / eeffa40 / a646c78: Composite Bands (125 cases), true typed U32/F64
+  fixtures, all-band exact pixel/statistics comparisons, type promotion, NoData
+  tagged-input ranking, signed U32 sentinel export, per-source and zero padding.
+  Initial AAIGrid fixture inference narrowed values; corrected typed arrays and
+  read-back verification now cover all23 fixtures. Detailed research/composite/README.md.
+- bab1f21: ug tools closed stdout no longer panics; deterministic regression test.
+  Normal inventory retains every registered tool; pipefail ug tools | head succeeds.
+CI through d29a79a SUCCESS; refresh CI status for later pushes. a646c78 push gate
+passed179 Rust tests,5 ignored,8 Python,fmt/clippy; /tmp/unigis-composite-outside-push.log.
 
-## Current slices (validated, committing next)
+## Current slice: ASCII To Raster / Float To Raster (validated, committing next)
 
-NoData / precision committed eeffa40; CLI stdout fix committed bab1f21.
-Normal push session83808 running /tmp/unigis-nodata-stdout-push.log; required gate.
-New READ-ONLY exploratory follow-up: 10 outside-range source NoData padding cases
-under /tmp; script /tmp/unigis-composite-outside-probe.py, log
-/tmp/unigis-composite-outside-research.log. All10 direct probes succeeded; ArcGIS fills zero when source integer NoData is
-not representable, even if output F64 could represent it. composite.rs now filters
-unrepresentable integer padding to zero. Five new shifted sources, ten CASES,
-probe_outside.py/outside_observations.json and make_matrix extension added.
-No follow-up edits staged. All10 cbands_oor* generated successfully, 125 Composite cases total.
-Full scripts/check PASSED exit0 /tmp/unigis-composite-outside-check.log: 179 Rust
-passed, 0 failed, 5 ignored, 80 groups, 8 Python tests, fmt/clippy. No build running. Docs/roadmap/gaps updated. Refresh dashboard,
-commit/push after gate. Previous 115-case NoData and CLI slices already pushed successfully.
+New crates/unigis-raster/src/grid_import.rs, lib/registry registration, CLI exact
+import pixel comparison and input-preservation test tests/grid_import.rs. 35 saved
+cases (31 successes,4 expected errors), generator CASES/RUN/RASTER_OUT, manifest,
+ascimp_* / fltimp_* results and raw input files under testdata/raster/grid_import.
+Research/reproducer: scripts/research/grid_import/README.md, make_inputs.py, probe*.py,
+observations.json. No new dependencies or GDAL runtime.
 
-1. Composite Bands follow-up: make_matrix.py now writes typed GDAL/NumPy arrays and
-   read-back verifies all 18 inputs (values/type/NoData/grid/EPSG). Prior AAIGrid
-   inference narrowed F64/U32 fixture values; those earlier comparisons passed for
-   actual stored inputs but missed intended precision boundaries. Corrected all
-   matrix/padding oracles; U32 high values and true F64 fractions now checked exactly.
-   29 new NoData cases => 115 Composite cases total. NoData defaults use highest-
-   ranked tagged INPUT type (U8<I8<U16<I16<U32<I32<F32<F64), not output promotion.
-   Defaults: 256 /256 /65536 /32767 /2147483647 /2147483647 /f32(3.4e38) /1.79e308.
-   Preserve integer tags outside pixel range. Last U32 sentinel promoted to F64
-   wraps signed32 (2^31 -> -2^31). Padding uses each source's sentinel or zero,
-   independent of final global tag. Raw evidence/probes in research/composite.
-   Source composite.rs, generator/manifest, matrix inputs, cbands_* outputs, research
-   and docs are staged; unrelated dirt excluded.
-2. Independent ug tools stdout fix in CLI main.rs and tests/tools_output.rs. Closed
-   stdout previously panic/exit101 (/tmp/unigis-tools-broken-pipe-red.log). Direct
-   Write catches BrokenPipe; deterministic closed-reader UnixStream test passes.
-   Ordinary inventory still has all135 tools; bash pipefail ug tools | head exits0.
-   Keep this as a SEPARATE commit after NoData commit.
+ArcGIS observations implemented: INTEGER S32 truncates fractions, FLOAT/binary F32;
+system NoData S32 -2147483647 / F32 min. ASCII compares raw doubles before conversion,
+binary normalizes header NoData to F32. Corner/center origins, endian choices,
+default ND-9999/defaultLSB. Short data010067; missing float header010062; extras
+ignored. Projection sidecars deliberately ignored (ArcGIS legacy behavior).
 
-## Validation
+Important oracle side-effect: bad FloatToRaster probe deleted its INPUT header.
+Generator now isolates both legacy import tools on temporary copies incl sidecars;
+restored original HDR and regenerated error cases. Native importer is READ ONLY;
+regression asserts input/header byte preservation and no partial output.
+Limits in KNOWN_GAPS/README: finite standard headers/cells, fitting INTEGER/F32,
+no compression/additional dialects/nondefault environments. CRS assignment separate.
 
-- make_matrix.py --check PASS all18 files (read-only).
-- First NoData gate /tmp/unigis-composite-nodata-check.log FAILED only 2 default-tag
-  cases; probes established tagged-input ranking; corrected and added 9 cases.
-- FINAL scripts/check /tmp/unigis-composite-nodata-and-pipe-final-check.log PASS exit0:
-  179 Rust passed, 0 failed, 5 ignored, 80 result groups; 8 Python dashboard tests,
-  fmt and workspace/all-target clippy -D warnings. Covers both current slices,
-  all115 exact Composite cases, 48 Graphic Buffer cases/guards and closed-output test.
-- No running builds/ArcGIS workers. No other agent. Source frozen.
-- Dashboard --ci fetched latest d29a79a SUCCESS; refresh after handoff/commits so its
-  next-actions card reflects current state. Generated data/JS checks to repeat.
+## Validation / processes
+
+- Initial clippy PASS /tmp/unigis-raster-import-clippy.log.
+- Oracle generation /tmp/unigis-raster-import-generation.log, corrected short/missing
+  generation /tmp/unigis-raster-import-short-generation.log; all expected outcomes.
+- FINAL scripts/check PASS exit0 /tmp/unigis-raster-import-check.log: 180 passed,
+  0 failed,5 ignored,81 groups;8 Python tests,fmt,workspace/all-target clippy-Dwarnings.
+  Includes every import pixel exactly,125 Composite cases,48 Graphic Buffer cases,
+  later-band corruption, closed-output and input-preservation guards.
+- No running Cargo/ArcGIS processes. Importer source/docs/fixtures UNSTAGED currently.
+- Root docs read; actual ug tools inventory confirmed both imports absent before work.
 
 ## Next actions
 
-1. NoData/precision committed eeffa40; stage/commit CLI stdout fix separately.
-2. Commit CLI stdout fix separately (add roadmap checkpoint, handoff and dashboard).
-3. Push both normally through mandatory pre-push gate, verify remote SHA and CI.
-4. Continue bounded development. Remaining Composite probe: padding with an input
-   integer NoData tag outside its own pixel range (not yet probed). Band selectors,
-   custom CRS/reprojection/nondefault environments unsupported; packed/complex pixel
-   types not verified. NEXT chosen family: ASCII To Raster / Float To Raster (absent in inventory).
-Official ArcGIS docs read and two exploratory batches completed; logs
-/tmp/unigis-raster-import-research.log and /tmp/unigis-raster-import-extra-research.log.
-Inputs/scripts/outputs in /tmp/unigis_import_probe and /tmp/unigis-raster-import-*.py.
-Findings: ASCII INTEGER -> S32 truncation with ND -2147483647, FLOAT ->F32 NDf32min;
-raw double comparison of ASCII NoData before output cast. Float binary normalizes
-header NoData to f32; LSB/MSB both supported, missing byteorder defaultsLSB, missing
-ND defaults-9999. Corner/center origins supported. Short data errors010067; trailing
-values ignored. Projection sidecars ignored (existing UTM .prj gives epsg0).
-No importer source edits or repo fixture additions yet. Implement after pushing
-current outside-range padding checkpoint. Inspect saved TIFF stats before choosing
-registry Output.statistics. Read applicable root docs (already read this turn).
+1. Refresh dashboard --ci, validate generated JSON/JS, stage only importer paths,
+   commit and push normally through required gate. Verify remote SHA/CI.
+2. Continue raster projection assignment: root define_projection currently opens
+   features only (crates/unigis-tools/src/dm_tools.rs:225). New legacy imports produce
+   unknown CRS by design, so this is a useful next capability. Probe ArcGIS first.
+3. When working on raster CRS encoding, inspect geotiff.rs::is_geographic_code:
+   current4000..4999 heuristic misses GDA2020 EPSG7844 (not tested/fixed yet).
+   A pure EPSG classification table from public PROJ database could fix metadata
+   without adding runtime GDAL/PROJ dependencies to the raster format engine.
+4. Continue bounded tested slices/commits/pushes/dashboard, no repeated user prompts.
 
 ## Durable context / preserve
 
-Research: scripts/research/{graphic_buffer,composite,sa_batch}/README.md.
-Read ROADMAP/KNOWN_GAPS before choosing next work. Capture ug tools to file for full
-inventory; its closed-pipe panic is fixed in pending CLI slice. New tool workflow is
-registry + generator RUN + saved cases. scripts/check pre-push is mandatory, no
-bypass. Cargo -j3, no overlapping builds, no local full app CI for root-only edits.
-Post-commit rebuilds dashboard offline from cached CI, leaving HTML dirty by design.
+Research: scripts/research/{graphic_buffer,composite,grid_import,sa_batch}/README.md.
+Read ROADMAP/KNOWN_GAPS before next scope. Registry+generator RUN+saved cases is the
+new tool workflow. scripts/check pre-push mandatory, no bypass. Cargo-j3, no overlapping
+builds, no local full app CI for root-only work. Post-commit rebuilds dashboard offline
+from cached CI, leaving HTML dirty by design. Do not launch agents/coordinators.
 
-Preserve/exclude unrelated tracked aux.xml in testdata/geoproc/raster, deleted
-*.sr.lock, .worktrees/, NOTES.md, scratch_cf.tif, scratch_trend_rms.txt.xml. DO NOT
-read/use NOTES.md (proprietary reverse-engineering material). No reset/stash/worktree
-transfer/external messaging/agent launch performed.
+Preserve/exclude unrelated aux.xml in testdata/geoproc/raster, deleted *.sr.lock,
+.worktrees/, NOTES.md, scratch_cf.tif, scratch_trend_rms.txt.xml. DO NOT read/use NOTES.md
+(proprietary reverse-engineering material). No reset/stash/worktree transfer or external
+messaging performed.
