@@ -278,7 +278,7 @@ fn directional_mean(ctx: &dyn Context) -> Result<ToolOutput> {
     )
 }
 
-const LINEAR_UNITS: &[(&str, f64)] = &[
+pub(crate) const LINEAR_UNITS: &[(&str, f64)] = &[
     ("METERS", 1.0),
     ("METER", 1.0),
     ("KILOMETERS", 1000.0),

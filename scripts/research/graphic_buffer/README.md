@@ -1,7 +1,7 @@
 # Graphic Buffer reference coverage
 
 ArcGIS Pro is the behavior oracle. The inherited `gb_*` cases in
-`scripts/make-arcgis-reference.py` plus `gb_more_*` cover 28 ArcGIS success/error cases in
+`scripts/make-arcgis-reference.py` plus `gb_more_*` and `gb_field_*` cover 48 ArcGIS success/error cases in
 `testdata/arcgis-reference/`; each is exercised through `ug run graphic_buffer`
 by the manifest-driven CLI comparison. No proprietary SDK or decompilation is used.
 Public parameter reference:
@@ -38,10 +38,31 @@ moderate and right-angle). `graphic_buffer_reserved` copies wells and adds numer
 BUFF_DIST/ORIG_FID fields. GDAL creates these input files only, with no geoprocessing
 behavior used as a reference.
 
-Current limits: constant distances and planar 2D input only; curves/Z, per-feature
-distance fields and maximum-deviation override are unsupported. Geographic and
-coordinate-system environments, M values, incompatible reserved-field types and
-very large-radius sampling remain unverified. Excessive arc vertex counts are refused.
+Distance fields (`gb_field_*`, another 20 cases):
+- Numeric fields and text fields containing numeric distances or recognized units
+  are accepted, with case-insensitive field lookup. Numeric nulls and field zeros
+  skip features with warning 000636. Negative point/line distances fail 000109.
+- A missing field or unsupported constant unit gives 000728. A numeric prefix
+  with an unknown unit *inside a text field* falls back to coordinate units.
+- ArcGIS uses US survey definitions for Feet/Foot/FeetUS, Inches, Yards and Miles;
+  FeetInt uses international feet. NauticalMiles is 1853.248 meters. Conversion
+  changes are local to Graphic Buffer: other tools' aliases are not yet probed.
+- Null or malformed text values can reuse the previous valid feature's buffer
+  size while writing BUFF_DIST=0. We deliberately refuse these inputs, before
+  writing any output. `field_observations.json` preserves the raw black-box rows.
+- `make_fields.py` recreates the synthetic point fields with GDAL for file IO.
+  Polygon field input: `ogr2ogr -f 'ESRI Shapefile'
+  testdata/geoproc/graphic_buffer_poly_fields.shp testdata/geoproc/clip_areas.shp
+  -sql 'SELECT *, -20.0 * AREA_ID AS DIST FROM clip_areas'`.
+
+Current limits: planar 2D only; curves/Z and maximum-deviation override are
+unsupported. Geographic input is refused, including raw numeric distances, so
+meters cannot silently become degrees. Coordinate-system environments, M values,
+incompatible reserved-field types and very large-radius sampling remain unverified.
+Excessive arc vertex counts are refused. Tiny positive distances can collapse in
+ArcGIS near its XY tolerance (the 1 Millimeters probe is empty); the native engine
+may retain these shapes. No general collapse threshold has been established. A field literally named UNKNOWN
+triggers ArcGIS parameter error 000735; that parser quirk is not yet reproduced.
 
 Validation logs (local, ephemeral):
 - `/tmp/unigis-graphic-buffer-reference.log`: inherited implementation fails 5 cases.
@@ -50,3 +71,6 @@ Validation logs (local, ephemeral):
   ArcGIS probes, including three expected errors.
 - `/tmp/unigis-gb-miter-overlap.log`: full manifest-driven CLI comparison passes,
   including all 28 Graphic Buffer cases, at existing tolerances.
+- `/tmp/unigis-gb-field-probes.log`: 20 saved field/unit cases generated successfully
+  (including five expected parameter/runtime errors).
+- `/tmp/unigis-gb-fields-reference.log`: manifest comparison for the field/unit slice.

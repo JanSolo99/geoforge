@@ -3,11 +3,74 @@
 use unigis_core::{Error, Feature, Field, FieldType, GeometryKind, Result, Value};
 
 use crate::ToolOutput;
-use crate::registry::{Context, Kind, Param, Runner, Tool, distance_in_units};
+use crate::registry::{Context, Kind, LINEAR_UNITS, Param, Runner, Tool, distance_in_units};
 use unigis_geometry::buffer::{GraphicCap as Cap, GraphicJoin as Join, graphic_buffer_geometry};
 
 fn err(msg: impl Into<String>) -> Error {
     Error::Unsupported(msg.into())
+}
+
+fn graphic_distance(text: &str, wkt: Option<&str>, from_field: bool) -> Result<f64> {
+    let text = text.trim();
+    let split = text
+        .find(|c: char| c.is_alphabetic() && c != 'e' && c != 'E')
+        .unwrap_or(text.len());
+    let (number, unit) = text.split_at(split);
+    let value: f64 = number
+        .trim()
+        .parse()
+        .map_err(|_| err(format!("Graphic Buffer cannot read distance '{text}'")))?;
+    let unit = unit.to_ascii_uppercase().replace([' ', '_'], "");
+    // Graphic Buffer's ArcGIS unit parser defaults to the US definitions. Keep
+    // this local: other tools' unit parsers have not been probed for these aliases.
+    let meters = match unit.as_str() {
+        "FEET" | "FOOT" | "FEETUS" | "FOOTUS" => Some(1200.0 / 3937.0),
+        "FEETINT" | "FOOTINT" => Some(0.3048),
+        "INCH" | "INCHES" => Some(100.0 / 3937.0),
+        "YARD" | "YARDS" => Some(3600.0 / 3937.0),
+        "MILE" | "MILES" => Some(6_336_000.0 / 3937.0),
+        "NAUTICALMILE" | "NAUTICALMILES" => Some(1853.248),
+        _ => None,
+    };
+    let distance = if let Some(meters) = meters {
+        distance_in_units(&format!("{} Meters", value * meters), wkt)?
+    } else {
+        match distance_in_units(text, wkt) {
+            Ok(v) => v,
+            // An unrecognized unit in a distance field falls back to map units.
+            // Malformed numeric text is refused above, including empty strings.
+            Err(_)
+                if from_field
+                    && !unit.is_empty()
+                    && unit != "UNKNOWN"
+                    && !LINEAR_UNITS.iter().any(|(name, _)| *name == unit) =>
+            {
+                value
+            }
+            Err(e) => return Err(e),
+        }
+    };
+    if !distance.is_finite() {
+        return Err(err("distance must be finite"));
+    }
+    Ok(distance)
+}
+
+fn validate_distance(distance: f64, kind: GeometryKind, from_field: bool) -> Result<()> {
+    if !distance.is_finite() {
+        return Err(err("distance must be finite"));
+    }
+    if kind != GeometryKind::Polygon {
+        if distance < 0.0 {
+            return Err(err(
+                "ERROR 000109: The buffer distance cannot be negative for lines and points",
+            ));
+        }
+        if distance == 0.0 && !from_field {
+            return Err(err("ERROR 000026: Buffer distance is zero"));
+        }
+    }
+    Ok(())
 }
 
 fn graphic_buffer(ctx: &dyn Context) -> Result<ToolOutput> {
@@ -15,22 +78,43 @@ fn graphic_buffer(ctx: &dyn Context) -> Result<ToolOutput> {
     let kind = input
         .geometry_kind()
         .ok_or_else(|| err("ERROR 000368: Invalid input data: features are required"))?;
-    let d = distance_in_units(
-        &ctx.get("distance")
-            .ok_or_else(|| err("ERROR 000735: Distance: value is required"))?,
-        input.spatial_reference_wkt(),
-    )?;
-    if !d.is_finite() {
-        return Err(err("distance must be finite"));
+    let wkt = input.spatial_reference_wkt();
+    if wkt.is_some_and(|w| w.trim_start().to_ascii_uppercase().starts_with("GEOG")) {
+        return Err(err(
+            "Graphic Buffer geographic input is not supported yet; project the features first",
+        ));
     }
-    if kind != GeometryKind::Polygon {
-        if d < 0.0 {
-            return Err(err(
-                "ERROR 000109: The buffer distance cannot be negative for lines and points",
-            ));
-        }
-        if d == 0.0 {
-            return Err(err("ERROR 000026: Buffer distance is zero"));
+    let distance = ctx
+        .get("distance")
+        .ok_or_else(|| err("ERROR 000735: Distance: value is required"))?;
+    let distance_field = input
+        .fields()
+        .iter()
+        .position(|f| f.name.eq_ignore_ascii_case(distance.trim()));
+    let constant = if distance_field.is_none() {
+        let d = graphic_distance(&distance, wkt, false).map_err(|_| {
+            err(format!(
+                "ERROR 000728: Field {distance} does not exist within table, or distance is unsupported"
+            ))
+        })?;
+        validate_distance(d, kind, false)?;
+        Some(d)
+    } else {
+        None
+    };
+    if let Some(index) = distance_field {
+        match input.fields()[index].field_type {
+            FieldType::SmallInteger
+            | FieldType::Integer
+            | FieldType::BigInteger
+            | FieldType::Single
+            | FieldType::Double
+            | FieldType::String => {}
+            _ => {
+                return Err(err(
+                    "Graphic Buffer distance fields must be numeric or text",
+                ));
+            }
         }
     }
     let cap = match ctx
@@ -98,7 +182,32 @@ fn graphic_buffer(ctx: &dyn Context) -> Result<ToolOutput> {
         if g.has_curves() || g.z.is_some() {
             return Err(err("Graphic Buffer does not handle curves or Z yet"));
         }
-        let Some(geometry) = graphic_buffer_geometry(g, d, cap, join, limit)? else {
+        let d = if let Some(index) = distance_field {
+            match f.attributes.get(index).unwrap_or(&Value::Null) {
+                Value::SmallInteger(v) => f64::from(*v),
+                Value::Integer(v) => f64::from(*v),
+                Value::BigInteger(v) => *v as f64,
+                Value::Single(v) => f64::from(*v),
+                Value::Double(v) => *v,
+                Value::String(v) => graphic_distance(v, wkt, true)?,
+                Value::Null if input.fields()[index].field_type != FieldType::String => 0.0,
+                _ => {
+                    return Err(err(format!(
+                        "Graphic Buffer cannot read the distance field for feature {}; null or malformed text distances are unsupported",
+                        f.oid
+                    )));
+                }
+            }
+        } else {
+            constant.expect("constant distance was validated")
+        };
+        validate_distance(d, kind, distance_field.is_some())?;
+        let geometry = if d == 0.0 {
+            None
+        } else {
+            graphic_buffer_geometry(g, d, cap, join, limit)?
+        };
+        let Some(geometry) = geometry else {
             messages.push(format!("WARNING 000636: Skipping feature {} because a negative or very small distance resulted in no geometry.", f.oid));
             continue;
         };
@@ -148,7 +257,7 @@ pub const GRAPHIC_BUFFER: Tool = Tool {
             kind: Kind::Text,
             required: true,
             default: "",
-            help: "e.g. 20 Meters.",
+            help: "A constant (e.g. 20 Meters) or a numeric/text distance field.",
         },
         Param {
             name: "line_caps",

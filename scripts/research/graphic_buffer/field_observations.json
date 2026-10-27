@@ -1,0 +1,650 @@
+{
+  "fields": [
+    {
+      "parameter": "DIST",
+      "status": "succeeded",
+      "messages": "Start Time: Wednesday, October 28, 2026 12:46:35 AM\nSucceeded at Wednesday, October 28, 2026 12:46:35 AM (Elapsed Time: 0.11 seconds)",
+      "rows": [
+        [
+          1,
+          10.0,
+          0,
+          400.0
+        ],
+        [
+          2,
+          20.0,
+          1,
+          1600.0
+        ],
+        [
+          3,
+          30.0,
+          2,
+          3600.0
+        ]
+      ]
+    },
+    {
+      "parameter": "dist",
+      "status": "succeeded",
+      "messages": "Start Time: Wednesday, October 28, 2026 12:46:35 AM\nSucceeded at Wednesday, October 28, 2026 12:46:35 AM (Elapsed Time: 0.08 seconds)",
+      "rows": [
+        [
+          1,
+          10.0,
+          0,
+          400.0
+        ],
+        [
+          2,
+          20.0,
+          1,
+          1600.0
+        ],
+        [
+          3,
+          30.0,
+          2,
+          3600.0
+        ]
+      ]
+    },
+    {
+      "parameter": "TEXT_DIST",
+      "status": "succeeded",
+      "messages": "Start Time: Wednesday, October 28, 2026 12:46:35 AM\nSucceeded at Wednesday, October 28, 2026 12:46:35 AM (Elapsed Time: 0.10 seconds)",
+      "rows": [
+        [
+          1,
+          10.0,
+          0,
+          400.0
+        ],
+        [
+          2,
+          20.0,
+          1,
+          1600.0
+        ],
+        [
+          3,
+          9.14401828804,
+          2,
+          334.45228181493434
+        ]
+      ]
+    },
+    {
+      "parameter": "ZERO",
+      "status": "succeeded",
+      "messages": "Start Time: Wednesday, October 28, 2026 12:46:35 AM\nWARNING 000636: Skipping feature 0 because a negative or very small distance resulted in no geometry.\nWARNING 000636: Skipping feature 1 because a negative or very small distance resulted in no geometry.\nWARNING 000636: Skipping feature 2 because a negative or very small distance resulted in no geometry.\nWARNING 000117: Warning empty output generated.\nSucceeded at Wednesday, October 28, 2026 12:46:35 AM (Elapsed Time: 0.10 seconds)",
+      "rows": []
+    },
+    {
+      "parameter": "NEG",
+      "status": "failed",
+      "error": "ERROR 000109: The buffer distance cannot be negative for lines and points\nFailed to execute (GraphicBuffer).\n"
+    },
+    {
+      "parameter": "MIX",
+      "status": "failed",
+      "error": "ERROR 000109: The buffer distance cannot be negative for lines and points\nFailed to execute (GraphicBuffer).\n"
+    },
+    {
+      "parameter": "BAD",
+      "status": "succeeded",
+      "messages": "Start Time: Wednesday, October 28, 2026 12:46:36 AM\nSucceeded at Wednesday, October 28, 2026 12:46:36 AM (Elapsed Time: 0.10 seconds)",
+      "rows": [
+        [
+          1,
+          10.0,
+          0,
+          400.0
+        ],
+        [
+          2,
+          0.0,
+          1,
+          400.0
+        ],
+        [
+          3,
+          0.0,
+          2,
+          400.0
+        ]
+      ]
+    },
+    {
+      "parameter": "NULL_DIST",
+      "status": "succeeded",
+      "messages": "Start Time: Wednesday, October 28, 2026 12:46:36 AM\nWARNING 000636: Skipping feature 1 because a negative or very small distance resulted in no geometry.\nSucceeded at Wednesday, October 28, 2026 12:46:36 AM (Elapsed Time: 0.10 seconds)",
+      "rows": [
+        [
+          1,
+          10.0,
+          0,
+          400.0
+        ],
+        [
+          3,
+          30.0,
+          2,
+          3600.0
+        ]
+      ]
+    },
+    {
+      "parameter": "UNKNOWN",
+      "status": "failed",
+      "error": "Failed to execute. Parameters are not valid.\nERROR 000735: Distance [value or field]: Value is required\nFailed to execute (GraphicBuffer).\n"
+    },
+    {
+      "parameter": "Missing",
+      "status": "failed",
+      "error": "Failed to execute. Parameters are not valid.\nERROR 000728: Field Missing does not exist within table\nFailed to execute (GraphicBuffer).\n"
+    },
+    {
+      "parameter": "10 Blargs",
+      "status": "failed",
+      "error": "Failed to execute. Parameters are not valid.\nERROR 000728: Field 10 Blargs does not exist within table\nFailed to execute (GraphicBuffer).\n"
+    }
+  ],
+  "text": [
+    {
+      "parameter": "TEXT_MIX",
+      "status": "succeeded",
+      "messages": "Start Time: Wednesday, October 28, 2026 12:49:21 AM\nWARNING 000636: Skipping feature 1 because a negative or very small distance resulted in no geometry.\nSucceeded at Wednesday, October 28, 2026 12:49:21 AM (Elapsed Time: 0.11 seconds)",
+      "rows": [
+        [
+          1,
+          10.0,
+          0,
+          400.0
+        ],
+        [
+          3,
+          20.0,
+          2,
+          1600.0
+        ]
+      ]
+    },
+    {
+      "parameter": "TEXT_NULL",
+      "status": "succeeded",
+      "messages": "Start Time: Wednesday, October 28, 2026 12:49:21 AM\nSucceeded at Wednesday, October 28, 2026 12:49:21 AM (Elapsed Time: 0.11 seconds)",
+      "rows": [
+        [
+          1,
+          10.0,
+          0,
+          400.0
+        ],
+        [
+          2,
+          0.0,
+          1,
+          400.0
+        ],
+        [
+          3,
+          30.0,
+          2,
+          3600.0
+        ]
+      ]
+    },
+    {
+      "parameter": "TEXT_NEG",
+      "status": "failed",
+      "error": "ERROR 000109: The buffer distance cannot be negative for lines and points\nFailed to execute (GraphicBuffer).\n"
+    }
+  ],
+  "units": [
+    {
+      "parameter": "30 Feet",
+      "status": "succeeded",
+      "messages": "Start Time: Wednesday, October 28, 2026 12:47:46 AM\nSucceeded at Wednesday, October 28, 2026 12:47:46 AM (Elapsed Time: 0.10 seconds)",
+      "rows": [
+        [
+          1,
+          9.14401828804,
+          0,
+          334.45228181493434
+        ],
+        [
+          2,
+          9.14401828804,
+          1,
+          334.45228181493434
+        ],
+        [
+          3,
+          9.14401828804,
+          2,
+          334.45228181493434
+        ]
+      ]
+    },
+    {
+      "parameter": "30 Foot",
+      "status": "succeeded",
+      "messages": "Start Time: Wednesday, October 28, 2026 12:47:46 AM\nSucceeded at Wednesday, October 28, 2026 12:47:46 AM (Elapsed Time: 0.10 seconds)",
+      "rows": [
+        [
+          1,
+          9.14401828804,
+          0,
+          334.45228181493434
+        ],
+        [
+          2,
+          9.14401828804,
+          1,
+          334.45228181493434
+        ],
+        [
+          3,
+          9.14401828804,
+          2,
+          334.45228181493434
+        ]
+      ]
+    },
+    {
+      "parameter": "30 FeetUS",
+      "status": "succeeded",
+      "messages": "Start Time: Wednesday, October 28, 2026 12:47:46 AM\nSucceeded at Wednesday, October 28, 2026 12:47:46 AM (Elapsed Time: 0.10 seconds)",
+      "rows": [
+        [
+          1,
+          9.14401828804,
+          0,
+          334.45228181493434
+        ],
+        [
+          2,
+          9.14401828804,
+          1,
+          334.45228181493434
+        ],
+        [
+          3,
+          9.14401828804,
+          2,
+          334.45228181493434
+        ]
+      ]
+    },
+    {
+      "parameter": "30 FeetInt",
+      "status": "succeeded",
+      "messages": "Start Time: Wednesday, October 28, 2026 12:47:46 AM\nSucceeded at Wednesday, October 28, 2026 12:47:46 AM (Elapsed Time: 0.10 seconds)",
+      "rows": [
+        [
+          1,
+          9.144,
+          0,
+          334.4509439946945
+        ],
+        [
+          2,
+          9.144,
+          1,
+          334.4509439946945
+        ],
+        [
+          3,
+          9.144,
+          2,
+          334.4509439946945
+        ]
+      ]
+    },
+    {
+      "parameter": "30 US Survey Feet",
+      "status": "failed",
+      "error": "Failed to execute. Parameters are not valid.\nERROR 000728: Field 30 US Survey Feet does not exist within table\nFailed to execute (GraphicBuffer).\n"
+    },
+    {
+      "parameter": "30 International Feet",
+      "status": "failed",
+      "error": "Failed to execute. Parameters are not valid.\nERROR 000728: Field 30 International Feet does not exist within table\nFailed to execute (GraphicBuffer).\n"
+    }
+  ],
+  "more_units": [
+    {
+      "parameter": "1 Inch",
+      "status": "succeeded",
+      "messages": "Start Time: Wednesday, October 28, 2026 12:50:44 AM\nSucceeded at Wednesday, October 28, 2026 12:50:44 AM (Elapsed Time: 0.11 seconds)",
+      "rows": [
+        [
+          1,
+          0.0254000508001,
+          0,
+          0.0025806503342685745
+        ],
+        [
+          2,
+          0.0254000508001,
+          1,
+          0.0025806503342685745
+        ],
+        [
+          3,
+          0.0254000508001,
+          2,
+          0.0025806503342685745
+        ]
+      ]
+    },
+    {
+      "parameter": "1 Inches",
+      "status": "succeeded",
+      "messages": "Start Time: Wednesday, October 28, 2026 12:50:44 AM\nSucceeded at Wednesday, October 28, 2026 12:50:44 AM (Elapsed Time: 0.11 seconds)",
+      "rows": [
+        [
+          1,
+          0.0254000508001,
+          0,
+          0.0025806503342685745
+        ],
+        [
+          2,
+          0.0254000508001,
+          1,
+          0.0025806503342685745
+        ],
+        [
+          3,
+          0.0254000508001,
+          2,
+          0.0025806503342685745
+        ]
+      ]
+    },
+    {
+      "parameter": "1 Yard",
+      "status": "succeeded",
+      "messages": "Start Time: Wednesday, October 28, 2026 12:50:44 AM\nSucceeded at Wednesday, October 28, 2026 12:50:44 AM (Elapsed Time: 0.11 seconds)",
+      "rows": [
+        [
+          1,
+          0.914401828804,
+          0,
+          3.3445228179896676
+        ],
+        [
+          2,
+          0.914401828804,
+          1,
+          3.3445228179896676
+        ],
+        [
+          3,
+          0.914401828804,
+          2,
+          3.3445228179896676
+        ]
+      ]
+    },
+    {
+      "parameter": "1 Yards",
+      "status": "succeeded",
+      "messages": "Start Time: Wednesday, October 28, 2026 12:50:44 AM\nSucceeded at Wednesday, October 28, 2026 12:50:44 AM (Elapsed Time: 0.11 seconds)",
+      "rows": [
+        [
+          1,
+          0.914401828804,
+          0,
+          3.3445228179896676
+        ],
+        [
+          2,
+          0.914401828804,
+          1,
+          3.3445228179896676
+        ],
+        [
+          3,
+          0.914401828804,
+          2,
+          3.3445228179896676
+        ]
+      ]
+    },
+    {
+      "parameter": "1 Mile",
+      "status": "succeeded",
+      "messages": "Start Time: Wednesday, October 28, 2026 12:50:44 AM\nSucceeded at Wednesday, October 28, 2026 12:50:45 AM (Elapsed Time: 0.12 seconds)",
+      "rows": [
+        [
+          1,
+          1609.34721869,
+          0,
+          10359993.881279267
+        ],
+        [
+          2,
+          1609.34721869,
+          1,
+          10359993.881279267
+        ],
+        [
+          3,
+          1609.34721869,
+          2,
+          10359993.881279267
+        ]
+      ]
+    },
+    {
+      "parameter": "1 Miles",
+      "status": "succeeded",
+      "messages": "Start Time: Wednesday, October 28, 2026 12:50:45 AM\nSucceeded at Wednesday, October 28, 2026 12:50:45 AM (Elapsed Time: 0.12 seconds)",
+      "rows": [
+        [
+          1,
+          1609.34721869,
+          0,
+          10359993.881279267
+        ],
+        [
+          2,
+          1609.34721869,
+          1,
+          10359993.881279267
+        ],
+        [
+          3,
+          1609.34721869,
+          2,
+          10359993.881279267
+        ]
+      ]
+    },
+    {
+      "parameter": "1 NauticalMiles",
+      "status": "succeeded",
+      "messages": "Start Time: Wednesday, October 28, 2026 12:50:45 AM\nSucceeded at Wednesday, October 28, 2026 12:50:45 AM (Elapsed Time: 0.12 seconds)",
+      "rows": [
+        [
+          1,
+          1853.248,
+          0,
+          13738112.598016964
+        ],
+        [
+          2,
+          1853.248,
+          1,
+          13738112.598016964
+        ],
+        [
+          3,
+          1853.248,
+          2,
+          13738112.598016964
+        ]
+      ]
+    },
+    {
+      "parameter": "1 NauticalMile",
+      "status": "succeeded",
+      "messages": "Start Time: Wednesday, October 28, 2026 12:50:45 AM\nSucceeded at Wednesday, October 28, 2026 12:50:45 AM (Elapsed Time: 0.11 seconds)",
+      "rows": [
+        [
+          1,
+          1853.248,
+          0,
+          13738112.598016964
+        ],
+        [
+          2,
+          1853.248,
+          1,
+          13738112.598016964
+        ],
+        [
+          3,
+          1853.248,
+          2,
+          13738112.598016964
+        ]
+      ]
+    },
+    {
+      "parameter": "1 Centimeters",
+      "status": "succeeded",
+      "messages": "Start Time: Wednesday, October 28, 2026 12:50:45 AM\nSucceeded at Wednesday, October 28, 2026 12:50:45 AM (Elapsed Time: 0.13 seconds)",
+      "rows": [
+        [
+          1,
+          0.01,
+          0,
+          0.0003999999914318323
+        ],
+        [
+          2,
+          0.01,
+          1,
+          0.0003999999914318323
+        ],
+        [
+          3,
+          0.01,
+          2,
+          0.0003999999914318323
+        ]
+      ]
+    },
+    {
+      "parameter": "1 Millimeters",
+      "status": "succeeded",
+      "messages": "Start Time: Wednesday, October 28, 2026 12:50:45 AM\nWARNING 000636: Skipping feature 0 because a negative or very small distance resulted in no geometry.\nWARNING 000636: Skipping feature 1 because a negative or very small distance resulted in no geometry.\nWARNING 000636: Skipping feature 2 because a negative or very small distance resulted in no geometry.\nWARNING 000117: Warning empty output generated.\nSucceeded at Wednesday, October 28, 2026 12:50:45 AM (Elapsed Time: 0.16 seconds)",
+      "rows": []
+    },
+    {
+      "parameter": "1 Decimeters",
+      "status": "succeeded",
+      "messages": "Start Time: Wednesday, October 28, 2026 12:50:45 AM\nSucceeded at Wednesday, October 28, 2026 12:50:46 AM (Elapsed Time: 0.12 seconds)",
+      "rows": [
+        [
+          1,
+          0.1,
+          0,
+          0.04000000003958121
+        ],
+        [
+          2,
+          0.1,
+          1,
+          0.04000000003958121
+        ],
+        [
+          3,
+          0.1,
+          2,
+          0.04000000003958121
+        ]
+      ]
+    },
+    {
+      "parameter": "1 Meters",
+      "status": "succeeded",
+      "messages": "Start Time: Wednesday, October 28, 2026 12:50:46 AM\nSucceeded at Wednesday, October 28, 2026 12:50:46 AM (Elapsed Time: 0.12 seconds)",
+      "rows": [
+        [
+          1,
+          1.0,
+          0,
+          4.0
+        ],
+        [
+          2,
+          1.0,
+          1,
+          4.0
+        ],
+        [
+          3,
+          1.0,
+          2,
+          4.0
+        ]
+      ]
+    },
+    {
+      "parameter": "1 Kilometers",
+      "status": "succeeded",
+      "messages": "Start Time: Wednesday, October 28, 2026 12:50:46 AM\nSucceeded at Wednesday, October 28, 2026 12:50:46 AM (Elapsed Time: 0.12 seconds)",
+      "rows": [
+        [
+          1,
+          1000.0,
+          0,
+          4000000.0
+        ],
+        [
+          2,
+          1000.0,
+          1,
+          4000000.0
+        ],
+        [
+          3,
+          1000.0,
+          2,
+          4000000.0
+        ]
+      ]
+    },
+    {
+      "parameter": "1 Unknown",
+      "status": "succeeded",
+      "messages": "Start Time: Wednesday, October 28, 2026 12:50:46 AM\nSucceeded at Wednesday, October 28, 2026 12:50:46 AM (Elapsed Time: 0.12 seconds)",
+      "rows": [
+        [
+          1,
+          1.0,
+          0,
+          4.0
+        ],
+        [
+          2,
+          1.0,
+          1,
+          4.0
+        ],
+        [
+          3,
+          1.0,
+          2,
+          4.0
+        ]
+      ]
+    }
+  ]
+}

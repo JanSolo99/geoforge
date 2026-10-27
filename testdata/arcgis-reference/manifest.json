@@ -49286,6 +49286,2067 @@
           "miter_limit": 2
         }
       }
+    },
+    "gb_field_numeric": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/graphic_buffer_fields.shp",
+        "<out>",
+        "DIST",
+        "SQUARE",
+        "MITER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CASE_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "TEXT_DIST",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "ZERO",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "NEG",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "MIX",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "TEXT_MIX",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "TEXT_NULL",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "TEXT_NEG",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BAD",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "NULL_DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "UNKNOWN",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/graphic_buffer_fields.shp",
+          "output": "<out>",
+          "distance": "DIST",
+          "line_caps": "SQUARE",
+          "line_joins": "MITER"
+        }
+      }
+    },
+    "gb_field_lowercase": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/graphic_buffer_fields.shp",
+        "<out>",
+        "dist",
+        "SQUARE",
+        "MITER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CASE_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "TEXT_DIST",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "ZERO",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "NEG",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "MIX",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "TEXT_MIX",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "TEXT_NULL",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "TEXT_NEG",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BAD",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "NULL_DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "UNKNOWN",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/graphic_buffer_fields.shp",
+          "output": "<out>",
+          "distance": "dist",
+          "line_caps": "SQUARE",
+          "line_joins": "MITER"
+        }
+      }
+    },
+    "gb_field_text_units": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/graphic_buffer_fields.shp",
+        "<out>",
+        "TEXT_DIST",
+        "SQUARE",
+        "MITER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CASE_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "TEXT_DIST",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "ZERO",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "NEG",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "MIX",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "TEXT_MIX",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "TEXT_NULL",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "TEXT_NEG",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BAD",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "NULL_DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "UNKNOWN",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/graphic_buffer_fields.shp",
+          "output": "<out>",
+          "distance": "TEXT_DIST",
+          "line_caps": "SQUARE",
+          "line_joins": "MITER"
+        }
+      }
+    },
+    "gb_field_zero": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/graphic_buffer_fields.shp",
+        "<out>",
+        "ZERO",
+        "SQUARE",
+        "MITER"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000636: Skipping feature 0 because a negative or very small distance resulted in no geometry.",
+        "WARNING 000636: Skipping feature 1 because a negative or very small distance resulted in no geometry.",
+        "WARNING 000636: Skipping feature 2 because a negative or very small distance resulted in no geometry.",
+        "WARNING 000117: Warning empty output generated."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CASE_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "TEXT_DIST",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "ZERO",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "NEG",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "MIX",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "TEXT_MIX",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "TEXT_NULL",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "TEXT_NEG",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BAD",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "NULL_DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "UNKNOWN",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/graphic_buffer_fields.shp",
+          "output": "<out>",
+          "distance": "ZERO",
+          "line_caps": "SQUARE",
+          "line_joins": "MITER"
+        }
+      }
+    },
+    "gb_field_negative": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/graphic_buffer_fields.shp",
+        "<out>",
+        "NEG",
+        "SQUARE",
+        "MITER"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 000109: The buffer distance cannot be negative for lines and points",
+        "Failed to execute (GraphicBuffer)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/graphic_buffer_fields.shp",
+          "output": "<out>",
+          "distance": "NEG",
+          "line_caps": "SQUARE",
+          "line_joins": "MITER"
+        }
+      }
+    },
+    "gb_field_mixed": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/graphic_buffer_fields.shp",
+        "<out>",
+        "MIX",
+        "SQUARE",
+        "MITER"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 000109: The buffer distance cannot be negative for lines and points",
+        "Failed to execute (GraphicBuffer)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/graphic_buffer_fields.shp",
+          "output": "<out>",
+          "distance": "MIX",
+          "line_caps": "SQUARE",
+          "line_joins": "MITER"
+        }
+      }
+    },
+    "gb_field_nullable": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/graphic_buffer_fields.shp",
+        "<out>",
+        "NULL_DIST",
+        "SQUARE",
+        "MITER"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000636: Skipping feature 1 because a negative or very small distance resulted in no geometry."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CASE_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "TEXT_DIST",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "ZERO",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "NEG",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "MIX",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "TEXT_MIX",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "TEXT_NULL",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "TEXT_NEG",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BAD",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "NULL_DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "UNKNOWN",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/graphic_buffer_fields.shp",
+          "output": "<out>",
+          "distance": "NULL_DIST",
+          "line_caps": "SQUARE",
+          "line_joins": "MITER"
+        }
+      }
+    },
+    "gb_field_text_zero": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/graphic_buffer_fields.shp",
+        "<out>",
+        "TEXT_MIX",
+        "SQUARE",
+        "MITER"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000636: Skipping feature 1 because a negative or very small distance resulted in no geometry."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CASE_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "TEXT_DIST",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "ZERO",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "NEG",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "MIX",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "TEXT_MIX",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "TEXT_NULL",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "TEXT_NEG",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BAD",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "NULL_DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "UNKNOWN",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/graphic_buffer_fields.shp",
+          "output": "<out>",
+          "distance": "TEXT_MIX",
+          "line_caps": "SQUARE",
+          "line_joins": "MITER"
+        }
+      }
+    },
+    "gb_field_text_negative": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/graphic_buffer_fields.shp",
+        "<out>",
+        "TEXT_NEG",
+        "SQUARE",
+        "MITER"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 000109: The buffer distance cannot be negative for lines and points",
+        "Failed to execute (GraphicBuffer)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/graphic_buffer_fields.shp",
+          "output": "<out>",
+          "distance": "TEXT_NEG",
+          "line_caps": "SQUARE",
+          "line_joins": "MITER"
+        }
+      }
+    },
+    "gb_field_missing": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/graphic_buffer_fields.shp",
+        "<out>",
+        "Missing",
+        "SQUARE",
+        "MITER"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000728: Field Missing does not exist within table",
+        "Failed to execute (GraphicBuffer)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/graphic_buffer_fields.shp",
+          "output": "<out>",
+          "distance": "Missing",
+          "line_caps": "SQUARE",
+          "line_joins": "MITER"
+        }
+      }
+    },
+    "gb_field_bad_constant_unit": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/graphic_buffer_fields.shp",
+        "<out>",
+        "10 Blargs",
+        "SQUARE",
+        "MITER"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000728: Field 10 Blargs does not exist within table",
+        "Failed to execute (GraphicBuffer)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/graphic_buffer_fields.shp",
+          "output": "<out>",
+          "distance": "10 Blargs",
+          "line_caps": "SQUARE",
+          "line_joins": "MITER"
+        }
+      }
+    },
+    "gb_field_unit_feet": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/graphic_buffer_fields.shp",
+        "<out>",
+        "30 Feet",
+        "SQUARE",
+        "MITER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CASE_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "TEXT_DIST",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "ZERO",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "NEG",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "MIX",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "TEXT_MIX",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "TEXT_NULL",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "TEXT_NEG",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BAD",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "NULL_DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "UNKNOWN",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/graphic_buffer_fields.shp",
+          "output": "<out>",
+          "distance": "30 Feet",
+          "line_caps": "SQUARE",
+          "line_joins": "MITER"
+        }
+      }
+    },
+    "gb_field_unit_feet_int": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/graphic_buffer_fields.shp",
+        "<out>",
+        "30 FeetInt",
+        "SQUARE",
+        "MITER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CASE_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "TEXT_DIST",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "ZERO",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "NEG",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "MIX",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "TEXT_MIX",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "TEXT_NULL",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "TEXT_NEG",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BAD",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "NULL_DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "UNKNOWN",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/graphic_buffer_fields.shp",
+          "output": "<out>",
+          "distance": "30 FeetInt",
+          "line_caps": "SQUARE",
+          "line_joins": "MITER"
+        }
+      }
+    },
+    "gb_field_unit_feet_us": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/graphic_buffer_fields.shp",
+        "<out>",
+        "30 FeetUS",
+        "SQUARE",
+        "MITER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CASE_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "TEXT_DIST",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "ZERO",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "NEG",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "MIX",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "TEXT_MIX",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "TEXT_NULL",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "TEXT_NEG",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BAD",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "NULL_DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "UNKNOWN",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/graphic_buffer_fields.shp",
+          "output": "<out>",
+          "distance": "30 FeetUS",
+          "line_caps": "SQUARE",
+          "line_joins": "MITER"
+        }
+      }
+    },
+    "gb_field_unit_miles": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/graphic_buffer_fields.shp",
+        "<out>",
+        "1 Miles",
+        "SQUARE",
+        "MITER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CASE_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "TEXT_DIST",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "ZERO",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "NEG",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "MIX",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "TEXT_MIX",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "TEXT_NULL",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "TEXT_NEG",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BAD",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "NULL_DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "UNKNOWN",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/graphic_buffer_fields.shp",
+          "output": "<out>",
+          "distance": "1 Miles",
+          "line_caps": "SQUARE",
+          "line_joins": "MITER"
+        }
+      }
+    },
+    "gb_field_unit_nautical": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/graphic_buffer_fields.shp",
+        "<out>",
+        "1 NauticalMiles",
+        "SQUARE",
+        "MITER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CASE_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "TEXT_DIST",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "ZERO",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "NEG",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "MIX",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "TEXT_MIX",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "TEXT_NULL",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "TEXT_NEG",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BAD",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "NULL_DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "UNKNOWN",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/graphic_buffer_fields.shp",
+          "output": "<out>",
+          "distance": "1 NauticalMiles",
+          "line_caps": "SQUARE",
+          "line_joins": "MITER"
+        }
+      }
+    },
+    "gb_field_unit_inches": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/graphic_buffer_fields.shp",
+        "<out>",
+        "1 Inches",
+        "SQUARE",
+        "MITER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CASE_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "TEXT_DIST",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "ZERO",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "NEG",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "MIX",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "TEXT_MIX",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "TEXT_NULL",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "TEXT_NEG",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BAD",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "NULL_DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "UNKNOWN",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/graphic_buffer_fields.shp",
+          "output": "<out>",
+          "distance": "1 Inches",
+          "line_caps": "SQUARE",
+          "line_joins": "MITER"
+        }
+      }
+    },
+    "gb_field_unit_yards": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/graphic_buffer_fields.shp",
+        "<out>",
+        "1 Yards",
+        "SQUARE",
+        "MITER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CASE_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "TEXT_DIST",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "ZERO",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "NEG",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "MIX",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "TEXT_MIX",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "TEXT_NULL",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "TEXT_NEG",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BAD",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "NULL_DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "UNKNOWN",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/graphic_buffer_fields.shp",
+          "output": "<out>",
+          "distance": "1 Yards",
+          "line_caps": "SQUARE",
+          "line_joins": "MITER"
+        }
+      }
+    },
+    "gb_field_poly_negative": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/graphic_buffer_poly_fields.shp",
+        "<out>",
+        "DIST",
+        "SQUARE",
+        "MITER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/graphic_buffer_poly_fields.shp",
+          "output": "<out>",
+          "distance": "DIST",
+          "line_caps": "SQUARE",
+          "line_joins": "MITER"
+        }
+      }
+    },
+    "gb_field_reserved": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/graphic_buffer_reserved.shp",
+        "<out>",
+        "BUFF_DIST",
+        "SQUARE",
+        "MITER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          18,
+          11
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          9,
+          9,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/graphic_buffer_reserved.shp",
+          "output": "<out>",
+          "distance": "BUFF_DIST",
+          "line_caps": "SQUARE",
+          "line_joins": "MITER"
+        }
+      }
     }
   }
 }

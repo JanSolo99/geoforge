@@ -1,93 +1,95 @@
 # Current handoff
 
-Updated: 2026-10-27T13:47:58+00:00; last agent: Codex.
-Workspace `/mnt/media/ArcGIS_Linux`; branch main; HEAD `ebc2d2d` (dashboard checkpoint), follows Graphic Buffer `d66383c`.
-Push COMPLETED, exit 0: origin/main advanced `526a0f2..ebc2d2d`.
-Pre-push Python/Cargo gates passed; log `/tmp/unigis-overnight-push1.log`.
+Updated: 2026-10-27T14:02:55+00:00; last agent: Codex.
+Workspace `/mnt/media/ArcGIS_Linux`; branch `main`; HEAD `cdc23aa`.
+Remote SHA verified cdc23aac785765e07bfc3cb053bf44ac5900eade. User authorizes ongoing
+commits/pushes. Do not launch another agent, CLI session or coordinator.
 
 ## Objective
 
-User explicitly requests sustained development, validated commits, pushes and dashboard
-updates without repeated prompts, until unable to proceed. Do not launch another agent
-or coordinator here. Prior run hit Claude usage limit; recovered request and relevant
-Graphic Buffer events from `.git/agent-coordinator/20261027T101238-693a3583/`.
+User requests sustained development, validated commits, pushes and dashboard updates
+without repeated “continue” prompts, until unable. Recovered prior Claude partial
+Graphic Buffer work from `.git/agent-coordinator/20261027T101238-693a3583/`; latest request
+takes precedence over old chat. Basemaps, branding and dock work are already landed.
 
-## Current slice: Graphic Buffer and dashboard accuracy
+## Completed and pushed this Codex run
 
-Inherited unfinished source/fixtures for Graphic Buffer failed five reference cases:
-round points were too dense; piece unions left gaps in tight bends and bad polygon holes.
-Codex replaced that implementation with native styled `geo` offsets via
-`crates/unigis-geometry/src/buffer.rs::graphic_buffer_geometry` and the registry wrapper
-`crates/unigis-tools/src/graphic_buffer.rs`. All TEN gb_* cases now match, without raising
-existing tolerances (0.2 shape, 0.0001 relative area). Unsupported parameters are refused.
-Limits/source documentation: `scripts/research/graphic_buffer/README.md`.
-Relevant source/fixture edits inherited: tools lib/registry registration, generator CASES/
-RUN line, manifest, ten gb_* shapefile sets and buffer classification in CLI comparisons.
-All belong to the authorized interrupted slice; review/stage them explicitly.
+- d66383c: finish inherited Graphic Buffer using native offsets, caps/joins and hole
+  ownership; all ten original reference cases pass, without tolerance changes.
+- ebc2d2d: dashboard counts actual tool headers and registered external modules,
+  excludes parameter names and reference-only unimplemented tools. Four offline tests
+  added to scripts/check and GitHub CI. Both early GitHub CI runs SUCCESS:
+  https://github.com/JanSolo99/geoforge/actions/runs/40512024122
+  https://github.com/JanSolo99/geoforge/actions/runs/40512020282
+- cdc23aa: 18 further Graphic Buffer cases, negative/zero polygon distances, numeric
+  reserved-field replacement and miter limits 1/1.25/2/10 including acute corners.
+  ArcGIS bevels over-limit miters; native clipping was incorrect. Unioned overlapping
+  tip patches on a bevel base match all 28 cases. Full root gate and mandatory
+  pre-push repeat passed: 174 Rust tests, 5 ignored, 78 result groups, four Python
+  dashboard tests, fmt, clippy -D warnings. Push exit 0, remote verified.
+  Logs: /tmp/unigis-gb-expanded-check.log, /tmp/unigis-gb-expanded-push.log.
 
-Dashboard fixes in `scripts/dashboard/build.py`: exclude Param names, discover external
-registered constants, require implementation plus successful reference case for green
-coverage. Green means saved reference coverage, explicitly not full compatibility.
-Four offline tests (`scripts/dashboard/test_build.py`) pass. Scanner matches all 134
-names listed by current `ug tools`. Rebuilt `docs/dashboard.html --ci`: 276 own names,
-303 ArcGIS entries with reference coverage, 56 implemented without successful references;
-ArcGIS entries repeat across toolboxes, so those counts differ. Eight recent CI rows loaded.
-Dashboard tests are now wired into scripts/check and GitHub CI; dashboard commit next.
+## Current slice: per-feature Graphic Buffer distances (uncommitted)
 
-## Follow-up parameter batch (validated; committing/pushing)
+- Source crates/unigis-tools/src/graphic_buffer.rs: case-insensitive numeric/text
+  distance fields, numeric null/field-zero skipping, negative point errors, unknown
+  field 000728, imperial units using ArcGIS's observed definitions. Unit changes are
+  local to Graphic Buffer; do not assume other tools use the same parser.
+- Geographic inputs are now refused, so raw numeric distances cannot become degrees.
+  Null/malformed text fields refused before any output: ArcGIS sometimes reuses prior
+  feature geometry while writing BUFF_DIST=0; we do not reproduce that unsafe quirk.
+- Three CLI tests in crates/unigis-cli/tests/graphic_buffer.rs exercise these refusals
+  and absence of partial output. All three passed in the completed final gate.
+- 20 gb_field_* cases generated (15 successes, 5 expected errors). New synthetic
+  inputs graphic_buffer_fields and graphic_buffer_poly_fields, generator entries,
+  manifest and output shapefile sets belong to this slice.
+- Reproducer/evidence: scripts/research/graphic_buffer/{make_fields.py,
+  field_observations.json,README.md}. Public docs and black-box ArcGIS only; GDAL
+  used solely for creating/inspecting input files.
+- Tiny positive buffers near ArcGIS XY tolerance may collapse there and survive here;
+  recorded in KNOWN_GAPS, including the 1 Millimeters observation. No threshold guessed.
+- docs/ROADMAP.md and KNOWN_GAPS.md updated; dashboard not yet refreshed for this slice.
 
-18 gb_more_* cases now generated and ALL 28 Graphic Buffer reference cases pass
-(`/tmp/unigis-gb-miter-overlap.log`, exit 0). Supports negative/zero polygon distances,
-reserved numeric field replacement, round point radii 30/1000, and miter limits
-1/1.25/2/10 including acute corners. ArcGIS bevels over-limit miters; native clipping
-was incorrect. Bevel base plus overlapping unioned miter patches fixes this without
-changing tolerances. Detailed findings: `scripts/research/graphic_buffer/README.md`.
-Changes are uncommitted in geometry/tools, generator/manifest, gb_more_* outputs and
-new graphic_buffer_angles / graphic_buffer_reserved input shapefiles.
-Final wrapper warnings now match observed 000636/000117; full `scripts/check` PASSED exit 0: 174 passed, 0 failed, 5 ignored in 78 result groups,
-plus four dashboard tests, fmt and clippy -D warnings. Log `/tmp/unigis-gb-expanded-check.log`.
-All 137 slice paths reviewed/staged; unrelated dirt excluded. No running build.
-Exploratory field probes completed (`/tmp/unigis-gb-field-research.log`): numeric/text
-distance fields, case-insensitive lookup and numeric null skipping supported by ArcGIS;
-zero numeric fields skip, negative points fail 000109. Malformed text has inconsistent
-geometry/BUFF_DIST behavior, so refuse rather than guess. No field support edited yet.
-A constants/unit probe is running session 15065, `/tmp/unigis-gb-unit-research.log`.
-Both pushed checkpoint GitHub CI runs completed SUCCESS:
-https://github.com/JanSolo99/geoforge/actions/runs/40512024122
-https://github.com/JanSolo99/geoforge/actions/runs/40512020282
+## Validation / running processes
 
-## Validation
-
-- Inherited baseline reference run FAILED 5 cases:
-  `/tmp/unigis-graphic-buffer-reference.log`.
-- Native offset pass initially failed 2 round-join area cases:
-  `/tmp/unigis-graphic-buffer-native-offset.log`.
-- Finer line/polygon join sampling, point circle sampling retained: reference harness
-  PASSED, including all ten new cases, `/tmp/unigis-graphic-buffer-round-refinement.log`.
-- `python3 -m unittest discover -s scripts/dashboard -p 'test_*.py' -v`: 4 passed.
-- `scripts/check` PASSED, exit 0: formatting, workspace/all-targets clippy -D warnings,
-  full workspace tests. 174 passed, 0 failed, 5 ignored, 78 result groups.
-  Log `/tmp/unigis-graphic-buffer-check.log`. This gate covers pushed `ebc2d2d`, not the current follow-up edits.
-- `git diff --check` passed. Both checkpoints pushed and remote SHA verified.
+- `cargo test -j3 -p unigis-cli --test arcgis_reference`: PASSED all manifest cases,
+  including all 48 Graphic Buffer cases; /tmp/unigis-gb-fields-reference.log.
+- First gate `/tmp/unigis-gb-field-check.log` stopped at one overly specific error
+  assertion: DBF text nulls read as empty strings; refusal and no-output behavior were
+  correct. Assertion corrected. Also tightened unknown-unit fallback so recognized
+  units never bypass a missing CRS conversion; third safety test added.
+- Final `scripts/check` PASSED exit 0, `/tmp/unigis-gb-field-check-final.log`,
+  on final Rust source/fixtures and three safety tests: 177 passed, 0 failed,
+  5 ignored, 79 result groups; fmt and clippy -D warnings passed. Four dashboard
+  tests ran at gate start; eight passed separately after the dashboard follow-up.
+  No running builds. Field slice staged separately from dashboard changes.
+- Dashboard follow-up (not staged with the field slice): build.py and test_build.py
+  preserve fetched CI results in docs/dashboard/ci_runs.json through offline hooks or
+  fetch failures, show last-fetched time, and use the latest KNOWN_GAPS section.
+  Eight Python tests pass; generated HTML JSON invariants and node --check pass.
+- ArcGIS generator and all exploratory probe workers finished. No other agent running.
+- cdc23aa GitHub CI in progress: https://github.com/JanSolo99/geoforge/actions/runs/40515889873
 
 ## Next actions
 
-1. Commit staged expanded Graphic Buffer slice; dashboard --ci refreshed.
-2. Push normally (mandatory root pre-push gate); verify remote HEAD.
-3. Continue bounded oracle-backed development; consider Graphic Buffer distance fields
-   and geographic safety next. Keep checkpointing and pushing validated slices.
+1. Commit validated field slice, then dashboard follow-up separately (8 Python tests
+   plus generated JSON/JavaScript checks passed). Refresh snapshot with --ci.
+2. Push both normally; mandatory root pre-push gate must pass. Verify remote HEAD/CI.
+3. Dashboard cache fix is implemented and tested; stage build/test, ci_runs.json,
+   dashboard.html and updated handoff in its own commit.
+4. Continue another bounded oracle-backed registry tool (inspect actual ug tools first),
+   keeping tested commit/push checkpoints and dashboard current.
 
-## Durable context / preserved work
+## Durable context / preserved unrelated work
 
-Previous tool-batch observations moved out of the handoff to
-`scripts/research/sa_batch/README.md`; current gaps/overall plan remain in docs/KNOWN_GAPS.md
-and docs/ROADMAP.md. New tools use registry + generator RUN + saved ArcGIS cases, not
-new clap/test branches. `scripts/check` / .githooks/pre-push is the push gate; core.hooksPath
-is already .githooks. Post-commit regenerates dashboard HTML, leaving it dirty by design.
-Use public docs and black-box ArcGIS ONLY; do not read/use proprietary reverse-engineering
-material in unrelated untracked NOTES.md.
+Detailed Graphic Buffer findings: scripts/research/graphic_buffer/README.md.
+Prior tool-batch findings: scripts/research/sa_batch/README.md. New tools use registry
++ generator RUN + saved ArcGIS cases, not giant clap/test branches. scripts/check is
+the mandatory pre-push gate (core.hooksPath=.githooks); do not bypass. Cargo jobs <=3,
+no overlapping builds, no local full app CI for root-only edits. Capture ug tools to a
+file rather than piping to head (known broken-pipe panic observed; not fixed).
 
-Preserve/exclude unrelated aux.xml changes in testdata/{geoproc,raster}, deleted tracked
-*.sr.lock files, .worktrees/, NOTES.md, scratch_cf.tif and scratch_trend_rms.txt.xml.
-The old doc push-status handoff was superseded by Claude's later committed work. No reset,
-stash, worktree transfer, external messaging or other agent/coordinator launch performed.
+Preserve/exclude unrelated tracked aux.xml changes in testdata/{geoproc,raster},
+deleted tracked *.sr.lock files, .worktrees/, NOTES.md, scratch_cf.tif and
+scratch_trend_rms.txt.xml. Do not read/use unrelated NOTES.md (proprietary reverse-
+engineering material). No reset, stash, worktree transfer or external messaging.
