@@ -1,0 +1,48 @@
+Abs u8 : matches
+Abs nd_u8 : matches
+Abs i8 : matches
+Abs nd_i8 : matches
+Abs u16 : matches
+Abs nd_u16 : matches
+Abs i16 : matches
+Abs nd_i16 : matches
+Abs u32 : matches
+Abs nd_u32 : matches
+Abs i32 : matches
+Abs nd_i32 : matches
+Abs f32 : matches
+Abs nd_f32 : matches
+Abs f64 : type Float32 != Float64, NoData -3.4028234663852886e+38 != -1.7976931348623157e+308, pixels
+Abs nd_f64 : type Float32 != Float64, NoData -3.4028234663852886e+38 != -1.7976931348623157e+308, pixels
+Negate u8 : matches
+Negate nd_u8 : matches
+Negate i8 : matches
+Negate nd_i8 : matches
+Negate u16 : matches
+Negate nd_u16 : matches
+Negate i16 : type Int16 != Int32, NoData -32768.0 != -2147483648.0, pixels
+Negate nd_i16 : type Int16 != Int32, NoData -32768.0 != -2147483648.0, pixels
+Negate u32 : pixels, count 3.0 != 5.0
+Negate nd_u32 : pixels, count 3.0 != 5.0
+Negate i32 : pixels, count 6.0 != 5.0
+Negate nd_i32 : pixels, count 5.0 != 4.0
+Negate f32 : matches
+Negate nd_f32 : matches
+Negate f64 : type Float32 != Float64, NoData -3.4028234663852886e+38 != -1.7976931348623157e+308, pixels
+Negate nd_f64 : type Float32 != Float64, NoData -3.4028234663852886e+38 != -1.7976931348623157e+308, pixels
+Square u8 : matches
+Square nd_u8 : matches
+Square i8 : type UInt16 != Int16, NoData 65535.0 != -32768.0
+Square nd_i8 : type UInt16 != Int16, NoData 65535.0 != -32768.0, pixels
+Square u16 : type Int32 != UInt32, NoData -2147483647.0 != 4294967295.0, pixels
+Square nd_u16 : type Int32 != UInt32, NoData -2147483647.0 != 4294967295.0, pixels
+Square i16 : NoData -2147483647.0 != -2147483648.0
+Square nd_i16 : NoData -2147483647.0 != -2147483648.0, pixels
+Square u32 : type Float32 != UInt32, NoData -3.4028234663852886e+38 != 4294967295.0, pixels, count 6.0 != 2.0
+Square nd_u32 : type Float32 != UInt32, NoData -3.4028234663852886e+38 != 4294967295.0, pixels, count 5.0 != 2.0
+Square i32 : type Float32 != Int32, NoData -3.4028234663852886e+38 != -2147483648.0, pixels, count 6.0 != 3.0
+Square nd_i32 : type Float32 != Int32, NoData -3.4028234663852886e+38 != -2147483648.0, pixels, count 5.0 != 2.0
+Square f32 : matches
+Square nd_f32 : matches
+Square f64 : type Float32 != Float64, NoData -3.4028234663852886e+38 != -1.7976931348623157e+308, pixels
+Square nd_f64 : type Float32 != Float64, NoData -3.4028234663852886e+38 != -1.7976931348623157e+308, pixels

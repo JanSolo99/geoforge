@@ -733,3 +733,5 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Copy Raster downcasts: 16 additional ArcGIS cases cover all eight types to F32/I16. Large float NoData metadata survives integer output, and statistics exclude the rounded F32 marker correctly. A GeoTIFF/GDAL regression checks tags beyond the i64 range.
 
 - [x] Equal To / Greater Than / Less Than Frequency (`ug run *_frequency`): exact source-precision comparisons, duplicate counts, both band modes, value-band broadcast, missing/extra comparison bands, ArcGIS count types/NoData and empty-band statistics.63 saved cases plus CLI refusal preservation; empty Rank/Popularity lists now return a parameter error instead of panicking. Limits: `scripts/research/frequency/README.md`.
+
+- [x] Abs / Negate / Square preserve Float64 cells and the F64 NoData marker instead of narrowing to Float32; six exact ArcGIS cases cover tagged and untagged double inputs. Wider integer/statistics-dependent behavior remains a separate documented slice.

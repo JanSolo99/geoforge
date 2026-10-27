@@ -1,8 +1,7 @@
 # Current handoff
 
-Updated 2026-10-27T19:47:12+00:00; last agent Codex.
-Workspace /mnt/media/ArcGIS_Linux; main; HEAD1c830f1 PUSHED/verified
-1c830f1c53e8b60b6e066464d633dce30dd4a30a. User authorizes ongoing development,
+Updated 2026-10-27T20:06:05+00:00; last agent Codex.
+Workspace /mnt/media/ArcGIS_Linux; main; HEADec66a49, frequency slice PUSHED; remote verification logged this turn. User authorizes ongoing development,
 tested commits/pushes/dashboard updates while sleeping; do not ask repeated prompts.
 Do not launch another agent, CLI or coordinator. Cargo -j3, sequential builds.
 
@@ -19,7 +18,7 @@ Logs /tmp/unigis-copy-downcast-{check,push}.log. Dashboard refreshed: CI40566379
 SUCCESS at19:41Z; downcast CI still pending.
 Durable research raster_crs/copy_raster; ROADMAP/KNOWN_GAPS updated.
 
-## Active frequency slice (VALIDATED; committing next)
+## Frequency slice completed/pushed ec66a49
 
 New crates/unigis-raster/src/frequency.rs +lib/registry registrations for3 tools,
 source-precision comparisons, SINGLE_BAND flatten/default and MULTI_BAND behavior.
@@ -48,11 +47,15 @@ ArcGIS cases and two CLI safety tests included. fmt done, generator63/63 succeed
 
 ## Next actions
 
-1. Commit and push validated frequency slice through normal gate; verify remote.
-2. Refresh dashboard --ci and validate JS; stage only frequency/docs/reference paths.
-3. Commit/push through mandatory gate, verify remote, record exact tests and CI state.
-4. Continue bounded slices. Existing CopyRaster tiny tagged stats/U32 signed-export
-   differences remain documented; no guessed size thresholds. Consider these later.
+1. Reconcile next unary math probes before implementation; all48 initial probes succeed.
+   Scripts/results scripts/research/unary_types/ (currently untracked).
+2. Cached-statistics isolation24 probes running session24161,
+   /tmp/unigis-unary-statistics-probe.log; /tmp/unigis-unary-statistics-probe.py.
+   Old DEM has cached min/max; matrix fixtures do not. Type/NoData differences must
+   be explained before changing rules. Do not break old references or guess thresholds.
+3. Save additional evidence, generate bounded reference cases, implement confirmed
+   differences, full root gate/dashboard, commit/push. No math source edits yet.
+4. Existing CopyRaster tiny tagged stats/U32 signed-export gaps remain documented.
 
 ## Preserve unrelated files
 
@@ -63,5 +66,27 @@ No reset/stash/worktree transfers. Root-only edits: no local full app build.
 Post-commit rebuilds dashboard HTML leaving expected dirt. No Cargo processes.
 Next exploratory48 Abs/Negate/Square type probes running session76974,
 /tmp/unigis-unary-types-probe.log, script /tmp/unigis-unary-types-probe.py.
-Only private copies; no math source edits. Dashboard regenerated --ci:
+Only private copies; no math source edits. Initial48 probes finished and durably saved.
+Current24 statistics-isolation probes still running. Frequency normal push gate
+PASS185 Rust/5ignored/8Python,fmt/clippy /tmp/unigis-frequency-push.log.
+Dashboard JS node --check PASS before commit. Dashboard regenerated --ci:
 282 own tools/307 verified entries. Native inventory exposes all3 new registry ids.
+
+## Active Float64 unary checkpoint (uncommitted)
+
+local.rs preserves F64 for Abs/Negate/Square with f64MIN NoData, without changing
+integer planners. Six um64_* cases + exact comparison prefix; generator session5107
+/tmp/unigis-unary-f64-generation.log. Research48 observations and native_before.txt
+show22 mismatches; six are F64, others deferred until stats rules explained.
+No new dependencies. ROADMAP/KNOWN_GAPS/research README updated.
+Next root gate on this bounded precision slice, dashboard, commit/push.
+Statistics isolation24 completed successfully; saved statistics_observations.json,
+probe_statistics.py and make_statistics_inputs.py in research/unary_types.
+F64 full gate session98444 /tmp/unigis-unary-f64-check.log:fmt/clippy/8Python and
+six exact ArcGIS comparisons PASS; remaining workspace tests running.
+Extra18 cached/tiny/F64-overflow probes session36307 /tmp/unigis-unary-extra-probe.log.
+
+FINAL F64 scripts/check PASS exit0:185 Rust,5ignored,8Python,fmt/clippy, all6
+exact reference cases. /tmp/unigis-unary-f64-check.log. After-check across48:
+32 match,16 integer differences remain; research/unary_types/native_after_f64.txt.
+Committing/pushing this bounded precision slice next; extra18 probes still pending.

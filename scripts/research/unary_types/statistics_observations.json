@@ -1,0 +1,482 @@
+[
+  {
+    "input": "i8_narrow",
+    "cached": false,
+    "tool": "Negate",
+    "status": "succeeded",
+    "type": "S16",
+    "nodata": -32768.0,
+    "values": [
+      [
+        2,
+        1,
+        0
+      ],
+      [
+        -1,
+        -100,
+        -126
+      ]
+    ]
+  },
+  {
+    "input": "i8_narrow",
+    "cached": false,
+    "tool": "Square",
+    "status": "succeeded",
+    "type": "S16",
+    "nodata": -32768.0,
+    "values": [
+      [
+        4,
+        1,
+        0
+      ],
+      [
+        1,
+        10000,
+        15876
+      ]
+    ]
+  },
+  {
+    "input": "i8_narrow",
+    "cached": true,
+    "tool": "Negate",
+    "status": "succeeded",
+    "type": "S8",
+    "nodata": -128.0,
+    "values": [
+      [
+        2,
+        1,
+        0
+      ],
+      [
+        -1,
+        -100,
+        -126
+      ]
+    ]
+  },
+  {
+    "input": "i8_narrow",
+    "cached": true,
+    "tool": "Square",
+    "status": "succeeded",
+    "type": "U16",
+    "nodata": 65535.0,
+    "values": [
+      [
+        4,
+        1,
+        0
+      ],
+      [
+        1,
+        10000,
+        15876
+      ]
+    ]
+  },
+  {
+    "input": "i16_narrow",
+    "cached": false,
+    "tool": "Negate",
+    "status": "succeeded",
+    "type": "S32",
+    "nodata": -2147483648.0,
+    "values": [
+      [
+        2,
+        1,
+        0
+      ],
+      [
+        -1,
+        -100,
+        -200
+      ]
+    ]
+  },
+  {
+    "input": "i16_narrow",
+    "cached": false,
+    "tool": "Square",
+    "status": "succeeded",
+    "type": "S32",
+    "nodata": -2147483648.0,
+    "values": [
+      [
+        4,
+        1,
+        0
+      ],
+      [
+        1,
+        10000,
+        40000
+      ]
+    ]
+  },
+  {
+    "input": "i16_narrow",
+    "cached": true,
+    "tool": "Negate",
+    "status": "succeeded",
+    "type": "S16",
+    "nodata": -32768.0,
+    "values": [
+      [
+        2,
+        1,
+        0
+      ],
+      [
+        -1,
+        -100,
+        -200
+      ]
+    ]
+  },
+  {
+    "input": "i16_narrow",
+    "cached": true,
+    "tool": "Square",
+    "status": "succeeded",
+    "type": "U16",
+    "nodata": 65535.0,
+    "values": [
+      [
+        4,
+        1,
+        0
+      ],
+      [
+        1,
+        10000,
+        40000
+      ]
+    ]
+  },
+  {
+    "input": "u16_narrow",
+    "cached": false,
+    "tool": "Negate",
+    "status": "succeeded",
+    "type": "S32",
+    "nodata": -2147483648.0,
+    "values": [
+      [
+        0,
+        -1,
+        -2
+      ],
+      [
+        -127,
+        -254,
+        -325
+      ]
+    ]
+  },
+  {
+    "input": "u16_narrow",
+    "cached": false,
+    "tool": "Square",
+    "status": "succeeded",
+    "type": "U32",
+    "nodata": 4294967295.0,
+    "values": [
+      [
+        0,
+        1,
+        4
+      ],
+      [
+        16129,
+        64516,
+        105625
+      ]
+    ]
+  },
+  {
+    "input": "u16_narrow",
+    "cached": true,
+    "tool": "Negate",
+    "status": "succeeded",
+    "type": "S16",
+    "nodata": -32768.0,
+    "values": [
+      [
+        0,
+        -1,
+        -2
+      ],
+      [
+        -127,
+        -254,
+        -325
+      ]
+    ]
+  },
+  {
+    "input": "u16_narrow",
+    "cached": true,
+    "tool": "Square",
+    "status": "succeeded",
+    "type": "S32",
+    "nodata": -2147483647.0,
+    "values": [
+      [
+        0,
+        1,
+        4
+      ],
+      [
+        16129,
+        64516,
+        105625
+      ]
+    ]
+  },
+  {
+    "input": "i8_wide",
+    "cached": false,
+    "tool": "Negate",
+    "status": "succeeded",
+    "type": "S16",
+    "nodata": -32768.0,
+    "values": [
+      [
+        128,
+        1,
+        0
+      ],
+      [
+        -1,
+        -126,
+        -127
+      ]
+    ]
+  },
+  {
+    "input": "i8_wide",
+    "cached": false,
+    "tool": "Square",
+    "status": "succeeded",
+    "type": "S16",
+    "nodata": -32768.0,
+    "values": [
+      [
+        16384,
+        1,
+        0
+      ],
+      [
+        1,
+        15876,
+        16129
+      ]
+    ]
+  },
+  {
+    "input": "i8_wide",
+    "cached": true,
+    "tool": "Negate",
+    "status": "succeeded",
+    "type": "S16",
+    "nodata": -32768.0,
+    "values": [
+      [
+        128,
+        1,
+        0
+      ],
+      [
+        -1,
+        -126,
+        -127
+      ]
+    ]
+  },
+  {
+    "input": "i8_wide",
+    "cached": true,
+    "tool": "Square",
+    "status": "succeeded",
+    "type": "U16",
+    "nodata": 65535.0,
+    "values": [
+      [
+        16384,
+        1,
+        0
+      ],
+      [
+        1,
+        15876,
+        16129
+      ]
+    ]
+  },
+  {
+    "input": "i16_wide",
+    "cached": false,
+    "tool": "Negate",
+    "status": "succeeded",
+    "type": "S32",
+    "nodata": -2147483648.0,
+    "values": [
+      [
+        32768,
+        1,
+        0
+      ],
+      [
+        -32767,
+        -100,
+        -200
+      ]
+    ]
+  },
+  {
+    "input": "i16_wide",
+    "cached": false,
+    "tool": "Square",
+    "status": "succeeded",
+    "type": "S32",
+    "nodata": -2147483648.0,
+    "values": [
+      [
+        1073741824,
+        1,
+        0
+      ],
+      [
+        1073676289,
+        10000,
+        40000
+      ]
+    ]
+  },
+  {
+    "input": "i16_wide",
+    "cached": true,
+    "tool": "Negate",
+    "status": "succeeded",
+    "type": "S32",
+    "nodata": -2147483647.0,
+    "values": [
+      [
+        32768,
+        1,
+        0
+      ],
+      [
+        -32767,
+        -100,
+        -200
+      ]
+    ]
+  },
+  {
+    "input": "i16_wide",
+    "cached": true,
+    "tool": "Square",
+    "status": "succeeded",
+    "type": "S32",
+    "nodata": -2147483647.0,
+    "values": [
+      [
+        1073741824,
+        1,
+        0
+      ],
+      [
+        1073676289,
+        10000,
+        40000
+      ]
+    ]
+  },
+  {
+    "input": "i16_ndmin",
+    "cached": false,
+    "tool": "Negate",
+    "status": "succeeded",
+    "type": "S32",
+    "nodata": -2147483648.0,
+    "values": [
+      [
+        -2147483648,
+        1,
+        0
+      ],
+      [
+        -32767,
+        -100,
+        -200
+      ]
+    ]
+  },
+  {
+    "input": "i16_ndmin",
+    "cached": false,
+    "tool": "Square",
+    "status": "succeeded",
+    "type": "S32",
+    "nodata": -2147483648.0,
+    "values": [
+      [
+        -2147483648,
+        1,
+        0
+      ],
+      [
+        1073676289,
+        10000,
+        40000
+      ]
+    ]
+  },
+  {
+    "input": "i16_ndmin",
+    "cached": true,
+    "tool": "Negate",
+    "status": "succeeded",
+    "type": "S16",
+    "nodata": -32768.0,
+    "values": [
+      [
+        -32768,
+        1,
+        0
+      ],
+      [
+        -32767,
+        -100,
+        -200
+      ]
+    ]
+  },
+  {
+    "input": "i16_ndmin",
+    "cached": true,
+    "tool": "Square",
+    "status": "succeeded",
+    "type": "S32",
+    "nodata": -2147483647.0,
+    "values": [
+      [
+        -2147483647,
+        1,
+        0
+      ],
+      [
+        1073676289,
+        10000,
+        40000
+      ]
+    ]
+  }
+]

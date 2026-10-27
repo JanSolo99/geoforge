@@ -1,11 +1,18 @@
 {
-  "fetched": "2026-10-27T19:41:15+00:00",
+  "fetched": "2026-10-27T19:58:15+00:00",
   "runs": [
     {
       "conclusion": "",
+      "createdAt": "2026-10-27T19:51:24Z",
+      "displayTitle": "Add three raster frequency tools with ArcGIS band and count semantics",
+      "status": "in_progress",
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40572839516"
+    },
+    {
+      "conclusion": "success",
       "createdAt": "2026-10-27T19:32:34Z",
       "displayTitle": "Retain large raster NoData tags and normalize downcast statistics",
-      "status": "in_progress",
+      "status": "completed",
       "url": "https://github.com/JanSolo99/geoforge/actions/runs/40570048929"
     },
     {
@@ -49,13 +56,6 @@
       "displayTitle": "Add Composite Bands with complete pixel-type and multiband reference \u2026",
       "status": "completed",
       "url": "https://github.com/JanSolo99/geoforge/actions/runs/40522528614"
-    },
-    {
-      "conclusion": "success",
-      "createdAt": "2026-10-27T14:07:16Z",
-      "displayTitle": "Preserve dashboard CI snapshots through offline rebuilds",
-      "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40518084617"
     }
   ]
 }
