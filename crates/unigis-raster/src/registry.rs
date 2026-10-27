@@ -422,6 +422,23 @@ fn raster_to_ascii(ctx: &dyn Context) -> Result<Output> {
     with_statistics(ctx.raster("input")?, false)
 }
 
+macro_rules! combinatorial_fn {
+    ($f:ident, $op:ident) => {
+        fn $f(ctx: &dyn Context) -> Result<Output> {
+            let raster = crate::local::combinatorial(
+                crate::local::CombinatorialOp::$op,
+                &ctx.raster("in1")?,
+                &ctx.raster("in2")?,
+            )
+            .ok_or_else(|| Error::Unsupported("the rasters do not overlap".into()))?;
+            with_statistics(raster, true)
+        }
+    };
+}
+combinatorial_fn!(combinatorial_and_tool, And);
+combinatorial_fn!(combinatorial_or_tool, Or);
+combinatorial_fn!(combinatorial_xor_tool, Xor);
+
 fn flip(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::extract::flip(&ctx.raster("input")?), true)
 }
@@ -550,6 +567,36 @@ pub static TOOLS: &[Tool] = &[
         summary: "Writes a raster as an Esri ASCII grid (the output path is the .asc file).",
         params: &[raster("input", "Input Raster", true)],
         run: raster_to_ascii,
+    },
+    Tool {
+        id: "combinatorial_and",
+        name: "Combinatorial And",
+        summary: "Numbers the pairs of values that satisfy the operation (Spatial Analyst).",
+        params: &[
+            raster("in1", "Input Raster 1", true),
+            raster("in2", "Input Raster 2", true),
+        ],
+        run: combinatorial_and_tool,
+    },
+    Tool {
+        id: "combinatorial_or",
+        name: "Combinatorial Or",
+        summary: "Numbers the pairs of values that satisfy the operation (Spatial Analyst).",
+        params: &[
+            raster("in1", "Input Raster 1", true),
+            raster("in2", "Input Raster 2", true),
+        ],
+        run: combinatorial_or_tool,
+    },
+    Tool {
+        id: "combinatorial_xor",
+        name: "Combinatorial XOr",
+        summary: "Numbers the pairs of values that satisfy the operation (Spatial Analyst).",
+        params: &[
+            raster("in1", "Input Raster 1", true),
+            raster("in2", "Input Raster 2", true),
+        ],
+        run: combinatorial_xor_tool,
     },
     Tool {
         id: "flip",

@@ -1025,6 +1025,14 @@ for _tool, _id in BINARY:
         CASES[f"bm_{_id}_{_k}"] = (f"gp.{_tool}_sa", [RASTER / o if o.endswith(".tif") else o for o in _ops], [])
 
 
+COMBINATORIAL = [("CombinatorialAnd", "combinatorial_and"), ("CombinatorialOr", "combinatorial_or"),
+                 ("CombinatorialXOr", "combinatorial_xor")]
+for _tool, _id in COMBINATORIAL:
+    for _k, (_a, _b) in {"lu_patch": ("landuse_u8", "patches_i16"), "lu_mask": ("landuse_u8", "nibble_mask_i16"),
+                         "patch_lu": ("patches_i16", "landuse_u8")}.items():
+        CASES[f"cb_{_id}_{_k}"] = (f"gp.{_tool}_sa", [RASTER / f"{_a}.tif", RASTER / f"{_b}.tif"], [])
+
+
 RUN = {
     "gp.Nibble_sa": ("nibble", ["input", "mask", "output", "values", "nodata"]),
     "gp.Filter_sa": ("filter", ["input", "output", "filter_type", "ignore_nodata"]),
@@ -1052,6 +1060,7 @@ RUN = {
     "cartography.SimplifyLine": ("simplify_line", ["input", "output", "algorithm", "tolerance"]),
     **{f"gp.{t}_sa": (i, ["input", "output"]) for t, i in UNARY},
     **{f"gp.{t}_sa": (i, ["in1", "in2", "output"]) for t, i in BINARY},
+    **{f"gp.{t}_sa": (i, ["in1", "in2", "output"]) for t, i in COMBINATORIAL},
     "conversion.RasterToASCII": ("raster_to_ascii", ["input", "output"]),
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
     "analysis.CountOverlappingFeatures": ("count_overlapping_features", ["input", "output", "minimum_overlap_count"]),
@@ -1068,7 +1077,7 @@ def run_spec(tool, args):
 
 
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
-RASTER_OUT = {*[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
+RASTER_OUT = {*[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
               "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa",
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",

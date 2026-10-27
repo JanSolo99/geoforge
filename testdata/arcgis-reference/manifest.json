@@ -44220,6 +44220,186 @@
           "output": "<out>"
         }
       }
+    },
+    "cb_combinatorial_and_lu_patch": {
+      "tool": "gp.CombinatorialAnd_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "testdata/raster/patches_i16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "combinatorial_and",
+        "params": {
+          "in1": "testdata/raster/landuse_u8.tif",
+          "in2": "testdata/raster/patches_i16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cb_combinatorial_and_lu_mask": {
+      "tool": "gp.CombinatorialAnd_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "testdata/raster/nibble_mask_i16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "combinatorial_and",
+        "params": {
+          "in1": "testdata/raster/landuse_u8.tif",
+          "in2": "testdata/raster/nibble_mask_i16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cb_combinatorial_and_patch_lu": {
+      "tool": "gp.CombinatorialAnd_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "testdata/raster/landuse_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "combinatorial_and",
+        "params": {
+          "in1": "testdata/raster/patches_i16.tif",
+          "in2": "testdata/raster/landuse_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cb_combinatorial_or_lu_patch": {
+      "tool": "gp.CombinatorialOr_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "testdata/raster/patches_i16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "combinatorial_or",
+        "params": {
+          "in1": "testdata/raster/landuse_u8.tif",
+          "in2": "testdata/raster/patches_i16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cb_combinatorial_or_lu_mask": {
+      "tool": "gp.CombinatorialOr_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "testdata/raster/nibble_mask_i16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "combinatorial_or",
+        "params": {
+          "in1": "testdata/raster/landuse_u8.tif",
+          "in2": "testdata/raster/nibble_mask_i16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cb_combinatorial_or_patch_lu": {
+      "tool": "gp.CombinatorialOr_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "testdata/raster/landuse_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "combinatorial_or",
+        "params": {
+          "in1": "testdata/raster/patches_i16.tif",
+          "in2": "testdata/raster/landuse_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cb_combinatorial_xor_lu_patch": {
+      "tool": "gp.CombinatorialXOr_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "testdata/raster/patches_i16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "combinatorial_xor",
+        "params": {
+          "in1": "testdata/raster/landuse_u8.tif",
+          "in2": "testdata/raster/patches_i16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cb_combinatorial_xor_lu_mask": {
+      "tool": "gp.CombinatorialXOr_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "testdata/raster/nibble_mask_i16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "combinatorial_xor",
+        "params": {
+          "in1": "testdata/raster/landuse_u8.tif",
+          "in2": "testdata/raster/nibble_mask_i16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cb_combinatorial_xor_patch_lu": {
+      "tool": "gp.CombinatorialXOr_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "testdata/raster/landuse_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "combinatorial_xor",
+        "params": {
+          "in1": "testdata/raster/patches_i16.tif",
+          "in2": "testdata/raster/landuse_u8.tif",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

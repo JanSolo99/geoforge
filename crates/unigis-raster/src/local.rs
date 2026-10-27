@@ -761,3 +761,45 @@ pub fn binary(op: BinaryOp, a: &Operand, b: &Operand) -> Option<Raster> {
         BinaryOp::BitwiseRightShift => bits(&|x, y| x.wrapping_shr(y as u32)),
     })
 }
+
+/// Combinatorial And / Or / XOr.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CombinatorialOp {
+    And,
+    Or,
+    Xor,
+}
+
+/// Combinatorial And / Or / XOr: each distinct pair of input values gets a number, in the order
+/// the pairs first occur (row by row). The pairs the operation calls false (And: either value 0;
+/// Or: both 0; XOr: both or neither 0) get 0 and use no number. NoData where either input is.
+/// The type is the smallest that holds the numbers (observed).
+pub fn combinatorial(op: CombinatorialOp, a: &Raster, b: &Raster) -> Option<Raster> {
+    let (a, b) = common_grid(a, b)?;
+    let mut ids: std::collections::HashMap<(u64, u64), f64> = std::collections::HashMap::new();
+    let mut next = 1.0;
+    let values: Vec<Option<f64>> = a.bands[0]
+        .iter()
+        .zip(&b.bands[0])
+        .map(|(&x, &y)| {
+            if a.is_nodata(x) || b.is_nodata(y) {
+                return None;
+            }
+            let numbered = match op {
+                CombinatorialOp::And => x != 0.0 && y != 0.0,
+                CombinatorialOp::Or => x != 0.0 || y != 0.0,
+                CombinatorialOp::Xor => (x != 0.0) != (y != 0.0),
+            };
+            if !numbered {
+                return Some(0.0);
+            }
+            Some(*ids.entry((x.to_bits(), y.to_bits())).or_insert_with(|| {
+                next += 1.0;
+                next - 1.0
+            }))
+        })
+        .collect();
+    let max = values.iter().flatten().fold(0.0_f64, |m, &v| m.max(v));
+    let (t, nodata) = crate::zonal::integer_output(0.0, max, true);
+    Some(typed_raster(&a, values.into_iter(), t, nodata))
+}
