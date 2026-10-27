@@ -58,3 +58,26 @@ Regenerate: make-arcgis-reference.py 'umint_*'. Boundary source files live under
  testdata/raster/unary_types; make_boundary_inputs.py/probe_boundaries.py preserve
 recipes. The unsigned Square boundary emits ArcGIS warning010663 about not building
 a raster attribute table; raster creation succeeds and values remain authoritative.
+
+## Cached integer planner
+
+81 umcache_* cases cover27 cached source snapshots under testdata/raster/unary_cached.
+Every source includes its ArcGIS CalculateStatistics sidecar. cached_inputs.json and
+make_cached_inputs.py recreate the pixel files while retaining those original sidecars.
+An initial72-case native comparison found a signed endpoint difference; after fixing
+it all72 known outputs match (cached_native_compare.txt). The81-case reference corpus
+adds missing Abs variants and symmetric signed32 endpoints.
+
+Range inference is conservative: Abs/Square start at0 even when no actual output
+zero occurs; Negate uses[-input_max,-input_min]. Small ranges use ArcGIS's packed/
+8/16-bit choices. Wider ranges select signed/unsigned32 with range-aware NoData;
+if both signed endpoints are needed or the range cannot fit, ArcGIS can retain
+S32 with NoData -f64MAX. Pixel overflow becomes logical missing, then the explicit
+GP writer policy writes0 without changing the tag or statistics. U32 Negate wraps
+through signed32; signed overflow is missing. The int32 upper bound is inclusive
+for signed ranges; wholly nonnegative ranges reaching that bound promote toU32.
+
+Regenerate: make-arcgis-reference.py 'umcache_*'. All comparisons are exact per cell,
+with type/NoData/grid/CRS/statistics checked. Uncached rules and cached F64 narrowing
+remain separately covered by umint_* and um64_*. Malformed/stale stats, multiband
+unary arithmetic and nondefault environments remain outside this checkpoint.

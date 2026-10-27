@@ -568,6 +568,57 @@ fn signed_for(t: DataType) -> (DataType, f64) {
     }
 }
 
+/// Cached integer metadata follows ArcGIS range inference, including its
+/// signed32 fallback with an out-of-range Double NoData marker.
+fn cached_integer_unary(op: UnaryOp, r: &Raster, (lo, hi): (f64, f64)) -> Raster {
+    let (out_lo, out_hi) = match op {
+        UnaryOp::Negate => (-hi, -lo),
+        UnaryOp::Abs => (0., lo.abs().max(hi.abs())),
+        _ => (0., (lo * lo).max(hi * hi)),
+    };
+    let (small_type, small_nodata) = crate::zonal::integer_output(out_lo, out_hi, true);
+    let (t, nodata) = if matches!(
+        small_type,
+        DataType::U8 | DataType::I8 | DataType::U16 | DataType::I16
+    ) {
+        (small_type, small_nodata)
+    } else if out_lo >= -(i32::MAX as f64)
+        && out_hi <= i32::MAX as f64
+        && (out_lo < 0. || out_hi < i32::MAX as f64)
+    {
+        (
+            DataType::I32,
+            if out_lo > -(i32::MAX as f64) {
+                -(i32::MAX as f64)
+            } else if out_hi < i32::MAX as f64 {
+                i32::MAX as f64
+            } else {
+                f64::MIN
+            },
+        )
+    } else if out_lo >= 0. && out_hi < u32::MAX as f64 {
+        (DataType::U32, u32::MAX as f64)
+    } else {
+        (DataType::I32, f64::MIN)
+    };
+    let (minimum, maximum) = type_range(t);
+    let values = r.bands[0].iter().map(|&value| {
+        if r.is_nodata(value) {
+            return None;
+        }
+        let result = match op {
+            UnaryOp::Abs => value.abs(),
+            UnaryOp::Negate if r.data_type == DataType::U32 => {
+                f64::from((value as u32).wrapping_neg() as i32)
+            }
+            UnaryOp::Negate => -value,
+            _ => value * value,
+        };
+        (result >= minimum && result <= maximum).then_some(result)
+    });
+    typed_raster(r, values, t, nodata)
+}
+
 /// Applies a one-raster math tool. Abs/Negate/Square preserve uncached F64 input precision.
 /// Other float results and the trigonometric, logarithmic and exponential functions give 32-bit float with NoData where the result is not a finite number
 /// (as 32-bit float); integer Abs keeps the width but is unsigned, Negate gives a signed type and
@@ -585,6 +636,14 @@ pub fn unary(op: UnaryOp, r: &Raster) -> Raster {
         )
     };
     let integer = !r.data_type.is_float();
+    if integer
+        && matches!(op, UnaryOp::Abs | UnaryOp::Negate | UnaryOp::Square)
+        && let Some(range) = r
+            .statistics
+            .filter(|(lo, hi)| lo.is_finite() && hi.is_finite() && lo <= hi)
+    {
+        return cached_integer_unary(op, r, range);
+    }
     match op {
         UnaryOp::Abs | UnaryOp::Negate | UnaryOp::Square
             if r.data_type == DataType::F64 && r.statistics.is_none() =>

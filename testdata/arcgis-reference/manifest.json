@@ -57647,6 +57647,1478 @@
           "output": "<out>"
         }
       }
+    },
+    "umcache_abs_i8_narrow": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/i8_narrow.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/i8_narrow.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_abs_i16_narrow": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_narrow.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_narrow.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_abs_u16_narrow": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/u16_narrow.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/u16_narrow.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_abs_i8_wide": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/i8_wide.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/i8_wide.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_abs_i16_wide": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_wide.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_wide.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_abs_i16_ndmin": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_ndmin.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_ndmin.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_abs_i16_tiny": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_tiny.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_tiny.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_abs_i16_bit": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_bit.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_bit.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_abs_i16_negative": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_negative.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_negative.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_abs_u8": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_abs_nd_u8": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/nd_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/nd_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_abs_u32": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/u32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010663: The raster attribute table will not be built because the cell values exceed the range of the VALUE field."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/u32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_abs_nd_u32": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/nd_u32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010663: The raster attribute table will not be built because the cell values exceed the range of the VALUE field."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/nd_u32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_abs_i32": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/i32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010663: The raster attribute table will not be built because the cell values exceed the range of the VALUE field."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/i32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_abs_nd_i32": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/nd_i32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010663: The raster attribute table will not be built because the cell values exceed the range of the VALUE field."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/nd_i32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_abs_i32_positive_max": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/i32_positive_max.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/i32_positive_max.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_abs_i32_negative_min": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/i32_negative_min.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010663: The raster attribute table will not be built because the cell values exceed the range of the VALUE field."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/i32_negative_min.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_abs_i32_negative_max": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/i32_negative_max.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/i32_negative_max.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_abs_i32_ndmin": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/i32_ndmin.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/i32_ndmin.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_abs_u16": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/u16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/u16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_abs_nd_u16": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/nd_u16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/nd_u16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_abs_i16_cross3": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_cross3.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_cross3.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_abs_i16_cross1": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_cross1.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_cross1.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_abs_i16_neg1to3": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_neg1to3.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_neg1to3.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_abs_u32_max": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/u32_max.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/u32_max.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_abs_constant1": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/constant1.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/constant1.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_i8_narrow": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/i8_narrow.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/i8_narrow.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_i16_narrow": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_narrow.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_narrow.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_u16_narrow": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/u16_narrow.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/u16_narrow.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_i8_wide": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/i8_wide.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/i8_wide.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_i16_wide": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_wide.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_wide.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_i16_ndmin": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_ndmin.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_ndmin.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_i16_tiny": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_tiny.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_tiny.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_i16_bit": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_bit.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_bit.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_i16_negative": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_negative.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_negative.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_u8": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_nd_u8": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/nd_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/nd_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_u32": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/u32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/u32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_nd_u32": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/nd_u32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/nd_u32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_i32": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/i32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/i32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_nd_i32": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/nd_i32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/nd_i32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_i32_positive_max": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/i32_positive_max.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/i32_positive_max.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_i32_negative_min": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/i32_negative_min.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/i32_negative_min.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_i32_negative_max": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/i32_negative_max.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/i32_negative_max.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_i32_ndmin": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/i32_ndmin.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/i32_ndmin.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_u16": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/u16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/u16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_nd_u16": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/nd_u16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/nd_u16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_i16_cross3": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_cross3.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_cross3.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_i16_cross1": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_cross1.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_cross1.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_i16_neg1to3": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_neg1to3.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_neg1to3.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_u32_max": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/u32_max.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/u32_max.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_constant1": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/constant1.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/constant1.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_i8_narrow": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/i8_narrow.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/i8_narrow.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_i16_narrow": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_narrow.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_narrow.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_u16_narrow": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/u16_narrow.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/u16_narrow.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_i8_wide": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/i8_wide.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/i8_wide.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_i16_wide": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_wide.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_wide.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_i16_ndmin": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_ndmin.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_ndmin.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_i16_tiny": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_tiny.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_tiny.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_i16_bit": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_bit.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_bit.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_i16_negative": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_negative.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_negative.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_u8": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_nd_u8": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/nd_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/nd_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_u32": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/u32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/u32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_nd_u32": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/nd_u32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/nd_u32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_i32": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/i32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/i32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_nd_i32": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/nd_i32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/nd_i32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_i32_positive_max": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/i32_positive_max.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/i32_positive_max.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_i32_negative_min": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/i32_negative_min.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/i32_negative_min.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_i32_negative_max": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/i32_negative_max.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/i32_negative_max.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_i32_ndmin": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/i32_ndmin.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/i32_ndmin.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_u16": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/u16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010663: The raster attribute table will not be built because the cell values exceed the range of the VALUE field."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/u16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_nd_u16": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/nd_u16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010663: The raster attribute table will not be built because the cell values exceed the range of the VALUE field."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/nd_u16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_i16_cross3": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_cross3.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_cross3.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_i16_cross1": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_cross1.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_cross1.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_i16_neg1to3": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/i16_neg1to3.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/i16_neg1to3.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_u32_max": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/u32_max.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/u32_max.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_constant1": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/constant1.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/constant1.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_abs_symmetric": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/unary_cached/symmetric.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/unary_cached/symmetric.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_negate_symmetric": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_cached/symmetric.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_cached/symmetric.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umcache_square_symmetric": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_cached/symmetric.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_cached/symmetric.tif",
+          "output": "<out>"
+        }
+      }
     }
   }
 }
