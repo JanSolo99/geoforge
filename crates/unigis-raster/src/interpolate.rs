@@ -202,3 +202,101 @@ pub fn idw(
     }
     Some(out)
 }
+
+/// Solves the square system `a x = b` by Gaussian elimination with partial pivoting.
+fn solve(mut a: Vec<Vec<f64>>, mut b: Vec<f64>) -> Option<Vec<f64>> {
+    let n = b.len();
+    for col in 0..n {
+        let pivot = (col..n).max_by(|&i, &j| a[i][col].abs().total_cmp(&a[j][col].abs()))?;
+        if a[pivot][col].abs() < 1e-12 {
+            return None;
+        }
+        a.swap(col, pivot);
+        b.swap(col, pivot);
+        for r in col + 1..n {
+            let f = a[r][col] / a[col][col];
+            for c in col..n {
+                a[r][c] -= f * a[col][c];
+            }
+            b[r] -= f * b[col];
+        }
+    }
+    let mut x = vec![0.0; n];
+    for r in (0..n).rev() {
+        let tail: f64 = (r + 1..n).map(|c| a[r][c] * x[c]).sum();
+        x[r] = (b[r] - tail) / a[r][r];
+    }
+    Some(x)
+}
+
+/// Trend (LINEAR): the least-squares polynomial surface of the given `order` (1 to 12) through
+/// the points, on IDW's default grid (observed to be the same). `None` when the points do not
+/// determine the surface.
+pub fn trend(
+    samples: &[Sample],
+    order: usize,
+    env: &Environment,
+    epsg: Option<u32>,
+) -> Option<Raster> {
+    let samples: Vec<Sample> = samples
+        .iter()
+        .copied()
+        .filter(|s| s.x.is_finite() && s.y.is_finite() && s.z.is_finite())
+        .collect();
+    let terms: Vec<(usize, usize)> = (0..=order)
+        .flat_map(|i| (0..=order - i).map(move |j| (i, j)))
+        .collect();
+    if samples.len() < terms.len() {
+        return None;
+    }
+    let grid = default_grid(&samples, env)?;
+    // Centre and scale the coordinates so the normal equations stay well conditioned.
+    let n = samples.len() as f64;
+    let (cx, cy) = (
+        samples.iter().map(|s| s.x).sum::<f64>() / n,
+        samples.iter().map(|s| s.y).sum::<f64>() / n,
+    );
+    let scale = samples
+        .iter()
+        .map(|s| (s.x - cx).abs().max((s.y - cy).abs()))
+        .fold(0.0, f64::max)
+        .max(1e-9);
+    let basis = |x: f64, y: f64| -> Vec<f64> {
+        let (u, v) = ((x - cx) / scale, (y - cy) / scale);
+        terms
+            .iter()
+            .map(|&(i, j)| u.powi(i as i32) * v.powi(j as i32))
+            .collect()
+    };
+    let m = terms.len();
+    let mut ata = vec![vec![0.0; m]; m];
+    let mut atz = vec![0.0; m];
+    for s in &samples {
+        let row = basis(s.x, s.y);
+        for i in 0..m {
+            atz[i] += row[i] * s.z;
+            for j in 0..m {
+                ata[i][j] += row[i] * row[j];
+            }
+        }
+    }
+    let coefficients = solve(ata, atz)?;
+    let nodata = f32::MIN as f64;
+    let mut out = Raster::new(grid.cols, grid.rows, DataType::F32, grid.transform);
+    out.epsg = epsg;
+    out.nodata = Some(nodata);
+    let cell = grid.transform[1];
+    for row in 0..grid.rows {
+        let y = grid.transform[3] + grid.transform[5] * (row as f64 + 0.5);
+        for col in 0..grid.cols {
+            let x = grid.transform[0] + cell * (col as f64 + 0.5);
+            let v: f64 = basis(x, y)
+                .iter()
+                .zip(&coefficients)
+                .map(|(b, c)| b * c)
+                .sum();
+            out.bands[0][row * grid.cols + col] = DataType::F32.store(v);
+        }
+    }
+    Some(out)
+}

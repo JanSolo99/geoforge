@@ -6158,6 +6158,30 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
         fn raster_at(&self, path: &str) -> Result<unigis_raster::Raster> {
             unigis_raster::read_geotiff(Path::new(path))
         }
+        fn point_samples(
+            &self,
+            name: &str,
+            field: &str,
+        ) -> Result<(Vec<unigis_raster::interpolate::Sample>, Option<u32>)> {
+            let path = self
+                .get(name)
+                .ok_or_else(|| Error::Unsupported(format!("{name} is required")))?;
+            let (features, _, epsg, _) = rasterize_input(Path::new(&path), field)?;
+            let mut samples = Vec::new();
+            for (g, z) in &features {
+                if matches!(
+                    g.kind,
+                    unigis_core::GeometryKind::Point | unigis_core::GeometryKind::Multipoint
+                ) {
+                    samples.extend(g.xy.iter().map(|c| unigis_raster::interpolate::Sample {
+                        x: c[0],
+                        y: c[1],
+                        z: *z,
+                    }));
+                }
+            }
+            Ok((samples, epsg))
+        }
         fn attribute_table(&self, name: &str) -> Result<Vec<(String, Vec<f64>)>> {
             let path = self
                 .get(name)

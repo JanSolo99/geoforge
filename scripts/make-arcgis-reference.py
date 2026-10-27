@@ -959,6 +959,9 @@ CASES = {
     "tophat_dem_annulus": ("gp.TopHatTransform_sa", [RASTER / "dem.tif"], ["Annulus 1 3 CELL", "VALLEY"]),
     "tophat_nodata": ("gp.TopHatTransform_sa", [RASTER / "dem_nodata.tif"], ["Circle 2 CELL", "RIDGE"]),
     "tophat_u8": ("gp.TopHatTransform_sa", [RASTER / "landuse_u8.tif"], ["Circle 2 CELL", "VALLEY"]),
+    "trend_wells_1": ("gp.Trend_sa", [DATA / "wells.shp", "DEPTH"], [10, 1]),
+    "trend_wells_2": ("gp.Trend_sa", [DATA / "wells.shp", "DEPTH"], [10, 2]),
+    "trend_wells_default": ("gp.Trend_sa", [DATA / "wells.shp", "DEPTH"], []),
     "gpal_roads_50": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "NO_END_POINTS"]),
     "gpal_roads_50_end": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "END_POINTS"]),
     "gpal_roads_pct": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["PERCENTAGE", "", 25, "NO_END_POINTS"]),
@@ -1136,6 +1139,7 @@ RUN = {
     "gp.TopographicPositionIndex_sa": ("topographic_position_index", ["input", "output", "neighborhood"]),
     "gp.TopHatTransform_sa": ("top_hat_transform", ["input", "output", "neighborhood", "analysis_type"]),
     "gp.Test_sa": ("test", ["input", "where_clause", "output"]),
+    "gp.Trend_sa": ("trend", ["input", "z_field", "output", "cell_size", "order"]),
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
     "analysis.CountOverlappingFeatures": ("count_overlapping_features", ["input", "output", "minimum_overlap_count"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
@@ -1151,7 +1155,7 @@ def run_spec(tool, args):
 
 
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
-RASTER_OUT = {"gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
+RASTER_OUT = {"gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
               "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa",
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",

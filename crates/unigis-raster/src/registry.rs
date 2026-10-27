@@ -41,6 +41,18 @@ pub trait Context {
     /// The numeric columns (name, values) of the attribute table (`.vat.dbf`) of the raster the
     /// parameter names.
     fn attribute_table(&self, name: &str) -> Result<Vec<(String, Vec<f64>)>>;
+    /// The points of the feature layer the parameter names with the numeric `field`'s values, and
+    /// the layer's EPSG code.
+    fn point_samples(
+        &self,
+        name: &str,
+        field: &str,
+    ) -> Result<(Vec<crate::interpolate::Sample>, Option<u32>)> {
+        let _ = (name, field);
+        Err(Error::Unsupported(
+            "this tool needs point features, which this context cannot read".into(),
+        ))
+    }
 }
 
 /// A tool's result: the raster, and whether ArcGIS writes statistics (`.aux.xml`) beside it.
@@ -640,6 +652,28 @@ fn test_tool(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::extract::test(&ctx.raster("input")?, &clause), true)
 }
 
+fn trend(ctx: &dyn Context) -> Result<Output> {
+    let field = ctx.get("z_field").unwrap_or_default();
+    let (samples, epsg) = ctx.point_samples("input", &field)?;
+    let order: usize = ctx
+        .get("order")
+        .and_then(|v| v.trim().parse().ok())
+        .unwrap_or(1);
+    if !(1..=12).contains(&order) {
+        return Err(Error::Unsupported(
+            "ERROR 000094: Polynomial order must be between 1 and 12".into(),
+        ));
+    }
+    let env = crate::env::Environment {
+        cell_size: ctx.get("cell_size").and_then(|v| v.trim().parse().ok()),
+        ..Default::default()
+    };
+    let raster = crate::interpolate::trend(&samples, order, &env, epsg).ok_or_else(|| {
+        Error::Unsupported("ERROR 010003: too few points for this polynomial order".into())
+    })?;
+    with_statistics(raster, true)
+}
+
 fn flip(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::extract::flip(&ctx.raster("input")?), true)
 }
@@ -941,6 +975,42 @@ pub static TOOLS: &[Tool] = &[
             },
         ],
         run: test_tool,
+    },
+    Tool {
+        id: "trend",
+        name: "Trend",
+        summary: "A least-squares polynomial surface through points (LINEAR).",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Point Features",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            Param {
+                name: "z_field",
+                label: "Z Value Field",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            Param {
+                name: "cell_size",
+                label: "Output Cell Size",
+                kind: Kind::Number,
+                required: false,
+                default: "",
+            },
+            Param {
+                name: "order",
+                label: "Polynomial Order",
+                kind: Kind::Number,
+                required: false,
+                default: "1",
+            },
+        ],
+        run: trend,
     },
     Tool {
         id: "flip",

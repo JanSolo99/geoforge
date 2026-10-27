@@ -46470,6 +46470,74 @@
           "analysis_type": "VALLEY"
         }
       }
+    },
+    "trend_wells_1": {
+      "tool": "gp.Trend_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "DEPTH",
+        "<out>",
+        10,
+        1
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "trend",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "z_field": "DEPTH",
+          "output": "<out>",
+          "cell_size": 10,
+          "order": 1
+        }
+      }
+    },
+    "trend_wells_2": {
+      "tool": "gp.Trend_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "DEPTH",
+        "<out>",
+        10,
+        2
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "trend",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "z_field": "DEPTH",
+          "output": "<out>",
+          "cell_size": 10,
+          "order": 2
+        }
+      }
+    },
+    "trend_wells_default": {
+      "tool": "gp.Trend_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "DEPTH",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "trend",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "z_field": "DEPTH",
+          "output": "<out>"
+        }
+      }
     }
   }
 }
