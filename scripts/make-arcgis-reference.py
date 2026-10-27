@@ -934,6 +934,11 @@ CASES = {
     "cpr_dem_nodata_in": ("management.CopyRaster", [RASTER / "dem_nodata.tif"], []),
     "cpr_i16_u8": ("management.CopyRaster", [RASTER / "dem_int16_packbits.tif"], ["", "", "", "", "", "8_BIT_UNSIGNED"]),
     "cpr_i16_64": ("management.CopyRaster", [RASTER / "dem_int16_packbits.tif"], ["", "", "", "", "", "64_BIT"]),
+    "mos_zones_last": ("management.MosaicToNewRaster", [f"{RASTER / 'zones.tif'};{RASTER / 'zones_shifted.tif'}"], ["", "8_BIT_UNSIGNED", "", "1", "LAST", "FIRST"]),
+    "mos_zones_first": ("management.MosaicToNewRaster", [f"{RASTER / 'zones_shifted.tif'};{RASTER / 'zones.tif'}"], ["", "8_BIT_UNSIGNED", "", "1", "FIRST", "FIRST"]),
+    "mos_zones_max": ("management.MosaicToNewRaster", [f"{RASTER / 'zones_shifted.tif'};{RASTER / 'zones.tif'}"], ["", "8_BIT_UNSIGNED", "", "1", "MAXIMUM", "FIRST"]),
+    "mos_dem_mean": ("management.MosaicToNewRaster", [f"{RASTER / 'dem.tif'};{RASTER / 'dem_nodata.tif'}"], ["", "32_BIT_FLOAT", "", "1", "MEAN", "FIRST"]),
+    "mos_zones_float": ("management.MosaicToNewRaster", [f"{RASTER / 'zones.tif'};{RASTER / 'zones_shifted.tif'}"], ["", "32_BIT_FLOAT", "", "1", "LAST", "FIRST"]),
     "gpal_roads_50": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "NO_END_POINTS"]),
     "gpal_roads_50_end": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "END_POINTS"]),
     "gpal_roads_pct": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["PERCENTAGE", "", 25, "NO_END_POINTS"]),
@@ -1105,6 +1110,7 @@ RUN = {
     "edit.FlipLine": ("flip_line", ["input", "output"]),
     "edit.Generalize": ("generalize", ["input", "output", "tolerance"]),
     "management.CopyRaster": ("copy_raster", ["input", "output", None, None, "nodata_value", None, None, "pixel_type"]),
+    "management.MosaicToNewRaster": ("mosaic_to_new_raster", ["inputs", "output", None, "pixel_type", "cellsize", None, "mosaic_method"]),
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
     "analysis.CountOverlappingFeatures": ("count_overlapping_features", ["input", "output", "minimum_overlap_count"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
@@ -1120,7 +1126,7 @@ def run_spec(tool, args):
 
 
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
-RASTER_OUT = {"management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
+RASTER_OUT = {"management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
               "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa",
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",
@@ -1238,6 +1244,8 @@ def main():
             w.call("run_tool", tool="management.CopyFeatures", args=[str(before[k]), str(out)],
                    env={"overwriteOutput": True})
             args = [str(out) if i == k else (a if isinstance(a, (list, int, float)) else str(a)) for i, a in enumerate(before)] + after
+        elif tool == "management.MosaicToNewRaster":
+            args = [before[0], str(out.parent), out.name] + after
         elif tool in CREATE_TOOLS:
             args = [str(out.parent), out.name] + [str(a) if isinstance(a, Path) else a for a in before + after]
         elif tool == "conversion.FeatureClassToFeatureClass":

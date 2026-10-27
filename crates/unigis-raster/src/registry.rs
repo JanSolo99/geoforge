@@ -507,6 +507,59 @@ fn copy_raster(ctx: &dyn Context) -> Result<Output> {
     )
 }
 
+fn mosaic_to_new_raster(ctx: &dyn Context) -> Result<Output> {
+    use crate::DataType;
+    use crate::extract::MosaicMethod;
+    let mut rasters = Vec::new();
+    for path in ctx.get("inputs").unwrap_or_default().split(';') {
+        if !path.trim().is_empty() {
+            rasters.push(ctx.raster_at(path.trim())?);
+        }
+    }
+    let pixel_type = match ctx
+        .get("pixel_type")
+        .unwrap_or_else(|| "8_BIT_UNSIGNED".into())
+        .to_ascii_uppercase()
+        .as_str()
+    {
+        "8_BIT_UNSIGNED" => DataType::U8,
+        "8_BIT_SIGNED" => DataType::I8,
+        "16_BIT_UNSIGNED" => DataType::U16,
+        "16_BIT_SIGNED" => DataType::I16,
+        "32_BIT_UNSIGNED" => DataType::U32,
+        "32_BIT_SIGNED" => DataType::I32,
+        "32_BIT_FLOAT" => DataType::F32,
+        "64_BIT" => DataType::F64,
+        other => {
+            return Err(Error::Unsupported(format!(
+                "ERROR 000067: Pixel Type: {other} is not supported yet"
+            )));
+        }
+    };
+    let method = match ctx
+        .get("mosaic_method")
+        .unwrap_or_else(|| "LAST".into())
+        .to_ascii_uppercase()
+        .as_str()
+    {
+        "FIRST" => MosaicMethod::First,
+        "LAST" => MosaicMethod::Last,
+        "MEAN" => MosaicMethod::Mean,
+        "MINIMUM" => MosaicMethod::Minimum,
+        "MAXIMUM" => MosaicMethod::Maximum,
+        other => {
+            return Err(Error::Unsupported(format!(
+                "ERROR 000067: Mosaic Method: {other} is not supported yet"
+            )));
+        }
+    };
+    let cell = ctx.get("cellsize").and_then(|v| v.trim().parse().ok());
+    let raster = crate::extract::mosaic(&rasters, pixel_type, cell, method).ok_or_else(|| {
+        Error::Unsupported("ERROR 000735: Input Rasters: value is required".into())
+    })?;
+    with_statistics(raster, true)
+}
+
 fn flip(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::extract::flip(&ctx.raster("input")?), true)
 }
@@ -719,6 +772,41 @@ pub static TOOLS: &[Tool] = &[
             },
         ],
         run: copy_raster,
+    },
+    Tool {
+        id: "mosaic_to_new_raster",
+        name: "Mosaic To New Raster",
+        summary: "Mosaics rasters into a new GeoTIFF (first-raster grid, nearest values).",
+        params: &[
+            Param {
+                name: "inputs",
+                label: "Input Rasters",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            Param {
+                name: "pixel_type",
+                label: "Pixel Type",
+                kind: Kind::Text,
+                required: false,
+                default: "8_BIT_UNSIGNED",
+            },
+            Param {
+                name: "cellsize",
+                label: "Cellsize",
+                kind: Kind::Number,
+                required: false,
+                default: "",
+            },
+            option(
+                "mosaic_method",
+                "Mosaic Operator",
+                &["FIRST", "LAST", "MEAN", "MINIMUM", "MAXIMUM"],
+                "LAST",
+            ),
+        ],
+        run: mosaic_to_new_raster,
     },
     Tool {
         id: "flip",

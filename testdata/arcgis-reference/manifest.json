@@ -45922,6 +45922,136 @@
           "pixel_type": "64_BIT"
         }
       }
+    },
+    "mos_zones_last": {
+      "tool": "management.MosaicToNewRaster",
+      "args": [
+        "testdata/raster/zones.tif;testdata/raster/zones_shifted.tif",
+        "<out>",
+        "",
+        "8_BIT_UNSIGNED",
+        "",
+        "1",
+        "LAST",
+        "FIRST"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "mosaic_to_new_raster",
+        "params": {
+          "inputs": "testdata/raster/zones.tif;testdata/raster/zones_shifted.tif",
+          "output": "<out>",
+          "pixel_type": "8_BIT_UNSIGNED",
+          "mosaic_method": "LAST"
+        }
+      }
+    },
+    "mos_zones_first": {
+      "tool": "management.MosaicToNewRaster",
+      "args": [
+        "testdata/raster/zones_shifted.tif;testdata/raster/zones.tif",
+        "<out>",
+        "",
+        "8_BIT_UNSIGNED",
+        "",
+        "1",
+        "FIRST",
+        "FIRST"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "mosaic_to_new_raster",
+        "params": {
+          "inputs": "testdata/raster/zones_shifted.tif;testdata/raster/zones.tif",
+          "output": "<out>",
+          "pixel_type": "8_BIT_UNSIGNED",
+          "mosaic_method": "FIRST"
+        }
+      }
+    },
+    "mos_zones_max": {
+      "tool": "management.MosaicToNewRaster",
+      "args": [
+        "testdata/raster/zones_shifted.tif;testdata/raster/zones.tif",
+        "<out>",
+        "",
+        "8_BIT_UNSIGNED",
+        "",
+        "1",
+        "MAXIMUM",
+        "FIRST"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "mosaic_to_new_raster",
+        "params": {
+          "inputs": "testdata/raster/zones_shifted.tif;testdata/raster/zones.tif",
+          "output": "<out>",
+          "pixel_type": "8_BIT_UNSIGNED",
+          "mosaic_method": "MAXIMUM"
+        }
+      }
+    },
+    "mos_dem_mean": {
+      "tool": "management.MosaicToNewRaster",
+      "args": [
+        "testdata/raster/dem.tif;testdata/raster/dem_nodata.tif",
+        "<out>",
+        "",
+        "32_BIT_FLOAT",
+        "",
+        "1",
+        "MEAN",
+        "FIRST"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "mosaic_to_new_raster",
+        "params": {
+          "inputs": "testdata/raster/dem.tif;testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "pixel_type": "32_BIT_FLOAT",
+          "mosaic_method": "MEAN"
+        }
+      }
+    },
+    "mos_zones_float": {
+      "tool": "management.MosaicToNewRaster",
+      "args": [
+        "testdata/raster/zones.tif;testdata/raster/zones_shifted.tif",
+        "<out>",
+        "",
+        "32_BIT_FLOAT",
+        "",
+        "1",
+        "LAST",
+        "FIRST"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "mosaic_to_new_raster",
+        "params": {
+          "inputs": "testdata/raster/zones.tif;testdata/raster/zones_shifted.tif",
+          "output": "<out>",
+          "pixel_type": "32_BIT_FLOAT",
+          "mosaic_method": "LAST"
+        }
+      }
     }
   }
 }

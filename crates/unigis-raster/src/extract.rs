@@ -258,3 +258,97 @@ pub fn copy_raster(input: &Raster, pixel_type: Option<DataType>, nodata: Option<
         .collect();
     out
 }
+
+/// How Mosaic To New Raster combines rasters where they overlap.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MosaicMethod {
+    First,
+    Last,
+    Mean,
+    Minimum,
+    Maximum,
+}
+
+/// Mosaic To New Raster: the union of the extents, on the grid of the first raster (its cell size
+/// unless `cell` says otherwise), each cell taking the value at its center from the rasters that
+/// have data there, combined by `method`. NoData is the largest input NoData plus one, or +3.4e38
+/// when an input has none and the output is float (observed).
+pub fn mosaic(
+    rasters: &[Raster],
+    pixel_type: DataType,
+    cell: Option<f64>,
+    method: MosaicMethod,
+) -> Option<Raster> {
+    let first = rasters.first()?;
+    let cell = cell.unwrap_or(first.transform[1]);
+    let extent = |r: &Raster| {
+        let t = r.transform;
+        (
+            t[0],
+            t[3] + t[5] * r.height as f64,
+            t[0] + t[1] * r.width as f64,
+            t[3],
+        )
+    };
+    let (mut x0, mut y0, mut x1, mut y1) = (f64::MAX, f64::MAX, f64::MIN, f64::MIN);
+    for r in rasters {
+        let e = extent(r);
+        x0 = x0.min(e.0);
+        y0 = y0.min(e.1);
+        x1 = x1.max(e.2);
+        y1 = y1.max(e.3);
+    }
+    let fe = extent(first);
+    let snap = |lo: f64, base: f64| base + ((lo - base) / cell + 1e-9).floor() * cell;
+    let snap_up = |hi: f64, base: f64| base + ((hi - base) / cell - 1e-9).ceil() * cell;
+    let (ox0, oy0) = (snap(x0, fe.0), snap(y0, fe.1));
+    let (ox1, oy1) = (snap_up(x1, fe.0), snap_up(y1, fe.1));
+    let width = ((ox1 - ox0) / cell).round() as usize;
+    let height = ((oy1 - oy0) / cell).round() as usize;
+    let nodata = if rasters.iter().all(|r| r.nodata.is_some()) {
+        rasters
+            .iter()
+            .filter_map(|r| r.nodata)
+            .fold(f64::MIN, f64::max)
+            + 1.0
+    } else if pixel_type.is_float() {
+        f64::from(3.4e38_f32)
+    } else {
+        rasters.iter().filter_map(|r| r.nodata).fold(0.0, f64::max) + 1.0
+    };
+    let mut out = Raster::new(width, height, pixel_type, [ox0, cell, 0.0, oy1, 0.0, -cell]);
+    out.epsg = first.epsg;
+    out.nodata = Some(nodata);
+    for row in 0..height {
+        for col in 0..width {
+            let x = ox0 + (col as f64 + 0.5) * cell;
+            let y = oy1 - (row as f64 + 0.5) * cell;
+            let mut values = Vec::new();
+            for r in rasters {
+                let t = r.transform;
+                let c = ((x - t[0]) / t[1]).floor();
+                let rr = ((t[3] - y) / -t[5]).floor();
+                if c < 0.0 || rr < 0.0 || c >= r.width as f64 || rr >= r.height as f64 {
+                    continue;
+                }
+                let v = r.bands[0][rr as usize * r.width + c as usize];
+                if !r.is_nodata(v) {
+                    values.push(v);
+                }
+            }
+            let v = match method {
+                MosaicMethod::First => values.first().copied(),
+                MosaicMethod::Last => values.last().copied(),
+                MosaicMethod::Mean => {
+                    (!values.is_empty()).then(|| values.iter().sum::<f64>() / values.len() as f64)
+                }
+                MosaicMethod::Minimum => values.iter().copied().reduce(f64::min),
+                MosaicMethod::Maximum => values.iter().copied().reduce(f64::max),
+            };
+            // Cells without data are the background 0 in an integer mosaic, NoData in a float one.
+            let gap = if pixel_type.is_float() { nodata } else { 0.0 };
+            out.bands[0][row * width + col] = v.map_or(gap, |v| pixel_type.store(v));
+        }
+    }
+    Some(out)
+}
