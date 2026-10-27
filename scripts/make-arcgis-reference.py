@@ -976,6 +976,12 @@ CASES = {
     "pop_mix_1": ("gp.Popularity_sa", [1, f"{RASTER / 'landuse_u8.tif'};{RASTER / 'patches_i16.tif'};{RASTER / 'nibble_mask_i16.tif'}"], []),
     "pop_mix_2": ("gp.Popularity_sa", [2, f"{RASTER / 'landuse_u8.tif'};{RASTER / 'patches_i16.tif'};{RASTER / 'nibble_mask_i16.tif'}"], []),
     "pop_mix_3": ("gp.Popularity_sa", [3, f"{RASTER / 'landuse_u8.tif'};{RASTER / 'patches_i16.tif'};{RASTER / 'nibble_mask_i16.tif'}"], []),
+    "inl_u8_const": ("gp.InList_sa", [RASTER / "landuse_u8.tif", "1;2"], []),
+    "inl_u8_one": ("gp.InList_sa", [RASTER / "landuse_u8.tif", "2"], []),
+    "inl_u8_raster": ("gp.InList_sa", [RASTER / "landuse_u8.tif", str(RASTER / "patches_i16.tif")], []),
+    "inl_u8_mixed": ("gp.InList_sa", [RASTER / "landuse_u8.tif", f"{RASTER / 'patches_i16.tif'};3"], []),
+    "inl_patches": ("gp.InList_sa", [RASTER / "patches_i16.tif", "2;7"], []),
+    "inl_dem": ("gp.InList_sa", [RASTER / "dem.tif", "200;250.5"], []),
     "gpal_roads_50": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "NO_END_POINTS"]),
     "gpal_roads_50_end": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "END_POINTS"]),
     "gpal_roads_pct": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["PERCENTAGE", "", 25, "NO_END_POINTS"]),
@@ -1156,6 +1162,7 @@ RUN = {
     "gp.Trend_sa": ("trend", ["input", "z_field", "output", "cell_size", "order"]),
     "gp.Rank_sa": ("rank", ["rank", "rasters", "output"]),
     "gp.Popularity_sa": ("popularity", ["rank", "rasters", "output"]),
+    "gp.InList_sa": ("in_list", ["input", "list", "output"]),
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
     "analysis.CountOverlappingFeatures": ("count_overlapping_features", ["input", "output", "minimum_overlap_count"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
@@ -1171,7 +1178,7 @@ def run_spec(tool, args):
 
 
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
-RASTER_OUT = {"gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
+RASTER_OUT = {"gp.InList_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
               "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa",
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",

@@ -46818,6 +46818,126 @@
           "output": "<out>"
         }
       }
+    },
+    "inl_u8_const": {
+      "tool": "gp.InList_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "1;2",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "in_list",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "list": "1;2",
+          "output": "<out>"
+        }
+      }
+    },
+    "inl_u8_one": {
+      "tool": "gp.InList_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "2",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "in_list",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "list": "2",
+          "output": "<out>"
+        }
+      }
+    },
+    "inl_u8_raster": {
+      "tool": "gp.InList_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "testdata/raster/patches_i16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "in_list",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "list": "testdata/raster/patches_i16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "inl_u8_mixed": {
+      "tool": "gp.InList_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "testdata/raster/patches_i16.tif;3",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "in_list",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "list": "testdata/raster/patches_i16.tif;3",
+          "output": "<out>"
+        }
+      }
+    },
+    "inl_patches": {
+      "tool": "gp.InList_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "2;7",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "in_list",
+        "params": {
+          "input": "testdata/raster/patches_i16.tif",
+          "list": "2;7",
+          "output": "<out>"
+        }
+      }
+    },
+    "inl_dem": {
+      "tool": "gp.InList_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "200;250.5",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "in_list",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "list": "200;250.5",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

@@ -705,6 +705,28 @@ fn popularity_tool(ctx: &dyn Context) -> Result<Output> {
     rank_or_popularity_tool(ctx, true)
 }
 
+fn in_list_tool(ctx: &dyn Context) -> Result<Output> {
+    let input = ctx.raster("input")?;
+    let mut list = Vec::new();
+    for item in ctx.get("list").unwrap_or_default().split(';') {
+        let item = item.trim();
+        if item.is_empty() {
+            continue;
+        }
+        list.push(match crate::local::Operand::constant(item) {
+            Some(c) => c,
+            None => {
+                let r = ctx.raster_at(item)?;
+                if (r.width, r.height) != (input.width, input.height) {
+                    return Err(Error::Unsupported("the rasters must share a grid".into()));
+                }
+                crate::local::Operand::Raster(r)
+            }
+        });
+    }
+    with_statistics(crate::local::in_list(&input, &list), true)
+}
+
 fn flip(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::extract::flip(&ctx.raster("input")?), true)
 }
@@ -1086,6 +1108,22 @@ pub static TOOLS: &[Tool] = &[
             },
         ],
         run: popularity_tool,
+    },
+    Tool {
+        id: "in_list",
+        name: "In List",
+        summary: "Keeps the cell values that occur in a list of constants and rasters.",
+        params: &[
+            raster("input", "Input Raster", true),
+            Param {
+                name: "list",
+                label: "Input Rasters Or Constants",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+        ],
+        run: in_list_tool,
     },
     Tool {
         id: "flip",

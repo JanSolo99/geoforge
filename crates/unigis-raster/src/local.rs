@@ -894,3 +894,31 @@ pub fn rank_or_popularity(k: usize, rasters: &[Raster], popularity: bool) -> Opt
     }
     Some(out)
 }
+
+/// In List: the cell's value where it equals a constant of `list` or the value of a raster of
+/// `list` at that cell, else NoData; the first raster's type stays and NoData is the type's
+/// default (observed: -32768 for a 16-bit signed raster that had -9999).
+pub fn in_list(input: &Raster, list: &[Operand]) -> Raster {
+    let nodata = if input.data_type.is_float() {
+        f32::MIN as f64
+    } else {
+        match input.data_type {
+            DataType::U8 | DataType::U16 | DataType::U32 => type_range(input.data_type).1,
+            _ => type_range(input.data_type).0,
+        }
+    };
+    let mut out = input.like(input.data_type);
+    out.nodata = Some(nodata);
+    for i in 0..input.width * input.height {
+        let v = input.bands[0][i];
+        let keep = !input.is_nodata(v)
+            && list.iter().any(|item| match item {
+                Operand::Constant(c) => *c == v,
+                Operand::Raster(r) => {
+                    i < r.bands[0].len() && !r.is_nodata(r.bands[0][i]) && r.bands[0][i] == v
+                }
+            });
+        out.bands[0][i] = if keep { v } else { nodata };
+    }
+    out
+}
