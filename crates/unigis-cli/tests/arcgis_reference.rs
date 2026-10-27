@@ -4086,6 +4086,9 @@ fn compare(case: &str, ours: &Path, theirs: &Path, fields: &serde_json::Value) -
         (1e-8, 1e-7)
     } else if is_buffer && one_sided {
         (0.2, 2e-4)
+    } else if case.starts_with("sn_") {
+        // Summarize Nearby draws its corner arcs coarser than Buffer does.
+        (0.25, 1.5e-3)
     } else if is_buffer {
         (0.2, 1e-4)
     } else if cascade {

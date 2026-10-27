@@ -47410,6 +47410,172 @@
           "keep_all": "ONLY_INTERSECTING"
         }
       }
+    },
+    "sn_parcels_wells": {
+      "tool": "analysis.SummarizeNearby",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "STRAIGHT_LINE",
+        "100",
+        "Meters"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Point_Coun",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "summarize_nearby",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "sum_features": "testdata/geoproc/wells.shp",
+          "output": "<out>",
+          "near_type": "STRAIGHT_LINE",
+          "distances": "100",
+          "distance_unit": "Meters"
+        }
+      }
+    },
+    "sn_parcels_wells_close": {
+      "tool": "analysis.SummarizeNearby",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "STRAIGHT_LINE",
+        "10",
+        "Meters"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Point_Coun",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "summarize_nearby",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "sum_features": "testdata/geoproc/wells.shp",
+          "output": "<out>",
+          "near_type": "STRAIGHT_LINE",
+          "distances": "10",
+          "distance_unit": "Meters"
+        }
+      }
     }
   }
 }

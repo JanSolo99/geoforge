@@ -997,6 +997,8 @@ CASES = {
     "cc_neg1": ("gp.CreateConstantRaster_sa", [-1], ["INTEGER", 10, "500000 5000000 500100 5000050"]),
     "sw_parcels_wells": ("analysis.SummarizeWithin", [DATA / "parcels.shp", DATA / "wells.shp"], ["KEEP_ALL", "DEPTH SUM;DEPTH MEAN"]),
     "sw_parcels_wells_only": ("analysis.SummarizeWithin", [DATA / "parcels.shp", DATA / "wells.shp"], ["ONLY_INTERSECTING"]),
+    "sn_parcels_wells": ("analysis.SummarizeNearby", [DATA / "parcels.shp", DATA / "wells.shp"], ["STRAIGHT_LINE", "100", "Meters"]),
+    "sn_parcels_wells_close": ("analysis.SummarizeNearby", [DATA / "parcels.shp", DATA / "wells.shp"], ["STRAIGHT_LINE", "10", "Meters"]),
     "gpal_roads_50": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "NO_END_POINTS"]),
     "gpal_roads_50_end": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "END_POINTS"]),
     "gpal_roads_pct": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["PERCENTAGE", "", 25, "NO_END_POINTS"]),
@@ -1180,6 +1182,7 @@ RUN = {
     "gp.InList_sa": ("in_list", ["input", "list", "output"]),
     "gp.CreateConstantRaster_sa": ("create_constant_raster", ["constant", "output", "data_type", "cell_size", "extent"]),
     "analysis.SummarizeWithin": ("summarize_within", ["input", "sum_features", "output", "keep_all", "summary_fields", "add_shape_sum", "shape_unit"]),
+    "analysis.SummarizeNearby": ("summarize_nearby", ["input", "sum_features", "output", "near_type", "distances", "distance_unit"]),
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
     "analysis.CountOverlappingFeatures": ("count_overlapping_features", ["input", "output", "minimum_overlap_count"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
@@ -1213,7 +1216,7 @@ TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable", "conversion.R
 TABLE_OUT = {"management.CopyRows", "gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa", "gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
              "management.TransposeFields", "management.PivotTable", "management.CreateTable", "analysis.PolygonNeighbors", "analysis.TabulateIntersection", "analysis.TableSelect"}
 # Tools whose ArcGIS output must be a geodatabase feature class or memory (copied to a shapefile).
-MEMORY_OUT = {"analysis.SummarizeWithin"}
+MEMORY_OUT = {"analysis.SummarizeWithin", "analysis.SummarizeNearby"}
 # Tools that take the output folder and name rather than a path.
 CREATE_TOOLS = {"management.CreateFeatureclass", "management.CreateTable"}
 

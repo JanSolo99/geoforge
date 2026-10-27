@@ -2221,6 +2221,7 @@ pub static TOOLS: &[Tool] = &[
     crate::neighbors::SIMPLIFY_LINE,
     crate::neighbors::GRID_INDEX_FEATURES,
     crate::neighbors::SUMMARIZE_WITHIN,
+    crate::neighbors::SUMMARIZE_NEARBY,
     crate::neighbors::POLYGON_NEIGHBORS,
     crate::neighbors::COUNT_OVERLAPPING_FEATURES,
 ];

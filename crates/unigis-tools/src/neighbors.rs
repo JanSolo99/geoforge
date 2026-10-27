@@ -1281,3 +1281,227 @@ pub const SUMMARIZE_WITHIN: Tool = Tool {
     measures: true,
     run: Runner::Features(summarize_within),
 };
+
+/// Summarize Nearby (STRAIGHT_LINE, point summary features): each input feature buffered by each
+/// distance, the buffer being the output geometry in feature-major order, with the number of
+/// summary features that meet it. With several distances each output is the ring between a
+/// buffer and the previous one and `BUFF_DIST` leads the fields; with one it follows the input's
+/// (observed). Features without any summary feature are left out unless KEEP_ALL.
+fn summarize_nearby(ctx: &dyn Context) -> Result<ToolOutput> {
+    let input = ctx.features("input")?;
+    let sums = ctx.features("sum_features")?;
+    let near = ctx
+        .get("near_type")
+        .unwrap_or_else(|| "STRAIGHT_LINE".into());
+    if !near.eq_ignore_ascii_case("STRAIGHT_LINE") {
+        return Err(err(
+            "only STRAIGHT_LINE is supported (network analysis is not)",
+        ));
+    }
+    if ctx
+        .get("add_shape_sum")
+        .is_some_and(|v| v.eq_ignore_ascii_case("ADD_SHAPE_SUM"))
+    {
+        return Err(err(
+            "ADD_SHAPE_SUM needs geodesic lengths and areas, which are not implemented yet",
+        ));
+    }
+    if !matches!(
+        sums.geometry_kind(),
+        Some(GeometryKind::Point | GeometryKind::Multipoint)
+    ) {
+        // ArcGIS adds a geodesic length / area sum for lines and polygons.
+        return Err(err(
+            "line and polygon summary features need geodesic shape sums, which are not implemented yet",
+        ));
+    }
+    let keep_all = !ctx
+        .get("keep_all")
+        .is_some_and(|v| v.eq_ignore_ascii_case("ONLY_INTERSECTING"));
+    let unit = ctx.get("distance_unit").unwrap_or_else(|| "Meters".into());
+    let wkt = input.spatial_reference_wkt();
+    let mut distances = Vec::new();
+    for d in ctx.get("distances").unwrap_or_default().split(';') {
+        let d = d.trim();
+        if d.is_empty() {
+            continue;
+        }
+        let shown: f64 = d
+            .parse()
+            .map_err(|_| err(format!("ERROR 000094: '{d}' is not a distance")))?;
+        distances.push((
+            shown,
+            crate::registry::distance_in_units(&format!("{d} {unit}"), wkt)?,
+        ));
+    }
+    if distances.is_empty() {
+        return Err(err("ERROR 000735: Distances: Value is required"));
+    }
+    let sum_geoms: Vec<unigis_core::Geometry> = sums
+        .features()
+        .filter_map(|f| f.map(|f| f.geometry).transpose())
+        .collect::<Result<_>>()?;
+
+    let mut dist_field = Field::new("BUFF_DIST", FieldType::Double);
+    dist_field.precision = 18;
+    dist_field.scale = 11;
+    let multi = distances.len() > 1;
+    let mut fields = Vec::new();
+    if multi {
+        fields.push(dist_field.clone());
+    }
+    fields.extend(input.fields().iter().cloned());
+    if !multi {
+        fields.push(dist_field);
+    }
+    fields.push(integer_field("Point_Count"));
+
+    let rows: Vec<Feature> = input.features().collect::<Result<_>>()?;
+    let mut per_distance = Vec::new();
+    for (_, d) in &distances {
+        per_distance.push(crate::buffer(
+            input.as_ref(),
+            crate::BufferDistance::Linear(*d),
+            unigis_geometry::LineEnd::Round,
+            unigis_geometry::LineSide::Full,
+            crate::Dissolve::None,
+        )?);
+    }
+    // Each distance after the first gives the ring between its buffer and the previous one.
+    for k in (1..per_distance.len()).rev() {
+        for i in 0..per_distance[k].features.len() {
+            let inner = per_distance[k - 1].features[i].geometry.clone();
+            let outer = per_distance[k].features[i].geometry.clone();
+            if let (Some(outer), Some(inner)) = (outer, inner) {
+                let area = unigis_geometry::ClipArea::new([&inner])?;
+                per_distance[k].features[i].geometry = unigis_geometry::erase(&outer, &area)?;
+            }
+        }
+    }
+    let mut hit: Vec<Feature> = Vec::new();
+    let mut miss: Vec<Feature> = Vec::new();
+    for (i, row) in rows.iter().enumerate() {
+        if row.geometry.is_none() {
+            continue;
+        }
+        for (k, (shown, _)) in distances.iter().enumerate() {
+            let Some(b) = per_distance[k].features.get(i) else {
+                continue;
+            };
+            // Counted against the drawn buffer (ArcGIS does the same; exact distances give a
+            // different count for a point near the arcs).
+            let Some(bg) = &b.geometry else { continue };
+            let mut count = 0;
+            for g in &sum_geoms {
+                if unigis_geometry::intersection(g, bg)?.is_some() {
+                    count += 1;
+                }
+            }
+            let mut attributes = Vec::new();
+            if multi {
+                attributes.push(Value::Double(*shown));
+            }
+            attributes.extend(row.attributes.iter().cloned());
+            if !multi {
+                attributes.push(Value::Double(*shown));
+            }
+            attributes.push(Value::Integer(count));
+            let feature = Feature {
+                oid: 0,
+                geometry: b.geometry.clone(),
+                attributes,
+            };
+            if count > 0 {
+                hit.push(feature);
+            } else {
+                miss.push(feature);
+            }
+        }
+    }
+    // Features with summary features come first, then the others (observed, as in Summarize
+    // Within); ONLY_INTERSECTING drops the others.
+    let mut features = hit;
+    if keep_all {
+        features.extend(miss);
+    }
+    for (i, f) in features.iter_mut().enumerate() {
+        f.oid = i as i64;
+    }
+    Ok(ToolOutput {
+        kind: GeometryKind::Polygon,
+        has_z: false,
+        has_m: false,
+        fields,
+        spatial_reference_wkt: wkt.map(str::to_owned),
+        features,
+        messages: Vec::new(),
+    })
+}
+
+pub const SUMMARIZE_NEARBY: Tool = Tool {
+    id: "summarize_nearby",
+    name: "Summarize Nearby",
+    toolbox: "Analysis › Summary",
+    summary: "Buffers features and counts the point features that meet each buffer (ArcGIS Pro Summarize Nearby, straight line).",
+    params: &[
+        Param {
+            name: "input",
+            label: "Input Features",
+            kind: Kind::Features,
+            required: true,
+            default: "",
+            help: "",
+        },
+        Param {
+            name: "sum_features",
+            label: "Input Summary Features",
+            kind: Kind::Features,
+            required: true,
+            default: "",
+            help: "",
+        },
+        Param {
+            name: "near_type",
+            label: "Nearby Type",
+            kind: Kind::Choice(&["STRAIGHT_LINE"]),
+            required: false,
+            default: "STRAIGHT_LINE",
+            help: "",
+        },
+        Param {
+            name: "distances",
+            label: "Distances",
+            kind: Kind::Text,
+            required: true,
+            default: "",
+            help: "Semicolon-separated, e.g. `50;150`.",
+        },
+        Param {
+            name: "distance_unit",
+            label: "Distance Units",
+            kind: Kind::Text,
+            required: false,
+            default: "Meters",
+            help: "",
+        },
+        Param {
+            name: "keep_all",
+            label: "Keep All Input Features",
+            kind: Kind::Choice(&["KEEP_ALL", "ONLY_INTERSECTING"]),
+            required: false,
+            default: "KEEP_ALL",
+            help: "",
+        },
+        Param {
+            name: "add_shape_sum",
+            label: "Add Shape Summary Attributes",
+            kind: Kind::Choice(&["NO_SHAPE_SUM", "ADD_SHAPE_SUM"]),
+            required: false,
+            default: "NO_SHAPE_SUM",
+            help: "",
+        },
+    ],
+    output_suffix: "Nearby",
+    measures: true,
+    run: Runner::Features(summarize_nearby),
+};
