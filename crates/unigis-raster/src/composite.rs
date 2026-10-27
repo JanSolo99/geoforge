@@ -86,25 +86,55 @@ pub fn composite_bands(inputs: &[Raster]) -> Result<Raster> {
     } else {
         DataType::U8
     };
-    let fallback = data_type.store(match data_type {
-        DataType::F32 | DataType::F64 => 3.4e38,
-        DataType::U8 => u8::MAX as f64,
-        DataType::I8 => i8::MAX as f64,
-        DataType::U16 => u16::MAX as f64,
+    // ArcGIS chooses the highest *tagged input's* pixel-type rank for its
+    // default sentinel, independently of output promotion. Signed follows
+    // unsigned at each width; e.g. tagged I16 + U16 chooses I16's default.
+    let fallback_type = inputs
+        .iter()
+        .filter(|r| r.nodata.is_some())
+        .max_by_key(|r| match r.data_type {
+            DataType::U8 => 0,
+            DataType::I8 => 1,
+            DataType::U16 => 2,
+            DataType::I16 => 3,
+            DataType::U32 => 4,
+            DataType::I32 => 5,
+            DataType::F32 => 6,
+            DataType::F64 => 7,
+        })
+        .map(|r| r.data_type);
+    let fallback = fallback_type.map(|t| match t {
+        DataType::F32 => f64::from(3.4e38_f32),
+        DataType::F64 => 1.79e308,
+        // ArcGIS can write an integer NoData tag outside the pixel range.
+        // Preserve those tags rather than clamping them to a valid cell value.
+        DataType::U8 | DataType::I8 => 256.0,
+        DataType::U16 => 65536.0,
         DataType::I16 => i16::MAX as f64,
-        DataType::U32 => u32::MAX as f64,
-        DataType::I32 => i32::MAX as f64,
+        DataType::U32 | DataType::I32 => i32::MAX as f64,
     });
     // ArcGIS retains stored cell values and takes the global TIFF NoData from the
     // final input. If that input has none but earlier inputs do, use the default.
     // Consequently reversing inputs can expose an earlier band's old sentinel.
-    let mut nodata = inputs
-        .last()
-        .and_then(|r| r.nodata)
-        .map(|v| data_type.store(v));
-    if nodata.is_none() && inputs.iter().any(|r| r.nodata.is_some()) {
-        nodata = Some(fallback);
-    }
+    let last = inputs.last().expect("nonempty inputs were validated");
+    let nodata = last
+        .nodata
+        .map(|v| {
+            if last.data_type == DataType::U32
+                && data_type == DataType::F64
+                && (0.0..=f64::from(u32::MAX)).contains(&v)
+                && v.fract() == 0.0
+            {
+                // ArcGIS exports the U32 sentinel through a signed 32-bit value
+                // when promoting its cells to F64 (2^31 becomes -2^31).
+                f64::from(v as u32 as i32)
+            } else if data_type == DataType::F32 {
+                f64::from(v as f32)
+            } else {
+                v
+            }
+        })
+        .or(fallback);
     let mut bands = Vec::with_capacity(band_count);
     for raster in inputs {
         for source in &raster.bands {
@@ -124,9 +154,9 @@ pub fn composite_bands(inputs: &[Raster]) -> Result<Raster> {
                             source[source_row as usize * raster.width + source_col as usize],
                         ));
                     } else {
-                        // With no NoData tag on any input ArcGIS pads with zero,
-                        // preserving both the absent tag and valid maximum values.
-                        band.push(nodata.unwrap_or(0.0));
+                        // Padding follows this source's sentinel (or zero), even
+                        // when the final TIFF uses a different global NoData tag.
+                        band.push(raster.nodata.unwrap_or(0.0));
                     }
                 }
             }

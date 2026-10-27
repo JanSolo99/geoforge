@@ -1,6 +1,13 @@
 {
-  "fetched": "2026-10-27T14:24:15+00:00",
+  "fetched": "2026-10-27T15:03:39+00:00",
   "runs": [
+    {
+      "conclusion": "success",
+      "createdAt": "2026-10-27T14:35:14Z",
+      "displayTitle": "Add Composite Bands with complete pixel-type and multiband reference \u2026",
+      "status": "completed",
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40522528614"
+    },
     {
       "conclusion": "success",
       "createdAt": "2026-10-27T14:07:16Z",
@@ -49,13 +56,6 @@
       "displayTitle": "Add Create Constant Raster with ArcGIS reference cases",
       "status": "completed",
       "url": "https://github.com/JanSolo99/geoforge/actions/runs/40505005442"
-    },
-    {
-      "conclusion": "success",
-      "createdAt": "2026-10-27T12:29:35Z",
-      "displayTitle": "Add In List with ArcGIS reference cases",
-      "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40504168059"
     }
   ]
 }
