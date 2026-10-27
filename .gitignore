@@ -5,3 +5,4 @@
 /testdata/large/
 .docs-cache/
 __pycache__/
+*.sr.lock
