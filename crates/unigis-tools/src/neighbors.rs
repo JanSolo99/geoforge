@@ -1060,3 +1060,224 @@ pub const GRID_INDEX_FEATURES: Tool = Tool {
     measures: true,
     run: Runner::Features(grid_index_features),
 };
+
+/// Summarize Within: for each polygon, the number of the summary features (points, lines or
+/// polygons) that meet it and statistics of their fields; lines and polygons can add the length
+/// or area inside. KEEP_ALL lists the polygons that have features first, then the others, each in
+/// input order (observed); ONLY_INTERSECTING drops the latter.
+fn summarize_within(ctx: &dyn Context) -> Result<ToolOutput> {
+    let polygons = ctx.features("input")?;
+    let sums = ctx.features("sum_features")?;
+    if polygons.geometry_kind() != Some(GeometryKind::Polygon) {
+        return Err(err(
+            "ERROR 000368: Invalid input data: polygons are required",
+        ));
+    }
+    let kind = sums.geometry_kind();
+    let (label, shape_name) = match kind {
+        Some(GeometryKind::Point | GeometryKind::Multipoint) => ("Point", None),
+        Some(GeometryKind::Polyline) => ("Polyline", Some("Length")),
+        Some(GeometryKind::Polygon) => ("Polygon", Some("Area")),
+        _ => return Err(err("ERROR 000368: Invalid input data")),
+    };
+    let keep_all = !ctx
+        .get("keep_all")
+        .is_some_and(|v| v.eq_ignore_ascii_case("ONLY_INTERSECTING"));
+    // (field index, statistic)
+    let mut stats: Vec<(usize, String)> = Vec::new();
+    for part in ctx.get("summary_fields").unwrap_or_default().split(';') {
+        let mut it = part.split_whitespace();
+        let (Some(name), Some(stat)) = (it.next(), it.next()) else {
+            continue;
+        };
+        let idx = sums
+            .fields()
+            .iter()
+            .position(|f| f.name.eq_ignore_ascii_case(name))
+            .ok_or_else(|| err(format!("ERROR 000728: Field {name} does not exist")))?;
+        stats.push((idx, stat.to_ascii_uppercase()));
+    }
+    let add_shape = ctx
+        .get("add_shape_sum")
+        .is_some_and(|v| v.eq_ignore_ascii_case("ADD_SHAPE_SUM"))
+        && shape_name.is_some();
+    if add_shape {
+        // ArcGIS measures these sums on the ellipsoid (a UTM line comes out 0.04 % longer than its
+        // planar length), which needs the projection engine.
+        return Err(err(
+            "ADD_SHAPE_SUM needs geodesic lengths and areas, which are not implemented yet",
+        ));
+    }
+    let (unit, factor) = (String::new(), 1.0);
+
+    let sum_rows: Vec<Feature> = sums.features().collect::<Result<_>>()?;
+    let value_of = |v: &Value| match v {
+        Value::SmallInteger(n) => Some(f64::from(*n)),
+        Value::Integer(n) => Some(f64::from(*n)),
+        Value::BigInteger(n) => Some(*n as f64),
+        Value::Single(n) => Some(f64::from(*n)),
+        Value::Double(n) => Some(*n),
+        _ => None,
+    };
+
+    let double = |name: String| {
+        let mut f = Field::new(name, FieldType::Double);
+        f.precision = 18;
+        f.scale = 11;
+        f
+    };
+    let mut fields = polygons.fields().to_vec();
+    for (idx, stat) in &stats {
+        fields.push(double(format!(
+            "{}_{}",
+            stat.to_ascii_lowercase(),
+            sums.fields()[*idx].name
+        )));
+    }
+    if add_shape {
+        fields.push(double(format!(
+            "sum_{}_{}",
+            shape_name.unwrap_or_default(),
+            unit.to_ascii_uppercase()
+        )));
+    }
+    fields.push(integer_field(&format!("{label}_Count")));
+
+    let mut hit: Vec<Feature> = Vec::new();
+    let mut miss: Vec<Feature> = Vec::new();
+    for poly in polygons.features() {
+        let poly = poly?;
+        let Some(pg) = &poly.geometry else { continue };
+        let mut members = Vec::new();
+        let mut shape_total = 0.0;
+        for s in &sum_rows {
+            let Some(sg) = &s.geometry else { continue };
+            let Some(part) = unigis_geometry::intersection(sg, pg)? else {
+                continue;
+            };
+            members.push(s);
+            if add_shape {
+                shape_total += if kind == Some(GeometryKind::Polygon) {
+                    unigis_geometry::area(&part)?
+                } else {
+                    unigis_geometry::length(&part)?
+                };
+            }
+        }
+        let mut attributes = poly.attributes.clone();
+        for (idx, stat) in &stats {
+            let vals: Vec<f64> = members
+                .iter()
+                .filter_map(|m| value_of(&m.attributes[*idx]))
+                .collect();
+            let n = vals.len() as f64;
+            let sum: f64 = vals.iter().sum();
+            let v = match stat.as_str() {
+                "SUM" => sum,
+                "MEAN" if n > 0.0 => sum / n,
+                "MIN" => vals.iter().copied().fold(f64::INFINITY, f64::min),
+                "MAX" => vals.iter().copied().fold(f64::NEG_INFINITY, f64::max),
+                "COUNT" => n,
+                "RANGE" => {
+                    vals.iter().copied().fold(f64::NEG_INFINITY, f64::max)
+                        - vals.iter().copied().fold(f64::INFINITY, f64::min)
+                }
+                "STD" if n > 1.0 => {
+                    let mean = sum / n;
+                    (vals.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / (n - 1.0)).sqrt()
+                }
+                _ => 0.0,
+            };
+            attributes.push(Value::Double(if v.is_finite() { v } else { 0.0 }));
+        }
+        if add_shape {
+            attributes.push(Value::Double(shape_total * factor));
+        }
+        attributes.push(Value::Integer(members.len() as i32));
+        let row = Feature {
+            oid: 0,
+            geometry: poly.geometry.clone(),
+            attributes,
+        };
+        if members.is_empty() {
+            miss.push(row);
+        } else {
+            hit.push(row);
+        }
+    }
+    if keep_all {
+        hit.extend(miss);
+    }
+    for (i, f) in hit.iter_mut().enumerate() {
+        f.oid = i as i64;
+    }
+    Ok(ToolOutput {
+        kind: GeometryKind::Polygon,
+        has_z: false,
+        has_m: false,
+        fields,
+        spatial_reference_wkt: polygons.spatial_reference_wkt().map(str::to_owned),
+        features: hit,
+        messages: Vec::new(),
+    })
+}
+
+pub const SUMMARIZE_WITHIN: Tool = Tool {
+    id: "summarize_within",
+    name: "Summarize Within",
+    toolbox: "Analysis › Summary",
+    summary: "Counts and summarizes the features inside each polygon (ArcGIS Pro Summarize Within, planar).",
+    params: &[
+        Param {
+            name: "input",
+            label: "Input Polygons",
+            kind: Kind::Features,
+            required: true,
+            default: "",
+            help: "",
+        },
+        Param {
+            name: "sum_features",
+            label: "Input Summary Features",
+            kind: Kind::Features,
+            required: true,
+            default: "",
+            help: "",
+        },
+        Param {
+            name: "keep_all",
+            label: "Keep All Polygons",
+            kind: Kind::Choice(&["KEEP_ALL", "ONLY_INTERSECTING"]),
+            required: false,
+            default: "KEEP_ALL",
+            help: "",
+        },
+        Param {
+            name: "summary_fields",
+            label: "Summary Fields",
+            kind: Kind::Text,
+            required: false,
+            default: "",
+            help: "`Field Statistic;Field Statistic`.",
+        },
+        Param {
+            name: "add_shape_sum",
+            label: "Add Shape Summary Attributes",
+            kind: Kind::Choice(&["NO_SHAPE_SUM", "ADD_SHAPE_SUM"]),
+            required: false,
+            default: "NO_SHAPE_SUM",
+            help: "",
+        },
+        Param {
+            name: "shape_unit",
+            label: "Shape Unit",
+            kind: Kind::Text,
+            required: false,
+            default: "",
+            help: "e.g. Meters, Square meters.",
+        },
+    ],
+    output_suffix: "Summary",
+    measures: true,
+    run: Runner::Features(summarize_within),
+};

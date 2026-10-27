@@ -995,6 +995,8 @@ CASES = {
     "cc_odd6": ("gp.CreateConstantRaster_sa", [5], ["INTEGER", 6, "500000 5000000 500100 5000050"]),
     "cc_v200": ("gp.CreateConstantRaster_sa", [200], ["INTEGER", 10, "500000 5000000 500100 5000050"]),
     "cc_neg1": ("gp.CreateConstantRaster_sa", [-1], ["INTEGER", 10, "500000 5000000 500100 5000050"]),
+    "sw_parcels_wells": ("analysis.SummarizeWithin", [DATA / "parcels.shp", DATA / "wells.shp"], ["KEEP_ALL", "DEPTH SUM;DEPTH MEAN"]),
+    "sw_parcels_wells_only": ("analysis.SummarizeWithin", [DATA / "parcels.shp", DATA / "wells.shp"], ["ONLY_INTERSECTING"]),
     "gpal_roads_50": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "NO_END_POINTS"]),
     "gpal_roads_50_end": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "END_POINTS"]),
     "gpal_roads_pct": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["PERCENTAGE", "", 25, "NO_END_POINTS"]),
@@ -1177,6 +1179,7 @@ RUN = {
     "gp.Popularity_sa": ("popularity", ["rank", "rasters", "output"]),
     "gp.InList_sa": ("in_list", ["input", "list", "output"]),
     "gp.CreateConstantRaster_sa": ("create_constant_raster", ["constant", "output", "data_type", "cell_size", "extent"]),
+    "analysis.SummarizeWithin": ("summarize_within", ["input", "sum_features", "output", "keep_all", "summary_fields", "add_shape_sum", "shape_unit"]),
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
     "analysis.CountOverlappingFeatures": ("count_overlapping_features", ["input", "output", "minimum_overlap_count"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
@@ -1209,6 +1212,8 @@ TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable", "conversion.R
 # Tools whose output is a table, written as <name>.dbf.
 TABLE_OUT = {"management.CopyRows", "gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa", "gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
              "management.TransposeFields", "management.PivotTable", "management.CreateTable", "analysis.PolygonNeighbors", "analysis.TabulateIntersection", "analysis.TableSelect"}
+# Tools whose ArcGIS output must be a geodatabase feature class or memory (copied to a shapefile).
+MEMORY_OUT = {"analysis.SummarizeWithin"}
 # Tools that take the output folder and name rather than a path.
 CREATE_TOOLS = {"management.CreateFeatureclass", "management.CreateTable"}
 
@@ -1319,7 +1324,16 @@ def main():
             args = [str(before[0]), str(out.parent), out.stem] + after
         else:
             args = [str(a) for a in before] + [str(out)] + [str(a) if isinstance(a, Path) else a for a in after]
+        if tool in MEMORY_OUT:
+            # These tools write only to a geodatabase or memory: run into memory, then copy.
+            mem = f"memory/{name}"
+            args = [mem if a == str(out) else a for a in args]
         r = w.call("run_tool", tool=tool, args=args, env={"overwriteOutput": True})
+        if tool in MEMORY_OUT and r.get("status") == "succeeded":
+            r2 = w.call("run_tool", tool="management.CopyFeatures", args=[mem, str(out)], env={"overwriteOutput": True})
+            w.call("python", code=f"arcpy.management.Delete('{mem}')")
+            if r2.get("status") != "succeeded":
+                r = r2
         if tool in WORKSPACE_OUT:
             outputs = {}
             for shp in sorted(out.glob("*.shp")):

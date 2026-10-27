@@ -2220,6 +2220,7 @@ pub static TOOLS: &[Tool] = &[
     crate::neighbors::CREATE_THIESSEN_POLYGONS,
     crate::neighbors::SIMPLIFY_LINE,
     crate::neighbors::GRID_INDEX_FEATURES,
+    crate::neighbors::SUMMARIZE_WITHIN,
     crate::neighbors::POLYGON_NEIGHBORS,
     crate::neighbors::COUNT_OVERLAPPING_FEATURES,
 ];

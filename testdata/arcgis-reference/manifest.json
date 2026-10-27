@@ -47250,6 +47250,166 @@
           "extent": "500000 5000000 500100 5000050"
         }
       }
+    },
+    "sw_parcels_wells": {
+      "tool": "analysis.SummarizeWithin",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "KEEP_ALL",
+        "DEPTH SUM;DEPTH MEAN"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "sum_DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "mean_DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Point_Coun",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "summarize_within",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "sum_features": "testdata/geoproc/wells.shp",
+          "output": "<out>",
+          "keep_all": "KEEP_ALL",
+          "summary_fields": "DEPTH SUM;DEPTH MEAN"
+        }
+      }
+    },
+    "sw_parcels_wells_only": {
+      "tool": "analysis.SummarizeWithin",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "ONLY_INTERSECTING"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "Point_Coun",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "summarize_within",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "sum_features": "testdata/geoproc/wells.shp",
+          "output": "<out>",
+          "keep_all": "ONLY_INTERSECTING"
+        }
+      }
     }
   }
 }
