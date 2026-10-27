@@ -725,3 +725,5 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] CLI tool inventory exits cleanly when a pipe consumer closes stdout early; ordinary listing still exposes every registered tool. Deterministic closed-output regression test covers the former panic.
 
 - [x] ASCII To Raster / Float To Raster (`ug run ascii_to_raster|float_to_raster`): native header/value decoding, S32 truncation/F32 output, system NoData replacement, center/corner origins and both binary byte orders. 35 ArcGIS success/error cases, exact converted pixels, and a read-only failure guard; projection sidecars ignored as in the legacy ArcGIS tools. Limits: `scripts/research/grid_import/README.md`.
+
+- [x] Raster Define Projection (`ug run define_projection`): EPSG assignment/replacement without changing cells or grid, five ArcGIS cases and multiband/in-place/failure safety tests. GeoTIFF geographic keys now recognize GDA2020 and other geographic EPSG identifiers outside 4000..4999; raw-key and GDAL format checks cover both geographic and projected systems. Limits: `scripts/research/raster_crs/README.md`.

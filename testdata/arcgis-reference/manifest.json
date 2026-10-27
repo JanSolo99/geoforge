@@ -54285,6 +54285,106 @@
           "output": "<out>"
         }
       }
+    },
+    "defras_4326": {
+      "tool": "management.DefineProjection",
+      "args": [
+        "testdata/arcgis-reference/ascimp_small_integer.tif",
+        4326,
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "define_projection",
+        "params": {
+          "input": "testdata/arcgis-reference/ascimp_small_integer.tif",
+          "coordinate_system": 4326,
+          "output": "<out>"
+        }
+      }
+    },
+    "defras_32633": {
+      "tool": "management.DefineProjection",
+      "args": [
+        "testdata/arcgis-reference/ascimp_small_integer.tif",
+        32633,
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "define_projection",
+        "params": {
+          "input": "testdata/arcgis-reference/ascimp_small_integer.tif",
+          "coordinate_system": 32633,
+          "output": "<out>"
+        }
+      }
+    },
+    "defras_3857": {
+      "tool": "management.DefineProjection",
+      "args": [
+        "testdata/arcgis-reference/ascimp_small_integer.tif",
+        3857,
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "define_projection",
+        "params": {
+          "input": "testdata/arcgis-reference/ascimp_small_integer.tif",
+          "coordinate_system": 3857,
+          "output": "<out>"
+        }
+      }
+    },
+    "defras_7844": {
+      "tool": "management.DefineProjection",
+      "args": [
+        "testdata/arcgis-reference/ascimp_small_integer.tif",
+        7844,
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "define_projection",
+        "params": {
+          "input": "testdata/arcgis-reference/ascimp_small_integer.tif",
+          "coordinate_system": 7844,
+          "output": "<out>"
+        }
+      }
+    },
+    "defras_7856": {
+      "tool": "management.DefineProjection",
+      "args": [
+        "testdata/arcgis-reference/ascimp_small_integer.tif",
+        7856,
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "define_projection",
+        "params": {
+          "input": "testdata/arcgis-reference/ascimp_small_integer.tif",
+          "coordinate_system": 7856,
+          "output": "<out>"
+        }
+      }
     }
   }
 }

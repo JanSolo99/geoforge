@@ -35,7 +35,7 @@ Limits: TIFF output, finite numeric headers/cells, values fitting the chosen out
 representation; INTEGER overflow and non-finite data are explicitly refused pending
 probes. Compressed float streams, additional header dialects and nondefault storage
 or statistics environments are unsupported. Projection assignment is a separate step;
-current root Define Projection implementation only handles feature data.
+root Define Projection now supports GeoTIFF EPSG assignment (see ../raster_crs/README.md).
 
 Local ephemeral logs:
 - /tmp/unigis-raster-import-{research,extra-research,empty-research}.log: exploratory probes.

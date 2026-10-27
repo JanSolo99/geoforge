@@ -1,0 +1,102 @@
+[
+  {
+    "code": 4326,
+    "status": "succeeded",
+    "epsg": 4326,
+    "pixelType": "S32",
+    "nodata": -2147483647.0,
+    "values": [
+      [
+        -2147483647,
+        0,
+        1
+      ],
+      [
+        127,
+        128,
+        255
+      ]
+    ],
+    "messages": "Start Time: Wednesday, October 28, 2026 3:24:02 AM\nSucceeded at Wednesday, October 28, 2026 3:24:02 AM (Elapsed Time: 0.17 seconds)"
+  },
+  {
+    "code": 32633,
+    "status": "succeeded",
+    "epsg": 32633,
+    "pixelType": "S32",
+    "nodata": -2147483647.0,
+    "values": [
+      [
+        -2147483647,
+        0,
+        1
+      ],
+      [
+        127,
+        128,
+        255
+      ]
+    ],
+    "messages": "Start Time: Wednesday, October 28, 2026 3:24:02 AM\nSucceeded at Wednesday, October 28, 2026 3:24:02 AM (Elapsed Time: 0.16 seconds)"
+  },
+  {
+    "code": 3857,
+    "status": "succeeded",
+    "epsg": 3857,
+    "pixelType": "S32",
+    "nodata": -2147483647.0,
+    "values": [
+      [
+        -2147483647,
+        0,
+        1
+      ],
+      [
+        127,
+        128,
+        255
+      ]
+    ],
+    "messages": "Start Time: Wednesday, October 28, 2026 3:24:02 AM\nSucceeded at Wednesday, October 28, 2026 3:24:02 AM (Elapsed Time: 0.17 seconds)"
+  },
+  {
+    "code": 7844,
+    "status": "succeeded",
+    "epsg": 7844,
+    "pixelType": "S32",
+    "nodata": -2147483647.0,
+    "values": [
+      [
+        -2147483647,
+        0,
+        1
+      ],
+      [
+        127,
+        128,
+        255
+      ]
+    ],
+    "messages": "Start Time: Wednesday, October 28, 2026 3:24:02 AM\nSucceeded at Wednesday, October 28, 2026 3:24:03 AM (Elapsed Time: 0.16 seconds)"
+  },
+  {
+    "code": 7856,
+    "status": "succeeded",
+    "epsg": 7856,
+    "pixelType": "S32",
+    "nodata": -2147483647.0,
+    "values": [
+      [
+        -2147483647,
+        0,
+        1
+      ],
+      [
+        127,
+        128,
+        255
+      ]
+    ],
+    "messages": "Start Time: Wednesday, October 28, 2026 3:24:03 AM\nSucceeded at Wednesday, October 28, 2026 3:24:03 AM (Elapsed Time: 0.17 seconds)"
+  }
+]

@@ -2676,6 +2676,19 @@ fn main() -> ExitCode {
                 None if reports => String::new(),
                 None => return Err(Error::Unsupported("output=<path> is required".into())),
             };
+            if spec.id == "define_projection"
+                && map.get("input").is_some_and(|p| {
+                    Path::new(p).extension().is_some_and(|e| {
+                        e.eq_ignore_ascii_case("tif") || e.eq_ignore_ascii_case("tiff")
+                    })
+                })
+            {
+                let input = Path::new(&map["input"]);
+                let coordinate_system = map.get("coordinate_system").ok_or_else(|| {
+                    Error::Unsupported("ERROR 000735: Coordinate System: Value is required".into())
+                })?;
+                return define_raster_projection(input, Path::new(&output), coordinate_system);
+            }
             struct Args(std::collections::HashMap<String, String>);
             impl registry::Context for Args {
                 fn get(&self, name: &str) -> Option<String> {
@@ -6257,6 +6270,46 @@ fn write_raster_plain(path: &Path, raster: &unigis_raster::Raster) -> Result<()>
 fn write_raster_basin(path: &Path, raster: &unigis_raster::Raster) -> Result<()> {
     write_raster_with(path, raster, false)?;
     unigis_raster::stats::write_aux_statistics_count(path, raster, Some(0))
+}
+
+fn define_raster_projection(input: &Path, output: &Path, coordinate_system: &str) -> Result<()> {
+    let normalized = coordinate_system.trim().to_ascii_uppercase();
+    let code: u32 = normalized
+        .strip_prefix("EPSG:")
+        .unwrap_or(&normalized)
+        .parse()
+        .map_err(|_| {
+            Error::Unsupported(
+                "Raster Define Projection currently requires a numeric EPSG code".into(),
+            )
+        })?;
+    if code == 0 || code >= u32::from(u16::MAX) {
+        return Err(Error::Unsupported(
+            "EPSG code cannot be represented by this GeoTIFF writer".into(),
+        ));
+    }
+    let crs = unigis_proj::Crs::parse(&format!("EPSG:{code}"))?;
+    if !crs.esri_wkt().starts_with("GEOGCS[") && !crs.esri_wkt().starts_with("PROJCS[") {
+        return Err(Error::Unsupported(
+            "Raster Define Projection requires a geographic or projected CRS".into(),
+        ));
+    }
+    for path in [input, output] {
+        let aux = std::path::PathBuf::from(format!("{}.aux.xml", path.display()));
+        match std::fs::read_to_string(&aux) {
+            Ok(xml) if xml.contains("<SRS") => {
+                return Err(Error::Unsupported(
+                    "Raster Define Projection does not yet update auxiliary SRS overrides".into(),
+                ));
+            }
+            Err(e) if e.kind() != std::io::ErrorKind::NotFound => return Err(Error::io(&aux, e)),
+            _ => {}
+        }
+    }
+    let mut raster = unigis_raster::read_geotiff(input)?;
+    let statistics = raster.statistics.is_some();
+    raster.epsg = Some(code);
+    write_raster_with(output, &raster, statistics)
 }
 
 fn write_raster_with(path: &Path, raster: &unigis_raster::Raster, statistics: bool) -> Result<()> {

@@ -539,7 +539,7 @@ pub(crate) fn geo_keys(epsg: Option<u32>) -> Vec<u16> {
     let mut keys: Vec<u16> = vec![1, 1, 0, 0];
     let mut key = |id: u16, value: u16| keys.extend([id, 0, 1, value]);
     match epsg {
-        Some(code) if is_geographic_code(code) => {
+        Some(code) if code <= u16::MAX as u32 && is_geographic_code(code) => {
             key(GT_MODEL_TYPE, 2);
             key(GT_RASTER_TYPE, 1);
             key(GEOGRAPHIC_TYPE, code as u16);
@@ -566,7 +566,9 @@ pub(crate) fn format_nodata(v: f64, data_type: DataType) -> String {
     }
 }
 
-/// EPSG geographic 2D CRS codes live in 4000–4999 (e.g. 4326, 4283).
+/// EPSG identifiers are not a coordinate-system type range (e.g. GDA2020 is 7844).
 fn is_geographic_code(code: u32) -> bool {
-    (4000..5000).contains(&code)
+    crate::geographic_crs::GEOGRAPHIC_EPSG
+        .binary_search(&code)
+        .is_ok()
 }

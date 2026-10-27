@@ -1,90 +1,50 @@
 # Current handoff
 
-Updated 2026-10-27T16:17:37+00:00; last agent Codex.
-Workspace /mnt/media/ArcGIS_Linux; branch main; HEAD a646c78, PUSHED/verified
- a646c78aae9bfd94ac13e049370fc150bfe8caf3. User authorizes ongoing commits/pushes.
-Do not launch another agent, CLI session or coordinator.
+Updated 2026-10-27T19:03:59+00:00; last agent Codex. Workspace /mnt/media/ArcGIS_Linux;
+branch main; HEAD bec6e20, verified origin/main matches via git ls-remote.
+User authorizes continuous development, tested commits, pushes and dashboard updates.
+Do not launch another agent, CLI or coordinator. Cargo -j3, sequential builds.
 
-## Objective
+## Completed / inherited
 
-Keep developing, testing, committing, pushing and updating dashboard while user sleeps,
-without repeated continue prompts, until unable. Prior Claude usage-limit run recovered
-from .git/agent-coordinator/20261027T101238-693a3583/. Basemaps/branding/docking already
-landed; old chat requests are stale. Current work is root native engine/CLI breadth.
+Prior run pushed Graphic Buffer48 cases, Composite Bands125 cases, dashboard fixes,
+closed stdout handling, and ASCII/Float imports35 cases (bec6e20). Import check and
+push gate passed180 Rust tests/5ignored/8Python. Basemaps/branding/docking already landed.
+Old handoff incorrectly called importer push pending; remote verifies complete.
 
-## Completed and pushed this Codex run
+## Active work
 
-- d66383c / cdc23aa / c3abd4a: finish inherited Graphic Buffer, caps/joins/holes,
-  miter-limit bevel fallback, erosion/zero polygons, numeric field replacement,
-  numeric/text distances, units and safety guards. 48 ArcGIS cases +3 refusal tests.
-- ebc2d2d / 735d4f3: accurate dashboard reference coverage; cached CI survives
-  offline hooks, fetch timestamp/latest gaps, 8 Python tests.
-- d29a79a / eeffa40 / a646c78: Composite Bands (125 cases), true typed U32/F64
-  fixtures, all-band exact pixel/statistics comparisons, type promotion, NoData
-  tagged-input ranking, signed U32 sentinel export, per-source and zero padding.
-  Initial AAIGrid fixture inference narrowed values; corrected typed arrays and
-  read-back verification now cover all23 fixtures. Detailed research/composite/README.md.
-- bab1f21: ug tools closed stdout no longer panics; deterministic regression test.
-  Normal inventory retains every registered tool; pipefail ug tools | head succeeds.
-CI through d29a79a SUCCESS; refresh CI status for later pushes. a646c78 push gate
-passed179 Rust tests,5 ignored,8 Python,fmt/clippy; /tmp/unigis-composite-outside-push.log.
-
-## Current slice: ASCII To Raster / Float To Raster (validated, committing next)
-
-New crates/unigis-raster/src/grid_import.rs, lib/registry registration, CLI exact
-import pixel comparison and input-preservation test tests/grid_import.rs. 35 saved
-cases (31 successes,4 expected errors), generator CASES/RUN/RASTER_OUT, manifest,
-ascimp_* / fltimp_* results and raw input files under testdata/raster/grid_import.
-Research/reproducer: scripts/research/grid_import/README.md, make_inputs.py, probe*.py,
-observations.json. No new dependencies or GDAL runtime.
-
-ArcGIS observations implemented: INTEGER S32 truncates fractions, FLOAT/binary F32;
-system NoData S32 -2147483647 / F32 min. ASCII compares raw doubles before conversion,
-binary normalizes header NoData to F32. Corner/center origins, endian choices,
-default ND-9999/defaultLSB. Short data010067; missing float header010062; extras
-ignored. Projection sidecars deliberately ignored (ArcGIS legacy behavior).
-
-Important oracle side-effect: bad FloatToRaster probe deleted its INPUT header.
-Generator now isolates both legacy import tools on temporary copies incl sidecars;
-restored original HDR and regenerated error cases. Native importer is READ ONLY;
-regression asserts input/header byte preservation and no partial output.
-Limits in KNOWN_GAPS/README: finite standard headers/cells, fitting INTEGER/F32,
-no compression/additional dialects/nondefault environments. CRS assignment separate.
-
-## Validation / processes
-
-- Initial clippy PASS /tmp/unigis-raster-import-clippy.log.
-- Oracle generation /tmp/unigis-raster-import-generation.log, corrected short/missing
-  generation /tmp/unigis-raster-import-short-generation.log; all expected outcomes.
-- FINAL scripts/check PASS exit0 /tmp/unigis-raster-import-check.log: 180 passed,
-  0 failed,5 ignored,81 groups;8 Python tests,fmt,workspace/all-target clippy-Dwarnings.
-  Includes every import pixel exactly,125 Composite cases,48 Graphic Buffer cases,
-  later-band corruption, closed-output and input-preservation guards.
-- No running Cargo/ArcGIS processes. Importer source/docs/fixtures UNSTAGED currently.
-- Root docs read; actual ug tools inventory confirmed both imports absent before work.
+Inherited UNCOMMITTED raster Define Projection CLI dispatch/helper (main.rs), public
+PROJ/EPSG geographic classification table/generator and geotiff.rs metadata fix.
+Five successful ArcGIS probes preserve pixels/type/grid/NoData with EPSG
+4326/32633/3857/7844/7856, saved research/raster_crs/define_observations.json.
+GDAL can repair the old wrong GDA2020 GeoKeys by EPSG lookup: test RAW keys too.
+This session added defras_* generator cases/native mapping; all five oracle cases
+succeeded. Raw GeoKey/GDAL test and CLI preservation/refusal test added. Scoped CLI
+test PASS (two F64 bands, in-place and invalid/aux SRS guards). First scripts/check
+stopped on clippy chunks_exact_to_as_chunks in new test; corrected, full gate rerunning.
+Logs /tmp/unigis-raster-crs-{generation,scoped,check,dashboard}.log.
+ROADMAP/KNOWN_GAPS/research README and dashboard CI cache refreshed.
+Latest prior importer CI SUCCESS: https://github.com/JanSolo99/geoforge/actions/runs/40540613972
+Dashboard JavaScript node --check and manifest mapping assertions passed.
+FINAL scripts/check PASS: 182 Rust passed,5 ignored,0 failed;8 Python,fmt,clippy.
+New raw GeoKey/GDAL checks and five manifest cases included.
+Exploratory multiband CopyRaster probe currently waiting (session26825), outputs
+under /tmp/unigis_cpr_*; /tmp/unigis-copy-bands-probe.log. No source edits yet.
+Source review found copy_raster uses input.like and band0 only; next slice should
+verify/fix multiband preservation after this checkpoint push.
+Support is standard GeoTIFF and validated numeric EPSG; no custom WKT/aux SRS override.
 
 ## Next actions
 
-1. Refresh dashboard --ci, validate generated JSON/JS, stage only importer paths,
-   commit and push normally through required gate. Verify remote SHA/CI.
-2. Continue raster projection assignment: root define_projection currently opens
-   features only (crates/unigis-tools/src/dm_tools.rs:225). New legacy imports produce
-   unknown CRS by design, so this is a useful next capability. Probe ArcGIS first.
-3. When working on raster CRS encoding, inspect geotiff.rs::is_geographic_code:
-   current4000..4999 heuristic misses GDA2020 EPSG7844 (not tested/fixed yet).
-   A pure EPSG classification table from public PROJ database could fix metadata
-   without adding runtime GDAL/PROJ dependencies to the raster format engine.
-4. Continue bounded tested slices/commits/pushes/dashboard, no repeated user prompts.
+1. Commit and push validated raster projection slice through normal pre-push gate.
+2. Finish compact ArcGIS multiband CopyRaster probes and save reference cases.
+3. Fix confirmed band loss, run root gate, refresh dashboard, commit/push.
+4. Continue bounded native engine slices; checkpoint after validation/commit/push.
 
-## Durable context / preserve
+## Preserve unrelated files
 
-Research: scripts/research/{graphic_buffer,composite,grid_import,sa_batch}/README.md.
-Read ROADMAP/KNOWN_GAPS before next scope. Registry+generator RUN+saved cases is the
-new tool workflow. scripts/check pre-push mandatory, no bypass. Cargo-j3, no overlapping
-builds, no local full app CI for root-only work. Post-commit rebuilds dashboard offline
-from cached CI, leaving HTML dirty by design. Do not launch agents/coordinators.
-
-Preserve/exclude unrelated aux.xml in testdata/geoproc/raster, deleted *.sr.lock,
-.worktrees/, NOTES.md, scratch_cf.tif, scratch_trend_rms.txt.xml. DO NOT read/use NOTES.md
-(proprietary reverse-engineering material). No reset/stash/worktree transfer or external
-messaging performed.
+Exclude testdata/geoproc/raster aux.xml edits, deleted *.sr.lock, .worktrees/,
+NOTES.md (DO NOT read/use: proprietary material), scratch_cf.tif,
+scratch_trend_rms.txt.xml and importer *.vat.* generated during oracle work.
+No running build/oracle processes at startup. Post-commit dashboard HTML dirt expected.

@@ -1,6 +1,13 @@
 {
-  "fetched": "2026-10-27T16:17:39+00:00",
+  "fetched": "2026-10-27T18:58:13+00:00",
   "runs": [
+    {
+      "conclusion": "success",
+      "createdAt": "2026-10-27T16:24:33Z",
+      "displayTitle": "Add native ASCII and binary Float raster imports with ArcGIS references",
+      "status": "completed",
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40540613972"
+    },
     {
       "conclusion": "success",
       "createdAt": "2026-10-27T15:58:23Z",
@@ -49,13 +56,6 @@
       "displayTitle": "Count only implemented tools in reference coverage and test the dashb\u2026",
       "status": "completed",
       "url": "https://github.com/JanSolo99/geoforge/actions/runs/40512020282"
-    },
-    {
-      "conclusion": "success",
-      "createdAt": "2026-10-27T12:57:55Z",
-      "displayTitle": "Add Summarize Nearby (points, single distance) with ArcGIS reference \u2026",
-      "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40507965518"
     }
   ]
 }

@@ -380,3 +380,50 @@ fn tiled_writer_with_overviews() {
         assert_eq!(back.bands, r.bands, "{name}: read back");
     }
 }
+
+/// Check stored keys directly: GDAL can repair inconsistent keys by EPSG lookup.
+#[test]
+fn epsg_geographic_keys_outside_the_old_numeric_range() {
+    let dir = tempdir("epsg-keys");
+    let mut raster = unigis_raster::Raster::new(1, 1, DataType::U8, [140., 1., 0., -30., 0., -1.]);
+    for (code, geographic) in [
+        (4326, true),
+        (7844, true),
+        (6318, true),
+        (32633, false),
+        (7856, false),
+    ] {
+        raster.epsg = Some(code);
+        let out = dir.join(format!("{code}.tif"));
+        write_geotiff(&out, &raster, Compression::None).unwrap();
+        let mut decoder = tiff::decoder::Decoder::new(std::io::BufReader::new(
+            std::fs::File::open(&out).unwrap(),
+        ))
+        .unwrap();
+        let keys = decoder
+            .find_tag(tiff::tags::Tag::GeoKeyDirectoryTag)
+            .unwrap()
+            .unwrap()
+            .into_u16_vec()
+            .unwrap();
+        let entries: Vec<_> = keys[4..].as_chunks::<4>().0.iter().collect();
+        let key = |id| {
+            entries
+                .iter()
+                .find(|entry| entry[0] == id)
+                .map(|entry| entry[3])
+        };
+        assert_eq!(
+            key(1024),
+            Some(if geographic { 2 } else { 1 }),
+            "EPSG:{code}"
+        );
+        assert_eq!(key(if geographic { 2048 } else { 3072 }), Some(code as u16));
+        assert_eq!(key(if geographic { 3072 } else { 2048 }), None);
+        assert_eq!(read_geotiff(&out).unwrap().epsg, Some(code));
+        if gdal_available() {
+            assert_eq!(gdal_read(&out, &dir).epsg, Some(code));
+        }
+    }
+    std::fs::remove_dir_all(dir).unwrap();
+}

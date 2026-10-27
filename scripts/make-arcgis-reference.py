@@ -1291,6 +1291,11 @@ CASES = {
     "cfc_template_same": ("management.CreateFeatureclass", ["POLYLINE", DATA / "roads_zm.shp", "SAME_AS_TEMPLATE", "SAME_AS_TEMPLATE"], []),
     "ct_default": ("management.CreateTable", [], []),
     "ct_template": ("management.CreateTable", [PARCELS], []),
+    "defras_4326": ("management.DefineProjection", [OUT / "ascimp_small_integer.tif", 4326], []),
+    "defras_32633": ("management.DefineProjection", [OUT / "ascimp_small_integer.tif", 32633], []),
+    "defras_3857": ("management.DefineProjection", [OUT / "ascimp_small_integer.tif", 3857], []),
+    "defras_7844": ("management.DefineProjection", [OUT / "ascimp_small_integer.tif", 7844], []),
+    "defras_7856": ("management.DefineProjection", [OUT / "ascimp_small_integer.tif", 7856], []),
     "defproj_prj": ("management.DefineProjection", [DM / "noprj.shp", DM / "chain.prj"], []),
     "defproj_wgs84": ("management.DefineProjection", [DM / "noprj.shp", DATA / "wells_wgs84.prj"], []),
     "defproj_replace": ("management.DefineProjection", [PARCELS, DATA / "wells_wgs84.prj"], []),
@@ -1404,6 +1409,8 @@ RUN = {
 
 def run_spec(tool, args):
     """The `run` entry of a manifest case: registry id and parameters (None and empty are left out)."""
+    if tool == "management.DefineProjection" and Path(str(args[0])).suffix.lower() in (".tif", ".tiff"):
+        return {"tool": "define_projection", "params": dict(zip(("input", "coordinate_system", "output"), args))}
     if tool not in RUN:
         return None
     rid, names = RUN[tool]
@@ -1510,7 +1517,8 @@ def main():
                 if isinstance(a, Path) and a.suffix == ".tif":
                     w.call("python", code=f"arcpy.management.BuildRasterAttributeTable(r'{win(a)}', 'Overwrite')")
         out = OUT / (f"{name}.dbf" if tool in TABLE_OUT else f"{name}.shp")
-        if tool in RASTER_OUT:
+        raster_projection = tool == "management.DefineProjection" and Path(str(before[0])).suffix.lower() in (".tif", ".tiff")
+        if tool in RASTER_OUT or raster_projection:
             out = OUT / f"{name}.tif"
         if tool in TEXT_OUT:
             out = OUT / (f"{name}.geojson" if "GEOJSON" in after else f"{name}.json")
@@ -1528,8 +1536,15 @@ def main():
             args = [str(out)] + [str(a) if isinstance(a, Path) else a for a in before + after]
         elif tool in IN_PLACE:
             k = IN_PLACE[tool]
-            w.call("run_tool", tool="management.CopyFeatures", args=[str(before[k]), str(out)],
-                   env={"overwriteOutput": True})
+            if raster_projection:
+                # CopyRaster can replace the NoData value; preserve source bytes.
+                shutil.copy2(before[k], out)
+                aux = Path(str(before[k]) + ".aux.xml")
+                if aux.exists():
+                    shutil.copy2(aux, Path(str(out) + ".aux.xml"))
+            else:
+                w.call("run_tool", tool="management.CopyFeatures", args=[str(before[k]), str(out)],
+                       env={"overwriteOutput": True})
             args = [str(out) if i == k else (a if isinstance(a, (list, int, float)) else str(a)) for i, a in enumerate(before)] + after
         elif tool == "management.MosaicToNewRaster":
             args = [before[0], str(out.parent), out.name] + after
@@ -1581,7 +1596,7 @@ def main():
             }
             print(f"{name}: {r.get('status')} {sorted(outputs)} {manifest['cases'][name]['messages']}")
             continue
-        d = w.call("describe", path=str(out)) if r.get("status") == "succeeded" and tool not in TEXT_OUT | RASTER_OUT else {}
+        d = w.call("describe", path=str(out)) if r.get("status") == "succeeded" and tool not in TEXT_OUT | RASTER_OUT and not raster_projection else {}
         manifest["cases"][name] = {
             "tool": tool,
             "args": [rel(a) for a in before] + ["<out>"] + [rel(a) for a in after],
