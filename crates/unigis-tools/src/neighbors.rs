@@ -861,3 +861,196 @@ pub const SIMPLIFY_LINE: Tool = Tool {
     measures: true,
     run: Runner::Features(simplify_line),
 };
+
+/// Whether the segment a-b has a point in the closed box (Liang-Barsky).
+fn segment_meets_box(a: [f64; 2], b: [f64; 2], x0: f64, y0: f64, x1: f64, y1: f64) -> bool {
+    let (mut t0, mut t1) = (0.0_f64, 1.0_f64);
+    let d = [b[0] - a[0], b[1] - a[1]];
+    for (p, q) in [
+        (-d[0], a[0] - x0),
+        (d[0], x1 - a[0]),
+        (-d[1], a[1] - y0),
+        (d[1], y1 - a[1]),
+    ] {
+        if p == 0.0 {
+            if q < 0.0 {
+                return false;
+            }
+        } else {
+            let t = q / p;
+            if p < 0.0 {
+                t0 = t0.max(t);
+            } else {
+                t1 = t1.min(t);
+            }
+            if t0 > t1 {
+                return false;
+            }
+        }
+    }
+    true
+}
+
+/// Row letters: A..Z, then AA, AB, ...
+fn page_letters(mut n: usize) -> String {
+    let mut s = Vec::new();
+    loop {
+        s.push(b'A' + (n % 26) as u8);
+        if n < 26 {
+            break;
+        }
+        n = n / 26 - 1;
+    }
+    s.reverse();
+    String::from_utf8(s).unwrap_or_default()
+}
+
+/// Grid Index Features: a grid of `width` by `height` cells anchored at the lower-left corner of
+/// the input's extent, covering it; cells are named by row (A from the top) and column (1 from
+/// the left) and numbered in that order. With INTERSECTFEATURE only the cells touching a
+/// feature are kept (and numbered).
+fn grid_index_features(ctx: &dyn Context) -> Result<ToolOutput> {
+    let fc = ctx.features("input")?;
+    let wkt = fc.spatial_reference_wkt();
+    let size = |name: &str| -> Result<f64> {
+        let v = ctx
+            .get(name)
+            .ok_or_else(|| err(format!("ERROR 000735: {name}: value is required")))?;
+        crate::registry::distance_in_units(&v, wkt)
+    };
+    let (width, height) = (size("polygon_width")?, size("polygon_height")?);
+    if !(width > 0.0 && height > 0.0) {
+        return Err(err("ERROR 000800: the cell size must be greater than zero"));
+    }
+    let intersect = ctx
+        .get("intersect_feature")
+        .is_some_and(|v| v.eq_ignore_ascii_case("INTERSECTFEATURE"));
+    let geoms: Vec<unigis_core::Geometry> = fc
+        .features()
+        .filter_map(|f| f.map(|f| f.geometry).transpose())
+        .collect::<Result<_>>()?;
+    let (mut x0, mut y0, mut x1, mut y1) = (f64::MAX, f64::MAX, f64::MIN, f64::MIN);
+    for g in &geoms {
+        let e = g.envelope();
+        x0 = x0.min(e.xmin);
+        y0 = y0.min(e.ymin);
+        x1 = x1.max(e.xmax);
+        y1 = y1.max(e.ymax);
+    }
+    if geoms.is_empty() {
+        return Err(err("ERROR 000735: Input Features: no features"));
+    }
+    let cols = (((x1 - x0) / width) - 1e-9).ceil().max(1.0) as usize;
+    let rows = (((y1 - y0) / height) - 1e-9).ceil().max(1.0) as usize;
+    let mut name_field = Field::new("PageName", FieldType::String);
+    name_field.length = 254;
+    let mut features = Vec::new();
+    for r in 0..rows {
+        for c in 0..cols {
+            let (cx0, cx1) = (x0 + c as f64 * width, x0 + (c + 1) as f64 * width);
+            let cy1 = y0 + (rows - r) as f64 * height;
+            let cy0 = cy1 - height;
+            let cell = unigis_geometry::paths_geometry(vec![vec![
+                [cx0, cy0],
+                [cx0, cy1],
+                [cx1, cy1],
+                [cx1, cy0],
+                [cx0, cy0],
+            ]])
+            .map(|mut g| {
+                g.kind = GeometryKind::Polygon;
+                g
+            })
+            .ok_or_else(|| err("empty cell"))?;
+            if intersect {
+                let mut touched = false;
+                for g in &geoms {
+                    let e = g.envelope();
+                    if e.xmax < cx0 || e.xmin > cx1 || e.ymax < cy0 || e.ymin > cy1 {
+                        continue;
+                    }
+                    if g.kind == GeometryKind::Point || g.kind == GeometryKind::Multipoint {
+                        touched =
+                            g.xy.iter()
+                                .any(|p| p[0] >= cx0 && p[0] <= cx1 && p[1] >= cy0 && p[1] <= cy1);
+                    } else {
+                        // Touching the cell's edge or corner counts (observed).
+                        touched = g.part_ranges().any(|r| {
+                            g.xy[r]
+                                .windows(2)
+                                .any(|w| segment_meets_box(w[0], w[1], cx0, cy0, cx1, cy1))
+                        }) || (g.kind == GeometryKind::Polygon
+                            && unigis_geometry::intersection(&cell, g)?.is_some());
+                    }
+                    if touched {
+                        break;
+                    }
+                }
+                if !touched {
+                    continue;
+                }
+            }
+            features.push(Feature {
+                oid: features.len() as i64,
+                geometry: Some(cell),
+                attributes: vec![
+                    Value::String(format!("{}{}", page_letters(r), c + 1)),
+                    Value::Integer(features.len() as i32 + 1),
+                ],
+            });
+        }
+    }
+    Ok(ToolOutput {
+        kind: GeometryKind::Polygon,
+        has_z: false,
+        has_m: false,
+        fields: vec![name_field, integer_field("PageNumber")],
+        spatial_reference_wkt: wkt.map(str::to_owned),
+        features,
+        messages: Vec::new(),
+    })
+}
+
+pub const GRID_INDEX_FEATURES: Tool = Tool {
+    id: "grid_index_features",
+    name: "Grid Index Features",
+    toolbox: "Cartography › Data Driven Pages",
+    summary: "A grid of polygons over the input (ArcGIS Pro Grid Index Features, planar sizes).",
+    params: &[
+        Param {
+            name: "input",
+            label: "Input Features",
+            kind: Kind::Features,
+            required: true,
+            default: "",
+            help: "",
+        },
+        Param {
+            name: "intersect_feature",
+            label: "Intersect Feature",
+            kind: Kind::Choice(&["NO_INTERSECTFEATURE", "INTERSECTFEATURE"]),
+            required: false,
+            default: "NO_INTERSECTFEATURE",
+            help: "",
+        },
+        Param {
+            name: "polygon_width",
+            label: "Polygon Width",
+            kind: Kind::Text,
+            required: true,
+            default: "",
+            help: "e.g. 150 Meters.",
+        },
+        Param {
+            name: "polygon_height",
+            label: "Polygon Height",
+            kind: Kind::Text,
+            required: true,
+            default: "",
+            help: "e.g. 150 Meters.",
+        },
+    ],
+    output_suffix: "Grid",
+    measures: true,
+    run: Runner::Features(grid_index_features),
+};

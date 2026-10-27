@@ -2161,6 +2161,7 @@ pub static TOOLS: &[Tool] = &[
     crate::neighbors::TABULATE_INTERSECTION,
     crate::neighbors::CREATE_THIESSEN_POLYGONS,
     crate::neighbors::SIMPLIFY_LINE,
+    crate::neighbors::GRID_INDEX_FEATURES,
     crate::neighbors::POLYGON_NEIGHBORS,
     crate::neighbors::COUNT_OVERLAPPING_FEATURES,
 ];

@@ -45124,6 +45124,226 @@
           "transect_length": "10 Meters"
         }
       }
+    },
+    "gix_parcels": {
+      "tool": "cartography.GridIndexFeatures",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "INTERSECTFEATURE",
+        "NO_USEPAGEUNIT",
+        "",
+        "150 Meters",
+        "150 Meters"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PageName",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "PageNumber",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "grid_index_features",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "intersect_feature": "INTERSECTFEATURE",
+          "polygon_width": "150 Meters",
+          "polygon_height": "150 Meters"
+        }
+      }
+    },
+    "gix_wells_all": {
+      "tool": "cartography.GridIndexFeatures",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "NO_INTERSECTFEATURE",
+        "NO_USEPAGEUNIT",
+        "",
+        "200 Meters",
+        "100 Meters"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PageName",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "PageNumber",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "grid_index_features",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "output": "<out>",
+          "intersect_feature": "NO_INTERSECTFEATURE",
+          "polygon_width": "200 Meters",
+          "polygon_height": "100 Meters"
+        }
+      }
+    },
+    "gix_wells": {
+      "tool": "cartography.GridIndexFeatures",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "INTERSECTFEATURE",
+        "NO_USEPAGEUNIT",
+        "",
+        "90 Meters",
+        "90 Meters"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PageName",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "PageNumber",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "grid_index_features",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "output": "<out>",
+          "intersect_feature": "INTERSECTFEATURE",
+          "polygon_width": "90 Meters",
+          "polygon_height": "90 Meters"
+        }
+      }
+    },
+    "gix_roads": {
+      "tool": "cartography.GridIndexFeatures",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "INTERSECTFEATURE",
+        "NO_USEPAGEUNIT",
+        "",
+        "120 Meters",
+        "120 Meters"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PageName",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "PageNumber",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "grid_index_features",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "output": "<out>",
+          "intersect_feature": "INTERSECTFEATURE",
+          "polygon_width": "120 Meters",
+          "polygon_height": "120 Meters"
+        }
+      }
     }
   }
 }

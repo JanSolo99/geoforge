@@ -909,6 +909,10 @@ CASES = {
     "gt_roads_100": ("management.GenerateTransectsAlongLines", [DATA / "roads.shp"], ["100 Meters", "20 Meters", "NO_END_POINTS"]),
     "gt_roads_80_end": ("management.GenerateTransectsAlongLines", [DATA / "roads.shp"], ["80 Meters", "30 Meters", "END_POINTS"]),
     "gt_streams_50": ("management.GenerateTransectsAlongLines", [DATA / "streams.shp"], ["50 Meters", "10 Meters"]),
+    "gix_parcels": ("cartography.GridIndexFeatures", [DATA / "parcels.shp"], ["INTERSECTFEATURE", "NO_USEPAGEUNIT", "", "150 Meters", "150 Meters"]),
+    "gix_wells_all": ("cartography.GridIndexFeatures", [DATA / "wells.shp"], ["NO_INTERSECTFEATURE", "NO_USEPAGEUNIT", "", "200 Meters", "100 Meters"]),
+    "gix_wells": ("cartography.GridIndexFeatures", [DATA / "wells.shp"], ["INTERSECTFEATURE", "NO_USEPAGEUNIT", "", "90 Meters", "90 Meters"]),
+    "gix_roads": ("cartography.GridIndexFeatures", [DATA / "roads.shp"], ["INTERSECTFEATURE", "NO_USEPAGEUNIT", "", "120 Meters", "120 Meters"]),
     "gpal_roads_50": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "NO_END_POINTS"]),
     "gpal_roads_50_end": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "END_POINTS"]),
     "gpal_roads_pct": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["PERCENTAGE", "", 25, "NO_END_POINTS"]),
@@ -1074,6 +1078,7 @@ RUN = {
     "analysis.TableSelect": ("table_select", ["input", "output", "where_clause"]),
     "conversion.ExportFeatures": ("export_features", ["input", "output", "where_clause", None, "field_mapping", "sort_field"]),
     "management.GenerateTransectsAlongLines": ("generate_transects_along_lines", ["input", "output", "interval", "transect_length", "include_end_points"]),
+    "cartography.GridIndexFeatures": ("grid_index_features", ["input", "output", "intersect_feature", None, None, "polygon_width", "polygon_height"]),
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
     "analysis.CountOverlappingFeatures": ("count_overlapping_features", ["input", "output", "minimum_overlap_count"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
@@ -1198,6 +1203,8 @@ def main():
             out = OUT / name
             out.mkdir()
             args = [str(a) for a in before] + [str(out)] + [str(a) if isinstance(a, Path) else a for a in after]
+        elif tool == "cartography.GridIndexFeatures":
+            args = [str(out)] + [str(a) if isinstance(a, Path) else a for a in before + after]
         elif tool in IN_PLACE:
             k = IN_PLACE[tool]
             w.call("run_tool", tool="management.CopyFeatures", args=[str(before[k]), str(out)],
