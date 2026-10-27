@@ -44400,6 +44400,220 @@
           "output": "<out>"
         }
       }
+    },
+    "um_bitwise_not_dem": {
+      "tool": "gp.BitwiseNot_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "bitwise_not",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "um_bitwise_not_dem_int16_packbits": {
+      "tool": "gp.BitwiseNot_sa",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "bitwise_not",
+        "params": {
+          "input": "testdata/raster/dem_int16_packbits.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "um_bitwise_not_landuse_u8": {
+      "tool": "gp.BitwiseNot_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "bitwise_not",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "bm_atan2_dem_i16": {
+      "tool": "gp.ATan2_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "atan2",
+        "params": {
+          "in1": "testdata/raster/dem.tif",
+          "in2": "testdata/raster/dem_int16_packbits.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "bm_atan2_i16_u8": {
+      "tool": "gp.ATan2_sa",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "testdata/raster/landuse_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "atan2",
+        "params": {
+          "in1": "testdata/raster/dem_int16_packbits.tif",
+          "in2": "testdata/raster/landuse_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "bm_atan2_u8_u8": {
+      "tool": "gp.ATan2_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "testdata/raster/landuse_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "atan2",
+        "params": {
+          "in1": "testdata/raster/landuse_u8.tif",
+          "in2": "testdata/raster/landuse_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "bm_atan2_u8_c2": {
+      "tool": "gp.ATan2_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "2",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "atan2",
+        "params": {
+          "in1": "testdata/raster/landuse_u8.tif",
+          "in2": "2",
+          "output": "<out>"
+        }
+      }
+    },
+    "bm_atan2_dem_c200": {
+      "tool": "gp.ATan2_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "200",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "atan2",
+        "params": {
+          "in1": "testdata/raster/dem.tif",
+          "in2": "200",
+          "output": "<out>"
+        }
+      }
+    },
+    "bm_atan2_i16_c200": {
+      "tool": "gp.ATan2_sa",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "200",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "atan2",
+        "params": {
+          "in1": "testdata/raster/dem_int16_packbits.tif",
+          "in2": "200",
+          "output": "<out>"
+        }
+      }
+    },
+    "bm_atan2_u8_c05": {
+      "tool": "gp.ATan2_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "0.5",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "atan2",
+        "params": {
+          "in1": "testdata/raster/landuse_u8.tif",
+          "in2": "0.5",
+          "output": "<out>"
+        }
+      }
+    },
+    "bm_atan2_c7_i16": {
+      "tool": "gp.ATan2_sa",
+      "args": [
+        "7",
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "atan2",
+        "params": {
+          "in1": "7",
+          "in2": "testdata/raster/dem_int16_packbits.tif",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

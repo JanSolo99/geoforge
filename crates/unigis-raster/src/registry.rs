@@ -352,6 +352,7 @@ unary_fn!(atanh_tool, ATanH);
 unary_fn!(round_down_tool, RoundDown);
 unary_fn!(round_up_tool, RoundUp);
 unary_fn!(boolean_not_tool, BooleanNot);
+unary_fn!(bitwise_not_tool, BitwiseNot);
 
 fn operand(ctx: &dyn Context, name: &str) -> Result<crate::local::Operand> {
     let text = ctx.get(name).unwrap_or_default();
@@ -400,6 +401,7 @@ macro_rules! binary_tool {
         }
     };
 }
+binary_fn!(atan2_tool, ATan2);
 binary_fn!(power_tool, Power);
 binary_fn!(mod_tool, Mod);
 binary_fn!(boolean_and_tool, BooleanAnd);
@@ -533,6 +535,8 @@ pub static TOOLS: &[Tool] = &[
     unary_tool!(round_down_tool, "round_down", "Round Down"),
     unary_tool!(round_up_tool, "round_up", "Round Up"),
     unary_tool!(boolean_not_tool, "boolean_not", "Boolean Not"),
+    unary_tool!(bitwise_not_tool, "bitwise_not", "Bitwise Not"),
+    binary_tool!(atan2_tool, "atan2", "ATan2"),
     binary_tool!(power_tool, "power", "Power"),
     binary_tool!(mod_tool, "mod", "Mod"),
     binary_tool!(boolean_and_tool, "boolean_and", "Boolean And"),

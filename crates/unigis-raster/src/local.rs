@@ -548,6 +548,7 @@ pub enum UnaryOp {
     RoundDown,
     RoundUp,
     BooleanNot,
+    BitwiseNot,
 }
 
 /// The unsigned type of the width of `t`, and its NoData (the maximum).
@@ -607,6 +608,12 @@ pub fn unary(op: UnaryOp, r: &Raster) -> Raster {
             DataType::U8,
             2.0,
         ),
+        UnaryOp::BitwiseNot => typed_raster(
+            r,
+            values().map(|v| v.map(|x| f64::from(!(x.trunc() as i64 as i32)))),
+            DataType::I32,
+            f64::from(i32::MIN),
+        ),
         UnaryOp::Abs => float_fn(f64::abs),
         UnaryOp::Negate => float_fn(|x| -x),
         UnaryOp::Square => float_fn(|x| x * x),
@@ -637,6 +644,7 @@ pub fn unary(op: UnaryOp, r: &Raster) -> Raster {
 /// Two-operand math tools (Spatial Analyst Math toolset, besides Plus, Minus, Times, Divide).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BinaryOp {
+    ATan2,
     Power,
     Mod,
     BooleanAnd,
@@ -728,6 +736,14 @@ pub fn binary(op: BinaryOp, a: &Operand, b: &Operand) -> Option<Raster> {
         )
     };
     Some(match op {
+        BinaryOp::ATan2 => float_raster(
+            g,
+            (0..n).map(|i| {
+                pair(i)
+                    .filter(|&(y, x)| y != 0.0 || x != 0.0)
+                    .map(|(y, x)| y.atan2(x))
+            }),
+        ),
         BinaryOp::Power => float_raster(
             g,
             (0..n).map(|i| pair(i).and_then(|(x, y)| finite(x.powf(y)))),

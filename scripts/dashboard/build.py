@@ -39,8 +39,12 @@ def implemented() -> dict[str, str]:
         ("crates/unigis-raster/src/registry.rs", "raster registry"),
         ("crates/unigis-tools/src/registry.rs", "tools registry"),
         ("crates/unigis-tools/src/dm_tools.rs", "tools registry"),
+        ("crates/unigis-tools/src/neighbors.rs", "tools registry"),
     ):
         for m in re.finditer(r'^\s*name: "([^"]+)",\s*$', read(ROOT / rel), re.M):
+            found.setdefault(norm(m.group(1)), kind)
+        # Tools declared through macros: unary_tool!(f, "id", "Name").
+        for m in re.finditer(r'_tool!\(\s*\w+,\s*"[^"]+",\s*"([^"]+)",?\s*\)', read(ROOT / rel)):
             found.setdefault(norm(m.group(1)), kind)
     cli = read(ROOT / "crates/unigis-cli/src/main.rs")
     block = cli[cli.find("enum Tool {"):]

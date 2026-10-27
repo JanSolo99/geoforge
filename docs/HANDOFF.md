@@ -86,6 +86,10 @@ Get ArcGIS tools done faster: (1) triage cheap tools in batches, (2) generate th
   (row-major) order; pairs the operation calls false get 0 and use no number (And: either 0; Or: both 0; XOr: both or neither 0);
   NoData if either input is; type = `integer_output(0, max id)` (4-bit NoData 15 for small ids, S8 -128 up to 127, ...). Probed only on
   same-grid integer rasters; different grids go through `common_grid` untested.
+- ATan2 (F32, both-zero -> NoData, args are y then x) and Bitwise Not (S32, -trunc(x)-1) added; cases `bm_atan2_*`, `um_bitwise_not_*` pass.
+  Dashboard scanner now also reads macro-declared tools (`unary_tool!`/`binary_tool!`) and `neighbors.rs`.
+  Probed but NOT done: Equal To / Greater Than / Less Than Frequency (U8; NoData 3 for 2 rasters but 16 for 3 rasters: rule unclear),
+  In List. Remaining sa gaps are listed by the dashboard (`python3 scripts/dashboard/build.py`, page "missing").
 - `NOTES.md` (untracked, from another agent) describes decompiling ArcGIS DLLs with Ghidra/REA. CLAUDE.md says black-box only
   (never decompile Esri binaries); I did not take part in that and did not touch it. Decide with the user before using it.
 

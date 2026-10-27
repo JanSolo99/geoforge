@@ -1003,14 +1003,14 @@ UNARY = [("Abs", "abs"), ("Negate", "negate"), ("Square", "square"), ("SquareRoo
          ("Exp2", "exp2"), ("Exp10", "exp10"), ("Ln", "ln"), ("Log2", "log2"), ("Log10", "log10"), ("Sin", "sin"),
          ("Cos", "cos"), ("Tan", "tan"), ("ASin", "asin"), ("ACos", "acos"), ("ATan", "atan"), ("SinH", "sinh"),
          ("CosH", "cosh"), ("TanH", "tanh"), ("ASinH", "asinh"), ("ACosH", "acosh"), ("ATanH", "atanh"),
-         ("RoundDown", "round_down"), ("RoundUp", "round_up"), ("BooleanNot", "boolean_not")]
+         ("RoundDown", "round_down"), ("RoundUp", "round_up"), ("BooleanNot", "boolean_not"), ("BitwiseNot", "bitwise_not")]
 for _tool, _id in UNARY:
     for _in in ("dem", "dem_int16_packbits", "landuse_u8"):
         CASES[f"um_{_id}_{_in}"] = (f"gp.{_tool}_sa", [RASTER / f"{_in}.tif"], [])
 
 
 # Two-operand Spatial Analyst Math tools: (ArcGIS tool, registry id)
-BINARY = [("Power", "power"), ("Mod", "mod"), ("BooleanAnd", "boolean_and"), ("BooleanOr", "boolean_or"),
+BINARY = [("ATan2", "atan2"), ("Power", "power"), ("Mod", "mod"), ("BooleanAnd", "boolean_and"), ("BooleanOr", "boolean_or"),
           ("BooleanXOr", "boolean_xor"), ("EqualTo", "equal_to"), ("GreaterThan", "greater_than"),
           ("GreaterThanEqual", "greater_than_equal"), ("LessThan", "less_than"), ("LessThanEqual", "less_than_equal"),
           ("NotEqual", "not_equal"), ("BitwiseAnd", "bitwise_and"), ("BitwiseOr", "bitwise_or"),
