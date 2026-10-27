@@ -44,3 +44,17 @@ Three exact boundary probes in boundary_observations.json confirm signed Square
 46340 remains data,46341 overflows to NoData; unsigned Square65535 remains data,
 65536 overflows. Uncached U32 Negate wraps through signed32, including2^31 and
 2^32-1. Run make_boundary_inputs.py then probe_boundaries.py to reproduce.
+
+Uncached integer checkpoint:39 umint_* cases cover six integer types with/without
+NoData and three exact boundary files. All48 baseline native comparisons now match
+(native_after_integer.txt). Abs keeps unsigned width; Negate widens8-bit toI16 and
+16-bit toI32, while32-bit operands use signed32 wrapping. Square doubles width for
+8/16-bit values preserving signedness, keeps32-bit operands32-bit, and marks overflow
+NoData. Uncached I32 uses -2147483648; cached legacy references can use -2147483647.
+Cached type planning remains separate: the old paths do not yet reproduce all
+statistics-isolation cases. Do not generalize these uncached rules to cached rasters.
+
+Regenerate: make-arcgis-reference.py 'umint_*'. Boundary source files live under
+ testdata/raster/unary_types; make_boundary_inputs.py/probe_boundaries.py preserve
+recipes. The unsigned Square boundary emits ArcGIS warning010663 about not building
+a raster attribute table; raster creation succeeds and values remain authoritative.

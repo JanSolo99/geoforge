@@ -605,9 +605,45 @@ pub fn unary(op: UnaryOp, r: &Raster) -> Raster {
             let (t, nodata) = unsigned_of(r.data_type);
             typed_raster(r, values().map(|v| v.map(f64::abs)), t, nodata)
         }
+        UnaryOp::Negate if integer && r.statistics.is_none() => {
+            let (t, nodata) = match r.data_type {
+                DataType::U8 | DataType::I8 => (DataType::I16, i16::MIN as f64),
+                _ => (DataType::I32, i32::MIN as f64),
+            };
+            let wide = matches!(r.data_type, DataType::U32 | DataType::I32);
+            typed_raster(
+                r,
+                values().map(|v| {
+                    v.map(|x| {
+                        if wide {
+                            f64::from((x as i64 as i32).wrapping_neg())
+                        } else {
+                            -x
+                        }
+                    })
+                }),
+                t,
+                nodata,
+            )
+        }
         UnaryOp::Negate if integer => {
             let (t, nodata) = signed_for(r.data_type);
             typed_raster(r, values().map(|v| v.map(|x| -x)), t, nodata)
+        }
+        UnaryOp::Square if integer && r.statistics.is_none() => {
+            let (t, nodata) = match r.data_type {
+                DataType::U8 => (DataType::U16, u16::MAX as f64),
+                DataType::I8 => (DataType::I16, i16::MIN as f64),
+                DataType::U16 | DataType::U32 => (DataType::U32, u32::MAX as f64),
+                _ => (DataType::I32, i32::MIN as f64),
+            };
+            let (lo, hi) = type_range(t);
+            typed_raster(
+                r,
+                values().map(|v| v.map(|x| x * x).filter(|x| *x >= lo && *x <= hi)),
+                t,
+                nodata,
+            )
         }
         UnaryOp::Square if integer => {
             let (t, nodata) = match r.data_type {

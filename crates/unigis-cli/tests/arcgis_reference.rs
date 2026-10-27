@@ -4293,6 +4293,7 @@ fn compare_rasters(case: &str, ours: &Path, arcgis: &Path) -> Vec<String> {
                                 "cprcast_",
                                 "freq_",
                                 "um64_",
+                                "umint_",
                             ]
                             .iter()
                             .any(|p| case.starts_with(p))

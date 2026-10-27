@@ -56871,6 +56871,722 @@
           "output": "<out>"
         }
       }
+    },
+    "umint_abs_u8": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_abs_nd_u8": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/composite_matrix/nd_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_abs_i8": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/composite_matrix/i8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/composite_matrix/i8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_abs_nd_i8": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/composite_matrix/nd_i8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_i8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_abs_u16": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_abs_nd_u16": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/composite_matrix/nd_u16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_u16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_abs_i16": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/composite_matrix/i16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/composite_matrix/i16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_abs_nd_i16": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/composite_matrix/nd_i16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_i16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_abs_u32": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010663: The raster attribute table will not be built because the cell values exceed the range of the VALUE field."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_abs_nd_u32": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/composite_matrix/nd_u32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010663: The raster attribute table will not be built because the cell values exceed the range of the VALUE field."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_u32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_abs_i32": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/composite_matrix/i32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010663: The raster attribute table will not be built because the cell values exceed the range of the VALUE field."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/composite_matrix/i32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_abs_nd_i32": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/composite_matrix/nd_i32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010663: The raster attribute table will not be built because the cell values exceed the range of the VALUE field."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_i32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_negate_u8": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_negate_nd_u8": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/composite_matrix/nd_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_negate_i8": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/composite_matrix/i8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/composite_matrix/i8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_negate_nd_i8": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/composite_matrix/nd_i8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_i8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_negate_u16": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_negate_nd_u16": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/composite_matrix/nd_u16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_u16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_negate_i16": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/composite_matrix/i16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/composite_matrix/i16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_negate_nd_i16": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/composite_matrix/nd_i16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_i16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_negate_u32": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_negate_nd_u32": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/composite_matrix/nd_u32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_u32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_negate_i32": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/composite_matrix/i32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/composite_matrix/i32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_negate_nd_i32": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/composite_matrix/nd_i32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_i32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_square_u8": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_square_nd_u8": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/composite_matrix/nd_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_square_i8": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/composite_matrix/i8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/composite_matrix/i8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_square_nd_i8": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/composite_matrix/nd_i8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_i8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_square_u16": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010663: The raster attribute table will not be built because the cell values exceed the range of the VALUE field."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_square_nd_u16": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/composite_matrix/nd_u16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010663: The raster attribute table will not be built because the cell values exceed the range of the VALUE field."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_u16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_square_i16": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/composite_matrix/i16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/composite_matrix/i16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_square_nd_i16": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/composite_matrix/nd_i16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_i16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_square_u32": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_square_nd_u32": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/composite_matrix/nd_u32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_u32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_square_i32": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/composite_matrix/i32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/composite_matrix/i32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_square_nd_i32": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/composite_matrix/nd_i32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_i32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_boundary_square_i32": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_types/square_i32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_types/square_i32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_boundary_square_u32": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/unary_types/square_u32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010663: The raster attribute table will not be built because the cell values exceed the range of the VALUE field."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/unary_types/square_u32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umint_boundary_negate_u32": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/unary_types/negate_u32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/unary_types/negate_u32.tif",
+          "output": "<out>"
+        }
+      }
     }
   }
 }
