@@ -1,7 +1,7 @@
 # Current handoff
 
 Updated: 2026-10-27T15:12:24+00:00; last agent Codex.
-Workspace /mnt/media/ArcGIS_Linux, branch main, HEAD d29a79a pushed and verified
+Workspace /mnt/media/ArcGIS_Linux, branch main, HEAD eeffa40 (NoData follow-up committed; push pending). Prior remote
  d29a79ab0a4ba2944d446ade71f80ed9c40b5639. User authorizes ongoing commits/pushes.
 Do not launch another agent, CLI session or coordinator.
 
@@ -27,7 +27,7 @@ https://github.com/JanSolo99/geoforge/actions/runs/40522528614
 
 ## Current slices (validated, committing next)
 
-NoData / precision slice STAGED separately; CLI stdout fix UNSTAGED intentionally.
+NoData / precision slice committed eeffa40; CLI stdout fix is committing separately.
 
 1. Composite Bands follow-up: make_matrix.py now writes typed GDAL/NumPy arrays and
    read-back verifies all 18 inputs (values/type/NoData/grid/EPSG). Prior AAIGrid
@@ -63,7 +63,7 @@ NoData / precision slice STAGED separately; CLI stdout fix UNSTAGED intentionall
 
 ## Next actions
 
-1. Commit staged NoData/precision slice after restaging this final handoff.
+1. NoData/precision committed eeffa40; stage/commit CLI stdout fix separately.
 2. Commit CLI stdout fix separately (add roadmap checkpoint, handoff and dashboard).
 3. Push both normally through mandatory pre-push gate, verify remote SHA and CI.
 4. Continue bounded development. Remaining Composite probe: padding with an input

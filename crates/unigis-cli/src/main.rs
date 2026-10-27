@@ -2602,41 +2602,53 @@ fn main() -> ExitCode {
             write_output(out, &out_feature_class, source_gdb(&in_features).as_deref())
         })(),
         Tool::Tools => {
-            for t in unigis_raster::registry::TOOLS {
-                println!("{}  {}  [Spatial Analyst]", t.id, t.name);
-                for p in t.params {
-                    println!(
-                        "    {}{}  {}{}",
-                        p.name,
-                        if p.required { " *" } else { "" },
-                        p.label,
-                        if p.default.is_empty() {
-                            String::new()
-                        } else {
-                            format!(" (default {})", p.default)
-                        }
-                    );
+            use std::io::{self, Write};
+            let result = (|| -> io::Result<()> {
+                let stdout = io::stdout();
+                let mut stdout = stdout.lock();
+                for t in unigis_raster::registry::TOOLS {
+                    writeln!(stdout, "{}  {}  [Spatial Analyst]", t.id, t.name)?;
+                    for p in t.params {
+                        writeln!(
+                            stdout,
+                            "    {}{}  {}{}",
+                            p.name,
+                            if p.required { " *" } else { "" },
+                            p.label,
+                            if p.default.is_empty() {
+                                String::new()
+                            } else {
+                                format!(" (default {})", p.default)
+                            }
+                        )?;
+                    }
+                    writeln!(stdout, "    output *  Output path")?;
                 }
-                println!("    output *  Output path");
-            }
-            for t in unigis_tools::registry::TOOLS {
-                println!("{}  {}  [{}]", t.id, t.name, t.toolbox);
-                for p in t.params {
-                    println!(
-                        "    {}{}  {}{}",
-                        p.name,
-                        if p.required { " *" } else { "" },
-                        p.label,
-                        if p.default.is_empty() {
-                            String::new()
-                        } else {
-                            format!(" (default {})", p.default)
-                        }
-                    );
+                for t in unigis_tools::registry::TOOLS {
+                    writeln!(stdout, "{}  {}  [{}]", t.id, t.name, t.toolbox)?;
+                    for p in t.params {
+                        writeln!(
+                            stdout,
+                            "    {}{}  {}{}",
+                            p.name,
+                            if p.required { " *" } else { "" },
+                            p.label,
+                            if p.default.is_empty() {
+                                String::new()
+                            } else {
+                                format!(" (default {})", p.default)
+                            }
+                        )?;
+                    }
+                    writeln!(stdout, "    output *  Output path")?;
                 }
-                println!("    output *  Output path");
+                Ok(())
+            })();
+            match result {
+                Ok(()) => Ok(()),
+                Err(error) if error.kind() == io::ErrorKind::BrokenPipe => Ok(()),
+                Err(error) => Err(Error::io("<stdout>", error)),
             }
-            Ok(())
         }
         Tool::Run { tool, args } => (|| {
             use unigis_tools::registry;
