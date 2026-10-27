@@ -1,7 +1,7 @@
 # Current handoff
 
 Updated: 2026-10-27T14:02:55+00:00; last agent: Codex.
-Workspace `/mnt/media/ArcGIS_Linux`; branch `main`; HEAD `cdc23aa`.
+Workspace `/mnt/media/ArcGIS_Linux`; branch `main`; HEAD `c3abd4a` (field support committed; push pending).
 Remote SHA verified cdc23aac785765e07bfc3cb053bf44ac5900eade. User authorizes ongoing
 commits/pushes. Do not launch another agent, CLI session or coordinator.
 
@@ -29,7 +29,7 @@ takes precedence over old chat. Basemaps, branding and dock work are already lan
   dashboard tests, fmt, clippy -D warnings. Push exit 0, remote verified.
   Logs: /tmp/unigis-gb-expanded-check.log, /tmp/unigis-gb-expanded-push.log.
 
-## Current slice: per-feature Graphic Buffer distances (uncommitted)
+## Current slice: field support committed as c3abd4a; dashboard follow-up ready
 
 - Source crates/unigis-tools/src/graphic_buffer.rs: case-insensitive numeric/text
   distance fields, numeric null/field-zero skipping, negative point errors, unknown
@@ -62,7 +62,7 @@ takes precedence over old chat. Basemaps, branding and dock work are already lan
   on final Rust source/fixtures and three safety tests: 177 passed, 0 failed,
   5 ignored, 79 result groups; fmt and clippy -D warnings passed. Four dashboard
   tests ran at gate start; eight passed separately after the dashboard follow-up.
-  No running builds. Field slice staged separately from dashboard changes.
+  No running builds. Field slice committed separately from dashboard changes.
 - Dashboard follow-up (not staged with the field slice): build.py and test_build.py
   preserve fetched CI results in docs/dashboard/ci_runs.json through offline hooks or
   fetch failures, show last-fetched time, and use the latest KNOWN_GAPS section.
@@ -72,8 +72,8 @@ takes precedence over old chat. Basemaps, branding and dock work are already lan
 
 ## Next actions
 
-1. Commit validated field slice, then dashboard follow-up separately (8 Python tests
-   plus generated JSON/JavaScript checks passed). Refresh snapshot with --ci.
+1. Field support committed c3abd4a. Commit dashboard follow-up separately (8 Python
+   tests plus generated JSON/JavaScript checks passed); snapshot refreshed with --ci.
 2. Push both normally; mandatory root pre-push gate must pass. Verify remote HEAD/CI.
 3. Dashboard cache fix is implemented and tested; stage build/test, ci_runs.json,
    dashboard.html and updated handoff in its own commit.

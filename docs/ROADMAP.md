@@ -717,3 +717,5 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - Pairwise Buffer/Dissolve/Intersect/Clip/Erase (aliases of the classic tools, `crates/unigis-cli/src/aliases.rs`), Multiple Ring Buffer, Generate Points Along Lines chainage fields, Copy Rows field widths: ArcGIS cases `pw*`, `mrb_*`, `gpal_*`, `cr_*`.
 
 - [x] Graphic Buffer (`ug run graphic_buffer`): constant and per-feature numeric/text planar distances, square/butt/round caps and miter/bevel/round joins; 48 ArcGIS cases cover points, tight bends, polygon holes, negative/zero polygon distances, reserved-field replacement and miter limits 1/1.25/2/10. Over-limit corners bevel as ArcGIS does; numeric nulls/field zeros skip, field lookup ignores case, imperial unit definitions match ArcGIS. Geographic and malformed/null text inputs are explicitly refused. Limits: `scripts/research/graphic_buffer/README.md`.
+
+- [x] Development dashboard: implementation-aware reference coverage, eight offline regression tests, latest known-gaps section, and cached CI results with a visible fetch timestamp that survives post-commit rebuilds.

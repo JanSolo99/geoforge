@@ -4,6 +4,9 @@
     python3 scripts/dashboard/build.py            # offline: files and git only
     python3 scripts/dashboard/build.py --ci       # also asks GitHub for the latest CI runs (gh)
 
+Offline rebuilds retain the last successful CI fetch in docs/dashboard/ci_runs.json.
+Use --ci to refresh those results; their fetch time is shown on the page.
+
 Open docs/dashboard.html in a browser. The `.githooks/post-commit` hook rebuilds it after every
 commit. ArcGIS's tool list (docs/dashboard/arcgis_tools.json) comes from arcpy.ListTools() through
 the bridge (scripts/dashboard/list_arcgis_tools.py); without it the page lists only our tools.
@@ -92,16 +95,49 @@ def git(*args: str) -> str:
         return ""
 
 
-def ci_runs() -> list[dict]:
+def ci_runs() -> list[dict] | None:
     try:
         out = subprocess.run(
             ["gh", "run", "list", "--workflow", "CI", "--limit", "8", "--json",
              "conclusion,status,displayTitle,createdAt,url"],
             cwd=ROOT, capture_output=True, text=True, timeout=30,
         ).stdout
-        return json.loads(out)
+        result = json.loads(out)
+        return result if valid_ci_runs(result) else None
     except (OSError, subprocess.SubprocessError, ValueError):
-        return []
+        return None
+
+
+def valid_ci_runs(value) -> bool:
+    return isinstance(value, list) and all(
+        isinstance(run, dict)
+        and all(isinstance(run.get(key), str) for key in ("status", "displayTitle", "createdAt", "url"))
+        and isinstance(run.get("conclusion", ""), (str, type(None)))
+        for run in value
+    )
+
+
+def ci_data(refresh: bool) -> tuple[list[dict], str | None]:
+    """Keep the last successful fetch through offline hooks and network failures."""
+    path = ROOT / "docs/dashboard/ci_runs.json"
+    try:
+        saved = json.loads(read(path) or "{}")
+    except ValueError:
+        saved = {}
+    if not isinstance(saved, dict):
+        saved = {}
+    runs = saved.get("runs", [])
+    fetched = saved.get("fetched")
+    if not valid_ci_runs(runs) or not isinstance(fetched, str):
+        runs, fetched = [], None
+    if refresh:
+        fresh = ci_runs()
+        if fresh is not None:
+            runs = fresh
+            fetched = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps({"fetched": fetched, "runs": runs}, indent=2) + "\n")
+    return runs, fetched
 
 
 def roadmap_counts() -> tuple[int, int]:
@@ -113,6 +149,11 @@ def section(path: str, heading: str) -> str:
     text = read(ROOT / path)
     m = re.search(rf"^##+ {re.escape(heading)}.*?\n(.*?)(?=^##+ |\Z)", text, re.M | re.S)
     return m.group(1).strip() if m else ""
+
+
+def latest_section(path: str) -> str:
+    sections = re.split(r"^## ", read(ROOT / path), flags=re.M)
+    return sections[-1].strip() if len(sections) > 1 else ""
 
 
 def main() -> None:
@@ -136,9 +177,9 @@ def main() -> None:
     done, todo = roadmap_counts()
     commits = [line.split("\t", 2) for line in git("log", "-n", "25", "--format=%h\t%ad\t%s", "--date=short").splitlines()]
     day = Counter(git("log", "--since=30 days ago", "--format=%ad", "--date=short").split())
-    runs = ci_runs() if "--ci" in sys.argv else []
+    runs, fetched = ci_data("--ci" in sys.argv)
     next_actions = section("docs/HANDOFF.md", "Next actions")
-    gaps = section("docs/KNOWN_GAPS.md", "Raster registry and Pairwise tools (2026-10-25)")
+    gaps = latest_section("docs/KNOWN_GAPS.md")
 
     data = {
         "generated": datetime.datetime.now().isoformat(timespec="minutes"),
@@ -153,6 +194,7 @@ def main() -> None:
         "commits": commits,
         "perday": sorted(day.items()),
         "ci": runs,
+        "ci_fetched": fetched,
         "next": next_actions,
         "gaps": gaps,
         "ours_only": sorted(have),
@@ -213,7 +255,7 @@ add(`<section class="card"><h2>Work so far</h2><div class="row">
  <div class="stat"><div class="big">${D.cases}</div><small>ArcGIS reference cases (${D.case_tools} tools)</small></div>
  <div class="stat"><div class="big">${D.roadmap[0]}</div><small>roadmap items done (${D.roadmap[1]} open)</small></div></div>
  <h2 style="margin-top:16px">Commits per day (30 days)</h2><div class="spark">${(()=>{const m=Math.max(1,...D.perday.map(x=>x[1]));return D.perday.map(x=>`<i title="${x[0]}: ${x[1]}" style="height:${100*x[1]/m}%"></i>`).join('')})()}</div></section>`);
-if(D.ci.length)add(`<section class="card"><h2>CI</h2>${D.ci.map(r=>`<div><span class="${r.conclusion==='success'?'ok':r.status==='completed'?'bad':'warn'}">${r.conclusion||r.status}</span> <a href="${r.url}">${esc(r.displayTitle)}</a> <small>${r.createdAt.slice(0,16)}</small></div>`).join('')}</section>`);
+if(D.ci.length)add(`<section class="card"><h2>CI</h2><p>Last fetched ${esc(D.ci_fetched||'unknown')}; refresh with --ci.</p>${D.ci.map(r=>`<div><span class="${r.conclusion==='success'?'ok':r.status==='completed'?'bad':'warn'}">${r.conclusion||r.status}</span> <a href="${r.url}">${esc(r.displayTitle)}</a> <small>${r.createdAt.slice(0,16)}</small></div>`).join('')}</section>`);
 add(`<section class="card"><h2>By toolbox</h2>${Object.entries(D.toolbox).sort((a,b)=>Object.values(b[1]).reduce((x,y)=>x+y,0)-Object.values(a[1]).reduce((x,y)=>x+y,0)).map(([k,c])=>{const n=(c.verified||0)+(c.implemented||0)+(c.missing||0);return `<div class="tb"><span>${esc(k)}</span><div class="bar"><i class="v" style="width:${100*(c.verified||0)/n}%"></i><i class="i" style="width:${100*(c.implemented||0)/n}%"></i></div><span>${(c.verified||0)+(c.implemented||0)} / ${n}</span></div>`}).join('')||'<p>No data.</p>'}</section>`);
 add(`<section class="card"><h2>Next actions</h2><pre>${esc(D.next||'-')}</pre></section>`);
 add(`<section class="card"><h2>Recent commits</h2><div class="scroll"><table>${D.commits.map(c=>`<tr><td>${c[0]}</td><td>${c[1]}</td><td>${esc(c[2])}</td></tr>`).join('')}</table></div></section>`);
