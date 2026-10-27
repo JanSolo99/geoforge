@@ -1,0 +1,272 @@
+[
+  {
+    "tool": "EqualToFrequency",
+    "case": "f64_precision",
+    "status": "succeeded",
+    "bands": 1,
+    "pixel_type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        1,
+        2,
+        2
+      ],
+      [
+        1,
+        1,
+        2
+      ]
+    ],
+    "extent": [
+      500000.0,
+      5000000.0,
+      500030.0,
+      5000020.0
+    ],
+    "cellsize": [
+      10.0,
+      10.0
+    ]
+  },
+  {
+    "tool": "EqualToFrequency",
+    "case": "f32_precision",
+    "status": "succeeded",
+    "bands": 1,
+    "pixel_type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        1,
+        2,
+        2
+      ],
+      [
+        1,
+        1,
+        2
+      ]
+    ],
+    "extent": [
+      500000.0,
+      5000000.0,
+      500030.0,
+      5000020.0
+    ],
+    "cellsize": [
+      10.0,
+      10.0
+    ]
+  },
+  {
+    "tool": "EqualToFrequency",
+    "case": "u32_precision",
+    "status": "succeeded",
+    "bands": 1,
+    "pixel_type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        2,
+        1
+      ]
+    ],
+    "extent": [
+      500000.0,
+      5000000.0,
+      500030.0,
+      5000020.0
+    ],
+    "cellsize": [
+      10.0,
+      10.0
+    ]
+  },
+  {
+    "tool": "GreaterThanFrequency",
+    "case": "f64_precision",
+    "status": "succeeded",
+    "bands": 1,
+    "pixel_type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ]
+    ],
+    "extent": [
+      500000.0,
+      5000000.0,
+      500030.0,
+      5000020.0
+    ],
+    "cellsize": [
+      10.0,
+      10.0
+    ]
+  },
+  {
+    "tool": "GreaterThanFrequency",
+    "case": "f32_precision",
+    "status": "succeeded",
+    "bands": 1,
+    "pixel_type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        1,
+        0
+      ]
+    ],
+    "extent": [
+      500000.0,
+      5000000.0,
+      500030.0,
+      5000020.0
+    ],
+    "cellsize": [
+      10.0,
+      10.0
+    ]
+  },
+  {
+    "tool": "GreaterThanFrequency",
+    "case": "u32_precision",
+    "status": "succeeded",
+    "bands": 1,
+    "pixel_type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        1
+      ]
+    ],
+    "extent": [
+      500000.0,
+      5000000.0,
+      500030.0,
+      5000020.0
+    ],
+    "cellsize": [
+      10.0,
+      10.0
+    ]
+  },
+  {
+    "tool": "LessThanFrequency",
+    "case": "f64_precision",
+    "status": "succeeded",
+    "bands": 1,
+    "pixel_type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        1,
+        0
+      ]
+    ],
+    "extent": [
+      500000.0,
+      5000000.0,
+      500030.0,
+      5000020.0
+    ],
+    "cellsize": [
+      10.0,
+      10.0
+    ]
+  },
+  {
+    "tool": "LessThanFrequency",
+    "case": "f32_precision",
+    "status": "succeeded",
+    "bands": 1,
+    "pixel_type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ]
+    ],
+    "extent": [
+      500000.0,
+      5000000.0,
+      500030.0,
+      5000020.0
+    ],
+    "cellsize": [
+      10.0,
+      10.0
+    ]
+  },
+  {
+    "tool": "LessThanFrequency",
+    "case": "u32_precision",
+    "status": "succeeded",
+    "bands": 1,
+    "pixel_type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        0,
+        0
+      ]
+    ],
+    "extent": [
+      500000.0,
+      5000000.0,
+      500030.0,
+      5000020.0
+    ],
+    "cellsize": [
+      10.0,
+      10.0
+    ]
+  }
+]

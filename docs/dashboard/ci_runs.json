@@ -1,11 +1,18 @@
 {
-  "fetched": "2026-10-27T19:23:58+00:00",
+  "fetched": "2026-10-27T19:41:15+00:00",
   "runs": [
     {
       "conclusion": "",
+      "createdAt": "2026-10-27T19:32:34Z",
+      "displayTitle": "Retain large raster NoData tags and normalize downcast statistics",
+      "status": "in_progress",
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40570048929"
+    },
+    {
+      "conclusion": "success",
       "createdAt": "2026-10-27T19:20:11Z",
       "displayTitle": "Preserve every Copy Raster band and match source-type NoData defaults",
-      "status": "in_progress",
+      "status": "completed",
       "url": "https://github.com/JanSolo99/geoforge/actions/runs/40568168576"
     },
     {
@@ -49,13 +56,6 @@
       "displayTitle": "Preserve dashboard CI snapshots through offline rebuilds",
       "status": "completed",
       "url": "https://github.com/JanSolo99/geoforge/actions/runs/40518084617"
-    },
-    {
-      "conclusion": "success",
-      "createdAt": "2026-10-27T13:52:14Z",
-      "displayTitle": "Match Graphic Buffer erosion, field replacement and miter limits",
-      "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40515889873"
     }
   ]
 }

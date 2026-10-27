@@ -1,95 +1,67 @@
 # Current handoff
 
-Updated 2026-10-27T19:28:28+00:00; last agent Codex.
-Workspace /mnt/media/ArcGIS_Linux; branch main; HEAD cd084e6, PUSHED/verified cd084e61bb9a5b6b774b70b78a4986a9a69155b0.
-Normal pre-push gate PASS /tmp/unigis-copy-bands-push.log. User authorizes ongoing tested commits,
-pushes and dashboard updates while sleeping; continue without repeated prompts.
+Updated 2026-10-27T19:47:12+00:00; last agent Codex.
+Workspace /mnt/media/ArcGIS_Linux; main; HEAD1c830f1 PUSHED/verified
+1c830f1c53e8b60b6e066464d633dce30dd4a30a. User authorizes ongoing development,
+tested commits/pushes/dashboard updates while sleeping; do not ask repeated prompts.
 Do not launch another agent, CLI or coordinator. Cargo -j3, sequential builds.
 
-## Completed
+## Completed/pushed
 
-Inherited prior run: Graphic Buffer48 cases, Composite Bands125 cases, dashboard
-accuracy/cache fixes, closed stdout handling, ASCII/Float imports35 cases (bec6e20).
-Importer CI SUCCESS https://github.com/JanSolo99/geoforge/actions/runs/40540613972.
-Basemaps/branding/docking already landed; old chat requests stale.
+Prior run: Graphic Buffer48 cases, Composite125, dashboard accuracy/cache fixes,
+closed stdout, ASCII/Float imports35 cases (bec6e20). Basemaps/branding/docking landed.
+This session:
+-6812ba6: raster Define Projection, geographic GeoKeys table/raw/GDAL tests,5 cases.
+-cd084e6: Copy Raster all bands and source NoData defaults,24 cases.
+-1c830f1: large integer NoData tags, float marker normalization/stats,16 downcast cases.
+All normal pre-push gates PASS. Latest gate183 Rust,5 ignored,8Python,fmt,clippy.
+Logs /tmp/unigis-copy-downcast-{check,push}.log. Dashboard refreshed: CI40566379155 (projection) and40568168576 (band copy)
+SUCCESS at19:41Z; downcast CI still pending.
+Durable research raster_crs/copy_raster; ROADMAP/KNOWN_GAPS updated.
 
-This run: 6812ba6 raster Define Projection and corrected geographic GeoTIFF keys.
-Five ArcGIS cases4326/32633/3857/7844/7856 retain cells/grid/type/NoData. Geographic
-classification from public PROJ metadata, no raster runtime database dependency.
-Raw GeoKey/GDAL and CLI multiband/in-place/refusal safety regressions included.
-FINAL scripts/check and normal pre-push gate PASS:182 Rust,5 ignored,0 failed;
-8 Python,fmt,clippy. /tmp/unigis-raster-crs-{check,push}.log.
-CI pending https://github.com/JanSolo99/geoforge/actions/runs/40566379155.
-Research/limits scripts/research/raster_crs/README.md, ROADMAP/KNOWN_GAPS updated.
+## Active frequency slice (VALIDATED; committing next)
 
-## Copy Raster slice committed cd084e6
+New crates/unigis-raster/src/frequency.rs +lib/registry registrations for3 tools,
+source-precision comparisons, SINGLE_BAND flatten/default and MULTI_BAND behavior.
+Native caps256 comparisons, matching grid/CRS;255 with NoData refused (encoding gap).
+Actual ArcGIS stores0+out-of-range256 tag for that case; GDAL mask flags1/all valid.
+Do NOT claim ArcGIS uses a standard mask. Native saturation would incorrectly store255.
 
-Source evidence: previous ug copy of RGB retained1 band vs ArcGIS3.
-extract.rs now converts every band in order and fixes untagged source default
-NoData: U8/I8=256,U16=65536,I16=32767,U32/I32=2147483647,F32=3.4e38,F64=1.79e308.
-F32->F64 uses double3.4e38. registry.rs enables per-band statistics for multiband
-copies, including first/later-band NoData. Existing single-band DEM behavior retained.
+63 successful saved freq_* cases, generator CASES/RUN/RASTER_OUT, manifest, exact
+CLI comparisons,4 tiny typed inputs testdata/raster/frequency. Research folder includes
+62 preliminary observations/scripts, make_inputs.py and README with primary links.
 
-24 saved cprbands_* cases all succeeded; generic ArcGIS comparison PASS on all24,
-exact every pixel/band plus grid/type/NoData/CRS/stats. Generator, manifest and new
-TIFF/TFW/XML references, two tiny testdata/raster/copy_raster inputs, research probes/
-observations/make_inputs.py/README. See scripts/research/copy_raster/README.md.
-ROADMAP/KNOWN_GAPS and dashboard refreshed. Slice committed cd084e6.
+ArcGIS MULTI_BAND repeats a single VALUE band up to max comparison bands; a multi
+value raster fixes output band count. Missing comparison bands yield NoData (no
+broadcast); extra comparison bands truncate. Stats empty bands count/min/mean0,
+max/stddev-1. New Output.empty_band_statistics policy + stats writer helper, CLI
+writer integration retain older tools' behavior. No app source changes.
 
-FINAL scripts/check PASS exit0 /tmp/unigis-copy-bands-check.log:
-182 Rust passed,5 ignored,0 failed;8 Python,fmt,clippy. Every24 case included.
-Dashboard JS node --check and git diff --check PASS. Normal push gate running.
-No other build/oracle processes. Research probes finished. git diff --check PASS.
+CLI tests/frequency.rs: grid/CRS, empty/oversized list,255-with-NoData refusal preserves
+inputs/existing output; also Rank/Popularity empty lists return000735 instead of panic.
+Scoped cargo test-j3-p unigis-cli --test frequency PASS2 tests before empty-band
+policy addition; initial workspace clippy PASS before final statistics policy.
+FINAL scripts/check PASS exit0 /tmp/unigis-frequency-check.log:185 Rust passed,
+5 ignored,0 failed;8Python,fmt,workspace/all-target clippy-Dwarnings. All63 exact
+ArcGIS cases and two CLI safety tests included. fmt done, generator63/63 succeeded exit0
+/tmp/unigis-frequency-generation.log. ROADMAP/KNOWN_GAPS/README updated.
 
 ## Next actions
 
-1. FINAL downcast scripts/check PASS exit0:183 Rust,5 ignored,0 failed;8Python,fmt,clippy.
-   /tmp/unigis-copy-downcast-check.log includes all16 cases and new large-tag regression.
-   Native after-check /tmp/unigis-copy-downcast-after.log matches all16 previously4 failed.
-2. Record results, refresh dashboard/JS check, stage only downcast paths, commit/push.
-3. Frequency tools research (not implemented): fifteen default/multiband/NoData probes
-   and eight count boundaries succeeded. /tmp/unigis-frequency-{probe,boundary-probe}.log.
-   Counts1/2/3/4/15/16/255/256 give ND16/3/16/15/16/-128/256/65535;
-   typesU8 except16 I8 and256 U16. Precise float-comparison probe session28958
-   /tmp/unigis-frequency-precision-probe.log. Save scripts/evidence durably before editing.
-4. Continue tested native engine slices. Tiny tagged CopyRaster stats/U32 export gaps
-   documented in KNOWN_GAPS; no guessed thresholds or fixes yet.
+1. Commit and push validated frequency slice through normal gate; verify remote.
+2. Refresh dashboard --ci and validate JS; stage only frequency/docs/reference paths.
+3. Commit/push through mandatory gate, verify remote, record exact tests and CI state.
+4. Continue bounded slices. Existing CopyRaster tiny tagged stats/U32 signed-export
+   differences remain documented; no guessed size thresholds. Consider these later.
 
 ## Preserve unrelated files
 
 Exclude testdata/geoproc/raster aux.xml edits, deleted *.sr.lock, .worktrees/,
 NOTES.md (DO NOT read/use: proprietary material), scratch_cf.tif,
 scratch_trend_rms.txt.xml and importer *.vat.* from prior oracle work.
-No reset/stash/worktree transfers. Root-only changes: no local full app build.
-Pre-push scripts/check mandatory; post-commit regenerates dashboard HTML (expected dirt).
-First full-array Copy Raster probe stalled on a large response; only its own worker
-cancelled; compact reruns completed. Oracle evidence always ArcGIS; GDAL file IO only.
-
-Additional research during push (no implementation changes): eight tagged CopyRaster
-probes /tmp/unigis-copy-tagged-probe.log show tiny single-band NoData copies do get
-statistics (unlike existing large DEM-with-NoData), U32 sentinel export signed wraps.
-General policy unresolved; preserve evidence and do not guess thresholds.
-Future frequency tools absent in actual ug inventory. Official Esri current Equal/
-Greater/Less Than Frequency docs consulted; preliminary15 black-box probes running
-session2708 /tmp/unigis-frequency-probe.log, script /tmp/unigis-frequency-probe.py.
-No frequency source edits; finish downcast slice before choosing new tools.
-
-## Active downcast slice (validated; committing next)
-
-extract.rs normalizes float output NoData before stats; F32 default uses double3.4e38
-for non-F32 output. geotiff.rs preserves integer NoData tags outside i64 range rather
-than saturating. Raw GeoTIFF/GDAL regression added for3.4e38 and +/-1.79e308.
-16 cprcast_* CASES/native exact comparison added; oracle generation session73517
-/tmp/unigis-copy-downcast-generation.log. ROADMAP/KNOWN_GAPS/README updated.
-Tiny tagged-statistics and U32 signed-export gaps now explicitly documented.
-Next complete root gate, refresh dashboard, commit/push, then consider frequency tools.
-Frequency boundary probes running session99851 /tmp/unigis-frequency-boundary-probe.log.
-
-Frequency32 successful probe results/scripts now durably saved in UNTRACKED
-scripts/research/frequency/ (baseline15,boundaries8,precision9, README with sources).
-Do NOT stage these with the downcast commit; keep subsequent implementation separate.
-
-Frequency broadcast18 probes complete; results /tmp/unigis-frequency-broadcast-probe.log
-show MULTI_BAND does NOT broadcast a single comparison band: later output bands all
-NoData; extra comparison bands truncate to value-band count (2vs3 outputs2).
-Do not implement standard broadcasting assumptions; inspect full results first.
+No reset/stash/worktree transfers. Root-only edits: no local full app build.
+Post-commit rebuilds dashboard HTML leaving expected dirt. No Cargo processes.
+Next exploratory48 Abs/Negate/Square type probes running session76974,
+/tmp/unigis-unary-types-probe.log, script /tmp/unigis-unary-types-probe.py.
+Only private copies; no math source edits. Dashboard regenerated --ci:
+282 own tools/307 verified entries. Native inventory exposes all3 new registry ids.

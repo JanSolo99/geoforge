@@ -731,3 +731,5 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Copy Raster retains every band and applies pixel conversion to each; 24 additional ArcGIS cases cover RGB layouts, all eight source pixel types, NoData defaults outside integer storage ranges, and first/later-band NoData statistics. Exact all-band cell comparisons prevent silent band loss. Research: `scripts/research/copy_raster/README.md`.
 
 - [x] Copy Raster downcasts: 16 additional ArcGIS cases cover all eight types to F32/I16. Large float NoData metadata survives integer output, and statistics exclude the rounded F32 marker correctly. A GeoTIFF/GDAL regression checks tags beyond the i64 range.
+
+- [x] Equal To / Greater Than / Less Than Frequency (`ug run *_frequency`): exact source-precision comparisons, duplicate counts, both band modes, value-band broadcast, missing/extra comparison bands, ArcGIS count types/NoData and empty-band statistics.63 saved cases plus CLI refusal preservation; empty Rank/Popularity lists now return a parameter error instead of panicking. Limits: `scripts/research/frequency/README.md`.

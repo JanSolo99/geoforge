@@ -1,0 +1,572 @@
+[
+  {
+    "tool": "EqualToFrequency",
+    "case": "val_broadcast",
+    "status": "succeeded",
+    "bands": 2,
+    "pixel_type": "U8",
+    "nodata": 16.0,
+    "values": [
+      [
+        [
+          1,
+          16,
+          16
+        ],
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      [
+        [
+          1,
+          16,
+          0
+        ],
+        [
+          16,
+          1,
+          0
+        ]
+      ]
+    ]
+  },
+  {
+    "tool": "EqualToFrequency",
+    "case": "list_broadcast",
+    "status": "succeeded",
+    "bands": 2,
+    "pixel_type": "U8",
+    "nodata": 16.0,
+    "values": [
+      [
+        [
+          1,
+          16,
+          1
+        ],
+        [
+          1,
+          1,
+          1
+        ]
+      ],
+      [
+        [
+          16,
+          16,
+          16
+        ],
+        [
+          16,
+          16,
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "tool": "EqualToFrequency",
+    "case": "multi_pair",
+    "status": "succeeded",
+    "bands": 2,
+    "pixel_type": "U8",
+    "nodata": 16.0,
+    "values": [
+      [
+        [
+          1,
+          16,
+          16
+        ],
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      [
+        [
+          0,
+          0,
+          1
+        ],
+        [
+          16,
+          16,
+          1
+        ]
+      ]
+    ]
+  },
+  {
+    "tool": "EqualToFrequency",
+    "case": "single_flat",
+    "status": "succeeded",
+    "bands": 1,
+    "pixel_type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        2,
+        3,
+        3
+      ],
+      [
+        3,
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "tool": "EqualToFrequency",
+    "case": "two_lists",
+    "status": "succeeded",
+    "bands": 2,
+    "pixel_type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        [
+          2,
+          3,
+          3
+        ],
+        [
+          2,
+          1,
+          1
+        ]
+      ],
+      [
+        [
+          3,
+          3,
+          3
+        ],
+        [
+          3,
+          3,
+          3
+        ]
+      ]
+    ]
+  },
+  {
+    "tool": "EqualToFrequency",
+    "case": "unequal",
+    "status": "succeeded",
+    "bands": 2,
+    "pixel_type": "U8",
+    "nodata": 16.0,
+    "values": [
+      [
+        [
+          1,
+          16,
+          16
+        ],
+        [
+          1,
+          0,
+          0
+        ]
+      ],
+      [
+        [
+          0,
+          0,
+          1
+        ],
+        [
+          16,
+          16,
+          1
+        ]
+      ]
+    ]
+  },
+  {
+    "tool": "GreaterThanFrequency",
+    "case": "val_broadcast",
+    "status": "succeeded",
+    "bands": 2,
+    "pixel_type": "U8",
+    "nodata": 16.0,
+    "values": [
+      [
+        [
+          0,
+          16,
+          16
+        ],
+        [
+          0,
+          1,
+          0
+        ]
+      ],
+      [
+        [
+          0,
+          16,
+          1
+        ],
+        [
+          16,
+          0,
+          0
+        ]
+      ]
+    ]
+  },
+  {
+    "tool": "GreaterThanFrequency",
+    "case": "list_broadcast",
+    "status": "succeeded",
+    "bands": 2,
+    "pixel_type": "U8",
+    "nodata": 16.0,
+    "values": [
+      [
+        [
+          0,
+          16,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      [
+        [
+          16,
+          16,
+          16
+        ],
+        [
+          16,
+          16,
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "tool": "GreaterThanFrequency",
+    "case": "multi_pair",
+    "status": "succeeded",
+    "bands": 2,
+    "pixel_type": "U8",
+    "nodata": 16.0,
+    "values": [
+      [
+        [
+          0,
+          16,
+          16
+        ],
+        [
+          0,
+          1,
+          0
+        ]
+      ],
+      [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          16,
+          16,
+          0
+        ]
+      ]
+    ]
+  },
+  {
+    "tool": "GreaterThanFrequency",
+    "case": "single_flat",
+    "status": "succeeded",
+    "bands": 1,
+    "pixel_type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        0,
+        3,
+        3
+      ],
+      [
+        3,
+        1,
+        0
+      ]
+    ]
+  },
+  {
+    "tool": "GreaterThanFrequency",
+    "case": "two_lists",
+    "status": "succeeded",
+    "bands": 2,
+    "pixel_type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        [
+          0,
+          3,
+          3
+        ],
+        [
+          0,
+          1,
+          0
+        ]
+      ],
+      [
+        [
+          3,
+          3,
+          3
+        ],
+        [
+          3,
+          3,
+          3
+        ]
+      ]
+    ]
+  },
+  {
+    "tool": "GreaterThanFrequency",
+    "case": "unequal",
+    "status": "succeeded",
+    "bands": 2,
+    "pixel_type": "U8",
+    "nodata": 16.0,
+    "values": [
+      [
+        [
+          0,
+          16,
+          16
+        ],
+        [
+          0,
+          1,
+          0
+        ]
+      ],
+      [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          16,
+          16,
+          0
+        ]
+      ]
+    ]
+  },
+  {
+    "tool": "LessThanFrequency",
+    "case": "val_broadcast",
+    "status": "succeeded",
+    "bands": 2,
+    "pixel_type": "U8",
+    "nodata": 16.0,
+    "values": [
+      [
+        [
+          0,
+          16,
+          16
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ],
+      [
+        [
+          0,
+          16,
+          0
+        ],
+        [
+          16,
+          0,
+          1
+        ]
+      ]
+    ]
+  },
+  {
+    "tool": "LessThanFrequency",
+    "case": "list_broadcast",
+    "status": "succeeded",
+    "bands": 2,
+    "pixel_type": "U8",
+    "nodata": 16.0,
+    "values": [
+      [
+        [
+          0,
+          16,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      [
+        [
+          16,
+          16,
+          16
+        ],
+        [
+          16,
+          16,
+          16
+        ]
+      ]
+    ]
+  },
+  {
+    "tool": "LessThanFrequency",
+    "case": "multi_pair",
+    "status": "succeeded",
+    "bands": 2,
+    "pixel_type": "U8",
+    "nodata": 16.0,
+    "values": [
+      [
+        [
+          0,
+          16,
+          16
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ],
+      [
+        [
+          1,
+          1,
+          0
+        ],
+        [
+          16,
+          16,
+          0
+        ]
+      ]
+    ]
+  },
+  {
+    "tool": "LessThanFrequency",
+    "case": "single_flat",
+    "status": "succeeded",
+    "bands": 1,
+    "pixel_type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        0,
+        3,
+        3
+      ],
+      [
+        3,
+        0,
+        2
+      ]
+    ]
+  },
+  {
+    "tool": "LessThanFrequency",
+    "case": "two_lists",
+    "status": "succeeded",
+    "bands": 2,
+    "pixel_type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        [
+          0,
+          3,
+          3
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ],
+      [
+        [
+          3,
+          3,
+          3
+        ],
+        [
+          3,
+          3,
+          3
+        ]
+      ]
+    ]
+  },
+  {
+    "tool": "LessThanFrequency",
+    "case": "unequal",
+    "status": "succeeded",
+    "bands": 2,
+    "pixel_type": "U8",
+    "nodata": 16.0,
+    "values": [
+      [
+        [
+          0,
+          16,
+          16
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ],
+      [
+        [
+          1,
+          1,
+          0
+        ],
+        [
+          16,
+          16,
+          0
+        ]
+      ]
+    ]
+  }
+]

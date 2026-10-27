@@ -1,0 +1,135 @@
+[
+  {
+    "count": 5,
+    "status": "succeeded",
+    "type": "U8",
+    "nodata": 15.0,
+    "bands": 1,
+    "values": [
+      [
+        5,
+        5,
+        5
+      ],
+      [
+        5,
+        5,
+        5
+      ]
+    ]
+  },
+  {
+    "count": 7,
+    "status": "succeeded",
+    "type": "U8",
+    "nodata": 15.0,
+    "bands": 1,
+    "values": [
+      [
+        7,
+        7,
+        7
+      ],
+      [
+        7,
+        7,
+        7
+      ]
+    ]
+  },
+  {
+    "count": 14,
+    "status": "succeeded",
+    "type": "U8",
+    "nodata": 15.0,
+    "bands": 1,
+    "values": [
+      [
+        14,
+        14,
+        14
+      ],
+      [
+        14,
+        14,
+        14
+      ]
+    ]
+  },
+  {
+    "count": 127,
+    "status": "succeeded",
+    "type": "S8",
+    "nodata": -128.0,
+    "bands": 1,
+    "values": [
+      [
+        127,
+        127,
+        127
+      ],
+      [
+        127,
+        127,
+        127
+      ]
+    ]
+  },
+  {
+    "count": 128,
+    "status": "succeeded",
+    "type": "U8",
+    "nodata": 255.0,
+    "bands": 1,
+    "values": [
+      [
+        128,
+        128,
+        128
+      ],
+      [
+        128,
+        128,
+        128
+      ]
+    ]
+  },
+  {
+    "count": 254,
+    "status": "succeeded",
+    "type": "U8",
+    "nodata": 255.0,
+    "bands": 1,
+    "values": [
+      [
+        254,
+        254,
+        254
+      ],
+      [
+        254,
+        254,
+        254
+      ]
+    ]
+  },
+  {
+    "case": "nd_255",
+    "count": 255,
+    "status": "succeeded",
+    "type": "U8",
+    "nodata": 256.0,
+    "values": [
+      [
+        255,
+        0,
+        255
+      ],
+      [
+        255,
+        255,
+        255
+      ]
+    ]
+  }
+]

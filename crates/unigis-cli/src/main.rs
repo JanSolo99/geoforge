@@ -6249,7 +6249,10 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
         println!("Wrote {output}");
         return Ok(());
     }
-    if out.zero_count {
+    if out.empty_band_statistics {
+        write_raster_with(Path::new(&output), &out.raster, false)?;
+        unigis_raster::stats::write_aux_statistics_with_empty(Path::new(&output), &out.raster)
+    } else if out.zero_count {
         write_raster_basin(Path::new(&output), &out.raster)
     } else {
         write_raster_with(Path::new(&output), &out.raster, out.statistics)

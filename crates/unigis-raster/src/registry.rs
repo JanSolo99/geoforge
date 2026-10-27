@@ -61,6 +61,8 @@ pub struct Output {
     pub statistics: bool,
     /// ArcGIS writes a STATISTICS_COUNT of 0 (Basin, Sink).
     pub zero_count: bool,
+    /// Write ArcGIS empty-band statistics for entirely NoData bands.
+    pub empty_band_statistics: bool,
 }
 
 pub struct Tool {
@@ -160,6 +162,7 @@ fn nibble(ctx: &dyn Context) -> Result<Output> {
         raster,
         statistics: false,
         zero_count: false,
+        empty_band_statistics: false,
     })
 }
 
@@ -193,6 +196,7 @@ fn with_statistics(raster: Raster, statistics: bool) -> Result<Output> {
         raster,
         statistics,
         zero_count: false,
+        empty_band_statistics: false,
     })
 }
 
@@ -688,6 +692,11 @@ fn rank_or_popularity_tool(ctx: &dyn Context, popularity: bool) -> Result<Output
             rasters.push(ctx.raster_at(path.trim())?);
         }
     }
+    if rasters.is_empty() {
+        return Err(Error::Unsupported(
+            "ERROR 000735: Input Rasters: value is required".into(),
+        ));
+    }
     for r in &rasters[1..] {
         if (r.width, r.height) != (rasters[0].width, rasters[0].height) {
             return Err(Error::Unsupported("the rasters must share a grid".into()));
@@ -704,6 +713,44 @@ fn rank_tool(ctx: &dyn Context) -> Result<Output> {
 
 fn popularity_tool(ctx: &dyn Context) -> Result<Output> {
     rank_or_popularity_tool(ctx, true)
+}
+
+fn frequency_tool(ctx: &dyn Context, comparison: crate::frequency::Comparison) -> Result<Output> {
+    let input = ctx.raster("input")?;
+    let paths = ctx.get("rasters").unwrap_or_default();
+    let paths: Vec<_> = paths
+        .split(';')
+        .map(str::trim)
+        .filter(|p| !p.is_empty())
+        .collect();
+    if paths.len() > 256 {
+        return Err(Error::Unsupported(
+            "Frequency supports at most 256 comparison rasters".into(),
+        ));
+    }
+    let rasters = paths
+        .iter()
+        .map(|path| ctx.raster_at(path))
+        .collect::<Result<Vec<_>>>()?;
+    let multiband = ctx
+        .get("process_as_multiband")
+        .is_some_and(|v| v.eq_ignore_ascii_case("MULTI_BAND"));
+    let mut output = with_statistics(
+        crate::frequency::frequency(&input, &rasters, comparison, multiband)?,
+        true,
+    )?;
+    output.empty_band_statistics = true;
+    Ok(output)
+}
+
+fn equal_to_frequency(ctx: &dyn Context) -> Result<Output> {
+    frequency_tool(ctx, crate::frequency::Comparison::Equal)
+}
+fn greater_than_frequency(ctx: &dyn Context) -> Result<Output> {
+    frequency_tool(ctx, crate::frequency::Comparison::Greater)
+}
+fn less_than_frequency(ctx: &dyn Context) -> Result<Output> {
+    frequency_tool(ctx, crate::frequency::Comparison::Less)
 }
 
 fn in_list_tool(ctx: &dyn Context) -> Result<Output> {
@@ -1202,6 +1249,72 @@ pub static TOOLS: &[Tool] = &[
             },
         ],
         run: popularity_tool,
+    },
+    Tool {
+        id: "equal_to_frequency",
+        name: "Equal To Frequency",
+        summary: "Counts matching comparison values on the same raster grid; supports SINGLE_BAND and MULTI_BAND.",
+        params: &[
+            raster("input", "Input Value Raster", true),
+            Param {
+                name: "rasters",
+                label: "Input Rasters",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            option(
+                "process_as_multiband",
+                "Process as Multiband",
+                &["SINGLE_BAND", "MULTI_BAND"],
+                "SINGLE_BAND",
+            ),
+        ],
+        run: equal_to_frequency,
+    },
+    Tool {
+        id: "greater_than_frequency",
+        name: "Greater Than Frequency",
+        summary: "Counts matching comparison values on the same raster grid; supports SINGLE_BAND and MULTI_BAND.",
+        params: &[
+            raster("input", "Input Value Raster", true),
+            Param {
+                name: "rasters",
+                label: "Input Rasters",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            option(
+                "process_as_multiband",
+                "Process as Multiband",
+                &["SINGLE_BAND", "MULTI_BAND"],
+                "SINGLE_BAND",
+            ),
+        ],
+        run: greater_than_frequency,
+    },
+    Tool {
+        id: "less_than_frequency",
+        name: "Less Than Frequency",
+        summary: "Counts matching comparison values on the same raster grid; supports SINGLE_BAND and MULTI_BAND.",
+        params: &[
+            raster("input", "Input Value Raster", true),
+            Param {
+                name: "rasters",
+                label: "Input Rasters",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            option(
+                "process_as_multiband",
+                "Process as Multiband",
+                &["SINGLE_BAND", "MULTI_BAND"],
+                "SINGLE_BAND",
+            ),
+        ],
+        run: less_than_frequency,
     },
     Tool {
         id: "in_list",

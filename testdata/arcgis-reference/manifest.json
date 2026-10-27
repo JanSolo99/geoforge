@@ -55301,6 +55301,1360 @@
           "pixel_type": "16_BIT_SIGNED"
         }
       }
+    },
+    "freq_eq_basic": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/i8.tif;testdata/raster/composite_matrix/f32.tif",
+        "<out>",
+        "SINGLE_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "rasters": "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/i8.tif;testdata/raster/composite_matrix/f32.tif",
+          "output": "<out>",
+          "process_as_multiband": "SINGLE_BAND"
+        }
+      }
+    },
+    "freq_eq_value_nd": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/nd_u8.tif",
+        "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/i8.tif",
+        "<out>",
+        "SINGLE_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_u8.tif",
+          "rasters": "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/i8.tif",
+          "output": "<out>",
+          "process_as_multiband": "SINGLE_BAND"
+        }
+      }
+    },
+    "freq_eq_list_nd": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "testdata/raster/composite_matrix/nd_u8.tif;testdata/raster/composite_matrix/i8.tif",
+        "<out>",
+        "SINGLE_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "rasters": "testdata/raster/composite_matrix/nd_u8.tif;testdata/raster/composite_matrix/i8.tif",
+          "output": "<out>",
+          "process_as_multiband": "SINGLE_BAND"
+        }
+      }
+    },
+    "freq_eq_multi_single": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/copy_raster/first_nodata.tif",
+        "testdata/raster/copy_raster/later_nodata.tif",
+        "<out>",
+        "SINGLE_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/copy_raster/first_nodata.tif",
+          "rasters": "testdata/raster/copy_raster/later_nodata.tif",
+          "output": "<out>",
+          "process_as_multiband": "SINGLE_BAND"
+        }
+      }
+    },
+    "freq_eq_multi_multi": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/copy_raster/first_nodata.tif",
+        "testdata/raster/copy_raster/later_nodata.tif",
+        "<out>",
+        "MULTI_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/copy_raster/first_nodata.tif",
+          "rasters": "testdata/raster/copy_raster/later_nodata.tif",
+          "output": "<out>",
+          "process_as_multiband": "MULTI_BAND"
+        }
+      }
+    },
+    "freq_eq_f64_precision": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/f64.tif",
+        "testdata/raster/composite_matrix/f32.tif;testdata/raster/composite_matrix/f64.tif",
+        "<out>",
+        "SINGLE_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/f64.tif",
+          "rasters": "testdata/raster/composite_matrix/f32.tif;testdata/raster/composite_matrix/f64.tif",
+          "output": "<out>",
+          "process_as_multiband": "SINGLE_BAND"
+        }
+      }
+    },
+    "freq_eq_f32_precision": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/f32.tif",
+        "testdata/raster/composite_matrix/f32.tif;testdata/raster/composite_matrix/f64.tif",
+        "<out>",
+        "SINGLE_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/f32.tif",
+          "rasters": "testdata/raster/composite_matrix/f32.tif;testdata/raster/composite_matrix/f64.tif",
+          "output": "<out>",
+          "process_as_multiband": "SINGLE_BAND"
+        }
+      }
+    },
+    "freq_eq_u32_precision": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u32.tif",
+        "testdata/raster/composite_matrix/f32.tif;testdata/raster/composite_matrix/u32.tif",
+        "<out>",
+        "SINGLE_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u32.tif",
+          "rasters": "testdata/raster/composite_matrix/f32.tif;testdata/raster/composite_matrix/u32.tif",
+          "output": "<out>",
+          "process_as_multiband": "SINGLE_BAND"
+        }
+      }
+    },
+    "freq_eq_val_broadcast": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/frequency/single.tif",
+        "testdata/raster/frequency/list2.tif",
+        "<out>",
+        "MULTI_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/frequency/single.tif",
+          "rasters": "testdata/raster/frequency/list2.tif",
+          "output": "<out>",
+          "process_as_multiband": "MULTI_BAND"
+        }
+      }
+    },
+    "freq_eq_list_broadcast": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/frequency/value2.tif",
+        "testdata/raster/frequency/single.tif",
+        "<out>",
+        "MULTI_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/frequency/value2.tif",
+          "rasters": "testdata/raster/frequency/single.tif",
+          "output": "<out>",
+          "process_as_multiband": "MULTI_BAND"
+        }
+      }
+    },
+    "freq_eq_multi_pair": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/frequency/value2.tif",
+        "testdata/raster/frequency/list2.tif",
+        "<out>",
+        "MULTI_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/frequency/value2.tif",
+          "rasters": "testdata/raster/frequency/list2.tif",
+          "output": "<out>",
+          "process_as_multiband": "MULTI_BAND"
+        }
+      }
+    },
+    "freq_eq_single_flat": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/frequency/value2.tif",
+        "testdata/raster/frequency/list2.tif",
+        "<out>",
+        "SINGLE_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/frequency/value2.tif",
+          "rasters": "testdata/raster/frequency/list2.tif",
+          "output": "<out>",
+          "process_as_multiband": "SINGLE_BAND"
+        }
+      }
+    },
+    "freq_eq_two_lists": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/frequency/value2.tif",
+        "testdata/raster/frequency/list2.tif;testdata/raster/frequency/single.tif",
+        "<out>",
+        "MULTI_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/frequency/value2.tif",
+          "rasters": "testdata/raster/frequency/list2.tif;testdata/raster/frequency/single.tif",
+          "output": "<out>",
+          "process_as_multiband": "MULTI_BAND"
+        }
+      }
+    },
+    "freq_eq_unequal": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/frequency/value2.tif",
+        "testdata/raster/frequency/three.tif",
+        "<out>",
+        "MULTI_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/frequency/value2.tif",
+          "rasters": "testdata/raster/frequency/three.tif",
+          "output": "<out>",
+          "process_as_multiband": "MULTI_BAND"
+        }
+      }
+    },
+    "freq_gt_basic": {
+      "tool": "gp.GreaterThanFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/i8.tif;testdata/raster/composite_matrix/f32.tif",
+        "<out>",
+        "SINGLE_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "greater_than_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "rasters": "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/i8.tif;testdata/raster/composite_matrix/f32.tif",
+          "output": "<out>",
+          "process_as_multiband": "SINGLE_BAND"
+        }
+      }
+    },
+    "freq_gt_value_nd": {
+      "tool": "gp.GreaterThanFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/nd_u8.tif",
+        "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/i8.tif",
+        "<out>",
+        "SINGLE_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "greater_than_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_u8.tif",
+          "rasters": "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/i8.tif",
+          "output": "<out>",
+          "process_as_multiband": "SINGLE_BAND"
+        }
+      }
+    },
+    "freq_gt_list_nd": {
+      "tool": "gp.GreaterThanFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "testdata/raster/composite_matrix/nd_u8.tif;testdata/raster/composite_matrix/i8.tif",
+        "<out>",
+        "SINGLE_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "greater_than_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "rasters": "testdata/raster/composite_matrix/nd_u8.tif;testdata/raster/composite_matrix/i8.tif",
+          "output": "<out>",
+          "process_as_multiband": "SINGLE_BAND"
+        }
+      }
+    },
+    "freq_gt_multi_single": {
+      "tool": "gp.GreaterThanFrequency_sa",
+      "args": [
+        "testdata/raster/copy_raster/first_nodata.tif",
+        "testdata/raster/copy_raster/later_nodata.tif",
+        "<out>",
+        "SINGLE_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "greater_than_frequency",
+        "params": {
+          "input": "testdata/raster/copy_raster/first_nodata.tif",
+          "rasters": "testdata/raster/copy_raster/later_nodata.tif",
+          "output": "<out>",
+          "process_as_multiband": "SINGLE_BAND"
+        }
+      }
+    },
+    "freq_gt_multi_multi": {
+      "tool": "gp.GreaterThanFrequency_sa",
+      "args": [
+        "testdata/raster/copy_raster/first_nodata.tif",
+        "testdata/raster/copy_raster/later_nodata.tif",
+        "<out>",
+        "MULTI_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "greater_than_frequency",
+        "params": {
+          "input": "testdata/raster/copy_raster/first_nodata.tif",
+          "rasters": "testdata/raster/copy_raster/later_nodata.tif",
+          "output": "<out>",
+          "process_as_multiband": "MULTI_BAND"
+        }
+      }
+    },
+    "freq_gt_f64_precision": {
+      "tool": "gp.GreaterThanFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/f64.tif",
+        "testdata/raster/composite_matrix/f32.tif;testdata/raster/composite_matrix/f64.tif",
+        "<out>",
+        "SINGLE_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "greater_than_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/f64.tif",
+          "rasters": "testdata/raster/composite_matrix/f32.tif;testdata/raster/composite_matrix/f64.tif",
+          "output": "<out>",
+          "process_as_multiband": "SINGLE_BAND"
+        }
+      }
+    },
+    "freq_gt_f32_precision": {
+      "tool": "gp.GreaterThanFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/f32.tif",
+        "testdata/raster/composite_matrix/f32.tif;testdata/raster/composite_matrix/f64.tif",
+        "<out>",
+        "SINGLE_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "greater_than_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/f32.tif",
+          "rasters": "testdata/raster/composite_matrix/f32.tif;testdata/raster/composite_matrix/f64.tif",
+          "output": "<out>",
+          "process_as_multiband": "SINGLE_BAND"
+        }
+      }
+    },
+    "freq_gt_u32_precision": {
+      "tool": "gp.GreaterThanFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u32.tif",
+        "testdata/raster/composite_matrix/f32.tif;testdata/raster/composite_matrix/u32.tif",
+        "<out>",
+        "SINGLE_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "greater_than_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u32.tif",
+          "rasters": "testdata/raster/composite_matrix/f32.tif;testdata/raster/composite_matrix/u32.tif",
+          "output": "<out>",
+          "process_as_multiband": "SINGLE_BAND"
+        }
+      }
+    },
+    "freq_gt_val_broadcast": {
+      "tool": "gp.GreaterThanFrequency_sa",
+      "args": [
+        "testdata/raster/frequency/single.tif",
+        "testdata/raster/frequency/list2.tif",
+        "<out>",
+        "MULTI_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "greater_than_frequency",
+        "params": {
+          "input": "testdata/raster/frequency/single.tif",
+          "rasters": "testdata/raster/frequency/list2.tif",
+          "output": "<out>",
+          "process_as_multiband": "MULTI_BAND"
+        }
+      }
+    },
+    "freq_gt_list_broadcast": {
+      "tool": "gp.GreaterThanFrequency_sa",
+      "args": [
+        "testdata/raster/frequency/value2.tif",
+        "testdata/raster/frequency/single.tif",
+        "<out>",
+        "MULTI_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "greater_than_frequency",
+        "params": {
+          "input": "testdata/raster/frequency/value2.tif",
+          "rasters": "testdata/raster/frequency/single.tif",
+          "output": "<out>",
+          "process_as_multiband": "MULTI_BAND"
+        }
+      }
+    },
+    "freq_gt_multi_pair": {
+      "tool": "gp.GreaterThanFrequency_sa",
+      "args": [
+        "testdata/raster/frequency/value2.tif",
+        "testdata/raster/frequency/list2.tif",
+        "<out>",
+        "MULTI_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "greater_than_frequency",
+        "params": {
+          "input": "testdata/raster/frequency/value2.tif",
+          "rasters": "testdata/raster/frequency/list2.tif",
+          "output": "<out>",
+          "process_as_multiband": "MULTI_BAND"
+        }
+      }
+    },
+    "freq_gt_single_flat": {
+      "tool": "gp.GreaterThanFrequency_sa",
+      "args": [
+        "testdata/raster/frequency/value2.tif",
+        "testdata/raster/frequency/list2.tif",
+        "<out>",
+        "SINGLE_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "greater_than_frequency",
+        "params": {
+          "input": "testdata/raster/frequency/value2.tif",
+          "rasters": "testdata/raster/frequency/list2.tif",
+          "output": "<out>",
+          "process_as_multiband": "SINGLE_BAND"
+        }
+      }
+    },
+    "freq_gt_two_lists": {
+      "tool": "gp.GreaterThanFrequency_sa",
+      "args": [
+        "testdata/raster/frequency/value2.tif",
+        "testdata/raster/frequency/list2.tif;testdata/raster/frequency/single.tif",
+        "<out>",
+        "MULTI_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "greater_than_frequency",
+        "params": {
+          "input": "testdata/raster/frequency/value2.tif",
+          "rasters": "testdata/raster/frequency/list2.tif;testdata/raster/frequency/single.tif",
+          "output": "<out>",
+          "process_as_multiband": "MULTI_BAND"
+        }
+      }
+    },
+    "freq_gt_unequal": {
+      "tool": "gp.GreaterThanFrequency_sa",
+      "args": [
+        "testdata/raster/frequency/value2.tif",
+        "testdata/raster/frequency/three.tif",
+        "<out>",
+        "MULTI_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "greater_than_frequency",
+        "params": {
+          "input": "testdata/raster/frequency/value2.tif",
+          "rasters": "testdata/raster/frequency/three.tif",
+          "output": "<out>",
+          "process_as_multiband": "MULTI_BAND"
+        }
+      }
+    },
+    "freq_lt_basic": {
+      "tool": "gp.LessThanFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/i8.tif;testdata/raster/composite_matrix/f32.tif",
+        "<out>",
+        "SINGLE_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "less_than_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "rasters": "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/i8.tif;testdata/raster/composite_matrix/f32.tif",
+          "output": "<out>",
+          "process_as_multiband": "SINGLE_BAND"
+        }
+      }
+    },
+    "freq_lt_value_nd": {
+      "tool": "gp.LessThanFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/nd_u8.tif",
+        "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/i8.tif",
+        "<out>",
+        "SINGLE_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "less_than_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_u8.tif",
+          "rasters": "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/i8.tif",
+          "output": "<out>",
+          "process_as_multiband": "SINGLE_BAND"
+        }
+      }
+    },
+    "freq_lt_list_nd": {
+      "tool": "gp.LessThanFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "testdata/raster/composite_matrix/nd_u8.tif;testdata/raster/composite_matrix/i8.tif",
+        "<out>",
+        "SINGLE_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "less_than_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "rasters": "testdata/raster/composite_matrix/nd_u8.tif;testdata/raster/composite_matrix/i8.tif",
+          "output": "<out>",
+          "process_as_multiband": "SINGLE_BAND"
+        }
+      }
+    },
+    "freq_lt_multi_single": {
+      "tool": "gp.LessThanFrequency_sa",
+      "args": [
+        "testdata/raster/copy_raster/first_nodata.tif",
+        "testdata/raster/copy_raster/later_nodata.tif",
+        "<out>",
+        "SINGLE_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "less_than_frequency",
+        "params": {
+          "input": "testdata/raster/copy_raster/first_nodata.tif",
+          "rasters": "testdata/raster/copy_raster/later_nodata.tif",
+          "output": "<out>",
+          "process_as_multiband": "SINGLE_BAND"
+        }
+      }
+    },
+    "freq_lt_multi_multi": {
+      "tool": "gp.LessThanFrequency_sa",
+      "args": [
+        "testdata/raster/copy_raster/first_nodata.tif",
+        "testdata/raster/copy_raster/later_nodata.tif",
+        "<out>",
+        "MULTI_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "less_than_frequency",
+        "params": {
+          "input": "testdata/raster/copy_raster/first_nodata.tif",
+          "rasters": "testdata/raster/copy_raster/later_nodata.tif",
+          "output": "<out>",
+          "process_as_multiband": "MULTI_BAND"
+        }
+      }
+    },
+    "freq_lt_f64_precision": {
+      "tool": "gp.LessThanFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/f64.tif",
+        "testdata/raster/composite_matrix/f32.tif;testdata/raster/composite_matrix/f64.tif",
+        "<out>",
+        "SINGLE_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "less_than_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/f64.tif",
+          "rasters": "testdata/raster/composite_matrix/f32.tif;testdata/raster/composite_matrix/f64.tif",
+          "output": "<out>",
+          "process_as_multiband": "SINGLE_BAND"
+        }
+      }
+    },
+    "freq_lt_f32_precision": {
+      "tool": "gp.LessThanFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/f32.tif",
+        "testdata/raster/composite_matrix/f32.tif;testdata/raster/composite_matrix/f64.tif",
+        "<out>",
+        "SINGLE_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "less_than_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/f32.tif",
+          "rasters": "testdata/raster/composite_matrix/f32.tif;testdata/raster/composite_matrix/f64.tif",
+          "output": "<out>",
+          "process_as_multiband": "SINGLE_BAND"
+        }
+      }
+    },
+    "freq_lt_u32_precision": {
+      "tool": "gp.LessThanFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u32.tif",
+        "testdata/raster/composite_matrix/f32.tif;testdata/raster/composite_matrix/u32.tif",
+        "<out>",
+        "SINGLE_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "less_than_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u32.tif",
+          "rasters": "testdata/raster/composite_matrix/f32.tif;testdata/raster/composite_matrix/u32.tif",
+          "output": "<out>",
+          "process_as_multiband": "SINGLE_BAND"
+        }
+      }
+    },
+    "freq_lt_val_broadcast": {
+      "tool": "gp.LessThanFrequency_sa",
+      "args": [
+        "testdata/raster/frequency/single.tif",
+        "testdata/raster/frequency/list2.tif",
+        "<out>",
+        "MULTI_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "less_than_frequency",
+        "params": {
+          "input": "testdata/raster/frequency/single.tif",
+          "rasters": "testdata/raster/frequency/list2.tif",
+          "output": "<out>",
+          "process_as_multiband": "MULTI_BAND"
+        }
+      }
+    },
+    "freq_lt_list_broadcast": {
+      "tool": "gp.LessThanFrequency_sa",
+      "args": [
+        "testdata/raster/frequency/value2.tif",
+        "testdata/raster/frequency/single.tif",
+        "<out>",
+        "MULTI_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "less_than_frequency",
+        "params": {
+          "input": "testdata/raster/frequency/value2.tif",
+          "rasters": "testdata/raster/frequency/single.tif",
+          "output": "<out>",
+          "process_as_multiband": "MULTI_BAND"
+        }
+      }
+    },
+    "freq_lt_multi_pair": {
+      "tool": "gp.LessThanFrequency_sa",
+      "args": [
+        "testdata/raster/frequency/value2.tif",
+        "testdata/raster/frequency/list2.tif",
+        "<out>",
+        "MULTI_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "less_than_frequency",
+        "params": {
+          "input": "testdata/raster/frequency/value2.tif",
+          "rasters": "testdata/raster/frequency/list2.tif",
+          "output": "<out>",
+          "process_as_multiband": "MULTI_BAND"
+        }
+      }
+    },
+    "freq_lt_single_flat": {
+      "tool": "gp.LessThanFrequency_sa",
+      "args": [
+        "testdata/raster/frequency/value2.tif",
+        "testdata/raster/frequency/list2.tif",
+        "<out>",
+        "SINGLE_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "less_than_frequency",
+        "params": {
+          "input": "testdata/raster/frequency/value2.tif",
+          "rasters": "testdata/raster/frequency/list2.tif",
+          "output": "<out>",
+          "process_as_multiband": "SINGLE_BAND"
+        }
+      }
+    },
+    "freq_lt_two_lists": {
+      "tool": "gp.LessThanFrequency_sa",
+      "args": [
+        "testdata/raster/frequency/value2.tif",
+        "testdata/raster/frequency/list2.tif;testdata/raster/frequency/single.tif",
+        "<out>",
+        "MULTI_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "less_than_frequency",
+        "params": {
+          "input": "testdata/raster/frequency/value2.tif",
+          "rasters": "testdata/raster/frequency/list2.tif;testdata/raster/frequency/single.tif",
+          "output": "<out>",
+          "process_as_multiband": "MULTI_BAND"
+        }
+      }
+    },
+    "freq_lt_unequal": {
+      "tool": "gp.LessThanFrequency_sa",
+      "args": [
+        "testdata/raster/frequency/value2.tif",
+        "testdata/raster/frequency/three.tif",
+        "<out>",
+        "MULTI_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "less_than_frequency",
+        "params": {
+          "input": "testdata/raster/frequency/value2.tif",
+          "rasters": "testdata/raster/frequency/three.tif",
+          "output": "<out>",
+          "process_as_multiband": "MULTI_BAND"
+        }
+      }
+    },
+    "freq_eq_count1": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "testdata/raster/composite_matrix/u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "rasters": "testdata/raster/composite_matrix/u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "freq_eq_count2": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "rasters": "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "freq_eq_count3": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "rasters": "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "freq_eq_count4": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "rasters": "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "freq_eq_count5": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "rasters": "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "freq_eq_count7": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "rasters": "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "freq_eq_count14": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "rasters": "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "freq_eq_count15": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "rasters": "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "freq_eq_count16": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "rasters": "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "freq_eq_count127": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "rasters": "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "freq_eq_count128": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "rasters": "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "freq_eq_count254": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "rasters": "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "freq_eq_count255": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "rasters": "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "freq_eq_count256": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "rasters": "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "freq_eq_single_then_two": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/frequency/single.tif",
+        "testdata/raster/frequency/single.tif;testdata/raster/frequency/list2.tif",
+        "<out>",
+        "MULTI_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/frequency/single.tif",
+          "rasters": "testdata/raster/frequency/single.tif;testdata/raster/frequency/list2.tif",
+          "output": "<out>",
+          "process_as_multiband": "MULTI_BAND"
+        }
+      }
+    },
+    "freq_eq_two_then_single": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/frequency/single.tif",
+        "testdata/raster/frequency/list2.tif;testdata/raster/frequency/single.tif",
+        "<out>",
+        "MULTI_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/frequency/single.tif",
+          "rasters": "testdata/raster/frequency/list2.tif;testdata/raster/frequency/single.tif",
+          "output": "<out>",
+          "process_as_multiband": "MULTI_BAND"
+        }
+      }
+    },
+    "freq_eq_two_then_three": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/frequency/single.tif",
+        "testdata/raster/frequency/list2.tif;testdata/raster/frequency/three.tif",
+        "<out>",
+        "MULTI_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/frequency/single.tif",
+          "rasters": "testdata/raster/frequency/list2.tif;testdata/raster/frequency/three.tif",
+          "output": "<out>",
+          "process_as_multiband": "MULTI_BAND"
+        }
+      }
+    },
+    "freq_eq_three_then_two": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/frequency/single.tif",
+        "testdata/raster/frequency/three.tif;testdata/raster/frequency/list2.tif",
+        "<out>",
+        "MULTI_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/frequency/single.tif",
+          "rasters": "testdata/raster/frequency/three.tif;testdata/raster/frequency/list2.tif",
+          "output": "<out>",
+          "process_as_multiband": "MULTI_BAND"
+        }
+      }
+    },
+    "freq_eq_three_value": {
+      "tool": "gp.EqualToFrequency_sa",
+      "args": [
+        "testdata/raster/frequency/three.tif",
+        "testdata/raster/frequency/value2.tif",
+        "<out>",
+        "MULTI_BAND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "equal_to_frequency",
+        "params": {
+          "input": "testdata/raster/frequency/three.tif",
+          "rasters": "testdata/raster/frequency/value2.tif",
+          "output": "<out>",
+          "process_as_multiband": "MULTI_BAND"
+        }
+      }
+    },
+    "freq_gt_zero4": {
+      "tool": "gp.GreaterThanFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "greater_than_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "rasters": "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "freq_lt_zero4": {
+      "tool": "gp.LessThanFrequency_sa",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif",
+        "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "less_than_frequency",
+        "params": {
+          "input": "testdata/raster/composite_matrix/u8.tif",
+          "rasters": "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/u8.tif",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

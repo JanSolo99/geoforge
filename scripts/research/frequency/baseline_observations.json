@@ -1,0 +1,476 @@
+[
+  {
+    "tool": "EqualToFrequency",
+    "case": "basic",
+    "status": "succeeded",
+    "bands": 1,
+    "pixel_type": "U8",
+    "nodata": 16.0,
+    "values": [
+      [
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1
+      ]
+    ],
+    "extent": [
+      500000.0,
+      5000000.0,
+      500030.0,
+      5000020.0
+    ],
+    "cellsize": [
+      10.0,
+      10.0
+    ]
+  },
+  {
+    "tool": "EqualToFrequency",
+    "case": "value_nd",
+    "status": "succeeded",
+    "bands": 1,
+    "pixel_type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        1,
+        3,
+        1
+      ],
+      [
+        1,
+        1,
+        1
+      ]
+    ],
+    "extent": [
+      500000.0,
+      5000000.0,
+      500030.0,
+      5000020.0
+    ],
+    "cellsize": [
+      10.0,
+      10.0
+    ]
+  },
+  {
+    "tool": "EqualToFrequency",
+    "case": "list_nd",
+    "status": "succeeded",
+    "bands": 1,
+    "pixel_type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        1,
+        3,
+        1
+      ],
+      [
+        1,
+        1,
+        1
+      ]
+    ],
+    "extent": [
+      500000.0,
+      5000000.0,
+      500030.0,
+      5000020.0
+    ],
+    "cellsize": [
+      10.0,
+      10.0
+    ]
+  },
+  {
+    "tool": "EqualToFrequency",
+    "case": "multi_single",
+    "status": "succeeded",
+    "bands": 1,
+    "pixel_type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        2,
+        3
+      ],
+      [
+        2,
+        2
+      ]
+    ],
+    "extent": [
+      500000.0,
+      5000000.0,
+      500020.0,
+      5000020.0
+    ],
+    "cellsize": [
+      10.0,
+      10.0
+    ]
+  },
+  {
+    "tool": "EqualToFrequency",
+    "case": "multi_multi",
+    "status": "succeeded",
+    "bands": 2,
+    "pixel_type": "U8",
+    "nodata": 16.0,
+    "values": [
+      [
+        [
+          1,
+          16
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      [
+        [
+          1,
+          16
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    ],
+    "extent": [
+      500000.0,
+      5000000.0,
+      500020.0,
+      5000020.0
+    ],
+    "cellsize": [
+      10.0,
+      10.0
+    ]
+  },
+  {
+    "tool": "GreaterThanFrequency",
+    "case": "basic",
+    "status": "succeeded",
+    "bands": 1,
+    "pixel_type": "U8",
+    "nodata": 16.0,
+    "values": [
+      [
+        1,
+        0,
+        1
+      ],
+      [
+        1,
+        2,
+        1
+      ]
+    ],
+    "extent": [
+      500000.0,
+      5000000.0,
+      500030.0,
+      5000020.0
+    ],
+    "cellsize": [
+      10.0,
+      10.0
+    ]
+  },
+  {
+    "tool": "GreaterThanFrequency",
+    "case": "value_nd",
+    "status": "succeeded",
+    "bands": 1,
+    "pixel_type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        0,
+        3,
+        0
+      ],
+      [
+        0,
+        1,
+        1
+      ]
+    ],
+    "extent": [
+      500000.0,
+      5000000.0,
+      500030.0,
+      5000020.0
+    ],
+    "cellsize": [
+      10.0,
+      10.0
+    ]
+  },
+  {
+    "tool": "GreaterThanFrequency",
+    "case": "list_nd",
+    "status": "succeeded",
+    "bands": 1,
+    "pixel_type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        0,
+        3,
+        0
+      ],
+      [
+        0,
+        1,
+        1
+      ]
+    ],
+    "extent": [
+      500000.0,
+      5000000.0,
+      500030.0,
+      5000020.0
+    ],
+    "cellsize": [
+      10.0,
+      10.0
+    ]
+  },
+  {
+    "tool": "GreaterThanFrequency",
+    "case": "multi_single",
+    "status": "succeeded",
+    "bands": 1,
+    "pixel_type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        0,
+        3
+      ],
+      [
+        0,
+        0
+      ]
+    ],
+    "extent": [
+      500000.0,
+      5000000.0,
+      500020.0,
+      5000020.0
+    ],
+    "cellsize": [
+      10.0,
+      10.0
+    ]
+  },
+  {
+    "tool": "GreaterThanFrequency",
+    "case": "multi_multi",
+    "status": "succeeded",
+    "bands": 2,
+    "pixel_type": "U8",
+    "nodata": 16.0,
+    "values": [
+      [
+        [
+          0,
+          16
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      [
+        [
+          0,
+          16
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    ],
+    "extent": [
+      500000.0,
+      5000000.0,
+      500020.0,
+      5000020.0
+    ],
+    "cellsize": [
+      10.0,
+      10.0
+    ]
+  },
+  {
+    "tool": "LessThanFrequency",
+    "case": "basic",
+    "status": "succeeded",
+    "bands": 1,
+    "pixel_type": "U8",
+    "nodata": 16.0,
+    "values": [
+      [
+        1,
+        2,
+        1
+      ],
+      [
+        1,
+        0,
+        1
+      ]
+    ],
+    "extent": [
+      500000.0,
+      5000000.0,
+      500030.0,
+      5000020.0
+    ],
+    "cellsize": [
+      10.0,
+      10.0
+    ]
+  },
+  {
+    "tool": "LessThanFrequency",
+    "case": "value_nd",
+    "status": "succeeded",
+    "bands": 1,
+    "pixel_type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        1,
+        3,
+        1
+      ],
+      [
+        1,
+        0,
+        0
+      ]
+    ],
+    "extent": [
+      500000.0,
+      5000000.0,
+      500030.0,
+      5000020.0
+    ],
+    "cellsize": [
+      10.0,
+      10.0
+    ]
+  },
+  {
+    "tool": "LessThanFrequency",
+    "case": "list_nd",
+    "status": "succeeded",
+    "bands": 1,
+    "pixel_type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        1,
+        3,
+        1
+      ],
+      [
+        1,
+        0,
+        0
+      ]
+    ],
+    "extent": [
+      500000.0,
+      5000000.0,
+      500030.0,
+      5000020.0
+    ],
+    "cellsize": [
+      10.0,
+      10.0
+    ]
+  },
+  {
+    "tool": "LessThanFrequency",
+    "case": "multi_single",
+    "status": "succeeded",
+    "bands": 1,
+    "pixel_type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        0,
+        3
+      ],
+      [
+        0,
+        0
+      ]
+    ],
+    "extent": [
+      500000.0,
+      5000000.0,
+      500020.0,
+      5000020.0
+    ],
+    "cellsize": [
+      10.0,
+      10.0
+    ]
+  },
+  {
+    "tool": "LessThanFrequency",
+    "case": "multi_multi",
+    "status": "succeeded",
+    "bands": 2,
+    "pixel_type": "U8",
+    "nodata": 16.0,
+    "values": [
+      [
+        [
+          0,
+          16
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      [
+        [
+          0,
+          16
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    ],
+    "extent": [
+      500000.0,
+      5000000.0,
+      500020.0,
+      5000020.0
+    ],
+    "cellsize": [
+      10.0,
+      10.0
+    ]
+  }
+]

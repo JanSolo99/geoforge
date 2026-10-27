@@ -14,6 +14,7 @@ pub mod density;
 pub mod env;
 pub mod extract;
 pub mod focal;
+pub mod frequency;
 pub mod generalize;
 mod geographic_crs;
 mod geotiff;

@@ -116,10 +116,33 @@ pub fn write_aux_statistics_count(
     r: &Raster,
     count: Option<u64>,
 ) -> Result<()> {
+    write_aux_statistics_policy(raster_path, r, count, false)
+}
+
+/// Includes ArcGIS empty-band statistics (count/min/mean=0, max/stddev=-1),
+/// as ArcGIS frequency tools do when an input comparison band is missing.
+pub fn write_aux_statistics_with_empty(raster_path: &Path, r: &Raster) -> Result<()> {
+    write_aux_statistics_policy(raster_path, r, None, true)
+}
+
+fn write_aux_statistics_policy(
+    raster_path: &Path,
+    r: &Raster,
+    count: Option<u64>,
+    include_empty: bool,
+) -> Result<()> {
     let mut xml = String::from("<PAMDataset>\n");
     for index in 0..r.bands.len() {
-        let Some(mut s) = statistics_for_band(r, index) else {
-            continue;
+        let mut s = match statistics_for_band(r, index) {
+            Some(s) => s,
+            None if include_empty => Statistics {
+                count: 0,
+                min: 0.,
+                max: -1.,
+                mean: 0.,
+                std_dev: -1.,
+            },
+            None => continue,
         };
         // Tools that override the count report stddev 1 for identical values.
         if count.is_some() && s.std_dev == 0.0 {
