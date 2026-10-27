@@ -422,3 +422,37 @@ pub fn test(input: &Raster, clause: &ValueClause) -> Raster {
         .collect();
     out
 }
+
+/// Create Constant Raster: every cell holds `value`, on the grid with the cell size over the
+/// extent (columns and rows rounded). Integer output takes the smallest type holding the value
+/// (the NoData of the 1/2/4/8-bit layouts as for other integer outputs; -2147483647 for 32-bit
+/// signed), float output is 32-bit float.
+pub fn constant_raster(
+    value: f64,
+    integer: bool,
+    cell: f64,
+    extent: (f64, f64, f64, f64),
+) -> Option<Raster> {
+    let (x0, y0, x1, y1) = extent;
+    if !(cell > 0.0 && x1 > x0 && y1 > y0) {
+        return None;
+    }
+    let width = ((x1 - x0) / cell).round().max(1.0) as usize;
+    let height = ((y1 - y0) / cell).round().max(1.0) as usize;
+    let transform = [x0, cell, 0.0, y0 + height as f64 * cell, 0.0, -cell];
+    let (t, nodata, stored) = if integer {
+        let v = value.trunc();
+        if v.abs() >= f64::from(i16::MAX) && v >= 65535.0 || v < f64::from(i16::MIN) {
+            (DataType::I32, -2147483647.0, v)
+        } else {
+            let (t, nd) = crate::zonal::integer_output(v, v, true);
+            (t, nd, v)
+        }
+    } else {
+        (DataType::F32, f32::MIN as f64, DataType::F32.store(value))
+    };
+    let mut out = Raster::new(width, height, t, transform);
+    out.nodata = Some(nodata);
+    out.bands[0] = vec![stored; width * height];
+    Some(out)
+}

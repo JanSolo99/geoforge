@@ -982,6 +982,19 @@ CASES = {
     "inl_u8_mixed": ("gp.InList_sa", [RASTER / "landuse_u8.tif", f"{RASTER / 'patches_i16.tif'};3"], []),
     "inl_patches": ("gp.InList_sa", [RASTER / "patches_i16.tif", "2;7"], []),
     "inl_dem": ("gp.InList_sa", [RASTER / "dem.tif", "200;250.5"], []),
+    "cc_int5": ("gp.CreateConstantRaster_sa", [5], ["INTEGER", 10, "500000 5000000 500100 5000050"]),
+    "cc_float": ("gp.CreateConstantRaster_sa", [2.5], ["FLOAT", 10, "500000 5000000 500100 5000050"]),
+    "cc_neg7": ("gp.CreateConstantRaster_sa", [-7], ["INTEGER", 5, "500003 5000002 500103 5000052"]),
+    "cc_big": ("gp.CreateConstantRaster_sa", [70000], ["INTEGER", 10, "500000 5000000 500100 5000050"]),
+    "cc_frac": ("gp.CreateConstantRaster_sa", [3.7], ["INTEGER", 10, "500000 5000000 500100 5000050"]),
+    "cc_zero": ("gp.CreateConstantRaster_sa", [0], ["INTEGER", 10, "500000 5000000 500100 5000050"]),
+    "cc_one": ("gp.CreateConstantRaster_sa", [1], ["INTEGER", 10, "500000 5000000 500100 5000050"]),
+    "cc_u300": ("gp.CreateConstantRaster_sa", [300], ["INTEGER", 10, "500000 5000000 500100 5000050"]),
+    "cc_neg200": ("gp.CreateConstantRaster_sa", [-200], ["INTEGER", 10, "500000 5000000 500100 5000050"]),
+    "cc_odd7": ("gp.CreateConstantRaster_sa", [5], ["INTEGER", 7, "500000 5000000 500100 5000050"]),
+    "cc_odd6": ("gp.CreateConstantRaster_sa", [5], ["INTEGER", 6, "500000 5000000 500100 5000050"]),
+    "cc_v200": ("gp.CreateConstantRaster_sa", [200], ["INTEGER", 10, "500000 5000000 500100 5000050"]),
+    "cc_neg1": ("gp.CreateConstantRaster_sa", [-1], ["INTEGER", 10, "500000 5000000 500100 5000050"]),
     "gpal_roads_50": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "NO_END_POINTS"]),
     "gpal_roads_50_end": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "END_POINTS"]),
     "gpal_roads_pct": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["PERCENTAGE", "", 25, "NO_END_POINTS"]),
@@ -1163,6 +1176,7 @@ RUN = {
     "gp.Rank_sa": ("rank", ["rank", "rasters", "output"]),
     "gp.Popularity_sa": ("popularity", ["rank", "rasters", "output"]),
     "gp.InList_sa": ("in_list", ["input", "list", "output"]),
+    "gp.CreateConstantRaster_sa": ("create_constant_raster", ["constant", "output", "data_type", "cell_size", "extent"]),
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
     "analysis.CountOverlappingFeatures": ("count_overlapping_features", ["input", "output", "minimum_overlap_count"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
@@ -1178,7 +1192,7 @@ def run_spec(tool, args):
 
 
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
-RASTER_OUT = {"gp.InList_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
+RASTER_OUT = {"gp.CreateConstantRaster_sa", "gp.InList_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
               "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa",
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",
@@ -1289,7 +1303,7 @@ def main():
             out = OUT / name
             out.mkdir()
             args = [str(a) for a in before] + [str(out)] + [str(a) if isinstance(a, Path) else a for a in after]
-        elif tool == "cartography.GridIndexFeatures":
+        elif tool in ("cartography.GridIndexFeatures", "gp.CreateConstantRaster_sa"):
             args = [str(out)] + [str(a) if isinstance(a, Path) else a for a in before + after]
         elif tool in IN_PLACE:
             k = IN_PLACE[tool]

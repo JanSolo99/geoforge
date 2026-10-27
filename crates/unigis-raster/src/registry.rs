@@ -727,6 +727,24 @@ fn in_list_tool(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::local::in_list(&input, &list), true)
 }
 
+fn create_constant_raster(ctx: &dyn Context) -> Result<Output> {
+    let value: f64 = ctx
+        .get("constant")
+        .and_then(|v| v.trim().parse().ok())
+        .ok_or_else(|| {
+            Error::Unsupported("ERROR 000735: Constant value: value is required".into())
+        })?;
+    let integer = !choice(ctx, "create_constant_raster", "data_type").eq_ignore_ascii_case("FLOAT");
+    let cell: f64 = ctx
+        .get("cell_size")
+        .and_then(|v| v.trim().parse().ok())
+        .ok_or_else(|| Error::Unsupported("ERROR 000735: Cell size: value is required".into()))?;
+    let e = parse_numbers(&ctx.get("extent").unwrap_or_default(), 4, "Extent")?;
+    let raster = crate::extract::constant_raster(value, integer, cell, (e[0], e[1], e[2], e[3]))
+        .ok_or_else(|| Error::Unsupported("ERROR 000094: bad cell size or extent".into()))?;
+    with_statistics(raster, true)
+}
+
 fn flip(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::extract::flip(&ctx.raster("input")?), true)
 }
@@ -1124,6 +1142,36 @@ pub static TOOLS: &[Tool] = &[
             },
         ],
         run: in_list_tool,
+    },
+    Tool {
+        id: "create_constant_raster",
+        name: "Create Constant Raster",
+        summary: "A raster whose cells all hold one value.",
+        params: &[
+            Param {
+                name: "constant",
+                label: "Constant Value",
+                kind: Kind::Number,
+                required: true,
+                default: "",
+            },
+            option("data_type", "Data Type", &["INTEGER", "FLOAT"], "INTEGER"),
+            Param {
+                name: "cell_size",
+                label: "Cell Size",
+                kind: Kind::Number,
+                required: true,
+                default: "",
+            },
+            Param {
+                name: "extent",
+                label: "Extent",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+        ],
+        run: create_constant_raster,
     },
     Tool {
         id: "flip",

@@ -46938,6 +46938,318 @@
           "output": "<out>"
         }
       }
+    },
+    "cc_int5": {
+      "tool": "gp.CreateConstantRaster_sa",
+      "args": [
+        5,
+        "<out>",
+        "INTEGER",
+        10,
+        "500000 5000000 500100 5000050"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "create_constant_raster",
+        "params": {
+          "constant": 5,
+          "output": "<out>",
+          "data_type": "INTEGER",
+          "cell_size": 10,
+          "extent": "500000 5000000 500100 5000050"
+        }
+      }
+    },
+    "cc_float": {
+      "tool": "gp.CreateConstantRaster_sa",
+      "args": [
+        2.5,
+        "<out>",
+        "FLOAT",
+        10,
+        "500000 5000000 500100 5000050"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "create_constant_raster",
+        "params": {
+          "constant": 2.5,
+          "output": "<out>",
+          "data_type": "FLOAT",
+          "cell_size": 10,
+          "extent": "500000 5000000 500100 5000050"
+        }
+      }
+    },
+    "cc_neg7": {
+      "tool": "gp.CreateConstantRaster_sa",
+      "args": [
+        -7,
+        "<out>",
+        "INTEGER",
+        5,
+        "500003 5000002 500103 5000052"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "create_constant_raster",
+        "params": {
+          "constant": -7,
+          "output": "<out>",
+          "data_type": "INTEGER",
+          "cell_size": 5,
+          "extent": "500003 5000002 500103 5000052"
+        }
+      }
+    },
+    "cc_big": {
+      "tool": "gp.CreateConstantRaster_sa",
+      "args": [
+        70000,
+        "<out>",
+        "INTEGER",
+        10,
+        "500000 5000000 500100 5000050"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "create_constant_raster",
+        "params": {
+          "constant": 70000,
+          "output": "<out>",
+          "data_type": "INTEGER",
+          "cell_size": 10,
+          "extent": "500000 5000000 500100 5000050"
+        }
+      }
+    },
+    "cc_frac": {
+      "tool": "gp.CreateConstantRaster_sa",
+      "args": [
+        3.7,
+        "<out>",
+        "INTEGER",
+        10,
+        "500000 5000000 500100 5000050"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "create_constant_raster",
+        "params": {
+          "constant": 3.7,
+          "output": "<out>",
+          "data_type": "INTEGER",
+          "cell_size": 10,
+          "extent": "500000 5000000 500100 5000050"
+        }
+      }
+    },
+    "cc_zero": {
+      "tool": "gp.CreateConstantRaster_sa",
+      "args": [
+        0,
+        "<out>",
+        "INTEGER",
+        10,
+        "500000 5000000 500100 5000050"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "create_constant_raster",
+        "params": {
+          "constant": 0,
+          "output": "<out>",
+          "data_type": "INTEGER",
+          "cell_size": 10,
+          "extent": "500000 5000000 500100 5000050"
+        }
+      }
+    },
+    "cc_one": {
+      "tool": "gp.CreateConstantRaster_sa",
+      "args": [
+        1,
+        "<out>",
+        "INTEGER",
+        10,
+        "500000 5000000 500100 5000050"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "create_constant_raster",
+        "params": {
+          "constant": 1,
+          "output": "<out>",
+          "data_type": "INTEGER",
+          "cell_size": 10,
+          "extent": "500000 5000000 500100 5000050"
+        }
+      }
+    },
+    "cc_u300": {
+      "tool": "gp.CreateConstantRaster_sa",
+      "args": [
+        300,
+        "<out>",
+        "INTEGER",
+        10,
+        "500000 5000000 500100 5000050"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "create_constant_raster",
+        "params": {
+          "constant": 300,
+          "output": "<out>",
+          "data_type": "INTEGER",
+          "cell_size": 10,
+          "extent": "500000 5000000 500100 5000050"
+        }
+      }
+    },
+    "cc_neg200": {
+      "tool": "gp.CreateConstantRaster_sa",
+      "args": [
+        -200,
+        "<out>",
+        "INTEGER",
+        10,
+        "500000 5000000 500100 5000050"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "create_constant_raster",
+        "params": {
+          "constant": -200,
+          "output": "<out>",
+          "data_type": "INTEGER",
+          "cell_size": 10,
+          "extent": "500000 5000000 500100 5000050"
+        }
+      }
+    },
+    "cc_odd7": {
+      "tool": "gp.CreateConstantRaster_sa",
+      "args": [
+        5,
+        "<out>",
+        "INTEGER",
+        7,
+        "500000 5000000 500100 5000050"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "create_constant_raster",
+        "params": {
+          "constant": 5,
+          "output": "<out>",
+          "data_type": "INTEGER",
+          "cell_size": 7,
+          "extent": "500000 5000000 500100 5000050"
+        }
+      }
+    },
+    "cc_odd6": {
+      "tool": "gp.CreateConstantRaster_sa",
+      "args": [
+        5,
+        "<out>",
+        "INTEGER",
+        6,
+        "500000 5000000 500100 5000050"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "create_constant_raster",
+        "params": {
+          "constant": 5,
+          "output": "<out>",
+          "data_type": "INTEGER",
+          "cell_size": 6,
+          "extent": "500000 5000000 500100 5000050"
+        }
+      }
+    },
+    "cc_v200": {
+      "tool": "gp.CreateConstantRaster_sa",
+      "args": [
+        200,
+        "<out>",
+        "INTEGER",
+        10,
+        "500000 5000000 500100 5000050"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "create_constant_raster",
+        "params": {
+          "constant": 200,
+          "output": "<out>",
+          "data_type": "INTEGER",
+          "cell_size": 10,
+          "extent": "500000 5000000 500100 5000050"
+        }
+      }
+    },
+    "cc_neg1": {
+      "tool": "gp.CreateConstantRaster_sa",
+      "args": [
+        -1,
+        "<out>",
+        "INTEGER",
+        10,
+        "500000 5000000 500100 5000050"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "create_constant_raster",
+        "params": {
+          "constant": -1,
+          "output": "<out>",
+          "data_type": "INTEGER",
+          "cell_size": 10,
+          "extent": "500000 5000000 500100 5000050"
+        }
+      }
     }
   }
 }
