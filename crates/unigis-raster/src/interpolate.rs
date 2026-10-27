@@ -215,8 +215,9 @@ fn solve(mut a: Vec<Vec<f64>>, mut b: Vec<f64>) -> Option<Vec<f64>> {
         b.swap(col, pivot);
         for r in col + 1..n {
             let f = a[r][col] / a[col][col];
-            for c in col..n {
-                a[r][c] -= f * a[col][c];
+            let pivot_row = a[col].clone();
+            for (x, p) in a[r][col..].iter_mut().zip(&pivot_row[col..]) {
+                *x -= f * p;
             }
             b[r] -= f * b[col];
         }
