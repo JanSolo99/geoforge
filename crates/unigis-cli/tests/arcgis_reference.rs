@@ -4370,7 +4370,7 @@ fn tools_match_arcgis_output() {
         let table = reference.join(format!("{case}.dbf")).exists()
             && !reference.join(format!("{case}.shp")).exists();
         // Text outputs (Features To JSON) are compared byte for byte.
-        let text_ext = ["json", "geojson", "csv"]
+        let text_ext = ["json", "geojson", "csv", "asc"]
             .into_iter()
             .find(|e| reference.join(format!("{case}.{e}")).exists());
         // Spatial Analyst outputs are GeoTIFFs, compared cell by cell.

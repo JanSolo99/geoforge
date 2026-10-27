@@ -417,6 +417,11 @@ binary_fn!(bitwise_xor_tool, BitwiseXor);
 binary_fn!(bitwise_left_shift_tool, BitwiseLeftShift);
 binary_fn!(bitwise_right_shift_tool, BitwiseRightShift);
 
+/// The raster is passed through; `ug run` writes it as text (see `run_raster_tool`).
+fn raster_to_ascii(ctx: &dyn Context) -> Result<Output> {
+    with_statistics(ctx.raster("input")?, false)
+}
+
 fn flip(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::extract::flip(&ctx.raster("input")?), true)
 }
@@ -539,6 +544,13 @@ pub static TOOLS: &[Tool] = &[
         "bitwise_right_shift",
         "Bitwise Right Shift"
     ),
+    Tool {
+        id: "raster_to_ascii",
+        name: "Raster to ASCII",
+        summary: "Writes a raster as an Esri ASCII grid (the output path is the .asc file).",
+        params: &[raster("input", "Input Raster", true)],
+        run: raster_to_ascii,
+    },
     Tool {
         id: "flip",
         name: "Flip",

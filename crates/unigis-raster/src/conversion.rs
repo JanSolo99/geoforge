@@ -184,3 +184,58 @@ fn simplify(ring: Vec<(usize, usize)>) -> Vec<(usize, usize)> {
     out.push(out[0]);
     out
 }
+
+/// Raster To ASCII: the Esri ASCII grid ArcGIS writes. The header's names are padded to 14
+/// characters, NoData is always -9999, rows end with a space, lines with CR LF; floats are written with 7 significant digits, as 32-bit floats.
+pub fn to_ascii(r: &crate::Raster) -> String {
+    use std::fmt::Write;
+    let cell = r.transform[1];
+    let lower = r.transform[3] + r.transform[5] * r.height as f64;
+    let mut out = String::new();
+    let mut header = |name: &str, value: String| {
+        let _ = write!(out, "{name:<14}{value}\r\n");
+    };
+    header("ncols", r.width.to_string());
+    header("nrows", r.height.to_string());
+    header("xllcorner", format!("{}", r.transform[0]));
+    header("yllcorner", format!("{lower}"));
+    header("cellsize", format!("{cell}"));
+    header("NODATA_value", "-9999".into());
+    for row in 0..r.height {
+        for col in 0..r.width {
+            let v = r.bands[0][row * r.width + col];
+            if r.is_nodata(v) {
+                out.push_str("-9999 ");
+            } else if r.data_type.is_float() {
+                out.push_str(&format_g7(v as f32));
+                out.push(' ');
+            } else {
+                let _ = write!(out, "{v} ");
+            }
+        }
+        out.push_str("\r\n");
+    }
+    out
+}
+
+/// `%.7g` of a 32-bit float.
+fn format_g7(v: f32) -> String {
+    if v == 0.0 {
+        return "0".into();
+    }
+    let exp = (f64::from(v).abs().log10().floor()) as i32;
+    if !(-5..7).contains(&exp) {
+        let s = format!("{:.6e}", v);
+        let (m, e) = s.split_once('e').unwrap_or((&s, "0"));
+        let m = m.trim_end_matches('0').trim_end_matches('.');
+        let e: i32 = e.parse().unwrap_or(0);
+        return format!("{m}e{}{:02}", if e < 0 { '-' } else { '+' }, e.abs());
+    }
+    let decimals = (6 - exp).max(0) as usize;
+    let s = format!("{:.*}", decimals, f64::from(v));
+    if s.contains('.') {
+        s.trim_end_matches('0').trim_end_matches('.').to_string()
+    } else {
+        s
+    }
+}

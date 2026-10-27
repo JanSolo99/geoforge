@@ -44112,6 +44112,114 @@
           "output": "<out>"
         }
       }
+    },
+    "r2a_dem": {
+      "tool": "conversion.RasterToASCII",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_to_ascii",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "r2a_int16": {
+      "tool": "conversion.RasterToASCII",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_to_ascii",
+        "params": {
+          "input": "testdata/raster/dem_int16_packbits.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "r2a_u8": {
+      "tool": "conversion.RasterToASCII",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_to_ascii",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "r2a_nodata": {
+      "tool": "conversion.RasterToASCII",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_to_ascii",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "r2a_f64": {
+      "tool": "conversion.RasterToASCII",
+      "args": [
+        "testdata/raster/dem_f64.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_to_ascii",
+        "params": {
+          "input": "testdata/raster/dem_f64.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "r2a_zones": {
+      "tool": "conversion.RasterToASCII",
+      "args": [
+        "testdata/raster/zones.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_to_ascii",
+        "params": {
+          "input": "testdata/raster/zones.tif",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

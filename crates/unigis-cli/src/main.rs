@@ -6184,6 +6184,12 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
         }
     }
     let out = registry::run(spec, &Args(map))?;
+    if spec.id == "raster_to_ascii" {
+        std::fs::write(&output, unigis_raster::conversion::to_ascii(&out.raster))
+            .map_err(|e| Error::io(Path::new(&output), e))?;
+        println!("Wrote {output}");
+        return Ok(());
+    }
     if out.zero_count {
         write_raster_basin(Path::new(&output), &out.raster)
     } else {

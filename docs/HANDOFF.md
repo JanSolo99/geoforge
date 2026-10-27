@@ -78,6 +78,12 @@ Get ArcGIS tools done faster: (1) triage cheap tools in batches, (2) generate th
   (`mod_type`, constant dividend: divisor alone sets the range), else the wider type (signed if the dividend raster or divisor raster is).
   Not probed: negative-valued stats inputs for Mod beyond Negate, U16/S32 operands, Mod type when one operand lacks statistics but is
   signed 32-bit. Next: Combinatorial And/Or/Xor, Zonal Fill, Raster To ASCII/Float, Copy Raster, Mosaic, Reclass by ASCII file.
+- Raster To ASCII (`raster_to_ascii`, `conversion::to_ascii`; cases `r2a_*`, byte-for-byte, pass): header names padded to 14, NoData
+  always -9999, rows end with a space, CR LF line ends, floats `%.7g` of the f32 value. `ug run` special-cases this tool to write
+  text (see `run_raster_tool`). The `.prj` (Esri `Projection UTM / Zone 33 / Datum WGS84 ...` block) and `.asc.xml` sidecars are NOT
+  written. Raster To Float (`.flt` + `.hdr` + `.prj`) not done. Combinatorial And/Or/XOr probed once but the value numbering was not
+  understood (output type S8/-128 for And/Or, U8 for XOr; numbering depends on the combination scan order): needs a cleaner probe on
+  two rasters sharing one grid (my first probe mixed grids).
 - `NOTES.md` (untracked, from another agent) describes decompiling ArcGIS DLLs with Ghidra/REA. CLAUDE.md says black-box only
   (never decompile Esri binaries); I did not take part in that and did not touch it. Decide with the user before using it.
 

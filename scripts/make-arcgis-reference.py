@@ -894,6 +894,12 @@ CASES = {
     "sl_streams_5": ("cartography.SimplifyLine", [DATA / "streams.shp"], ["POINT_REMOVE", "5 Meters", "RESOLVE_ERRORS", "KEEP_COLLAPSED_POINTS", "CHECK"]),
     "sl_roads_5": ("cartography.SimplifyLine", [DATA / "roads.shp"], ["POINT_REMOVE", "5 Meters", "RESOLVE_ERRORS", "KEEP_COLLAPSED_POINTS", "CHECK"]),
     "sl_roads_20": ("cartography.SimplifyLine", [DATA / "roads.shp"], ["POINT_REMOVE", "20 Meters", "RESOLVE_ERRORS", "KEEP_COLLAPSED_POINTS", "CHECK"]),
+    "r2a_dem": ("conversion.RasterToASCII", [RASTER / "dem.tif"], []),
+    "r2a_int16": ("conversion.RasterToASCII", [RASTER / "dem_int16_packbits.tif"], []),
+    "r2a_u8": ("conversion.RasterToASCII", [RASTER / "landuse_u8.tif"], []),
+    "r2a_nodata": ("conversion.RasterToASCII", [RASTER / "dem_nodata.tif"], []),
+    "r2a_f64": ("conversion.RasterToASCII", [RASTER / "dem_f64.tif"], []),
+    "r2a_zones": ("conversion.RasterToASCII", [RASTER / "zones.tif"], []),
     "gpal_roads_50": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "NO_END_POINTS"]),
     "gpal_roads_50_end": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "END_POINTS"]),
     "gpal_roads_pct": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["PERCENTAGE", "", 25, "NO_END_POINTS"]),
@@ -1046,6 +1052,7 @@ RUN = {
     "cartography.SimplifyLine": ("simplify_line", ["input", "output", "algorithm", "tolerance"]),
     **{f"gp.{t}_sa": (i, ["input", "output"]) for t, i in UNARY},
     **{f"gp.{t}_sa": (i, ["in1", "in2", "output"]) for t, i in BINARY},
+    "conversion.RasterToASCII": ("raster_to_ascii", ["input", "output"]),
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
     "analysis.CountOverlappingFeatures": ("count_overlapping_features", ["input", "output", "minimum_overlap_count"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
@@ -1074,7 +1081,7 @@ RASTER_OUT = {*[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINA
               "gp.Slice_sa", "gp.ExtractByAttributes_sa", "gp.ExtractByRectangle_sa", "gp.ExtractByCircle_sa", "gp.Lookup_sa"}
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.
-TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable"}
+TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable", "conversion.RasterToASCII"}
 # Tools whose output is a table, written as <name>.dbf.
 TABLE_OUT = {"management.CopyRows", "gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa", "gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
              "management.TransposeFields", "management.PivotTable", "management.CreateTable", "analysis.PolygonNeighbors", "analysis.TabulateIntersection"}
@@ -1164,6 +1171,8 @@ def main():
             out = OUT / (f"{name}.geojson" if "GEOJSON" in after else f"{name}.json")
             if tool == "conversion.ExportTable":
                 out = OUT / f"{name}.csv"
+            if tool == "conversion.RasterToASCII":
+                out = OUT / f"{name}.asc"
         if tool in WORKSPACE_OUT:
             out = OUT / name
             out.mkdir()
