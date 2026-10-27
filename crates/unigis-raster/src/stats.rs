@@ -21,7 +21,11 @@ pub struct Statistics {
 
 /// Statistics of the first band, or `None` if every cell is NoData.
 pub fn statistics(r: &Raster) -> Option<Statistics> {
-    let band = r.bands.first()?;
+    statistics_for_band(r, 0)
+}
+
+fn statistics_for_band(r: &Raster, index: usize) -> Option<Statistics> {
+    let band = r.bands.get(index)?;
     let (mut n, mut min, mut max) = (0u64, f64::INFINITY, f64::NEG_INFINITY);
     // Welford's update keeps the variance accurate for large rasters.
     let (mut mean, mut m2) = (0.0, 0.0);
@@ -82,8 +86,12 @@ pub fn format_g14(v: f64) -> String {
 /// The `.aux.xml` text for `s`, as GDAL's PAM and ArcGIS write statistics.
 /// `count` is the number written as STATISTICS_COUNT (ArcGIS's Basin writes 0 there).
 pub fn aux_xml(s: &Statistics, count: u64) -> String {
+    format!("<PAMDataset>\n{}</PAMDataset>\n", aux_band_xml(s, count, 1))
+}
+
+fn aux_band_xml(s: &Statistics, count: u64, band: usize) -> String {
     let item = |k: &str, v: String| format!("      <MDI key=\"STATISTICS_{k}\">{v}</MDI>\n");
-    let mut out = String::from("<PAMDataset>\n  <PAMRasterBand band=\"1\">\n    <Metadata>\n");
+    let mut out = format!("  <PAMRasterBand band=\"{band}\">\n    <Metadata>\n");
     out += &item("COUNT", format!("{:.6}", count as f64));
     out += &item("MAXIMUM", format_g14(s.max));
     out += &item("MEAN", format_g14(s.mean));
@@ -92,7 +100,7 @@ pub fn aux_xml(s: &Statistics, count: u64) -> String {
     out += &item("SKIPFACTORX", "1".into());
     out += &item("SKIPFACTORY", "1".into());
     out += &item("STDDEV", format_g14(s.std_dev));
-    out += "    </Metadata>\n  </PAMRasterBand>\n</PAMDataset>\n";
+    out += "    </Metadata>\n  </PAMRasterBand>\n";
     out
 }
 
@@ -108,19 +116,25 @@ pub fn write_aux_statistics_count(
     r: &Raster,
     count: Option<u64>,
 ) -> Result<()> {
-    let Some(s) = statistics(r) else {
+    let mut xml = String::from("<PAMDataset>\n");
+    for index in 0..r.bands.len() {
+        let Some(mut s) = statistics_for_band(r, index) else {
+            continue;
+        };
+        // Tools that override the count report stddev 1 for identical values.
+        if count.is_some() && s.std_dev == 0.0 {
+            s.std_dev = 1.0;
+        }
+        xml += &aux_band_xml(&s, count.unwrap_or(s.count), index + 1);
+    }
+    if xml == "<PAMDataset>\n" {
         return Ok(());
-    };
+    }
+    xml += "</PAMDataset>\n";
     let mut name = raster_path.as_os_str().to_owned();
     name.push(".aux.xml");
     let path = std::path::PathBuf::from(name);
-    // The tools that write a different count (Basin, Sink) report a standard deviation of 1 for
-    // identical values (observed).
-    let mut s = s;
-    if count.is_some() && s.std_dev == 0.0 {
-        s.std_dev = 1.0;
-    }
-    std::fs::write(&path, aux_xml(&s, count.unwrap_or(s.count))).map_err(|e| Error::io(&path, e))
+    std::fs::write(&path, xml).map_err(|e| Error::io(&path, e))
 }
 
 #[cfg(test)]

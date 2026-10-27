@@ -1,0 +1,590 @@
+{
+  "types": [
+    {
+      "a": "u8",
+      "b": "u8",
+      "status": "succeeded",
+      "pixelType": "U8",
+      "nodata": null
+    },
+    {
+      "a": "u8",
+      "b": "i8",
+      "status": "succeeded",
+      "pixelType": "S16",
+      "nodata": null
+    },
+    {
+      "a": "u8",
+      "b": "u16",
+      "status": "succeeded",
+      "pixelType": "U16",
+      "nodata": null
+    },
+    {
+      "a": "u8",
+      "b": "i16",
+      "status": "succeeded",
+      "pixelType": "S16",
+      "nodata": null
+    },
+    {
+      "a": "u8",
+      "b": "u32",
+      "status": "succeeded",
+      "pixelType": "U32",
+      "nodata": null
+    },
+    {
+      "a": "u8",
+      "b": "i32",
+      "status": "succeeded",
+      "pixelType": "S32",
+      "nodata": null
+    },
+    {
+      "a": "u8",
+      "b": "f32",
+      "status": "succeeded",
+      "pixelType": "F32",
+      "nodata": null
+    },
+    {
+      "a": "u8",
+      "b": "f64",
+      "status": "succeeded",
+      "pixelType": "F64",
+      "nodata": null
+    },
+    {
+      "a": "i8",
+      "b": "u8",
+      "status": "succeeded",
+      "pixelType": "S16",
+      "nodata": null
+    },
+    {
+      "a": "i8",
+      "b": "i8",
+      "status": "succeeded",
+      "pixelType": "S8",
+      "nodata": null
+    },
+    {
+      "a": "i8",
+      "b": "u16",
+      "status": "succeeded",
+      "pixelType": "S32",
+      "nodata": null
+    },
+    {
+      "a": "i8",
+      "b": "i16",
+      "status": "succeeded",
+      "pixelType": "S16",
+      "nodata": null
+    },
+    {
+      "a": "i8",
+      "b": "u32",
+      "status": "succeeded",
+      "pixelType": "F64",
+      "nodata": null
+    },
+    {
+      "a": "i8",
+      "b": "i32",
+      "status": "succeeded",
+      "pixelType": "S32",
+      "nodata": null
+    },
+    {
+      "a": "i8",
+      "b": "f32",
+      "status": "succeeded",
+      "pixelType": "F32",
+      "nodata": null
+    },
+    {
+      "a": "i8",
+      "b": "f64",
+      "status": "succeeded",
+      "pixelType": "F64",
+      "nodata": null
+    },
+    {
+      "a": "u16",
+      "b": "u8",
+      "status": "succeeded",
+      "pixelType": "U16",
+      "nodata": null
+    },
+    {
+      "a": "u16",
+      "b": "i8",
+      "status": "succeeded",
+      "pixelType": "S32",
+      "nodata": null
+    },
+    {
+      "a": "u16",
+      "b": "u16",
+      "status": "succeeded",
+      "pixelType": "U16",
+      "nodata": null
+    },
+    {
+      "a": "u16",
+      "b": "i16",
+      "status": "succeeded",
+      "pixelType": "S32",
+      "nodata": null
+    },
+    {
+      "a": "u16",
+      "b": "u32",
+      "status": "succeeded",
+      "pixelType": "U32",
+      "nodata": null
+    },
+    {
+      "a": "u16",
+      "b": "i32",
+      "status": "succeeded",
+      "pixelType": "S32",
+      "nodata": null
+    },
+    {
+      "a": "u16",
+      "b": "f32",
+      "status": "succeeded",
+      "pixelType": "F32",
+      "nodata": null
+    },
+    {
+      "a": "u16",
+      "b": "f64",
+      "status": "succeeded",
+      "pixelType": "F64",
+      "nodata": null
+    },
+    {
+      "a": "i16",
+      "b": "u8",
+      "status": "succeeded",
+      "pixelType": "S16",
+      "nodata": null
+    },
+    {
+      "a": "i16",
+      "b": "i8",
+      "status": "succeeded",
+      "pixelType": "S16",
+      "nodata": null
+    },
+    {
+      "a": "i16",
+      "b": "u16",
+      "status": "succeeded",
+      "pixelType": "S32",
+      "nodata": null
+    },
+    {
+      "a": "i16",
+      "b": "i16",
+      "status": "succeeded",
+      "pixelType": "S16",
+      "nodata": null
+    },
+    {
+      "a": "i16",
+      "b": "u32",
+      "status": "succeeded",
+      "pixelType": "F64",
+      "nodata": null
+    },
+    {
+      "a": "i16",
+      "b": "i32",
+      "status": "succeeded",
+      "pixelType": "S32",
+      "nodata": null
+    },
+    {
+      "a": "i16",
+      "b": "f32",
+      "status": "succeeded",
+      "pixelType": "F32",
+      "nodata": null
+    },
+    {
+      "a": "i16",
+      "b": "f64",
+      "status": "succeeded",
+      "pixelType": "F64",
+      "nodata": null
+    },
+    {
+      "a": "u32",
+      "b": "u8",
+      "status": "succeeded",
+      "pixelType": "U32",
+      "nodata": null
+    },
+    {
+      "a": "u32",
+      "b": "i8",
+      "status": "succeeded",
+      "pixelType": "F64",
+      "nodata": null
+    },
+    {
+      "a": "u32",
+      "b": "u16",
+      "status": "succeeded",
+      "pixelType": "U32",
+      "nodata": null
+    },
+    {
+      "a": "u32",
+      "b": "i16",
+      "status": "succeeded",
+      "pixelType": "F64",
+      "nodata": null
+    },
+    {
+      "a": "u32",
+      "b": "u32",
+      "status": "succeeded",
+      "pixelType": "U32",
+      "nodata": null
+    },
+    {
+      "a": "u32",
+      "b": "i32",
+      "status": "succeeded",
+      "pixelType": "F64",
+      "nodata": null
+    },
+    {
+      "a": "u32",
+      "b": "f32",
+      "status": "succeeded",
+      "pixelType": "F64",
+      "nodata": null
+    },
+    {
+      "a": "u32",
+      "b": "f64",
+      "status": "succeeded",
+      "pixelType": "F64",
+      "nodata": null
+    },
+    {
+      "a": "i32",
+      "b": "u8",
+      "status": "succeeded",
+      "pixelType": "S32",
+      "nodata": null
+    },
+    {
+      "a": "i32",
+      "b": "i8",
+      "status": "succeeded",
+      "pixelType": "S32",
+      "nodata": null
+    },
+    {
+      "a": "i32",
+      "b": "u16",
+      "status": "succeeded",
+      "pixelType": "S32",
+      "nodata": null
+    },
+    {
+      "a": "i32",
+      "b": "i16",
+      "status": "succeeded",
+      "pixelType": "S32",
+      "nodata": null
+    },
+    {
+      "a": "i32",
+      "b": "u32",
+      "status": "succeeded",
+      "pixelType": "F64",
+      "nodata": null
+    },
+    {
+      "a": "i32",
+      "b": "i32",
+      "status": "succeeded",
+      "pixelType": "S32",
+      "nodata": null
+    },
+    {
+      "a": "i32",
+      "b": "f32",
+      "status": "succeeded",
+      "pixelType": "F64",
+      "nodata": null
+    },
+    {
+      "a": "i32",
+      "b": "f64",
+      "status": "succeeded",
+      "pixelType": "F64",
+      "nodata": null
+    },
+    {
+      "a": "f32",
+      "b": "u8",
+      "status": "succeeded",
+      "pixelType": "F32",
+      "nodata": null
+    },
+    {
+      "a": "f32",
+      "b": "i8",
+      "status": "succeeded",
+      "pixelType": "F32",
+      "nodata": null
+    },
+    {
+      "a": "f32",
+      "b": "u16",
+      "status": "succeeded",
+      "pixelType": "F32",
+      "nodata": null
+    },
+    {
+      "a": "f32",
+      "b": "i16",
+      "status": "succeeded",
+      "pixelType": "F32",
+      "nodata": null
+    },
+    {
+      "a": "f32",
+      "b": "u32",
+      "status": "succeeded",
+      "pixelType": "F64",
+      "nodata": null
+    },
+    {
+      "a": "f32",
+      "b": "i32",
+      "status": "succeeded",
+      "pixelType": "F64",
+      "nodata": null
+    },
+    {
+      "a": "f32",
+      "b": "f32",
+      "status": "succeeded",
+      "pixelType": "F32",
+      "nodata": null
+    },
+    {
+      "a": "f32",
+      "b": "f64",
+      "status": "succeeded",
+      "pixelType": "F64",
+      "nodata": null
+    },
+    {
+      "a": "f64",
+      "b": "u8",
+      "status": "succeeded",
+      "pixelType": "F64",
+      "nodata": null
+    },
+    {
+      "a": "f64",
+      "b": "i8",
+      "status": "succeeded",
+      "pixelType": "F64",
+      "nodata": null
+    },
+    {
+      "a": "f64",
+      "b": "u16",
+      "status": "succeeded",
+      "pixelType": "F64",
+      "nodata": null
+    },
+    {
+      "a": "f64",
+      "b": "i16",
+      "status": "succeeded",
+      "pixelType": "F64",
+      "nodata": null
+    },
+    {
+      "a": "f64",
+      "b": "u32",
+      "status": "succeeded",
+      "pixelType": "F64",
+      "nodata": null
+    },
+    {
+      "a": "f64",
+      "b": "i32",
+      "status": "succeeded",
+      "pixelType": "F64",
+      "nodata": null
+    },
+    {
+      "a": "f64",
+      "b": "f32",
+      "status": "succeeded",
+      "pixelType": "F64",
+      "nodata": null
+    },
+    {
+      "a": "f64",
+      "b": "f64",
+      "status": "succeeded",
+      "pixelType": "F64",
+      "nodata": null
+    }
+  ],
+  "padding": [
+    {
+      "inputs": [
+        "u8",
+        "shifted"
+      ],
+      "pixelType": "U8",
+      "nodata": null,
+      "values": [
+        [
+          [
+            0,
+            127,
+            128
+          ],
+          [
+            255,
+            3,
+            4
+          ]
+        ],
+        [
+          [
+            0,
+            0,
+            127
+          ],
+          [
+            0,
+            255,
+            3
+          ]
+        ]
+      ]
+    },
+    {
+      "inputs": [
+        "shifted",
+        "u8"
+      ],
+      "pixelType": "U8",
+      "nodata": null,
+      "values": [
+        [
+          [
+            0,
+            127,
+            128
+          ],
+          [
+            255,
+            3,
+            4
+          ]
+        ],
+        [
+          [
+            127,
+            128,
+            0
+          ],
+          [
+            3,
+            4,
+            0
+          ]
+        ]
+      ]
+    },
+    {
+      "inputs": [
+        "f32",
+        "shifted"
+      ],
+      "pixelType": "F32",
+      "nodata": null,
+      "values": [
+        [
+          [
+            0.10000000149011612,
+            -1.25,
+            32768.5
+          ],
+          [
+            16777216.0,
+            4000000000.0,
+            3.5
+          ]
+        ],
+        [
+          [
+            0.0,
+            0.0,
+            127.0
+          ],
+          [
+            0.0,
+            255.0,
+            3.0
+          ]
+        ]
+      ]
+    },
+    {
+      "inputs": [
+        "i16",
+        "shifted"
+      ],
+      "pixelType": "S16",
+      "nodata": null,
+      "values": [
+        [
+          [
+            -32768,
+            -1,
+            0
+          ],
+          [
+            32767,
+            100,
+            200
+          ]
+        ],
+        [
+          [
+            0,
+            0,
+            127
+          ],
+          [
+            0,
+            255,
+            3
+          ]
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,162 @@
+{
+  "dem": {
+    "case": "dem",
+    "inputs": [
+      "dem.tif"
+    ],
+    "status": "succeeded",
+    "messages": "Start Time: Wednesday, October 28, 2026 1:04:25 AM\nBuilding Pyramids...\nSucceeded at Wednesday, October 28, 2026 1:04:25 AM (Elapsed Time: 0.22 seconds)"
+  },
+  "dem_twice": {
+    "case": "dem_twice",
+    "inputs": [
+      "dem.tif",
+      "dem.tif"
+    ],
+    "status": "succeeded",
+    "messages": "Start Time: Wednesday, October 28, 2026 1:04:25 AM\nBuilding Pyramids...\nSucceeded at Wednesday, October 28, 2026 1:04:25 AM (Elapsed Time: 0.16 seconds)"
+  },
+  "float_nodata": {
+    "case": "float_nodata",
+    "inputs": [
+      "dem.tif",
+      "dem_nodata.tif"
+    ],
+    "status": "succeeded",
+    "messages": "Start Time: Wednesday, October 28, 2026 1:04:25 AM\nBuilding Pyramids...\nSucceeded at Wednesday, October 28, 2026 1:04:25 AM (Elapsed Time: 0.17 seconds)"
+  },
+  "nodata_float": {
+    "case": "nodata_float",
+    "inputs": [
+      "dem_nodata.tif",
+      "dem.tif"
+    ],
+    "status": "succeeded",
+    "messages": "Start Time: Wednesday, October 28, 2026 1:04:25 AM\nBuilding Pyramids...\nSucceeded at Wednesday, October 28, 2026 1:04:26 AM (Elapsed Time: 0.17 seconds)"
+  },
+  "int_float": {
+    "case": "int_float",
+    "inputs": [
+      "dem_int16_packbits.tif",
+      "dem.tif"
+    ],
+    "status": "succeeded",
+    "messages": "Start Time: Wednesday, October 28, 2026 1:04:26 AM\nBuilding Pyramids...\nSucceeded at Wednesday, October 28, 2026 1:04:26 AM (Elapsed Time: 0.17 seconds)"
+  },
+  "float_int": {
+    "case": "float_int",
+    "inputs": [
+      "dem.tif",
+      "dem_int16_packbits.tif"
+    ],
+    "status": "succeeded",
+    "messages": "Start Time: Wednesday, October 28, 2026 1:04:26 AM\nBuilding Pyramids...\nSucceeded at Wednesday, October 28, 2026 1:04:26 AM (Elapsed Time: 0.17 seconds)"
+  },
+  "int_mix": {
+    "case": "int_mix",
+    "inputs": [
+      "landuse_u8.tif",
+      "patches_i16.tif"
+    ],
+    "status": "succeeded",
+    "messages": "Start Time: Wednesday, October 28, 2026 1:04:26 AM\nBuilding Pyramids...\nSucceeded at Wednesday, October 28, 2026 1:04:26 AM (Elapsed Time: 0.17 seconds)"
+  },
+  "rgb": {
+    "case": "rgb",
+    "inputs": [
+      "rgb_pixel_u8.tif"
+    ],
+    "status": "succeeded",
+    "messages": "Start Time: Wednesday, October 28, 2026 1:04:26 AM\nBuilding Pyramids...\nSucceeded at Wednesday, October 28, 2026 1:04:26 AM (Elapsed Time: 0.17 seconds)"
+  },
+  "rgb_twice": {
+    "case": "rgb_twice",
+    "inputs": [
+      "rgb_pixel_u8.tif",
+      "rgb_pixel_u8.tif"
+    ],
+    "status": "succeeded",
+    "messages": "Start Time: Wednesday, October 28, 2026 1:04:26 AM\nBuilding Pyramids...\nSucceeded at Wednesday, October 28, 2026 1:04:27 AM (Elapsed Time: 0.18 seconds)"
+  },
+  "rgb_u16": {
+    "case": "rgb_u16",
+    "inputs": [
+      "rgb_pixel_u8.tif",
+      "rgb_planar_u16.tif"
+    ],
+    "status": "succeeded",
+    "messages": "Start Time: Wednesday, October 28, 2026 1:04:27 AM\nBuilding Pyramids...\nSucceeded at Wednesday, October 28, 2026 1:04:27 AM (Elapsed Time: 0.18 seconds)"
+  },
+  "shifted": {
+    "case": "shifted",
+    "inputs": [
+      "dem.tif",
+      "zones_shifted.tif"
+    ],
+    "status": "succeeded",
+    "messages": "Start Time: Wednesday, October 28, 2026 1:04:27 AM\nBuilding Pyramids...\nSucceeded at Wednesday, October 28, 2026 1:04:27 AM (Elapsed Time: 0.17 seconds)"
+  },
+  "different_cell": {
+    "case": "different_cell",
+    "inputs": [
+      "dem.tif",
+      "landuse_u8.tif"
+    ],
+    "status": "succeeded",
+    "messages": "Start Time: Wednesday, October 28, 2026 1:04:27 AM\nBuilding Pyramids...\nSucceeded at Wednesday, October 28, 2026 1:04:27 AM (Elapsed Time: 0.18 seconds)"
+  },
+  "u16_i16": {
+    "case": "u16_i16",
+    "inputs": [
+      "rgb_planar_u16.tif",
+      "dem_int16_packbits.tif"
+    ],
+    "status": "succeeded",
+    "messages": "Start Time: Wednesday, October 28, 2026 1:06:17 AM\nBuilding Pyramids...\nSucceeded at Wednesday, October 28, 2026 1:06:18 AM (Elapsed Time: 0.22 seconds)"
+  },
+  "i16_u16": {
+    "case": "i16_u16",
+    "inputs": [
+      "dem_int16_packbits.tif",
+      "rgb_planar_u16.tif"
+    ],
+    "status": "succeeded",
+    "messages": "Start Time: Wednesday, October 28, 2026 1:06:18 AM\nBuilding Pyramids...\nSucceeded at Wednesday, October 28, 2026 1:06:18 AM (Elapsed Time: 0.18 seconds)"
+  },
+  "f64_f32": {
+    "case": "f64_f32",
+    "inputs": [
+      "dem_f64.tif",
+      "dem.tif"
+    ],
+    "status": "succeeded",
+    "messages": "Start Time: Wednesday, October 28, 2026 1:06:18 AM\nBuilding Pyramids...\nSucceeded at Wednesday, October 28, 2026 1:06:18 AM (Elapsed Time: 0.21 seconds)"
+  },
+  "f32_f64": {
+    "case": "f32_f64",
+    "inputs": [
+      "dem.tif",
+      "dem_f64.tif"
+    ],
+    "status": "succeeded",
+    "messages": "Start Time: Wednesday, October 28, 2026 1:06:18 AM\nBuilding Pyramids...\nSucceeded at Wednesday, October 28, 2026 1:06:18 AM (Elapsed Time: 0.17 seconds)"
+  },
+  "i32_u16": {
+    "case": "i32_u16",
+    "inputs": [
+      "dem_bigtiff_i32.tif",
+      "rgb_planar_u16.tif"
+    ],
+    "status": "succeeded",
+    "messages": "Start Time: Wednesday, October 28, 2026 1:06:19 AM\nBuilding Pyramids...\nSucceeded at Wednesday, October 28, 2026 1:06:19 AM (Elapsed Time: 0.21 seconds)"
+  },
+  "i32_float": {
+    "case": "i32_float",
+    "inputs": [
+      "dem_bigtiff_i32.tif",
+      "dem.tif"
+    ],
+    "status": "succeeded",
+    "messages": "Start Time: Wednesday, October 28, 2026 1:06:19 AM\nBuilding Pyramids...\nSucceeded at Wednesday, October 28, 2026 1:06:19 AM (Elapsed Time: 0.18 seconds)"
+  }
+}

@@ -790,7 +790,31 @@ fn clip_raster(ctx: &dyn Context) -> Result<Output> {
 
 const EXTRACTION_AREA: &[&str] = &["INSIDE", "OUTSIDE"];
 
+fn composite_bands(ctx: &dyn Context) -> Result<Output> {
+    let inputs = ctx
+        .get("inputs")
+        .unwrap_or_default()
+        .split(';')
+        .filter(|p| !p.trim().is_empty())
+        .map(|p| ctx.raster_at(p.trim()))
+        .collect::<Result<Vec<_>>>()?;
+    with_statistics(crate::composite::composite_bands(&inputs)?, true)
+}
+
 pub static TOOLS: &[Tool] = &[
+    Tool {
+        id: "composite_bands",
+        name: "Composite Bands",
+        summary: "Combines all input bands in order on the first raster's grid (nearest neighbour).",
+        params: &[Param {
+            name: "inputs",
+            label: "Input Rasters",
+            kind: Kind::Text,
+            required: true,
+            default: "",
+        }],
+        run: composite_bands,
+    },
     Tool {
         id: "pick",
         name: "Pick",

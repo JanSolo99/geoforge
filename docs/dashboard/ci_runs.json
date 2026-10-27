@@ -1,11 +1,18 @@
 {
-  "fetched": "2026-10-27T14:03:20+00:00",
+  "fetched": "2026-10-27T14:24:15+00:00",
   "runs": [
     {
-      "conclusion": "",
+      "conclusion": "success",
+      "createdAt": "2026-10-27T14:07:16Z",
+      "displayTitle": "Preserve dashboard CI snapshots through offline rebuilds",
+      "status": "completed",
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40518084617"
+    },
+    {
+      "conclusion": "success",
       "createdAt": "2026-10-27T13:52:14Z",
       "displayTitle": "Match Graphic Buffer erosion, field replacement and miter limits",
-      "status": "in_progress",
+      "status": "completed",
       "url": "https://github.com/JanSolo99/geoforge/actions/runs/40515889873"
     },
     {
@@ -49,13 +56,6 @@
       "displayTitle": "Add In List with ArcGIS reference cases",
       "status": "completed",
       "url": "https://github.com/JanSolo99/geoforge/actions/runs/40504168059"
-    },
-    {
-      "conclusion": "success",
-      "createdAt": "2026-10-27T12:23:02Z",
-      "displayTitle": "Add Rank and Popularity with ArcGIS reference cases",
-      "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40503316709"
     }
   ]
 }

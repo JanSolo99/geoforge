@@ -4267,25 +4267,39 @@ fn compare_rasters(case: &str, ours: &Path, arcgis: &Path) -> Vec<String> {
     if a.epsg != b.epsg {
         diffs.push(format!("epsg: ours {:?}, ArcGIS {:?}", a.epsg, b.epsg));
     }
+    if a.bands.len() != b.bands.len() {
+        diffs.push(format!(
+            "band count: ours {}, ArcGIS {}",
+            a.bands.len(),
+            b.bands.len()
+        ));
+    }
     let mut bad = 0;
-    for row in 0..a.height {
-        for col in 0..a.width {
-            let (x, y) = (a.get(col, row), b.get(col, row));
-            let same = match (x, y) {
-                (Some(x), Some(y)) => {
-                    if b.data_type.is_float() {
-                        (x - y).abs() <= 1e-5 * y.abs().max(1.0)
-                    } else {
-                        x == y
+    for (index, (left, right)) in a.bands.iter().zip(&b.bands).enumerate() {
+        for row in 0..a.height {
+            for col in 0..a.width {
+                let cell = row * a.width + col;
+                let x = (!a.is_nodata(left[cell])).then_some(left[cell]);
+                let y = (!b.is_nodata(right[cell])).then_some(right[cell]);
+                let same = match (x, y) {
+                    (Some(x), Some(y)) => {
+                        if b.data_type.is_float() && !case.starts_with("cbands_") {
+                            (x - y).abs() <= 1e-5 * y.abs().max(1.0)
+                        } else {
+                            x == y
+                        }
                     }
-                }
-                (None, None) => true,
-                _ => false,
-            };
-            if !same {
-                bad += 1;
-                if bad <= 4 {
-                    diffs.push(format!("cell ({col}, {row}): ours {x:?}, ArcGIS {y:?}"));
+                    (None, None) => true,
+                    _ => false,
+                };
+                if !same {
+                    bad += 1;
+                    if bad <= 4 {
+                        diffs.push(format!(
+                            "cell band {} ({col}, {row}): ours {x:?}, ArcGIS {y:?}",
+                            index + 1
+                        ));
+                    }
                 }
             }
         }
@@ -4299,13 +4313,19 @@ fn compare_rasters(case: &str, ours: &Path, arcgis: &Path) -> Vec<String> {
     } else if bad > 4 {
         diffs.push(format!("{bad} cells differ"));
     }
-    diffs.extend(compare_statistics(ours, arcgis, bad > 0));
+    diffs.extend(compare_statistics(ours, arcgis, b.bands.len(), bad > 0));
     diffs
 }
 
 /// A `STATISTICS_<key>` value of a `<raster>.aux.xml`.
-fn aux_statistic(raster: &Path, key: &str) -> Option<f64> {
+fn aux_statistic(raster: &Path, key: &str, band: usize) -> Option<f64> {
     let text = std::fs::read_to_string(format!("{}.aux.xml", raster.display())).ok()?;
+    let band_marker = format!("<PAMRasterBand band=\"{band}\">");
+    let text = text
+        .split_once(&band_marker)?
+        .1
+        .split_once("</PAMRasterBand>")?
+        .0;
     let marker = format!("STATISTICS_{key}\">");
     let start = text.find(&marker)? + marker.len();
     text[start..start + text[start..].find('<')?].parse().ok()
@@ -4313,36 +4333,89 @@ fn aux_statistic(raster: &Path, key: &str) -> Option<f64> {
 
 /// ArcGIS writes cell statistics beside most Spatial Analyst outputs (and none beside a
 /// few); later tools pick their output types from them, so ours must agree.
-fn compare_statistics(ours: &Path, arcgis: &Path, cells_differ: bool) -> Vec<String> {
+fn compare_statistics(ours: &Path, arcgis: &Path, bands: usize, cells_differ: bool) -> Vec<String> {
     let mut diffs = Vec::new();
-    let theirs = |k| aux_statistic(arcgis, k);
-    let mine = |k| aux_statistic(ours, k);
-    if theirs("MEAN").is_none() {
-        if mine("MEAN").is_some() {
-            diffs.push("statistics written where ArcGIS has none".into());
-        }
-        return diffs;
-    }
-    for (key, rel) in [
-        ("COUNT", 0.0),
-        ("MINIMUM", 1e-5),
-        ("MAXIMUM", 1e-5),
-        ("MEAN", 1e-4),
-        ("STDDEV", 1e-3),
-    ] {
-        match (mine(key), theirs(key)) {
-            (Some(a), Some(b)) => {
-                // Cells that differ from ArcGIS's move the counts and moments: only
-                // check that the statistics exist.
-                if !cells_differ && (a - b).abs() > rel * b.abs().max(1.0) {
-                    diffs.push(format!("STATISTICS_{key}: ours {a}, ArcGIS {b}"));
-                }
+    for band in 1..=bands {
+        let theirs = |k| aux_statistic(arcgis, k, band);
+        let mine = |k| aux_statistic(ours, k, band);
+        if theirs("MEAN").is_none() {
+            if mine("MEAN").is_some() {
+                diffs.push(format!(
+                    "band {band}: statistics written where ArcGIS has none"
+                ));
             }
-            (None, Some(_)) => diffs.push(format!("STATISTICS_{key} missing")),
-            _ => {}
+            continue;
+        }
+        for (key, rel) in [
+            ("COUNT", 0.0),
+            ("MINIMUM", 1e-5),
+            ("MAXIMUM", 1e-5),
+            ("MEAN", 1e-4),
+            ("STDDEV", 1e-3),
+        ] {
+            match (mine(key), theirs(key)) {
+                (Some(a), Some(b)) => {
+                    // Cells that differ from ArcGIS's move the counts and moments: only
+                    // check that the statistics exist.
+                    if !cells_differ && (a - b).abs() > rel * b.abs().max(1.0) {
+                        diffs.push(format!(
+                            "band {band} STATISTICS_{key}: ours {a}, ArcGIS {b}"
+                        ));
+                    }
+                }
+                (None, Some(_)) => diffs.push(format!("band {band} STATISTICS_{key} missing")),
+                _ => {}
+            }
         }
     }
     diffs
+}
+
+#[test]
+fn raster_comparison_detects_missing_or_changed_later_bands() {
+    use unigis_raster::{Compression, DataType, Raster, write_geotiff};
+    let dir = std::env::temp_dir().join(format!("ug-compare-bands-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).unwrap();
+    let ours = dir.join("ours.tif");
+    let reference = dir.join("reference.tif");
+    let mut raster = Raster::new(2, 1, DataType::U8, [0., 1., 0., 1., 0., -1.]);
+    raster.bands = vec![vec![1., 2.], vec![3., 4.], vec![5., 6.]];
+    let write = |path: &Path, r: &Raster| {
+        write_geotiff(path, r, Compression::None).unwrap();
+        unigis_raster::stats::write_aux_statistics(path, r).unwrap();
+    };
+    write(&reference, &raster);
+    write(&ours, &raster);
+    assert!(compare_rasters("comparison_guard", &ours, &reference).is_empty());
+    raster.bands[2][1] = 7.;
+    write(&ours, &raster);
+    assert!(
+        compare_rasters("comparison_guard", &ours, &reference)
+            .iter()
+            .any(|d| d.starts_with("cell band 3"))
+    );
+    raster.bands.pop();
+    write(&ours, &raster);
+    assert!(
+        compare_rasters("comparison_guard", &ours, &reference)
+            .iter()
+            .any(|d| d.starts_with("band count"))
+    );
+    raster.bands.push(vec![5., 6.]);
+    write(&ours, &raster);
+    let aux = dir.join("ours.tif.aux.xml");
+    let text = std::fs::read_to_string(&aux).unwrap();
+    std::fs::write(
+        aux,
+        text.replace("<PAMRasterBand band=\"3\">", "<PAMRasterBand band=\"4\">"),
+    )
+    .unwrap();
+    assert!(
+        compare_rasters("comparison_guard", &ours, &reference)
+            .iter()
+            .any(|d| d.contains("band 3 STATISTICS_MEAN missing"))
+    );
+    std::fs::remove_dir_all(dir).unwrap();
 }
 
 #[test]
