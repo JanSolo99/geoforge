@@ -819,3 +819,78 @@ pub fn combinatorial(op: CombinatorialOp, a: &Raster, b: &Raster) -> Option<Rast
     let (t, nodata) = crate::zonal::integer_output(0.0, max, true);
     Some(typed_raster(&a, values.into_iter(), t, nodata))
 }
+
+/// The type ArcGIS gives a raster holding values of all of `types`: float if any is, else signed
+/// if any is signed, else unsigned; the widest width (U16 with S16 gives S16, observed).
+fn promote(rasters: &[Raster]) -> (DataType, f64) {
+    let types: Vec<DataType> = rasters.iter().map(|r| r.data_type).collect();
+    // A signed raster whose stored statistics are all non-negative counts as unsigned (observed).
+    let signed_needed = rasters.iter().any(|r| {
+        matches!(r.data_type, DataType::I8 | DataType::I16 | DataType::I32)
+            && !r.statistics.is_some_and(|(lo, _)| lo >= 0.0)
+    });
+    let types: &[DataType] = &types;
+    if types.iter().any(|t| t.is_float()) {
+        return (DataType::F32, f32::MIN as f64);
+    }
+    let width = |t: &DataType| match t {
+        DataType::U8 | DataType::I8 => 8,
+        DataType::U16 | DataType::I16 => 16,
+        _ => 32,
+    };
+    let signed = signed_needed;
+    let w = types.iter().map(width).max().unwrap_or(8);
+    match (signed, w) {
+        (false, 8) => (DataType::U8, 255.0),
+        (false, 16) => (DataType::U16, f64::from(u16::MAX)),
+        (false, _) => (DataType::U32, f64::from(u32::MAX)),
+        (true, 8) => (DataType::I8, -128.0),
+        (true, 16) => (DataType::I16, f64::from(i16::MIN)),
+        (true, _) => (DataType::I32, f64::from(i32::MIN)),
+    }
+}
+
+/// Rank (`popularity` false): the `k`-th smallest of the rasters' values in each cell. Popularity:
+/// the `k`-th most frequent value; NoData when it is tied with another or there are fewer
+/// distinct values. NoData where any raster is NoData.
+pub fn rank_or_popularity(k: usize, rasters: &[Raster], popularity: bool) -> Option<Raster> {
+    let first = rasters.first()?;
+    if k == 0 || k > rasters.len() {
+        return None;
+    }
+    let (t, nodata) = promote(rasters);
+    let mut out = first.like(t);
+    out.nodata = Some(nodata);
+    for i in 0..first.width * first.height {
+        let values: Option<Vec<f64>> = rasters
+            .iter()
+            .map(|r| {
+                let v = r.bands[0][i];
+                (!r.is_nodata(v)).then_some(v)
+            })
+            .collect();
+        let v = values.and_then(|mut vals| {
+            if !popularity {
+                vals.sort_by(f64::total_cmp);
+                return Some(vals[k - 1]);
+            }
+            let mut counts: Vec<(f64, usize)> = Vec::new();
+            for v in vals {
+                match counts.iter_mut().find(|(x, _)| *x == v) {
+                    Some(c) => c.1 += 1,
+                    None => counts.push((v, 1)),
+                }
+            }
+            // When every raster agrees, any rank gives that value (observed).
+            if let [(value, _)] = counts[..] {
+                return Some(value);
+            }
+            counts.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.total_cmp(&b.0)));
+            let (value, n) = *counts.get(k - 1)?;
+            let tied = counts.iter().filter(|c| c.1 == n).count() > 1;
+            (!tied).then_some(value)
+        });
+        out.bands[0][i] = v.map_or(nodata, |v| t.store(v));
+    }
+    Some(out)
+}

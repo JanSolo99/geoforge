@@ -674,6 +674,37 @@ fn trend(ctx: &dyn Context) -> Result<Output> {
     with_statistics(raster, true)
 }
 
+fn rank_or_popularity_tool(ctx: &dyn Context, popularity: bool) -> Result<Output> {
+    let k: usize = ctx
+        .get("rank")
+        .and_then(|v| v.trim().parse().ok())
+        .ok_or_else(|| {
+            Error::Unsupported("ERROR 000094: the rank must be a whole number".into())
+        })?;
+    let mut rasters = Vec::new();
+    for path in ctx.get("rasters").unwrap_or_default().split(';') {
+        if !path.trim().is_empty() {
+            rasters.push(ctx.raster_at(path.trim())?);
+        }
+    }
+    for r in &rasters[1..] {
+        if (r.width, r.height) != (rasters[0].width, rasters[0].height) {
+            return Err(Error::Unsupported("the rasters must share a grid".into()));
+        }
+    }
+    let raster = crate::local::rank_or_popularity(k, &rasters, popularity)
+        .ok_or_else(|| Error::Unsupported("ERROR 000094: the rank is out of range".into()))?;
+    with_statistics(raster, true)
+}
+
+fn rank_tool(ctx: &dyn Context) -> Result<Output> {
+    rank_or_popularity_tool(ctx, false)
+}
+
+fn popularity_tool(ctx: &dyn Context) -> Result<Output> {
+    rank_or_popularity_tool(ctx, true)
+}
+
 fn flip(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::extract::flip(&ctx.raster("input")?), true)
 }
@@ -1011,6 +1042,50 @@ pub static TOOLS: &[Tool] = &[
             },
         ],
         run: trend,
+    },
+    Tool {
+        id: "rank",
+        name: "Rank",
+        summary: "The k-th value of the rasters in each cell.",
+        params: &[
+            Param {
+                name: "rank",
+                label: "Rank",
+                kind: Kind::Number,
+                required: true,
+                default: "",
+            },
+            Param {
+                name: "rasters",
+                label: "Input Rasters",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+        ],
+        run: rank_tool,
+    },
+    Tool {
+        id: "popularity",
+        name: "Popularity",
+        summary: "The k-th value of the rasters in each cell.",
+        params: &[
+            Param {
+                name: "rank",
+                label: "Rank",
+                kind: Kind::Number,
+                required: true,
+                default: "",
+            },
+            Param {
+                name: "rasters",
+                label: "Input Rasters",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+        ],
+        run: popularity_tool,
     },
     Tool {
         id: "flip",

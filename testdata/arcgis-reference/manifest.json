@@ -46538,6 +46538,286 @@
           "output": "<out>"
         }
       }
+    },
+    "rk_dem_1": {
+      "tool": "gp.Rank_sa",
+      "args": [
+        1,
+        "testdata/raster/dem.tif;testdata/raster/dem_nodata.tif;testdata/raster/dem_point.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rank",
+        "params": {
+          "rank": 1,
+          "rasters": "testdata/raster/dem.tif;testdata/raster/dem_nodata.tif;testdata/raster/dem_point.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "rk_dem_2": {
+      "tool": "gp.Rank_sa",
+      "args": [
+        2,
+        "testdata/raster/dem.tif;testdata/raster/dem_nodata.tif;testdata/raster/dem_point.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rank",
+        "params": {
+          "rank": 2,
+          "rasters": "testdata/raster/dem.tif;testdata/raster/dem_nodata.tif;testdata/raster/dem_point.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "rk_dem_3": {
+      "tool": "gp.Rank_sa",
+      "args": [
+        3,
+        "testdata/raster/dem.tif;testdata/raster/dem_nodata.tif;testdata/raster/dem_point.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rank",
+        "params": {
+          "rank": 3,
+          "rasters": "testdata/raster/dem.tif;testdata/raster/dem_nodata.tif;testdata/raster/dem_point.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "rk_i16_1": {
+      "tool": "gp.Rank_sa",
+      "args": [
+        1,
+        "testdata/raster/dem_int16_packbits.tif;testdata/raster/dem_int16_packbits.tif;testdata/raster/dem_int16_packbits.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rank",
+        "params": {
+          "rank": 1,
+          "rasters": "testdata/raster/dem_int16_packbits.tif;testdata/raster/dem_int16_packbits.tif;testdata/raster/dem_int16_packbits.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "pop_dem_1": {
+      "tool": "gp.Popularity_sa",
+      "args": [
+        1,
+        "testdata/raster/dem.tif;testdata/raster/dem_nodata.tif;testdata/raster/dem_point.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "popularity",
+        "params": {
+          "rank": 1,
+          "rasters": "testdata/raster/dem.tif;testdata/raster/dem_nodata.tif;testdata/raster/dem_point.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "pop_dem_2": {
+      "tool": "gp.Popularity_sa",
+      "args": [
+        2,
+        "testdata/raster/dem.tif;testdata/raster/dem_nodata.tif;testdata/raster/dem_point.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "popularity",
+        "params": {
+          "rank": 2,
+          "rasters": "testdata/raster/dem.tif;testdata/raster/dem_nodata.tif;testdata/raster/dem_point.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "pop_dem_3": {
+      "tool": "gp.Popularity_sa",
+      "args": [
+        3,
+        "testdata/raster/dem.tif;testdata/raster/dem_nodata.tif;testdata/raster/dem_point.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "popularity",
+        "params": {
+          "rank": 3,
+          "rasters": "testdata/raster/dem.tif;testdata/raster/dem_nodata.tif;testdata/raster/dem_point.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "pop_i16_1": {
+      "tool": "gp.Popularity_sa",
+      "args": [
+        1,
+        "testdata/raster/dem_int16_packbits.tif;testdata/raster/dem_int16_packbits.tif;testdata/raster/dem_int16_packbits.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "popularity",
+        "params": {
+          "rank": 1,
+          "rasters": "testdata/raster/dem_int16_packbits.tif;testdata/raster/dem_int16_packbits.tif;testdata/raster/dem_int16_packbits.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "rk_mix_1": {
+      "tool": "gp.Rank_sa",
+      "args": [
+        1,
+        "testdata/raster/landuse_u8.tif;testdata/raster/patches_i16.tif;testdata/raster/nibble_mask_i16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rank",
+        "params": {
+          "rank": 1,
+          "rasters": "testdata/raster/landuse_u8.tif;testdata/raster/patches_i16.tif;testdata/raster/nibble_mask_i16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "rk_mix_2": {
+      "tool": "gp.Rank_sa",
+      "args": [
+        2,
+        "testdata/raster/landuse_u8.tif;testdata/raster/patches_i16.tif;testdata/raster/nibble_mask_i16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rank",
+        "params": {
+          "rank": 2,
+          "rasters": "testdata/raster/landuse_u8.tif;testdata/raster/patches_i16.tif;testdata/raster/nibble_mask_i16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "rk_mix_3": {
+      "tool": "gp.Rank_sa",
+      "args": [
+        3,
+        "testdata/raster/landuse_u8.tif;testdata/raster/patches_i16.tif;testdata/raster/nibble_mask_i16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rank",
+        "params": {
+          "rank": 3,
+          "rasters": "testdata/raster/landuse_u8.tif;testdata/raster/patches_i16.tif;testdata/raster/nibble_mask_i16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "pop_mix_1": {
+      "tool": "gp.Popularity_sa",
+      "args": [
+        1,
+        "testdata/raster/landuse_u8.tif;testdata/raster/patches_i16.tif;testdata/raster/nibble_mask_i16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "popularity",
+        "params": {
+          "rank": 1,
+          "rasters": "testdata/raster/landuse_u8.tif;testdata/raster/patches_i16.tif;testdata/raster/nibble_mask_i16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "pop_mix_2": {
+      "tool": "gp.Popularity_sa",
+      "args": [
+        2,
+        "testdata/raster/landuse_u8.tif;testdata/raster/patches_i16.tif;testdata/raster/nibble_mask_i16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "popularity",
+        "params": {
+          "rank": 2,
+          "rasters": "testdata/raster/landuse_u8.tif;testdata/raster/patches_i16.tif;testdata/raster/nibble_mask_i16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "pop_mix_3": {
+      "tool": "gp.Popularity_sa",
+      "args": [
+        3,
+        "testdata/raster/landuse_u8.tif;testdata/raster/patches_i16.tif;testdata/raster/nibble_mask_i16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "popularity",
+        "params": {
+          "rank": 3,
+          "rasters": "testdata/raster/landuse_u8.tif;testdata/raster/patches_i16.tif;testdata/raster/nibble_mask_i16.tif",
+          "output": "<out>"
+        }
+      }
     }
   }
 }
