@@ -410,6 +410,20 @@ fn generate_transects_along_lines(ctx: &dyn Context) -> Result<ToolOutput> {
     )
 }
 
+fn flip_line(ctx: &dyn Context) -> Result<ToolOutput> {
+    construct::flip_line(ctx.features("input")?.as_ref())
+}
+
+fn generalize(ctx: &dyn Context) -> Result<ToolOutput> {
+    let t = find("generalize").ok_or_else(|| Error::Unsupported("generalize".into()))?;
+    let fc = ctx.features("input")?;
+    let tolerance = match text(ctx, t, "tolerance") {
+        Some(v) => distance_in_units(&v, fc.spatial_reference_wkt())?,
+        None => 0.0,
+    };
+    construct::generalize(fc.as_ref(), tolerance)
+}
+
 fn create_fishnet(ctx: &dyn Context) -> Result<ToolOutput> {
     let t = find("create_fishnet").ok_or_else(|| Error::Unsupported("create_fishnet".into()))?;
     let num = |k: &str| {
@@ -1221,6 +1235,50 @@ pub static TOOLS: &[Tool] = &[
         output_suffix: "Transects",
         measures: true,
         run: Runner::Features(generate_transects_along_lines),
+    },
+    Tool {
+        id: "flip_line",
+        name: "Flip Line",
+        toolbox: "Editing › Tools",
+        summary: "Reverses the direction of lines (ArcGIS Pro Flip Line).",
+        params: &[Param {
+            name: "input",
+            label: "Input Features",
+            kind: Kind::Features,
+            required: true,
+            default: "",
+            help: "Lines.",
+        }],
+        output_suffix: "Flipped",
+        measures: false,
+        run: Runner::Features(flip_line),
+    },
+    Tool {
+        id: "generalize",
+        name: "Generalize",
+        toolbox: "Editing › Tools",
+        summary: "Removes vertices within a tolerance of the line (ArcGIS Pro Generalize, lines).",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Features",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "Lines.",
+            },
+            Param {
+                name: "tolerance",
+                label: "Maximum Offset Tolerance",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "For example `20 Meters`.",
+            },
+        ],
+        output_suffix: "Generalized",
+        measures: true,
+        run: Runner::Features(generalize),
     },
     Tool {
         id: "create_fishnet",

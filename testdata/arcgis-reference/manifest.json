@@ -45432,6 +45432,247 @@
           "missing_values": "NODATA"
         }
       }
+    },
+    "flip_roads": {
+      "tool": "edit.FlipLine",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "flip_line",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "output": "<out>"
+        }
+      }
+    },
+    "flip_streams": {
+      "tool": "edit.FlipLine",
+      "args": [
+        "testdata/geoproc/streams.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "STREAM_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          80,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "flip_line",
+        "params": {
+          "input": "testdata/geoproc/streams.shp",
+          "output": "<out>"
+        }
+      }
+    },
+    "gen_roads_20": {
+      "tool": "edit.Generalize",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "20 Meters"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "generalize",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "output": "<out>",
+          "tolerance": "20 Meters"
+        }
+      }
+    },
+    "gen_roads_5": {
+      "tool": "edit.Generalize",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "5 Meters"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "generalize",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "output": "<out>",
+          "tolerance": "5 Meters"
+        }
+      }
+    },
+    "gen_streams_30": {
+      "tool": "edit.Generalize",
+      "args": [
+        "testdata/geoproc/streams.shp",
+        "<out>",
+        "30 Meters"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "STREAM_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          80,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "generalize",
+        "params": {
+          "input": "testdata/geoproc/streams.shp",
+          "output": "<out>",
+          "tolerance": "30 Meters"
+        }
+      }
     }
   }
 }

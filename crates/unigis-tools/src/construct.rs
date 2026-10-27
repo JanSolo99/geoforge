@@ -328,6 +328,70 @@ pub fn generate_transects_along_lines(
     })
 }
 
+/// A copy of the lines with each part's vertices rewritten by `edit` (Flip Line, Generalize).
+fn edit_line_parts(
+    input: &dyn FeatureClass,
+    mut edit: impl FnMut(&[[f64; 2]]) -> Vec<[f64; 2]>,
+) -> Result<ToolOutput> {
+    if input.geometry_kind() != Some(GeometryKind::Polyline) {
+        return Err(err("ERROR 000368: Invalid input data: lines are required"));
+    }
+    let mut features = Vec::new();
+    for f in input.features() {
+        let mut f = f?;
+        if let Some(g) = &mut f.geometry {
+            if g.z.is_some() || g.m.is_some() || g.has_curves() {
+                return Err(err("this tool does not handle Z, M or curves yet"));
+            }
+            let mut xy = Vec::new();
+            let mut starts = Vec::new();
+            for r in g.part_ranges().collect::<Vec<_>>() {
+                starts.push(xy.len() as u32);
+                xy.extend(edit(&g.xy[r]));
+            }
+            g.xy = xy;
+            g.parts = starts;
+        }
+        features.push(f);
+    }
+    Ok(ToolOutput {
+        kind: GeometryKind::Polyline,
+        has_z: false,
+        has_m: false,
+        fields: input.fields().to_vec(),
+        spatial_reference_wkt: input.spatial_reference_wkt().map(str::to_owned),
+        features,
+        messages: Vec::new(),
+    })
+}
+
+/// Flip Line: the direction of every line reversed.
+pub fn flip_line(input: &dyn FeatureClass) -> Result<ToolOutput> {
+    edit_line_parts(input, |p| p.iter().rev().copied().collect())
+}
+
+/// Generalize: vertices within `tolerance` of the line through the kept ones are removed
+/// (Douglas-Peucker; same vertices as ArcGIS, observed).
+pub fn generalize(input: &dyn FeatureClass, tolerance: f64) -> Result<ToolOutput> {
+    edit_line_parts(input, |p| {
+        let mut keep = vec![false; p.len()];
+        if let Some(k) = keep.first_mut() {
+            *k = true;
+        }
+        if let Some(k) = keep.last_mut() {
+            *k = true;
+        }
+        if p.len() > 2 {
+            crate::neighbors::douglas_peucker(p, tolerance, &mut keep, 0, p.len() - 1);
+        }
+        p.iter()
+            .zip(&keep)
+            .filter(|(_, k)| **k)
+            .map(|(v, _)| *v)
+            .collect()
+    })
+}
+
 /// What Create Fishnet needs: the origin, the second point of the y-axis and either the cell size
 /// with the cell counts or an opposite corner with them.
 #[derive(Debug, Clone, Copy)]

@@ -917,6 +917,11 @@ CASES = {
     "rba_dem_nodata": ("gp.ReclassByASCIIFile_sa", [RASTER / "dem.tif", RASTER / "remap_ascii1.txt"], ["NODATA"]),
     "rba_int": ("gp.ReclassByASCIIFile_sa", [RASTER / "landuse_u8.tif", RASTER / "remap_ascii2.txt"], ["DATA"]),
     "rba_int_nodata": ("gp.ReclassByASCIIFile_sa", [RASTER / "landuse_u8.tif", RASTER / "remap_ascii2.txt"], ["NODATA"]),
+    "flip_roads": ("edit.FlipLine", [DATA / "roads.shp"], []),
+    "flip_streams": ("edit.FlipLine", [DATA / "streams.shp"], []),
+    "gen_roads_20": ("edit.Generalize", [DATA / "roads.shp"], ["20 Meters"]),
+    "gen_roads_5": ("edit.Generalize", [DATA / "roads.shp"], ["5 Meters"]),
+    "gen_streams_30": ("edit.Generalize", [DATA / "streams.shp"], ["30 Meters"]),
     "gpal_roads_50": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "NO_END_POINTS"]),
     "gpal_roads_50_end": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "END_POINTS"]),
     "gpal_roads_pct": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["PERCENTAGE", "", 25, "NO_END_POINTS"]),
@@ -1084,6 +1089,8 @@ RUN = {
     "management.GenerateTransectsAlongLines": ("generate_transects_along_lines", ["input", "output", "interval", "transect_length", "include_end_points"]),
     "cartography.GridIndexFeatures": ("grid_index_features", ["input", "output", "intersect_feature", None, None, "polygon_width", "polygon_height"]),
     "gp.ReclassByASCIIFile_sa": ("reclass_by_ascii_file", ["input", "remap_file", "output", "missing_values"]),
+    "edit.FlipLine": ("flip_line", ["input", "output"]),
+    "edit.Generalize": ("generalize", ["input", "output", "tolerance"]),
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
     "analysis.CountOverlappingFeatures": ("count_overlapping_features", ["input", "output", "minimum_overlap_count"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
@@ -1120,7 +1127,7 @@ TABLE_OUT = {"management.CopyRows", "gp.ZonalHistogram_sa", "gp.TabulateArea_sa"
 CREATE_TOOLS = {"management.CreateFeatureclass", "management.CreateTable"}
 
 # In-place tools: the index of the input they edit (run on a copy written as the output).
-IN_PLACE = {"management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.AddGeometryAttributes": 0,
+IN_PLACE = {"edit.FlipLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.AddGeometryAttributes": 0,
             "management.CalculateFields": 0, "management.StandardizeField": 0, "management.TransformField": 0, "management.ReclassifyField": 0, "management.DefineProjection": 0, "management.CalculateEndTime": 0}
 
 # Select Layer By Location cases, saved with Copy Features:

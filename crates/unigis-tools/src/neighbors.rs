@@ -729,7 +729,13 @@ pub const CREATE_THIESSEN_POLYGONS: Tool = Tool {
 
 /// Douglas-Peucker on one path: keeps the vertex farthest from the chord while it is more than
 /// `tol` away (ArcGIS Simplify Line, POINT_REMOVE: the same vertices, observed).
-fn douglas_peucker(path: &[[f64; 2]], tol: f64, keep: &mut Vec<bool>, lo: usize, hi: usize) {
+pub(crate) fn douglas_peucker(
+    path: &[[f64; 2]],
+    tol: f64,
+    keep: &mut Vec<bool>,
+    lo: usize,
+    hi: usize,
+) {
     if hi <= lo + 1 {
         return;
     }
