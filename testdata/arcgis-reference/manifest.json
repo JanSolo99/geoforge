@@ -47576,6 +47576,669 @@
           "distance_unit": "Meters"
         }
       }
+    },
+    "gb_parcels_sq_miter": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "20 Meters",
+        "SQUARE",
+        "MITER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "distance": "20 Meters",
+          "line_caps": "SQUARE",
+          "line_joins": "MITER"
+        }
+      }
+    },
+    "gb_roads_sq_miter": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "20 Meters",
+        "SQUARE",
+        "MITER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "output": "<out>",
+          "distance": "20 Meters",
+          "line_caps": "SQUARE",
+          "line_joins": "MITER"
+        }
+      }
+    },
+    "gb_roads_butt_bevel": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "20 Meters",
+        "BUTT",
+        "BEVEL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "output": "<out>",
+          "distance": "20 Meters",
+          "line_caps": "BUTT",
+          "line_joins": "BEVEL"
+        }
+      }
+    },
+    "gb_roads_round": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "20 Meters",
+        "ROUND",
+        "ROUND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "output": "<out>",
+          "distance": "20 Meters",
+          "line_caps": "ROUND",
+          "line_joins": "ROUND"
+        }
+      }
+    },
+    "gb_wells_sq": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "15 Meters",
+        "SQUARE",
+        "MITER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "output": "<out>",
+          "distance": "15 Meters",
+          "line_caps": "SQUARE",
+          "line_joins": "MITER"
+        }
+      }
+    },
+    "gb_wells_round": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "15 Meters",
+        "ROUND",
+        "ROUND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "output": "<out>",
+          "distance": "15 Meters",
+          "line_caps": "ROUND",
+          "line_joins": "ROUND"
+        }
+      }
+    },
+    "gb_clip_sq_miter": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/clip_areas.shp",
+        "<out>",
+        "25 Meters",
+        "SQUARE",
+        "MITER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/clip_areas.shp",
+          "output": "<out>",
+          "distance": "25 Meters",
+          "line_caps": "SQUARE",
+          "line_joins": "MITER"
+        }
+      }
+    },
+    "gb_clip_butt_bevel": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/clip_areas.shp",
+        "<out>",
+        "25 Meters",
+        "BUTT",
+        "BEVEL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/clip_areas.shp",
+          "output": "<out>",
+          "distance": "25 Meters",
+          "line_caps": "BUTT",
+          "line_joins": "BEVEL"
+        }
+      }
+    },
+    "gb_clip_round": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/clip_areas.shp",
+        "<out>",
+        "25 Meters",
+        "ROUND",
+        "ROUND"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/clip_areas.shp",
+          "output": "<out>",
+          "distance": "25 Meters",
+          "line_caps": "ROUND",
+          "line_joins": "ROUND"
+        }
+      }
+    },
+    "gb_streams_sq_bevel": {
+      "tool": "analysis.GraphicBuffer",
+      "args": [
+        "testdata/geoproc/streams.shp",
+        "<out>",
+        "30 Meters",
+        "SQUARE",
+        "BEVEL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "STREAM_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "BUFF_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "graphic_buffer",
+        "params": {
+          "input": "testdata/geoproc/streams.shp",
+          "output": "<out>",
+          "distance": "30 Meters",
+          "line_caps": "SQUARE",
+          "line_joins": "BEVEL"
+        }
+      }
     }
   }
 }

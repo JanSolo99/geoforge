@@ -4071,6 +4071,7 @@ fn compare(case: &str, ours: &Path, theirs: &Path, fields: &serde_json::Value) -
     let is_buffer = case.starts_with("buffer")
         || case.starts_with("pwbuf_")
         || case.starts_with("mrb_")
+        || case.starts_with("gb_")
         || case.ends_with("_circle");
     // Intersect of three or more inputs runs as a cascade of overlays, each of
     // which may move a vertex within the tolerance: allow two steps.

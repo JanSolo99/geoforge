@@ -761,3 +761,80 @@ mod tests {
         );
     }
 }
+
+/// Graphic Buffer's endpoint shape (independent of its corner style).
+#[derive(Debug, Clone, Copy)]
+pub enum GraphicCap {
+    Square,
+    Butt,
+    Round,
+}
+
+/// Graphic Buffer's corner style.
+#[derive(Debug, Clone, Copy)]
+pub enum GraphicJoin {
+    Miter,
+    Bevel,
+    Round,
+}
+
+/// Styled planar buffer. Ring orientation/ownership is retained through the polygon
+/// offset so holes contract instead of being treated as filled input polygons.
+pub fn graphic_buffer_geometry(
+    g: &Geometry,
+    distance: f64,
+    cap: GraphicCap,
+    join: GraphicJoin,
+    miter_limit: f64,
+) -> Result<Option<Geometry>> {
+    use crate::convert::{to_multilinestring, to_multipoint};
+    use geo::algorithm::buffer::{Buffer, BufferStyle, LineCap, LineJoin};
+    if !distance.is_finite() || distance <= 0.0 || !miter_limit.is_finite() || miter_limit < 1.0 {
+        return Err(Error::Unsupported(
+            "Graphic Buffer requires a finite positive distance and miter limit >= 1".into(),
+        ));
+    }
+    if g.xy.iter().flatten().any(|v| !v.is_finite()) {
+        return Err(Error::Unsupported(
+            "Graphic Buffer requires finite coordinates".into(),
+        ));
+    }
+    let segments = arcgis_arc_segments(TAU, distance, 0.1);
+    if segments > 100_000 {
+        return Err(Error::Unsupported(
+            "Graphic Buffer would require too many arc vertices".into(),
+        ));
+    }
+    let angle = if matches!(g.kind, GeometryKind::Point | GeometryKind::Multipoint) {
+        TAU / segments as f64
+    } else {
+        1.0_f64.to_radians()
+    };
+    let line_cap = match cap {
+        GraphicCap::Square => LineCap::Square,
+        GraphicCap::Butt if matches!(g.kind, GeometryKind::Point | GeometryKind::Multipoint) => {
+            LineCap::Square
+        }
+        GraphicCap::Butt => LineCap::Butt,
+        GraphicCap::Round => LineCap::Round(angle),
+    };
+    let line_join = match join {
+        GraphicJoin::Miter => LineJoin::Miter(2.0 * (1.0 / miter_limit).asin()),
+        GraphicJoin::Bevel => LineJoin::Bevel,
+        GraphicJoin::Round => LineJoin::Round(angle),
+    };
+    let style = BufferStyle::new(distance)
+        .line_cap(line_cap)
+        .line_join(line_join);
+    let out = match g.kind {
+        GeometryKind::Point | GeometryKind::Multipoint => to_multipoint(g).buffer_with_style(style),
+        GeometryKind::Polyline => to_multilinestring(g).buffer_with_style(style),
+        GeometryKind::Polygon => to_multipolygon(g).buffer_with_style(style),
+        _ => {
+            return Err(Error::Unsupported(
+                "Graphic Buffer does not handle multipatches".into(),
+            ));
+        }
+    };
+    Ok(from_multipolygon(&out))
+}

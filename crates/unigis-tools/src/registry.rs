@@ -2222,6 +2222,7 @@ pub static TOOLS: &[Tool] = &[
     crate::neighbors::GRID_INDEX_FEATURES,
     crate::neighbors::SUMMARIZE_WITHIN,
     crate::neighbors::SUMMARIZE_NEARBY,
+    crate::graphic_buffer::GRAPHIC_BUFFER,
     crate::neighbors::POLYGON_NEIGHBORS,
     crate::neighbors::COUNT_OVERLAPPING_FEATURES,
 ];

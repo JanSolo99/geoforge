@@ -78,3 +78,5 @@ Update this file when a gap is found or closed.
 - Trend: LINEAR, orders 1-2 verified; order 3 differs (ArcGIS ill-conditioned); LOGISTIC and the RMS file not done.
 - Tools that write only to a geodatabase in ArcGIS (Summarize Within, Summarize Nearby, Enrich, ...) cannot be probed with the shapefile reference harness yet.
 - Probed and left: Zonal Fill (fill = boundary minimum but zones 1 and 2 of the zones raster share one value: merged-catchment rule unknown), Cut Fill (region numbering), Surface Area Ratio (neither Jenness nor 1/cos(slope) fits), Boundary Clean, Aggregate Points, Sample (column naming), Extend/Trim Line (act on selections).
+
+- Graphic Buffer: positive constant planar 2D distances only; negative/zero distances, distance fields, curves/Z, maximum-deviation override and existing BUFF_DIST/ORIG_FID replacement are refused. Nondefault miter limits and geographic environments need probes (`scripts/research/graphic_buffer/README.md`).

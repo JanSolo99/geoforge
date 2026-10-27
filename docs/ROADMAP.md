@@ -715,3 +715,5 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - Reclass by Table (`ug reclass-by-table`; integer output field required, float fractions are truncated): 7 ArcGIS cases. `ug` now reads a stand-alone .dbf as a table.
 - Raster registry (`ug run <id>`; `RUN` in the reference script drives the test): Nibble and Filter moved to it; added Slice (equal interval/area; ~10 boundary cells differ), Extract by Attributes/Rectangle/Circle, Lookup, Sink, Pick, Flip, Mirror, Shift and Clip (rectangle) with 40+ ArcGIS cases.
 - Pairwise Buffer/Dissolve/Intersect/Clip/Erase (aliases of the classic tools, `crates/unigis-cli/src/aliases.rs`), Multiple Ring Buffer, Generate Points Along Lines chainage fields, Copy Rows field widths: ArcGIS cases `pw*`, `mrb_*`, `gpal_*`, `cr_*`.
+
+- [x] Graphic Buffer (`ug run graphic_buffer`): positive constant distances, square/butt/round caps and miter/bevel/round joins; ten ArcGIS cases cover points, tight line bends and polygon holes. Native offset geometry replaces the unfinished piece-union heuristic. Limits: `scripts/research/graphic_buffer/README.md`.
