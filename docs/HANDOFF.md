@@ -90,6 +90,7 @@ Get ArcGIS tools done faster: (1) triage cheap tools in batches, (2) generate th
   Dashboard scanner now also reads macro-declared tools (`unary_tool!`/`binary_tool!`) and `neighbors.rs`.
   Probed but NOT done: Equal To / Greater Than / Less Than Frequency (U8; NoData 3 for 2 rasters but 16 for 3 rasters: rule unclear),
   In List. Remaining sa gaps are listed by the dashboard (`python3 scripts/dashboard/build.py`, page "missing").
+- Table Select (`table_select` = Copy Rows with an SQL where, same 19-wide decimal cap; cases `tsel_*`) passes.
 - `NOTES.md` (untracked, from another agent) describes decompiling ArcGIS DLLs with Ghidra/REA. CLAUDE.md says black-box only
   (never decompile Esri binaries); I did not take part in that and did not touch it. Decide with the user before using it.
 

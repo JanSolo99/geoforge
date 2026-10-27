@@ -44614,6 +44614,249 @@
           "output": "<out>"
         }
       }
+    },
+    "tsel_sales_2020": {
+      "tool": "analysis.TableSelect",
+      "args": [
+        "testdata/dm/sales.dbf",
+        "<out>",
+        "YEAR = 2020"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "REGION",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "YEAR",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "PRODUCT",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "AMOUNT",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "UNITS",
+          "Integer",
+          9,
+          9,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "table_select",
+        "params": {
+          "input": "testdata/dm/sales.dbf",
+          "output": "<out>",
+          "where_clause": "YEAR = 2020"
+        }
+      }
+    },
+    "tsel_sales_north": {
+      "tool": "analysis.TableSelect",
+      "args": [
+        "testdata/dm/sales.dbf",
+        "<out>",
+        "REGION = 'north' AND AMOUNT > 10"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "REGION",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "YEAR",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "PRODUCT",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "AMOUNT",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "UNITS",
+          "Integer",
+          9,
+          9,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "table_select",
+        "params": {
+          "input": "testdata/dm/sales.dbf",
+          "output": "<out>",
+          "where_clause": "REGION = 'north' AND AMOUNT > 10"
+        }
+      }
+    },
+    "tsel_sales_all": {
+      "tool": "analysis.TableSelect",
+      "args": [
+        "testdata/dm/sales.dbf",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "REGION",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "YEAR",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "PRODUCT",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "AMOUNT",
+          "Double",
+          19,
+          18,
+          15
+        ],
+        [
+          "UNITS",
+          "Integer",
+          9,
+          9,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "table_select",
+        "params": {
+          "input": "testdata/dm/sales.dbf",
+          "output": "<out>"
+        }
+      }
+    },
+    "tsel_parcels": {
+      "tool": "analysis.TableSelect",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "ZONE = 1"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "table_select",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "where_clause": "ZONE = 1"
+        }
+      }
     }
   }
 }

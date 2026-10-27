@@ -891,6 +891,19 @@ fn copy_rows(ctx: &dyn Context) -> Result<Outcome> {
     Ok(Outcome::Table(table))
 }
 
+fn table_select(ctx: &dyn Context) -> Result<Outcome> {
+    let t = find("table_select").ok_or_else(|| Error::Unsupported("table_select".into()))?;
+    let fc = ctx.features("input")?;
+    let mut table = tables::copy_rows(fc.as_ref(), where_of(ctx, t).as_deref())?;
+    // Like Copy Rows, decimal fields are at most 19 characters wide (observed).
+    for f in &mut table.fields {
+        if f.field_type == unigis_core::FieldType::Double && f.precision > 0 {
+            f.precision = f.precision.min(19 - u32::from(f.scale > 0));
+        }
+    }
+    Ok(Outcome::Table(table))
+}
+
 fn table_to_table(ctx: &dyn Context) -> Result<Outcome> {
     let t = find("table_to_table").ok_or_else(|| Error::Unsupported("table_to_table".into()))?;
     let fc = ctx.features("input")?;
@@ -1899,6 +1912,33 @@ pub static TOOLS: &[Tool] = &[
         output_suffix: "Rows",
         measures: false,
         run: Runner::Dynamic(copy_rows),
+    },
+    Tool {
+        id: "table_select",
+        name: "Table Select",
+        toolbox: "Analysis › Extract",
+        summary: "Copies the rows a where clause selects into a new table (ArcGIS Pro Table Select).",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Rows",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "where_clause",
+                label: "Expression",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "An SQL where clause.",
+            },
+        ],
+        output_suffix: "Select",
+        measures: false,
+        run: Runner::Dynamic(table_select),
     },
     Tool {
         id: "table_to_table",

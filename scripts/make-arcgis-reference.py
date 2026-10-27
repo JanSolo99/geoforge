@@ -900,6 +900,10 @@ CASES = {
     "r2a_nodata": ("conversion.RasterToASCII", [RASTER / "dem_nodata.tif"], []),
     "r2a_f64": ("conversion.RasterToASCII", [RASTER / "dem_f64.tif"], []),
     "r2a_zones": ("conversion.RasterToASCII", [RASTER / "zones.tif"], []),
+    "tsel_sales_2020": ("analysis.TableSelect", [DM / "sales.dbf"], ["YEAR = 2020"]),
+    "tsel_sales_north": ("analysis.TableSelect", [DM / "sales.dbf"], ["REGION = 'north' AND AMOUNT > 10"]),
+    "tsel_sales_all": ("analysis.TableSelect", [DM / "sales.dbf"], []),
+    "tsel_parcels": ("analysis.TableSelect", [DATA / "parcels.shp"], ["ZONE = 1"]),
     "gpal_roads_50": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "NO_END_POINTS"]),
     "gpal_roads_50_end": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "END_POINTS"]),
     "gpal_roads_pct": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["PERCENTAGE", "", 25, "NO_END_POINTS"]),
@@ -1062,6 +1066,7 @@ RUN = {
     **{f"gp.{t}_sa": (i, ["in1", "in2", "output"]) for t, i in BINARY},
     **{f"gp.{t}_sa": (i, ["in1", "in2", "output"]) for t, i in COMBINATORIAL},
     "conversion.RasterToASCII": ("raster_to_ascii", ["input", "output"]),
+    "analysis.TableSelect": ("table_select", ["input", "output", "where_clause"]),
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
     "analysis.CountOverlappingFeatures": ("count_overlapping_features", ["input", "output", "minimum_overlap_count"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
@@ -1093,7 +1098,7 @@ WORKSPACE_OUT = {"analysis.Split"}
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable", "conversion.RasterToASCII"}
 # Tools whose output is a table, written as <name>.dbf.
 TABLE_OUT = {"management.CopyRows", "gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa", "gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
-             "management.TransposeFields", "management.PivotTable", "management.CreateTable", "analysis.PolygonNeighbors", "analysis.TabulateIntersection"}
+             "management.TransposeFields", "management.PivotTable", "management.CreateTable", "analysis.PolygonNeighbors", "analysis.TabulateIntersection", "analysis.TableSelect"}
 # Tools that take the output folder and name rather than a path.
 CREATE_TOOLS = {"management.CreateFeatureclass", "management.CreateTable"}
 
