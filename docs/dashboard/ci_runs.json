@@ -1,6 +1,13 @@
 {
-  "fetched": "2026-10-27T21:25:10+00:00",
+  "fetched": "2026-10-27T21:39:24+00:00",
   "runs": [
+    {
+      "conclusion": "",
+      "createdAt": "2026-10-27T21:38:16Z",
+      "displayTitle": "Add Graphic Buffer with ArcGIS reference cases",
+      "status": "in_progress",
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40588424404"
+    },
     {
       "conclusion": "success",
       "createdAt": "2026-10-27T21:13:13Z",
@@ -49,13 +56,6 @@
       "displayTitle": "Support raster projection assignment and correct geographic GeoTIFF keys",
       "status": "completed",
       "url": "https://github.com/JanSolo99/geoforge/actions/runs/40566379155"
-    },
-    {
-      "conclusion": "success",
-      "createdAt": "2026-10-27T16:24:33Z",
-      "displayTitle": "Add native ASCII and binary Float raster imports with ArcGIS references",
-      "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40540613972"
     }
   ]
 }

@@ -56,11 +56,14 @@ by the writer policy. Save new observations/recipe before choosing next patch.
 
 ## Next actions
 
-1. Finish final cached full gate; record exact totals and JS/diff results.
-2. Stage only cached planner/docs/snapshots/reference paths, commit/push normally,
-   verify remote and refresh this handoff. No repeated completed external actions.
-3. Inspect/save Copy Raster6 results, isolate metadata policy, add reference cases
-   before implementing. Continue bounded tested commits/pushes/dashboard updates.
+1. Keep going in probe -> implement -> reference-test batches (see "Session 2026-10-26" entries for what is done and the gaps).
+   Cheap families left: Spatial Analyst (Sample column naming, Extract Multi Values To Points, Surface Parameters, frequency tools),
+   Edit toolbox (Extend/Trim Line, Snap, Erase Point: need selections), vector (Apportion Polygon, Remove Overlap Multiple,
+   Aggregate Points/Polygons, Calculate Polygon Main Angle (rule unknown: not min-area rectangle, not Feret, not PCA)),
+   conversion (Table To dBASE, Feature Class To Shapefile: workspace outputs; ArcGIS makes shapefiles with null shapes from tables).
+2. Geodesic length/area (needs unigis-proj in unigis-tools) unlocks ADD_SHAPE_SUM of Summarize Within/Nearby with line/polygon inputs.
+3. `MEMORY_OUT` in the reference script runs geodatabase-only tools through memory and copies to a shapefile.
+4. `/remote-control` is a Claude Code slash command: the user has to type it in the interactive session.
 
 ## Preserve unrelated dirt
 
