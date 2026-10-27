@@ -65,3 +65,16 @@ Update this file when a gap is found or closed.
 - Multiple Ring Buffer: dissolve ALL only; arc density differs a little at 30 m around polygons (0.05% area).
 - Pairwise tools: output order is not reproduced (compared unordered); Pairwise Buffer line/polygon arcs use a fixed 3.75 degree step, and the rule for large radii is not checked.
 
+
+## Registry batch of 2026-10-26/27
+
+- Create Thiessen Polygons: ArcGIS lists polygons in an internal spatial order (we use input order; the test sorts); no Extent environment, duplicate points or geographic input.
+- Tabulate Intersection: no sum fields, XY tolerance or point classes; line-class PERCENTAGE rule inferred from one probe; areas agree to ~1e-5 (ArcGIS measures on its own grid).
+- Subdivide Polygon: only NUMBER_OF_EQUAL_PARTS and EQUAL_AREAS (horizontal strips); stacked blocks, split angle and width not done.
+- Simplify Line: POINT_REMOVE only (Douglas-Peucker); `_Pnt` output not written. Simplify Polygon is NOT plain Douglas-Peucker (vertices added, areas change) and is not implemented. Generalize: lines only.
+- Math tools: Mod type rule inferred from ~12 cases; Abs/Negate/Square on U16/S32 unprobed; frequency tools (Equal To / Greater Than / Less Than Frequency) and In List not done.
+- Raster To ASCII / Float: `.prj` and `.xml` sidecars not written. Copy Raster: TIFF only; float -> 16-bit signed keeps NoData 3.4e38 in ArcGIS (not reproduced).
+- Mosaic To New Raster: same-cell-size rasters, no BLEND/colormaps; NoData = max input NoData + 1.
+- Trend: LINEAR, orders 1-2 verified; order 3 differs (ArcGIS ill-conditioned); LOGISTIC and the RMS file not done.
+- Tools that write only to a geodatabase in ArcGIS (Summarize Within, Summarize Nearby, Enrich, ...) cannot be probed with the shapefile reference harness yet.
+- Probed and left: Zonal Fill (fill = boundary minimum but zones 1 and 2 of the zones raster share one value: merged-catchment rule unknown), Cut Fill (region numbering), Surface Area Ratio (neither Jenness nor 1/cos(slope) fits), Boundary Clean, Aggregate Points, Sample (column naming), Extend/Trim Line (act on selections).
