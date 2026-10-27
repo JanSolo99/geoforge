@@ -46162,6 +46162,182 @@
           "extraction_area": "OUTSIDE"
         }
       }
+    },
+    "tpi_dem": {
+      "tool": "gp.TopographicPositionIndex_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "topographic_position_index",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "tpi_dem_circle": {
+      "tool": "gp.TopographicPositionIndex_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "Circle 3 CELL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "topographic_position_index",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "neighborhood": "Circle 3 CELL"
+        }
+      }
+    },
+    "tpi_dem_annulus": {
+      "tool": "gp.TopographicPositionIndex_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "Annulus 2 4 CELL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "topographic_position_index",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "neighborhood": "Annulus 2 4 CELL"
+        }
+      }
+    },
+    "tpi_dem_rect": {
+      "tool": "gp.TopographicPositionIndex_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "Rectangle 5 3 CELL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "topographic_position_index",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "neighborhood": "Rectangle 5 3 CELL"
+        }
+      }
+    },
+    "tpi_dem_nodata": {
+      "tool": "gp.TopographicPositionIndex_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "topographic_position_index",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "tpi_u8": {
+      "tool": "gp.TopographicPositionIndex_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "Circle 2 CELL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "topographic_position_index",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "output": "<out>",
+          "neighborhood": "Circle 2 CELL"
+        }
+      }
+    },
+    "test_dem": {
+      "tool": "gp.Test_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "VALUE > 220",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "test",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "where_clause": "VALUE > 220",
+          "output": "<out>"
+        }
+      }
+    },
+    "test_u8": {
+      "tool": "gp.Test_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "VALUE = 2 OR VALUE = 3",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "test",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "where_clause": "VALUE = 2 OR VALUE = 3",
+          "output": "<out>"
+        }
+      }
+    },
+    "test_nodata": {
+      "tool": "gp.Test_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "VALUE < 250",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "test",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "where_clause": "VALUE < 250",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

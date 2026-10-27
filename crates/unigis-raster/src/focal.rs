@@ -308,3 +308,40 @@ pub fn filter(input: &Raster, low: bool, ignore_nodata: bool) -> Raster {
     }
     out
 }
+
+/// Topographic Position Index: each cell minus the mean of the cells of the neighborhood that
+/// lie in the raster and have data. Without a neighborhood ArcGIS uses a circle of radius 3
+/// that leaves out the cell itself. The output is 32-bit float with NoData +3.4028235e38.
+pub fn topographic_position_index(input: &Raster, neighborhood: Option<Neighborhood>) -> Raster {
+    let nodata = f64::from(f32::MAX);
+    let (offsets, skip_center) = match neighborhood {
+        Some(n) => (n.offsets(), false),
+        None => (Neighborhood::Circle { radius: 3.0 }.offsets(), true),
+    };
+    let mut out = input.like(DataType::F32);
+    out.nodata = Some(nodata);
+    for row in 0..input.height {
+        for col in 0..input.width {
+            let value = input.get(col, row).and_then(|z| {
+                let (mut sum, mut n) = (0.0, 0usize);
+                for &(dx, dy) in &offsets {
+                    if skip_center && dx == 0 && dy == 0 {
+                        continue;
+                    }
+                    let (x, y) = (col as isize + dx, row as isize + dy);
+                    if x < 0 || y < 0 || x >= input.width as isize || y >= input.height as isize {
+                        continue;
+                    }
+                    if let Some(v) = input.get(x as usize, y as usize) {
+                        sum += v;
+                        n += 1;
+                    }
+                }
+                (n > 0).then(|| z - sum / n as f64)
+            });
+            out.bands[0][row * input.width + col] =
+                value.map_or(nodata, |v| DataType::F32.store(v));
+        }
+    }
+    out
+}

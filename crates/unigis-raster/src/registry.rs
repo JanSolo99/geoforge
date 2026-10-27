@@ -595,6 +595,27 @@ fn extract_by_points(ctx: &dyn Context) -> Result<Output> {
     )
 }
 
+fn topographic_position_index(ctx: &dyn Context) -> Result<Output> {
+    let neighborhood = match ctx.get("neighborhood") {
+        None => None,
+        Some(text) => Some(crate::focal::Neighborhood::parse(&text).ok_or_else(|| {
+            Error::Unsupported(format!(
+                "ERROR 000094: Neighborhood: '{text}' is not understood"
+            ))
+        })?),
+    };
+    with_statistics(
+        crate::focal::topographic_position_index(&ctx.raster("input")?, neighborhood),
+        true,
+    )
+}
+
+fn test_tool(ctx: &dyn Context) -> Result<Output> {
+    let clause = crate::local::ValueClause::parse(&ctx.get("where_clause").unwrap_or_default())
+        .ok_or_else(|| Error::Unsupported("ERROR 000358: Invalid expression".into()))?;
+    with_statistics(crate::extract::test(&ctx.raster("input")?, &clause), true)
+}
+
 fn flip(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::extract::flip(&ctx.raster("input")?), true)
 }
@@ -842,6 +863,38 @@ pub static TOOLS: &[Tool] = &[
             ),
         ],
         run: mosaic_to_new_raster,
+    },
+    Tool {
+        id: "topographic_position_index",
+        name: "Topographic Position Index",
+        summary: "A cell's value minus the mean of its neighborhood.",
+        params: &[
+            raster("input", "Input Raster", true),
+            Param {
+                name: "neighborhood",
+                label: "Neighborhood",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+            },
+        ],
+        run: topographic_position_index,
+    },
+    Tool {
+        id: "test",
+        name: "Test",
+        summary: "1 where the cell value matches an expression, else 0.",
+        params: &[
+            raster("input", "Input Raster", true),
+            Param {
+                name: "where_clause",
+                label: "Expression",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+        ],
+        run: test_tool,
     },
     Tool {
         id: "flip",

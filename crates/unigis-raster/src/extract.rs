@@ -405,3 +405,20 @@ pub fn mosaic(
     }
     Some(out)
 }
+
+/// Test: 1 where the cell matches the clause, else 0, as 8-bit with NoData 2 (observed).
+pub fn test(input: &Raster, clause: &ValueClause) -> Raster {
+    let mut out = input.like(DataType::U8);
+    out.nodata = Some(2.0);
+    out.bands[0] = input.bands[0]
+        .iter()
+        .map(|&v| {
+            if input.is_nodata(v) {
+                2.0
+            } else {
+                f64::from(clause.matches(v))
+            }
+        })
+        .collect();
+    out
+}

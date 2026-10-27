@@ -944,6 +944,15 @@ CASES = {
     "ebpoly_int": ("gp.ExtractByPolygon_sa", [RASTER / "landuse_u8.tif", "500100 5000100;501000 5000300;500600 5001000"], ["INSIDE"]),
     "ebpts_in": ("gp.ExtractByPoints_sa", [RASTER / "dem.tif", "500205 5000205;501105 5000305;500805 5001005;500305 5000905;500300 5000300"], ["INSIDE"]),
     "ebpts_out": ("gp.ExtractByPoints_sa", [RASTER / "dem.tif", "500205 5000205;501105 5000305;500805 5001005;500305 5000905;500300 5000300"], ["OUTSIDE"]),
+    "tpi_dem": ("gp.TopographicPositionIndex_sa", [RASTER / "dem.tif"], []),
+    "tpi_dem_circle": ("gp.TopographicPositionIndex_sa", [RASTER / "dem.tif"], ["Circle 3 CELL"]),
+    "tpi_dem_annulus": ("gp.TopographicPositionIndex_sa", [RASTER / "dem.tif"], ["Annulus 2 4 CELL"]),
+    "tpi_dem_rect": ("gp.TopographicPositionIndex_sa", [RASTER / "dem.tif"], ["Rectangle 5 3 CELL"]),
+    "tpi_dem_nodata": ("gp.TopographicPositionIndex_sa", [RASTER / "dem_nodata.tif"], []),
+    "tpi_u8": ("gp.TopographicPositionIndex_sa", [RASTER / "landuse_u8.tif"], ["Circle 2 CELL"]),
+    "test_dem": ("gp.Test_sa", [RASTER / "dem.tif", "VALUE > 220"], []),
+    "test_u8": ("gp.Test_sa", [RASTER / "landuse_u8.tif", "VALUE = 2 OR VALUE = 3"], []),
+    "test_nodata": ("gp.Test_sa", [RASTER / "dem_nodata.tif", "VALUE < 250"], []),
     "gpal_roads_50": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "NO_END_POINTS"]),
     "gpal_roads_50_end": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "END_POINTS"]),
     "gpal_roads_pct": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["PERCENTAGE", "", 25, "NO_END_POINTS"]),
@@ -1118,6 +1127,8 @@ RUN = {
     "management.MosaicToNewRaster": ("mosaic_to_new_raster", ["inputs", "output", None, "pixel_type", "cellsize", None, "mosaic_method"]),
     "gp.ExtractByPolygon_sa": ("extract_by_polygon", ["input", "polygon", "output", "extraction_area"]),
     "gp.ExtractByPoints_sa": ("extract_by_points", ["input", "points", "output", "extraction_area"]),
+    "gp.TopographicPositionIndex_sa": ("topographic_position_index", ["input", "output", "neighborhood"]),
+    "gp.Test_sa": ("test", ["input", "where_clause", "output"]),
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
     "analysis.CountOverlappingFeatures": ("count_overlapping_features", ["input", "output", "minimum_overlap_count"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
@@ -1133,7 +1144,7 @@ def run_spec(tool, args):
 
 
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
-RASTER_OUT = {"gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
+RASTER_OUT = {"gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
               "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa",
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",
