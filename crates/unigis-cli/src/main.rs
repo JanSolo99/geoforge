@@ -6327,6 +6327,7 @@ fn write_raster_with(path: &Path, raster: &unigis_raster::Raster, statistics: bo
         &unigis_raster::WriteOptions {
             compression,
             tile: Some((128, 128)),
+            zero_out_of_range_nodata: true,
             ..Default::default()
         },
     )?;

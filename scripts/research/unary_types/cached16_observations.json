@@ -1,0 +1,116 @@
+[
+  {
+    "input": "u16",
+    "tool": "Abs",
+    "status": "succeeded",
+    "type": "S32",
+    "nodata": -2147483647.0,
+    "values": [
+      [
+        0,
+        32767,
+        32768
+      ],
+      [
+        65535,
+        1,
+        2
+      ]
+    ]
+  },
+  {
+    "input": "u16",
+    "tool": "Negate",
+    "status": "succeeded",
+    "type": "S32",
+    "nodata": -2147483647.0,
+    "values": [
+      [
+        0,
+        -32767,
+        -32768
+      ],
+      [
+        -65535,
+        -1,
+        -2
+      ]
+    ]
+  },
+  {
+    "input": "u16",
+    "tool": "Square",
+    "status": "succeeded",
+    "type": "U32",
+    "nodata": 4294967295.0,
+    "values": [
+      [
+        0,
+        1073676289,
+        1073741824
+      ],
+      [
+        4294836225,
+        1,
+        4
+      ]
+    ]
+  },
+  {
+    "input": "nd_u16",
+    "tool": "Abs",
+    "status": "succeeded",
+    "type": "S32",
+    "nodata": -2147483647.0,
+    "values": [
+      [
+        0,
+        -2147483647,
+        32768
+      ],
+      [
+        65535,
+        1,
+        2
+      ]
+    ]
+  },
+  {
+    "input": "nd_u16",
+    "tool": "Negate",
+    "status": "succeeded",
+    "type": "S32",
+    "nodata": -2147483647.0,
+    "values": [
+      [
+        0,
+        -2147483647,
+        -32768
+      ],
+      [
+        -65535,
+        -1,
+        -2
+      ]
+    ]
+  },
+  {
+    "input": "nd_u16",
+    "tool": "Square",
+    "status": "succeeded",
+    "type": "U32",
+    "nodata": 4294967295.0,
+    "values": [
+      [
+        0,
+        4294967295,
+        1073741824
+      ],
+      [
+        4294836225,
+        1,
+        4
+      ]
+    ]
+  }
+]

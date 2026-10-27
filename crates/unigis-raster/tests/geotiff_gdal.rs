@@ -293,6 +293,7 @@ fn tiled_writer_with_overviews() {
                 OverviewResampling::Nearest
             },
             bigtiff,
+            zero_out_of_range_nodata: false,
         };
         write_geotiff_with(&out, &r, &opts).unwrap();
         let g = gdal_read(&out, &dir);
@@ -446,6 +447,57 @@ fn integer_nodata_tags_preserve_values_outside_i64_range() {
                 gdal_json(&out)["bands"][0]["noDataValue"].as_f64(),
                 Some(nodata)
             );
+        }
+    }
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+/// ArcGIS GP output encoding is optional; logical cells remain available for stats.
+#[test]
+fn integer_nodata_zero_encoding_is_explicit_and_preserves_logical_cells() {
+    let dir = tempdir("zero-nodata");
+    for (i, (data_type, nodata, clamped)) in [
+        (DataType::U8, 256., 255.),
+        (DataType::I16, 3.4e38, 32767.),
+        (DataType::I32, f64::MIN, i32::MIN as f64),
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        let mut raster = unigis_raster::Raster::new(2, 1, data_type, [0., 1., 0., 1., 0., -1.]);
+        raster.nodata = Some(nodata);
+        raster.bands[0] = vec![1., nodata];
+        let default = dir.join(format!("default-{i}.tif"));
+        write_geotiff(&default, &raster, Compression::None).unwrap();
+        assert_eq!(read_geotiff(&default).unwrap().bands[0], vec![1., clamped]);
+        for tiled in [false, true] {
+            let path = dir.join(format!("{i}-{tiled}.tif"));
+            unigis_raster::write_geotiff_with(
+                &path,
+                &raster,
+                &unigis_raster::WriteOptions {
+                    zero_out_of_range_nodata: true,
+                    tile: tiled.then_some((16, 16)),
+                    bigtiff: tiled,
+                    compression: if tiled {
+                        Compression::Lzw
+                    } else {
+                        Compression::None
+                    },
+                    ..Default::default()
+                },
+            )
+            .unwrap();
+            let back = read_geotiff(&path).unwrap();
+            assert_eq!(back.nodata, Some(nodata));
+            assert_eq!(back.bands[0], vec![1., 0.]);
+            if gdal_available() {
+                let observed = gdal_read(&path, &dir);
+                assert_eq!(observed.nodata, Some(nodata));
+                assert_eq!(observed.values, vec![1., 0.]);
+            }
+            assert_eq!(raster.bands[0], vec![1., nodata]);
+            assert_eq!(unigis_raster::stats::statistics(&raster).unwrap().count, 1);
         }
     }
     std::fs::remove_dir_all(dir).unwrap();

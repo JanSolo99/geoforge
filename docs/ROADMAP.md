@@ -737,3 +737,5 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Abs / Negate / Square preserve uncached Float64 cells and the F64 NoData marker; cached Float64 inputs follow ArcGIS narrowing to Float32. Twelve exact ArcGIS cases cover tagged/untagged and cached/uncached doubles. Wider integer/statistics-dependent behavior remains a separate documented slice.
 
 - [x] Uncached integer Abs/Negate/Square: 39 additional ArcGIS cases cover six integer types with/without NoData plus exact signed/unsigned32 boundaries. Negate uses observed widths and signed32 wrapping; Square preserves signedness, widens appropriately and marks integer overflow NoData. All48 original typed probes now match; cached integer planning remains documented follow-up work.
+
+- [x] Explicit GP encoding for integer NoData outside sample storage: zero physical cells, original tag and logical statistics preserved. GeoTIFF API retains default conversion; CLI opts in. Frequency255-with-NoData now works with three additional ArcGIS cases; native/GDAL tests cover U8/I16/I32, tiled/striped and BigTIFF layouts.

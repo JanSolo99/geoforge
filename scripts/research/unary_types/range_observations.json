@@ -1,0 +1,230 @@
+[
+  {
+    "input": "i16_cross3",
+    "tool": "Abs",
+    "status": "succeeded",
+    "type": "U8",
+    "nodata": 15.0,
+    "values": [
+      [
+        3,
+        2,
+        1
+      ],
+      [
+        1,
+        2,
+        3
+      ]
+    ]
+  },
+  {
+    "input": "i16_cross3",
+    "tool": "Negate",
+    "status": "succeeded",
+    "type": "S8",
+    "nodata": -128.0,
+    "values": [
+      [
+        3,
+        2,
+        1
+      ],
+      [
+        -1,
+        -2,
+        -3
+      ]
+    ]
+  },
+  {
+    "input": "i16_cross3",
+    "tool": "Square",
+    "status": "succeeded",
+    "type": "U8",
+    "nodata": 15.0,
+    "values": [
+      [
+        9,
+        4,
+        1
+      ],
+      [
+        1,
+        4,
+        9
+      ]
+    ]
+  },
+  {
+    "input": "i16_cross1",
+    "tool": "Abs",
+    "status": "succeeded",
+    "type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1
+      ]
+    ]
+  },
+  {
+    "input": "i16_cross1",
+    "tool": "Negate",
+    "status": "succeeded",
+    "type": "S8",
+    "nodata": -128.0,
+    "values": [
+      [
+        1,
+        1,
+        1
+      ],
+      [
+        -1,
+        -1,
+        -1
+      ]
+    ]
+  },
+  {
+    "input": "i16_cross1",
+    "tool": "Square",
+    "status": "succeeded",
+    "type": "U8",
+    "nodata": 3.0,
+    "values": [
+      [
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        1
+      ]
+    ]
+  },
+  {
+    "input": "i16_neg1to3",
+    "tool": "Abs",
+    "status": "succeeded",
+    "type": "U8",
+    "nodata": 15.0,
+    "values": [
+      [
+        3,
+        2,
+        1
+      ],
+      [
+        1,
+        2,
+        3
+      ]
+    ]
+  },
+  {
+    "input": "i16_neg1to3",
+    "tool": "Negate",
+    "status": "succeeded",
+    "type": "U8",
+    "nodata": 0.0,
+    "values": [
+      [
+        3,
+        2,
+        1
+      ],
+      [
+        1,
+        2,
+        3
+      ]
+    ]
+  },
+  {
+    "input": "i16_neg1to3",
+    "tool": "Square",
+    "status": "succeeded",
+    "type": "U8",
+    "nodata": 15.0,
+    "values": [
+      [
+        9,
+        4,
+        1
+      ],
+      [
+        1,
+        4,
+        9
+      ]
+    ]
+  },
+  {
+    "input": "u32_max",
+    "tool": "Abs",
+    "status": "succeeded",
+    "type": "S32",
+    "nodata": -1.7976931348623157e+308,
+    "values": [
+      [
+        0,
+        1,
+        2147483647
+      ],
+      [
+        0,
+        0,
+        0
+      ]
+    ]
+  },
+  {
+    "input": "u32_max",
+    "tool": "Negate",
+    "status": "succeeded",
+    "type": "S32",
+    "nodata": -1.7976931348623157e+308,
+    "values": [
+      [
+        0,
+        -1,
+        -2147483647
+      ],
+      [
+        -2147483648,
+        2,
+        1
+      ]
+    ]
+  },
+  {
+    "input": "u32_max",
+    "tool": "Square",
+    "status": "succeeded",
+    "type": "S32",
+    "nodata": -1.7976931348623157e+308,
+    "values": [
+      [
+        0,
+        1,
+        0
+      ],
+      [
+        0,
+        0,
+        0
+      ]
+    ]
+  }
+]

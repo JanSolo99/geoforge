@@ -32,6 +32,9 @@ pub struct WriteOptions {
     pub overview_resampling: OverviewResampling,
     /// Write BigTIFF (64-bit offsets); chosen automatically past 4 GB.
     pub bigtiff: bool,
+    /// Encode logical NoData outside an integer sample range as zero while
+    /// retaining its metadata tag (ArcGIS geoprocessing convention).
+    pub zero_out_of_range_nodata: bool,
 }
 
 const MODEL_PIXEL_SCALE: u16 = 33550;
@@ -322,6 +325,20 @@ pub fn write_geotiff_with(path: &Path, raster: &Raster, opts: &WriteOptions) -> 
     for &f in &opts.overviews {
         if f > 1 {
             levels.push(overview(raster, f, opts.overview_resampling));
+        }
+    }
+    if opts.zero_out_of_range_nodata
+        && !t.is_float()
+        && raster
+            .nodata
+            .is_some_and(|nd| nd < t.store(f64::NEG_INFINITY) || nd > t.store(f64::INFINITY))
+    {
+        for level in &mut levels {
+            for value in level.bands.iter_mut().flatten() {
+                if raster.is_nodata(*value) {
+                    *value = 0.0;
+                }
+            }
         }
     }
     let encoded: Vec<(usize, usize, Vec<Vec<u8>>)> = levels

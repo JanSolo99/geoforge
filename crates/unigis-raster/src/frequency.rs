@@ -128,12 +128,5 @@ pub fn frequency(
             }
         }
     }
-    if data_type.store(nodata) != nodata
-        && output.bands.iter().flatten().any(|&v| output.is_nodata(v))
-    {
-        return Err(unsupported(
-            "255 comparisons with NoData require an unsupported integer NoData encoding",
-        ));
-    }
     Ok(output)
 }

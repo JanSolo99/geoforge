@@ -31,7 +31,6 @@ fn frequency_refusals_preserve_sources_and_existing_output() {
             (";".to_owned(), "at least one"),
             (mismatch.display().to_string(), "matching grids"),
             (repeat(257), "256 comparison"),
-            (repeat(255), "255 comparisons"),
         ] {
             let result = Command::new(env!("CARGO_BIN_EXE_ug"))
                 .args(["run", tool])

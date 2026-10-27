@@ -1,8 +1,8 @@
 # Current handoff
 
-Updated 2026-10-27T20:36:45+00:00; last agent Codex.
-/mnt/media/ArcGIS_Linux; main; HEAD4fe66fc PUSHED/verified
-4fe66fc017ddc6df8237628ce519116704a7a1f9. User authorizes ongoing development,
+Updated 2026-10-27T21:08:35+00:00; last agent Codex.
+/mnt/media/ArcGIS_Linux; main; HEADc2ed0cf PUSHED/verified
+c2ed0cf0a8d62accfa4c052564e02883cfa81e43. User authorizes ongoing development,
 tested commits/pushes/dashboard updates while sleeping. No repeated prompts.
 Do not launch another agent, CLI or coordinator. Cargo -j3, sequential builds.
 
@@ -17,7 +17,7 @@ The first overbroad F64 push was stopped before publication; corrected4fe66fc
 was the published head. No history rewrite. All normal pre-push gates passed.
 Prior imports35/Composite125/GraphicBuffer48 already pushed; branding/docking/OSM done.
 
-## Active uncached integer slice (validated; committing next)
+## Uncached integer slice completed/pushed c2ed0cf
 
 local.rs uncached Negate:8bit->I16,16bit->I32,32bit signed wrap. Square preserves
 signedness, widens8/16bit, keeps32bit, overflow->NoData. Cached integer paths remain
@@ -30,7 +30,8 @@ FINAL scripts/check PASS exit0 /tmp/unigis-unary-integer-check.log:185 Rust pass
 12 Float64 cases and prior references included. CLI build PASS30.75s. Oracle39/39
 success; unsigned Square boundary warning010663 (no RAT) is expected, raster succeeds.
 ROADMAP/KNOWN_GAPS/research README/dashboard refreshed. These source/docs/reference
-edits UNCOMMITTED. Need JS/diff check, stage scoped paths, commit/push normally.
+edits committed/pushed c2ed0cf. JS/diff checks and normal push gate PASS185 Rust,
+5ignored,8Python /tmp/unigis-unary-integer-push.log.
 
 ## Next research
 
@@ -61,3 +62,33 @@ Exclude testdata/geoproc/raster aux.xml edits, deleted *.sr.lock, .worktrees/,
 NOTES.md (DO NOT read/use: proprietary material), scratch_cf.tif,
 scratch_trend_rms.txt.xml and importer *.vat.* from earlier oracle work.
 No reset/stash/worktree transfers. Post-commit dashboard HTML dirt expected.
+
+Cached32 probe30/30 completed; saved cached32_observations.json/probe_cached32.py.
+Important: cached U32/I32 Negate/Square can use S32 with NoData -f64MAX, physical
+NoData/overflow cells0. Current integer writer saturates that marker; do not pretend
+these are fixed. Cached Abs of full-range U8 promotes toU16. Small cached type
+selection fits zonal-style low-width ranges; additional wide32 rules remain unclear.
+No Cargo/oracle processes active now. Next bounded investigation cached8/16-bit
+planning; verify U16 full-range Square before implementing.
+
+Active next slice: explicit WriteOptions.zero_out_of_range_nodata (defaultfalse),
+CLI GP opts in. Encodes logical out-of-range integer missing cells0, retains tag,
+input unchanged for stats. Restored fractional formatting; only out-of-range mapping.
+Frequency255-NoData guard removed;3 new successful references. New GDAL/native
+format regression covers default/opt-in, layouts and input preservation.
+No cached planner edits yet; cached30 observations saved but not yet committed.
+Full next gate /tmp/unigis-nodata-encoding-check.log; research/nodata_encoding docs.
+
+Current writer-policy full gate session18512 /tmp/unigis-nodata-encoding-check.log:
+fmt/clippy/8Python PASS, generic ArcGIS comparisons running. No cached math edits.
+Cached16 six probes complete/saved cached16_observations.json, confirming full-range
+U16 Abs/Negate S32(-2147483647), Square U32(max). Range-control12 probes running
+session3077 /tmp/unigis-unary-ranges-probe.log. Scripts/private inputs /tmp only
+for latest controls; save recipe/results when complete. Only one Cargo gate and
+one independent oracle worker; no agents/coordinators launched.
+
+FINAL writer-policy scripts/check PASS exit0:186 Rust,5ignored,8Python,fmt/clippy.
+/tmp/unigis-nodata-encoding-check.log includes new format regression and all3
+255-with-NoData cases; prior raster references unchanged. Source integer/frequency/
+Float64 CI all SUCCESS at21:02Z. Dashboard refreshed, JS checking before commit.
+Next commit/push writer policy; cached math remains research only.

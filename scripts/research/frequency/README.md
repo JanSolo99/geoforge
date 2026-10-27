@@ -4,7 +4,7 @@ Native registry ids: equal_to_frequency, greater_than_frequency, less_than_frequ
 ArcGIS Pro 3.7 is the behavior oracle. GDAL creates/inspects fixture files only;
 there is no new runtime dependency. The initial ug inventory lacked all three.
 
-Regenerate the63 saved cases:
+Regenerate the66 saved cases:
 
 ```
 uv run -q --with 'mcp>=2' python scripts/make-arcgis-reference.py 'freq_*'
@@ -28,17 +28,17 @@ this policy is explicit and does not alter other tools' empty-band behavior.
 
 Scope: GeoTIFFs, exactly matching grids/CRS, at most256 comparisons and finite data
 or NoData. Nondefault environments, resampling/reprojection and multidimensional
-CRF processing are unsupported. The255-comparison case with NoData is refused:
-ArcGIS stores physical zero with an out-of-range256 tag, while the current native
-writer saturates that missing marker. GDAL sees no standard mask (flags1/all valid).
-Do not assume mask support or silently write an incorrect255 cell; probe the
-encoding separately before extending support.255 comparisons without NoData work.
+CRF processing are unsupported. The255-comparison case with NoData now uses the explicit CLI output policy:
+logical256 markers become physical zero with the256 tag retained, matching ArcGIS.
+Statistics still exclude those logical missing cells before encoding. GDAL sees
+no standard mask (flags1/all valid); this reproduces physical file output, not a
+new mask representation. The format API exposes this as an opt-in WriteOptions
+policy; default format sample conversion is retained. See ../nodata_encoding/README.md.
 
 62 preliminary probes are saved in *_observations.json and probe_*.py: baseline15,
-boundaries8, precision9, broadcast18, order5, interior7.63 reference cases additionally
+boundaries8, precision9, broadcast18, order5, interior7.66 reference cases additionally
 cover zero counts, output type transitions, NoData, varied band values and missing
-bands. The CLI safety tests verify empty/oversized lists, CRS mismatch and the
-unsupported255-with-NoData case preserve inputs and an existing output. Empty
+bands. The CLI safety tests verify empty/oversized lists, CRS mismatch preserve inputs and an existing output. Empty
 Rank/Popularity lists now return000735 instead of panicking (separate regression).
 
 Run make_inputs.py from repo root with GDAL Python bindings/NumPy to reproduce

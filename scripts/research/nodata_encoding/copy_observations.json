@@ -1,0 +1,110 @@
+[
+  {
+    "case": "u8_300",
+    "status": "succeeded",
+    "type": "U8",
+    "nodata": 300.0,
+    "values": [
+      [
+        0,
+        127,
+        128
+      ],
+      [
+        255,
+        3,
+        4
+      ]
+    ]
+  },
+  {
+    "case": "u8_fraction",
+    "status": "succeeded",
+    "type": "U8",
+    "nodata": 300.0,
+    "values": [
+      [
+        0,
+        127,
+        128
+      ],
+      [
+        255,
+        3,
+        4
+      ]
+    ]
+  },
+  {
+    "case": "i16_fraction",
+    "status": "succeeded",
+    "type": "S16",
+    "nodata": -1.0,
+    "values": [
+      [
+        0,
+        -1,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ]
+  },
+  {
+    "case": "i16_big",
+    "status": "succeeded",
+    "type": "S16",
+    "nodata": 3.4e+38,
+    "values": [
+      [
+        0,
+        -1,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ]
+  },
+  {
+    "case": "i16_double",
+    "status": "succeeded",
+    "type": "S16",
+    "nodata": -1.7976931348623157e+308,
+    "values": [
+      [
+        0,
+        -1,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ]
+  },
+  {
+    "case": "i16_inrange_fraction",
+    "status": "succeeded",
+    "type": "S16",
+    "nodata": -10000.0,
+    "values": [
+      [
+        0,
+        -10000,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ]
+  }
+]
