@@ -12,7 +12,7 @@ fn err(msg: impl Into<String>) -> Error {
 
 fn graphic_buffer(ctx: &dyn Context) -> Result<ToolOutput> {
     let input = ctx.features("input")?;
-    input
+    let kind = input
         .geometry_kind()
         .ok_or_else(|| err("ERROR 000368: Invalid input data: features are required"))?;
     let d = distance_in_units(
@@ -20,8 +20,18 @@ fn graphic_buffer(ctx: &dyn Context) -> Result<ToolOutput> {
             .ok_or_else(|| err("ERROR 000735: Distance: value is required"))?,
         input.spatial_reference_wkt(),
     )?;
-    if !d.is_finite() || d <= 0.0 {
-        return Err(err("ERROR 000800: the distance must be greater than zero"));
+    if !d.is_finite() {
+        return Err(err("distance must be finite"));
+    }
+    if kind != GeometryKind::Polygon {
+        if d < 0.0 {
+            return Err(err(
+                "ERROR 000109: The buffer distance cannot be negative for lines and points",
+            ));
+        }
+        if d == 0.0 {
+            return Err(err("ERROR 000026: Buffer distance is zero"));
+        }
     }
     let cap = match ctx
         .get("line_caps")
@@ -54,38 +64,58 @@ fn graphic_buffer(ctx: &dyn Context) -> Result<ToolOutput> {
     if !limit.is_finite() || limit < 1.0 {
         return Err(err("miter_limit must be a finite number >= 1"));
     }
-    if input.fields().iter().any(|f| {
-        f.name.eq_ignore_ascii_case("BUFF_DIST") || f.name.eq_ignore_ascii_case("ORIG_FID")
-    }) {
-        return Err(err(
-            "Graphic Buffer does not yet overwrite existing BUFF_DIST or ORIG_FID fields",
-        ));
-    }
     let mut dist_field = Field::new("BUFF_DIST", FieldType::Double);
     dist_field.precision = 18;
     dist_field.scale = 11;
     let mut orig = Field::new("ORIG_FID", FieldType::Integer);
     orig.length = 10;
     orig.precision = 10;
+    if matches!(kind, GeometryKind::Point | GeometryKind::Multipoint) && matches!(cap, Cap::Butt) {
+        return Err(err(
+            "ERROR 000800: The value is not a member of SQUARE | ROUND.",
+        ));
+    }
     let mut fields = input.fields().to_vec();
-    fields.push(dist_field);
-    fields.push(orig);
+    let dist_index = fields
+        .iter()
+        .position(|f| f.name.eq_ignore_ascii_case("BUFF_DIST"))
+        .unwrap_or_else(|| {
+            fields.push(dist_field);
+            fields.len() - 1
+        });
+    let orig_index = fields
+        .iter()
+        .position(|f| f.name.eq_ignore_ascii_case("ORIG_FID"))
+        .unwrap_or_else(|| {
+            fields.push(orig);
+            fields.len() - 1
+        });
     let mut features = Vec::new();
+    let mut messages = Vec::new();
     for f in input.features() {
         let f = f?;
         let Some(g) = &f.geometry else { continue };
         if g.has_curves() || g.z.is_some() {
             return Err(err("Graphic Buffer does not handle curves or Z yet"));
         }
-        let geometry = graphic_buffer_geometry(g, d, cap, join, limit)?;
+        let Some(geometry) = graphic_buffer_geometry(g, d, cap, join, limit)? else {
+            messages.push(format!("WARNING 000636: Skipping feature {} because a negative or very small distance resulted in no geometry.", f.oid));
+            continue;
+        };
         let mut attributes = f.attributes.clone();
-        attributes.push(Value::Double(d));
-        attributes.push(Value::Integer(f.oid as i32));
+        attributes.resize(fields.len(), Value::Null);
+        attributes[dist_index] = Value::Double(d);
+        attributes[orig_index] = Value::Integer(
+            i32::try_from(f.oid).map_err(|_| err("Graphic Buffer requires 32-bit feature IDs"))?,
+        );
         features.push(Feature {
             oid: features.len() as i64,
-            geometry,
+            geometry: Some(geometry),
             attributes,
         });
+    }
+    if features.is_empty() {
+        messages.push("WARNING 000117: Warning empty output generated.".into());
     }
     Ok(ToolOutput {
         kind: GeometryKind::Polygon,
@@ -94,7 +124,7 @@ fn graphic_buffer(ctx: &dyn Context) -> Result<ToolOutput> {
         fields,
         spatial_reference_wkt: input.spatial_reference_wkt().map(str::to_owned),
         features,
-        messages: Vec::new(),
+        messages,
     })
 }
 

@@ -789,9 +789,9 @@ pub fn graphic_buffer_geometry(
 ) -> Result<Option<Geometry>> {
     use crate::convert::{to_multilinestring, to_multipoint};
     use geo::algorithm::buffer::{Buffer, BufferStyle, LineCap, LineJoin};
-    if !distance.is_finite() || distance <= 0.0 || !miter_limit.is_finite() || miter_limit < 1.0 {
+    if !distance.is_finite() || !miter_limit.is_finite() || miter_limit < 1.0 {
         return Err(Error::Unsupported(
-            "Graphic Buffer requires a finite positive distance and miter limit >= 1".into(),
+            "Graphic Buffer requires a finite distance and miter limit >= 1".into(),
         ));
     }
     if g.xy.iter().flatten().any(|v| !v.is_finite()) {
@@ -799,7 +799,15 @@ pub fn graphic_buffer_geometry(
             "Graphic Buffer requires finite coordinates".into(),
         ));
     }
-    let segments = arcgis_arc_segments(TAU, distance, 0.1);
+    if distance <= 0.0 && g.kind != GeometryKind::Polygon {
+        return Err(Error::Unsupported(
+            "Graphic Buffer requires a positive distance for points/lines".into(),
+        ));
+    }
+    if distance == 0.0 {
+        return Ok(None);
+    }
+    let segments = arcgis_arc_segments(TAU, distance.abs(), 0.1);
     if segments > 100_000 {
         return Err(Error::Unsupported(
             "Graphic Buffer would require too many arc vertices".into(),
@@ -813,20 +821,22 @@ pub fn graphic_buffer_geometry(
     let line_cap = match cap {
         GraphicCap::Square => LineCap::Square,
         GraphicCap::Butt if matches!(g.kind, GeometryKind::Point | GeometryKind::Multipoint) => {
-            LineCap::Square
+            return Err(Error::Unsupported(
+                "Graphic Buffer point caps must be square or round".into(),
+            ));
         }
         GraphicCap::Butt => LineCap::Butt,
         GraphicCap::Round => LineCap::Round(angle),
     };
     let line_join = match join {
-        GraphicJoin::Miter => LineJoin::Miter(2.0 * (1.0 / miter_limit).asin()),
+        GraphicJoin::Miter => LineJoin::Bevel,
         GraphicJoin::Bevel => LineJoin::Bevel,
         GraphicJoin::Round => LineJoin::Round(angle),
     };
     let style = BufferStyle::new(distance)
         .line_cap(line_cap)
         .line_join(line_join);
-    let out = match g.kind {
+    let mut out = match g.kind {
         GeometryKind::Point | GeometryKind::Multipoint => to_multipoint(g).buffer_with_style(style),
         GeometryKind::Polyline => to_multilinestring(g).buffer_with_style(style),
         GeometryKind::Polygon => to_multipolygon(g).buffer_with_style(style),
@@ -836,5 +846,88 @@ pub fn graphic_buffer_geometry(
             ));
         }
     };
+    if matches!(join, GraphicJoin::Miter)
+        && matches!(g.kind, GeometryKind::Polyline | GeometryKind::Polygon)
+    {
+        // ArcGIS bevels joins beyond the miter ratio. The native offset library
+        // clips long miters instead, so start from a bevel and add only allowed tips.
+        let patches = graphic_miter_tips(g, distance.abs(), miter_limit);
+        if !patches.0.is_empty() {
+            out = if distance > 0.0 {
+                out.union(&patches)
+            } else {
+                out.difference(&patches)
+            };
+        }
+    }
     Ok(from_multipolygon(&out))
+}
+
+fn graphic_miter_tips(g: &Geometry, radius: f64, limit: f64) -> MultiPolygon<f64> {
+    let mut tips = Vec::new();
+    for part in g.part_ranges() {
+        let mut points = Vec::new();
+        for &point in &g.xy[part] {
+            if points.last() != Some(&point) {
+                points.push(point);
+            }
+        }
+        let closed = g.kind == GeometryKind::Polygon;
+        if closed && points.first() == points.last() {
+            points.pop();
+        }
+        let n = points.len();
+        if n < 3 {
+            continue;
+        }
+        let joins = if closed { 0..n } else { 1..n - 1 };
+        for i in joins {
+            let (a, b, c) = (points[(i + n - 1) % n], points[i], points[(i + 1) % n]);
+            let unit = |a: [f64; 2], b: [f64; 2]| {
+                let (x, y) = (b[0] - a[0], b[1] - a[1]);
+                let length = x.hypot(y);
+                (length > 0.0 && length.is_finite()).then_some([x / length, y / length])
+            };
+            let (Some(u), Some(v)) = (unit(a, b), unit(b, c)) else {
+                continue;
+            };
+            let cross = u[0] * v[1] - u[1] * v[0];
+            let dot = (u[0] * v[0] + u[1] * v[1]).clamp(-1.0, 1.0);
+            if cross.abs() < 1e-12 || 1.0 + dot <= 1e-12 {
+                continue;
+            }
+            let ratio = (2.0 / (1.0 + dot)).sqrt();
+            if ratio > limit + 1e-12 {
+                continue;
+            }
+            let side = if cross > 0.0 { 1.0 } else { -1.0 };
+            let n1 = [side * u[1], -side * u[0]];
+            let n2 = [side * v[1], -side * v[0]];
+            let p = Coord {
+                x: b[0] + radius * n1[0],
+                y: b[1] + radius * n1[1],
+            };
+            let q = Coord {
+                x: b[0] + radius * n2[0],
+                y: b[1] + radius * n2[1],
+            };
+            let tip = Coord {
+                x: b[0] + radius * (n1[0] + n2[0]) / (1.0 + dot),
+                y: b[1] + radius * (n1[1] + n2[1]) / (1.0 + dot),
+            };
+            let area = (tip.x - p.x) * (q.y - p.y) - (tip.y - p.y) * (q.x - p.x);
+            // Include the original corner, inside the bevel base, so the patch
+            // overlaps it instead of merely sharing a floating-point edge.
+            let center = Coord { x: b[0], y: b[1] };
+            let ring = if area < 0.0 {
+                vec![center, p, tip, q, center]
+            } else {
+                vec![center, q, tip, p, center]
+            };
+            tips.push(Polygon::new(LineString::new(ring), vec![]));
+        }
+    }
+    // Tips from neighbouring corners can overlap. Union them before the binary
+    // operation, whose even-odd fill would otherwise cancel those overlaps.
+    unary_union(tips.iter())
 }

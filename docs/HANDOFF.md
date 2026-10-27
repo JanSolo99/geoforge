@@ -1,7 +1,9 @@
 # Current handoff
 
-Updated: 2026-10-27T13:22:15+00:00; last agent: Codex.
-Workspace `/mnt/media/ArcGIS_Linux`; branch main; HEAD `d66383c` (Graphic Buffer local checkpoint); origin/main still `526a0f2`.
+Updated: 2026-10-27T13:47:58+00:00; last agent: Codex.
+Workspace `/mnt/media/ArcGIS_Linux`; branch main; HEAD `ebc2d2d` (dashboard checkpoint), follows Graphic Buffer `d66383c`.
+Push COMPLETED, exit 0: origin/main advanced `526a0f2..ebc2d2d`.
+Pre-push Python/Cargo gates passed; log `/tmp/unigis-overnight-push1.log`.
 
 ## Objective
 
@@ -32,6 +34,28 @@ names listed by current `ug tools`. Rebuilt `docs/dashboard.html --ci`: 276 own 
 ArcGIS entries repeat across toolboxes, so those counts differ. Eight recent CI rows loaded.
 Dashboard tests are now wired into scripts/check and GitHub CI; dashboard commit next.
 
+## Follow-up parameter batch (validated; committing/pushing)
+
+18 gb_more_* cases now generated and ALL 28 Graphic Buffer reference cases pass
+(`/tmp/unigis-gb-miter-overlap.log`, exit 0). Supports negative/zero polygon distances,
+reserved numeric field replacement, round point radii 30/1000, and miter limits
+1/1.25/2/10 including acute corners. ArcGIS bevels over-limit miters; native clipping
+was incorrect. Bevel base plus overlapping unioned miter patches fixes this without
+changing tolerances. Detailed findings: `scripts/research/graphic_buffer/README.md`.
+Changes are uncommitted in geometry/tools, generator/manifest, gb_more_* outputs and
+new graphic_buffer_angles / graphic_buffer_reserved input shapefiles.
+Final wrapper warnings now match observed 000636/000117; full `scripts/check` PASSED exit 0: 174 passed, 0 failed, 5 ignored in 78 result groups,
+plus four dashboard tests, fmt and clippy -D warnings. Log `/tmp/unigis-gb-expanded-check.log`.
+All 137 slice paths reviewed/staged; unrelated dirt excluded. No running build.
+Exploratory field probes completed (`/tmp/unigis-gb-field-research.log`): numeric/text
+distance fields, case-insensitive lookup and numeric null skipping supported by ArcGIS;
+zero numeric fields skip, negative points fail 000109. Malformed text has inconsistent
+geometry/BUFF_DIST behavior, so refuse rather than guess. No field support edited yet.
+A constants/unit probe is running session 15065, `/tmp/unigis-gb-unit-research.log`.
+Both pushed checkpoint GitHub CI runs completed SUCCESS:
+https://github.com/JanSolo99/geoforge/actions/runs/40512024122
+https://github.com/JanSolo99/geoforge/actions/runs/40512020282
+
 ## Validation
 
 - Inherited baseline reference run FAILED 5 cases:
@@ -43,17 +67,15 @@ Dashboard tests are now wired into scripts/check and GitHub CI; dashboard commit
 - `python3 -m unittest discover -s scripts/dashboard -p 'test_*.py' -v`: 4 passed.
 - `scripts/check` PASSED, exit 0: formatting, workspace/all-targets clippy -D warnings,
   full workspace tests. 174 passed, 0 failed, 5 ignored, 78 result groups.
-  Log `/tmp/unigis-graphic-buffer-check.log`. No Cargo builds remain running.
-- `git diff --check` passed. No push in this Codex continuation yet.
+  Log `/tmp/unigis-graphic-buffer-check.log`. This gate covers pushed `ebc2d2d`, not the current follow-up edits.
+- `git diff --check` passed. Both checkpoints pushed and remote SHA verified.
 
 ## Next actions
 
-1. Graphic Buffer committed locally as `d66383c`; validation complete.
-2. Add dashboard tests to scripts/check and GitHub CI, review/rebuild and commit dashboard.
-3. Push both validated commits (pre-push hook scripts/check is mandatory).
-4. Batch black-box probes for custom Graphic Buffer miter limits, negative/zero distances,
-   output-field collisions and round point radii; implement supported cases and repeat gates.
-5. Continue missing registry tools from actual `ug tools` inventory; checkpoint each milestone.
+1. Commit staged expanded Graphic Buffer slice; dashboard --ci refreshed.
+2. Push normally (mandatory root pre-push gate); verify remote HEAD.
+3. Continue bounded oracle-backed development; consider Graphic Buffer distance fields
+   and geographic safety next. Keep checkpointing and pushing validated slices.
 
 ## Durable context / preserved work
 
