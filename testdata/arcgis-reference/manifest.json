@@ -44857,6 +44857,116 @@
           "where_clause": "ZONE = 1"
         }
       }
+    },
+    "ef_where": {
+      "tool": "conversion.ExportFeatures",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "ZONE = 1"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "export_features",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "where_clause": "ZONE = 1"
+        }
+      }
+    },
+    "ef_all": {
+      "tool": "conversion.ExportFeatures",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "export_features",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

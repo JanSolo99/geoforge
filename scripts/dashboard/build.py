@@ -52,8 +52,8 @@ def implemented() -> dict[str, str]:
     for m in re.finditer(r"^    ([A-Z][A-Za-z0-9]+)\s*[{,]", block, re.M):
         found.setdefault(norm(m.group(1)), "ug command")
     aliases = read(ROOT / "crates/unigis-cli/src/aliases.rs")
-    for m in re.finditer(r'"pairwise_(\w+)" =>', aliases):
-        found.setdefault(norm("Pairwise" + m.group(1)), "alias")
+    for m in re.finditer(r'"([a-z0-9_]+)" =>', aliases):
+        found.setdefault(norm(m.group(1)), "alias")
     return found
 
 

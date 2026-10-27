@@ -25,6 +25,7 @@ pub fn rewrite(args: Vec<String>) -> Vec<String> {
         "pairwise_buffer" => buffer,
         "pairwise_dissolve" => dissolve,
         "pairwise_intersect" => intersect,
+        "export_features" => export_features,
         "pairwise_clip" => |p| overlay("clip", "clip_features", p),
         "pairwise_erase" => |p| overlay("erase", "erase_features", p),
         _ => return args,
@@ -70,6 +71,21 @@ fn buffer(p: &Params) -> Option<Vec<String>> {
     each(&mut line, "--dissolve-field", p, "dissolve_field");
     option(&mut line, "--line-end-type", p, "line_end_type");
     line.extend(["--max-arc-angle".to_string(), "3.75".to_string()]);
+    Some(line)
+}
+
+/// Export Features is Feature Class To Feature Class under a newer name (sorting aside).
+fn export_features(p: &Params) -> Option<Vec<String>> {
+    if get(p, "sort_field").is_some() {
+        return None;
+    }
+    let mut line = vec![
+        "feature-class-to-feature-class".to_string(),
+        get(p, "input")?.into(),
+        get(p, "output")?.into(),
+    ];
+    option(&mut line, "--where-clause", p, "where_clause");
+    option(&mut line, "--field-mapping", p, "field_mapping");
     Some(line)
 }
 
