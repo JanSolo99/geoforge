@@ -600,6 +600,13 @@ pub static TOOLS: &[Tool] = &[
         "Bitwise Right Shift"
     ),
     Tool {
+        id: "raster_to_float",
+        name: "Raster to Float",
+        summary: "Writes a raster as a binary float file (the output path is the .flt file) with its .hdr.",
+        params: &[raster("input", "Input Raster", true)],
+        run: raster_to_ascii,
+    },
+    Tool {
         id: "raster_to_ascii",
         name: "Raster to ASCII",
         summary: "Writes a raster as an Esri ASCII grid (the output path is the .asc file).",

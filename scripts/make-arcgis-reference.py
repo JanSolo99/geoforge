@@ -922,6 +922,11 @@ CASES = {
     "gen_roads_20": ("edit.Generalize", [DATA / "roads.shp"], ["20 Meters"]),
     "gen_roads_5": ("edit.Generalize", [DATA / "roads.shp"], ["5 Meters"]),
     "gen_streams_30": ("edit.Generalize", [DATA / "streams.shp"], ["30 Meters"]),
+    "r2f_dem": ("conversion.RasterToFloat", [RASTER / "dem.tif"], []),
+    "r2f_int16": ("conversion.RasterToFloat", [RASTER / "dem_int16_packbits.tif"], []),
+    "r2f_u8": ("conversion.RasterToFloat", [RASTER / "landuse_u8.tif"], []),
+    "r2f_nodata": ("conversion.RasterToFloat", [RASTER / "dem_nodata.tif"], []),
+    "r2f_f64": ("conversion.RasterToFloat", [RASTER / "dem_f64.tif"], []),
     "gpal_roads_50": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "NO_END_POINTS"]),
     "gpal_roads_50_end": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "END_POINTS"]),
     "gpal_roads_pct": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["PERCENTAGE", "", 25, "NO_END_POINTS"]),
@@ -1084,6 +1089,7 @@ RUN = {
     **{f"gp.{t}_sa": (i, ["in1", "in2", "output"]) for t, i in BINARY},
     **{f"gp.{t}_sa": (i, ["in1", "in2", "output"]) for t, i in COMBINATORIAL},
     "conversion.RasterToASCII": ("raster_to_ascii", ["input", "output"]),
+    "conversion.RasterToFloat": ("raster_to_float", ["input", "output"]),
     "analysis.TableSelect": ("table_select", ["input", "output", "where_clause"]),
     "conversion.ExportFeatures": ("export_features", ["input", "output", "where_clause", None, "field_mapping", "sort_field"]),
     "management.GenerateTransectsAlongLines": ("generate_transects_along_lines", ["input", "output", "interval", "transect_length", "include_end_points"]),
@@ -1119,7 +1125,7 @@ RASTER_OUT = {"gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f
               "gp.Slice_sa", "gp.ExtractByAttributes_sa", "gp.ExtractByRectangle_sa", "gp.ExtractByCircle_sa", "gp.Lookup_sa"}
 WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.
-TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable", "conversion.RasterToASCII"}
+TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable", "conversion.RasterToASCII", "conversion.RasterToFloat"}
 # Tools whose output is a table, written as <name>.dbf.
 TABLE_OUT = {"management.CopyRows", "gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa", "gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
              "management.TransposeFields", "management.PivotTable", "management.CreateTable", "analysis.PolygonNeighbors", "analysis.TabulateIntersection", "analysis.TableSelect"}
@@ -1211,6 +1217,8 @@ def main():
                 out = OUT / f"{name}.csv"
             if tool == "conversion.RasterToASCII":
                 out = OUT / f"{name}.asc"
+            if tool == "conversion.RasterToFloat":
+                out = OUT / f"{name}.flt"
         if tool in WORKSPACE_OUT:
             out = OUT / name
             out.mkdir()

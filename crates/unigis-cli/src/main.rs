@@ -6184,6 +6184,16 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
         }
     }
     let out = registry::run(spec, &Args(map))?;
+    if spec.id == "raster_to_float" {
+        let path = Path::new(&output);
+        std::fs::write(path, unigis_raster::conversion::to_float(&out.raster))
+            .map_err(|e| Error::io(path, e))?;
+        let hdr = path.with_extension("hdr");
+        std::fs::write(&hdr, unigis_raster::conversion::float_header(&out.raster))
+            .map_err(|e| Error::io(&hdr, e))?;
+        println!("Wrote {output}");
+        return Ok(());
+    }
     if spec.id == "raster_to_ascii" {
         std::fs::write(&output, unigis_raster::conversion::to_ascii(&out.raster))
             .map_err(|e| Error::io(Path::new(&output), e))?;

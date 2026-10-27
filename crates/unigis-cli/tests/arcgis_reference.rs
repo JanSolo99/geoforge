@@ -4370,7 +4370,7 @@ fn tools_match_arcgis_output() {
         let table = reference.join(format!("{case}.dbf")).exists()
             && !reference.join(format!("{case}.shp")).exists();
         // Text outputs (Features To JSON) are compared byte for byte.
-        let text_ext = ["json", "geojson", "csv", "asc"]
+        let text_ext = ["json", "geojson", "csv", "asc", "flt"]
             .into_iter()
             .find(|e| reference.join(format!("{case}.{e}")).exists());
         // Spatial Analyst outputs are GeoTIFFs, compared cell by cell.
@@ -4550,11 +4550,15 @@ fn tools_match_arcgis_output() {
         } else if raster {
             diffs = compare_rasters(case, &out, &reference.join(format!("{case}.tif")));
         } else if let Some(ext) = text_ext {
-            let (ours, theirs) = (
-                std::fs::read_to_string(&out).unwrap_or_default(),
-                std::fs::read_to_string(reference.join(format!("{case}.{ext}"))).unwrap(),
+            let (ours_bytes, theirs_bytes) = (
+                std::fs::read(&out).unwrap_or_default(),
+                std::fs::read(reference.join(format!("{case}.{ext}"))).unwrap(),
             );
-            if ours != theirs {
+            let (ours, theirs) = (
+                String::from_utf8_lossy(&ours_bytes).into_owned(),
+                String::from_utf8_lossy(&theirs_bytes).into_owned(),
+            );
+            if ours_bytes != theirs_bytes {
                 let at = ours
                     .chars()
                     .zip(theirs.chars())

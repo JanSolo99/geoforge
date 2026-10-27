@@ -239,3 +239,29 @@ fn format_g7(v: f32) -> String {
         s
     }
 }
+
+/// Raster To Float: the cells as little-endian 32-bit floats, NoData -9999, rows from the top.
+pub fn to_float(r: &crate::Raster) -> Vec<u8> {
+    r.bands[0]
+        .iter()
+        .flat_map(|&v| {
+            let x = if r.is_nodata(v) {
+                -9999.0_f32
+            } else {
+                v as f32
+            };
+            x.to_le_bytes()
+        })
+        .collect()
+}
+
+/// The `.hdr` beside a `.flt`: the ASCII grid's header and the byte order.
+pub fn float_header(r: &crate::Raster) -> String {
+    let ascii = to_ascii(r);
+    let header: String = ascii
+        .split("\r\n")
+        .take(6)
+        .map(|l| format!("{l}\r\n"))
+        .collect();
+    format!("{header}{:<14}LSBFIRST\r\n", "byteorder")
+}

@@ -45673,6 +45673,96 @@
           "tolerance": "30 Meters"
         }
       }
+    },
+    "r2f_dem": {
+      "tool": "conversion.RasterToFloat",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_to_float",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "r2f_int16": {
+      "tool": "conversion.RasterToFloat",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_to_float",
+        "params": {
+          "input": "testdata/raster/dem_int16_packbits.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "r2f_u8": {
+      "tool": "conversion.RasterToFloat",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_to_float",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "r2f_nodata": {
+      "tool": "conversion.RasterToFloat",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_to_float",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "r2f_f64": {
+      "tool": "conversion.RasterToFloat",
+      "args": [
+        "testdata/raster/dem_f64.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_to_float",
+        "params": {
+          "input": "testdata/raster/dem_f64.tif",
+          "output": "<out>"
+        }
+      }
     }
   }
 }
