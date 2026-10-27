@@ -46052,6 +46052,116 @@
           "mosaic_method": "LAST"
         }
       }
+    },
+    "ebpoly_in": {
+      "tool": "gp.ExtractByPolygon_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "500205 5000205;501105 5000305;500805 5001005;500305 5000905",
+        "<out>",
+        "INSIDE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "extract_by_polygon",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "polygon": "500205 5000205;501105 5000305;500805 5001005;500305 5000905",
+          "output": "<out>",
+          "extraction_area": "INSIDE"
+        }
+      }
+    },
+    "ebpoly_out": {
+      "tool": "gp.ExtractByPolygon_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "500205 5000205;501105 5000305;500805 5001005;500305 5000905",
+        "<out>",
+        "OUTSIDE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "extract_by_polygon",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "polygon": "500205 5000205;501105 5000305;500805 5001005;500305 5000905",
+          "output": "<out>",
+          "extraction_area": "OUTSIDE"
+        }
+      }
+    },
+    "ebpoly_int": {
+      "tool": "gp.ExtractByPolygon_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "500100 5000100;501000 5000300;500600 5001000",
+        "<out>",
+        "INSIDE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "extract_by_polygon",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "polygon": "500100 5000100;501000 5000300;500600 5001000",
+          "output": "<out>",
+          "extraction_area": "INSIDE"
+        }
+      }
+    },
+    "ebpts_in": {
+      "tool": "gp.ExtractByPoints_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "500205 5000205;501105 5000305;500805 5001005;500305 5000905;500300 5000300",
+        "<out>",
+        "INSIDE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "extract_by_points",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "points": "500205 5000205;501105 5000305;500805 5001005;500305 5000905;500300 5000300",
+          "output": "<out>",
+          "extraction_area": "INSIDE"
+        }
+      }
+    },
+    "ebpts_out": {
+      "tool": "gp.ExtractByPoints_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "500205 5000205;501105 5000305;500805 5001005;500305 5000905;500300 5000300",
+        "<out>",
+        "OUTSIDE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "extract_by_points",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "points": "500205 5000205;501105 5000305;500805 5001005;500305 5000905;500300 5000300",
+          "output": "<out>",
+          "extraction_area": "OUTSIDE"
+        }
+      }
     }
   }
 }

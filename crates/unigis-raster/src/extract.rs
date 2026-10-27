@@ -42,6 +42,59 @@ pub fn extract_by_circle(input: &Raster, center: (f64, f64), radius: f64, inside
     })
 }
 
+/// Whether (x, y) is inside the ring, scanline style: the spans between the ring's crossings of
+/// the row include their right end and not their left end (a cell center on an edge belongs to
+/// the polygon on the right edges only; matched ArcGIS).
+fn in_ring(ring: &[(f64, f64)], x: f64, y: f64) -> bool {
+    let mut crossings: Vec<f64> = Vec::new();
+    for i in 0..ring.len() {
+        let (a, b) = (ring[i], ring[(i + 1) % ring.len()]);
+        if (a.1 > y) != (b.1 > y) {
+            crossings.push((b.0 - a.0) * (y - a.1) / (b.1 - a.1) + a.0);
+        }
+    }
+    crossings.sort_by(f64::total_cmp);
+    crossings
+        .chunks(2)
+        .any(|c| c.len() == 2 && x > c[0] && x <= c[1])
+}
+
+/// Extract by Polygon: cells whose centers are inside the polygon keep their values (the grid
+/// is the input's).
+pub fn extract_by_polygon(input: &Raster, ring: &[(f64, f64)], inside: bool) -> Raster {
+    keep_cells(input, |x, y| in_ring(ring, x, y) == inside)
+}
+
+/// Extract by Points: the cells that contain one of the points keep their values (with
+/// `inside` false, all the others do).
+pub fn extract_by_points(input: &Raster, points: &[(f64, f64)], inside: bool) -> Raster {
+    let t = input.transform;
+    let hit: std::collections::HashSet<(i64, i64)> = points
+        .iter()
+        .map(|&(x, y)| {
+            // A point on a cell edge belongs to the cell to its right / above it.
+            let r = (t[3] - y) / -t[5];
+            (
+                ((x - t[0]) / t[1]).floor() as i64,
+                if r.fract() == 0.0 {
+                    r as i64 - 1
+                } else {
+                    r.floor() as i64
+                },
+            )
+        })
+        .collect();
+    let cells: Vec<Option<f64>> = (0..input.height)
+        .flat_map(|row| (0..input.width).map(move |col| (col, row)))
+        .map(|(col, row)| {
+            let v = input.bands[0][row * input.width + col];
+            let on = hit.contains(&(col as i64, row as i64));
+            (!input.is_nodata(v) && on == inside).then_some(v)
+        })
+        .collect();
+    typed_cells(input, &cells, input.data_type)
+}
+
 /// Extract by Attributes: the cells matching `clause` keep their values; the type and NoData
 /// are the input's (32-bit float with NoData −FLT_MAX when it has none).
 pub fn extract_by_attributes(input: &Raster, clause: &ValueClause) -> Raster {

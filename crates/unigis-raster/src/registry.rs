@@ -560,6 +560,41 @@ fn mosaic_to_new_raster(ctx: &dyn Context) -> Result<Output> {
     with_statistics(raster, true)
 }
 
+/// "x y;x y;..." as coordinate pairs.
+fn coordinate_list(text: &str) -> Result<Vec<(f64, f64)>> {
+    text.split(';')
+        .filter(|p| !p.trim().is_empty())
+        .map(|p| {
+            let v = parse_numbers(p, 2, "Polygon")?;
+            Ok((v[0], v[1]))
+        })
+        .collect()
+}
+
+fn extract_by_polygon(ctx: &dyn Context) -> Result<Output> {
+    let ring = coordinate_list(&ctx.get("polygon").unwrap_or_default())?;
+    with_statistics(
+        crate::extract::extract_by_polygon(
+            &ctx.raster("input")?,
+            &ring,
+            inside(ctx, "extract_by_polygon"),
+        ),
+        true,
+    )
+}
+
+fn extract_by_points(ctx: &dyn Context) -> Result<Output> {
+    let points = coordinate_list(&ctx.get("points").unwrap_or_default())?;
+    with_statistics(
+        crate::extract::extract_by_points(
+            &ctx.raster("input")?,
+            &points,
+            inside(ctx, "extract_by_points"),
+        ),
+        true,
+    )
+}
+
 fn flip(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::extract::flip(&ctx.raster("input")?), true)
 }
@@ -901,6 +936,50 @@ pub static TOOLS: &[Tool] = &[
             ),
         ],
         run: extract_by_rectangle,
+    },
+    Tool {
+        id: "extract_by_polygon",
+        name: "Extract by Polygon",
+        summary: "The cells inside (or outside) a polygon, on the input's grid.",
+        params: &[
+            raster("input", "Input Raster", true),
+            Param {
+                name: "polygon",
+                label: "Polygon",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            option(
+                "extraction_area",
+                "Extraction Area",
+                &["INSIDE", "OUTSIDE"],
+                "INSIDE",
+            ),
+        ],
+        run: extract_by_polygon,
+    },
+    Tool {
+        id: "extract_by_points",
+        name: "Extract by Points",
+        summary: "The cells that contain (or do not contain) points, on the input's grid.",
+        params: &[
+            raster("input", "Input Raster", true),
+            Param {
+                name: "points",
+                label: "Points",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            option(
+                "extraction_area",
+                "Extraction Area",
+                &["INSIDE", "OUTSIDE"],
+                "INSIDE",
+            ),
+        ],
+        run: extract_by_points,
     },
     Tool {
         id: "extract_by_circle",
