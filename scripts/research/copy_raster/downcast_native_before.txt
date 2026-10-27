@@ -1,0 +1,16 @@
+u8 32_BIT_FLOAT : matches
+u8 16_BIT_SIGNED : matches
+i8 32_BIT_FLOAT : matches
+i8 16_BIT_SIGNED : matches
+u16 32_BIT_FLOAT : matches
+u16 16_BIT_SIGNED : matches
+i16 32_BIT_FLOAT : matches
+i16 16_BIT_SIGNED : matches
+u32 32_BIT_FLOAT : count 6.000000 != 5.000000
+u32 16_BIT_SIGNED : matches
+i32 32_BIT_FLOAT : count 6.000000 != 5.000000
+i32 16_BIT_SIGNED : matches
+f32 32_BIT_FLOAT : matches
+f32 16_BIT_SIGNED : nodata 9.223372036854776e+18 != 3.4e+38
+f64 32_BIT_FLOAT : matches
+f64 16_BIT_SIGNED : nodata 9.223372036854776e+18 != 1.79e+308

@@ -1,50 +1,66 @@
 # Current handoff
 
-Updated 2026-10-27T19:03:59+00:00; last agent Codex. Workspace /mnt/media/ArcGIS_Linux;
-branch main; HEAD bec6e20, verified origin/main matches via git ls-remote.
-User authorizes continuous development, tested commits, pushes and dashboard updates.
+Updated 2026-10-27T19:15:49+00:00; last agent Codex.
+Workspace /mnt/media/ArcGIS_Linux; branch main; HEAD 6812ba6, PUSHED/verified
+6812ba6bd183c0b6c9ba0ddf9ed4de1eeaf6e80e. User authorizes ongoing tested commits,
+pushes and dashboard updates while sleeping; continue without repeated prompts.
 Do not launch another agent, CLI or coordinator. Cargo -j3, sequential builds.
 
-## Completed / inherited
+## Completed
 
-Prior run pushed Graphic Buffer48 cases, Composite Bands125 cases, dashboard fixes,
-closed stdout handling, and ASCII/Float imports35 cases (bec6e20). Import check and
-push gate passed180 Rust tests/5ignored/8Python. Basemaps/branding/docking already landed.
-Old handoff incorrectly called importer push pending; remote verifies complete.
+Inherited prior run: Graphic Buffer48 cases, Composite Bands125 cases, dashboard
+accuracy/cache fixes, closed stdout handling, ASCII/Float imports35 cases (bec6e20).
+Importer CI SUCCESS https://github.com/JanSolo99/geoforge/actions/runs/40540613972.
+Basemaps/branding/docking already landed; old chat requests stale.
 
-## Active work
+This run: 6812ba6 raster Define Projection and corrected geographic GeoTIFF keys.
+Five ArcGIS cases4326/32633/3857/7844/7856 retain cells/grid/type/NoData. Geographic
+classification from public PROJ metadata, no raster runtime database dependency.
+Raw GeoKey/GDAL and CLI multiband/in-place/refusal safety regressions included.
+FINAL scripts/check and normal pre-push gate PASS:182 Rust,5 ignored,0 failed;
+8 Python,fmt,clippy. /tmp/unigis-raster-crs-{check,push}.log.
+CI pending https://github.com/JanSolo99/geoforge/actions/runs/40566379155.
+Research/limits scripts/research/raster_crs/README.md, ROADMAP/KNOWN_GAPS updated.
 
-Inherited UNCOMMITTED raster Define Projection CLI dispatch/helper (main.rs), public
-PROJ/EPSG geographic classification table/generator and geotiff.rs metadata fix.
-Five successful ArcGIS probes preserve pixels/type/grid/NoData with EPSG
-4326/32633/3857/7844/7856, saved research/raster_crs/define_observations.json.
-GDAL can repair the old wrong GDA2020 GeoKeys by EPSG lookup: test RAW keys too.
-This session added defras_* generator cases/native mapping; all five oracle cases
-succeeded. Raw GeoKey/GDAL test and CLI preservation/refusal test added. Scoped CLI
-test PASS (two F64 bands, in-place and invalid/aux SRS guards). First scripts/check
-stopped on clippy chunks_exact_to_as_chunks in new test; corrected, full gate rerunning.
-Logs /tmp/unigis-raster-crs-{generation,scoped,check,dashboard}.log.
-ROADMAP/KNOWN_GAPS/research README and dashboard CI cache refreshed.
-Latest prior importer CI SUCCESS: https://github.com/JanSolo99/geoforge/actions/runs/40540613972
-Dashboard JavaScript node --check and manifest mapping assertions passed.
-FINAL scripts/check PASS: 182 Rust passed,5 ignored,0 failed;8 Python,fmt,clippy.
-New raw GeoKey/GDAL checks and five manifest cases included.
-Exploratory multiband CopyRaster probe currently waiting (session26825), outputs
-under /tmp/unigis_cpr_*; /tmp/unigis-copy-bands-probe.log. No source edits yet.
-Source review found copy_raster uses input.like and band0 only; next slice should
-verify/fix multiband preservation after this checkpoint push.
-Support is standard GeoTIFF and validated numeric EPSG; no custom WKT/aux SRS override.
+## Active uncommitted Copy Raster slice
+
+Source evidence: previous ug copy of RGB retained1 band vs ArcGIS3.
+extract.rs now converts every band in order and fixes untagged source default
+NoData: U8/I8=256,U16=65536,I16=32767,U32/I32=2147483647,F32=3.4e38,F64=1.79e308.
+F32->F64 uses double3.4e38. registry.rs enables per-band statistics for multiband
+copies, including first/later-band NoData. Existing single-band DEM behavior retained.
+
+24 saved cprbands_* cases all succeeded; generic ArcGIS comparison PASS on all24,
+exact every pixel/band plus grid/type/NoData/CRS/stats. Generator, manifest and new
+TIFF/TFW/XML references, two tiny testdata/raster/copy_raster inputs, research probes/
+observations/make_inputs.py/README. See scripts/research/copy_raster/README.md.
+ROADMAP/KNOWN_GAPS and dashboard refreshed. All edits this slice UNCOMMITTED.
+
+FINAL scripts/check PASS exit0 /tmp/unigis-copy-bands-check.log:
+182 Rust passed,5 ignored,0 failed;8 Python,fmt,clippy. Every24 case included.
+Dashboard JS node --check and git diff --check PASS. Commit/push next.
+No other build/oracle processes. Research probes finished. git diff --check PASS.
 
 ## Next actions
 
-1. Commit and push validated raster projection slice through normal pre-push gate.
-2. Finish compact ArcGIS multiband CopyRaster probes and save reference cases.
-3. Fix confirmed band loss, run root gate, refresh dashboard, commit/push.
-4. Continue bounded native engine slices; checkpoint after validation/commit/push.
+1. Finish full root gate; record exact result, refresh CI/dashboard and JS check.
+2. Stage only Copy Raster/docs/dashboard/reference paths, commit/push normally.
+3. Next bounded slice:16 compact downcast probes saved copy_raster/downcast_observations.json
+   and probe_downcast.py. F64->F32 NoData Infinity matches new native behavior.
+   F32/F64->I16 keep3.4e38/1.79e308 tags; current integer tag writer clamps to i64.
+   Fix/test huge tags; normalize float output NoData before stats (I32/U32 marker
+   rounds to2147483648). Native red probe confirms exactly4 of16 mismatches:
+   U32/I32->F32 counts6 vs ArcGIS5, F32/F64->I16 tags i64MAX vs3.4e38/1.79e308.
+   Evidence research/copy_raster/downcast_native_before.txt; /tmp/unigis-copy-downcast-red.py.
+   Generate saved cases and verify before further commits.
+4. Continue tested native engine slices; checkpoint after milestones.
 
 ## Preserve unrelated files
 
 Exclude testdata/geoproc/raster aux.xml edits, deleted *.sr.lock, .worktrees/,
 NOTES.md (DO NOT read/use: proprietary material), scratch_cf.tif,
-scratch_trend_rms.txt.xml and importer *.vat.* generated during oracle work.
-No running build/oracle processes at startup. Post-commit dashboard HTML dirt expected.
+scratch_trend_rms.txt.xml and importer *.vat.* from prior oracle work.
+No reset/stash/worktree transfers. Root-only changes: no local full app build.
+Pre-push scripts/check mandatory; post-commit regenerates dashboard HTML (expected dirt).
+First full-array Copy Raster probe stalled on a large response; only its own worker
+cancelled; compact reruns completed. Oracle evidence always ArcGIS; GDAL file IO only.

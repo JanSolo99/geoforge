@@ -1,0 +1,674 @@
+[
+  {
+    "probe": "bands-compact",
+    "source": "rgb_pixel_u8.tif",
+    "pixel_type": "",
+    "status": "succeeded",
+    "bands": 3,
+    "type": "U8",
+    "nodata": 256.0,
+    "shape": [
+      3,
+      120,
+      150
+    ],
+    "first_values": [
+      [
+        203,
+        203,
+        204,
+        205,
+        206,
+        207,
+        208,
+        209
+      ],
+      [
+        149,
+        151,
+        153,
+        155,
+        157,
+        158,
+        160,
+        162
+      ],
+      [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    ]
+  },
+  {
+    "probe": "bands-compact",
+    "source": "rgb_pixel_u8.tif",
+    "pixel_type": "32_BIT_FLOAT",
+    "status": "succeeded",
+    "bands": 3,
+    "type": "F32",
+    "nodata": 256.0,
+    "shape": [
+      3,
+      120,
+      150
+    ],
+    "first_values": [
+      [
+        203.0,
+        203.0,
+        204.0,
+        205.0,
+        206.0,
+        207.0,
+        208.0,
+        209.0
+      ],
+      [
+        149.0,
+        151.0,
+        153.0,
+        155.0,
+        157.0,
+        158.0,
+        160.0,
+        162.0
+      ],
+      [
+        0.0,
+        1.0,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        7.0
+      ]
+    ]
+  },
+  {
+    "probe": "bands-compact",
+    "source": "rgb_pixel_u8.tif",
+    "pixel_type": "16_BIT_UNSIGNED",
+    "status": "succeeded",
+    "bands": 3,
+    "type": "U16",
+    "nodata": 256.0,
+    "shape": [
+      3,
+      120,
+      150
+    ],
+    "first_values": [
+      [
+        203,
+        203,
+        204,
+        205,
+        206,
+        207,
+        208,
+        209
+      ],
+      [
+        149,
+        151,
+        153,
+        155,
+        157,
+        158,
+        160,
+        162
+      ],
+      [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    ]
+  },
+  {
+    "probe": "bands-compact",
+    "source": "rgb_planar_u16.tif",
+    "pixel_type": "",
+    "status": "succeeded",
+    "bands": 3,
+    "type": "U16",
+    "nodata": 65536.0,
+    "shape": [
+      3,
+      120,
+      150
+    ],
+    "first_values": [
+      [
+        203,
+        203,
+        204,
+        205,
+        206,
+        207,
+        208,
+        209
+      ],
+      [
+        405,
+        407,
+        409,
+        411,
+        413,
+        414,
+        416,
+        418
+      ],
+      [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    ]
+  },
+  {
+    "probe": "bands-compact",
+    "source": "rgb_planar_u16.tif",
+    "pixel_type": "32_BIT_FLOAT",
+    "status": "succeeded",
+    "bands": 3,
+    "type": "F32",
+    "nodata": 65536.0,
+    "shape": [
+      3,
+      120,
+      150
+    ],
+    "first_values": [
+      [
+        203.0,
+        203.0,
+        204.0,
+        205.0,
+        206.0,
+        207.0,
+        208.0,
+        209.0
+      ],
+      [
+        405.0,
+        407.0,
+        409.0,
+        411.0,
+        413.0,
+        414.0,
+        416.0,
+        418.0
+      ],
+      [
+        0.0,
+        1.0,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        7.0
+      ]
+    ]
+  },
+  {
+    "probe": "bands-compact",
+    "source": "rgb_planar_u16.tif",
+    "pixel_type": "16_BIT_UNSIGNED",
+    "status": "succeeded",
+    "bands": 3,
+    "type": "U16",
+    "nodata": 65536.0,
+    "shape": [
+      3,
+      120,
+      150
+    ],
+    "first_values": [
+      [
+        203,
+        203,
+        204,
+        205,
+        206,
+        207,
+        208,
+        209
+      ],
+      [
+        405,
+        407,
+        409,
+        411,
+        413,
+        414,
+        416,
+        418
+      ],
+      [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    ]
+  },
+  {
+    "probe": "types",
+    "source": "u8",
+    "pixel_type": "",
+    "status": "succeeded",
+    "bands": 1,
+    "type": "U8",
+    "nodata": 256.0,
+    "values": [
+      [
+        0,
+        127,
+        128
+      ],
+      [
+        255,
+        3,
+        4
+      ]
+    ]
+  },
+  {
+    "probe": "types",
+    "source": "u8",
+    "pixel_type": "64_BIT",
+    "status": "succeeded",
+    "bands": 1,
+    "type": "F64",
+    "nodata": 256.0,
+    "values": [
+      [
+        0.0,
+        127.0,
+        128.0
+      ],
+      [
+        255.0,
+        3.0,
+        4.0
+      ]
+    ]
+  },
+  {
+    "probe": "types",
+    "source": "i8",
+    "pixel_type": "",
+    "status": "succeeded",
+    "bands": 1,
+    "type": "S8",
+    "nodata": 256.0,
+    "values": [
+      [
+        -128,
+        -1,
+        0
+      ],
+      [
+        1,
+        126,
+        127
+      ]
+    ]
+  },
+  {
+    "probe": "types",
+    "source": "i8",
+    "pixel_type": "64_BIT",
+    "status": "succeeded",
+    "bands": 1,
+    "type": "F64",
+    "nodata": 256.0,
+    "values": [
+      [
+        -128.0,
+        -1.0,
+        0.0
+      ],
+      [
+        1.0,
+        126.0,
+        127.0
+      ]
+    ]
+  },
+  {
+    "probe": "types",
+    "source": "u16",
+    "pixel_type": "",
+    "status": "succeeded",
+    "bands": 1,
+    "type": "U16",
+    "nodata": 65536.0,
+    "values": [
+      [
+        0,
+        32767,
+        32768
+      ],
+      [
+        65535,
+        1,
+        2
+      ]
+    ]
+  },
+  {
+    "probe": "types",
+    "source": "u16",
+    "pixel_type": "64_BIT",
+    "status": "succeeded",
+    "bands": 1,
+    "type": "F64",
+    "nodata": 65536.0,
+    "values": [
+      [
+        0.0,
+        32767.0,
+        32768.0
+      ],
+      [
+        65535.0,
+        1.0,
+        2.0
+      ]
+    ]
+  },
+  {
+    "probe": "types",
+    "source": "i16",
+    "pixel_type": "",
+    "status": "succeeded",
+    "bands": 1,
+    "type": "S16",
+    "nodata": 32767.0,
+    "values": [
+      [
+        -32768,
+        -1,
+        0
+      ],
+      [
+        32767,
+        100,
+        200
+      ]
+    ]
+  },
+  {
+    "probe": "types",
+    "source": "i16",
+    "pixel_type": "64_BIT",
+    "status": "succeeded",
+    "bands": 1,
+    "type": "F64",
+    "nodata": 32767.0,
+    "values": [
+      [
+        -32768.0,
+        -1.0,
+        0.0
+      ],
+      [
+        32767.0,
+        100.0,
+        200.0
+      ]
+    ]
+  },
+  {
+    "probe": "types",
+    "source": "u32",
+    "pixel_type": "",
+    "status": "succeeded",
+    "bands": 1,
+    "type": "U32",
+    "nodata": 2147483647.0,
+    "values": [
+      [
+        1,
+        2147483648,
+        4294967294
+      ],
+      [
+        16777217,
+        4000000000,
+        3
+      ]
+    ]
+  },
+  {
+    "probe": "types",
+    "source": "u32",
+    "pixel_type": "64_BIT",
+    "status": "succeeded",
+    "bands": 1,
+    "type": "F64",
+    "nodata": 2147483647.0,
+    "values": [
+      [
+        1.0,
+        2147483648.0,
+        4294967294.0
+      ],
+      [
+        16777217.0,
+        4000000000.0,
+        3.0
+      ]
+    ]
+  },
+  {
+    "probe": "types",
+    "source": "i32",
+    "pixel_type": "",
+    "status": "succeeded",
+    "bands": 1,
+    "type": "S32",
+    "nodata": 2147483647.0,
+    "values": [
+      [
+        -2147483648,
+        -1,
+        0
+      ],
+      [
+        2147483647,
+        16777217,
+        1
+      ]
+    ]
+  },
+  {
+    "probe": "types",
+    "source": "i32",
+    "pixel_type": "64_BIT",
+    "status": "succeeded",
+    "bands": 1,
+    "type": "F64",
+    "nodata": 2147483647.0,
+    "values": [
+      [
+        -2147483648.0,
+        -1.0,
+        0.0
+      ],
+      [
+        2147483647.0,
+        16777217.0,
+        1.0
+      ]
+    ]
+  },
+  {
+    "probe": "types",
+    "source": "f32",
+    "pixel_type": "",
+    "status": "succeeded",
+    "bands": 1,
+    "type": "F32",
+    "nodata": 3.3999999521443642e+38,
+    "values": [
+      [
+        0.10000000149011612,
+        -1.25,
+        32768.5
+      ],
+      [
+        16777216.0,
+        4000000000.0,
+        3.5
+      ]
+    ]
+  },
+  {
+    "probe": "types",
+    "source": "f32",
+    "pixel_type": "64_BIT",
+    "status": "succeeded",
+    "bands": 1,
+    "type": "F64",
+    "nodata": 3.4e+38,
+    "values": [
+      [
+        0.10000000149011612,
+        -1.25,
+        32768.5
+      ],
+      [
+        16777216.0,
+        4000000000.0,
+        3.5
+      ]
+    ]
+  },
+  {
+    "probe": "types",
+    "source": "f64",
+    "pixel_type": "",
+    "status": "succeeded",
+    "bands": 1,
+    "type": "F64",
+    "nodata": 1.79e+308,
+    "values": [
+      [
+        0.1,
+        -1.25,
+        32768.5
+      ],
+      [
+        16777217.25,
+        4000000000.125,
+        3.5
+      ]
+    ]
+  },
+  {
+    "probe": "types",
+    "source": "f64",
+    "pixel_type": "64_BIT",
+    "status": "succeeded",
+    "bands": 1,
+    "type": "F64",
+    "nodata": 1.79e+308,
+    "values": [
+      [
+        0.1,
+        -1.25,
+        32768.5
+      ],
+      [
+        16777217.25,
+        4000000000.125,
+        3.5
+      ]
+    ]
+  },
+  {
+    "probe": "later-nodata",
+    "status": "succeeded",
+    "bands": 2,
+    "type": "F32",
+    "nodata": -9999.0,
+    "values": [
+      [
+        [
+          1.0,
+          2.0
+        ],
+        [
+          3.0,
+          4.0
+        ]
+      ],
+      [
+        [
+          1.0,
+          -9999.0
+        ],
+        [
+          3.0,
+          4.0
+        ]
+      ]
+    ],
+    "aux_exists": true
+  },
+  {
+    "probe": "first-nodata",
+    "status": "succeeded",
+    "bands": 2,
+    "type": "F32",
+    "nodata": -9999.0,
+    "values": [
+      [
+        [
+          1.0,
+          -9999.0
+        ],
+        [
+          3.0,
+          4.0
+        ]
+      ],
+      [
+        [
+          1.0,
+          2.0
+        ],
+        [
+          3.0,
+          4.0
+        ]
+      ]
+    ],
+    "aux_exists": true
+  }
+]

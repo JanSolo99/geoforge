@@ -511,11 +511,12 @@ fn copy_raster(ctx: &dyn Context) -> Result<Output> {
     };
     let nodata = ctx.get("nodata_value").and_then(|v| v.trim().parse().ok());
     let input = ctx.raster("input")?;
-    // No statistics beside a copy of a raster that has NoData cells (observed).
+    // Saved single-band DEM copies with NoData have no statistics; the
+    // multiband probes write statistics for each band, including NoData bands.
     let has_nodata = input.bands[0].iter().any(|&v| input.is_nodata(v));
     with_statistics(
         crate::extract::copy_raster(&input, pixel_type, nodata),
-        !has_nodata,
+        input.bands.len() > 1 || !has_nodata,
     )
 }
 

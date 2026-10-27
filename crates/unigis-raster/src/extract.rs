@@ -284,29 +284,34 @@ pub fn clip_rectangle(
 }
 
 /// Copy Raster: the cells as another pixel type (rounded, saturating) with the NoData value
-/// given, else the input's, else (observed) +3.4e38 for float input and the maximum of the
-/// input's type otherwise.
+/// given, else the input's, else ArcGIS's default for the source pixel type.
+/// All bands retain their order; integer defaults may lie outside the pixel range.
 pub fn copy_raster(input: &Raster, pixel_type: Option<DataType>, nodata: Option<f64>) -> Raster {
     let t = pixel_type.unwrap_or(input.data_type);
     let out_nodata = nodata.or(input.nodata).unwrap_or(match input.data_type {
-        DataType::F32 | DataType::F64 => f64::from(3.4e38_f32),
-        DataType::U8 => 255.0,
-        DataType::I8 => 127.0,
-        DataType::U16 => f64::from(u16::MAX),
+        DataType::F32 if t == DataType::F64 => 3.4e38,
+        DataType::F32 => f64::from(3.4e38_f32),
+        DataType::F64 => 1.79e308,
+        DataType::U8 | DataType::I8 => 256.0,
+        DataType::U16 => 65536.0,
         DataType::I16 => f64::from(i16::MAX),
-        DataType::U32 => f64::from(u32::MAX),
-        DataType::I32 => f64::from(i32::MAX),
+        DataType::U32 | DataType::I32 => f64::from(i32::MAX),
     });
     let mut out = input.like(t);
     out.nodata = Some(out_nodata);
-    out.bands[0] = input.bands[0]
+    out.bands = input
+        .bands
         .iter()
-        .map(|&v| {
-            if input.is_nodata(v) {
-                out_nodata
-            } else {
-                t.store(v)
-            }
+        .map(|band| {
+            band.iter()
+                .map(|&v| {
+                    if input.is_nodata(v) {
+                        out_nodata
+                    } else {
+                        t.store(v)
+                    }
+                })
+                .collect()
         })
         .collect();
     out
