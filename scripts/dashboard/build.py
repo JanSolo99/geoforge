@@ -32,20 +32,28 @@ def read(path: Path) -> str:
         return ""
 
 
+def tool_names(text: str) -> list[str]:
+    """Literal Tool headers only: Param.name is not a tool declaration."""
+    names = re.findall(r'\bTool\s*\{\s*id:\s*"[^"]+",\s*name:\s*"([^"]+)"', text)
+    names += re.findall(r'_tool!\(\s*\w+,\s*"[^"]+",\s*"([^"]+)",?\s*\)', text)
+    return names
+
+
 def implemented() -> dict[str, str]:
-    """normalized tool name -> where it is implemented."""
+    """Normalized names of tools exposed by registries, commands or aliases."""
     found: dict[str, str] = {}
-    for rel, kind in (
-        ("crates/unigis-raster/src/registry.rs", "raster registry"),
-        ("crates/unigis-tools/src/registry.rs", "tools registry"),
-        ("crates/unigis-tools/src/dm_tools.rs", "tools registry"),
-        ("crates/unigis-tools/src/neighbors.rs", "tools registry"),
-    ):
-        for m in re.finditer(r'^\s*name: "([^"]+)",\s*$', read(ROOT / rel), re.M):
-            found.setdefault(norm(m.group(1)), kind)
-        # Tools declared through macros: unary_tool!(f, "id", "Name").
-        for m in re.finditer(r'_tool!\(\s*\w+,\s*"[^"]+",\s*"([^"]+)",?\s*\)', read(ROOT / rel)):
-            found.setdefault(norm(m.group(1)), kind)
+    for crate, kind in (("unigis-raster", "raster registry"), ("unigis-tools", "tools registry")):
+        folder = ROOT / "crates" / crate / "src"
+        text = read(folder / "registry.rs")
+        for name in tool_names(text):
+            found.setdefault(norm(name), kind)
+        # Constants registered from other modules, including newly added modules.
+        for module, constant in re.findall(r'crate::(\w+)::([A-Z][A-Z_0-9]+)\s*,', text):
+            source = read(folder / f"{module}.rs")
+            decl = re.search(rf'\bconst\s+{re.escape(constant)}\s*:\s*Tool\s*=\s*(Tool\s*\{{.*?^\}};)', source, re.M | re.S)
+            if decl:
+                for name in tool_names(decl.group(1)):
+                    found.setdefault(norm(name), kind)
     cli = read(ROOT / "crates/unigis-cli/src/main.rs")
     block = cli[cli.find("enum Tool {"):]
     block = block[: block.find("\n}\n")]
@@ -61,11 +69,20 @@ def verified(manifest: dict) -> dict[str, int]:
     """normalized tool name -> number of ArcGIS reference cases."""
     count: Counter = Counter()
     for case in manifest.get("cases", {}).values():
+        if case.get("status") != "succeeded":
+            continue
         tool = case.get("tool", "")
         name = tool.split(".", 1)[-1]
         name = re.sub(r"_(sa|3d|ga|stats|na|md|ba)$", "", name)
         count[norm(name)] += 1
     return dict(count)
+
+
+def coverage_status(name: str, have: dict, references: dict) -> str:
+    key = norm(name)
+    if key not in have:
+        return "missing"
+    return "verified" if key in references else "implemented"
 
 
 def git(*args: str) -> str:
@@ -108,13 +125,7 @@ def main() -> None:
     rows = []  # (toolbox, name, status)
     for tbx, names in sorted(arc.get("by_toolbox", {}).items()):
         for name in names:
-            n = norm(name)
-            if n in ref:
-                status = "verified"
-            elif n in have:
-                status = "implemented"
-            else:
-                status = "missing"
+            status = coverage_status(name, have, ref)
             rows.append((tbx, name, status))
     total = len(rows)
     by_status = Counter(r[2] for r in rows)
@@ -191,10 +202,11 @@ const main=document.getElementById('main');
 const add=(h)=>main.appendChild($(h));
 add(`<section class="card"><h2>Coverage of ArcGIS tools</h2><div class="row">
  <div class="stat"><div class="big">${T?pct(vv+ii):'-'}</div><small>${vv+ii} of ${T} ArcGIS tools</small></div>
- <div class="stat"><div class="big ok">${vv}</div><small>verified against ArcGIS</small></div>
+ <div class="stat"><div class="big ok">${vv}</div><small>implemented with ArcGIS reference cases</small></div>
  <div class="stat"><div class="big" style="color:var(--blue)">${ii}</div><small>implemented, no reference case</small></div>
  <div class="stat"><div class="big">${mm}</div><small>missing</small></div></div>
  <div class="bar" style="margin-top:14px"><i class="v" style="width:${T?100*vv/T:0}%"></i><i class="i" style="width:${T?100*ii/T:0}%"></i></div>
+ <p>Reference coverage records saved successful ArcGIS cases for implemented tools; it is not a claim of full compatibility. See known gaps and CI results below.</p>
  ${T?'':'<p class="warn">No ArcGIS tool list yet: run scripts/dashboard/list_arcgis_tools.py through the bridge and save docs/dashboard/arcgis_tools.json.</p>'}</section>`);
 add(`<section class="card"><h2>Work so far</h2><div class="row">
  <div class="stat"><div class="big">${D.have_total}</div><small>tools of ours</small></div>

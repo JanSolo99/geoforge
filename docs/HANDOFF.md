@@ -1,7 +1,7 @@
 # Current handoff
 
 Updated: 2026-10-27T13:22:15+00:00; last agent: Codex.
-Workspace `/mnt/media/ArcGIS_Linux`; branch main; starting HEAD `526a0f2` = origin/main.
+Workspace `/mnt/media/ArcGIS_Linux`; branch main; HEAD `d66383c` (Graphic Buffer local checkpoint); origin/main still `526a0f2`.
 
 ## Objective
 
@@ -30,7 +30,7 @@ Four offline tests (`scripts/dashboard/test_build.py`) pass. Scanner matches all
 names listed by current `ug tools`. Rebuilt `docs/dashboard.html --ci`: 276 own names,
 303 ArcGIS entries with reference coverage, 56 implemented without successful references;
 ArcGIS entries repeat across toolboxes, so those counts differ. Eight recent CI rows loaded.
-Dashboard commit and adding its tests to CI/pre-push are next after the Rust gate.
+Dashboard tests are now wired into scripts/check and GitHub CI; dashboard commit next.
 
 ## Validation
 
@@ -42,13 +42,13 @@ Dashboard commit and adding its tests to CI/pre-push are next after the Rust gat
   PASSED, including all ten new cases, `/tmp/unigis-graphic-buffer-round-refinement.log`.
 - `python3 -m unittest discover -s scripts/dashboard -p 'test_*.py' -v`: 4 passed.
 - `scripts/check` PASSED, exit 0: formatting, workspace/all-targets clippy -D warnings,
-  full workspace tests. 173 passed, 0 failed, 5 ignored, 77 result groups.
+  full workspace tests. 174 passed, 0 failed, 5 ignored, 78 result groups.
   Log `/tmp/unigis-graphic-buffer-check.log`. No Cargo builds remain running.
 - `git diff --check` passed. No push in this Codex continuation yet.
 
 ## Next actions
 
-1. Commit validated Graphic Buffer source/fixtures/docs; gate is complete.
+1. Graphic Buffer committed locally as `d66383c`; validation complete.
 2. Add dashboard tests to scripts/check and GitHub CI, review/rebuild and commit dashboard.
 3. Push both validated commits (pre-push hook scripts/check is mandatory).
 4. Batch black-box probes for custom Graphic Buffer miter limits, negative/zero distances,

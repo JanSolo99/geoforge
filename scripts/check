@@ -3,6 +3,7 @@
 # Run before pushing; `git config core.hooksPath .githooks` makes git do it on every push.
 set -e
 cd "$(dirname "$0")/.."
+python3 -m unittest discover -s scripts/dashboard -p 'test_*.py'
 cargo fmt --all --check
 cargo clippy -j3 --workspace --all-targets -- -D warnings
 cargo test -j3 --workspace
