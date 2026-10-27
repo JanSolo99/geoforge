@@ -720,6 +720,6 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 
 - [x] Development dashboard: implementation-aware reference coverage, eight offline regression tests, latest known-gaps section, and cached CI results with a visible fetch timestamp that survives post-commit rebuilds.
 
-- [x] Composite Bands (`ug run composite_bands`): concatenates every input band in order on the first grid, nearest-neighbor sampling, verified pixel-type promotion and ArcGIS NoData order behavior; 115 saved ArcGIS cases include every pairing of eight pixel types, per-source padding and mixed-type NoData defaults. Typed fixture creation verifies stored UInt32/Float64 boundary values by read-back. Generic raster comparisons and statistics writing now cover every band. Limits: `scripts/research/composite/README.md`.
+- [x] Composite Bands (`ug run composite_bands`): concatenates every input band in order on the first grid, nearest-neighbor sampling, verified pixel-type promotion and ArcGIS NoData order behavior; 125 saved ArcGIS cases include every pairing of eight pixel types, per-source padding and mixed-type NoData defaults. Typed fixture creation verifies stored UInt32/Float64 boundary values by read-back. Generic raster comparisons and statistics writing now cover every band. Limits: `scripts/research/composite/README.md`.
 
 - [x] CLI tool inventory exits cleanly when a pipe consumer closes stdout early; ordinary listing still exposes every registered tool. Deterministic closed-output regression test covers the former panic.

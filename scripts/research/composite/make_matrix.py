@@ -56,4 +56,9 @@ for kind in values:
     write('nd_' + kind, kind, nodata=no_data[kind])
 write('shifted', 'u8', x=500010)
 write('shifted_nd_u8', 'u8', x=500010, nodata=127)
-print('Verified all stored values, grids, pixel types and NoData tags in', 2 * len(values) + 2, 'fixtures.')
+outside_profiles = [('oor_u8', 'u8', 256), ('oor_i8', 'i8', 256),
+                    ('oor_u16', 'u16', 65536), ('oor300_u8', 'u8', 300),
+                    ('oorneg_u8', 'u8', -9999)]
+for name, kind, nodata in outside_profiles:
+    write(name, kind, x=500010, nodata=nodata)
+print('Verified all stored values, grids, pixel types and NoData tags in', 2 * len(values) + 2 + len(outside_profiles), 'fixtures.')

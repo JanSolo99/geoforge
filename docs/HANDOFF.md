@@ -1,7 +1,8 @@
 # Current handoff
 
-Updated: 2026-10-27T15:12:24+00:00; last agent Codex.
-Workspace /mnt/media/ArcGIS_Linux, branch main, HEAD eeffa40 (NoData follow-up committed; push pending). Prior remote
+Updated: 2026-10-27T15:49:16+00:00; last agent Codex.
+Workspace /mnt/media/ArcGIS_Linux, branch main, HEAD bab1f21 (CLI stdout fix), follows eeffa40 NoData fix. Both commits PUSHED, exit0.
+Prior remote
  d29a79ab0a4ba2944d446ade71f80ed9c40b5639. User authorizes ongoing commits/pushes.
 Do not launch another agent, CLI session or coordinator.
 
@@ -27,7 +28,18 @@ https://github.com/JanSolo99/geoforge/actions/runs/40522528614
 
 ## Current slices (validated, committing next)
 
-NoData / precision slice committed eeffa40; CLI stdout fix is committing separately.
+NoData / precision committed eeffa40; CLI stdout fix committed bab1f21.
+Normal push session83808 running /tmp/unigis-nodata-stdout-push.log; required gate.
+New READ-ONLY exploratory follow-up: 10 outside-range source NoData padding cases
+under /tmp; script /tmp/unigis-composite-outside-probe.py, log
+/tmp/unigis-composite-outside-research.log. All10 direct probes succeeded; ArcGIS fills zero when source integer NoData is
+not representable, even if output F64 could represent it. composite.rs now filters
+unrepresentable integer padding to zero. Five new shifted sources, ten CASES,
+probe_outside.py/outside_observations.json and make_matrix extension added.
+No follow-up edits staged. All10 cbands_oor* generated successfully, 125 Composite cases total.
+Full scripts/check PASSED exit0 /tmp/unigis-composite-outside-check.log: 179 Rust
+passed, 0 failed, 5 ignored, 80 groups, 8 Python tests, fmt/clippy. No build running. Docs/roadmap/gaps updated. Refresh dashboard,
+commit/push after gate. Previous 115-case NoData and CLI slices already pushed successfully.
 
 1. Composite Bands follow-up: make_matrix.py now writes typed GDAL/NumPy arrays and
    read-back verifies all 18 inputs (values/type/NoData/grid/EPSG). Prior AAIGrid
@@ -69,7 +81,18 @@ NoData / precision slice committed eeffa40; CLI stdout fix is committing separat
 4. Continue bounded development. Remaining Composite probe: padding with an input
    integer NoData tag outside its own pixel range (not yet probed). Band selectors,
    custom CRS/reprojection/nondefault environments unsupported; packed/complex pixel
-   types not verified. New tool candidates ASCII To Raster / Float To Raster.
+   types not verified. NEXT chosen family: ASCII To Raster / Float To Raster (absent in inventory).
+Official ArcGIS docs read and two exploratory batches completed; logs
+/tmp/unigis-raster-import-research.log and /tmp/unigis-raster-import-extra-research.log.
+Inputs/scripts/outputs in /tmp/unigis_import_probe and /tmp/unigis-raster-import-*.py.
+Findings: ASCII INTEGER -> S32 truncation with ND -2147483647, FLOAT ->F32 NDf32min;
+raw double comparison of ASCII NoData before output cast. Float binary normalizes
+header NoData to f32; LSB/MSB both supported, missing byteorder defaultsLSB, missing
+ND defaults-9999. Corner/center origins supported. Short data errors010067; trailing
+values ignored. Projection sidecars ignored (existing UTM .prj gives epsg0).
+No importer source edits or repo fixture additions yet. Implement after pushing
+current outside-range padding checkpoint. Inspect saved TIFF stats before choosing
+registry Output.statistics. Read applicable root docs (already read this turn).
 
 ## Durable context / preserve
 

@@ -137,6 +137,12 @@ pub fn composite_bands(inputs: &[Raster]) -> Result<Raster> {
         .or(fallback);
     let mut bands = Vec::with_capacity(band_count);
     for raster in inputs {
+        // An unrepresentable integer sentinel still belongs in TIFF metadata,
+        // but ArcGIS pads that source with zero, even for a wider output type.
+        let padding = raster
+            .nodata
+            .filter(|&v| raster.data_type.is_float() || raster.data_type.store(v) == v)
+            .unwrap_or(0.0);
         for source in &raster.bands {
             let mut band = Vec::with_capacity(first.width * first.height);
             for row in 0..first.height {
@@ -156,7 +162,7 @@ pub fn composite_bands(inputs: &[Raster]) -> Result<Raster> {
                     } else {
                         // Padding follows this source's sentinel (or zero), even
                         // when the final TIFF uses a different global NoData tag.
-                        band.push(raster.nodata.unwrap_or(0.0));
+                        band.push(padding);
                     }
                 }
             }

@@ -3,7 +3,7 @@
 Behavior reference: ArcGIS Pro 3.7, public documentation and black-box runs only.
 https://doc.esri.com/en/arcgis-pro/latest/tool-reference/data-management/composite-bands.html
 
-The `cbands_*` batch in `scripts/make-arcgis-reference.py` saves 115 ArcGIS outputs (18 original, a complete 64-pair type matrix, four padding cases and 29 NoData cases).
+The `cbands_*` batch in `scripts/make-arcgis-reference.py` saves 125 ArcGIS outputs (18 original, a complete 64-pair type matrix, four padding cases, 29 NoData cases and 10 out-of-range padding cases).
 Regenerate with:
 
 ```
@@ -55,8 +55,9 @@ Current limits: packed/complex input types are unverified; GeoTIFF inputs/output
 square first-input cells. Band selectors/layers, custom or differing coordinate systems/reprojection,
 nondefault raster environments and resampling choices are not implemented. Pyramids,
 histograms, covariance/median metadata and ancillary ArcGIS XML/world files are not
-replicated. Padding with an input integer NoData tag outside that input pixel range still
-needs probes; current padding cases use representable source sentinels.
+replicated. Integer source sentinels outside their pixel range now have ten saved padding
+cases: padding is zero, even when the output F64 type could represent the tag.
+The original metadata tag remains intact.
 
 Local validation logs (ephemeral):
 - /tmp/unigis-composite-reference-generation.log: all 18 ArcGIS cases succeed.
@@ -69,7 +70,7 @@ Local validation logs (ephemeral):
 
 `matrix_inputs.json` defines the tiny source rasters; `make_matrix.py` recreates them
 using GDAL for file conversion only. `matrix_observations.json`, `probe_matrix.py`
-and `probe_padding.py` preserve the direct black-box observations. The 18 source
+and `probe_padding.py` preserve the direct black-box observations. The 23 source
 TIFFs (normal/tagged variants plus shifted grids) are stored in testdata/raster/composite_matrix (all without NoData tags).
 
 Precision fixture correction (follow-up after d29a79a): the original AAIGrid-based
@@ -89,3 +90,8 @@ Three-input probes distinguish fallback ranking from both first/last input and
 numeric maximum: tagged I16+U16 followed by an untagged input chooses I16's 32767,
 while tagged I32+F32 chooses F32's already-rounded 3.4e38, even for F64 output.
 `probe_nodata_first.py` and `probe_nodata_combo.py` preserve those distinctions.
+
+Out-of-range source padding: `probe_outside.py` / `outside_observations.json` cover
+U8/I8 tags 256, U16 tag 65536, and U8 tags 300/-9999, each into its own type and
+F64. All ten use zero padding. `make_matrix.py --check` verifies all 23 inputs.
+Final follow-up gate: /tmp/unigis-composite-outside-check.log.

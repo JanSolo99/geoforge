@@ -53417,6 +53417,186 @@
           "output": "<out>"
         }
       }
+    },
+    "cbands_oor_u8_u8": {
+      "tool": "management.CompositeBands",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/oor_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "composite_bands",
+        "params": {
+          "inputs": "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/oor_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cbands_oor_u8_f64": {
+      "tool": "management.CompositeBands",
+      "args": [
+        "testdata/raster/composite_matrix/f64.tif;testdata/raster/composite_matrix/oor_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "composite_bands",
+        "params": {
+          "inputs": "testdata/raster/composite_matrix/f64.tif;testdata/raster/composite_matrix/oor_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cbands_oor_i8_i8": {
+      "tool": "management.CompositeBands",
+      "args": [
+        "testdata/raster/composite_matrix/i8.tif;testdata/raster/composite_matrix/oor_i8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "composite_bands",
+        "params": {
+          "inputs": "testdata/raster/composite_matrix/i8.tif;testdata/raster/composite_matrix/oor_i8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cbands_oor_i8_f64": {
+      "tool": "management.CompositeBands",
+      "args": [
+        "testdata/raster/composite_matrix/f64.tif;testdata/raster/composite_matrix/oor_i8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "composite_bands",
+        "params": {
+          "inputs": "testdata/raster/composite_matrix/f64.tif;testdata/raster/composite_matrix/oor_i8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cbands_oor_u16_u16": {
+      "tool": "management.CompositeBands",
+      "args": [
+        "testdata/raster/composite_matrix/u16.tif;testdata/raster/composite_matrix/oor_u16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "composite_bands",
+        "params": {
+          "inputs": "testdata/raster/composite_matrix/u16.tif;testdata/raster/composite_matrix/oor_u16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cbands_oor_u16_f64": {
+      "tool": "management.CompositeBands",
+      "args": [
+        "testdata/raster/composite_matrix/f64.tif;testdata/raster/composite_matrix/oor_u16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "composite_bands",
+        "params": {
+          "inputs": "testdata/raster/composite_matrix/f64.tif;testdata/raster/composite_matrix/oor_u16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cbands_oor300_u8_u8": {
+      "tool": "management.CompositeBands",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/oor300_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "composite_bands",
+        "params": {
+          "inputs": "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/oor300_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cbands_oor300_u8_f64": {
+      "tool": "management.CompositeBands",
+      "args": [
+        "testdata/raster/composite_matrix/f64.tif;testdata/raster/composite_matrix/oor300_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "composite_bands",
+        "params": {
+          "inputs": "testdata/raster/composite_matrix/f64.tif;testdata/raster/composite_matrix/oor300_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cbands_oorneg_u8_u8": {
+      "tool": "management.CompositeBands",
+      "args": [
+        "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/oorneg_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "composite_bands",
+        "params": {
+          "inputs": "testdata/raster/composite_matrix/u8.tif;testdata/raster/composite_matrix/oorneg_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cbands_oorneg_u8_f64": {
+      "tool": "management.CompositeBands",
+      "args": [
+        "testdata/raster/composite_matrix/f64.tif;testdata/raster/composite_matrix/oorneg_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "composite_bands",
+        "params": {
+          "inputs": "testdata/raster/composite_matrix/f64.tif;testdata/raster/composite_matrix/oorneg_u8.tif",
+          "output": "<out>"
+        }
+      }
     }
   }
 }
