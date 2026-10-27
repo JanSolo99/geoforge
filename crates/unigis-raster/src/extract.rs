@@ -229,3 +229,32 @@ pub fn clip_rectangle(
         .collect();
     Some(out)
 }
+
+/// Copy Raster: the cells as another pixel type (rounded, saturating) with the NoData value
+/// given, else the input's, else (observed) +3.4e38 for float input and the maximum of the
+/// input's type otherwise.
+pub fn copy_raster(input: &Raster, pixel_type: Option<DataType>, nodata: Option<f64>) -> Raster {
+    let t = pixel_type.unwrap_or(input.data_type);
+    let out_nodata = nodata.or(input.nodata).unwrap_or(match input.data_type {
+        DataType::F32 | DataType::F64 => f64::from(3.4e38_f32),
+        DataType::U8 => 255.0,
+        DataType::I8 => 127.0,
+        DataType::U16 => f64::from(u16::MAX),
+        DataType::I16 => f64::from(i16::MAX),
+        DataType::U32 => f64::from(u32::MAX),
+        DataType::I32 => f64::from(i32::MAX),
+    });
+    let mut out = input.like(t);
+    out.nodata = Some(out_nodata);
+    out.bands[0] = input.bands[0]
+        .iter()
+        .map(|&v| {
+            if input.is_nodata(v) {
+                out_nodata
+            } else {
+                t.store(v)
+            }
+        })
+        .collect();
+    out
+}

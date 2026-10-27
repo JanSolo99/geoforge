@@ -475,6 +475,38 @@ fn reclass_by_ascii_file(ctx: &dyn Context) -> Result<Output> {
     )
 }
 
+fn copy_raster(ctx: &dyn Context) -> Result<Output> {
+    use crate::DataType;
+    let pixel_type = match ctx
+        .get("pixel_type")
+        .map(|v| v.to_ascii_uppercase())
+        .as_deref()
+    {
+        None => None,
+        Some("8_BIT_UNSIGNED") => Some(DataType::U8),
+        Some("8_BIT_SIGNED") => Some(DataType::I8),
+        Some("16_BIT_UNSIGNED") => Some(DataType::U16),
+        Some("16_BIT_SIGNED") => Some(DataType::I16),
+        Some("32_BIT_UNSIGNED") => Some(DataType::U32),
+        Some("32_BIT_SIGNED") => Some(DataType::I32),
+        Some("32_BIT_FLOAT") => Some(DataType::F32),
+        Some("64_BIT") => Some(DataType::F64),
+        Some(other) => {
+            return Err(Error::Unsupported(format!(
+                "ERROR 000067: Pixel Type: {other} is not supported yet"
+            )));
+        }
+    };
+    let nodata = ctx.get("nodata_value").and_then(|v| v.trim().parse().ok());
+    let input = ctx.raster("input")?;
+    // No statistics beside a copy of a raster that has NoData cells (observed).
+    let has_nodata = input.bands[0].iter().any(|&v| input.is_nodata(v));
+    with_statistics(
+        crate::extract::copy_raster(&input, pixel_type, nodata),
+        !has_nodata,
+    )
+}
+
 fn flip(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::extract::flip(&ctx.raster("input")?), true)
 }
@@ -664,6 +696,29 @@ pub static TOOLS: &[Tool] = &[
             ),
         ],
         run: reclass_by_ascii_file,
+    },
+    Tool {
+        id: "copy_raster",
+        name: "Copy Raster",
+        summary: "Copies a raster to a new GeoTIFF, optionally changing the pixel type or NoData value.",
+        params: &[
+            raster("input", "Input Raster", true),
+            Param {
+                name: "nodata_value",
+                label: "NoData Value",
+                kind: Kind::Number,
+                required: false,
+                default: "",
+            },
+            Param {
+                name: "pixel_type",
+                label: "Pixel Type",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+            },
+        ],
+        run: copy_raster,
     },
     Tool {
         id: "flip",

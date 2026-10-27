@@ -45763,6 +45763,165 @@
           "output": "<out>"
         }
       }
+    },
+    "cpr_dem": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cpr_dem_nodata": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "",
+        "",
+        "-1",
+        "",
+        "",
+        "32_BIT_FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "nodata_value": "-1",
+          "pixel_type": "32_BIT_FLOAT"
+        }
+      }
+    },
+    "cpr_u8_float": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "32_BIT_FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "output": "<out>",
+          "pixel_type": "32_BIT_FLOAT"
+        }
+      }
+    },
+    "cpr_u8_nodata": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "",
+        "",
+        "7"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "output": "<out>",
+          "nodata_value": "7"
+        }
+      }
+    },
+    "cpr_dem_nodata_in": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cpr_i16_u8": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "8_BIT_UNSIGNED"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/dem_int16_packbits.tif",
+          "output": "<out>",
+          "pixel_type": "8_BIT_UNSIGNED"
+        }
+      }
+    },
+    "cpr_i16_64": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "64_BIT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/dem_int16_packbits.tif",
+          "output": "<out>",
+          "pixel_type": "64_BIT"
+        }
+      }
     }
   }
 }
