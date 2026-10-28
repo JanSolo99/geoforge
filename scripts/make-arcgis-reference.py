@@ -1449,6 +1449,10 @@ CASES = {
     "apo_parcels_clip": ("analysis.ApportionPolygon", [DATA / "parcels.shp", "VALUE SUM;PARCEL_ID SUM", DATA / "clip_areas.shp"], ["AREA"]),
     "apo_clip_parcels": ("analysis.ApportionPolygon", [DATA / "clip_areas.shp", "AREA_ID SUM", DATA / "parcels.shp"], ["AREA"]),
     "apo_parcels_squares": ("analysis.ApportionPolygon", [DATA / "parcels.shp", "VALUE SUM", DATA / "squares.shp"], ["AREA"]),
+    "ebd_src_one": ("gp.EucBackDirection_sa", [RASTER / "cost_src_one.tif"], []),
+    "ebd_src_i16": ("gp.EucBackDirection_sa", [RASTER / "cost_src_i16.tif"], []),
+    "ebd_src_max": ("gp.EucBackDirection_sa", [RASTER / "cost_src_i16.tif"], ["#", 400]),
+    "ebd_landuse": ("gp.EucBackDirection_sa", [RASTER / "landuse_u8.tif"], []),
     "gpal_roads_50": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "NO_END_POINTS"]),
     "gpal_roads_50_end": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "END_POINTS"]),
     "gpal_roads_pct": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["PERCENTAGE", "", 25, "NO_END_POINTS"]),
@@ -1646,6 +1650,7 @@ RUN = {
     "management.CompositeBands": ("composite_bands", ["inputs", "output"]),
     "analysis.GraphicBuffer": ("graphic_buffer", ["input", "output", "distance", "line_caps", "line_joins", "miter_limit"]),
     "analysis.ApportionPolygon": ("apportion_polygon", ["input", "apportion_fields", "target_features", "output", "apportion_by"]),
+    "gp.EucBackDirection_sa": ("euclidean_back_direction", ["input", "output", None, "maximum_distance"]),
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
     "analysis.CountOverlappingFeatures": ("count_overlapping_features", ["input", "output", "minimum_overlap_count"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
@@ -1663,7 +1668,7 @@ def run_spec(tool, args):
 
 
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
-RASTER_OUT = {"gp.EqualToFrequency_sa", "gp.GreaterThanFrequency_sa", "gp.LessThanFrequency_sa", "conversion.ASCIIToRaster", "conversion.FloatToRaster", "management.CompositeBands", "gp.CreateConstantRaster_sa", "gp.InList_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
+RASTER_OUT = {"gp.EucBackDirection_sa", "gp.EqualToFrequency_sa", "gp.GreaterThanFrequency_sa", "gp.LessThanFrequency_sa", "conversion.ASCIIToRaster", "conversion.FloatToRaster", "management.CompositeBands", "gp.CreateConstantRaster_sa", "gp.InList_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
               "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa",
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",

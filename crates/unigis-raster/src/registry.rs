@@ -793,6 +793,16 @@ fn create_constant_raster(ctx: &dyn Context) -> Result<Output> {
     with_statistics(raster, true)
 }
 
+fn euclidean_back_direction(ctx: &dyn Context) -> Result<Output> {
+    let max = ctx
+        .get("maximum_distance")
+        .and_then(|v| v.trim().parse().ok());
+    with_statistics(
+        crate::resample::euclidean_back_direction(&ctx.raster("input")?, max),
+        false,
+    )
+}
+
 fn flip(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::extract::flip(&ctx.raster("input")?), true)
 }
@@ -1361,6 +1371,22 @@ pub static TOOLS: &[Tool] = &[
             },
         ],
         run: create_constant_raster,
+    },
+    Tool {
+        id: "euclidean_back_direction",
+        name: "Euclidean Back Direction",
+        summary: "Unrounded azimuth from each cell to its nearest source.",
+        params: &[
+            raster("input", "Input Source Data", true),
+            Param {
+                name: "maximum_distance",
+                label: "Maximum Distance",
+                kind: Kind::Number,
+                required: false,
+                default: "",
+            },
+        ],
+        run: euclidean_back_direction,
     },
     Tool {
         id: "flip",

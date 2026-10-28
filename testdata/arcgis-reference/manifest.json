@@ -59313,6 +59313,81 @@
           "apportion_by": "AREA"
         }
       }
+    },
+    "ebd_src_one": {
+      "tool": "gp.EucBackDirection_sa",
+      "args": [
+        "testdata/raster/cost_src_one.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "euclidean_back_direction",
+        "params": {
+          "input": "testdata/raster/cost_src_one.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "ebd_src_i16": {
+      "tool": "gp.EucBackDirection_sa",
+      "args": [
+        "testdata/raster/cost_src_i16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "euclidean_back_direction",
+        "params": {
+          "input": "testdata/raster/cost_src_i16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "ebd_src_max": {
+      "tool": "gp.EucBackDirection_sa",
+      "args": [
+        "testdata/raster/cost_src_i16.tif",
+        "<out>",
+        "#",
+        400
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "euclidean_back_direction",
+        "params": {
+          "input": "testdata/raster/cost_src_i16.tif",
+          "output": "<out>",
+          "maximum_distance": 400
+        }
+      }
+    },
+    "ebd_landuse": {
+      "tool": "gp.EucBackDirection_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "euclidean_back_direction",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

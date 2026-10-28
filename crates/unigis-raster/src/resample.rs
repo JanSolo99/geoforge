@@ -335,6 +335,34 @@ pub fn euclidean_direction(source: &Raster, max_distance: Option<f64>) -> Raster
     out
 }
 
+/// Euclidean Back Direction: the azimuth as in [`euclidean_direction`] but not rounded, 32-bit
+/// float with NoData 3.4e38 (observed).
+pub fn euclidean_back_direction(source: &Raster, max_distance: Option<f64>) -> Raster {
+    let near = nearest_sources(source);
+    let cell = source.cell_width();
+    let nodata = f64::from(3.4e38_f32);
+    let mut out = source.like(DataType::F32);
+    out.nodata = Some(nodata);
+    out.bands[0] = near
+        .iter()
+        .enumerate()
+        .map(|(i, n)| {
+            let Some((sx, sy)) = *n else { return nodata };
+            let (x, y) = ((i % source.width) as f64, (i / source.width) as f64);
+            let (dx, dy) = (sx as f64 - x, sy as f64 - y);
+            if max_distance.is_some_and(|m| dx.hypot(dy) * cell > m) {
+                return nodata;
+            }
+            if dx == 0.0 && dy == 0.0 {
+                return 0.0;
+            }
+            let a = dx.atan2(-dy).to_degrees().rem_euclid(360.0);
+            DataType::F32.store(if a == 0.0 { 360.0 } else { a })
+        })
+        .collect();
+    out
+}
+
 /// Spatial Analyst Euclidean Allocation: the value of the nearest source cell,
 /// NoData beyond `max_distance`. Integer output takes ArcGIS's type choice for the
 /// values present (as Extract by Mask does); float output is 32-bit.

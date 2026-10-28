@@ -69,6 +69,8 @@ Tested offline (`test_daemon_runs_inbox_tasks_commands_pause_and_keepalive`); no
 
 - Apportion Polygon (`apportion_polygon`, AREA + SUM only; `apo_*` pass via MEMORY_OUT): target polygons + each apportioned field as Double = sum of value x (overlap / source area); integer source fields are truncated. MEAN (and other statistics) NOT done: ArcGIS gave 0.588 / 0.833 for ZONE MEAN on clip_areas whose rule I could not match (not an area-weighted mean). Points/Length and estimation features not done.
 
+- Euclidean Back Direction (`euclidean_back_direction`, `ebd_*` pass): the Euclidean Direction azimuth unrounded, F32, NoData 3.4e38, no statistics sidecar. Distance Accumulation / Distance Allocation (sa) not probed yet.
+
 ## Next actions
 
 1. Keep going in probe -> implement -> reference-test batches (see "Session 2026-10-26" entries for what is done and the gaps).
