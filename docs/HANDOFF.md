@@ -65,6 +65,8 @@ The web page + dashboard now run as the user service `unigis-web` on the tailnet
 `agents-remote chat` is a prompt attached to the daemon (so a terminal can stay open while it runs headless); `agents-remote web` also serves docs/dashboard.html at /dashboard (unit `unigis-web.service`, publish with `tailscale serve --bg 8765`).
 Tested offline (`test_daemon_runs_inbox_tasks_commands_pause_and_keepalive`); not yet run against real CLIs.
 
+- Surface Parameters (probed 2026-10-28, NOT implemented): SLOPE/ASPECT/MEAN, PROFILE, TANGENTIAL, GAUSSIAN curvature with the default quadratic 3x3 neighborhood are within ~0.1% (slope) and ~0.5% (curvature) of Wood's least-squares quadratic fit (G=(z3+z6+z9-z1-z4-z7)/6c etc.) but not equal, and differ from both `Slope` and Evans-Young; first row/column are NoData; PLAN_CURVATURE is refused ("not within the defined domain"; ArcGIS calls it PLAN... use the keyword from `arcpy.Usage`). The exact weighting is unknown.
+
 ## Next actions
 
 1. Keep going in probe -> implement -> reference-test batches (see "Session 2026-10-26" entries for what is done and the gaps).
