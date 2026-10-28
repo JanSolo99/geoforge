@@ -98,3 +98,5 @@ Update this file when a gap is found or closed.
 
 - Compute Change Raster: single-band DIFFERENCE/RELATIVE_DIFFERENCE only; categorical and spectral modes and multiband inputs remain unsupported. Create Binary Mask: basic background-value comparison only; flood-fill, expansion, minimum-region and BACKGROUND_NODATA modes remain unsupported.
 - Generate Tessellation: square, diamond, both hexagon orientations and triangle have saved projected-meter cases (six transverse cases verify ordered rings/IDs); H3 hexagons remain unsupported. 31 additional cases now verify18 physical area units, meter/US-foot projections, bare sizes and missing SR defaults. Geographic/compound/custom engineering CRS, WKT2, nondefault environments and H3 remain unsupported/unverified; malformed/nonfinite/excessive requests are refused safely.
+
+- Table To Ellipse: planar only; vertices of very eccentric or very large ellipses differ from ArcGIS (positions up to 0.4 m for a 2000 x 300 m ellipse; 100 km ellipses cap the vertex count differently); geodesic method unsupported.

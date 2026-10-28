@@ -866,3 +866,108 @@ pub fn convert_coordinate_notation(
         messages: Vec::new(),
     })
 }
+
+/// Table To Ellipse (planar): one elliptic-arc ring (or line) per row, centred on X/Y. The major
+/// and minor fields are full axis lengths; the azimuth turns the major axis clockwise from north.
+/// The ring starts at the north end of the major axis and runs clockwise, as one complete
+/// elliptic arc (observed against ArcGIS Pro 3.7, `ellipse_*` cases).
+#[allow(clippy::too_many_arguments)]
+pub fn table_to_ellipse(
+    table: &dyn FeatureClass,
+    x_field: &str,
+    y_field: &str,
+    major_field: &str,
+    minor_field: &str,
+    unit_scale: f64,
+    azimuth_field: Option<&str>,
+    azimuth_to_radians: f64,
+    polygon: bool,
+    spatial_reference_wkt: Option<String>,
+) -> Result<ToolOutput> {
+    use unigis_core::{Segment, SegmentKind, curves::ELLIPSE_COMPLETE};
+    let pos = |n: &str| crate::field_positions(table, &[n.to_owned()]).map(|v| v[0]);
+    let (xi, yi, ai, bi) = (
+        pos(x_field)?,
+        pos(y_field)?,
+        pos(major_field)?,
+        pos(minor_field)?,
+    );
+    let zi = azimuth_field.map(pos).transpose()?;
+    // Only the fields the tool reads come through; ArcGIS renames a field called MIN to MIN_.
+    let keep: Vec<usize> = [xi, yi, ai, bi]
+        .into_iter()
+        .chain(zi)
+        .collect::<std::collections::BTreeSet<_>>()
+        .into_iter()
+        .collect();
+    let fields: Vec<Field> = keep
+        .iter()
+        .map(|&i| {
+            let mut f = table.fields()[i].clone();
+            if f.name.eq_ignore_ascii_case("MIN") {
+                f.name.push('_');
+            }
+            f
+        })
+        .collect();
+    let mut features = Vec::new();
+    for f in table.features() {
+        let f = f?;
+        let n = |i: usize| crate::number(&f.attributes[i]);
+        let geometry = match (n(xi), n(yi), n(ai), n(bi)) {
+            (Some(x), Some(y), Some(major), Some(minor)) if major > 0.0 && minor > 0.0 => {
+                let az = zi.and_then(n).unwrap_or(0.0) * azimuth_to_radians;
+                let a = major * unit_scale / 2.0;
+                let b = minor * unit_scale / 2.0;
+                // The semi-major axis must be the longer one; a longer "minor" swaps them.
+                let (a, b, az) = if b > a {
+                    (b, a, az + std::f64::consts::FRAC_PI_2)
+                } else {
+                    (a, b, az)
+                };
+                let start = [x + a * az.sin(), y + a * az.cos()];
+                Some(Geometry {
+                    kind: if polygon {
+                        GeometryKind::Polygon
+                    } else {
+                        GeometryKind::Polyline
+                    },
+                    parts: vec![0],
+                    part_types: None,
+                    xy: vec![start, start],
+                    z: None,
+                    m: None,
+                    curves: vec![Segment {
+                        start: 0,
+                        kind: SegmentKind::EllipticArc {
+                            center: [x, y],
+                            rotation: std::f64::consts::FRAC_PI_2 - az,
+                            semi_major: a,
+                            minor_major_ratio: b / a,
+                            bits: ELLIPSE_COMPLETE,
+                        },
+                    }],
+                })
+            }
+            _ => None,
+        };
+        features.push(Feature {
+            oid: features.len() as i64,
+            geometry,
+            attributes: keep.iter().map(|&i| f.attributes[i].clone()).collect(),
+        });
+    }
+    Ok(ToolOutput {
+        kind: if polygon {
+            GeometryKind::Polygon
+        } else {
+            GeometryKind::Polyline
+        },
+        has_z: false,
+        has_m: false,
+        fields,
+        spatial_reference_wkt,
+        features,
+        messages: Vec::new(),
+    })
+}

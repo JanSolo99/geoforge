@@ -69747,6 +69747,448 @@
           "output_format": "DD_NUMERIC"
         }
       }
+    },
+    "ellipse_poly": {
+      "tool": "management.TableToEllipse",
+      "args": [
+        "testdata/geoproc/ellipses.csv",
+        "<out>",
+        "X",
+        "Y",
+        "MAJ",
+        "MIN",
+        "Meters",
+        "AZ",
+        "Decimal degrees",
+        "",
+        32633,
+        "NO_ATTRIBUTES",
+        "Polygon",
+        "Planar"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "X",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Y",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MAJ",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MIN_",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "AZ",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "table_to_ellipse",
+        "params": {
+          "input": "testdata/geoproc/ellipses.csv",
+          "output": "<out>",
+          "x_field": "X",
+          "y_field": "Y",
+          "major_field": "MAJ",
+          "minor_field": "MIN",
+          "distance_units": "Meters",
+          "azimuth_field": "AZ",
+          "azimuth_units": "Decimal degrees",
+          "spatial_reference": 32633,
+          "shape_type": "Polygon",
+          "method": "Planar"
+        }
+      }
+    },
+    "ellipse_line": {
+      "tool": "management.TableToEllipse",
+      "args": [
+        "testdata/geoproc/ellipses.csv",
+        "<out>",
+        "X",
+        "Y",
+        "MAJ",
+        "MIN",
+        "Meters",
+        "AZ",
+        "Decimal degrees",
+        "",
+        32633,
+        "NO_ATTRIBUTES",
+        "Line",
+        "Planar"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "X",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Y",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MAJ",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MIN_",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "AZ",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "table_to_ellipse",
+        "params": {
+          "input": "testdata/geoproc/ellipses.csv",
+          "output": "<out>",
+          "x_field": "X",
+          "y_field": "Y",
+          "major_field": "MAJ",
+          "minor_field": "MIN",
+          "distance_units": "Meters",
+          "azimuth_field": "AZ",
+          "azimuth_units": "Decimal degrees",
+          "spatial_reference": 32633,
+          "shape_type": "Line",
+          "method": "Planar"
+        }
+      }
+    },
+    "ellipse_feet_rad": {
+      "tool": "management.TableToEllipse",
+      "args": [
+        "testdata/geoproc/ellipses.csv",
+        "<out>",
+        "X",
+        "Y",
+        "MAJ",
+        "MIN",
+        "Feet",
+        "AZ",
+        "Radians",
+        "",
+        32633,
+        "NO_ATTRIBUTES",
+        "Polygon",
+        "Planar"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "X",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Y",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MAJ",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MIN_",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "AZ",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "table_to_ellipse",
+        "params": {
+          "input": "testdata/geoproc/ellipses.csv",
+          "output": "<out>",
+          "x_field": "X",
+          "y_field": "Y",
+          "major_field": "MAJ",
+          "minor_field": "MIN",
+          "distance_units": "Feet",
+          "azimuth_field": "AZ",
+          "azimuth_units": "Radians",
+          "spatial_reference": 32633,
+          "shape_type": "Polygon",
+          "method": "Planar"
+        }
+      }
+    },
+    "ellipse_noaz": {
+      "tool": "management.TableToEllipse",
+      "args": [
+        "testdata/geoproc/ellipses.csv",
+        "<out>",
+        "X",
+        "Y",
+        "MAJ",
+        "MIN",
+        "Meters",
+        "",
+        "Decimal degrees",
+        "",
+        32633,
+        "NO_ATTRIBUTES",
+        "Polygon",
+        "Planar"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "X",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Y",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MAJ",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MIN_",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "table_to_ellipse",
+        "params": {
+          "input": "testdata/geoproc/ellipses.csv",
+          "output": "<out>",
+          "x_field": "X",
+          "y_field": "Y",
+          "major_field": "MAJ",
+          "minor_field": "MIN",
+          "distance_units": "Meters",
+          "azimuth_units": "Decimal degrees",
+          "spatial_reference": 32633,
+          "shape_type": "Polygon",
+          "method": "Planar"
+        }
+      }
+    },
+    "ellipse_mils": {
+      "tool": "management.TableToEllipse",
+      "args": [
+        "testdata/geoproc/ellipses.csv",
+        "<out>",
+        "X",
+        "Y",
+        "MAJ",
+        "MIN",
+        "Meters",
+        "AZ",
+        "Mils",
+        "",
+        32633,
+        "NO_ATTRIBUTES",
+        "Polygon",
+        "Planar"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "X",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Y",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MAJ",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "MIN_",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "AZ",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "table_to_ellipse",
+        "params": {
+          "input": "testdata/geoproc/ellipses.csv",
+          "output": "<out>",
+          "x_field": "X",
+          "y_field": "Y",
+          "major_field": "MAJ",
+          "minor_field": "MIN",
+          "distance_units": "Meters",
+          "azimuth_field": "AZ",
+          "azimuth_units": "Mils",
+          "spatial_reference": 32633,
+          "shape_type": "Polygon",
+          "method": "Planar"
+        }
+      }
     }
   }
 }

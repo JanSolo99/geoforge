@@ -372,6 +372,26 @@ impl Curve {
     }
 }
 
+/// Splits `[t0, t1]` in halves until the curve's midpoint is within `max_deviation` of the chord;
+/// pushes the interior split parameters in order.
+fn bisect_curve(curve: &Curve, t0: f64, t1: f64, max_deviation: f64, out: &mut Vec<f64>) {
+    let (p0, p1) = (curve.at(t0), curve.at(t1));
+    let tm = (t0 + t1) / 2.0;
+    let pm = curve.at(tm);
+    let (dx, dy) = (p1[0] - p0[0], p1[1] - p0[1]);
+    let len = dx.hypot(dy);
+    let dev = if len > 0.0 {
+        (dx * (pm[1] - p0[1]) - dy * (pm[0] - p0[0])).abs() / len
+    } else {
+        f64::INFINITY
+    };
+    if dev > max_deviation && t1 - t0 > 1e-6 {
+        bisect_curve(curve, t0, tm, max_deviation, out);
+        out.push(tm);
+        bisect_curve(curve, tm, t1, max_deviation, out);
+    }
+}
+
 /// Points strictly between `p0` and `p1` along the segment, each with its fraction
 /// (0..1) of the way along.
 fn interior_points(
@@ -383,6 +403,15 @@ fn interior_points(
     let curve = Curve::new(p0, p1, kind)?;
     if matches!(curve, Curve::Line) {
         return Ok(Vec::new());
+    }
+    // A complete ellipse is bisected where a chord strays from the curve by more than the
+    // deviation (observed: counts of 12..1024 vertices match for 21 of 22 sizes).
+    if let (Curve::Ellipse { sweep, .. }, Density::ArcGis { max_deviation }) = (&curve, density)
+        && (sweep.abs() - TAU).abs() < 1e-9
+    {
+        let mut ts = Vec::new();
+        bisect_curve(&curve, 0.0, 1.0, max_deviation, &mut ts);
+        return Ok(ts.into_iter().map(|t| (curve.at(t), t)).collect());
     }
     let n = match density {
         Density::AngleStep(step) => curve.steps(step),

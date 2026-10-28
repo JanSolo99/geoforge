@@ -480,6 +480,42 @@ fn convert_coordinate_notation(ctx: &dyn Context) -> Result<ToolOutput> {
     )
 }
 
+fn table_to_ellipse(ctx: &dyn Context) -> Result<ToolOutput> {
+    let t =
+        find("table_to_ellipse").ok_or_else(|| Error::Unsupported("table_to_ellipse".into()))?;
+    let need = |k: &str| text(ctx, t, k).ok_or_else(|| Error::Unsupported(format!("missing {k}")));
+    if text(ctx, t, "method").is_some_and(|m| !m.eq_ignore_ascii_case("planar")) {
+        return Err(Error::Unsupported("geodesic ellipses".into()));
+    }
+    let crs = unigis_proj::Crs::parse(&need("spatial_reference")?)?;
+    let wkt = crs.esri_wkt().to_owned();
+    let unit = text(ctx, t, "distance_units").unwrap_or_else(|| "Meters".into());
+    let scale = distance_in_units(&format!("1 {unit}"), Some(&wkt))?;
+    let to_rad = match text(ctx, t, "azimuth_units")
+        .unwrap_or_default()
+        .to_ascii_uppercase()
+        .as_str()
+    {
+        "MILS" => std::f64::consts::TAU / 6400.0,
+        "RADIANS" => 1.0,
+        "GRADIANS" => std::f64::consts::TAU / 400.0,
+        _ => std::f64::consts::PI / 180.0,
+    };
+    let polygon = !text(ctx, t, "shape_type").is_some_and(|s| s.eq_ignore_ascii_case("line"));
+    construct::table_to_ellipse(
+        ctx.features("input")?.as_ref(),
+        &need("x_field")?,
+        &need("y_field")?,
+        &need("major_field")?,
+        &need("minor_field")?,
+        scale,
+        text(ctx, t, "azimuth_field").as_deref(),
+        to_rad,
+        polygon,
+        Some(wkt),
+    )
+}
+
 fn generalize(ctx: &dyn Context) -> Result<ToolOutput> {
     let t = find("generalize").ok_or_else(|| Error::Unsupported("generalize".into()))?;
     let fc = ctx.features("input")?;
@@ -1398,6 +1434,127 @@ pub static TOOLS: &[Tool] = &[
         output_suffix: "Notation",
         measures: false,
         run: Runner::Features(convert_coordinate_notation),
+    },
+    Tool {
+        id: "table_to_ellipse",
+        name: "Table To Ellipse",
+        toolbox: "Data Management › Features",
+        summary: "Ellipses from center, axis and azimuth fields, as polygons or lines (ArcGIS Pro Table To Ellipse, planar).",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Table",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "A table with center, axis and azimuth fields.",
+            },
+            Param {
+                name: "x_field",
+                label: "X Field",
+                kind: Kind::Field {
+                    of: "input",
+                    numeric: true,
+                },
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "y_field",
+                label: "Y Field",
+                kind: Kind::Field {
+                    of: "input",
+                    numeric: true,
+                },
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "major_field",
+                label: "Major Axis Field",
+                kind: Kind::Field {
+                    of: "input",
+                    numeric: true,
+                },
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "minor_field",
+                label: "Minor Axis Field",
+                kind: Kind::Field {
+                    of: "input",
+                    numeric: true,
+                },
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "distance_units",
+                label: "Distance Units",
+                kind: Kind::Choice(&[
+                    "Meters",
+                    "Kilometers",
+                    "Miles",
+                    "Nautical miles",
+                    "Feet",
+                    "U.S. survey feet",
+                ]),
+                required: false,
+                default: "Meters",
+                help: "",
+            },
+            Param {
+                name: "azimuth_field",
+                label: "Azimuth Field",
+                kind: Kind::Field {
+                    of: "input",
+                    numeric: true,
+                },
+                required: false,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "azimuth_units",
+                label: "Azimuth Units",
+                kind: Kind::Choice(&["Decimal degrees", "Mils", "Radians", "Gradians"]),
+                required: false,
+                default: "Decimal degrees",
+                help: "",
+            },
+            Param {
+                name: "spatial_reference",
+                label: "Coordinate System",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+                help: "A projected coordinate system, e.g. 32633.",
+            },
+            Param {
+                name: "shape_type",
+                label: "Output Type",
+                kind: Kind::Choice(&["Polygon", "Line"]),
+                required: false,
+                default: "Polygon",
+                help: "",
+            },
+            Param {
+                name: "method",
+                label: "Method",
+                kind: Kind::Choice(&["Planar"]),
+                required: false,
+                default: "Planar",
+                help: "",
+            },
+        ],
+        output_suffix: "Ellipses",
+        measures: false,
+        run: Runner::Features(table_to_ellipse),
     },
     Tool {
         id: "flip_line",

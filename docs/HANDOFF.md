@@ -124,3 +124,12 @@ keeps crossing lines untrimmed (both sides of a crossing shorter than the length
 resolved: partial vs whole trimming for multi-crossing lines, and shared-endpoint chains. ug has no
 extend_line/trim_line/smooth_line/table_to_ellipse/integrate (vector) yet; Aggregate Points and Geodetic
 Densify are other open candidates. Working tree otherwise unchanged (Codex files untouched).
+
+Claude: Table To Ellipse (planar, Polygon/Line) added as registry tool `table_to_ellipse`
+(construct.rs, complete EllipticArc ring from the north end of the major axis, clockwise; only the
+used fields kept, MIN->MIN_). Complete ellipses now densify by bisecting the eccentric parameter
+until the midpoint is within 0.1 m of the chord (curves.rs `bisect_curve`): vertex counts match
+ArcGIS for 21 of 22 sizes tested (400x50 semi-axes: 96 vs 98). Positions are off by up to ~1e-5
+of the semi-axis (0.0014 m at 150 m; 0.37 m for a 1000x150 ellipse, so the ellipse_* test
+tolerance is 0.01 m and reference cases use moderate sizes). Not done: Geodesic method, huge
+ellipses (100 km: ArcGIS caps vertices differently), geographic CRS.
