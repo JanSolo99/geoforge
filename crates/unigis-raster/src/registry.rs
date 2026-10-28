@@ -41,8 +41,20 @@ pub trait Context {
     /// The numeric columns (name, values) of the attribute table (`.vat.dbf`) of the raster the
     /// parameter names.
     fn attribute_table(&self, name: &str) -> Result<Vec<(String, Vec<f64>)>>;
-    /// The points of the feature layer the parameter names with the numeric `field`'s values, and
-    /// the layer's EPSG code.
+    /// The line features of the layer the parameter names: their parts and the numeric `field`'s
+    /// value, whether that field is integral, and the layer's EPSG code.
+    #[allow(clippy::type_complexity)]
+    fn line_values(
+        &self,
+        name: &str,
+        field: &str,
+    ) -> Result<(Vec<(Vec<Vec<[f64; 2]>>, f64)>, bool, Option<u32>)> {
+        let _ = (name, field);
+        Err(Error::Unsupported(
+            "this tool needs line features, which this context cannot read".into(),
+        ))
+    }
+    /// The points of the feature layer with numeric field values and its EPSG code.
     fn point_samples(
         &self,
         name: &str,
@@ -942,6 +954,29 @@ fn point_statistics(ctx: &dyn Context) -> Result<Output> {
     with_statistics(raster, true)
 }
 
+fn line_statistics(ctx: &dyn Context) -> Result<Output> {
+    let field = ctx.get("field").unwrap_or_default();
+    let (lines, integer, epsg) = ctx.line_values("input", &field)?;
+    let cell: f64 = ctx
+        .get("cell_size")
+        .and_then(|v| v.trim().parse().ok())
+        .ok_or_else(|| {
+            Error::Unsupported("ERROR 000735: Output cell size: value is required".into())
+        })?;
+    let radius: f64 = ctx
+        .get("search_radius")
+        .and_then(|v| v.trim().parse().ok())
+        .ok_or_else(|| {
+            Error::Unsupported("ERROR 000735: Search radius: value is required".into())
+        })?;
+    let stat = ctx.get("statistic").unwrap_or_else(|| "MEAN".into());
+    let raster = crate::interpolate::line_statistics(&lines, integer, cell, radius, &stat, epsg)
+        .ok_or_else(|| {
+            Error::Unsupported("ERROR 000094: bad statistic, cell size or lines".into())
+        })?;
+    with_statistics(raster, true)
+}
+
 fn flip(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::extract::flip(&ctx.raster("input")?), true)
 }
@@ -1691,6 +1726,51 @@ pub static TOOLS: &[Tool] = &[
             ),
         ],
         run: point_statistics,
+    },
+    Tool {
+        id: "line_statistics",
+        name: "Line Statistics",
+        summary: "Length-weighted statistics of line field values around each cell.",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Polyline Features",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            Param {
+                name: "field",
+                label: "Field",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            Param {
+                name: "cell_size",
+                label: "Output Cell Size",
+                kind: Kind::Number,
+                required: true,
+                default: "",
+            },
+            Param {
+                name: "search_radius",
+                label: "Search Radius",
+                kind: Kind::Number,
+                required: true,
+                default: "",
+            },
+            option(
+                "statistic",
+                "Statistics Type",
+                &[
+                    "MEAN", "MAJORITY", "MAXIMUM", "MINIMUM", "MINORITY", "RANGE", "VARIETY",
+                    "LENGTH",
+                ],
+                "MEAN",
+            ),
+        ],
+        run: line_statistics,
     },
     Tool {
         id: "flip",

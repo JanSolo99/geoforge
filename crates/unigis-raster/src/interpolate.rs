@@ -403,3 +403,179 @@ pub fn point_statistics(
     }
     Some(out)
 }
+
+/// Line Statistics: for each cell the statistic of the field values of the line parts within
+/// `radius` of the cell centre, weighted by the length inside the circle. LENGTH is the sum of
+/// value x length (the field is a weight, observed). The grid is IDW's default one (the extent
+/// of the lines grown half a cell, round(w / cell) + 1 columns); NoData where no line reaches.
+/// `integer` says the field is integral (statistics other than MEAN and LENGTH then give 32-bit
+/// integers with NoData -2147483647, VARIETY 0 for none).
+pub fn line_statistics(
+    lines: &[(Vec<Vec<[f64; 2]>>, f64)],
+    integer: bool,
+    cell: f64,
+    radius: f64,
+    stat: &str,
+    epsg: Option<u32>,
+) -> Option<Raster> {
+    let stat = stat.to_ascii_uppercase();
+    if !cell.is_finite()
+        || cell <= 0.0
+        || !radius.is_finite()
+        || radius <= 0.0
+        || !matches!(
+            stat.as_str(),
+            "MEAN"
+                | "MAXIMUM"
+                | "MINIMUM"
+                | "RANGE"
+                | "LENGTH"
+                | "VARIETY"
+                | "MAJORITY"
+                | "MINORITY"
+        )
+        || (!integer && matches!(stat.as_str(), "VARIETY" | "MAJORITY" | "MINORITY"))
+    {
+        return None;
+    }
+    let (mut x0, mut y0, mut x1, mut y1) = (f64::MAX, f64::MAX, f64::MIN, f64::MIN);
+    for (parts, value) in lines {
+        if !value.is_finite() {
+            return None;
+        }
+        for p in parts.iter().flatten() {
+            if !p[0].is_finite() || !p[1].is_finite() {
+                return None;
+            }
+            x0 = x0.min(p[0]);
+            y0 = y0.min(p[1]);
+            x1 = x1.max(p[0]);
+            y1 = y1.max(p[1]);
+        }
+    }
+    if x0 >= x1 || y0 >= y1 {
+        return None;
+    }
+    let (gx, gy) = (x0 - cell / 2.0, y0 - cell / 2.0);
+    let cols = ((x1 - x0) / cell).round() + 1.0;
+    let rows = ((y1 - y0) / cell).round() + 1.0;
+    if !cols.is_finite() || !rows.is_finite() || cols * rows > crate::MAX_CELLS as f64 {
+        return None;
+    }
+    let (cols, rows) = (cols as usize, rows as usize);
+    let transform = [gx, cell, 0.0, gy + rows as f64 * cell, 0.0, -cell];
+    let float_out = !integer || stat == "MEAN" || stat == "LENGTH";
+    let (dt, nodata) = if float_out {
+        (DataType::F32, f32::MIN as f64)
+    } else {
+        (DataType::I32, -2147483647.0)
+    };
+    let mut out = Raster::new(cols, rows, dt, transform);
+    out.epsg = epsg;
+    out.nodata = Some(nodata);
+    // ArcGIS stores line vertices as single-precision offsets from the lower-left
+    // grid origin before clipping. Keep output world coordinates in double precision.
+    let lines: Vec<_> = lines
+        .iter()
+        .map(|(parts, value)| {
+            let parts: Vec<Vec<[f64; 2]>> = parts
+                .iter()
+                .map(|part| {
+                    part.iter()
+                        .map(|p| [((p[0] - gx) as f32) as f64, ((p[1] - gy) as f32) as f64])
+                        .collect()
+                })
+                .collect();
+            (parts, *value)
+        })
+        .collect();
+    // A zero-length contact still participates in extrema, variety and modes.
+    // None means the segment never meets the disc.
+    let inside = |a: [f64; 2], b: [f64; 2], c: [f64; 2], r: f64| -> Option<f64> {
+        let (dx, dy) = (b[0] - a[0], b[1] - a[1]);
+        let len = dx.hypot(dy);
+        if len == 0.0 {
+            return None;
+        }
+        let (fx, fy) = (a[0] - c[0], a[1] - c[1]);
+        let (qa, qb, qc) = (
+            dx * dx + dy * dy,
+            2.0 * (fx * dx + fy * dy),
+            fx * fx + fy * fy - r * r,
+        );
+        let disc = qb * qb - 4.0 * qa * qc;
+        if disc < 0.0 {
+            return None;
+        }
+        let sq = disc.sqrt();
+        let t0 = ((-qb - sq) / (2.0 * qa)).max(0.0);
+        let t1 = ((-qb + sq) / (2.0 * qa)).min(1.0);
+        (t1 >= t0).then_some((t1 - t0) * len)
+    };
+    for row in 0..rows {
+        let y = (rows as f64 - row as f64 - 0.5) * cell;
+        for col in 0..cols {
+            let x = (col as f64 + 0.5) * cell;
+            let mut found: Vec<(f64, f64)> = Vec::new(); // (value, length inside)
+            for (parts, value) in &lines {
+                let mut l = 0.0;
+                let mut touches = false;
+                for part in parts {
+                    for w in part.windows(2) {
+                        if let Some(length) = inside(w[0], w[1], [x, y], radius) {
+                            touches = true;
+                            l += length;
+                        }
+                    }
+                }
+                if touches {
+                    found.push((*value, l));
+                }
+            }
+            let v = if found.is_empty() {
+                if stat == "VARIETY" && !float_out {
+                    0.0
+                } else {
+                    nodata
+                }
+            } else {
+                let total: f64 = found.iter().map(|f| f.1).sum();
+                let max = found.iter().map(|f| f.0).fold(f64::MIN, f64::max);
+                let min = found.iter().map(|f| f.0).fold(f64::MAX, f64::min);
+                // Length per distinct value.
+                let mut per: Vec<(f64, f64)> = Vec::new();
+                for (val, l) in &found {
+                    match per.iter_mut().find(|p| p.0 == *val) {
+                        Some(p) => p.1 += l,
+                        None => per.push((*val, *l)),
+                    }
+                }
+                match stat.as_str() {
+                    "LENGTH" => found.iter().map(|f| f.0 * f.1).sum(),
+                    "MEAN" => {
+                        if total > 0.0 {
+                            found.iter().map(|f| f.0 * f.1).sum::<f64>() / total
+                        } else {
+                            nodata
+                        }
+                    }
+                    "MAXIMUM" => max,
+                    "MINIMUM" => min,
+                    "RANGE" => max - min,
+                    "VARIETY" => per.len() as f64,
+                    "MAJORITY" => per
+                        .iter()
+                        .max_by(|a, b| a.1.total_cmp(&b.1).then(b.0.total_cmp(&a.0)))
+                        .map_or(nodata, |p| p.0),
+                    "MINORITY" => per
+                        .iter()
+                        .min_by(|a, b| a.1.total_cmp(&b.1).then(a.0.total_cmp(&b.0)))
+                        .map_or(nodata, |p| p.0),
+                    _ => return None,
+                }
+            };
+            out.bands[0][row * cols + col] = if v == nodata { v } else { dt.store(v) };
+        }
+    }
+    Some(out)
+}

@@ -60508,6 +60508,578 @@
           "statistic": "MEAN"
         }
       }
+    },
+    "ls_length": {
+      "tool": "gp.LineStatistics_sa",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "ROAD_ID",
+        "<out>",
+        20,
+        60,
+        "LENGTH"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "line_statistics",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "field": "ROAD_ID",
+          "output": "<out>",
+          "cell_size": 20,
+          "search_radius": 60,
+          "statistic": "LENGTH"
+        }
+      }
+    },
+    "ls_mean": {
+      "tool": "gp.LineStatistics_sa",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "ROAD_ID",
+        "<out>",
+        20,
+        60,
+        "MEAN"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "line_statistics",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "field": "ROAD_ID",
+          "output": "<out>",
+          "cell_size": 20,
+          "search_radius": 60,
+          "statistic": "MEAN"
+        }
+      }
+    },
+    "ls_max": {
+      "tool": "gp.LineStatistics_sa",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "ROAD_ID",
+        "<out>",
+        25,
+        80,
+        "MAXIMUM"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "line_statistics",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "field": "ROAD_ID",
+          "output": "<out>",
+          "cell_size": 25,
+          "search_radius": 80,
+          "statistic": "MAXIMUM"
+        }
+      }
+    },
+    "ls_min": {
+      "tool": "gp.LineStatistics_sa",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "ROAD_ID",
+        "<out>",
+        25,
+        80,
+        "MINIMUM"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "line_statistics",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "field": "ROAD_ID",
+          "output": "<out>",
+          "cell_size": 25,
+          "search_radius": 80,
+          "statistic": "MINIMUM"
+        }
+      }
+    },
+    "ls_range": {
+      "tool": "gp.LineStatistics_sa",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "ROAD_ID",
+        "<out>",
+        30,
+        100,
+        "RANGE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "line_statistics",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "field": "ROAD_ID",
+          "output": "<out>",
+          "cell_size": 30,
+          "search_radius": 100,
+          "statistic": "RANGE"
+        }
+      }
+    },
+    "ls_variety": {
+      "tool": "gp.LineStatistics_sa",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "ROAD_ID",
+        "<out>",
+        30,
+        100,
+        "VARIETY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "line_statistics",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "field": "ROAD_ID",
+          "output": "<out>",
+          "cell_size": 30,
+          "search_radius": 100,
+          "statistic": "VARIETY"
+        }
+      }
+    },
+    "ls_majority": {
+      "tool": "gp.LineStatistics_sa",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "ROAD_ID",
+        "<out>",
+        20,
+        90,
+        "MAJORITY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "line_statistics",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "field": "ROAD_ID",
+          "output": "<out>",
+          "cell_size": 20,
+          "search_radius": 90,
+          "statistic": "MAJORITY"
+        }
+      }
+    },
+    "ls_minority": {
+      "tool": "gp.LineStatistics_sa",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "ROAD_ID",
+        "<out>",
+        20,
+        90,
+        "MINORITY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "line_statistics",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "field": "ROAD_ID",
+          "output": "<out>",
+          "cell_size": 20,
+          "search_radius": 90,
+          "statistic": "MINORITY"
+        }
+      }
+    },
+    "ls_streams_mean": {
+      "tool": "gp.LineStatistics_sa",
+      "args": [
+        "testdata/geoproc/streams.shp",
+        "STREAM_ID",
+        "<out>",
+        25,
+        70,
+        "MEAN"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "line_statistics",
+        "params": {
+          "input": "testdata/geoproc/streams.shp",
+          "field": "STREAM_ID",
+          "output": "<out>",
+          "cell_size": 25,
+          "search_radius": 70,
+          "statistic": "MEAN"
+        }
+      }
+    },
+    "ls_tie_ival_length": {
+      "tool": "gp.LineStatistics_sa",
+      "args": [
+        "testdata/geoproc/line_stats_ties.shp",
+        "IVAL",
+        "<out>",
+        10,
+        6,
+        "LENGTH"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "line_statistics",
+        "params": {
+          "input": "testdata/geoproc/line_stats_ties.shp",
+          "field": "IVAL",
+          "output": "<out>",
+          "cell_size": 10,
+          "search_radius": 6,
+          "statistic": "LENGTH"
+        }
+      }
+    },
+    "ls_tie_ival_mean": {
+      "tool": "gp.LineStatistics_sa",
+      "args": [
+        "testdata/geoproc/line_stats_ties.shp",
+        "IVAL",
+        "<out>",
+        10,
+        6,
+        "MEAN"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "line_statistics",
+        "params": {
+          "input": "testdata/geoproc/line_stats_ties.shp",
+          "field": "IVAL",
+          "output": "<out>",
+          "cell_size": 10,
+          "search_radius": 6,
+          "statistic": "MEAN"
+        }
+      }
+    },
+    "ls_tie_ival_maximum": {
+      "tool": "gp.LineStatistics_sa",
+      "args": [
+        "testdata/geoproc/line_stats_ties.shp",
+        "IVAL",
+        "<out>",
+        10,
+        6,
+        "MAXIMUM"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "line_statistics",
+        "params": {
+          "input": "testdata/geoproc/line_stats_ties.shp",
+          "field": "IVAL",
+          "output": "<out>",
+          "cell_size": 10,
+          "search_radius": 6,
+          "statistic": "MAXIMUM"
+        }
+      }
+    },
+    "ls_tie_ival_minimum": {
+      "tool": "gp.LineStatistics_sa",
+      "args": [
+        "testdata/geoproc/line_stats_ties.shp",
+        "IVAL",
+        "<out>",
+        10,
+        6,
+        "MINIMUM"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "line_statistics",
+        "params": {
+          "input": "testdata/geoproc/line_stats_ties.shp",
+          "field": "IVAL",
+          "output": "<out>",
+          "cell_size": 10,
+          "search_radius": 6,
+          "statistic": "MINIMUM"
+        }
+      }
+    },
+    "ls_tie_ival_range": {
+      "tool": "gp.LineStatistics_sa",
+      "args": [
+        "testdata/geoproc/line_stats_ties.shp",
+        "IVAL",
+        "<out>",
+        10,
+        6,
+        "RANGE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "line_statistics",
+        "params": {
+          "input": "testdata/geoproc/line_stats_ties.shp",
+          "field": "IVAL",
+          "output": "<out>",
+          "cell_size": 10,
+          "search_radius": 6,
+          "statistic": "RANGE"
+        }
+      }
+    },
+    "ls_tie_ival_variety": {
+      "tool": "gp.LineStatistics_sa",
+      "args": [
+        "testdata/geoproc/line_stats_ties.shp",
+        "IVAL",
+        "<out>",
+        10,
+        6,
+        "VARIETY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "line_statistics",
+        "params": {
+          "input": "testdata/geoproc/line_stats_ties.shp",
+          "field": "IVAL",
+          "output": "<out>",
+          "cell_size": 10,
+          "search_radius": 6,
+          "statistic": "VARIETY"
+        }
+      }
+    },
+    "ls_tie_ival_majority": {
+      "tool": "gp.LineStatistics_sa",
+      "args": [
+        "testdata/geoproc/line_stats_ties.shp",
+        "IVAL",
+        "<out>",
+        10,
+        6,
+        "MAJORITY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "line_statistics",
+        "params": {
+          "input": "testdata/geoproc/line_stats_ties.shp",
+          "field": "IVAL",
+          "output": "<out>",
+          "cell_size": 10,
+          "search_radius": 6,
+          "statistic": "MAJORITY"
+        }
+      }
+    },
+    "ls_tie_ival_minority": {
+      "tool": "gp.LineStatistics_sa",
+      "args": [
+        "testdata/geoproc/line_stats_ties.shp",
+        "IVAL",
+        "<out>",
+        10,
+        6,
+        "MINORITY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "line_statistics",
+        "params": {
+          "input": "testdata/geoproc/line_stats_ties.shp",
+          "field": "IVAL",
+          "output": "<out>",
+          "cell_size": 10,
+          "search_radius": 6,
+          "statistic": "MINORITY"
+        }
+      }
+    },
+    "ls_tie_dval_length": {
+      "tool": "gp.LineStatistics_sa",
+      "args": [
+        "testdata/geoproc/line_stats_ties.shp",
+        "DVAL",
+        "<out>",
+        10,
+        6,
+        "LENGTH"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "line_statistics",
+        "params": {
+          "input": "testdata/geoproc/line_stats_ties.shp",
+          "field": "DVAL",
+          "output": "<out>",
+          "cell_size": 10,
+          "search_radius": 6,
+          "statistic": "LENGTH"
+        }
+      }
+    },
+    "ls_tie_dval_mean": {
+      "tool": "gp.LineStatistics_sa",
+      "args": [
+        "testdata/geoproc/line_stats_ties.shp",
+        "DVAL",
+        "<out>",
+        10,
+        6,
+        "MEAN"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "line_statistics",
+        "params": {
+          "input": "testdata/geoproc/line_stats_ties.shp",
+          "field": "DVAL",
+          "output": "<out>",
+          "cell_size": 10,
+          "search_radius": 6,
+          "statistic": "MEAN"
+        }
+      }
+    },
+    "ls_tie_dval_maximum": {
+      "tool": "gp.LineStatistics_sa",
+      "args": [
+        "testdata/geoproc/line_stats_ties.shp",
+        "DVAL",
+        "<out>",
+        10,
+        6,
+        "MAXIMUM"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "line_statistics",
+        "params": {
+          "input": "testdata/geoproc/line_stats_ties.shp",
+          "field": "DVAL",
+          "output": "<out>",
+          "cell_size": 10,
+          "search_radius": 6,
+          "statistic": "MAXIMUM"
+        }
+      }
+    },
+    "ls_tie_dval_minimum": {
+      "tool": "gp.LineStatistics_sa",
+      "args": [
+        "testdata/geoproc/line_stats_ties.shp",
+        "DVAL",
+        "<out>",
+        10,
+        6,
+        "MINIMUM"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "line_statistics",
+        "params": {
+          "input": "testdata/geoproc/line_stats_ties.shp",
+          "field": "DVAL",
+          "output": "<out>",
+          "cell_size": 10,
+          "search_radius": 6,
+          "statistic": "MINIMUM"
+        }
+      }
+    },
+    "ls_tie_dval_range": {
+      "tool": "gp.LineStatistics_sa",
+      "args": [
+        "testdata/geoproc/line_stats_ties.shp",
+        "DVAL",
+        "<out>",
+        10,
+        6,
+        "RANGE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "line_statistics",
+        "params": {
+          "input": "testdata/geoproc/line_stats_ties.shp",
+          "field": "DVAL",
+          "output": "<out>",
+          "cell_size": 10,
+          "search_radius": 6,
+          "statistic": "RANGE"
+        }
+      }
     }
   }
 }

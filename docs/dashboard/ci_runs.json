@@ -1,61 +1,61 @@
 {
-  "fetched": "2026-10-27T21:39:24+00:00",
+  "fetched": "2026-10-28T10:01:41+00:00",
   "runs": [
     {
-      "conclusion": "",
-      "createdAt": "2026-10-27T21:38:16Z",
-      "displayTitle": "Add Graphic Buffer with ArcGIS reference cases",
-      "status": "in_progress",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40588424404"
+      "conclusion": "success",
+      "createdAt": "2026-10-28T09:46:15Z",
+      "displayTitle": "Point Statistics: clippy-clean cell check",
+      "status": "completed",
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40666840212"
     },
     {
       "conclusion": "success",
-      "createdAt": "2026-10-27T21:13:13Z",
-      "displayTitle": "Encode out-of-range integer NoData as ArcGIS zero cells for GP output",
+      "createdAt": "2026-10-28T09:30:19Z",
+      "displayTitle": "Add Extract Multi Values To Points with ArcGIS reference cases",
       "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40584899310"
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40664746941"
     },
     {
       "conclusion": "success",
-      "createdAt": "2026-10-27T20:42:54Z",
-      "displayTitle": "Match uncached integer raster math widths wrapping and overflow",
+      "createdAt": "2026-10-28T09:08:32Z",
+      "displayTitle": "Add Sample (nearest/bilinear) with ArcGIS reference cases",
       "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40580491314"
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40661931112"
     },
     {
       "conclusion": "success",
-      "createdAt": "2026-10-27T20:23:54Z",
-      "displayTitle": "Match ArcGIS cached Float64 narrowing and add regression references",
+      "createdAt": "2026-10-28T08:36:58Z",
+      "displayTitle": "HANDOFF: Stream To Feature findings",
       "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40577677342"
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40658070311"
     },
     {
       "conclusion": "success",
-      "createdAt": "2026-10-27T19:51:24Z",
-      "displayTitle": "Add three raster frequency tools with ArcGIS band and count semantics",
+      "createdAt": "2026-10-28T08:29:43Z",
+      "displayTitle": "HANDOFF: stage explicit paths after probing",
       "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40572839516"
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40657179770"
     },
     {
       "conclusion": "success",
-      "createdAt": "2026-10-27T19:32:34Z",
-      "displayTitle": "Retain large raster NoData tags and normalize downcast statistics",
+      "createdAt": "2026-10-28T08:24:53Z",
+      "displayTitle": "Remove stray ArcGIS probe outputs",
       "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40570048929"
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40656603088"
     },
     {
       "conclusion": "success",
-      "createdAt": "2026-10-27T19:20:11Z",
-      "displayTitle": "Preserve every Copy Raster band and match source-type NoData defaults",
+      "createdAt": "2026-10-28T08:21:10Z",
+      "displayTitle": "Add Snap Pour Point with ArcGIS reference cases",
       "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40568168576"
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40656161374"
     },
     {
       "conclusion": "success",
-      "createdAt": "2026-10-27T19:08:25Z",
-      "displayTitle": "Support raster projection assignment and correct geographic GeoTIFF keys",
+      "createdAt": "2026-10-28T08:04:25Z",
+      "displayTitle": "HANDOFF: binned Jenks does not match Slice natural breaks",
       "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40566379155"
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40654206715"
     }
   ]
 }

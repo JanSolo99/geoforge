@@ -6183,6 +6183,26 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
         fn raster_at(&self, path: &str) -> Result<unigis_raster::Raster> {
             unigis_raster::read_geotiff(Path::new(path))
         }
+        fn line_values(
+            &self,
+            name: &str,
+            field: &str,
+        ) -> Result<(Vec<(Vec<Vec<[f64; 2]>>, f64)>, bool, Option<u32>)> {
+            use unigis_raster::rasterize::ValueKind;
+            let path = self
+                .get(name)
+                .ok_or_else(|| Error::Unsupported(format!("{name} is required")))?;
+            let (features, kind, epsg, _) = rasterize_input(Path::new(&path), field)?;
+            let lines = features
+                .iter()
+                .filter(|(g, _)| g.kind == unigis_core::GeometryKind::Polyline)
+                .map(|(g, v)| {
+                    let parts = g.part_ranges().map(|r| g.xy[r].to_vec()).collect();
+                    (parts, *v)
+                })
+                .collect();
+            Ok((lines, matches!(kind, ValueKind::Integer), epsg))
+        }
         fn point_samples(
             &self,
             name: &str,

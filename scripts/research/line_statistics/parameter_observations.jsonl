@@ -1,0 +1,5 @@
+{"cell": 20, "radius": -1, "status": "error", "message": "Failed to execute. Parameters are not valid.\nERROR 000864: Search radius: The input is not within the defined domain.\r\nERROR 000892: The numeric value is outside of the valid range.\nFailed to execute (LineStatistics).\n"}
+{"cell": 20, "radius": 0, "status": "error", "message": "Failed to execute. Parameters are not valid.\nERROR 000864: Search radius: The input is not within the defined domain.\r\nERROR 000892: The numeric value is outside of the valid range.\nFailed to execute (LineStatistics).\n"}
+{"cell": -1, "radius": 60, "status": "error", "message": "ERROR 000622: Failed to execute (Line Statistics). Parameters are not valid.\nERROR 000628: Cannot set input into parameter cell_size.\n"}
+{"cell": 0, "radius": 60, "status": "error", "message": "ERROR 000622: Failed to execute (Line Statistics). Parameters are not valid.\nERROR 000628: Cannot set input into parameter cell_size.\n"}
+{"cell": 20, "radius": 60, "status": "success", "size": [36, 35]}

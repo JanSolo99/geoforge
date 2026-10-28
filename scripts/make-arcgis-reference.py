@@ -1486,6 +1486,20 @@ CASES = {
     "ps_wells_std": ("gp.PointStatistics_sa", [DATA / "wells.shp", "DEPTH"], [50, "Circle 120 MAP", "STD"]),
     "ps_pour_mean": ("gp.PointStatistics_sa", [DATA / "pour_pts.shp", "PP_ID"], [100, "Circle 300 MAP", "MEAN"]),
     "ps_wells_rect_cell": ("gp.PointStatistics_sa", [DATA / "wells.shp", "DEPTH"], [30, "Rectangle 3 5 CELL", "MEAN"]),
+    **{f"ls_tie_{field.lower()}_{stat.lower()}":
+       ("gp.LineStatistics_sa", [DATA / "line_stats_ties.shp", field], [10, 6, stat])
+       for field in ["IVAL", "DVAL"]
+       for stat in (["LENGTH", "MEAN", "MAXIMUM", "MINIMUM", "RANGE", "VARIETY", "MAJORITY", "MINORITY"]
+                    if field == "IVAL" else ["LENGTH", "MEAN", "MAXIMUM", "MINIMUM", "RANGE"])},
+    "ls_length": ("gp.LineStatistics_sa", [DATA / "roads.shp", "ROAD_ID"], [20, 60, "LENGTH"]),
+    "ls_mean": ("gp.LineStatistics_sa", [DATA / "roads.shp", "ROAD_ID"], [20, 60, "MEAN"]),
+    "ls_max": ("gp.LineStatistics_sa", [DATA / "roads.shp", "ROAD_ID"], [25, 80, "MAXIMUM"]),
+    "ls_min": ("gp.LineStatistics_sa", [DATA / "roads.shp", "ROAD_ID"], [25, 80, "MINIMUM"]),
+    "ls_range": ("gp.LineStatistics_sa", [DATA / "roads.shp", "ROAD_ID"], [30, 100, "RANGE"]),
+    "ls_variety": ("gp.LineStatistics_sa", [DATA / "roads.shp", "ROAD_ID"], [30, 100, "VARIETY"]),
+    "ls_majority": ("gp.LineStatistics_sa", [DATA / "roads.shp", "ROAD_ID"], [20, 90, "MAJORITY"]),
+    "ls_minority": ("gp.LineStatistics_sa", [DATA / "roads.shp", "ROAD_ID"], [20, 90, "MINORITY"]),
+    "ls_streams_mean": ("gp.LineStatistics_sa", [DATA / "streams.shp", "STREAM_ID"], [25, 70, "MEAN"]),
     "gpal_roads_50": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "NO_END_POINTS"]),
     "gpal_roads_50_end": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "END_POINTS"]),
     "gpal_roads_pct": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["PERCENTAGE", "", 25, "NO_END_POINTS"]),
@@ -1691,6 +1705,7 @@ RUN = {
     "gp.Sample_sa": ("sample", ["input", "locations", "output", "resampling", "unique_id_field"]),
     "gp.ExtractMultiValuesToPoints_sa": ("extract_multi_values_to_points", ["input", "rasters", "output", "interpolate"]),
     "gp.PointStatistics_sa": ("point_statistics", ["input", "field", "output", "cell_size", "neighborhood", "statistic"]),
+    "gp.LineStatistics_sa": ("line_statistics", ["input", "field", "output", "cell_size", "search_radius", "statistic"]),
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
     "analysis.CountOverlappingFeatures": ("count_overlapping_features", ["input", "output", "minimum_overlap_count"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
@@ -1708,7 +1723,7 @@ def run_spec(tool, args):
 
 
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
-RASTER_OUT = {"gp.PointStatistics_sa", "gp.SnapPourPoint_sa", "gp.FocalFlow_sa", "gp.DistanceAccumulation_sa", "gp.DistanceAllocation_sa", "gp.EucBackDirection_sa", "gp.EqualToFrequency_sa", "gp.GreaterThanFrequency_sa", "gp.LessThanFrequency_sa", "conversion.ASCIIToRaster", "conversion.FloatToRaster", "management.CompositeBands", "gp.CreateConstantRaster_sa", "gp.InList_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
+RASTER_OUT = {"gp.LineStatistics_sa", "gp.PointStatistics_sa", "gp.SnapPourPoint_sa", "gp.FocalFlow_sa", "gp.DistanceAccumulation_sa", "gp.DistanceAllocation_sa", "gp.EucBackDirection_sa", "gp.EqualToFrequency_sa", "gp.GreaterThanFrequency_sa", "gp.LessThanFrequency_sa", "conversion.ASCIIToRaster", "conversion.FloatToRaster", "management.CompositeBands", "gp.CreateConstantRaster_sa", "gp.InList_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
               "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa",
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",

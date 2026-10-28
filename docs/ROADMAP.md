@@ -741,3 +741,5 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Explicit GP encoding for integer NoData outside sample storage: zero physical cells, original tag and logical statistics preserved. GeoTIFF API retains default conversion; CLI opts in. Frequency255-with-NoData now works with three additional ArcGIS cases; native/GDAL tests cover U8/I16/I32, tiled/striped and BigTIFF layouts.
 
 - [x] Cached integer Abs/Negate/Square planning: 81 ArcGIS cases/27 snapshots with original statistics sidecars, conservative ranges, narrow packed/signed types, signed/unsigned32 endpoint choices, wrapping/overflow and out-of-range NoData encoding. Uncached and Float64 paths retain separate references. Reproducer: `scripts/research/unary_types/README.md`.
+
+- [x] Line Statistics (`ug run line_statistics`): clipped-length weighting, all eight statistics, integer/double output types, lower-value mode ties and empty-neighborhood semantics; 22 ArcGIS cases and invalid-parameter/allocation guards. Planar straight polylines with explicit cell size/radius; remaining scope in `scripts/research/line_statistics/README.md`.
