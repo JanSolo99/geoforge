@@ -1,12 +1,13 @@
-# User service: status page + progress dashboard on 127.0.0.1:8765, published to the tailnet by
-#   tailscale serve --bg 8765
+# User service: status page + progress dashboard on this machine's tailnet address, port 8765
+# (http://<tailscale-ip>:8765/ and /dashboard; reachable only from your tailnet). For HTTPS names:
+#   sudo tailscale serve --bg 8765   (then use `web 8765` without `tailscale`)
 #   cp tools/agent-coordinator/unigis-web.service ~/.config/systemd/user/ && systemctl --user enable --now unigis-web
 [Unit]
 Description=UniGIS coordinator status page and dashboard (localhost only)
 
 [Service]
 WorkingDirectory=/mnt/media/ArcGIS_Linux
-ExecStart=/usr/bin/python3 /mnt/media/ArcGIS_Linux/scripts/agents-remote web 8765
+ExecStart=/usr/bin/python3 /mnt/media/ArcGIS_Linux/scripts/agents-remote web 8765 tailscale
 Restart=on-failure
 
 [Install]

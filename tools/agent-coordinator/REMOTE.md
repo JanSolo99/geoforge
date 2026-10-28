@@ -64,7 +64,7 @@ coordinator: `agents-remote stop`, run `./scripts/agents`, and start the service
 ## Optional web page and progress dashboard (tailnet only)
 
 ```sh
-./scripts/agents-remote web 8765            # listens on 127.0.0.1 only; /dashboard serves docs/dashboard.html
+./scripts/agents-remote web 8765 tailscale   # listens on the tailnet address only (no sudo); without `tailscale`: 127.0.0.1; /dashboard serves docs/dashboard.html
 # or as a service:  cp tools/agent-coordinator/unigis-web.service ~/.config/systemd/user/ && systemctl --user enable --now unigis-web
 tailscale serve --bg 8765                   # publishes it to your tailnet over HTTPS
 tailscale serve status                      # shows the https://<machine>.<tailnet>.ts.net URL

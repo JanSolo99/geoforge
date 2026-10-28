@@ -10,7 +10,7 @@
     agents-remote pause | resume    hold / release new tasks (the turn in progress finishes)
     agents-remote stop              ask the daemon to exit after the current turn
     agents-remote chat              a prompt like ./scripts/agents, attached to the running daemon
-    agents-remote web [PORT]        status page + progress dashboard on 127.0.0.1 (publish: `tailscale serve`)
+    agents-remote web [PORT] [HOST] status page + progress dashboard on 127.0.0.1 (publish: `tailscale serve`)
 """
 import json
 import subprocess
@@ -217,8 +217,12 @@ def main(argv):
         chat()
     elif cmd == "web":
         port = int(rest[0]) if rest else 8765
-        print(f"http://127.0.0.1:{port}  (publish to your tailnet: tailscale serve --bg {port})")
-        ThreadingHTTPServer(("127.0.0.1", port), Handler).serve_forever()
+        host = rest[1] if len(rest) > 1 else "127.0.0.1"
+        if host == "tailscale":  # listen on this machine's tailnet address only
+            host = subprocess.run(["tailscale", "ip", "-4"], capture_output=True, text=True,
+                                  check=True).stdout.split()[0]
+        print(f"http://{host}:{port}  (localhost-only by default; `tailscale serve --bg {port}` adds HTTPS)")
+        ThreadingHTTPServer((host, port), Handler).serve_forever()
     else:
         print(__doc__)
         return 1
