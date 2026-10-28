@@ -463,11 +463,16 @@ fn generate_tessellation(ctx: &dyn Context) -> Result<ToolOutput> {
     let t = find("generate_tessellation")
         .ok_or_else(|| Error::Unsupported("generate_tessellation".into()))?;
     let shape = text(ctx, t, "shape").unwrap_or_else(|| "HEXAGON".into());
-    if !shape.eq_ignore_ascii_case("SQUARE") {
-        return Err(Error::Unsupported(format!(
-            "tessellation shape {shape} is not supported yet (SQUARE only)"
-        )));
-    }
+    let shape = match shape.to_ascii_uppercase().as_str() {
+        "SQUARE" => construct::Tessellation::Square,
+        "DIAMOND" => construct::Tessellation::Diamond,
+        "HEXAGON" => construct::Tessellation::Hexagon,
+        other => {
+            return Err(Error::Unsupported(format!(
+                "tessellation shape {other} is not supported yet"
+            )));
+        }
+    };
     let nums: Vec<f64> = text(ctx, t, "extent")
         .unwrap_or_default()
         .split_whitespace()
@@ -488,7 +493,7 @@ fn generate_tessellation(ctx: &dyn Context) -> Result<ToolOutput> {
             .map(str::to_owned),
         None => ctx.default_spatial_reference_wkt(),
     };
-    construct::generate_tessellation_squares([x0, y0, x1, y1], area, wkt)
+    construct::generate_tessellation(shape, [x0, y0, x1, y1], area, wkt)
 }
 
 fn polygon_to_line(ctx: &dyn Context) -> Result<ToolOutput> {
@@ -1316,7 +1321,7 @@ pub static TOOLS: &[Tool] = &[
         id: "generate_tessellation",
         name: "Generate Tessellation",
         toolbox: "Data Management › Sampling",
-        summary: "Square cells over an extent (ArcGIS Pro Generate Tessellation, SQUARE).",
+        summary: "Square, diamond or hexagon cells over an extent (ArcGIS Pro Generate Tessellation).",
         params: &[
             Param {
                 name: "extent",

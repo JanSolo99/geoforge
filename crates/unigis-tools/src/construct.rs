@@ -392,12 +392,22 @@ pub fn generalize(input: &dyn FeatureClass, tolerance: f64) -> Result<ToolOutput
     })
 }
 
-/// Generate Tessellation (SQUARE): square cells of `area` whose first cell is centred on the
-/// extent's lower-left corner, as many columns and rows as are needed for the cells' edges to
-/// pass the extent's upper-right corner. `GRID_ID` is `<column letters>-<row from the top>`; the
-/// cells are listed from the bottom row up, left to right, each ring clockwise from the top
-/// right (observed).
-pub fn generate_tessellation_squares(
+/// The cells Generate Tessellation makes.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Tessellation {
+    Square,
+    Diamond,
+    Hexagon,
+}
+
+/// Generate Tessellation (SQUARE, DIAMOND, HEXAGON): cells of `area` whose first one is centred on
+/// the extent's lower-left corner; squares and diamonds/hexagons continue while their edges
+/// start before the extent's far edges (diamonds and hexagons by the rule `(span + half cell) /
+/// spacing`, observed on three extents). `GRID_ID` is `<column letters>-<row from the top>`; the
+/// cells are listed from the bottom row up, left to right, each ring clockwise (squares from the
+/// top right, diamonds from the top, hexagons from the east vertex).
+pub fn generate_tessellation(
+    shape: Tessellation,
     extent: [f64; 4],
     area: f64,
     wkt: Option<String>,
@@ -407,9 +417,76 @@ pub fn generate_tessellation_squares(
             "ERROR 000800: the size and the extent must be positive",
         ));
     }
-    let side = area.sqrt();
-    let count = |span: f64| ((span - side / 2.0) / side).ceil().max(0.0) as usize + 1;
-    let (cols, rows) = (count(extent[2] - extent[0]), count(extent[3] - extent[1]));
+    let (w, h) = (extent[2] - extent[0], extent[3] - extent[1]);
+    // (columns, rows, centre of the cell in column c, row r, ring around the centre)
+    let (cols, rows): (usize, usize);
+    let centre: Box<dyn Fn(usize, usize) -> [f64; 2]>;
+    let ring: Box<dyn Fn([f64; 2]) -> Vec<[f64; 2]>>;
+    match shape {
+        Tessellation::Square => {
+            let side = area.sqrt();
+            let count = |span: f64| ((span - side / 2.0) / side).ceil().max(0.0) as usize + 1;
+            (cols, rows) = (count(w), count(h));
+            let (x0, y0) = (extent[0], extent[1]);
+            centre = Box::new(move |c, r| [x0 + c as f64 * side, y0 + r as f64 * side]);
+            ring = Box::new(move |m| {
+                let q = side / 2.0;
+                vec![
+                    [m[0] + q, m[1] + q],
+                    [m[0] + q, m[1] - q],
+                    [m[0] - q, m[1] - q],
+                    [m[0] - q, m[1] + q],
+                    [m[0] + q, m[1] + q],
+                ]
+            });
+        }
+        Tessellation::Diamond => {
+            let d = (area / 2.0).sqrt();
+            cols = ((w + d) / (2.0 * d)).ceil().max(1.0) as usize;
+            rows = ((h + d) / d).ceil().max(1.0) as usize;
+            let (x0, y0) = (extent[0], extent[1]);
+            centre = Box::new(move |c, r| {
+                [
+                    x0 + 2.0 * d * c as f64 + if r % 2 == 1 { d } else { 0.0 },
+                    y0 + d * r as f64,
+                ]
+            });
+            ring = Box::new(move |m| {
+                vec![
+                    [m[0], m[1] + d],
+                    [m[0] + d, m[1]],
+                    [m[0], m[1] - d],
+                    [m[0] - d, m[1]],
+                    [m[0], m[1] + d],
+                ]
+            });
+        }
+        Tessellation::Hexagon => {
+            let side = (area / (1.5 * 3f64.sqrt())).sqrt();
+            let height = 3f64.sqrt() * side;
+            cols = ((w + side) / (1.5 * side)).ceil().max(1.0) as usize;
+            rows = ((h + height / 2.0) / height).ceil().max(1.0) as usize;
+            let (x0, y0) = (extent[0], extent[1]);
+            centre = Box::new(move |c, r| {
+                [
+                    x0 + 1.5 * side * c as f64,
+                    y0 + height * r as f64 + if c % 2 == 1 { height / 2.0 } else { 0.0 },
+                ]
+            });
+            ring = Box::new(move |m| {
+                let q = height / 2.0;
+                vec![
+                    [m[0] + side, m[1]],
+                    [m[0] + side / 2.0, m[1] - q],
+                    [m[0] - side / 2.0, m[1] - q],
+                    [m[0] - side, m[1]],
+                    [m[0] - side / 2.0, m[1] + q],
+                    [m[0] + side / 2.0, m[1] + q],
+                    [m[0] + side, m[1]],
+                ]
+            });
+        }
+    }
     if cols.saturating_mul(rows) > 5_000_000 {
         return Err(err("ERROR 000800: too many cells"));
     }
@@ -429,18 +506,8 @@ pub fn generate_tessellation_squares(
     grid_id.length = 12;
     let mut features = Vec::with_capacity(cols * rows);
     for r in 0..rows {
-        let cy = extent[1] + r as f64 * side;
         for c in 0..cols {
-            let cx = extent[0] + c as f64 * side;
-            let h = side / 2.0;
-            let ring = vec![
-                [cx + h, cy + h],
-                [cx + h, cy - h],
-                [cx - h, cy - h],
-                [cx - h, cy + h],
-                [cx + h, cy + h],
-            ];
-            let mut g = unigis_geometry::paths_geometry(vec![ring]);
+            let mut g = unigis_geometry::paths_geometry(vec![ring(centre(c, r))]);
             if let Some(g) = &mut g {
                 g.kind = GeometryKind::Polygon;
             }

@@ -140,3 +140,7 @@ system): size = cell AREA; first cell centred on the extent's lower-left; column
 fields Id, GRID_ID. HEXAGON/TRIANGLE/DIAMOND/TRANSVERSE HEXAGON/H3 are NOT done: hexagon side = sqrt(area/(3*sqrt(3)/2)), flat-top,
 first hexagon centred at the extent corner, alternate columns raised half a hexagon height; diamond half-diagonal = sqrt(area/2) with
 rows offset half a cell; inclusion rules at the extent edges need more probing (counts for 400x300: hexagon 20, triangle 36, diamond 35).
+
+Claude 2026-10-29: Generate Tessellation DIAMOND and HEXAGON also done (`tess_dia_*`, `tess_hex_*` 8 cases pass): diamond half-diagonal
+d = sqrt(area/2), columns ceil((w+d)/2d), rows ceil((h+d)/d) (odd rows shifted by d); hexagon (flat-top) side s = sqrt(area/(1.5 sqrt3)),
+columns ceil((w+s)/1.5s), rows ceil((h+height/2)/height), odd columns raised half a hexagon height. TRIANGLE, TRANSVERSE HEXAGON and H3 still missing.
