@@ -1,0 +1,17 @@
+# User service: runs the coordinator headless so it survives logouts and reboots.
+#   mkdir -p ~/.config/systemd/user && cp tools/agent-coordinator/unigis-agents.service ~/.config/systemd/user/
+#   systemctl --user daemon-reload && systemctl --user enable --now unigis-agents
+#   loginctl enable-linger $USER      # keep it running when nobody is logged in
+[Unit]
+Description=UniGIS Claude/Codex coordinator (headless)
+After=network-online.target
+
+[Service]
+WorkingDirectory=/mnt/media/ArcGIS_Linux
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/usr/bin/python3 /mnt/media/ArcGIS_Linux/scripts/agents --daemon
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=default.target

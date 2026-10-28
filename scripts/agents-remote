@@ -1,0 +1,167 @@
+#!/usr/bin/env python3
+"""Manage a running `./scripts/agents --daemon` from any shell (for example over SSH/Tailscale).
+
+    agents-remote status            what the coordinator is doing
+    agents-remote log [N]           last N lines of the daemon log (default 40)
+    agents-remote follow            follow the log
+    agents-remote submit TEXT...    queue a task (runs after the ones already queued)
+    agents-remote cmd /switch codex queue a coordinator command (/switch, /auto, /new, /session)
+    agents-remote queue             tasks waiting and recently finished
+    agents-remote pause | resume    hold / release new tasks (the turn in progress finishes)
+    agents-remote stop              ask the daemon to exit after the current turn
+    agents-remote web [PORT]        small status page on 127.0.0.1 (publish it with `tailscale serve`)
+"""
+import json
+import subprocess
+import sys
+import time
+from datetime import datetime
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
+from urllib.parse import parse_qs
+
+ROOT = Path(__file__).resolve().parents[1]
+common = Path(subprocess.run(["git", "-C", str(ROOT), "rev-parse", "--git-common-dir"],
+                             capture_output=True, text=True, check=True).stdout.strip())
+REMOTE = (ROOT / common).resolve() / "agent-coordinator" / "remote"
+INBOX, DONE = REMOTE / "inbox", REMOTE / "done"
+
+
+def ensure():
+    for d in (INBOX, DONE):
+        d.mkdir(parents=True, exist_ok=True)
+
+
+def enqueue(kind, text):
+    ensure()
+    name = f"{time.time_ns()}.{kind}"
+    tmp = INBOX / f".{name}.tmp"
+    tmp.write_text(text.strip() + "\n")
+    tmp.rename(INBOX / name)  # only complete files are ever visible to the daemon
+    return name
+
+
+def status():
+    path = REMOTE / "status.json"
+    if not path.exists():
+        return {"state": "no daemon has run yet"}
+    data = json.loads(path.read_text())
+    return data
+
+
+def tail(n):
+    path = REMOTE / "daemon.log"
+    return "".join(path.read_text(errors="replace").splitlines(keepends=True)[-n:]) if path.exists() else ""
+
+
+def queue():
+    ensure()
+    waiting = sorted(p.name for p in INBOX.iterdir() if not p.name.startswith("."))
+    finished = sorted(p.name for p in DONE.iterdir())[-10:]
+    return waiting, finished
+
+
+def show_status():
+    s = status()
+    print(json.dumps({k: v for k, v in s.items() if k != "last_run"}, indent=2))
+    print("last run:", json.dumps(s.get("last_run", {})))
+    waiting, _ = queue()
+    print(f"queued: {len(waiting)}")
+
+
+PAGE = """<!doctype html><meta name=viewport content="width=device-width,initial-scale=1">
+<title>UniGIS agents</title><style>body{{font:15px system-ui;margin:1rem;max-width:60rem}}
+pre{{background:#111;color:#ddd;padding:.7rem;overflow:auto;max-height:24rem}}
+button,input{{font:inherit;padding:.4rem}}textarea{{width:100%;height:5rem;font:inherit}}</style>
+<h1>UniGIS agents</h1><pre>{status}</pre>
+<form method=post action=/submit><textarea name=text placeholder="Task for the agent"></textarea>
+<button>Queue task</button></form>
+<p><form method=post action=/cmd style=display:inline><input type=hidden name=text value="{pause_cmd}">
+<button>{pause_label}</button></form>
+<form method=post action=/cmd style=display:inline><input type=hidden name=text value="/switch {other}">
+<button>Switch to {other}</button></form>
+<form method=post action=/stop style=display:inline><button>Stop daemon</button></form></p>
+<h3>Queue</h3><pre>{queue}</pre><h3>Log</h3><pre>{log}</pre>"""
+
+
+class Handler(BaseHTTPRequestHandler):
+    def log_message(self, *args):
+        pass
+
+    def reply(self, body, code=200):
+        data = body.encode()
+        self.send_response(code)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
+
+    def do_GET(self):
+        s = status()
+        waiting, finished = queue()
+        paused = (REMOTE / "PAUSE").exists()
+        other = "codex" if s.get("agent") == "claude" else "claude"
+        text = lambda v: str(v).replace("&", "&amp;").replace("<", "&lt;")
+        self.reply(PAGE.format(
+            status=text(json.dumps({k: v for k, v in s.items() if k != "last_run"}, indent=1)
+                        + "\nlast run: " + json.dumps(s.get("last_run", {}))),
+            queue=text("waiting:\n" + "\n".join(waiting) + "\nfinished:\n" + "\n".join(finished)),
+            log=text(tail(60)), other=other,
+            pause_cmd="/resume" if paused else "/pause", pause_label="Resume" if paused else "Pause"))
+
+    def do_POST(self):
+        length = int(self.headers.get("Content-Length", 0))
+        form = parse_qs(self.rfile.read(length).decode())
+        text = (form.get("text") or [""])[0].strip()
+        if self.path == "/submit" and text:
+            enqueue("task", text)
+        elif self.path == "/cmd" and text == "/pause":
+            ensure(); (REMOTE / "PAUSE").write_text("")
+        elif self.path == "/cmd" and text == "/resume":
+            (REMOTE / "PAUSE").unlink(missing_ok=True)
+        elif self.path == "/cmd" and text.startswith("/switch "):
+            enqueue("cmd", text)
+        elif self.path == "/stop":
+            ensure(); (REMOTE / "STOP").write_text("")
+        self.send_response(303)
+        self.send_header("Location", "/")
+        self.end_headers()
+
+
+def main(argv):
+    if not argv:
+        print(__doc__)
+        return 0
+    cmd, rest = argv[0], argv[1:]
+    if cmd == "status":
+        show_status()
+    elif cmd == "log":
+        print(tail(int(rest[0]) if rest else 40), end="")
+    elif cmd == "follow":
+        subprocess.call(["tail", "-n", "40", "-F", str(REMOTE / "daemon.log")])
+    elif cmd == "submit" and rest:
+        print("queued", enqueue("task", " ".join(rest)))
+    elif cmd == "cmd" and rest:
+        print("queued", enqueue("cmd", " ".join(rest)))
+    elif cmd == "queue":
+        waiting, finished = queue()
+        print("waiting:", *waiting, sep="\n  ")
+        print("finished:", *finished, sep="\n  ")
+    elif cmd == "pause":
+        ensure(); (REMOTE / "PAUSE").write_text(""); print("paused")
+    elif cmd == "resume":
+        (REMOTE / "PAUSE").unlink(missing_ok=True); print("resumed")
+    elif cmd == "stop":
+        ensure(); (REMOTE / "STOP").write_text(""); print("stop requested")
+    elif cmd == "web":
+        port = int(rest[0]) if rest else 8765
+        print(f"http://127.0.0.1:{port}  (publish to your tailnet: tailscale serve --bg {port})")
+        ThreadingHTTPServer(("127.0.0.1", port), Handler).serve_forever()
+    else:
+        print(__doc__)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

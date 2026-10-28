@@ -116,6 +116,41 @@ print(json.dumps({{'type': 'turn.completed'}}), end='')
         self.assertTrue(any("--resume" in request["command"] for request in requests))
         self.assertEqual((self.root / "docs/HANDOFF.md").read_text(), "Existing handoff\n")
 
+    def test_daemon_runs_inbox_tasks_commands_pause_and_keepalive(self):
+        codex = self.executable("codex", f'''
+import json, pathlib, sys
+pathlib.Path('prompts.txt').open('a').write(sys.argv[-1].split('Latest user request:')[-1].strip().splitlines()[0] + '\\n')
+print(json.dumps({{'type': 'thread.started', 'thread_id': {CODEX_ID!r}}}))
+print(json.dumps({{'type': 'turn.completed'}}))
+''')
+        with self.coordinator.lock() as fd, patch.object(module.shutil, "which", return_value=codex), \
+                contextlib.redirect_stdout(io.StringIO()):
+            remote = self.coordinator.remote_dirs()
+            (remote / "inbox" / "001.cmd").write_text("/switch codex")
+            (remote / "inbox" / "002.task").write_text("first remote task")
+            (remote / "inbox" / "003.task").write_text("second remote task")
+            self.coordinator.daemon(fd, keepalive=False, poll=0, sleep=lambda _: None, max_cycles=4)
+            self.assertEqual(self.coordinator.state["agent"], "codex")
+            self.assertEqual(sorted(p.name for p in (remote / "done").iterdir()),
+                             ["001.cmd.exit0", "002.task.exit0", "003.task.exit0"])
+            status = json.loads((remote / "status.json").read_text())
+            self.assertEqual(status["state"], "idle")
+            # Paused: tasks wait, commands still run, keepalive does nothing.
+            (remote / "PAUSE").write_text("")
+            (remote / "inbox" / "004.task").write_text("held task")
+            self.coordinator.daemon(fd, keepalive=True, poll=0, sleep=lambda _: None, max_cycles=2)
+            self.assertTrue((remote / "inbox" / "004.task").exists())
+            # Resumed with an empty inbox: the keepalive sends the handoff task.
+            (remote / "PAUSE").unlink()
+            (remote / "inbox" / "004.task").unlink()
+            self.coordinator.daemon(fd, keepalive=True, poll=0, sleep=lambda _: None, max_cycles=1)
+            (remote / "STOP").write_text("")
+            self.assertEqual(self.coordinator.daemon(fd, poll=0, sleep=lambda _: None), 0)
+        prompts = (self.root / "prompts.txt").read_text().splitlines()
+        self.assertEqual(prompts, ["first remote task", "second remote task",
+                                   "Continue the task in docs/HANDOFF.md."])
+        self.assertIn("keepalive", (remote / "daemon.log").read_text())
+
     def test_successful_reply_about_limits_does_not_trigger_fallback(self):
         codex = self.executable("codex", f'''
 import json

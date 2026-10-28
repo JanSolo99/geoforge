@@ -14,6 +14,7 @@ import shutil
 import signal
 import subprocess
 import sys
+import time
 import uuid
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -23,6 +24,7 @@ LIMIT = re.compile(
     r"you(?:'|’)ve (?:hit|reached) your limit|too many requests|"
     r"insufficient_quota|limit reached|hit your (?:usage )?limit", re.I
 )
+DEFAULT_TASK = "Continue the task in docs/HANDOFF.md."
 HELP = """Type a task to send it to the selected agent.
 /switch claude|codex   Select the other agent; context is carried automatically
 /session AGENT UUID    Link an existing stopped session (do not run it elsewhere)
@@ -323,6 +325,43 @@ class Coordinator:
             result = self.run(other, task, lock_fd, previous=result)
         return 0 if result["status"] == "completed" else 1
 
+    def handle(self, line, lock_fd):
+        """Run one prompt line (a task or a /command). True means quit."""
+        if not line.startswith("/"):
+            self.turn(line, lock_fd, self.auto)
+            return False
+        parts = shlex.split(line)
+        command, args = parts[0], parts[1:]
+        if command == "/quit":
+            return True
+        if command == "/help":
+            print(HELP)
+        elif command == "/status":
+            self.status()
+        elif command == "/handoff":
+            print((self.root / "docs/HANDOFF.md").read_text())
+        elif command == "/switch" and len(args) == 1 and args[0] in AGENTS:
+            self.state["agent"] = args[0]
+            self.save()
+        elif command == "/session" and len(args) == 2 and args[0] in AGENTS:
+            self.state["sessions"][args[0]] = str(uuid.UUID(args[1]))
+            self.save()
+        elif command == "/new" and len(args) <= 1 and (not args or args[0] in AGENTS):
+            self.state["sessions"].pop(args[0] if args else self.state["agent"], None)
+            self.save()
+        elif command == "/auto" and args in (["on"], ["off"]):
+            self.auto = args == ["on"]
+        elif command == "/cli" and len(args) <= 1 and (not args or args[0] in AGENTS):
+            agent = args[0] if args else self.state["agent"]
+            self.run(agent, "Continue the task in docs/HANDOFF.md.", lock_fd,
+                     native=True, previous=self.state.get("last_run"))
+            if agent == "codex" and not self.state["sessions"].get(agent):
+                print("To resume this native Codex session later, use /session codex UUID "
+                      "with the ID shown by Codex when it exits.")
+        else:
+            print("Unknown command or arguments. /help lists commands.")
+        return False
+
     def repl(self, lock_fd):
         print(f"UniGIS agent coordinator — {self.root}\n{HELP}")
         while True:
@@ -334,41 +373,103 @@ class Coordinator:
             if not line:
                 continue
             try:
-                if not line.startswith("/"):
-                    self.turn(line, lock_fd, self.auto)
-                    continue
-                parts = shlex.split(line)
-                command, args = parts[0], parts[1:]
-                if command == "/quit":
+                if self.handle(line, lock_fd):
                     return 0
-                if command == "/help":
-                    print(HELP)
-                elif command == "/status":
-                    self.status()
-                elif command == "/handoff":
-                    print((self.root / "docs/HANDOFF.md").read_text())
-                elif command == "/switch" and len(args) == 1 and args[0] in AGENTS:
-                    self.state["agent"] = args[0]
-                    self.save()
-                elif command == "/session" and len(args) == 2 and args[0] in AGENTS:
-                    self.state["sessions"][args[0]] = str(uuid.UUID(args[1]))
-                    self.save()
-                elif command == "/new" and len(args) <= 1 and (not args or args[0] in AGENTS):
-                    self.state["sessions"].pop(args[0] if args else self.state["agent"], None)
-                    self.save()
-                elif command == "/auto" and args in (["on"], ["off"]):
-                    self.auto = args == ["on"]
-                elif command == "/cli" and len(args) <= 1 and (not args or args[0] in AGENTS):
-                    agent = args[0] if args else self.state["agent"]
-                    self.run(agent, "Continue the task in docs/HANDOFF.md.", lock_fd,
-                             native=True, previous=self.state.get("last_run"))
-                    if agent == "codex" and not self.state["sessions"].get(agent):
-                        print("To resume this native Codex session later, use /session codex UUID "
-                              "with the ID shown by Codex when it exits.")
-                else:
-                    print("Unknown command or arguments. /help lists commands.")
             except (RuntimeError, ValueError, OSError) as error:
                 print(f"Error: {error}", file=sys.stderr)
+
+    # --- Headless mode for remote management (see tools/agent-coordinator/REMOTE.md) ---
+
+    def remote_dirs(self):
+        remote = self.directory / "remote"
+        for name in ("inbox", "done"):
+            (remote / name).mkdir(parents=True, exist_ok=True, mode=0o700)
+        os.chmod(remote, 0o700)
+        return remote
+
+    def write_remote_status(self, remote, state, task="", failures=0):
+        save_json(remote / "status.json", {
+            "time": now(), "state": state, "agent": self.state.get("agent"),
+            "task": task[:300], "failures": failures,
+            "paused": (remote / "PAUSE").exists(),
+            "last_run": self.state.get("last_run", {}),
+            "pid": os.getpid(),
+        })
+
+    def daemon(self, lock_fd, keepalive=True, poll=5.0, idle_task=DEFAULT_TASK,
+               sleep=time.sleep, max_cycles=None):
+        """Run without a terminal: tasks and commands arrive as files in the remote inbox.
+
+        Tasks (*.task) run in file-name order; commands (*.cmd) hold one /command line. With
+        `keepalive` and an empty inbox the agent is sent `idle_task` again and again, backing off
+        after failures. Files named PAUSE and STOP in the remote directory pause and end the loop.
+        """
+        remote = self.remote_dirs()
+        failures = 0
+        cycles = 0
+        with (remote / "daemon.log").open("a", buffering=1) as log, \
+                contextlib.redirect_stdout(_Tee(sys.stdout, log)):
+            print(f"[{now()}] daemon started in {self.root}")
+            while max_cycles is None or cycles < max_cycles:
+                cycles += 1
+                if (remote / "STOP").exists():
+                    (remote / "STOP").unlink()
+                    self.write_remote_status(remote, "stopped")
+                    print(f"[{now()}] stop requested")
+                    return 0
+                paused = (remote / "PAUSE").exists()
+                items = sorted(p for p in (remote / "inbox").iterdir()
+                               if p.suffix in (".task", ".cmd"))
+                item = next((p for p in items if p.suffix == ".cmd" or not paused), None)
+                try:
+                    if item is not None:
+                        text = item.read_text().strip()
+                        self.write_remote_status(remote, "running", text, failures)
+                        print(f"[{now()}] {item.name}: {text[:200]}")
+                        code = 0
+                        if item.suffix == ".cmd":
+                            self.handle(text, lock_fd)
+                        else:
+                            code = self.turn(text, lock_fd, self.auto)
+                        item.rename(remote / "done" / f"{item.name}.exit{code}")
+                        failures = failures + 1 if code else 0
+                    elif keepalive and not paused:
+                        self.write_remote_status(remote, "running", idle_task, failures)
+                        print(f"[{now()}] keepalive: {idle_task}")
+                        code = self.turn(idle_task, lock_fd, self.auto)
+                        failures = failures + 1 if code else 0
+                        if code:
+                            wait = min(60 * 2 ** (failures - 1), 1800)
+                            print(f"[{now()}] turn did not complete; waiting {wait}s")
+                            self.write_remote_status(remote, "backoff", idle_task, failures)
+                            waited = 0.0
+                            while waited < wait and not (remote / "STOP").exists():
+                                sleep(poll)
+                                waited += poll
+                            continue
+                    else:
+                        self.write_remote_status(remote, "paused" if paused else "idle", "", failures)
+                        sleep(poll)
+                except (RuntimeError, ValueError, OSError) as error:
+                    print(f"[{now()}] error: {error}")
+                    if item is not None and item.exists():
+                        item.rename(remote / "done" / f"{item.name}.error")
+                    sleep(poll)
+        return 0
+
+
+class _Tee:
+    def __init__(self, *streams):
+        self.streams = streams
+
+    def write(self, text):
+        for stream in self.streams:
+            stream.write(text)
+        return len(text)
+
+    def flush(self):
+        for stream in self.streams:
+            stream.flush()
 
 
 def main():
@@ -377,6 +478,10 @@ def main():
     parser.add_argument("--status", action="store_true", help="Show local state without starting an agent")
     parser.add_argument("--no-fallback", action="store_true", help="Disable automatic usage-limit fallback")
     parser.add_argument("--task", help="Run one task and exit; otherwise open the interactive coordinator")
+    parser.add_argument("--daemon", action="store_true",
+                        help="Run headless: take tasks from the remote inbox (see REMOTE.md)")
+    parser.add_argument("--no-keepalive", action="store_true",
+                        help="With --daemon, wait for inbox tasks instead of re-sending the handoff task")
     args = parser.parse_args()
     coordinator = Coordinator()
     if args.status:
@@ -387,6 +492,8 @@ def main():
             coordinator.state["agent"] = args.agent
         coordinator.auto = not args.no_fallback
         coordinator.save()
+        if args.daemon:
+            return coordinator.daemon(lock_fd, keepalive=not args.no_keepalive)
         if args.task:
             return coordinator.turn(args.task, lock_fd, coordinator.auto)
         if not sys.stdin.isatty():

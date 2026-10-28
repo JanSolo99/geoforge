@@ -128,6 +128,11 @@ The implementation uses [Claude Code's programmatic interface](https://code.clau
 and [Codex's noninteractive JSON events](https://learn.chatgpt.com/docs/non-interactive-mode).
 It does not use a continuously running model supervisor or install an MCP service.
 
+## Remote management
+
+`./scripts/agents --daemon` runs headless and `./scripts/agents-remote` steers it over SSH or a
+tailnet-only web page; see [REMOTE.md](REMOTE.md).
+
 ## Offline validation
 
 ```sh

@@ -54,6 +54,15 @@ No Copy Raster source edits. nodata_encoding/probe_copy.py has6 separate argumen
 observations; override/remapping differences remain documented. These are not fixed
 by the writer policy. Save new observations/recipe before choosing next patch.
 
+## Remote management of the coordinator (2026-10-28)
+
+`./scripts/agents --daemon` runs the coordinator headless (file inbox, keepalive "continue the HANDOFF" with back-off,
+Claude/Codex fallback as before); `./scripts/agents-remote status|log|follow|submit|cmd|pause|resume|stop|web` steers it;
+`tools/agent-coordinator/REMOTE.md` has the Tailscale steps (sudo tailscaled + `tailscale up --ssh`, user systemd unit
+`unigis-agents.service`, `tailscale serve` for the status page). Tailscale is installed here but logged out: the user must run
+`sudo tailscale up --ssh` (interactive login) and stop the interactive coordinator before starting the service.
+Tested offline (`test_daemon_runs_inbox_tasks_commands_pause_and_keepalive`); not yet run against real CLIs.
+
 ## Next actions
 
 1. Keep going in probe -> implement -> reference-test batches (see "Session 2026-10-26" entries for what is done and the gaps).
