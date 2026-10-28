@@ -984,7 +984,7 @@ pub fn geodetic_densify(input: &dyn FeatureClass, max_length: f64) -> Result<Too
             "ERROR 000368: Invalid input data: lines or polygons are required",
         ));
     }
-    if !(max_length > 0.0) {
+    if max_length.is_nan() || max_length <= 0.0 {
         return Err(err("a densify distance greater than zero is required"));
     }
     let wkt = input
