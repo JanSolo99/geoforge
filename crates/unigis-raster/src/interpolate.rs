@@ -337,7 +337,7 @@ pub fn point_statistics(
         .copied()
         .filter(|s| s.x.is_finite() && s.y.is_finite() && s.z.is_finite())
         .collect();
-    if samples.is_empty() || !(cell > 0.0) {
+    if samples.is_empty() || cell.is_nan() || cell <= 0.0 {
         return None;
     }
     let (mut x0, mut y0, mut x1, mut y1) = (f64::MAX, f64::MAX, f64::MIN, f64::MIN);
