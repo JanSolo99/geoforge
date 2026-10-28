@@ -63884,6 +63884,286 @@
           "output": "<out>"
         }
       }
+    },
+    "diff_dem_i16": {
+      "tool": "gp.Diff_ia",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "diff",
+        "params": {
+          "in1": "testdata/raster/dem.tif",
+          "in2": "testdata/raster/dem_int16_packbits.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "diff_u8_u8": {
+      "tool": "gp.Diff_ia",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "testdata/raster/landuse_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "diff",
+        "params": {
+          "in1": "testdata/raster/landuse_u8.tif",
+          "in2": "testdata/raster/landuse_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "diff_i16_c200": {
+      "tool": "gp.Diff_ia",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "200",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "diff",
+        "params": {
+          "in1": "testdata/raster/dem_int16_packbits.tif",
+          "in2": "200",
+          "output": "<out>"
+        }
+      }
+    },
+    "diff_u8_c2": {
+      "tool": "gp.Diff_ia",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "2",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "diff",
+        "params": {
+          "in1": "testdata/raster/landuse_u8.tif",
+          "in2": "2",
+          "output": "<out>"
+        }
+      }
+    },
+    "diff_dem_c": {
+      "tool": "gp.Diff_ia",
+      "args": [
+        "testdata/raster/dem.tif",
+        "200.5",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "diff",
+        "params": {
+          "in1": "testdata/raster/dem.tif",
+          "in2": "200.5",
+          "output": "<out>"
+        }
+      }
+    },
+    "diff_u8_patch": {
+      "tool": "gp.Diff_ia",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "testdata/raster/patches_i16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "diff",
+        "params": {
+          "in1": "testdata/raster/landuse_u8.tif",
+          "in2": "testdata/raster/patches_i16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "diff_patch_u8": {
+      "tool": "gp.Diff_ia",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "testdata/raster/landuse_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "diff",
+        "params": {
+          "in1": "testdata/raster/patches_i16.tif",
+          "in2": "testdata/raster/landuse_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "over_dem_i16": {
+      "tool": "gp.Over_ia",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "over",
+        "params": {
+          "in1": "testdata/raster/dem.tif",
+          "in2": "testdata/raster/dem_int16_packbits.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "over_u8_u8": {
+      "tool": "gp.Over_ia",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "testdata/raster/landuse_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "over",
+        "params": {
+          "in1": "testdata/raster/landuse_u8.tif",
+          "in2": "testdata/raster/landuse_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "over_i16_c200": {
+      "tool": "gp.Over_ia",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "200",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "over",
+        "params": {
+          "in1": "testdata/raster/dem_int16_packbits.tif",
+          "in2": "200",
+          "output": "<out>"
+        }
+      }
+    },
+    "over_u8_c2": {
+      "tool": "gp.Over_ia",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "2",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "over",
+        "params": {
+          "in1": "testdata/raster/landuse_u8.tif",
+          "in2": "2",
+          "output": "<out>"
+        }
+      }
+    },
+    "over_dem_c": {
+      "tool": "gp.Over_ia",
+      "args": [
+        "testdata/raster/dem.tif",
+        "200.5",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "over",
+        "params": {
+          "in1": "testdata/raster/dem.tif",
+          "in2": "200.5",
+          "output": "<out>"
+        }
+      }
+    },
+    "over_u8_patch": {
+      "tool": "gp.Over_ia",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "testdata/raster/patches_i16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "over",
+        "params": {
+          "in1": "testdata/raster/landuse_u8.tif",
+          "in2": "testdata/raster/patches_i16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "over_patch_u8": {
+      "tool": "gp.Over_ia",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "testdata/raster/landuse_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "over",
+        "params": {
+          "in1": "testdata/raster/patches_i16.tif",
+          "in2": "testdata/raster/landuse_u8.tif",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

@@ -998,6 +998,18 @@ fn line_statistics(ctx: &dyn Context) -> Result<Output> {
     with_statistics(raster, true)
 }
 
+fn diff_tool(ctx: &dyn Context) -> Result<Output> {
+    let r = crate::local::diff_or_over(false, &operand(ctx, "in1")?, &operand(ctx, "in2")?)
+        .ok_or_else(|| Error::Unsupported("at least one input must be a raster".into()))?;
+    with_statistics(r, true)
+}
+
+fn over_tool(ctx: &dyn Context) -> Result<Output> {
+    let r = crate::local::diff_or_over(true, &operand(ctx, "in1")?, &operand(ctx, "in2")?)
+        .ok_or_else(|| Error::Unsupported("at least one input must be a raster".into()))?;
+    with_statistics(r, true)
+}
+
 fn flip(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::extract::flip(&ctx.raster("input")?), true)
 }
@@ -1793,6 +1805,8 @@ pub static TOOLS: &[Tool] = &[
         ],
         run: line_statistics,
     },
+    binary_tool!(diff_tool, "diff", "Diff"),
+    binary_tool!(over_tool, "over", "Over"),
     Tool {
         id: "flip",
         name: "Flip",

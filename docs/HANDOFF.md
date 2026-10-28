@@ -119,3 +119,7 @@ with non-zero middle-column weights), only the 1-cell border is NoData, so the n
 nonlinear in the slope/aspect formulas. Not implemented. User asked (2026-10-29) to keep going until ALL ArcGIS
 tools exist: ~330 of 2028 tools have ArcGIS reference cases so far; the dashboard (http://100.99.35.95:8765/dashboard)
 tracks it. Rule for the long run: keep to probe -> closed-form fit -> registry entry -> reference cases -> commit.
+
+Claude 2026-10-29: Diff and Over (Image Analyst; `diff`, `over` in the raster registry, `diff_*`/`over_*` 14 cases pass):
+Diff = first value where it differs from the second, 0 where equal (type from the FIRST operand only: width, floating,
+signed-if-statistics-negative); Over = first value, or the second where the first is 0 (background); type = widest of both.

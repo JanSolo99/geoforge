@@ -1032,3 +1032,61 @@ pub fn in_list(input: &Raster, list: &[Operand]) -> Raster {
     }
     out
 }
+
+/// Diff and Over (Image Analyst). Diff: the first value where it differs from the second, 0 where
+/// they are equal. Over: the first value, or the second where the first is 0 (the background).
+/// The type is the widest of the operands' (floating if any is, signed only if a signed raster's
+/// statistics have negatives); NoData where either operand is.
+pub fn diff_or_over(over: bool, a: &Operand, b: &Operand) -> Option<Raster> {
+    let (a, b) = match (a, b) {
+        (Operand::Raster(ra), Operand::Raster(rb)) => {
+            let (ra, rb) = common_grid(ra, rb)?;
+            (Operand::Raster(ra), Operand::Raster(rb))
+        }
+        _ => (a.clone(), b.clone()),
+    };
+    let g = grid(&[&a, &b])?;
+    let n = g.width * g.height;
+    // Diff only returns values of the first operand, so only its type counts.
+    let float = a.is_float() || (over && b.is_float());
+    let signed = |o: &Operand| match o {
+        Operand::Raster(r) => {
+            matches!(r.data_type, DataType::I8 | DataType::I16 | DataType::I32)
+                && !r.statistics.is_some_and(|(lo, _)| lo >= 0.0)
+        }
+        Operand::Constant(c) => *c < 0.0,
+    };
+    let width = |o: &Operand| match o.integer_type() {
+        DataType::U8 | DataType::I8 => 8,
+        DataType::U16 | DataType::I16 => 16,
+        _ => 32,
+    };
+    let values = (0..n).map(|i| {
+        let (x, y) = (a.get(i)?, b.get(i)?);
+        Some(if over {
+            if x != 0.0 { x } else { y }
+        } else if x != y {
+            x
+        } else {
+            0.0
+        })
+    });
+    Some(if float {
+        float_raster(g, values)
+    } else {
+        let w = if over {
+            width(&a).max(width(&b))
+        } else {
+            width(&a)
+        };
+        let (t, nodata) = match (signed(&a) || (over && signed(&b)), w) {
+            (false, 8) => (DataType::U8, 255.0),
+            (false, 16) => (DataType::U16, f64::from(u16::MAX)),
+            (false, _) => (DataType::U32, f64::from(u32::MAX)),
+            (true, 8) => (DataType::I8, -128.0),
+            (true, 16) => (DataType::I16, f64::from(i16::MIN)),
+            (true, _) => (DataType::I32, f64::from(i32::MIN)),
+        };
+        typed_raster(g, values, t, nodata)
+    })
+}
