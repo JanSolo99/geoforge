@@ -2,7 +2,7 @@
 
 ## Latest state (Claude, 2026-10-29) — read this first
 
-Workspace /mnt/media/ArcGIS_Linux, branch main, all Claude work pushed (HEAD e24029f or later).
+Workspace /mnt/media/ArcGIS_Linux, branch main, all Claude work pushed (HEAD d7d507c or later).
 GitHub Actions minutes are exhausted: both workflows are manual-only; the gate is `scripts/check`
 (run by the pre-push hook, core.hooksPath=.githooks). Do not rely on or trigger hosted CI.
 Claude added this stretch (each with ArcGIS reference cases, details in the dated notes below):
@@ -18,7 +18,7 @@ committing make-arcgis-reference.py hunks, exclude Codex's umintfloat hunk (git 
 --unidiff-zero of a filtered diff). If a push says "cannot lock ref", run `git fetch` and check
 `git status -sb`: the earlier push may already have landed.
 Next candidates: Extend Line / Trim Line (need a topology-aware test set), Convert Coordinate
-Notation for UTM/MGRS/USNG, Field Statistics To Table Date fields / combined NUMERIC+TEXT run, Aggregate Points,
+Notation non-DD input formats, Field Statistics To Table Date fields / combined NUMERIC+TEXT run, Aggregate Points,
 Rotate/Rescale rasters (after Codex finishes the raster files), items in docs/KNOWN_GAPS.md.
 
 Claude 2026-10-29 (this run): Field Statistics To Table group-by (`group_by=` param, tables.rs +
@@ -45,6 +45,24 @@ keyword in a TEXT run ERROR 000800; case-insensitive name clash (also with the g
 diffs identical; refusal codes match.
 Validation: full scripts/check EXIT 0 (log /tmp/unigis-fst-stats-check.log; tree incl. Codex's
 uncommitted raster edits). Committed as "Add Output Statistics list to Field Statistics To Table".
+
+Claude 2026-10-29 (third run): Convert Coordinate Notation grid outputs UTM_BANDS, UTM_ZONES, MGRS,
+USNG, GARS, GEOREF (new crates/unigis-tools/src/grid_notation.rs: Krüger n^6 TM + UPS, no PROJ;
+wired in construct.rs/registry.rs). Output field = format name, Text 255. ArcGIS rules found by
+probing 39 points (fixture testdata/geoproc/lonlat_grid.csv): UTM E/N floored to the metre, zone 2
+digits, E 6/N 7 digits; MGRS/USNG rounded to the metre before the 100 km letters (a southern point
+rounded to N 10 000 000 is written in band N); UTM to 84N/80S inclusive, else UPS with A/B/Y/Z by
+lon<0; UTM notations of UPS subtract 1 300 000 (north) / 800 000 (south) from E and N; Norway and
+Svalbard zone exceptions; UTM_ZONES hemisphere N for lat>=0. GARS: plain floor, lon 180 wraps to
+001, lat 90 stays in the top cell. GEOREF: minutes rounded to 0.001 with carry, clamped at the
+east/north edge to 59.999. Unit test checks 15 points x 6 formats; 6 new ccn_* reference cases
+(39 rows each) identical to ArcGIS by ogrinfo diff.
+Finding: GDAL 3.13 reading a FileGDB point (1e-9 resolution, origin -400) at -45.9999999 /
+-45.99999999 prints POINT (-46.0 46.0) (exact with -xyRes 1e-12), which failed to_geodatabase's
+GDAL cross-check; the fixture point is -45.999996 instead (still a GEOREF minute carry).
+Validation: first scripts/check failed only on that to_geodatabase cross-check (6 ccn_* files);
+rerun after the fixture change EXIT 0 (/tmp/unigis-ccn-grid-check2.log; tree incl. Codex's
+uncommitted raster edits). Committed as "Add UTM, MGRS, USNG, GARS and GEOREF to Convert Coordinate Notation".
 
 Older notes (Codex, then Claude) follow.
 

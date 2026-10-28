@@ -785,8 +785,10 @@ fn notation_axis(value: f64, is_lat: bool, parts: u8) -> String {
 }
 
 /// Convert Coordinate Notation from decimal-degree X/Y fields to `DD_1`, `DD_2`, `DDM_1`,
-/// `DDM_2`, `DMS_1`, `DMS_2` or `DD_NUMERIC` (observed against ArcGIS Pro 3.7). Points are the
-/// input coordinates; the input's fields come first, then the notation field(s).
+/// `DDM_2`, `DMS_1`, `DMS_2`, `DD_NUMERIC`, or the grid notations `UTM_BANDS`, `UTM_ZONES`,
+/// `MGRS`, `USNG`, `GARS` and `GEOREF` (observed against ArcGIS Pro 3.7; a grid notation is one
+/// text field named after the format). Points are the input coordinates; the input's fields come
+/// first, then the notation field(s).
 pub fn convert_coordinate_notation(
     table: &dyn FeatureClass,
     x_field: &str,
@@ -805,6 +807,7 @@ pub fn convert_coordinate_notation(
         "DMS_1" => ("DMS", 3, true),
         "DMS_2" => ("DMS", 3, false),
         "DD_NUMERIC" => ("DD", 0, false),
+        other if crate::grid_notation::grid_notation(other, 0.0, 0.0).is_some() => ("", 4, true),
         other => return Err(err(format!("output format {other}"))),
     };
     let text = |len: u32, name: &str| {
@@ -816,6 +819,8 @@ pub fn convert_coordinate_notation(
     if parts == 0 {
         fields.push(Field::new("DDLat", FieldType::Double));
         fields.push(Field::new("DDLon", FieldType::Double));
+    } else if parts == 4 {
+        fields.push(text(255, &fmt));
     } else if single {
         fields.push(text(255, &format!("{prefix}LatLon")));
     } else {
@@ -831,6 +836,10 @@ pub fn convert_coordinate_notation(
         );
         let mut attributes = f.attributes.clone();
         match (x, y) {
+            (Some(x), Some(y)) if parts == 4 => {
+                let notation = crate::grid_notation::grid_notation(&fmt, x, y).flatten();
+                attributes.push(notation.map_or(Value::Null, Value::String));
+            }
             (Some(x), Some(y)) if parts == 0 => {
                 attributes.push(Value::Double(y));
                 attributes.push(Value::Double(x));

@@ -72070,6 +72070,426 @@
           "group_by": "VALUE"
         }
       }
+    },
+    "ccn_utm_bands": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/lonlat_grid.csv",
+        "<out>",
+        "LON",
+        "LAT",
+        "DD_2",
+        "UTM_BANDS",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "LON",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LAT",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "UTM_BANDS",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/lonlat_grid.csv",
+          "output": "<out>",
+          "x_field": "LON",
+          "y_field": "LAT",
+          "output_format": "UTM_BANDS"
+        }
+      }
+    },
+    "ccn_utm_zones": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/lonlat_grid.csv",
+        "<out>",
+        "LON",
+        "LAT",
+        "DD_2",
+        "UTM_ZONES",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "LON",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LAT",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "UTM_ZONES",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/lonlat_grid.csv",
+          "output": "<out>",
+          "x_field": "LON",
+          "y_field": "LAT",
+          "output_format": "UTM_ZONES"
+        }
+      }
+    },
+    "ccn_mgrs": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/lonlat_grid.csv",
+        "<out>",
+        "LON",
+        "LAT",
+        "DD_2",
+        "MGRS",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "LON",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LAT",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "MGRS",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/lonlat_grid.csv",
+          "output": "<out>",
+          "x_field": "LON",
+          "y_field": "LAT",
+          "output_format": "MGRS"
+        }
+      }
+    },
+    "ccn_usng": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/lonlat_grid.csv",
+        "<out>",
+        "LON",
+        "LAT",
+        "DD_2",
+        "USNG",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "LON",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LAT",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "USNG",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/lonlat_grid.csv",
+          "output": "<out>",
+          "x_field": "LON",
+          "y_field": "LAT",
+          "output_format": "USNG"
+        }
+      }
+    },
+    "ccn_gars": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/lonlat_grid.csv",
+        "<out>",
+        "LON",
+        "LAT",
+        "DD_2",
+        "GARS",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "LON",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LAT",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "GARS",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/lonlat_grid.csv",
+          "output": "<out>",
+          "x_field": "LON",
+          "y_field": "LAT",
+          "output_format": "GARS"
+        }
+      }
+    },
+    "ccn_georef": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/lonlat_grid.csv",
+        "<out>",
+        "LON",
+        "LAT",
+        "DD_2",
+        "GEOREF",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "LON",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LAT",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "GEOREF",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/lonlat_grid.csv",
+          "output": "<out>",
+          "x_field": "LON",
+          "y_field": "LAT",
+          "output_format": "GEOREF"
+        }
+      }
     }
   }
 }

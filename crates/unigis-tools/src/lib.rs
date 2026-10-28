@@ -9,6 +9,7 @@ mod dm_geometry;
 pub mod dm_tools;
 mod fieldmap;
 pub mod graphic_buffer;
+pub(crate) mod grid_notation;
 pub mod neighbors;
 pub mod planar;
 pub mod pycalc;
