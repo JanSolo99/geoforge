@@ -398,9 +398,10 @@ pub enum Tessellation {
     Square,
     Diamond,
     Hexagon,
+    Triangle,
 }
 
-/// Generate Tessellation (SQUARE, DIAMOND, HEXAGON): cells of `area` whose first one is centred on
+/// Generate Tessellation (SQUARE, DIAMOND, HEXAGON, TRIANGLE): cells of `area` whose first one is centred on
 /// the extent's lower-left corner; squares and diamonds/hexagons continue while their edges
 /// start before the extent's far edges (diamonds and hexagons by the rule `(span + half cell) /
 /// spacing`, observed on three extents). `GRID_ID` is `<column letters>-<row from the top>`; the
@@ -484,6 +485,40 @@ pub fn generate_tessellation(
                     [m[0] + side / 2.0, m[1] + q],
                     [m[0] + side, m[1]],
                 ]
+            });
+        }
+        Tessellation::Triangle => {
+            // Equilateral triangles whose first (pointing up) has its centroid on the extent's
+            // lower-left corner; rows of alternating up / down triangles, odd rows shifted half
+            // a triangle.
+            let a = (area * 4.0 / 3f64.sqrt()).sqrt();
+            let ht = 3f64.sqrt() / 2.0 * a;
+            cols = ((w + a / 2.0) / (a / 2.0)).ceil().max(1.0) as usize;
+            rows = ((h + ht / 3.0) / ht).ceil().max(1.0) as usize;
+            let (x0, y0) = (extent[0], extent[1]);
+            // `centre` gives a triangle's left vertex x and bottom y; `ring` recovers its column
+            // and row from them to know whether it points up (column + row even) or down.
+            centre = Box::new(move |c, r| {
+                [
+                    x0 - a / 2.0 + a / 2.0 * c as f64,
+                    y0 - ht / 3.0 + ht * r as f64,
+                ]
+            });
+            ring = Box::new(move |m| {
+                let col = ((m[0] - (x0 - a / 2.0)) / (a / 2.0)).round() as i64;
+                let row = ((m[1] - (y0 - ht / 3.0)) / ht).round() as i64;
+                let up = (col + row).rem_euclid(2) == 0;
+                let (xl, yb, yt) = (m[0], m[1], m[1] + ht);
+                if up {
+                    vec![
+                        [xl + a / 2.0, yt],
+                        [xl + a, yb],
+                        [xl, yb],
+                        [xl + a / 2.0, yt],
+                    ]
+                } else {
+                    vec![[xl, yt], [xl + a, yt], [xl + a / 2.0, yb], [xl, yt]]
+                }
             });
         }
     }

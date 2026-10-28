@@ -144,3 +144,7 @@ rows offset half a cell; inclusion rules at the extent edges need more probing (
 Claude 2026-10-29: Generate Tessellation DIAMOND and HEXAGON also done (`tess_dia_*`, `tess_hex_*` 8 cases pass): diamond half-diagonal
 d = sqrt(area/2), columns ceil((w+d)/2d), rows ceil((h+d)/d) (odd rows shifted by d); hexagon (flat-top) side s = sqrt(area/(1.5 sqrt3)),
 columns ceil((w+s)/1.5s), rows ceil((h+height/2)/height), odd columns raised half a hexagon height. TRIANGLE, TRANSVERSE HEXAGON and H3 still missing.
+
+Claude 2026-10-29: Generate Tessellation TRIANGLE done (`tess_tri_*` 5 cases pass): side a = sqrt(4 area/sqrt3), height ht = sqrt3/2 a; first triangle points
+up with its centroid on the extent's lower-left corner; rows from y0 - ht/3 up; triangles alternate up/down (odd rows shifted half a triangle), left
+vertex x0 - a/2 + (a/2) i; columns ceil((w + a/2)/(a/2)), rows ceil((h + ht/3)/ht). TRANSVERSE HEXAGON and H3 HEXAGON still missing.

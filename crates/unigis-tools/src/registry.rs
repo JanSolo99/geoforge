@@ -467,6 +467,7 @@ fn generate_tessellation(ctx: &dyn Context) -> Result<ToolOutput> {
         "SQUARE" => construct::Tessellation::Square,
         "DIAMOND" => construct::Tessellation::Diamond,
         "HEXAGON" => construct::Tessellation::Hexagon,
+        "TRIANGLE" => construct::Tessellation::Triangle,
         other => {
             return Err(Error::Unsupported(format!(
                 "tessellation shape {other} is not supported yet"
