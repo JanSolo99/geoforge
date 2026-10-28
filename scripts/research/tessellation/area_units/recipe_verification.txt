@@ -1,0 +1,1 @@
+PASS: fresh OGR storage + captured canonical EPSG2272 PRJ recipe; native four-cell output matches ArcGIS exact PRJ bytes, IDs/GRID_ID order and every ordered vertex within 0.001 coordinate units.

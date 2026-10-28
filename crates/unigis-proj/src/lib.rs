@@ -65,6 +65,15 @@ impl Crs {
     /// The CRS as ArcGIS writes it to a new dataset: PROJ's Esri WKT of it (ArcGIS
     /// regenerates the WKT rather than copying the input's text).
     pub fn arcgis_wkt(&self) -> String {
+        // PROJ's exporter renames Foot_US and truncates supplied parameters.
+        // Retain an existing Esri foot definition, including its full precision.
+        if self.wkt.starts_with("PROJCS[")
+            && self.wkt.contains("GEOGCS[\"GCS_")
+            && self.wkt.contains("DATUM[\"D_")
+            && self.wkt.contains("UNIT[\"Foot_US\",")
+        {
+            return arcgis_style(&self.wkt);
+        }
         Proj::new(&self.wkt)
             .ok()
             .and_then(|p| p.as_wkt(Some(WktVersion::Wkt1_Esri), None).ok())

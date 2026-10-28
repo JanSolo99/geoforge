@@ -1,0 +1,219 @@
+[
+  [
+    "sqm",
+    "500000 5000000 500413 5000277",
+    "10000 SquareMeters",
+    "SQUARE",
+    "metres"
+  ],
+  [
+    "km",
+    "500000 5000000 500413 5000277",
+    "0.01 SquareKilometers",
+    "SQUARE",
+    "metres"
+  ],
+  [
+    "ha",
+    "500000 5000000 500413 5000277",
+    "1 Hectares",
+    "SQUARE",
+    "metres"
+  ],
+  [
+    "acre",
+    "500000 5000000 500413 5000277",
+    "2.471053814671653 Acres",
+    "SQUARE",
+    "metres"
+  ],
+  [
+    "sqft",
+    "500000 5000000 500413 5000277",
+    "107639.10416709722 SquareFeet",
+    "SQUARE",
+    "metres"
+  ],
+  [
+    "sqyard",
+    "500000 5000000 500413 5000277",
+    "11959.900463010803 SquareYards",
+    "SQUARE",
+    "metres"
+  ],
+  [
+    "sqmile",
+    "500000 5000000 500413 5000277",
+    "0.003861021585424458 SquareMiles",
+    "SQUARE",
+    "metres"
+  ],
+  [
+    "sqcm",
+    "500000 5000000 500413 5000277",
+    "100000000 SquareCentimeters",
+    "SQUARE",
+    "metres"
+  ],
+  [
+    "are",
+    "500000 5000000 500413 5000277",
+    "100 Ares",
+    "SQUARE",
+    "metres"
+  ],
+  [
+    "bare",
+    "500000 5000000 500413 5000277",
+    "10000",
+    "SQUARE",
+    "metres"
+  ],
+  [
+    "feet_sqm",
+    "500000 5000000 500413 5000277",
+    "10000 SquareMeters",
+    "SQUARE",
+    "feet"
+  ],
+  [
+    "feet_bare",
+    "500000 5000000 500413 5000277",
+    "10000",
+    "SQUARE",
+    "feet"
+  ],
+  [
+    "feet_sqft",
+    "500000 5000000 540000 5030000",
+    "100000000 SquareFeet",
+    "SQUARE",
+    "feet"
+  ],
+  [
+    "feet_us",
+    "500000 5000000 540000 5030000",
+    "100000000 SquareFeetUS",
+    "SQUARE",
+    "feet"
+  ],
+  [
+    "unknown_sr",
+    "500000 5000000 500413 5000277",
+    "10000 SquareMeters",
+    "SQUARE",
+    "none"
+  ],
+  [
+    "sqmm",
+    "500000 5000000 500413 5000277",
+    "10000000000 SquareMillimeters",
+    "SQUARE",
+    "metres"
+  ],
+  [
+    "sqdm",
+    "500000 5000000 500413 5000277",
+    "1000000 SquareDecimeters",
+    "SQUARE",
+    "metres"
+  ],
+  [
+    "sqin",
+    "500000 5000000 500413 5000277",
+    "15500031.000062 SquareInches",
+    "SQUARE",
+    "metres"
+  ],
+  [
+    "sqnaut",
+    "500000 5000000 500413 5000277",
+    "0.002915533495981229 SquareNauticalMiles",
+    "SQUARE",
+    "metres"
+  ],
+  [
+    "sqyard_us",
+    "500000 5000000 500413 5000277",
+    "11959.85262345679 SquareYardsUS",
+    "SQUARE",
+    "metres"
+  ],
+  [
+    "acre_us",
+    "500000 5000000 500413 5000277",
+    "2.4710439304662795 AcresUS",
+    "SQUARE",
+    "metres"
+  ],
+  [
+    "sqmile_us",
+    "500000 5000000 500413 5000277",
+    "0.003861006141353561 SquareMilesUS",
+    "SQUARE",
+    "metres"
+  ],
+  [
+    "sqin_us",
+    "500000 5000000 500413 5000277",
+    "15499969.0 SquareInchesUS",
+    "SQUARE",
+    "metres"
+  ],
+  [
+    "mile_factor",
+    "0 0 1 1",
+    "1 SquareMiles",
+    "SQUARE",
+    "metres"
+  ],
+  [
+    "mile_us_factor",
+    "0 0 1 1",
+    "1 SquareMilesUS",
+    "SQUARE",
+    "metres"
+  ],
+  [
+    "acre_factor",
+    "0 0 1 1",
+    "1 Acres",
+    "SQUARE",
+    "metres"
+  ],
+  [
+    "acre_us_factor",
+    "0 0 1 1",
+    "1 AcresUS",
+    "SQUARE",
+    "metres"
+  ],
+  [
+    "hexagon_ha",
+    "500000 5000000 500400 5000300",
+    "1 Hectares",
+    "HEXAGON",
+    "metres"
+  ],
+  [
+    "transverse_hexagon_ha",
+    "500000 5000000 500400 5000300",
+    "1 Hectares",
+    "TRANSVERSE_HEXAGON",
+    "metres"
+  ],
+  [
+    "triangle_ha",
+    "500000 5000000 500400 5000300",
+    "1 Hectares",
+    "TRIANGLE",
+    "metres"
+  ],
+  [
+    "diamond_ha",
+    "500000 5000000 500400 5000300",
+    "1 Hectares",
+    "DIAMOND",
+    "metres"
+  ]
+]

@@ -339,6 +339,58 @@ pub fn distance_in_units(text: &str, wkt: Option<&str>) -> Result<f64> {
     Ok(value * meters / per_unit)
 }
 
+/// An area in coordinate units squared; bare values already use those units.
+fn area_in_units(text: &str, wkt: Option<&str>) -> Result<f64> {
+    let text = text.trim();
+    let split = text
+        .find(|c: char| c.is_alphabetic() && c != 'e' && c != 'E')
+        .unwrap_or(text.len());
+    let (number, unit) = text.split_at(split);
+    let value: f64 = number
+        .trim()
+        .parse()
+        .map_err(|_| Error::Unsupported(format!("ERROR 000094: '{text}' is not an area")))?;
+    let unit = unit.trim().to_ascii_uppercase().replace([' ', '_'], "");
+    if unit.is_empty() || unit == "UNKNOWN" {
+        return Ok(value);
+    }
+    let square_foot_us = (1200.0 / 3937.0) * (1200.0 / 3937.0);
+    let square_metres = match unit.as_str() {
+        "SQUAREMETERS" => 1.0,
+        "SQUAREKILOMETERS" => 1_000_000.0,
+        "SQUARECENTIMETERS" => 0.0001,
+        "SQUAREMILLIMETERS" => 0.000001,
+        "SQUAREDECIMETERS" => 0.01,
+        "HECTARES" => 10_000.0,
+        "ARES" => 100.0,
+        "ACRES" => 4046.8564224,
+        "SQUAREFEET" => 0.09290304,
+        "SQUAREYARDS" => 0.83612736,
+        "SQUAREINCHES" => 0.00064516,
+        // ArcGIS uses this rounded international square-mile conversion.
+        "SQUAREMILES" => 2_589_988.11,
+        "SQUARENAUTICALMILES" => 3_429_904.0,
+        "SQUAREFEETUS" => square_foot_us,
+        "SQUAREYARDSUS" => 9.0 * square_foot_us,
+        "SQUAREINCHESUS" => square_foot_us / 144.0,
+        "ACRESUS" => 43_560.0 * square_foot_us,
+        "SQUAREMILESUS" => 27_878_400.0 * square_foot_us,
+        _ => {
+            return Err(Error::Unsupported(format!(
+                "ERROR 000094: unknown area unit '{unit}'"
+            )));
+        }
+    };
+    // ArcGIS treats an unknown coordinate system as meters for explicit units.
+    let per_unit = match wkt {
+        None => 1.0,
+        Some(wkt) => meters_per_unit(wkt).filter(|u| u.is_finite() && *u > 0.0).ok_or_else(|| {
+            Error::Unsupported("ERROR 000800: an area with a unit needs a projected or unknown coordinate system".into())
+        })?,
+    };
+    Ok(value * square_metres / (per_unit * per_unit))
+}
+
 fn pair(text: &str, what: &str) -> Result<[f64; 2]> {
     let v: Vec<f64> = text
         .split(|c: char| c.is_whitespace() || c == ',' || c == ';')
@@ -478,15 +530,15 @@ fn generate_tessellation(ctx: &dyn Context) -> Result<ToolOutput> {
     let nums: Vec<f64> = text(ctx, t, "extent")
         .unwrap_or_default()
         .split_whitespace()
-        .filter_map(|v| v.parse().ok())
-        .collect();
+        .map(str::parse)
+        .collect::<std::result::Result<_, _>>()
+        .map_err(|_| Error::Unsupported("ERROR 000094: Extent: expected four numbers".into()))?;
     let [x0, y0, x1, y1] = nums[..] else {
         return Err(Error::Unsupported(
             "ERROR 000735: Extent: four numbers (xmin ymin xmax ymax) are required".into(),
         ));
     };
-    let area: f64 = text(ctx, t, "size")
-        .and_then(|v| v.split_whitespace().next().and_then(|n| n.parse().ok()))
+    let size = text(ctx, t, "size")
         .ok_or_else(|| Error::Unsupported("ERROR 000735: Size: value is required".into()))?;
     let wkt = match text(ctx, t, "template") {
         Some(_) => ctx
@@ -495,6 +547,7 @@ fn generate_tessellation(ctx: &dyn Context) -> Result<ToolOutput> {
             .map(str::to_owned),
         None => ctx.default_spatial_reference_wkt(),
     };
+    let area = area_in_units(&size, wkt.as_deref())?;
     construct::generate_tessellation(shape, [x0, y0, x1, y1], area, wkt)
 }
 

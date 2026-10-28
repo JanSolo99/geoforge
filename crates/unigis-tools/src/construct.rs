@@ -414,12 +414,12 @@ pub fn generate_tessellation(
     area: f64,
     wkt: Option<String>,
 ) -> Result<ToolOutput> {
-    if !(area.is_finite() && area > 0.0) || !(extent[2] > extent[0] && extent[3] > extent[1]) {
+    let (w, h) = (extent[2] - extent[0], extent[3] - extent[1]);
+    if !(area.is_finite() && area > 0.0 && w.is_finite() && w > 0.0 && h.is_finite() && h > 0.0) {
         return Err(err(
-            "ERROR 000800: the size and the extent must be positive",
+            "ERROR 000800: the size and the extent must be finite and positive",
         ));
     }
-    let (w, h) = (extent[2] - extent[0], extent[3] - extent[1]);
     // (columns, rows, centre of the cell in column c, row r, ring around the centre)
     let (cols, rows): (usize, usize);
     let centre: Box<dyn Fn(usize, usize) -> [f64; 2]>;
@@ -427,7 +427,9 @@ pub fn generate_tessellation(
     match shape {
         Tessellation::Square => {
             let side = area.sqrt();
-            let count = |span: f64| ((span - side / 2.0) / side).ceil().max(0.0) as usize + 1;
+            let count = |span: f64| {
+                (((span - side / 2.0) / side).ceil().max(0.0) as usize).saturating_add(1)
+            };
             (cols, rows) = (count(w), count(h));
             let (x0, y0) = (extent[0], extent[1]);
             centre = Box::new(move |c, r| [x0 + c as f64 * side, y0 + r as f64 * side]);

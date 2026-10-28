@@ -1,0 +1,36 @@
+Warning 1: Non closed ring detected. To avoid accepting it, set the OGR_GEOMETRY_ACCEPT_UNCLOSED_RING configuration option to NO
+Warning 1: Non closed ring detected. To avoid accepting it, set the OGR_GEOMETRY_ACCEPT_UNCLOSED_RING configuration option to NO
+Warning 1: Non closed ring detected. To avoid accepting it, set the OGR_GEOMETRY_ACCEPT_UNCLOSED_RING configuration option to NO
+Warning 1: Non closed ring detected. To avoid accepting it, set the OGR_GEOMETRY_ACCEPT_UNCLOSED_RING configuration option to NO
+tess_area_sqm PASS
+tess_area_km PASS
+tess_area_ha PASS
+tess_area_acre PASS
+tess_area_sqft PASS
+tess_area_sqyard PASS
+tess_area_sqmile PASS
+tess_area_sqcm PASS
+tess_area_are PASS
+tess_area_bare PASS
+tess_area_feet_sqm PASS
+tess_area_feet_bare PASS
+tess_area_feet_sqft PASS
+tess_area_feet_us PASS
+tess_area_unknown_sr PASS
+tess_area_sqmm PASS
+tess_area_sqdm PASS
+tess_area_sqin PASS
+tess_area_sqnaut PASS
+tess_area_sqyard_us PASS
+tess_area_acre_us PASS
+tess_area_sqmile_us PASS
+tess_area_sqin_us PASS
+tess_area_mile_factor PASS
+tess_area_mile_us_factor PASS
+tess_area_acre_factor PASS
+tess_area_acre_us_factor PASS
+tess_area_hexagon_ha PASS
+tess_area_transverse_hexagon_ha PASS
+tess_area_triangle_ha PASS
+tess_area_diamond_ha PASS
+Checked 31 FAILED 0 []
