@@ -2,7 +2,8 @@
 
 Updated 2026-10-28T13:36:16.816330+00:00; last agent Codex.
 Workspace `/mnt/media/ArcGIS_Linux`; branch `main`;
-HEAD27ae5ccb66e15b93866103e55ace0094028ea95f PUSHED and verified remote.
+HEAD9b4dcaf; normal push RUNNING (session/log below). Previous
+27ae5ccb66e15b93866103e55ace0094028ea95f PUSHED and verified remote.
 User authorizes continuous tested development, frequent commits/pushes/dashboard
 updates. Work alone; no agents/CLIs/coordinators. Cargo-j3, sequential builds,
 normal hooks, no full local app CI for root edits. Preserve unrelated files below.
@@ -95,3 +96,19 @@ RUNNING session92106, /tmp/unigis-copy-multicache-types.log.
 Potential shared stats_metadata XML parser refactor can fix geotiff cache routing
 without new Raster fields/app API changes; verify unary behavior before choosing.
 app/AGENTS.md read while assessing API impact; no app edits made.
+
+Cache slice committed9b4dcaf with full gate192 PASS; normal push RUNNING
+/tmp/unigis-copy-cache-push.log. No new product edits until push hook completes.
+Multiband type oracle session92106 EXIT0: Abs/Negate/Square keep F64 when ANY band
+lacks cached extrema, narrow toF32 only for complete caches (single-quoted XML
+valid). This supports making Raster.statistics Some(first-band-range) only when
+EVERY band has min/max, using shared metadata XML parser with band/domain/quote
+handling. No new Raster field/app API change needed; root-only checks suffice.
+Next research17 saved refs (8CopyRaster+9unary) and robust reader, after push.
+
+Claude 2026-10-29: Line Statistics implemented (`line_statistics` in interpolate.rs, `ls_*` 9 cases, all
+pass; code was swept into Codex's commits). Rules found: value = field weighted by LENGTH inside the circle:
+LENGTH = sum(field x length inside), MEAN = length-weighted mean, MAXIMUM/MINIMUM/RANGE/VARIETY/MAJORITY/
+MINORITY by length per distinct value; grid = IDW default (extent grown half a cell, round(w/cell)+1);
+integer field -> S32 NoData -2147483647 except MEAN/LENGTH (F32). Median not done. Pushing is left to the
+running Codex push; do not start a second push while it runs.
