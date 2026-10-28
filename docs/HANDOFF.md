@@ -76,6 +76,8 @@ Tested offline (`test_daemon_runs_inbox_tasks_commands_pause_and_keepalive`); no
 
 - Focal Flow (`focal_flow`, `ff_*` pass): bits E1 SE2 S4 SW8 W16 NW32 N64 NE128 set for each neighbor whose elevation exceeds the cell's by MORE than the threshold (z units, default 0; neighbors outside or NoData give no bit); U16 NoData 65535 on NoData cells.
 
+- Probed 2026-10-28 and left: Generate Rectangles Along Lines (fields PageNumber, GroupId = line FID as text, SeqId, Previous, Next, Angle; rectangles `length x width` along each line, first one starting at the line start, 'Upper left' etc. changes the anchor corner; roads give 30 rectangles but the sequence for the multi-vertex lines (restarting SeqId 1..8 then 1..3 for line '2') is unexplained), Raster To Polyline (ArcInfo-style arcs with from_node/to_node; numbering order unknown), Remove Overlap Multiple (center line = medial axis), Split By Attributes (writes tables as null-shape shapefiles).
+
 ## Next actions
 
 1. Keep going in probe -> implement -> reference-test batches (see "Session 2026-10-26" entries for what is done and the gaps).
