@@ -113,3 +113,14 @@ web-netlify.yml) now trigger only by workflow_dispatch. The CI gate is `scripts/
 run by the pre-push hook (core.hooksPath=.githooks, already set). The Netlify web deploy
 no longer runs automatically: build with scripts/build-web.sh and deploy by hand if wanted.
 Dashboard's cached CI result will go stale. Not tested: a hosted run (deliberately not triggered).
+
+Claude: probed Trim Line (edit.TrimLine in_features {dangle_length} {DELETE_SHORT|KEEP_SHORT}); not
+implemented. Synthetic "+" and "T" networks show a topological rule set: a free end is trimmed back to
+the nearest crossing when that part is shorter than the length (vertical stub 5 beyond a crossing went
+at length 6; a 10 stub stayed). Whole isolated lines shorter than the length are deleted with
+DELETE_SHORT and kept with KEEP_SHORT; a whole feature touching others at one end (T stub, 30 long)
+is deleted at length 35 in BOTH modes. At length 200: DELETE_SHORT deletes everything, KEEP_SHORT
+keeps crossing lines untrimmed (both sides of a crossing shorter than the length). Not yet
+resolved: partial vs whole trimming for multi-crossing lines, and shared-endpoint chains. ug has no
+extend_line/trim_line/smooth_line/table_to_ellipse/integrate (vector) yet; Aggregate Points and Geodetic
+Densify are other open candidates. Working tree otherwise unchanged (Codex files untouched).
