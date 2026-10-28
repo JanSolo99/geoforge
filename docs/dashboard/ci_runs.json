@@ -1,11 +1,18 @@
 {
-  "fetched": "2026-10-28T10:16:01+00:00",
+  "fetched": "2026-10-28T10:36:08+00:00",
   "runs": [
     {
       "conclusion": "",
+      "createdAt": "2026-10-28T10:29:18Z",
+      "displayTitle": "Match Copy Raster statistics to source cache and effective type and N\u2026",
+      "status": "in_progress",
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40672507702"
+    },
+    {
+      "conclusion": "success",
       "createdAt": "2026-10-28T10:13:21Z",
       "displayTitle": "Add ArcGIS-verified Line Statistics with contact and clipping precisi\u2026",
-      "status": "in_progress",
+      "status": "completed",
       "url": "https://github.com/JanSolo99/geoforge/actions/runs/40670384449"
     },
     {
@@ -49,13 +56,6 @@
       "displayTitle": "Remove stray ArcGIS probe outputs",
       "status": "completed",
       "url": "https://github.com/JanSolo99/geoforge/actions/runs/40656603088"
-    },
-    {
-      "conclusion": "success",
-      "createdAt": "2026-10-28T08:21:10Z",
-      "displayTitle": "Add Snap Pour Point with ArcGIS reference cases",
-      "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40656161374"
     }
   ]
 }

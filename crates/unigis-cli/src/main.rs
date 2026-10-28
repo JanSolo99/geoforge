@@ -6629,6 +6629,16 @@ fn write_raster_with(path: &Path, raster: &unigis_raster::Raster, statistics: bo
     )?;
     if statistics {
         unigis_raster::stats::write_aux_statistics(path, raster)?;
+    } else {
+        // A replacement must not inherit the previous raster's cached range,
+        // counts or SRS from its PAM sidecar. Validate and write the new TIFF
+        // before removing anything, including for an in-place copy.
+        let aux = std::path::PathBuf::from(format!("{}.aux.xml", path.display()));
+        if let Err(error) = std::fs::remove_file(&aux)
+            && error.kind() != std::io::ErrorKind::NotFound
+        {
+            return Err(Error::io(&aux, error));
+        }
     }
     println!(
         "Wrote {} ({}x{})",

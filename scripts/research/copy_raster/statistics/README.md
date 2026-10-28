@@ -45,6 +45,22 @@ export and extreme/fractional override mapping remain separate known gaps.
 
 Overwrite follow-up: `probe_overwrite.py` first copies the untagged DEM (count18000,
 mean238.346012569), then replaces the same output with small_cached. ArcGIS clears
-statistics (`overwrite_arcgis.jsonl`). Native CLI currently retains the previous
-sidecar, despite the new 3x2 raster. This is a separate output-lifecycle defect;
-the 22 saved fresh-output references do not exercise an existing destination.
+statistics (`overwrite_arcgis.jsonl`). Native CLI originally retained the previous
+sidecar, despite the new 3x2 raster. The CLI GeoTIFF output helper now removes old
+PAM metadata after a successful write when statistics are omitted, ignoring an
+absent sidecar and reporting other IO errors. Invalid parameters still leave the
+TIFF and sidecar unchanged. The 22 saved fresh-output references do not exercise
+an existing destination; the separate CLI regression does:
+
+```
+cargo test -j3 -p unigis-cli --test raster_output_statistics
+```
+
+It failed on the stale-statistics assertion before the fix, then passed after
+cleanup, including an existing native in-place copy and invalid-parameter byte
+preservation. This covers PAM metadata; other external sidecars are not managed.
+
+`probe_in_place.py` is a separate safety control on a disposable copy. ArcGIS
+failed with ERROR999999 and replaced the scratch pixels with NoData (see
+`in_place_arcgis.jsonl` and `in_place_format_observation.json`). Native CLI's pre-existing in-place extension is retained and tested;
+this is not a claim to match ArcGIS in-place Copy Raster behavior.

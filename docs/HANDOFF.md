@@ -1,62 +1,57 @@
 # Current handoff
 
-Updated 2026-10-28T10:14:45.697693+00:00; last agent Codex.
-Workspace `/mnt/media/ArcGIS_Linux`; branch `main`; HEAD `e73e223` PUSHED and
-verified remote `e73e223e66e2bfcbae7d099445ab2be4122f2a08`.
-User authorizes continued tested development, frequent commits/pushes/dashboard.
+Updated 2026-10-28T10:29:55.514367+00:00; last agent Codex.
+Workspace `/mnt/media/ArcGIS_Linux`; main; HEAD `a613de7` PUSHED/verified remote
+`a613de77564b6e57803f03481a23234a4d52be69`.
+User authorizes continuous tested development, frequent commits/pushes/dashboard.
 Work alone; no new agents/CLI sessions/coordinators. Cargo -j3, sequential builds.
 
 ## Completed this session
 
-Finished inherited Line Statistics from Claude usage-limit run
-`.git/agent-coordinator/20261028T094627-4d2f2b6c`. Fixed zero-length circle contact
-semantics and F32 vertex-offset clipping precision; added parameter/grid guards,
-13 controlled cases (22 total), research and documentation. Commit e73e223.
-No tolerance relaxed. Full scripts/check and normal pre-push hook PASS exit0:
-187 Rust passed,5 ignored;8 Python;fmt/all-target workspace clippy-Dwarnings.
-Logs /tmp/unigis-line-final-check.log and /tmp/unigis-line-push.log. Dashboard --ci,
-node --check extracted script, diff --check passed. Limits in research README.
+- e73e223 Line Statistics: finished inherited Claude edits, corrected circle
+  contacts and clipping precision, all8 statistics/int+double fields, parameter/
+  grid guards.22 saved ArcGIS cases, research/recipes and failure regression.
+- a613de7 Copy Raster stats:22 controlled cases/12 input snapshots isolate source
+  cache/tag and effective type/marker changes. Replaces first-band missing/band-
+  count heuristic. Exact cells/type/NoData and per-band metadata references.
+- Both committed and normally pushed with hooks; each full gate187 Rust passed,
+  5 ignored,0 failed;8 Python;fmt/all-target workspace clippy-Dwarnings. Dashboard
+  --ci and extracted JS node --check PASS. No tolerance relaxed. Roadmap/gaps updated.
+  Logs /tmp/unigis-line-final-check.log, /tmp/unigis-line-push.log,
+  /tmp/unigis-copy-statistics-check.log, /tmp/unigis-copy-statistics-push.log.
 
-## Active Copy Raster statistics slice (UNCOMMITTED)
+## Active overwrite-statistics fix (UNCOMMITTED)
 
-22 ArcGIS controls isolated cache presence from size/missing pixels/band count.
-Default cached tagged inputs omit output stats; type/marker changes force stats;
-explicit unchanged marker/type keeps omission. Untagged or uncached inputs write
-stats. Source pixels/grid/CRS/NoData matched across six cached/uncached pairs.
+Native CLI reproduces stale .aux.xml: copy dem.tif (stats count18000/mean238.346),
+then small_cached to same output (3x2 pixels) and old DEM statistics survive.
+ArcGIS clears stats on this replacement. Evidence and probe committed under
+scripts/research/copy_raster/statistics/{probe_overwrite.py,overwrite_arcgis.jsonl}.
+Known gap recorded. Target write_raster_with in CLI main.rs: after successful
+TIFF write, remove old .aux.xml when statistics=false; tolerate absence, report
+other IO errors. Keep validation failures before mutation. Other sidecars not scoped.
 
-Current edits: registry.rs replaces first-band missing/band-count heuristic with
-source cache/tag and effective output type/marker checks. Generic raster comparer
-adds cprstats_ to exact-float families. Generator has22 cprstats_* cases. Twelve
-input snapshots +six genuine ArcGIS PAM sidecars under raster/copy_statistics;
-recipe uses only GDAL file IO and preserves cached sidecars. Research scripts,
-22 observations, policy explanation under scripts/research/copy_raster/statistics.
-ROADMAP/KNOWN_GAPS/copy_raster README updated. All edits performed this session;
-no inherited uncommitted source edits remain after Line Statistics commit.
+Current edits: new crates/unigis-cli/tests/raster_output_statistics.rs exercises
+replacement, in-place copy and invalid-parameter preservation of TIFF+aux bytes.
+RED regression FAILED as expected at stale-statistics assertion, exit101,
+/tmp/unigis-raster-overwrite-before.log. Implemented cleanup in main.rs; targeted
+regression PASS exit0 /tmp/unigis-raster-overwrite-after.log. Full scripts/check PASS exit0 /tmp/unigis-raster-overwrite-check.log:188 Rust
+passed,5 ignored,0 failed;8 Python;fmt/all-target workspace clippy-Dwarnings.
+Dashboard --ci exit0, extracted JS node --check and diff --check PASS.
+No push running. Independent ArcGIS in-place control failed999999/mutated scratch;
+retained native existing in-place extension, documented difference/probe. No new
+same-path restriction added. Handoff/dashboard dirt expected from checkpoint/post-commit.
 
-## Current validation and next actions
+## Next actions
 
-- cargo fmt --all done. Twelve recreated inputs matched original oracle inputs
-  pixels/grid/CRS/tags, only cached sources carry stats (read-only GDAL check).
-- Oracle generation PASS all22 +exit0 /tmp/unigis-copy-statistics-references.log.
-- scripts/check PASS exit0 /tmp/unigis-copy-statistics-check.log:187 Rust passed,
-  5 ignored,0 failed;8 Python;fmt/all-target workspace clippy-Dwarnings. All22 new
-  exact-copy cases and prior corpora/metadata passed.
-- Dashboard --ci PASS exit0; extracted JavaScript node --check PASS. No push running.
-- Independent overwrite probe confirms stale .aux.xml: native keeps count18000/
-  mean238.346 from old DEM on replacement with small_cached, ArcGIS clears stats.
-  Saved oracle evidence under statistics/probe_overwrite.py/overwrite_arcgis.jsonl.
-  Candidate CLI regression /tmp/unigis-raster-output-statistics.rs; no cleanup
-  source edit yet. Implement as next separate tested commit after policy push.
-
-1. Commit staged policy slice, normal push with mandatory hook; verify remote.
-2. Implement the documented overwrite-sidecar cleanup as a separate tested slice;
-   start with /tmp/unigis-raster-output-statistics.rs regression before editing writer.
-4. Remaining Copy Raster integer override/U32 signed-export differences are separate,
-   documented gaps. Other roadmap work can follow another bounded milestone.
+1. Commit cleanup/regression/docs (all checks passed), normal push with hook.
+2. Verify remote SHA before next source edits. Known gap resolved; native in-place
+   extension explicitly documented because ArcGIS same-path probe corrupts scratch.
+3. Verify remote SHA; checkpoint before choosing next roadmap/gap slice.
+Copy Raster tagged-U32 signed exports/extreme override mapping remain separate.
 
 ## Preserve unrelated files
 
-Do not read/add NOTES.md or touch .worktrees/. Untracked geoproc/LineSta_roads*.tif
-and sidecars are inherited exploratory oracle artifacts, excluded from commits.
-Current-session LineSta_roads2 scratch output was removed after saving observations.
-No reset/stash/worktree transfers. Post-commit dashboard dirt is expected.
+Do not read/add NOTES.md or touch .worktrees/. Inherited geoproc/LineSta_roads1.*
+are excluded exploratory artifacts. Current-session LineSta_roads2 scratch was
+removed after saving observations. No reset/stash/worktree transfers. No full
+local app CI for root-only changes. Never bypass push hook.

@@ -1,0 +1,36 @@
+{
+  "output_exists": true,
+  "output_bytes": 3198,
+  "pixels_preserved": false,
+  "size": [
+    3,
+    2
+  ],
+  "output_cells": [
+    [
+      -1.25,
+      -1.25,
+      -1.25
+    ],
+    [
+      -1.25,
+      -1.25,
+      -1.25
+    ]
+  ],
+  "output_nodata": -1.25,
+  "source_cells": [
+    [
+      0.10000000149011612,
+      -1.25,
+      32768.5
+    ],
+    [
+      16777216.0,
+      4000000000.0,
+      3.5
+    ]
+  ],
+  "source_nodata": -1.25,
+  "logical_pixels_preserved": false
+}

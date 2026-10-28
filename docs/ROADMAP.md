@@ -745,3 +745,5 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Line Statistics (`ug run line_statistics`): clipped-length weighting, all eight statistics, integer/double output types, lower-value mode ties and empty-neighborhood semantics; 22 ArcGIS cases and invalid-parameter/allocation guards. Planar straight polylines with explicit cell size/radius; remaining scope in `scripts/research/line_statistics/README.md`.
 
 - [x] Copy Raster statistics policy: 22 additional ArcGIS cases isolate cached/uncached inputs, size, band count, unused tags, type changes and equal/changed markers. Tagged cached copies omit statistics only when output type/marker stay unchanged. Reproducer: `scripts/research/copy_raster/statistics/README.md`.
+
+- [x] CLI GeoTIFF overwrite lifecycle: no-statistics outputs remove stale PAM metadata after a successful TIFF write. Replacement, existing native in-place behavior and invalid-parameter byte preservation have a dedicated regression; ArcGIS overwrite probe confirms clearing old statistics.

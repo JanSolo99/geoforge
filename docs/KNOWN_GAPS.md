@@ -93,4 +93,5 @@ Update this file when a gap is found or closed.
 
 - Line Statistics: planar straight lines and explicit cell size/radius; raster environments, default parameters, geographic distances, curves/Z/M, null-field semantics and extreme field ranges are not verified. 22 saved cases cover all eight statistics, integer/double field types, empty neighborhoods and exact ties; see `scripts/research/line_statistics/README.md`.
 
-- Raster output overwrites (CLI): a no-statistics output currently retains a pre-existing `.aux.xml`, so a small copied raster can inherit the old DEM count18000/mean238.346. ArcGIS removes those statistics on overwrite. Evidence: `scripts/research/copy_raster/statistics/overwrite_arcgis.jsonl`; cleanup/failure-preservation regression is the next slice.
+
+- Copy Raster in-place: native CLI retains its existing safe in-place copying extension. The isolated ArcGIS same-input/output probe failed with ERROR999999 and changed the scratch files; identical in-place ArcGIS behavior is not claimed. See `scripts/research/copy_raster/statistics/in_place_arcgis.jsonl`.
