@@ -81,3 +81,7 @@ Regenerate: make-arcgis-reference.py 'umcache_*'. All comparisons are exact per 
 with type/NoData/grid/CRS/statistics checked. Uncached rules and cached F64 narrowing
 remain separately covered by umint_* and um64_*. Malformed/stale stats, multiband
 unary arithmetic and nondefault environments remain outside this checkpoint.
+
+Uncached integer multiband follow-up:21 typed two-band cases and the per-band
+dispatch extension are recorded in `../unary_multiband/README.md`. Cached integer
+multiband is still incomplete: the current cached range model retains only band0.

@@ -1,62 +1,71 @@
 # Current handoff
 
-Updated 2026-10-28T16:30:09.150515+00:00; last agent Codex.
-Workspace `/mnt/media/ArcGIS_Linux`; branch `main`; HEAD `598f777` pushed/verified
-in prior session. Standing objective: continuous development, tested frequent
-commits/pushes and dashboard updates. Work alone; never launch another coordinator
-or agent. Cargo -j3; no overlapping builds. Preserve `.worktrees/` and `NOTES.md`.
+Updated 2026-10-28T16:47:10.638816+00:00; last agent Codex.
+Workspace `/mnt/media/ArcGIS_Linux`; branch `main`; HEAD `0eba1e7` PUSHED, verified
+remote main SHA0eba1e7c32a61b3b6f4df756705df87c0fa2d2a0. Standing objective:
+continuous development, tested frequent commits/pushes/dashboard updates. Work
+alone, no other agents/CLIs/coordinators. Cargo-j3; no overlapping builds.
+Preserve .worktrees/ and NOTES.md (never read/add). Explicit-path staging only.
 
-## Recovery and active edits
+## Completed this session
 
-Inherited all uncommitted area-unit work from prior Codex attempt. Previous run
-ended with model capacity error (coordinator 20261028T151230-a40a1e5b/result.json).
-No previous build/push process remained; check2 log stopped mid reference suite.
-Completed ancestors c5064bc (multiband floating unary/cache fixes) and598f777
-(transverse hexagons) already pushed; do not repeat their external actions.
+Recovered inherited tessellation area-unit/safety/foot-WKT edits from interrupted
+Codex attempt. Finished strict31-case exactPRJ/ordered-ring/ID comparison, verified
+fresh template recipe, dashboard--ci/node/Python/diff checks, committed0eba1e7.
+Both full local gate and NORMAL push hook EXIT0:195Rust/5ignored,8Python,
+fmt/clippy-Dwarnings. Logs /tmp/unigis-tess-area-{check3,push}.log. Research and
+validation artifacts scripts/research/tessellation/area_units. Prior pushed
+c5064bc/598f777 remain ancestors; do not repeat their work or external actions.
 
-Active slice: 18 tessellation area units, coordinate-unit/default/unknownSR
-behavior, finite extent/resource guards, precise supplied Esri Foot_US WKT.
-Product: crates/unigis-tools/src/{registry,construct}.rs and
-crates/unigis-proj/src/lib.rs. New CLI safety/Proj WKT regressions. 31tess_area_*
-ArcGIS Pro3.7 goldens, generator/manifest, empty testdata/tessellation feet source.
-Research: scripts/research/tessellation/area_units (27 probes,31 saved cases,
-canonical PRJ/template recipe, strict ordered vertices/IDs/exactPRJ comparator).
-ROADMAP/KNOWN_GAPS/dashboard edited. Initial full gate failed four exact foot PRJs;
-selective canonical Foot_US preservation fixes PROJ renaming/truncation. Other
-CRS export paths unchanged; meter source requires existing degree normalization.
-GDAL/OGR is only a format reader/fixture creator, ArcGIS is the GP oracle.
+## Active new slice: uncached integer multiband unary
 
-## Validation and running processes
+ArcGIS Pro3.7 oracle:21 controls, six integer types plus reversed I16 band order;
+Abs/Negate/Square all preserve2bands. Native baseline drops second band21/21.
+Seven typed sources read-back verified. Additional12 I16 cached/uncached controls
+show cached planner must combine BOTH stored band ranges; Raster.statistics only
+retains band0 extrema. Scanning pixels is not an equivalent stale-cache fix.
+Current bounded edit extends existing per-band dispatcher to uncached integer
+Abs/Negate/Square. Cached integer multiband remains unresolved; other unary ops
+also remain outside this slice. No app sources or public API fields changed.
 
-Prior build/reference generation successful; all31 semantic geometry/CRS checks
-passed, but final exactPRJ verification was pending. No claim of final gate pass.
-`scripts/check > /tmp/unigis-tess-area-check3.log 2>&1` EXIT0:195Rust
-passed/5ignored,8Python passed; formatting and clippy-Dwarnings passed. Covers
-all current product edits and31 new goldens. No Cargo processes running. Final comparator PASS31/31 including exact PRJ bytes, log
-/tmp/unigis-tess-area-after2.log; copied to research/native_after.txt. Fresh
-fixture recipe PASS exact PRJ/IDs/ordered vertices (recipe_verification.txt). Earlier logs /tmp/unigis-tess-area-check{,2}.log
-are failure/interruption evidence, not successful validation.
+New edits: crates/unigis-raster/src/local.rs (dispatcher condition/comment),
+scripts/make-arcgis-reference.py (+21umrawmulti_* cases), seven TIFF sources in
+testdata/raster/unary_multiband, scripts/research/unary_multiband (profiles/recipe,
+21observations/baseline and12cached controls/probes/comparator/README).
+Inherited post-commit dashboard dirt and this handoff also modified.
+GDAL/OGR only supplies file creation/read-back; ArcGIS defines GP behavior.
+
+## Running / pending validation
+
+`cargo build -j3 -p unigis-cli` EXIT0; /tmp/unigis-intmulti-build.log.
+`uv run -q --with 'mcp>=2' python scripts/make-arcgis-reference.py 'umrawmulti_*'`
+EXIT0,21successful; /tmp/unigis-intmulti-references.log. All21 companion native
+comparisons PASS with original AND freshly recreated inputs; semantic CRS and
+every band checked. Artifacts native_after.txt/recipe_verification.txt. All seven
+source TIFFs unchanged/no source PAMs; source_verification.json. Dashboard--ci PASS.
+Full `scripts/check > /tmp/unigis-intmulti-check.log 2>&1` EXIT0:195Rust
+passed/5ignored,8Python/fmt/clippy-Dwarnings PASS, covering current Rust edit and
+21 new goldens. Node JS syntax/Python compile/diff PASS. No Cargo running.
+Private probes completed: /tmp/unigis-integer-multiband-{probe,typed}.log;
+sources/output profiles /tmp/unigis-integer-multiband/typed. No other workers.
+Current Rust edit/new goldens pass both scoped and full validation.
 
 ## Next actions
 
-1. Full gate complete. Explicitly staged tessellation slice ready for commit;
-   normal push hook and remote SHA verification still pending.
-2. Comparator and recipe verification complete. Dashboard--ci PASS (297tools,
-   320verified); inline node syntax, Python compile and diff checks PASS.
-3. Refresh dashboard--ci, node syntax/Python/diff checks, explicit-path commit
-   (exclude unrelated NOTES.md/.worktrees), normal push hook, verify remote SHA.
-4. Continue roadmap in next small empirical slice; update this handoff as work
-   lands. Remaining examples: H3, nonlinear SurfaceParameters, ComputeChangeRaster
-   modes, BinaryMask options, integer multiband unary operations.
+1. Finish build/reference generation; run research/unary_multiband/compare_native.py
+   against all21 with exact per-band samples/type/marker/stats/grid/PAM placement.
+   Fix observed failures empirically. Verify source fixtures unchanged/no caches.
+2. Complete README/recipe verification, ROADMAP/KNOWN_GAPS (cached integer still
+   drops bands; do not claim complete integer multiband support), dashboard--ci.
+3. Validation complete; explicit-path commit staged, normal push and remote
+   verification pending. Do not overlap Cargo with the pre-push hook.
+4. Continue another small roadmap slice; cached integer range model, other unary
+   multiband paths, H3, SurfaceParameters nonlinear fit, ChangeRaster/BinaryMask
+   missing modes remain. Read ROADMAP/KNOWN_GAPS before choosing.
 
-## Next-slice private research (no product edits)
-
-While current gate runs, created four private two-band I16 controls (opposite
-narrow/wide band order, cached/uncached) under /tmp/unigis-integer-multiband.
-ArcGIS Abs/Negate/Square probe PASS12/12 (all retain2bands); log
-/tmp/unigis-integer-multiband-probe.log. This uses private inputs only; current
-commitable slice remains tessellation. Settle existing slice before coding next. Cached I16 output planning uses both
-bands: forward/reverse give U16 Abs, S16 Negate, S32 Square; blindly passing the
-first-band cached range to every band would be wrong. Raster.statistics currently
-retains only band0 extrema. Uncached integer multiband can be handled independently
-with existing type rules; cached multiband needs a deliberate range-model solution.
+Next slice selected: registered unary operations that still drop later bands
+(cached integers and other unary functions) should refuse multiband inputs before
+writing any output. Share the supported-combination predicate with the existing
+dispatcher, add CLI existing-output preservation coverage, update gaps. Keep this
+separate from the now-validated uncached integer fix. Do not mutate product until
+its pending commit/push hook completes. No app API field changes required.

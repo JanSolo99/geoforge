@@ -626,11 +626,13 @@ fn cached_integer_unary(op: UnaryOp, r: &Raster, (lo, hi): (f64, f64)) -> Raster
 /// (observed).
 pub fn unary(op: UnaryOp, r: &Raster) -> Raster {
     if r.bands.len() > 1
-        && r.data_type.is_float()
+        && (r.data_type.is_float() || r.statistics.is_none())
         && matches!(op, UnaryOp::Abs | UnaryOp::Negate | UnaryOp::Square)
     {
         // Use the dataset's cache status for every band, as ArcGIS does for
-        // F64 output planning. Clone only the current band, not the dataset.
+        // F64 output planning. Uncached integer planning depends only on storage
+        // type, so every band has the same output type and NoData marker.
+        // Clone only the current band, not the dataset.
         let apply = |band: &[f64]| {
             let single = Raster {
                 width: r.width,

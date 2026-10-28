@@ -1,0 +1,86 @@
+[
+  {
+    "case": "forward_raw",
+    "op": "Abs",
+    "bands": 2,
+    "type": "U16",
+    "nodata": 65535.0
+  },
+  {
+    "case": "forward_raw",
+    "op": "Negate",
+    "bands": 2,
+    "type": "S32",
+    "nodata": -2147483648.0
+  },
+  {
+    "case": "forward_raw",
+    "op": "Square",
+    "bands": 2,
+    "type": "S32",
+    "nodata": -2147483648.0
+  },
+  {
+    "case": "forward_cached",
+    "op": "Abs",
+    "bands": 2,
+    "type": "U16",
+    "nodata": 65535.0
+  },
+  {
+    "case": "forward_cached",
+    "op": "Negate",
+    "bands": 2,
+    "type": "S16",
+    "nodata": -32768.0
+  },
+  {
+    "case": "forward_cached",
+    "op": "Square",
+    "bands": 2,
+    "type": "S32",
+    "nodata": -2147483647.0
+  },
+  {
+    "case": "reverse_raw",
+    "op": "Abs",
+    "bands": 2,
+    "type": "U16",
+    "nodata": 65535.0
+  },
+  {
+    "case": "reverse_raw",
+    "op": "Negate",
+    "bands": 2,
+    "type": "S32",
+    "nodata": -2147483648.0
+  },
+  {
+    "case": "reverse_raw",
+    "op": "Square",
+    "bands": 2,
+    "type": "S32",
+    "nodata": -2147483648.0
+  },
+  {
+    "case": "reverse_cached",
+    "op": "Abs",
+    "bands": 2,
+    "type": "U16",
+    "nodata": 65535.0
+  },
+  {
+    "case": "reverse_cached",
+    "op": "Negate",
+    "bands": 2,
+    "type": "S16",
+    "nodata": -32768.0
+  },
+  {
+    "case": "reverse_cached",
+    "op": "Square",
+    "bands": 2,
+    "type": "S32",
+    "nodata": -2147483647.0
+  }
+]

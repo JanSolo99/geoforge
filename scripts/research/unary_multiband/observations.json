@@ -1,0 +1,149 @@
+[
+  {
+    "case": "u8",
+    "op": "Abs",
+    "bands": 2,
+    "type": "U8",
+    "nodata": 255.0
+  },
+  {
+    "case": "u8",
+    "op": "Negate",
+    "bands": 2,
+    "type": "S16",
+    "nodata": -32768.0
+  },
+  {
+    "case": "u8",
+    "op": "Square",
+    "bands": 2,
+    "type": "U16",
+    "nodata": 65535.0
+  },
+  {
+    "case": "i8",
+    "op": "Abs",
+    "bands": 2,
+    "type": "U8",
+    "nodata": 255.0
+  },
+  {
+    "case": "i8",
+    "op": "Negate",
+    "bands": 2,
+    "type": "S16",
+    "nodata": -32768.0
+  },
+  {
+    "case": "i8",
+    "op": "Square",
+    "bands": 2,
+    "type": "S16",
+    "nodata": -32768.0
+  },
+  {
+    "case": "u16",
+    "op": "Abs",
+    "bands": 2,
+    "type": "U16",
+    "nodata": 65535.0
+  },
+  {
+    "case": "u16",
+    "op": "Negate",
+    "bands": 2,
+    "type": "S32",
+    "nodata": -2147483648.0
+  },
+  {
+    "case": "u16",
+    "op": "Square",
+    "bands": 2,
+    "type": "U32",
+    "nodata": 4294967295.0
+  },
+  {
+    "case": "i16",
+    "op": "Abs",
+    "bands": 2,
+    "type": "U16",
+    "nodata": 65535.0
+  },
+  {
+    "case": "i16",
+    "op": "Negate",
+    "bands": 2,
+    "type": "S32",
+    "nodata": -2147483648.0
+  },
+  {
+    "case": "i16",
+    "op": "Square",
+    "bands": 2,
+    "type": "S32",
+    "nodata": -2147483648.0
+  },
+  {
+    "case": "u32",
+    "op": "Abs",
+    "bands": 2,
+    "type": "U32",
+    "nodata": 4294967295.0
+  },
+  {
+    "case": "u32",
+    "op": "Negate",
+    "bands": 2,
+    "type": "S32",
+    "nodata": -2147483648.0
+  },
+  {
+    "case": "u32",
+    "op": "Square",
+    "bands": 2,
+    "type": "U32",
+    "nodata": 4294967295.0
+  },
+  {
+    "case": "i32",
+    "op": "Abs",
+    "bands": 2,
+    "type": "U32",
+    "nodata": 4294967295.0
+  },
+  {
+    "case": "i32",
+    "op": "Negate",
+    "bands": 2,
+    "type": "S32",
+    "nodata": -2147483648.0
+  },
+  {
+    "case": "i32",
+    "op": "Square",
+    "bands": 2,
+    "type": "S32",
+    "nodata": -2147483648.0
+  },
+  {
+    "case": "i16_reverse",
+    "op": "Abs",
+    "bands": 2,
+    "type": "U16",
+    "nodata": 65535.0
+  },
+  {
+    "case": "i16_reverse",
+    "op": "Negate",
+    "bands": 2,
+    "type": "S32",
+    "nodata": -2147483648.0
+  },
+  {
+    "case": "i16_reverse",
+    "op": "Square",
+    "bands": 2,
+    "type": "S32",
+    "nodata": -2147483648.0
+  }
+]

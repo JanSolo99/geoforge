@@ -1,0 +1,128 @@
+[
+  {
+    "case": "u8",
+    "op": "Abs",
+    "native_bands": 1,
+    "arcgis_bands": 2
+  },
+  {
+    "case": "u8",
+    "op": "Negate",
+    "native_bands": 1,
+    "arcgis_bands": 2
+  },
+  {
+    "case": "u8",
+    "op": "Square",
+    "native_bands": 1,
+    "arcgis_bands": 2
+  },
+  {
+    "case": "i8",
+    "op": "Abs",
+    "native_bands": 1,
+    "arcgis_bands": 2
+  },
+  {
+    "case": "i8",
+    "op": "Negate",
+    "native_bands": 1,
+    "arcgis_bands": 2
+  },
+  {
+    "case": "i8",
+    "op": "Square",
+    "native_bands": 1,
+    "arcgis_bands": 2
+  },
+  {
+    "case": "u16",
+    "op": "Abs",
+    "native_bands": 1,
+    "arcgis_bands": 2
+  },
+  {
+    "case": "u16",
+    "op": "Negate",
+    "native_bands": 1,
+    "arcgis_bands": 2
+  },
+  {
+    "case": "u16",
+    "op": "Square",
+    "native_bands": 1,
+    "arcgis_bands": 2
+  },
+  {
+    "case": "i16",
+    "op": "Abs",
+    "native_bands": 1,
+    "arcgis_bands": 2
+  },
+  {
+    "case": "i16",
+    "op": "Negate",
+    "native_bands": 1,
+    "arcgis_bands": 2
+  },
+  {
+    "case": "i16",
+    "op": "Square",
+    "native_bands": 1,
+    "arcgis_bands": 2
+  },
+  {
+    "case": "u32",
+    "op": "Abs",
+    "native_bands": 1,
+    "arcgis_bands": 2
+  },
+  {
+    "case": "u32",
+    "op": "Negate",
+    "native_bands": 1,
+    "arcgis_bands": 2
+  },
+  {
+    "case": "u32",
+    "op": "Square",
+    "native_bands": 1,
+    "arcgis_bands": 2
+  },
+  {
+    "case": "i32",
+    "op": "Abs",
+    "native_bands": 1,
+    "arcgis_bands": 2
+  },
+  {
+    "case": "i32",
+    "op": "Negate",
+    "native_bands": 1,
+    "arcgis_bands": 2
+  },
+  {
+    "case": "i32",
+    "op": "Square",
+    "native_bands": 1,
+    "arcgis_bands": 2
+  },
+  {
+    "case": "i16_reverse",
+    "op": "Abs",
+    "native_bands": 1,
+    "arcgis_bands": 2
+  },
+  {
+    "case": "i16_reverse",
+    "op": "Negate",
+    "native_bands": 1,
+    "arcgis_bands": 2
+  },
+  {
+    "case": "i16_reverse",
+    "op": "Square",
+    "native_bands": 1,
+    "arcgis_bands": 2
+  }
+]

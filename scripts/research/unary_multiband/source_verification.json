@@ -1,0 +1,44 @@
+[
+  {
+    "file": "u8.tif",
+    "matches_pre_oracle_control": true,
+    "sha256": "5032248aed2325ea41941ca96e86bb65321b74e91a261cf1e9b26233296bed16",
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "i8.tif",
+    "matches_pre_oracle_control": true,
+    "sha256": "581c447d42cb94a594755c3c17cad5a97f69c826ba4e5b6cd8193ddc69ba1783",
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "u16.tif",
+    "matches_pre_oracle_control": true,
+    "sha256": "9e8058b154f4ba706d9e07b931dada3a3be5bb5a871001887c838e4654caffcc",
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "i16.tif",
+    "matches_pre_oracle_control": true,
+    "sha256": "e22fe32ae0748aae732307e2dbeae0e7f7fe4af69d0ecd32274c63b79aa7d682",
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "u32.tif",
+    "matches_pre_oracle_control": true,
+    "sha256": "35403d4c21ab7d7249582d82d0cc496331342fc2e62c3b7a3c02e5eecb499f7d",
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "i32.tif",
+    "matches_pre_oracle_control": true,
+    "sha256": "8dad9580422abee8b352c3a6e6a4d47e93a45a189a9bd697d6662740c3d9f975",
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "i16_reverse.tif",
+    "matches_pre_oracle_control": true,
+    "sha256": "be3d4fcb941bdacadfee9d737ae9f49e0b11b91550f23ec1cda07a37c608ea5a",
+    "unchanged_after_reference_generation": true
+  }
+]

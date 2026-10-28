@@ -1,0 +1,22 @@
+umrawmulti_abs_u8 PASS
+umrawmulti_abs_i8 PASS
+umrawmulti_abs_u16 PASS
+umrawmulti_abs_i16 PASS
+umrawmulti_abs_u32 PASS
+umrawmulti_abs_i32 PASS
+umrawmulti_abs_i16_reverse PASS
+umrawmulti_negate_u8 PASS
+umrawmulti_negate_i8 PASS
+umrawmulti_negate_u16 PASS
+umrawmulti_negate_i16 PASS
+umrawmulti_negate_u32 PASS
+umrawmulti_negate_i32 PASS
+umrawmulti_negate_i16_reverse PASS
+umrawmulti_square_u8 PASS
+umrawmulti_square_i8 PASS
+umrawmulti_square_u16 PASS
+umrawmulti_square_i16 PASS
+umrawmulti_square_u32 PASS
+umrawmulti_square_i32 PASS
+umrawmulti_square_i16_reverse PASS
+Checked 21 FAILED 0 []
