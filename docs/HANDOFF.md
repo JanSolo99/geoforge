@@ -139,3 +139,12 @@ lines/polygons) added as `geodetic_densify`; 6 `gdd_*` cases match ArcGIS (n = c
 geodesic parts, direct from the segment start). Not done: default distance (omitted: ArcGIS used
 ~49.75 km for a 5622 km segment, rule unknown), Loxodrome / Great elliptic / Normal section methods
 (probed: loxodrome keeps latitude, great elliptic differs from geodesic by ~5e-4 deg), Z/M, curves.
+
+Claude: probe survey, nothing implemented this turn. Add Incrementing ID Field is ArcSDE-only (ERROR 000186) so
+out of scope. Convert Time Zone is deterministic (UTC->Eastern 2024-01-15 12:00 -> 07:00; DST applied per date;
+DST flags shift by 1 h; Date output has ~1 microsecond float jitter when DST is applied) but needs a
+Windows-zone-name table and a tz database (no chrono-tz in the workspace; /usr/share/zoneinfo exists), and
+shapefile output drops the time. Field Statistics To Table needs a nested "Field Types" parameter
+(validator error with a plain field list); not yet decoded. Extend Line / Trim Line / Integrate are topological.
+Other open candidates: Subset Features (random split, likely untestable), Encode Field, Rotate/Rescale rasters
+(Codex owns raster files now). Working tree unchanged; Codex's files untouched.
