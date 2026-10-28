@@ -133,3 +133,9 @@ ArcGIS for 21 of 22 sizes tested (400x50 semi-axes: 96 vs 98). Positions are off
 of the semi-axis (0.0014 m at 150 m; 0.37 m for a 1000x150 ellipse, so the ellipse_* test
 tolerance is 0.01 m and reference cases use moderate sizes). Not done: Geodesic method, huge
 ellipses (100 km: ArcGIS caps vertices differently), geographic CRS.
+
+Claude: Geodetic Densify (GEODESIC, explicit max length with optional unit; geographic or projected
+lines/polygons) added as `geodetic_densify`; 6 `gdd_*` cases match ArcGIS (n = ceil(len/dist) equal
+geodesic parts, direct from the segment start). Not done: default distance (omitted: ArcGIS used
+~49.75 km for a 5622 km segment, rule unknown), Loxodrome / Great elliptic / Normal section methods
+(probed: loxodrome keeps latitude, great elliptic differs from geodesic by ~5e-4 deg), Z/M, curves.

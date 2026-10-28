@@ -70189,6 +70189,270 @@
           "method": "Planar"
         }
       }
+    },
+    "gdd_lines": {
+      "tool": "management.GeodeticDensify",
+      "args": [
+        "testdata/geoproc/geodens_lines.shp",
+        "<out>",
+        "Geodesic",
+        "500000"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          80,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "geodetic_densify",
+        "params": {
+          "input": "testdata/geoproc/geodens_lines.shp",
+          "output": "<out>",
+          "densify_method": "Geodesic",
+          "max_segment_length": "500000"
+        }
+      }
+    },
+    "gdd_lines_km": {
+      "tool": "management.GeodeticDensify",
+      "args": [
+        "testdata/geoproc/geodens_lines.shp",
+        "<out>",
+        "Geodesic",
+        "500 Kilometers"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          80,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "geodetic_densify",
+        "params": {
+          "input": "testdata/geoproc/geodens_lines.shp",
+          "output": "<out>",
+          "densify_method": "Geodesic",
+          "max_segment_length": "500 Kilometers"
+        }
+      }
+    },
+    "gdd_lines_small": {
+      "tool": "management.GeodeticDensify",
+      "args": [
+        "testdata/geoproc/geodens_lines.shp",
+        "<out>",
+        "Geodesic",
+        "80000"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          80,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "geodetic_densify",
+        "params": {
+          "input": "testdata/geoproc/geodens_lines.shp",
+          "output": "<out>",
+          "densify_method": "Geodesic",
+          "max_segment_length": "80000"
+        }
+      }
+    },
+    "gdd_poly": {
+      "tool": "management.GeodeticDensify",
+      "args": [
+        "testdata/geoproc/geodens_poly.shp",
+        "<out>",
+        "Geodesic",
+        "1000000"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          80,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "geodetic_densify",
+        "params": {
+          "input": "testdata/geoproc/geodens_poly.shp",
+          "output": "<out>",
+          "densify_method": "Geodesic",
+          "max_segment_length": "1000000"
+        }
+      }
+    },
+    "gdd_utm": {
+      "tool": "management.GeodeticDensify",
+      "args": [
+        "testdata/geoproc/geodens_utm.shp",
+        "<out>",
+        "Geodesic",
+        "100000"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          80,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "geodetic_densify",
+        "params": {
+          "input": "testdata/geoproc/geodens_utm.shp",
+          "output": "<out>",
+          "densify_method": "Geodesic",
+          "max_segment_length": "100000"
+        }
+      }
+    },
+    "gdd_utm_mi": {
+      "tool": "management.GeodeticDensify",
+      "args": [
+        "testdata/geoproc/geodens_utm.shp",
+        "<out>",
+        "Geodesic",
+        "20 Miles"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          80,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "geodetic_densify",
+        "params": {
+          "input": "testdata/geoproc/geodens_utm.shp",
+          "output": "<out>",
+          "densify_method": "Geodesic",
+          "max_segment_length": "20 Miles"
+        }
+      }
     }
   }
 }

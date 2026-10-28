@@ -19,7 +19,8 @@ pub use buffer::{
 };
 pub use clip::{ClipArea, clip};
 pub use geodesic::{
-    GeodesicOptions, azimuth, buffer_geodesic, buffer_geodesic_union, nearest_geodesic,
+    GeodesicOptions, azimuth, buffer_geodesic, buffer_geodesic_union, direct, distance,
+    nearest_geodesic,
 };
 pub use index::EnvelopeIndex;
 pub use linework::{LineNodes, Meeting, XY_TOLERANCE, meeting, on_path};

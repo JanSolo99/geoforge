@@ -516,6 +516,38 @@ fn table_to_ellipse(ctx: &dyn Context) -> Result<ToolOutput> {
     )
 }
 
+fn geodetic_densify(ctx: &dyn Context) -> Result<ToolOutput> {
+    let t =
+        find("geodetic_densify").ok_or_else(|| Error::Unsupported("geodetic_densify".into()))?;
+    if text(ctx, t, "densify_method").is_some_and(|m| !m.eq_ignore_ascii_case("geodesic")) {
+        return Err(Error::Unsupported(
+            "densify methods other than Geodesic".into(),
+        ));
+    }
+    let given = text(ctx, t, "max_segment_length")
+        .ok_or_else(|| Error::Unsupported("a maximum segment length is required".into()))?;
+    let given = given.trim();
+    let split = given
+        .find(|c: char| c.is_alphabetic() && c != 'e' && c != 'E')
+        .unwrap_or(given.len());
+    let (num, unit) = given.split_at(split);
+    let value: f64 = num
+        .trim()
+        .parse()
+        .map_err(|_| Error::Unsupported(format!("ERROR 000094: '{given}' is not a distance")))?;
+    let unit = unit.trim().to_ascii_uppercase().replace([' ', '_'], "");
+    let meters = if unit.is_empty() {
+        1.0
+    } else {
+        LINEAR_UNITS
+            .iter()
+            .find(|(n, _)| *n == unit)
+            .map(|u| u.1)
+            .ok_or_else(|| Error::Unsupported(format!("unknown distance unit '{unit}'")))?
+    };
+    construct::geodetic_densify(ctx.features("input")?.as_ref(), value * meters)
+}
+
 fn generalize(ctx: &dyn Context) -> Result<ToolOutput> {
     let t = find("generalize").ok_or_else(|| Error::Unsupported("generalize".into()))?;
     let fc = ctx.features("input")?;
@@ -1555,6 +1587,41 @@ pub static TOOLS: &[Tool] = &[
         output_suffix: "Ellipses",
         measures: false,
         run: Runner::Features(table_to_ellipse),
+    },
+    Tool {
+        id: "geodetic_densify",
+        name: "Geodetic Densify",
+        toolbox: "Data Management › Features",
+        summary: "Adds vertices along the geodesic between a segment's ends (ArcGIS Pro Geodetic Densify, GEODESIC).",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Features",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "Lines or polygons.",
+            },
+            Param {
+                name: "densify_method",
+                label: "Densification Method",
+                kind: Kind::Choice(&["Geodesic"]),
+                required: false,
+                default: "Geodesic",
+                help: "",
+            },
+            Param {
+                name: "max_segment_length",
+                label: "Maximum Segment Length",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+                help: "A length, for example `500 Kilometers` (bare numbers are meters).",
+            },
+        ],
+        output_suffix: "Densified",
+        measures: false,
+        run: Runner::Features(geodetic_densify),
     },
     Tool {
         id: "flip_line",

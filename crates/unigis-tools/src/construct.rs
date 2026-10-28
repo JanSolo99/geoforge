@@ -971,3 +971,84 @@ pub fn table_to_ellipse(
         messages: Vec::new(),
     })
 }
+
+/// Geodetic Densify (GEODESIC): every segment longer than `max_length` metres is cut into
+/// `ceil(length / max_length)` equal parts along the WGS 84 geodesic between its ends; original
+/// vertices are kept exactly. Projected input is unprojected for the geodesics and projected back.
+pub fn geodetic_densify(input: &dyn FeatureClass, max_length: f64) -> Result<ToolOutput> {
+    let kind = input
+        .geometry_kind()
+        .ok_or_else(|| err("input has no geometry"))?;
+    if !matches!(kind, GeometryKind::Polyline | GeometryKind::Polygon) {
+        return Err(err(
+            "ERROR 000368: Invalid input data: lines or polygons are required",
+        ));
+    }
+    if !(max_length > 0.0) {
+        return Err(err("a densify distance greater than zero is required"));
+    }
+    let wkt = input
+        .spatial_reference_wkt()
+        .ok_or_else(|| err("ERROR 000622: the input has an unknown coordinate system"))?;
+    let crs = unigis_proj::Crs::from_wkt(wkt)?;
+    let wgs84 = unigis_proj::Crs::parse("4326")?;
+    let geographic = crs.is_geographic();
+    let (to_geo, from_geo) = if geographic {
+        (None, None)
+    } else {
+        (
+            Some(unigis_proj::Transform::new(&crs, &wgs84)?),
+            Some(unigis_proj::Transform::new(&wgs84, &crs)?),
+        )
+    };
+    let mut features = Vec::new();
+    for f in input.features() {
+        let mut f = f?;
+        if let Some(g) = &mut f.geometry {
+            if g.z.is_some() || g.m.is_some() || g.has_curves() {
+                return Err(err("this tool does not handle Z, M or curves yet"));
+            }
+            let mut xy = Vec::new();
+            let mut starts = Vec::new();
+            for r in g.part_ranges().collect::<Vec<_>>() {
+                starts.push(xy.len() as u32);
+                let part = &g.xy[r];
+                let mut geo = part.to_vec();
+                if let Some(t) = &to_geo {
+                    t.apply(&mut geo)?;
+                }
+                for (i, w) in part.windows(2).enumerate() {
+                    xy.push(w[0]);
+                    let (a, b) = (geo[i], geo[i + 1]);
+                    let len = unigis_geometry::distance(a, b);
+                    let n = (len / max_length - 1e-9).ceil() as usize;
+                    if n > 1 {
+                        let az = unigis_geometry::azimuth(a, b);
+                        let mut mid: Vec<[f64; 2]> = (1..n)
+                            .map(|k| unigis_geometry::direct(a, az, len * k as f64 / n as f64))
+                            .collect();
+                        if let Some(t) = &from_geo {
+                            t.apply(&mut mid)?;
+                        }
+                        xy.extend(mid);
+                    }
+                }
+                if let Some(last) = part.last() {
+                    xy.push(*last);
+                }
+            }
+            g.xy = xy;
+            g.parts = starts;
+        }
+        features.push(f);
+    }
+    Ok(ToolOutput {
+        kind,
+        has_z: false,
+        has_m: false,
+        fields: input.fields().to_vec(),
+        spatial_reference_wkt: Some(wkt.to_owned()),
+        features,
+        messages: Vec::new(),
+    })
+}

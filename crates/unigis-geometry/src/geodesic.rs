@@ -588,3 +588,8 @@ pub fn direct(from: [f64; 2], azimuth_degrees: f64, distance: f64) -> [f64; 2] {
 pub fn azimuth(from: [f64; 2], to: [f64; 2]) -> f64 {
     Earth::wgs84().azimuths(from, to).map_or(0.0, |(az, _)| az)
 }
+
+/// The WGS 84 geodesic distance in metres between two points (longitude, latitude).
+pub fn distance(a: [f64; 2], b: [f64; 2]) -> f64 {
+    Earth::wgs84().distance(a, b)
+}
