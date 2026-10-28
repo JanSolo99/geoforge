@@ -705,3 +705,63 @@ pub fn focal_flow(input: &Raster, threshold: f64) -> Raster {
     }
     out
 }
+
+/// Snap Pour Point: each point moves to the cell of highest flow accumulation within `snap`
+/// (distance between cell centres, the point taken at the centre of its own cell); the output
+/// holds the point's value in that cell. Integer values take ArcGIS's type for 8-bit rasters.
+pub fn snap_pour_point(points: &[(f64, f64, f64)], accumulation: &Raster, snap: f64) -> Raster {
+    let t = accumulation.transform;
+    let cell = t[1];
+    let (min, max) = points
+        .iter()
+        .fold((f64::MAX, f64::MIN), |(a, b), p| (a.min(p.2), b.max(p.2)));
+    let (dt, nodata) = crate::zonal::integer_output(min.min(max), max.max(min), true);
+    let mut out = accumulation.like(dt);
+    out.nodata = Some(nodata);
+    out.bands[0] = vec![nodata; accumulation.width * accumulation.height];
+    for &(x, y, value) in points {
+        let (c0, r0) = (
+            ((x - t[0]) / cell).floor() as isize,
+            ((t[3] - y) / cell).floor() as isize,
+        );
+        if c0 < 0
+            || r0 < 0
+            || c0 >= accumulation.width as isize
+            || r0 >= accumulation.height as isize
+        {
+            continue;
+        }
+        let reach = (snap / cell).floor() as isize;
+        let mut best: Option<(f64, f64, usize, usize)> = None;
+        for dr in -reach..=reach {
+            for dc in -reach..=reach {
+                let dist = (dr * dr + dc * dc) as f64 * cell * cell;
+                if dist.sqrt() > snap + 1e-9 {
+                    continue;
+                }
+                let (c, r) = (c0 + dc, r0 + dr);
+                if c < 0
+                    || r < 0
+                    || c >= accumulation.width as isize
+                    || r >= accumulation.height as isize
+                {
+                    continue;
+                }
+                let Some(a) = accumulation.get(c as usize, r as usize) else {
+                    continue;
+                };
+                let better = match best {
+                    None => true,
+                    Some((ba, bd, ..)) => a > ba || (a == ba && dist < bd),
+                };
+                if better {
+                    best = Some((a, dist, c as usize, r as usize));
+                }
+            }
+        }
+        if let Some((_, _, c, r)) = best {
+            out.bands[0][r * accumulation.width + c] = dt.store(value);
+        }
+    }
+    out
+}

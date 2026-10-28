@@ -850,6 +850,22 @@ fn focal_flow(ctx: &dyn Context) -> Result<Output> {
     )
 }
 
+fn snap_pour_point(ctx: &dyn Context) -> Result<Output> {
+    let field = ctx.get("pour_point_field").unwrap_or_else(|| "FID".into());
+    let (samples, _) = ctx.point_samples("input", &field)?;
+    let snap: f64 = ctx
+        .get("snap_distance")
+        .and_then(|v| v.trim().parse().ok())
+        .ok_or_else(|| {
+            Error::Unsupported("ERROR 000735: Snap distance: value is required".into())
+        })?;
+    let points: Vec<(f64, f64, f64)> = samples.iter().map(|s| (s.x, s.y, s.z)).collect();
+    with_statistics(
+        crate::hydro::snap_pour_point(&points, &ctx.raster("accumulation")?, snap),
+        true,
+    )
+}
+
 fn flip(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::extract::flip(&ctx.raster("input")?), true)
 }
@@ -1464,6 +1480,36 @@ pub static TOOLS: &[Tool] = &[
             },
         ],
         run: focal_flow,
+    },
+    Tool {
+        id: "snap_pour_point",
+        name: "Snap Pour Point",
+        summary: "Moves pour points to the highest flow accumulation within a distance.",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Pour Point Data",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            raster("accumulation", "Input Accumulation Raster", true),
+            Param {
+                name: "snap_distance",
+                label: "Snap Distance",
+                kind: Kind::Number,
+                required: true,
+                default: "",
+            },
+            Param {
+                name: "pour_point_field",
+                label: "Pour Point Field",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+            },
+        ],
+        run: snap_pour_point,
     },
     Tool {
         id: "flip",

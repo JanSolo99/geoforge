@@ -1464,6 +1464,11 @@ CASES = {
     "ff_dem_nodata": ("gp.FocalFlow_sa", [RASTER / "dem_nodata.tif"], [0.5]),
     "ff_hydro": ("gp.FocalFlow_sa", [RASTER / "hydro.tif"], []),
     "ff_u8": ("gp.FocalFlow_sa", [RASTER / "landuse_u8.tif"], [1]),
+    "spp_30": ("gp.SnapPourPoint_sa", [DATA / "pour_pts.shp", OUT / "flowacc_hydro.tif"], [30]),
+    "spp_100": ("gp.SnapPourPoint_sa", [DATA / "pour_pts.shp", OUT / "flowacc_hydro.tif"], [100]),
+    "spp_100_field": ("gp.SnapPourPoint_sa", [DATA / "pour_pts.shp", OUT / "flowacc_hydro.tif"], [100, "PP_ID"]),
+    "spp_0": ("gp.SnapPourPoint_sa", [DATA / "pour_pts.shp", OUT / "flowacc_hydro.tif"], [0]),
+    "spp_300_int": ("gp.SnapPourPoint_sa", [DATA / "pour_pts.shp", OUT / "flowacc_hydro_int.tif"], [300, "PP_ID"]),
     "gpal_roads_50": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "NO_END_POINTS"]),
     "gpal_roads_50_end": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "END_POINTS"]),
     "gpal_roads_pct": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["PERCENTAGE", "", 25, "NO_END_POINTS"]),
@@ -1665,6 +1670,7 @@ RUN = {
     "gp.DistanceAccumulation_sa": ("distance_accumulation", ["input", "output"]),
     "gp.DistanceAllocation_sa": ("distance_allocation", ["input", "output"]),
     "gp.FocalFlow_sa": ("focal_flow", ["input", "output", "threshold_value"]),
+    "gp.SnapPourPoint_sa": ("snap_pour_point", ["input", "accumulation", "output", "snap_distance", "pour_point_field"]),
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
     "analysis.CountOverlappingFeatures": ("count_overlapping_features", ["input", "output", "minimum_overlap_count"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
@@ -1682,7 +1688,7 @@ def run_spec(tool, args):
 
 
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
-RASTER_OUT = {"gp.FocalFlow_sa", "gp.DistanceAccumulation_sa", "gp.DistanceAllocation_sa", "gp.EucBackDirection_sa", "gp.EqualToFrequency_sa", "gp.GreaterThanFrequency_sa", "gp.LessThanFrequency_sa", "conversion.ASCIIToRaster", "conversion.FloatToRaster", "management.CompositeBands", "gp.CreateConstantRaster_sa", "gp.InList_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
+RASTER_OUT = {"gp.SnapPourPoint_sa", "gp.FocalFlow_sa", "gp.DistanceAccumulation_sa", "gp.DistanceAllocation_sa", "gp.EucBackDirection_sa", "gp.EqualToFrequency_sa", "gp.GreaterThanFrequency_sa", "gp.LessThanFrequency_sa", "conversion.ASCIIToRaster", "conversion.FloatToRaster", "management.CompositeBands", "gp.CreateConstantRaster_sa", "gp.InList_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
               "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa",
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",

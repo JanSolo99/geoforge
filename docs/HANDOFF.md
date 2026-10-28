@@ -80,6 +80,8 @@ Tested offline (`test_daemon_runs_inbox_tasks_commands_pause_and_keepalive`); no
 
 - Probed 2026-10-28 and left: Line Statistics (LENGTH value = 3.0x the length inside the search circle in one cell, 1.38x in another: formula unknown; other statistics also unexplained). Slice NATURAL_BREAKS: ArcGIS breaks on dem.tif 5 classes lie between 209.763|209.772, 231.463|231.467, 253.554|253.563, 279.088|279.113, exact Jenks on all 18000 cells gives 209.69|209.72, 231.32|231.33, 253.40|253.42, 279.01|279.04 (0.05-0.15 lower), so ArcGIS runs Jenks on a binned or sampled version (histogram Jenks with 128..2000 bins of the value range was tried: breaks 209.5-209.7, 231.3-231.9, 253.3-254.3, 278.9-280.0, none matches 209.77/231.47/253.56/279.10); STANDARD_DEVIATION and GEOMETRICAL_INTERVAL are refused by `arcpy.sa.Slice` here (domain error), only EQUAL_INTERVAL/EQUAL_AREA/NATURAL_BREAKS exist in this build.
 
+- Snap Pour Point (`snap_pour_point`, `spp_*` pass; new test points `testdata/geoproc/pour_pts.shp`): each point -> highest-accumulation cell within the snap distance (cell centres, point at its own cell centre; ties nearest); value = FID (0-based) or the chosen field, typed by the 8-bit integer rules (U8/15 for 0..5, S8 for 10..60); statistics written.
+
 ## Next actions
 
 1. Keep going in probe -> implement -> reference-test batches (see "Session 2026-10-26" entries for what is done and the gaps).

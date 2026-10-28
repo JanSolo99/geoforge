@@ -59592,6 +59592,120 @@
           "threshold_value": 1
         }
       }
+    },
+    "spp_30": {
+      "tool": "gp.SnapPourPoint_sa",
+      "args": [
+        "testdata/geoproc/pour_pts.shp",
+        "testdata/arcgis-reference/flowacc_hydro.tif",
+        "<out>",
+        30
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "snap_pour_point",
+        "params": {
+          "input": "testdata/geoproc/pour_pts.shp",
+          "accumulation": "testdata/arcgis-reference/flowacc_hydro.tif",
+          "output": "<out>",
+          "snap_distance": 30
+        }
+      }
+    },
+    "spp_100": {
+      "tool": "gp.SnapPourPoint_sa",
+      "args": [
+        "testdata/geoproc/pour_pts.shp",
+        "testdata/arcgis-reference/flowacc_hydro.tif",
+        "<out>",
+        100
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "snap_pour_point",
+        "params": {
+          "input": "testdata/geoproc/pour_pts.shp",
+          "accumulation": "testdata/arcgis-reference/flowacc_hydro.tif",
+          "output": "<out>",
+          "snap_distance": 100
+        }
+      }
+    },
+    "spp_100_field": {
+      "tool": "gp.SnapPourPoint_sa",
+      "args": [
+        "testdata/geoproc/pour_pts.shp",
+        "testdata/arcgis-reference/flowacc_hydro.tif",
+        "<out>",
+        100,
+        "PP_ID"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "snap_pour_point",
+        "params": {
+          "input": "testdata/geoproc/pour_pts.shp",
+          "accumulation": "testdata/arcgis-reference/flowacc_hydro.tif",
+          "output": "<out>",
+          "snap_distance": 100,
+          "pour_point_field": "PP_ID"
+        }
+      }
+    },
+    "spp_0": {
+      "tool": "gp.SnapPourPoint_sa",
+      "args": [
+        "testdata/geoproc/pour_pts.shp",
+        "testdata/arcgis-reference/flowacc_hydro.tif",
+        "<out>",
+        0
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "snap_pour_point",
+        "params": {
+          "input": "testdata/geoproc/pour_pts.shp",
+          "accumulation": "testdata/arcgis-reference/flowacc_hydro.tif",
+          "output": "<out>",
+          "snap_distance": 0
+        }
+      }
+    },
+    "spp_300_int": {
+      "tool": "gp.SnapPourPoint_sa",
+      "args": [
+        "testdata/geoproc/pour_pts.shp",
+        "testdata/arcgis-reference/flowacc_hydro_int.tif",
+        "<out>",
+        300,
+        "PP_ID"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "snap_pour_point",
+        "params": {
+          "input": "testdata/geoproc/pour_pts.shp",
+          "accumulation": "testdata/arcgis-reference/flowacc_hydro_int.tif",
+          "output": "<out>",
+          "snap_distance": 300,
+          "pour_point_field": "PP_ID"
+        }
+      }
     }
   }
 }
