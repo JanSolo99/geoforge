@@ -71804,6 +71804,272 @@
           "group_by": "NAME"
         }
       }
+    },
+    "fst_parcels_num_stats": {
+      "tool": "management.FieldStatisticsToTable",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "VALUE;PARCEL_ID",
+        "NUMERIC",
+        "",
+        "MEDIAN Med;SUM Total;FIELDNAME;COUNT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Med",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Total",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "FieldName",
+          "String",
+          9,
+          0,
+          0
+        ],
+        [
+          "Count",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "field_statistics_to_table",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "fields": "VALUE;PARCEL_ID",
+          "field_type": "NUMERIC",
+          "statistics": "MEDIAN Med;SUM Total;FIELDNAME;COUNT"
+        }
+      }
+    },
+    "fst_parcels_num_stats_by_zone": {
+      "tool": "management.FieldStatisticsToTable",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "VALUE",
+        "NUMERIC",
+        "ZONE",
+        "KURTOSIS;MEDIAN #;SUM 'My Sum';BOGUS B"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000304: Renamed field My Sum to My_Sum"
+      ],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Kurtosis",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Median",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "My_Sum",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "field_statistics_to_table",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "fields": "VALUE",
+          "field_type": "NUMERIC",
+          "group_by": "ZONE",
+          "statistics": "KURTOSIS;MEDIAN #;SUM 'My Sum';BOGUS B"
+        }
+      }
+    },
+    "fst_parcels_text_stats_by_zone": {
+      "tool": "management.FieldStatisticsToTable",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "NAME",
+        "TEXT",
+        "ZONE",
+        "MODE Most;FIELDTYPE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Most",
+          "String",
+          19,
+          0,
+          0
+        ],
+        [
+          "FieldType",
+          "String",
+          9,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "field_statistics_to_table",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "fields": "NAME",
+          "field_type": "TEXT",
+          "group_by": "ZONE",
+          "statistics": "MODE Most;FIELDTYPE"
+        }
+      }
+    },
+    "fst_err_duplicate_stat": {
+      "tool": "management.FieldStatisticsToTable",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "VALUE",
+        "NUMERIC",
+        "",
+        "MEDIAN A;MEDIAN B"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 110415: The following values MEDIAN have duplicates.",
+        "Failed to execute (FieldStatisticsToTable)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "field_statistics_to_table",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "fields": "VALUE",
+          "field_type": "NUMERIC",
+          "statistics": "MEDIAN A;MEDIAN B"
+        }
+      }
+    },
+    "fst_err_text_numeric_stat": {
+      "tool": "management.FieldStatisticsToTable",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "NAME",
+        "TEXT",
+        "",
+        "MEAN M"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000800: The value is not a member of FIELDNAME | ALIAS | FIELDTYPE | NULLS | COUNT | NUMBEROFUNIQUEVALUES | MODE | LEASTCOMMON.",
+        "Failed to execute (FieldStatisticsToTable)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "field_statistics_to_table",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "fields": "NAME",
+          "field_type": "TEXT",
+          "statistics": "MEAN M"
+        }
+      }
+    },
+    "fst_err_double_group": {
+      "tool": "management.FieldStatisticsToTable",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "ZONE",
+        "NUMERIC",
+        "VALUE"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 003911: The field is not of type SHORT | TEXT | LONG | DATE | TIMEONLY | DATEONLY | BIGINTEGER\nWARNING 230006: All Output Statistics will be included in the Output Tables if the parameter is not provided.",
+        "Failed to execute (FieldStatisticsToTable)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "field_statistics_to_table",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "fields": "ZONE",
+          "field_type": "NUMERIC",
+          "group_by": "VALUE"
+        }
+      }
     }
   }
 }

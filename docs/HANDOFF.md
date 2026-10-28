@@ -2,7 +2,7 @@
 
 ## Latest state (Claude, 2026-10-29) — read this first
 
-Workspace /mnt/media/ArcGIS_Linux, branch main, all Claude work pushed (HEAD 588fa36 or later).
+Workspace /mnt/media/ArcGIS_Linux, branch main, all Claude work pushed (HEAD e24029f or later).
 GitHub Actions minutes are exhausted: both workflows are manual-only; the gate is `scripts/check`
 (run by the pre-push hook, core.hooksPath=.githooks). Do not rely on or trigger hosted CI.
 Claude added this stretch (each with ArcGIS reference cases, details in the dated notes below):
@@ -18,7 +18,7 @@ committing make-arcgis-reference.py hunks, exclude Codex's umintfloat hunk (git 
 --unidiff-zero of a filtered diff). If a push says "cannot lock ref", run `git fetch` and check
 `git status -sb`: the earlier push may already have landed.
 Next candidates: Extend Line / Trim Line (need a topology-aware test set), Convert Coordinate
-Notation for UTM/MGRS/USNG, Field Statistics To Table Statistic list / Date fields, Aggregate Points,
+Notation for UTM/MGRS/USNG, Field Statistics To Table Date fields / combined NUMERIC+TEXT run, Aggregate Points,
 Rotate/Rescale rasters (after Codex finishes the raster files), items in docs/KNOWN_GAPS.md.
 
 Claude 2026-10-29 (this run): Field Statistics To Table group-by (`group_by=` param, tables.rs +
@@ -33,6 +33,18 @@ testdata/arcgis-reference/fst_parcels_*_by_* files, ROADMAP.md, HANDOFF.md).
 Validation: full scripts/check EXIT 0 (fmt, clippy -D warnings, workspace tests incl.
 tools_match_arcgis_output; log /tmp/unigis-fst-group-check.log). The run covered the working tree
 including Codex's uncommitted raster edits. Committed as "Add group-by field to Field Statistics To Table".
+
+Claude 2026-10-29 (next run): Field Statistics To Table Output Statistics (`statistics=` param,
+"KEYWORD [Name];..." as arcpy's string form; `#` = default name). ArcGIS probe: keywords are the
+default column names upper-cased (MEDIAN, STANDARDDEVIATION, NUMBEROFUNIQUEVALUES, FIELDNAME...);
+exact-case only; unknown keywords ignored, none known -> full table; columns in list order after
+the group field; empty name -> default name; names sanitized like ValidateFieldName (My Med ->
+My_Med, 1sum -> F1sum, WARNING 000304 not reproduced); duplicate keyword ERROR 110415; numeric
+keyword in a TEXT run ERROR 000800; case-insensitive name clash (also with the group field) ERROR
+000210. 3 new success cases + 3 refusal cases (fst_err_*), 2 more unit tests. ug-vs-ArcGIS dbf
+diffs identical; refusal codes match.
+Validation: full scripts/check EXIT 0 (log /tmp/unigis-fst-stats-check.log; tree incl. Codex's
+uncommitted raster edits). Committed as "Add Output Statistics list to Field Statistics To Table".
 
 Older notes (Codex, then Claude) follow.
 

@@ -323,12 +323,15 @@ pub fn encode_field(input: &dyn FeatureClass, field: &str, method: &str) -> Resu
 /// quartiles by linear interpolation at `(n-1)p`, outliers beyond 1.5 IQR (observed, ArcGIS Pro
 /// 3.7). With `group_by` (Short, Long, BigInteger, Text or a date type) the rows repeat per group
 /// value, ascending (text by byte order), led by the group field; rows with a null group value
-/// are left out.
+/// are left out. `statistics` (keyword, output name) picks and renames the columns, in its
+/// order; keywords are the default column names in upper case, unknown ones are ignored, and if
+/// none is known every column is written.
 pub fn field_statistics_to_table(
     input: &dyn FeatureClass,
     field_names: &[String],
     numeric: bool,
     group_by: Option<&str>,
+    statistics: &[(String, String)],
 ) -> Result<TableOutput> {
     let fields = input.fields().to_vec();
     let mut picked = Vec::new();
@@ -580,10 +583,95 @@ pub fn field_statistics_to_table(
             cols.push(fld);
         }
     }
+    // The statistics to keep, as (column index, output name). ArcGIS validates the keywords
+    // against the full list of both field types and rejects the numeric ones in a TEXT run.
+    let mut picked_stats: Vec<(usize, String)> = Vec::new();
+    for (k, (key, name)) in statistics.iter().enumerate() {
+        if statistics[..k].iter().any(|(earlier, _)| earlier == key) {
+            return Err(err(format!(
+                "ERROR 110415: The following values {key} have duplicates."
+            )));
+        }
+        if let Some(c) = (lead..cols.len()).find(|&c| cols[c].name.to_uppercase() == *key) {
+            let name = if name.is_empty() {
+                cols[c].name.clone()
+            } else {
+                valid_field_name(name)
+            };
+            picked_stats.push((c, name));
+        } else if !numeric && NUMERIC_STATISTICS.contains(&key.as_str()) {
+            let text: Vec<String> = cols[lead..].iter().map(|f| f.name.to_uppercase()).collect();
+            return Err(err(format!(
+                "ERROR 000800: The value is not a member of {}.",
+                text.join(" | ")
+            )));
+        }
+    }
+    if picked_stats.is_empty() {
+        return Ok(TableOutput {
+            fields: cols,
+            rows: out_rows,
+        });
+    }
+    let mut keep: Vec<usize> = (0..lead).collect();
+    keep.extend(picked_stats.iter().map(|(c, _)| *c));
+    let mut fields_out: Vec<Field> = cols[..lead].to_vec();
+    for (c, name) in &picked_stats {
+        if fields_out.iter().any(|f| f.name.eq_ignore_ascii_case(name)) {
+            return Err(err(
+                "ERROR 000210: Cannot create output table (duplicate field name)",
+            ));
+        }
+        let mut f = cols[*c].clone();
+        f.name = name.clone();
+        fields_out.push(f);
+    }
+    let rows = out_rows
+        .into_iter()
+        .map(|r| keep.iter().map(|&k| r[k].clone()).collect())
+        .collect();
     Ok(TableOutput {
-        fields: cols,
-        rows: out_rows,
+        fields: fields_out,
+        rows,
     })
+}
+
+/// The Field Statistics To Table keywords only a NUMERIC run accepts.
+const NUMERIC_STATISTICS: [&str; 14] = [
+    "MINIMUM",
+    "MAXIMUM",
+    "MEAN",
+    "STANDARDDEVIATION",
+    "MEDIAN",
+    "OUTLIERS",
+    "SUM",
+    "RANGE",
+    "INTERQUARTILERANGE",
+    "FIRSTQUARTILE",
+    "THIRDQUARTILE",
+    "COEFFICIENTOFVARIATION",
+    "SKEWNESS",
+    "KURTOSIS",
+];
+
+/// A field name as arcpy.ValidateFieldName makes it: other characters than letters, digits and
+/// `_` become `_`, and a leading digit gets an `F` in front (`My Med` → `My_Med`, `1sum` →
+/// `F1sum`).
+fn valid_field_name(name: &str) -> String {
+    let mut out: String = name
+        .chars()
+        .map(|c| {
+            if c.is_alphanumeric() || c == '_' {
+                c
+            } else {
+                '_'
+            }
+        })
+        .collect();
+    if out.starts_with(|c: char| c.is_ascii_digit()) {
+        out.insert(0, 'F');
+    }
+    out
 }
 
 /// Ascending order of Field Statistics To Table group values: numbers by value, text by bytes.
@@ -668,7 +756,7 @@ mod tests {
     #[test]
     fn field_statistics_groups_skip_nulls_and_sort_by_bytes() {
         let names = ["V".to_owned(), "S".to_owned()];
-        let t = field_statistics_to_table(&probe_table(), &names, true, Some("G")).unwrap();
+        let t = field_statistics_to_table(&probe_table(), &names, true, Some("G"), &[]).unwrap();
         assert_eq!(t.fields[0].name, "G");
         assert_eq!(t.fields[0].length, 1);
         let keys: Vec<_> = t.rows.iter().map(|r| r[0].clone()).collect();
@@ -688,7 +776,7 @@ mod tests {
     #[test]
     fn field_statistics_group_by_short_drops_null_group_rows() {
         let names = ["V".to_owned()];
-        let t = field_statistics_to_table(&probe_table(), &names, true, Some("S")).unwrap();
+        let t = field_statistics_to_table(&probe_table(), &names, true, Some("S"), &[]).unwrap();
         let keys: Vec<_> = t.rows.iter().map(|r| r[0].clone()).collect();
         let k: Vec<_> = [1, 2, 4, 5, 6, 7, 8].map(Value::SmallInteger).into();
         assert_eq!(keys, k);
@@ -700,7 +788,63 @@ mod tests {
     #[test]
     fn field_statistics_rejects_a_double_group_field() {
         let names = ["S".to_owned()];
-        let e = field_statistics_to_table(&probe_table(), &names, true, Some("V")).unwrap_err();
+        let e =
+            field_statistics_to_table(&probe_table(), &names, true, Some("V"), &[]).unwrap_err();
         assert!(e.to_string().contains("003911"), "{e}");
+    }
+
+    fn stats(items: &[(&str, &str)]) -> Vec<(String, String)> {
+        items
+            .iter()
+            .map(|(k, n)| ((*k).to_owned(), (*n).to_owned()))
+            .collect()
+    }
+
+    #[test]
+    fn field_statistics_picks_and_renames_columns_in_list_order() {
+        let names = ["V".to_owned()];
+        let picks = stats(&[
+            ("MEDIAN", "My Med"),
+            ("BOGUS", "B"),
+            ("SUM", "1sum"),
+            ("COUNT", ""),
+        ]);
+        let t = field_statistics_to_table(&probe_table(), &names, true, Some("S"), &picks).unwrap();
+        let cols: Vec<_> = t.fields.iter().map(|f| f.name.as_str()).collect();
+        assert_eq!(cols, ["S", "My_Med", "F1sum", "Count"]);
+        assert_eq!(
+            t.rows[0],
+            [
+                Value::SmallInteger(1),
+                Value::Double(1.0),
+                Value::Double(1.0),
+                Value::Integer(1)
+            ]
+        );
+        // Only unknown or lower-case keywords: every column.
+        let all = field_statistics_to_table(
+            &probe_table(),
+            &names,
+            true,
+            None,
+            &stats(&[("median", "m")]),
+        )
+        .unwrap();
+        assert_eq!(all.fields.len(), 22);
+    }
+
+    #[test]
+    fn field_statistics_rejects_bad_statistic_lists() {
+        let run = |numeric: bool, group: Option<&str>, items: &[(&str, &str)]| {
+            let n = [if numeric { "V" } else { "G" }.to_owned()];
+            field_statistics_to_table(&probe_table(), &n, numeric, group, &stats(items))
+                .unwrap_err()
+                .to_string()
+        };
+        assert!(run(true, None, &[("MEDIAN", "A"), ("MEDIAN", "B")]).contains("110415"));
+        assert!(run(true, None, &[("MEDIAN", "X"), ("SUM", "x")]).contains("000210"));
+        assert!(run(true, Some("S"), &[("MEDIAN", "s")]).contains("000210"));
+        let text = run(false, None, &[("MEAN", "M")]);
+        assert!(text.contains("ERROR 000800: The value is not a member of FIELDNAME | ALIAS | FIELDTYPE | NULLS | COUNT | NUMBEROFUNIQUEVALUES | MODE | LEASTCOMMON."), "{text}");
     }
 }

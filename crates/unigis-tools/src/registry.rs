@@ -1119,11 +1119,24 @@ fn field_statistics_to_table(ctx: &dyn Context) -> Result<Outcome> {
         .collect();
     let numeric = !text(ctx, t, "field_type").is_some_and(|f| f.eq_ignore_ascii_case("text"));
     let group_by = text(ctx, t, "group_by").filter(|g| !g.trim().is_empty());
+    // `KEYWORD [Output Name];...`
+    let statistics: Vec<(String, String)> = text(ctx, t, "statistics")
+        .unwrap_or_default()
+        .split(';')
+        .filter_map(|item| {
+            let item = item.trim();
+            let (key, name) = item.split_once(char::is_whitespace).unwrap_or((item, ""));
+            let name = name.trim().trim_matches('\'');
+            let name = if name == "#" { "" } else { name };
+            (!key.is_empty()).then(|| (key.to_owned(), name.to_owned()))
+        })
+        .collect();
     Ok(Outcome::Table(tables::field_statistics_to_table(
         ctx.features("input")?.as_ref(),
         &fields,
         numeric,
         group_by.as_deref().map(str::trim),
+        &statistics,
     )?))
 }
 
@@ -1725,6 +1738,14 @@ pub static TOOLS: &[Tool] = &[
                 required: false,
                 default: "",
                 help: "Short, Long, BigInteger, Text or date field; statistics repeat per value.",
+            },
+            Param {
+                name: "statistics",
+                label: "Output Statistics",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "KEYWORD [Output Name] items separated by semicolons (MEDIAN Med;SUM;...), in output order; default all.",
             },
         ],
         output_suffix: "FieldStatistics",
