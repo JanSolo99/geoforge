@@ -1,8 +1,7 @@
 name: Deploy web app to Netlify
 
+# Manual only, to avoid using Actions minutes; build locally with scripts/build-web.sh.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:

@@ -107,3 +107,9 @@ decimal-degree lon/lat input) added as registry tool `convert_coordinate_notatio
 output does).
 Not done: UTM/MGRS/USNG/GARS/GEOREF output, non-DD input formats. Codex's
 umintfloat edits left untouched/unstaged.
+
+Claude: user is out of GitHub Actions minutes. Both workflows (.github/workflows/ci.yml,
+web-netlify.yml) now trigger only by workflow_dispatch. The CI gate is `scripts/check`,
+run by the pre-push hook (core.hooksPath=.githooks, already set). The Netlify web deploy
+no longer runs automatically: build with scripts/build-web.sh and deploy by hand if wanted.
+Dashboard's cached CI result will go stale. Not tested: a hosted run (deliberately not triggered).

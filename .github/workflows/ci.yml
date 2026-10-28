@@ -1,9 +1,9 @@
 name: CI
 
+# Manual only: the project's gate runs locally (scripts/check, via the pre-push hook) so no
+# Actions minutes are used. Start this by hand from the Actions tab if a hosted run is wanted.
 on:
-  push:
-    branches: [main]
-  pull_request:
+  workflow_dispatch:
 
 env:
   CARGO_TERM_COLOR: always
