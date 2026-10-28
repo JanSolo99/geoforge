@@ -1,0 +1,13 @@
+# User service: status page + progress dashboard on 127.0.0.1:8765, published to the tailnet by
+#   tailscale serve --bg 8765
+#   cp tools/agent-coordinator/unigis-web.service ~/.config/systemd/user/ && systemctl --user enable --now unigis-web
+[Unit]
+Description=UniGIS coordinator status page and dashboard (localhost only)
+
+[Service]
+WorkingDirectory=/mnt/media/ArcGIS_Linux
+ExecStart=/usr/bin/python3 /mnt/media/ArcGIS_Linux/scripts/agents-remote web 8765
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

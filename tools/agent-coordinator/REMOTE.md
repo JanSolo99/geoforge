@@ -51,10 +51,21 @@ cd /mnt/media/ArcGIS_Linux
 Queued tasks run in order before any keepalive "continue". Commands (`/switch`, `/auto`,
 `/new`, `/session`) run even while paused.
 
-## Optional web page (tailnet only)
+## Keeping a prompt open while it runs headless
+
+Only one process can *own* the coordinator, so the interactive `./scripts/agents` and the
+daemon cannot run together. Run the daemon (it keeps working when you leave) and use
+`./scripts/agents-remote chat` as your prompt at the machine: it looks like the normal
+coordinator (type a task, `/switch codex`, `/pause`, `/status`), streams the daemon's log, and
+you can quit and re-open it at any time without stopping the work. Over SSH from your phone it
+is the same command. Only `/cli` (the native Claude/Codex TUI) needs the interactive
+coordinator: `agents-remote stop`, run `./scripts/agents`, and start the service again after.
+
+## Optional web page and progress dashboard (tailnet only)
 
 ```sh
-./scripts/agents-remote web 8765            # listens on 127.0.0.1 only
+./scripts/agents-remote web 8765            # listens on 127.0.0.1 only; /dashboard serves docs/dashboard.html
+# or as a service:  cp tools/agent-coordinator/unigis-web.service ~/.config/systemd/user/ && systemctl --user enable --now unigis-web
 tailscale serve --bg 8765                   # publishes it to your tailnet over HTTPS
 tailscale serve status                      # shows the https://<machine>.<tailnet>.ts.net URL
 ```

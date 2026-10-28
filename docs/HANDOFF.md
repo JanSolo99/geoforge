@@ -61,6 +61,7 @@ Claude/Codex fallback as before); `./scripts/agents-remote status|log|follow|sub
 `tools/agent-coordinator/REMOTE.md` has the Tailscale steps (sudo tailscaled + `tailscale up --ssh`, user systemd unit
 `unigis-agents.service`, `tailscale serve` for the status page). Tailscale is installed here but logged out: the user must run
 `sudo tailscale up --ssh` (interactive login) and stop the interactive coordinator before starting the service.
+`agents-remote chat` is a prompt attached to the daemon (so a terminal can stay open while it runs headless); `agents-remote web` also serves docs/dashboard.html at /dashboard (unit `unigis-web.service`, publish with `tailscale serve --bg 8765`).
 Tested offline (`test_daemon_runs_inbox_tasks_commands_pause_and_keepalive`); not yet run against real CLIs.
 
 ## Next actions

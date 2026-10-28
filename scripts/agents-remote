@@ -9,7 +9,8 @@
     agents-remote queue             tasks waiting and recently finished
     agents-remote pause | resume    hold / release new tasks (the turn in progress finishes)
     agents-remote stop              ask the daemon to exit after the current turn
-    agents-remote web [PORT]        small status page on 127.0.0.1 (publish it with `tailscale serve`)
+    agents-remote chat              a prompt like ./scripts/agents, attached to the running daemon
+    agents-remote web [PORT]        status page + progress dashboard on 127.0.0.1 (publish: `tailscale serve`)
 """
 import json
 import subprocess
@@ -73,7 +74,7 @@ PAGE = """<!doctype html><meta name=viewport content="width=device-width,initial
 <title>UniGIS agents</title><style>body{{font:15px system-ui;margin:1rem;max-width:60rem}}
 pre{{background:#111;color:#ddd;padding:.7rem;overflow:auto;max-height:24rem}}
 button,input{{font:inherit;padding:.4rem}}textarea{{width:100%;height:5rem;font:inherit}}</style>
-<h1>UniGIS agents</h1><pre>{status}</pre>
+<h1>UniGIS agents</h1><p><a href=/dashboard>Progress dashboard</a></p><pre>{status}</pre>
 <form method=post action=/submit><textarea name=text placeholder="Task for the agent"></textarea>
 <button>Queue task</button></form>
 <p><form method=post action=/cmd style=display:inline><input type=hidden name=text value="{pause_cmd}">
@@ -97,6 +98,13 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(data)
 
     def do_GET(self):
+        if self.path.split("?")[0] in ("/dashboard", "/dashboard.html"):
+            page = ROOT / "docs" / "dashboard.html"
+            if page.exists():
+                self.reply(page.read_text())
+            else:
+                self.reply("dashboard.html has not been built yet: python3 scripts/dashboard/build.py", 404)
+            return
         s = status()
         waiting, finished = queue()
         paused = (REMOTE / "PAUSE").exists()
@@ -128,6 +136,58 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
 
 
+def chat():
+    """A prompt attached to the daemon: lines become tasks, /commands become commands."""
+    import threading
+    ensure()
+    log = REMOTE / "daemon.log"
+    stop = threading.Event()
+
+    def pump():
+        pos = log.stat().st_size if log.exists() else 0
+        while not stop.is_set():
+            if log.exists() and log.stat().st_size > pos:
+                with log.open(errors="replace") as f:
+                    f.seek(pos)
+                    sys.stdout.write(f.read())
+                    sys.stdout.flush()
+                    pos = f.tell()
+            time.sleep(1)
+
+    threading.Thread(target=pump, daemon=True).start()
+    print("Attached to the coordinator daemon. A line queues a task; /pause /resume /stop /status /queue "
+          "and /switch|/auto|/new|/session go to the daemon; /quit leaves (the daemon keeps running).")
+    try:
+        while True:
+            try:
+                line = input("remote> ").strip()
+            except (EOFError, KeyboardInterrupt):
+                print()
+                break
+            if not line:
+                continue
+            if line == "/quit":
+                break
+            if line == "/pause":
+                ensure(); (REMOTE / "PAUSE").write_text(""); print("paused")
+            elif line == "/resume":
+                (REMOTE / "PAUSE").unlink(missing_ok=True); print("resumed")
+            elif line == "/stop":
+                ensure(); (REMOTE / "STOP").write_text(""); print("stop requested")
+            elif line == "/status":
+                show_status()
+            elif line == "/queue":
+                waiting, finished = queue()
+                print("waiting:", *waiting, sep="\n  ")
+                print("finished:", *finished, sep="\n  ")
+            elif line.startswith("/"):
+                print("queued", enqueue("cmd", line))
+            else:
+                print("queued", enqueue("task", line))
+    finally:
+        stop.set()
+
+
 def main(argv):
     if not argv:
         print(__doc__)
@@ -153,6 +213,8 @@ def main(argv):
         (REMOTE / "PAUSE").unlink(missing_ok=True); print("resumed")
     elif cmd == "stop":
         ensure(); (REMOTE / "STOP").write_text(""); print("stop requested")
+    elif cmd == "chat":
+        chat()
     elif cmd == "web":
         port = int(rest[0]) if rest else 8765
         print(f"http://127.0.0.1:{port}  (publish to your tailnet: tailscale serve --bg {port})")
