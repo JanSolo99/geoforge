@@ -1034,6 +1034,17 @@ fn compute_change_raster(ctx: &dyn Context) -> Result<Output> {
     with_statistics(r, false)
 }
 
+fn create_binary_mask(ctx: &dyn Context) -> Result<Output> {
+    let background = ctx
+        .get("background_value")
+        .and_then(|v| v.trim().parse().ok())
+        .unwrap_or(0.0);
+    with_statistics(
+        crate::local::binary_mask(&ctx.raster("input")?, background),
+        true,
+    )
+}
+
 fn flip(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::extract::flip(&ctx.raster("input")?), true)
 }
@@ -1846,6 +1857,22 @@ pub static TOOLS: &[Tool] = &[
             ),
         ],
         run: compute_change_raster,
+    },
+    Tool {
+        id: "create_binary_mask",
+        name: "Create Binary Mask",
+        summary: "1 where the cell differs from the background value, else 0.",
+        params: &[
+            raster("input", "Input Raster", true),
+            Param {
+                name: "background_value",
+                label: "Background Value",
+                kind: Kind::Number,
+                required: false,
+                default: "",
+            },
+        ],
+        run: create_binary_mask,
     },
     Tool {
         id: "flip",

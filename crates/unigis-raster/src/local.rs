@@ -1118,3 +1118,21 @@ pub fn compute_change(from: &Raster, to: &Raster, relative: bool) -> Option<Rast
         .collect();
     Some(out)
 }
+
+/// Create Binary Mask (no flood fill, expansion or minimum region size): 1 where the cell is not
+/// the background value (default 0), else 0; 8-bit with NoData 255 kept on NoData cells.
+pub fn binary_mask(input: &Raster, background: f64) -> Raster {
+    let mut out = input.like(DataType::U8);
+    out.nodata = Some(255.0);
+    out.bands[0] = input.bands[0]
+        .iter()
+        .map(|&v| {
+            if input.is_nodata(v) {
+                255.0
+            } else {
+                f64::from(v != background)
+            }
+        })
+        .collect();
+    out
+}

@@ -6312,6 +6312,28 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
         println!("Wrote {output}");
         return Ok(());
     }
+    if spec.id == "create_binary_mask" {
+        // ArcGIS embeds an "empty" statistics cache (count 0, max 255, stddev -1) in the TIFF.
+        let empty: unigis_raster::stats_metadata::BandStatistics = [
+            ("COUNT", "0.000000"),
+            ("MINIMUM", "0"),
+            ("MAXIMUM", "255"),
+            ("MEAN", "0"),
+            ("STDDEV", "-1"),
+            ("MEDIAN", "nan"),
+            ("SKIPFACTORX", "1"),
+            ("SKIPFACTORY", "1"),
+        ]
+        .into_iter()
+        .map(|(k, v)| (format!("STATISTICS_{k}"), v.to_string()))
+        .collect();
+        return write_raster_with_metadata(
+            Path::new(&output),
+            &out.raster,
+            false,
+            unigis_raster::stats_metadata::encode(&[empty]),
+        );
+    }
     if out.empty_band_statistics {
         write_raster_with(Path::new(&output), &out.raster, false)?;
         unigis_raster::stats::write_aux_statistics_with_empty(Path::new(&output), &out.raster)

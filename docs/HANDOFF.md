@@ -128,3 +128,8 @@ Claude 2026-10-29: Compute Change Raster (single band; DIFFERENCE = to - from, R
 where both 0; F32 NoData 3.4e38, no statistics sidecar; `compute_change_raster`, `cc2_*` 10 cases pass). Categorical difference,
 spectral distance/angle and multiband inputs not done. Probed ConvertSARUnits, CreateBinaryMask, CreateColorComposite,
 SummarizeCategoricalRaster usage only (SAR/multiband inputs needed).
+
+Claude 2026-10-29: Create Binary Mask (basic: `create_binary_mask`, background_value; `bmask_*` 5 cases pass): U8 0/1 (1 = not the
+background value, default 0), NoData 255 kept; ArcGIS embeds an EMPTY statistics cache in the TIFF (count 0, min 0, max 255, mean 0,
+stddev -1, median nan), reproduced in run_raster_tool. Flood fill / expand / min region size / BACKGROUND_NODATA not done.
+SAR tools (Convert SAR Units, Despeckle, ...) refuse non-radar inputs (ERROR 003514: radar metadata is missing): not testable here.

@@ -64384,6 +64384,100 @@
           "change_type": "RELATIVE_DIFFERENCE"
         }
       }
+    },
+    "bmask_u8": {
+      "tool": "gp.CreateBinaryMask_ia",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "create_binary_mask",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "bmask_u8_bg2": {
+      "tool": "gp.CreateBinaryMask_ia",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        2
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "create_binary_mask",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "output": "<out>",
+          "background_value": 2
+        }
+      }
+    },
+    "bmask_dem": {
+      "tool": "gp.CreateBinaryMask_ia",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "create_binary_mask",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "bmask_nodata": {
+      "tool": "gp.CreateBinaryMask_ia",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "create_binary_mask",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "bmask_patches": {
+      "tool": "gp.CreateBinaryMask_ia",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        7
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "create_binary_mask",
+        "params": {
+          "input": "testdata/raster/patches_i16.tif",
+          "output": "<out>",
+          "background_value": 7
+        }
+      }
     }
   }
 }
