@@ -316,3 +316,230 @@ pub fn encode_field(input: &dyn FeatureClass, field: &str, method: &str) -> Resu
         messages: Vec::new(),
     })
 }
+
+/// Field Statistics To Table (one field type per run, ungrouped): a row per field with its null
+/// count, count, unique values, mode and least common value, and for numeric fields the usual
+/// moments and quartiles. Sample standard deviation, population skewness and (non-excess)
+/// kurtosis, quartiles by linear interpolation at `(n-1)p`, outliers beyond 1.5 IQR (observed,
+/// ArcGIS Pro 3.7).
+pub fn field_statistics_to_table(
+    input: &dyn FeatureClass,
+    field_names: &[String],
+    numeric: bool,
+) -> Result<TableOutput> {
+    let fields = input.fields().to_vec();
+    let mut picked = Vec::new();
+    for n in field_names {
+        let i = fields
+            .iter()
+            .position(|f| f.name.eq_ignore_ascii_case(n))
+            .ok_or_else(|| err(format!("ERROR 000728: Field {n} does not exist")))?;
+        let is_numeric = matches!(
+            fields[i].field_type,
+            FieldType::SmallInteger
+                | FieldType::Integer
+                | FieldType::BigInteger
+                | FieldType::Single
+                | FieldType::Double
+        );
+        if is_numeric == numeric && (is_numeric || fields[i].field_type == FieldType::String) {
+            picked.push(i);
+        }
+    }
+    let mut rows_in: Vec<Vec<Value>> = Vec::new();
+    for f in input.features() {
+        rows_in.push(f?.attributes);
+    }
+    let mut out_rows: Vec<Vec<Value>> = Vec::new();
+    for &i in &picked {
+        let f = &fields[i];
+        let alias = f.alias.clone().unwrap_or_else(|| f.name.clone());
+        let type_name = match f.field_type {
+            FieldType::SmallInteger => "Short".to_owned(),
+            FieldType::Integer => "Long".to_owned(),
+            FieldType::BigInteger => "BigInteger".to_owned(),
+            FieldType::Single => "Float".to_owned(),
+            FieldType::Double => "Double".to_owned(),
+            _ => format!("Text ({})", f.length),
+        };
+        let nulls = rows_in
+            .iter()
+            .filter(|r| matches!(r[i], Value::Null))
+            .count();
+        let mut row = vec![
+            Value::String(f.name.clone()),
+            Value::String(alias),
+            Value::String(type_name),
+            Value::Integer(nulls as i32),
+        ];
+        if numeric {
+            let mut v: Vec<f64> = rows_in
+                .iter()
+                .filter_map(|r| crate::number(&r[i]))
+                .collect();
+            v.sort_by(f64::total_cmp);
+            let n = v.len();
+            let (counts, mode, least) =
+                value_counts(&v.iter().map(|x| x.to_bits()).collect::<Vec<_>>());
+            let nf = n as f64;
+            let sum: f64 = v.iter().sum();
+            let mean = sum / nf;
+            let q = |p: f64| {
+                let pos = (nf - 1.0) * p;
+                let lo = pos.floor() as usize;
+                let hi = (lo + 1).min(n - 1);
+                v[lo] + (v[hi] - v[lo]) * (pos - lo as f64)
+            };
+            let moment = |k: i32| v.iter().map(|x| (x - mean).powi(k)).sum::<f64>() / nf;
+            let (q1, med, q3) = if n > 0 {
+                (q(0.25), q(0.5), q(0.75))
+            } else {
+                (0.0, 0.0, 0.0)
+            };
+            let iqr = q3 - q1;
+            let sd = (n > 1).then(|| (moment(2) * nf / (nf - 1.0)).sqrt());
+            let m2 = moment(2);
+            let opt = |x: Option<f64>| {
+                x.filter(|y| y.is_finite())
+                    .map_or(Value::Null, Value::Double)
+            };
+            let outliers = v
+                .iter()
+                .filter(|&&x| x < q1 - 1.5 * iqr || x > q3 + 1.5 * iqr)
+                .count();
+            let bits = |b: Option<u64>| opt(b.map(f64::from_bits));
+            row.extend([
+                opt(v.first().copied()),
+                opt(v.last().copied()),
+                opt((n > 0).then_some(mean)),
+                opt(sd),
+                opt((n > 0).then_some(med)),
+                Value::Integer(n as i32),
+                Value::Integer(counts as i32),
+                bits(mode),
+                bits(least),
+                Value::Integer(outliers as i32),
+                opt((n > 0).then_some(sum)),
+                opt(v.first().zip(v.last()).map(|(a, b)| b - a)),
+                opt((n > 0).then_some(iqr)),
+                opt((n > 0).then_some(q1)),
+                opt((n > 0).then_some(q3)),
+                opt(sd.map(|s| s / mean)),
+                opt((n > 2 && m2 > 0.0).then(|| moment(3) / m2.powf(1.5))),
+                opt((n > 2 && m2 > 0.0).then(|| moment(4) / (m2 * m2))),
+            ]);
+        } else {
+            let strings: Vec<&str> = rows_in
+                .iter()
+                .filter_map(|r| match &r[i] {
+                    Value::String(s) => Some(s.as_str()),
+                    _ => None,
+                })
+                .collect();
+            let mut ids: Vec<usize> = Vec::new();
+            let mut uniq: Vec<&str> = Vec::new();
+            for s in &strings {
+                let p = uniq.iter().position(|u| u == s).unwrap_or_else(|| {
+                    uniq.push(s);
+                    uniq.len() - 1
+                });
+                ids.push(p);
+            }
+            let (counts, mode, least) =
+                value_counts(&ids.iter().map(|&x| x as u64).collect::<Vec<_>>());
+            let all_unique = !uniq.is_empty() && uniq.len() > 1 && uniq.len() == strings.len();
+            let label = |pick: Option<u64>, any: bool| {
+                if all_unique {
+                    Value::String("[All Unique Values]".into())
+                } else if let Some(p) = pick {
+                    Value::String(uniq[p as usize].to_owned())
+                } else if any {
+                    Value::String("[Multiple Values]".into())
+                } else {
+                    Value::Null
+                }
+            };
+            row.extend([
+                Value::Integer(strings.len() as i32),
+                Value::Integer(counts as i32),
+                label(mode, !strings.is_empty()),
+                label(least, !strings.is_empty()),
+            ]);
+        }
+        out_rows.push(row);
+    }
+    let mut cols: Vec<Field> = Vec::new();
+    for (k, name) in ["FieldName", "Alias", "FieldType"].iter().enumerate() {
+        let mut fld = Field::new(*name, FieldType::String);
+        fld.length = out_rows
+            .iter()
+            .map(|r| match &r[k] {
+                Value::String(s) => s.chars().count() as u32,
+                _ => 0,
+            })
+            .max()
+            .unwrap_or(1)
+            .max(1);
+        cols.push(fld);
+    }
+    cols.push(Field::new("Nulls", FieldType::Integer));
+    let dbl = |n: &str| Field::new(n, FieldType::Double);
+    if numeric {
+        cols.extend([
+            dbl("Minimum"),
+            dbl("Maximum"),
+            dbl("Mean"),
+            dbl("StandardDeviation"),
+            dbl("Median"),
+            Field::new("Count", FieldType::Integer),
+            Field::new("NumberofUniqueValues", FieldType::Integer),
+            dbl("Mode"),
+            dbl("LeastCommon"),
+            Field::new("Outliers", FieldType::Integer),
+            dbl("Sum"),
+            dbl("Range"),
+            dbl("InterquartileRange"),
+            dbl("FirstQuartile"),
+            dbl("ThirdQuartile"),
+            dbl("CoefficientofVariation"),
+            dbl("Skewness"),
+            dbl("Kurtosis"),
+        ]);
+    } else {
+        cols.push(Field::new("Count", FieldType::Integer));
+        cols.push(Field::new("NumberofUniqueValues", FieldType::Integer));
+        for n in ["Mode", "LeastCommon"] {
+            let mut fld = Field::new(n, FieldType::String);
+            fld.length = 19;
+            cols.push(fld);
+        }
+    }
+    Ok(TableOutput {
+        fields: cols,
+        rows: out_rows,
+    })
+}
+
+/// (distinct values, the single most common value, the single least common value) of `keys`;
+/// a tie for first place gives `None`.
+fn value_counts(keys: &[u64]) -> (usize, Option<u64>, Option<u64>) {
+    let mut counts: Vec<(u64, usize)> = Vec::new();
+    for &k in keys {
+        match counts.iter_mut().find(|c| c.0 == k) {
+            Some(c) => c.1 += 1,
+            None => counts.push((k, 1)),
+        }
+    }
+    let single = |target: usize| {
+        let hits: Vec<_> = counts.iter().filter(|c| c.1 == target).collect();
+        (hits.len() == 1).then(|| hits[0].0)
+    };
+    let max = counts.iter().map(|c| c.1).max().unwrap_or(0);
+    let min = counts.iter().map(|c| c.1).min().unwrap_or(0);
+    let mode = if counts.len() > 1 && max == 1 {
+        None
+    } else {
+        single(max)
+    };
+    (counts.len(), mode, single(min))
+}

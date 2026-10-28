@@ -70783,6 +70783,546 @@
           "method": "One-cold"
         }
       }
+    },
+    "fst_parcels_num": {
+      "tool": "management.FieldStatisticsToTable",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "VALUE;ZONE;PARCEL_ID",
+        "NUMERIC"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "FieldName",
+          "String",
+          9,
+          0,
+          0
+        ],
+        [
+          "Alias",
+          "String",
+          9,
+          0,
+          0
+        ],
+        [
+          "FieldType",
+          "String",
+          6,
+          0,
+          0
+        ],
+        [
+          "Nulls",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Minimum",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Maximum",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Mean",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "StandardDe",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Median",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Count",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NumberofUn",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Mode",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LeastCommo",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Outliers",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Sum",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Range",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Interquart",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "FirstQuart",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ThirdQuart",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Coefficien",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Skewness",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Kurtosis",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "field_statistics_to_table",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "fields": "VALUE;ZONE;PARCEL_ID",
+          "field_type": "NUMERIC"
+        }
+      }
+    },
+    "fst_parcels_text": {
+      "tool": "management.FieldStatisticsToTable",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "NAME",
+        "TEXT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "FieldName",
+          "String",
+          4,
+          0,
+          0
+        ],
+        [
+          "Alias",
+          "String",
+          4,
+          0,
+          0
+        ],
+        [
+          "FieldType",
+          "String",
+          9,
+          0,
+          0
+        ],
+        [
+          "Nulls",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Count",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NumberofUn",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Mode",
+          "String",
+          19,
+          0,
+          0
+        ],
+        [
+          "LeastCommo",
+          "String",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "field_statistics_to_table",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "fields": "NAME",
+          "field_type": "TEXT"
+        }
+      }
+    },
+    "fst_streams_text": {
+      "tool": "management.FieldStatisticsToTable",
+      "args": [
+        "testdata/geoproc/streams.shp",
+        "<out>",
+        "NAME",
+        "TEXT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "FieldName",
+          "String",
+          4,
+          0,
+          0
+        ],
+        [
+          "Alias",
+          "String",
+          4,
+          0,
+          0
+        ],
+        [
+          "FieldType",
+          "String",
+          9,
+          0,
+          0
+        ],
+        [
+          "Nulls",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Count",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NumberofUn",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Mode",
+          "String",
+          19,
+          0,
+          0
+        ],
+        [
+          "LeastCommo",
+          "String",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "field_statistics_to_table",
+        "params": {
+          "input": "testdata/geoproc/streams.shp",
+          "output": "<out>",
+          "fields": "NAME",
+          "field_type": "TEXT"
+        }
+      }
+    },
+    "fst_wells_num": {
+      "tool": "management.FieldStatisticsToTable",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "DEPTH",
+        "NUMERIC"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "FieldName",
+          "String",
+          5,
+          0,
+          0
+        ],
+        [
+          "Alias",
+          "String",
+          5,
+          0,
+          0
+        ],
+        [
+          "FieldType",
+          "String",
+          6,
+          0,
+          0
+        ],
+        [
+          "Nulls",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Minimum",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Maximum",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Mean",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "StandardDe",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Median",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Count",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NumberofUn",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Mode",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LeastCommo",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Outliers",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Sum",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Range",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Interquart",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "FirstQuart",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ThirdQuart",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Coefficien",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Skewness",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Kurtosis",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "field_statistics_to_table",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "output": "<out>",
+          "fields": "DEPTH",
+          "field_type": "NUMERIC"
+        }
+      }
     }
   }
 }

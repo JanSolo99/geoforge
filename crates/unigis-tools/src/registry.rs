@@ -1108,6 +1108,23 @@ fn copy_rows(ctx: &dyn Context) -> Result<Outcome> {
     Ok(Outcome::Table(table))
 }
 
+fn field_statistics_to_table(ctx: &dyn Context) -> Result<Outcome> {
+    let t = find("field_statistics_to_table")
+        .ok_or_else(|| Error::Unsupported("field_statistics_to_table".into()))?;
+    let fields: Vec<String> = text(ctx, t, "fields")
+        .ok_or_else(|| Error::Unsupported("ERROR 000735: Input Fields: value is required".into()))?
+        .split(';')
+        .map(|f| f.trim().to_owned())
+        .filter(|f| !f.is_empty())
+        .collect();
+    let numeric = !text(ctx, t, "field_type").is_some_and(|f| f.eq_ignore_ascii_case("text"));
+    Ok(Outcome::Table(tables::field_statistics_to_table(
+        ctx.features("input")?.as_ref(),
+        &fields,
+        numeric,
+    )?))
+}
+
 fn table_select(ctx: &dyn Context) -> Result<Outcome> {
     let t = find("table_select").ok_or_else(|| Error::Unsupported("table_select".into()))?;
     let fc = ctx.features("input")?;
@@ -1668,6 +1685,41 @@ pub static TOOLS: &[Tool] = &[
         output_suffix: "Encoded",
         measures: false,
         run: Runner::Features(encode_field),
+    },
+    Tool {
+        id: "field_statistics_to_table",
+        name: "Field Statistics To Table",
+        toolbox: "Data Management › Fields",
+        summary: "Descriptive statistics per field (ArcGIS Pro Field Statistics To Table), one field type per run, ungrouped.",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Table",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "fields",
+                label: "Input Fields",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+                help: "Field names separated by semicolons.",
+            },
+            Param {
+                name: "field_type",
+                label: "Field Type",
+                kind: Kind::Choice(&["Numeric", "Text"]),
+                required: false,
+                default: "Numeric",
+                help: "The kind of fields to summarize; others in the list are skipped.",
+            },
+        ],
+        output_suffix: "FieldStatistics",
+        measures: false,
+        run: Runner::Dynamic(field_statistics_to_table),
     },
     Tool {
         id: "flip_line",

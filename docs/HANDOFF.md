@@ -154,3 +154,12 @@ integer fields on streams/parcels shapefiles). Categories are sorted (text bytew
 numerically), named OH_/OC_ + value with non-alphanumerics -> '_'; null rows stay null. Unverified:
 ArcGIS's de-duplication of colliding names (saw OH_b_1 for b/B, OH_a_b1..3 for 'a b','a-b','a_b'; we use _N),
 64-char name limit, Temporal method, DATE/BIGINTEGER fields.
+
+Claude: Field Statistics To Table added as `field_statistics_to_table` (one field type per run,
+NUMERIC or TEXT, no group-by / custom statistics). arcpy needs the Field Types argument as
+uppercase NUMERIC / TEXT (other keys raise KeyError in the validator). 4 `fst_*` cases match.
+Findings: sample std dev, population skewness and non-excess kurtosis, quartiles at (n-1)p
+interpolation, Outliers beyond 1.5 IQR; Mode/LeastCommon are None on ties (text: '[Multiple Values]',
+all-unique: '[All Unique Values]'); '' counts as a value, NULL as Nulls. Not done: Date fields,
+group_by_field, the Statistic list, a combined NUMERIC+TEXT run (ArcGIS writes two tables).
+Harness: the case runs into memory then copies the table to the output .dbf.

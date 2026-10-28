@@ -406,6 +406,10 @@ CASES = {
     "enc_name_cold": ("management.EncodeField", [DATA / "streams.shp"], ["NAME", "One-cold"]),
         "enc_zone_hot": ("management.EncodeField", [DATA / "parcels.shp"], ["ZONE", "One-hot"]),
     "enc_zone_cold": ("management.EncodeField", [DATA / "parcels.shp"], ["ZONE", "One-cold"]),
+    "fst_parcels_num": ("management.FieldStatisticsToTable", [DATA / "parcels.shp"], ["VALUE;ZONE;PARCEL_ID", "NUMERIC"]),
+    "fst_parcels_text": ("management.FieldStatisticsToTable", [DATA / "parcels.shp"], ["NAME", "TEXT"]),
+    "fst_streams_text": ("management.FieldStatisticsToTable", [DATA / "streams.shp"], ["NAME", "TEXT"]),
+    "fst_wells_num": ("management.FieldStatisticsToTable", [DATA / "wells.shp"], ["DEPTH", "NUMERIC"]),
     "xy_stations": ("management.XYTableToPoint", [DATA / "stations.csv"], ["X", "Y", "", 32633]),
     "xy_stations_z": ("management.XYTableToPoint", [DATA / "stations.csv"], ["X", "Y", "ELEV", 32633]),
     "slope_dem": ("gp.Slope_sa", [RASTER / "dem.tif"], ["DEGREE", 1, "PLANAR", "METER"]),
@@ -1890,10 +1894,7 @@ RUN = {
     "cartography.GridIndexFeatures": ("grid_index_features", ["input", "output", "intersect_feature", None, None, "polygon_width", "polygon_height"]),
     "gp.ReclassByASCIIFile_sa": ("reclass_by_ascii_file", ["input", "remap_file", "output", "missing_values"]),
     "edit.FlipLine": ("flip_line", ["input", "output"]),
-    "edit.Generalize": ("generalize", ["input", "output", "tolerance"]),
-    "management.CopyRaster": ("copy_raster", ["input", "output", None, None, "nodata_value", None, None, "pixel_type"]),
-    "management.MosaicToNewRaster": ("mosaic_to_new_raster", ["inputs", "output", None, "pixel_type", "cellsize", None, "mosaic_method"]),
-    "gp.ExtractByPolygon_sa": ("extract_by_polygon", ["input", "polygon", "output", "extraction_area"]),
+    "management.FieldStatisticsToTable": ("field_statistics_to_table", ["input", "output", "fields", "field_type"]),
     "management.EncodeField": ("encode_field", ["input", "output", "field", "method"]),
     "management.GeodeticDensify": ("geodetic_densify", ["input", "output", "densify_method", "max_segment_length"]),
     "management.TableToEllipse": ("table_to_ellipse", ["input", "output", "x_field", "y_field", "major_field", "minor_field", "distance_units", "azimuth_field", "azimuth_units", None, "spatial_reference", None, "shape_type", "method"]),
@@ -1902,6 +1903,10 @@ RUN = {
     "gp.TopographicPositionIndex_sa": ("topographic_position_index", ["input", "output", "neighborhood"]),
     "gp.TopHatTransform_sa": ("top_hat_transform", ["input", "output", "neighborhood", "analysis_type"]),
     "gp.Test_sa": ("test", ["input", "where_clause", "output"]),
+    "edit.Generalize": ("generalize", ["input", "output", "tolerance"]),
+    "management.CopyRaster": ("copy_raster", ["input", "output", None, None, "nodata_value", None, None, "pixel_type"]),
+    "management.MosaicToNewRaster": ("mosaic_to_new_raster", ["inputs", "output", None, "pixel_type", "cellsize", None, "mosaic_method"]),
+    "gp.ExtractByPolygon_sa": ("extract_by_polygon", ["input", "polygon", "output", "extraction_area"]),
     "gp.Trend_sa": ("trend", ["input", "z_field", "output", "cell_size", "order"]),
     "gp.Rank_sa": ("rank", ["rank", "rasters", "output"]),
     "gp.Popularity_sa": ("popularity", ["rank", "rasters", "output"]),
@@ -1963,7 +1968,7 @@ WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable", "conversion.RasterToASCII", "conversion.RasterToFloat"}
 # Tools whose output is a table, written as <name>.dbf.
-TABLE_OUT = {"gp.Sample_sa", "management.CopyRows", "gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa", "gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
+TABLE_OUT = {"management.FieldStatisticsToTable", "gp.Sample_sa", "management.CopyRows", "gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa", "gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
              "management.TransposeFields", "management.PivotTable", "management.CreateTable", "analysis.PolygonNeighbors", "analysis.TabulateIntersection", "analysis.TableSelect"}
 # Tools whose ArcGIS output must be a geodatabase feature class or memory (copied to a shapefile).
 MEMORY_OUT = {"analysis.SummarizeWithin", "analysis.SummarizeNearby", "analysis.ApportionPolygon"}
@@ -2068,6 +2073,10 @@ def main():
             k = IN_PLACE[tool]
             if raster_projection:
                 # CopyRaster can replace the NoData value; preserve source bytes.
+        elif tool == "management.FieldStatisticsToTable":
+            # Writes <input>_FieldStatisticsToTable_<type> into the output location: run into
+            # memory, then copy that table to the output below.
+            args = [str(before[0]), after[0], "memory", after[1]]
                 shutil.copy2(before[k], out)
                 aux = Path(str(before[k]) + ".aux.xml")
                 if aux.exists():
@@ -2108,6 +2117,12 @@ def main():
             r2 = w.call("run_tool", tool="management.CopyFeatures", args=[mem, str(out)], env={"overwriteOutput": True})
             w.call("python", code=f"arcpy.management.Delete('{mem}')")
             if r2.get("status") != "succeeded":
+        if tool == "management.FieldStatisticsToTable" and r.get("status") == "succeeded":
+            w.call("python", code=(
+                "arcpy.env.workspace = 'memory'\n"
+                "tb = [t for t in arcpy.ListTables() if 'FieldStatisticsToTable' in t]\n"
+                f"arcpy.management.CopyRows('memory/' + tb[0], r'{out}')\n"
+                "for t in tb: arcpy.management.Delete('memory/' + t)\n"))
                 r = r2
         if tool in WORKSPACE_OUT:
             outputs = {}
