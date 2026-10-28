@@ -1010,6 +1010,30 @@ fn over_tool(ctx: &dyn Context) -> Result<Output> {
     with_statistics(r, true)
 }
 
+fn compute_change_raster(ctx: &dyn Context) -> Result<Output> {
+    let relative = match ctx
+        .get("change_type")
+        .unwrap_or_else(|| "DIFFERENCE".into())
+        .to_ascii_uppercase()
+        .as_str()
+    {
+        "DIFFERENCE" => false,
+        "RELATIVE_DIFFERENCE" => true,
+        other => {
+            return Err(Error::Unsupported(format!(
+                "ERROR 000067: Change Type: {other} is not supported yet"
+            )));
+        }
+    };
+    let r = crate::local::compute_change(
+        &ctx.raster("from_raster")?,
+        &ctx.raster("to_raster")?,
+        relative,
+    )
+    .ok_or_else(|| Error::Unsupported("the rasters do not overlap".into()))?;
+    with_statistics(r, false)
+}
+
 fn flip(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::extract::flip(&ctx.raster("input")?), true)
 }
@@ -1807,6 +1831,22 @@ pub static TOOLS: &[Tool] = &[
     },
     binary_tool!(diff_tool, "diff", "Diff"),
     binary_tool!(over_tool, "over", "Over"),
+    Tool {
+        id: "compute_change_raster",
+        name: "Compute Change Raster",
+        summary: "Difference or relative difference between two single-band rasters.",
+        params: &[
+            raster("from_raster", "From Raster", true),
+            raster("to_raster", "To Raster", true),
+            option(
+                "change_type",
+                "Method",
+                &["DIFFERENCE", "RELATIVE_DIFFERENCE"],
+                "DIFFERENCE",
+            ),
+        ],
+        run: compute_change_raster,
+    },
     Tool {
         id: "flip",
         name: "Flip",

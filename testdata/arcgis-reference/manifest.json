@@ -64164,6 +64164,226 @@
           "output": "<out>"
         }
       }
+    },
+    "cc2_difference_dem_i16": {
+      "tool": "gp.ComputeChangeRaster_ia",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>",
+        "DIFFERENCE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "compute_change_raster",
+        "params": {
+          "from_raster": "testdata/raster/dem.tif",
+          "to_raster": "testdata/raster/dem_int16_packbits.tif",
+          "output": "<out>",
+          "change_type": "DIFFERENCE"
+        }
+      }
+    },
+    "cc2_difference_i16_dem": {
+      "tool": "gp.ComputeChangeRaster_ia",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "testdata/raster/dem.tif",
+        "<out>",
+        "DIFFERENCE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "compute_change_raster",
+        "params": {
+          "from_raster": "testdata/raster/dem_int16_packbits.tif",
+          "to_raster": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "change_type": "DIFFERENCE"
+        }
+      }
+    },
+    "cc2_difference_u8_patch": {
+      "tool": "gp.ComputeChangeRaster_ia",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        "DIFFERENCE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "compute_change_raster",
+        "params": {
+          "from_raster": "testdata/raster/landuse_u8.tif",
+          "to_raster": "testdata/raster/patches_i16.tif",
+          "output": "<out>",
+          "change_type": "DIFFERENCE"
+        }
+      }
+    },
+    "cc2_difference_patch_u8": {
+      "tool": "gp.ComputeChangeRaster_ia",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "DIFFERENCE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "compute_change_raster",
+        "params": {
+          "from_raster": "testdata/raster/patches_i16.tif",
+          "to_raster": "testdata/raster/landuse_u8.tif",
+          "output": "<out>",
+          "change_type": "DIFFERENCE"
+        }
+      }
+    },
+    "cc2_difference_dem_nodata": {
+      "tool": "gp.ComputeChangeRaster_ia",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "DIFFERENCE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "compute_change_raster",
+        "params": {
+          "from_raster": "testdata/raster/dem.tif",
+          "to_raster": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "change_type": "DIFFERENCE"
+        }
+      }
+    },
+    "cc2_relative_difference_dem_i16": {
+      "tool": "gp.ComputeChangeRaster_ia",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>",
+        "RELATIVE_DIFFERENCE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "compute_change_raster",
+        "params": {
+          "from_raster": "testdata/raster/dem.tif",
+          "to_raster": "testdata/raster/dem_int16_packbits.tif",
+          "output": "<out>",
+          "change_type": "RELATIVE_DIFFERENCE"
+        }
+      }
+    },
+    "cc2_relative_difference_i16_dem": {
+      "tool": "gp.ComputeChangeRaster_ia",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "testdata/raster/dem.tif",
+        "<out>",
+        "RELATIVE_DIFFERENCE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "compute_change_raster",
+        "params": {
+          "from_raster": "testdata/raster/dem_int16_packbits.tif",
+          "to_raster": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "change_type": "RELATIVE_DIFFERENCE"
+        }
+      }
+    },
+    "cc2_relative_difference_u8_patch": {
+      "tool": "gp.ComputeChangeRaster_ia",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "testdata/raster/patches_i16.tif",
+        "<out>",
+        "RELATIVE_DIFFERENCE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "compute_change_raster",
+        "params": {
+          "from_raster": "testdata/raster/landuse_u8.tif",
+          "to_raster": "testdata/raster/patches_i16.tif",
+          "output": "<out>",
+          "change_type": "RELATIVE_DIFFERENCE"
+        }
+      }
+    },
+    "cc2_relative_difference_patch_u8": {
+      "tool": "gp.ComputeChangeRaster_ia",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "RELATIVE_DIFFERENCE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "compute_change_raster",
+        "params": {
+          "from_raster": "testdata/raster/patches_i16.tif",
+          "to_raster": "testdata/raster/landuse_u8.tif",
+          "output": "<out>",
+          "change_type": "RELATIVE_DIFFERENCE"
+        }
+      }
+    },
+    "cc2_relative_difference_dem_nodata": {
+      "tool": "gp.ComputeChangeRaster_ia",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "RELATIVE_DIFFERENCE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "compute_change_raster",
+        "params": {
+          "from_raster": "testdata/raster/dem.tif",
+          "to_raster": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "change_type": "RELATIVE_DIFFERENCE"
+        }
+      }
     }
   }
 }

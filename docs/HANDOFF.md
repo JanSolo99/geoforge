@@ -123,3 +123,8 @@ tracks it. Rule for the long run: keep to probe -> closed-form fit -> registry e
 Claude 2026-10-29: Diff and Over (Image Analyst; `diff`, `over` in the raster registry, `diff_*`/`over_*` 14 cases pass):
 Diff = first value where it differs from the second, 0 where equal (type from the FIRST operand only: width, floating,
 signed-if-statistics-negative); Over = first value, or the second where the first is 0 (background); type = widest of both.
+
+Claude 2026-10-29: Compute Change Raster (single band; DIFFERENCE = to - from, RELATIVE_DIFFERENCE = (to - from)/max(|from|,|to|), 0
+where both 0; F32 NoData 3.4e38, no statistics sidecar; `compute_change_raster`, `cc2_*` 10 cases pass). Categorical difference,
+spectral distance/angle and multiband inputs not done. Probed ConvertSARUnits, CreateBinaryMask, CreateColorComposite,
+SummarizeCategoricalRaster usage only (SAR/multiband inputs needed).

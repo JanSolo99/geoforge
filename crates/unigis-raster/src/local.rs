@@ -1090,3 +1090,31 @@ pub fn diff_or_over(over: bool, a: &Operand, b: &Operand) -> Option<Raster> {
         typed_raster(g, values, t, nodata)
     })
 }
+
+/// Compute Change Raster (single band, DIFFERENCE or RELATIVE_DIFFERENCE): `to - from`, or that
+/// divided by the larger absolute value of the two (0 where both are 0). 32-bit float, NoData
+/// 3.4e38; NoData where either raster is.
+pub fn compute_change(from: &Raster, to: &Raster, relative: bool) -> Option<Raster> {
+    let (f, t) = common_grid(from, to)?;
+    let nodata = f64::from(3.4e38_f32);
+    let mut out = f.like(DataType::F32);
+    out.nodata = Some(nodata);
+    out.bands[0] = f.bands[0]
+        .iter()
+        .zip(&t.bands[0])
+        .map(|(&a, &b)| {
+            if f.is_nodata(a) || t.is_nodata(b) {
+                return nodata;
+            }
+            let d = b - a;
+            let v = if relative {
+                let m = a.abs().max(b.abs());
+                if m == 0.0 { 0.0 } else { d / m }
+            } else {
+                d
+            };
+            DataType::F32.store(v)
+        })
+        .collect();
+    Some(out)
+}
