@@ -738,3 +738,139 @@ pub fn polygon_to_line(input: &dyn FeatureClass) -> Result<ToolOutput> {
         messages: Vec::new(),
     })
 }
+
+/// One axis of a coordinate as ArcGIS Convert Coordinate Notation writes it: degrees (two digits
+/// for latitude, three for longitude), then minutes and seconds with eight decimals, and the
+/// hemisphere letter last (`45 40 44.04360000N`).
+fn notation_axis(value: f64, is_lat: bool, parts: u8) -> String {
+    let width = if is_lat { 2 } else { 3 };
+    let hemi = match (is_lat, value < 0.0) {
+        (true, true) => 'S',
+        (true, false) => 'N',
+        (false, true) => 'W',
+        (false, false) => 'E',
+    };
+    let mut a = value.abs();
+    // ArcGIS carries a value within about 1e-8 degrees of the next minute or second.
+    if parts > 1 {
+        let grid = if parts == 2 { 60.0 } else { 3600.0 };
+        let snapped = (a * grid).round() / grid;
+        if (a - snapped).abs() <= 1.5e-8 {
+            a = snapped;
+        }
+    }
+    let mut deg = a.floor();
+    let rem = a - deg;
+    let body = match parts {
+        1 => format!("{a:0w$.8}", w = width + 9),
+        2 => {
+            let mut min = format!("{:011.8}", rem * 60.0);
+            if min.starts_with("60.") {
+                deg += 1.0;
+                min = format!("{:011.8}", 0.0);
+            }
+            format!("{deg:0width$.0} {min}")
+        }
+        _ => {
+            let mut min = (rem * 60.0).floor();
+            let mut sec = (rem - min / 60.0) * 3600.0;
+            if sec < 0.0 {
+                sec = 0.0;
+            }
+            let mut s = format!("{sec:011.8}");
+            if s.starts_with("60.") {
+                min += 1.0;
+                s = format!("{:011.8}", 0.0);
+            }
+            if min >= 60.0 {
+                min = 0.0;
+                deg += 1.0;
+            }
+            format!("{deg:0width$.0} {min:02.0} {s}")
+        }
+    };
+    format!("{body}{hemi}")
+}
+
+/// Convert Coordinate Notation from decimal-degree X/Y fields to `DD_1`, `DD_2`, `DDM_1`,
+/// `DDM_2`, `DMS_1`, `DMS_2` or `DD_NUMERIC` (observed against ArcGIS Pro 3.7). Points are the
+/// input coordinates; the input's fields come first, then the notation field(s).
+pub fn convert_coordinate_notation(
+    table: &dyn FeatureClass,
+    x_field: &str,
+    y_field: &str,
+    output_format: &str,
+    spatial_reference_wkt: Option<String>,
+) -> Result<ToolOutput> {
+    let pos = |n: &str| crate::field_positions(table, &[n.to_owned()]).map(|v| v[0]);
+    let (xi, yi) = (pos(x_field)?, pos(y_field)?);
+    let fmt = output_format.to_ascii_uppercase();
+    let (prefix, parts, single) = match fmt.as_str() {
+        "DD_1" => ("DD", 1, true),
+        "DD_2" => ("DD", 1, false),
+        "DDM_1" => ("DDM", 2, true),
+        "DDM_2" => ("DDM", 2, false),
+        "DMS_1" => ("DMS", 3, true),
+        "DMS_2" => ("DMS", 3, false),
+        "DD_NUMERIC" => ("DD", 0, false),
+        other => return Err(err(format!("output format {other}"))),
+    };
+    let text = |len: u32, name: &str| {
+        let mut f = Field::new(name, FieldType::String);
+        f.length = len;
+        f
+    };
+    let mut fields = table.fields().to_vec();
+    if parts == 0 {
+        fields.push(Field::new("DDLat", FieldType::Double));
+        fields.push(Field::new("DDLon", FieldType::Double));
+    } else if single {
+        fields.push(text(255, &format!("{prefix}LatLon")));
+    } else {
+        fields.push(text(255, &format!("{prefix}Lat")));
+        fields.push(text(255, &format!("{prefix}Lon")));
+    }
+    let mut features = Vec::new();
+    for f in table.features() {
+        let f = f?;
+        let (x, y) = (
+            crate::number(&f.attributes[xi]),
+            crate::number(&f.attributes[yi]),
+        );
+        let mut attributes = f.attributes.clone();
+        match (x, y) {
+            (Some(x), Some(y)) if parts == 0 => {
+                attributes.push(Value::Double(y));
+                attributes.push(Value::Double(x));
+            }
+            (Some(x), Some(y)) => {
+                let lat = notation_axis(y, true, parts);
+                let lon = notation_axis(x, false, parts);
+                if single {
+                    attributes.push(Value::String(format!("{lat} {lon}")));
+                } else {
+                    attributes.push(Value::String(lat));
+                    attributes.push(Value::String(lon));
+                }
+            }
+            _ => {
+                let n = if parts == 0 || !single { 2 } else { 1 };
+                attributes.extend(std::iter::repeat_n(Value::Null, n));
+            }
+        }
+        features.push(Feature {
+            oid: features.len() as i64,
+            geometry: x.zip(y).map(|(x, y)| Geometry::point(x, y)),
+            attributes,
+        });
+    }
+    Ok(ToolOutput {
+        kind: GeometryKind::Point,
+        has_z: false,
+        has_m: false,
+        fields,
+        spatial_reference_wkt,
+        features,
+        messages: Vec::new(),
+    })
+}

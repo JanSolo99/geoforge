@@ -466,6 +466,20 @@ fn flip_line(ctx: &dyn Context) -> Result<ToolOutput> {
     construct::flip_line(ctx.features("input")?.as_ref())
 }
 
+fn convert_coordinate_notation(ctx: &dyn Context) -> Result<ToolOutput> {
+    let t = find("convert_coordinate_notation")
+        .ok_or_else(|| Error::Unsupported("convert_coordinate_notation".into()))?;
+    let need = |k: &str| text(ctx, t, k).ok_or_else(|| Error::Unsupported(format!("missing {k}")));
+    let wgs84 = unigis_proj::Crs::parse("4326")?;
+    construct::convert_coordinate_notation(
+        ctx.features("input")?.as_ref(),
+        &need("x_field")?,
+        &need("y_field")?,
+        &need("output_format")?,
+        Some(wgs84.esri_wkt().to_owned()),
+    )
+}
+
 fn generalize(ctx: &dyn Context) -> Result<ToolOutput> {
     let t = find("generalize").ok_or_else(|| Error::Unsupported("generalize".into()))?;
     let fc = ctx.features("input")?;
@@ -1327,6 +1341,63 @@ pub static TOOLS: &[Tool] = &[
         output_suffix: "Transects",
         measures: true,
         run: Runner::Features(generate_transects_along_lines),
+    },
+    Tool {
+        id: "convert_coordinate_notation",
+        name: "Convert Coordinate Notation",
+        toolbox: "Data Management › Features",
+        summary: "Writes decimal-degree X/Y fields as DD, DDM or DMS text (ArcGIS Pro Convert Coordinate Notation, DD input).",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Table",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "A table with longitude and latitude fields in decimal degrees.",
+            },
+            Param {
+                name: "x_field",
+                label: "X Field (Longitude)",
+                kind: Kind::Field {
+                    of: "input",
+                    numeric: true,
+                },
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "y_field",
+                label: "Y Field (Latitude)",
+                kind: Kind::Field {
+                    of: "input",
+                    numeric: true,
+                },
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "output_format",
+                label: "Output Coordinate Format",
+                kind: Kind::Choice(&[
+                    "DD_1",
+                    "DD_2",
+                    "DDM_1",
+                    "DDM_2",
+                    "DMS_1",
+                    "DMS_2",
+                    "DD_NUMERIC",
+                ]),
+                required: true,
+                default: "DD_2",
+                help: "",
+            },
+        ],
+        output_suffix: "Notation",
+        measures: false,
+        run: Runner::Features(convert_coordinate_notation),
     },
     Tool {
         id: "flip_line",

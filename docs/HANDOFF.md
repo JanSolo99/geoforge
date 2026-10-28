@@ -100,3 +100,10 @@ original/fresh-recipe cases all exactPASS, including32value precision fixture.
 Dashboard--ci/JS/Python/diff PASS. Ready for explicit commit/normal push.
 Next private integer-float GP probe EXIT0:39/39, all2bands/F32. No corresponding
 product/manifest edits yet; metadata/precision inspection pending.
+
+Claude: Convert Coordinate Notation (DD_1/DD_2/DDM_1/DDM_2/DMS_1/DMS_2/DD_NUMERIC,
+decimal-degree lon/lat input) added as registry tool `convert_coordinate_notation`;
+7 `ccn_*` reference cases match ArcGIS. Shapefile output has no ORIG_OID (memory
+output does). ArcGIS carries values within ~1e-8 deg of the next minute/second.
+Not done: UTM/MGRS/USNG/GARS/GEOREF output, non-DD input formats. Codex's
+umintfloat edits left untouched/unstaged.

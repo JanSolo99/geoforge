@@ -69229,6 +69229,524 @@
           "output": "<out>"
         }
       }
+    },
+    "ccn_dd_1": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/lonlat.csv",
+        "<out>",
+        "LON",
+        "LAT",
+        "DD_2",
+        "DD_1",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "LON",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LAT",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DDLatLon",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/lonlat.csv",
+          "output": "<out>",
+          "x_field": "LON",
+          "y_field": "LAT",
+          "output_format": "DD_1"
+        }
+      }
+    },
+    "ccn_dd_2": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/lonlat.csv",
+        "<out>",
+        "LON",
+        "LAT",
+        "DD_2",
+        "DD_2",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "LON",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LAT",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DDLat",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDLon",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/lonlat.csv",
+          "output": "<out>",
+          "x_field": "LON",
+          "y_field": "LAT",
+          "output_format": "DD_2"
+        }
+      }
+    },
+    "ccn_ddm_1": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/lonlat.csv",
+        "<out>",
+        "LON",
+        "LAT",
+        "DD_2",
+        "DDM_1",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "LON",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LAT",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DDMLatLon",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/lonlat.csv",
+          "output": "<out>",
+          "x_field": "LON",
+          "y_field": "LAT",
+          "output_format": "DDM_1"
+        }
+      }
+    },
+    "ccn_ddm_2": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/lonlat.csv",
+        "<out>",
+        "LON",
+        "LAT",
+        "DD_2",
+        "DDM_2",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "LON",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LAT",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DDMLat",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDMLon",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/lonlat.csv",
+          "output": "<out>",
+          "x_field": "LON",
+          "y_field": "LAT",
+          "output_format": "DDM_2"
+        }
+      }
+    },
+    "ccn_dms_1": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/lonlat.csv",
+        "<out>",
+        "LON",
+        "LAT",
+        "DD_2",
+        "DMS_1",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "LON",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LAT",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DMSLatLon",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/lonlat.csv",
+          "output": "<out>",
+          "x_field": "LON",
+          "y_field": "LAT",
+          "output_format": "DMS_1"
+        }
+      }
+    },
+    "ccn_dms_2": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/lonlat.csv",
+        "<out>",
+        "LON",
+        "LAT",
+        "DD_2",
+        "DMS_2",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "LON",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LAT",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DMSLat",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DMSLon",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/lonlat.csv",
+          "output": "<out>",
+          "x_field": "LON",
+          "y_field": "LAT",
+          "output_format": "DMS_2"
+        }
+      }
+    },
+    "ccn_dd_numeric": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/lonlat.csv",
+        "<out>",
+        "LON",
+        "LAT",
+        "DD_2",
+        "DD_NUMERIC",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "LON",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LAT",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DDLat",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DDLon",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/lonlat.csv",
+          "output": "<out>",
+          "x_field": "LON",
+          "y_field": "LAT",
+          "output_format": "DD_NUMERIC"
+        }
+      }
     }
   }
 }
