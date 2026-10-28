@@ -750,15 +750,7 @@ fn notation_axis(value: f64, is_lat: bool, parts: u8) -> String {
         (false, true) => 'W',
         (false, false) => 'E',
     };
-    let mut a = value.abs();
-    // ArcGIS carries a value within about 1e-8 degrees of the next minute or second.
-    if parts > 1 {
-        let grid = if parts == 2 { 60.0 } else { 3600.0 };
-        let snapped = (a * grid).round() / grid;
-        if (a - snapped).abs() <= 1.5e-8 {
-            a = snapped;
-        }
-    }
+    let a = value.abs();
     let mut deg = a.floor();
     let rem = a - deg;
     let body = match parts {
