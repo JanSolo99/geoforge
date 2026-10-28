@@ -1505,3 +1505,144 @@ pub const SUMMARIZE_NEARBY: Tool = Tool {
     measures: true,
     run: Runner::Features(summarize_nearby),
 };
+
+/// Apportion Polygon (AREA, SUM): the target polygons with, for each chosen source field, the sum
+/// over the source polygons of their value times the share of the source polygon's area inside
+/// the target. The target's own fields come first, then the apportioned ones (Double). Other
+/// statistics, Points / Length and estimation features are not implemented.
+fn apportion_polygon(ctx: &dyn Context) -> Result<ToolOutput> {
+    let source = ctx.features("input")?;
+    let target = ctx.features("target_features")?;
+    if source.geometry_kind() != Some(GeometryKind::Polygon)
+        || target.geometry_kind() != Some(GeometryKind::Polygon)
+    {
+        return Err(err(
+            "ERROR 000368: Invalid input data: polygons are required",
+        ));
+    }
+    let method = ctx.get("apportion_by").unwrap_or_else(|| "AREA".into());
+    if !method.eq_ignore_ascii_case("AREA") {
+        return Err(err("only AREA apportioning is supported"));
+    }
+    let mut fields_to_apportion = Vec::new();
+    for part in ctx.get("apportion_fields").unwrap_or_default().split(';') {
+        let mut it = part.split_whitespace();
+        let (Some(name), Some(stat)) = (it.next(), it.next()) else {
+            continue;
+        };
+        if !stat.eq_ignore_ascii_case("SUM") {
+            return Err(err(format!(
+                "statistic {stat} is not supported yet (SUM only)"
+            )));
+        }
+        let idx = source
+            .fields()
+            .iter()
+            .position(|f| f.name.eq_ignore_ascii_case(name))
+            .ok_or_else(|| err(format!("ERROR 000728: Field {name} does not exist")))?;
+        fields_to_apportion.push(idx);
+    }
+    let rows: Vec<Feature> = source.features().collect::<Result<_>>()?;
+    let number = |v: &Value| match v {
+        Value::SmallInteger(n) => Some(f64::from(*n)),
+        Value::Integer(n) => Some(f64::from(*n)),
+        Value::BigInteger(n) => Some(*n as f64),
+        Value::Single(n) => Some(f64::from(*n)),
+        Value::Double(n) => Some(*n),
+        _ => None,
+    };
+    let mut fields = target.fields().to_vec();
+    // The apportioned fields are Double; the sum of an integer field is truncated (observed).
+    for &i in &fields_to_apportion {
+        let mut f = Field::new(source.fields()[i].name.clone(), FieldType::Double);
+        f.precision = 18;
+        f.scale = 11;
+        fields.push(f);
+    }
+    let mut features = Vec::new();
+    for t in target.features() {
+        let t = t?;
+        let Some(tg) = &t.geometry else { continue };
+        let mut sums = vec![0.0; fields_to_apportion.len()];
+        for s in &rows {
+            let Some(sg) = &s.geometry else { continue };
+            let Some(part) = unigis_geometry::intersection(sg, tg)? else {
+                continue;
+            };
+            let share = unigis_geometry::area(&part)? / unigis_geometry::area(sg)?;
+            for (k, &i) in fields_to_apportion.iter().enumerate() {
+                sums[k] += number(&s.attributes[i]).unwrap_or(0.0) * share;
+            }
+        }
+        let mut attributes = t.attributes.clone();
+        for (k, &i) in fields_to_apportion.iter().enumerate() {
+            let integer = matches!(
+                source.fields()[i].field_type,
+                FieldType::SmallInteger | FieldType::Integer | FieldType::BigInteger
+            );
+            attributes.push(Value::Double(if integer {
+                sums[k].trunc()
+            } else {
+                sums[k]
+            }));
+        }
+        features.push(Feature {
+            oid: features.len() as i64,
+            geometry: t.geometry.clone(),
+            attributes,
+        });
+    }
+    Ok(ToolOutput {
+        kind: GeometryKind::Polygon,
+        has_z: false,
+        has_m: false,
+        fields,
+        spatial_reference_wkt: target.spatial_reference_wkt().map(str::to_owned),
+        features,
+        messages: Vec::new(),
+    })
+}
+
+pub const APPORTION_POLYGON: Tool = Tool {
+    id: "apportion_polygon",
+    name: "Apportion Polygon",
+    toolbox: "Analysis › Overlay",
+    summary: "Distributes source polygon values over target polygons by area (ArcGIS Pro Apportion Polygon, AREA / SUM).",
+    params: &[
+        Param {
+            name: "input",
+            label: "Input Features",
+            kind: Kind::Features,
+            required: true,
+            default: "",
+            help: "",
+        },
+        Param {
+            name: "apportion_fields",
+            label: "Apportion Fields",
+            kind: Kind::Text,
+            required: true,
+            default: "",
+            help: "`Field SUM;Field SUM`.",
+        },
+        Param {
+            name: "target_features",
+            label: "Target Features",
+            kind: Kind::Features,
+            required: true,
+            default: "",
+            help: "",
+        },
+        Param {
+            name: "apportion_by",
+            label: "Apportion By",
+            kind: Kind::Choice(&["AREA"]),
+            required: false,
+            default: "AREA",
+            help: "",
+        },
+    ],
+    output_suffix: "Apportioned",
+    measures: true,
+    run: Runner::Features(apportion_polygon),
+};

@@ -1446,6 +1446,9 @@ CASES = {
     "gb_more_angles_bevel": ("analysis.GraphicBuffer", [DATA / "graphic_buffer_angles.shp"], ["20 Meters", "SQUARE", "BEVEL"]),
     "gb_more_clip_negative_miter1": ("analysis.GraphicBuffer", [DATA / "clip_areas.shp"], ["-20 Meters", "SQUARE", "MITER", 1]),
     "gb_more_clip_negative_miter2": ("analysis.GraphicBuffer", [DATA / "clip_areas.shp"], ["-20 Meters", "SQUARE", "MITER", 2]),
+    "apo_parcels_clip": ("analysis.ApportionPolygon", [DATA / "parcels.shp", "VALUE SUM;PARCEL_ID SUM", DATA / "clip_areas.shp"], ["AREA"]),
+    "apo_clip_parcels": ("analysis.ApportionPolygon", [DATA / "clip_areas.shp", "AREA_ID SUM", DATA / "parcels.shp"], ["AREA"]),
+    "apo_parcels_squares": ("analysis.ApportionPolygon", [DATA / "parcels.shp", "VALUE SUM", DATA / "squares.shp"], ["AREA"]),
     "gpal_roads_50": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "NO_END_POINTS"]),
     "gpal_roads_50_end": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "END_POINTS"]),
     "gpal_roads_pct": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["PERCENTAGE", "", 25, "NO_END_POINTS"]),
@@ -1642,6 +1645,7 @@ RUN = {
     "conversion.FloatToRaster": ("float_to_raster", ["input", "output"]),
     "management.CompositeBands": ("composite_bands", ["inputs", "output"]),
     "analysis.GraphicBuffer": ("graphic_buffer", ["input", "output", "distance", "line_caps", "line_joins", "miter_limit"]),
+    "analysis.ApportionPolygon": ("apportion_polygon", ["input", "apportion_fields", "target_features", "output", "apportion_by"]),
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
     "analysis.CountOverlappingFeatures": ("count_overlapping_features", ["input", "output", "minimum_overlap_count"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
@@ -1677,7 +1681,7 @@ TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable", "conversion.R
 TABLE_OUT = {"management.CopyRows", "gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa", "gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
              "management.TransposeFields", "management.PivotTable", "management.CreateTable", "analysis.PolygonNeighbors", "analysis.TabulateIntersection", "analysis.TableSelect"}
 # Tools whose ArcGIS output must be a geodatabase feature class or memory (copied to a shapefile).
-MEMORY_OUT = {"analysis.SummarizeWithin", "analysis.SummarizeNearby"}
+MEMORY_OUT = {"analysis.SummarizeWithin", "analysis.SummarizeNearby", "analysis.ApportionPolygon"}
 # Tools that take the output folder and name rather than a path.
 CREATE_TOOLS = {"management.CreateFeatureclass", "management.CreateTable"}
 

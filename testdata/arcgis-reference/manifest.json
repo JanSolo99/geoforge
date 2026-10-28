@@ -59119,6 +59119,200 @@
           "output": "<out>"
         }
       }
+    },
+    "apo_parcels_clip": {
+      "tool": "analysis.ApportionPolygon",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "VALUE SUM;PARCEL_ID SUM",
+        "testdata/geoproc/clip_areas.shp",
+        "<out>",
+        "AREA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "apportion_polygon",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "apportion_fields": "VALUE SUM;PARCEL_ID SUM",
+          "target_features": "testdata/geoproc/clip_areas.shp",
+          "output": "<out>",
+          "apportion_by": "AREA"
+        }
+      }
+    },
+    "apo_clip_parcels": {
+      "tool": "analysis.ApportionPolygon",
+      "args": [
+        "testdata/geoproc/clip_areas.shp",
+        "AREA_ID SUM",
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "AREA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "AREA_ID",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "apportion_polygon",
+        "params": {
+          "input": "testdata/geoproc/clip_areas.shp",
+          "apportion_fields": "AREA_ID SUM",
+          "target_features": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "apportion_by": "AREA"
+        }
+      }
+    },
+    "apo_parcels_squares": {
+      "tool": "analysis.ApportionPolygon",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "VALUE SUM",
+        "testdata/geoproc/squares.shp",
+        "<out>",
+        "AREA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "SQ_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "apportion_polygon",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "apportion_fields": "VALUE SUM",
+          "target_features": "testdata/geoproc/squares.shp",
+          "output": "<out>",
+          "apportion_by": "AREA"
+        }
+      }
     }
   }
 }

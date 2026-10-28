@@ -4106,7 +4106,11 @@ fn compare(case: &str, ours: &Path, theirs: &Path, fields: &serde_json::Value) -
                 (Value::Double(x), Value::Double(y)) => (x - y).abs() <= 0.001,
                 _ => false,
             };
-            if !same_value(va, vb) && !(measured && near(va, vb)) {
+            // Apportion Polygon sums areas shares on ArcGIS's grid: 1e-9 relative.
+            let apportioned = case.starts_with("apo_")
+                && matches!((va, vb), (Value::Double(x), Value::Double(y))
+                    if (x - y).abs() <= 1e-9 * x.abs().max(y.abs()).max(1.0));
+            if !same_value(va, vb) && !(measured && near(va, vb)) && !apportioned {
                 diffs.push(format!("feature {i} field {k}: ours {va:?}, ArcGIS {vb:?}"));
             }
         }

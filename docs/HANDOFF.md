@@ -67,6 +67,8 @@ Tested offline (`test_daemon_runs_inbox_tasks_commands_pause_and_keepalive`); no
 
 - Surface Parameters (probed 2026-10-28, NOT implemented): SLOPE/ASPECT/MEAN, PROFILE, TANGENTIAL, GAUSSIAN curvature with the default quadratic 3x3 neighborhood are within ~0.1% (slope) and ~0.5% (curvature) of Wood's least-squares quadratic fit (G=(z3+z6+z9-z1-z4-z7)/6c etc.) but not equal, and differ from both `Slope` and Evans-Young; first row/column are NoData; PLAN_CURVATURE is refused ("not within the defined domain"; ArcGIS calls it PLAN... use the keyword from `arcpy.Usage`). The exact weighting is unknown.
 
+- Apportion Polygon (`apportion_polygon`, AREA + SUM only; `apo_*` pass via MEMORY_OUT): target polygons + each apportioned field as Double = sum of value x (overlap / source area); integer source fields are truncated. MEAN (and other statistics) NOT done: ArcGIS gave 0.588 / 0.833 for ZONE MEAN on clip_areas whose rule I could not match (not an area-weighted mean). Points/Length and estimation features not done.
+
 ## Next actions
 
 1. Keep going in probe -> implement -> reference-test batches (see "Session 2026-10-26" entries for what is done and the gaps).
