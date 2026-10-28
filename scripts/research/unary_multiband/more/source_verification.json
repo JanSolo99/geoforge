@@ -1,0 +1,43 @@
+[
+  {
+    "file": "float32_cached.tif",
+    "sha256": "ad680241e04b24a0838227e84c96ca65d8a8bf5a05ef0a4acce8d19f4fb8cbb8",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "float32_cached.tif.aux.xml",
+    "sha256": "f1bdb53217e1dcf423e7d25857cf6ef2f1c5ce78d3cf042f9ea5cab6aa099797",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "float32_raw.tif",
+    "sha256": "ad680241e04b24a0838227e84c96ca65d8a8bf5a05ef0a4acce8d19f4fb8cbb8",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "float64_cached.tif",
+    "sha256": "1e0b8333fffcf7a490d4e8bb30bfbe496a2df85a90ee214795d129ec7b1ca36c",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "float64_cached.tif.aux.xml",
+    "sha256": "f1bdb53217e1dcf423e7d25857cf6ef2f1c5ce78d3cf042f9ea5cab6aa099797",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "float64_raw.tif",
+    "sha256": "1e0b8333fffcf7a490d4e8bb30bfbe496a2df85a90ee214795d129ec7b1ca36c",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "unary_log2_precision/input.tif",
+    "sha256": "ea9636d08c060d44683e3b7b4836f56041e0646cb08f80bc8aa4ad497b479972",
+    "matches_private_oracle_source": true
+  }
+]

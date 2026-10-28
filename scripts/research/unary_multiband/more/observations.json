@@ -1,0 +1,98 @@
+[
+  {
+    "case": "float32_raw",
+    "op": "Log2",
+    "type": "F32",
+    "bands": 2,
+    "nodata": -3.4028234663852886e+38,
+    "messages": "Start Time: Thursday, October 29, 2026 4:56:13 AM\nSucceeded at Thursday, October 29, 2026 4:56:13 AM (Elapsed Time: 0.60 seconds)"
+  },
+  {
+    "case": "float32_raw",
+    "op": "Sin",
+    "type": "F32",
+    "bands": 2,
+    "nodata": -3.4028234663852886e+38,
+    "messages": "Start Time: Thursday, October 29, 2026 4:56:13 AM\nSucceeded at Thursday, October 29, 2026 4:56:14 AM (Elapsed Time: 0.24 seconds)"
+  },
+  {
+    "case": "float32_raw",
+    "op": "RoundUp",
+    "type": "F32",
+    "bands": 2,
+    "nodata": -3.4028234663852886e+38,
+    "messages": "Start Time: Thursday, October 29, 2026 4:56:14 AM\nSucceeded at Thursday, October 29, 2026 4:56:14 AM (Elapsed Time: 0.23 seconds)"
+  },
+  {
+    "case": "float32_cached",
+    "op": "Log2",
+    "type": "F32",
+    "bands": 2,
+    "nodata": -3.4028234663852886e+38,
+    "messages": "Start Time: Thursday, October 29, 2026 4:56:14 AM\nSucceeded at Thursday, October 29, 2026 4:56:14 AM (Elapsed Time: 0.23 seconds)"
+  },
+  {
+    "case": "float32_cached",
+    "op": "Sin",
+    "type": "F32",
+    "bands": 2,
+    "nodata": -3.4028234663852886e+38,
+    "messages": "Start Time: Thursday, October 29, 2026 4:56:14 AM\nSucceeded at Thursday, October 29, 2026 4:56:14 AM (Elapsed Time: 0.23 seconds)"
+  },
+  {
+    "case": "float32_cached",
+    "op": "RoundUp",
+    "type": "F32",
+    "bands": 2,
+    "nodata": -3.4028234663852886e+38,
+    "messages": "Start Time: Thursday, October 29, 2026 4:56:14 AM\nSucceeded at Thursday, October 29, 2026 4:56:15 AM (Elapsed Time: 0.23 seconds)"
+  },
+  {
+    "case": "float64_raw",
+    "op": "Log2",
+    "type": "F32",
+    "bands": 2,
+    "nodata": -3.4028234663852886e+38,
+    "messages": "Start Time: Thursday, October 29, 2026 4:56:15 AM\nSucceeded at Thursday, October 29, 2026 4:56:15 AM (Elapsed Time: 0.24 seconds)"
+  },
+  {
+    "case": "float64_raw",
+    "op": "Sin",
+    "type": "F32",
+    "bands": 2,
+    "nodata": -3.4028234663852886e+38,
+    "messages": "Start Time: Thursday, October 29, 2026 4:56:15 AM\nSucceeded at Thursday, October 29, 2026 4:56:15 AM (Elapsed Time: 0.24 seconds)"
+  },
+  {
+    "case": "float64_raw",
+    "op": "RoundUp",
+    "type": "F32",
+    "bands": 2,
+    "nodata": -3.4028234663852886e+38,
+    "messages": "Start Time: Thursday, October 29, 2026 4:56:15 AM\nSucceeded at Thursday, October 29, 2026 4:56:15 AM (Elapsed Time: 0.24 seconds)"
+  },
+  {
+    "case": "float64_cached",
+    "op": "Log2",
+    "type": "F32",
+    "bands": 2,
+    "nodata": -3.4028234663852886e+38,
+    "messages": "Start Time: Thursday, October 29, 2026 4:56:15 AM\nSucceeded at Thursday, October 29, 2026 4:56:16 AM (Elapsed Time: 0.24 seconds)"
+  },
+  {
+    "case": "float64_cached",
+    "op": "Sin",
+    "type": "F32",
+    "bands": 2,
+    "nodata": -3.4028234663852886e+38,
+    "messages": "Start Time: Thursday, October 29, 2026 4:56:16 AM\nSucceeded at Thursday, October 29, 2026 4:56:16 AM (Elapsed Time: 0.24 seconds)"
+  },
+  {
+    "case": "float64_cached",
+    "op": "RoundUp",
+    "type": "F32",
+    "bands": 2,
+    "nodata": -3.4028234663852886e+38,
+    "messages": "Start Time: Thursday, October 29, 2026 4:56:16 AM\nSucceeded at Thursday, October 29, 2026 4:56:16 AM (Elapsed Time: 0.24 seconds)"
+  }
+]

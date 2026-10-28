@@ -636,7 +636,12 @@ pub(crate) fn supports_multiband_unary(op: UnaryOp, raster: &Raster) -> bool {
                     .statistics
                     .is_none_or(|(lo, hi)| lo.is_finite() && hi.is_finite() && lo <= hi)
         }
-        UnaryOp::Sqrt | UnaryOp::Ln | UnaryOp::Exp => raster.data_type.is_float(),
+        UnaryOp::Sqrt
+        | UnaryOp::Ln
+        | UnaryOp::Exp
+        | UnaryOp::Log2
+        | UnaryOp::Sin
+        | UnaryOp::RoundUp => raster.data_type.is_float(),
         _ => false,
     }
 }
@@ -779,6 +784,10 @@ pub fn unary(op: UnaryOp, r: &Raster) -> Raster {
         UnaryOp::Exp2 => float_fn(f64::exp2),
         UnaryOp::Exp10 => float_fn(|x| 10f64.powf(x)),
         UnaryOp::Ln => float_fn(f64::ln),
+        UnaryOp::Log2 if r.data_type == DataType::F32 => {
+            // ArcGIS rounds the natural log before the single-precision scale.
+            float_fn(|x| f64::from((x as f32).ln() * std::f32::consts::LOG2_E))
+        }
         UnaryOp::Log2 => float_fn(f64::log2),
         UnaryOp::Log10 => float_fn(f64::log10),
         UnaryOp::Sin => float_fn(f64::sin),

@@ -1,0 +1,86 @@
+[
+  {
+    "case": "float32_raw",
+    "tool": "log2",
+    "exit": 1,
+    "output_exists": false,
+    "stderr": "ERROR: unsupported: Log2 is not yet supported for this multiband input"
+  },
+  {
+    "case": "float32_raw",
+    "tool": "sin",
+    "exit": 1,
+    "output_exists": false,
+    "stderr": "ERROR: unsupported: Sin is not yet supported for this multiband input"
+  },
+  {
+    "case": "float32_raw",
+    "tool": "round_up",
+    "exit": 1,
+    "output_exists": false,
+    "stderr": "ERROR: unsupported: RoundUp is not yet supported for this multiband input"
+  },
+  {
+    "case": "float32_cached",
+    "tool": "log2",
+    "exit": 1,
+    "output_exists": false,
+    "stderr": "ERROR: unsupported: Log2 is not yet supported for this multiband input"
+  },
+  {
+    "case": "float32_cached",
+    "tool": "sin",
+    "exit": 1,
+    "output_exists": false,
+    "stderr": "ERROR: unsupported: Sin is not yet supported for this multiband input"
+  },
+  {
+    "case": "float32_cached",
+    "tool": "round_up",
+    "exit": 1,
+    "output_exists": false,
+    "stderr": "ERROR: unsupported: RoundUp is not yet supported for this multiband input"
+  },
+  {
+    "case": "float64_raw",
+    "tool": "log2",
+    "exit": 1,
+    "output_exists": false,
+    "stderr": "ERROR: unsupported: Log2 is not yet supported for this multiband input"
+  },
+  {
+    "case": "float64_raw",
+    "tool": "sin",
+    "exit": 1,
+    "output_exists": false,
+    "stderr": "ERROR: unsupported: Sin is not yet supported for this multiband input"
+  },
+  {
+    "case": "float64_raw",
+    "tool": "round_up",
+    "exit": 1,
+    "output_exists": false,
+    "stderr": "ERROR: unsupported: RoundUp is not yet supported for this multiband input"
+  },
+  {
+    "case": "float64_cached",
+    "tool": "log2",
+    "exit": 1,
+    "output_exists": false,
+    "stderr": "ERROR: unsupported: Log2 is not yet supported for this multiband input"
+  },
+  {
+    "case": "float64_cached",
+    "tool": "sin",
+    "exit": 1,
+    "output_exists": false,
+    "stderr": "ERROR: unsupported: Sin is not yet supported for this multiband input"
+  },
+  {
+    "case": "float64_cached",
+    "tool": "round_up",
+    "exit": 1,
+    "output_exists": false,
+    "stderr": "ERROR: unsupported: RoundUp is not yet supported for this multiband input"
+  }
+]

@@ -1,0 +1,14 @@
+umfloatnext_log2_float32_raw PASS
+umfloatnext_log2_float32_cached PASS
+umfloatnext_log2_float64_raw PASS
+umfloatnext_log2_float64_cached PASS
+umfloatnext_sin_float32_raw PASS
+umfloatnext_sin_float32_cached PASS
+umfloatnext_sin_float64_raw PASS
+umfloatnext_sin_float64_cached PASS
+umfloatnext_roundup_float32_raw PASS
+umfloatnext_roundup_float32_cached PASS
+umfloatnext_roundup_float64_raw PASS
+umfloatnext_roundup_float64_cached PASS
+umfloatnext_log2_precision PASS
+Checked 13 FAILED 0 []

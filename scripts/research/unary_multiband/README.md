@@ -79,9 +79,12 @@ uncached source fixture. Existing full/scoped references cover supported inputs.
 
 Floating SquareRoot/Ln/Exp support follows in `floating/README.md`. Its twelve
 positive cases replace those three refusal scenarios; the current guard
-regression tests Log2/Sin/RoundUp floats and retains cached integer refusals.
+regression tests Log10/Cos/RoundDown floats and retains cached integer refusals.
 
 Cached integer support now follows in `cached/README.md`. Its36 positive cases
 cover Abs/Negate/Square with valid complete stored ranges. The current guard
-regression retains integer SquareRoot/Ln/Exp and float Log2/Sin/RoundUp refusals
+regression retains integer SquareRoot/Ln/Exp and float Log10/Cos/RoundDown refusals
 and adds malformed later-band cache refusal; all seven preserve existing files.
+
+Floating Log2/Sin/RoundUp and F32 logarithm precision are covered in
+`more/README.md` (13additional GP cases with a32value fingerprint).

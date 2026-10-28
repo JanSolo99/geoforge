@@ -1047,6 +1047,11 @@ CASES = {
        (f"gp.{op}_sa", [RASTER / "unary_cached_multiband" / f"{name}.tif"], [])
        for op in ["Abs", "Negate", "Square"]
        for name in ["u8", "i8", "u16", "i16", "u32", "i32", "i16_reverse", "i8_nonpositive", "i16_nonpositive", "u32_overflow", "u32_three_bands", "u32_single_overflow"]},
+    "umfloatnext_log2_precision": ("gp.Log2_sa", [RASTER / "unary_log2_precision/input.tif"], []),
+    **{f"umfloatnext_{op.lower()}_{name}":
+       (f"gp.{op}_sa", [RASTER / "unary_float_multiband" / f"{name}.tif"], [])
+       for op in ["Log2", "Sin", "RoundUp"]
+       for name in ["float32_raw", "float32_cached", "float64_raw", "float64_cached"]},
     **{f"umfloatmore_{op.lower()}_{name}":
        (f"gp.{op}_sa", [RASTER / "unary_float_multiband" / f"{name}.tif"], [])
        for op in ["SquareRoot", "Ln", "Exp"]

@@ -68995,6 +68995,240 @@
           "output": "<out>"
         }
       }
+    },
+    "umfloatnext_log2_float32_raw": {
+      "tool": "gp.Log2_sa",
+      "args": [
+        "testdata/raster/unary_float_multiband/float32_raw.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "log2",
+        "params": {
+          "input": "testdata/raster/unary_float_multiband/float32_raw.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umfloatnext_log2_float32_cached": {
+      "tool": "gp.Log2_sa",
+      "args": [
+        "testdata/raster/unary_float_multiband/float32_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "log2",
+        "params": {
+          "input": "testdata/raster/unary_float_multiband/float32_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umfloatnext_log2_float64_raw": {
+      "tool": "gp.Log2_sa",
+      "args": [
+        "testdata/raster/unary_float_multiband/float64_raw.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "log2",
+        "params": {
+          "input": "testdata/raster/unary_float_multiband/float64_raw.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umfloatnext_log2_float64_cached": {
+      "tool": "gp.Log2_sa",
+      "args": [
+        "testdata/raster/unary_float_multiband/float64_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "log2",
+        "params": {
+          "input": "testdata/raster/unary_float_multiband/float64_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umfloatnext_sin_float32_raw": {
+      "tool": "gp.Sin_sa",
+      "args": [
+        "testdata/raster/unary_float_multiband/float32_raw.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "sin",
+        "params": {
+          "input": "testdata/raster/unary_float_multiband/float32_raw.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umfloatnext_sin_float32_cached": {
+      "tool": "gp.Sin_sa",
+      "args": [
+        "testdata/raster/unary_float_multiband/float32_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "sin",
+        "params": {
+          "input": "testdata/raster/unary_float_multiband/float32_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umfloatnext_sin_float64_raw": {
+      "tool": "gp.Sin_sa",
+      "args": [
+        "testdata/raster/unary_float_multiband/float64_raw.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "sin",
+        "params": {
+          "input": "testdata/raster/unary_float_multiband/float64_raw.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umfloatnext_sin_float64_cached": {
+      "tool": "gp.Sin_sa",
+      "args": [
+        "testdata/raster/unary_float_multiband/float64_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "sin",
+        "params": {
+          "input": "testdata/raster/unary_float_multiband/float64_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umfloatnext_roundup_float32_raw": {
+      "tool": "gp.RoundUp_sa",
+      "args": [
+        "testdata/raster/unary_float_multiband/float32_raw.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "round_up",
+        "params": {
+          "input": "testdata/raster/unary_float_multiband/float32_raw.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umfloatnext_roundup_float32_cached": {
+      "tool": "gp.RoundUp_sa",
+      "args": [
+        "testdata/raster/unary_float_multiband/float32_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "round_up",
+        "params": {
+          "input": "testdata/raster/unary_float_multiband/float32_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umfloatnext_roundup_float64_raw": {
+      "tool": "gp.RoundUp_sa",
+      "args": [
+        "testdata/raster/unary_float_multiband/float64_raw.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "round_up",
+        "params": {
+          "input": "testdata/raster/unary_float_multiband/float64_raw.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umfloatnext_roundup_float64_cached": {
+      "tool": "gp.RoundUp_sa",
+      "args": [
+        "testdata/raster/unary_float_multiband/float64_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "round_up",
+        "params": {
+          "input": "testdata/raster/unary_float_multiband/float64_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umfloatnext_log2_precision": {
+      "tool": "gp.Log2_sa",
+      "args": [
+        "testdata/raster/unary_log2_precision/input.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "log2",
+        "params": {
+          "input": "testdata/raster/unary_log2_precision/input.tif",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

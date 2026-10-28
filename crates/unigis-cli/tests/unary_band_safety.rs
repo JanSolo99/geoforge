@@ -61,9 +61,9 @@ fn unsupported_multiband_unary_preserves_existing_output() {
         ("square_root", &cached),
         ("ln", &cached),
         ("exp", &cached),
-        ("log2", &float),
-        ("sin", &float),
-        ("round_up", &float),
+        ("log10", &float),
+        ("cos", &float),
+        ("round_down", &float),
         ("abs", &invalid),
     ] {
         let result = run(tool, input);

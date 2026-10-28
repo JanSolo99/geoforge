@@ -1,6 +1,13 @@
 {
-  "fetched": "2026-10-28T17:52:09+00:00",
+  "fetched": "2026-10-28T18:29:28+00:00",
   "runs": [
+    {
+      "conclusion": "failure",
+      "createdAt": "2026-10-28T18:13:20Z",
+      "displayTitle": "Plan cached unary types across bands and match GP overflow statistics",
+      "status": "completed",
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40743062723"
+    },
     {
       "conclusion": "failure",
       "createdAt": "2026-10-28T17:22:47Z",
@@ -49,13 +56,6 @@
       "displayTitle": "Generate Tessellation: triangle cells",
       "status": "completed",
       "url": "https://github.com/JanSolo99/geoforge/actions/runs/40713587322"
-    },
-    {
-      "conclusion": "success",
-      "createdAt": "2026-10-28T15:01:11Z",
-      "displayTitle": "Generate Tessellation: diamond and hexagon cells",
-      "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40711699219"
     }
   ]
 }
