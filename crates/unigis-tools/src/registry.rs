@@ -548,6 +548,14 @@ fn geodetic_densify(ctx: &dyn Context) -> Result<ToolOutput> {
     construct::geodetic_densify(ctx.features("input")?.as_ref(), value * meters)
 }
 
+fn encode_field(ctx: &dyn Context) -> Result<ToolOutput> {
+    let t = find("encode_field").ok_or_else(|| Error::Unsupported("encode_field".into()))?;
+    let field = text(ctx, t, "field")
+        .ok_or_else(|| Error::Unsupported("ERROR 000735: Field: value is required".into()))?;
+    let method = text(ctx, t, "method").unwrap_or_else(|| "One-hot".into());
+    tables::encode_field(ctx.features("input")?.as_ref(), &field, &method)
+}
+
 fn generalize(ctx: &dyn Context) -> Result<ToolOutput> {
     let t = find("generalize").ok_or_else(|| Error::Unsupported("generalize".into()))?;
     let fc = ctx.features("input")?;
@@ -1622,6 +1630,44 @@ pub static TOOLS: &[Tool] = &[
         output_suffix: "Densified",
         measures: false,
         run: Runner::Features(geodetic_densify),
+    },
+    Tool {
+        id: "encode_field",
+        name: "Encode Field",
+        toolbox: "Data Management › Fields",
+        summary: "One-hot or one-cold integer fields for the values of a text or integer field (ArcGIS Pro Encode Field).",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Table",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "field",
+                label: "Field",
+                kind: Kind::Field {
+                    of: "input",
+                    numeric: false,
+                },
+                required: true,
+                default: "",
+                help: "Text or integer field to encode.",
+            },
+            Param {
+                name: "method",
+                label: "Encoding Method",
+                kind: Kind::Choice(&["One-hot", "One-cold"]),
+                required: false,
+                default: "One-hot",
+                help: "",
+            },
+        ],
+        output_suffix: "Encoded",
+        measures: false,
+        run: Runner::Features(encode_field),
     },
     Tool {
         id: "flip_line",

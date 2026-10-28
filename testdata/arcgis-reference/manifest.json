@@ -70453,6 +70453,336 @@
           "max_segment_length": "20 Miles"
         }
       }
+    },
+    "enc_name_hot": {
+      "tool": "management.EncodeField",
+      "args": [
+        "testdata/geoproc/streams.shp",
+        "<out>",
+        "NAME",
+        "One-hot"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "STREAM_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "OH_Cedar_B",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "OH_Fox_Run",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "OH_Mill_Cr",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "encode_field",
+        "params": {
+          "input": "testdata/geoproc/streams.shp",
+          "output": "<out>",
+          "field": "NAME",
+          "method": "One-hot"
+        }
+      }
+    },
+    "enc_name_cold": {
+      "tool": "management.EncodeField",
+      "args": [
+        "testdata/geoproc/streams.shp",
+        "<out>",
+        "NAME",
+        "One-cold"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "STREAM_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "OC_Cedar_B",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "OC_Fox_Run",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "OC_Mill_Cr",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "encode_field",
+        "params": {
+          "input": "testdata/geoproc/streams.shp",
+          "output": "<out>",
+          "field": "NAME",
+          "method": "One-cold"
+        }
+      }
+    },
+    "enc_zone_hot": {
+      "tool": "management.EncodeField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "ZONE",
+        "One-hot"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "OH_0",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "OH_1",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "OH_2",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "OH_3",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "encode_field",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "field": "ZONE",
+          "method": "One-hot"
+        }
+      }
+    },
+    "enc_zone_cold": {
+      "tool": "management.EncodeField",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "ZONE",
+        "One-cold"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "OC_0",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "OC_1",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "OC_2",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "OC_3",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "encode_field",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "field": "ZONE",
+          "method": "One-cold"
+        }
+      }
     }
   }
 }

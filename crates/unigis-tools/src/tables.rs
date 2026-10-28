@@ -216,3 +216,103 @@ pub fn add_fields(input: &dyn FeatureClass, spec: &str) -> Result<ToolOutput> {
     out.messages = messages;
     Ok(out)
 }
+
+/// Encode Field (One-hot / One-cold): one integer field per distinct value of a text or integer
+/// field, named `OH_` / `OC_` plus the value (characters other than letters, digits and `_`
+/// become `_`), ordered by value (text bytewise, numbers numerically). One-hot is 1 on the rows
+/// that have the value, One-cold the reverse; rows with a null keep nulls (observed, ArcGIS Pro 3.7).
+pub fn encode_field(input: &dyn FeatureClass, field: &str, method: &str) -> Result<ToolOutput> {
+    let kind = input
+        .geometry_kind()
+        .ok_or_else(|| err("input has no geometry"))?;
+    let one_hot = match method
+        .to_ascii_uppercase()
+        .replace(['-', '_', ' '], "")
+        .as_str()
+    {
+        "ONEHOT" => true,
+        "ONECOLD" => false,
+        other => return Err(err(format!("encoding method {other}"))),
+    };
+    let fields = input.fields().to_vec();
+    let fi = fields
+        .iter()
+        .position(|f| f.name.eq_ignore_ascii_case(field))
+        .ok_or_else(|| err(format!("ERROR 000728: Field {field} does not exist")))?;
+    if !matches!(
+        fields[fi].field_type,
+        FieldType::String | FieldType::SmallInteger | FieldType::Integer | FieldType::BigInteger
+    ) {
+        return Err(err(
+            "ERROR 003911: The field is not of type SHORT | TEXT | LONG | BIGINTEGER",
+        ));
+    }
+    let mut rows: Vec<Feature> = Vec::new();
+    for f in input.features() {
+        rows.push(f?);
+    }
+    let mut cats: Vec<Value> = Vec::new();
+    for r in &rows {
+        let v = &r.attributes[fi];
+        if !matches!(v, Value::Null) && !cats.contains(v) {
+            cats.push(v.clone());
+        }
+    }
+    cats.sort_by(|a, b| match (a, b) {
+        (Value::String(x), Value::String(y)) => x.as_bytes().cmp(y.as_bytes()),
+        _ => crate::number(a)
+            .partial_cmp(&crate::number(b))
+            .unwrap_or(std::cmp::Ordering::Equal),
+    });
+    let prefix = if one_hot { "OH_" } else { "OC_" };
+    let mut out_fields = fields.clone();
+    for c in &cats {
+        let text = match c {
+            Value::String(s) => s.clone(),
+            other => crate::number(other).map_or_else(String::new, |n| format!("{n}")),
+        };
+        let mut name: String = prefix.to_owned()
+            + &text
+                .chars()
+                .map(|ch| {
+                    if ch.is_ascii_alphanumeric() || ch == '_' {
+                        ch
+                    } else {
+                        '_'
+                    }
+                })
+                .collect::<String>();
+        let mut k = 0;
+        while out_fields
+            .iter()
+            .any(|f| f.name.eq_ignore_ascii_case(&name))
+        {
+            k += 1;
+            name = format!("{prefix}{}_{k}", name.trim_start_matches(prefix));
+        }
+        out_fields.push(Field::new(name, FieldType::Integer));
+    }
+    let features = rows
+        .into_iter()
+        .map(|mut r| {
+            let v = r.attributes[fi].clone();
+            for c in &cats {
+                r.attributes.push(if matches!(v, Value::Null) {
+                    Value::Null
+                } else {
+                    Value::Integer(i32::from((&v == c) == one_hot))
+                });
+            }
+            r
+        })
+        .collect();
+    Ok(ToolOutput {
+        kind,
+        has_z: input.has_z(),
+        has_m: input.has_m(),
+        fields: out_fields,
+        spatial_reference_wkt: input.spatial_reference_wkt().map(str::to_owned),
+        features,
+        messages: Vec::new(),
+    })
+}

@@ -148,3 +148,9 @@ shapefile output drops the time. Field Statistics To Table needs a nested "Field
 (validator error with a plain field list); not yet decoded. Extend Line / Trim Line / Integrate are topological.
 Other open candidates: Subset Features (random split, likely untestable), Encode Field, Rotate/Rescale rasters
 (Codex owns raster files now). Working tree unchanged; Codex's files untouched.
+
+Claude: Encode Field (One-hot / One-cold) added as `encode_field`; 4 `enc_*` cases match ArcGIS (text and
+integer fields on streams/parcels shapefiles). Categories are sorted (text bytewise, numbers
+numerically), named OH_/OC_ + value with non-alphanumerics -> '_'; null rows stay null. Unverified:
+ArcGIS's de-duplication of colliding names (saw OH_b_1 for b/B, OH_a_b1..3 for 'a b','a-b','a_b'; we use _N),
+64-char name limit, Temporal method, DATE/BIGINTEGER fields.

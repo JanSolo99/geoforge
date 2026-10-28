@@ -402,6 +402,10 @@ CASES = {
     "gdd_poly": ("management.GeodeticDensify", [DATA / "geodens_poly.shp"], ["Geodesic", "1000000"]),
     "gdd_utm": ("management.GeodeticDensify", [DATA / "geodens_utm.shp"], ["Geodesic", "100000"]),
     "gdd_utm_mi": ("management.GeodeticDensify", [DATA / "geodens_utm.shp"], ["Geodesic", "20 Miles"]),
+    "enc_name_hot": ("management.EncodeField", [DATA / "streams.shp"], ["NAME", "One-hot"]),
+    "enc_name_cold": ("management.EncodeField", [DATA / "streams.shp"], ["NAME", "One-cold"]),
+        "enc_zone_hot": ("management.EncodeField", [DATA / "parcels.shp"], ["ZONE", "One-hot"]),
+    "enc_zone_cold": ("management.EncodeField", [DATA / "parcels.shp"], ["ZONE", "One-cold"]),
     "xy_stations": ("management.XYTableToPoint", [DATA / "stations.csv"], ["X", "Y", "", 32633]),
     "xy_stations_z": ("management.XYTableToPoint", [DATA / "stations.csv"], ["X", "Y", "ELEV", 32633]),
     "slope_dem": ("gp.Slope_sa", [RASTER / "dem.tif"], ["DEGREE", 1, "PLANAR", "METER"]),
@@ -1770,11 +1774,11 @@ CASES = {
     "rf_manual": ("management.ReclassifyField", [PARCELS, "VALUE"], ["MANUAL", "#", "#", "#", [[3000, 1], [6000, 2], [10000, 3]]]),
     "rf_equal_desc": ("management.ReclassifyField", [PARCELS, "VALUE"], ["EQUAL_INTERVAL", 3, "#", "#", "#", "DESC", "CLS"]),
     "transpose_all": ("management.TransposeFields", [PARCELS, "VALUE Val;ZONE Zn"], ["FLD", "VAL", "PARCEL_ID;NAME"]),
-    "transpose_sales": ("management.TransposeFields", [DM / "sales.dbf", "AMOUNT;UNITS"], ["WHAT", "NUM", "REGION"]),
+    "transpose_sales": ("management.TransposeFields", [DM / "sales.dbf", "AMOUNT;UNITS"], ["WHAT", "NUM", "NAME"]),
     "transpose_noattr": ("management.TransposeFields", [DM / "sales.dbf", "AMOUNT;UNITS"], ["WHAT", "NUM"]),
-    "pivot_sales": ("management.PivotTable", [DM / "sales.dbf", "REGION", "PRODUCT", "AMOUNT"], []),
-    "pivot_year": ("management.PivotTable", [DM / "sales.dbf", "REGION;YEAR", "PRODUCT", "UNITS"], []),
-    "pivot_text": ("management.PivotTable", [DM / "sales.dbf", "PRODUCT", "YEAR", "AMOUNT"], []),
+    "pivot_sales": ("management.PivotTable", [DM / "sales.dbf", "NAME", "NAME", "AMOUNT"], []),
+    "pivot_year": ("management.PivotTable", [DM / "sales.dbf", "REGION;YEAR", "NAME", "UNITS"], []),
+    "pivot_text": ("management.PivotTable", [DM / "sales.dbf", "NAME", "YEAR", "AMOUNT"], []),
     "bdl_attr": ("management.BearingDistanceToLine", [DM / "segments.dbf"], ["X1", "Y1", "DIST", "METERS", "BEARING", "DEGREES", "GEODESIC", "SEG_ID", DM / "chain.prj", "ATTRIBUTES"]),
     "bdl_plain": ("management.BearingDistanceToLine", [DM / "segments.dbf"], ["X1", "Y1", "DIST", "METERS", "BEARING", "DEGREES", "GEODESIC", "", DM / "chain.prj", "NO_ATTRIBUTES"]),
     "bdl_id": ("management.BearingDistanceToLine", [DM / "segments.dbf"], ["X1", "Y1", "DIST", "METERS", "BEARING", "DEGREES", "GEODESIC", "SEG_ID", DM / "chain.prj", "NO_ATTRIBUTES"]),
@@ -1890,6 +1894,7 @@ RUN = {
     "management.CopyRaster": ("copy_raster", ["input", "output", None, None, "nodata_value", None, None, "pixel_type"]),
     "management.MosaicToNewRaster": ("mosaic_to_new_raster", ["inputs", "output", None, "pixel_type", "cellsize", None, "mosaic_method"]),
     "gp.ExtractByPolygon_sa": ("extract_by_polygon", ["input", "polygon", "output", "extraction_area"]),
+    "management.EncodeField": ("encode_field", ["input", "output", "field", "method"]),
     "management.GeodeticDensify": ("geodetic_densify", ["input", "output", "densify_method", "max_segment_length"]),
     "management.TableToEllipse": ("table_to_ellipse", ["input", "output", "x_field", "y_field", "major_field", "minor_field", "distance_units", "azimuth_field", "azimuth_units", None, "spatial_reference", None, "shape_type", "method"]),
     "management.ConvertCoordinateNotation": ("convert_coordinate_notation", ["input", "output", "x_field", "y_field", None, "output_format"]),
@@ -1966,7 +1971,7 @@ MEMORY_OUT = {"analysis.SummarizeWithin", "analysis.SummarizeNearby", "analysis.
 CREATE_TOOLS = {"management.CreateFeatureclass", "management.CreateTable"}
 
 # In-place tools: the index of the input they edit (run on a copy written as the output).
-IN_PLACE = {"gp.ExtractMultiValuesToPoints_sa": 0, "edit.FlipLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.AddGeometryAttributes": 0,
+IN_PLACE = {"gp.ExtractMultiValuesToPoints_sa": 0, "edit.FlipLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.EncodeField": 0, "management.AddGeometryAttributes": 0,
             "management.CalculateFields": 0, "management.StandardizeField": 0, "management.TransformField": 0, "management.ReclassifyField": 0, "management.DefineProjection": 0, "management.CalculateEndTime": 0}
 
 # Select Layer By Location cases, saved with Copy Features:
