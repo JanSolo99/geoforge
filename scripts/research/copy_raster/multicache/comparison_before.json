@@ -1,0 +1,278 @@
+[
+  {
+    "case": "first_full",
+    "arcgis_pam": true,
+    "native_pam": false,
+    "differences": [
+      {
+        "MEAN": [
+          "2.6666666666667",
+          "2.5"
+        ],
+        "STDDEV": [
+          "1.5275252316519",
+          "1.2"
+        ]
+      },
+      {
+        "COUNT": [
+          "4.000000",
+          null
+        ],
+        "MINIMUM": [
+          "1",
+          null
+        ],
+        "MAXIMUM": [
+          "4",
+          null
+        ],
+        "MEAN": [
+          "2.5",
+          null
+        ],
+        "STDDEV": [
+          "1.2909944487358",
+          null
+        ]
+      }
+    ]
+  },
+  {
+    "case": "second_full",
+    "arcgis_pam": true,
+    "native_pam": false,
+    "differences": [
+      {
+        "COUNT": [
+          "3.000000",
+          null
+        ],
+        "MINIMUM": [
+          "1",
+          null
+        ],
+        "MAXIMUM": [
+          "4",
+          null
+        ],
+        "MEAN": [
+          "2.6666666666667",
+          null
+        ],
+        "STDDEV": [
+          "1.5275252316519",
+          null
+        ]
+      },
+      {
+        "MINIMUM": [
+          "1",
+          "10"
+        ],
+        "MAXIMUM": [
+          "4",
+          "40"
+        ],
+        "MEAN": [
+          "2.5",
+          "25"
+        ],
+        "STDDEV": [
+          "1.2909944487358",
+          "12"
+        ]
+      }
+    ]
+  },
+  {
+    "case": "split_extrema",
+    "arcgis_pam": true,
+    "native_pam": false,
+    "differences": [
+      {
+        "COUNT": [
+          "3.000000",
+          "0.000000"
+        ],
+        "MAXIMUM": [
+          "4",
+          null
+        ],
+        "MEAN": [
+          "2.6666666666667",
+          "0"
+        ],
+        "STDDEV": [
+          "1.5275252316519",
+          "-1"
+        ]
+      },
+      {
+        "COUNT": [
+          "4.000000",
+          "0.000000"
+        ],
+        "MINIMUM": [
+          "1",
+          null
+        ],
+        "MAXIMUM": [
+          "4",
+          "40"
+        ],
+        "MEAN": [
+          "2.5",
+          "0"
+        ],
+        "STDDEV": [
+          "1.2909944487358",
+          "-1"
+        ]
+      }
+    ]
+  },
+  {
+    "case": "first_full_second_extrema",
+    "arcgis_pam": false,
+    "native_pam": false,
+    "differences": [
+      {},
+      {}
+    ]
+  },
+  {
+    "case": "first_extrema_second_full",
+    "arcgis_pam": false,
+    "native_pam": false,
+    "differences": [
+      {},
+      {}
+    ]
+  },
+  {
+    "case": "second_missing_extrema",
+    "arcgis_pam": true,
+    "native_pam": false,
+    "differences": [
+      {
+        "MEAN": [
+          "2.6666666666667",
+          "2.5"
+        ],
+        "STDDEV": [
+          "1.5275252316519",
+          "1.2"
+        ]
+      },
+      {
+        "COUNT": [
+          "4.000000",
+          "0.000000"
+        ],
+        "MINIMUM": [
+          "1",
+          null
+        ],
+        "MAXIMUM": [
+          "4",
+          null
+        ],
+        "MEAN": [
+          "2.5",
+          "25"
+        ],
+        "STDDEV": [
+          "1.2909944487358",
+          "12"
+        ]
+      }
+    ]
+  },
+  {
+    "case": "domain_only",
+    "arcgis_pam": true,
+    "native_pam": false,
+    "differences": [
+      {
+        "COUNT": [
+          "3.000000",
+          null
+        ],
+        "MINIMUM": [
+          "1",
+          null
+        ],
+        "MAXIMUM": [
+          "4",
+          null
+        ],
+        "MEAN": [
+          "2.6666666666667",
+          null
+        ],
+        "STDDEV": [
+          "1.5275252316519",
+          null
+        ]
+      },
+      {
+        "COUNT": [
+          "4.000000",
+          null
+        ],
+        "MINIMUM": [
+          "1",
+          null
+        ],
+        "MAXIMUM": [
+          "4",
+          null
+        ],
+        "MEAN": [
+          "2.5",
+          null
+        ],
+        "STDDEV": [
+          "1.2909944487358",
+          null
+        ]
+      }
+    ]
+  },
+  {
+    "case": "single_quotes",
+    "arcgis_pam": false,
+    "native_pam": true,
+    "differences": [
+      {
+        "MEAN": [
+          "2.5",
+          "2.6666666666667"
+        ],
+        "STDDEV": [
+          "1.2",
+          "1.5275252316519"
+        ]
+      },
+      {
+        "MINIMUM": [
+          "10",
+          "1"
+        ],
+        "MAXIMUM": [
+          "40",
+          "4"
+        ],
+        "MEAN": [
+          "25",
+          "2.5"
+        ],
+        "STDDEV": [
+          "12",
+          "1.2909944487358"
+        ]
+      }
+    ]
+  }
+]

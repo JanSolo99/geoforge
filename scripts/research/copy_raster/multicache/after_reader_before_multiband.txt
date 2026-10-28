@@ -1,0 +1,18 @@
+cprmulti_first_full PASS
+cprmulti_second_full PASS
+cprmulti_split_extrema PASS
+cprmulti_first_full_second_extrema PASS
+cprmulti_first_extrema_second_full PASS
+cprmulti_second_missing_extrema PASS
+cprmulti_domain_only PASS
+cprmulti_single_quotes PASS
+ummulti_abs_first_full ['bands 1 vs 2']
+ummulti_abs_second_full ['bands 1 vs 2']
+ummulti_abs_single_quotes ['bands 1 vs 2']
+ummulti_negate_first_full ['bands 1 vs 2']
+ummulti_negate_second_full ['bands 1 vs 2']
+ummulti_negate_single_quotes ['bands 1 vs 2']
+ummulti_square_first_full ['bands 1 vs 2']
+ummulti_square_second_full ['bands 1 vs 2']
+ummulti_square_single_quotes ['bands 1 vs 2']
+Checked 17 FAILED 9 ['ummulti_abs_first_full', 'ummulti_abs_second_full', 'ummulti_abs_single_quotes', 'ummulti_negate_first_full', 'ummulti_negate_second_full', 'ummulti_negate_single_quotes', 'ummulti_square_first_full', 'ummulti_square_second_full', 'ummulti_square_single_quotes']

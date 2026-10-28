@@ -108,3 +108,33 @@ fn physical_nodata_override_keeps_logical_samples_and_statistics() {
     }
     std::fs::remove_dir_all(folder).unwrap();
 }
+
+#[test]
+fn only_complete_default_domain_caches_enable_statistics_planning() {
+    let folder =
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../testdata/raster/copy_multicache");
+    for name in [
+        "first_full",
+        "second_full",
+        "split_extrema",
+        "first_full_second_extrema",
+        "first_extrema_second_full",
+        "second_missing_extrema",
+        "domain_only",
+        "single_quotes",
+        "first_full_f64",
+        "second_full_f64",
+        "single_quotes_f64",
+    ] {
+        let raster = unigis_raster::read_geotiff(&folder.join(format!("{name}.tif"))).unwrap();
+        let complete = matches!(
+            name,
+            "first_full_second_extrema"
+                | "first_extrema_second_full"
+                | "single_quotes"
+                | "single_quotes_f64"
+        );
+        assert_eq!(raster.statistics, complete.then_some((1., 4.)), "{name}");
+        assert_eq!(raster.bands.len(), 2, "{name}");
+    }
+}

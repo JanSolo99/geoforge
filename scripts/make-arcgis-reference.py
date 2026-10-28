@@ -1166,6 +1166,16 @@ CASES = {
     "umcache_abs_symmetric": ("gp.Abs_sa", [RASTER / "unary_cached/symmetric.tif"], []),
     "umcache_negate_symmetric": ("gp.Negate_sa", [RASTER / "unary_cached/symmetric.tif"], []),
     "umcache_square_symmetric": ("gp.Square_sa", [RASTER / "unary_cached/symmetric.tif"], []),
+    **{f"cprmulti_{name}":
+       ("management.CopyRaster", [RASTER / f"copy_multicache/{name}.tif"], [])
+       for name in ["first_full","second_full","split_extrema","first_full_second_extrema",
+                    "first_extrema_second_full","second_missing_extrema","domain_only","single_quotes"]},
+    **{f"ummulti_{op.lower()}_f32_first_full":
+       (f"gp.{op}_sa", [RASTER / "copy_multicache/first_full.tif"], [])
+       for op in ["Abs","Negate","Square"]},
+    **{f"ummulti_{op.lower()}_{name}":
+       (f"gp.{op}_sa", [RASTER / f"copy_multicache/{name}_f64.tif"], [])
+       for op in ["Abs","Negate","Square"] for name in ["first_full","second_full","single_quotes"]},
     **{f"cprcache_{name}":
        ("management.CopyRaster", [RASTER / f"copy_cache/{name}.tif"], [])
        for name in ["minmax","meanstd","stale","all","missing_minimum","missing_maximum",

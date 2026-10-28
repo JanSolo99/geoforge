@@ -625,6 +625,31 @@ fn cached_integer_unary(op: UnaryOp, r: &Raster, (lo, hi): (f64, f64)) -> Raster
 /// Square a wider one; Round Down / Up give float; Boolean Not gives 8-bit with NoData 2
 /// (observed).
 pub fn unary(op: UnaryOp, r: &Raster) -> Raster {
+    if r.bands.len() > 1
+        && r.data_type.is_float()
+        && matches!(op, UnaryOp::Abs | UnaryOp::Negate | UnaryOp::Square)
+    {
+        // Use the dataset's cache status for every band, as ArcGIS does for
+        // F64 output planning. Clone only the current band, not the dataset.
+        let apply = |band: &[f64]| {
+            let single = Raster {
+                width: r.width,
+                height: r.height,
+                data_type: r.data_type,
+                transform: r.transform,
+                nodata: r.nodata,
+                epsg: r.epsg,
+                statistics: r.statistics,
+                bands: vec![band.to_vec()],
+            };
+            unary(op, &single)
+        };
+        let mut output = apply(&r.bands[0]);
+        for band in r.bands.iter().skip(1) {
+            output.bands.extend(apply(band).bands);
+        }
+        return output;
+    }
     let values = || r.bands[0].iter().map(|&v| (!r.is_nodata(v)).then_some(v));
     let float_fn = |f: fn(f64) -> f64| {
         float_raster(

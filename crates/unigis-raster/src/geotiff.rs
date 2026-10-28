@@ -138,10 +138,20 @@ pub fn read_geotiff(path: &Path) -> Result<Raster> {
         Some(v) => v.into_string().ok(),
         None => None,
     };
-    let statistics = aux
-        .as_deref()
-        .and_then(stored_statistics)
-        .or_else(|| tag.as_deref().and_then(stored_statistics));
+    // ArcGIS treats the source as cached only when every band has extrema.
+    // Keep band 0's range for type planning, without mixing keys across bands
+    // or treating custom metadata domains as a default-domain cache.
+    let cached = crate::stats_metadata::from_xml(samples, tag.as_deref(), aux.as_deref());
+    let extrema: Option<Vec<(f64, f64)>> = cached
+        .iter()
+        .map(|band| {
+            Some((
+                band.get("STATISTICS_MINIMUM")?.parse().ok()?,
+                band.get("STATISTICS_MAXIMUM")?.parse().ok()?,
+            ))
+        })
+        .collect();
+    let statistics = extrema.and_then(|bands| bands.first().copied());
 
     let compression = dec
         .find_tag_unsigned::<u16>(Tag::Compression)
@@ -176,19 +186,6 @@ pub fn read_geotiff(path: &Path) -> Result<Raster> {
         statistics,
         bands,
     })
-}
-
-/// STATISTICS_MINIMUM and STATISTICS_MAXIMUM of the first band from GDAL
-/// metadata XML (`<Item name=…>` in the TIFF tag, `<MDI key=…>` in .aux.xml).
-fn stored_statistics(xml: &str) -> Option<(f64, f64)> {
-    let item = |key: &str| -> Option<f64> {
-        let at = xml.find(&format!("\"{key}\""))?;
-        let rest = &xml[at..];
-        let start = rest.find('>')? + 1;
-        let end = rest[start..].find('<')? + start;
-        rest[start..end].trim().parse().ok()
-    };
-    Some((item("STATISTICS_MINIMUM")?, item("STATISTICS_MAXIMUM")?))
 }
 
 fn interleaved_to_bands(

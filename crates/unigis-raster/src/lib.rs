@@ -91,7 +91,8 @@ pub struct Raster {
     /// EPSG code of the coordinate system, when the file names one.
     pub epsg: Option<u32>,
     /// Minimum and maximum of band 0 as stored with the file (GDAL metadata or
-    /// `.aux.xml`), which ArcGIS uses to choose some output types.
+    /// `.aux.xml`), which ArcGIS uses to choose some output types. Only set
+    /// when every band has cached minimum and maximum values.
     pub statistics: Option<(f64, f64)>,
     /// One `width * height` row-major vector per band. NoData cells hold the
     /// NoData value as stored.

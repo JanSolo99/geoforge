@@ -1,0 +1,46 @@
+[
+  {
+    "case": "domain_only.tif",
+    "equivalent": true
+  },
+  {
+    "case": "first_extrema_second_full.tif",
+    "equivalent": true
+  },
+  {
+    "case": "first_full.tif",
+    "equivalent": true
+  },
+  {
+    "case": "first_full_f64.tif",
+    "equivalent": true
+  },
+  {
+    "case": "first_full_second_extrema.tif",
+    "equivalent": true
+  },
+  {
+    "case": "second_full.tif",
+    "equivalent": true
+  },
+  {
+    "case": "second_full_f64.tif",
+    "equivalent": true
+  },
+  {
+    "case": "second_missing_extrema.tif",
+    "equivalent": true
+  },
+  {
+    "case": "single_quotes.tif",
+    "equivalent": true
+  },
+  {
+    "case": "single_quotes_f64.tif",
+    "equivalent": true
+  },
+  {
+    "case": "split_extrema.tif",
+    "equivalent": true
+  }
+]

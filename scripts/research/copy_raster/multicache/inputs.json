@@ -1,0 +1,95 @@
+{
+  "first_full": [
+    {
+      "MINIMUM": "1",
+      "MAXIMUM": "4",
+      "MEAN": "2.5",
+      "STDDEV": "1.2",
+      "COUNT": "3.000000"
+    },
+    {}
+  ],
+  "second_full": [
+    {},
+    {
+      "MINIMUM": "10",
+      "MAXIMUM": "40",
+      "MEAN": "25",
+      "STDDEV": "12",
+      "COUNT": "4.000000"
+    }
+  ],
+  "split_extrema": [
+    {
+      "MINIMUM": "1"
+    },
+    {
+      "MAXIMUM": "40"
+    }
+  ],
+  "first_full_second_extrema": [
+    {
+      "MINIMUM": "1",
+      "MAXIMUM": "4",
+      "MEAN": "2.5",
+      "STDDEV": "1.2",
+      "COUNT": "3.000000"
+    },
+    {
+      "MINIMUM": "10",
+      "MAXIMUM": "40"
+    }
+  ],
+  "first_extrema_second_full": [
+    {
+      "MINIMUM": "1",
+      "MAXIMUM": "4"
+    },
+    {
+      "MINIMUM": "10",
+      "MAXIMUM": "40",
+      "MEAN": "25",
+      "STDDEV": "12",
+      "COUNT": "4.000000"
+    }
+  ],
+  "second_missing_extrema": [
+    {
+      "MINIMUM": "1",
+      "MAXIMUM": "4",
+      "MEAN": "2.5",
+      "STDDEV": "1.2",
+      "COUNT": "3.000000"
+    },
+    {
+      "MEAN": "25",
+      "STDDEV": "12"
+    }
+  ],
+  "domain_only": [
+    {
+      "MINIMUM": "1",
+      "MAXIMUM": "4",
+      "MEAN": "2.5",
+      "STDDEV": "1.2",
+      "COUNT": "3.000000"
+    },
+    {}
+  ],
+  "single_quotes": [
+    {
+      "MINIMUM": "1",
+      "MAXIMUM": "4",
+      "MEAN": "2.5",
+      "STDDEV": "1.2",
+      "COUNT": "3.000000"
+    },
+    {
+      "MINIMUM": "10",
+      "MAXIMUM": "40",
+      "MEAN": "25",
+      "STDDEV": "12",
+      "COUNT": "4.000000"
+    }
+  ]
+}

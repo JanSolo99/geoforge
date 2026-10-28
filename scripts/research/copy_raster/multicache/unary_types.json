@@ -1,0 +1,47 @@
+[
+  {
+    "case": "first_full",
+    "operation": "Abs",
+    "type": "F64"
+  },
+  {
+    "case": "first_full",
+    "operation": "Negate",
+    "type": "F64"
+  },
+  {
+    "case": "first_full",
+    "operation": "Square",
+    "type": "F64"
+  },
+  {
+    "case": "second_full",
+    "operation": "Abs",
+    "type": "F64"
+  },
+  {
+    "case": "second_full",
+    "operation": "Negate",
+    "type": "F64"
+  },
+  {
+    "case": "second_full",
+    "operation": "Square",
+    "type": "F64"
+  },
+  {
+    "case": "single_quotes",
+    "operation": "Abs",
+    "type": "F32"
+  },
+  {
+    "case": "single_quotes",
+    "operation": "Negate",
+    "type": "F32"
+  },
+  {
+    "case": "single_quotes",
+    "operation": "Square",
+    "type": "F32"
+  }
+]

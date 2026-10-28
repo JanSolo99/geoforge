@@ -1,0 +1,21 @@
+cprmulti_first_full PASS
+cprmulti_second_full PASS
+cprmulti_split_extrema PASS
+cprmulti_first_full_second_extrema PASS
+cprmulti_first_extrema_second_full PASS
+cprmulti_second_missing_extrema PASS
+cprmulti_domain_only PASS
+cprmulti_single_quotes PASS
+ummulti_abs_first_full PASS
+ummulti_abs_second_full PASS
+ummulti_abs_single_quotes PASS
+ummulti_negate_first_full PASS
+ummulti_negate_second_full PASS
+ummulti_negate_single_quotes PASS
+ummulti_square_first_full PASS
+ummulti_square_second_full PASS
+ummulti_square_single_quotes PASS
+ummulti_abs_f32_first_full PASS
+ummulti_negate_f32_first_full PASS
+ummulti_square_f32_first_full PASS
+Checked 20 FAILED 0 []

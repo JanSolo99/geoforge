@@ -1,150 +1,98 @@
 # Current handoff
 
-Updated 2026-10-28T13:36:16.816330+00:00; last agent Codex.
-Workspace `/mnt/media/ArcGIS_Linux`; branch `main`;
-HEAD9b4dcaf; normal push RUNNING (session/log below). Previous
-27ae5ccb66e15b93866103e55ace0094028ea95f PUSHED and verified remote.
-User authorizes continuous tested development, frequent commits/pushes/dashboard
-updates. Work alone; no agents/CLIs/coordinators. Cargo-j3, sequential builds,
-normal hooks, no full local app CI for root edits. Preserve unrelated files below.
+Updated 2026-10-28T15:27:17.658187+00:00; last agent Codex.
+Workspace /mnt/media/ArcGIS_Linux; main; HEADab12681bc9b6fec4418e1781885da8bd00c39c3f
+verified remote. User authorizes continuous tested development, frequent commits,
+pushes and dashboard updates. No other agents/CLIs/coordinators. Cargo-j3, one build
+at a time. Preserve NOTES.md (do not read/add) and .worktrees/. Dashboard inherited
+dirt is automatic generation. No other inherited source edits.
 
-## Completed/pushed this long-running session
+## Recovered state
 
-- e73e223 Line Statistics22 references, F32 local-coordinate clipping and guards.
-- a613de7 Copy Raster PAM-placement policy22 controls.
-- 48d99ae stale PAM cleanup after no-PAM overwrite; safe native in-place extension.
-- 002a79b UInt32/default/tagged NoData48 refs, preserved embedded caches, native
-  metadata API and Expand DISTANCE right/bottom statistics workspace. Full gate190.
-- 27ae5cc fractional Copy Raster44 refs: ties-even markers, midpoint-up pixels,
-  signed range boundaries, raw negative unsigned TIFF tags separate from logical
-  statistics masks. Native/GDAL classic+BigTIFF writer override regression.
-  Full local gate AND normal push hook PASS191 Rust/5ignored/8Python/fmt/clippy.
-  Logs /tmp/unigis-copy-fraction-check.log, /tmp/unigis-copy-fraction-push.log.
-  Dashboard--ci/JS syntax/Python syntax/diff checks PASS.
+Latest coordinator request/result/events read from
+.git/agent-coordinator/20261028T150119-562239a4 (Claude usage_limit).
+9b4dcaf cache fix and all earlier Codex changes are committed ancestors of HEAD;
+Claude subsequently added Diff/Over, Compute Change Raster, basic Create Binary
+Mask, and tessellation square/diamond/hexagon/triangle, all committed and pushed.
+Latest Claude log records five triangle oracle cases and clippy success, normal
+background push; remote now matches HEAD. No builds or pushes remain running.
 
-Durable findings/reproducers: scripts/research/copy_raster/{statistics,u32,fraction},
-scripts/research/line_statistics, docs/formats/raster-statistics.md.
-Do not infer absence of statistics from no PAM:120 references store them in TIFF.
-Do not recompute stale caches/counts: COUNT0 and COUNT>savedcells can be intended.
-ArcGIS same-path CopyRaster probe failed999999 and damaged scratch pixels; native
-safe in-place copy remains an intentional extension, documented separately.
+Durable prior Codex findings: docs/formats/raster-statistics.md and
+scripts/research/copy_raster/{statistics,u32,fraction,cache}, line_statistics.
+Last Codex complete gate9b4dcaf:192Rust/5ignored/8Python/fmt/clippy. No claim that
+this count validates newer Claude tools; next full gate will include them.
 
-## Active cache follow-up (uncommitted, this session)
+## Active multiband-cache slice (new edits this resumed session)
 
-11 new cprcache_* cases generated successfully; frozen source TIFF/PAM pairs in
-`testdata/raster/copy_cache`. All input bytes unchanged by oracle. Controlled
-caches are synthetic format inputs; ArcGIS Pro3.7 is the GP oracle, GDAL reads
-files only. Source input copies were frozen BEFORE oracle to prevent mutation bias.
+Private prior research recovered:8CopyRaster +9Abs/Negate/Square oracle runs.
+ArcGIS requires extrema in EVERY band to treat input as cached. Any incomplete
+band =>CopyRaster recomputes ALL bands to PAM, F64 unary retainsF64. Complete
+cache =>reuse/noPAM, unary narrowsF32. Custom domains ignored; single-quoted XML
+accepted. Current naive geotiff parser mixes extrema across bands/domains and
+misses single quotes:6/8CopyRaster routing failures saved in research JSON.
 
-Findings: both cached extrema select embedded/no-PAM output; absent either =>fresh
-PAM. If MEAN or STDDEV absent, reset BOTH to0/-1, preserve min/max. MissingCOUNT
-=>0.000000, MEDIAN=>nan, skipfactors=>1. Existing values retained, including stale
-complete COUNT999, median123, skips2/3, covariance7 and excluded127. Never replace
-complete stale fields with freshly calculated pixel statistics.
+Applied shared stats_metadata::from_xml parser refactor to geotiff cache detection;
+Raster.statistics stays existing API, Some(first-band-range) only for complete
+per-band caches. No new field or app edits. App AGENTS read during API assessment;
+no local full app CI needed for these root-only edits. Input/PAM decoding policy
+otherwise preserved, including tolerant optional sidecar read in geotiff reader.
 
-Edits: CLI main existing cached-copy loop fills paired moments and missing ancillary
-fields; reference harness cprcache_ exact prefix; CLI raster_output_statistics
-regression compares EVERY field for8 embedded-cache golden cases. Generator,
-manifest,11 source/11 reference files+sidecars; research recipes/observations in
-scripts/research/copy_raster/cache; ROADMAP/KNOWN_GAPS/formats doc updated.
-
-Validation:
-- Native build PASS /tmp/unigis-copy-cache-build.log.
-- Generator11 success EXIT0 /tmp/unigis-copy-cache-references.log.
-- All11 grid/type/tag/all-cell/core-stat comparisons PASS
-  /tmp/unigis-copy-cache-after.log; prior nine-control metadata comparison found
-  three moment mismatches, preserved in research/cache/comparison_before.json.
-- Initial full `scripts/check` FAILED session3749, /tmp/unigis-copy-cache-check.log.
-  Python8/fmt/clippy/reference suite passed. New full-key cache test revealed
-  missing default EXCLUDEDVALUES empty field (GDAL GetMetadata hides it). Added
-  default empty value; revised gate PASS192 Rust/5ignored/8Python/fmt/clippy.
-- Python py_compile and git diff --check PASS. Dashboard--ci and JS syntax PASS.
+Files: stats_metadata.rs/geotiff.rs/lib.rs, reference exact prefixes, generator
+17 new cprmulti_*/ummulti_* definitions,11 frozen TIFF/PAM pairs in
+raster/copy_multicache; scripts/research/copy_raster/multicache holds observations,
+recipes and prior mismatch JSON. No validation of new Rust edits yet.
 
 ## Next actions
 
-1. Revised scripts/check PASS192; commit cache slice, normal push, verify remote.
-2. Refresh dashboard--ci, extract/check JS; git diff --check; inspect intended diffs.
-3. Commit explicit paths for this cache slice; normal push (required hook), verify
-   remote SHA. Update this handoff during milestones and before finishing.
-4. Follow ROADMAP/KNOWN_GAPS. Unverified cache scope: malformed/nonfinite fields,
-   incomplete multiband caches, nondefault environments. New-tool inventory found
-   CalculateDistanceBand missing; metadata /tmp/unigis-distance-band-info.log;
-   no implementation started. Prefer one concrete verified slice at a time.
+1. Full scripts/check49742 PASS exit0:193Rust/5ignored/8Python/fmt/clippy;
+   /tmp/unigis-multicache-check.log, includes all recent Claude tools and20 new refs.
+2. Dashboard--ci83312 PASS; JS/Python syntax, recipe11 equivalence and diff checks
+   PASS. Commit explicit paths for this slice, normal push and verify remote.
+3. Next private transverse tessellation29438 EXIT0, /tmp/unigis-tess-transverse-
+   probe.log; no next-slice product edits. Eight controls include narrow/tiny
+   extents and area-unit equivalents. Formula/probe findings below.
+4. Continuous development: follow ROADMAP/KNOWN_GAPS after each tested push.
 
-## Preserve unrelated files
+## Prior Claude durable findings still relevant
 
-NOTES.md DO NOT READ/add; .worktrees/ untouched. Inherited scratch
-`testdata/geoproc/LineSta_roads1.*` excluded. Own LineSta_roads2 removed earlier.
-Post-commit dashboard/handoff dirt expected. No reset/stash/worktree transfers.
+Surface Parameters is not a fixed linear3x3 filter (gradient regression residual
+2e-5); only one-cell NoData border; not implemented. SAR tools refuse ordinary
+rasters with ERROR003514, no radar metadata fixtures available. Compute Change
+Raster categorical/spectral/multiband modes and binary-mask flood-fill/expansion/
+minimum-region/BACKGROUND_NODATA remain unsupported.
+Tessellation triangle: side=sqrt(4area/sqrt3), height=sqrt3/2*side, first up-triangle
+centroid at lower-left extent; columns ceil((width+side/2)/(side/2)), rows
+ceil((height+triangle_height/3)/triangle_height). See committed code/references for
+other shapes. Keep probe -> verified implementation -> checks -> commit/push.
 
-Revised gate63483 COMPLETE exit0 /tmp/unigis-copy-cache-check2.log.
-Missing EXCLUDEDVALUES empty default added after first gate failure.
+Milestone:17 reference generation PASS exit0; frozen inputs byte-identical. Native
+build PASS /tmp/unigis-multicache-build.log. Comparison after shared reader fixed
+all8CopyRaster cases but revealed9 unary cases dropped band2 (pre-existing bug).
+Added floating Abs/Negate/Square per-band wrapper with shared dataset cache status;
+no whole-dataset clone per band. Added3F32 cases to cover input float widths.
+This expands slice to20 refs. New math edit unvalidated; build/reference sessions
+recorded in next tool output. No app edits/API field changes.
 
-Revised cache gate63483 PASS exit0:192 Rust/5ignored/8Python/fmt/clippy.
-Every-field test now PASS, including empty excluded-values. Dashboard--ci,
-extracted JS node--check, Python syntax and diff checks PASS. Committing cache
-slice next, then normal push/remote verification. No Cargo running now.
+Both native builds PASS; oracle17+3 generation PASS exit0, total20 new cases.
+All20 exact per-band grid/type/tag/cell/core-stat/PAM comparisons PASS
+/tmp/unigis-multicache-after2.log. Source hashes unchanged. New helper closure
+uses slices (same behavior); full gate now next validation authority.
 
-Private NEXT research8 multiband cache controls completed EXIT0 session84517:
-/tmp/unigis-copy-multicache-controls/comparison_before.json. Six routing failures:
-ArcGIS requires cached extrema in EVERY band; missing any extrema recomputes ALL
-bands to PAM. Native naive geotiff parser mixes keys across bands/domains and
-misses single-quoted attributes. Two all-extrema partial-moment cases pass.
-Do not change product source until current slice pushed. Next source design must
-keep Raster.statistics/type-planning semantics correct: F64 unary cache probe
-RUNNING session92106, /tmp/unigis-copy-multicache-types.log.
-Potential shared stats_metadata XML parser refactor can fix geotiff cache routing
-without new Raster fields/app API changes; verify unary behavior before choosing.
-app/AGENTS.md read while assessing API impact; no app edits made.
+Full gate RUNNING session49742 /tmp/unigis-multicache-check.log; no other Cargo
+commands until it exits. Research recipe/docs finalized; candidate comparison20
+PASS, read-only source hashes unchanged. Dashboard refresh/JS/full gate pending.
 
-Cache slice committed9b4dcaf with full gate192 PASS; normal push RUNNING
-/tmp/unigis-copy-cache-push.log. No new product edits until push hook completes.
-Multiband type oracle session92106 EXIT0: Abs/Negate/Square keep F64 when ANY band
-lacks cached extrema, narrow toF32 only for complete caches (single-quoted XML
-valid). This supports making Raster.statistics Some(first-band-range) only when
-EVERY band has min/max, using shared metadata XML parser with band/domain/quote
-handling. No new Raster field/app API change needed; root-only checks suffice.
-Next research17 saved refs (8CopyRaster+9unary) and robust reader, after push.
+Dashboard--ci83312 PASS; extracted JavaScript node--check, Python py_compile,
+git diff--check PASS. Recipe recreated11 private snapshots; GDAL confirms identical
+grid/types/NoData/pixels/per-band metadata (recipe_verification.json). Full gate49742
+continues; generic full reference suite passed including newer Claude cases.
+Private transverse tessellation29438 EXIT0:8 controls, counts a20/b20/c36/d21,
+tiny1/thin5. Side s=sqrt(area/(1.5sqrt3)); width=sqrt3*s, rows step1.5*s,
+odd rows shifted half-width. First cell centred at extent lower-left; ring CW from
+top vertex. Columns ceil((w+width/2)/width), rows ceil((h+s)/(1.5s)).
+1hectare and0.01square-km match10000square-m. No next-slice product edits yet.
 
-Claude 2026-10-29: Line Statistics implemented (`line_statistics` in interpolate.rs, `ls_*` 9 cases, all
-pass; code was swept into Codex's commits). Rules found: value = field weighted by LENGTH inside the circle:
-LENGTH = sum(field x length inside), MEAN = length-weighted mean, MAXIMUM/MINIMUM/RANGE/VARIETY/MAJORITY/
-MINORITY by length per distinct value; grid = IDW default (extent grown half a cell, round(w/cell)+1);
-integer field -> S32 NoData -2147483647 except MEAN/LENGTH (F32). Median not done. Pushing is left to the
-running Codex push; do not start a second push while it runs.
-
-Claude 2026-10-29: Surface Parameters again (SLOPE+ASPECT from ArcGIS turned into gradients and regressed on the 3x3
-cells): not a fixed linear 3x3 filter (max residual 2e-5 on gradients ~0.03; fitted weights ~ (1,4,1)/12 columns but
-with non-zero middle-column weights), only the 1-cell border is NoData, so the neighbourhood is 3x3 and the fit is
-nonlinear in the slope/aspect formulas. Not implemented. User asked (2026-10-29) to keep going until ALL ArcGIS
-tools exist: ~330 of 2028 tools have ArcGIS reference cases so far; the dashboard (http://100.99.35.95:8765/dashboard)
-tracks it. Rule for the long run: keep to probe -> closed-form fit -> registry entry -> reference cases -> commit.
-
-Claude 2026-10-29: Diff and Over (Image Analyst; `diff`, `over` in the raster registry, `diff_*`/`over_*` 14 cases pass):
-Diff = first value where it differs from the second, 0 where equal (type from the FIRST operand only: width, floating,
-signed-if-statistics-negative); Over = first value, or the second where the first is 0 (background); type = widest of both.
-
-Claude 2026-10-29: Compute Change Raster (single band; DIFFERENCE = to - from, RELATIVE_DIFFERENCE = (to - from)/max(|from|,|to|), 0
-where both 0; F32 NoData 3.4e38, no statistics sidecar; `compute_change_raster`, `cc2_*` 10 cases pass). Categorical difference,
-spectral distance/angle and multiband inputs not done. Probed ConvertSARUnits, CreateBinaryMask, CreateColorComposite,
-SummarizeCategoricalRaster usage only (SAR/multiband inputs needed).
-
-Claude 2026-10-29: Create Binary Mask (basic: `create_binary_mask`, background_value; `bmask_*` 5 cases pass): U8 0/1 (1 = not the
-background value, default 0), NoData 255 kept; ArcGIS embeds an EMPTY statistics cache in the TIFF (count 0, min 0, max 255, mean 0,
-stddev -1, median nan), reproduced in run_raster_tool. Flood fill / expand / min region size / BACKGROUND_NODATA not done.
-SAR tools (Convert SAR Units, Despeckle, ...) refuse non-radar inputs (ERROR 003514: radar metadata is missing): not testable here.
-
-Claude 2026-10-29: Generate Tessellation SQUARE (`generate_tessellation`, `tess_sq_*` 5 cases pass; `template` layer gives the coordinate
-system): size = cell AREA; first cell centred on the extent's lower-left; columns = ceil((w - s/2)/s) + 1, rows likewise; GRID_ID =
-`<letters from A, AA after Z>-<row from the top>`; cells listed bottom row first, left to right; rings clockwise from the top right;
-fields Id, GRID_ID. HEXAGON/TRIANGLE/DIAMOND/TRANSVERSE HEXAGON/H3 are NOT done: hexagon side = sqrt(area/(3*sqrt(3)/2)), flat-top,
-first hexagon centred at the extent corner, alternate columns raised half a hexagon height; diamond half-diagonal = sqrt(area/2) with
-rows offset half a cell; inclusion rules at the extent edges need more probing (counts for 400x300: hexagon 20, triangle 36, diamond 35).
-
-Claude 2026-10-29: Generate Tessellation DIAMOND and HEXAGON also done (`tess_dia_*`, `tess_hex_*` 8 cases pass): diamond half-diagonal
-d = sqrt(area/2), columns ceil((w+d)/2d), rows ceil((h+d)/d) (odd rows shifted by d); hexagon (flat-top) side s = sqrt(area/(1.5 sqrt3)),
-columns ceil((w+s)/1.5s), rows ceil((h+height/2)/height), odd columns raised half a hexagon height. TRIANGLE, TRANSVERSE HEXAGON and H3 still missing.
-
-Claude 2026-10-29: Generate Tessellation TRIANGLE done (`tess_tri_*` 5 cases pass): side a = sqrt(4 area/sqrt3), height ht = sqrt3/2 a; first triangle points
-up with its centroid on the extent's lower-left corner; rows from y0 - ht/3 up; triangles alternate up/down (odd rows shifted half a triangle), left
-vertex x0 - a/2 + (a/2) i; columns ceil((w + a/2)/(a/2)), rows ceil((h + ht/3)/ht). TRANSVERSE HEXAGON and H3 HEXAGON still missing.
+Validation milestone: full gate193 passed (normal hook still pending for next
+push); source review completed. ROADMAP/KNOWN_GAPS now also record previously
+committed Claude tool coverage/limits, verified in this same full gate. No builds
+or oracle runs remain active. Preparing explicit-path commit for current slice.

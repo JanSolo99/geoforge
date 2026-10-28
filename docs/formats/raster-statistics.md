@@ -55,3 +55,11 @@ excluded-values becomes an empty field, and skip factors become1. Existing value
 moments/counts and existing median/skip/covariance/excluded-value fields. Missing
 minimum OR maximum instead triggers fresh PAM statistics. Evidence:
 [11 partial/stale cache controls](../../scripts/research/copy_raster/cache/README.md).
+
+Cache planning requires minimum and maximum in EVERY band of the default domain.
+A missing extremum anywhere makes Copy Raster recompute ALL bands into PAM and
+keeps F64 for Abs/Negate/Square. Complete caches permit preserved embedded copies
+and F32 narrowing. Keys cannot be paired across different bands or custom domains.
+The same parser handles valid single/double-quoted XML and embedded/PAM per-key
+precedence. Raster.statistics exposes band0's range only for a complete cache.
+See [20 multiband controls](../../scripts/research/copy_raster/multicache/README.md).

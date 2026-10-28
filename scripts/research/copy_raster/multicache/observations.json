@@ -1,0 +1,42 @@
+[
+  {
+    "case": "first_full",
+    "ok": true,
+    "messages": "Start Time: Thursday, October 29, 2026 12:39:52 AM\nBuilding Pyramids...\nCalculating statistics and histogram...\nSucceeded at Thursday, October 29, 2026 12:39:52 AM (Elapsed Time: 0.07 seconds)"
+  },
+  {
+    "case": "second_full",
+    "ok": true,
+    "messages": "Start Time: Thursday, October 29, 2026 12:39:52 AM\nBuilding Pyramids...\nCalculating statistics and histogram...\nSucceeded at Thursday, October 29, 2026 12:39:52 AM (Elapsed Time: 0.06 seconds)"
+  },
+  {
+    "case": "split_extrema",
+    "ok": true,
+    "messages": "Start Time: Thursday, October 29, 2026 12:39:52 AM\nBuilding Pyramids...\nCalculating statistics and histogram...\nSucceeded at Thursday, October 29, 2026 12:39:52 AM (Elapsed Time: 0.06 seconds)"
+  },
+  {
+    "case": "first_full_second_extrema",
+    "ok": true,
+    "messages": "Start Time: Thursday, October 29, 2026 12:39:52 AM\nBuilding Pyramids...\nCalculating statistics and histogram...\nSucceeded at Thursday, October 29, 2026 12:39:52 AM (Elapsed Time: 0.06 seconds)"
+  },
+  {
+    "case": "first_extrema_second_full",
+    "ok": true,
+    "messages": "Start Time: Thursday, October 29, 2026 12:39:52 AM\nBuilding Pyramids...\nCalculating statistics and histogram...\nSucceeded at Thursday, October 29, 2026 12:39:52 AM (Elapsed Time: 0.06 seconds)"
+  },
+  {
+    "case": "second_missing_extrema",
+    "ok": true,
+    "messages": "Start Time: Thursday, October 29, 2026 12:39:52 AM\nBuilding Pyramids...\nCalculating statistics and histogram...\nSucceeded at Thursday, October 29, 2026 12:39:52 AM (Elapsed Time: 0.06 seconds)"
+  },
+  {
+    "case": "domain_only",
+    "ok": true,
+    "messages": "Start Time: Thursday, October 29, 2026 12:39:52 AM\nBuilding Pyramids...\nCalculating statistics and histogram...\nSucceeded at Thursday, October 29, 2026 12:39:52 AM (Elapsed Time: 0.06 seconds)"
+  },
+  {
+    "case": "single_quotes",
+    "ok": true,
+    "messages": "Start Time: Thursday, October 29, 2026 12:39:52 AM\nBuilding Pyramids...\nCalculating statistics and histogram...\nSucceeded at Thursday, October 29, 2026 12:39:52 AM (Elapsed Time: 0.06 seconds)"
+  }
+]

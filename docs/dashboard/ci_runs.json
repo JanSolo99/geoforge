@@ -1,61 +1,61 @@
 {
-  "fetched": "2026-10-28T13:36:28+00:00",
+  "fetched": "2026-10-28T15:22:51+00:00",
   "runs": [
     {
-      "conclusion": "",
-      "createdAt": "2026-10-28T13:31:43Z",
-      "displayTitle": "Match ArcGIS Copy Raster fractional markers and pixel rounding",
-      "status": "in_progress",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40697239509"
+      "conclusion": "success",
+      "createdAt": "2026-10-28T15:12:26Z",
+      "displayTitle": "Generate Tessellation: triangle cells",
+      "status": "completed",
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40713587322"
     },
     {
       "conclusion": "success",
-      "createdAt": "2026-10-28T12:24:19Z",
-      "displayTitle": "Preserve ArcGIS embedded raster statistics and Copy Raster NoData def\u2026",
+      "createdAt": "2026-10-28T15:01:11Z",
+      "displayTitle": "Generate Tessellation: diamond and hexagon cells",
       "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40687521836"
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40711699219"
     },
     {
       "conclusion": "success",
-      "createdAt": "2026-10-28T10:45:33Z",
-      "displayTitle": "Clear stale PAM statistics after no-statistics raster overwrites",
+      "createdAt": "2026-10-28T14:50:37Z",
+      "displayTitle": "Add Generate Tessellation (SQUARE) with ArcGIS reference cases",
       "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40674640766"
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40709943508"
     },
     {
       "conclusion": "success",
-      "createdAt": "2026-10-28T10:29:18Z",
-      "displayTitle": "Match Copy Raster statistics to source cache and effective type and N\u2026",
+      "createdAt": "2026-10-28T14:39:11Z",
+      "displayTitle": "Add Create Binary Mask (basic) with ArcGIS reference cases",
       "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40672507702"
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40708058510"
     },
     {
       "conclusion": "success",
-      "createdAt": "2026-10-28T10:13:21Z",
-      "displayTitle": "Add ArcGIS-verified Line Statistics with contact and clipping precisi\u2026",
+      "createdAt": "2026-10-28T14:23:58Z",
+      "displayTitle": "Add Compute Change Raster (difference, relative difference) with ArcG\u2026",
       "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40670384449"
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40705530803"
     },
     {
       "conclusion": "success",
-      "createdAt": "2026-10-28T09:46:15Z",
-      "displayTitle": "Point Statistics: clippy-clean cell check",
+      "createdAt": "2026-10-28T14:13:05Z",
+      "displayTitle": "Add Diff and Over with ArcGIS reference cases",
       "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40666840212"
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40703764602"
     },
     {
       "conclusion": "success",
-      "createdAt": "2026-10-28T09:30:19Z",
-      "displayTitle": "Add Extract Multi Values To Points with ArcGIS reference cases",
+      "createdAt": "2026-10-28T14:01:03Z",
+      "displayTitle": "HANDOFF: Surface Parameters regression result",
       "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40664746941"
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40701817759"
     },
     {
       "conclusion": "success",
-      "createdAt": "2026-10-28T09:08:32Z",
-      "displayTitle": "Add Sample (nearest/bilinear) with ArcGIS reference cases",
+      "createdAt": "2026-10-28T13:54:58Z",
+      "displayTitle": "HANDOFF: Line Statistics rules",
       "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40661931112"
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40700848000"
     }
   ]
 }

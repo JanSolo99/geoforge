@@ -22,13 +22,29 @@ pub fn read(path: &Path) -> Result<Vec<BandStatistics>> {
         .find_tag_unsigned::<u16>(Tag::SamplesPerPixel)
         .map_err(error)?
         .unwrap_or(1) as usize;
-    let mut bands = vec![BandStatistics::new(); samples];
-    if let Some(xml) = decoder
+    let embedded = decoder
         .find_tag(Tag::Unknown(42112))
         .map_err(error)?
-        .and_then(|v| v.into_string().ok())
-    {
-        for (head, text) in elements(&xml, "Item") {
+        .and_then(|v| v.into_string().ok());
+    let mut aux_path = path.as_os_str().to_owned();
+    aux_path.push(".aux.xml");
+    let aux = match std::fs::read_to_string(&aux_path) {
+        Ok(xml) => Some(xml),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
+        Err(e) => return Err(Error::io(Path::new(&aux_path), e)),
+    };
+    Ok(from_xml(samples, embedded.as_deref(), aux.as_deref()))
+}
+
+/// Shared band/domain-aware parsing for raster type planning and cache copying.
+pub(crate) fn from_xml(
+    samples: usize,
+    embedded: Option<&str>,
+    aux: Option<&str>,
+) -> Vec<BandStatistics> {
+    let mut bands = vec![BandStatistics::new(); samples];
+    if let Some(xml) = embedded {
+        for (head, text) in elements(xml, "Item") {
             if attribute(head, "domain").is_some_and(|v| !v.is_empty()) {
                 continue;
             }
@@ -41,34 +57,28 @@ pub fn read(path: &Path) -> Result<Vec<BandStatistics>> {
             }
         }
     }
-    let mut aux = path.as_os_str().to_owned();
-    aux.push(".aux.xml");
-    match std::fs::read_to_string(&aux) {
-        Ok(xml) => {
-            for (head, body) in elements(&xml, "PAMRasterBand") {
-                let Some(index) = attribute(head, "band")
-                    .and_then(|s| s.parse::<usize>().ok())
-                    .and_then(|v| v.checked_sub(1))
-                else {
+    if let Some(xml) = aux {
+        for (head, body) in elements(xml, "PAMRasterBand") {
+            let Some(index) = attribute(head, "band")
+                .and_then(|s| s.parse::<usize>().ok())
+                .and_then(|v| v.checked_sub(1))
+            else {
+                continue;
+            };
+            let Some(band) = bands.get_mut(index) else {
+                continue;
+            };
+            for (head, body) in elements(body, "Metadata") {
+                if attribute(head, "domain").is_some_and(|v| !v.is_empty()) {
                     continue;
-                };
-                let Some(band) = bands.get_mut(index) else {
-                    continue;
-                };
-                for (head, body) in elements(body, "Metadata") {
-                    if attribute(head, "domain").is_some_and(|v| !v.is_empty()) {
-                        continue;
-                    }
-                    for (head, text) in elements(body, "MDI") {
-                        insert(band, attribute(head, "key"), text);
-                    }
+                }
+                for (head, text) in elements(body, "MDI") {
+                    insert(band, attribute(head, "key"), text);
                 }
             }
         }
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
-        Err(e) => return Err(Error::io(Path::new(&aux), e)),
     }
-    Ok(bands)
+    bands
 }
 
 /// Encodes stored statistics as the public GDAL_METADATA XML representation.

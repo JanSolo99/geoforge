@@ -65432,6 +65432,366 @@
           "template": "testdata/geoproc/parcels.shp"
         }
       }
+    },
+    "cprmulti_first_full": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_multicache/first_full.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_multicache/first_full.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprmulti_second_full": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_multicache/second_full.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_multicache/second_full.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprmulti_split_extrema": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_multicache/split_extrema.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_multicache/split_extrema.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprmulti_first_full_second_extrema": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_multicache/first_full_second_extrema.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_multicache/first_full_second_extrema.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprmulti_first_extrema_second_full": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_multicache/first_extrema_second_full.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_multicache/first_extrema_second_full.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprmulti_second_missing_extrema": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_multicache/second_missing_extrema.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_multicache/second_missing_extrema.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprmulti_domain_only": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_multicache/domain_only.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_multicache/domain_only.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprmulti_single_quotes": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_multicache/single_quotes.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_multicache/single_quotes.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "ummulti_abs_first_full": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/copy_multicache/first_full_f64.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/copy_multicache/first_full_f64.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "ummulti_abs_second_full": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/copy_multicache/second_full_f64.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/copy_multicache/second_full_f64.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "ummulti_abs_single_quotes": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/copy_multicache/single_quotes_f64.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/copy_multicache/single_quotes_f64.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "ummulti_negate_first_full": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/copy_multicache/first_full_f64.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/copy_multicache/first_full_f64.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "ummulti_negate_second_full": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/copy_multicache/second_full_f64.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/copy_multicache/second_full_f64.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "ummulti_negate_single_quotes": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/copy_multicache/single_quotes_f64.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/copy_multicache/single_quotes_f64.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "ummulti_square_first_full": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/copy_multicache/first_full_f64.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/copy_multicache/first_full_f64.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "ummulti_square_second_full": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/copy_multicache/second_full_f64.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/copy_multicache/second_full_f64.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "ummulti_square_single_quotes": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/copy_multicache/single_quotes_f64.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/copy_multicache/single_quotes_f64.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "ummulti_abs_f32_first_full": {
+      "tool": "gp.Abs_sa",
+      "args": [
+        "testdata/raster/copy_multicache/first_full.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "abs",
+        "params": {
+          "input": "testdata/raster/copy_multicache/first_full.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "ummulti_negate_f32_first_full": {
+      "tool": "gp.Negate_sa",
+      "args": [
+        "testdata/raster/copy_multicache/first_full.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "negate",
+        "params": {
+          "input": "testdata/raster/copy_multicache/first_full.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "ummulti_square_f32_first_full": {
+      "tool": "gp.Square_sa",
+      "args": [
+        "testdata/raster/copy_multicache/first_full.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square",
+        "params": {
+          "input": "testdata/raster/copy_multicache/first_full.tif",
+          "output": "<out>"
+        }
+      }
     }
   }
 }
