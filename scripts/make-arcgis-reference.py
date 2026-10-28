@@ -410,6 +410,9 @@ CASES = {
     "fst_parcels_text": ("management.FieldStatisticsToTable", [DATA / "parcels.shp"], ["NAME", "TEXT"]),
     "fst_streams_text": ("management.FieldStatisticsToTable", [DATA / "streams.shp"], ["NAME", "TEXT"]),
     "fst_wells_num": ("management.FieldStatisticsToTable", [DATA / "wells.shp"], ["DEPTH", "NUMERIC"]),
+    "fst_parcels_num_by_zone": ("management.FieldStatisticsToTable", [DATA / "parcels.shp"], ["VALUE;PARCEL_ID;ZONE", "NUMERIC", "ZONE"]),
+    "fst_parcels_text_by_zone": ("management.FieldStatisticsToTable", [DATA / "parcels.shp"], ["NAME", "TEXT", "ZONE"]),
+    "fst_parcels_num_by_name": ("management.FieldStatisticsToTable", [DATA / "parcels.shp"], ["VALUE", "NUMERIC", "NAME"]),
     "xy_stations": ("management.XYTableToPoint", [DATA / "stations.csv"], ["X", "Y", "", 32633]),
     "xy_stations_z": ("management.XYTableToPoint", [DATA / "stations.csv"], ["X", "Y", "ELEV", 32633]),
     "slope_dem": ("gp.Slope_sa", [RASTER / "dem.tif"], ["DEGREE", 1, "PLANAR", "METER"]),
@@ -1894,7 +1897,7 @@ RUN = {
     "cartography.GridIndexFeatures": ("grid_index_features", ["input", "output", "intersect_feature", None, None, "polygon_width", "polygon_height"]),
     "gp.ReclassByASCIIFile_sa": ("reclass_by_ascii_file", ["input", "remap_file", "output", "missing_values"]),
     "edit.FlipLine": ("flip_line", ["input", "output"]),
-    "management.FieldStatisticsToTable": ("field_statistics_to_table", ["input", "output", "fields", "field_type"]),
+    "management.FieldStatisticsToTable": ("field_statistics_to_table", ["input", "output", "fields", "field_type", "group_by"]),
     "management.EncodeField": ("encode_field", ["input", "output", "field", "method"]),
     "management.GeodeticDensify": ("geodetic_densify", ["input", "output", "densify_method", "max_segment_length"]),
     "management.TableToEllipse": ("table_to_ellipse", ["input", "output", "x_field", "y_field", "major_field", "minor_field", "distance_units", "azimuth_field", "azimuth_units", None, "spatial_reference", None, "shape_type", "method"]),
@@ -2076,7 +2079,7 @@ def main():
         elif tool == "management.FieldStatisticsToTable":
             # Writes <input>_FieldStatisticsToTable_<type> into the output location: run into
             # memory, then copy that table to the output below.
-            args = [str(before[0]), after[0], "memory", after[1]]
+            args = [str(before[0]), after[0], "memory", after[1]] + after[2:]
                 shutil.copy2(before[k], out)
                 aux = Path(str(before[k]) + ".aux.xml")
                 if aux.exists():

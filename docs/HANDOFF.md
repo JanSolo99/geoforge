@@ -18,8 +18,21 @@ committing make-arcgis-reference.py hunks, exclude Codex's umintfloat hunk (git 
 --unidiff-zero of a filtered diff). If a push says "cannot lock ref", run `git fetch` and check
 `git status -sb`: the earlier push may already have landed.
 Next candidates: Extend Line / Trim Line (need a topology-aware test set), Convert Coordinate
-Notation for UTM/MGRS/USNG, Field Statistics To Table group-by, Aggregate Points, Rotate/Rescale
-rasters (after Codex finishes the raster files), items in docs/KNOWN_GAPS.md.
+Notation for UTM/MGRS/USNG, Field Statistics To Table Statistic list / Date fields, Aggregate Points,
+Rotate/Rescale rasters (after Codex finishes the raster files), items in docs/KNOWN_GAPS.md.
+
+Claude 2026-10-29 (this run): Field Statistics To Table group-by (`group_by=` param, tables.rs +
+registry.rs, 3 unit tests, 3 new `fst_parcels_*_by_*` reference cases + manifest annotate). ArcGIS
+probe (memory table with nulls): the group field leads the row (fresh field of its type: default
+width, no alias; text width = longest value), groups ascending (text by byte order: '' < B < a < b),
+rows with a NULL group value are dropped, the group field may also be summarized, Double/Float group
+fields fail with ERROR 003911. Manual ug-vs-ArcGIS dbf diff (ogrinfo) identical for all 3 cases.
+Validation status is in the line below; commit only explicit paths (tables.rs, registry.rs in
+unigis-tools, the 3 fst case hunks of make-arcgis-reference.py, manifest.json, the 9 new
+testdata/arcgis-reference/fst_parcels_*_by_* files, ROADMAP.md, HANDOFF.md).
+Validation: full scripts/check EXIT 0 (fmt, clippy -D warnings, workspace tests incl.
+tools_match_arcgis_output; log /tmp/unigis-fst-group-check.log). The run covered the working tree
+including Codex's uncommitted raster edits. Committed as "Add group-by field to Field Statistics To Table".
 
 Older notes (Codex, then Claude) follow.
 
