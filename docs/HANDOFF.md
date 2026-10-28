@@ -86,6 +86,8 @@ Tested offline (`test_daemon_runs_inbox_tasks_commands_pause_and_keepalive`); no
 
 - Sample (`sample`, `smp_*` pass; rasters `a;b`, locations = points, NEAREST/BILINEAR, unique_id_field; handled by `run_sample` in the CLI because it writes a table): columns = location layer name (FID or the id field), X, Y, one per raster named by file stem (float rasters get `_Band_1`, all cut to 10 characters); F32 values keep 6 significant digits (Single field F 13.11), F64 and integers exact. Point on a cell edge -> the cell to its left / above. Outside raster: 0 if the raster has no NoData, else the NoData value (float) / -9999 (integer). Bilinear: outside neighbours count as 0 for rasters without NoData; with NoData, missing and NoData neighbours are dropped and weights renormalised. Not done: multiband rasters, buffer_distance/statistics options, ALL_SLICES.
 
+- Extract Multi Values To Points (`extract_multi_values_to_points`, `emv_*` pass; `run_extract_multi_values` + shared `sample_value` in the CLI): adds one field per raster (name given or file stem, 10 chars; Single for F32, Double for F64, Integer for integer rasters unless BILINEAR, which makes them Single) with the Sample values; in the reference test its interpolated singles are compared to 3e-6 relative because ArcGIS's single-precision arithmetic differs in the sixth digit (feature 9 of the hydro case, 86.7259 vs 86.726).
+
 ## Next actions
 
 1. Keep going in probe -> implement -> reference-test batches (see "Session 2026-10-26" entries for what is done and the gaps).

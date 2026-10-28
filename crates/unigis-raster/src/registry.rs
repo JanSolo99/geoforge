@@ -873,6 +873,14 @@ fn sample_unsupported(_: &dyn Context) -> Result<Output> {
     ))
 }
 
+/// Extract Multi Values To Points writes the points with new fields; the command line builds it
+/// (`run_extract_multi_values` in the CLI).
+fn extract_multi_unsupported(_: &dyn Context) -> Result<Output> {
+    Err(Error::Unsupported(
+        "Extract Multi Values To Points writes features; run it through `ug run`".into(),
+    ))
+}
+
 fn flip(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::extract::flip(&ctx.raster("input")?), true)
 }
@@ -1552,6 +1560,34 @@ pub static TOOLS: &[Tool] = &[
             },
         ],
         run: sample_unsupported,
+    },
+    Tool {
+        id: "extract_multi_values_to_points",
+        name: "Extract Multi Values To Points",
+        summary: "Adds a field per raster with the raster's value at each point.",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Point Features",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            Param {
+                name: "rasters",
+                label: "Input Rasters",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            option(
+                "interpolate",
+                "Interpolate Values At The Point Locations",
+                &["NONE", "BILINEAR"],
+                "NONE",
+            ),
+        ],
+        run: extract_multi_unsupported,
     },
     Tool {
         id: "flip",

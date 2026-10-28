@@ -4110,7 +4110,12 @@ fn compare(case: &str, ours: &Path, theirs: &Path, fields: &serde_json::Value) -
             let apportioned = case.starts_with("apo_")
                 && matches!((va, vb), (Value::Double(x), Value::Double(y))
                     if (x - y).abs() <= 1e-9 * x.abs().max(y.abs()).max(1.0));
-            if !same_value(va, vb) && !(measured && near(va, vb)) && !apportioned {
+            // Extract Multi Values To Points rounds interpolated singles to six digits after its
+            // own single-precision arithmetic: 3e-6 relative.
+            let single_noise = case.starts_with("emv_")
+                && matches!((va, vb), (Value::Single(x), Value::Single(y))
+                    if (x - y).abs() <= 3e-6 * x.abs().max(y.abs()).max(1.0));
+            if !same_value(va, vb) && !(measured && near(va, vb)) && !apportioned && !single_noise {
                 diffs.push(format!("feature {i} field {k}: ours {va:?}, ArcGIS {vb:?}"));
             }
         }

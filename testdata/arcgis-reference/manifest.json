@@ -60142,6 +60142,164 @@
           "resampling": "NEAREST"
         }
       }
+    },
+    "emv_nearest": {
+      "tool": "gp.ExtractMultiValuesToPoints_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "testdata/raster/dem.tif;testdata/raster/landuse_u8.tif;testdata/raster/dem_int16_packbits.tif;testdata/raster/dem_f64.tif",
+        "<out>",
+        "NONE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem",
+          "Single",
+          13,
+          0,
+          0
+        ],
+        [
+          "landuse_u8",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "dem_int16_",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "dem_f64",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "extract_multi_values_to_points",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "rasters": "testdata/raster/dem.tif;testdata/raster/landuse_u8.tif;testdata/raster/dem_int16_packbits.tif;testdata/raster/dem_f64.tif",
+          "output": "<out>",
+          "interpolate": "NONE"
+        }
+      }
+    },
+    "emv_bilinear": {
+      "tool": "gp.ExtractMultiValuesToPoints_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "testdata/raster/dem.tif;testdata/raster/landuse_u8.tif;testdata/raster/dem_nodata.tif;testdata/raster/hydro.tif",
+        "<out>",
+        "BILINEAR"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem",
+          "Single",
+          13,
+          0,
+          0
+        ],
+        [
+          "landuse_u8",
+          "Single",
+          13,
+          0,
+          0
+        ],
+        [
+          "dem_nodata",
+          "Single",
+          13,
+          0,
+          0
+        ],
+        [
+          "hydro",
+          "Single",
+          13,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "extract_multi_values_to_points",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "rasters": "testdata/raster/dem.tif;testdata/raster/landuse_u8.tif;testdata/raster/dem_nodata.tif;testdata/raster/hydro.tif",
+          "output": "<out>",
+          "interpolate": "BILINEAR"
+        }
+      }
     }
   }
 }

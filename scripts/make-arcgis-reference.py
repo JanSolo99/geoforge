@@ -1476,6 +1476,8 @@ CASES = {
     "smp_nodata_bil": ("gp.Sample_sa", [RASTER / "dem_nodata.tif", DATA / "wells.shp"], ["BILINEAR"]),
     "smp_f64_id": ("gp.Sample_sa", [RASTER / "dem_f64.tif", DATA / "wells.shp"], ["NEAREST", "WELL_ID"]),
     "smp_hydro_parcels": ("gp.Sample_sa", [RASTER / "hydro.tif", DATA / "pour_pts.shp"], ["NEAREST"]),
+    "emv_nearest": ("gp.ExtractMultiValuesToPoints_sa", [DATA / "wells.shp", f"{RASTER / 'dem.tif'};{RASTER / 'landuse_u8.tif'};{RASTER / 'dem_int16_packbits.tif'};{RASTER / 'dem_f64.tif'}"], ["NONE"]),
+    "emv_bilinear": ("gp.ExtractMultiValuesToPoints_sa", [DATA / "wells.shp", f"{RASTER / 'dem.tif'};{RASTER / 'landuse_u8.tif'};{RASTER / 'dem_nodata.tif'};{RASTER / 'hydro.tif'}"], ["BILINEAR"]),
     "gpal_roads_50": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "NO_END_POINTS"]),
     "gpal_roads_50_end": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "END_POINTS"]),
     "gpal_roads_pct": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["PERCENTAGE", "", 25, "NO_END_POINTS"]),
@@ -1679,6 +1681,7 @@ RUN = {
     "gp.FocalFlow_sa": ("focal_flow", ["input", "output", "threshold_value"]),
     "gp.SnapPourPoint_sa": ("snap_pour_point", ["input", "accumulation", "output", "snap_distance", "pour_point_field"]),
     "gp.Sample_sa": ("sample", ["input", "locations", "output", "resampling", "unique_id_field"]),
+    "gp.ExtractMultiValuesToPoints_sa": ("extract_multi_values_to_points", ["input", "rasters", "output", "interpolate"]),
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
     "analysis.CountOverlappingFeatures": ("count_overlapping_features", ["input", "output", "minimum_overlap_count"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
@@ -1719,7 +1722,7 @@ MEMORY_OUT = {"analysis.SummarizeWithin", "analysis.SummarizeNearby", "analysis.
 CREATE_TOOLS = {"management.CreateFeatureclass", "management.CreateTable"}
 
 # In-place tools: the index of the input they edit (run on a copy written as the output).
-IN_PLACE = {"edit.FlipLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.AddGeometryAttributes": 0,
+IN_PLACE = {"gp.ExtractMultiValuesToPoints_sa": 0, "edit.FlipLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.AddGeometryAttributes": 0,
             "management.CalculateFields": 0, "management.StandardizeField": 0, "management.TransformField": 0, "management.ReclassifyField": 0, "management.DefineProjection": 0, "management.CalculateEndTime": 0}
 
 # Select Layer By Location cases, saved with Copy Features:

@@ -6235,6 +6235,9 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
     if spec.id == "sample" {
         return run_sample(&Args(map), &output);
     }
+    if spec.id == "extract_multi_values_to_points" {
+        return run_extract_multi_values(&Args(map), &output);
+    }
     let out = registry::run(spec, &Args(map))?;
     if spec.id == "raster_to_float" {
         let path = Path::new(&output);
@@ -6340,14 +6343,6 @@ fn run_sample(ctx: &dyn unigis_raster::registry::Context, output: &str) -> Resul
         }
         fields.push(f);
     }
-    // Cell index of a coordinate: edges belong to the cell to the left / above.
-    let index = |v: f64| {
-        if v.fract() == 0.0 {
-            v as i64 - 1
-        } else {
-            v.floor() as i64
-        }
-    };
     let mut rows = Vec::new();
     for f in fc.features() {
         let f = f?;
@@ -6361,70 +6356,7 @@ fn run_sample(ctx: &dyn unigis_raster::registry::Context, output: &str) -> Resul
             };
             let mut row = vec![Value::Integer(id), Value::Double(p[0]), Value::Double(p[1])];
             for (_, r) in &rasters {
-                let t = r.transform;
-                let (cx, cy) = ((p[0] - t[0]) / t[1], (t[3] - p[1]) / -t[5]);
-                let inside = cx >= 0.0 && cy >= 0.0 && cx < r.width as f64 && cy < r.height as f64;
-                let value = if !inside {
-                    None
-                } else if bilinear {
-                    // Beside the outermost cell centres: a raster without NoData counts the
-                    // missing neighbours as 0 (0.8 of the edge value 0.2 of a cell from the
-                    // edge); one with NoData drops missing and NoData neighbours and
-                    // renormalises the weights (observed).
-                    let (fx, fy) = (cx - 0.5, cy - 0.5);
-                    let (c0, r0) = (fx.floor() as i64, fy.floor() as i64);
-                    let (dx, dy) = (fx - c0 as f64, fy - r0 as f64);
-                    let has_nodata = r.nodata.is_some();
-                    let at = |c: i64, rr: i64| {
-                        if c < 0 || rr < 0 || c >= r.width as i64 || rr >= r.height as i64 {
-                            (!has_nodata).then_some(0.0)
-                        } else {
-                            r.get(c as usize, rr as usize)
-                        }
-                    };
-                    let corners = [
-                        (at(c0, r0), (1.0 - dx) * (1.0 - dy)),
-                        (at(c0 + 1, r0), dx * (1.0 - dy)),
-                        (at(c0, r0 + 1), (1.0 - dx) * dy),
-                        (at(c0 + 1, r0 + 1), dx * dy),
-                    ];
-                    let weight: f64 = corners
-                        .iter()
-                        .filter(|(v, _)| v.is_some())
-                        .map(|c| c.1)
-                        .sum();
-                    (weight > 0.0).then(|| {
-                        corners
-                            .iter()
-                            .filter_map(|(v, w)| v.map(|v| v * w))
-                            .sum::<f64>()
-                            / weight
-                    })
-                } else {
-                    let (c, rr) = (index(cx), index(cy));
-                    r.get(c as usize, rr as usize)
-                };
-                let float = r.data_type.is_float();
-                // Without a NoData value a raster gives 0; with one, floats give it and integers
-                // -9999 (observed).
-                let missing = match (r.nodata, float) {
-                    (None, _) => 0.0,
-                    (Some(n), true) => n,
-                    (Some(_), false) => -9999.0,
-                };
-                let v = value.unwrap_or(missing);
-                // A 32-bit float column keeps six significant digits (its 13-wide field holds
-                // d.ddddde+xx).
-                let v = if r.data_type == unigis_raster::DataType::F32 && v != 0.0 {
-                    format!("{v:.5e}").parse().unwrap_or(v)
-                } else {
-                    v
-                };
-                row.push(match r.data_type {
-                    unigis_raster::DataType::F32 => Value::Single(v as f32),
-                    unigis_raster::DataType::F64 => Value::Double(v),
-                    _ => Value::Integer(v as i32),
-                });
+                row.push(sample_value(r, p[0], p[1], bilinear, false));
             }
             rows.push(row);
         }
@@ -6432,6 +6364,174 @@ fn run_sample(ctx: &dyn unigis_raster::registry::Context, output: &str) -> Resul
     write_table(
         &unigis_tools::TableOutput { fields, rows },
         Path::new(output),
+    )
+}
+
+/// The value of `r` at (x, y) as a table cell (see [`run_sample`] for the rules).
+fn sample_value(
+    r: &unigis_raster::Raster,
+    x: f64,
+    y: f64,
+    bilinear: bool,
+    float_out: bool,
+) -> Value {
+    // Cell index of a coordinate: edges belong to the cell to the left / above.
+    let index = |v: f64| {
+        if v.fract() == 0.0 {
+            v as i64 - 1
+        } else {
+            v.floor() as i64
+        }
+    };
+    let t = r.transform;
+    let (cx, cy) = ((x - t[0]) / t[1], (t[3] - y) / -t[5]);
+    let inside = cx >= 0.0 && cy >= 0.0 && cx < r.width as f64 && cy < r.height as f64;
+    let value = if !inside {
+        None
+    } else if bilinear {
+        // Beside the outermost cell centres: a raster without NoData counts the
+        // missing neighbours as 0 (0.8 of the edge value 0.2 of a cell from the
+        // edge); one with NoData drops missing and NoData neighbours and
+        // renormalises the weights (observed).
+        let (fx, fy) = (cx - 0.5, cy - 0.5);
+        let (c0, r0) = (fx.floor() as i64, fy.floor() as i64);
+        let (dx, dy) = (fx - c0 as f64, fy - r0 as f64);
+        let has_nodata = r.nodata.is_some();
+        let at = |c: i64, rr: i64| {
+            if c < 0 || rr < 0 || c >= r.width as i64 || rr >= r.height as i64 {
+                (!has_nodata).then_some(0.0)
+            } else {
+                r.get(c as usize, rr as usize)
+            }
+        };
+        let corners = [
+            (at(c0, r0), (1.0 - dx) * (1.0 - dy)),
+            (at(c0 + 1, r0), dx * (1.0 - dy)),
+            (at(c0, r0 + 1), (1.0 - dx) * dy),
+            (at(c0 + 1, r0 + 1), dx * dy),
+        ];
+        let weight: f64 = corners
+            .iter()
+            .filter(|(v, _)| v.is_some())
+            .map(|c| c.1)
+            .sum();
+        (weight > 0.0).then(|| {
+            corners
+                .iter()
+                .filter_map(|(v, w)| v.map(|v| v * w))
+                .sum::<f64>()
+                / weight
+        })
+    } else {
+        let (c, rr) = (index(cx), index(cy));
+        r.get(c as usize, rr as usize)
+    };
+    let float = r.data_type.is_float();
+    // Without a NoData value a raster gives 0; with one, floats give it and integers
+    // -9999 (observed).
+    let missing = match (r.nodata, float) {
+        (None, _) => 0.0,
+        (Some(n), true) => n,
+        (Some(_), false) => -9999.0,
+    };
+    let v = value.unwrap_or(missing);
+    // A 32-bit float column keeps six significant digits (its 13-wide field holds
+    // d.ddddde+xx).
+    let v = if r.data_type == unigis_raster::DataType::F32 && v != 0.0 {
+        format!("{v:.5e}").parse().unwrap_or(v)
+    } else {
+        v
+    };
+    match r.data_type {
+        unigis_raster::DataType::F32 => Value::Single(v as f32),
+        unigis_raster::DataType::F64 => Value::Double(v),
+        _ if float_out => Value::Single(v as f32),
+        _ => Value::Integer(v as i32),
+    }
+}
+
+/// Extract Multi Values To Points: the points with one added field per raster (named as given, or
+/// by the raster's file stem, cut to 10 characters), holding the raster's value at the point as
+/// in Sample. Integer rasters give integers, except with BILINEAR (single floats).
+fn run_extract_multi_values(
+    ctx: &dyn unigis_raster::registry::Context,
+    output: &str,
+) -> Result<()> {
+    use unigis_core::{Field, FieldType};
+    let input = ctx
+        .get("input")
+        .ok_or_else(|| Error::Unsupported("input is required".into()))?;
+    let (fc, _) = open_feature_class(Path::new(&input))?;
+    let bilinear = ctx
+        .get("interpolate")
+        .is_some_and(|v| v.eq_ignore_ascii_case("BILINEAR"));
+    let mut rasters = Vec::new();
+    for item in ctx.get("rasters").unwrap_or_default().split(';') {
+        let item = item.trim();
+        if item.is_empty() {
+            continue;
+        }
+        // "path" or "path name" (the name is the last word when the path itself has no space).
+        let (path, name) = match item.rsplit_once(' ') {
+            Some((p, n)) if !Path::new(item).exists() => (p.trim(), Some(n.trim())),
+            _ => (item, None),
+        };
+        let stem = Path::new(path)
+            .file_stem()
+            .map(|s| s.to_string_lossy().into_owned())
+            .unwrap_or_default();
+        let name: String = name.map_or(stem, str::to_owned).chars().take(10).collect();
+        rasters.push((name, unigis_raster::read_geotiff(Path::new(path))?));
+    }
+    let mut fields = fc.fields().to_vec();
+    for (name, r) in &rasters {
+        let ty = match r.data_type {
+            unigis_raster::DataType::F32 => FieldType::Single,
+            unigis_raster::DataType::F64 => FieldType::Double,
+            _ if bilinear => FieldType::Single,
+            _ => FieldType::Integer,
+        };
+        let mut f = Field::new(name.clone(), ty);
+        match ty {
+            FieldType::Double => {
+                f.precision = 18;
+                f.scale = 11;
+            }
+            FieldType::Integer => {
+                f.length = 10;
+                f.precision = 10;
+            }
+            _ => {}
+        }
+        fields.push(f);
+    }
+    let mut features = Vec::new();
+    for f in fc.features() {
+        let mut f = f?;
+        if let Some(g) = &f.geometry {
+            let p = g.xy[0];
+            for (_, r) in &rasters {
+                f.attributes
+                    .push(sample_value(r, p[0], p[1], bilinear, bilinear));
+            }
+        }
+        features.push(f);
+    }
+    write_output_as(
+        ToolOutput {
+            kind: fc
+                .geometry_kind()
+                .unwrap_or(unigis_core::GeometryKind::Point),
+            has_z: fc.has_z(),
+            has_m: fc.has_m(),
+            fields,
+            spatial_reference_wkt: fc.spatial_reference_wkt().map(str::to_owned),
+            features,
+            messages: Vec::new(),
+        },
+        Path::new(output),
+        None,
+        true,
     )
 }
 
