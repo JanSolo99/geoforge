@@ -1,6 +1,13 @@
 {
-  "fetched": "2026-10-28T15:22:51+00:00",
+  "fetched": "2026-10-28T15:40:26+00:00",
   "runs": [
+    {
+      "conclusion": "",
+      "createdAt": "2026-10-28T15:33:09Z",
+      "displayTitle": "Preserve floating raster bands and require complete cached extrema",
+      "status": "in_progress",
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40717108087"
+    },
     {
       "conclusion": "success",
       "createdAt": "2026-10-28T15:12:26Z",
@@ -49,13 +56,6 @@
       "displayTitle": "HANDOFF: Surface Parameters regression result",
       "status": "completed",
       "url": "https://github.com/JanSolo99/geoforge/actions/runs/40701817759"
-    },
-    {
-      "conclusion": "success",
-      "createdAt": "2026-10-28T13:54:58Z",
-      "displayTitle": "HANDOFF: Line Statistics rules",
-      "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40700848000"
     }
   ]
 }

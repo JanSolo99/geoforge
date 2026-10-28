@@ -1,0 +1,7 @@
+tess_trhex_a PASS
+tess_trhex_b PASS
+tess_trhex_c PASS
+tess_trhex_d PASS
+tess_trhex_tiny PASS
+tess_trhex_thin PASS
+Checked 6 FAILED 0 []

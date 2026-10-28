@@ -467,6 +467,7 @@ fn generate_tessellation(ctx: &dyn Context) -> Result<ToolOutput> {
         "SQUARE" => construct::Tessellation::Square,
         "DIAMOND" => construct::Tessellation::Diamond,
         "HEXAGON" => construct::Tessellation::Hexagon,
+        "TRANSVERSE_HEXAGON" => construct::Tessellation::TransverseHexagon,
         "TRIANGLE" => construct::Tessellation::Triangle,
         other => {
             return Err(Error::Unsupported(format!(
@@ -1322,7 +1323,7 @@ pub static TOOLS: &[Tool] = &[
         id: "generate_tessellation",
         name: "Generate Tessellation",
         toolbox: "Data Management › Sampling",
-        summary: "Square, diamond or hexagon cells over an extent (ArcGIS Pro Generate Tessellation).",
+        summary: "Square, diamond, triangle or hexagon cells over an extent (ArcGIS Pro Generate Tessellation).",
         params: &[
             Param {
                 name: "extent",
@@ -1335,7 +1336,13 @@ pub static TOOLS: &[Tool] = &[
             Param {
                 name: "shape",
                 label: "Shape Type",
-                kind: Kind::Choice(&["HEXAGON", "SQUARE", "TRIANGLE", "DIAMOND"]),
+                kind: Kind::Choice(&[
+                    "HEXAGON",
+                    "TRANSVERSE_HEXAGON",
+                    "SQUARE",
+                    "TRIANGLE",
+                    "DIAMOND",
+                ]),
                 required: false,
                 default: "HEXAGON",
                 help: "",

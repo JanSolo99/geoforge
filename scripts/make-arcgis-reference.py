@@ -1632,6 +1632,15 @@ CASES = {
     "tess_hex_b": ("management.GenerateTessellation", [], ["500000 5000000 500413 5000277", "HEXAGON", "10000 SquareMeters", str(DATA / "parcels.shp")]),
     "tess_hex_c": ("management.GenerateTessellation", [], ["500037 5000011 500390 5000333", "HEXAGON", "5000 SquareMeters", str(DATA / "parcels.shp")]),
     "tess_hex_d": ("management.GenerateTessellation", [], ["500100 5000200 501000 5000500", "HEXAGON", "20000 SquareMeters", str(DATA / "parcels.shp")]),
+    **{f"tess_trhex_{name}":
+       ("management.GenerateTessellation", [], [extent,"TRANSVERSE_HEXAGON",size,str(DATA / "parcels.shp")])
+       for name,extent,size in [
+           ("a","500000 5000000 500400 5000300","10000 SquareMeters"),
+           ("b","500000 5000000 500413 5000277","10000 SquareMeters"),
+           ("c","500037 5000011 500390 5000333","5000 SquareMeters"),
+           ("d","500100 5000200 501000 5000500","20000 SquareMeters"),
+           ("tiny","500000 5000000 500001 5000001","10000 SquareMeters"),
+           ("thin","500000 5000000 500400 5000001","10000 SquareMeters")]},
     "tess_tri_a": ("management.GenerateTessellation", [], ["500000 5000000 500400 5000300", "TRIANGLE", "5000 SquareMeters", str(DATA / "parcels.shp")]),
     "tess_tri_b": ("management.GenerateTessellation", [], ["500000 5000000 500413 5000277", "TRIANGLE", "5000 SquareMeters", str(DATA / "parcels.shp")]),
     "tess_tri_c": ("management.GenerateTessellation", [], ["500037 5000011 500390 5000333", "TRIANGLE", "5000 SquareMeters", str(DATA / "parcels.shp")]),

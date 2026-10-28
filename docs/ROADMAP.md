@@ -759,4 +759,6 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Complete multiband raster caches and floating unary bands:20 ArcGIS cases cover per-band extrema, default/custom domains, single-quoted XML, stale/partial caches, and F32/F64 Abs/Negate/Square. Shared metadata parsing requires cached extrema in every band; the three floating unary paths now preserve all bands. Native cache-planning regression covers11 snapshots. Research: `scripts/research/copy_raster/multicache/README.md`.
 
 - [x] Recently committed raster tools validated by the full workspace gate: Diff/Over (14 ArcGIS cases), single-band Compute Change Raster DIFFERENCE/RELATIVE_DIFFERENCE (10), and basic Create Binary Mask (5). Remaining modes are recorded in KNOWN_GAPS.
-- [x] Generate Tessellation square, diamond, hexagon and triangle:18 ArcGIS cases cover projected extents, cell geometry, ordering and GRID_ID fields. Transverse/H3 shapes and explicit size-unit conversion remain follow-up work.
+- [x] Generate Tessellation square, diamond, hexagon and triangle:18 ArcGIS cases cover projected extents, cell geometry, ordering and GRID_ID fields. Transverse hexagons have subsequent coverage below; H3 shapes and explicit size-unit conversion remain follow-up work.
+
+- [x] Generate Tessellation transverse hexagons:6 additional ArcGIS cases verify row staggering, extent coverage, IDs, row-major order and clockwise rings, including tiny and thin extents. Research: `scripts/research/tessellation/transverse/README.md`.

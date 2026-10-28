@@ -398,10 +398,11 @@ pub enum Tessellation {
     Square,
     Diamond,
     Hexagon,
+    TransverseHexagon,
     Triangle,
 }
 
-/// Generate Tessellation (SQUARE, DIAMOND, HEXAGON, TRIANGLE): cells of `area` whose first one is centred on
+/// Generate Tessellation (square, diamond, both hexagon orientations, triangle): cells of `area` whose first one is centred on
 /// the extent's lower-left corner; squares and diamonds/hexagons continue while their edges
 /// start before the extent's far edges (diamonds and hexagons by the rule `(span + half cell) /
 /// spacing`, observed on three extents). `GRID_ID` is `<column letters>-<row from the top>`; the
@@ -484,6 +485,31 @@ pub fn generate_tessellation(
                     [m[0] - side / 2.0, m[1] + q],
                     [m[0] + side / 2.0, m[1] + q],
                     [m[0] + side, m[1]],
+                ]
+            });
+        }
+        Tessellation::TransverseHexagon => {
+            let side = (area / (1.5 * 3f64.sqrt())).sqrt();
+            let width = 3f64.sqrt() * side;
+            cols = ((w + width / 2.0) / width).ceil().max(1.0) as usize;
+            rows = ((h + side) / (1.5 * side)).ceil().max(1.0) as usize;
+            let (x0, y0) = (extent[0], extent[1]);
+            centre = Box::new(move |c, r| {
+                [
+                    x0 + width * c as f64 + if r % 2 == 1 { width / 2.0 } else { 0.0 },
+                    y0 + 1.5 * side * r as f64,
+                ]
+            });
+            ring = Box::new(move |m| {
+                let q = width / 2.0;
+                vec![
+                    [m[0], m[1] + side],
+                    [m[0] + q, m[1] + side / 2.0],
+                    [m[0] + q, m[1] - side / 2.0],
+                    [m[0], m[1] - side],
+                    [m[0] - q, m[1] - side / 2.0],
+                    [m[0] - q, m[1] + side / 2.0],
+                    [m[0], m[1] + side],
                 ]
             });
         }

@@ -1,98 +1,83 @@
 # Current handoff
 
-Updated 2026-10-28T15:27:17.658187+00:00; last agent Codex.
-Workspace /mnt/media/ArcGIS_Linux; main; HEADab12681bc9b6fec4418e1781885da8bd00c39c3f
-verified remote. User authorizes continuous tested development, frequent commits,
-pushes and dashboard updates. No other agents/CLIs/coordinators. Cargo-j3, one build
-at a time. Preserve NOTES.md (do not read/add) and .worktrees/. Dashboard inherited
-dirt is automatic generation. No other inherited source edits.
+Updated 2026-10-28T15:47:00.438445+00:00; last agent Codex.
+Workspace /mnt/media/ArcGIS_Linux; main; HEADc5064bc PUSHED with normal hook and
+verified remote SHA (latest tool output). User authorizes continuous development,
+frequent tested commits/pushes/dashboard updates. Work alone: no agents/CLIs/
+coordinators. Cargo-j3, one build at a time. Preserve NOTES.md (do not read/add),
+.worktrees/. Dashboard inherited dirt is generated automatically.
 
-## Recovered state
+## Completed current resumed session
 
-Latest coordinator request/result/events read from
-.git/agent-coordinator/20261028T150119-562239a4 (Claude usage_limit).
-9b4dcaf cache fix and all earlier Codex changes are committed ancestors of HEAD;
-Claude subsequently added Diff/Over, Compute Change Raster, basic Create Binary
-Mask, and tessellation square/diamond/hexagon/triangle, all committed and pushed.
-Latest Claude log records five triangle oracle cases and clippy success, normal
-background push; remote now matches HEAD. No builds or pushes remain running.
+c5064bc: shared band/domain/quote-aware cache parsing; cached extrema required in
+EVERY band. Incomplete caches recompute all CopyRaster bands and keep unaryF64;
+complete caches preserve and narrowF32. Floating Abs/Negate/Square now retain ALL
+bands instead of silently dropping band2.20 new ArcGIS refs,11 frozen snapshots,
+native planning regression, reproduction recipe verified equivalent with GDAL.
+Full scripts/check AND normal push hook PASS193Rust/5ignored/8Python/fmt/clippy.
+Logs /tmp/unigis-multicache-{check,push}.log; dashboard--ci/JS/Python/diff PASS.
+Research scripts/research/copy_raster/multicache, formats/raster-statistics.md.
+All prior Codex/Claude changes are committed ancestors (9b4dcaf and recent Diff/
+Over, ComputeChangeRaster, BinaryMask, four tessellation shapes). Current full gate
+validated them; ROADMAP/KNOWN_GAPS now record their coverage and limits.
 
-Durable prior Codex findings: docs/formats/raster-statistics.md and
-scripts/research/copy_raster/{statistics,u32,fraction,cache}, line_statistics.
-Last Codex complete gate9b4dcaf:192Rust/5ignored/8Python/fmt/clippy. No claim that
-this count validates newer Claude tools; next full gate will include them.
+## Active transverse hexagon slice (new uncommitted edits)
 
-## Active multiband-cache slice (new edits this resumed session)
-
-Private prior research recovered:8CopyRaster +9Abs/Negate/Square oracle runs.
-ArcGIS requires extrema in EVERY band to treat input as cached. Any incomplete
-band =>CopyRaster recomputes ALL bands to PAM, F64 unary retainsF64. Complete
-cache =>reuse/noPAM, unary narrowsF32. Custom domains ignored; single-quoted XML
-accepted. Current naive geotiff parser mixes extrema across bands/domains and
-misses single quotes:6/8CopyRaster routing failures saved in research JSON.
-
-Applied shared stats_metadata::from_xml parser refactor to geotiff cache detection;
-Raster.statistics stays existing API, Some(first-band-range) only for complete
-per-band caches. No new field or app edits. App AGENTS read during API assessment;
-no local full app CI needed for these root-only edits. Input/PAM decoding policy
-otherwise preserved, including tolerant optional sidecar read in geotiff reader.
-
-Files: stats_metadata.rs/geotiff.rs/lib.rs, reference exact prefixes, generator
-17 new cprmulti_*/ummulti_* definitions,11 frozen TIFF/PAM pairs in
-raster/copy_multicache; scripts/research/copy_raster/multicache holds observations,
-recipes and prior mismatch JSON. No validation of new Rust edits yet.
+Primary8 controls /tmp/unigis-tess-transverse-probe.log EXIT0. Six projected-meter
+frames a/b/c/d/tiny/thin give20/20/36/21/1/5cells. Side=sqrt(area/(1.5sqrt3));
+width=sqrt3*side, row step1.5side; odd rows shift half-width. First centre at lower
+left extent, clockwise ring from top vertex, same GRID_ID and row-major ordering.
+Columns ceil((width_extent+width/2)/width), rows ceil((height_extent+side)/(1.5side)).
+Added enum/constructor branch and registry choice; six tess_trhex_* generator cases.
+No app edits/API field changes. Native build PASS /tmp/unigis-tess-transverse-build.log. Six goldens generated
+successfully; all six exact ordered-ring/ID/count comparisons PASS
+/tmp/unigis-tess-transverse-after.log. Full scripts/check PASS193Rust/5ignored/8Python/fmt/clippy, exit0;
+/tmp/unigis-tess-transverse-check.log. Dashboard--ci/Python/diff PASS; JS check
+immediately before commit. Preparing commit, normal push still pending.
 
 ## Next actions
 
-1. Full scripts/check49742 PASS exit0:193Rust/5ignored/8Python/fmt/clippy;
-   /tmp/unigis-multicache-check.log, includes all recent Claude tools and20 new refs.
-2. Dashboard--ci83312 PASS; JS/Python syntax, recipe11 equivalence and diff checks
-   PASS. Commit explicit paths for this slice, normal push and verify remote.
-3. Next private transverse tessellation29438 EXIT0, /tmp/unigis-tess-transverse-
-   probe.log; no next-slice product edits. Eight controls include narrow/tiny
-   extents and area-unit equivalents. Formula/probe findings below.
-4. Continuous development: follow ROADMAP/KNOWN_GAPS after each tested push.
+1. Generate six tess_trhex_* goldens; inspect exact geometries/IDs/order, build and
+   full scripts/check-j3. Update ROADMAP/KNOWN_GAPS and research recipe/observations.
+2. Dashboard--ci +JS/Python/diff checks, explicit-path commit, normal push, remote
+   verification. Do not overlap builds; checkpoint during work and before stopping.
+3. Next separate slice: tessellation area units.15 private controls completed:
+   /tmp/unigis-tess-units-probe.log. Eight rarer units EXIT0 session47818,
+   /tmp/unigis-tess-units-extra-probe.log. No area-unit source edits yet.
 
-## Prior Claude durable findings still relevant
+## Area-unit findings for next slice
 
-Surface Parameters is not a fixed linear3x3 filter (gradient regression residual
-2e-5); only one-cell NoData border; not implemented. SAR tools refuse ordinary
-rasters with ERROR003514, no radar metadata fixtures available. Compute Change
-Raster categorical/spectral/multiband modes and binary-mask flood-fill/expansion/
-minimum-region/BACKGROUND_NODATA remain unsupported.
-Tessellation triangle: side=sqrt(4area/sqrt3), height=sqrt3/2*side, first up-triangle
-centroid at lower-left extent; columns ceil((width+side/2)/(side/2)), rows
-ceil((height+triangle_height/3)/triangle_height). See committed code/references for
-other shapes. Keep probe -> verified implementation -> checks -> commit/push.
+Current size parser ignores unit suffix (wrong hectares/km sizes). Projected meters:
+sqm/km/hectare/acre/feet/yards/miles/cm/ares equivalents produce same20cells/10000m2.
+Projected US feet2272:10000sqm=>4cells/107638.673611ft2; bare10000=>20cells/10000ft2.
+SquareFeet vs SquareFeetUS differ (1e8area=>side9999.98 vs10000USft). No SR+10000sqm
+=>20cells, unknownSR: default coordinate unit is meter if SR absent. Reuse existing
+registry::meters_per_unit with squared factor; bare sizes remain coordinate squared.
+Private feet_template.shp available for future fixtures. No mutation of repo inputs.
 
-Milestone:17 reference generation PASS exit0; frozen inputs byte-identical. Native
-build PASS /tmp/unigis-multicache-build.log. Comparison after shared reader fixed
-all8CopyRaster cases but revealed9 unary cases dropped band2 (pre-existing bug).
-Added floating Abs/Negate/Square per-band wrapper with shared dataset cache status;
-no whole-dataset clone per band. Added3F32 cases to cover input float widths.
-This expands slice to20 refs. New math edit unvalidated; build/reference sessions
-recorded in next tool output. No app edits/API field changes.
+## Other durable limits
 
-Both native builds PASS; oracle17+3 generation PASS exit0, total20 new cases.
-All20 exact per-band grid/type/tag/cell/core-stat/PAM comparisons PASS
-/tmp/unigis-multicache-after2.log. Source hashes unchanged. New helper closure
-uses slices (same behavior); full gate now next validation authority.
+H3 tessellation missing. SAR tools refuse ordinary rasters003514 (no radar fixtures).
+SurfaceParameters not a fixed linear3x3 filter; prior regression residual2e-5,
+not implemented. ComputeChangeRaster categorical/spectral/multiband and BinaryMask
+flood-fill/expansion/min-region/BACKGROUND_NODATA unsupported. Float unary other
+operators/integer multiband and malformed/nonfinite caches unverified. See ROADMAP,
+KNOWN_GAPS and committed research. Latest recovery logs read from coordinator
+.git/agent-coordinator/20261028T150119-562239a4 (Claude usage_limit); no concurrent
+CLI/build/push remains from it.
 
-Full gate RUNNING session49742 /tmp/unigis-multicache-check.log; no other Cargo
-commands until it exits. Research recipe/docs finalized; candidate comparison20
-PASS, read-only source hashes unchanged. Dashboard refresh/JS/full gate pending.
+Current full scripts/check48827 COMPLETE PASS /tmp/unigis-tess-transverse-check.log;
+193Rust/5ignored/8Python/fmt/clippy. Research recipe/results and roadmap/
+known gaps updated. Do not overlap Cargo. Area-unit extra8 controls all succeeded:
+mm/dm/inch/nautical-mile and US survey yard/acre/mile/inch equivalents.23 private
+area controls total; no area conversion product edit yet.
 
-Dashboard--ci83312 PASS; extracted JavaScript node--check, Python py_compile,
-git diff--check PASS. Recipe recreated11 private snapshots; GDAL confirms identical
-grid/types/NoData/pixels/per-band metadata (recipe_verification.json). Full gate49742
-continues; generic full reference suite passed including newer Claude cases.
-Private transverse tessellation29438 EXIT0:8 controls, counts a20/b20/c36/d21,
-tiny1/thin5. Side s=sqrt(area/(1.5sqrt3)); width=sqrt3*s, rows step1.5*s,
-odd rows shifted half-width. First cell centred at extent lower-left; ring CW from
-top vertex. Columns ceil((w+width/2)/width), rows ceil((h+s)/(1.5s)).
-1hectare and0.01square-km match10000square-m. No next-slice product edits yet.
+Area correction plan saved /tmp/unigis-tess-area-plan.md; no product edit. Current
+constructor square-count +1 can overflow for tiny areas/infinite extent spans;
+plan safety guard alongside area parsing (native excessive-grid refusal, no claim
+of exact ArcGIS error codes for resource-exhaustion inputs). Area control logs23
+successful. Current transverse full gate48827 continues.
 
-Validation milestone: full gate193 passed (normal hook still pending for next
-push); source review completed. ROADMAP/KNOWN_GAPS now also record previously
-committed Claude tool coverage/limits, verified in this same full gate. No builds
-or oracle runs remain active. Preparing explicit-path commit for current slice.
+Milestone: source reviewed; full gate exited0; dashboard--ci exited0. Preparing
+explicit-path transverse commit. No builds/oracle workers running. Next work area
+parsing and extreme-size guards only after this push hook finishes.
