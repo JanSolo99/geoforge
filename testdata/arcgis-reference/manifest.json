@@ -63686,6 +63686,204 @@
           "pixel_type": "16_BIT_SIGNED"
         }
       }
+    },
+    "cprcache_minmax": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_cache/minmax.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_cache/minmax.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprcache_meanstd": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_cache/meanstd.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_cache/meanstd.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprcache_stale": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_cache/stale.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_cache/stale.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprcache_all": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_cache/all.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_cache/all.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprcache_missing_minimum": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_cache/missing_minimum.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_cache/missing_minimum.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprcache_missing_maximum": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_cache/missing_maximum.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_cache/missing_maximum.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprcache_missing_mean": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_cache/missing_mean.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_cache/missing_mean.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprcache_missing_stddev": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_cache/missing_stddev.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_cache/missing_stddev.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprcache_missing_count": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_cache/missing_count.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_cache/missing_count.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprcache_extra": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_cache/extra.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_cache/extra.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprcache_missing_mean_extra": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_cache/missing_mean_extra.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_cache/missing_mean_extra.tif",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

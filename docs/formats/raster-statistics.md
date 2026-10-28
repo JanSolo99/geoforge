@@ -47,3 +47,11 @@ rounded0 from statistics; the original127 sentinel becomes ordinary data. The6
 raw cells are valid by the tag, while COUNT is5. WriteOptions.nodata_tag provides
 an opt-in physical override without changing logical sample encoding or cache
 computation. See [fractional controls](../../scripts/research/copy_raster/fraction/README.md).
+
+For tagged same-type Copy Raster, cached minimum AND maximum select embedded
+statistics even if other fields are missing. If either mean or standard deviation
+is missing, ArcGIS resets BOTH to0/-1. Missing count becomes0, median becomesnan,
+excluded-values becomes an empty field, and skip factors become1. Existing values survive, including stale complete
+moments/counts and existing median/skip/covariance/excluded-value fields. Missing
+minimum OR maximum instead triggers fresh PAM statistics. Evidence:
+[11 partial/stale cache controls](../../scripts/research/copy_raster/cache/README.md).

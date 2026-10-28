@@ -4305,6 +4305,7 @@ fn compare_rasters(case: &str, ours: &Path, arcgis: &Path) -> Vec<String> {
                                 "cprtag_",
                                 "cprnd_",
                                 "cprfrac_",
+                                "cprcache_",
                                 "freq_",
                                 "um64_",
                                 "umint_",

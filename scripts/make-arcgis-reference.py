@@ -1166,6 +1166,10 @@ CASES = {
     "umcache_abs_symmetric": ("gp.Abs_sa", [RASTER / "unary_cached/symmetric.tif"], []),
     "umcache_negate_symmetric": ("gp.Negate_sa", [RASTER / "unary_cached/symmetric.tif"], []),
     "umcache_square_symmetric": ("gp.Square_sa", [RASTER / "unary_cached/symmetric.tif"], []),
+    **{f"cprcache_{name}":
+       ("management.CopyRaster", [RASTER / f"copy_cache/{name}.tif"], [])
+       for name in ["minmax","meanstd","stale","all","missing_minimum","missing_maximum",
+                    "missing_mean","missing_stddev","missing_count","extra","missing_mean_extra"]},
     **{f"cprfrac_{name}":
        ("management.CopyRaster", [RASTER / f"copy_fraction/{src}.tif"], ["","",nd,"","",typ])
        for name,src,nd,typ in [

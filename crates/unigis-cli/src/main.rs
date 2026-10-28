@@ -6327,6 +6327,22 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
                         // the supplied moments instead of recalculating them.
                         band.entry("STATISTICS_COUNT".into())
                             .or_insert_with(|| "0.000000".into());
+                        // ArcGIS treats the moments as a pair: either missing
+                        // field resets both, even when min/max remain cached.
+                        if !band.contains_key("STATISTICS_MEAN")
+                            || !band.contains_key("STATISTICS_STDDEV")
+                        {
+                            band.insert("STATISTICS_MEAN".into(), "0".into());
+                            band.insert("STATISTICS_STDDEV".into(), "-1".into());
+                        }
+                        for (key, value) in [
+                            ("STATISTICS_MEDIAN", "nan"),
+                            ("STATISTICS_EXCLUDEDVALUES", ""),
+                            ("STATISTICS_SKIPFACTORX", "1"),
+                            ("STATISTICS_SKIPFACTORY", "1"),
+                        ] {
+                            band.entry(key.into()).or_insert_with(|| value.into());
+                        }
                     }
                 }
                 unigis_raster::stats_metadata::encode(&stored)

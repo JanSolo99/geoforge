@@ -1,0 +1,12 @@
+cprcache_minmax PASS
+cprcache_meanstd PASS
+cprcache_stale PASS
+cprcache_all PASS
+cprcache_missing_minimum PASS
+cprcache_missing_maximum PASS
+cprcache_missing_mean PASS
+cprcache_missing_stddev PASS
+cprcache_missing_count PASS
+cprcache_extra PASS
+cprcache_missing_mean_extra PASS
+FAILED 0 []

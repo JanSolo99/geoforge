@@ -1,104 +1,97 @@
 # Current handoff
 
-Updated 2026-10-28T13:26:45.604165+00:00; last agent Codex.
-Workspace `/mnt/media/ArcGIS_Linux`; `main`; HEAD002a79b PUSHED/verified remote
-002a79b2d1bcd0a69616f551b00c55d5e7a57e67. User authorizes continuous tested commits,
-pushes and dashboard updates. Work alone; no agents/CLIs/coordinators. Cargo-j3,
-sequential builds; mandatory normal hooks; no local full app CI for root edits.
+Updated 2026-10-28T13:36:16.816330+00:00; last agent Codex.
+Workspace `/mnt/media/ArcGIS_Linux`; branch `main`;
+HEAD27ae5ccb66e15b93866103e55ace0094028ea95f PUSHED and verified remote.
+User authorizes continuous tested development, frequent commits/pushes/dashboard
+updates. Work alone; no agents/CLIs/coordinators. Cargo-j3, sequential builds,
+normal hooks, no full local app CI for root edits. Preserve unrelated files below.
 
-## Completed/pushed this session
+## Completed/pushed this long-running session
 
-e73e223 Line Statistics22 refs/guards; a613de7 Copy Raster PAM-placement22 controls;
-48d99ae stale PAM cleanup/no-PAM overwrite regression. These all pushed normally.
-Latest published gate188 Rust/5ignored/8Python/fmt/clippy. Earlier logs in /tmp.
-Native safe in-place Copy Raster extension retained; ArcGIS scratch same-path probe
-failed999999/replaced pixels with NoData. Difference/probes committed, not reproduced.
+- e73e223 Line Statistics22 references, F32 local-coordinate clipping and guards.
+- a613de7 Copy Raster PAM-placement policy22 controls.
+- 48d99ae stale PAM cleanup after no-PAM overwrite; safe native in-place extension.
+- 002a79b UInt32/default/tagged NoData48 refs, preserved embedded caches, native
+  metadata API and Expand DISTANCE right/bottom statistics workspace. Full gate190.
+- 27ae5cc fractional Copy Raster44 refs: ties-even markers, midpoint-up pixels,
+  signed range boundaries, raw negative unsigned TIFF tags separate from logical
+  statistics masks. Native/GDAL classic+BigTIFF writer override regression.
+  Full local gate AND normal push hook PASS191 Rust/5ignored/8Python/fmt/clippy.
+  Logs /tmp/unigis-copy-fraction-check.log, /tmp/unigis-copy-fraction-push.log.
+  Dashboard--ci/JS syntax/Python syntax/diff checks PASS.
 
-## Completed 002a79b slice (PUSHED)
+Durable findings/reproducers: scripts/research/copy_raster/{statistics,u32,fraction},
+scripts/research/line_statistics, docs/formats/raster-statistics.md.
+Do not infer absence of statistics from no PAM:120 references store them in TIFF.
+Do not recompute stale caches/counts: COUNT0 and COUNT>savedcells can be intended.
+ArcGIS same-path CopyRaster probe failed999999 and damaged scratch pixels; native
+safe in-place copy remains an intentional extension, documented separately.
 
-48 new cpru32_*/cprtag_*/cprnd_* refs;17 U32 snapshots +7 genuine ArcGIS PAM caches.
-U32 high default markers signed32; U32 destination rounds negative defaults toF32,
-I32/F64 keep signed exact. Source mask stays unsigned. Unrepresentable integer
-markers preserve converted source sentinel payloads as ordinary data. General GP
-zero-encoding/default format API unchanged. Cached source2^31 system-marker special
-PAM placement verified against neighbors/overrides.
+## Active cache follow-up (uncommitted, this session)
 
-IMPORTANT correction: no PAM does NOT mean no statistics.120 reference cases use
-embedded TIFF GDAL_METADATA;24 without either store are all-NoData. New native
-stats_metadata module reads both stores with per-band PAM overrides, encodes caches,
-and computes fresh ones. WriteOptions.gdal_metadata writes main-image tag42112.
-CLI preserves cached Copy Raster fields before writing (including in-place), embeds
-computed stats for other no-PAM GP outputs, and clears old PAM after successful
-TIFF write for both policies (including all-NoData results). Format API still has
-no metadata by default. Generic comparison now checks both stores while retaining
-PAM placement. Own/GDAL classic+BigTIFF/PAM-priority/band-bound tests added.
+11 new cprcache_* cases generated successfully; frozen source TIFF/PAM pairs in
+`testdata/raster/copy_cache`. All input bytes unchanged by oracle. Controlled
+caches are synthetic format inputs; ArcGIS Pro3.7 is the GP oracle, GDAL reads
+files only. Source input copies were frozen BEFORE oracle to prevent mutation bias.
 
-Do not recompute stored caches: U32 cached system marker keepsCOUNT5 although6 raw
-cells are valid. GDAL cache lackingCOUNT exportsCOUNT0, not recalculated17700.
-Expand DISTANCE statistics include n cells RIGHT/BOTTOM of the saved extent; a
-750-cell result storesCOUNT891. Symmetric padding failed; window enumeration
-uniquely matched right/bottom for3 cases. Sources/research in copy_raster/u32;
-durable format findings in docs/formats/raster-statistics.md.
+Findings: both cached extrema select embedded/no-PAM output; absent either =>fresh
+PAM. If MEAN or STDDEV absent, reset BOTH to0/-1, preserve min/max. MissingCOUNT
+=>0.000000, MEDIAN=>nan, skipfactors=>1. Existing values retained, including stale
+complete COUNT999, median123, skips2/3, covariance7 and excluded127. Never replace
+complete stale fields with freshly calculated pixel statistics.
 
-## Validation
+Edits: CLI main existing cached-copy loop fills paired moments and missing ancillary
+fields; reference harness cprcache_ exact prefix; CLI raster_output_statistics
+regression compares EVERY field for8 embedded-cache golden cases. Generator,
+manifest,11 source/11 reference files+sidecars; research recipes/observations in
+scripts/research/copy_raster/cache; ROADMAP/KNOWN_GAPS/formats doc updated.
 
-- Oracle generation all48 success/exit0; numeric old31failed ->6 cached-stat failures
-  ->all48 fully pass after embedded preservation (native_after.txt).
-- New metadata tests2 PASS with native+GDAL; CLI overwrite regression PASS including
-  all-NoData cleanup, correct new cache, in-place preservation and invalid params.
-- Initial stronger full gate found4 stats differences; count-from-pixels/symmetric
-  padding approaches were incorrect. CorrectedCOUNT0 and right/bottom workspace.
-- FINAL `scripts/check` PASS exit0 /tmp/unigis-copy-nodata-final3-check.log:
-  190 Rust passed,5ignored,0 failed;8Python;fmt/all-target workspace clippy-Dwarnings.
-  All previous cases, all48 new, and120 embedded-stat cases checked.
-- Five focused embedded regressions PASS /tmp/unigis-embedded-regressions-final.log.
-- Dashboard --ci PASS /tmp/unigis-copy-nodata-dashboard.log; extracted JS node --check,
-  Python py_compile, cargo fmt --check and diff --check PASS.
-- Generator expand_classes_dist_3 source corrected to classes_u8 to match its
-  existing saved manifest/reference and native test (found landuse drift). No
-  reference regenerated for that correction; saved case is already classes_u8.
+Validation:
+- Native build PASS /tmp/unigis-copy-cache-build.log.
+- Generator11 success EXIT0 /tmp/unigis-copy-cache-references.log.
+- All11 grid/type/tag/all-cell/core-stat comparisons PASS
+  /tmp/unigis-copy-cache-after.log; prior nine-control metadata comparison found
+  three moment mismatches, preserved in research/cache/comparison_before.json.
+- Initial full `scripts/check` FAILED session3749, /tmp/unigis-copy-cache-check.log.
+  Python8/fmt/clippy/reference suite passed. New full-key cache test revealed
+  missing default EXCLUDEDVALUES empty field (GDAL GetMetadata hides it). Added
+  default empty value; revised gate PASS192 Rust/5ignored/8Python/fmt/clippy.
+- Python py_compile and git diff --check PASS. Dashboard--ci and JS syntax PASS.
 
 ## Next actions
 
-1. 002a79b committed/pushed with normal hook PASS190 Rust/5ignored/8Python/fmt/clippy;
-   remote verified. No builds/pushes currently running.
-2. Continue explicit fractional Copy Raster NoData normalization: saved probe
-   -9999.5 to I16 expects-10000; native still truncates. Probe .25/.5/.75 and positive/
-   negative ties on private files before choosing rounding; source-default and
-   explicit-argument paths may differ. Research/nodata_encoding has original cases.
-3. Audit legacy generator/native argument drift before regenerating other old
-   families; newly added cases use RUN manifests. Metadata domains/stale/partial
-   caches, nonfinite/unusual source tags and ancillary metadata remain limited.
+1. Revised scripts/check PASS192; commit cache slice, normal push, verify remote.
+2. Refresh dashboard--ci, extract/check JS; git diff --check; inspect intended diffs.
+3. Commit explicit paths for this cache slice; normal push (required hook), verify
+   remote SHA. Update this handoff during milestones and before finishing.
+4. Follow ROADMAP/KNOWN_GAPS. Unverified cache scope: malformed/nonfinite fields,
+   incomplete multiband caches, nondefault environments. New-tool inventory found
+   CalculateDistanceBand missing; metadata /tmp/unigis-distance-band-info.log;
+   no implementation started. Prefer one concrete verified slice at a time.
 
 ## Preserve unrelated files
 
-NOTES.md DO NOT READ/add; .worktrees/ untouched. Inherited geoproc/LineSta_roads1.*
-excluded scratch. Own LineSta_roads2 removed. Post-commit dashboard/handoff dirt
-expected. No reset/stash/worktree transfers.
+NOTES.md DO NOT READ/add; .worktrees/ untouched. Inherited scratch
+`testdata/geoproc/LineSta_roads1.*` excluded. Own LineSta_roads2 removed earlier.
+Post-commit dashboard/handoff dirt expected. No reset/stash/worktree transfers.
 
-## Fractional NoData follow-up COMPLETE, committing now
+Revised gate63483 COMPLETE exit0 /tmp/unigis-copy-cache-check2.log.
+Missing EXCLUDEDVALUES empty default added after first gate failure.
 
-44 new cprfrac_* golden cases; exact type/grid/tag/all-cell/stored-stat comparisons
-all PASS. Markers ties-even, integer pixels floor(value+0.5), rounded signed range
-checks, cached normalized-equal markers preserve caches. Negative unsigned fractions
-keep raw TIFF tag separately from rounded logical statistics marker and old source
-payload. Opt-in WriteOptions.nodata_tag passed through registry/CLI; format default
-unchanged. Native/GDAL classic/BigTIFF override regression added. Source/fixtures:
-extract.rs/registry.rs/writer.rs, CLI main/reference harness, raster/copy_fraction,
-scripts/research/copy_raster/fraction. Documentation/generator/dashboard updated.
+Revised cache gate63483 PASS exit0:192 Rust/5ignored/8Python/fmt/clippy.
+Every-field test now PASS, including empty excluded-values. Dashboard--ci,
+extracted JS node--check, Python syntax and diff checks PASS. Committing cache
+slice next, then normal push/remote verification. No Cargo running now.
 
-Validation on these edits:
-- Build PASS /tmp/unigis-copy-fraction-build2.log.
-- All44 exact oracle comparisons PASS /tmp/unigis-copy-fraction-after2.log.
-- scripts/check PASS exit0 /tmp/unigis-copy-fraction-check.log:191 Rust passed,
-  5ignored,0failed;8Python;fmt;all-target workspace clippy-Dwarnings-j3.
-- Dashboard --ci PASS /tmp/unigis-copy-fraction-dashboard.log, extracted JS
-  node --check, Python py_compile and git diff --check PASS.
-- Initial comparison31/39 failed, candidate42/44 passed, raw-tag override fixeslast2.
-- Seven extra private controls confirm raw negative default/explicit U8 tags and
-  lack of extra raw-argument pixel masking; saved JSON/probes in fraction research.
-
-Next: commit explicit paths, normal push with required hook; verify remote SHA.
-Then investigate documented partial/stale Copy Raster caches on PRIVATE files.
-No Cargo builds currently running; next push hook runs the gate sequentially.
-No agents/coordinator launched. Preserve unrelated files above.
+Private NEXT research8 multiband cache controls completed EXIT0 session84517:
+/tmp/unigis-copy-multicache-controls/comparison_before.json. Six routing failures:
+ArcGIS requires cached extrema in EVERY band; missing any extrema recomputes ALL
+bands to PAM. Native naive geotiff parser mixes keys across bands/domains and
+misses single-quoted attributes. Two all-extrema partial-moment cases pass.
+Do not change product source until current slice pushed. Next source design must
+keep Raster.statistics/type-planning semantics correct: F64 unary cache probe
+RUNNING session92106, /tmp/unigis-copy-multicache-types.log.
+Potential shared stats_metadata XML parser refactor can fix geotiff cache routing
+without new Raster fields/app API changes; verify unary behavior before choosing.
+app/AGENTS.md read while assessing API impact; no app edits made.

@@ -1,6 +1,13 @@
 {
-  "fetched": "2026-10-28T13:22:23+00:00",
+  "fetched": "2026-10-28T13:36:28+00:00",
   "runs": [
+    {
+      "conclusion": "",
+      "createdAt": "2026-10-28T13:31:43Z",
+      "displayTitle": "Match ArcGIS Copy Raster fractional markers and pixel rounding",
+      "status": "in_progress",
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40697239509"
+    },
     {
       "conclusion": "success",
       "createdAt": "2026-10-28T12:24:19Z",
@@ -49,13 +56,6 @@
       "displayTitle": "Add Sample (nearest/bilinear) with ArcGIS reference cases",
       "status": "completed",
       "url": "https://github.com/JanSolo99/geoforge/actions/runs/40661931112"
-    },
-    {
-      "conclusion": "success",
-      "createdAt": "2026-10-28T08:36:58Z",
-      "displayTitle": "HANDOFF: Stream To Feature findings",
-      "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40658070311"
     }
   ]
 }

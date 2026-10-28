@@ -1,0 +1,316 @@
+[
+  {
+    "case": "minmax",
+    "arcgis": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "0",
+      "STATISTICS_STDDEV": "-1",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "0.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1"
+    },
+    "native": {
+      "STATISTICS_COUNT": "0.000000",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MINIMUM": "0"
+    },
+    "arcgis_pam": false,
+    "native_pam": false,
+    "differences": {
+      "STATISTICS_MEAN": [
+        "0",
+        null
+      ],
+      "STATISTICS_MEDIAN": [
+        "nan",
+        null
+      ],
+      "STATISTICS_SKIPFACTORX": [
+        "1",
+        null
+      ],
+      "STATISTICS_SKIPFACTORY": [
+        "1",
+        null
+      ],
+      "STATISTICS_STDDEV": [
+        "-1",
+        null
+      ]
+    }
+  },
+  {
+    "case": "meanstd",
+    "arcgis": {
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_COVARIANCES": "12753.5",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "78",
+      "STATISTICS_MEDIAN": "3.000000",
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "112.9313951034"
+    },
+    "native": {
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "78",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "112.9313951034"
+    },
+    "arcgis_pam": true,
+    "native_pam": true,
+    "differences": {
+      "STATISTICS_COVARIANCES": [
+        "12753.5",
+        null
+      ],
+      "STATISTICS_MEDIAN": [
+        "3.000000",
+        "nan"
+      ]
+    }
+  },
+  {
+    "case": "stale",
+    "arcgis": {
+      "STATISTICS_MINIMUM": "20",
+      "STATISTICS_MAXIMUM": "200",
+      "STATISTICS_MEAN": "100",
+      "STATISTICS_STDDEV": "50",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "999.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1"
+    },
+    "native": {
+      "STATISTICS_COUNT": "999.000000",
+      "STATISTICS_MAXIMUM": "200",
+      "STATISTICS_MEAN": "100",
+      "STATISTICS_MINIMUM": "20",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "50"
+    },
+    "arcgis_pam": false,
+    "native_pam": false,
+    "differences": {
+      "STATISTICS_MEDIAN": [
+        "nan",
+        null
+      ]
+    }
+  },
+  {
+    "case": "all",
+    "arcgis": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "78",
+      "STATISTICS_STDDEV": "100",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1"
+    },
+    "native": {
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "78",
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "100"
+    },
+    "arcgis_pam": false,
+    "native_pam": false,
+    "differences": {
+      "STATISTICS_MEDIAN": [
+        "nan",
+        null
+      ]
+    }
+  },
+  {
+    "case": "missing_minimum",
+    "arcgis": {
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_COVARIANCES": "12753.5",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "78",
+      "STATISTICS_MEDIAN": "3.000000",
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "112.9313951034"
+    },
+    "native": {
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "78",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "112.9313951034"
+    },
+    "arcgis_pam": true,
+    "native_pam": true,
+    "differences": {
+      "STATISTICS_COVARIANCES": [
+        "12753.5",
+        null
+      ],
+      "STATISTICS_MEDIAN": [
+        "3.000000",
+        "nan"
+      ]
+    }
+  },
+  {
+    "case": "missing_maximum",
+    "arcgis": {
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_COVARIANCES": "12753.5",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "78",
+      "STATISTICS_MEDIAN": "3.000000",
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "112.9313951034"
+    },
+    "native": {
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "78",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "112.9313951034"
+    },
+    "arcgis_pam": true,
+    "native_pam": true,
+    "differences": {
+      "STATISTICS_COVARIANCES": [
+        "12753.5",
+        null
+      ],
+      "STATISTICS_MEDIAN": [
+        "3.000000",
+        "nan"
+      ]
+    }
+  },
+  {
+    "case": "missing_mean",
+    "arcgis": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "0",
+      "STATISTICS_STDDEV": "-1",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1"
+    },
+    "native": {
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "100"
+    },
+    "arcgis_pam": false,
+    "native_pam": false,
+    "differences": {
+      "STATISTICS_MEAN": [
+        "0",
+        null
+      ],
+      "STATISTICS_MEDIAN": [
+        "nan",
+        null
+      ],
+      "STATISTICS_STDDEV": [
+        "-1",
+        "100"
+      ]
+    }
+  },
+  {
+    "case": "missing_stddev",
+    "arcgis": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "0",
+      "STATISTICS_STDDEV": "-1",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1"
+    },
+    "native": {
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "78",
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1"
+    },
+    "arcgis_pam": false,
+    "native_pam": false,
+    "differences": {
+      "STATISTICS_MEAN": [
+        "0",
+        "78"
+      ],
+      "STATISTICS_MEDIAN": [
+        "nan",
+        null
+      ],
+      "STATISTICS_STDDEV": [
+        "-1",
+        null
+      ]
+    }
+  },
+  {
+    "case": "missing_count",
+    "arcgis": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "78",
+      "STATISTICS_STDDEV": "100",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "0.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1"
+    },
+    "native": {
+      "STATISTICS_COUNT": "0.000000",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "78",
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "100"
+    },
+    "arcgis_pam": false,
+    "native_pam": false,
+    "differences": {
+      "STATISTICS_MEDIAN": [
+        "nan",
+        null
+      ]
+    }
+  }
+]
