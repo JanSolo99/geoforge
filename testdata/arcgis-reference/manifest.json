@@ -59388,6 +59388,114 @@
           "output": "<out>"
         }
       }
+    },
+    "dacc_src_one": {
+      "tool": "gp.DistanceAccumulation_sa",
+      "args": [
+        "testdata/raster/cost_src_one.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "distance_accumulation",
+        "params": {
+          "input": "testdata/raster/cost_src_one.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "dacc_src_i16": {
+      "tool": "gp.DistanceAccumulation_sa",
+      "args": [
+        "testdata/raster/cost_src_i16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "distance_accumulation",
+        "params": {
+          "input": "testdata/raster/cost_src_i16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "dacc_landuse": {
+      "tool": "gp.DistanceAccumulation_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "distance_accumulation",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "dalloc_src_one": {
+      "tool": "gp.DistanceAllocation_sa",
+      "args": [
+        "testdata/raster/cost_src_one.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "distance_allocation",
+        "params": {
+          "input": "testdata/raster/cost_src_one.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "dalloc_src_i16": {
+      "tool": "gp.DistanceAllocation_sa",
+      "args": [
+        "testdata/raster/cost_src_i16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "distance_allocation",
+        "params": {
+          "input": "testdata/raster/cost_src_i16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "dalloc_landuse": {
+      "tool": "gp.DistanceAllocation_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "distance_allocation",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

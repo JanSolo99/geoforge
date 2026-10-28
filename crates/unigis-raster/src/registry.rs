@@ -803,6 +803,42 @@ fn euclidean_back_direction(ctx: &dyn Context) -> Result<Output> {
     )
 }
 
+/// Distance Accumulation / Allocation without barriers, surface or cost rasters: the Euclidean
+/// distance / allocation (identical output, observed).
+fn distance_accumulation(ctx: &dyn Context) -> Result<Output> {
+    with_statistics(
+        crate::resample::euclidean_distance(&ctx.raster("input")?, None),
+        false,
+    )
+}
+
+/// Allocation values are stored as bytes (16 bit beyond 255): NoData 0 when no cell holds 0,
+/// none otherwise (observed), no statistics.
+fn distance_allocation(ctx: &dyn Context) -> Result<Output> {
+    use crate::DataType;
+    let alloc = crate::resample::euclidean_allocation(&ctx.raster("input")?, None);
+    let valid = |v: f64| !alloc.is_nodata(v);
+    let max = alloc.bands[0]
+        .iter()
+        .copied()
+        .filter(|&v| valid(v))
+        .fold(0.0_f64, f64::max);
+    let uses_zero = alloc.bands[0].iter().any(|&v| valid(v) && v == 0.0);
+    let t = if max <= 255.0 {
+        DataType::U8
+    } else {
+        DataType::U16
+    };
+    let nodata = if uses_zero { None } else { Some(0.0) };
+    let mut out = alloc.like(t);
+    out.nodata = nodata;
+    out.bands[0] = alloc.bands[0]
+        .iter()
+        .map(|&v| if valid(v) { v } else { nodata.unwrap_or(0.0) })
+        .collect();
+    with_statistics(out, false)
+}
+
 fn flip(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::extract::flip(&ctx.raster("input")?), true)
 }
@@ -1387,6 +1423,20 @@ pub static TOOLS: &[Tool] = &[
             },
         ],
         run: euclidean_back_direction,
+    },
+    Tool {
+        id: "distance_accumulation",
+        name: "Distance Accumulation",
+        summary: "Euclidean distance / allocation from sources (no barriers, surface or cost rasters yet).",
+        params: &[raster("input", "Input Source Data", true)],
+        run: distance_accumulation,
+    },
+    Tool {
+        id: "distance_allocation",
+        name: "Distance Allocation",
+        summary: "Euclidean distance / allocation from sources (no barriers, surface or cost rasters yet).",
+        params: &[raster("input", "Input Source Data", true)],
+        run: distance_allocation,
     },
     Tool {
         id: "flip",
