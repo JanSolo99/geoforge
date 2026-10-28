@@ -777,3 +777,5 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 
 - [x] Convert Coordinate Notation (DD/DDM/DMS/DD_NUMERIC output from lon/lat; 7 `ccn_*` cases), Table To Ellipse (planar; adaptive complete-ellipse densification; 5 `ellipse_*` cases), Geodetic Densify (geodesic; 6 `gdd_*` cases), Encode Field (One-hot/One-cold; 4 `enc_*` cases) and Field Statistics To Table (numeric/text, ungrouped; 4 `fst_*` cases) match ArcGIS; gaps are in docs/KNOWN_GAPS.md and docs/HANDOFF.md.
 - [x] CI gate runs locally (`scripts/check`, pre-push hook); GitHub workflows are manual-only because Actions minutes ran out.
+
+- [x] Convert Coordinate Notation (DD_1/DD_2/DDM_1/DDM_2/DMS_1/DMS_2/DD_NUMERIC from lon/lat), Table To Ellipse (planar), Geodetic Densify (geodesic), Encode Field (one-hot/one-cold) and Field Statistics To Table (numeric/text): reference cases match ArcGIS; gaps in KNOWN_GAPS.md and HANDOFF.md. Not done: other coordinate formats (UTM/MGRS/...), geodesic ellipses, Trim/Extend Line, Convert Time Zone.

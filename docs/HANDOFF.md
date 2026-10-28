@@ -1,5 +1,28 @@
 # Current handoff
 
+## Latest state (Claude, 2026-10-29) — read this first
+
+Workspace /mnt/media/ArcGIS_Linux, branch main, all Claude work pushed (HEAD 588fa36 or later).
+GitHub Actions minutes are exhausted: both workflows are manual-only; the gate is `scripts/check`
+(run by the pre-push hook, core.hooksPath=.githooks). Do not rely on or trigger hosted CI.
+Claude added this stretch (each with ArcGIS reference cases, details in the dated notes below):
+Convert Coordinate Notation (DD/DDM/DMS), Table To Ellipse (planar, plus adaptive ellipse
+densification in unigis-core curves.rs), Geodetic Densify (geodesic), Encode Field, Field
+Statistics To Table (NUMERIC or TEXT). Probed but not implemented: Trim Line (topological),
+Convert Time Zone (needs tz database), Add Incrementing ID Field (ArcSDE only).
+Uncommitted work in the tree belongs to Codex (unary integer-float multiband: local.rs,
+registry.rs, stats.rs, unary_band_safety.rs, its umintfloat_* cases in make-arcgis-reference.py,
+testdata/raster/unary_integer_float, scripts/research/unary_multiband/integer_float): do not
+commit or revert it. Never read or add NOTES.md or .worktrees. Stage explicit paths only; when
+committing make-arcgis-reference.py hunks, exclude Codex's umintfloat hunk (git apply --cached
+--unidiff-zero of a filtered diff). If a push says "cannot lock ref", run `git fetch` and check
+`git status -sb`: the earlier push may already have landed.
+Next candidates: Extend Line / Trim Line (need a topology-aware test set), Convert Coordinate
+Notation for UTM/MGRS/USNG, Field Statistics To Table group-by, Aggregate Points, Rotate/Rescale
+rasters (after Codex finishes the raster files), items in docs/KNOWN_GAPS.md.
+
+Older notes (Codex, then Claude) follow.
+
 Updated 2026-10-28T18:40:03.782995+00:00; last agent Codex.
 Workspace /mnt/media/ArcGIS_Linux; main; HEAD97043a1 PUSHED, remote main verified
 97043a1cc01d142feef3f2ab4eea3216cce3e2f8. Standing objective continuous development,
