@@ -82,6 +82,8 @@ Tested offline (`test_daemon_runs_inbox_tasks_commands_pause_and_keepalive`); no
 
 - Snap Pour Point (`snap_pour_point`, `spp_*` pass; new test points `testdata/geoproc/pour_pts.shp`): each point -> highest-accumulation cell within the snap distance (cell centres, point at its own cell centre; ties nearest); value = FID (0-based) or the chosen field, typed by the 8-bit integer rules (U8/15 for 0..5, S8 for 10..60); statistics written.
 
+- Probed 2026-10-28 and left: Stream To Feature (one arc per stream link; geometry is derivable: the line starts half a cell UPSTREAM of the link's first cell centre along its flow direction (an edge midpoint or a corner), runs through the cell centres where the direction changes and ends at the centre of the first cell of the downstream link; from_node = the link's own value, to_node = the downstream link's value; the ORDER of arcs (arcid) is by to_node with ties and the late part of the list in an ArcInfo scan order that I could not reproduce; outlets' to_node unknown). Implementing the geometry with a sort that matches only partly would fail the reference test, so it is not done.
+
 ## Next actions
 
 1. Keep going in probe -> implement -> reference-test batches (see "Session 2026-10-26" entries for what is done and the gaps).
