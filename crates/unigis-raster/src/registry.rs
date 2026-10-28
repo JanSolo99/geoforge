@@ -71,6 +71,8 @@ pub trait Context {
 pub struct Output {
     pub raster: Raster,
     pub statistics: bool,
+    /// Physical TIFF marker when it differs from the logical statistics marker.
+    pub nodata_tag: Option<f64>,
     /// ArcGIS writes a STATISTICS_COUNT of 0 (Basin, Sink).
     pub zero_count: bool,
     /// Write ArcGIS empty-band statistics for entirely NoData bands.
@@ -175,6 +177,7 @@ fn nibble(ctx: &dyn Context) -> Result<Output> {
         statistics: false,
         zero_count: false,
         empty_band_statistics: false,
+        nodata_tag: None,
     })
 }
 
@@ -209,6 +212,7 @@ fn with_statistics(raster: Raster, statistics: bool) -> Result<Output> {
         statistics,
         zero_count: false,
         empty_band_statistics: false,
+        nodata_tag: None,
     })
 }
 
@@ -539,7 +543,18 @@ fn copy_raster(ctx: &dyn Context) -> Result<Output> {
         || input.nodata.is_none()
         || raster.data_type != input.data_type
         || (raster.nodata != input.nodata && !default_u32_system_marker);
-    with_statistics(raster, statistics)
+    let mut output = with_statistics(raster, statistics)?;
+    if matches!(
+        output.raster.data_type,
+        DataType::U8 | DataType::U16 | DataType::U32
+    ) {
+        // Negative fractional unsigned markers remain raw in TIFF, while the
+        // logical rounded marker controls ArcGIS statistics. Old payloads stay.
+        output.nodata_tag = nodata
+            .or(input.nodata)
+            .filter(|v| v.is_finite() && *v < 0.0 && v.fract() != 0.0);
+    }
+    Ok(output)
 }
 
 fn mosaic_to_new_raster(ctx: &dyn Context) -> Result<Output> {

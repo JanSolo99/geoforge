@@ -1,0 +1,118 @@
+[
+  {
+    "output": "/tmp/unigis-copy-fraction-controls/default_u8_-1.5_False.tif",
+    "nd": -1.0,
+    "tiff_nodata": -1.5,
+    "cells": [
+      [
+        0,
+        0,
+        255
+      ],
+      [
+        255,
+        255,
+        4
+      ]
+    ],
+    "statistics": {
+      "RepresentationType": "ATHEMATIC",
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_COVARIANCES": "19306.16666666667",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "128.16666666667",
+      "STATISTICS_MEDIAN": "4.000000",
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "138.9466324409"
+    }
+  },
+  {
+    "output": "/tmp/unigis-copy-fraction-controls/default_u8_-1.5_True.tif",
+    "nd": -1.0,
+    "tiff_nodata": -1.5,
+    "cells": [
+      [
+        0,
+        0,
+        255
+      ],
+      [
+        255,
+        255,
+        4
+      ]
+    ],
+    "statistics": {
+      "RepresentationType": "ATHEMATIC",
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_COVARIANCES": "19306.16666666667",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "128.16666666667",
+      "STATISTICS_MEDIAN": "4.000000",
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "138.9466324409"
+    }
+  },
+  {
+    "output": "/tmp/unigis-copy-fraction-controls/default_u8_-1.75_False.tif",
+    "nd": -1.0,
+    "tiff_nodata": -1.75,
+    "cells": [
+      [
+        0,
+        0,
+        255
+      ],
+      [
+        255,
+        255,
+        4
+      ]
+    ],
+    "statistics": {
+      "RepresentationType": "ATHEMATIC",
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_COVARIANCES": "19306.16666666667",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "128.16666666667",
+      "STATISTICS_MEDIAN": "4.000000",
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "138.9466324409"
+    }
+  },
+  {
+    "output": "/tmp/unigis-copy-fraction-controls/default_u8_-1.75_True.tif",
+    "nd": -1.0,
+    "tiff_nodata": -1.75,
+    "cells": [
+      [
+        0,
+        0,
+        255
+      ],
+      [
+        255,
+        255,
+        4
+      ]
+    ],
+    "statistics": {
+      "RepresentationType": "ATHEMATIC",
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_COVARIANCES": "19306.16666666667",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "128.16666666667",
+      "STATISTICS_MEDIAN": "4.000000",
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "138.9466324409"
+    }
+  }
+]

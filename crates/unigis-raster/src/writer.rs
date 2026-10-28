@@ -37,6 +37,9 @@ pub struct WriteOptions {
     pub zero_out_of_range_nodata: bool,
     /// GDAL_METADATA XML (tag 42112) for the main image, such as cached band statistics.
     pub gdal_metadata: Option<String>,
+    /// Override the main image NoData tag without changing logical sample masking.
+    /// Used when ArcGIS stores a raw marker but computes statistics with a cast marker.
+    pub nodata_tag: Option<f64>,
 }
 
 const MODEL_PIXEL_SCALE: u16 = 33550;
@@ -426,7 +429,7 @@ pub fn write_geotiff_with(path: &Path, raster: &Raster, opts: &WriteOptions) -> 
         }
         fields.push((339, Field::Short(vec![sample_format(t); samples as usize])));
         if li == 0 {
-            geo_fields(raster, &mut fields);
+            geo_fields(raster, opts.nodata_tag, &mut fields);
             if let Some(xml) = &opts.gdal_metadata {
                 fields.push((42112, Field::Ascii(xml.clone())));
             }
@@ -500,7 +503,7 @@ pub fn write_geotiff_with(path: &Path, raster: &Raster, opts: &WriteOptions) -> 
 }
 
 /// GeoTIFF georeferencing and NoData tags for the main image.
-fn geo_fields(r: &Raster, fields: &mut Vec<(u16, Field)>) {
+fn geo_fields(r: &Raster, nodata_tag: Option<f64>, fields: &mut Vec<(u16, Field)>) {
     let t = &r.transform;
     if t[2] == 0.0 && t[4] == 0.0 {
         fields.push((MODEL_PIXEL_SCALE, Field::Double(vec![t[1], -t[5], 0.0])));
@@ -521,11 +524,13 @@ fn geo_fields(r: &Raster, fields: &mut Vec<(u16, Field)>) {
         GEO_KEY_DIRECTORY,
         Field::Short(crate::geotiff::geo_keys(r.epsg)),
     ));
-    if let Some(nd) = r.nodata {
-        fields.push((
-            GDAL_NODATA,
-            Field::Ascii(crate::geotiff::format_nodata(nd, r.data_type)),
-        ));
+    if let Some(nd) = nodata_tag.or(r.nodata) {
+        let text = if nodata_tag.is_some() {
+            nd.to_string()
+        } else {
+            crate::geotiff::format_nodata(nd, r.data_type)
+        };
+        fields.push((GDAL_NODATA, Field::Ascii(text)));
     }
 }
 

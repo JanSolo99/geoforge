@@ -322,8 +322,25 @@ pub fn copy_raster(input: &Raster, pixel_type: Option<DataType>, nodata: Option<
     } else {
         out_nodata
     };
+    // Negative unsigned markers remain invalid even when they round to zero.
+    let negative_unsigned_marker =
+        matches!(t, DataType::U8 | DataType::U16 | DataType::U32) && out_nodata < 0.0;
+    let out_nodata = if t.is_float() {
+        out_nodata
+    } else {
+        out_nodata.round_ties_even()
+    };
     let integer_marker_outside_storage = !t.is_float()
-        && (out_nodata < t.store(f64::NEG_INFINITY) || out_nodata > t.store(f64::INFINITY));
+        && (negative_unsigned_marker
+            || out_nodata < t.store(f64::NEG_INFINITY)
+            || out_nodata > t.store(f64::INFINITY));
+    let convert = |v: f64| {
+        if t.is_float() {
+            t.store(v)
+        } else {
+            t.store((v + 0.5).floor())
+        }
+    };
     let mut out = input.like(t);
     out.nodata = Some(out_nodata);
     out.bands = input
@@ -337,7 +354,7 @@ pub fn copy_raster(input: &Raster, pixel_type: Option<DataType>, nodata: Option<
                     } else {
                         // Copy Raster preserves the converted original payload
                         // when the integer destination cannot store its marker.
-                        t.store(v)
+                        convert(v)
                     }
                 })
                 .collect()

@@ -1,6 +1,13 @@
 {
-  "fetched": "2026-10-28T12:08:35+00:00",
+  "fetched": "2026-10-28T13:22:23+00:00",
   "runs": [
+    {
+      "conclusion": "success",
+      "createdAt": "2026-10-28T12:24:19Z",
+      "displayTitle": "Preserve ArcGIS embedded raster statistics and Copy Raster NoData def\u2026",
+      "status": "completed",
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40687521836"
+    },
     {
       "conclusion": "success",
       "createdAt": "2026-10-28T10:45:33Z",
@@ -49,13 +56,6 @@
       "displayTitle": "HANDOFF: Stream To Feature findings",
       "status": "completed",
       "url": "https://github.com/JanSolo99/geoforge/actions/runs/40658070311"
-    },
-    {
-      "conclusion": "success",
-      "createdAt": "2026-10-28T08:29:43Z",
-      "displayTitle": "HANDOFF: stage explicit paths after probing",
-      "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40657179770"
     }
   ]
 }

@@ -66,8 +66,8 @@ checks the120 embedded cases. Separate native/GDAL tests cover classic/BigTIFF,
 band indexing, PAM overrides, XML escaping and empty outputs. The CLI overwrite
 regression also checks that all-NoData outputs remove old PAM overrides.
 
-Remaining scope: explicit fractional marker normalization (e.g. -9999.5 to I16),
-nonfinite/unusual out-of-range source tags, partial/stale caches, other formats,
+Fractional marker and pixel conversion follow-up: [44 controls](../fraction/README.md).
+Remaining scope: nonfinite/unusual out-of-range source tags, partial/stale caches, other formats,
 nondefault environments and wholesale ancillary metadata preservation. Native
 in-place copying remains an explicit extension; ArcGIS's failing/destructive
 same-path behavior is documented separately in statistics/README.md.

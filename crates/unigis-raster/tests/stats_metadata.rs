@@ -68,3 +68,43 @@ fn all_nodata_has_no_cache_and_text_is_escaped_without_becoming_xml() {
     assert!(xml.contains("&lt;bad&gt;&amp;&quot;&apos;"));
     assert!(!xml.contains("<bad>"));
 }
+
+#[test]
+fn physical_nodata_override_keeps_logical_samples_and_statistics() {
+    let folder = std::env::temp_dir().join(format!("unigis-raw-nodata-{}", std::process::id()));
+    std::fs::create_dir_all(&folder).unwrap();
+    let mut raster = Raster::new(3, 1, DataType::U8, [0., 1., 0., 1., 0., -1.]);
+    raster.nodata = Some(0.);
+    raster.bands[0] = vec![0., 3., 127.];
+    for bigtiff in [false, true] {
+        let path = folder.join(format!("raw-{bigtiff}.tif"));
+        write_geotiff_with(
+            &path,
+            &raster,
+            &WriteOptions {
+                bigtiff,
+                nodata_tag: Some(-0.25),
+                gdal_metadata: stats_metadata::for_raster(&raster),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let read = unigis_raster::read_geotiff(&path).unwrap();
+        assert_eq!(read.nodata, Some(-0.25));
+        assert_eq!(read.bands, raster.bands);
+        assert_eq!(
+            stats_metadata::read(&path).unwrap()[0]["STATISTICS_COUNT"],
+            "2.000000"
+        );
+        let output = Command::new("gdalinfo")
+            .arg("-json")
+            .arg(&path)
+            .output()
+            .unwrap();
+        assert!(output.status.success());
+        let gdal: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+        assert_eq!(gdal["bands"][0]["noDataValue"], -0.25);
+        assert_eq!(gdal["bands"][0]["metadata"][""]["STATISTICS_MEAN"], "65");
+    }
+    std::fs::remove_dir_all(folder).unwrap();
+}

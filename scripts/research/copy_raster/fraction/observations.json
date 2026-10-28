@@ -1,0 +1,1341 @@
+[
+  {
+    "case": "i16_arg_-9999.25",
+    "argument": -9999.25,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_f32.tif",
+    "pixel_type": "S16",
+    "nodata": -9999.0,
+    "cells": [
+      [
+        0,
+        -9999,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "32767",
+      "STATISTICS_MEAN": "19661",
+      "STATISTICS_STDDEV": "17946.129652379",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "322063569.4999999"
+    }
+  },
+  {
+    "case": "i16_arg_-9999.5",
+    "argument": -9999.5,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_f32.tif",
+    "pixel_type": "S16",
+    "nodata": -10000.0,
+    "cells": [
+      [
+        0,
+        -10000,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "32767",
+      "STATISTICS_MEAN": "19661",
+      "STATISTICS_STDDEV": "17946.129652379",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "322063569.4999999"
+    }
+  },
+  {
+    "case": "i16_arg_-9999.75",
+    "argument": -9999.75,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_f32.tif",
+    "pixel_type": "S16",
+    "nodata": -10000.0,
+    "cells": [
+      [
+        0,
+        -10000,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "32767",
+      "STATISTICS_MEAN": "19661",
+      "STATISTICS_STDDEV": "17946.129652379",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "322063569.4999999"
+    }
+  },
+  {
+    "case": "i16_arg_0.5",
+    "argument": 0.5,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_f32.tif",
+    "pixel_type": "S16",
+    "nodata": 0.0,
+    "cells": [
+      [
+        0,
+        0,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "4",
+      "STATISTICS_MAXIMUM": "32767",
+      "STATISTICS_MEAN": "24576.25",
+      "STATISTICS_STDDEV": "16381.5",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "4.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "268353542.25"
+    }
+  },
+  {
+    "case": "i16_arg_1.5",
+    "argument": 1.5,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_f32.tif",
+    "pixel_type": "S16",
+    "nodata": 2.0,
+    "cells": [
+      [
+        0,
+        2,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "32767",
+      "STATISTICS_MEAN": "19661",
+      "STATISTICS_STDDEV": "17946.129652379",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "322063569.4999999"
+    }
+  },
+  {
+    "case": "i16_arg_-0.5",
+    "argument": -0.5,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_f32.tif",
+    "pixel_type": "S16",
+    "nodata": 0.0,
+    "cells": [
+      [
+        0,
+        0,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "4",
+      "STATISTICS_MAXIMUM": "32767",
+      "STATISTICS_MEAN": "24576.25",
+      "STATISTICS_STDDEV": "16381.5",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "4.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "268353542.25"
+    }
+  },
+  {
+    "case": "i16_arg_-1.5",
+    "argument": -1.5,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_f32.tif",
+    "pixel_type": "S16",
+    "nodata": -2.0,
+    "cells": [
+      [
+        0,
+        -2,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "32767",
+      "STATISTICS_MEAN": "19661",
+      "STATISTICS_STDDEV": "17946.129652379",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "322063569.4999999"
+    }
+  },
+  {
+    "case": "u8_arg_126.25",
+    "argument": 126.25,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_u8.tif",
+    "pixel_type": "U8",
+    "nodata": 126.0,
+    "cells": [
+      [
+        0,
+        126,
+        128
+      ],
+      [
+        255,
+        3,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "78",
+      "STATISTICS_STDDEV": "112.9313951034",
+      "STATISTICS_MEDIAN": "3.000000",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "12753.5"
+    }
+  },
+  {
+    "case": "u8_arg_126.5",
+    "argument": 126.5,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_u8.tif",
+    "pixel_type": "U8",
+    "nodata": 126.0,
+    "cells": [
+      [
+        0,
+        126,
+        128
+      ],
+      [
+        255,
+        3,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "78",
+      "STATISTICS_STDDEV": "112.9313951034",
+      "STATISTICS_MEDIAN": "3.000000",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "12753.5"
+    }
+  },
+  {
+    "case": "u8_arg_126.75",
+    "argument": 126.75,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_u8.tif",
+    "pixel_type": "U8",
+    "nodata": 127.0,
+    "cells": [
+      [
+        0,
+        127,
+        128
+      ],
+      [
+        255,
+        3,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "78",
+      "STATISTICS_STDDEV": "112.9313951034",
+      "STATISTICS_MEDIAN": "3.000000",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "12753.5"
+    }
+  },
+  {
+    "case": "u8_arg_127.5",
+    "argument": 127.5,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_u8.tif",
+    "pixel_type": "U8",
+    "nodata": 128.0,
+    "cells": [
+      [
+        0,
+        128,
+        128
+      ],
+      [
+        255,
+        3,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "65.5",
+      "STATISTICS_STDDEV": "126.34476641318",
+      "STATISTICS_MEDIAN": "3.000000",
+      "STATISTICS_COUNT": "4.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "15963"
+    }
+  },
+  {
+    "case": "u8_arg_128.5",
+    "argument": 128.5,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_u8.tif",
+    "pixel_type": "U8",
+    "nodata": 128.0,
+    "cells": [
+      [
+        0,
+        128,
+        128
+      ],
+      [
+        255,
+        3,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "65.5",
+      "STATISTICS_STDDEV": "126.34476641318",
+      "STATISTICS_MEDIAN": "3.000000",
+      "STATISTICS_COUNT": "4.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "15963"
+    }
+  },
+  {
+    "case": "u8_arg_255.5",
+    "argument": 255.5,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_u8.tif",
+    "pixel_type": "U8",
+    "nodata": 256.0,
+    "cells": [
+      [
+        0,
+        127,
+        128
+      ],
+      [
+        255,
+        3,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "86.166666666667",
+      "STATISTICS_STDDEV": "102.9707078089",
+      "STATISTICS_MEDIAN": "4.000000",
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "10602.96666666667"
+    }
+  },
+  {
+    "case": "u8_arg_300.25",
+    "argument": 300.25,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_u8.tif",
+    "pixel_type": "U8",
+    "nodata": 300.0,
+    "cells": [
+      [
+        0,
+        127,
+        128
+      ],
+      [
+        255,
+        3,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "86.166666666667",
+      "STATISTICS_STDDEV": "102.9707078089",
+      "STATISTICS_MEDIAN": "4.000000",
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "10602.96666666667"
+    }
+  },
+  {
+    "case": "u8_arg_300.5",
+    "argument": 300.5,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_u8.tif",
+    "pixel_type": "U8",
+    "nodata": 300.0,
+    "cells": [
+      [
+        0,
+        127,
+        128
+      ],
+      [
+        255,
+        3,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "86.166666666667",
+      "STATISTICS_STDDEV": "102.9707078089",
+      "STATISTICS_MEDIAN": "4.000000",
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "10602.96666666667"
+    }
+  },
+  {
+    "case": "u8_arg_300.75",
+    "argument": 300.75,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_u8.tif",
+    "pixel_type": "U8",
+    "nodata": 301.0,
+    "cells": [
+      [
+        0,
+        127,
+        128
+      ],
+      [
+        255,
+        3,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "86.166666666667",
+      "STATISTICS_STDDEV": "102.9707078089",
+      "STATISTICS_MEDIAN": "4.000000",
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "10602.96666666667"
+    }
+  },
+  {
+    "case": "u8_arg_-0.5",
+    "argument": -0.5,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_u8.tif",
+    "pixel_type": "U8",
+    "nodata": 0.0,
+    "cells": [
+      [
+        0,
+        127,
+        128
+      ],
+      [
+        255,
+        3,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "3",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "103.4",
+      "STATISTICS_STDDEV": "105.00619029372",
+      "STATISTICS_MEDIAN": "4.000000",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "11026.3"
+    }
+  },
+  {
+    "case": "i16_default_-1.5",
+    "argument": null,
+    "source": "/tmp/unigis-copy-fraction-controls/source_-1.5.tif",
+    "pixel_type": "S16",
+    "nodata": -2.0,
+    "cells": [
+      [
+        0,
+        -2,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "32767",
+      "STATISTICS_MEAN": "19661",
+      "STATISTICS_STDDEV": "17946.129652379",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "322063569.4999999"
+    }
+  },
+  {
+    "case": "i16_equal_-1.5",
+    "argument": -1.5,
+    "source": "/tmp/unigis-copy-fraction-controls/source_-1.5.tif",
+    "pixel_type": "S16",
+    "nodata": -2.0,
+    "cells": [
+      [
+        0,
+        -2,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "32767",
+      "STATISTICS_MEAN": "19661",
+      "STATISTICS_STDDEV": "17946.129652379",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "322063569.4999999"
+    }
+  },
+  {
+    "case": "i16_default_-1.75",
+    "argument": null,
+    "source": "/tmp/unigis-copy-fraction-controls/source_-1.75.tif",
+    "pixel_type": "S16",
+    "nodata": -2.0,
+    "cells": [
+      [
+        0,
+        -2,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "32767",
+      "STATISTICS_MEAN": "19661",
+      "STATISTICS_STDDEV": "17946.129652379",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "322063569.4999999"
+    }
+  },
+  {
+    "case": "i16_equal_-1.75",
+    "argument": -1.75,
+    "source": "/tmp/unigis-copy-fraction-controls/source_-1.75.tif",
+    "pixel_type": "S16",
+    "nodata": -2.0,
+    "cells": [
+      [
+        0,
+        -2,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "32767",
+      "STATISTICS_MEAN": "19661",
+      "STATISTICS_STDDEV": "17946.129652379",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "322063569.4999999"
+    }
+  },
+  {
+    "case": "i16_default_1.5",
+    "argument": null,
+    "source": "/tmp/unigis-copy-fraction-controls/source_1.5.tif",
+    "pixel_type": "S16",
+    "nodata": 2.0,
+    "cells": [
+      [
+        0,
+        2,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "32767",
+      "STATISTICS_MEAN": "19661",
+      "STATISTICS_STDDEV": "17946.129652379",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "322063569.4999999"
+    }
+  },
+  {
+    "case": "i16_equal_1.5",
+    "argument": 1.5,
+    "source": "/tmp/unigis-copy-fraction-controls/source_1.5.tif",
+    "pixel_type": "S16",
+    "nodata": 2.0,
+    "cells": [
+      [
+        0,
+        2,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "32767",
+      "STATISTICS_MEAN": "19661",
+      "STATISTICS_STDDEV": "17946.129652379",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "322063569.4999999"
+    }
+  },
+  {
+    "case": "i16_default_1.75",
+    "argument": null,
+    "source": "/tmp/unigis-copy-fraction-controls/source_1.75.tif",
+    "pixel_type": "S16",
+    "nodata": 2.0,
+    "cells": [
+      [
+        0,
+        2,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "32767",
+      "STATISTICS_MEAN": "19661",
+      "STATISTICS_STDDEV": "17946.129652379",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "322063569.4999999"
+    }
+  },
+  {
+    "case": "i16_equal_1.75",
+    "argument": 1.75,
+    "source": "/tmp/unigis-copy-fraction-controls/source_1.75.tif",
+    "pixel_type": "S16",
+    "nodata": 2.0,
+    "cells": [
+      [
+        0,
+        2,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "32767",
+      "STATISTICS_MEAN": "19661",
+      "STATISTICS_STDDEV": "17946.129652379",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "322063569.4999999"
+    }
+  },
+  {
+    "case": "i16_default_0.5",
+    "argument": null,
+    "source": "/tmp/unigis-copy-fraction-controls/source_0.5.tif",
+    "pixel_type": "S16",
+    "nodata": 0.0,
+    "cells": [
+      [
+        0,
+        0,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "4",
+      "STATISTICS_MAXIMUM": "32767",
+      "STATISTICS_MEAN": "24576.25",
+      "STATISTICS_STDDEV": "16381.5",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "4.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "268353542.25"
+    }
+  },
+  {
+    "case": "i16_equal_0.5",
+    "argument": 0.5,
+    "source": "/tmp/unigis-copy-fraction-controls/source_0.5.tif",
+    "pixel_type": "S16",
+    "nodata": 0.0,
+    "cells": [
+      [
+        0,
+        0,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "4",
+      "STATISTICS_MAXIMUM": "32767",
+      "STATISTICS_MEAN": "24576.25",
+      "STATISTICS_STDDEV": "16381.5",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "4.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "268353542.25"
+    }
+  },
+  {
+    "case": "u8_cached_126.75",
+    "argument": 126.75,
+    "source": "/tmp/unigis-copy-fraction-controls/cached_u8.tif",
+    "pixel_type": "U8",
+    "nodata": 127.0,
+    "cells": [
+      [
+        0,
+        127,
+        128
+      ],
+      [
+        255,
+        3,
+        4
+      ]
+    ],
+    "statistics": {}
+  },
+  {
+    "case": "u8_cached_127.25",
+    "argument": 127.25,
+    "source": "/tmp/unigis-copy-fraction-controls/cached_u8.tif",
+    "pixel_type": "U8",
+    "nodata": 127.0,
+    "cells": [
+      [
+        0,
+        127,
+        128
+      ],
+      [
+        255,
+        3,
+        4
+      ]
+    ],
+    "statistics": {}
+  },
+  {
+    "case": "u8_edge_255.25",
+    "argument": 255.25,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_u8.tif",
+    "pixel_type": "U8",
+    "nodata": 255.0,
+    "cells": [
+      [
+        0,
+        255,
+        128
+      ],
+      [
+        255,
+        3,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "128",
+      "STATISTICS_MEAN": "33.75",
+      "STATISTICS_STDDEV": "62.856317635276",
+      "STATISTICS_MEDIAN": "3.000000",
+      "STATISTICS_COUNT": "4.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "3950.916666666667"
+    }
+  },
+  {
+    "case": "u8_edge_-0.25",
+    "argument": -0.25,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_u8.tif",
+    "pixel_type": "U8",
+    "nodata": 0.0,
+    "cells": [
+      [
+        0,
+        127,
+        128
+      ],
+      [
+        255,
+        3,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "3",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "103.4",
+      "STATISTICS_STDDEV": "105.00619029372",
+      "STATISTICS_MEDIAN": "4.000000",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "11026.3"
+    }
+  },
+  {
+    "case": "i16_edge_-32768.25",
+    "argument": -32768.25,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_f32.tif",
+    "pixel_type": "S16",
+    "nodata": -32768.0,
+    "cells": [
+      [
+        0,
+        -32768,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "32767",
+      "STATISTICS_MEAN": "19661",
+      "STATISTICS_STDDEV": "17946.129652379",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "322063569.4999999"
+    }
+  },
+  {
+    "case": "i16_edge_-32768.5",
+    "argument": -32768.5,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_f32.tif",
+    "pixel_type": "S16",
+    "nodata": -32768.0,
+    "cells": [
+      [
+        0,
+        -32768,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "32767",
+      "STATISTICS_MEAN": "19661",
+      "STATISTICS_STDDEV": "17946.129652379",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "322063569.4999999"
+    }
+  },
+  {
+    "case": "i16_edge_-32768.75",
+    "argument": -32768.75,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_f32.tif",
+    "pixel_type": "S16",
+    "nodata": -32769.0,
+    "cells": [
+      [
+        0,
+        -1,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "-1",
+      "STATISTICS_MAXIMUM": "32767",
+      "STATISTICS_MEAN": "16384",
+      "STATISTICS_STDDEV": "17946.677397223",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "322083229.6"
+    }
+  },
+  {
+    "case": "i16_edge_32767.25",
+    "argument": 32767.25,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_f32.tif",
+    "pixel_type": "S16",
+    "nodata": 32767.0,
+    "cells": [
+      [
+        0,
+        32767,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "4",
+      "STATISTICS_MEAN": "2",
+      "STATISTICS_STDDEV": "2.8284271247462",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "2.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "8.000000000000002"
+    }
+  },
+  {
+    "case": "i16_edge_32767.5",
+    "argument": 32767.5,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_f32.tif",
+    "pixel_type": "S16",
+    "nodata": 32768.0,
+    "cells": [
+      [
+        0,
+        -1,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "-1",
+      "STATISTICS_MAXIMUM": "32767",
+      "STATISTICS_MEAN": "16384",
+      "STATISTICS_STDDEV": "17946.677397223",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "322083229.6"
+    }
+  },
+  {
+    "case": "i16_edge_32767.75",
+    "argument": 32767.75,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_f32.tif",
+    "pixel_type": "S16",
+    "nodata": 32768.0,
+    "cells": [
+      [
+        0,
+        -1,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "-1",
+      "STATISTICS_MAXIMUM": "32767",
+      "STATISTICS_MEAN": "16384",
+      "STATISTICS_STDDEV": "17946.677397223",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "322083229.6"
+    }
+  },
+  {
+    "case": "u8_zero_-0.0",
+    "argument": -0.0,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_u8.tif",
+    "pixel_type": "U8",
+    "nodata": 0.0,
+    "cells": [
+      [
+        0,
+        0,
+        128
+      ],
+      [
+        255,
+        3,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "3",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "97.5",
+      "STATISTICS_STDDEV": "120.28992753621",
+      "STATISTICS_MEDIAN": "4.000000",
+      "STATISTICS_COUNT": "4.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "14469.66666666667"
+    }
+  },
+  {
+    "case": "u8_zero_0.0",
+    "argument": 0.0,
+    "source": "/mnt/media/ArcGIS_Linux/testdata/raster/composite_matrix/nd_u8.tif",
+    "pixel_type": "U8",
+    "nodata": 0.0,
+    "cells": [
+      [
+        0,
+        0,
+        128
+      ],
+      [
+        255,
+        3,
+        4
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "3",
+      "STATISTICS_MAXIMUM": "255",
+      "STATISTICS_MEAN": "97.5",
+      "STATISTICS_STDDEV": "120.28992753621",
+      "STATISTICS_MEDIAN": "4.000000",
+      "STATISTICS_COUNT": "4.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "14469.66666666667"
+    }
+  },
+  {
+    "case": "pixel_ties_i16",
+    "argument": null,
+    "source": "/tmp/unigis-copy-fraction-controls/pixel_ties.tif",
+    "pixel_type": "S16",
+    "nodata": -9999.0,
+    "cells": [
+      [
+        -2,
+        -1,
+        0,
+        1,
+        2,
+        3,
+        -9999
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "-2",
+      "STATISTICS_MAXIMUM": "3",
+      "STATISTICS_MEAN": "0.5",
+      "STATISTICS_STDDEV": "1.870828693387",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "3.5"
+    }
+  },
+  {
+    "case": "pixel_ties_u8",
+    "argument": 127,
+    "source": "/tmp/unigis-copy-fraction-controls/pixel_ties.tif",
+    "pixel_type": "U8",
+    "nodata": 127.0,
+    "cells": [
+      [
+        0,
+        0,
+        0,
+        1,
+        2,
+        3,
+        127
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "0",
+      "STATISTICS_MAXIMUM": "3",
+      "STATISTICS_MEAN": "1",
+      "STATISTICS_STDDEV": "1.2649110640674",
+      "STATISTICS_MEDIAN": "0.000000",
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "1.6"
+    }
+  },
+  {
+    "case": "pixel_ties_collision",
+    "argument": 1.5,
+    "source": "/tmp/unigis-copy-fraction-controls/pixel_ties.tif",
+    "pixel_type": "S16",
+    "nodata": 2.0,
+    "cells": [
+      [
+        -2,
+        -1,
+        0,
+        1,
+        2,
+        3,
+        2
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "-2",
+      "STATISTICS_MAXIMUM": "3",
+      "STATISTICS_MEAN": "0.2",
+      "STATISTICS_STDDEV": "1.9235384061671",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "3.699999999999999"
+    }
+  },
+  {
+    "case": "pixel_quarters_i16",
+    "argument": null,
+    "source": "/tmp/unigis-copy-fraction-controls/pixel_quarters.tif",
+    "pixel_type": "S16",
+    "nodata": -9999.0,
+    "cells": [
+      [
+        -3,
+        -2,
+        -2,
+        -1,
+        -1,
+        0,
+        0,
+        1,
+        -9999
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "-3",
+      "STATISTICS_MAXIMUM": "1",
+      "STATISTICS_MEAN": "-1",
+      "STATISTICS_STDDEV": "1.309307341416",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "8.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "1.714285714285714"
+    }
+  },
+  {
+    "case": "payload_tie_i16",
+    "argument": "3.4e38",
+    "source": "/tmp/unigis-copy-fraction-controls/payload_tie.tif",
+    "pixel_type": "S16",
+    "nodata": 3.4e+38,
+    "cells": [
+      [
+        -2,
+        -1,
+        0,
+        1,
+        2,
+        3,
+        -2
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "-2",
+      "STATISTICS_MAXIMUM": "3",
+      "STATISTICS_MEAN": "0.14285714285714",
+      "STATISTICS_STDDEV": "1.9518001458971",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "7.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "3.80952380952381"
+    }
+  }
+]

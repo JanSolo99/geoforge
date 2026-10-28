@@ -1166,6 +1166,35 @@ CASES = {
     "umcache_abs_symmetric": ("gp.Abs_sa", [RASTER / "unary_cached/symmetric.tif"], []),
     "umcache_negate_symmetric": ("gp.Negate_sa", [RASTER / "unary_cached/symmetric.tif"], []),
     "umcache_square_symmetric": ("gp.Square_sa", [RASTER / "unary_cached/symmetric.tif"], []),
+    **{f"cprfrac_{name}":
+       ("management.CopyRaster", [RASTER / f"copy_fraction/{src}.tif"], ["","",nd,"","",typ])
+       for name,src,nd,typ in [
+           ("pixels_i16","pixel_ties","","16_BIT_SIGNED"),
+           ("pixels_u8","pixel_ties","127","8_BIT_UNSIGNED"),
+           ("pixels_collision","pixel_ties","1.5","16_BIT_SIGNED"),
+           ("pixels_quarters","pixel_quarters","","16_BIT_SIGNED"),
+           ("payload_tie","payload_tie","3.4e38","16_BIT_SIGNED")]},
+    **{f"cprfrac_i16_arg_{marker}":
+       ("management.CopyRaster", [RASTER / "composite_matrix/nd_f32.tif"], ["","",str(marker),"","","16_BIT_SIGNED"])
+       for marker in [-9999.25,-9999.5,-9999.75,0.5,1.5,-0.5,-1.5]},
+    **{f"cprfrac_u8_arg_{marker}":
+       ("management.CopyRaster", [RASTER / "composite_matrix/nd_u8.tif"], ["","",str(marker),"","","8_BIT_UNSIGNED"])
+       for marker in [126.25,126.5,126.75,127.5,128.5,255.5,300.25,300.5,300.75,-0.5]},
+    **{f"cprfrac_i16_{mode}_{marker}":
+       ("management.CopyRaster", [RASTER / f"copy_fraction/source_{marker}.tif"], ["","",str(marker) if mode=="equal" else "","","","16_BIT_SIGNED"])
+       for marker in [-1.5,-1.75,1.5,1.75,0.5] for mode in ["default","equal"]},
+    **{f"cprfrac_u8_cached_{marker}":
+       ("management.CopyRaster", [RASTER / "copy_fraction/cached_u8.tif"], ["","",str(marker),"","","8_BIT_UNSIGNED"])
+       for marker in [126.75,127.25]},
+    **{f"cprfrac_u8_edge_{marker}":
+       ("management.CopyRaster", [RASTER / "composite_matrix/nd_u8.tif"], ["","",str(marker),"","","8_BIT_UNSIGNED"])
+       for marker in [255.25,-0.25]},
+    **{f"cprfrac_i16_edge_{marker}":
+       ("management.CopyRaster", [RASTER / "composite_matrix/nd_f32.tif"], ["","",str(marker),"","","16_BIT_SIGNED"])
+       for marker in [-32768.25,-32768.5,-32768.75,32767.25,32767.5,32767.75]},
+    **{f"cprfrac_u8_zero_{name}":
+       ("management.CopyRaster", [RASTER / "composite_matrix/nd_u8.tif"], ["","",value,"","","8_BIT_UNSIGNED"])
+       for name,value in [("negative","-0.0"),("positive","0.0")]},
     **{f"cpru32_{marker}_{cache}":
        ("management.CopyRaster", [RASTER / f"copy_u32/nd_{marker}_{cache}.tif"], [])
        for marker in [0,1,2147483647,2147483648,2147483649,4294967294,4294967295]

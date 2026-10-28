@@ -1,8 +1,8 @@
 # Current handoff
 
-Updated 2026-10-28T12:17:11.094680+00:00; last agent Codex.
-Workspace `/mnt/media/ArcGIS_Linux`; `main`; parent HEAD48d99ae PUSHED/verified
-48d99ae401c20ac02e9d4a5e5117d5494205c82d. User authorizes continuous tested commits,
+Updated 2026-10-28T13:26:45.604165+00:00; last agent Codex.
+Workspace `/mnt/media/ArcGIS_Linux`; `main`; HEAD002a79b PUSHED/verified remote
+002a79b2d1bcd0a69616f551b00c55d5e7a57e67. User authorizes continuous tested commits,
 pushes and dashboard updates. Work alone; no agents/CLIs/coordinators. Cargo-j3,
 sequential builds; mandatory normal hooks; no local full app CI for root edits.
 
@@ -14,7 +14,7 @@ Latest published gate188 Rust/5ignored/8Python/fmt/clippy. Earlier logs in /tmp.
 Native safe in-place Copy Raster extension retained; ArcGIS scratch same-path probe
 failed999999/replaced pixels with NoData. Difference/probes committed, not reproduced.
 
-## Current validated slice (commit/push next)
+## Completed 002a79b slice (PUSHED)
 
 48 new cpru32_*/cprtag_*/cprnd_* refs;17 U32 snapshots +7 genuine ArcGIS PAM caches.
 U32 high default markers signed32; U32 destination rounds negative defaults toF32,
@@ -60,8 +60,8 @@ durable format findings in docs/formats/raster-statistics.md.
 
 ## Next actions
 
-1. Explicit-path commit validated slice, normal push with mandatory hook; verify
-   remote SHA; checkpoint completion. No builds/pushes currently running.
+1. 002a79b committed/pushed with normal hook PASS190 Rust/5ignored/8Python/fmt/clippy;
+   remote verified. No builds/pushes currently running.
 2. Continue explicit fractional Copy Raster NoData normalization: saved probe
    -9999.5 to I16 expects-10000; native still truncates. Probe .25/.5/.75 and positive/
    negative ties on private files before choosing rounding; source-default and
@@ -75,3 +75,30 @@ durable format findings in docs/formats/raster-statistics.md.
 NOTES.md DO NOT READ/add; .worktrees/ untouched. Inherited geoproc/LineSta_roads1.*
 excluded scratch. Own LineSta_roads2 removed. Post-commit dashboard/handoff dirt
 expected. No reset/stash/worktree transfers.
+
+## Fractional NoData follow-up COMPLETE, committing now
+
+44 new cprfrac_* golden cases; exact type/grid/tag/all-cell/stored-stat comparisons
+all PASS. Markers ties-even, integer pixels floor(value+0.5), rounded signed range
+checks, cached normalized-equal markers preserve caches. Negative unsigned fractions
+keep raw TIFF tag separately from rounded logical statistics marker and old source
+payload. Opt-in WriteOptions.nodata_tag passed through registry/CLI; format default
+unchanged. Native/GDAL classic/BigTIFF override regression added. Source/fixtures:
+extract.rs/registry.rs/writer.rs, CLI main/reference harness, raster/copy_fraction,
+scripts/research/copy_raster/fraction. Documentation/generator/dashboard updated.
+
+Validation on these edits:
+- Build PASS /tmp/unigis-copy-fraction-build2.log.
+- All44 exact oracle comparisons PASS /tmp/unigis-copy-fraction-after2.log.
+- scripts/check PASS exit0 /tmp/unigis-copy-fraction-check.log:191 Rust passed,
+  5ignored,0failed;8Python;fmt;all-target workspace clippy-Dwarnings-j3.
+- Dashboard --ci PASS /tmp/unigis-copy-fraction-dashboard.log, extracted JS
+  node --check, Python py_compile and git diff --check PASS.
+- Initial comparison31/39 failed, candidate42/44 passed, raw-tag override fixeslast2.
+- Seven extra private controls confirm raw negative default/explicit U8 tags and
+  lack of extra raw-argument pixel masking; saved JSON/probes in fraction research.
+
+Next: commit explicit paths, normal push with required hook; verify remote SHA.
+Then investigate documented partial/stale Copy Raster caches on PRIVATE files.
+No Cargo builds currently running; next push hook runs the gate sequentially.
+No agents/coordinator launched. Preserve unrelated files above.

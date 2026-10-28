@@ -40,3 +40,10 @@ sidecar-placement check. Native/GDAL format tests cover band metadata, PAM
 precedence, classic TIFF and tiled BigTIFF. Median/covariance/histogram computation
 and wholesale ancillary metadata preservation are not implemented; existing
 cached statistics fields are retained when copied.
+
+Copy Raster can store a physical NoData tag that differs from the marker used for
+its cached statistics. U8 arguments -0.25/-0.5 retain that raw TIFF tag but exclude
+rounded0 from statistics; the original127 sentinel becomes ordinary data. The6
+raw cells are valid by the tag, while COUNT is5. WriteOptions.nodata_tag provides
+an opt-in physical override without changing logical sample encoding or cache
+computation. See [fractional controls](../../scripts/research/copy_raster/fraction/README.md).

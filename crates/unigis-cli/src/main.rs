@@ -6336,9 +6336,15 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
         } else {
             unigis_raster::stats_metadata::for_raster(&out.raster)
         };
-        write_raster_with_metadata(Path::new(&output), &out.raster, false, metadata)
+        write_raster_with_tags(
+            Path::new(&output),
+            &out.raster,
+            false,
+            metadata,
+            out.nodata_tag,
+        )
     } else {
-        write_raster_with(Path::new(&output), &out.raster, true)
+        write_raster_with_tags(Path::new(&output), &out.raster, true, None, out.nodata_tag)
     }
 }
 
@@ -6683,6 +6689,16 @@ fn write_raster_with_metadata(
     statistics: bool,
     gdal_metadata: Option<String>,
 ) -> Result<()> {
+    write_raster_with_tags(path, raster, statistics, gdal_metadata, None)
+}
+
+fn write_raster_with_tags(
+    path: &Path,
+    raster: &unigis_raster::Raster,
+    statistics: bool,
+    gdal_metadata: Option<String>,
+    nodata_tag: Option<f64>,
+) -> Result<()> {
     let compression = if raster.data_type.is_float() {
         unigis_raster::Compression::None
     } else {
@@ -6696,6 +6712,7 @@ fn write_raster_with_metadata(
             tile: Some((128, 128)),
             zero_out_of_range_nodata: true,
             gdal_metadata,
+            nodata_tag,
             ..Default::default()
         },
     )?;
