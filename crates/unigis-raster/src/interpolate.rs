@@ -301,3 +301,105 @@ pub fn trend(
     }
     Some(out)
 }
+
+/// A point-statistics neighborhood in map units.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum PointNeighborhood {
+    Circle(f64),
+    Rectangle(f64, f64),
+    Annulus(f64, f64),
+}
+
+/// Statistics of Point Statistics.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PointStatistic {
+    Mean,
+    Maximum,
+    Minimum,
+    Range,
+    Std,
+    Sum,
+}
+
+/// Point Statistics: for each cell the statistic of the values of the points inside the
+/// neighborhood around its centre (NoData where there are none). The grid starts
+/// `(w + h) / 798` below and left of the points' extent and has round((w + 2 off) / cell)
+/// columns and round((h + 2 off) / cell) rows (observed).
+pub fn point_statistics(
+    samples: &[Sample],
+    cell: f64,
+    neighborhood: PointNeighborhood,
+    stat: PointStatistic,
+    epsg: Option<u32>,
+) -> Option<Raster> {
+    let samples: Vec<Sample> = samples
+        .iter()
+        .copied()
+        .filter(|s| s.x.is_finite() && s.y.is_finite() && s.z.is_finite())
+        .collect();
+    if samples.is_empty() || !(cell > 0.0) {
+        return None;
+    }
+    let (mut x0, mut y0, mut x1, mut y1) = (f64::MAX, f64::MAX, f64::MIN, f64::MIN);
+    for s in &samples {
+        x0 = x0.min(s.x);
+        y0 = y0.min(s.y);
+        x1 = x1.max(s.x);
+        y1 = y1.max(s.y);
+    }
+    let (w, h) = (x1 - x0, y1 - y0);
+    let offset = (w + h) / 798.0;
+    let (gx, gy) = (x0 - offset, y0 - offset);
+    // The extent grown by the offset on both sides, in whole cells (rounded).
+    let cols = (((w + 2.0 * offset) / cell).round() as usize).max(1);
+    let rows = (((h + 2.0 * offset) / cell).round() as usize).max(1);
+    let transform = [gx, cell, 0.0, gy + rows as f64 * cell, 0.0, -cell];
+    let nodata = f32::MIN as f64;
+    let mut out = Raster::new(cols, rows, DataType::F32, transform);
+    out.epsg = epsg;
+    out.nodata = Some(nodata);
+    for row in 0..rows {
+        let y = transform[3] - (row as f64 + 0.5) * cell;
+        for col in 0..cols {
+            let x = gx + (col as f64 + 0.5) * cell;
+            let vals: Vec<f64> = samples
+                .iter()
+                .filter(|s| {
+                    let (dx, dy) = ((s.x - x).abs(), (s.y - y).abs());
+                    match neighborhood {
+                        PointNeighborhood::Circle(r) => dx.hypot(dy) <= r,
+                        PointNeighborhood::Rectangle(a, b) => dx <= a / 2.0 && dy <= b / 2.0,
+                        PointNeighborhood::Annulus(a, b) => {
+                            let d = dx.hypot(dy);
+                            d >= a && d <= b
+                        }
+                    }
+                })
+                .map(|s| s.z)
+                .collect();
+            let v = if vals.is_empty() {
+                nodata
+            } else {
+                let n = vals.len() as f64;
+                let sum: f64 = vals.iter().sum();
+                let v = match stat {
+                    PointStatistic::Sum => sum,
+                    PointStatistic::Mean => sum / n,
+                    PointStatistic::Maximum => vals.iter().copied().fold(f64::MIN, f64::max),
+                    PointStatistic::Minimum => vals.iter().copied().fold(f64::MAX, f64::min),
+                    PointStatistic::Range => {
+                        vals.iter().copied().fold(f64::MIN, f64::max)
+                            - vals.iter().copied().fold(f64::MAX, f64::min)
+                    }
+                    PointStatistic::Std => {
+                        let mean = sum / n;
+                        (vals.iter().map(|v| (v - mean).powi(2)).sum::<f64>() / n).sqrt()
+                    }
+                };
+                DataType::F32.store(v)
+            };
+            out.bands[0][row * cols + col] = v;
+        }
+    }
+    Some(out)
+}

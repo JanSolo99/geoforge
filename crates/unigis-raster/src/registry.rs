@@ -881,6 +881,67 @@ fn extract_multi_unsupported(_: &dyn Context) -> Result<Output> {
     ))
 }
 
+fn point_statistics(ctx: &dyn Context) -> Result<Output> {
+    use crate::interpolate::{PointNeighborhood, PointStatistic};
+    let field = ctx.get("field").unwrap_or_default();
+    let (samples, epsg) = ctx.point_samples("input", &field)?;
+    let cell: f64 = ctx
+        .get("cell_size")
+        .and_then(|v| v.trim().parse().ok())
+        .ok_or_else(|| {
+            Error::Unsupported("ERROR 000735: Output cell size: value is required".into())
+        })?;
+    let text = ctx.get("neighborhood").unwrap_or_default();
+    let parts: Vec<&str> = text.split_whitespace().collect();
+    let unit = parts.last().copied().unwrap_or("").to_ascii_uppercase();
+    let scale = match unit.as_str() {
+        "MAP" => 1.0,
+        "CELL" => cell,
+        _ => {
+            return Err(Error::Unsupported(format!(
+                "ERROR 000094: Neighborhood: '{text}' is not understood"
+            )));
+        }
+    };
+    let num = |i: usize| parts.get(i).and_then(|v| v.parse::<f64>().ok());
+    let neighborhood = match parts.first().map(|p| p.to_ascii_uppercase()).as_deref() {
+        Some("CIRCLE") => PointNeighborhood::Circle(num(1).unwrap_or(0.0) * scale),
+        Some("RECTANGLE") => PointNeighborhood::Rectangle(
+            num(1).unwrap_or(0.0) * scale,
+            num(2).unwrap_or(0.0) * scale,
+        ),
+        Some("ANNULUS") => {
+            PointNeighborhood::Annulus(num(1).unwrap_or(0.0) * scale, num(2).unwrap_or(0.0) * scale)
+        }
+        _ => {
+            return Err(Error::Unsupported(format!(
+                "ERROR 000094: Neighborhood: '{text}' is not understood"
+            )));
+        }
+    };
+    let stat = match ctx
+        .get("statistic")
+        .unwrap_or_else(|| "MEAN".into())
+        .to_ascii_uppercase()
+        .as_str()
+    {
+        "MEAN" => PointStatistic::Mean,
+        "MAXIMUM" => PointStatistic::Maximum,
+        "MINIMUM" => PointStatistic::Minimum,
+        "RANGE" => PointStatistic::Range,
+        "STD" => PointStatistic::Std,
+        "SUM" => PointStatistic::Sum,
+        other => {
+            return Err(Error::Unsupported(format!(
+                "ERROR 000067: Statistic: {other} is not supported"
+            )));
+        }
+    };
+    let raster = crate::interpolate::point_statistics(&samples, cell, neighborhood, stat, epsg)
+        .ok_or_else(|| Error::Unsupported("ERROR 000735: no points".into()))?;
+    with_statistics(raster, true)
+}
+
 fn flip(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::extract::flip(&ctx.raster("input")?), true)
 }
@@ -1588,6 +1649,48 @@ pub static TOOLS: &[Tool] = &[
             ),
         ],
         run: extract_multi_unsupported,
+    },
+    Tool {
+        id: "point_statistics",
+        name: "Point Statistics",
+        summary: "Statistics of point values within a neighborhood of each cell.",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Point Features",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            Param {
+                name: "field",
+                label: "Field",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            Param {
+                name: "cell_size",
+                label: "Output Cell Size",
+                kind: Kind::Number,
+                required: true,
+                default: "",
+            },
+            Param {
+                name: "neighborhood",
+                label: "Neighborhood",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            option(
+                "statistic",
+                "Statistics Type",
+                &["MEAN", "MAXIMUM", "MINIMUM", "RANGE", "STD", "SUM"],
+                "MEAN",
+            ),
+        ],
+        run: point_statistics,
     },
     Tool {
         id: "flip",

@@ -60300,6 +60300,214 @@
           "interpolate": "BILINEAR"
         }
       }
+    },
+    "ps_wells_mean": {
+      "tool": "gp.PointStatistics_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "DEPTH",
+        "<out>",
+        50,
+        "Circle 100 MAP",
+        "MEAN"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "point_statistics",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "field": "DEPTH",
+          "output": "<out>",
+          "cell_size": 50,
+          "neighborhood": "Circle 100 MAP",
+          "statistic": "MEAN"
+        }
+      }
+    },
+    "ps_wells_sum": {
+      "tool": "gp.PointStatistics_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "DEPTH",
+        "<out>",
+        25,
+        "Circle 60 MAP",
+        "SUM"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "point_statistics",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "field": "DEPTH",
+          "output": "<out>",
+          "cell_size": 25,
+          "neighborhood": "Circle 60 MAP",
+          "statistic": "SUM"
+        }
+      }
+    },
+    "ps_wells_max": {
+      "tool": "gp.PointStatistics_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "DEPTH",
+        "<out>",
+        50,
+        "Circle 4 CELL",
+        "MAXIMUM"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "point_statistics",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "field": "DEPTH",
+          "output": "<out>",
+          "cell_size": 50,
+          "neighborhood": "Circle 4 CELL",
+          "statistic": "MAXIMUM"
+        }
+      }
+    },
+    "ps_wells_min": {
+      "tool": "gp.PointStatistics_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "DEPTH",
+        "<out>",
+        50,
+        "Rectangle 150 100 MAP",
+        "MINIMUM"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "point_statistics",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "field": "DEPTH",
+          "output": "<out>",
+          "cell_size": 50,
+          "neighborhood": "Rectangle 150 100 MAP",
+          "statistic": "MINIMUM"
+        }
+      }
+    },
+    "ps_wells_range": {
+      "tool": "gp.PointStatistics_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "DEPTH",
+        "<out>",
+        40,
+        "Annulus 20 90 MAP",
+        "RANGE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "point_statistics",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "field": "DEPTH",
+          "output": "<out>",
+          "cell_size": 40,
+          "neighborhood": "Annulus 20 90 MAP",
+          "statistic": "RANGE"
+        }
+      }
+    },
+    "ps_wells_std": {
+      "tool": "gp.PointStatistics_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "DEPTH",
+        "<out>",
+        50,
+        "Circle 120 MAP",
+        "STD"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "point_statistics",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "field": "DEPTH",
+          "output": "<out>",
+          "cell_size": 50,
+          "neighborhood": "Circle 120 MAP",
+          "statistic": "STD"
+        }
+      }
+    },
+    "ps_pour_mean": {
+      "tool": "gp.PointStatistics_sa",
+      "args": [
+        "testdata/geoproc/pour_pts.shp",
+        "PP_ID",
+        "<out>",
+        100,
+        "Circle 300 MAP",
+        "MEAN"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "point_statistics",
+        "params": {
+          "input": "testdata/geoproc/pour_pts.shp",
+          "field": "PP_ID",
+          "output": "<out>",
+          "cell_size": 100,
+          "neighborhood": "Circle 300 MAP",
+          "statistic": "MEAN"
+        }
+      }
+    },
+    "ps_wells_rect_cell": {
+      "tool": "gp.PointStatistics_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "DEPTH",
+        "<out>",
+        30,
+        "Rectangle 3 5 CELL",
+        "MEAN"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "point_statistics",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "field": "DEPTH",
+          "output": "<out>",
+          "cell_size": 30,
+          "neighborhood": "Rectangle 3 5 CELL",
+          "statistic": "MEAN"
+        }
+      }
     }
   }
 }

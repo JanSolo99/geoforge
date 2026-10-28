@@ -88,6 +88,8 @@ Tested offline (`test_daemon_runs_inbox_tasks_commands_pause_and_keepalive`); no
 
 - Extract Multi Values To Points (`extract_multi_values_to_points`, `emv_*` pass; `run_extract_multi_values` + shared `sample_value` in the CLI): adds one field per raster (name given or file stem, 10 chars; Single for F32, Double for F64, Integer for integer rasters unless BILINEAR, which makes them Single) with the Sample values; in the reference test its interpolated singles are compared to 3e-6 relative because ArcGIS's single-precision arithmetic differs in the sixth digit (feature 9 of the hydro case, 86.7259 vs 86.726).
 
+- Point Statistics (`point_statistics`, `ps_*` pass; closes the old "Point Statistics offset" gap): grid origin = points' extent minus (w+h)/798 in both x and y (fits 4 point sets), columns/rows = round((w + 2 off)/cell), (h + 2 off)/cell); cell value = MEAN/MAXIMUM/MINIMUM/RANGE/STD(population)/SUM of the points whose distance to the cell centre is inside the Circle/Rectangle/Annulus (MAP or CELL units); F32, NoData -FLT_MAX where no point. Default cell size not probed.
+
 ## Next actions
 
 1. Keep going in probe -> implement -> reference-test batches (see "Session 2026-10-26" entries for what is done and the gaps).
