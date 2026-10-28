@@ -392,6 +392,79 @@ pub fn generalize(input: &dyn FeatureClass, tolerance: f64) -> Result<ToolOutput
     })
 }
 
+/// Generate Tessellation (SQUARE): square cells of `area` whose first cell is centred on the
+/// extent's lower-left corner, as many columns and rows as are needed for the cells' edges to
+/// pass the extent's upper-right corner. `GRID_ID` is `<column letters>-<row from the top>`; the
+/// cells are listed from the bottom row up, left to right, each ring clockwise from the top
+/// right (observed).
+pub fn generate_tessellation_squares(
+    extent: [f64; 4],
+    area: f64,
+    wkt: Option<String>,
+) -> Result<ToolOutput> {
+    if !(area.is_finite() && area > 0.0) || !(extent[2] > extent[0] && extent[3] > extent[1]) {
+        return Err(err(
+            "ERROR 000800: the size and the extent must be positive",
+        ));
+    }
+    let side = area.sqrt();
+    let count = |span: f64| ((span - side / 2.0) / side).ceil().max(0.0) as usize + 1;
+    let (cols, rows) = (count(extent[2] - extent[0]), count(extent[3] - extent[1]));
+    if cols.saturating_mul(rows) > 5_000_000 {
+        return Err(err("ERROR 000800: too many cells"));
+    }
+    let letters = |mut n: usize| {
+        let mut s = Vec::new();
+        loop {
+            s.push(b'A' + (n % 26) as u8);
+            if n < 26 {
+                break;
+            }
+            n = n / 26 - 1;
+        }
+        s.reverse();
+        String::from_utf8(s).unwrap_or_default()
+    };
+    let mut grid_id = Field::new("GRID_ID", FieldType::String);
+    grid_id.length = 12;
+    let mut features = Vec::with_capacity(cols * rows);
+    for r in 0..rows {
+        let cy = extent[1] + r as f64 * side;
+        for c in 0..cols {
+            let cx = extent[0] + c as f64 * side;
+            let h = side / 2.0;
+            let ring = vec![
+                [cx + h, cy + h],
+                [cx + h, cy - h],
+                [cx - h, cy - h],
+                [cx - h, cy + h],
+                [cx + h, cy + h],
+            ];
+            let mut g = unigis_geometry::paths_geometry(vec![ring]);
+            if let Some(g) = &mut g {
+                g.kind = GeometryKind::Polygon;
+            }
+            features.push(Feature {
+                oid: features.len() as i64,
+                geometry: g,
+                attributes: vec![
+                    Value::Integer(0),
+                    Value::String(format!("{}-{}", letters(c), rows - r)),
+                ],
+            });
+        }
+    }
+    Ok(ToolOutput {
+        kind: GeometryKind::Polygon,
+        has_z: false,
+        has_m: false,
+        fields: vec![id_field(), grid_id],
+        spatial_reference_wkt: wkt,
+        features,
+        messages: Vec::new(),
+    })
+}
+
 /// What Create Fishnet needs: the origin, the second point of the y-axis and either the cell size
 /// with the cell counts or an opposite corner with them.
 #[derive(Debug, Clone, Copy)]

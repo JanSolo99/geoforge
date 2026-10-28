@@ -64478,6 +64478,271 @@
           "background_value": 7
         }
       }
+    },
+    "tess_sq_a": {
+      "tool": "management.GenerateTessellation",
+      "args": [
+        "<out>",
+        "500000 5000000 500400 5000300",
+        "SQUARE",
+        "100 SquareMeters",
+        "testdata/geoproc/parcels.shp"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "GRID_ID",
+          "String",
+          12,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "generate_tessellation",
+        "params": {
+          "output": "<out>",
+          "extent": "500000 5000000 500400 5000300",
+          "shape": "SQUARE",
+          "size": "100 SquareMeters",
+          "template": "testdata/geoproc/parcels.shp"
+        }
+      }
+    },
+    "tess_sq_b": {
+      "tool": "management.GenerateTessellation",
+      "args": [
+        "<out>",
+        "500000 5000000 500413 5000277",
+        "SQUARE",
+        "100 SquareMeters",
+        "testdata/geoproc/parcels.shp"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "GRID_ID",
+          "String",
+          12,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "generate_tessellation",
+        "params": {
+          "output": "<out>",
+          "extent": "500000 5000000 500413 5000277",
+          "shape": "SQUARE",
+          "size": "100 SquareMeters",
+          "template": "testdata/geoproc/parcels.shp"
+        }
+      }
+    },
+    "tess_sq_c": {
+      "tool": "management.GenerateTessellation",
+      "args": [
+        "<out>",
+        "500037 5000011 500390 5000333",
+        "SQUARE",
+        "100 SquareMeters",
+        "testdata/geoproc/parcels.shp"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "GRID_ID",
+          "String",
+          12,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "generate_tessellation",
+        "params": {
+          "output": "<out>",
+          "extent": "500037 5000011 500390 5000333",
+          "shape": "SQUARE",
+          "size": "100 SquareMeters",
+          "template": "testdata/geoproc/parcels.shp"
+        }
+      }
+    },
+    "tess_sq_d": {
+      "tool": "management.GenerateTessellation",
+      "args": [
+        "<out>",
+        "500037 5000011 500390 5000333",
+        "SQUARE",
+        "2500 SquareMeters",
+        "testdata/geoproc/parcels.shp"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "GRID_ID",
+          "String",
+          12,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "generate_tessellation",
+        "params": {
+          "output": "<out>",
+          "extent": "500037 5000011 500390 5000333",
+          "shape": "SQUARE",
+          "size": "2500 SquareMeters",
+          "template": "testdata/geoproc/parcels.shp"
+        }
+      }
+    },
+    "tess_sq_e": {
+      "tool": "management.GenerateTessellation",
+      "args": [
+        "<out>",
+        "500100 5000200 501000 5000500",
+        "SQUARE",
+        "10000 SquareMeters",
+        "testdata/geoproc/parcels.shp"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "GRID_ID",
+          "String",
+          12,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "generate_tessellation",
+        "params": {
+          "output": "<out>",
+          "extent": "500100 5000200 501000 5000500",
+          "shape": "SQUARE",
+          "size": "10000 SquareMeters",
+          "template": "testdata/geoproc/parcels.shp"
+        }
+      }
     }
   }
 }

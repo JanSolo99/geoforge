@@ -1609,6 +1609,11 @@ CASES = {
     "bmask_dem": ("gp.CreateBinaryMask_ia", [RASTER / "dem.tif"], []),
     "bmask_nodata": ("gp.CreateBinaryMask_ia", [RASTER / "dem_nodata.tif"], []),
     "bmask_patches": ("gp.CreateBinaryMask_ia", [RASTER / "patches_i16.tif"], [7]),
+    "tess_sq_a": ("management.GenerateTessellation", [], ["500000 5000000 500400 5000300", "SQUARE", "100 SquareMeters", str(DATA / "parcels.shp")]),
+    "tess_sq_b": ("management.GenerateTessellation", [], ["500000 5000000 500413 5000277", "SQUARE", "100 SquareMeters", str(DATA / "parcels.shp")]),
+    "tess_sq_c": ("management.GenerateTessellation", [], ["500037 5000011 500390 5000333", "SQUARE", "100 SquareMeters", str(DATA / "parcels.shp")]),
+    "tess_sq_d": ("management.GenerateTessellation", [], ["500037 5000011 500390 5000333", "SQUARE", "2500 SquareMeters", str(DATA / "parcels.shp")]),
+    "tess_sq_e": ("management.GenerateTessellation", [], ["500100 5000200 501000 5000500", "SQUARE", "10000 SquareMeters", str(DATA / "parcels.shp")]),
     "gpal_roads_50": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "NO_END_POINTS"]),
     "gpal_roads_50_end": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "END_POINTS"]),
     "gpal_roads_pct": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["PERCENTAGE", "", 25, "NO_END_POINTS"]),
@@ -1819,6 +1824,7 @@ RUN = {
     "gp.Over_ia": ("over", ["in1", "in2", "output"]),
     "gp.ComputeChangeRaster_ia": ("compute_change_raster", ["from_raster", "to_raster", "output", "change_type"]),
     "gp.CreateBinaryMask_ia": ("create_binary_mask", ["input", "output", "background_value"]),
+    "management.GenerateTessellation": ("generate_tessellation", ["output", "extent", "shape", "size", "template"]),
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
     "analysis.CountOverlappingFeatures": ("count_overlapping_features", ["input", "output", "minimum_overlap_count"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
@@ -1950,7 +1956,7 @@ def main():
             out = OUT / name
             out.mkdir()
             args = [str(a) for a in before] + [str(out)] + [str(a) if isinstance(a, Path) else a for a in after]
-        elif tool in ("cartography.GridIndexFeatures", "gp.CreateConstantRaster_sa"):
+        elif tool in ("cartography.GridIndexFeatures", "gp.CreateConstantRaster_sa", "management.GenerateTessellation"):
             args = [str(out)] + [str(a) if isinstance(a, Path) else a for a in before + after]
         elif tool in IN_PLACE:
             k = IN_PLACE[tool]

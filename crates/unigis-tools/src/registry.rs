@@ -459,6 +459,38 @@ fn create_fishnet(ctx: &dyn Context) -> Result<ToolOutput> {
     construct::create_fishnet(&f, wkt)
 }
 
+fn generate_tessellation(ctx: &dyn Context) -> Result<ToolOutput> {
+    let t = find("generate_tessellation")
+        .ok_or_else(|| Error::Unsupported("generate_tessellation".into()))?;
+    let shape = text(ctx, t, "shape").unwrap_or_else(|| "HEXAGON".into());
+    if !shape.eq_ignore_ascii_case("SQUARE") {
+        return Err(Error::Unsupported(format!(
+            "tessellation shape {shape} is not supported yet (SQUARE only)"
+        )));
+    }
+    let nums: Vec<f64> = text(ctx, t, "extent")
+        .unwrap_or_default()
+        .split_whitespace()
+        .filter_map(|v| v.parse().ok())
+        .collect();
+    let [x0, y0, x1, y1] = nums[..] else {
+        return Err(Error::Unsupported(
+            "ERROR 000735: Extent: four numbers (xmin ymin xmax ymax) are required".into(),
+        ));
+    };
+    let area: f64 = text(ctx, t, "size")
+        .and_then(|v| v.split_whitespace().next().and_then(|n| n.parse().ok()))
+        .ok_or_else(|| Error::Unsupported("ERROR 000735: Size: value is required".into()))?;
+    let wkt = match text(ctx, t, "template") {
+        Some(_) => ctx
+            .features("template")?
+            .spatial_reference_wkt()
+            .map(str::to_owned),
+        None => ctx.default_spatial_reference_wkt(),
+    };
+    construct::generate_tessellation_squares([x0, y0, x1, y1], area, wkt)
+}
+
 fn polygon_to_line(ctx: &dyn Context) -> Result<ToolOutput> {
     let t = find("polygon_to_line").ok_or_else(|| Error::Unsupported("polygon_to_line".into()))?;
     let fc = ctx.features("input")?;
@@ -1279,6 +1311,49 @@ pub static TOOLS: &[Tool] = &[
         output_suffix: "Generalized",
         measures: true,
         run: Runner::Features(generalize),
+    },
+    Tool {
+        id: "generate_tessellation",
+        name: "Generate Tessellation",
+        toolbox: "Data Management › Sampling",
+        summary: "Square cells over an extent (ArcGIS Pro Generate Tessellation, SQUARE).",
+        params: &[
+            Param {
+                name: "extent",
+                label: "Extent",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+                help: "xmin ymin xmax ymax.",
+            },
+            Param {
+                name: "shape",
+                label: "Shape Type",
+                kind: Kind::Choice(&["HEXAGON", "SQUARE", "TRIANGLE", "DIAMOND"]),
+                required: false,
+                default: "HEXAGON",
+                help: "",
+            },
+            Param {
+                name: "size",
+                label: "Size",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+                help: "The cell area, e.g. `100 SquareMeters`.",
+            },
+            Param {
+                name: "template",
+                label: "Spatial Reference From",
+                kind: Kind::Features,
+                required: false,
+                default: "",
+                help: "A layer whose coordinate system the cells take.",
+            },
+        ],
+        output_suffix: "Tessellation",
+        measures: true,
+        run: Runner::Features(generate_tessellation),
     },
     Tool {
         id: "create_fishnet",

@@ -133,3 +133,10 @@ Claude 2026-10-29: Create Binary Mask (basic: `create_binary_mask`, background_v
 background value, default 0), NoData 255 kept; ArcGIS embeds an EMPTY statistics cache in the TIFF (count 0, min 0, max 255, mean 0,
 stddev -1, median nan), reproduced in run_raster_tool. Flood fill / expand / min region size / BACKGROUND_NODATA not done.
 SAR tools (Convert SAR Units, Despeckle, ...) refuse non-radar inputs (ERROR 003514: radar metadata is missing): not testable here.
+
+Claude 2026-10-29: Generate Tessellation SQUARE (`generate_tessellation`, `tess_sq_*` 5 cases pass; `template` layer gives the coordinate
+system): size = cell AREA; first cell centred on the extent's lower-left; columns = ceil((w - s/2)/s) + 1, rows likewise; GRID_ID =
+`<letters from A, AA after Z>-<row from the top>`; cells listed bottom row first, left to right; rings clockwise from the top right;
+fields Id, GRID_ID. HEXAGON/TRIANGLE/DIAMOND/TRANSVERSE HEXAGON/H3 are NOT done: hexagon side = sqrt(area/(3*sqrt(3)/2)), flat-top,
+first hexagon centred at the extent corner, alternate columns raised half a hexagon height; diamond half-diagonal = sqrt(area/2) with
+rows offset half a cell; inclusion rules at the extent edges need more probing (counts for 400x300: hexagon 20, triangle 36, diamond 35).
