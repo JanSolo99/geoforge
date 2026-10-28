@@ -29,6 +29,7 @@ pub mod registry;
 pub mod resample;
 pub mod sample;
 pub mod stats;
+pub mod stats_metadata;
 pub mod surface;
 mod writer;
 pub mod zonal;

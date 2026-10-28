@@ -1,0 +1,188 @@
+[
+  {
+    "marker": 2147483648,
+    "cached": false,
+    "case": "f32",
+    "pixel_type": "F32",
+    "nodata": -2147483648.0,
+    "values": [
+      [
+        1.0,
+        -2147483648.0,
+        4294967296.0
+      ],
+      [
+        16777216.0,
+        4000000000.0,
+        3.0
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_MAXIMUM": "4294967296",
+      "STATISTICS_MEAN": "1662348903.2",
+      "STATISTICS_STDDEV": "2271013329.3772",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "5.157501542208762e+18"
+    }
+  },
+  {
+    "marker": 2147483648,
+    "cached": false,
+    "case": "i16",
+    "pixel_type": "S16",
+    "nodata": -2147483648.0,
+    "values": [
+      [
+        1,
+        32767,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_MAXIMUM": "32767",
+      "STATISTICS_MEAN": "21845.333333333",
+      "STATISTICS_STDDEV": "16919.773256952",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "286278727.0666667"
+    }
+  },
+  {
+    "marker": 2147483648,
+    "cached": true,
+    "case": "f32",
+    "pixel_type": "F32",
+    "nodata": -2147483648.0,
+    "values": [
+      [
+        1.0,
+        -2147483648.0,
+        4294967296.0
+      ],
+      [
+        16777216.0,
+        4000000000.0,
+        3.0
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_MAXIMUM": "4294967296",
+      "STATISTICS_MEAN": "1662348903.2",
+      "STATISTICS_STDDEV": "2271013329.3772",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "5.157501542208762e+18"
+    }
+  },
+  {
+    "marker": 2147483648,
+    "cached": true,
+    "case": "i16",
+    "pixel_type": "S16",
+    "nodata": -2147483648.0,
+    "values": [
+      [
+        1,
+        32767,
+        32767
+      ],
+      [
+        32767,
+        32767,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_MAXIMUM": "32767",
+      "STATISTICS_MEAN": "21845.333333333",
+      "STATISTICS_STDDEV": "16919.773256952",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "286278727.0666667"
+    }
+  },
+  {
+    "marker": 2147483649,
+    "cached": false,
+    "case": "f64",
+    "pixel_type": "F64",
+    "nodata": -2147483647.0,
+    "values": [
+      [
+        1.0,
+        2147483648.0,
+        4294967294.0
+      ],
+      [
+        16777217.0,
+        4000000000.0,
+        3.0
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_MAXIMUM": "4294967294",
+      "STATISTICS_MEAN": "1743204693.8333",
+      "STATISTICS_STDDEV": "2040888822.1729",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "4.165227184470389e+18"
+    }
+  },
+  {
+    "marker": 2147483649,
+    "cached": false,
+    "case": "i32",
+    "pixel_type": "S32",
+    "nodata": -2147483647.0,
+    "values": [
+      [
+        1,
+        2147483647,
+        2147483647
+      ],
+      [
+        16777217,
+        2147483647,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_MAXIMUM": "2147483647",
+      "STATISTICS_MEAN": "1076538027",
+      "STATISTICS_STDDEV": "1173178142.9898",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_EXCLUDEDVALUES": null,
+      "STATISTICS_COVARIANCES": "1.376346955189042e+18"
+    }
+  }
+]

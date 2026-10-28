@@ -16,16 +16,18 @@ Six cached/uncached pairs have identical pixels, grid, CRS and NoData tags:
 | unused | 3x2 F32 values | tag present, no matching pixel |
 | large_valid | 150x120 F32 DEM | no source tag |
 
-All uncached copies write statistics. Cached tagged copies omit statistics for
-every band, including the unused-marker and later-band controls. Cached untagged
-copies write statistics. Thus neither size nor testing only the first band's
+All uncached copies write PAM statistics. Cached tagged copies omit PAM for
+every band, including the unused-marker and later-band controls, and preserve
+the source cache in TIFF GDAL_METADATA instead. Cached untagged copies write PAM
+statistics. The initial observations inspected PAM only; later raw TIFF inspection
+corrected the interpretation that statistics were absent. Thus neither size nor testing only the first band's
 pixels explains the behavior.
 
 Eight conversion/override controls on the small pair show that changing type
 (F64 or I16) or changing the NoData marker (-9999) writes statistics even from
 cached input. Explicit F32 output retains the default policy. Two further
 controls explicitly set the original marker (-1.25), with/without the original
-F32 type: statistics remain omitted. Compare effective output metadata rather
+F32 type: PAM remains omitted; cached statistics are embedded. Compare effective output metadata rather
 than the mere presence of optional parameters.
 
 The six cached `.aux.xml` sidecars are original ArcGIS CalculateStatistics
@@ -45,7 +47,7 @@ export and extreme/fractional override mapping remain separate known gaps.
 
 Overwrite follow-up: `probe_overwrite.py` first copies the untagged DEM (count18000,
 mean238.346012569), then replaces the same output with small_cached. ArcGIS clears
-statistics (`overwrite_arcgis.jsonl`). Native CLI originally retained the previous
+the old statistics (`overwrite_arcgis.jsonl`). Native CLI originally retained the previous
 sidecar, despite the new 3x2 raster. The CLI GeoTIFF output helper now removes old
 PAM metadata after a successful write when statistics are omitted, ignoring an
 absent sidecar and reporting other IO errors. Invalid parameters still leave the

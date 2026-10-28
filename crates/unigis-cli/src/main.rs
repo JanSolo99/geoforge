@@ -6130,7 +6130,42 @@ fn expand_shrink(
         shrink(&r, n, &zones, method)
     }
     .map_err(|e| Error::Unsupported(e.0))?;
-    if method == Method::Distance {
+    if method == Method::Distance && grow {
+        // ArcGIS's statistics include the workspace extended n cells to the
+        // right and bottom, before cropping pixels to the original extent.
+        let width = r
+            .width
+            .checked_add(n)
+            .ok_or_else(|| Error::Unsupported("Expand statistics grid is too large".into()))?;
+        let height = r
+            .height
+            .checked_add(n)
+            .ok_or_else(|| Error::Unsupported("Expand statistics grid is too large".into()))?;
+        if width
+            .checked_mul(height)
+            .is_none_or(|v| v as u64 > unigis_raster::MAX_CELLS)
+        {
+            return Err(Error::Unsupported(
+                "Expand statistics grid is too large".into(),
+            ));
+        }
+        let mut padded = unigis_raster::Raster::new(width, height, r.data_type, r.transform);
+        padded.epsg = r.epsg;
+        padded.nodata = Some(r.nodata.unwrap_or(f64::NAN));
+        padded.bands[0].fill(padded.nodata.unwrap_or(f64::NAN));
+        for row in 0..r.height {
+            let start = row * width;
+            padded.bands[0][start..start + r.width]
+                .copy_from_slice(&r.bands[0][row * r.width..(row + 1) * r.width]);
+        }
+        let expanded = expand(&padded, n, &zones, method).map_err(|e| Error::Unsupported(e.0))?;
+        write_raster_with_metadata(
+            out_raster,
+            &out,
+            false,
+            unigis_raster::stats_metadata::for_raster(&expanded),
+        )
+    } else if method == Method::Distance {
         write_raster_plain(out_raster, &out)
     } else {
         write_raster(out_raster, &out)
@@ -6149,6 +6184,7 @@ fn eight_neighbors(s: &str) -> Result<bool> {
 /// `ug run` for a tool of the raster registry: `name=value` pairs, rasters as GeoTIFF paths.
 fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Result<()> {
     use unigis_raster::registry;
+    use unigis_raster::registry::Context as _;
     let mut map = std::collections::HashMap::new();
     for a in args {
         let (k, v) = a
@@ -6258,7 +6294,8 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
     if spec.id == "extract_multi_values_to_points" {
         return run_extract_multi_values(&Args(map), &output);
     }
-    let out = registry::run(spec, &Args(map))?;
+    let parameters = Args(map);
+    let out = registry::run(spec, &parameters)?;
     if spec.id == "raster_to_float" {
         let path = Path::new(&output);
         std::fs::write(path, unigis_raster::conversion::to_float(&out.raster))
@@ -6280,8 +6317,28 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
         unigis_raster::stats::write_aux_statistics_with_empty(Path::new(&output), &out.raster)
     } else if out.zero_count {
         write_raster_basin(Path::new(&output), &out.raster)
+    } else if !out.statistics {
+        let metadata = if spec.id == "copy_raster" {
+            if let Some(input) = parameters.get("input") {
+                let mut stored = unigis_raster::stats_metadata::read(Path::new(&input))?;
+                for band in &mut stored {
+                    if !band.is_empty() {
+                        // ArcGIS exports zero for a missing cached count; keep
+                        // the supplied moments instead of recalculating them.
+                        band.entry("STATISTICS_COUNT".into())
+                            .or_insert_with(|| "0.000000".into());
+                    }
+                }
+                unigis_raster::stats_metadata::encode(&stored)
+            } else {
+                None
+            }
+        } else {
+            unigis_raster::stats_metadata::for_raster(&out.raster)
+        };
+        write_raster_with_metadata(Path::new(&output), &out.raster, false, metadata)
     } else {
-        write_raster_with(Path::new(&output), &out.raster, out.statistics)
+        write_raster_with(Path::new(&output), &out.raster, true)
     }
 }
 
@@ -6559,10 +6616,15 @@ fn write_raster(path: &Path, raster: &unigis_raster::Raster) -> Result<()> {
     write_raster_with(path, raster, true)
 }
 
-/// For the tools whose ArcGIS output carries no statistics (Euclidean Distance, Fill,
-/// Flow Direction, Reclassify, Stream Link, Watershed, Zonal Statistics).
+/// For tools whose ArcGIS statistics are embedded in TIFF rather than a PAM sidecar
+/// (Euclidean Distance, Fill, Flow Direction, Reclassify, Stream Link, Watershed, Zonal Statistics).
 fn write_raster_plain(path: &Path, raster: &unigis_raster::Raster) -> Result<()> {
-    write_raster_with(path, raster, false)
+    write_raster_with_metadata(
+        path,
+        raster,
+        false,
+        unigis_raster::stats_metadata::for_raster(raster),
+    )
 }
 
 /// ArcGIS's Basin writes statistics whose cell count is 0.
@@ -6612,6 +6674,15 @@ fn define_raster_projection(input: &Path, output: &Path, coordinate_system: &str
 }
 
 fn write_raster_with(path: &Path, raster: &unigis_raster::Raster, statistics: bool) -> Result<()> {
+    write_raster_with_metadata(path, raster, statistics, None)
+}
+
+fn write_raster_with_metadata(
+    path: &Path,
+    raster: &unigis_raster::Raster,
+    statistics: bool,
+    gdal_metadata: Option<String>,
+) -> Result<()> {
     let compression = if raster.data_type.is_float() {
         unigis_raster::Compression::None
     } else {
@@ -6624,21 +6695,20 @@ fn write_raster_with(path: &Path, raster: &unigis_raster::Raster, statistics: bo
             compression,
             tile: Some((128, 128)),
             zero_out_of_range_nodata: true,
+            gdal_metadata,
             ..Default::default()
         },
     )?;
+    // A completed replacement must not inherit old PAM overrides, including
+    // when an all-NoData output has no new statistics to write.
+    let aux = std::path::PathBuf::from(format!("{}.aux.xml", path.display()));
+    if let Err(error) = std::fs::remove_file(&aux)
+        && error.kind() != std::io::ErrorKind::NotFound
+    {
+        return Err(Error::io(&aux, error));
+    }
     if statistics {
         unigis_raster::stats::write_aux_statistics(path, raster)?;
-    } else {
-        // A replacement must not inherit the previous raster's cached range,
-        // counts or SRS from its PAM sidecar. Validate and write the new TIFF
-        // before removing anything, including for an in-place copy.
-        let aux = std::path::PathBuf::from(format!("{}.aux.xml", path.display()));
-        if let Err(error) = std::fs::remove_file(&aux)
-            && error.kind() != std::io::ErrorKind::NotFound
-        {
-            return Err(Error::io(&aux, error));
-        }
     }
     println!(
         "Wrote {} ({}x{})",

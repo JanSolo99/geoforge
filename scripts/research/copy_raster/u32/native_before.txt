@@ -1,0 +1,49 @@
+cpru32_0_cached ['statistics presence differs', 'STATISTICS_COUNT differs', 'STATISTICS_MINIMUM differs', 'STATISTICS_MAXIMUM differs', 'STATISTICS_MEAN differs', 'STATISTICS_STDDEV differs']
+cpru32_0_uncached PASS
+cpru32_1_cached ['statistics presence differs', 'STATISTICS_COUNT differs', 'STATISTICS_MINIMUM differs', 'STATISTICS_MAXIMUM differs', 'STATISTICS_MEAN differs', 'STATISTICS_STDDEV differs']
+cpru32_1_uncached PASS
+cpru32_2147483647_cached ['statistics presence differs', 'STATISTICS_COUNT differs', 'STATISTICS_MINIMUM differs', 'STATISTICS_MAXIMUM differs', 'STATISTICS_MEAN differs', 'STATISTICS_STDDEV differs']
+cpru32_2147483647_uncached PASS
+cpru32_2147483648_cached ['NoData 2147483648.0 vs -2147483648.0', '1 cells differ: [(0, 1, 2147483648.0, 2147483648.0)]', 'statistics presence differs', 'STATISTICS_COUNT differs', 'STATISTICS_MINIMUM differs', 'STATISTICS_MAXIMUM differs', 'STATISTICS_MEAN differs', 'STATISTICS_STDDEV differs']
+cpru32_2147483648_uncached ['NoData 2147483648.0 vs -2147483648.0', '1 cells differ: [(0, 1, 2147483648.0, 2147483648.0)]', 'STATISTICS_COUNT differs', 'STATISTICS_MEAN differs', 'STATISTICS_STDDEV differs']
+cpru32_2147483649_cached ['NoData 2147483649.0 vs -2147483648.0', 'statistics presence differs', 'STATISTICS_COUNT differs', 'STATISTICS_MINIMUM differs', 'STATISTICS_MAXIMUM differs', 'STATISTICS_MEAN differs', 'STATISTICS_STDDEV differs']
+cpru32_2147483649_uncached ['NoData 2147483649.0 vs -2147483648.0']
+cpru32_4294967294_cached ['NoData 4294967294.0 vs -2.0', '1 cells differ: [(0, 2, 4294967294.0, 4294967294.0)]', 'statistics presence differs', 'STATISTICS_COUNT differs', 'STATISTICS_MINIMUM differs', 'STATISTICS_MAXIMUM differs', 'STATISTICS_MEAN differs', 'STATISTICS_STDDEV differs']
+cpru32_4294967294_uncached ['NoData 4294967294.0 vs -2.0', '1 cells differ: [(0, 2, 4294967294.0, 4294967294.0)]', 'STATISTICS_COUNT differs', 'STATISTICS_MAXIMUM differs', 'STATISTICS_MEAN differs', 'STATISTICS_STDDEV differs']
+cpru32_4294967295_cached ['NoData 4294967295.0 vs -1.0', 'statistics presence differs', 'STATISTICS_COUNT differs', 'STATISTICS_MINIMUM differs', 'STATISTICS_MAXIMUM differs', 'STATISTICS_MEAN differs', 'STATISTICS_STDDEV differs']
+cpru32_4294967295_uncached ['NoData 4294967295.0 vs -1.0']
+cpru32_cached_same ['NoData 2147483648.0 vs -2147483648.0', '1 cells differ: [(0, 1, 2147483648.0, 2147483648.0)]', 'statistics presence differs', 'STATISTICS_COUNT differs', 'STATISTICS_MINIMUM differs', 'STATISTICS_MAXIMUM differs', 'STATISTICS_MEAN differs', 'STATISTICS_STDDEV differs']
+cpru32_cached_f64 ['NoData 2147483648.0 vs -2147483648.0']
+cpru32_cached_f32 ['NoData 2147483648.0 vs -2147483648.0']
+cpru32_cached_i32 ['NoData 2147483648.0 vs -2147483648.0', '1 cells differ: [(0, 1, 0.0, -2147483648.0)]']
+cpru32_cached_i16 ['NoData 2147483648.0 vs -2147483648.0', '1 cells differ: [(0, 1, 0.0, 32767.0)]', 'STATISTICS_COUNT differs', 'STATISTICS_MEAN differs', 'STATISTICS_STDDEV differs']
+cpru32_cached_override_low PASS
+cpru32_cached_override_high PASS
+cpru32_cached_equal ['statistics presence differs', 'STATISTICS_COUNT differs', 'STATISTICS_MINIMUM differs', 'STATISTICS_MAXIMUM differs', 'STATISTICS_MEAN differs', 'STATISTICS_STDDEV differs']
+cpru32_uncached_same ['NoData 2147483648.0 vs -2147483648.0', '1 cells differ: [(0, 1, 2147483648.0, 2147483648.0)]', 'STATISTICS_COUNT differs', 'STATISTICS_MEAN differs', 'STATISTICS_STDDEV differs']
+cpru32_uncached_f64 ['NoData 2147483648.0 vs -2147483648.0']
+cpru32_uncached_f32 ['NoData 2147483648.0 vs -2147483648.0']
+cpru32_uncached_i32 ['NoData 2147483648.0 vs -2147483648.0', '1 cells differ: [(0, 1, 0.0, -2147483648.0)]']
+cpru32_uncached_i16 ['NoData 2147483648.0 vs -2147483648.0', '1 cells differ: [(0, 1, 0.0, 32767.0)]', 'STATISTICS_COUNT differs', 'STATISTICS_MEAN differs', 'STATISTICS_STDDEV differs']
+cpru32_uncached_override_low PASS
+cpru32_uncached_override_high PASS
+cpru32_uncached_equal PASS
+cpru32_next_f64 ['NoData 2147483649.0 vs -2147483647.0']
+cpru32_next_i32 ['NoData 2147483649.0 vs -2147483647.0']
+cpru32_neg_float_edge ['NoData 4278190079.0 vs -16777216.0']
+cpru32_neg_near_min ['NoData 2147483775.0 vs -2147483520.0']
+cpru32_positive_edge PASS
+cprtag_u8 PASS
+cprtag_i8 PASS
+cprtag_u16 PASS
+cprtag_i16 PASS
+cprtag_u32 ['NoData 2147483648.0 vs -2147483648.0', '1 cells differ: [(0, 1, 2147483648.0, 2147483648.0)]', 'STATISTICS_COUNT differs', 'STATISTICS_MEAN differs', 'STATISTICS_STDDEV differs']
+cprtag_i32 PASS
+cprtag_f32 PASS
+cprtag_f64 PASS
+cprnd_u8_big ['1 cells differ: [(0, 1, 0.0, 127.0)]', 'STATISTICS_COUNT differs', 'STATISTICS_MEAN differs', 'STATISTICS_STDDEV differs']
+cprnd_u8_fraction ['1 cells differ: [(0, 1, 0.0, 127.0)]', 'STATISTICS_COUNT differs', 'STATISTICS_MEAN differs', 'STATISTICS_STDDEV differs']
+cprnd_i16_big ['1 cells differ: [(0, 1, 0.0, -1.0)]', 'STATISTICS_COUNT differs', 'STATISTICS_MINIMUM differs', 'STATISTICS_MEAN differs']
+cprnd_i16_double ['1 cells differ: [(0, 1, 0.0, -1.0)]', 'STATISTICS_COUNT differs', 'STATISTICS_MINIMUM differs', 'STATISTICS_MEAN differs']
+cprnd_i16_default PASS
+FAILED 31 ['cpru32_0_cached', 'cpru32_1_cached', 'cpru32_2147483647_cached', 'cpru32_2147483648_cached', 'cpru32_2147483648_uncached', 'cpru32_2147483649_cached', 'cpru32_2147483649_uncached', 'cpru32_4294967294_cached', 'cpru32_4294967294_uncached', 'cpru32_4294967295_cached', 'cpru32_4294967295_uncached', 'cpru32_cached_same', 'cpru32_cached_f64', 'cpru32_cached_f32', 'cpru32_cached_i32', 'cpru32_cached_i16', 'cpru32_cached_equal', 'cpru32_uncached_same', 'cpru32_uncached_f64', 'cpru32_uncached_f32', 'cpru32_uncached_i32', 'cpru32_uncached_i16', 'cpru32_next_f64', 'cpru32_next_i32', 'cpru32_neg_float_edge', 'cpru32_neg_near_min', 'cprtag_u32', 'cprnd_u8_big', 'cprnd_u8_fraction', 'cprnd_i16_big', 'cprnd_i16_double']

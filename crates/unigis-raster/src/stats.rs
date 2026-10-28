@@ -24,7 +24,7 @@ pub fn statistics(r: &Raster) -> Option<Statistics> {
     statistics_for_band(r, 0)
 }
 
-fn statistics_for_band(r: &Raster, index: usize) -> Option<Statistics> {
+pub(crate) fn statistics_for_band(r: &Raster, index: usize) -> Option<Statistics> {
     let band = r.bands.get(index)?;
     let (mut n, mut min, mut max) = (0u64, f64::INFINITY, f64::NEG_INFINITY);
     // Welford's update keeps the variance accurate for large rasters.

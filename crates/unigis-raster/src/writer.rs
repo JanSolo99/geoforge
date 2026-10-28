@@ -35,6 +35,8 @@ pub struct WriteOptions {
     /// Encode logical NoData outside an integer sample range as zero while
     /// retaining its metadata tag (ArcGIS geoprocessing convention).
     pub zero_out_of_range_nodata: bool,
+    /// GDAL_METADATA XML (tag 42112) for the main image, such as cached band statistics.
+    pub gdal_metadata: Option<String>,
 }
 
 const MODEL_PIXEL_SCALE: u16 = 33550;
@@ -425,6 +427,9 @@ pub fn write_geotiff_with(path: &Path, raster: &Raster, opts: &WriteOptions) -> 
         fields.push((339, Field::Short(vec![sample_format(t); samples as usize])));
         if li == 0 {
             geo_fields(raster, &mut fields);
+            if let Some(xml) = &opts.gdal_metadata {
+                fields.push((42112, Field::Ascii(xml.clone())));
+            }
         }
         fields.sort_by_key(|f| f.0);
 

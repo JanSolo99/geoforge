@@ -61538,6 +61538,1017 @@
           "pixel_type": "32_BIT_FLOAT"
         }
       }
+    },
+    "cpru32_0_cached": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_0_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_0_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cpru32_0_uncached": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_0_uncached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_0_uncached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cpru32_1_cached": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_1_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_1_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cpru32_1_uncached": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_1_uncached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_1_uncached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cpru32_2147483647_cached": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_2147483647_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_2147483647_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cpru32_2147483647_uncached": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_2147483647_uncached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_2147483647_uncached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cpru32_2147483648_cached": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_2147483648_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_2147483648_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cpru32_2147483648_uncached": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_2147483648_uncached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_2147483648_uncached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cpru32_2147483649_cached": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_2147483649_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_2147483649_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cpru32_2147483649_uncached": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_2147483649_uncached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_2147483649_uncached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cpru32_4294967294_cached": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_4294967294_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_4294967294_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cpru32_4294967294_uncached": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_4294967294_uncached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_4294967294_uncached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cpru32_4294967295_cached": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_4294967295_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_4294967295_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cpru32_4294967295_uncached": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_4294967295_uncached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_4294967295_uncached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cpru32_cached_same": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_2147483648_cached.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "32_BIT_UNSIGNED"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_2147483648_cached.tif",
+          "output": "<out>",
+          "pixel_type": "32_BIT_UNSIGNED"
+        }
+      }
+    },
+    "cpru32_cached_f64": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_2147483648_cached.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "64_BIT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_2147483648_cached.tif",
+          "output": "<out>",
+          "pixel_type": "64_BIT"
+        }
+      }
+    },
+    "cpru32_cached_f32": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_2147483648_cached.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "32_BIT_FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_2147483648_cached.tif",
+          "output": "<out>",
+          "pixel_type": "32_BIT_FLOAT"
+        }
+      }
+    },
+    "cpru32_cached_i32": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_2147483648_cached.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "32_BIT_SIGNED"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_2147483648_cached.tif",
+          "output": "<out>",
+          "pixel_type": "32_BIT_SIGNED"
+        }
+      }
+    },
+    "cpru32_cached_i16": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_2147483648_cached.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "16_BIT_SIGNED"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_2147483648_cached.tif",
+          "output": "<out>",
+          "pixel_type": "16_BIT_SIGNED"
+        }
+      }
+    },
+    "cpru32_cached_override_low": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_2147483648_cached.tif",
+        "<out>",
+        "",
+        "",
+        "1000000000"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_2147483648_cached.tif",
+          "output": "<out>",
+          "nodata_value": "1000000000"
+        }
+      }
+    },
+    "cpru32_cached_override_high": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_2147483648_cached.tif",
+        "<out>",
+        "",
+        "",
+        "4294967294"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_2147483648_cached.tif",
+          "output": "<out>",
+          "nodata_value": "4294967294"
+        }
+      }
+    },
+    "cpru32_cached_equal": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_2147483648_cached.tif",
+        "<out>",
+        "",
+        "",
+        "2147483648"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_2147483648_cached.tif",
+          "output": "<out>",
+          "nodata_value": "2147483648"
+        }
+      }
+    },
+    "cpru32_uncached_same": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_2147483648_uncached.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "32_BIT_UNSIGNED"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_2147483648_uncached.tif",
+          "output": "<out>",
+          "pixel_type": "32_BIT_UNSIGNED"
+        }
+      }
+    },
+    "cpru32_uncached_f64": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_2147483648_uncached.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "64_BIT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_2147483648_uncached.tif",
+          "output": "<out>",
+          "pixel_type": "64_BIT"
+        }
+      }
+    },
+    "cpru32_uncached_f32": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_2147483648_uncached.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "32_BIT_FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_2147483648_uncached.tif",
+          "output": "<out>",
+          "pixel_type": "32_BIT_FLOAT"
+        }
+      }
+    },
+    "cpru32_uncached_i32": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_2147483648_uncached.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "32_BIT_SIGNED"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_2147483648_uncached.tif",
+          "output": "<out>",
+          "pixel_type": "32_BIT_SIGNED"
+        }
+      }
+    },
+    "cpru32_uncached_i16": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_2147483648_uncached.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "16_BIT_SIGNED"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_2147483648_uncached.tif",
+          "output": "<out>",
+          "pixel_type": "16_BIT_SIGNED"
+        }
+      }
+    },
+    "cpru32_uncached_override_low": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_2147483648_uncached.tif",
+        "<out>",
+        "",
+        "",
+        "1000000000"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_2147483648_uncached.tif",
+          "output": "<out>",
+          "nodata_value": "1000000000"
+        }
+      }
+    },
+    "cpru32_uncached_override_high": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_2147483648_uncached.tif",
+        "<out>",
+        "",
+        "",
+        "4294967294"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_2147483648_uncached.tif",
+          "output": "<out>",
+          "nodata_value": "4294967294"
+        }
+      }
+    },
+    "cpru32_uncached_equal": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_2147483648_uncached.tif",
+        "<out>",
+        "",
+        "",
+        "2147483648"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_2147483648_uncached.tif",
+          "output": "<out>",
+          "nodata_value": "2147483648"
+        }
+      }
+    },
+    "cpru32_next_f64": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_2147483649_uncached.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "64_BIT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_2147483649_uncached.tif",
+          "output": "<out>",
+          "pixel_type": "64_BIT"
+        }
+      }
+    },
+    "cpru32_next_i32": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/nd_2147483649_uncached.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "32_BIT_SIGNED"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/nd_2147483649_uncached.tif",
+          "output": "<out>",
+          "pixel_type": "32_BIT_SIGNED"
+        }
+      }
+    },
+    "cpru32_neg_float_edge": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/neg_float_edge.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/neg_float_edge.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cpru32_neg_near_min": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/neg_near_min.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/neg_near_min.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cpru32_positive_edge": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_u32/positive_edge.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_u32/positive_edge.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprtag_u8": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/nd_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprtag_i8": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/nd_i8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_i8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprtag_u16": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/nd_u16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_u16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprtag_i16": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/nd_i16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_i16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprtag_u32": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/nd_u32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_u32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprtag_i32": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/nd_i32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_i32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprtag_f32": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/nd_f32.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_f32.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprtag_f64": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/nd_f64.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_f64.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprnd_u8_big": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/nd_u8.tif",
+        "<out>",
+        "",
+        "",
+        "300",
+        "",
+        "",
+        "8_BIT_UNSIGNED"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_u8.tif",
+          "output": "<out>",
+          "nodata_value": "300",
+          "pixel_type": "8_BIT_UNSIGNED"
+        }
+      }
+    },
+    "cprnd_u8_fraction": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/nd_u8.tif",
+        "<out>",
+        "",
+        "",
+        "300.5",
+        "",
+        "",
+        "8_BIT_UNSIGNED"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_u8.tif",
+          "output": "<out>",
+          "nodata_value": "300.5",
+          "pixel_type": "8_BIT_UNSIGNED"
+        }
+      }
+    },
+    "cprnd_i16_big": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/nd_f32.tif",
+        "<out>",
+        "",
+        "",
+        "3.4e38",
+        "",
+        "",
+        "16_BIT_SIGNED"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_f32.tif",
+          "output": "<out>",
+          "nodata_value": "3.4e38",
+          "pixel_type": "16_BIT_SIGNED"
+        }
+      }
+    },
+    "cprnd_i16_double": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/nd_f64.tif",
+        "<out>",
+        "",
+        "",
+        "-1.7976931348623157e308",
+        "",
+        "",
+        "16_BIT_SIGNED"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_f64.tif",
+          "output": "<out>",
+          "nodata_value": "-1.7976931348623157e308",
+          "pixel_type": "16_BIT_SIGNED"
+        }
+      }
+    },
+    "cprnd_i16_default": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/composite_matrix/nd_f32.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "16_BIT_SIGNED"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/composite_matrix/nd_f32.tif",
+          "output": "<out>",
+          "pixel_type": "16_BIT_SIGNED"
+        }
+      }
     }
   }
 }

@@ -594,7 +594,7 @@ CASES = {
     # Expand, Shrink, Majority Filter, Region Group (rules in unigis-raster::generalize).
     "expand_classes_1": ("gp.Expand_sa", [RASTER / "landuse_u8.tif"], [1, "1;2", "MORPHOLOGICAL"]),
     "expand_classes_2": ("gp.Expand_sa", [RASTER / "landuse_u8.tif"], [2, "0;3;5", "MORPHOLOGICAL"]),
-    "expand_classes_dist_3": ("gp.Expand_sa", [RASTER / "landuse_u8.tif"], [3, "1;2;5", "DISTANCE"]),
+    "expand_classes_dist_3": ("gp.Expand_sa", [RASTER / "classes_u8.tif"], [3, "1;2;5", "DISTANCE"]),
     "expand_patches_2": ("gp.Expand_sa", [RASTER / "patches_i16.tif"], [2, "-3;12", "MORPHOLOGICAL"]),
     "expand_patches_5": ("gp.Expand_sa", [RASTER / "patches_i16.tif"], [5, "2;7;12", "MORPHOLOGICAL"]),
     "expand_patches_dist_2_5": ("gp.Expand_sa", [RASTER / "patches_i16.tif"], [2.5, "2;7;12", "DISTANCE"]),
@@ -1166,6 +1166,39 @@ CASES = {
     "umcache_abs_symmetric": ("gp.Abs_sa", [RASTER / "unary_cached/symmetric.tif"], []),
     "umcache_negate_symmetric": ("gp.Negate_sa", [RASTER / "unary_cached/symmetric.tif"], []),
     "umcache_square_symmetric": ("gp.Square_sa", [RASTER / "unary_cached/symmetric.tif"], []),
+    **{f"cpru32_{marker}_{cache}":
+       ("management.CopyRaster", [RASTER / f"copy_u32/nd_{marker}_{cache}.tif"], [])
+       for marker in [0,1,2147483647,2147483648,2147483649,4294967294,4294967295]
+       for cache in ["cached", "uncached"]},
+    **{f"cpru32_{cache}_{option}":
+       ("management.CopyRaster", [RASTER / f"copy_u32/nd_2147483648_{cache}.tif"], args)
+       for cache in ["cached", "uncached"]
+       for option,args in [
+           ("same",["","","","","","32_BIT_UNSIGNED"]),
+           ("f64",["","","","","","64_BIT"]),
+           ("f32",["","","","","","32_BIT_FLOAT"]),
+           ("i32",["","","","","","32_BIT_SIGNED"]),
+           ("i16",["","","","","","16_BIT_SIGNED"]),
+           ("override_low",["","","1000000000"]),
+           ("override_high",["","","4294967294"]),
+           ("equal",["","","2147483648"])]},
+    **{f"cpru32_next_{option}":
+       ("management.CopyRaster", [RASTER / "copy_u32/nd_2147483649_uncached.tif"], ["","","","","",typ])
+       for option,typ in [("f64","64_BIT"),("i32","32_BIT_SIGNED")]},
+    **{f"cpru32_{profile}":
+       ("management.CopyRaster", [RASTER / f"copy_u32/{profile}.tif"], [])
+       for profile in ["neg_float_edge","neg_near_min","positive_edge"]},
+    **{f"cprtag_{typ}":
+       ("management.CopyRaster", [RASTER / f"composite_matrix/nd_{typ}.tif"], [])
+       for typ in ["u8","i8","u16","i16","u32","i32","f32","f64"]},
+    **{f"cprnd_{name}":
+       ("management.CopyRaster", [RASTER / f"composite_matrix/{src}.tif"], ["","",nd,"","",typ])
+       for name,src,nd,typ in [
+           ("u8_big","nd_u8","300","8_BIT_UNSIGNED"),
+           ("u8_fraction","nd_u8","300.5","8_BIT_UNSIGNED"),
+           ("i16_big","nd_f32","3.4e38","16_BIT_SIGNED"),
+           ("i16_double","nd_f64","-1.7976931348623157e308","16_BIT_SIGNED"),
+           ("i16_default","nd_f32","","16_BIT_SIGNED")]},
     **{f"cprstats_{profile}_{cache}":
        ("management.CopyRaster", [RASTER / f"copy_statistics/{profile}_{cache}.tif"], [])
        for profile in ["large", "small", "multi", "later", "unused", "large_valid"]

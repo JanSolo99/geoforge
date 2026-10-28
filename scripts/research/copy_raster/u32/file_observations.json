@@ -1,0 +1,730 @@
+[
+  {
+    "file": "result_0_False_default.tif",
+    "type": "UInt32",
+    "nodata": 0.0,
+    "values": [
+      [
+        1,
+        2147483648,
+        4294967294
+      ],
+      [
+        16777217,
+        4000000000,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_COVARIANCES": "4.165227184470389e+18",
+      "STATISTICS_MAXIMUM": "4294967294",
+      "STATISTICS_MEAN": "1743204693.8333",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "2040888822.1729"
+    }
+  },
+  {
+    "file": "result_0_True_default.tif",
+    "type": "UInt32",
+    "nodata": 0.0,
+    "values": [
+      [
+        1,
+        2147483648,
+        4294967294
+      ],
+      [
+        16777217,
+        4000000000,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_MAXIMUM": "4294967294",
+      "STATISTICS_MEAN": "1743204693.8333",
+      "STATISTICS_STDDEV": "2040888822.1729",
+      "STATISTICS_MEDIAN": "1.000000",
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_COVARIANCES": "4.165227184470389e+18"
+    }
+  },
+  {
+    "file": "result_1_False_default.tif",
+    "type": "UInt32",
+    "nodata": 1.0,
+    "values": [
+      [
+        1,
+        2147483648,
+        4294967294
+      ],
+      [
+        16777217,
+        4000000000,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_COVARIANCES": "4.294905200253139e+18",
+      "STATISTICS_MAXIMUM": "4294967294",
+      "STATISTICS_MEAN": "2091845632.4",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_MINIMUM": "3",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "2072415305.93"
+    }
+  },
+  {
+    "file": "result_1_True_default.tif",
+    "type": "UInt32",
+    "nodata": 1.0,
+    "values": [
+      [
+        1,
+        2147483648,
+        4294967294
+      ],
+      [
+        16777217,
+        4000000000,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "3",
+      "STATISTICS_MAXIMUM": "4294967294",
+      "STATISTICS_MEAN": "2091845632.4",
+      "STATISTICS_STDDEV": "2072415305.93",
+      "STATISTICS_MEDIAN": "3.000000",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_COVARIANCES": "4.294905200253139e+18"
+    }
+  },
+  {
+    "file": "result_2147483647_False_default.tif",
+    "type": "UInt32",
+    "nodata": 2147483647.0,
+    "values": [
+      [
+        1,
+        2147483648,
+        4294967294
+      ],
+      [
+        16777217,
+        4000000000,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_COVARIANCES": "4.165227184470389e+18",
+      "STATISTICS_MAXIMUM": "4294967294",
+      "STATISTICS_MEAN": "1743204693.8333",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "2040888822.1729"
+    }
+  },
+  {
+    "file": "result_2147483647_True_default.tif",
+    "type": "UInt32",
+    "nodata": 2147483647.0,
+    "values": [
+      [
+        1,
+        2147483648,
+        4294967294
+      ],
+      [
+        16777217,
+        4000000000,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_MAXIMUM": "4294967294",
+      "STATISTICS_MEAN": "1743204693.8333",
+      "STATISTICS_STDDEV": "2040888822.1729",
+      "STATISTICS_MEDIAN": "1.000000",
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_COVARIANCES": "4.165227184470389e+18"
+    }
+  },
+  {
+    "file": "result_2147483648_False_default.tif",
+    "type": "UInt32",
+    "nodata": -2147483648.0,
+    "values": [
+      [
+        1,
+        2147483648,
+        4294967294
+      ],
+      [
+        16777217,
+        4000000000,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_COVARIANCES": "4.165227184470389e+18",
+      "STATISTICS_MAXIMUM": "4294967294",
+      "STATISTICS_MEAN": "1743204693.8333",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "2040888822.1729"
+    }
+  },
+  {
+    "file": "result_2147483648_False_equal.tif",
+    "type": "UInt32",
+    "nodata": 2147483648.0,
+    "values": [
+      [
+        1,
+        2147483648,
+        4294967294
+      ],
+      [
+        16777217,
+        4000000000,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_COVARIANCES": "5.157501538753357e+18",
+      "STATISTICS_MAXIMUM": "4294967294",
+      "STATISTICS_MEAN": "1662348903",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "2271013328.6164"
+    }
+  },
+  {
+    "file": "result_2147483648_False_f64.tif",
+    "type": "Float64",
+    "nodata": -2147483648.0,
+    "values": [
+      [
+        1.0,
+        -2147483648.0,
+        4294967294.0
+      ],
+      [
+        16777217.0,
+        4000000000.0,
+        3.0
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_COVARIANCES": "5.157501538753357e+18",
+      "STATISTICS_MAXIMUM": "4294967294",
+      "STATISTICS_MEAN": "1662348903",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "2271013328.6164"
+    }
+  },
+  {
+    "file": "result_2147483648_False_i32.tif",
+    "type": "Int32",
+    "nodata": -2147483648.0,
+    "values": [
+      [
+        1,
+        -2147483648,
+        2147483647
+      ],
+      [
+        16777217,
+        2147483647,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_COVARIANCES": "1.376356337687147e+18",
+      "STATISTICS_MAXIMUM": "2147483647",
+      "STATISTICS_MEAN": "862348903",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "1173182141.7355"
+    }
+  },
+  {
+    "file": "result_2147483648_False_override_high.tif",
+    "type": "UInt32",
+    "nodata": 4294967294.0,
+    "values": [
+      [
+        1,
+        4294967294,
+        4294967294
+      ],
+      [
+        16777217,
+        4000000000,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_COUNT": "4.000000",
+      "STATISTICS_COVARIANCES": "3.988885554741381e+18",
+      "STATISTICS_MAXIMUM": "4000000000",
+      "STATISTICS_MEAN": "1004194305.25",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "1997219455.8289"
+    }
+  },
+  {
+    "file": "result_2147483648_False_override_low.tif",
+    "type": "UInt32",
+    "nodata": 1000000000.0,
+    "values": [
+      [
+        1,
+        1000000000,
+        4294967294
+      ],
+      [
+        16777217,
+        4000000000,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_COVARIANCES": "5.157501538753357e+18",
+      "STATISTICS_MAXIMUM": "4294967294",
+      "STATISTICS_MEAN": "1662348903",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "2271013328.6164"
+    }
+  },
+  {
+    "file": "result_2147483648_False_same.tif",
+    "type": "UInt32",
+    "nodata": -2147483648.0,
+    "values": [
+      [
+        1,
+        2147483648,
+        4294967294
+      ],
+      [
+        16777217,
+        4000000000,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_COVARIANCES": "4.165227184470389e+18",
+      "STATISTICS_MAXIMUM": "4294967294",
+      "STATISTICS_MEAN": "1743204693.8333",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "2040888822.1729"
+    }
+  },
+  {
+    "file": "result_2147483648_True_default.tif",
+    "type": "UInt32",
+    "nodata": -2147483648.0,
+    "values": [
+      [
+        1,
+        2147483648,
+        4294967294
+      ],
+      [
+        16777217,
+        4000000000,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_MAXIMUM": "4294967294",
+      "STATISTICS_MEAN": "1662348903",
+      "STATISTICS_STDDEV": "2271013328.6164",
+      "STATISTICS_MEDIAN": "1.000000",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_COVARIANCES": "5.157501538753357e+18"
+    }
+  },
+  {
+    "file": "result_2147483648_True_equal.tif",
+    "type": "UInt32",
+    "nodata": 2147483648.0,
+    "values": [
+      [
+        1,
+        2147483648,
+        4294967294
+      ],
+      [
+        16777217,
+        4000000000,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_MAXIMUM": "4294967294",
+      "STATISTICS_MEAN": "1662348903",
+      "STATISTICS_STDDEV": "2271013328.6164",
+      "STATISTICS_MEDIAN": "1.000000",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_COVARIANCES": "5.157501538753357e+18"
+    }
+  },
+  {
+    "file": "result_2147483648_True_f64.tif",
+    "type": "Float64",
+    "nodata": -2147483648.0,
+    "values": [
+      [
+        1.0,
+        -2147483648.0,
+        4294967294.0
+      ],
+      [
+        16777217.0,
+        4000000000.0,
+        3.0
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_COVARIANCES": "5.157501538753357e+18",
+      "STATISTICS_MAXIMUM": "4294967294",
+      "STATISTICS_MEAN": "1662348903",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "2271013328.6164"
+    }
+  },
+  {
+    "file": "result_2147483648_True_i32.tif",
+    "type": "Int32",
+    "nodata": -2147483648.0,
+    "values": [
+      [
+        1,
+        -2147483648,
+        2147483647
+      ],
+      [
+        16777217,
+        2147483647,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_COVARIANCES": "1.376356337687147e+18",
+      "STATISTICS_MAXIMUM": "2147483647",
+      "STATISTICS_MEAN": "862348903",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "1173182141.7355"
+    }
+  },
+  {
+    "file": "result_2147483648_True_override_high.tif",
+    "type": "UInt32",
+    "nodata": 4294967294.0,
+    "values": [
+      [
+        1,
+        4294967294,
+        4294967294
+      ],
+      [
+        16777217,
+        4000000000,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_COUNT": "4.000000",
+      "STATISTICS_COVARIANCES": "3.988885554741381e+18",
+      "STATISTICS_MAXIMUM": "4000000000",
+      "STATISTICS_MEAN": "1004194305.25",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "1997219455.8289"
+    }
+  },
+  {
+    "file": "result_2147483648_True_override_low.tif",
+    "type": "UInt32",
+    "nodata": 1000000000.0,
+    "values": [
+      [
+        1,
+        1000000000,
+        4294967294
+      ],
+      [
+        16777217,
+        4000000000,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_COVARIANCES": "5.157501538753357e+18",
+      "STATISTICS_MAXIMUM": "4294967294",
+      "STATISTICS_MEAN": "1662348903",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "2271013328.6164"
+    }
+  },
+  {
+    "file": "result_2147483648_True_same.tif",
+    "type": "UInt32",
+    "nodata": -2147483648.0,
+    "values": [
+      [
+        1,
+        2147483648,
+        4294967294
+      ],
+      [
+        16777217,
+        4000000000,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_MAXIMUM": "4294967294",
+      "STATISTICS_MEAN": "1662348903",
+      "STATISTICS_STDDEV": "2271013328.6164",
+      "STATISTICS_MEDIAN": "1.000000",
+      "STATISTICS_COUNT": "5.000000",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_COVARIANCES": "5.157501538753357e+18"
+    }
+  },
+  {
+    "file": "result_2147483649_False_default.tif",
+    "type": "UInt32",
+    "nodata": -2147483648.0,
+    "values": [
+      [
+        1,
+        2147483648,
+        4294967294
+      ],
+      [
+        16777217,
+        4000000000,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_COVARIANCES": "4.165227184470389e+18",
+      "STATISTICS_MAXIMUM": "4294967294",
+      "STATISTICS_MEAN": "1743204693.8333",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "2040888822.1729"
+    }
+  },
+  {
+    "file": "result_2147483649_True_default.tif",
+    "type": "UInt32",
+    "nodata": -2147483648.0,
+    "values": [
+      [
+        1,
+        2147483648,
+        4294967294
+      ],
+      [
+        16777217,
+        4000000000,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_COVARIANCES": "4.165227184470389e+18",
+      "STATISTICS_MAXIMUM": "4294967294",
+      "STATISTICS_MEAN": "1743204693.8333",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "2040888822.1729"
+    }
+  },
+  {
+    "file": "result_4294967294_False_default.tif",
+    "type": "UInt32",
+    "nodata": -2.0,
+    "values": [
+      [
+        1,
+        2147483648,
+        4294967294
+      ],
+      [
+        16777217,
+        4000000000,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_COVARIANCES": "4.165227184470389e+18",
+      "STATISTICS_MAXIMUM": "4294967294",
+      "STATISTICS_MEAN": "1743204693.8333",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "2040888822.1729"
+    }
+  },
+  {
+    "file": "result_4294967294_True_default.tif",
+    "type": "UInt32",
+    "nodata": -2.0,
+    "values": [
+      [
+        1,
+        2147483648,
+        4294967294
+      ],
+      [
+        16777217,
+        4000000000,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_COVARIANCES": "4.165227184470389e+18",
+      "STATISTICS_MAXIMUM": "4294967294",
+      "STATISTICS_MEAN": "1743204693.8333",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "2040888822.1729"
+    }
+  },
+  {
+    "file": "result_4294967295_False_default.tif",
+    "type": "UInt32",
+    "nodata": -1.0,
+    "values": [
+      [
+        1,
+        2147483648,
+        4294967294
+      ],
+      [
+        16777217,
+        4000000000,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_COVARIANCES": "4.165227184470389e+18",
+      "STATISTICS_MAXIMUM": "4294967294",
+      "STATISTICS_MEAN": "1743204693.8333",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "2040888822.1729"
+    }
+  },
+  {
+    "file": "result_4294967295_True_default.tif",
+    "type": "UInt32",
+    "nodata": -1.0,
+    "values": [
+      [
+        1,
+        2147483648,
+        4294967294
+      ],
+      [
+        16777217,
+        4000000000,
+        3
+      ]
+    ],
+    "statistics": {
+      "STATISTICS_COUNT": "6.000000",
+      "STATISTICS_COVARIANCES": "4.165227184470389e+18",
+      "STATISTICS_MAXIMUM": "4294967294",
+      "STATISTICS_MEAN": "1743204693.8333",
+      "STATISTICS_MEDIAN": "nan",
+      "STATISTICS_MINIMUM": "1",
+      "STATISTICS_SKIPFACTORX": "1",
+      "STATISTICS_SKIPFACTORY": "1",
+      "STATISTICS_STDDEV": "2040888822.1729"
+    }
+  }
+]

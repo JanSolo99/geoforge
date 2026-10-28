@@ -1,0 +1,70 @@
+[
+  {
+    "case": "expand_classes_dist_3",
+    "n": 891,
+    "sum": 2182,
+    "matching_window_count": 1,
+    "matching_windows_first": [
+      [
+        0,
+        3,
+        0,
+        3
+      ]
+    ]
+  },
+  {
+    "case": "expand_patches_dist_2_5",
+    "n": 2000,
+    "sum": 9203,
+    "matching_window_count": 1,
+    "matching_windows_first": [
+      [
+        0,
+        2,
+        0,
+        2
+      ]
+    ]
+  },
+  {
+    "case": "expand_patches_dist_1_5",
+    "n": 1989,
+    "sum": 4014,
+    "matching_window_count": 1,
+    "matching_windows_first": [
+      [
+        0,
+        2,
+        0,
+        2
+      ]
+    ]
+  },
+  {
+    "case": "expand_zones_dist_12",
+    "n": 17600,
+    "sum": 49531,
+    "matching_window_count": 169,
+    "matching_windows_first": [
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        2
+      ]
+    ]
+  }
+]

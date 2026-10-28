@@ -43,7 +43,7 @@ fn copy_raster_overwrites_drop_stale_stats_and_invalid_parameters_preserve_files
     assert_eq!(got.bands, want.bands);
     assert_eq!(got.transform, want.transform);
     assert_eq!(got.nodata, want.nodata);
-    assert_eq!(got.statistics, None);
+    assert_eq!(got.statistics, want.statistics);
 
     std::fs::copy(format!("{}.aux.xml", input.display()), &aux).unwrap();
     assert!(
@@ -56,7 +56,21 @@ fn copy_raster_overwrites_drop_stale_stats_and_invalid_parameters_preserve_files
     assert!(result.status.success(), "{:?}", result);
     let got = unigis_raster::read_geotiff(&output).unwrap();
     assert_eq!(got.bands, want.bands);
-    assert_eq!(got.statistics, None);
+    assert_eq!(got.statistics, want.statistics);
     assert!(!aux.exists());
+    // A requested statistics write can also produce no sidecar for all-NoData.
+    let result = copy(&root.join("testdata/raster/dem.tif"), &output, &[]);
+    assert!(result.status.success(), "{:?}", result);
+    assert!(aux.exists());
+    let result = copy(
+        &root.join("testdata/arcgis-reference/ascimp_all_nd_float.tif"),
+        &output,
+        &[],
+    );
+    assert!(result.status.success(), "{:?}", result);
+    assert!(!aux.exists());
+    let empty = unigis_raster::read_geotiff(&output).unwrap();
+    assert!(empty.bands[0].iter().all(|&v| empty.is_nodata(v)));
+    assert_eq!(empty.statistics, None);
     std::fs::remove_dir_all(folder).unwrap();
 }

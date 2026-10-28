@@ -336,10 +336,12 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         checked with GDAL and read by ArcGIS; tool output uses ArcGIS's 128×128 tiles
   - [x] Reader keeps stored statistics (GDAL_METADATA tag, .aux.xml) — ArcGIS's local tools
         choose output types from them
-  - [x] `.aux.xml` statistics beside every Spatial Analyst output, as ArcGIS writes them (count,
-        min, max, mean, sample standard deviation, `%.14g` numbers; none for Euclidean Distance,
-        Fill, Flow Direction, Reclassify, Stream Link, Watershed, Zonal Statistics; Basin writes
-        count 0), so chained tools pick the same output types; checked on all 167 references
+  - [x] Stored statistics in PAM or TIFF GDAL_METADATA as ArcGIS uses them (count,
+        min/max/mean/sample stddev; `%.14g` numbers). Copy Raster preserves cached
+        fields; other outputs compute new caches. Both stores and PAM placement
+        are compared, including120 embedded references. Basin writes count0;
+        Expand DISTANCE includes its right/bottom workspace. See
+        `docs/formats/raster-statistics.md`.
   - [ ] `.aux.xml` histograms. Found so far: the bucket is `floor((v - min) / (max - min) *
         (n - 1) + 0.001)` for 256-bucket float histograms (exact on 14 of 14 float outputs);
         integer histograms have one bucket per value (bounds min..max, or half-integer bounds
@@ -744,6 +746,8 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 
 - [x] Line Statistics (`ug run line_statistics`): clipped-length weighting, all eight statistics, integer/double output types, lower-value mode ties and empty-neighborhood semantics; 22 ArcGIS cases and invalid-parameter/allocation guards. Planar straight polylines with explicit cell size/radius; remaining scope in `scripts/research/line_statistics/README.md`.
 
-- [x] Copy Raster statistics policy: 22 additional ArcGIS cases isolate cached/uncached inputs, size, band count, unused tags, type changes and equal/changed markers. Tagged cached copies omit statistics only when output type/marker stay unchanged. Reproducer: `scripts/research/copy_raster/statistics/README.md`.
+- [x] Copy Raster statistics policy: 22 additional ArcGIS cases isolate cached/uncached inputs, size, band count, unused tags, type changes and equal/changed markers. Ordinary tagged cached copies reuse embedded statistics without PAM when type/marker stay unchanged; UInt32 system-marker cases are separately verified. Reproducer: `scripts/research/copy_raster/statistics/README.md`.
 
 - [x] CLI GeoTIFF overwrite lifecycle: no-statistics outputs remove stale PAM metadata after a successful TIFF write. Replacement, existing native in-place behavior and invalid-parameter byte preservation have a dedicated regression; ArcGIS overwrite probe confirms clearing old statistics.
+
+- [x] Copy Raster tagged/default NoData:48 additional exact cases cover UInt32 sign/precision boundaries, all eight tagged types, destination types, overrides and converted source sentinel payloads. Cached statistics are preserved in TIFF; other no-PAM GP outputs compute embedded statistics. Generic validation now checks both stores across120 previously unchecked embedded-cache references. Native/GDAL classic/BigTIFF and PAM-override tests cover the format API.

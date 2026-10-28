@@ -528,13 +528,17 @@ fn copy_raster(ctx: &dyn Context) -> Result<Output> {
     let nodata = ctx.get("nodata_value").and_then(|v| v.trim().parse().ok());
     let input = ctx.raster("input")?;
     let raster = crate::extract::copy_raster(&input, pixel_type, nodata);
-    // Cached tagged sources retain the observed no-statistics copy path only
-    // when the effective pixel type and marker are unchanged. Actual missing
-    // cells, raster size and band count do not select this path.
+    // Cached tagged sources reuse embedded statistics without a PAM sidecar
+    // when the effective type and marker are unchanged. Actual missing cells,
+    // raster size and band count do not select this path.
+    // The default signed32 system marker retains omission for cached U32 input
+    // tagged 2^31. Adjacent/high markers recompute, verified by the U32 controls.
+    let default_u32_system_marker =
+        input.data_type == DataType::U32 && input.nodata == Some(2147483648.0) && nodata.is_none();
     let statistics = input.statistics.is_none()
         || input.nodata.is_none()
         || raster.data_type != input.data_type
-        || raster.nodata != input.nodata;
+        || (raster.nodata != input.nodata && !default_u32_system_marker);
     with_statistics(raster, statistics)
 }
 

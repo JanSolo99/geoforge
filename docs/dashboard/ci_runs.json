@@ -1,11 +1,18 @@
 {
-  "fetched": "2026-10-28T10:36:08+00:00",
+  "fetched": "2026-10-28T12:08:35+00:00",
   "runs": [
     {
-      "conclusion": "",
+      "conclusion": "success",
+      "createdAt": "2026-10-28T10:45:33Z",
+      "displayTitle": "Clear stale PAM statistics after no-statistics raster overwrites",
+      "status": "completed",
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40674640766"
+    },
+    {
+      "conclusion": "success",
       "createdAt": "2026-10-28T10:29:18Z",
       "displayTitle": "Match Copy Raster statistics to source cache and effective type and N\u2026",
-      "status": "in_progress",
+      "status": "completed",
       "url": "https://github.com/JanSolo99/geoforge/actions/runs/40672507702"
     },
     {
@@ -49,13 +56,6 @@
       "displayTitle": "HANDOFF: stage explicit paths after probing",
       "status": "completed",
       "url": "https://github.com/JanSolo99/geoforge/actions/runs/40657179770"
-    },
-    {
-      "conclusion": "success",
-      "createdAt": "2026-10-28T08:24:53Z",
-      "displayTitle": "Remove stray ArcGIS probe outputs",
-      "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40656603088"
     }
   ]
 }

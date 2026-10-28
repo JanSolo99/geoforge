@@ -25,10 +25,10 @@ apply. Every band undergoes the requested pixel conversion in its original order
 
 The original multiband probes write statistics because their inputs have no cached
 statistics. The saved single-band DEM-with-NoData input is cached, and its copy
-has no output statistics.22 isolated controls now explain this distinction:
+reuses the cached statistics inside the TIFF without a new PAM sidecar.22 isolated controls now explain this distinction:
 [statistics/README.md](statistics/README.md). Size, actual missing cells and band
-count do not select this policy; cached tagged sources omit statistics only when
-the effective type and marker remain unchanged.
+count do not select this policy; ordinary cached tagged sources reuse embedded statistics when the effective
+type and marker remain unchanged. UInt32 system-marker behavior has separate controls.
 
 Input RGB/type fixtures are reused from `testdata/raster` and `composite_matrix`.
 `make_inputs.py` uses GDAL solely for file IO to create the tiny first/later-band
@@ -51,7 +51,9 @@ rounded marker2147483648. NoData is now normalized before statistics, and intege
 metadata beyond i64 is serialized without saturation. GDAL/native file tests cover
 large positive/negative sentinels separately from the ArcGIS operation oracle.
 
-Further tagged-input probes remain outside this slice: U32 NoData metadata exports
-through signed32 in ArcGIS; extreme/fractional explicit markers can map cells
-differently. Native Copy Raster still differs there; see KNOWN_GAPS. The former
-tiny-input statistics gap is resolved by the cached-source/type/marker policy.
+UInt32 default markers, destination precision, converted original payloads for
+unrepresentable integer markers, and full cached statistics now have48 additional
+cases; see [u32/README.md](u32/README.md). Explicit fractional marker normalization
+remains a known gap. Cached statistics are preserved rather than recomputed.
+Other geoprocessing outputs without PAM now store their computed statistics inside
+TIFF; generic reference validation checks both stores and PAM placement.

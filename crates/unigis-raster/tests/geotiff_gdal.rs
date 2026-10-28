@@ -294,6 +294,7 @@ fn tiled_writer_with_overviews() {
             },
             bigtiff,
             zero_out_of_range_nodata: false,
+            gdal_metadata: None,
         };
         write_geotiff_with(&out, &r, &opts).unwrap();
         let g = gdal_read(&out, &dir);

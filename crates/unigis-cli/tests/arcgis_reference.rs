@@ -4301,6 +4301,9 @@ fn compare_rasters(case: &str, ours: &Path, arcgis: &Path) -> Vec<String> {
                                 "cprbands_",
                                 "cprcast_",
                                 "cprstats_",
+                                "cpru32_",
+                                "cprtag_",
+                                "cprnd_",
                                 "freq_",
                                 "um64_",
                                 "umint_",
@@ -4359,10 +4362,32 @@ fn aux_statistic(raster: &Path, key: &str, band: usize) -> Option<f64> {
 /// ArcGIS writes cell statistics beside most Spatial Analyst outputs (and none beside a
 /// few); later tools pick their output types from them, so ours must agree.
 fn compare_statistics(ours: &Path, arcgis: &Path, bands: usize, cells_differ: bool) -> Vec<String> {
+    let ours_stored = unigis_raster::stats_metadata::read(ours).unwrap();
+    let theirs_stored = unigis_raster::stats_metadata::read(arcgis).unwrap();
     let mut diffs = Vec::new();
     for band in 1..=bands {
-        let theirs = |k| aux_statistic(arcgis, k, band);
-        let mine = |k| aux_statistic(ours, k, band);
+        // Keep the sidecar-placement check as well as checking embedded values.
+        if aux_statistic(arcgis, "MEAN", band).is_none()
+            && aux_statistic(ours, "MEAN", band).is_some()
+        {
+            diffs.push(format!(
+                "band {band}: statistics sidecar written where ArcGIS has none"
+            ));
+        }
+        let theirs = |key: &str| -> Option<f64> {
+            theirs_stored
+                .get(band - 1)?
+                .get(&format!("STATISTICS_{key}"))?
+                .parse()
+                .ok()
+        };
+        let mine = |key: &str| -> Option<f64> {
+            ours_stored
+                .get(band - 1)?
+                .get(&format!("STATISTICS_{key}"))?
+                .parse()
+                .ok()
+        };
         if theirs("MEAN").is_none() {
             if mine("MEAN").is_some() {
                 diffs.push(format!(
