@@ -1,0 +1,17 @@
+[
+  {
+    "tool": "square_root",
+    "native_bands": 1,
+    "arcgis_bands": 2
+  },
+  {
+    "tool": "ln",
+    "native_bands": 1,
+    "arcgis_bands": 2
+  },
+  {
+    "tool": "exp",
+    "native_bands": 1,
+    "arcgis_bands": 2
+  }
+]

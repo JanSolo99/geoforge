@@ -619,16 +619,20 @@ fn cached_integer_unary(op: UnaryOp, r: &Raster, (lo, hi): (f64, f64)) -> Raster
     typed_raster(r, values, t, nodata)
 }
 
+/// Whether every input band can use the existing per-band unary planner.
+pub(crate) fn supports_multiband_unary(op: UnaryOp, raster: &Raster) -> bool {
+    (raster.data_type.is_float() || raster.statistics.is_none())
+        && matches!(op, UnaryOp::Abs | UnaryOp::Negate | UnaryOp::Square)
+}
+
 /// Applies a one-raster math tool. Abs/Negate/Square preserve uncached F64 input precision.
 /// Other float results and the trigonometric, logarithmic and exponential functions give 32-bit float with NoData where the result is not a finite number
 /// (as 32-bit float); integer Abs keeps the width but is unsigned, Negate gives a signed type and
 /// Square a wider one; Round Down / Up give float; Boolean Not gives 8-bit with NoData 2
-/// (observed).
+/// (observed). The registry refuses unsupported multiband combinations before
+/// calling this function.
 pub fn unary(op: UnaryOp, r: &Raster) -> Raster {
-    if r.bands.len() > 1
-        && (r.data_type.is_float() || r.statistics.is_none())
-        && matches!(op, UnaryOp::Abs | UnaryOp::Negate | UnaryOp::Square)
-    {
+    if r.bands.len() > 1 && supports_multiband_unary(op, r) {
         // Use the dataset's cache status for every band, as ArcGIS does for
         // F64 output planning. Uncached integer planning depends only on storage
         // type, so every band has the same output type and NoData marker.

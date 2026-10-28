@@ -341,10 +341,14 @@ fn sink(ctx: &dyn Context) -> Result<Output> {
 macro_rules! unary_fn {
     ($f:ident, $op:ident) => {
         fn $f(ctx: &dyn Context) -> Result<Output> {
-            with_statistics(
-                crate::local::unary(crate::local::UnaryOp::$op, &ctx.raster("input")?),
-                true,
-            )
+            let input = ctx.raster("input")?;
+            let op = crate::local::UnaryOp::$op;
+            if input.bands.len() > 1 && !crate::local::supports_multiband_unary(op, &input) {
+                return Err(Error::Unsupported(format!(
+                    "{op:?} is not yet supported for this multiband input"
+                )));
+            }
+            with_statistics(crate::local::unary(op, &input), true)
         }
     };
 }

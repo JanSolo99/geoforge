@@ -51,3 +51,27 @@ uncached integers; existing per-band storage/overflow rules are reused.
 
 Full workspace validation is recorded in docs/HANDOFF.md; do not infer a full
 suite pass solely from the companion 21-case comparison.
+
+
+## Refuse unsupported multiband operations safely
+
+Three additional private F64 controls confirm ArcGIS SquareRoot/Ln/Exp retain
+both bands (F32 output); native014c027 wrote only band0. guard_probe.py,
+guard_observations.json and guard_baseline.json record this evidence. Recreate
+its private float64.tif by copying first_full_f64.tif from
+ testdata/raster/copy_multicache without its PAM to
+ /tmp/unigis-unary-guard-controls before running the bridge probe.
+
+Registered unary tools now explicitly refuse unsupported multiband combinations
+before returning an output. The support predicate is shared with the existing
+Abs/Negate/Square dispatcher. Cached integer unary math and other unary multiband
+operators still need implementation; the refusal is a native capability limit,
+not a claim that ArcGIS refuses these inputs. The low-level local::unary API
+expects a supported combination; known callers use the validating registry.
+
+unary_band_safety.rs starts with a valid existing output, then checks six
+unsupported requests return code1 with a clear message and leave every file
+byte-identical. Cached integer inputs pair the existing i16.tif pixels with
+frozen ArcGIS CalculateStatistics XML from the earlier forward_cached control.
+That cache is stored separately as i16_cached_statistics.xml to preserve the
+uncached source fixture. Existing full/scoped references cover supported inputs.

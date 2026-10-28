@@ -1,11 +1,18 @@
 {
-  "fetched": "2026-10-28T16:39:03+00:00",
+  "fetched": "2026-10-28T16:52:47+00:00",
   "runs": [
     {
       "conclusion": "",
+      "createdAt": "2026-10-28T16:51:34Z",
+      "displayTitle": "Preserve every band in uncached integer unary math",
+      "status": "in_progress",
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40730089604"
+    },
+    {
+      "conclusion": "success",
       "createdAt": "2026-10-28T16:36:23Z",
       "displayTitle": "Honor tessellation area units and preserve foot CRS precision",
-      "status": "in_progress",
+      "status": "completed",
       "url": "https://github.com/JanSolo99/geoforge/actions/runs/40727613355"
     },
     {
@@ -49,13 +56,6 @@
       "displayTitle": "Add Create Binary Mask (basic) with ArcGIS reference cases",
       "status": "completed",
       "url": "https://github.com/JanSolo99/geoforge/actions/runs/40708058510"
-    },
-    {
-      "conclusion": "success",
-      "createdAt": "2026-10-28T14:23:58Z",
-      "displayTitle": "Add Compute Change Raster (difference, relative difference) with ArcG\u2026",
-      "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40705530803"
     }
   ]
 }
