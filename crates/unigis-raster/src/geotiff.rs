@@ -139,8 +139,8 @@ pub fn read_geotiff(path: &Path) -> Result<Raster> {
         None => None,
     };
     // ArcGIS treats the source as cached only when every band has extrema.
-    // Keep band 0's range for type planning, without mixing keys across bands
-    // or treating custom metadata domains as a default-domain cache.
+    // Union all stored ranges for the dataset's common output type. Metadata
+    // remains band-specific; custom domains do not enable cache planning.
     let cached = crate::stats_metadata::from_xml(samples, tag.as_deref(), aux.as_deref());
     let extrema: Option<Vec<(f64, f64)>> = cached
         .iter()
@@ -151,7 +151,22 @@ pub fn read_geotiff(path: &Path) -> Result<Raster> {
             ))
         })
         .collect();
-    let statistics = extrema.and_then(|bands| bands.first().copied());
+    let statistics = extrema.and_then(|bands| {
+        if bands.len() == 1 {
+            return bands.first().copied();
+        }
+        if bands
+            .iter()
+            .any(|&(lo, hi)| !lo.is_finite() || !hi.is_finite() || lo > hi)
+        {
+            // Keep cache presence for existing float planning, while the
+            // registry refuses cached integer math with invalid extrema.
+            return Some((f64::NAN, f64::NAN));
+        }
+        bands
+            .into_iter()
+            .reduce(|(lo, hi), (a, b)| (lo.min(a), hi.max(b)))
+    });
 
     let compression = dec
         .find_tag_unsigned::<u16>(Tag::Compression)

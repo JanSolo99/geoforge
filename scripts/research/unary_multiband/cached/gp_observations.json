@@ -1,0 +1,78 @@
+[
+  {
+    "case": "u32",
+    "outputs": [
+      "//tmp//unigis-cached-int-multiband//u32_Square_gp.tif"
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 4:41:32 AM\nSucceeded at Thursday, October 29, 2026 4:41:33 AM (Elapsed Time: 0.67 seconds)"
+  },
+  {
+    "case": "u32_overflow",
+    "outputs": [
+      "//tmp//unigis-cached-int-multiband//u32_overflow_Square_gp.tif"
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 4:41:33 AM\nSucceeded at Thursday, October 29, 2026 4:41:33 AM (Elapsed Time: 0.32 seconds)"
+  },
+  {
+    "case": "u32_band2",
+    "outputs": [
+      "//tmp//unigis-cached-int-multiband//u32_band2_Square_gp.tif"
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 4:41:33 AM\nSucceeded at Thursday, October 29, 2026 4:41:33 AM (Elapsed Time: 0.24 seconds)"
+  },
+  {
+    "case": "i32",
+    "outputs": [
+      "//tmp//unigis-cached-int-multiband//i32_Square_gp.tif"
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 4:41:33 AM\nSucceeded at Thursday, October 29, 2026 4:41:34 AM (Elapsed Time: 0.31 seconds)"
+  },
+  {
+    "case": "u32_three_bands",
+    "op": "Abs",
+    "outputs": [
+      "//tmp//unigis-cached-int-multiband//u32_three_bands_Abs_gp.tif"
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 4:45:59 AM\nSucceeded at Thursday, October 29, 2026 4:46:00 AM (Elapsed Time: 0.66 seconds)"
+  },
+  {
+    "case": "u32_three_bands",
+    "op": "Negate",
+    "outputs": [
+      "//tmp//unigis-cached-int-multiband//u32_three_bands_Negate_gp.tif"
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 4:46:00 AM\nSucceeded at Thursday, October 29, 2026 4:46:00 AM (Elapsed Time: 0.40 seconds)"
+  },
+  {
+    "case": "u32_three_bands",
+    "op": "Square",
+    "outputs": [
+      "//tmp//unigis-cached-int-multiband//u32_three_bands_Square_gp.tif"
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 4:46:00 AM\nSucceeded at Thursday, October 29, 2026 4:46:01 AM (Elapsed Time: 0.39 seconds)"
+  },
+  {
+    "case": "u32_single_overflow",
+    "op": "Abs",
+    "outputs": [
+      "//tmp//unigis-cached-int-multiband//u32_single_overflow_Abs_gp.tif"
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 4:46:29 AM\nWARNING 010663: The raster attribute table will not be built because the cell values exceed the range of the VALUE field.\nSucceeded at Thursday, October 29, 2026 4:46:29 AM (Elapsed Time: 0.26 seconds)"
+  },
+  {
+    "case": "u32_single_overflow",
+    "op": "Negate",
+    "outputs": [
+      "//tmp//unigis-cached-int-multiband//u32_single_overflow_Negate_gp.tif"
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 4:46:29 AM\nSucceeded at Thursday, October 29, 2026 4:46:29 AM (Elapsed Time: 0.26 seconds)"
+  },
+  {
+    "case": "u32_single_overflow",
+    "op": "Square",
+    "outputs": [
+      "//tmp//unigis-cached-int-multiband//u32_single_overflow_Square_gp.tif"
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 4:46:29 AM\nSucceeded at Thursday, October 29, 2026 4:46:29 AM (Elapsed Time: 0.26 seconds)"
+  }
+]

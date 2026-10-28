@@ -77,6 +77,8 @@ pub struct Output {
     pub zero_count: bool,
     /// Write ArcGIS empty-band statistics for entirely NoData bands.
     pub empty_band_statistics: bool,
+    /// Include GP-recomputed covariance statistics after stored-cell normalization.
+    pub covariance_statistics: bool,
 }
 
 pub struct Tool {
@@ -177,6 +179,7 @@ fn nibble(ctx: &dyn Context) -> Result<Output> {
         statistics: false,
         zero_count: false,
         empty_band_statistics: false,
+        covariance_statistics: false,
         nodata_tag: None,
     })
 }
@@ -212,6 +215,7 @@ fn with_statistics(raster: Raster, statistics: bool) -> Result<Output> {
         statistics,
         zero_count: false,
         empty_band_statistics: false,
+        covariance_statistics: false,
         nodata_tag: None,
     })
 }
@@ -348,7 +352,36 @@ macro_rules! unary_fn {
                     "{op:?} is not yet supported for this multiband input"
                 )));
             }
-            with_statistics(crate::local::unary(op, &input), true)
+            let mut output = with_statistics(crate::local::unary(op, &input), true)?;
+            // GP postprocessing recomputes statistics from stored pixels when
+            // an empty band has an unrepresentable integer NoData marker.
+            let (lo, hi) = crate::local::type_range_of(output.raster.data_type);
+            let outside = output.raster.nodata.is_some_and(|nd| nd < lo || nd > hi);
+            let empty_band = output
+                .raster
+                .bands
+                .iter()
+                .any(|band| band.iter().all(|&value| output.raster.is_nodata(value)));
+            if matches!(
+                op,
+                crate::local::UnaryOp::Abs
+                    | crate::local::UnaryOp::Negate
+                    | crate::local::UnaryOp::Square
+            ) && !input.data_type.is_float()
+                && !output.raster.data_type.is_float()
+                && input.statistics.is_some()
+                && outside
+                && empty_band
+            {
+                let nodata = output.raster.nodata;
+                for value in output.raster.bands.iter_mut().flatten() {
+                    if Some(*value) == nodata {
+                        *value = 0.0;
+                    }
+                }
+                output.covariance_statistics = true;
+            }
+            Ok(output)
         }
     };
 }

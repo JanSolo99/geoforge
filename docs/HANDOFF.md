@@ -1,83 +1,107 @@
 # Current handoff
 
-Updated 2026-10-28T17:17:12.886395+00:00; last agent Codex.
-Workspace /mnt/media/ArcGIS_Linux; branch main; HEAD87338d2 PUSHED, remote verified
-87338d26e29670d30064da25512ecece4e6e1df9. Standing objective: continue development,
-frequent tested commits/pushes/dashboard updates. Work alone; no agents/other
-Claude/Codex CLIs/new coordinators. Cargo-j3, one build at a time. Preserve
-NOTES.md/.worktrees (never read/add); explicit-path staging only.
+Updated 2026-10-28T18:08:54.525150+00:00; last agent Codex.
+Workspace /mnt/media/ArcGIS_Linux; main; HEAD9142ac1 PUSHED, verified remote
+9142ac1de100be9117a44b78cdf5c2989e844a7e. Objective continuous development,
+frequent tested commits/pushes/dashboard updates. Work alone, no agents/other
+Claude/Codex CLIs/coordinator. Cargo-j3; only one build. Preserve NOTES.md and
+.worktrees (never read/add), explicit-path staging only.
 
-## Completed this session
+## Completed this session, all pushed and remote verified
 
-0eba1e7: finished inherited tessellation area-unit/safety/Foot_US precision work,
-31goldens, exactPRJ/ordered rings/IDs and fresh fixture recipe verified.
-014c027: uncached integer Abs/Negate/Square retain all bands;21typed goldens,
-fresh source recipe verified. Both local/full normal push gates195Rust/5ignored,
-8Python/fmt/clippy-Dwarnings PASS, remote SHAs verified.
-87338d2: registered unary tools refuse unsupported multiband combinations before
-output; shared support predicate, six CLI cases preserve every existing file.
-Local+normal push gates196Rust/5ignored,8Python/fmt/clippy PASS, remote verified.
-Logs /tmp/unigis-tess-area-{check3,push}.log, /tmp/unigis-intmulti-{check,push}.log,
-/tmp/unigis-unary-guard-{test,check,push}.log. Dashboard/node/Python/diff PASS per
-slice. Research scripts/research/tessellation/area_units and unary_multiband.
-Earlier c5064bc/598f777 remain pushed ancestors; do not repeat external actions.
+0eba1e7 inherited tessellation units/safety/Foot_US WKT:31 refs+fresh recipe.
+014c027 uncached integer Abs/Negate/Square bands:21refs+fresh recipe.
+Both local+normal push gates195Rust/5ignored,8Python/fmt/clippy PASS.
+87338d2 unary unsupported-band guard:6file-preservation scenarios.
+9142ac1 floating multiband SquareRoot/Ln/Exp:12refs+fresh recipe/domain/overflow.
+Both local+normal push gates196Rust/5ignored,8Python/fmt/clippy PASS.
+Dashboards/JS/Python/diff PASS per slice. Logs /tmp/unigis-tess-area-{check3,push},
+/tmp/unigis-{intmulti,unary-guard,float-more}-{check,push}.log.
+Earlier c5064bc/598f777 remain pushed ancestors. No external actions to repeat.
 
-## Active new slice: floating multiband SquareRoot/Ln/Exp
+## Active cached integer bands / GP statistics slice
 
-12private ArcGIS Pro3.7 successes: F32/F64 x cached/uncached x3ops, all2bands/F32.
-Negative/zero domains, exponential overflow near F32 max and independent NoData
-positions. /tmp/unigis-float-unary-more/profiles.json, observations.json,
-make_inputs.py/probe.py; /tmp/unigis-float-unary-more-probe.log. Current guard
-baseline refuses12/12 code1/no output (baseline.json). Cached TIFFs equal raw
-pair byte-for-byte; ArcGIS caches in PAM only. GDAL only format IO/read-back.
+36goldens umcachemulti_* across six integer types, reversed I16, positive127,
+all-overflow U32, correlated3band and single-band overflow.12source TIFFs+12frozen
+ArcGIS CalculateStatistics PAMs: testdata/raster/unary_cached_multiband. All24
+components byte-match original private controls and are unchanged by generation.
+Research scripts/research/unary_multiband/cached contains profiles/recipes,
+observations, failed union prototype, GP controls and successful native artifacts.
+GDAL only format IO, ArcGIS Pro3.7 GP oracle; no runtime GDAL or SDK work.
 
-New local.rs shared predicate permits Sqrt/Ln/Exp for floats, dispatcher reuses
-existing per-band code. Guard regression moves float refusal cases to still-
-unsupported Log2/Sin/RoundUp; cached integer refusals retained. No app/API field
-changes. Generator adds12umfloatmore_*; four source TIFFs+two frozen ArcGIS PAMs
-in testdata/raster/unary_float_multiband. All six byte-match private sources;
-initial hashes in research source_verification.json. ROADMAP/KNOWN_GAPS edited.
-New research scripts/research/unary_multiband/floating contains profiles, frozen
-caches, recipe, observations/baseline, comparator/README. Inherited post-commit
-HTML/HANDOFF dirt; all other active edits new here.
+Source edits: geotiff.rs unions complete stored extrema for common type planning;
+single-band tuple behavior preserved. Invalid complete multiband ranges expose
+NaNs to retain float cache presence; integer unary guard refuses them. lib.rs
+Raster documentation changed, no Raster fields added. local.rs supports finite
+cached integer ranges and promotes nonnegative signed8 endpoint127 toU8.
+Stats metadata tests expect union1..40, per-band source metadata stays unchanged.
+Seven-case CLI safety regression retains unsupported operators and adds malformed
+later-band refusal with every existing file byte preserved (scoped PASS).
 
-## Running / validation
+Critical GP finding: SA Raster.save stats differ from direct GP execution. An
+entirely missing integer result band with an out-of-storage NoData marker causes
+GP to recompute statistics on stored zeros across ALL bands, including single-
+band outputs. GP initializes covariance vectors to sample variance on diagonal,
+zero elsewhere, even for correlated bands. Source CalculateStatistics can have
+real cross-covariances and those are preserved. Registry now normalizes missing
+pixels to stored0 for that condition and sets new Output.covariance_statistics
+policy flag; CLI writes appropriate PAM via stats.rs. New public Output flag;
+app has no Output policy constructors/field users (rg audit), no app edits.
 
-cargo fmt --all/build PASS; /tmp/unigis-float-more-build.log.
-Reference generation EXIT0,12 successes /tmp/unigis-float-more-references.log.
-Strict12-case comparison PASS with original AND fresh recipe inputs; artifacts
-native_after.txt/recipe_verification.txt. Four TIFFs/two PAMs unchanged; verified
-source hashes after oracle. Full scripts/check EXIT0 /tmp/unigis-float-more-check.log:196Rust passed/5ignored,
-8Python/fmt/clippy-Dwarnings PASS. Dashboard--ci/JS/Python/diff PASS. No Cargo
-running. Feature explicitly staged, commit/normal push outcome still pending.
+Initial union prototype39/42PASS exposed127/empty-stat mismatches. First36-phase
+attempt30comparison28PASS: SA-only empty-stat policy incorrect for GP. GP probes
+proved COUNT6/COV recomputation; 3-band control disproved true cross-covariance
+for this initialized GP cache. All corrected. Failed logs preserved:
+/tmp/unigis-cached-int-union-prototype.log, cached-multi-after{,2}.log.
+
+## Validation / running
+
+fmt/build3 PASS (/tmp/unigis-cached-multi-build3.log).
+Reference generators EXIT0:30+6cases (/tmp/unigis-cached-multi-{,extra-}references.log).
+Strict36-case original AND fresh-recipe comparisons PASS including covariance;
+/tmp/unigis-cached-multi-after4.log and research/native_after.txt/
+recipe_verification.txt. Seven-case focused guard PASS (before covariance flag,
+full gate covers final code). Python/diff passed before latest docs; JS pending.
+Full scripts/check RUNNING50703 /tmp/unigis-cached-multi-check.log (ONLY Cargo).
+Dashboard--ci RUNNING22543 /tmp/unigis-cached-multi-dashboard.log. No oracle workers.
 
 ## Next actions
 
-1. Finish build/goldens; strict12-case research comparator, check any exact pixel/
-   NoData/type/stat differences empirically. Check source hashes after oracle.
-2. Fresh recipe + comparator with optional input-folder argument; save artifacts.
-   Update README, dashboard--ci, JS/Python/diff checks. Full scripts/check-j3,
-   including shifted six-case guard regression (expected196Rust, not yet passed).
-3. Explicit feature commit, normal push hook, verify remote main SHA; checkpoint.
-4. Continue roadmap. Cached integer multiband needs all-band stored ranges; do not
-   scan samples as a stale-cache substitute. A possible future approach is global
-   cached range aggregation for type planning without changing Raster fields,
-   but audit tuple consumers and probe asymmetric/stale ranges first. Other unary
-   multiband operators, H3 and nonlinear SurfaceParameters remain gaps.
+1. Finish full gate; inspect/fix any regressions (expected196Rust, not yet passed).
+2. Finish dashboard/JS/Python/diff checks; explicit source/docs/research/36refs/
+   24sourcecomponents commit, normal push hook, verify remote main SHA.
+3. Continue roadmap after this slice. Other floating multiband functions or
+   integer SquareRoot/Ln/Exp are bounded follow-ups. Stale/partial/empty-source
+   cache semantics need probes; invalid ranges remain safely refused. Read
+   ROADMAP/KNOWN_GAPS before choosing. Keep checkpoints current.
 
-Next-slice private probe EXIT0:21 successful cached integer controls, all2bands. seven cached typed two-band integer sources
-(all six types plus reversed I16), ArcGIS CalculateStatistics +Abs/Negate/Square.
-/tmp/unigis-cached-int-multiband/{make_inputs,probe}.py and profiles.json;
-/tmp/unigis-cached-int-multiband-probe.log. Root source/manifest/fixtures for that
-slice untouched. Audit confirmed read_geotiff currently collects all band extrema
-but stores only bands.first() in Raster.statistics. Type-planning consumers use
-the tuple as a range; per-band source XML remains independently preserved by
-stats_metadata. A global union might fix cached unary without new struct fields;
-normal/stale/asymmetric oracle evidence still required before editing that slice.
+Next-feature private GP probe RUNNING: /tmp/unigis-float-unary-next/probe.py,
+/tmp/unigis-float-unary-next-probe.log, shell session in tool output. Reuses four
+private F32/F64 cached/uncached sources from /tmp/unigis-float-unary-more;
+12Log2/Sin/RoundUp controls. No next-feature product/manifest edits. Root and
+private raw floating inputs have no PAMs (verified), preserving uncached controls.
+Finish current cached integer commit/push before enabling new operators.
 
-Range-model prototype ready at /tmp/unigis-cached-int-multiband/prototype_union.py:
-GDAL slices each source into1band files, overrides only their stored extrema with
-the dataset union, then runs existing native single-band Abs/Negate/Square and
-compares each result against the corresponding saved ArcGIS band. This isolates
-the hypothesis without changing repository code or overlapping Cargo builds.
-Prototype outcome pending; run it after verifying21 oracle successes.
+Full gate50703 EXIT101:8 prior single-band integer-input FLOAT-output unary cases
+(Exp/Exp2/Exp10/etc) incorrectly normalized to0. GP stored-cell policy too broad;
+type_range_of assumes integer. Fixed by explicitly restricting Abs/Negate/Square
+with integer OUTPUT. No goldens weakened. /tmp/unigis-cached-multi-check.log.
+An exact-text patch initially failed after fmt; stopped that unchanged rerun
+(check2.log, exit143), applied verified patch, revised gate pending.
+Next private Log2/Sin/RoundUp probe EXIT0,12/12 all2bands/F32. No next-feature
+product or manifest edits. Preserve those private controls for next slice.
+
+Revised full gate RUNNING21346 /tmp/unigis-cached-multi-check3.log, only Cargo
+process. Actual narrowed condition verified in registry.rs before starting it.
+Dashboard--ci PASS; 36-scope/fresh-recipe/covariance comparisons passed before
+scope restriction (same integer Abs/Negate/Square path); full gate verifies fix.
+Next private GP probe Log2/Sin/RoundUp finished12/12, all2bands/F32;
+/tmp/unigis-float-unary-next-probe.log. No next-feature repo edits yet.
+
+Final milestone: revised full check3 EXIT0,196Rust passed/5ignored,
+8Python/fmt/clippy-Dwarnings PASS. Scoped36 covariance-aware comparison rerun
+on final restricted-policy binary PASS /tmp/unigis-cached-multi-after5.log;
+native_after.txt updated. JS/Python/diff PASS.217 intended files staged, unrelated
+NOTES.md/.worktrees excluded. Cached slice ready for commit/normal push. No Cargo
+or oracle workers running. Next float Log2/Sin/RoundUp12controls already successful
+but no next-feature repo changes yet.

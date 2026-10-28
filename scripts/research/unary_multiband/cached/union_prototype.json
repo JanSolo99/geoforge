@@ -1,0 +1,434 @@
+[
+  {
+    "case": "u8",
+    "op": "Abs",
+    "band": 1,
+    "global_range": [
+      0.0,
+      254.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "u8",
+    "op": "Negate",
+    "band": 1,
+    "global_range": [
+      0.0,
+      254.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "u8",
+    "op": "Square",
+    "band": 1,
+    "global_range": [
+      0.0,
+      254.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "u8",
+    "op": "Abs",
+    "band": 2,
+    "global_range": [
+      0.0,
+      254.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "u8",
+    "op": "Negate",
+    "band": 2,
+    "global_range": [
+      0.0,
+      254.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "u8",
+    "op": "Square",
+    "band": 2,
+    "global_range": [
+      0.0,
+      254.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "i8",
+    "op": "Abs",
+    "band": 1,
+    "global_range": [
+      -127.0,
+      127.0
+    ],
+    "differences": [
+      "type Int8 vs Byte",
+      "ND -128.0 vs 255.0"
+    ]
+  },
+  {
+    "case": "i8",
+    "op": "Negate",
+    "band": 1,
+    "global_range": [
+      -127.0,
+      127.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "i8",
+    "op": "Square",
+    "band": 1,
+    "global_range": [
+      -127.0,
+      127.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "i8",
+    "op": "Abs",
+    "band": 2,
+    "global_range": [
+      -127.0,
+      127.0
+    ],
+    "differences": [
+      "type Int8 vs Byte",
+      "ND -128.0 vs 255.0"
+    ]
+  },
+  {
+    "case": "i8",
+    "op": "Negate",
+    "band": 2,
+    "global_range": [
+      -127.0,
+      127.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "i8",
+    "op": "Square",
+    "band": 2,
+    "global_range": [
+      -127.0,
+      127.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "u16",
+    "op": "Abs",
+    "band": 1,
+    "global_range": [
+      0.0,
+      65534.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "u16",
+    "op": "Negate",
+    "band": 1,
+    "global_range": [
+      0.0,
+      65534.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "u16",
+    "op": "Square",
+    "band": 1,
+    "global_range": [
+      0.0,
+      65534.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "u16",
+    "op": "Abs",
+    "band": 2,
+    "global_range": [
+      0.0,
+      65534.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "u16",
+    "op": "Negate",
+    "band": 2,
+    "global_range": [
+      0.0,
+      65534.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "u16",
+    "op": "Square",
+    "band": 2,
+    "global_range": [
+      0.0,
+      65534.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "i16",
+    "op": "Abs",
+    "band": 1,
+    "global_range": [
+      -30000.0,
+      30000.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "i16",
+    "op": "Negate",
+    "band": 1,
+    "global_range": [
+      -30000.0,
+      30000.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "i16",
+    "op": "Square",
+    "band": 1,
+    "global_range": [
+      -30000.0,
+      30000.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "i16",
+    "op": "Abs",
+    "band": 2,
+    "global_range": [
+      -30000.0,
+      30000.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "i16",
+    "op": "Negate",
+    "band": 2,
+    "global_range": [
+      -30000.0,
+      30000.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "i16",
+    "op": "Square",
+    "band": 2,
+    "global_range": [
+      -30000.0,
+      30000.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "u32",
+    "op": "Abs",
+    "band": 1,
+    "global_range": [
+      0.0,
+      4294967294.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "u32",
+    "op": "Negate",
+    "band": 1,
+    "global_range": [
+      0.0,
+      4294967294.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "u32",
+    "op": "Square",
+    "band": 1,
+    "global_range": [
+      0.0,
+      4294967294.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "u32",
+    "op": "Abs",
+    "band": 2,
+    "global_range": [
+      0.0,
+      4294967294.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "u32",
+    "op": "Negate",
+    "band": 2,
+    "global_range": [
+      0.0,
+      4294967294.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "u32",
+    "op": "Square",
+    "band": 2,
+    "global_range": [
+      0.0,
+      4294967294.0
+    ],
+    "differences": [
+      "STATISTICS_COUNT",
+      "STATISTICS_MINIMUM",
+      "STATISTICS_MAXIMUM",
+      "STATISTICS_MEAN",
+      "STATISTICS_STDDEV"
+    ]
+  },
+  {
+    "case": "i32",
+    "op": "Abs",
+    "band": 1,
+    "global_range": [
+      -2147483647.0,
+      46341.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "i32",
+    "op": "Negate",
+    "band": 1,
+    "global_range": [
+      -2147483647.0,
+      46341.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "i32",
+    "op": "Square",
+    "band": 1,
+    "global_range": [
+      -2147483647.0,
+      46341.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "i32",
+    "op": "Abs",
+    "band": 2,
+    "global_range": [
+      -2147483647.0,
+      46341.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "i32",
+    "op": "Negate",
+    "band": 2,
+    "global_range": [
+      -2147483647.0,
+      46341.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "i32",
+    "op": "Square",
+    "band": 2,
+    "global_range": [
+      -2147483647.0,
+      46341.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "i16_reverse",
+    "op": "Abs",
+    "band": 1,
+    "global_range": [
+      -30000.0,
+      30000.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "i16_reverse",
+    "op": "Negate",
+    "band": 1,
+    "global_range": [
+      -30000.0,
+      30000.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "i16_reverse",
+    "op": "Square",
+    "band": 1,
+    "global_range": [
+      -30000.0,
+      30000.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "i16_reverse",
+    "op": "Abs",
+    "band": 2,
+    "global_range": [
+      -30000.0,
+      30000.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "i16_reverse",
+    "op": "Negate",
+    "band": 2,
+    "global_range": [
+      -30000.0,
+      30000.0
+    ],
+    "differences": []
+  },
+  {
+    "case": "i16_reverse",
+    "op": "Square",
+    "band": 2,
+    "global_range": [
+      -30000.0,
+      30000.0
+    ],
+    "differences": []
+  }
+]

@@ -61,5 +61,24 @@ A missing extremum anywhere makes Copy Raster recompute ALL bands into PAM and
 keeps F64 for Abs/Negate/Square. Complete caches permit preserved embedded copies
 and F32 narrowing. Keys cannot be paired across different bands or custom domains.
 The same parser handles valid single/double-quoted XML and embedded/PAM per-key
-precedence. Raster.statistics exposes band0's range only for a complete cache.
+precedence. Raster.statistics exposes the union of all stored band extrema for
+a complete cache, used for the dataset's common output type. Per-band stored
+metadata remains independent and is preserved by stats_metadata::read.
 See [20 multiband controls](../../scripts/research/copy_raster/multicache/README.md).
+
+
+Cached integer Abs/Negate/Square now apply that union to every band's planner.
+A nonnegative output range reaching127 promotesS8 toU8/NoData255; signed ranges
+can retain127. This matches the existing strict nonnegative signed32 endpoint
+rule. Direct GP tool execution can differ from SA Raster.save: when an integer result
+band is entirely missing and its NoData marker cannot fit storage, GP recomputes
+statistics from stored zeros for every band. Counts include those pixels. GP
+initializes covariance vectors with sample variance on the diagonal and zeros
+off-diagonal, verified with correlated bands. This also applies to single-band
+all-empty results. The native Output covariance_statistics policy requests that
+PAM initialization. Existing source cross-covariances stay untouched.
+Complete multiband caches with nonfinite/inverted extrema retain presence via
+NaN planning extrema and are refused by registered integer unary tools. The
+single-band reader behavior and per-band metadata are unchanged. Missing extrema
+still select uncached planning; stale/empty-source cache semantics need probes.
+See [36 cached integer controls](../../scripts/research/unary_multiband/cached/README.md).

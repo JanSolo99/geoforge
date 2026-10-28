@@ -6334,7 +6334,10 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
             unigis_raster::stats_metadata::encode(&[empty]),
         );
     }
-    if out.empty_band_statistics {
+    if out.covariance_statistics {
+        write_raster_with(Path::new(&output), &out.raster, false)?;
+        unigis_raster::stats::write_aux_statistics_with_covariance(Path::new(&output), &out.raster)
+    } else if out.empty_band_statistics {
         write_raster_with(Path::new(&output), &out.raster, false)?;
         unigis_raster::stats::write_aux_statistics_with_empty(Path::new(&output), &out.raster)
     } else if out.zero_count {

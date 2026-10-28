@@ -577,6 +577,14 @@ fn cached_integer_unary(op: UnaryOp, r: &Raster, (lo, hi): (f64, f64)) -> Raster
         _ => (0., (lo * lo).max(hi * hi)),
     };
     let (small_type, small_nodata) = crate::zonal::integer_output(out_lo, out_hi, true);
+    // A nonnegative range reaching the signed 8-bit endpoint promotes, just
+    // as the signed 32-bit endpoint below does. Signed ranges may retain it.
+    let (small_type, small_nodata) =
+        if small_type == DataType::I8 && out_lo >= 0.0 && out_hi == i8::MAX as f64 {
+            (DataType::U8, u8::MAX as f64)
+        } else {
+            (small_type, small_nodata)
+        };
     let (t, nodata) = if matches!(
         small_type,
         DataType::U8 | DataType::I8 | DataType::U16 | DataType::I16
@@ -623,7 +631,10 @@ fn cached_integer_unary(op: UnaryOp, r: &Raster, (lo, hi): (f64, f64)) -> Raster
 pub(crate) fn supports_multiband_unary(op: UnaryOp, raster: &Raster) -> bool {
     match op {
         UnaryOp::Abs | UnaryOp::Negate | UnaryOp::Square => {
-            raster.data_type.is_float() || raster.statistics.is_none()
+            raster.data_type.is_float()
+                || raster
+                    .statistics
+                    .is_none_or(|(lo, hi)| lo.is_finite() && hi.is_finite() && lo <= hi)
         }
         UnaryOp::Sqrt | UnaryOp::Ln | UnaryOp::Exp => raster.data_type.is_float(),
         _ => false,

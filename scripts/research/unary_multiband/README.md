@@ -12,12 +12,12 @@ existing single-band storage rules, so each band shares an output type/marker.
 NoData propagates per band; U32 Negate wraps through signed32 and Square overflow
 becomes missing, as in the existing single-band controls.
 
-Cached integer inputs need a separate solution. Twelve private cached/uncached
-I16 controls (cached_observations.json) show that output planning uses both band
-ranges, regardless of order. Raster.statistics currently retains only band0's
-range. Reusing that range for all cached integer bands would be incorrect. Stale
-per-band caches must be preserved, so scanning pixels is not an equivalent fix.
-Cached integer multiband remains a known gap; this slice covers uncached inputs.
+Twelve initial private cached/uncached I16 controls (cached_observations.json)
+showed output planning needs both band ranges, regardless of order. The original
+reader retained only band0; that was insufficient for cached integer support.
+The subsequent `cached/README.md` checkpoint unions stored extrema without
+scanning samples and adds36 typed controls. Stale per-band caches remain a
+separate compatibility question.
 
 Recreate format inputs in a fresh directory:
 
@@ -64,12 +64,13 @@ its private float64.tif by copying first_full_f64.tif from
 
 Registered unary tools now explicitly refuse unsupported multiband combinations
 before returning an output. The support predicate is shared with the existing
-Abs/Negate/Square dispatcher. Cached integer unary math and other unary multiband
-operators still need implementation; the refusal is a native capability limit,
+Abs/Negate/Square dispatcher. At this checkpoint cached integer and other unary multiband operators were
+refused; subsequent cached/floating support is linked below. Remaining refusals
+are native capability limits,
 not a claim that ArcGIS refuses these inputs. The low-level local::unary API
 expects a supported combination; known callers use the validating registry.
 
-unary_band_safety.rs starts with a valid existing output, then checks six
+unary_band_safety.rs starts with a valid existing output, then checks seven
 unsupported requests return code1 with a clear message and leave every file
 byte-identical. Cached integer inputs pair the existing i16.tif pixels with
 frozen ArcGIS CalculateStatistics XML from the earlier forward_cached control.
@@ -79,3 +80,8 @@ uncached source fixture. Existing full/scoped references cover supported inputs.
 Floating SquareRoot/Ln/Exp support follows in `floating/README.md`. Its twelve
 positive cases replace those three refusal scenarios; the current guard
 regression tests Log2/Sin/RoundUp floats and retains cached integer refusals.
+
+Cached integer support now follows in `cached/README.md`. Its36 positive cases
+cover Abs/Negate/Square with valid complete stored ranges. The current guard
+regression retains integer SquareRoot/Ln/Exp and float Log2/Sin/RoundUp refusals
+and adds malformed later-band cache refusal; all seven preserve existing files.

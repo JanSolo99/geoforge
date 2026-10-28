@@ -30,7 +30,7 @@ fn embedded_statistics_roundtrip_through_native_and_gdal_with_pam_overrides() {
         assert_eq!(read[1]["STATISTICS_COUNT"], "4.000000");
         assert_eq!(
             unigis_raster::read_geotiff(&path).unwrap().statistics,
-            Some((1., 4.))
+            Some((1., 40.))
         );
         assert!(!Path::new(&format!("{}.aux.xml", path.display())).exists());
         let output = Command::new("gdalinfo")
@@ -134,7 +134,7 @@ fn only_complete_default_domain_caches_enable_statistics_planning() {
                 | "single_quotes"
                 | "single_quotes_f64"
         );
-        assert_eq!(raster.statistics, complete.then_some((1., 4.)), "{name}");
+        assert_eq!(raster.statistics, complete.then_some((1., 40.)), "{name}");
         assert_eq!(raster.bands.len(), 2, "{name}");
     }
 }

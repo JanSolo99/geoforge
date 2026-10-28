@@ -86,13 +86,19 @@ pub fn format_g14(v: f64) -> String {
 /// The `.aux.xml` text for `s`, as GDAL's PAM and ArcGIS write statistics.
 /// `count` is the number written as STATISTICS_COUNT (ArcGIS's Basin writes 0 there).
 pub fn aux_xml(s: &Statistics, count: u64) -> String {
-    format!("<PAMDataset>\n{}</PAMDataset>\n", aux_band_xml(s, count, 1))
+    format!(
+        "<PAMDataset>\n{}</PAMDataset>\n",
+        aux_band_xml(s, count, 1, None)
+    )
 }
 
-fn aux_band_xml(s: &Statistics, count: u64, band: usize) -> String {
+fn aux_band_xml(s: &Statistics, count: u64, band: usize, covariance: Option<&str>) -> String {
     let item = |k: &str, v: String| format!("      <MDI key=\"STATISTICS_{k}\">{v}</MDI>\n");
     let mut out = format!("  <PAMRasterBand band=\"{band}\">\n    <Metadata>\n");
     out += &item("COUNT", format!("{:.6}", count as f64));
+    if let Some(covariance) = covariance {
+        out += &item("COVARIANCES", covariance.into());
+    }
     out += &item("MAXIMUM", format_g14(s.max));
     out += &item("MEAN", format_g14(s.mean));
     out += &item("MEDIAN", "nan".into());
@@ -125,6 +131,33 @@ pub fn write_aux_statistics_with_empty(raster_path: &Path, r: &Raster) -> Result
     write_aux_statistics_policy(raster_path, r, None, true)
 }
 
+/// Writes GP diagonal-only covariance initialization after stored-cell normalization.
+pub fn write_aux_statistics_with_covariance(raster_path: &Path, r: &Raster) -> Result<()> {
+    let mut xml = String::from("<PAMDataset>\n");
+    for index in 0..r.bands.len() {
+        let Some(s) = statistics_for_band(r, index) else {
+            continue;
+        };
+        let values = (0..r.bands.len())
+            .map(|other| {
+                if index == other {
+                    format_g14(s.std_dev * s.std_dev)
+                } else {
+                    "0".into()
+                }
+            })
+            .collect::<Vec<_>>()
+            .join(",");
+        xml += &aux_band_xml(&s, s.count, index + 1, Some(&values));
+    }
+    if xml == "<PAMDataset>\n" {
+        return Ok(());
+    }
+    xml += "</PAMDataset>\n";
+    let path = std::path::PathBuf::from(format!("{}.aux.xml", raster_path.display()));
+    std::fs::write(&path, xml).map_err(|e| Error::io(&path, e))
+}
+
 fn write_aux_statistics_policy(
     raster_path: &Path,
     r: &Raster,
@@ -148,7 +181,7 @@ fn write_aux_statistics_policy(
         if count.is_some() && s.std_dev == 0.0 {
             s.std_dev = 1.0;
         }
-        xml += &aux_band_xml(&s, count.unwrap_or(s.count), index + 1);
+        xml += &aux_band_xml(&s, count.unwrap_or(s.count), index + 1, None);
     }
     if xml == "<PAMDataset>\n" {
         return Ok(());

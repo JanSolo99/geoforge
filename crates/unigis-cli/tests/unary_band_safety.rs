@@ -24,6 +24,7 @@ fn unsupported_multiband_unary_preserves_existing_output() {
     let raw = folder.join("raw.tif");
     let cached = folder.join("cached.tif");
     let float = folder.join("float.tif");
+    let invalid = folder.join("invalid.tif");
     let output = folder.join("existing.tif");
     std::fs::copy(root.join("testdata/raster/unary_multiband/i16.tif"), &raw).unwrap();
     std::fs::copy(&raw, &cached).unwrap();
@@ -35,6 +36,14 @@ fn unsupported_multiband_unary_preserves_existing_output() {
     std::fs::copy(
         root.join("testdata/raster/copy_multicache/first_full_f64.tif"),
         &float,
+    )
+    .unwrap();
+    std::fs::copy(&raw, &invalid).unwrap();
+    let cache = std::fs::read_to_string(folder.join("cached.tif.aux.xml")).unwrap();
+    assert!(cache.contains(">30000</MDI>"));
+    std::fs::write(
+        folder.join("invalid.tif.aux.xml"),
+        cache.replace(">30000</MDI>", ">nan</MDI>"),
     )
     .unwrap();
     let run = |tool: &str, input: &Path| {
@@ -49,12 +58,13 @@ fn unsupported_multiband_unary_preserves_existing_output() {
     assert!(initial.status.success(), "{initial:?}");
     let before = snapshot(&folder);
     for (tool, input) in [
-        ("abs", &cached),
-        ("negate", &cached),
-        ("square", &cached),
+        ("square_root", &cached),
+        ("ln", &cached),
+        ("exp", &cached),
         ("log2", &float),
         ("sin", &float),
         ("round_up", &float),
+        ("abs", &invalid),
     ] {
         let result = run(tool, input);
         assert_eq!(result.status.code(), Some(1), "{tool}: {result:?}");

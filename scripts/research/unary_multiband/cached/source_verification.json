@@ -1,0 +1,146 @@
+[
+  {
+    "file": "i16.tif",
+    "sha256": "e22fe32ae0748aae732307e2dbeae0e7f7fe4af69d0ecd32274c63b79aa7d682",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "i16.tif.aux.xml",
+    "sha256": "b1fb54b8acd1699772f1a413e6c99a0df0095b05f0bede412edd8c0c6557e996",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "i16_nonpositive.tif",
+    "sha256": "7edab187a9fae907e131c75f678108f9226871c9aea506f5d0c1a8bca0e35093",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "i16_nonpositive.tif.aux.xml",
+    "sha256": "c8b5aa77f6f95c00cc19fb72f04fe7d5363cfa55c00a9744e9c2bf20b56260ab",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "i16_reverse.tif",
+    "sha256": "be3d4fcb941bdacadfee9d737ae9f49e0b11b91550f23ec1cda07a37c608ea5a",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "i16_reverse.tif.aux.xml",
+    "sha256": "87ff903fcd715cdeb59c022c6e47801a72a5c9812f2d5dbd8a17f27c6e542d6f",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "i32.tif",
+    "sha256": "8dad9580422abee8b352c3a6e6a4d47e93a45a189a9bd697d6662740c3d9f975",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "i32.tif.aux.xml",
+    "sha256": "4792c1eb51e21cc07129ce6fd74e1d91f5b952e9623d2c5fbf7f66bd3655905f",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "i8.tif",
+    "sha256": "581c447d42cb94a594755c3c17cad5a97f69c826ba4e5b6cd8193ddc69ba1783",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "i8.tif.aux.xml",
+    "sha256": "2ceef09552f68ec5cc8348fac2a43538aea6581738fb8bc887bbfbb41087d235",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "i8_nonpositive.tif",
+    "sha256": "f750de32166a682b1dc7d65ba899760e3249a41fe098334153a7d3c4d0d2a640",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "i8_nonpositive.tif.aux.xml",
+    "sha256": "ba070cb7ef7b42dbb5985849560084b882f4b53e471814371ca13a228cdf7194",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "u16.tif",
+    "sha256": "9e8058b154f4ba706d9e07b931dada3a3be5bb5a871001887c838e4654caffcc",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "u16.tif.aux.xml",
+    "sha256": "a1a72dc20e3e83e1ab18f2b443c0ea06bc7f05a81bc779645a1e21723ac26543",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "u32.tif",
+    "sha256": "35403d4c21ab7d7249582d82d0cc496331342fc2e62c3b7a3c02e5eecb499f7d",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "u32.tif.aux.xml",
+    "sha256": "506af9b19eac198181fd1b5cbe8e3711e072a84bb5bdabc2d623030f7bf552ca",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "u32_overflow.tif",
+    "sha256": "ce3fe7cc7d79ab5d20bb3945d6a3375d19204ec3fd5250653be91d2cfc62ef61",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "u32_overflow.tif.aux.xml",
+    "sha256": "5d57cbe48913df70f488d51ecbdc18dd1f2afa41d9c8e7411ce9629566a582d0",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "u32_single_overflow.tif",
+    "sha256": "ab807b601eae6993c32ce00abb90ede6e2feddc1df7f04f2efc2581b63873a9c",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "u32_single_overflow.tif.aux.xml",
+    "sha256": "52475162cf6727f5a4ae9f212912b67f3e34efc9eb0296dbe744a92dea6b1246",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "u32_three_bands.tif",
+    "sha256": "808a9e141b17ef3ac1271bdbb83f774e987bcdce676e8c2c1185493a3f759893",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "u32_three_bands.tif.aux.xml",
+    "sha256": "68c38cc110e55b809c9a145e5a03388483e43f8b487acd0e748f5e0866ab0546",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "u8.tif",
+    "sha256": "5032248aed2325ea41941ca96e86bb65321b74e91a261cf1e9b26233296bed16",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  },
+  {
+    "file": "u8.tif.aux.xml",
+    "sha256": "f501ded57282f0d03121524412b1df013ea747a31c8297e06e8cc5d4781a738c",
+    "matches_private_oracle_source": true,
+    "unchanged_after_reference_generation": true
+  }
+]

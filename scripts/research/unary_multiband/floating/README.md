@@ -29,6 +29,6 @@ exact samples, masks/type/NoData, statistics, grid, semantic CRS and PAM placeme
 (native_after.txt/recipe_verification.txt). Source hashes and frozen PAM bytes
 remain unchanged after reference generation (source_verification.json).
 The existing per-band dispatcher now supports these three floating operations.
-The safety regression retains six refusals, moving its float cases to still-
-unsupported Log2/Sin/RoundUp. Cached integer and remaining multiband operations
-remain refused. Full gate/push validation is recorded in docs/HANDOFF.md.
+The safety regression retains float refusals for still-unsupported Log2/Sin/
+RoundUp; the cached follow-up adds a malformed-cache refusal. Subsequent valid cached integer support is covered in ../cached/README.md;
+remaining unsupported operators and malformed complete caches are refused. Full gate/push validation is recorded in docs/HANDOFF.md.

@@ -1043,6 +1043,10 @@ CASES = {
     "um64_negate_f64_nd_cached": ("gp.Negate_sa", [RASTER / "unary_types/f64_nd_cached.tif"], []),
     "um64_square_f64_cached": ("gp.Square_sa", [RASTER / "unary_types/f64_cached.tif"], []),
     "um64_square_f64_nd_cached": ("gp.Square_sa", [RASTER / "unary_types/f64_nd_cached.tif"], []),
+    **{f"umcachemulti_{op.lower()}_{name}":
+       (f"gp.{op}_sa", [RASTER / "unary_cached_multiband" / f"{name}.tif"], [])
+       for op in ["Abs", "Negate", "Square"]
+       for name in ["u8", "i8", "u16", "i16", "u32", "i32", "i16_reverse", "i8_nonpositive", "i16_nonpositive", "u32_overflow", "u32_three_bands", "u32_single_overflow"]},
     **{f"umfloatmore_{op.lower()}_{name}":
        (f"gp.{op}_sa", [RASTER / "unary_float_multiband" / f"{name}.tif"], [])
        for op in ["SquareRoot", "Ln", "Exp"]

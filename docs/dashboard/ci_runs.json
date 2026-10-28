@@ -1,11 +1,18 @@
 {
-  "fetched": "2026-10-28T17:08:07+00:00",
+  "fetched": "2026-10-28T17:52:09+00:00",
   "runs": [
     {
-      "conclusion": "",
+      "conclusion": "failure",
+      "createdAt": "2026-10-28T17:22:47Z",
+      "displayTitle": "Support floating multiband square root logarithm and exponential",
+      "status": "completed",
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40735144822"
+    },
+    {
+      "conclusion": "success",
       "createdAt": "2026-10-28T17:06:09Z",
       "displayTitle": "Refuse unsupported multiband unary requests before writing output",
-      "status": "in_progress",
+      "status": "completed",
       "url": "https://github.com/JanSolo99/geoforge/actions/runs/40732452475"
     },
     {
@@ -49,13 +56,6 @@
       "displayTitle": "Generate Tessellation: diamond and hexagon cells",
       "status": "completed",
       "url": "https://github.com/JanSolo99/geoforge/actions/runs/40711699219"
-    },
-    {
-      "conclusion": "success",
-      "createdAt": "2026-10-28T14:50:37Z",
-      "displayTitle": "Add Generate Tessellation (SQUARE) with ArcGIS reference cases",
-      "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40709943508"
     }
   ]
 }
