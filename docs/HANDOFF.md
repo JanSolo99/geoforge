@@ -84,6 +84,8 @@ Tested offline (`test_daemon_runs_inbox_tasks_commands_pause_and_keepalive`); no
 
 - Probed 2026-10-28 and left: Stream To Feature (one arc per stream link; geometry is derivable: the line starts half a cell UPSTREAM of the link's first cell centre along its flow direction (an edge midpoint or a corner), runs through the cell centres where the direction changes and ends at the centre of the first cell of the downstream link; from_node = the link's own value, to_node = the downstream link's value; the ORDER of arcs (arcid) is by to_node with ties and the late part of the list in an ArcInfo scan order that I could not reproduce; outlets' to_node unknown). Implementing the geometry with a sort that matches only partly would fail the reference test, so it is not done.
 
+- Sample (`sample`, `smp_*` pass; rasters `a;b`, locations = points, NEAREST/BILINEAR, unique_id_field; handled by `run_sample` in the CLI because it writes a table): columns = location layer name (FID or the id field), X, Y, one per raster named by file stem (float rasters get `_Band_1`, all cut to 10 characters); F32 values keep 6 significant digits (Single field F 13.11), F64 and integers exact. Point on a cell edge -> the cell to its left / above. Outside raster: 0 if the raster has no NoData, else the NoData value (float) / -9999 (integer). Bilinear: outside neighbours count as 0 for rasters without NoData; with NoData, missing and NoData neighbours are dropped and weights renormalised. Not done: multiband rasters, buffer_distance/statistics options, ALL_SLICES.
+
 ## Next actions
 
 1. Keep going in probe -> implement -> reference-test batches (see "Session 2026-10-26" entries for what is done and the gaps).

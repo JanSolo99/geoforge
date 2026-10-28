@@ -866,6 +866,13 @@ fn snap_pour_point(ctx: &dyn Context) -> Result<Output> {
     )
 }
 
+/// Sample writes a table, which the command line produces (see `run_sample` in the CLI).
+fn sample_unsupported(_: &dyn Context) -> Result<Output> {
+    Err(Error::Unsupported(
+        "Sample writes a table; run it through `ug run sample`".into(),
+    ))
+}
+
 fn flip(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::extract::flip(&ctx.raster("input")?), true)
 }
@@ -1510,6 +1517,41 @@ pub static TOOLS: &[Tool] = &[
             },
         ],
         run: snap_pour_point,
+    },
+    Tool {
+        id: "sample",
+        name: "Sample",
+        summary: "Raster values at point locations, as a table.",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Rasters",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            Param {
+                name: "locations",
+                label: "Input Location Data",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            option(
+                "resampling",
+                "Resampling Technique",
+                &["NEAREST", "BILINEAR"],
+                "NEAREST",
+            ),
+            Param {
+                name: "unique_id_field",
+                label: "Unique ID Field",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+            },
+        ],
+        run: sample_unsupported,
     },
     Tool {
         id: "flip",

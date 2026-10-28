@@ -59706,6 +59706,442 @@
           "pour_point_field": "PP_ID"
         }
       }
+    },
+    "smp_dem": {
+      "tool": "gp.Sample_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "NEAREST"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010559: The input feature class does not have a spatial index."
+      ],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "wells",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_Band_1",
+          "Single",
+          13,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "sample",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "locations": "testdata/geoproc/wells.shp",
+          "output": "<out>",
+          "resampling": "NEAREST"
+        }
+      }
+    },
+    "smp_dem_bil": {
+      "tool": "gp.Sample_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "BILINEAR"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010559: The input feature class does not have a spatial index."
+      ],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "wells",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_Band_1",
+          "Single",
+          13,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "sample",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "locations": "testdata/geoproc/wells.shp",
+          "output": "<out>",
+          "resampling": "BILINEAR"
+        }
+      }
+    },
+    "smp_u8": {
+      "tool": "gp.Sample_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "NEAREST"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010559: The input feature class does not have a spatial index."
+      ],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "wells",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "landuse_u8",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "sample",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "locations": "testdata/geoproc/wells.shp",
+          "output": "<out>",
+          "resampling": "NEAREST"
+        }
+      }
+    },
+    "smp_multi": {
+      "tool": "gp.Sample_sa",
+      "args": [
+        "testdata/raster/dem.tif;testdata/raster/landuse_u8.tif;testdata/raster/dem_int16_packbits.tif",
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "NEAREST"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010559: The input feature class does not have a spatial index."
+      ],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "wells",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_Band_1",
+          "Single",
+          13,
+          0,
+          0
+        ],
+        [
+          "landuse_u8",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "dem_int16_",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "sample",
+        "params": {
+          "input": "testdata/raster/dem.tif;testdata/raster/landuse_u8.tif;testdata/raster/dem_int16_packbits.tif",
+          "locations": "testdata/geoproc/wells.shp",
+          "output": "<out>",
+          "resampling": "NEAREST"
+        }
+      }
+    },
+    "smp_nodata_bil": {
+      "tool": "gp.Sample_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "BILINEAR"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010559: The input feature class does not have a spatial index."
+      ],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "wells",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_nodata",
+          "Single",
+          13,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "sample",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "locations": "testdata/geoproc/wells.shp",
+          "output": "<out>",
+          "resampling": "BILINEAR"
+        }
+      }
+    },
+    "smp_f64_id": {
+      "tool": "gp.Sample_sa",
+      "args": [
+        "testdata/raster/dem_f64.tif",
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "NEAREST",
+        "WELL_ID"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010559: The input feature class does not have a spatial index."
+      ],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "wells",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_f64_Ba",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "sample",
+        "params": {
+          "input": "testdata/raster/dem_f64.tif",
+          "locations": "testdata/geoproc/wells.shp",
+          "output": "<out>",
+          "resampling": "NEAREST",
+          "unique_id_field": "WELL_ID"
+        }
+      }
+    },
+    "smp_hydro_parcels": {
+      "tool": "gp.Sample_sa",
+      "args": [
+        "testdata/raster/hydro.tif",
+        "testdata/geoproc/pour_pts.shp",
+        "<out>",
+        "NEAREST"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010559: The input feature class does not have a spatial index."
+      ],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "pour_pts",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "hydro_Band",
+          "Single",
+          13,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "sample",
+        "params": {
+          "input": "testdata/raster/hydro.tif",
+          "locations": "testdata/geoproc/pour_pts.shp",
+          "output": "<out>",
+          "resampling": "NEAREST"
+        }
+      }
     }
   }
 }

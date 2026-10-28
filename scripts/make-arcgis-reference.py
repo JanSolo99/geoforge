@@ -1469,6 +1469,13 @@ CASES = {
     "spp_100_field": ("gp.SnapPourPoint_sa", [DATA / "pour_pts.shp", OUT / "flowacc_hydro.tif"], [100, "PP_ID"]),
     "spp_0": ("gp.SnapPourPoint_sa", [DATA / "pour_pts.shp", OUT / "flowacc_hydro.tif"], [0]),
     "spp_300_int": ("gp.SnapPourPoint_sa", [DATA / "pour_pts.shp", OUT / "flowacc_hydro_int.tif"], [300, "PP_ID"]),
+    "smp_dem": ("gp.Sample_sa", [RASTER / "dem.tif", DATA / "wells.shp"], ["NEAREST"]),
+    "smp_dem_bil": ("gp.Sample_sa", [RASTER / "dem.tif", DATA / "wells.shp"], ["BILINEAR"]),
+    "smp_u8": ("gp.Sample_sa", [RASTER / "landuse_u8.tif", DATA / "wells.shp"], ["NEAREST"]),
+    "smp_multi": ("gp.Sample_sa", [f"{RASTER / 'dem.tif'};{RASTER / 'landuse_u8.tif'};{RASTER / 'dem_int16_packbits.tif'}", DATA / "wells.shp"], ["NEAREST"]),
+    "smp_nodata_bil": ("gp.Sample_sa", [RASTER / "dem_nodata.tif", DATA / "wells.shp"], ["BILINEAR"]),
+    "smp_f64_id": ("gp.Sample_sa", [RASTER / "dem_f64.tif", DATA / "wells.shp"], ["NEAREST", "WELL_ID"]),
+    "smp_hydro_parcels": ("gp.Sample_sa", [RASTER / "hydro.tif", DATA / "pour_pts.shp"], ["NEAREST"]),
     "gpal_roads_50": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "NO_END_POINTS"]),
     "gpal_roads_50_end": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["DISTANCE", "50 Meters", "", "END_POINTS"]),
     "gpal_roads_pct": ("management.GeneratePointsAlongLines", [DATA / "roads.shp"], ["PERCENTAGE", "", 25, "NO_END_POINTS"]),
@@ -1671,6 +1678,7 @@ RUN = {
     "gp.DistanceAllocation_sa": ("distance_allocation", ["input", "output"]),
     "gp.FocalFlow_sa": ("focal_flow", ["input", "output", "threshold_value"]),
     "gp.SnapPourPoint_sa": ("snap_pour_point", ["input", "accumulation", "output", "snap_distance", "pour_point_field"]),
+    "gp.Sample_sa": ("sample", ["input", "locations", "output", "resampling", "unique_id_field"]),
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
     "analysis.CountOverlappingFeatures": ("count_overlapping_features", ["input", "output", "minimum_overlap_count"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
@@ -1703,7 +1711,7 @@ WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable", "conversion.RasterToASCII", "conversion.RasterToFloat"}
 # Tools whose output is a table, written as <name>.dbf.
-TABLE_OUT = {"management.CopyRows", "gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa", "gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
+TABLE_OUT = {"gp.Sample_sa", "management.CopyRows", "gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa", "gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
              "management.TransposeFields", "management.PivotTable", "management.CreateTable", "analysis.PolygonNeighbors", "analysis.TabulateIntersection", "analysis.TableSelect"}
 # Tools whose ArcGIS output must be a geodatabase feature class or memory (copied to a shapefile).
 MEMORY_OUT = {"analysis.SummarizeWithin", "analysis.SummarizeNearby", "analysis.ApportionPolygon"}
