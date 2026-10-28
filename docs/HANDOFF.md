@@ -74,6 +74,8 @@ Tested offline (`test_daemon_runs_inbox_tasks_commands_pause_and_keepalive`); no
 - Distance Accumulation / Distance Allocation without barrier/surface/cost rasters (`distance_accumulation`, `distance_allocation`, `dacc_*`, `dalloc_*` pass): same values as Euclidean Distance/Allocation; no statistics sidecar; allocation is Byte (16-bit beyond 255) with NoData 0 when no cell is 0, no NoData otherwise. With a cost raster ArcGIS differs from Cost Distance (max 130 on cost_f32): NOT done.
 - WARNING (cost me a test run): never run `gdalinfo -stats` on files in testdata/raster or elsewhere in testdata: it writes `.aux.xml` statistics beside the input and changes how the tools type their outputs (inputs with stats take the "known range" path). Also ArcGIS probes can leave auto-named rasters (`EucDist_cost_sr1.tif` ...) in testdata/raster: delete untracked files there before committing.
 
+- Focal Flow (`focal_flow`, `ff_*` pass): bits E1 SE2 S4 SW8 W16 NW32 N64 NE128 set for each neighbor whose elevation exceeds the cell's by MORE than the threshold (z units, default 0; neighbors outside or NoData give no bit); U16 NoData 65535 on NoData cells.
+
 ## Next actions
 
 1. Keep going in probe -> implement -> reference-test batches (see "Session 2026-10-26" entries for what is done and the gaps).

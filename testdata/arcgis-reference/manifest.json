@@ -59496,6 +59496,102 @@
           "output": "<out>"
         }
       }
+    },
+    "ff_dem": {
+      "tool": "gp.FocalFlow_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "focal_flow",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "ff_dem_2": {
+      "tool": "gp.FocalFlow_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        2
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "focal_flow",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "threshold_value": 2
+        }
+      }
+    },
+    "ff_dem_nodata": {
+      "tool": "gp.FocalFlow_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        0.5
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "focal_flow",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "threshold_value": 0.5
+        }
+      }
+    },
+    "ff_hydro": {
+      "tool": "gp.FocalFlow_sa",
+      "args": [
+        "testdata/raster/hydro.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "focal_flow",
+        "params": {
+          "input": "testdata/raster/hydro.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "ff_u8": {
+      "tool": "gp.FocalFlow_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        1
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "focal_flow",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "output": "<out>",
+          "threshold_value": 1
+        }
+      }
     }
   }
 }

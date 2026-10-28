@@ -663,3 +663,45 @@ pub fn flow_length(directions: &Raster, upstream: bool) -> Raster {
         .collect();
     out
 }
+
+/// Focal Flow: for each cell a bit per neighbor that is higher than it by more than `threshold`
+/// (so water can flow in from it): east 1, south-east 2, south 4, south-west 8, west 16,
+/// north-west 32, north 64, north-east 128. 16-bit unsigned, NoData 65535 (observed).
+pub fn focal_flow(input: &Raster, threshold: f64) -> Raster {
+    const DIRS: [(isize, isize, f64); 8] = [
+        (1, 0, 1.0),
+        (1, 1, 2.0),
+        (0, 1, 4.0),
+        (-1, 1, 8.0),
+        (-1, 0, 16.0),
+        (-1, -1, 32.0),
+        (0, -1, 64.0),
+        (1, -1, 128.0),
+    ];
+    let nodata = f64::from(u16::MAX);
+    let mut out = input.like(DataType::U16);
+    out.nodata = Some(nodata);
+    for row in 0..input.height {
+        for col in 0..input.width {
+            let Some(z) = input.get(col, row) else {
+                out.bands[0][row * input.width + col] = nodata;
+                continue;
+            };
+            let mut bits = 0.0;
+            for (dx, dy, bit) in DIRS {
+                let (x, y) = (col as isize + dx, row as isize + dy);
+                if x < 0 || y < 0 || x >= input.width as isize || y >= input.height as isize {
+                    continue;
+                }
+                if input
+                    .get(x as usize, y as usize)
+                    .is_some_and(|n| n - z > threshold)
+                {
+                    bits += bit;
+                }
+            }
+            out.bands[0][row * input.width + col] = bits;
+        }
+    }
+    out
+}

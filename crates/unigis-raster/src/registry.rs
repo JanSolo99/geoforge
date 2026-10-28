@@ -839,6 +839,17 @@ fn distance_allocation(ctx: &dyn Context) -> Result<Output> {
     with_statistics(out, false)
 }
 
+fn focal_flow(ctx: &dyn Context) -> Result<Output> {
+    let threshold = ctx
+        .get("threshold_value")
+        .and_then(|v| v.trim().parse().ok())
+        .unwrap_or(0.0);
+    with_statistics(
+        crate::hydro::focal_flow(&ctx.raster("input")?, threshold),
+        true,
+    )
+}
+
 fn flip(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::extract::flip(&ctx.raster("input")?), true)
 }
@@ -1437,6 +1448,22 @@ pub static TOOLS: &[Tool] = &[
         summary: "Euclidean distance / allocation from sources (no barriers, surface or cost rasters yet).",
         params: &[raster("input", "Input Source Data", true)],
         run: distance_allocation,
+    },
+    Tool {
+        id: "focal_flow",
+        name: "Focal Flow",
+        summary: "Which neighbors of each cell are higher than it (flow directions into the cell).",
+        params: &[
+            raster("input", "Input Surface Raster", true),
+            Param {
+                name: "threshold_value",
+                label: "Threshold Value",
+                kind: Kind::Number,
+                required: false,
+                default: "",
+            },
+        ],
+        run: focal_flow,
     },
     Tool {
         id: "flip",
