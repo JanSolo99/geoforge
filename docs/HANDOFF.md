@@ -78,6 +78,8 @@ Tested offline (`test_daemon_runs_inbox_tasks_commands_pause_and_keepalive`); no
 
 - Probed 2026-10-28 and left: Generate Rectangles Along Lines (fields PageNumber, GroupId = line FID as text, SeqId, Previous, Next, Angle; rectangles `length x width` along each line, first one starting at the line start, 'Upper left' etc. changes the anchor corner; roads give 30 rectangles but the sequence for the multi-vertex lines (restarting SeqId 1..8 then 1..3 for line '2') is unexplained), Raster To Polyline (ArcInfo-style arcs with from_node/to_node; numbering order unknown), Remove Overlap Multiple (center line = medial axis), Split By Attributes (writes tables as null-shape shapefiles).
 
+- Probed 2026-10-28 and left: Line Statistics (LENGTH value = 3.0x the length inside the search circle in one cell, 1.38x in another: formula unknown; other statistics also unexplained). Slice NATURAL_BREAKS: ArcGIS breaks on dem.tif 5 classes lie between 209.763|209.772, 231.463|231.467, 253.554|253.563, 279.088|279.113, exact Jenks on all 18000 cells gives 209.69|209.72, 231.32|231.33, 253.40|253.42, 279.01|279.04 (0.05-0.15 lower), so ArcGIS runs Jenks on a binned or sampled version; STANDARD_DEVIATION and GEOMETRICAL_INTERVAL are refused by `arcpy.sa.Slice` here (domain error), only EQUAL_INTERVAL/EQUAL_AREA/NATURAL_BREAKS exist in this build.
+
 ## Next actions
 
 1. Keep going in probe -> implement -> reference-test batches (see "Session 2026-10-26" entries for what is done and the gaps).
