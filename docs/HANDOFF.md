@@ -163,3 +163,13 @@ interpolation, Outliers beyond 1.5 IQR; Mode/LeastCommon are None on ties (text:
 all-unique: '[All Unique Values]'); '' counts as a value, NULL as Nulls. Not done: Date fields,
 group_by_field, the Statistic list, a combined NUMERIC+TEXT run (ArcGIS writes two tables).
 Harness: the case runs into memory then copies the table to the output .dbf.
+
+Claude (state at last checkpoint): branch main == origin/main at 588fa36 (Field Statistics To Table). No GitHub
+Actions minutes: do not rely on hosted CI; run `scripts/check` (pre-push hook does). A push can report
+"cannot lock ref" if a previous interrupted push landed late; `git fetch && git status -sb` to confirm.
+Uncommitted work in the tree belongs to Codex (unary multiband integer-float: local.rs, registry.rs,
+stats.rs, unary_band_safety.rs, umintfloat_* cases in scripts/make-arcgis-reference.py, docs/dashboard.html,
+testdata/raster/unary_integer_float/, scripts/research/unary_multiband/integer_float/). Do not stage it
+unless continuing that slice. Next candidates: Field Statistics To Table group-by/statistics list,
+Convert Time Zone (needs tz table), Trim/Extend Line (topological, see probe notes above), MGRS/USNG
+notation output, Aggregate Points.
