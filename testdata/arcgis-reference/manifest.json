@@ -68129,6 +68129,222 @@
           "output": "<out>"
         }
       }
+    },
+    "umfloatmore_squareroot_float32_raw": {
+      "tool": "gp.SquareRoot_sa",
+      "args": [
+        "testdata/raster/unary_float_multiband/float32_raw.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square_root",
+        "params": {
+          "input": "testdata/raster/unary_float_multiband/float32_raw.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umfloatmore_squareroot_float32_cached": {
+      "tool": "gp.SquareRoot_sa",
+      "args": [
+        "testdata/raster/unary_float_multiband/float32_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square_root",
+        "params": {
+          "input": "testdata/raster/unary_float_multiband/float32_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umfloatmore_squareroot_float64_raw": {
+      "tool": "gp.SquareRoot_sa",
+      "args": [
+        "testdata/raster/unary_float_multiband/float64_raw.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square_root",
+        "params": {
+          "input": "testdata/raster/unary_float_multiband/float64_raw.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umfloatmore_squareroot_float64_cached": {
+      "tool": "gp.SquareRoot_sa",
+      "args": [
+        "testdata/raster/unary_float_multiband/float64_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "square_root",
+        "params": {
+          "input": "testdata/raster/unary_float_multiband/float64_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umfloatmore_ln_float32_raw": {
+      "tool": "gp.Ln_sa",
+      "args": [
+        "testdata/raster/unary_float_multiband/float32_raw.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ln",
+        "params": {
+          "input": "testdata/raster/unary_float_multiband/float32_raw.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umfloatmore_ln_float32_cached": {
+      "tool": "gp.Ln_sa",
+      "args": [
+        "testdata/raster/unary_float_multiband/float32_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ln",
+        "params": {
+          "input": "testdata/raster/unary_float_multiband/float32_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umfloatmore_ln_float64_raw": {
+      "tool": "gp.Ln_sa",
+      "args": [
+        "testdata/raster/unary_float_multiband/float64_raw.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ln",
+        "params": {
+          "input": "testdata/raster/unary_float_multiband/float64_raw.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umfloatmore_ln_float64_cached": {
+      "tool": "gp.Ln_sa",
+      "args": [
+        "testdata/raster/unary_float_multiband/float64_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "ln",
+        "params": {
+          "input": "testdata/raster/unary_float_multiband/float64_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umfloatmore_exp_float32_raw": {
+      "tool": "gp.Exp_sa",
+      "args": [
+        "testdata/raster/unary_float_multiband/float32_raw.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "exp",
+        "params": {
+          "input": "testdata/raster/unary_float_multiband/float32_raw.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umfloatmore_exp_float32_cached": {
+      "tool": "gp.Exp_sa",
+      "args": [
+        "testdata/raster/unary_float_multiband/float32_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "exp",
+        "params": {
+          "input": "testdata/raster/unary_float_multiband/float32_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umfloatmore_exp_float64_raw": {
+      "tool": "gp.Exp_sa",
+      "args": [
+        "testdata/raster/unary_float_multiband/float64_raw.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "exp",
+        "params": {
+          "input": "testdata/raster/unary_float_multiband/float64_raw.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "umfloatmore_exp_float64_cached": {
+      "tool": "gp.Exp_sa",
+      "args": [
+        "testdata/raster/unary_float_multiband/float64_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "exp",
+        "params": {
+          "input": "testdata/raster/unary_float_multiband/float64_cached.tif",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

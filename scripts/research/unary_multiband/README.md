@@ -75,3 +75,7 @@ byte-identical. Cached integer inputs pair the existing i16.tif pixels with
 frozen ArcGIS CalculateStatistics XML from the earlier forward_cached control.
 That cache is stored separately as i16_cached_statistics.xml to preserve the
 uncached source fixture. Existing full/scoped references cover supported inputs.
+
+Floating SquareRoot/Ln/Exp support follows in `floating/README.md`. Its twelve
+positive cases replace those three refusal scenarios; the current guard
+regression tests Log2/Sin/RoundUp floats and retains cached integer refusals.

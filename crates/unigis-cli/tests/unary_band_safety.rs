@@ -52,9 +52,9 @@ fn unsupported_multiband_unary_preserves_existing_output() {
         ("abs", &cached),
         ("negate", &cached),
         ("square", &cached),
-        ("square_root", &float),
-        ("ln", &float),
-        ("exp", &float),
+        ("log2", &float),
+        ("sin", &float),
+        ("round_up", &float),
     ] {
         let result = run(tool, input);
         assert_eq!(result.status.code(), Some(1), "{tool}: {result:?}");

@@ -621,8 +621,13 @@ fn cached_integer_unary(op: UnaryOp, r: &Raster, (lo, hi): (f64, f64)) -> Raster
 
 /// Whether every input band can use the existing per-band unary planner.
 pub(crate) fn supports_multiband_unary(op: UnaryOp, raster: &Raster) -> bool {
-    (raster.data_type.is_float() || raster.statistics.is_none())
-        && matches!(op, UnaryOp::Abs | UnaryOp::Negate | UnaryOp::Square)
+    match op {
+        UnaryOp::Abs | UnaryOp::Negate | UnaryOp::Square => {
+            raster.data_type.is_float() || raster.statistics.is_none()
+        }
+        UnaryOp::Sqrt | UnaryOp::Ln | UnaryOp::Exp => raster.data_type.is_float(),
+        _ => false,
+    }
 }
 
 /// Applies a one-raster math tool. Abs/Negate/Square preserve uncached F64 input precision.

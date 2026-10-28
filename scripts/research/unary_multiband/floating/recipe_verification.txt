@@ -1,0 +1,13 @@
+umfloatmore_squareroot_float32_raw PASS
+umfloatmore_squareroot_float32_cached PASS
+umfloatmore_squareroot_float64_raw PASS
+umfloatmore_squareroot_float64_cached PASS
+umfloatmore_ln_float32_raw PASS
+umfloatmore_ln_float32_cached PASS
+umfloatmore_ln_float64_raw PASS
+umfloatmore_ln_float64_cached PASS
+umfloatmore_exp_float32_raw PASS
+umfloatmore_exp_float32_cached PASS
+umfloatmore_exp_float64_raw PASS
+umfloatmore_exp_float64_cached PASS
+Checked 12 FAILED 0 []

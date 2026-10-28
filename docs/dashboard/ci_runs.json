@@ -1,11 +1,18 @@
 {
-  "fetched": "2026-10-28T16:52:47+00:00",
+  "fetched": "2026-10-28T17:08:07+00:00",
   "runs": [
     {
       "conclusion": "",
+      "createdAt": "2026-10-28T17:06:09Z",
+      "displayTitle": "Refuse unsupported multiband unary requests before writing output",
+      "status": "in_progress",
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40732452475"
+    },
+    {
+      "conclusion": "success",
       "createdAt": "2026-10-28T16:51:34Z",
       "displayTitle": "Preserve every band in uncached integer unary math",
-      "status": "in_progress",
+      "status": "completed",
       "url": "https://github.com/JanSolo99/geoforge/actions/runs/40730089604"
     },
     {
@@ -49,13 +56,6 @@
       "displayTitle": "Add Generate Tessellation (SQUARE) with ArcGIS reference cases",
       "status": "completed",
       "url": "https://github.com/JanSolo99/geoforge/actions/runs/40709943508"
-    },
-    {
-      "conclusion": "success",
-      "createdAt": "2026-10-28T14:39:11Z",
-      "displayTitle": "Add Create Binary Mask (basic) with ArcGIS reference cases",
-      "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40708058510"
     }
   ]
 }

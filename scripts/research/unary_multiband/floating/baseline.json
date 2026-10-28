@@ -1,0 +1,86 @@
+[
+  {
+    "case": "float32_raw",
+    "tool": "square_root",
+    "exit": 1,
+    "stderr": "ERROR: unsupported: Sqrt is not yet supported for this multiband input",
+    "output_exists": false
+  },
+  {
+    "case": "float32_raw",
+    "tool": "ln",
+    "exit": 1,
+    "stderr": "ERROR: unsupported: Ln is not yet supported for this multiband input",
+    "output_exists": false
+  },
+  {
+    "case": "float32_raw",
+    "tool": "exp",
+    "exit": 1,
+    "stderr": "ERROR: unsupported: Exp is not yet supported for this multiband input",
+    "output_exists": false
+  },
+  {
+    "case": "float32_cached",
+    "tool": "square_root",
+    "exit": 1,
+    "stderr": "ERROR: unsupported: Sqrt is not yet supported for this multiband input",
+    "output_exists": false
+  },
+  {
+    "case": "float32_cached",
+    "tool": "ln",
+    "exit": 1,
+    "stderr": "ERROR: unsupported: Ln is not yet supported for this multiband input",
+    "output_exists": false
+  },
+  {
+    "case": "float32_cached",
+    "tool": "exp",
+    "exit": 1,
+    "stderr": "ERROR: unsupported: Exp is not yet supported for this multiband input",
+    "output_exists": false
+  },
+  {
+    "case": "float64_raw",
+    "tool": "square_root",
+    "exit": 1,
+    "stderr": "ERROR: unsupported: Sqrt is not yet supported for this multiband input",
+    "output_exists": false
+  },
+  {
+    "case": "float64_raw",
+    "tool": "ln",
+    "exit": 1,
+    "stderr": "ERROR: unsupported: Ln is not yet supported for this multiband input",
+    "output_exists": false
+  },
+  {
+    "case": "float64_raw",
+    "tool": "exp",
+    "exit": 1,
+    "stderr": "ERROR: unsupported: Exp is not yet supported for this multiband input",
+    "output_exists": false
+  },
+  {
+    "case": "float64_cached",
+    "tool": "square_root",
+    "exit": 1,
+    "stderr": "ERROR: unsupported: Sqrt is not yet supported for this multiband input",
+    "output_exists": false
+  },
+  {
+    "case": "float64_cached",
+    "tool": "ln",
+    "exit": 1,
+    "stderr": "ERROR: unsupported: Ln is not yet supported for this multiband input",
+    "output_exists": false
+  },
+  {
+    "case": "float64_cached",
+    "tool": "exp",
+    "exit": 1,
+    "stderr": "ERROR: unsupported: Exp is not yet supported for this multiband input",
+    "output_exists": false
+  }
+]

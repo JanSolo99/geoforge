@@ -1,0 +1,86 @@
+[
+  {
+    "case": "float32_raw",
+    "op": "SquareRoot",
+    "bands": 2,
+    "type": "F32",
+    "nodata": -3.4028234663852886e+38
+  },
+  {
+    "case": "float32_raw",
+    "op": "Ln",
+    "bands": 2,
+    "type": "F32",
+    "nodata": -3.4028234663852886e+38
+  },
+  {
+    "case": "float32_raw",
+    "op": "Exp",
+    "bands": 2,
+    "type": "F32",
+    "nodata": -3.4028234663852886e+38
+  },
+  {
+    "case": "float32_cached",
+    "op": "SquareRoot",
+    "bands": 2,
+    "type": "F32",
+    "nodata": -3.4028234663852886e+38
+  },
+  {
+    "case": "float32_cached",
+    "op": "Ln",
+    "bands": 2,
+    "type": "F32",
+    "nodata": -3.4028234663852886e+38
+  },
+  {
+    "case": "float32_cached",
+    "op": "Exp",
+    "bands": 2,
+    "type": "F32",
+    "nodata": -3.4028234663852886e+38
+  },
+  {
+    "case": "float64_raw",
+    "op": "SquareRoot",
+    "bands": 2,
+    "type": "F32",
+    "nodata": -3.4028234663852886e+38
+  },
+  {
+    "case": "float64_raw",
+    "op": "Ln",
+    "bands": 2,
+    "type": "F32",
+    "nodata": -3.4028234663852886e+38
+  },
+  {
+    "case": "float64_raw",
+    "op": "Exp",
+    "bands": 2,
+    "type": "F32",
+    "nodata": -3.4028234663852886e+38
+  },
+  {
+    "case": "float64_cached",
+    "op": "SquareRoot",
+    "bands": 2,
+    "type": "F32",
+    "nodata": -3.4028234663852886e+38
+  },
+  {
+    "case": "float64_cached",
+    "op": "Ln",
+    "bands": 2,
+    "type": "F32",
+    "nodata": -3.4028234663852886e+38
+  },
+  {
+    "case": "float64_cached",
+    "op": "Exp",
+    "bands": 2,
+    "type": "F32",
+    "nodata": -3.4028234663852886e+38
+  }
+]
