@@ -1,0 +1,418 @@
+[
+  {
+    "input": "large",
+    "cached": false,
+    "status": "succeeded",
+    "bands": [
+      {
+        "band": "1",
+        "statistics": {
+          "STATISTICS_MINIMUM": "188.10171508789",
+          "STATISTICS_MAXIMUM": "324.82815551758",
+          "STATISTICS_MEAN": "238.33279059803",
+          "STATISTICS_STDDEV": "30.645301756308",
+          "STATISTICS_MEDIAN": "nan",
+          "STATISTICS_COUNT": "17700.000000",
+          "STATISTICS_SKIPFACTORX": "1",
+          "STATISTICS_SKIPFACTORY": "1",
+          "STATISTICS_EXCLUDEDVALUES": null,
+          "STATISTICS_COVARIANCES": "939.1345197352013"
+        }
+      }
+    ]
+  },
+  {
+    "input": "large",
+    "cached": true,
+    "status": "succeeded",
+    "bands": [
+      {
+        "band": "1",
+        "statistics": {}
+      }
+    ]
+  },
+  {
+    "input": "small",
+    "cached": false,
+    "status": "succeeded",
+    "bands": [
+      {
+        "band": "1",
+        "statistics": {
+          "STATISTICS_MINIMUM": "0.10000000149012",
+          "STATISTICS_MAXIMUM": "4000000000",
+          "STATISTICS_MEAN": "803361997.62",
+          "STATISTICS_STDDEV": "1786989715.9714",
+          "STATISTICS_MEDIAN": "nan",
+          "STATISTICS_COUNT": "5.000000",
+          "STATISTICS_SKIPFACTORX": "1",
+          "STATISTICS_SKIPFACTORY": "1",
+          "STATISTICS_EXCLUDEDVALUES": null,
+          "STATISTICS_COVARIANCES": "3.193332244987626e+18"
+        }
+      }
+    ]
+  },
+  {
+    "input": "small",
+    "cached": true,
+    "status": "succeeded",
+    "bands": [
+      {
+        "band": "1",
+        "statistics": {}
+      }
+    ]
+  },
+  {
+    "input": "multi",
+    "cached": false,
+    "status": "succeeded",
+    "bands": [
+      {
+        "band": "1",
+        "statistics": {
+          "STATISTICS_MINIMUM": "1",
+          "STATISTICS_MAXIMUM": "4",
+          "STATISTICS_MEAN": "2.6666666666667",
+          "STATISTICS_STDDEV": "1.5275252316519",
+          "STATISTICS_MEDIAN": "nan",
+          "STATISTICS_COUNT": "3.000000",
+          "STATISTICS_SKIPFACTORX": "1",
+          "STATISTICS_SKIPFACTORY": "1",
+          "STATISTICS_EXCLUDEDVALUES": null,
+          "STATISTICS_COVARIANCES": "2.333333333333333,0"
+        }
+      },
+      {
+        "band": "2",
+        "statistics": {
+          "STATISTICS_MINIMUM": "1",
+          "STATISTICS_MAXIMUM": "4",
+          "STATISTICS_MEAN": "2.5",
+          "STATISTICS_STDDEV": "1.2909944487358",
+          "STATISTICS_MEDIAN": "nan",
+          "STATISTICS_COUNT": "4.000000",
+          "STATISTICS_SKIPFACTORX": "1",
+          "STATISTICS_SKIPFACTORY": "1",
+          "STATISTICS_EXCLUDEDVALUES": null,
+          "STATISTICS_COVARIANCES": "0,1.666666666666667"
+        }
+      }
+    ]
+  },
+  {
+    "input": "multi",
+    "cached": true,
+    "status": "succeeded",
+    "bands": [
+      {
+        "band": "1",
+        "statistics": {}
+      },
+      {
+        "band": "2",
+        "statistics": {}
+      }
+    ]
+  },
+  {
+    "input": "later",
+    "cached": false,
+    "status": "succeeded",
+    "bands": [
+      {
+        "band": "1",
+        "statistics": {
+          "STATISTICS_MINIMUM": "1",
+          "STATISTICS_MAXIMUM": "4",
+          "STATISTICS_MEAN": "2.5",
+          "STATISTICS_STDDEV": "1.2909944487358",
+          "STATISTICS_MEDIAN": "nan",
+          "STATISTICS_COUNT": "4.000000",
+          "STATISTICS_SKIPFACTORX": "1",
+          "STATISTICS_SKIPFACTORY": "1",
+          "STATISTICS_EXCLUDEDVALUES": null,
+          "STATISTICS_COVARIANCES": "1.666666666666667,0"
+        }
+      },
+      {
+        "band": "2",
+        "statistics": {
+          "STATISTICS_MINIMUM": "1",
+          "STATISTICS_MAXIMUM": "4",
+          "STATISTICS_MEAN": "2.6666666666667",
+          "STATISTICS_STDDEV": "1.5275252316519",
+          "STATISTICS_MEDIAN": "nan",
+          "STATISTICS_COUNT": "3.000000",
+          "STATISTICS_SKIPFACTORX": "1",
+          "STATISTICS_SKIPFACTORY": "1",
+          "STATISTICS_EXCLUDEDVALUES": null,
+          "STATISTICS_COVARIANCES": "0,2.333333333333333"
+        }
+      }
+    ]
+  },
+  {
+    "input": "later",
+    "cached": true,
+    "status": "succeeded",
+    "bands": [
+      {
+        "band": "1",
+        "statistics": {}
+      },
+      {
+        "band": "2",
+        "statistics": {}
+      }
+    ]
+  },
+  {
+    "input": "unused",
+    "cached": false,
+    "status": "succeeded",
+    "bands": [
+      {
+        "band": "1",
+        "statistics": {
+          "STATISTICS_MINIMUM": "-1.25",
+          "STATISTICS_MAXIMUM": "4000000000",
+          "STATISTICS_MEAN": "669468331.14167",
+          "STATISTICS_STDDEV": "1631634419.6934",
+          "STATISTICS_MEDIAN": "nan",
+          "STATISTICS_COUNT": "6.000000",
+          "STATISTICS_SKIPFACTORX": "1",
+          "STATISTICS_SKIPFACTORY": "1",
+          "STATISTICS_EXCLUDEDVALUES": null,
+          "STATISTICS_COVARIANCES": "2.662230879528167e+18"
+        }
+      }
+    ]
+  },
+  {
+    "input": "unused",
+    "cached": true,
+    "status": "succeeded",
+    "bands": [
+      {
+        "band": "1",
+        "statistics": {}
+      }
+    ]
+  },
+  {
+    "input": "large_valid",
+    "cached": false,
+    "status": "succeeded",
+    "bands": [
+      {
+        "band": "1",
+        "statistics": {
+          "STATISTICS_MINIMUM": "188.10171508789",
+          "STATISTICS_MAXIMUM": "324.82815551758",
+          "STATISTICS_MEAN": "238.346012569",
+          "STATISTICS_STDDEV": "30.479163071878",
+          "STATISTICS_MEDIAN": "nan",
+          "STATISTICS_COUNT": "18000.000000",
+          "STATISTICS_SKIPFACTORX": "1",
+          "STATISTICS_SKIPFACTORY": "1",
+          "STATISTICS_EXCLUDEDVALUES": null,
+          "STATISTICS_COVARIANCES": "928.9793815621518"
+        }
+      }
+    ]
+  },
+  {
+    "input": "large_valid",
+    "cached": true,
+    "status": "succeeded",
+    "bands": [
+      {
+        "band": "1",
+        "statistics": {
+          "STATISTICS_MINIMUM": "188.10171508789",
+          "STATISTICS_MAXIMUM": "324.82815551758",
+          "STATISTICS_MEAN": "238.346012569",
+          "STATISTICS_STDDEV": "30.479163071878",
+          "STATISTICS_MEDIAN": "nan",
+          "STATISTICS_COUNT": "18000.000000",
+          "STATISTICS_SKIPFACTORX": "1",
+          "STATISTICS_SKIPFACTORY": "1",
+          "STATISTICS_EXCLUDEDVALUES": null,
+          "STATISTICS_COVARIANCES": "928.9793815621518"
+        }
+      }
+    ]
+  },
+  {
+    "cached": false,
+    "case": "f64",
+    "bands": [
+      {
+        "band": "1",
+        "statistics": {
+          "STATISTICS_MINIMUM": "0.10000000149012",
+          "STATISTICS_MAXIMUM": "4000000000",
+          "STATISTICS_MEAN": "803361997.62",
+          "STATISTICS_STDDEV": "1786989715.9714",
+          "STATISTICS_MEDIAN": "nan",
+          "STATISTICS_COUNT": "5.000000",
+          "STATISTICS_SKIPFACTORX": "1",
+          "STATISTICS_SKIPFACTORY": "1",
+          "STATISTICS_EXCLUDEDVALUES": null,
+          "STATISTICS_COVARIANCES": "3.193332244987626e+18"
+        }
+      }
+    ]
+  },
+  {
+    "cached": false,
+    "case": "i16",
+    "bands": [
+      {
+        "band": "1",
+        "statistics": {
+          "STATISTICS_MINIMUM": "0",
+          "STATISTICS_MAXIMUM": "32767",
+          "STATISTICS_MEAN": "19661",
+          "STATISTICS_STDDEV": "17946.129652379",
+          "STATISTICS_MEDIAN": "nan",
+          "STATISTICS_COUNT": "5.000000",
+          "STATISTICS_SKIPFACTORX": "1",
+          "STATISTICS_SKIPFACTORY": "1",
+          "STATISTICS_EXCLUDEDVALUES": null,
+          "STATISTICS_COVARIANCES": "322063569.4999999"
+        }
+      }
+    ]
+  },
+  {
+    "cached": false,
+    "case": "override",
+    "bands": [
+      {
+        "band": "1",
+        "statistics": {
+          "STATISTICS_MINIMUM": "0.10000000149012",
+          "STATISTICS_MAXIMUM": "4000000000",
+          "STATISTICS_MEAN": "803361997.62",
+          "STATISTICS_STDDEV": "1786989715.9714",
+          "STATISTICS_MEDIAN": "nan",
+          "STATISTICS_COUNT": "5.000000",
+          "STATISTICS_SKIPFACTORX": "1",
+          "STATISTICS_SKIPFACTORY": "1",
+          "STATISTICS_EXCLUDEDVALUES": null,
+          "STATISTICS_COVARIANCES": "3.193332244987626e+18"
+        }
+      }
+    ]
+  },
+  {
+    "cached": false,
+    "case": "same",
+    "bands": [
+      {
+        "band": "1",
+        "statistics": {
+          "STATISTICS_MINIMUM": "0.10000000149012",
+          "STATISTICS_MAXIMUM": "4000000000",
+          "STATISTICS_MEAN": "803361997.62",
+          "STATISTICS_STDDEV": "1786989715.9714",
+          "STATISTICS_MEDIAN": "nan",
+          "STATISTICS_COUNT": "5.000000",
+          "STATISTICS_SKIPFACTORX": "1",
+          "STATISTICS_SKIPFACTORY": "1",
+          "STATISTICS_EXCLUDEDVALUES": null,
+          "STATISTICS_COVARIANCES": "3.193332244987626e+18"
+        }
+      }
+    ]
+  },
+  {
+    "cached": true,
+    "case": "f64",
+    "bands": [
+      {
+        "band": "1",
+        "statistics": {
+          "STATISTICS_MINIMUM": "0.10000000149012",
+          "STATISTICS_MAXIMUM": "4000000000",
+          "STATISTICS_MEAN": "803361997.62",
+          "STATISTICS_STDDEV": "1786989715.9714",
+          "STATISTICS_MEDIAN": "nan",
+          "STATISTICS_COUNT": "5.000000",
+          "STATISTICS_SKIPFACTORX": "1",
+          "STATISTICS_SKIPFACTORY": "1",
+          "STATISTICS_EXCLUDEDVALUES": null,
+          "STATISTICS_COVARIANCES": "3.193332244987626e+18"
+        }
+      }
+    ]
+  },
+  {
+    "cached": true,
+    "case": "i16",
+    "bands": [
+      {
+        "band": "1",
+        "statistics": {
+          "STATISTICS_MINIMUM": "0",
+          "STATISTICS_MAXIMUM": "32767",
+          "STATISTICS_MEAN": "19661",
+          "STATISTICS_STDDEV": "17946.129652379",
+          "STATISTICS_MEDIAN": "nan",
+          "STATISTICS_COUNT": "5.000000",
+          "STATISTICS_SKIPFACTORX": "1",
+          "STATISTICS_SKIPFACTORY": "1",
+          "STATISTICS_EXCLUDEDVALUES": null,
+          "STATISTICS_COVARIANCES": "322063569.4999999"
+        }
+      }
+    ]
+  },
+  {
+    "cached": true,
+    "case": "override",
+    "bands": [
+      {
+        "band": "1",
+        "statistics": {
+          "STATISTICS_MINIMUM": "0.10000000149012",
+          "STATISTICS_MAXIMUM": "4000000000",
+          "STATISTICS_MEAN": "803361997.62",
+          "STATISTICS_STDDEV": "1786989715.9714",
+          "STATISTICS_MEDIAN": "nan",
+          "STATISTICS_COUNT": "5.000000",
+          "STATISTICS_SKIPFACTORX": "1",
+          "STATISTICS_SKIPFACTORY": "1",
+          "STATISTICS_EXCLUDEDVALUES": null,
+          "STATISTICS_COVARIANCES": "3.193332244987626e+18"
+        }
+      }
+    ]
+  },
+  {
+    "cached": true,
+    "case": "same",
+    "bands": [
+      {
+        "band": "1",
+        "statistics": {}
+      }
+    ]
+  },
+  {
+    "case": "equal",
+    "statistics": [
+      {}
+    ]
+  },
+  {
+    "case": "equal_type",
+    "statistics": [
+      {}
+    ]
+  }
+]

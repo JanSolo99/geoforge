@@ -527,13 +527,15 @@ fn copy_raster(ctx: &dyn Context) -> Result<Output> {
     };
     let nodata = ctx.get("nodata_value").and_then(|v| v.trim().parse().ok());
     let input = ctx.raster("input")?;
-    // Saved single-band DEM copies with NoData have no statistics; the
-    // multiband probes write statistics for each band, including NoData bands.
-    let has_nodata = input.bands[0].iter().any(|&v| input.is_nodata(v));
-    with_statistics(
-        crate::extract::copy_raster(&input, pixel_type, nodata),
-        input.bands.len() > 1 || !has_nodata,
-    )
+    let raster = crate::extract::copy_raster(&input, pixel_type, nodata);
+    // Cached tagged sources retain the observed no-statistics copy path only
+    // when the effective pixel type and marker are unchanged. Actual missing
+    // cells, raster size and band count do not select this path.
+    let statistics = input.statistics.is_none()
+        || input.nodata.is_none()
+        || raster.data_type != input.data_type
+        || raster.nodata != input.nodata;
+    with_statistics(raster, statistics)
 }
 
 fn mosaic_to_new_raster(ctx: &dyn Context) -> Result<Output> {

@@ -732,14 +732,16 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 
 - [x] Copy Raster downcasts: 16 additional ArcGIS cases cover all eight types to F32/I16. Large float NoData metadata survives integer output, and statistics exclude the rounded F32 marker correctly. A GeoTIFF/GDAL regression checks tags beyond the i64 range.
 
-- [x] Equal To / Greater Than / Less Than Frequency (`ug run *_frequency`): exact source-precision comparisons, duplicate counts, both band modes, value-band broadcast, missing/extra comparison bands, ArcGIS count types/NoData and empty-band statistics.63 saved cases plus CLI refusal preservation; empty Rank/Popularity lists now return a parameter error instead of panicking. Limits: `scripts/research/frequency/README.md`.
+- [x] Equal To / Greater Than / Less Than Frequency (`ug run *_frequency`): exact source-precision comparisons, duplicate counts, both band modes, value-band broadcast, missing/extra comparison bands, ArcGIS count types/NoData and empty-band statistics.66 saved cases plus CLI refusal preservation; empty Rank/Popularity lists now return a parameter error instead of panicking. Limits: `scripts/research/frequency/README.md`.
 
-- [x] Abs / Negate / Square preserve uncached Float64 cells and the F64 NoData marker; cached Float64 inputs follow ArcGIS narrowing to Float32. Twelve exact ArcGIS cases cover tagged/untagged and cached/uncached doubles. Wider integer/statistics-dependent behavior remains a separate documented slice.
+- [x] Abs / Negate / Square preserve uncached Float64 cells and the F64 NoData marker; cached Float64 inputs follow ArcGIS narrowing to Float32. Twelve exact ArcGIS cases cover tagged/untagged and cached/uncached doubles. Integer paths have separate cached/uncached reference corpora below.
 
-- [x] Uncached integer Abs/Negate/Square: 39 additional ArcGIS cases cover six integer types with/without NoData plus exact signed/unsigned32 boundaries. Negate uses observed widths and signed32 wrapping; Square preserves signedness, widens appropriately and marks integer overflow NoData. All48 original typed probes now match; cached integer planning remains documented follow-up work.
+- [x] Uncached integer Abs/Negate/Square: 39 additional ArcGIS cases cover six integer types with/without NoData plus exact signed/unsigned32 boundaries. Negate uses observed widths and signed32 wrapping; Square preserves signedness, widens appropriately and marks integer overflow NoData. All48 original typed probes now match; cached integer planning is covered by the subsequent 81-case milestone below.
 
 - [x] Explicit GP encoding for integer NoData outside sample storage: zero physical cells, original tag and logical statistics preserved. GeoTIFF API retains default conversion; CLI opts in. Frequency255-with-NoData now works with three additional ArcGIS cases; native/GDAL tests cover U8/I16/I32, tiled/striped and BigTIFF layouts.
 
 - [x] Cached integer Abs/Negate/Square planning: 81 ArcGIS cases/27 snapshots with original statistics sidecars, conservative ranges, narrow packed/signed types, signed/unsigned32 endpoint choices, wrapping/overflow and out-of-range NoData encoding. Uncached and Float64 paths retain separate references. Reproducer: `scripts/research/unary_types/README.md`.
 
 - [x] Line Statistics (`ug run line_statistics`): clipped-length weighting, all eight statistics, integer/double output types, lower-value mode ties and empty-neighborhood semantics; 22 ArcGIS cases and invalid-parameter/allocation guards. Planar straight polylines with explicit cell size/radius; remaining scope in `scripts/research/line_statistics/README.md`.
+
+- [x] Copy Raster statistics policy: 22 additional ArcGIS cases isolate cached/uncached inputs, size, band count, unused tags, type changes and equal/changed markers. Tagged cached copies omit statistics only when output type/marker stay unchanged. Reproducer: `scripts/research/copy_raster/statistics/README.md`.

@@ -1,0 +1,2 @@
+{"input": "/mnt/media/ArcGIS_Linux/testdata/raster/dem.tif", "statistics": {"STATISTICS_MINIMUM": "188.10171508789", "STATISTICS_MAXIMUM": "324.82815551758", "STATISTICS_MEAN": "238.346012569", "STATISTICS_STDDEV": "30.479163071878", "STATISTICS_MEDIAN": "nan", "STATISTICS_COUNT": "18000.000000", "STATISTICS_SKIPFACTORX": "1", "STATISTICS_SKIPFACTORY": "1", "STATISTICS_EXCLUDEDVALUES": null, "STATISTICS_COVARIANCES": "928.9793815621518"}}
+{"input": "/mnt/media/ArcGIS_Linux/testdata/raster/copy_statistics/small_cached.tif", "statistics": {}}

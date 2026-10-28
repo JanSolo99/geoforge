@@ -1166,6 +1166,20 @@ CASES = {
     "umcache_abs_symmetric": ("gp.Abs_sa", [RASTER / "unary_cached/symmetric.tif"], []),
     "umcache_negate_symmetric": ("gp.Negate_sa", [RASTER / "unary_cached/symmetric.tif"], []),
     "umcache_square_symmetric": ("gp.Square_sa", [RASTER / "unary_cached/symmetric.tif"], []),
+    **{f"cprstats_{profile}_{cache}":
+       ("management.CopyRaster", [RASTER / f"copy_statistics/{profile}_{cache}.tif"], [])
+       for profile in ["large", "small", "multi", "later", "unused", "large_valid"]
+       for cache in ["cached", "uncached"]},
+    **{f"cprstats_small_{cache}_{option}":
+       ("management.CopyRaster", [RASTER / f"copy_statistics/small_{cache}.tif"], args)
+       for cache in ["cached", "uncached"]
+       for option, args in [
+           ("f64", ["", "", "", "", "", "64_BIT"]),
+           ("i16", ["", "", "", "", "", "16_BIT_SIGNED"]),
+           ("override", ["", "", "-9999"]),
+           ("same", ["", "", "", "", "", "32_BIT_FLOAT"])]},
+    "cprstats_small_cached_equal": ("management.CopyRaster", [RASTER / "copy_statistics/small_cached.tif"], ["", "", "-1.25"]),
+    "cprstats_small_cached_equal_type": ("management.CopyRaster", [RASTER / "copy_statistics/small_cached.tif"], ["", "", "-1.25", "", "", "32_BIT_FLOAT"]),
     "cpr_dem": ("management.CopyRaster", [RASTER / "dem.tif"], []),
     "cpr_dem_nodata": ("management.CopyRaster", [RASTER / "dem.tif"], ["", "", "-1", "", "", "32_BIT_FLOAT"]),
     "cpr_u8_float": ("management.CopyRaster", [RASTER / "landuse_u8.tif"], ["", "", "", "", "", "32_BIT_FLOAT"]),

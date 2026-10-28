@@ -61080,6 +61080,464 @@
           "statistic": "RANGE"
         }
       }
+    },
+    "cprstats_large_cached": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_statistics/large_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_statistics/large_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprstats_large_uncached": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_statistics/large_uncached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_statistics/large_uncached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprstats_small_cached": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_statistics/small_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_statistics/small_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprstats_small_uncached": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_statistics/small_uncached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_statistics/small_uncached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprstats_multi_cached": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_statistics/multi_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_statistics/multi_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprstats_multi_uncached": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_statistics/multi_uncached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_statistics/multi_uncached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprstats_later_cached": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_statistics/later_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_statistics/later_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprstats_later_uncached": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_statistics/later_uncached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_statistics/later_uncached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprstats_unused_cached": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_statistics/unused_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_statistics/unused_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprstats_unused_uncached": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_statistics/unused_uncached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_statistics/unused_uncached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprstats_large_valid_cached": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_statistics/large_valid_cached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_statistics/large_valid_cached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprstats_large_valid_uncached": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_statistics/large_valid_uncached.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_statistics/large_valid_uncached.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "cprstats_small_cached_f64": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_statistics/small_cached.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "64_BIT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_statistics/small_cached.tif",
+          "output": "<out>",
+          "pixel_type": "64_BIT"
+        }
+      }
+    },
+    "cprstats_small_cached_i16": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_statistics/small_cached.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "16_BIT_SIGNED"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_statistics/small_cached.tif",
+          "output": "<out>",
+          "pixel_type": "16_BIT_SIGNED"
+        }
+      }
+    },
+    "cprstats_small_cached_override": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_statistics/small_cached.tif",
+        "<out>",
+        "",
+        "",
+        "-9999"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_statistics/small_cached.tif",
+          "output": "<out>",
+          "nodata_value": "-9999"
+        }
+      }
+    },
+    "cprstats_small_cached_same": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_statistics/small_cached.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "32_BIT_FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_statistics/small_cached.tif",
+          "output": "<out>",
+          "pixel_type": "32_BIT_FLOAT"
+        }
+      }
+    },
+    "cprstats_small_uncached_f64": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_statistics/small_uncached.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "64_BIT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_statistics/small_uncached.tif",
+          "output": "<out>",
+          "pixel_type": "64_BIT"
+        }
+      }
+    },
+    "cprstats_small_uncached_i16": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_statistics/small_uncached.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "16_BIT_SIGNED"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_statistics/small_uncached.tif",
+          "output": "<out>",
+          "pixel_type": "16_BIT_SIGNED"
+        }
+      }
+    },
+    "cprstats_small_uncached_override": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_statistics/small_uncached.tif",
+        "<out>",
+        "",
+        "",
+        "-9999"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_statistics/small_uncached.tif",
+          "output": "<out>",
+          "nodata_value": "-9999"
+        }
+      }
+    },
+    "cprstats_small_uncached_same": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_statistics/small_uncached.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "32_BIT_FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_statistics/small_uncached.tif",
+          "output": "<out>",
+          "pixel_type": "32_BIT_FLOAT"
+        }
+      }
+    },
+    "cprstats_small_cached_equal": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_statistics/small_cached.tif",
+        "<out>",
+        "",
+        "",
+        "-1.25"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_statistics/small_cached.tif",
+          "output": "<out>",
+          "nodata_value": "-1.25"
+        }
+      }
+    },
+    "cprstats_small_cached_equal_type": {
+      "tool": "management.CopyRaster",
+      "args": [
+        "testdata/raster/copy_statistics/small_cached.tif",
+        "<out>",
+        "",
+        "",
+        "-1.25",
+        "",
+        "",
+        "32_BIT_FLOAT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "copy_raster",
+        "params": {
+          "input": "testdata/raster/copy_statistics/small_cached.tif",
+          "output": "<out>",
+          "nodata_value": "-1.25",
+          "pixel_type": "32_BIT_FLOAT"
+        }
+      }
     }
   }
 }

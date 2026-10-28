@@ -23,10 +23,12 @@ Do not clamp integer NoData tags to the cell range: valid U8 value255 must survi
 when its metadata marker is256. Existing explicit/input NoData overrides still
 apply. Every band undergoes the requested pixel conversion in its original order.
 
-Multiband probes write statistics for each band even when a band contains NoData.
-The existing single-band DEM-with-NoData reference has histograms but no statistics;
-that behavior remains separate. ArcGIS's general statistics-generation policy
-across sizes/input caches/environments is not fully established.
+The original multiband probes write statistics because their inputs have no cached
+statistics. The saved single-band DEM-with-NoData input is cached, and its copy
+has no output statistics.22 isolated controls now explain this distinction:
+[statistics/README.md](statistics/README.md). Size, actual missing cells and band
+count do not select this policy; cached tagged sources omit statistics only when
+the effective type and marker remain unchanged.
 
 Input RGB/type fixtures are reused from `testdata/raster` and `composite_matrix`.
 `make_inputs.py` uses GDAL solely for file IO to create the tiny first/later-band
@@ -49,7 +51,7 @@ rounded marker2147483648. NoData is now normalized before statistics, and intege
 metadata beyond i64 is serialized without saturation. GDAL/native file tests cover
 large positive/negative sentinels separately from the ArcGIS operation oracle.
 
-Further tagged-input probes remain outside this slice: ArcGIS writes statistics
-for tiny single-band NoData inputs (unlike the saved large DEM case), and U32
-NoData metadata exports through signed32. Native Copy Raster still differs there;
-see KNOWN_GAPS. This does not change the saved downcast/default-input results.
+Further tagged-input probes remain outside this slice: U32 NoData metadata exports
+through signed32 in ArcGIS; extreme/fractional explicit markers can map cells
+differently. Native Copy Raster still differs there; see KNOWN_GAPS. The former
+tiny-input statistics gap is resolved by the cached-source/type/marker policy.

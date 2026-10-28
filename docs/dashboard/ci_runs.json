@@ -1,6 +1,13 @@
 {
-  "fetched": "2026-10-28T10:01:41+00:00",
+  "fetched": "2026-10-28T10:16:01+00:00",
   "runs": [
+    {
+      "conclusion": "",
+      "createdAt": "2026-10-28T10:13:21Z",
+      "displayTitle": "Add ArcGIS-verified Line Statistics with contact and clipping precisi\u2026",
+      "status": "in_progress",
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40670384449"
+    },
     {
       "conclusion": "success",
       "createdAt": "2026-10-28T09:46:15Z",
@@ -49,13 +56,6 @@
       "displayTitle": "Add Snap Pour Point with ArcGIS reference cases",
       "status": "completed",
       "url": "https://github.com/JanSolo99/geoforge/actions/runs/40656161374"
-    },
-    {
-      "conclusion": "success",
-      "createdAt": "2026-10-28T08:04:25Z",
-      "displayTitle": "HANDOFF: binned Jenks does not match Slice natural breaks",
-      "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40654206715"
     }
   ]
 }
