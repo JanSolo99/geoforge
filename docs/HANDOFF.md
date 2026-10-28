@@ -112,3 +112,10 @@ LENGTH = sum(field x length inside), MEAN = length-weighted mean, MAXIMUM/MINIMU
 MINORITY by length per distinct value; grid = IDW default (extent grown half a cell, round(w/cell)+1);
 integer field -> S32 NoData -2147483647 except MEAN/LENGTH (F32). Median not done. Pushing is left to the
 running Codex push; do not start a second push while it runs.
+
+Claude 2026-10-29: Surface Parameters again (SLOPE+ASPECT from ArcGIS turned into gradients and regressed on the 3x3
+cells): not a fixed linear 3x3 filter (max residual 2e-5 on gradients ~0.03; fitted weights ~ (1,4,1)/12 columns but
+with non-zero middle-column weights), only the 1-cell border is NoData, so the neighbourhood is 3x3 and the fit is
+nonlinear in the slope/aspect formulas. Not implemented. User asked (2026-10-29) to keep going until ALL ArcGIS
+tools exist: ~330 of 2028 tools have ArcGIS reference cases so far; the dashboard (http://100.99.35.95:8765/dashboard)
+tracks it. Rule for the long run: keep to probe -> closed-form fit -> registry entry -> reference cases -> commit.
