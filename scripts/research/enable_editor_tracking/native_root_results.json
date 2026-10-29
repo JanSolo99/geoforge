@@ -1,0 +1,19 @@
+{
+  "tracking": {
+    "editorTrackingEnabled": true,
+    "creatorFieldName": "maker",
+    "createdAtFieldName": "made",
+    "editorFieldName": "changer",
+    "editedAtFieldName": "changed",
+    "isTimeInUTC": true
+  },
+  "editable": {
+    "OBJECTID": false,
+    "Field1": true,
+    "maker": false,
+    "made": false,
+    "changer": false,
+    "changed": false
+  },
+  "rows": 0
+}

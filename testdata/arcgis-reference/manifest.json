@@ -90868,6 +90868,1401 @@
           "output": "<out>"
         }
       }
+    },
+    "etrack_add_all": {
+      "tool": "management.EnableEditorTracking",
+      "args": [
+        "testdata/geoproc/enable_tracking_base.gdb/add_all",
+        "maker",
+        "made",
+        "changer",
+        "changed",
+        "ADD_FIELDS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape",
+            "aliasName": "Shape",
+            "type": "Geometry",
+            "length": 0,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "maker",
+            "aliasName": "maker",
+            "type": "String",
+            "length": 255,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "made",
+            "aliasName": "made",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "changer",
+            "aliasName": "changer",
+            "type": "String",
+            "length": 255,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "changed",
+            "aliasName": "changed",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "shapeType": "Point",
+        "hasZ": false,
+        "hasM": false,
+        "OIDFieldName": "OBJECTID",
+        "shapeFieldName": "Shape",
+        "spatialReference": {
+          "name": "WGS_1984_UTM_Zone_33N",
+          "factoryCode": 32633,
+          "type": "Projected",
+          "XYResolution": 0.0001,
+          "XYTolerance": 0.001
+        }
+      },
+      "domains": [],
+      "editor_tracking": {
+        "properties": {
+          "editorTrackingEnabled": true,
+          "creatorFieldName": "maker",
+          "createdAtFieldName": "made",
+          "editorFieldName": "changer",
+          "editedAtFieldName": "changed",
+          "isTimeInUTC": true
+        },
+        "editable": {
+          "OBJECTID": false,
+          "Shape": true,
+          "KEY": true,
+          "maker": false,
+          "made": false,
+          "changer": false,
+          "changed": false
+        }
+      },
+      "run": {
+        "tool": "enable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/enable_tracking_base.gdb/add_all",
+          "output": "<out>",
+          "creator_field": "maker",
+          "creation_date_field": "made",
+          "last_editor_field": "changer",
+          "last_edit_date_field": "changed",
+          "add_fields": "ADD_FIELDS"
+        }
+      }
+    },
+    "etrack_table_add": {
+      "tool": "management.EnableEditorTracking",
+      "args": [
+        "testdata/geoproc/enable_tracking_base.gdb/table_add",
+        "maker",
+        "made",
+        "changer",
+        "changed",
+        "ADD_FIELDS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "maker",
+            "aliasName": "maker",
+            "type": "String",
+            "length": 255,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "made",
+            "aliasName": "made",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "changer",
+            "aliasName": "changer",
+            "type": "String",
+            "length": 255,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "changed",
+            "aliasName": "changed",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "OIDFieldName": "OBJECTID"
+      },
+      "domains": [],
+      "editor_tracking": {
+        "properties": {
+          "editorTrackingEnabled": true,
+          "creatorFieldName": "maker",
+          "createdAtFieldName": "made",
+          "editorFieldName": "changer",
+          "editedAtFieldName": "changed",
+          "isTimeInUTC": true
+        },
+        "editable": {
+          "OBJECTID": false,
+          "KEY": true,
+          "maker": false,
+          "made": false,
+          "changer": false,
+          "changed": false
+        }
+      },
+      "run": {
+        "tool": "enable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/enable_tracking_base.gdb/table_add",
+          "output": "<out>",
+          "creator_field": "maker",
+          "creation_date_field": "made",
+          "last_editor_field": "changer",
+          "last_edit_date_field": "changed",
+          "add_fields": "ADD_FIELDS"
+        }
+      }
+    },
+    "etrack_creator_only": {
+      "tool": "management.EnableEditorTracking",
+      "args": [
+        "testdata/geoproc/enable_tracking_base.gdb/creator_only",
+        "maker",
+        "",
+        "",
+        "",
+        "ADD_FIELDS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape",
+            "aliasName": "Shape",
+            "type": "Geometry",
+            "length": 0,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "maker",
+            "aliasName": "maker",
+            "type": "String",
+            "length": 255,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "shapeType": "Point",
+        "hasZ": false,
+        "hasM": false,
+        "OIDFieldName": "OBJECTID",
+        "shapeFieldName": "Shape",
+        "spatialReference": {
+          "name": "WGS_1984_UTM_Zone_33N",
+          "factoryCode": 32633,
+          "type": "Projected",
+          "XYResolution": 0.0001,
+          "XYTolerance": 0.001
+        }
+      },
+      "domains": [],
+      "editor_tracking": {
+        "properties": {
+          "editorTrackingEnabled": true,
+          "creatorFieldName": "maker",
+          "createdAtFieldName": "",
+          "editorFieldName": "",
+          "editedAtFieldName": "",
+          "isTimeInUTC": true
+        },
+        "editable": {
+          "OBJECTID": false,
+          "Shape": true,
+          "KEY": true,
+          "maker": false
+        }
+      },
+      "run": {
+        "tool": "enable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/enable_tracking_base.gdb/creator_only",
+          "output": "<out>",
+          "creator_field": "maker",
+          "add_fields": "ADD_FIELDS"
+        }
+      }
+    },
+    "etrack_dates_only": {
+      "tool": "management.EnableEditorTracking",
+      "args": [
+        "testdata/geoproc/enable_tracking_base.gdb/dates_only",
+        "",
+        "made",
+        "",
+        "changed",
+        "ADD_FIELDS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape",
+            "aliasName": "Shape",
+            "type": "Geometry",
+            "length": 0,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "made",
+            "aliasName": "made",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "changed",
+            "aliasName": "changed",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "shapeType": "Point",
+        "hasZ": false,
+        "hasM": false,
+        "OIDFieldName": "OBJECTID",
+        "shapeFieldName": "Shape",
+        "spatialReference": {
+          "name": "WGS_1984_UTM_Zone_33N",
+          "factoryCode": 32633,
+          "type": "Projected",
+          "XYResolution": 0.0001,
+          "XYTolerance": 0.001
+        }
+      },
+      "domains": [],
+      "editor_tracking": {
+        "properties": {
+          "editorTrackingEnabled": true,
+          "creatorFieldName": "",
+          "createdAtFieldName": "made",
+          "editorFieldName": "",
+          "editedAtFieldName": "changed",
+          "isTimeInUTC": true
+        },
+        "editable": {
+          "OBJECTID": false,
+          "Shape": true,
+          "KEY": true,
+          "made": false,
+          "changed": false
+        }
+      },
+      "run": {
+        "tool": "enable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/enable_tracking_base.gdb/dates_only",
+          "output": "<out>",
+          "creation_date_field": "made",
+          "last_edit_date_field": "changed",
+          "add_fields": "ADD_FIELDS"
+        }
+      }
+    },
+    "etrack_local_time": {
+      "tool": "management.EnableEditorTracking",
+      "args": [
+        "testdata/geoproc/enable_tracking_base.gdb/local_time",
+        "maker",
+        "made",
+        "changer",
+        "changed",
+        "ADD_FIELDS",
+        "DATABASE_TIME"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape",
+            "aliasName": "Shape",
+            "type": "Geometry",
+            "length": 0,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "maker",
+            "aliasName": "maker",
+            "type": "String",
+            "length": 255,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "made",
+            "aliasName": "made",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "changer",
+            "aliasName": "changer",
+            "type": "String",
+            "length": 255,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "changed",
+            "aliasName": "changed",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "shapeType": "Point",
+        "hasZ": false,
+        "hasM": false,
+        "OIDFieldName": "OBJECTID",
+        "shapeFieldName": "Shape",
+        "spatialReference": {
+          "name": "WGS_1984_UTM_Zone_33N",
+          "factoryCode": 32633,
+          "type": "Projected",
+          "XYResolution": 0.0001,
+          "XYTolerance": 0.001
+        }
+      },
+      "domains": [],
+      "editor_tracking": {
+        "properties": {
+          "editorTrackingEnabled": true,
+          "creatorFieldName": "maker",
+          "createdAtFieldName": "made",
+          "editorFieldName": "changer",
+          "editedAtFieldName": "changed",
+          "isTimeInUTC": false
+        },
+        "editable": {
+          "OBJECTID": false,
+          "Shape": true,
+          "KEY": true,
+          "maker": false,
+          "made": false,
+          "changer": false,
+          "changed": false
+        }
+      },
+      "run": {
+        "tool": "enable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/enable_tracking_base.gdb/local_time",
+          "output": "<out>",
+          "creator_field": "maker",
+          "creation_date_field": "made",
+          "last_editor_field": "changer",
+          "last_edit_date_field": "changed",
+          "add_fields": "ADD_FIELDS",
+          "record_dates_in": "DATABASE_TIME"
+        }
+      }
+    },
+    "etrack_existing": {
+      "tool": "management.EnableEditorTracking",
+      "args": [
+        "testdata/geoproc/enable_tracking_base.gdb/existing",
+        "maker",
+        "made",
+        "changer",
+        "changed"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape",
+            "aliasName": "Shape",
+            "type": "Geometry",
+            "length": 0,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "maker",
+            "aliasName": "My maker",
+            "type": "String",
+            "length": 40,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "made",
+            "aliasName": "My made",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "changer",
+            "aliasName": "My changer",
+            "type": "String",
+            "length": 40,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "changed",
+            "aliasName": "My changed",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "shapeType": "Point",
+        "hasZ": false,
+        "hasM": false,
+        "OIDFieldName": "OBJECTID",
+        "shapeFieldName": "Shape",
+        "spatialReference": {
+          "name": "WGS_1984_UTM_Zone_33N",
+          "factoryCode": 32633,
+          "type": "Projected",
+          "XYResolution": 0.0001,
+          "XYTolerance": 0.001
+        }
+      },
+      "domains": [],
+      "editor_tracking": {
+        "properties": {
+          "editorTrackingEnabled": true,
+          "creatorFieldName": "maker",
+          "createdAtFieldName": "made",
+          "editorFieldName": "changer",
+          "editedAtFieldName": "changed",
+          "isTimeInUTC": true
+        },
+        "editable": {
+          "OBJECTID": false,
+          "Shape": true,
+          "KEY": true,
+          "maker": false,
+          "made": false,
+          "changer": false,
+          "changed": false
+        }
+      },
+      "run": {
+        "tool": "enable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/enable_tracking_base.gdb/existing",
+          "output": "<out>",
+          "creator_field": "maker",
+          "creation_date_field": "made",
+          "last_editor_field": "changer",
+          "last_edit_date_field": "changed"
+        }
+      }
+    },
+    "etrack_missing": {
+      "tool": "management.EnableEditorTracking",
+      "args": [
+        "testdata/geoproc/enable_tracking_base.gdb/missing",
+        "maker",
+        "made",
+        "changer",
+        "changed"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 001278: Field does not exist. Check add field check box to add new field. [missing]",
+        "ERROR 001278: Field does not exist. Check add field check box to add new field. [missing]",
+        "ERROR 001278: Field does not exist. Check add field check box to add new field. [missing]",
+        "ERROR 001278: Field does not exist. Check add field check box to add new field. [missing]",
+        "ERROR 002941: An expected Field was not found or could not be retrieved properly.",
+        "Failed to execute (EnableEditorTracking)."
+      ],
+      "schema_edit": true,
+      "run": {
+        "tool": "enable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/enable_tracking_base.gdb/missing",
+          "output": "<out>",
+          "creator_field": "maker",
+          "creation_date_field": "made",
+          "last_editor_field": "changer",
+          "last_edit_date_field": "changed"
+        }
+      }
+    },
+    "etrack_wrong": {
+      "tool": "management.EnableEditorTracking",
+      "args": [
+        "testdata/geoproc/enable_tracking_base.gdb/wrong",
+        "maker",
+        "",
+        "",
+        "",
+        "ADD_FIELDS"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 001217: Invalid Editor Tracking field in dataset wrong",
+        "Failed to execute (EnableEditorTracking)."
+      ],
+      "schema_edit": true,
+      "run": {
+        "tool": "enable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/enable_tracking_base.gdb/wrong",
+          "output": "<out>",
+          "creator_field": "maker",
+          "add_fields": "ADD_FIELDS"
+        }
+      }
+    },
+    "etrack_no_roles": {
+      "tool": "management.EnableEditorTracking",
+      "args": [
+        "testdata/geoproc/enable_tracking_base.gdb/no_roles"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 001218: No editor tracking property selected for operation. [no_roles]",
+        "Failed to execute (EnableEditorTracking)."
+      ],
+      "schema_edit": true,
+      "run": {
+        "tool": "enable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/enable_tracking_base.gdb/no_roles",
+          "output": "<out>"
+        }
+      }
+    },
+    "etrack_active_same": {
+      "tool": "management.EnableEditorTracking",
+      "args": [
+        "testdata/geoproc/enable_tracking_base.gdb/active_same",
+        "maker",
+        "made",
+        "",
+        ""
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape",
+            "aliasName": "Shape",
+            "type": "Geometry",
+            "length": 0,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "maker",
+            "aliasName": "My maker",
+            "type": "String",
+            "length": 40,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "made",
+            "aliasName": "My made",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "changer",
+            "aliasName": "My changer",
+            "type": "String",
+            "length": 40,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "changed",
+            "aliasName": "My changed",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "shapeType": "Point",
+        "hasZ": false,
+        "hasM": false,
+        "OIDFieldName": "OBJECTID",
+        "shapeFieldName": "Shape",
+        "spatialReference": {
+          "name": "WGS_1984_UTM_Zone_33N",
+          "factoryCode": 32633,
+          "type": "Projected",
+          "XYResolution": 0.0001,
+          "XYTolerance": 0.001
+        }
+      },
+      "domains": [],
+      "editor_tracking": {
+        "properties": {
+          "editorTrackingEnabled": true,
+          "creatorFieldName": "maker",
+          "createdAtFieldName": "made",
+          "editorFieldName": "",
+          "editedAtFieldName": "",
+          "isTimeInUTC": true
+        },
+        "editable": {
+          "OBJECTID": false,
+          "Shape": true,
+          "KEY": true,
+          "maker": false,
+          "made": false,
+          "changer": true,
+          "changed": true
+        }
+      },
+      "run": {
+        "tool": "enable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/enable_tracking_base.gdb/active_same",
+          "output": "<out>",
+          "creator_field": "maker",
+          "creation_date_field": "made"
+        }
+      }
+    },
+    "etrack_active_extra": {
+      "tool": "management.EnableEditorTracking",
+      "args": [
+        "testdata/geoproc/enable_tracking_base.gdb/active_extra",
+        "",
+        "",
+        "changer",
+        "changed"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape",
+            "aliasName": "Shape",
+            "type": "Geometry",
+            "length": 0,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "maker",
+            "aliasName": "My maker",
+            "type": "String",
+            "length": 40,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "made",
+            "aliasName": "My made",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "changer",
+            "aliasName": "My changer",
+            "type": "String",
+            "length": 40,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "changed",
+            "aliasName": "My changed",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "shapeType": "Point",
+        "hasZ": false,
+        "hasM": false,
+        "OIDFieldName": "OBJECTID",
+        "shapeFieldName": "Shape",
+        "spatialReference": {
+          "name": "WGS_1984_UTM_Zone_33N",
+          "factoryCode": 32633,
+          "type": "Projected",
+          "XYResolution": 0.0001,
+          "XYTolerance": 0.001
+        }
+      },
+      "domains": [],
+      "editor_tracking": {
+        "properties": {
+          "editorTrackingEnabled": true,
+          "creatorFieldName": "maker",
+          "createdAtFieldName": "made",
+          "editorFieldName": "changer",
+          "editedAtFieldName": "changed",
+          "isTimeInUTC": true
+        },
+        "editable": {
+          "OBJECTID": false,
+          "Shape": true,
+          "KEY": true,
+          "maker": false,
+          "made": false,
+          "changer": false,
+          "changed": false
+        }
+      },
+      "run": {
+        "tool": "enable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/enable_tracking_base.gdb/active_extra",
+          "output": "<out>",
+          "last_editor_field": "changer",
+          "last_edit_date_field": "changed"
+        }
+      }
+    },
+    "etrack_active_switch": {
+      "tool": "management.EnableEditorTracking",
+      "args": [
+        "testdata/geoproc/enable_tracking_base.gdb/active_switch",
+        "other",
+        "made",
+        "",
+        "",
+        "ADD_FIELDS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape",
+            "aliasName": "Shape",
+            "type": "Geometry",
+            "length": 0,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "maker",
+            "aliasName": "My maker",
+            "type": "String",
+            "length": 40,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "made",
+            "aliasName": "My made",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "changer",
+            "aliasName": "My changer",
+            "type": "String",
+            "length": 40,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "changed",
+            "aliasName": "My changed",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "shapeType": "Point",
+        "hasZ": false,
+        "hasM": false,
+        "OIDFieldName": "OBJECTID",
+        "shapeFieldName": "Shape",
+        "spatialReference": {
+          "name": "WGS_1984_UTM_Zone_33N",
+          "factoryCode": 32633,
+          "type": "Projected",
+          "XYResolution": 0.0001,
+          "XYTolerance": 0.001
+        }
+      },
+      "domains": [],
+      "editor_tracking": {
+        "properties": {
+          "editorTrackingEnabled": true,
+          "creatorFieldName": "maker",
+          "createdAtFieldName": "made",
+          "editorFieldName": "",
+          "editedAtFieldName": "",
+          "isTimeInUTC": true
+        },
+        "editable": {
+          "OBJECTID": false,
+          "Shape": true,
+          "KEY": true,
+          "maker": false,
+          "made": false,
+          "changer": true,
+          "changed": true
+        }
+      },
+      "run": {
+        "tool": "enable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/enable_tracking_base.gdb/active_switch",
+          "output": "<out>",
+          "creator_field": "other",
+          "creation_date_field": "made",
+          "add_fields": "ADD_FIELDS"
+        }
+      }
+    },
+    "etrack_active_zone": {
+      "tool": "management.EnableEditorTracking",
+      "args": [
+        "testdata/geoproc/enable_tracking_base.gdb/active_zone",
+        "maker",
+        "made",
+        "",
+        "",
+        "NO_ADD_FIELDS",
+        "DATABASE_TIME"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape",
+            "aliasName": "Shape",
+            "type": "Geometry",
+            "length": 0,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "maker",
+            "aliasName": "My maker",
+            "type": "String",
+            "length": 40,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "made",
+            "aliasName": "My made",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "changer",
+            "aliasName": "My changer",
+            "type": "String",
+            "length": 40,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "changed",
+            "aliasName": "My changed",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "shapeType": "Point",
+        "hasZ": false,
+        "hasM": false,
+        "OIDFieldName": "OBJECTID",
+        "shapeFieldName": "Shape",
+        "spatialReference": {
+          "name": "WGS_1984_UTM_Zone_33N",
+          "factoryCode": 32633,
+          "type": "Projected",
+          "XYResolution": 0.0001,
+          "XYTolerance": 0.001
+        }
+      },
+      "domains": [],
+      "editor_tracking": {
+        "properties": {
+          "editorTrackingEnabled": true,
+          "creatorFieldName": "maker",
+          "createdAtFieldName": "made",
+          "editorFieldName": "",
+          "editedAtFieldName": "",
+          "isTimeInUTC": true
+        },
+        "editable": {
+          "OBJECTID": false,
+          "Shape": true,
+          "KEY": true,
+          "maker": false,
+          "made": false,
+          "changer": true,
+          "changed": true
+        }
+      },
+      "run": {
+        "tool": "enable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/enable_tracking_base.gdb/active_zone",
+          "output": "<out>",
+          "creator_field": "maker",
+          "creation_date_field": "made",
+          "add_fields": "NO_ADD_FIELDS",
+          "record_dates_in": "DATABASE_TIME"
+        }
+      }
+    },
+    "etrack_shared": {
+      "tool": "management.EnableEditorTracking",
+      "args": [
+        "testdata/geoproc/enable_tracking_base.gdb/shared",
+        "maker",
+        "made",
+        "maker",
+        "made"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 001214: Invalid input field names. Editor tracking field names should be unique. [shared]",
+        "Failed to execute (EnableEditorTracking)."
+      ],
+      "schema_edit": true,
+      "run": {
+        "tool": "enable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/enable_tracking_base.gdb/shared",
+          "output": "<out>",
+          "creator_field": "maker",
+          "creation_date_field": "made",
+          "last_editor_field": "maker",
+          "last_edit_date_field": "made"
+        }
+      }
     }
   }
 }

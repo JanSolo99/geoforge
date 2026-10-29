@@ -1,0 +1,3066 @@
+{
+  "add_all": {
+    "args": [
+      "maker",
+      "made",
+      "changer",
+      "changed",
+      "ADD_FIELDS"
+    ],
+    "before": {
+      "tracking": {
+        "editorTrackingEnabled": false,
+        "creatorFieldName": "",
+        "createdAtFieldName": "",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "after": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "maker",
+        "createdAtFieldName": "made",
+        "editorFieldName": "changer",
+        "editedAtFieldName": "changed",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "maker",
+          "type": "String",
+          "length": 255,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "made",
+          "alias": "made",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changer",
+          "alias": "changer",
+          "type": "String",
+          "length": 255,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changed",
+          "alias": "changed",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          null,
+          null,
+          null,
+          null,
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "repeat": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "maker",
+        "createdAtFieldName": "made",
+        "editorFieldName": "changer",
+        "editedAtFieldName": "changed",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "maker",
+          "type": "String",
+          "length": 255,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "made",
+          "alias": "made",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changer",
+          "alias": "changer",
+          "type": "String",
+          "length": 255,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changed",
+          "alias": "changed",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          null,
+          null,
+          null,
+          null,
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 8:22:38 PM\nSucceeded at Thursday, October 29, 2026 8:22:38 PM (Elapsed Time: 0.12 seconds)"
+  },
+  "table_add": {
+    "args": [
+      "maker",
+      "made",
+      "changer",
+      "changed",
+      "ADD_FIELDS"
+    ],
+    "before": {
+      "tracking": {
+        "editorTrackingEnabled": false,
+        "creatorFieldName": "",
+        "createdAtFieldName": "",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7
+        ]
+      ]
+    },
+    "after": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "maker",
+        "createdAtFieldName": "made",
+        "editorFieldName": "changer",
+        "editedAtFieldName": "changed",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "maker",
+          "type": "String",
+          "length": 255,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "made",
+          "alias": "made",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changer",
+          "alias": "changer",
+          "type": "String",
+          "length": 255,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changed",
+          "alias": "changed",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          null,
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    "repeat": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "maker",
+        "createdAtFieldName": "made",
+        "editorFieldName": "changer",
+        "editedAtFieldName": "changed",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "maker",
+          "type": "String",
+          "length": 255,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "made",
+          "alias": "made",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changer",
+          "alias": "changer",
+          "type": "String",
+          "length": 255,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changed",
+          "alias": "changed",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          null,
+          null,
+          null,
+          null
+        ]
+      ]
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 8:22:38 PM\nSucceeded at Thursday, October 29, 2026 8:22:38 PM (Elapsed Time: 0.11 seconds)"
+  },
+  "creator_only": {
+    "args": [
+      "maker",
+      "",
+      "",
+      "",
+      "ADD_FIELDS"
+    ],
+    "before": {
+      "tracking": {
+        "editorTrackingEnabled": false,
+        "creatorFieldName": "",
+        "createdAtFieldName": "",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "after": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "maker",
+        "createdAtFieldName": "",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "maker",
+          "type": "String",
+          "length": 255,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          null,
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "repeat": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "maker",
+        "createdAtFieldName": "",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "maker",
+          "type": "String",
+          "length": 255,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          null,
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 8:22:39 PM\nSucceeded at Thursday, October 29, 2026 8:22:39 PM (Elapsed Time: 0.07 seconds)"
+  },
+  "dates_only": {
+    "args": [
+      "",
+      "made",
+      "",
+      "changed",
+      "ADD_FIELDS"
+    ],
+    "before": {
+      "tracking": {
+        "editorTrackingEnabled": false,
+        "creatorFieldName": "",
+        "createdAtFieldName": "",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "after": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "",
+        "createdAtFieldName": "made",
+        "editorFieldName": "",
+        "editedAtFieldName": "changed",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "made",
+          "alias": "made",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changed",
+          "alias": "changed",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          null,
+          null,
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "repeat": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "",
+        "createdAtFieldName": "made",
+        "editorFieldName": "",
+        "editedAtFieldName": "changed",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "made",
+          "alias": "made",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changed",
+          "alias": "changed",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          null,
+          null,
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 8:22:40 PM\nSucceeded at Thursday, October 29, 2026 8:22:40 PM (Elapsed Time: 0.09 seconds)"
+  },
+  "local_time": {
+    "args": [
+      "maker",
+      "made",
+      "changer",
+      "changed",
+      "ADD_FIELDS",
+      "DATABASE_TIME"
+    ],
+    "before": {
+      "tracking": {
+        "editorTrackingEnabled": false,
+        "creatorFieldName": "",
+        "createdAtFieldName": "",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "after": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "maker",
+        "createdAtFieldName": "made",
+        "editorFieldName": "changer",
+        "editedAtFieldName": "changed",
+        "isTimeInUTC": false
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "maker",
+          "type": "String",
+          "length": 255,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "made",
+          "alias": "made",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changer",
+          "alias": "changer",
+          "type": "String",
+          "length": 255,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changed",
+          "alias": "changed",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          null,
+          null,
+          null,
+          null,
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "repeat": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "maker",
+        "createdAtFieldName": "made",
+        "editorFieldName": "changer",
+        "editedAtFieldName": "changed",
+        "isTimeInUTC": false
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "maker",
+          "type": "String",
+          "length": 255,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "made",
+          "alias": "made",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changer",
+          "alias": "changer",
+          "type": "String",
+          "length": 255,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changed",
+          "alias": "changed",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          null,
+          null,
+          null,
+          null,
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 8:22:40 PM\nSucceeded at Thursday, October 29, 2026 8:22:40 PM (Elapsed Time: 0.12 seconds)"
+  },
+  "existing": {
+    "args": [
+      "maker",
+      "made",
+      "changer",
+      "changed"
+    ],
+    "before": {
+      "tracking": {
+        "editorTrackingEnabled": false,
+        "creatorFieldName": "",
+        "createdAtFieldName": "",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "My maker",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "made",
+          "alias": "My made",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "changer",
+          "alias": "My changer",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "changed",
+          "alias": "My changed",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "original",
+          "2020-01-02 03:04:05",
+          "last",
+          "2021-02-03 04:05:06",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "after": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "maker",
+        "createdAtFieldName": "made",
+        "editorFieldName": "changer",
+        "editedAtFieldName": "changed",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "My maker",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "made",
+          "alias": "My made",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changer",
+          "alias": "My changer",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changed",
+          "alias": "My changed",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "original",
+          "2020-01-02 03:04:05",
+          "last",
+          "2021-02-03 04:05:06",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "repeat": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "maker",
+        "createdAtFieldName": "made",
+        "editorFieldName": "changer",
+        "editedAtFieldName": "changed",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "My maker",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "made",
+          "alias": "My made",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changer",
+          "alias": "My changer",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changed",
+          "alias": "My changed",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "original",
+          "2020-01-02 03:04:05",
+          "last",
+          "2021-02-03 04:05:06",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 8:22:41 PM\nSucceeded at Thursday, October 29, 2026 8:22:41 PM (Elapsed Time: 0.09 seconds)"
+  },
+  "missing": {
+    "args": [
+      "maker",
+      "made",
+      "changer",
+      "changed"
+    ],
+    "before": {
+      "tracking": {
+        "editorTrackingEnabled": false,
+        "creatorFieldName": "",
+        "createdAtFieldName": "",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "error": "ERROR 001278: Field does not exist. Check add field check box to add new field. [missing]\nERROR 001278: Field does not exist. Check add field check box to add new field. [missing]\nERROR 001278: Field does not exist. Check add field check box to add new field. [missing]\nERROR 001278: Field does not exist. Check add field check box to add new field. [missing]\nERROR 002941: An expected Field was not found or could not be retrieved properly.\nFailed to execute (EnableEditorTracking).\n",
+    "messages": "Start Time: Thursday, October 29, 2026 8:22:42 PM\nERROR 001278: Field does not exist. Check add field check box to add new field. [missing]\nERROR 001278: Field does not exist. Check add field check box to add new field. [missing]\nERROR 001278: Field does not exist. Check add field check box to add new field. [missing]\nERROR 001278: Field does not exist. Check add field check box to add new field. [missing]\nERROR 002941: An expected Field was not found or could not be retrieved properly.\nFailed to execute (EnableEditorTracking).\nFailed at Thursday, October 29, 2026 8:22:42 PM (Elapsed Time: 0.01 seconds)",
+    "after": {
+      "tracking": {
+        "editorTrackingEnabled": false,
+        "creatorFieldName": "",
+        "createdAtFieldName": "",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    }
+  },
+  "wrong": {
+    "args": [
+      "maker",
+      "",
+      "",
+      "",
+      "ADD_FIELDS"
+    ],
+    "before": {
+      "tracking": {
+        "editorTrackingEnabled": false,
+        "creatorFieldName": "",
+        "createdAtFieldName": "",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "maker",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          null,
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "error": "ERROR 001217: Invalid Editor Tracking field in dataset wrong\nFailed to execute (EnableEditorTracking).\n",
+    "messages": "Start Time: Thursday, October 29, 2026 8:22:42 PM\nERROR 001217: Invalid Editor Tracking field in dataset wrong\nFailed to execute (EnableEditorTracking).\nFailed at Thursday, October 29, 2026 8:22:42 PM (Elapsed Time: 0.01 seconds)",
+    "after": {
+      "tracking": {
+        "editorTrackingEnabled": false,
+        "creatorFieldName": "",
+        "createdAtFieldName": "",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "maker",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          null,
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    }
+  },
+  "no_roles": {
+    "args": [],
+    "before": {
+      "tracking": {
+        "editorTrackingEnabled": false,
+        "creatorFieldName": "",
+        "createdAtFieldName": "",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "error": "ERROR 001218: No editor tracking property selected for operation. [no_roles]\nFailed to execute (EnableEditorTracking).\n",
+    "messages": "Start Time: Thursday, October 29, 2026 8:22:42 PM\nERROR 001218: No editor tracking property selected for operation. [no_roles]\nFailed to execute (EnableEditorTracking).\nFailed at Thursday, October 29, 2026 8:22:42 PM (Elapsed Time: 0.01 seconds)",
+    "after": {
+      "tracking": {
+        "editorTrackingEnabled": false,
+        "creatorFieldName": "",
+        "createdAtFieldName": "",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    }
+  },
+  "active_same": {
+    "args": [
+      "maker",
+      "made",
+      "",
+      ""
+    ],
+    "before": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "maker",
+        "createdAtFieldName": "made",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "My maker",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "made",
+          "alias": "My made",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changer",
+          "alias": "My changer",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "changed",
+          "alias": "My changed",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "original",
+          "2020-01-02 03:04:05",
+          "last",
+          "2021-02-03 04:05:06",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "after": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "maker",
+        "createdAtFieldName": "made",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "My maker",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "made",
+          "alias": "My made",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changer",
+          "alias": "My changer",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "changed",
+          "alias": "My changed",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "original",
+          "2020-01-02 03:04:05",
+          "last",
+          "2021-02-03 04:05:06",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "repeat": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "maker",
+        "createdAtFieldName": "made",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "My maker",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "made",
+          "alias": "My made",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changer",
+          "alias": "My changer",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "changed",
+          "alias": "My changed",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "original",
+          "2020-01-02 03:04:05",
+          "last",
+          "2021-02-03 04:05:06",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 8:22:42 PM\nSucceeded at Thursday, October 29, 2026 8:22:43 PM (Elapsed Time: 0.06 seconds)"
+  },
+  "active_extra": {
+    "args": [
+      "",
+      "",
+      "changer",
+      "changed"
+    ],
+    "before": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "maker",
+        "createdAtFieldName": "made",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "My maker",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "made",
+          "alias": "My made",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changer",
+          "alias": "My changer",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "changed",
+          "alias": "My changed",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "original",
+          "2020-01-02 03:04:05",
+          "last",
+          "2021-02-03 04:05:06",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "after": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "maker",
+        "createdAtFieldName": "made",
+        "editorFieldName": "changer",
+        "editedAtFieldName": "changed",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "My maker",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "made",
+          "alias": "My made",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changer",
+          "alias": "My changer",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changed",
+          "alias": "My changed",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "original",
+          "2020-01-02 03:04:05",
+          "last",
+          "2021-02-03 04:05:06",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "repeat": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "maker",
+        "createdAtFieldName": "made",
+        "editorFieldName": "changer",
+        "editedAtFieldName": "changed",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "My maker",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "made",
+          "alias": "My made",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changer",
+          "alias": "My changer",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changed",
+          "alias": "My changed",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "original",
+          "2020-01-02 03:04:05",
+          "last",
+          "2021-02-03 04:05:06",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 8:22:43 PM\nSucceeded at Thursday, October 29, 2026 8:22:43 PM (Elapsed Time: 0.07 seconds)"
+  },
+  "active_switch": {
+    "args": [
+      "other",
+      "made",
+      "",
+      "",
+      "ADD_FIELDS"
+    ],
+    "before": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "maker",
+        "createdAtFieldName": "made",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "My maker",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "made",
+          "alias": "My made",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changer",
+          "alias": "My changer",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "changed",
+          "alias": "My changed",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "original",
+          "2020-01-02 03:04:05",
+          "last",
+          "2021-02-03 04:05:06",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "after": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "maker",
+        "createdAtFieldName": "made",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "My maker",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "made",
+          "alias": "My made",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changer",
+          "alias": "My changer",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "changed",
+          "alias": "My changed",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "original",
+          "2020-01-02 03:04:05",
+          "last",
+          "2021-02-03 04:05:06",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "repeat": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "maker",
+        "createdAtFieldName": "made",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "My maker",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "made",
+          "alias": "My made",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changer",
+          "alias": "My changer",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "changed",
+          "alias": "My changed",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "original",
+          "2020-01-02 03:04:05",
+          "last",
+          "2021-02-03 04:05:06",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 8:22:44 PM\nSucceeded at Thursday, October 29, 2026 8:22:44 PM (Elapsed Time: 0.06 seconds)"
+  },
+  "active_zone": {
+    "args": [
+      "maker",
+      "made",
+      "",
+      "",
+      "NO_ADD_FIELDS",
+      "DATABASE_TIME"
+    ],
+    "before": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "maker",
+        "createdAtFieldName": "made",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "My maker",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "made",
+          "alias": "My made",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changer",
+          "alias": "My changer",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "changed",
+          "alias": "My changed",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "original",
+          "2020-01-02 03:04:05",
+          "last",
+          "2021-02-03 04:05:06",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "after": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "maker",
+        "createdAtFieldName": "made",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "My maker",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "made",
+          "alias": "My made",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changer",
+          "alias": "My changer",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "changed",
+          "alias": "My changed",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "original",
+          "2020-01-02 03:04:05",
+          "last",
+          "2021-02-03 04:05:06",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "repeat": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "maker",
+        "createdAtFieldName": "made",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "My maker",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "made",
+          "alias": "My made",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "changer",
+          "alias": "My changer",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "changed",
+          "alias": "My changed",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "original",
+          "2020-01-02 03:04:05",
+          "last",
+          "2021-02-03 04:05:06",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 8:22:44 PM\nSucceeded at Thursday, October 29, 2026 8:22:44 PM (Elapsed Time: 0.05 seconds)"
+  },
+  "shared": {
+    "args": [
+      "maker",
+      "made",
+      "maker",
+      "made"
+    ],
+    "before": {
+      "tracking": {
+        "editorTrackingEnabled": false,
+        "creatorFieldName": "",
+        "createdAtFieldName": "",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "My maker",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "made",
+          "alias": "My made",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "changer",
+          "alias": "My changer",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "changed",
+          "alias": "My changed",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "original",
+          "2020-01-02 03:04:05",
+          "last",
+          "2021-02-03 04:05:06",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "error": "ERROR 001214: Invalid input field names. Editor tracking field names should be unique. [shared]\nFailed to execute (EnableEditorTracking).\n",
+    "messages": "Start Time: Thursday, October 29, 2026 8:22:45 PM\nERROR 001214: Invalid input field names. Editor tracking field names should be unique. [shared]\nFailed to execute (EnableEditorTracking).\nFailed at Thursday, October 29, 2026 8:22:45 PM (Elapsed Time: 0.01 seconds)",
+    "after": {
+      "tracking": {
+        "editorTrackingEnabled": false,
+        "creatorFieldName": "",
+        "createdAtFieldName": "",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "maker",
+          "alias": "My maker",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "made",
+          "alias": "My made",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "changer",
+          "alias": "My changer",
+          "type": "String",
+          "length": 40,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "changed",
+          "alias": "My changed",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "original",
+          "2020-01-02 03:04:05",
+          "last",
+          "2021-02-03 04:05:06",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    }
+  }
+}

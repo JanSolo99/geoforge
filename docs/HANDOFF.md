@@ -1,80 +1,83 @@
 # Current handoff
 
-Updated 2026-10-29T09:20:53.656344+00:00; last agent Codex.
-Workspace /mnt/media/ArcGIS_Linux, main; HEAD792f12850cd558cc09cb43bfc4470120a0d1305d.
-136 scoped paths staged. User objective: finish/wrap current tool, then build next
-WORK_QUEUE tool, following public ArcGIS evidence, full gate and separate landing.
-Disable Editor Tracking792f128 was already pushed/complete on startup. This turn
-implemented Enable COGO; validated and ready to commit/push. No extra agents or
+Updated 2026-10-29T09:42:28.971136+00:00; last agent Codex.
+Workspace /mnt/media/ArcGIS_Linux, main; HEADc241a910b07493fae5797d62b3e84feeb1c877a9.
+143 scoped paths staged. User objective: finish/wrap current tool, then build next
+WORK_QUEUE tool, with public ArcGIS evidence, full gate and separate landing.
+Enable COGOc241a91 was already pushed/complete on startup. This turn implemented
+Enable Editor Tracking; validated and ready to commit/push. No extra agents or
 coordinators launched; inherited unrelated edits preserved.
 
 ## Completed implementation
 
-- Native filegdb/writer/cogo.rs enable_cogo validates line geometry and ALL existing
-  dimension types before writing. One journal adds missing nullable doubles,
-  retaining existing values, rows/geometry, OID holes/sequence and index definitions.
-  Canonical aliases Direction/Distance/Radius/Arc Length/Radius2 and Required=true
-  catalog markers plus physical required mask0x02 are applied together.
-- Rewrites only when fields/physical aliases change; preserves unrelated field
-  flags after rewrite. Metadata-only re-enable and already-enabled/repeated calls
-  avoid row rewrites; repeated/no-op calls are byte-identical. Uses the normal
-  spatial-grid recalculation to rebuild indexes. No SDK/runtime GDAL dependency.
-- Registry cogo::ENABLE, optional Context::enable_cogo capability and CLI FileGDB
-  host. Shared line validator also used by Disable COGO, behavior unchanged.
-  Other hosts explicitly fail. Wrong fields002045, point/polygon003917, table
-  000732 and shapefile000156 match public controls.
--11 ecogo_* refs:5 successes/6 refusals. All2270 prior cases unchanged;2281 total.
-  Generic schema comparator checks fields/required markers, rows/OIDs, geometry/CRS,
-  domains/indexes, NULL new dimensions and repeat. Original definitions allow ONLY
-  the five observed alias resets. Two new safety tests protect values/OID holes,
-  unrelated file bytes, refusal/already-enabled/repeat byte identity.
-- Public recipes/results/catalog/physical flag states and independent native
-  reader evidence in scripts/research/enable_cogo/. Source fixture saved once at
-  testdata/geoproc/enable_cogo_base.gdb before controls mutated disposable data.
-  Do not recreate it merely for context recovery. GDAL read saved file formats
-  only; ArcGIS Pro3.7 is the GP oracle. Public official reference read.
-- ROADMAP/KNOWN_GAPS/formats/filegdb.md updated. FileGDB lines only; layer labeling/
-  symbology, enterprise/mobile data and selections unsupported. Unusual class
-  extensions, curves/ZM, nonstandard casing and custom dimension defaults/domains
-  unverified. Native normalizes all physical required flags; ArcGIS leaves Radius2
-  at5 in the complete-existing control despite Required=true in catalog/Describe.
-  That descriptor quirk and unrelated catalog extent/index normalization are gaps.
+- filegdb/writer/editor_tracking.rs enable_editor_tracking configures simple class/
+  table roles in one existing journal. Supports optional roles, ADD_FIELDS and
+  default NO_ADD_FIELDS, UTC/default and DATABASE_TIME. Existing roles/time basis
+  are retained on attempted switches; additional roles can be enabled.
+- Missing user/date fields become nullable text255/low-precision Date with NULL
+  values. Existing aliases/types/lengths/values/OIDs/geometry remain. All names and
+  types preflighted before changes. Missing fields require one rewrite using
+  normal spatial-grid recalculation, with unrelated binary flags restored.
+  Otherwise only catalog/descriptor flags change. Repeat/active no-ops retain bytes.
+- Roles/EditorTrackingEnabled/IsTimeInUTC and GPFieldInfoEx Editable=false set with
+  physical editable mask0x04 cleared. Missing root properties use the actual XML
+  closing tag, including native prefixed roots. Other properties/domains retained.
+- Registry editor_tracking::ENABLE, optional Context host capability, CLI FileGDB
+  host. Unsupported hosts fail explicitly. No roles001218, missing001278, wrong
+  type001217 and duplicate roles001214 match primary public errors. Secondary/
+  repeated ArcGIS diagnostics omitted. Conventional attachment tables refused.
+-14 etrack_* refs:10 successes/4 refusals. All2281 prior cases unchanged;2295 total.
+  Existing schema comparator covers roles/time basis, XML AND physical readonly
+  flags, fields/values/OIDs/geometry/CRS/domains/index definitions and repeat.
+ 3 new safety tests protect data/NULL additions/unrelated files, readonly flags,
+  no-op/refusal byte identity and newly created native table root metadata.
+- Public recipes/results/raw catalog and independent reader evidence in
+  scripts/research/enable_editor_tracking/. Source fixture
+  testdata/geoproc/enable_tracking_base.gdb saved once before disposable controls.
+  Do not recreate merely for context. GDAL read saved file formats only;
+  public ArcGIS Pro3.7 is the GP oracle. No SDK/runtime GDAL dependency.
+- ROADMAP/KNOWN_GAPS updated. Scope: simple FileGDB classes/tables. Feature datasets,
+  relationships/attachments/advanced class extensions, enterprise/mobile/layers
+  unsupported/unverified. Conventional attachment names refused; renamed schemas
+  unverified. High-precision date roles refused. Unusual casing/defaults/domains/
+  ZMcurves and rare invalid combinations unverified. Native edit APIs do NOT
+  automatically stamp users/timestamps on later edits; metadata configuration is
+  verified but that broader edit engine behavior remains a documented gap.
 
 ## Validation and decisions
 
-- ug tools confirmed absent before implementing. Public11 controls confirm missing
-  fields added in order as NULL doubles, retained values, canonical aliases,
-  required markers, repeat/no-op and refusals. Dimension values not calculated.
-- uv run -q --with 'mcp>=2' python scripts/make-arcgis-reference.py 'ecogo_*' PASS;
-  /tmp/unigis-ecogo-references.log,5 successes/6 expected failures.
-- Initial cargo test -j3 -p unigis-cli --test enable_cogo_safety --test
-  arcgis_reference FAILED3 references because direct rewrite_core retained a fixed
-  grid, suppressing index rebuild. Fixed by clearing grid_sizes as generic schema
-  rewrite already does. No comparison weakened. Initial unused import removed.
-- Corrected /tmp/unigis-ecogo-tests-fixed.log: references PASS2; safety1 PASS/1 FAIL
-  due test prefix using table.gdbtable. instead of table. Fixed to file_stem;
-  final full gate verifies both safety tests. Do not call that partial run a pass.
-- Independent public arcpy reader PASS exact field schema/aliases/nullability/
-  required/editable flags, COGO state, rows/values/geometry for ALL5 successes.
-  /tmp/unigis-enable-cogo-native-fixed.log, native_reader_results.json. First
-  reader assertion needed Python tuples normalized to saved JSON lists, no
-  semantic tolerance. Initial wrong-index output retained at
-  /tmp/unigis-enable-cogo-native-initial.gdb; corrected output
-  /tmp/unigis-enable-cogo-native.gdb; results /tmp/unigis-enable-cogo-native.json.
-- Final scripts/check EXIT0 /tmp/unigis-ecogo-check.{log,exit,pid}:239 Rust passed,
-  5 ignored; Python8/fmt/clippy -D warnings PASS. Covers final spatial-index fix,
-  all refs, BOTH safety tests, host/default capability and full format/engine
-  suites. No product edits after gate; documentation only.
-- Python syntax, staged/source whitespace,136-path scope, old-manifest and inherited
-  preservation audits PASS. Filtered /tmp/unigis-ecogo-stage.patch excludes the
+- ug tools confirmed absent before implementing; official public reference read.
+ 14 public controls confirm existing data not backfilled/converted, role additions,
+  readonly flags, defaults, existing state retention and primary refusal codes.
+- uv run -q --with 'mcp>=2' python scripts/make-arcgis-reference.py 'etrack_*' PASS;
+  /tmp/unigis-etrack-references.log,10 successes/4 expected failures.
+- cargo test -j3 -p unigis-cli --test enable_tracking_safety --test arcgis_reference
+  PASS4 /tmp/unigis-etrack-tests.log. Afterwards added native prefixed-root handling
+  and third safety test; the final full gate covers those additions.
+- Independent public arcpy read PASS for ALL10 successes, exact roles/time basis,
+  field schema/aliases/length/nullability/required/editable flags, values/geometry.
+  /tmp/unigis-enable-tracking-native.{log,json}, native_reader_results.json;
+  disposable /tmp/unigis-enable-tracking-native.gdb.
+- Extra public reader probe_native_root.py PASS on final CLI native-created table
+  with newly inserted root properties; all roles/UTC recognized and fields readonly.
+  /tmp/unigis-enable-tracking-native-root.{log,json}, native_root_results.json;
+  disposable /tmp/unigis-enable-tracking-native-root.gdb/native. Native Create Table
+  was invoked once; no external publish. Initial classic create-table --help lookup
+  was unrecognized; registry ug run create_table used correctly.
+- Final scripts/check EXIT0 /tmp/unigis-etrack-check.{log,exit,pid}:242 Rust passed,
+  5 ignored; Python8/fmt/clippy -D warnings PASS. Covers final root handling, all3
+  new safety tests/refs/host capability and full format/engine suites. No product
+  edits after gate; research/docs only (extra root reader independently validated).
+- Python syntax, staged/source whitespace,143-path scope, old-manifest and inherited
+  preservation audits PASS. Filtered /tmp/unigis-etrack-stage.patch excludes the
   inherited4-line umintfloat generator hunk. No Cargo/Trunk/probes running.
 
 ## Next actions
 
 1. Commit/push this validated tool per queue rules, regenerate queue.
 2. Final handoff with resulting HEAD/push evidence.
-3. Next queue item: Enable Editor Tracking (management.EnableEditorTracking).
-   Do not polish landed tools unless requested.
+3. Next queue item: Migrate Date Field To High Precision
+   (management.MigrateDateFieldToHighPrecision). Do not polish landed tools.
 
 ## Inherited unrelated work
 

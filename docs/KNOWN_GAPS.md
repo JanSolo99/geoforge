@@ -194,3 +194,14 @@ Update this file when a gap is found or closed.
   ArcGIS's complete-existing Radius2 descriptor exception and unrelated catalog
   extent/index normalization are not reproduced. Evidence:
   scripts/research/enable_cogo/README.md.
+
+- Enable Editor Tracking: configures simple FileGDB classes/tables; other hosts
+  need the optional mutation capability. Native edit APIs do not automatically
+  stamp users/timestamps on subsequent edits. Feature datasets, relationship and
+  attachment classes, enterprise/mobile data, layers/services and advanced class
+  extensions are unsupported/unverified. Conventional attachment table names are
+  explicitly refused; renamed attachment schemas are unverified. Unusual casing,
+  domains/defaults, high-precision date roles (refused), Z/M/curves and rare invalid
+  combinations are unverified. Repeated/secondary ArcGIS diagnostics and unrelated
+  catalog normalization are omitted. Evidence:
+  scripts/research/enable_editor_tracking/README.md.

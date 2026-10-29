@@ -77,6 +77,20 @@ DM = ROOT / "testdata" / "dm"
 
 CASES = {
     # name: (tool, args before the output, args after the output)
+    "etrack_add_all": ("management.EnableEditorTracking", [DATA / "enable_tracking_base.gdb" / "add_all"], ['maker', 'made', 'changer', 'changed', 'ADD_FIELDS']),
+    "etrack_table_add": ("management.EnableEditorTracking", [DATA / "enable_tracking_base.gdb" / "table_add"], ['maker', 'made', 'changer', 'changed', 'ADD_FIELDS']),
+    "etrack_creator_only": ("management.EnableEditorTracking", [DATA / "enable_tracking_base.gdb" / "creator_only"], ['maker', '', '', '', 'ADD_FIELDS']),
+    "etrack_dates_only": ("management.EnableEditorTracking", [DATA / "enable_tracking_base.gdb" / "dates_only"], ['', 'made', '', 'changed', 'ADD_FIELDS']),
+    "etrack_local_time": ("management.EnableEditorTracking", [DATA / "enable_tracking_base.gdb" / "local_time"], ['maker', 'made', 'changer', 'changed', 'ADD_FIELDS', 'DATABASE_TIME']),
+    "etrack_existing": ("management.EnableEditorTracking", [DATA / "enable_tracking_base.gdb" / "existing"], ['maker', 'made', 'changer', 'changed']),
+    "etrack_missing": ("management.EnableEditorTracking", [DATA / "enable_tracking_base.gdb" / "missing"], ['maker', 'made', 'changer', 'changed']),
+    "etrack_wrong": ("management.EnableEditorTracking", [DATA / "enable_tracking_base.gdb" / "wrong"], ['maker', '', '', '', 'ADD_FIELDS']),
+    "etrack_no_roles": ("management.EnableEditorTracking", [DATA / "enable_tracking_base.gdb" / "no_roles"], []),
+    "etrack_active_same": ("management.EnableEditorTracking", [DATA / "enable_tracking_base.gdb" / "active_same"], ['maker', 'made', '', '']),
+    "etrack_active_extra": ("management.EnableEditorTracking", [DATA / "enable_tracking_base.gdb" / "active_extra"], ['', '', 'changer', 'changed']),
+    "etrack_active_switch": ("management.EnableEditorTracking", [DATA / "enable_tracking_base.gdb" / "active_switch"], ['other', 'made', '', '', 'ADD_FIELDS']),
+    "etrack_active_zone": ("management.EnableEditorTracking", [DATA / "enable_tracking_base.gdb" / "active_zone"], ['maker', 'made', '', '', 'NO_ADD_FIELDS', 'DATABASE_TIME']),
+    "etrack_shared": ("management.EnableEditorTracking", [DATA / "enable_tracking_base.gdb" / "shared"], ['maker', 'made', 'maker', 'made']),
     **{f"ecogo_{name}": ("management.EnableCOGO", [DATA / "enable_cogo_base.gdb" / name], [])
        for name in ["plain", "empty", "partial", "existing", "wrong_string", "wrong_integer", "point", "polygon", "table_only", "enabled"]},
     "ecogo_shapefile": ("management.EnableCOGO", [DATA / "roads.shp"], []),
@@ -2137,6 +2151,7 @@ RUN = {
     "management.DisableCOGO": ("disable_cogo", ["input", "output"]),
     "management.EnableCOGO": ("enable_cogo", ["input", "output"]),
     "management.DisableEditorTracking": ("disable_editor_tracking", ["input", "output", "creator", "creation_date", "last_editor", "last_edit_date"]),
+    "management.EnableEditorTracking": ("enable_editor_tracking", ["input", "output", "creator_field", "creation_date_field", "last_editor_field", "last_edit_date_field", "add_fields", "record_dates_in"]),
     "management.DeleteMultiple": ("delete_multiple", ["in_data"]),
     "analysis.SplitByAttributes": ("split_by_attributes", ["input", "target_workspace", "split_fields"]),
     "analysis.PairwisePolygonNeighbors": ("pairwise_polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides", "cluster_tolerance", "out_linear_units", "out_area_units", "precision"]),
@@ -2287,7 +2302,7 @@ for d in arcpy.da.ListDomains({win(copied)!r}):
             if tool in ("management.DisableCOGO", "management.EnableCOGO"):
                 flags = w.call("python", code=f"result = dict(enabled=arcpy.Describe({win(target)!r}).isCOGOEnabled, required={{f.name:f.required for f in arcpy.ListFields({win(target)!r}) if f.name.lower() in ['direction','distance','radius','arclength','radius2']}})")
                 entry["cogo"] = flags["result"]
-            if tool == "management.DisableEditorTracking":
+            if tool in ("management.DisableEditorTracking", "management.EnableEditorTracking"):
                 tracking = w.call("python", code=f"d=arcpy.Describe({win(target)!r}); result = dict(properties={{p:getattr(d,p) for p in ['editorTrackingEnabled','creatorFieldName','createdAtFieldName','editorFieldName','editedAtFieldName','isTimeInUTC']}}, editable={{f.name:f.editable for f in arcpy.ListFields({win(target)!r})}})")
                 entry["editor_tracking"] = tracking["result"]
             # A second call must be idempotent; snapshot both schema and domains.
@@ -2347,7 +2362,7 @@ def main():
             manifest["cases"][name] = delete_multiple_case(w, before[0])
             print(f"{name}: {manifest['cases'][name]['status']}")
             continue
-        if tool in ("management.AddGPSMetadataFields", "management.DisableCOGO", "management.EnableCOGO", "management.DisableEditorTracking") and Path(before[0]).parent.suffix == ".gdb":
+        if tool in ("management.AddGPSMetadataFields", "management.DisableCOGO", "management.EnableCOGO", "management.DisableEditorTracking", "management.EnableEditorTracking") and Path(before[0]).parent.suffix == ".gdb":
             manifest["cases"][name] = schema_edit_case(w, tool, before, after)
             print(f"{name}: {manifest['cases'][name]['status']}")
             continue

@@ -53,6 +53,104 @@ pub const DISABLE: Tool = Tool {
     measures: false,
     run: Runner::Report(disable),
 };
+pub const ENABLE: Tool = Tool {
+    id: "enable_editor_tracking",
+    name: "Enable Editor Tracking",
+    toolbox: "Data Management › Database",
+    summary: "Enables selected editor tracking roles, optionally adding missing fields; retains existing values.",
+    params: &[
+        Param {
+            name: "input",
+            label: "Input Dataset",
+            kind: Kind::Text,
+            required: true,
+            default: "",
+            help: "Simple FileGDB feature class or table.",
+        },
+        Param {
+            name: "creator_field",
+            label: "Creator Field",
+            kind: Kind::Text,
+            required: false,
+            default: "",
+            help: "String field for creator.",
+        },
+        Param {
+            name: "creation_date_field",
+            label: "Creation Date Field",
+            kind: Kind::Text,
+            required: false,
+            default: "",
+            help: "Low precision date field.",
+        },
+        Param {
+            name: "last_editor_field",
+            label: "Last Editor Field",
+            kind: Kind::Text,
+            required: false,
+            default: "",
+            help: "String field for last editor.",
+        },
+        Param {
+            name: "last_edit_date_field",
+            label: "Last Edit Date Field",
+            kind: Kind::Text,
+            required: false,
+            default: "",
+            help: "Low precision date field.",
+        },
+        Param {
+            name: "add_fields",
+            label: "Add Fields",
+            kind: Kind::Bool,
+            required: false,
+            default: "false",
+            help: "ADD_FIELDS or NO_ADD_FIELDS; true/false also accepted.",
+        },
+        Param {
+            name: "record_dates_in",
+            label: "Record Dates In",
+            kind: Kind::Choice(&["UTC", "DATABASE_TIME"]),
+            required: false,
+            default: "UTC",
+            help: "Time basis when initially enabling tracking.",
+        },
+    ],
+    output_suffix: "tracking_enabled",
+    measures: false,
+    run: Runner::Report(enable),
+};
+fn enable(ctx: &dyn Context) -> Result<Report> {
+    let fields = [
+        "creator_field",
+        "creation_date_field",
+        "last_editor_field",
+        "last_edit_date_field",
+    ]
+    .map(|p| ctx.get(p).filter(|v| v != "#").unwrap_or_default());
+    let add = match ctx
+        .get("add_fields")
+        .unwrap_or_else(|| "NO_ADD_FIELDS".into())
+        .to_ascii_uppercase()
+        .as_str()
+    {
+        "ADD_FIELDS" | "TRUE" | "1" => true,
+        "NO_ADD_FIELDS" | "FALSE" | "0" => false,
+        _ => {
+            return Err(Error::Unsupported(
+                "ERROR 000800: expected ADD_FIELDS or NO_ADD_FIELDS".into(),
+            ));
+        }
+    };
+    let utc = ctx
+        .get("record_dates_in")
+        .is_none_or(|v| v.eq_ignore_ascii_case("UTC"));
+    ctx.enable_editor_tracking("input", fields, add, utc)?;
+    Ok(Report {
+        rows: vec![],
+        messages: vec!["Editor tracking enabled".into()],
+    })
+}
 fn disable(ctx: &dyn Context) -> Result<Report> {
     let mut flags = [true; 4];
     for (i, param) in DISABLE.params[1..].iter().enumerate() {
@@ -95,6 +193,12 @@ mod tests {
     }
     #[test]
     fn unsupported_host_refuses_mutation() {
+        assert!(
+            enable(&Host)
+                .unwrap_err()
+                .to_string()
+                .contains("editor tracking edits are not supported by this host")
+        );
         assert!(
             disable(&Host)
                 .unwrap_err()

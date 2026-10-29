@@ -103,6 +103,18 @@ pub trait Context {
             "COGO edits are not supported by this host".into(),
         ))
     }
+    /// Enable tracking roles; mutation must be supplied by the host.
+    fn enable_editor_tracking(
+        &self,
+        _input: &str,
+        _fields: [String; 4],
+        _add_fields: bool,
+        _utc: bool,
+    ) -> Result<()> {
+        Err(Error::Unsupported(
+            "editor tracking edits are not supported by this host".into(),
+        ))
+    }
     /// Disable selected tracking roles; read-only hosts must explicitly refuse.
     fn disable_editor_tracking(&self, _input: &str, _disable: [bool; 4]) -> Result<()> {
         Err(Error::Unsupported(
@@ -3668,5 +3680,6 @@ pub static TOOLS: &[Tool] = &[
     crate::cogo::DISABLE,
     crate::cogo::ENABLE,
     crate::editor_tracking::DISABLE,
+    crate::editor_tracking::ENABLE,
     crate::neighbors::COUNT_OVERLAPPING_FEATURES,
 ];

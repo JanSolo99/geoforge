@@ -2750,6 +2750,32 @@ fn main() -> ExitCode {
                 ) -> Result<()> {
                     delete_multiple::run(items)
                 }
+                fn enable_editor_tracking(
+                    &self,
+                    input: &str,
+                    fields: [String; 4],
+                    add_fields: bool,
+                    utc: bool,
+                ) -> Result<()> {
+                    let path = self
+                        .get(input)
+                        .ok_or_else(|| Error::Unsupported(format!("{input} is required")))?;
+                    match locate(Path::new(&path)) {
+                        Location::Geodatabase {
+                            gdb,
+                            item: Some(item),
+                        } => unigis_filegdb::enable_editor_tracking(
+                            gdb,
+                            &item,
+                            fields.each_ref().map(String::as_str),
+                            add_fields,
+                            utc,
+                        ),
+                        _ => Err(Error::Unsupported(
+                            "ERROR 001216: Editor Tracking not supported for dataset".into(),
+                        )),
+                    }
+                }
                 fn disable_editor_tracking(&self, input: &str, disable: [bool; 4]) -> Result<()> {
                     let path = self
                         .get(input)

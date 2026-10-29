@@ -893,3 +893,9 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
       markers and canonical aliases; retains existing values and OID holes.
       11 ArcGIS references plus refusal/idempotence safety controls. Research:
       scripts/research/enable_cogo/README.md.
+
+- [x] Enable Editor Tracking: simple FileGDB classes/tables, optional roles,
+      ADD_FIELDS/NO_ADD_FIELDS, UTC/DATABASE_TIME and active-state preservation.
+      14 public references and native field/read-only/value/no-op safety checks.
+      Later native edit auto-stamping remains a gap. Research:
+      scripts/research/enable_editor_tracking/README.md.
