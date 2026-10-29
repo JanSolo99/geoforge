@@ -87068,6 +87068,298 @@
           "output_time_type": "DATE"
         }
       }
+    },
+    "ctz_utc_pacific": {
+      "tool": "management.ConvertTimeZone",
+      "args": [
+        "testdata/geoproc/dates.dbf",
+        "<out>",
+        "D",
+        "UTC",
+        "OUT",
+        "Pacific Standard Time",
+        "INPUT_ADJUSTED_FOR_DST",
+        "OUTPUT_ADJUSTED_FOR_DST"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "GRP",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "D",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "E",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "OUT",
+          "Date",
+          8,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "convert_time_zone",
+        "params": {
+          "input": "testdata/geoproc/dates.dbf",
+          "output": "<out>",
+          "input_time_field": "D",
+          "input_time_zone": "UTC",
+          "output_time_field": "OUT",
+          "output_time_zone": "Pacific Standard Time",
+          "input_dst": "INPUT_ADJUSTED_FOR_DST",
+          "output_dst": "OUTPUT_ADJUSTED_FOR_DST"
+        }
+      }
+    },
+    "ctz_utc_pacific_std": {
+      "tool": "management.ConvertTimeZone",
+      "args": [
+        "testdata/geoproc/dates.dbf",
+        "<out>",
+        "D",
+        "UTC",
+        "OUT",
+        "Pacific Standard Time",
+        "INPUT_ADJUSTED_FOR_DST",
+        "OUTPUT_NOT_ADJUSTED_FOR_DST"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "GRP",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "D",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "E",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "OUT",
+          "Date",
+          8,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "convert_time_zone",
+        "params": {
+          "input": "testdata/geoproc/dates.dbf",
+          "output": "<out>",
+          "input_time_field": "D",
+          "input_time_zone": "UTC",
+          "output_time_field": "OUT",
+          "output_time_zone": "Pacific Standard Time",
+          "input_dst": "INPUT_ADJUSTED_FOR_DST",
+          "output_dst": "OUTPUT_NOT_ADJUSTED_FOR_DST"
+        }
+      }
+    },
+    "ctz_tonga_utc": {
+      "tool": "management.ConvertTimeZone",
+      "args": [
+        "testdata/geoproc/dates.dbf",
+        "<out>",
+        "E",
+        "Tonga Standard Time",
+        "OUT",
+        "UTC",
+        "INPUT_ADJUSTED_FOR_DST",
+        "OUTPUT_ADJUSTED_FOR_DST"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "GRP",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "D",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "E",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "OUT",
+          "Date",
+          8,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "convert_time_zone",
+        "params": {
+          "input": "testdata/geoproc/dates.dbf",
+          "output": "<out>",
+          "input_time_field": "E",
+          "input_time_zone": "Tonga Standard Time",
+          "output_time_field": "OUT",
+          "output_time_zone": "UTC",
+          "input_dst": "INPUT_ADJUSTED_FOR_DST",
+          "output_dst": "OUTPUT_ADJUSTED_FOR_DST"
+        }
+      }
+    },
+    "ctz_utc_tokyo": {
+      "tool": "management.ConvertTimeZone",
+      "args": [
+        "testdata/geoproc/dates.dbf",
+        "<out>",
+        "E",
+        "UTC",
+        "OUT",
+        "Tokyo Standard Time",
+        "INPUT_ADJUSTED_FOR_DST",
+        "OUTPUT_ADJUSTED_FOR_DST"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "GRP",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "D",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "E",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "OUT",
+          "Date",
+          8,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "convert_time_zone",
+        "params": {
+          "input": "testdata/geoproc/dates.dbf",
+          "output": "<out>",
+          "input_time_field": "E",
+          "input_time_zone": "UTC",
+          "output_time_field": "OUT",
+          "output_time_zone": "Tokyo Standard Time",
+          "input_dst": "INPUT_ADJUSTED_FOR_DST",
+          "output_dst": "OUTPUT_ADJUSTED_FOR_DST"
+        }
+      }
     }
   }
 }

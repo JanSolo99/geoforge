@@ -28,6 +28,7 @@ mod sql;
 pub mod swm;
 pub mod tables;
 pub mod temporal;
+pub mod timezone;
 pub mod trim;
 mod zm;
 

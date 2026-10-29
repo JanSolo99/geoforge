@@ -502,6 +502,32 @@ fn generate_transects_along_lines(ctx: &dyn Context) -> Result<ToolOutput> {
     )
 }
 
+fn convert_time_zone(ctx: &dyn Context) -> Result<Outcome> {
+    let t =
+        find("convert_time_zone").ok_or_else(|| Error::Unsupported("convert_time_zone".into()))?;
+    let input = ctx.features("input")?;
+    let need = |k: &str| text(ctx, t, k).ok_or_else(|| Error::Unsupported(format!("missing {k}")));
+    let adjusted =
+        |k: &str| !text(ctx, t, k).is_some_and(|v| v.to_ascii_uppercase().contains("NOT_ADJUSTED"));
+    let out = crate::timezone::convert_time_zone(
+        input.as_ref(),
+        &need("input_time_field")?,
+        &need("input_time_zone")?,
+        &need("output_time_field")?,
+        &need("output_time_zone")?,
+        adjusted("input_dst"),
+        adjusted("output_dst"),
+    )?;
+    Ok(if input.geometry_kind().is_some() {
+        Outcome::Features(out)
+    } else {
+        Outcome::Table(TableOutput {
+            fields: out.fields,
+            rows: out.features.into_iter().map(|f| f.attributes).collect(),
+        })
+    })
+}
+
 fn convert_time_field(ctx: &dyn Context) -> Result<Outcome> {
     let t = find("convert_time_field")
         .ok_or_else(|| Error::Unsupported("convert_time_field".into()))?;
@@ -2132,6 +2158,73 @@ pub static TOOLS: &[Tool] = &[
         output_suffix: "ODLinks",
         measures: false,
         run: Runner::Features(generate_origin_destination_links),
+    },
+    Tool {
+        id: "convert_time_zone",
+        name: "Convert Time Zone",
+        toolbox: "Data Management › Fields",
+        summary: "Date values converted from one time zone to another into a new field (ArcGIS Pro Convert Time Zone).",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Table",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "input_time_field",
+                label: "Input Time Field",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+                help: "A date field.",
+            },
+            Param {
+                name: "input_time_zone",
+                label: "Input Time Zone",
+                kind: Kind::Text,
+                required: true,
+                default: "Pacific Standard Time",
+                help: "Windows time zone name, e.g. `Pacific Standard Time`.",
+            },
+            Param {
+                name: "output_time_field",
+                label: "Output Time Field",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+                help: "The new date field.",
+            },
+            Param {
+                name: "output_time_zone",
+                label: "Output Time Zone",
+                kind: Kind::Text,
+                required: true,
+                default: "UTC",
+                help: "",
+            },
+            Param {
+                name: "input_dst",
+                label: "Input Time Is Adjusted For Daylight Saving",
+                kind: Kind::Choice(&["INPUT_ADJUSTED_FOR_DST", "INPUT_NOT_ADJUSTED_FOR_DST"]),
+                required: false,
+                default: "INPUT_ADJUSTED_FOR_DST",
+                help: "",
+            },
+            Param {
+                name: "output_dst",
+                label: "Output Time Is Adjusted For Daylight Saving",
+                kind: Kind::Choice(&["OUTPUT_ADJUSTED_FOR_DST", "OUTPUT_NOT_ADJUSTED_FOR_DST"]),
+                required: false,
+                default: "OUTPUT_ADJUSTED_FOR_DST",
+                help: "",
+            },
+        ],
+        output_suffix: "Converted",
+        measures: false,
+        run: Runner::Dynamic(convert_time_zone),
     },
     Tool {
         id: "convert_time_field",

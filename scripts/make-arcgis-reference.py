@@ -516,6 +516,10 @@ CASES = {
     "ctf_long_date": ("management.ConvertTimeField", [DATA / "ctf_text.dbf"], ["N1", "yyyyMMdd", "OUT", "DATE"]),
     "ctf_text_to_text": ("management.ConvertTimeField", [DATA / "ctf_text.dbf"], ["S1", "yyyyMMdd", "OUT", "TEXT", "dd.MM.yyyy"]),
     "ctf_err_none": ("management.ConvertTimeField", [DATA / "ctf_text.dbf"], ["S3", None, "OUT", "DATE"]),
+    "ctz_utc_pacific": ("management.ConvertTimeZone", [DATA / "dates.dbf"], ["D", "UTC", "OUT", "Pacific Standard Time", "INPUT_ADJUSTED_FOR_DST", "OUTPUT_ADJUSTED_FOR_DST"]),
+    "ctz_utc_pacific_std": ("management.ConvertTimeZone", [DATA / "dates.dbf"], ["D", "UTC", "OUT", "Pacific Standard Time", "INPUT_ADJUSTED_FOR_DST", "OUTPUT_NOT_ADJUSTED_FOR_DST"]),
+    "ctz_tonga_utc": ("management.ConvertTimeZone", [DATA / "dates.dbf"], ["E", "Tonga Standard Time", "OUT", "UTC", "INPUT_ADJUSTED_FOR_DST", "OUTPUT_ADJUSTED_FOR_DST"]),
+    "ctz_utc_tokyo": ("management.ConvertTimeZone", [DATA / "dates.dbf"], ["E", "UTC", "OUT", "Tokyo Standard Time", "INPUT_ADJUSTED_FOR_DST", "OUTPUT_ADJUSTED_FOR_DST"]),
     "fst_parcels_num": ("management.FieldStatisticsToTable", [DATA / "parcels.shp"], ["VALUE;ZONE;PARCEL_ID", "NUMERIC"]),
     "fst_parcels_text": ("management.FieldStatisticsToTable", [DATA / "parcels.shp"], ["NAME", "TEXT"]),
     "fst_streams_text": ("management.FieldStatisticsToTable", [DATA / "streams.shp"], ["NAME", "TEXT"]),
@@ -2052,6 +2056,7 @@ RUN = {
     "management.AddSpatialJoin": ("add_spatial_join", ["target_features", "join_features", "output", "join_operation", "join_type", None, "match_option", "search_radius", "distance_field_name", "permanent_join"]),
     "management.BatchUpdateFields": ("batch_update_fields", ["input", "output", "field_definition_table", None, "output_field_name", "source_field_name", "output_field_type", "output_field_decimals_or_length", "output_field_alias", "output_field_script"]),
     "management.ConvertTimeField": ("convert_time_field", ["input", "output", "input_time_field", "input_time_format", "output_time_field", "output_time_type", "output_time_format"]),
+    "management.ConvertTimeZone": ("convert_time_zone", ["input", "output", "input_time_field", "input_time_zone", "output_time_field", "output_time_zone", "input_dst", "output_dst"]),
     "management.FieldStatisticsToTable": ("field_statistics_to_table", ["input", "output", "fields", "field_type", "group_by", "statistics"]),
     "management.EncodeField": ("encode_field", ["input", "output", "field", "method"]),
     "management.GeodeticDensify": ("geodetic_densify", ["input", "output", "densify_method", "max_segment_length"]),
@@ -2137,7 +2142,7 @@ MEMORY_OUT = {"analysis.SummarizeWithin", "analysis.SummarizeNearby", "analysis.
 CREATE_TOOLS = {"management.CreateFeatureclass", "management.CreateTable"}
 
 # In-place tools: the index of the input they edit (run on a copy written as the output).
-IN_PLACE = {"management.AddGPSMetadataFields": 0, "management.ConvertTimeField": 0, "management.AddSpatialJoin": 0, "gp.ExtractMultiValuesToPoints_sa": 0, "edit.ExtendLine": 0, "edit.FlipLine": 0, "edit.TrimLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.EncodeField": 0, "management.AddGeometryAttributes": 0,
+IN_PLACE = {"management.AddGPSMetadataFields": 0, "management.ConvertTimeZone": 0, "management.ConvertTimeField": 0, "management.AddSpatialJoin": 0, "gp.ExtractMultiValuesToPoints_sa": 0, "edit.ExtendLine": 0, "edit.FlipLine": 0, "edit.TrimLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.EncodeField": 0, "management.AddGeometryAttributes": 0,
             "management.CalculateFields": 0, "management.StandardizeField": 0, "management.TransformField": 0, "management.ReclassifyField": 0, "management.DefineProjection": 0, "management.CalculateEndTime": 0}
 
 # Select Layer By Location cases, saved with Copy Features:
@@ -2268,7 +2273,7 @@ def main():
             print(f"{name}: {manifest['cases'][name]['status']}")
             continue
         out = OUT / (f"{name}.dbf" if tool in TABLE_OUT else f"{name}.shp")
-        if tool in ("management.BatchUpdateFields", "management.ConvertTimeField") and str(before[0]).endswith(".dbf"):
+        if tool in ("management.BatchUpdateFields", "management.ConvertTimeField", "management.ConvertTimeZone") and str(before[0]).endswith(".dbf"):
             out = OUT / f"{name}.dbf"  # a table in, a table out
         raster_projection = tool == "management.DefineProjection" and Path(str(before[0])).suffix.lower() in (".tif", ".tiff")
         if tool in RASTER_OUT or raster_projection:

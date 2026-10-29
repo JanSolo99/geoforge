@@ -779,7 +779,7 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Convert Coordinate Notation (DD/DDM/DMS/DD_NUMERIC and UTM_BANDS/UTM_ZONES/MGRS/USNG/GARS/GEOREF output from lon/lat; 13 `ccn_*` cases), Table To Ellipse (planar; adaptive complete-ellipse densification; 5 `ellipse_*` cases), Geodetic Densify (geodesic; 6 `gdd_*` cases), Encode Field (One-hot/One-cold; 4 `enc_*` cases) and Field Statistics To Table (numeric/text/date, optional group-by field and Output Statistics list; 17 `fst_*` cases incl. 4 refusals) match ArcGIS; gaps are in docs/KNOWN_GAPS.md and docs/HANDOFF.md.
 - [x] CI gate runs locally (`scripts/check`, pre-push hook); GitHub workflows are manual-only because Actions minutes ran out.
 
-- [x] Convert Coordinate Notation (DD_1/DD_2/DDM_1/DDM_2/DMS_1/DMS_2/DD_NUMERIC/UTM_BANDS/UTM_ZONES/MGRS/USNG/GARS/GEOREF from lon/lat), Table To Ellipse (planar), Geodetic Densify (geodesic), Encode Field (one-hot/one-cold) and Field Statistics To Table (numeric/text): reference cases match ArcGIS; gaps in KNOWN_GAPS.md and HANDOFF.md. Not done: DDM/DMS and grid outputs from projected-grid inputs, H3 output, geodesic ellipses, Convert Time Zone.
+- [x] Convert Coordinate Notation (DD_1/DD_2/DDM_1/DDM_2/DMS_1/DMS_2/DD_NUMERIC/UTM_BANDS/UTM_ZONES/MGRS/USNG/GARS/GEOREF from lon/lat), Table To Ellipse (planar), Geodetic Densify (geodesic), Encode Field (one-hot/one-cold) and Field Statistics To Table (numeric/text): reference cases match ArcGIS; gaps in KNOWN_GAPS.md and HANDOFF.md. Not done: DDM/DMS and grid outputs from projected-grid inputs, H3 output, geodesic ellipses.
 
 - [x] Convert Coordinate Notation angular text inputs: DD/DDM/DMS single- and two-field
       formats, hemisphere overrides/axis order, packed forms and invalid-row retention.
@@ -812,6 +812,9 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
       The angular numeric GARS boundary path remains separate follow-up work.
       Evidence: `scripts/research/coordinate_notation/grid/gars-boundaries.md`.
 
+- [x] Convert Time Zone (139 ArcGIS/Windows zone names via CLDR -> IANA rules with chrono-tz,
+      DST-adjusted or standard-time input/output): 4 `ctz_*` cases + a 72-instant unit test
+      match ArcGIS. Evidence: `scripts/research/convert_time_zone/README.md`.
 - [x] Convert Temporal Field (date <-> text/number with .NET-style formats, lenient parsing,
       WARNING 002125/ERROR 002126): 10 `ctf_*` in-place cases + 1 refusal match ArcGIS. Evidence:
       `scripts/research/convert_time_field/README.md`.

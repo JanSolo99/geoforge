@@ -26,7 +26,12 @@ Convert Temporal Field (this run): crates/unigis-tools/src/temporal.rs + registr
 testdata/geoproc/ctf_text.dbf (recipe scripts/research/convert_time_field/make_inputs.py).
 ogrinfo diff identical for all 10 outputs; dropped ctf_date_long (numeric nulls blank in ArcGIS,
 0 from our dbf writer; in KNOWN_GAPS). Validation: full scripts/check EXIT 0, 227 Rust passed / 5 ignored (/tmp/unigis-ctf-check.log).
-Next action after landing: next queue item (docs/WORK_QUEUE.md; #2 Convert Time Zone).
+Landed and pushed as fed1cc4.
+Convert Time Zone (this run): crates/unigis-tools/src/timezone.rs (Windows->IANA table, chrono-tz
+added to the workspace and unigis-tools), registry runner/entry `convert_time_zone`; 4 ctz_*
+in-place cases on dates.dbf; unit test of 72 probed conversions. ogrinfo diff identical.
+Validation: full scripts/check EXIT 0, 228 Rust passed / 5 ignored (/tmp/unigis-ctz-check.log).
+Next action after landing: next queue item (docs/WORK_QUEUE.md; Delete Multiple).
 
 Updated 2026-10-29T05:06:20.186536+00:00; last agent Codex.
 Workspace /mnt/media/ArcGIS_Linux, main, HEAD and origin/main both
