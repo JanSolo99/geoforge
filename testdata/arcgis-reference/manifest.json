@@ -97262,6 +97262,584 @@
           "subset_size_units": "PERCENTAGE_OF_INPUT"
         }
       }
+    },
+    "gids_points": {
+      "tool": "management.AddGlobalIDs",
+      "status": "succeeded",
+      "global_ids_edit": true,
+      "messages": [],
+      "run": {
+        "tool": "add_global_ids",
+        "params": {
+          "in_datasets": "testdata/geoproc/globalids_base.gdb/points"
+        }
+      },
+      "targets": {
+        "points": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "length": 4
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "length": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "length": 4
+            },
+            {
+              "name": "GlobalID",
+              "type": "GlobalID",
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "length": 38
+            }
+          ],
+          "globalIDFieldName": "GlobalID",
+          "hasGlobalID": true,
+          "ids": [
+            "{7C0A6215-90A9-4F6D-B48C-3FAEC13A1669}",
+            "{3A965C0C-7154-48F9-A7CD-79B7714365CF}",
+            "{DDE19BFE-EDFA-442B-BAFB-5BF4AB6431AA}"
+          ],
+          "indexes": [
+            {
+              "name": "FDO_OBJECTID",
+              "fields": [
+                "OBJECTID"
+              ]
+            },
+            {
+              "name": "FDO_Shape",
+              "fields": [
+                "Shape"
+              ]
+            },
+            {
+              "name": "FDO_GlobalID",
+              "fields": [
+                "GlobalID"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "gids_repeat": {
+      "tool": "management.AddGlobalIDs",
+      "status": "succeeded",
+      "global_ids_edit": true,
+      "messages": [],
+      "run": {
+        "tool": "add_global_ids",
+        "params": {
+          "in_datasets": "testdata/geoproc/globalids_base.gdb/repeat"
+        }
+      },
+      "targets": {
+        "repeat": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "length": 4
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "length": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "length": 4
+            },
+            {
+              "name": "GlobalID",
+              "type": "GlobalID",
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "length": 38
+            }
+          ],
+          "globalIDFieldName": "GlobalID",
+          "hasGlobalID": true,
+          "ids": [
+            "{60B783FF-2561-4ED9-AE39-35D802940B4C}",
+            "{15EA3FBA-49D6-4015-A52E-1C4E864F0396}",
+            "{D0C30EB9-B8B0-46F3-B84C-78141EE6E4C4}"
+          ],
+          "indexes": [
+            {
+              "name": "FDO_OBJECTID",
+              "fields": [
+                "OBJECTID"
+              ]
+            },
+            {
+              "name": "FDO_Shape",
+              "fields": [
+                "Shape"
+              ]
+            },
+            {
+              "name": "FDO_GlobalID",
+              "fields": [
+                "GlobalID"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "gids_records": {
+      "tool": "management.AddGlobalIDs",
+      "status": "succeeded",
+      "global_ids_edit": true,
+      "messages": [],
+      "run": {
+        "tool": "add_global_ids",
+        "params": {
+          "in_datasets": "testdata/geoproc/globalids_base.gdb/records"
+        }
+      },
+      "targets": {
+        "records": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "length": 4
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "length": 4
+            },
+            {
+              "name": "GlobalID",
+              "type": "GlobalID",
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "length": 38
+            }
+          ],
+          "globalIDFieldName": "GlobalID",
+          "hasGlobalID": true,
+          "ids": [
+            "{CC5234E7-E78A-43F5-A073-9371C2DAB2AC}"
+          ],
+          "indexes": [
+            {
+              "name": "FDO_OBJECTID",
+              "fields": [
+                "OBJECTID"
+              ]
+            },
+            {
+              "name": "FDO_GlobalID",
+              "fields": [
+                "GlobalID"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "gids_empty": {
+      "tool": "management.AddGlobalIDs",
+      "status": "succeeded",
+      "global_ids_edit": true,
+      "messages": [],
+      "run": {
+        "tool": "add_global_ids",
+        "params": {
+          "in_datasets": "testdata/geoproc/globalids_base.gdb/empty"
+        }
+      },
+      "targets": {
+        "empty": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "length": 4
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "length": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "length": 4
+            },
+            {
+              "name": "GlobalID",
+              "type": "GlobalID",
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "length": 38
+            }
+          ],
+          "globalIDFieldName": "GlobalID",
+          "hasGlobalID": true,
+          "ids": [],
+          "indexes": [
+            {
+              "name": "FDO_OBJECTID",
+              "fields": [
+                "OBJECTID"
+              ]
+            },
+            {
+              "name": "FDO_Shape",
+              "fields": [
+                "Shape"
+              ]
+            },
+            {
+              "name": "FDO_GlobalID",
+              "fields": [
+                "GlobalID"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "gids_collision": {
+      "tool": "management.AddGlobalIDs",
+      "status": "succeeded",
+      "global_ids_edit": true,
+      "messages": [],
+      "run": {
+        "tool": "add_global_ids",
+        "params": {
+          "in_datasets": "testdata/geoproc/globalids_base.gdb/collision"
+        }
+      },
+      "targets": {
+        "collision": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "length": 4
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "length": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "length": 4
+            },
+            {
+              "name": "GlobalID",
+              "type": "String",
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "length": 255
+            },
+            {
+              "name": "GlobalID_1",
+              "type": "GlobalID",
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "length": 38
+            }
+          ],
+          "globalIDFieldName": "GlobalID_1",
+          "hasGlobalID": true,
+          "ids": [
+            "{4B1DD064-5B81-44FA-9472-30B86313F79C}",
+            "{53CC5DD3-EE3C-472D-9A90-4CEB692C1A0C}",
+            "{376E45DB-F858-4EBC-A039-84B5EB9D511F}"
+          ],
+          "indexes": [
+            {
+              "name": "FDO_OBJECTID",
+              "fields": [
+                "OBJECTID"
+              ]
+            },
+            {
+              "name": "FDO_Shape",
+              "fields": [
+                "Shape"
+              ]
+            },
+            {
+              "name": "FDO_GlobalID_1",
+              "fields": [
+                "GlobalID_1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "gids_group": {
+      "tool": "management.AddGlobalIDs",
+      "status": "succeeded",
+      "global_ids_edit": true,
+      "messages": [],
+      "run": {
+        "tool": "add_global_ids",
+        "params": {
+          "in_datasets": "testdata/geoproc/globalids_base.gdb/group"
+        }
+      },
+      "targets": {
+        "child": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "length": 4
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "length": 0
+            },
+            {
+              "name": "GlobalID",
+              "type": "GlobalID",
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "length": 38
+            }
+          ],
+          "globalIDFieldName": "GlobalID",
+          "hasGlobalID": true,
+          "ids": [],
+          "indexes": [
+            {
+              "name": "FDO_OBJECTID",
+              "fields": [
+                "OBJECTID"
+              ]
+            },
+            {
+              "name": "FDO_Shape",
+              "fields": [
+                "Shape"
+              ]
+            },
+            {
+              "name": "FDO_GlobalID",
+              "fields": [
+                "GlobalID"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "gids_missing": {
+      "tool": "management.AddGlobalIDs",
+      "status": "failed",
+      "global_ids_edit": true,
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000242: The input dataset, file or layer is invalid",
+        "Failed to execute (AddGlobalIDs)."
+      ],
+      "run": {
+        "tool": "add_global_ids",
+        "params": {
+          "in_datasets": "testdata/geoproc/globalids_base.gdb/missing"
+        }
+      }
+    },
+    "gids_batch": {
+      "tool": "management.AddGlobalIDs",
+      "status": "succeeded",
+      "global_ids_edit": true,
+      "messages": [],
+      "run": {
+        "tool": "add_global_ids",
+        "params": {
+          "in_datasets": "testdata/geoproc/globalids_base.gdb/points;testdata/geoproc/globalids_base.gdb/records"
+        }
+      },
+      "targets": {
+        "points": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "length": 4
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "length": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "length": 4
+            },
+            {
+              "name": "GlobalID",
+              "type": "GlobalID",
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "length": 38
+            }
+          ],
+          "globalIDFieldName": "GlobalID",
+          "hasGlobalID": true,
+          "ids": [
+            "{A10959BA-059D-457E-AE3C-F57EE28CB4BD}",
+            "{C37161D2-524B-4282-A039-62BE89B04C31}",
+            "{525C7C80-F4FE-496D-B9EB-E28EBACBE310}"
+          ],
+          "indexes": [
+            {
+              "name": "FDO_OBJECTID",
+              "fields": [
+                "OBJECTID"
+              ]
+            },
+            {
+              "name": "FDO_Shape",
+              "fields": [
+                "Shape"
+              ]
+            },
+            {
+              "name": "FDO_GlobalID",
+              "fields": [
+                "GlobalID"
+              ]
+            }
+          ]
+        },
+        "records": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "length": 4
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "length": 4
+            },
+            {
+              "name": "GlobalID",
+              "type": "GlobalID",
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "length": 38
+            }
+          ],
+          "globalIDFieldName": "GlobalID",
+          "hasGlobalID": true,
+          "ids": [
+            "{0066894B-E89E-4803-8772-1AC1CD9005AB}"
+          ],
+          "indexes": [
+            {
+              "name": "FDO_OBJECTID",
+              "fields": [
+                "OBJECTID"
+              ]
+            },
+            {
+              "name": "FDO_GlobalID",
+              "fields": [
+                "GlobalID"
+              ]
+            }
+          ]
+        }
+      }
     }
   }
 }

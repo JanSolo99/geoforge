@@ -1,0 +1,418 @@
+{
+  "points": {
+    "matches": true,
+    "errors": [],
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "type": "OID",
+        "nullable": false,
+        "required": true,
+        "editable": false,
+        "length": 4
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "length": 0
+      },
+      {
+        "name": "KEY",
+        "type": "Integer",
+        "nullable": true,
+        "required": false,
+        "editable": true,
+        "length": 4
+      },
+      {
+        "name": "GlobalID",
+        "type": "GlobalID",
+        "nullable": false,
+        "required": true,
+        "editable": false,
+        "length": 38
+      }
+    ],
+    "indexes": [
+      {
+        "name": "FDO_OBJECTID",
+        "fields": [
+          "OBJECTID"
+        ]
+      },
+      {
+        "name": "FDO_Shape",
+        "fields": [
+          "Shape"
+        ]
+      },
+      {
+        "name": "FDO_GlobalID",
+        "fields": [
+          "GlobalID"
+        ]
+      }
+    ],
+    "ids": [
+      "{71352045-02D6-4C3A-9917-D2EF8E9463A4}",
+      "{B62233CD-79B7-43CC-90C7-0495F0FA3F6B}",
+      "{29140BC2-F7F0-412D-8660-806C50507F36}"
+    ],
+    "preserved_rows": [
+      [
+        1,
+        1,
+        "{\"x\":0,\"y\":0,\"spatialReference\":{\"wkid\":102100,\"latestWkid\":3857}}"
+      ],
+      [
+        2,
+        2,
+        "{\"x\":1,\"y\":1,\"spatialReference\":{\"wkid\":102100,\"latestWkid\":3857}}"
+      ],
+      [
+        3,
+        3,
+        "{\"x\":2,\"y\":2,\"spatialReference\":{\"wkid\":102100,\"latestWkid\":3857}}"
+      ]
+    ]
+  },
+  "repeat": {
+    "matches": true,
+    "errors": [],
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "type": "OID",
+        "nullable": false,
+        "required": true,
+        "editable": false,
+        "length": 4
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "length": 0
+      },
+      {
+        "name": "KEY",
+        "type": "Integer",
+        "nullable": true,
+        "required": false,
+        "editable": true,
+        "length": 4
+      },
+      {
+        "name": "GlobalID",
+        "type": "GlobalID",
+        "nullable": false,
+        "required": true,
+        "editable": false,
+        "length": 38
+      }
+    ],
+    "indexes": [
+      {
+        "name": "FDO_OBJECTID",
+        "fields": [
+          "OBJECTID"
+        ]
+      },
+      {
+        "name": "FDO_Shape",
+        "fields": [
+          "Shape"
+        ]
+      },
+      {
+        "name": "FDO_GlobalID",
+        "fields": [
+          "GlobalID"
+        ]
+      }
+    ],
+    "ids": [
+      "{AD3088E8-62D2-405D-929C-F76EC7A1AB9F}",
+      "{24A64707-11DD-410F-8D12-1B54F253609F}",
+      "{1CF839A5-DF7E-4546-8C8F-51D76D889C12}"
+    ],
+    "preserved_rows": [
+      [
+        1,
+        1,
+        "{\"x\":0,\"y\":0,\"spatialReference\":{\"wkid\":102100,\"latestWkid\":3857}}"
+      ],
+      [
+        2,
+        2,
+        "{\"x\":1,\"y\":1,\"spatialReference\":{\"wkid\":102100,\"latestWkid\":3857}}"
+      ],
+      [
+        3,
+        3,
+        "{\"x\":2,\"y\":2,\"spatialReference\":{\"wkid\":102100,\"latestWkid\":3857}}"
+      ]
+    ]
+  },
+  "records": {
+    "matches": true,
+    "errors": [],
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "type": "OID",
+        "nullable": false,
+        "required": true,
+        "editable": false,
+        "length": 4
+      },
+      {
+        "name": "KEY",
+        "type": "Integer",
+        "nullable": true,
+        "required": false,
+        "editable": true,
+        "length": 4
+      },
+      {
+        "name": "GlobalID",
+        "type": "GlobalID",
+        "nullable": false,
+        "required": true,
+        "editable": false,
+        "length": 38
+      }
+    ],
+    "indexes": [
+      {
+        "name": "FDO_OBJECTID",
+        "fields": [
+          "OBJECTID"
+        ]
+      },
+      {
+        "name": "FDO_GlobalID",
+        "fields": [
+          "GlobalID"
+        ]
+      }
+    ],
+    "ids": [
+      "{8C133A08-8D68-4E58-AAEA-A82F5BC16121}"
+    ],
+    "preserved_rows": [
+      [
+        1,
+        1
+      ]
+    ]
+  },
+  "empty": {
+    "matches": true,
+    "errors": [],
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "type": "OID",
+        "nullable": false,
+        "required": true,
+        "editable": false,
+        "length": 4
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "length": 0
+      },
+      {
+        "name": "KEY",
+        "type": "Integer",
+        "nullable": true,
+        "required": false,
+        "editable": true,
+        "length": 4
+      },
+      {
+        "name": "GlobalID",
+        "type": "GlobalID",
+        "nullable": false,
+        "required": true,
+        "editable": false,
+        "length": 38
+      }
+    ],
+    "indexes": [
+      {
+        "name": "FDO_OBJECTID",
+        "fields": [
+          "OBJECTID"
+        ]
+      },
+      {
+        "name": "FDO_Shape",
+        "fields": [
+          "Shape"
+        ]
+      },
+      {
+        "name": "FDO_GlobalID",
+        "fields": [
+          "GlobalID"
+        ]
+      }
+    ],
+    "ids": [],
+    "preserved_rows": []
+  },
+  "collision": {
+    "matches": true,
+    "errors": [],
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "type": "OID",
+        "nullable": false,
+        "required": true,
+        "editable": false,
+        "length": 4
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "length": 0
+      },
+      {
+        "name": "KEY",
+        "type": "Integer",
+        "nullable": true,
+        "required": false,
+        "editable": true,
+        "length": 4
+      },
+      {
+        "name": "GlobalID",
+        "type": "String",
+        "nullable": true,
+        "required": false,
+        "editable": true,
+        "length": 255
+      },
+      {
+        "name": "GlobalID_1",
+        "type": "GlobalID",
+        "nullable": false,
+        "required": true,
+        "editable": false,
+        "length": 38
+      }
+    ],
+    "indexes": [
+      {
+        "name": "FDO_OBJECTID",
+        "fields": [
+          "OBJECTID"
+        ]
+      },
+      {
+        "name": "FDO_Shape",
+        "fields": [
+          "Shape"
+        ]
+      },
+      {
+        "name": "FDO_GlobalID_1",
+        "fields": [
+          "GlobalID_1"
+        ]
+      }
+    ],
+    "ids": [
+      "{070591CA-FC5B-411C-97BB-F047589574C0}",
+      "{F756D951-7B8E-4074-B859-4681D23112B3}",
+      "{C57C34CE-A176-427C-8263-BE13C29DD7D6}"
+    ],
+    "preserved_rows": [
+      [
+        1,
+        1,
+        null,
+        "{\"x\":0,\"y\":0,\"spatialReference\":{\"wkid\":102100,\"latestWkid\":3857}}"
+      ],
+      [
+        2,
+        2,
+        null,
+        "{\"x\":1,\"y\":1,\"spatialReference\":{\"wkid\":102100,\"latestWkid\":3857}}"
+      ],
+      [
+        3,
+        3,
+        null,
+        "{\"x\":2,\"y\":2,\"spatialReference\":{\"wkid\":102100,\"latestWkid\":3857}}"
+      ]
+    ]
+  },
+  "child": {
+    "matches": true,
+    "errors": [],
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "type": "OID",
+        "nullable": false,
+        "required": true,
+        "editable": false,
+        "length": 4
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "length": 0
+      },
+      {
+        "name": "GlobalID",
+        "type": "GlobalID",
+        "nullable": false,
+        "required": true,
+        "editable": false,
+        "length": 38
+      }
+    ],
+    "indexes": [
+      {
+        "name": "FDO_OBJECTID",
+        "fields": [
+          "OBJECTID"
+        ]
+      },
+      {
+        "name": "FDO_Shape",
+        "fields": [
+          "Shape"
+        ]
+      },
+      {
+        "name": "FDO_GlobalID",
+        "fields": [
+          "GlobalID"
+        ]
+      }
+    ],
+    "ids": [],
+    "preserved_rows": []
+  }
+}

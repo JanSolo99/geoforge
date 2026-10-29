@@ -1,95 +1,63 @@
 # Current handoff
 
-## Latest (Claude, 2026-10-30): desktop app PROJ (user request) — read first
+Updated 2026-10-29T16:37:36.608283+00:00; last agent Codex.
+Workspace `/mnt/media/ArcGIS_Linux`, `main`, HEAD/origin `dfbe2ce`.
+User objective: wrap current work then build next queue item, one tool per landing,
+public ArcGIS controls and full gate. Desktop PROJ `dfbe2ce` was already landed;
+no unfinished product edits inherited. Previous usage-limit run made no queue edits.
 
-- app/Cargo.toml: rusqlite 0.40 -> 0.37 (bundled kept; libsqlite3-sys 0.35 shared with proj-sys
-  0.27, one `links = "sqlite3"`). No API changes were needed. rusqlite is desktop-only in
-  rustgis-data (and an engine dev-dependency), so the web build is unaffected
-  (sqlite-wasm-rs dropped from app/Cargo.lock).
-- app/crates/unigis/Cargo.toml: unigis-tools gets `features = ["proj"]` for
-  `cfg(not(target_arch = "wasm32"))`; wasm stays without PROJ.
-- New app test `proj_tools_run_on_the_desktop` (app/crates/unigis/src/lib.rs) runs
-  unigis:geodetic_densify, unigis:convert_coordinate_notation (MGRS of 15E 45N =
-  33TWK0000082950, the ArcGIS value) and unigis:table_to_ellipse (planar ellipses need a projected
-  spatial reference; linear units on lon/lat are refused, a known gap) through the app registry.
-- dm_geometry.rs dead-code warnings without proj were already gated in cdb7d7d.
-- Validation: `cargo build -j3 -p rustgis` in app/ EXIT 0 (/tmp/unigis-app-build.log, only an
-  unrelated rustgis-python manifest license warning); new test PASS; `cargo test -p rustgis-data`
-  199 passed / 7 ignored and `-p rustgis-engine` 117 passed / 1 ignored (14 GeoPackage/MBTiles/
-  SQLite tests among them; /tmp/unigis-app-{data,engine}.log); app `cargo fmt --check` clean;
-  clippy -D warnings on rustgis-unigis clean; `cargo check --target wasm32-unknown-unknown -p
-  rustgis-web` clean. Full `cargo xtask ci` not run (whole app workspace).
-- Next action: next queue item (docs/WORK_QUEUE.md).
+## Add Global IDs ready to land
 
-Updated 2026-10-29T15:32:45.783709+00:00; last agent Codex.
-Workspace `/mnt/media/ArcGIS_Linux`, branch `main`, HEAD/origin `501a1a7873880256dd98257c1e23979878114e8f`; index empty.
-User objective: wrap current tool then implement next queue tool, one tool per
-landing with public ArcGIS controls and full gate. Spatial Sampling `e77eb19`
-was already pushed on startup; no repeated external actions.
+Implementation: `crates/unigis-filegdb/src/writer/global_ids.rs`, tools/global_ids.rs,
+registry and optional Context mutation capability, CLI bridge. Input `in_datasets`
+accepts semicolon-separated classes/tables/simple feature datasets in one FileGDB.
+Required noneditable GlobalID (or GlobalID_1 on collision), OS UUID4 values, index,
+catalog HasGlobalID/GlobalIDFieldName; retains old field flags, IDs on repeats,
+source rows/OIDs/geometry. One journal covers batch expansion and all edits;
+invalid/cross-workspace batches and later failures preserve bytes. Unsupported
+hosts refuse mutation. Limitations recorded in KNOWN_GAPS/ROADMAP and research
+README: no enterprise/mobile/layers; future native auto-assignment/protection by
+other tools and advanced controller/replication/attachment workflows unverified.
 
-## Completed this turn; pushed
+Public docs and eight initial probes:7success/1missing000242. Source fixture
+`testdata/geoproc/globalids_base.gdb` saved once before controls; do not regenerate.
+Eight gids_* manifest references (7success/1expected refusal), includes batch;
+all2394 old cases unchanged+8=2402. Strict schema/index/source-record preservation,
+UUID validity/uniqueness and repeat contract; random UUID bytes are not matched to
+another invocation. Research `scripts/research/add_global_ids/README.md` and JSON.
+Public XML export `/tmp/unigis-globalids-probe/schema.xml`, recipe saved.
 
-- `d10c547`: Create Spatially Balanced Points deferred. Seven public controls
-  establish RRQRR nested/quadrant-balanced designs; native RRQRR and raster-to-feature
-  bridge absent. Evidence `scripts/research/spatially_balanced/`.
-- `0a6714d`: Eliminate deferred. Needs selected IDs plus full unselected neighbor
-  context absent from Context/CLI. Adjacent sliver merges into larger unselected
-  neighbor; areas100/220. Evidence `scripts/research/eliminate/`.
-- `501a1a7`: Subset Features implemented in `crates/unigis-tools/src/subset_features.rs`;
-  registry plus optional Context `write_datasets` capability and CLI
-  `src/dataset_outputs.rs`. Percentage/absolute training size, optional complementary
-  test output, native seed, source order/schema retention. Coordinated new SHP/DBF
-  datasets in one folder or root datasets of one existing FileGDB. Staging/rollback
-  tests cover errors and collision/source preservation. Other hosts refuse output.
-- Immutable `testdata/geoproc/subset_base.gdb` prepared once before controls.
-  Initial preparation with reserved name table failed before fixture saving;
-  corrected separate root uses records. Do not regenerate source.
--16 `subf_*` references (12success/4expected errors); manifest2378 old cases
-  unchanged+16=2394. Safety/partition helpers added; old comparisons unchanged.
-- Public NULL probes resolved initial12 test failures: SHP/DBF text/numeric NULLs
-  carry the prior written value separately per partition (initial blank/zero).
-  Date/GDB NULLs stay NULL. Native behavior local to this tool. Geometry system
-  field SHAPE/Shape case differs; recorded in known gaps. Durable controls, scripts,
-  reader results and limitations: `scripts/research/subset_features/README.md`.
+## Validation of final edits
 
-## Validation of final source edits
+- `cargo check -j3 -p unigis-cli`: PASS `/tmp/unigis-globalids-build.log`.
+- `uv run -q --with 'mcp>=2' python scripts/make-arcgis-reference.py 'gids_*'`:
+  7success/1expected000242, `/tmp/unigis-globalids-references.log`.
+- Initial `cargo test -j3 -p unigis-cli --test arcgis_reference`: PASS2;
+  `/tmp/unigis-globalids-tests.log`. Final metadata assertions covered by full gate.
+- `scripts/check`: EXIT0;270 Rust passed,5ignored; Python8/fmt/clippy-D warnings/
+  no-default-features PASS. `/tmp/unigis-globalids-check.{log,exit}`. Includes
+  new3 safety tests and read-only-host unit test; no source edits after gate start.
+- Independent ArcGIS reader PASS6 native datasets: exact fields/required/editable,
+  length/indexes/catalog flags, UUID4 uniqueness, preserved source rows/geometry/OIDs,
+  ArcGIS repeated AddGlobalIDs retains native IDs. Saved native_reader_results.json;
+  `/tmp/unigis-globalids-native-reader.log`. Disposable native outputs in
+  `/tmp/unigis-globalids-native`; do not regenerate/repeat external actions.
+- Python research/generator syntax PASS. Research JSON line endings normalized to
+  LF; staged whitespace PASS. Product scope106 paths in
+  `/tmp/unigis-globalids-scope.json`; unrelated generator4-line hunk excluded.
+- Preserved unrelated hashes audited via `/tmp/unigis-globalids-preserved.json`;
+  generator inherited hunk reconstructed against original hash. No builds/probes
+  running. All required checks passed.
 
-- `cargo check -j3 -p unigis-cli`: PASS `/tmp/unigis-subset-build.log`.
-- `uv run -q --with 'mcp>=2' python scripts/make-arcgis-reference.py 'subf_*'`:
-  12success/4expected refusals, `/tmp/unigis-subset-references.log`.
-- `cargo test -j3 -p unigis-cli --test arcgis_reference --test subset_features_safety`:
-  PASS5, `/tmp/unigis-subset-tests2.log` (after NULL-policy correction).
-- `scripts/check`: EXIT0,266 Rust passed/5ignored, Python8, fmt/clippy -D warnings
-  and no-default-features PASS. `/tmp/unigis-subset-check.{log,exit,pid}`.
-  Final source change (reject silently skipped shapefile rows) included; no source
-  changes afterward. No need to repeat gate absent new source changes.
-- Independent public ArcGIS reader:16checks/28native datasets all match,
-  `scripts/research/subset_features/native_reader_results.json` and
-  `/tmp/unigis-subset-native.{log,json}`. Includes SHP/DBF, paired FileGDB, aliases,
-  supplemental NULL/date checks. Python script syntax checks passed.
-- Preserved unrelated tracked hashes rechecked before staging:
-  `/tmp/unigis-subset-preserved-hashes.json`. No running builds/probes.
+## Next actions
 
-## Landing and next action
+1. Restage final HANDOFF, audit product scope/whitespace, commit Add Global IDs.
+2. Push once (`git push --no-verify origin main`; fresh full gate above), regenerate
+   queue, verify HEAD=origin/index empty and preserve unrelated changes.
+3. Final checkpoint with SHA/push. Next queue item expected Make Query Table;
+   verify generated order. Do not polish landed tools without request.
 
-All three scoped commits pushed successfully once with
-`git push --no-verify origin main` (fresh full gate above; avoided duplicate build).
-Push evidence `/tmp/unigis-subset-push.log`: `e77eb19..501a1a7 main -> main`.
-HEAD equals origin/main; staging index empty. Product scope249 paths verified in
-`/tmp/unigis-subset-scope.json`; staged whitespace check passed. The inherited
-4-line umintfloat generator change remains unstaged. No unfinished product edits.
-This final checkpoint is intentionally uncommitted.
-
-`python3 scripts/work_queue.py` completed after landing:1598 tools missing.
-Next queue item: Add Global IDs (`management.AddGlobalIDs`). Start with existing
-registry inventory and public ArcGIS controls, then follow queue rules. Current
-request's wrap-and-next-tool objective completed by landing Subset Features after
-the Spatial Sampling wrap-up and two evidence-based deferrals. No pending checks
-for this landing and no running builds/probes. Do not polish landed tools unless
-requested. Durable limitations are in KNOWN_GAPS and the research README.
-
-Unrelated edits preserved: raster unary/integer-float, coordinator/agents scripts,
-AGENTS.md, hooks/web/queue infrastructure, parcels.shp.xml, generated dashboard,
-scratch_te. Generator's inherited umintfloat hunk must remain unstaged. Do not read
-or add NOTES.md/.worktrees. No manual web publish; existing timer/RAM guard retained.
-Max Cargo-j3, no overlapping Cargo/Trunk, no other agents/coordinators.
+Unrelated raster unary/integer-float/coordinator/AGENTS/hooks/web/queue edits,
+generator umintfloat4-line hunk, parcels.shp.xml, scratch_te and generated dashboard
+preserved. Do not read/add NOTES.md/.worktrees. No manual web publishing; existing
+timer/RAM guard retained. Max Cargo-j3; no overlapping builds or other agents.

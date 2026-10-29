@@ -59,6 +59,12 @@ pub enum SchemaDomainKind {
 
 /// Tool parameters, input access and optional workspace output supplied by a host.
 pub trait Context {
+    /// Mutate the supplied datasets; unsupported hosts must refuse explicitly.
+    fn add_global_ids(&self, _input: &str) -> Result<()> {
+        Err(Error::Unsupported(
+            "GlobalID edits are not supported by this host".into(),
+        ))
+    }
     /// The parameter's value as text, when it was given and is not empty.
     fn get(&self, name: &str) -> Option<String>;
     /// The feature layer named by the parameter.
@@ -3970,5 +3976,6 @@ pub static TOOLS: &[Tool] = &[
     crate::random_points::TOOL,
     crate::spatial_sampling::TOOL,
     crate::subset_features::TOOL,
+    crate::global_ids::TOOL,
     crate::neighbors::COUNT_OVERLAPPING_FEATURES,
 ];

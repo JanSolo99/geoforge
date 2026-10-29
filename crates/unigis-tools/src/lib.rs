@@ -17,6 +17,7 @@ pub mod dm_tools;
 pub mod editor_tracking;
 pub mod extend;
 mod fieldmap;
+pub mod global_ids;
 pub mod gps_metadata;
 pub mod graphic_buffer;
 pub(crate) mod grid_notation;

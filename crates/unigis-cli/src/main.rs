@@ -2873,6 +2873,41 @@ fn main() -> ExitCode {
                         _ => Err(Error::Unsupported("ERROR 001216: Editor Tracking not supported for dataset; use a FileGDB feature class, table or feature dataset".into())),
                     }
                 }
+                fn add_global_ids(&self, input: &str) -> Result<()> {
+                    let paths = self.get(input).unwrap_or_default();
+                    let mut workspace = None;
+                    let mut items = Vec::new();
+                    for path in paths.split(';').map(str::trim).filter(|s| !s.is_empty()) {
+                        match locate(Path::new(path.trim_matches('\''))) {
+                            Location::Geodatabase {
+                                gdb,
+                                item: Some(item),
+                            } => {
+                                let canonical =
+                                    std::fs::canonicalize(&gdb).map_err(|e| Error::io(&gdb, e))?;
+                                if workspace.as_ref().is_some_and(|old| old != &canonical) {
+                                    return Err(Error::Unsupported(
+                                        "GlobalID input datasets must share one FileGDB".into(),
+                                    ));
+                                }
+                                workspace = Some(canonical);
+                                items.push(item);
+                            }
+                            _ => {
+                                return Err(Error::Unsupported(
+                                    "ERROR 000242: The input dataset, file or layer is invalid"
+                                        .into(),
+                                ));
+                            }
+                        }
+                    }
+                    let workspace = workspace.ok_or_else(|| {
+                        Error::Unsupported(
+                            "ERROR 000242: The input dataset, file or layer is invalid".into(),
+                        )
+                    })?;
+                    unigis_filegdb::add_global_ids(workspace, &items)
+                }
                 fn enable_cogo(&self, input: &str) -> Result<()> {
                     let path = self
                         .get(input)

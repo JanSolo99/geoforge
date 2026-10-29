@@ -14,6 +14,7 @@ mod edit;
 mod editor_tracking;
 mod extract;
 mod geometry;
+mod global_ids;
 mod index_edit;
 mod keys;
 mod rebuild;
@@ -48,6 +49,7 @@ pub use domain_edit::{
 pub use edit::{TableEditor, delete_rows};
 pub use editor_tracking::{disable_editor_tracking, enable_editor_tracking};
 pub use extract::{Expand, ExtractOptions, extract_data};
+pub use global_ids::add_global_ids;
 pub use index_edit::{add_attribute_index, remove_attribute_index};
 pub use rebuild::rebuild_attribute_indexes;
 pub use rewrite::{add_field, delete_fields, rewrite_table, truncate_table};

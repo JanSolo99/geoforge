@@ -818,6 +818,10 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Adjust 3D Z (reverse, constant or field shift, US-survey unit conversion): 6 in-place `a3z_*`
       cases over point, line, polygon and multipoint Z shapefiles match ArcGIS. Evidence:
       `scripts/research/adjust_3d_z/README.md`.
+- [x] Add Global IDs (`add_global_ids`): in-place FileGDB class/table and simple
+  feature-dataset expansion, batches in one workspace, UUID4 values, system field
+  metadata/index and repeat stability. Eight public references plus rollback tests;
+  evidence `scripts/research/add_global_ids/README.md`.
 - [x] Subset Features (`subset_features`): percentage/absolute training size,
   optional complementary test output, feature/table schemas and input order,
   native seeded sampling and observed DBF NULL conversion. Coordinated new folder

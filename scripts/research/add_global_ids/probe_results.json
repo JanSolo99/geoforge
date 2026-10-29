@@ -1,0 +1,574 @@
+{
+  "points": {
+    "status": "succeeded",
+    "messages": "Start Time: Friday, October 30, 2026 3:20:05 AM\nExecuting AddGlobalIDs...\nAdd Global IDS successfully completed...\nSucceeded at Friday, October 30, 2026 3:20:05 AM (Elapsed Time: 0.04 seconds)",
+    "after": {
+      "globalIDFieldName": "GlobalID",
+      "hasGlobalID": true,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "length": 4
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "length": 0
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "length": 4
+        },
+        {
+          "name": "GlobalID",
+          "alias": "GlobalID",
+          "type": "GlobalID",
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "length": 38
+        }
+      ],
+      "rows": [
+        [
+          1,
+          1,
+          "{FF432AB4-8317-4108-BFF0-9212BC57D628}"
+        ],
+        [
+          2,
+          2,
+          "{54818828-3BC3-4C19-A2DD-5FB54C341110}"
+        ],
+        [
+          3,
+          3,
+          "{332CA642-6866-4283-AE98-6759C42A321D}"
+        ]
+      ],
+      "indexes": [
+        {
+          "name": "FDO_OBJECTID",
+          "unique": true,
+          "ascending": true,
+          "fields": [
+            "OBJECTID"
+          ]
+        },
+        {
+          "name": "FDO_Shape",
+          "unique": false,
+          "ascending": true,
+          "fields": [
+            "Shape"
+          ]
+        },
+        {
+          "name": "FDO_GlobalID",
+          "unique": false,
+          "ascending": true,
+          "fields": [
+            "GlobalID"
+          ]
+        }
+      ]
+    }
+  },
+  "repeat": {
+    "status": "succeeded",
+    "messages": "Start Time: Friday, October 30, 2026 3:20:05 AM\nExecuting AddGlobalIDs...\nAdd Global IDS successfully completed...\nSucceeded at Friday, October 30, 2026 3:20:05 AM (Elapsed Time: 0.04 seconds)",
+    "after": {
+      "globalIDFieldName": "GlobalID",
+      "hasGlobalID": true,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "length": 4
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "length": 0
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "length": 4
+        },
+        {
+          "name": "GlobalID",
+          "alias": "GlobalID",
+          "type": "GlobalID",
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "length": 38
+        }
+      ],
+      "rows": [
+        [
+          1,
+          1,
+          "{28820E82-F200-4C40-BC89-A41F6F08CDBF}"
+        ],
+        [
+          2,
+          2,
+          "{91923131-6172-484A-AF1F-E0913764F2B4}"
+        ],
+        [
+          3,
+          3,
+          "{C1210874-A185-40F9-AF42-09B44CE4585C}"
+        ]
+      ],
+      "indexes": [
+        {
+          "name": "FDO_OBJECTID",
+          "unique": true,
+          "ascending": true,
+          "fields": [
+            "OBJECTID"
+          ]
+        },
+        {
+          "name": "FDO_Shape",
+          "unique": false,
+          "ascending": true,
+          "fields": [
+            "Shape"
+          ]
+        },
+        {
+          "name": "FDO_GlobalID",
+          "unique": false,
+          "ascending": true,
+          "fields": [
+            "GlobalID"
+          ]
+        }
+      ]
+    }
+  },
+  "repeat_again": {
+    "status": "succeeded",
+    "messages": "Start Time: Friday, October 30, 2026 3:20:05 AM\nExecuting AddGlobalIDs...\nAdd Global IDS successfully completed...\nSucceeded at Friday, October 30, 2026 3:20:06 AM (Elapsed Time: 0.03 seconds)",
+    "after": {
+      "globalIDFieldName": "GlobalID",
+      "hasGlobalID": true,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "length": 4
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "length": 0
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "length": 4
+        },
+        {
+          "name": "GlobalID",
+          "alias": "GlobalID",
+          "type": "GlobalID",
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "length": 38
+        }
+      ],
+      "rows": [
+        [
+          1,
+          1,
+          "{28820E82-F200-4C40-BC89-A41F6F08CDBF}"
+        ],
+        [
+          2,
+          2,
+          "{91923131-6172-484A-AF1F-E0913764F2B4}"
+        ],
+        [
+          3,
+          3,
+          "{C1210874-A185-40F9-AF42-09B44CE4585C}"
+        ]
+      ],
+      "indexes": [
+        {
+          "name": "FDO_OBJECTID",
+          "unique": true,
+          "ascending": true,
+          "fields": [
+            "OBJECTID"
+          ]
+        },
+        {
+          "name": "FDO_Shape",
+          "unique": false,
+          "ascending": true,
+          "fields": [
+            "Shape"
+          ]
+        },
+        {
+          "name": "FDO_GlobalID",
+          "unique": false,
+          "ascending": true,
+          "fields": [
+            "GlobalID"
+          ]
+        }
+      ]
+    }
+  },
+  "table": {
+    "status": "succeeded",
+    "messages": "Start Time: Friday, October 30, 2026 3:20:06 AM\nExecuting AddGlobalIDs...\nAdd Global IDS successfully completed...\nSucceeded at Friday, October 30, 2026 3:20:06 AM (Elapsed Time: 0.04 seconds)",
+    "after": {
+      "globalIDFieldName": "GlobalID",
+      "hasGlobalID": true,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "length": 4
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "length": 4
+        },
+        {
+          "name": "GlobalID",
+          "alias": "GlobalID",
+          "type": "GlobalID",
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "length": 38
+        }
+      ],
+      "rows": [
+        [
+          1,
+          1,
+          "{787104F3-5C16-4403-AB58-AAC1F1F8DF17}"
+        ]
+      ],
+      "indexes": [
+        {
+          "name": "FDO_OBJECTID",
+          "unique": true,
+          "ascending": true,
+          "fields": [
+            "OBJECTID"
+          ]
+        },
+        {
+          "name": "FDO_GlobalID",
+          "unique": false,
+          "ascending": true,
+          "fields": [
+            "GlobalID"
+          ]
+        }
+      ]
+    }
+  },
+  "empty": {
+    "status": "succeeded",
+    "messages": "Start Time: Friday, October 30, 2026 3:20:06 AM\nExecuting AddGlobalIDs...\nAdd Global IDS successfully completed...\nSucceeded at Friday, October 30, 2026 3:20:06 AM (Elapsed Time: 0.04 seconds)",
+    "after": {
+      "globalIDFieldName": "GlobalID",
+      "hasGlobalID": true,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "length": 4
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "length": 0
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "length": 4
+        },
+        {
+          "name": "GlobalID",
+          "alias": "GlobalID",
+          "type": "GlobalID",
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "length": 38
+        }
+      ],
+      "rows": [],
+      "indexes": [
+        {
+          "name": "FDO_OBJECTID",
+          "unique": true,
+          "ascending": true,
+          "fields": [
+            "OBJECTID"
+          ]
+        },
+        {
+          "name": "FDO_Shape",
+          "unique": false,
+          "ascending": true,
+          "fields": [
+            "Shape"
+          ]
+        },
+        {
+          "name": "FDO_GlobalID",
+          "unique": false,
+          "ascending": true,
+          "fields": [
+            "GlobalID"
+          ]
+        }
+      ]
+    }
+  },
+  "collision": {
+    "status": "succeeded",
+    "messages": "Start Time: Friday, October 30, 2026 3:20:06 AM\nExecuting AddGlobalIDs...\nAdd Global IDS successfully completed...\nSucceeded at Friday, October 30, 2026 3:20:06 AM (Elapsed Time: 0.04 seconds)",
+    "after": {
+      "globalIDFieldName": "GlobalID_1",
+      "hasGlobalID": true,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "length": 4
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "length": 0
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "length": 4
+        },
+        {
+          "name": "GlobalID",
+          "alias": "GlobalID",
+          "type": "String",
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "length": 255
+        },
+        {
+          "name": "GlobalID_1",
+          "alias": "GlobalID_1",
+          "type": "GlobalID",
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "length": 38
+        }
+      ],
+      "rows": [
+        [
+          1,
+          1,
+          null,
+          "{DA1E8D9E-62EB-4D8C-9F0A-799755E72431}"
+        ],
+        [
+          2,
+          2,
+          null,
+          "{652E17C2-DF97-4A54-80EA-57078141402F}"
+        ],
+        [
+          3,
+          3,
+          null,
+          "{ECE0EF95-D4A5-4437-9492-3BD5587F27C8}"
+        ]
+      ],
+      "indexes": [
+        {
+          "name": "FDO_OBJECTID",
+          "unique": true,
+          "ascending": true,
+          "fields": [
+            "OBJECTID"
+          ]
+        },
+        {
+          "name": "FDO_Shape",
+          "unique": false,
+          "ascending": true,
+          "fields": [
+            "Shape"
+          ]
+        },
+        {
+          "name": "FDO_GlobalID_1",
+          "unique": false,
+          "ascending": true,
+          "fields": [
+            "GlobalID_1"
+          ]
+        }
+      ]
+    }
+  },
+  "dataset": {
+    "status": "succeeded",
+    "messages": "Start Time: Friday, October 30, 2026 3:20:07 AM\nExecuting AddGlobalIDs...\nAdd Global IDS successfully completed...\nSucceeded at Friday, October 30, 2026 3:20:07 AM (Elapsed Time: 0.11 seconds)",
+    "after": {
+      "globalIDFieldName": "GlobalID",
+      "hasGlobalID": true,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "length": 4
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "length": 0
+        },
+        {
+          "name": "GlobalID",
+          "alias": "GlobalID",
+          "type": "GlobalID",
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "length": 38
+        }
+      ],
+      "rows": [],
+      "indexes": [
+        {
+          "name": "FDO_OBJECTID",
+          "unique": true,
+          "ascending": true,
+          "fields": [
+            "OBJECTID"
+          ]
+        },
+        {
+          "name": "FDO_Shape",
+          "unique": false,
+          "ascending": true,
+          "fields": [
+            "Shape"
+          ]
+        },
+        {
+          "name": "FDO_GlobalID",
+          "unique": false,
+          "ascending": true,
+          "fields": [
+            "GlobalID"
+          ]
+        }
+      ]
+    }
+  },
+  "missing": {
+    "status": "failed",
+    "error": "Failed to execute. Parameters are not valid.\nERROR 000242: The input dataset, file or layer is invalid\nFailed to execute (AddGlobalIDs).\n",
+    "messages": "Start Time: Friday, October 30, 2026 3:20:07 AM\nFailed to execute. Parameters are not valid.\nERROR 000242: The input dataset, file or layer is invalid\nFailed to execute (AddGlobalIDs).\nFailed at Friday, October 30, 2026 3:20:07 AM (Elapsed Time: 0.00 seconds)"
+  }
+}

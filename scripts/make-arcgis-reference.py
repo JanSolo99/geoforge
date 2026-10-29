@@ -77,6 +77,9 @@ DM = ROOT / "testdata" / "dm"
 
 CASES = {
     # name: (tool, args before the output, args after the output)
+    **{f"gids_{name}": ("management.AddGlobalIDs", [DATA / "globalids_base.gdb" / name], [])
+       for name in ["points", "repeat", "records", "empty", "collision", "group", "missing"]},
+    "gids_batch": ("management.AddGlobalIDs", [DATA / "globalids_base.gdb" / n for n in ["points", "records"]], []),
     **{f"subf_{name}": ("management.SubsetFeatures", [DATA / "subset_base.gdb" / item], [test, size, units])
        for name, item, test, size, units in [
         ("default", "points", True, "", ""),
@@ -2173,6 +2176,7 @@ for _tool, _id in COMBINATORIAL:
 
 
 RUN = {
+    "management.AddGlobalIDs": ("add_global_ids", ["in_datasets"]),
     "management.SubsetFeatures": ("subset_features", ["input", "out_training_feature_class", "out_test_feature_class", "size_of_training_dataset", "subset_size_units"]),
     "management.CreateSpatialSamplingLocations": ("create_spatial_sampling_locations", ["input", "output", "sampling_method", "strata_id_field", "strata_count_method", "bin_shape", "bin_size", "h3_resolution", "num_samples", "num_samples_per_strata", "population_field", "geometry_type", "min_distance", "spatial_relationship"]),
     "management.CreateRandomPoints": ("create_random_points", ["output", "constraining_feature_class", "constraining_extent", "number_of_points_or_field", "minimum_allowed_distance", "create_multipoint_output", "multipoint_size"]),
@@ -2386,6 +2390,41 @@ result = dict(files=sorted(files),catalogs=catalogs)
             run=run_spec("management.DeleteMultiple",[template]))
 
 
+def global_ids_case(w, tool, before):
+    """Random UUID values use a strict schema/identity contract, with idempotence."""
+    source_gdb = Path(before[0]).parent
+    with tempfile.TemporaryDirectory(prefix="unigis-globalids-reference-") as temp:
+        copied = Path(temp) / source_gdb.name
+        shutil.copytree(source_gdb,copied,ignore=shutil.ignore_patterns("*.lock"))
+        targets = [copied / Path(p).name for p in before]
+        response = w.call("run_tool",tool=tool,args=[";".join(map(str,targets))])
+        entry = dict(tool=tool,status=response.get("status"),global_ids_edit=True,
+                     messages=[m["text"] for m in response.get("messages",[]) if m["severity"]>0],
+                     run=run_spec(tool,[";".join(rel(p) for p in before)]))
+        if entry["status"] == "succeeded":
+            paths = []
+            for target in targets:
+                d = w.call("describe",path=str(target))
+                if d.get("dataType") == "FeatureDataset":
+                    paths.append(target / "child")
+                else:
+                    paths.append(target)
+            code = f"""
+result = {{}}
+for path in {list(map(win,paths))!r}:
+ d=arcpy.Describe(path)
+ fields=[dict(name=f.name,type=f.type,nullable=f.isNullable,required=f.required,editable=f.editable,length=f.length) for f in arcpy.ListFields(path)]
+ ids=[r[0] for r in arcpy.da.SearchCursor(path,[d.globalIDFieldName])]
+ result[os.path.basename(path)]=dict(fields=fields,globalIDFieldName=d.globalIDFieldName,hasGlobalID=d.hasGlobalID,ids=ids,indexes=[dict(name=i.name,fields=[f.name for f in i.fields]) for i in arcpy.ListIndexes(path)])
+"""
+            first=w.call("python",code="import os\n"+code)["result"]
+            repeat=w.call("run_tool",tool=tool,args=[";".join(map(str,targets))])
+            if repeat.get("status")!="succeeded" or w.call("python",code=code)["result"] != first:
+                raise RuntimeError("GlobalID repeat changed identities or schema")
+            entry["targets"]=first
+        return entry
+
+
 def subset_case(w, name, tool, before, after):
     """Save both sides of a random record partition, without demanding RNG parity."""
     source = Path(before[0])
@@ -2527,6 +2566,10 @@ def main():
             for a in before:
                 if isinstance(a, Path) and a.suffix == ".tif":
                     w.call("python", code=f"arcpy.management.BuildRasterAttributeTable(r'{win(a)}', 'Overwrite')")
+        if tool == "management.AddGlobalIDs":
+            manifest["cases"][name] = global_ids_case(w,tool,before)
+            print(f"{name}: {manifest['cases'][name]['status']}")
+            continue
         if tool == "management.SubsetFeatures":
             manifest["cases"][name] = subset_case(w, name, tool, before, after)
             print(f"{name}: {manifest['cases'][name]['status']}")

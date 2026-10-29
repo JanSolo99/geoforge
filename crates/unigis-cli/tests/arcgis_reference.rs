@@ -27,6 +27,8 @@ mod workspace_extract;
 
 #[path = "common/catalog_edits.rs"]
 mod catalog_edits;
+#[path = "common/global_ids.rs"]
+mod global_ids;
 #[path = "common/schema_edits.rs"]
 mod schema_edits;
 
@@ -4533,6 +4535,13 @@ fn tools_match_arcgis_output() {
         }
         if info.get("catalog_edit").is_some() {
             let diffs = catalog_edits::compare(case, info, &root, &out_dir);
+            if !diffs.is_empty() {
+                failures.push(format!("{case}:\n    {}", diffs.join("\n    ")));
+            }
+            continue;
+        }
+        if info["global_ids_edit"] == true {
+            let diffs = global_ids::compare(case, info, &root, &out_dir);
             if !diffs.is_empty() {
                 failures.push(format!("{case}:\n    {}", diffs.join("\n    ")));
             }
