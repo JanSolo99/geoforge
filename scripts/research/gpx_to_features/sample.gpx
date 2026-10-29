@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="test" xmlns="http://www.topografix.com/GPX/1/1">
+  <wpt lat="45.5" lon="15.25"><ele>120.5</ele><time>2024-02-29T12:30:00Z</time><name>Peak</name><desc>A peak</desc><cmt>c1</cmt><sym>Flag</sym><type>summit</type></wpt>
+  <wpt lat="-10.125" lon="-70.75"><name>Low</name></wpt>
+  <trk><name>Track A</name><desc>first</desc><trkseg>
+    <trkpt lat="46.0" lon="16.0"><ele>100</ele><time>2024-03-01T08:00:00Z</time></trkpt>
+    <trkpt lat="46.1" lon="16.1"><ele>110</ele><time>2024-03-01T08:05:00Z</time></trkpt>
+  </trkseg><trkseg><trkpt lat="46.2" lon="16.2"/></trkseg></trk>
+  <rte><name>Route R</name><rtept lat="1" lon="2"><name>r1</name></rtept><rtept lat="3" lon="4"/></rte>
+</gpx>

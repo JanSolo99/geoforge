@@ -19,7 +19,14 @@ input with feature_class_to_feature_class before writing); 3 fc2shp_* WORKSPACE_
 generator now passes list arguments as lists (the bridge translates list elements) and
 --annotate skips cases without args (Codex's gids_* cases made it crash). ogrinfo diff identical.
 Validation: full scripts/check EXIT 0, 275 Rust passed / 5 ignored (/tmp/unigis-fc2shp-check.log).
-Next action after landing: next queue item (docs/WORK_QUEUE.md: Features To GPX).
+Landed and pushed as 3fc9fae.
+- Features To GPX DEFERRED (docs/WORK_QUEUE_DEFERRED.txt): ArcGIS's script repeats track points by
+  an unidentified rule (x5 / x2), merges multipart lines and fails on non-cp1252 text; byte-exact
+  GPX needs those quirks.
+- Next action: next queue item: GPX To Features (conversion.GPXtoFeatures). Probed, not
+  implemented: findings and probe file in scripts/research/gpx_to_features/ (order tracks, routes,
+  waypoints; Id/Name/Descript/Type/Comment/Symbol/DateTimeS/Elevation for a shapefile; PointZM with
+  M NaN; TRACKS_AS_LINES one PolylineZM per trk). roxmltree is already a workspace dependency.
 
 Updated 2026-10-29T18:49:14.455806+00:00; last agent Codex.
 Workspace `/mnt/media/ArcGIS_Linux`, main, HEAD b20d66d2fcbf56bbae05b0591da78ad853e6b7c8.
