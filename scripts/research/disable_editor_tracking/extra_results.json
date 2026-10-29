@@ -1,0 +1,504 @@
+{
+  "dataset": {
+    "before": [
+      {
+        "tracking": {
+          "editorTrackingEnabled": true,
+          "creatorFieldName": "maker",
+          "createdAtFieldName": "made",
+          "editorFieldName": "changer",
+          "editedAtFieldName": "changed",
+          "isTimeInUTC": true
+        },
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "alias": "OBJECTID",
+            "editable": false,
+            "domain": ""
+          },
+          {
+            "name": "Shape",
+            "alias": "Shape",
+            "editable": true,
+            "domain": ""
+          },
+          {
+            "name": "maker",
+            "alias": "maker",
+            "editable": false,
+            "domain": ""
+          },
+          {
+            "name": "made",
+            "alias": "made",
+            "editable": false,
+            "domain": ""
+          },
+          {
+            "name": "changer",
+            "alias": "changer",
+            "editable": false,
+            "domain": ""
+          },
+          {
+            "name": "changed",
+            "alias": "changed",
+            "editable": false,
+            "domain": ""
+          }
+        ]
+      },
+      {
+        "tracking": {
+          "editorTrackingEnabled": false,
+          "creatorFieldName": "",
+          "createdAtFieldName": "",
+          "editorFieldName": "",
+          "editedAtFieldName": "",
+          "isTimeInUTC": true
+        },
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "alias": "OBJECTID",
+            "editable": false,
+            "domain": ""
+          },
+          {
+            "name": "Shape",
+            "alias": "Shape",
+            "editable": true,
+            "domain": ""
+          }
+        ]
+      }
+    ],
+    "after": [
+      {
+        "tracking": {
+          "editorTrackingEnabled": false,
+          "creatorFieldName": "",
+          "createdAtFieldName": "",
+          "editorFieldName": "",
+          "editedAtFieldName": "",
+          "isTimeInUTC": true
+        },
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "alias": "OBJECTID",
+            "editable": false,
+            "domain": ""
+          },
+          {
+            "name": "Shape",
+            "alias": "Shape",
+            "editable": true,
+            "domain": ""
+          },
+          {
+            "name": "maker",
+            "alias": "maker",
+            "editable": true,
+            "domain": ""
+          },
+          {
+            "name": "made",
+            "alias": "made",
+            "editable": true,
+            "domain": ""
+          },
+          {
+            "name": "changer",
+            "alias": "changer",
+            "editable": true,
+            "domain": ""
+          },
+          {
+            "name": "changed",
+            "alias": "changed",
+            "editable": true,
+            "domain": ""
+          }
+        ]
+      },
+      {
+        "tracking": {
+          "editorTrackingEnabled": false,
+          "creatorFieldName": "",
+          "createdAtFieldName": "",
+          "editorFieldName": "",
+          "editedAtFieldName": "",
+          "isTimeInUTC": true
+        },
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "alias": "OBJECTID",
+            "editable": false,
+            "domain": ""
+          },
+          {
+            "name": "Shape",
+            "alias": "Shape",
+            "editable": true,
+            "domain": ""
+          }
+        ]
+      }
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 7:34:25 PM\nSucceeded at Thursday, October 29, 2026 7:34:25 PM (Elapsed Time: 0.17 seconds)"
+  },
+  "custom": {
+    "before": [
+      {
+        "tracking": {
+          "editorTrackingEnabled": true,
+          "creatorFieldName": "maker",
+          "createdAtFieldName": "made",
+          "editorFieldName": "",
+          "editedAtFieldName": "",
+          "isTimeInUTC": true
+        },
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "alias": "OBJECTID",
+            "editable": false,
+            "domain": ""
+          },
+          {
+            "name": "Shape",
+            "alias": "Shape",
+            "editable": true,
+            "domain": ""
+          },
+          {
+            "name": "maker",
+            "alias": "Original author",
+            "editable": false,
+            "domain": "authors"
+          },
+          {
+            "name": "made",
+            "alias": "Original creation",
+            "editable": false,
+            "domain": ""
+          }
+        ]
+      }
+    ],
+    "after": [
+      {
+        "tracking": {
+          "editorTrackingEnabled": false,
+          "creatorFieldName": "",
+          "createdAtFieldName": "",
+          "editorFieldName": "",
+          "editedAtFieldName": "",
+          "isTimeInUTC": true
+        },
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "alias": "OBJECTID",
+            "editable": false,
+            "domain": ""
+          },
+          {
+            "name": "Shape",
+            "alias": "Shape",
+            "editable": true,
+            "domain": ""
+          },
+          {
+            "name": "maker",
+            "alias": "Original author",
+            "editable": true,
+            "domain": "authors"
+          },
+          {
+            "name": "made",
+            "alias": "Original creation",
+            "editable": true,
+            "domain": ""
+          }
+        ]
+      }
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 7:34:26 PM\nSucceeded at Thursday, October 29, 2026 7:34:26 PM (Elapsed Time: 0.07 seconds)"
+  },
+  "boolean": {
+    "before": [
+      {
+        "tracking": {
+          "editorTrackingEnabled": false,
+          "creatorFieldName": "",
+          "createdAtFieldName": "",
+          "editorFieldName": "",
+          "editedAtFieldName": "",
+          "isTimeInUTC": true
+        },
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "alias": "OBJECTID",
+            "editable": false,
+            "domain": ""
+          },
+          {
+            "name": "Shape",
+            "alias": "Shape",
+            "editable": true,
+            "domain": ""
+          },
+          {
+            "name": "maker",
+            "alias": "Original author",
+            "editable": true,
+            "domain": "authors"
+          },
+          {
+            "name": "made",
+            "alias": "Original creation",
+            "editable": true,
+            "domain": ""
+          }
+        ]
+      }
+    ],
+    "after": [
+      {
+        "tracking": {
+          "editorTrackingEnabled": false,
+          "creatorFieldName": "",
+          "createdAtFieldName": "",
+          "editorFieldName": "",
+          "editedAtFieldName": "",
+          "isTimeInUTC": true
+        },
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "alias": "OBJECTID",
+            "editable": false,
+            "domain": ""
+          },
+          {
+            "name": "Shape",
+            "alias": "Shape",
+            "editable": true,
+            "domain": ""
+          },
+          {
+            "name": "maker",
+            "alias": "Original author",
+            "editable": true,
+            "domain": "authors"
+          },
+          {
+            "name": "made",
+            "alias": "Original creation",
+            "editable": true,
+            "domain": ""
+          }
+        ]
+      }
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 7:34:26 PM\nSucceeded at Thursday, October 29, 2026 7:34:26 PM (Elapsed Time: 0.05 seconds)"
+  },
+  "bad_bool": {
+    "before": [
+      {
+        "tracking": {
+          "editorTrackingEnabled": false,
+          "creatorFieldName": "",
+          "createdAtFieldName": "",
+          "editorFieldName": "",
+          "editedAtFieldName": "",
+          "isTimeInUTC": true
+        },
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "alias": "OBJECTID",
+            "editable": false,
+            "domain": ""
+          },
+          {
+            "name": "Shape",
+            "alias": "Shape",
+            "editable": true,
+            "domain": ""
+          },
+          {
+            "name": "maker",
+            "alias": "Original author",
+            "editable": true,
+            "domain": "authors"
+          },
+          {
+            "name": "made",
+            "alias": "Original creation",
+            "editable": true,
+            "domain": ""
+          }
+        ]
+      }
+    ],
+    "error": "ERROR 000622: Failed to execute (Disable Editor Tracking). Parameters are not valid.\nERROR 000800: The value is not a member of DISABLE_CREATOR | NO_DISABLE_CREATOR.\n",
+    "messages": "ERROR 000622: Failed to execute (Disable Editor Tracking). Parameters are not valid.\nERROR 000800: The value is not a member of DISABLE_CREATOR | NO_DISABLE_CREATOR."
+  },
+  "empty_group": {
+    "before": [
+      {
+        "tracking": {
+          "editorTrackingEnabled": false,
+          "creatorFieldName": "",
+          "createdAtFieldName": "",
+          "editorFieldName": "",
+          "editedAtFieldName": "",
+          "isTimeInUTC": true
+        },
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "alias": "OBJECTID",
+            "editable": false,
+            "domain": ""
+          },
+          {
+            "name": "Shape",
+            "alias": "Shape",
+            "editable": true,
+            "domain": ""
+          },
+          {
+            "name": "maker",
+            "alias": "maker",
+            "editable": true,
+            "domain": ""
+          },
+          {
+            "name": "made",
+            "alias": "made",
+            "editable": true,
+            "domain": ""
+          },
+          {
+            "name": "changer",
+            "alias": "changer",
+            "editable": true,
+            "domain": ""
+          },
+          {
+            "name": "changed",
+            "alias": "changed",
+            "editable": true,
+            "domain": ""
+          }
+        ]
+      },
+      {
+        "tracking": {
+          "editorTrackingEnabled": false,
+          "creatorFieldName": "",
+          "createdAtFieldName": "",
+          "editorFieldName": "",
+          "editedAtFieldName": "",
+          "isTimeInUTC": true
+        },
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "alias": "OBJECTID",
+            "editable": false,
+            "domain": ""
+          },
+          {
+            "name": "Shape",
+            "alias": "Shape",
+            "editable": true,
+            "domain": ""
+          }
+        ]
+      }
+    ],
+    "after": [
+      {
+        "tracking": {
+          "editorTrackingEnabled": false,
+          "creatorFieldName": "",
+          "createdAtFieldName": "",
+          "editorFieldName": "",
+          "editedAtFieldName": "",
+          "isTimeInUTC": true
+        },
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "alias": "OBJECTID",
+            "editable": false,
+            "domain": ""
+          },
+          {
+            "name": "Shape",
+            "alias": "Shape",
+            "editable": true,
+            "domain": ""
+          },
+          {
+            "name": "maker",
+            "alias": "maker",
+            "editable": true,
+            "domain": ""
+          },
+          {
+            "name": "made",
+            "alias": "made",
+            "editable": true,
+            "domain": ""
+          },
+          {
+            "name": "changer",
+            "alias": "changer",
+            "editable": true,
+            "domain": ""
+          },
+          {
+            "name": "changed",
+            "alias": "changed",
+            "editable": true,
+            "domain": ""
+          }
+        ]
+      },
+      {
+        "tracking": {
+          "editorTrackingEnabled": false,
+          "creatorFieldName": "",
+          "createdAtFieldName": "",
+          "editorFieldName": "",
+          "editedAtFieldName": "",
+          "isTimeInUTC": true
+        },
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "alias": "OBJECTID",
+            "editable": false,
+            "domain": ""
+          },
+          {
+            "name": "Shape",
+            "alias": "Shape",
+            "editable": true,
+            "domain": ""
+          }
+        ]
+      }
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 7:34:26 PM\nSucceeded at Thursday, October 29, 2026 7:34:26 PM (Elapsed Time: 0.05 seconds)"
+  }
+}

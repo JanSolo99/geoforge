@@ -88605,6 +88605,1422 @@
           "output": "<out>"
         }
       }
+    },
+    "dtrack_all_off": {
+      "tool": "management.DisableEditorTracking",
+      "args": [
+        "testdata/geoproc/editor_tracking_base.gdb/all_off"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape",
+            "aliasName": "Shape",
+            "type": "Geometry",
+            "length": 0,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "creator",
+            "aliasName": "creator",
+            "type": "String",
+            "length": 255,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "created",
+            "aliasName": "created",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "editor",
+            "aliasName": "editor",
+            "type": "String",
+            "length": 255,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "edited",
+            "aliasName": "edited",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "shapeType": "Point",
+        "hasZ": false,
+        "hasM": false,
+        "OIDFieldName": "OBJECTID",
+        "shapeFieldName": "Shape",
+        "spatialReference": {
+          "name": "WGS_1984_UTM_Zone_33N",
+          "factoryCode": 32633,
+          "type": "Projected",
+          "XYResolution": 0.0001,
+          "XYTolerance": 0.001
+        }
+      },
+      "domains": [],
+      "editor_tracking": {
+        "properties": {
+          "editorTrackingEnabled": false,
+          "creatorFieldName": "",
+          "createdAtFieldName": "",
+          "editorFieldName": "",
+          "editedAtFieldName": "",
+          "isTimeInUTC": true
+        },
+        "editable": {
+          "OBJECTID": false,
+          "Shape": true,
+          "KEY": true,
+          "creator": true,
+          "created": true,
+          "editor": true,
+          "edited": true
+        }
+      },
+      "run": {
+        "tool": "disable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/editor_tracking_base.gdb/all_off",
+          "output": "<out>"
+        }
+      }
+    },
+    "dtrack_table_all": {
+      "tool": "management.DisableEditorTracking",
+      "args": [
+        "testdata/geoproc/editor_tracking_base.gdb/table_all"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "creator",
+            "aliasName": "creator",
+            "type": "String",
+            "length": 255,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "created",
+            "aliasName": "created",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "editor",
+            "aliasName": "editor",
+            "type": "String",
+            "length": 255,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "edited",
+            "aliasName": "edited",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "OIDFieldName": "OBJECTID"
+      },
+      "domains": [],
+      "editor_tracking": {
+        "properties": {
+          "editorTrackingEnabled": false,
+          "creatorFieldName": "",
+          "createdAtFieldName": "",
+          "editorFieldName": "",
+          "editedAtFieldName": "",
+          "isTimeInUTC": true
+        },
+        "editable": {
+          "OBJECTID": false,
+          "KEY": true,
+          "creator": true,
+          "created": true,
+          "editor": true,
+          "edited": true
+        }
+      },
+      "run": {
+        "tool": "disable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/editor_tracking_base.gdb/table_all",
+          "output": "<out>"
+        }
+      }
+    },
+    "dtrack_plain": {
+      "tool": "management.DisableEditorTracking",
+      "args": [
+        "testdata/geoproc/editor_tracking_base.gdb/plain"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape",
+            "aliasName": "Shape",
+            "type": "Geometry",
+            "length": 0,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "shapeType": "Point",
+        "hasZ": false,
+        "hasM": false,
+        "OIDFieldName": "OBJECTID",
+        "shapeFieldName": "Shape",
+        "spatialReference": {
+          "name": "WGS_1984_UTM_Zone_33N",
+          "factoryCode": 32633,
+          "type": "Projected",
+          "XYResolution": 0.0001,
+          "XYTolerance": 0.001
+        }
+      },
+      "domains": [],
+      "editor_tracking": {
+        "properties": {
+          "editorTrackingEnabled": false,
+          "creatorFieldName": "",
+          "createdAtFieldName": "",
+          "editorFieldName": "",
+          "editedAtFieldName": "",
+          "isTimeInUTC": true
+        },
+        "editable": {
+          "OBJECTID": false,
+          "Shape": true,
+          "KEY": true
+        }
+      },
+      "run": {
+        "tool": "disable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/editor_tracking_base.gdb/plain",
+          "output": "<out>"
+        }
+      }
+    },
+    "dtrack_local_time": {
+      "tool": "management.DisableEditorTracking",
+      "args": [
+        "testdata/geoproc/editor_tracking_base.gdb/local_time"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape",
+            "aliasName": "Shape",
+            "type": "Geometry",
+            "length": 0,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "creator",
+            "aliasName": "creator",
+            "type": "String",
+            "length": 255,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "created",
+            "aliasName": "created",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "editor",
+            "aliasName": "editor",
+            "type": "String",
+            "length": 255,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "edited",
+            "aliasName": "edited",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "shapeType": "Point",
+        "hasZ": false,
+        "hasM": false,
+        "OIDFieldName": "OBJECTID",
+        "shapeFieldName": "Shape",
+        "spatialReference": {
+          "name": "WGS_1984_UTM_Zone_33N",
+          "factoryCode": 32633,
+          "type": "Projected",
+          "XYResolution": 0.0001,
+          "XYTolerance": 0.001
+        }
+      },
+      "domains": [],
+      "editor_tracking": {
+        "properties": {
+          "editorTrackingEnabled": false,
+          "creatorFieldName": "",
+          "createdAtFieldName": "",
+          "editorFieldName": "",
+          "editedAtFieldName": "",
+          "isTimeInUTC": false
+        },
+        "editable": {
+          "OBJECTID": false,
+          "Shape": true,
+          "KEY": true,
+          "creator": true,
+          "created": true,
+          "editor": true,
+          "edited": true
+        }
+      },
+      "run": {
+        "tool": "disable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/editor_tracking_base.gdb/local_time",
+          "output": "<out>"
+        }
+      }
+    },
+    "dtrack_creator_off": {
+      "tool": "management.DisableEditorTracking",
+      "args": [
+        "testdata/geoproc/editor_tracking_base.gdb/creator_off",
+        "DISABLE_CREATOR",
+        "NO_DISABLE_CREATION_DATE",
+        "NO_DISABLE_LAST_EDITOR",
+        "NO_DISABLE_LAST_EDIT_DATE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape",
+            "aliasName": "Shape",
+            "type": "Geometry",
+            "length": 0,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "creator",
+            "aliasName": "creator",
+            "type": "String",
+            "length": 255,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "created",
+            "aliasName": "created",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "editor",
+            "aliasName": "editor",
+            "type": "String",
+            "length": 255,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "edited",
+            "aliasName": "edited",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "shapeType": "Point",
+        "hasZ": false,
+        "hasM": false,
+        "OIDFieldName": "OBJECTID",
+        "shapeFieldName": "Shape",
+        "spatialReference": {
+          "name": "WGS_1984_UTM_Zone_33N",
+          "factoryCode": 32633,
+          "type": "Projected",
+          "XYResolution": 0.0001,
+          "XYTolerance": 0.001
+        }
+      },
+      "domains": [],
+      "editor_tracking": {
+        "properties": {
+          "editorTrackingEnabled": true,
+          "creatorFieldName": "",
+          "createdAtFieldName": "created",
+          "editorFieldName": "editor",
+          "editedAtFieldName": "edited",
+          "isTimeInUTC": true
+        },
+        "editable": {
+          "OBJECTID": false,
+          "Shape": true,
+          "KEY": true,
+          "creator": true,
+          "created": false,
+          "editor": false,
+          "edited": false
+        }
+      },
+      "run": {
+        "tool": "disable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/editor_tracking_base.gdb/creator_off",
+          "output": "<out>",
+          "creator": "DISABLE_CREATOR",
+          "creation_date": "NO_DISABLE_CREATION_DATE",
+          "last_editor": "NO_DISABLE_LAST_EDITOR",
+          "last_edit_date": "NO_DISABLE_LAST_EDIT_DATE"
+        }
+      }
+    },
+    "dtrack_created_off": {
+      "tool": "management.DisableEditorTracking",
+      "args": [
+        "testdata/geoproc/editor_tracking_base.gdb/created_off",
+        "NO_DISABLE_CREATOR",
+        "DISABLE_CREATION_DATE",
+        "NO_DISABLE_LAST_EDITOR",
+        "NO_DISABLE_LAST_EDIT_DATE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape",
+            "aliasName": "Shape",
+            "type": "Geometry",
+            "length": 0,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "creator",
+            "aliasName": "creator",
+            "type": "String",
+            "length": 255,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "created",
+            "aliasName": "created",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "editor",
+            "aliasName": "editor",
+            "type": "String",
+            "length": 255,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "edited",
+            "aliasName": "edited",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "shapeType": "Point",
+        "hasZ": false,
+        "hasM": false,
+        "OIDFieldName": "OBJECTID",
+        "shapeFieldName": "Shape",
+        "spatialReference": {
+          "name": "WGS_1984_UTM_Zone_33N",
+          "factoryCode": 32633,
+          "type": "Projected",
+          "XYResolution": 0.0001,
+          "XYTolerance": 0.001
+        }
+      },
+      "domains": [],
+      "editor_tracking": {
+        "properties": {
+          "editorTrackingEnabled": true,
+          "creatorFieldName": "creator",
+          "createdAtFieldName": "",
+          "editorFieldName": "editor",
+          "editedAtFieldName": "edited",
+          "isTimeInUTC": true
+        },
+        "editable": {
+          "OBJECTID": false,
+          "Shape": true,
+          "KEY": true,
+          "creator": false,
+          "created": true,
+          "editor": false,
+          "edited": false
+        }
+      },
+      "run": {
+        "tool": "disable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/editor_tracking_base.gdb/created_off",
+          "output": "<out>",
+          "creator": "NO_DISABLE_CREATOR",
+          "creation_date": "DISABLE_CREATION_DATE",
+          "last_editor": "NO_DISABLE_LAST_EDITOR",
+          "last_edit_date": "NO_DISABLE_LAST_EDIT_DATE"
+        }
+      }
+    },
+    "dtrack_editor_off": {
+      "tool": "management.DisableEditorTracking",
+      "args": [
+        "testdata/geoproc/editor_tracking_base.gdb/editor_off",
+        "NO_DISABLE_CREATOR",
+        "NO_DISABLE_CREATION_DATE",
+        "DISABLE_LAST_EDITOR",
+        "NO_DISABLE_LAST_EDIT_DATE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape",
+            "aliasName": "Shape",
+            "type": "Geometry",
+            "length": 0,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "creator",
+            "aliasName": "creator",
+            "type": "String",
+            "length": 255,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "created",
+            "aliasName": "created",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "editor",
+            "aliasName": "editor",
+            "type": "String",
+            "length": 255,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "edited",
+            "aliasName": "edited",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "shapeType": "Point",
+        "hasZ": false,
+        "hasM": false,
+        "OIDFieldName": "OBJECTID",
+        "shapeFieldName": "Shape",
+        "spatialReference": {
+          "name": "WGS_1984_UTM_Zone_33N",
+          "factoryCode": 32633,
+          "type": "Projected",
+          "XYResolution": 0.0001,
+          "XYTolerance": 0.001
+        }
+      },
+      "domains": [],
+      "editor_tracking": {
+        "properties": {
+          "editorTrackingEnabled": true,
+          "creatorFieldName": "creator",
+          "createdAtFieldName": "created",
+          "editorFieldName": "",
+          "editedAtFieldName": "edited",
+          "isTimeInUTC": true
+        },
+        "editable": {
+          "OBJECTID": false,
+          "Shape": true,
+          "KEY": true,
+          "creator": false,
+          "created": false,
+          "editor": true,
+          "edited": false
+        }
+      },
+      "run": {
+        "tool": "disable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/editor_tracking_base.gdb/editor_off",
+          "output": "<out>",
+          "creator": "NO_DISABLE_CREATOR",
+          "creation_date": "NO_DISABLE_CREATION_DATE",
+          "last_editor": "DISABLE_LAST_EDITOR",
+          "last_edit_date": "NO_DISABLE_LAST_EDIT_DATE"
+        }
+      }
+    },
+    "dtrack_edited_off": {
+      "tool": "management.DisableEditorTracking",
+      "args": [
+        "testdata/geoproc/editor_tracking_base.gdb/edited_off",
+        "NO_DISABLE_CREATOR",
+        "NO_DISABLE_CREATION_DATE",
+        "NO_DISABLE_LAST_EDITOR",
+        "DISABLE_LAST_EDIT_DATE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape",
+            "aliasName": "Shape",
+            "type": "Geometry",
+            "length": 0,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "creator",
+            "aliasName": "creator",
+            "type": "String",
+            "length": 255,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "created",
+            "aliasName": "created",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "editor",
+            "aliasName": "editor",
+            "type": "String",
+            "length": 255,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "edited",
+            "aliasName": "edited",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "shapeType": "Point",
+        "hasZ": false,
+        "hasM": false,
+        "OIDFieldName": "OBJECTID",
+        "shapeFieldName": "Shape",
+        "spatialReference": {
+          "name": "WGS_1984_UTM_Zone_33N",
+          "factoryCode": 32633,
+          "type": "Projected",
+          "XYResolution": 0.0001,
+          "XYTolerance": 0.001
+        }
+      },
+      "domains": [],
+      "editor_tracking": {
+        "properties": {
+          "editorTrackingEnabled": true,
+          "creatorFieldName": "creator",
+          "createdAtFieldName": "created",
+          "editorFieldName": "editor",
+          "editedAtFieldName": "",
+          "isTimeInUTC": true
+        },
+        "editable": {
+          "OBJECTID": false,
+          "Shape": true,
+          "KEY": true,
+          "creator": false,
+          "created": false,
+          "editor": false,
+          "edited": true
+        }
+      },
+      "run": {
+        "tool": "disable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/editor_tracking_base.gdb/edited_off",
+          "output": "<out>",
+          "creator": "NO_DISABLE_CREATOR",
+          "creation_date": "NO_DISABLE_CREATION_DATE",
+          "last_editor": "NO_DISABLE_LAST_EDITOR",
+          "last_edit_date": "DISABLE_LAST_EDIT_DATE"
+        }
+      }
+    },
+    "dtrack_keep_all": {
+      "tool": "management.DisableEditorTracking",
+      "args": [
+        "testdata/geoproc/editor_tracking_base.gdb/keep_all",
+        "NO_DISABLE_CREATOR",
+        "NO_DISABLE_CREATION_DATE",
+        "NO_DISABLE_LAST_EDITOR",
+        "NO_DISABLE_LAST_EDIT_DATE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape",
+            "aliasName": "Shape",
+            "type": "Geometry",
+            "length": 0,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "creator",
+            "aliasName": "creator",
+            "type": "String",
+            "length": 255,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "created",
+            "aliasName": "created",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "editor",
+            "aliasName": "editor",
+            "type": "String",
+            "length": 255,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "edited",
+            "aliasName": "edited",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "shapeType": "Point",
+        "hasZ": false,
+        "hasM": false,
+        "OIDFieldName": "OBJECTID",
+        "shapeFieldName": "Shape",
+        "spatialReference": {
+          "name": "WGS_1984_UTM_Zone_33N",
+          "factoryCode": 32633,
+          "type": "Projected",
+          "XYResolution": 0.0001,
+          "XYTolerance": 0.001
+        }
+      },
+      "domains": [],
+      "editor_tracking": {
+        "properties": {
+          "editorTrackingEnabled": true,
+          "creatorFieldName": "creator",
+          "createdAtFieldName": "created",
+          "editorFieldName": "editor",
+          "editedAtFieldName": "edited",
+          "isTimeInUTC": true
+        },
+        "editable": {
+          "OBJECTID": false,
+          "Shape": true,
+          "KEY": true,
+          "creator": false,
+          "created": false,
+          "editor": false,
+          "edited": false
+        }
+      },
+      "run": {
+        "tool": "disable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/editor_tracking_base.gdb/keep_all",
+          "output": "<out>",
+          "creator": "NO_DISABLE_CREATOR",
+          "creation_date": "NO_DISABLE_CREATION_DATE",
+          "last_editor": "NO_DISABLE_LAST_EDITOR",
+          "last_edit_date": "NO_DISABLE_LAST_EDIT_DATE"
+        }
+      }
+    },
+    "dtrack_keep_dates": {
+      "tool": "management.DisableEditorTracking",
+      "args": [
+        "testdata/geoproc/editor_tracking_base.gdb/keep_dates",
+        "DISABLE_CREATOR",
+        "NO_DISABLE_CREATION_DATE",
+        "DISABLE_LAST_EDITOR",
+        "NO_DISABLE_LAST_EDIT_DATE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape",
+            "aliasName": "Shape",
+            "type": "Geometry",
+            "length": 0,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "creator",
+            "aliasName": "creator",
+            "type": "String",
+            "length": 255,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "created",
+            "aliasName": "created",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "editor",
+            "aliasName": "editor",
+            "type": "String",
+            "length": 255,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "edited",
+            "aliasName": "edited",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "shapeType": "Point",
+        "hasZ": false,
+        "hasM": false,
+        "OIDFieldName": "OBJECTID",
+        "shapeFieldName": "Shape",
+        "spatialReference": {
+          "name": "WGS_1984_UTM_Zone_33N",
+          "factoryCode": 32633,
+          "type": "Projected",
+          "XYResolution": 0.0001,
+          "XYTolerance": 0.001
+        }
+      },
+      "domains": [],
+      "editor_tracking": {
+        "properties": {
+          "editorTrackingEnabled": true,
+          "creatorFieldName": "",
+          "createdAtFieldName": "created",
+          "editorFieldName": "",
+          "editedAtFieldName": "edited",
+          "isTimeInUTC": true
+        },
+        "editable": {
+          "OBJECTID": false,
+          "Shape": true,
+          "KEY": true,
+          "creator": true,
+          "created": false,
+          "editor": true,
+          "edited": false
+        }
+      },
+      "run": {
+        "tool": "disable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/editor_tracking_base.gdb/keep_dates",
+          "output": "<out>",
+          "creator": "DISABLE_CREATOR",
+          "creation_date": "NO_DISABLE_CREATION_DATE",
+          "last_editor": "DISABLE_LAST_EDITOR",
+          "last_edit_date": "NO_DISABLE_LAST_EDIT_DATE"
+        }
+      }
+    },
+    "dtrack_custom": {
+      "tool": "management.DisableEditorTracking",
+      "args": [
+        "testdata/geoproc/editor_tracking_extra.gdb/custom"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape",
+            "aliasName": "Shape",
+            "type": "Geometry",
+            "length": 0,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "maker",
+            "aliasName": "Original author",
+            "type": "String",
+            "length": 40,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "authors",
+            "required": false
+          },
+          {
+            "name": "made",
+            "aliasName": "Original creation",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "shapeType": "Point",
+        "hasZ": false,
+        "hasM": false,
+        "OIDFieldName": "OBJECTID",
+        "shapeFieldName": "Shape",
+        "spatialReference": {
+          "name": "WGS_1984_UTM_Zone_33N",
+          "factoryCode": 32633,
+          "type": "Projected",
+          "XYResolution": 0.0001,
+          "XYTolerance": 0.001
+        }
+      },
+      "domains": [
+        {
+          "name": "authors",
+          "description": "Author choices",
+          "type": "Text",
+          "kind": "CodedValue",
+          "split": "DefaultValue",
+          "merge": "DefaultValue",
+          "values": {
+            "a": "Author A"
+          }
+        }
+      ],
+      "editor_tracking": {
+        "properties": {
+          "editorTrackingEnabled": false,
+          "creatorFieldName": "",
+          "createdAtFieldName": "",
+          "editorFieldName": "",
+          "editedAtFieldName": "",
+          "isTimeInUTC": true
+        },
+        "editable": {
+          "OBJECTID": false,
+          "Shape": true,
+          "maker": true,
+          "made": true
+        }
+      },
+      "run": {
+        "tool": "disable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/editor_tracking_extra.gdb/custom",
+          "output": "<out>"
+        }
+      }
+    },
+    "dtrack_shapefile": {
+      "tool": "management.DisableEditorTracking",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 001216: Editor Tracking not supported for dataset dtrack_shapefile.shp",
+        "Failed to execute (DisableEditorTracking)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "run": {
+        "tool": "disable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "output": "<out>"
+        }
+      }
+    },
+    "dtrack_bad_flag": {
+      "tool": "management.DisableEditorTracking",
+      "args": [
+        "testdata/geoproc/editor_tracking_base.gdb/all_off",
+        "garbage"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 000622: Failed to execute (Disable Editor Tracking). Parameters are not valid.",
+        "ERROR 000800: The value is not a member of DISABLE_CREATOR | NO_DISABLE_CREATOR."
+      ],
+      "schema_edit": true,
+      "run": {
+        "tool": "disable_editor_tracking",
+        "params": {
+          "input": "testdata/geoproc/editor_tracking_base.gdb/all_off",
+          "output": "<out>",
+          "creator": "garbage"
+        }
+      }
     }
   }
 }

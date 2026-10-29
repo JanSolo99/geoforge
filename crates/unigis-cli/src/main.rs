@@ -2750,6 +2750,15 @@ fn main() -> ExitCode {
                 ) -> Result<()> {
                     delete_multiple::run(items)
                 }
+                fn disable_editor_tracking(&self, input: &str, disable: [bool; 4]) -> Result<()> {
+                    let path = self
+                        .get(input)
+                        .ok_or_else(|| Error::Unsupported(format!("{input} is required")))?;
+                    match locate(Path::new(&path)) {
+                        Location::Geodatabase { gdb, item: Some(item) } => unigis_filegdb::disable_editor_tracking(&gdb, &item, disable),
+                        _ => Err(Error::Unsupported("ERROR 001216: Editor Tracking not supported for dataset; use a FileGDB feature class, table or feature dataset".into())),
+                    }
+                }
                 fn disable_cogo(&self, input: &str) -> Result<()> {
                     let path = self
                         .get(input)

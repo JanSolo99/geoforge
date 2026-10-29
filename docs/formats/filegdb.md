@@ -36,6 +36,13 @@ Types: 0 i16, 1 i32, 2 f32, 3 f64, 4 string, 5 datetime, 6 objectid, 7 geometry,
 16 DateTimeWithOffset. Field flag bits: 0 nullable, 1 required, 2 editable /
 "has default".
 
+Disable Editor Tracking controls confirm that bit 2 is the physical editable
+flag: disabled String/DateTime tracking fields change 1 to 5, while retained
+roles stay at 1. Clearing catalog Editable=false alone does not restore ArcGIS
+field editability. Both catalog role/editability metadata and these flag bytes
+must change together; rows, defaults and the UTC basis remain unchanged. Saved
+public-tool/file-format controls: scripts/research/disable_editor_tracking/.
+
 - string: `i32 maxlen, u8 flag, varuint len + default bytes` (the length is always
   present, contrary to the spec's "if flag & 4"; verified on ArcGIS-written files)
 - objectid: `u8 width (4|8), u8 flag`

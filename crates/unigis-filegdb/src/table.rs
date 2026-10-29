@@ -205,6 +205,7 @@ pub struct Table {
     has_z: bool,
     has_m: bool,
     fields: Vec<GdbField>,
+    field_flags: Vec<(u64, u8)>,
     oid_index: Option<usize>,
     shape_index: Option<usize>,
     attribute_fields: Vec<Field>,
@@ -261,8 +262,11 @@ impl Table {
         let has_z = flags & (1 << 31) != 0;
 
         let mut fields = Vec::with_capacity(n.max(0) as usize);
+        let mut field_flags = Vec::with_capacity(n.max(0) as usize);
         for _ in 0..n {
-            fields.push(read_field(&mut r, has_z, has_m)?);
+            let (field, flag_at) = read_field(&mut r, has_z, has_m)?;
+            field_flags.push((field_offset + 4 + flag_at as u64, section[flag_at]));
+            fields.push(field);
         }
         // Section-relative offsets become file offsets.
         for g in fields.iter_mut().filter_map(|f| f.geometry.as_mut()) {
@@ -306,6 +310,7 @@ impl Table {
             has_z,
             has_m,
             fields,
+            field_flags,
             oid_index,
             shape_index,
             attribute_fields,
@@ -314,6 +319,19 @@ impl Table {
             subtypes: None,
             indexes,
         })
+    }
+
+    /// The physical field descriptor's editable flag, including system fields.
+    pub fn field_editable(&self, name: &str) -> Option<bool> {
+        self.fields
+            .iter()
+            .position(|f| f.name.eq_ignore_ascii_case(name))
+            .map(|i| self.field_flags[i].1 & 4 != 0)
+    }
+
+    /// File offsets and flag bytes in the same order as all_fields().
+    pub(crate) fn field_flag_locations(&self) -> &[(u64, u8)] {
+        &self.field_flags
     }
 
     /// All fields, including OBJECTID and the geometry field.
@@ -905,7 +923,7 @@ fn format_guid(b: &[u8]) -> String {
     )
 }
 
-fn read_field(r: &mut Reader, layer_z: bool, layer_m: bool) -> Result<GdbField> {
+fn read_field(r: &mut Reader, layer_z: bool, layer_m: bool) -> Result<(GdbField, usize)> {
     let n = usize::from(r.u8()?);
     let name = r.utf16(n)?;
     let n = usize::from(r.u8()?);
@@ -929,6 +947,7 @@ fn read_field(r: &mut Reader, layer_z: bool, layer_m: bool) -> Result<GdbField> 
         domain: None,
     };
     use GdbFieldType as G;
+    let flag_at = r.p + if field_type == G::String { 4 } else { 1 };
     match field_type {
         G::String => {
             field.length = r.u32()?;
@@ -977,7 +996,7 @@ fn read_field(r: &mut Reader, layer_z: bool, layer_m: bool) -> Result<GdbField> 
                 .transpose()?;
         }
     }
-    Ok(field)
+    Ok((field, flag_at))
 }
 
 fn read_geometry_def(r: &mut Reader, layer_z: bool, layer_m: bool) -> Result<GeometryDef> {

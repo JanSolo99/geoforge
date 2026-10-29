@@ -11,6 +11,7 @@ mod dm_data;
 mod dm_fields;
 mod dm_geometry;
 pub mod dm_tools;
+pub mod editor_tracking;
 pub mod extend;
 mod fieldmap;
 pub mod gps_metadata;

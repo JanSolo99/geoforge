@@ -1,0 +1,366 @@
+{
+  "all_off": {
+    "tracking": {
+      "editorTrackingEnabled": false,
+      "creatorFieldName": "",
+      "createdAtFieldName": "",
+      "editorFieldName": "",
+      "editedAtFieldName": "",
+      "isTimeInUTC": true
+    },
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "editable": false,
+        "domain": ""
+      },
+      {
+        "name": "Shape",
+        "alias": "Shape",
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "KEY",
+        "alias": "KEY",
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "creator",
+        "alias": "creator",
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "created",
+        "alias": "created",
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "editor",
+        "alias": "editor",
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "edited",
+        "alias": "edited",
+        "editable": true,
+        "domain": ""
+      }
+    ],
+    "rows": [
+      [
+        1,
+        7,
+        "STEAMUSER",
+        "2026-10-29 08:33:10",
+        "STEAMUSER",
+        "2026-10-29 08:33:10",
+        "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ]
+  },
+  "creator_off": {
+    "tracking": {
+      "editorTrackingEnabled": true,
+      "creatorFieldName": "",
+      "createdAtFieldName": "created",
+      "editorFieldName": "editor",
+      "editedAtFieldName": "edited",
+      "isTimeInUTC": true
+    },
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "editable": false,
+        "domain": ""
+      },
+      {
+        "name": "Shape",
+        "alias": "Shape",
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "KEY",
+        "alias": "KEY",
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "creator",
+        "alias": "creator",
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "created",
+        "alias": "created",
+        "editable": false,
+        "domain": ""
+      },
+      {
+        "name": "editor",
+        "alias": "editor",
+        "editable": false,
+        "domain": ""
+      },
+      {
+        "name": "edited",
+        "alias": "edited",
+        "editable": false,
+        "domain": ""
+      }
+    ],
+    "rows": [
+      [
+        1,
+        7,
+        "STEAMUSER",
+        "2026-10-29 08:33:11.000001",
+        "STEAMUSER",
+        "2026-10-29 08:33:11.000001",
+        "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ]
+  },
+  "table_all": {
+    "tracking": {
+      "editorTrackingEnabled": false,
+      "creatorFieldName": "",
+      "createdAtFieldName": "",
+      "editorFieldName": "",
+      "editedAtFieldName": "",
+      "isTimeInUTC": true
+    },
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "editable": false,
+        "domain": ""
+      },
+      {
+        "name": "KEY",
+        "alias": "KEY",
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "creator",
+        "alias": "creator",
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "created",
+        "alias": "created",
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "editor",
+        "alias": "editor",
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "edited",
+        "alias": "edited",
+        "editable": true,
+        "domain": ""
+      }
+    ],
+    "rows": [
+      [
+        1,
+        7,
+        "STEAMUSER",
+        "2026-10-29 08:33:13.000001",
+        "STEAMUSER",
+        "2026-10-29 08:33:13.000001"
+      ]
+    ]
+  },
+  "local_time": {
+    "tracking": {
+      "editorTrackingEnabled": false,
+      "creatorFieldName": "",
+      "createdAtFieldName": "",
+      "editorFieldName": "",
+      "editedAtFieldName": "",
+      "isTimeInUTC": false
+    },
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "editable": false,
+        "domain": ""
+      },
+      {
+        "name": "Shape",
+        "alias": "Shape",
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "KEY",
+        "alias": "KEY",
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "creator",
+        "alias": "creator",
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "created",
+        "alias": "created",
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "editor",
+        "alias": "editor",
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "edited",
+        "alias": "edited",
+        "editable": true,
+        "domain": ""
+      }
+    ],
+    "rows": [
+      [
+        1,
+        7,
+        "STEAMUSER",
+        "2026-10-29 19:33:14",
+        "STEAMUSER",
+        "2026-10-29 19:33:14",
+        "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ]
+  },
+  "grouped/tracked": {
+    "tracking": {
+      "editorTrackingEnabled": false,
+      "creatorFieldName": "",
+      "createdAtFieldName": "",
+      "editorFieldName": "",
+      "editedAtFieldName": "",
+      "isTimeInUTC": true
+    },
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "editable": false,
+        "domain": ""
+      },
+      {
+        "name": "Shape",
+        "alias": "Shape",
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "maker",
+        "alias": "maker",
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "made",
+        "alias": "made",
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "changer",
+        "alias": "changer",
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "changed",
+        "alias": "changed",
+        "editable": true,
+        "domain": ""
+      }
+    ],
+    "rows": []
+  },
+  "grouped/plain": {
+    "tracking": {
+      "editorTrackingEnabled": false,
+      "creatorFieldName": "",
+      "createdAtFieldName": "",
+      "editorFieldName": "",
+      "editedAtFieldName": "",
+      "isTimeInUTC": true
+    },
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "editable": false,
+        "domain": ""
+      },
+      {
+        "name": "Shape",
+        "alias": "Shape",
+        "editable": true,
+        "domain": ""
+      }
+    ],
+    "rows": []
+  },
+  "custom": {
+    "tracking": {
+      "editorTrackingEnabled": false,
+      "creatorFieldName": "",
+      "createdAtFieldName": "",
+      "editorFieldName": "",
+      "editedAtFieldName": "",
+      "isTimeInUTC": true
+    },
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "editable": false,
+        "domain": ""
+      },
+      {
+        "name": "Shape",
+        "alias": "Shape",
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "maker",
+        "alias": "Original author",
+        "editable": true,
+        "domain": "authors"
+      },
+      {
+        "name": "made",
+        "alias": "Original creation",
+        "editable": true,
+        "domain": ""
+      }
+    ],
+    "rows": []
+  }
+}

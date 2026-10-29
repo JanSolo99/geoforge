@@ -77,6 +77,20 @@ DM = ROOT / "testdata" / "dm"
 
 CASES = {
     # name: (tool, args before the output, args after the output)
+    **{f"dtrack_{name}": ("management.DisableEditorTracking", [DATA / "editor_tracking_base.gdb" / name], [])
+       for name in ["all_off", "table_all", "plain", "local_time"]},
+    **{f"dtrack_{name}": ("management.DisableEditorTracking", [DATA / "editor_tracking_base.gdb" / name], flags)
+       for name, flags in {
+           "creator_off": ["DISABLE_CREATOR", "NO_DISABLE_CREATION_DATE", "NO_DISABLE_LAST_EDITOR", "NO_DISABLE_LAST_EDIT_DATE"],
+           "created_off": ["NO_DISABLE_CREATOR", "DISABLE_CREATION_DATE", "NO_DISABLE_LAST_EDITOR", "NO_DISABLE_LAST_EDIT_DATE"],
+           "editor_off": ["NO_DISABLE_CREATOR", "NO_DISABLE_CREATION_DATE", "DISABLE_LAST_EDITOR", "NO_DISABLE_LAST_EDIT_DATE"],
+           "edited_off": ["NO_DISABLE_CREATOR", "NO_DISABLE_CREATION_DATE", "NO_DISABLE_LAST_EDITOR", "DISABLE_LAST_EDIT_DATE"],
+           "keep_all": ["NO_DISABLE_CREATOR", "NO_DISABLE_CREATION_DATE", "NO_DISABLE_LAST_EDITOR", "NO_DISABLE_LAST_EDIT_DATE"],
+           "keep_dates": ["DISABLE_CREATOR", "NO_DISABLE_CREATION_DATE", "DISABLE_LAST_EDITOR", "NO_DISABLE_LAST_EDIT_DATE"],
+       }.items()},
+    "dtrack_custom": ("management.DisableEditorTracking", [DATA / "editor_tracking_extra.gdb" / "custom"], []),
+    "dtrack_shapefile": ("management.DisableEditorTracking", [DATA / "roads.shp"], []),
+    "dtrack_bad_flag": ("management.DisableEditorTracking", [DATA / "editor_tracking_base.gdb" / "all_off"], ["garbage"]),
     **{f"dcogo_{name}": ("management.DisableCOGO", [DATA / "cogo_base.gdb" / name], [])
        for name in ["enabled", "empty_enabled", "plain", "custom", "point", "polygon", "table_only"]},
     "dcogo_shapefile": ("management.DisableCOGO", [DATA / "roads.shp"], []),
@@ -2118,6 +2132,7 @@ RUN = {
     "management.GenerateTessellation": ("generate_tessellation", ["output", "extent", "shape", "size", "template"]),
     "management.AddGPSMetadataFields": ("add_gps_metadata_fields", ["input", "output", "include_offset_fields"]),
     "management.DisableCOGO": ("disable_cogo", ["input", "output"]),
+    "management.DisableEditorTracking": ("disable_editor_tracking", ["input", "output", "creator", "creation_date", "last_editor", "last_edit_date"]),
     "management.DeleteMultiple": ("delete_multiple", ["in_data"]),
     "analysis.SplitByAttributes": ("split_by_attributes", ["input", "target_workspace", "split_fields"]),
     "analysis.PairwisePolygonNeighbors": ("pairwise_polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides", "cluster_tolerance", "out_linear_units", "out_area_units", "precision"]),
@@ -2161,7 +2176,7 @@ MEMORY_OUT = {"analysis.SummarizeWithin", "analysis.SummarizeNearby", "analysis.
 CREATE_TOOLS = {"management.CreateFeatureclass", "management.CreateTable"}
 
 # In-place tools: the index of the input they edit (run on a copy written as the output).
-IN_PLACE = {"management.DisableCOGO": 0, "management.AddGPSMetadataFields": 0, "management.ConvertTimeZone": 0, "management.ConvertTimeField": 0, "management.AddSpatialJoin": 0, "gp.ExtractMultiValuesToPoints_sa": 0, "edit.ExtendLine": 0, "edit.FlipLine": 0, "edit.TrimLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.EncodeField": 0, "management.AddGeometryAttributes": 0,
+IN_PLACE = {"management.DisableEditorTracking": 0, "management.DisableCOGO": 0, "management.AddGPSMetadataFields": 0, "management.ConvertTimeZone": 0, "management.ConvertTimeField": 0, "management.AddSpatialJoin": 0, "gp.ExtractMultiValuesToPoints_sa": 0, "edit.ExtendLine": 0, "edit.FlipLine": 0, "edit.TrimLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.EncodeField": 0, "management.AddGeometryAttributes": 0,
             "management.CalculateFields": 0, "management.StandardizeField": 0, "management.TransformField": 0, "management.ReclassifyField": 0, "management.DefineProjection": 0, "management.CalculateEndTime": 0}
 
 # Select Layer By Location cases, saved with Copy Features:
@@ -2243,7 +2258,8 @@ def schema_edit_case(w, tool, before, after):
         args = [str(target)] + after
         preserve_code = f"""
 preserved_fields = [f.name for f in arcpy.ListFields({win(target)!r}) if f.type != 'Geometry']
-preserved_rows = list(arcpy.da.SearchCursor({win(target)!r}, preserved_fields + ['SHAPE@JSON']))
+preserved_fields += ['SHAPE@JSON'] if hasattr(arcpy.Describe({win(target)!r}), 'shapeType') else []
+preserved_rows = list(arcpy.da.SearchCursor({win(target)!r}, preserved_fields))
 """
         w.call("python", code=preserve_code)
         r = w.call("run_tool", tool=tool, args=args, env={"overwriteOutput": True})
@@ -2267,6 +2283,9 @@ for d in arcpy.da.ListDomains({win(copied)!r}):
             if tool == "management.DisableCOGO":
                 flags = w.call("python", code=f"result = dict(enabled=arcpy.Describe({win(target)!r}).isCOGOEnabled, required={{f.name:f.required for f in arcpy.ListFields({win(target)!r}) if f.name.lower() in ['direction','distance','radius','arclength','radius2']}})")
                 entry["cogo"] = flags["result"]
+            if tool == "management.DisableEditorTracking":
+                tracking = w.call("python", code=f"d=arcpy.Describe({win(target)!r}); result = dict(properties={{p:getattr(d,p) for p in ['editorTrackingEnabled','creatorFieldName','createdAtFieldName','editorFieldName','editedAtFieldName','isTimeInUTC']}}, editable={{f.name:f.editable for f in arcpy.ListFields({win(target)!r})}})")
+                entry["editor_tracking"] = tracking["result"]
             # A second call must be idempotent; snapshot both schema and domains.
             repeated = w.call("run_tool", tool=tool, args=args, env={"overwriteOutput": True})
             if repeated.get("status") != "succeeded":
@@ -2277,7 +2296,7 @@ for d in arcpy.da.ListDomains({win(copied)!r}):
                     raise RuntimeError(f"repeated schema edit changed {key}")
             if w.call("python", code=code)["result"] != entry["domains"]:
                 raise RuntimeError("repeated schema edit changed domains")
-            preserved = w.call("python", code=f"result = preserved_rows == list(arcpy.da.SearchCursor({win(target)!r}, preserved_fields + ['SHAPE@JSON']))")
+            preserved = w.call("python", code=f"result = preserved_rows == list(arcpy.da.SearchCursor({win(target)!r}, preserved_fields))")
             if preserved["result"] is not True:
                 raise RuntimeError("schema edit changed existing rows or geometries")
         entry["run"] = run_spec(tool, [rel(source), "<out>"] + after)
@@ -2324,7 +2343,7 @@ def main():
             manifest["cases"][name] = delete_multiple_case(w, before[0])
             print(f"{name}: {manifest['cases'][name]['status']}")
             continue
-        if tool in ("management.AddGPSMetadataFields", "management.DisableCOGO") and Path(before[0]).parent.suffix == ".gdb":
+        if tool in ("management.AddGPSMetadataFields", "management.DisableCOGO", "management.DisableEditorTracking") and Path(before[0]).parent.suffix == ".gdb":
             manifest["cases"][name] = schema_edit_case(w, tool, before, after)
             print(f"{name}: {manifest['cases'][name]['status']}")
             continue
@@ -2354,7 +2373,7 @@ def main():
             args = [str(before[0]), after[0], "memory", after[1]] + after[2:]
         elif tool in IN_PLACE:
             k = IN_PLACE[tool]
-            if tool == "management.DisableCOGO":
+            if tool in ("management.DisableCOGO", "management.DisableEditorTracking"):
                 source = Path(before[k])
                 for sidecar in source.parent.glob(source.stem + ".*"):
                     if sidecar.is_file() and not sidecar.name.endswith(".lock"):
@@ -2436,7 +2455,7 @@ def main():
             "fields": [[f["name"], f["type"], f["length"], f["precision"], f["scale"]] for f in d.get("fields", [])],
             "shapeType": d.get("shapeType"),
         }
-        if tool == "management.DisableCOGO":
+        if tool in ("management.DisableCOGO", "management.DisableEditorTracking"):
             manifest["cases"][name]["report_in_place"] = True
         spec = run_spec(tool, manifest["cases"][name]["args"])
         if spec:

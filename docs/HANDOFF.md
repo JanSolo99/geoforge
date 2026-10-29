@@ -1,73 +1,84 @@
 # Current handoff
 
-Updated 2026-10-29T08:28:30.163364+00:00; Codex.
-Workspace /mnt/media/ArcGIS_Linux, main, HEAD/origin/main7ab7822.
-User: finish current tool then build next WORK_QUEUE item, separate landings.
-No other agents/coordinators; preserve all unrelated work.
+Updated 2026-10-29T08:57:38.712949+00:00; last agent Codex.
+Workspace /mnt/media/ArcGIS_Linux, main; HEAD1e837b9b49737f6ad61d9181ca23778f253612a9.
+205 scoped paths staged. User objective: finish/wrap current tool, then build next
+WORK_QUEUE tool, following public ArcGIS evidence, full gate and separate landing.
+Inherited Delete Multiple7ab7822/Disable COGO1e837b9 already pushed/complete.
+This turn implemented Disable Editor Tracking; ready to commit/push. No agents or
+coordinators launched; unrelated edits preserved.
 
-## Completed landing / current tool
+## Completed implementation
 
-Delete Multiple committed/pushed7ab7822 (observed8194f63..7ab7822 main->main).
-109 scoped paths; source unchanged since full scripts/check EXIT0 confirmed
-/tmp/unigis-dml-check.{log,exit}:232 Rust/5 ignored,Python8/fmt/clippy PASS.
-Empty abandoned .git/index.lock from interrupted17:40 staging removed only after
-no Git process/file holder was found. Index empty after landing. Generator
-excluded inherited umintfloat hunk; web/raster/coordinator changes preserved.
+- Native filegdb/writer/editor_tracking.rs updates selected role names,
+  EditorTrackingEnabled, catalog Editable metadata and physical field descriptor
+  editable mask0x04 in one existing journal transaction. No field removal or row/
+  value rewrite. Simple feature datasets update all classes/tables atomically;
+  advanced member kinds refused. Repeats/keep-all are byte-idempotent.
+- Table reader retains field flag locations and exposes field_editable. Registry
+  tools/editor_tracking.rs plus optional Context mutation capability/CLI FileGDB
+  host support default and four selective flags: ArcGIS tokens or true/false/1/0.
+  Other hosts explicitly refuse. Shapefile001216; invalid token000800.
+-13 dtrack_* refs (11 successes,2 refusals), all2257 old refs unchanged. Generator/
+  comparator cover tracking properties/editability (XML AND physical flags),
+  schema, existing rows/OIDs, geometry/CRS, domains/indexes and repeat results.
+  Generic table snapshots omit SHAPE@JSON for plain tables.
+-2 new safety tests allow only the exact descriptor-byte changes observed in the
+  ArcGIS source/output files, protecting all remaining user data/index bytes;
+  repeat/no-op/refusal identity and feature dataset membership also checked.
+- Recipes/results/raw catalog and flag snapshots/source fixtures in
+  scripts/research/disable_editor_tracking/ and
+  testdata/geoproc/editor_tracking_{base,extra}.gdb. Sources saved once before
+  mutation; do not recreate merely for context. No SDK/runtime GDAL dependency;
+  GDAL only read saved file formats. Public ArcGIS is GP behavior oracle.
+- ROADMAP/KNOWN_GAPS and docs/formats/filegdb.md updated. Scope: FileGDB paths,
+  classes/tables/simple feature datasets. Other hosts/formats/advanced datasets,
+  layer selections/shared fields/ZMcurves/class extensions remain gaps. Native
+  edit engine does not populate roles left enabled by selective disable.
+  Unrelated ArcGIS extent/spatial-index catalog normalization not reproduced.
 
-Queue regenerated1616 missing, next Disable COGO (management.DisableCOGO).
-ug tools confirmed absent; official docs/probes completed (8 controls).
-ArcGIS retains fields/values but clears their Required markers, disabling COGO;
-plain/custom lines succeed unchanged, point/polygon error003917, table000732.
-Shapefile succeeds unchanged with002051 warnings; native no-op does not emit these.
-Public arcpy GDB_Items SearchCursor exposed only root row, so initial Definition
-capture was None; public file-format read with GDAL (not GP behavior oracle)
-identified removal of5 Required elements in GPFieldInfoEx. Raw evidence saved in
-scripts/research/disable_cogo/catalog_format_results.json and probe_results.json.
-Fixture cogo_base.gdb saved once from untouched enabled state; reuse it.
+## Validation and decisions
 
-Disable COGO implemented (not landed):
-- filegdb/writer/cogo.rs transactional metadata splice removes only Required
-  elements for Direction/Distance/Radius/ArcLength/Radius2; no user table rewrite.
-- tools/cogo.rs runner checks geometry and invokes optional Context capability;
-  read-only hosts explicitly fail; CLI implements FileGDB and shapefile no-op.
--8 dcogo_* references generated, /tmp/unigis-dcogo-references.log:5 successes,
-  3 refusals; all2,249 prior manifest cases unchanged. Generic schema snapshots
-  include cogo required flags; comparator now checks raw catalog Required markers
-  (roxmltree dev dependency) as well as retained rows/fields/geometry/indexes.
-- Safety test guards user-data byte identity, repeat byte-idempotence and invalid
-  geometry; host default explicit-failure test. Native build running/finished
-  /tmp/unigis-dcogo-build.log (session40793); inspect before starting another Cargo.
-Native build PASS /tmp/unigis-dcogo-build.log. Independent ArcGIS read PASS:
-Describe.isCOGOEnabled false, all5 fields deletable, original dimension90/10
-and source KEY7/geometry retained; /tmp/unigis-disable-cogo-native.log and saved
-native_reader_results.json. No new source fixture/probe needed.
-Initial reference test stopped at shapefile case because Report tools mutate
-input instead of creating output. Added generic report_in_place fixture handling;
-oracle and native now both use byte copies (no CopyFeatures schema conversion),
-so originals remain protected. Regenerated only dcogo_shapefile, no old cases
-changed. No tolerance changes/skips.
-Safety test PASS /tmp/unigis-dcogo-safety.log: user data bytes unchanged,
-byte-idempotent repeat and invalid point refusal. Python syntax/whitespace PASS.
-Full scripts/check EXIT0 /tmp/unigis-dcogo-check.{log,exit}:234 Rust passed,
-5 ignored; Python8/fmt/clippy -D warnings PASS. Covers final native error mapping,
-all8 COGO references, raw Required marker comparison, shapefile report adapter,
-metadata safety/readonly host, prior tools and format/index/roundtrip tests.
-No product changes after gate; only docs. Scope/source/staged whitespace and
-inherited preservation audits PASS;120 COGO-only paths staged. Cargo.lock change
-is the roxmltree dev dependency for catalog assertions. Generator patch excludes
-inherited umintfloat hunk. No Cargo/Trunk/probes running.
-Next: commit/push staged COGO implementation separately; regenerate queue and
-final checkpoint. Actual next queue item Disable Editor Tracking.
-No ArcGIS probe running after reference generation completed. No Trunk started.
+- ug tools confirmed absent before implementing; official public reference read.
+  Public probes11 primary+5 supplemental controls confirm default/selective roles,
+  fields/values/time basis, custom aliases/domain, dataset members and refusals.
+- Reference generation PASS /tmp/unigis-dtrack-references.log;13 cases.
+- Initial metadata-only version passed catalog-based tests but independent ArcGIS
+  read exposed binary fields still read-only. First full gate deliberately STOPPED
+  (own group1427288), /tmp/unigis-dtrack-check.log; NOT a pass. Saved format read
+  proved flags1->5 for released roles and1 for retained roles. Corrected runtime,
+  comparator/safety tests accordingly. Initial output /tmp/unigis-dtrack-native/.
+- Corrected cargo test -j3 -p unigis-cli --test disable_editor_tracking_safety
+  --test arcgis_reference PASS4; /tmp/unigis-dtrack-tests-fixed.log. Removed initial
+  unused-import warning before final gate. No warnings in corrected run.
+- Independent public arcpy read of corrected native output PASS: every tracking
+  property/editability flag matches public controls; all4 original row/geometry
+  snapshots retained; dataset/custom aliases/domain match. Final results
+  native_reader_results.json; /tmp/unigis-dtrack-native-fixed.{log,json} and
+  disposable output folder of same stem. probe_native.py records assertions.
+- Final scripts/check EXIT0 /tmp/unigis-dtrack-check-final.{log,exit,pid}:
+  237 Rust passed,5 ignored; Python8/fmt/clippy -D warnings PASS. Covers final
+  descriptor reader/patches, all references/safety/host tests and full format/engine
+  suites. No product edits after gate; documentation only.
+- Python syntax, staged/source whitespace, scoped205-path/old-manifest and
+  inherited-preservation audits PASS. Filtered generator patch
+  /tmp/unigis-dtrack-stage.patch excludes inherited4-line umintfloat hunk.
+- No Cargo/Trunk/ArcGIS probes running; no manual web build/publish.
 
-## Unrelated work preserved
+## Next actions
 
-Previous RAM request complete: publisher one Cargo job,9 GiB MemAvailable/cgroup
-check, exclusive lock, no manual publish. scripts/publish-web-dist.sh,
-scripts/web-build-memory.py, docs/WEB.md and service/timer files stay outside
-GP commits. Read-only tests /tmp/unigis-web-memory-validation.log; no build peak
-measured. Timer remains installed; it waits for coordinator/Cargo idle.
-Preserve inherited unary raster local/registry/stats,safety,generator umintfloat
-hunk/research/fixtures and coordinator/queue infra. Baseline
-/tmp/unigis-dm-inherited-hashes.json (WEB changes intentional from later task).
-Never read/add NOTES.md or .worktrees; scratch_te scratch. No extra agents.
+1. Commit/push this validated single-tool landing. Queue rules authorize landing.
+2. Regenerate queue and update final handoff with resulting HEAD/push evidence.
+3. Next queue item: Enable COGO (management.EnableCOGO). Do not polish landed tools.
+
+## Inherited unrelated work
+
+Previous RAM task complete/uncommitted: scripts/publish-web-dist.sh forces1 job,
+9GiB admission guard/exclusive lock; scripts/web-build-memory.py, docs/WEB.md and
+service/timer files remain outside GP commits. No measured build peak. Prior
+/tmp/unigis-web-memory-validation.log. Timer waits for idle coordinator/Cargo.
+Preserve raster local/registry/stats, unary safety/fixtures/research, generator
+umintfloat hunk, AGENTS/hooks/agents-remote/coordinator, queue infrastructure and
+generated dashboard/WORK_QUEUE. Baseline /tmp/unigis-dm-inherited-hashes.json
+(prior WEB edits intentional). Never read/add NOTES.md or .worktrees; scratch_te
+scratch. Max Cargo-j3; publisher1; no extra agents/coordinators.

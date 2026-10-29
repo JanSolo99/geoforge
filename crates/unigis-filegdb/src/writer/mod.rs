@@ -10,6 +10,7 @@ mod catalog;
 mod cogo;
 mod domain_edit;
 mod edit;
+mod editor_tracking;
 mod geometry;
 mod index_edit;
 mod keys;
@@ -42,6 +43,7 @@ pub use domain_edit::{
     table_to_domain,
 };
 pub use edit::{TableEditor, delete_rows};
+pub use editor_tracking::disable_editor_tracking;
 pub use index_edit::{add_attribute_index, remove_attribute_index};
 pub use rebuild::rebuild_attribute_indexes;
 pub use rewrite::{add_field, delete_fields, rewrite_table, truncate_table};

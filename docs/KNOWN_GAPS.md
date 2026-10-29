@@ -176,3 +176,12 @@ Update this file when a gap is found or closed.
   extensions are unverified or unsupported. Native shapefile no-op omits002051
   warnings; unrelated catalog normalization is preserved. Evidence:
   scripts/research/disable_cogo/README.md.
+
+- Disable Editor Tracking: native FileGDB classes/tables and simple feature datasets
+  only; other hosts must provide the optional mutation capability. Enterprise/mobile,
+  mosaic/topology/network datasets, services and layer selections are unsupported.
+  Advanced feature dataset members are refused. Unusual class extensions, shared
+  tracking fields and Z/M/curves are unverified. Native edit APIs do not automatically
+  fill roles left enabled by selective disable. Unrelated ArcGIS catalog extent/index
+  normalization is not reproduced. Evidence:
+  scripts/research/disable_editor_tracking/README.md.

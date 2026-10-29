@@ -883,3 +883,8 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
       8 ArcGIS references, original dimension fields/values retained. Full local
       gate passed; layer styling and other hosts remain gaps. Research:
       scripts/research/disable_cogo/README.md.
+
+- [x] Disable Editor Tracking: FileGDB classes/tables and simple feature datasets;
+      default and four selective disable options preserve fields/values/time basis.
+      13 ArcGIS references plus dataset/byte-preservation safety checks. Research:
+      scripts/research/disable_editor_tracking/README.md.

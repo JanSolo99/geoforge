@@ -97,6 +97,12 @@ pub trait Context {
             "COGO edits are not supported by this host".into(),
         ))
     }
+    /// Disable selected tracking roles; read-only hosts must explicitly refuse.
+    fn disable_editor_tracking(&self, _input: &str, _disable: [bool; 4]) -> Result<()> {
+        Err(Error::Unsupported(
+            "editor tracking edits are not supported by this host".into(),
+        ))
+    }
     /// The coordinate system new data (a fishnet) gets when no template names one.
     fn default_spatial_reference_wkt(&self) -> Option<String> {
         None
@@ -3654,5 +3660,6 @@ pub static TOOLS: &[Tool] = &[
     crate::gps_metadata::TOOL,
     crate::delete_multiple::TOOL,
     crate::cogo::DISABLE,
+    crate::editor_tracking::DISABLE,
     crate::neighbors::COUNT_OVERLAPPING_FEATURES,
 ];

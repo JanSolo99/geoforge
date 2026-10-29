@@ -185,6 +185,64 @@ pub fn compare(case: &str, info: &Json, root: &Path, out_dir: &Path) -> Vec<Stri
                 diffs.push("COGO required field markers differ".into());
             }
         }
+        if let Some(tracking) = info.get("editor_tracking") {
+            let items = unigis_filegdb::Table::open(copied.join("a00000004")).unwrap();
+            let column = |name: &str| items.fields().iter().position(|f| f.name == name).unwrap();
+            let row = items.features().map(Result::unwrap).find(|r| matches!(&r.attributes[column("Name")], Value::String(n) if n == dataset.to_str().unwrap())).unwrap();
+            let xml = match &row.attributes[column("Definition")] {
+                Value::Xml(x) | Value::String(x) => x,
+                _ => panic!("missing definition"),
+            };
+            let doc = roxmltree::Document::parse(xml).unwrap();
+            let root = doc.root_element();
+            let text = |tag: &str| {
+                root.children()
+                    .find(|n| n.is_element() && n.tag_name().name() == tag)
+                    .and_then(|n| n.text())
+                    .unwrap_or("")
+            };
+            let properties = json!({
+                "editorTrackingEnabled":text("EditorTrackingEnabled") == "true",
+                "creatorFieldName":text("CreatorFieldName"),
+                "createdAtFieldName":text("CreatedAtFieldName"),
+                "editorFieldName":text("EditorFieldName"),
+                "editedAtFieldName":text("EditedAtFieldName"),
+                "isTimeInUTC":text("IsTimeInUTC") == "true",
+            });
+            let mut editable = serde_json::Map::new();
+            for name in tracking["editable"].as_object().unwrap().keys() {
+                let entry = doc
+                    .descendants()
+                    .filter(|n| n.is_element() && n.tag_name().name() == "GPFieldInfoEx")
+                    .find(|n| {
+                        n.children().any(|c| {
+                            c.is_element()
+                                && c.tag_name().name() == "Name"
+                                && c.text() == Some(name)
+                        })
+                    });
+                let flag = !entry.is_some_and(|n| {
+                    n.children().any(|c| {
+                        c.is_element()
+                            && c.tag_name().name() == "Editable"
+                            && c.text() == Some("false")
+                    })
+                });
+                if table.field_editable(name) != Some(flag) {
+                    diffs.push(format!(
+                        "physical field editability disagrees with catalog: {name}"
+                    ));
+                }
+                editable.insert(name.clone(), json!(flag));
+            }
+            if properties != tracking["properties"]
+                || Json::Object(editable) != tracking["editable"]
+            {
+                diffs.push(format!(
+                    "editor tracking metadata differs: {properties}; expected {tracking}"
+                ));
+            }
+        }
         let mut domains:Vec<_>=gdb.domains().iter().map(|d|json!({
             "name":d.name,"description":d.description,"type":match d.field_type {FieldType::SmallInteger=>"Short",FieldType::String=>"Text",_=>panic!("unexpected domain type")},
             "split":format!("{:?}",d.split_policy),"merge":format!("{:?}",d.merge_policy),

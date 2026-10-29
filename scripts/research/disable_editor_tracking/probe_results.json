@@ -1,0 +1,1943 @@
+{
+  "all_off": {
+    "before": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "creator",
+        "createdAtFieldName": "created",
+        "editorFieldName": "editor",
+        "editedAtFieldName": "edited",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 08:33:10",
+          "STEAMUSER",
+          "2026-10-29 08:33:10",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "after": {
+      "tracking": {
+        "editorTrackingEnabled": false,
+        "creatorFieldName": "",
+        "createdAtFieldName": "",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 08:33:10",
+          "STEAMUSER",
+          "2026-10-29 08:33:10",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "repeat": {
+      "tracking": {
+        "editorTrackingEnabled": false,
+        "creatorFieldName": "",
+        "createdAtFieldName": "",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 08:33:10",
+          "STEAMUSER",
+          "2026-10-29 08:33:10",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 7:33:16 PM\nSucceeded at Thursday, October 29, 2026 7:33:17 PM (Elapsed Time: 0.09 seconds)"
+  },
+  "creator_off": {
+    "before": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "creator",
+        "createdAtFieldName": "created",
+        "editorFieldName": "editor",
+        "editedAtFieldName": "edited",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 08:33:11.000001",
+          "STEAMUSER",
+          "2026-10-29 08:33:11.000001",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "after": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "",
+        "createdAtFieldName": "created",
+        "editorFieldName": "editor",
+        "editedAtFieldName": "edited",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 08:33:11.000001",
+          "STEAMUSER",
+          "2026-10-29 08:33:11.000001",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "repeat": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "",
+        "createdAtFieldName": "created",
+        "editorFieldName": "editor",
+        "editedAtFieldName": "edited",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 08:33:11.000001",
+          "STEAMUSER",
+          "2026-10-29 08:33:11.000001",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 7:33:17 PM\nSucceeded at Thursday, October 29, 2026 7:33:17 PM (Elapsed Time: 0.07 seconds)"
+  },
+  "created_off": {
+    "before": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "creator",
+        "createdAtFieldName": "created",
+        "editorFieldName": "editor",
+        "editedAtFieldName": "edited",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 08:33:11.000001",
+          "STEAMUSER",
+          "2026-10-29 08:33:11.000001",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "after": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "creator",
+        "createdAtFieldName": "",
+        "editorFieldName": "editor",
+        "editedAtFieldName": "edited",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 08:33:11.000001",
+          "STEAMUSER",
+          "2026-10-29 08:33:11.000001",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "repeat": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "creator",
+        "createdAtFieldName": "",
+        "editorFieldName": "editor",
+        "editedAtFieldName": "edited",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 08:33:11.000001",
+          "STEAMUSER",
+          "2026-10-29 08:33:11.000001",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 7:33:18 PM\nSucceeded at Thursday, October 29, 2026 7:33:18 PM (Elapsed Time: 0.06 seconds)"
+  },
+  "editor_off": {
+    "before": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "creator",
+        "createdAtFieldName": "created",
+        "editorFieldName": "editor",
+        "editedAtFieldName": "edited",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 08:33:11.000001",
+          "STEAMUSER",
+          "2026-10-29 08:33:12.000001",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "after": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "creator",
+        "createdAtFieldName": "created",
+        "editorFieldName": "",
+        "editedAtFieldName": "edited",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 08:33:11.000001",
+          "STEAMUSER",
+          "2026-10-29 08:33:12.000001",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "repeat": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "creator",
+        "createdAtFieldName": "created",
+        "editorFieldName": "",
+        "editedAtFieldName": "edited",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 08:33:11.000001",
+          "STEAMUSER",
+          "2026-10-29 08:33:12.000001",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 7:33:18 PM\nSucceeded at Thursday, October 29, 2026 7:33:18 PM (Elapsed Time: 0.07 seconds)"
+  },
+  "edited_off": {
+    "before": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "creator",
+        "createdAtFieldName": "created",
+        "editorFieldName": "editor",
+        "editedAtFieldName": "edited",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 08:33:12.000001",
+          "STEAMUSER",
+          "2026-10-29 08:33:12.000001",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "after": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "creator",
+        "createdAtFieldName": "created",
+        "editorFieldName": "editor",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 08:33:12.000001",
+          "STEAMUSER",
+          "2026-10-29 08:33:12.000001",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "repeat": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "creator",
+        "createdAtFieldName": "created",
+        "editorFieldName": "editor",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 08:33:12.000001",
+          "STEAMUSER",
+          "2026-10-29 08:33:12.000001",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 7:33:19 PM\nSucceeded at Thursday, October 29, 2026 7:33:19 PM (Elapsed Time: 0.06 seconds)"
+  },
+  "keep_all": {
+    "before": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "creator",
+        "createdAtFieldName": "created",
+        "editorFieldName": "editor",
+        "editedAtFieldName": "edited",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 08:33:12.000001",
+          "STEAMUSER",
+          "2026-10-29 08:33:12.000001",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "after": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "creator",
+        "createdAtFieldName": "created",
+        "editorFieldName": "editor",
+        "editedAtFieldName": "edited",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 08:33:12.000001",
+          "STEAMUSER",
+          "2026-10-29 08:33:12.000001",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "repeat": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "creator",
+        "createdAtFieldName": "created",
+        "editorFieldName": "editor",
+        "editedAtFieldName": "edited",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 08:33:12.000001",
+          "STEAMUSER",
+          "2026-10-29 08:33:12.000001",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 7:33:19 PM\nSucceeded at Thursday, October 29, 2026 7:33:19 PM (Elapsed Time: 0.04 seconds)"
+  },
+  "keep_dates": {
+    "before": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "creator",
+        "createdAtFieldName": "created",
+        "editorFieldName": "editor",
+        "editedAtFieldName": "edited",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 08:33:13.000001",
+          "STEAMUSER",
+          "2026-10-29 08:33:13.000001",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "after": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "",
+        "createdAtFieldName": "created",
+        "editorFieldName": "",
+        "editedAtFieldName": "edited",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 08:33:13.000001",
+          "STEAMUSER",
+          "2026-10-29 08:33:13.000001",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "repeat": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "",
+        "createdAtFieldName": "created",
+        "editorFieldName": "",
+        "editedAtFieldName": "edited",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 08:33:13.000001",
+          "STEAMUSER",
+          "2026-10-29 08:33:13.000001",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 7:33:20 PM\nSucceeded at Thursday, October 29, 2026 7:33:20 PM (Elapsed Time: 0.07 seconds)"
+  },
+  "table_all": {
+    "before": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "creator",
+        "createdAtFieldName": "created",
+        "editorFieldName": "editor",
+        "editedAtFieldName": "edited",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 08:33:13.000001",
+          "STEAMUSER",
+          "2026-10-29 08:33:13.000001"
+        ]
+      ]
+    },
+    "after": {
+      "tracking": {
+        "editorTrackingEnabled": false,
+        "creatorFieldName": "",
+        "createdAtFieldName": "",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 08:33:13.000001",
+          "STEAMUSER",
+          "2026-10-29 08:33:13.000001"
+        ]
+      ]
+    },
+    "repeat": {
+      "tracking": {
+        "editorTrackingEnabled": false,
+        "creatorFieldName": "",
+        "createdAtFieldName": "",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 08:33:13.000001",
+          "STEAMUSER",
+          "2026-10-29 08:33:13.000001"
+        ]
+      ]
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 7:33:20 PM\nSucceeded at Thursday, October 29, 2026 7:33:21 PM (Elapsed Time: 0.08 seconds)"
+  },
+  "plain": {
+    "before": {
+      "tracking": {
+        "editorTrackingEnabled": false,
+        "creatorFieldName": "",
+        "createdAtFieldName": "",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "after": {
+      "tracking": {
+        "editorTrackingEnabled": false,
+        "creatorFieldName": "",
+        "createdAtFieldName": "",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "repeat": {
+      "tracking": {
+        "editorTrackingEnabled": false,
+        "creatorFieldName": "",
+        "createdAtFieldName": "",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": true
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 7:33:21 PM\nSucceeded at Thursday, October 29, 2026 7:33:21 PM (Elapsed Time: 0.05 seconds)"
+  },
+  "local_time": {
+    "before": {
+      "tracking": {
+        "editorTrackingEnabled": true,
+        "creatorFieldName": "creator",
+        "createdAtFieldName": "created",
+        "editorFieldName": "editor",
+        "editedAtFieldName": "edited",
+        "isTimeInUTC": false
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 19:33:14",
+          "STEAMUSER",
+          "2026-10-29 19:33:14",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "after": {
+      "tracking": {
+        "editorTrackingEnabled": false,
+        "creatorFieldName": "",
+        "createdAtFieldName": "",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": false
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 19:33:14",
+          "STEAMUSER",
+          "2026-10-29 19:33:14",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "repeat": {
+      "tracking": {
+        "editorTrackingEnabled": false,
+        "creatorFieldName": "",
+        "createdAtFieldName": "",
+        "editorFieldName": "",
+        "editedAtFieldName": "",
+        "isTimeInUTC": false
+      },
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "required": false
+        },
+        {
+          "name": "creator",
+          "alias": "creator",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "created",
+          "alias": "created",
+          "type": "Date",
+          "required": false
+        },
+        {
+          "name": "editor",
+          "alias": "editor",
+          "type": "String",
+          "required": false
+        },
+        {
+          "name": "edited",
+          "alias": "edited",
+          "type": "Date",
+          "required": false
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "STEAMUSER",
+          "2026-10-29 19:33:14",
+          "STEAMUSER",
+          "2026-10-29 19:33:14",
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 7:33:22 PM\nSucceeded at Thursday, October 29, 2026 7:33:22 PM (Elapsed Time: 0.09 seconds)"
+  },
+  "shape": {
+    "before": {
+      "tracking": {
+        "editorTrackingEnabled": null,
+        "creatorFieldName": null,
+        "createdAtFieldName": null,
+        "editorFieldName": null,
+        "editedAtFieldName": null,
+        "isTimeInUTC": null
+      },
+      "fields": [
+        {
+          "name": "FID",
+          "alias": "FID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "Id",
+          "alias": "Id",
+          "type": "Integer",
+          "required": false
+        }
+      ],
+      "rows": []
+    },
+    "error": "Failed to execute. Parameters are not valid.\nERROR 001216: Editor Tracking not supported for dataset point.shp\nFailed to execute (DisableEditorTracking).\n",
+    "messages": "Start Time: Thursday, October 29, 2026 7:33:22 PM\nFailed to execute. Parameters are not valid.\nERROR 001216: Editor Tracking not supported for dataset point.shp\nFailed to execute (DisableEditorTracking).\nFailed at Thursday, October 29, 2026 7:33:22 PM (Elapsed Time: 0.00 seconds)",
+    "after": {
+      "tracking": {
+        "editorTrackingEnabled": null,
+        "creatorFieldName": null,
+        "createdAtFieldName": null,
+        "editorFieldName": null,
+        "editedAtFieldName": null,
+        "isTimeInUTC": null
+      },
+      "fields": [
+        {
+          "name": "FID",
+          "alias": "FID",
+          "type": "OID",
+          "required": true
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "required": true
+        },
+        {
+          "name": "Id",
+          "alias": "Id",
+          "type": "Integer",
+          "required": false
+        }
+      ],
+      "rows": []
+    }
+  }
+}
