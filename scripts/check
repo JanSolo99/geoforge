@@ -6,4 +6,6 @@ cd "$(dirname "$0")/.."
 python3 -m unittest discover -s scripts/dashboard -p 'test_*.py'
 cargo fmt --all --check
 cargo clippy -j3 --workspace --all-targets -- -D warnings
+# The web app builds unigis-tools without its default features (no PROJ): keep that compiling.
+cargo check -j3 -p unigis-tools --no-default-features
 cargo test -j3 --workspace

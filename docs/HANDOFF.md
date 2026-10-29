@@ -26,7 +26,17 @@
   testdata/geoproc/cga_{parcels,roads,wells}.shp (recipe in
   scripts/research/calculate_geometry_attributes/); 5 cga_* IN_PLACE cases; ogrinfo diff identical.
   Validation: full scripts/check EXIT 0, 245 Rust passed / 5 ignored (/tmp/unigis-cga-check.log).
-- Next action after landing: next queue item (docs/WORK_QUEUE.md; Create Database View is
+- Calculate Geometry Attributes landed and pushed as 1b1bfc8.
+- Urgent web fix (user request): unigis-tools must compile without default features (web app,
+  no PROJ). geodetic_densify (construct.rs), convert_coordinate_notation and table_to_ellipse
+  (registry.rs) have `cfg(not(feature = "proj"))` stubs returning "... needs the proj feature"
+  (these edits were already in the working tree, uncommitted; reviewed and kept); the
+  dm_geometry.rs helpers used only by proj code are gated too (no dead-code warnings).
+  scripts/check now runs `cargo check -j3 -p unigis-tools --no-default-features` after clippy.
+  app/Cargo.lock carries chrono-tz (from Convert Time Zone). Validation: full scripts/check EXIT 0
+  (245 Rust passed / 5 ignored, /tmp/unigis-wasmfix-check.log); `cargo check -p unigis-tools
+  --no-default-features --target wasm32-unknown-unknown` clean (no warnings).
+- Next action after this fix: next queue item (docs/WORK_QUEUE.md; Create Database View is
   enterprise/SQLite -- check before deferring).
 
 Updated 2026-10-29T09:44:00.347279+00:00; last agent Codex.

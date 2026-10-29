@@ -1082,6 +1082,13 @@ pub fn table_to_ellipse(
 /// Geodetic Densify (GEODESIC): every segment longer than `max_length` metres is cut into
 /// `ceil(length / max_length)` equal parts along the WGS 84 geodesic between its ends; original
 /// vertices are kept exactly. Projected input is unprojected for the geodesics and projected back.
+#[cfg(not(feature = "proj"))]
+pub fn geodetic_densify(input: &dyn FeatureClass, max_length: f64) -> Result<ToolOutput> {
+    let _ = (input, max_length);
+    Err(err("Geodetic Densify needs the proj feature"))
+}
+
+#[cfg(feature = "proj")]
 pub fn geodetic_densify(input: &dyn FeatureClass, max_length: f64) -> Result<ToolOutput> {
     let kind = input
         .geometry_kind()

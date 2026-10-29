@@ -827,6 +827,15 @@ fn flip_line(ctx: &dyn Context) -> Result<ToolOutput> {
     construct::flip_line(ctx.features("input")?.as_ref())
 }
 
+#[cfg(not(feature = "proj"))]
+fn convert_coordinate_notation(ctx: &dyn Context) -> Result<ToolOutput> {
+    let _ = ctx;
+    Err(Error::Unsupported(
+        "Convert Coordinate Notation needs the proj feature".into(),
+    ))
+}
+
+#[cfg(feature = "proj")]
 fn convert_coordinate_notation(ctx: &dyn Context) -> Result<ToolOutput> {
     let t = find("convert_coordinate_notation")
         .ok_or_else(|| Error::Unsupported("convert_coordinate_notation".into()))?;
@@ -842,6 +851,15 @@ fn convert_coordinate_notation(ctx: &dyn Context) -> Result<ToolOutput> {
     )
 }
 
+#[cfg(not(feature = "proj"))]
+fn table_to_ellipse(ctx: &dyn Context) -> Result<ToolOutput> {
+    let _ = ctx;
+    Err(Error::Unsupported(
+        "Table To Ellipse needs the proj feature".into(),
+    ))
+}
+
+#[cfg(feature = "proj")]
 fn table_to_ellipse(ctx: &dyn Context) -> Result<ToolOutput> {
     let t =
         find("table_to_ellipse").ok_or_else(|| Error::Unsupported("table_to_ellipse".into()))?;

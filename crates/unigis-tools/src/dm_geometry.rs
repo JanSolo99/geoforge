@@ -639,6 +639,7 @@ pub fn xy_to_line(
 }
 
 /// Metres in a distance unit of Bearing Distance To Line.
+#[cfg(feature = "proj")]
 pub fn distance_unit_meters(unit: &str) -> Option<f64> {
     Some(match unit.to_ascii_uppercase().as_str() {
         "METERS" => 1.0,
@@ -653,6 +654,7 @@ pub fn distance_unit_meters(unit: &str) -> Option<f64> {
 }
 
 /// Degrees in one bearing unit of Bearing Distance To Line.
+#[cfg(feature = "proj")]
 pub fn bearing_unit_degrees(unit: &str) -> Option<f64> {
     Some(match unit.to_ascii_uppercase().as_str() {
         "DEGREES" => 1.0,
@@ -665,11 +667,13 @@ pub fn bearing_unit_degrees(unit: &str) -> Option<f64> {
 
 /// The fields and values Bearing Distance To Line and XY To Line keep (`attributes`: all fields
 /// and `ORIG_FID`; else the coordinate fields and the ID field).
+#[cfg(feature = "proj")]
 struct Kept {
     fields: Vec<Field>,
     indexes: Vec<usize>,
 }
 
+#[cfg(feature = "proj")]
 fn kept_fields(
     input: &dyn FeatureClass,
     coordinates: &[usize],
