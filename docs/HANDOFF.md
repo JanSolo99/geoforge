@@ -55,16 +55,22 @@ Split By Attributes COMPLETE in e07a10e, committed/pushed (observed
 
 ## Next action
 
-Pairwise Integrate DEFERRED this turn:33 public controls saved in
-scripts/research/pairwise_integrate/. Default tolerance0.001 duplicate positions
-0,0,0.0006 map to0.0001, not simple centroid0.0002. Native per-geometry repair
-and intersection helpers lack complete cluster/collapse behavior. No runtime stub.
-Validation: all3 bridge batches completed; JSON parses; Python syntax/whitespace
-check pending before docs landing. No builds or probes running for this tool.
-Next eligible Add Full-Text Index requires SQLite/mobile/enterprise databases;
-FileGDB explicitly unsupported in official docs. A disposable ArcGIS check is
-running with GPS metadata schema probes (/tmp/unigis-gps-probe.*,session52799).
-Next implementation target after format deferral: Add GPS Metadata Fields.
+Pairwise Integrate deferred in1e78736 (committed, not yet pushed):33 public
+controls in scripts/research/pairwise_integrate/. All3 bridge batches completed;
+JSON/syntax/whitespace passed. No runtime implementation. Default clustering
+and collapse absent from native helpers; see research README for evidence.
+Add Full-Text Index deferred this turn: official docs exclude FileGDB, disposable
+ArcGIS control ERROR002764. Unsupported SQLite/mobile/enterprise backend.
+Research scripts/research/full_text_index/. Deferral-only docs landing next.
+Neither deferral has been pushed; push separately after local gate.
+Current tool: Add GPS Metadata Fields. Eight public schema/domain cases plus
+repeat calls complete, scripts/research/gps_metadata/probe{,_results.json}.
+Point default22 fields, offset68; lines/polygons/multipoints6 fields, offset
+ignored. ArcGIS3.7 differs from public docs (AVG_POSITIONS is SHORT, position
+source domain adds5 Snapped). Repeating succeeds without duplicate fields.
+Next: implement native FileGDB schema edit, registry/CLI capability, saved
+reference controls and full scripts/check; then scoped commit/push.
+No Cargo or probes running; inherited edits preserved.
 
 ## Inherited edits to preserve
 

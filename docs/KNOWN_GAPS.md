@@ -145,3 +145,7 @@ Update this file when a gap is found or closed.
   duplicate-point clustering unlike simple centroid averaging; intersection
   noding alone does not implement its cluster/collapse behavior. Multi-input
   in-place host support is also absent.33 controls: scripts/research/pairwise_integrate/README.md.
+
+- Add Full-Text Index: no supported database backend. ArcGIS explicitly excludes
+  FileGDB (ERROR002764); SQLite/mobile/enterprise formats are not implemented.
+  Evidence: scripts/research/full_text_index/README.md.

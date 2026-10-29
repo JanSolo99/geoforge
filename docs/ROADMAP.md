@@ -852,3 +852,6 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [ ] Pairwise Integrate: deferred; default cluster/collapse behavior is absent
       from native primitives.33 public controls, including default XY tolerance,
       saved in scripts/research/pairwise_integrate/README.md.
+
+- [ ] Add Full-Text Index: deferred; requires unsupported SQLite/mobile/enterprise
+      database backend. FileGDB control ERROR002764; scripts/research/full_text_index/.

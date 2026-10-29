@@ -1,0 +1,4 @@
+{
+  "error": "ERROR 002764: The operation is not supported by this implementation.\nFailed to execute (AddFullTextIndex).\n",
+  "messages": "Start Time: Thursday, October 29, 2026 3:42:26 PM\nERROR 002764: The operation is not supported by this implementation.\nFailed to execute (AddFullTextIndex).\nFailed at Thursday, October 29, 2026 3:42:26 PM (Elapsed Time: 0.00 seconds)"
+}
