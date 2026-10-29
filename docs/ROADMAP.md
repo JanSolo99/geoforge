@@ -843,3 +843,8 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [ ] Remove Overlap (multiple): deferred; default CENTER_LINE needs a medial-axis
       partition primitive absent from the native engine.18 controls saved in
       scripts/research/remove_overlap/; reason recorded in WORK_QUEUE_DEFERRED.txt.
+- [x] Split By Attributes: folder shapefile/DBF partitions by text/32-bit integer
+      fields, multiple keys, source metadata/order, safe unique naming and existing
+      output preservation.11 ArcGIS cases; full local gate passed. Host workspace
+      capability is explicit; other hosts and advanced types remain gaps.
+      Findings: scripts/research/split_by_attributes/README.md.

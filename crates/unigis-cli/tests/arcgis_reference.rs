@@ -4652,11 +4652,20 @@ fn tools_match_arcgis_output() {
                 ));
             }
         } else if let Some(outputs) = info["outputs"].as_object() {
-            // Workspace outputs (Split): the same files, each matching.
+            // Workspace outputs: the same feature/table datasets, each matching.
+            if !run.status.success() {
+                diffs.push(format!(
+                    "workspace tool failed: {}",
+                    String::from_utf8_lossy(&run.stderr)
+                ));
+            }
             let mut ours: Vec<String> = std::fs::read_dir(&out)
                 .unwrap()
                 .filter_map(|e| e.ok()?.file_name().into_string().ok())
-                .filter(|n| n.ends_with(".shp"))
+                .filter(|n| {
+                    n.ends_with(".shp")
+                        || (n.ends_with(".dbf") && !out.join(n).with_extension("shp").exists())
+                })
                 .collect();
             ours.sort();
             let theirs: Vec<String> = outputs.keys().cloned().collect();
@@ -4665,16 +4674,21 @@ fn tools_match_arcgis_output() {
             }
             for (name, o) in outputs {
                 if out.join(name).exists() {
-                    diffs.extend(
+                    let found = if name.ends_with(".dbf") {
+                        compare_tables(
+                            &out.join(name),
+                            &reference.join(case).join(name),
+                            &o["fields"],
+                        )
+                    } else {
                         compare(
                             case,
                             &out.join(name),
                             &reference.join(case).join(name),
                             &o["fields"],
                         )
-                        .into_iter()
-                        .map(|d| format!("{name}: {d}")),
-                    );
+                    };
+                    diffs.extend(found.into_iter().map(|d| format!("{name}: {d}")));
                 }
             }
         } else if !run.status.success() {

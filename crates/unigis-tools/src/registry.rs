@@ -39,12 +39,29 @@ pub struct Param {
     pub help: &'static str,
 }
 
-/// How a tool reads its parameters; each front end implements it over its own storage.
+/// One named dataset to write into a host-supported workspace.
+pub enum WorkspaceOutput {
+    Features(ToolOutput),
+    Table(TableOutput),
+}
+
+/// Tool parameters, input access and optional workspace output supplied by a host.
 pub trait Context {
     /// The parameter's value as text, when it was given and is not empty.
     fn get(&self, name: &str) -> Option<String>;
     /// The feature layer named by the parameter.
     fn features(&self, name: &str) -> Result<Box<dyn FeatureClass + '_>>;
+    /// Write precomputed partitions. Hosts without filesystem/workspace support
+    /// must fail explicitly; a successful report must never imply unwritten data.
+    fn write_workspace(
+        &self,
+        _workspace: &str,
+        _outputs: Vec<(String, WorkspaceOutput)>,
+    ) -> Result<()> {
+        Err(Error::Unsupported(
+            "workspace outputs are not supported by this host".into(),
+        ))
+    }
     /// The coordinate system new data (a fishnet) gets when no template names one.
     fn default_spatial_reference_wkt(&self) -> Option<String> {
         None
@@ -3161,5 +3178,6 @@ pub static TOOLS: &[Tool] = &[
     crate::neighbors::APPORTION_POLYGON,
     crate::neighbors::POLYGON_NEIGHBORS,
     crate::pairwise_neighbors::TOOL,
+    crate::split_attributes::TOOL,
     crate::neighbors::COUNT_OVERLAPPING_FEATURES,
 ];

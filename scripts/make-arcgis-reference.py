@@ -223,6 +223,17 @@ CASES = {
     "append_parcels_to_parcels": ("management.Append", [DATA / "parcels.shp", DATA / "parcels.shp"], ["TEST"]),
     "near_wells_roads_clip": ("analysis.Near", [DATA / "wells.shp", f"{DATA / 'roads.shp'};{DATA / 'clip_areas.shp'}"], ["", "LOCATION", "ANGLE"]),
     # Split writes one shapefile per split value into a folder (WORKSPACE_OUT).
+    "sba_text": ("analysis.SplitByAttributes", [DATA / "split_attributes.shp"], ['REGION']),
+    "sba_integer": ("analysis.SplitByAttributes", [DATA / "split_attributes.shp"], ['CLASS']),
+    "sba_multi": ("analysis.SplitByAttributes", [DATA / "split_attributes.shp"], ['REGION;CLASS']),
+    "sba_reversed_fields": ("analysis.SplitByAttributes", [DATA / "split_attributes.shp"], ['CLASS;REGION']),
+    "sba_names": ("analysis.SplitByAttributes", [DATA / "split_attribute_names.shp"], ['REGION']),
+    "sba_table_text": ("analysis.SplitByAttributes", [DATA / "split_attribute_table.dbf"], ['REGION']),
+    "sba_table_multi": ("analysis.SplitByAttributes", [DATA / "split_attribute_table.dbf"], ['REGION;CLASS']),
+    "sba_polygons": ("analysis.SplitByAttributes", [DATA / "pairwise_neighbors.shp"], ['GRP']),
+    "sba_err_oid": ("analysis.SplitByAttributes", [DATA / "split_attributes.shp"], ['FID']),
+    "sba_err_field": ("analysis.SplitByAttributes", [DATA / "split_attributes.shp"], ['NO_SUCH']),
+    "sba_err_no_fields": ("analysis.SplitByAttributes", [DATA / "split_attributes.shp"], []),
     "split_parcels_clip": ("analysis.Split", [DATA / "parcels.shp", DATA / "clip_areas.shp", "AREA_ID"], []),
     "split_roads_parcels_name": ("analysis.Split", [DATA / "roads.shp", DATA / "parcels.shp", "NAME"], []),
     "split_wells_parcels_name": ("analysis.Split", [DATA / "wells.shp", DATA / "parcels.shp", "NAME"], []),
@@ -2054,6 +2065,7 @@ RUN = {
     "gp.ComputeChangeRaster_ia": ("compute_change_raster", ["from_raster", "to_raster", "output", "change_type"]),
     "gp.CreateBinaryMask_ia": ("create_binary_mask", ["input", "output", "background_value"]),
     "management.GenerateTessellation": ("generate_tessellation", ["output", "extent", "shape", "size", "template"]),
+    "analysis.SplitByAttributes": ("split_by_attributes", ["input", "target_workspace", "split_fields"]),
     "analysis.PairwisePolygonNeighbors": ("pairwise_polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides", "cluster_tolerance", "out_linear_units", "out_area_units", "precision"]),
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
     "analysis.CountOverlappingFeatures": ("count_overlapping_features", ["input", "output", "minimum_overlap_count"]),
@@ -2083,7 +2095,7 @@ RASTER_OUT = {"gp.CreateBinaryMask_ia", "gp.ComputeChangeRaster_ia", "gp.Diff_ia
               "gp.CostDistance_sa", "gp.CostBackLink_sa", "gp.CostAllocation_sa", "gp.CostPath_sa", "gp.Corridor_sa", "gp.Filter_sa", "gp.Nibble_sa", "gp.ReclassByTable_sa",
               "gp.Sink_sa", "gp.Pick_sa", "management.Flip", "management.Mirror", "management.Shift", "management.Clip",
               "gp.Slice_sa", "gp.ExtractByAttributes_sa", "gp.ExtractByRectangle_sa", "gp.ExtractByCircle_sa", "gp.Lookup_sa"}
-WORKSPACE_OUT = {"analysis.Split"}
+WORKSPACE_OUT = {"analysis.Split", "analysis.SplitByAttributes"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable", "conversion.RasterToASCII", "conversion.RasterToFloat"}
 # Tools whose output is a table, written as <name>.dbf.
@@ -2245,7 +2257,8 @@ def main():
                 r = r2
         if tool in WORKSPACE_OUT:
             outputs = {}
-            for shp in sorted(out.glob("*.shp")):
+            datasets = [*out.glob("*.shp"), *(p for p in out.glob("*.dbf") if not p.with_suffix(".shp").exists())]
+            for shp in sorted(datasets):
                 d = w.call("describe", path=str(shp))
                 outputs[shp.name] = {
                     "fields": [[f["name"], f["type"], f["length"], f["precision"], f["scale"]] for f in d.get("fields", [])],

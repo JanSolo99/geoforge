@@ -1,8 +1,8 @@
 # Current handoff
 
-Updated 2026-10-29T04:33:58.069293+00:00; last agent Codex.
+Updated 2026-10-29T04:36:31.824933+00:00; last agent Codex.
 Workspace `/mnt/media/ArcGIS_Linux`, main, HEAD
-`338d0b900cc8caac226baa729fd4d8df19be993f` (pushed before this task).
+`272b70f` (pushed; Split-only implementation staged252 paths, committing next).
 
 ## Objective / current state
 
@@ -15,8 +15,8 @@ scripts/research/remove_overlap/. Default CENTER_LINE gives a branched boundary
 and areas325/275 for equal overlapping rectangles, unlike centroid/Thiessen
 300/300. Native engine lacks a matching boundary partitioner. No runtime stub.
 Deferral reason/README/known gap/roadmap recorded. A separate deferral-only docs
-index is staged (7 paths); no commit/push yet. Index intentionally omits the
-user's earlier untracked AddIncrementingIDField deferral; working copy retains it.
+landing272b70f was committed/pushed (observed338d0b9..272b70f to origin/main). That landing excluded the user's prior AddIncrementingIDField entry; the
+working copy retains it as an unstaged inherited change.
 
 Next eligible tool, Split By Attributes: IMPLEMENTED, full gate EXIT0 (222 Rust passed,5 ignored; Python8/fmt/clippy PASS). No
 product commit/push yet. Files/decisions:
@@ -57,11 +57,12 @@ product commit/push yet. Files/decisions:
 
 ## Next actions
 
-1. Gate passed. Commit/push deferral-only staged7 files; index excludes Split code and the old user deferral entry.
-2. Stage/commit/push Split implementation and evidence separately. Filter the
-   shared generator diff to exclude inherited umintfloat hunk. Do not stage the
-   user AddIncrementingIDField deferral or unrelated queue/coordinator files.
-3. Regenerate queue; next queue item: Pairwise Integrate. Leave polish in gaps.
+1. Full gate passed; Split-only252 paths staged and whitespace checked. Commit/
+   push that implementation now; do not repeat deferral272b70f push.
+2. Filtered staging patch /tmp/unigis-sba-stage.patch excludes inherited raster
+   generator hunk. Old AddIncrementingIDField entry remains unstaged intentionally.
+3. Regenerate queue; next queue item: Pairwise Integrate. Final handoff checkpoint
+   after actual commit/push. No builds or probes running.
 
 ## Inherited edits
 

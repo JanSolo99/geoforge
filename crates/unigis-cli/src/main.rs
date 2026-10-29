@@ -2697,6 +2697,13 @@ fn main() -> ExitCode {
                         .map(|v| v.trim().to_string())
                         .filter(|v| !v.is_empty())
                 }
+                fn write_workspace(
+                    &self,
+                    workspace: &str,
+                    outputs: Vec<(String, registry::WorkspaceOutput)>,
+                ) -> Result<()> {
+                    write_workspace_outputs(Path::new(workspace), outputs)
+                }
                 fn features(&self, name: &str) -> Result<Box<dyn FeatureClass + '_>> {
                     let path = self
                         .get(name)
@@ -5744,6 +5751,62 @@ fn write_table(table: &unigis_tools::TableOutput, path: &Path) -> Result<()> {
     let cpg = path.with_extension("cpg");
     std::fs::write(&cpg, "UTF-8").map_err(|e| Error::io(&cpg, e))?;
     println!("Wrote {} ({} rows)", path.display(), table.rows.len());
+    Ok(())
+}
+
+/// Allocate all names before writing. Existing files (including sidecars) are
+/// reserved case-insensitively, matching ArcGIS's unique-name suffix starting at0.
+fn write_workspace_outputs(
+    workspace: &Path,
+    outputs: Vec<(String, unigis_tools::registry::WorkspaceOutput)>,
+) -> Result<()> {
+    use unigis_tools::registry::WorkspaceOutput;
+    if !workspace.is_dir() {
+        return Err(Error::Unsupported(
+            "ERROR 000732: Target Workspace does not exist or is not a folder".into(),
+        ));
+    }
+    if matches!(locate(workspace), Location::Geodatabase { .. }) {
+        return Err(Error::Unsupported(
+            "geodatabase split workspaces are not yet supported; use a folder".into(),
+        ));
+    }
+    let mut reserved = std::collections::HashSet::new();
+    for entry in std::fs::read_dir(workspace).map_err(|e| Error::io(workspace, e))? {
+        let entry = entry.map_err(|e| Error::io(workspace, e))?;
+        let file = entry.file_name().to_string_lossy().to_string();
+        reserved.insert(file.split('.').next().unwrap_or(&file).to_ascii_lowercase());
+    }
+    let mut planned = Vec::new();
+    for (name, data) in outputs {
+        // A malicious custom host/tool result cannot escape the target workspace.
+        if name.is_empty()
+            || !name.is_ascii()
+            || name.len() > 128
+            || name.contains(['/', '\\', '.', ':', '*', '?', '"', '<', '>', '|'])
+            || name.chars().any(|c| c.is_ascii_control())
+        {
+            return Err(Error::Unsupported("invalid workspace output name".into()));
+        }
+        let mut candidate = name.clone();
+        let mut suffix = 0;
+        while reserved.contains(&candidate.to_ascii_lowercase()) {
+            candidate = format!("{name}{suffix}");
+            suffix += 1;
+        }
+        reserved.insert(candidate.to_ascii_lowercase());
+        let extension = match &data {
+            WorkspaceOutput::Features(_) => "shp",
+            WorkspaceOutput::Table(_) => "dbf",
+        };
+        planned.push((workspace.join(format!("{candidate}.{extension}")), data));
+    }
+    for (path, data) in planned {
+        match data {
+            WorkspaceOutput::Features(out) => write_output_as(out, &path, None, false)?,
+            WorkspaceOutput::Table(out) => write_table(&out, &path)?,
+        }
+    }
     Ok(())
 }
 

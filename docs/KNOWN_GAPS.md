@@ -132,3 +132,11 @@ Update this file when a gap is found or closed.
   a bent boundary (areas325/275) unlike a centroid bisector (300/300). THIESSEN
   and GRID controls are saved but no implementation is claimed. Evidence:
   `scripts/research/remove_overlap/README.md`.
+
+- Split By Attributes: existing folder targets and non-null TEXT/SHORT/LONG split
+  fields supported. Geodatabase targets, floating/date/64-bit/null split values,
+  non-ASCII/long names and selected reserved device names are refused. Other hosts need
+  explicit workspace-output support; selection/environments, Unicode collation
+  and unprobed attribute types remain unverified. Orphan files reserve stems
+  conservatively; I/O errors are not multi-dataset transactional. Evidence:
+  `scripts/research/split_by_attributes/README.md`.

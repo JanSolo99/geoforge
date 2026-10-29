@@ -79467,6 +79467,1431 @@
           "fields": "NO_SUCH"
         }
       }
+    },
+    "sba_text": {
+      "tool": "analysis.SplitByAttributes",
+      "args": [
+        "testdata/geoproc/split_attributes.shp",
+        "<out>",
+        "REGION"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "outputs": {
+        "East.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "Id",
+              "Integer",
+              6,
+              6,
+              0
+            ],
+            [
+              "REGION",
+              "String",
+              32,
+              0,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        },
+        "West.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "Id",
+              "Integer",
+              6,
+              6,
+              0
+            ],
+            [
+              "REGION",
+              "String",
+              32,
+              0,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        }
+      },
+      "run": {
+        "tool": "split_by_attributes",
+        "params": {
+          "input": "testdata/geoproc/split_attributes.shp",
+          "target_workspace": "<out>",
+          "split_fields": "REGION"
+        }
+      }
+    },
+    "sba_integer": {
+      "tool": "analysis.SplitByAttributes",
+      "args": [
+        "testdata/geoproc/split_attributes.shp",
+        "<out>",
+        "CLASS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "outputs": {
+        "1.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "Id",
+              "Integer",
+              6,
+              6,
+              0
+            ],
+            [
+              "REGION",
+              "String",
+              32,
+              0,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        },
+        "2.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "Id",
+              "Integer",
+              6,
+              6,
+              0
+            ],
+            [
+              "REGION",
+              "String",
+              32,
+              0,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        }
+      },
+      "run": {
+        "tool": "split_by_attributes",
+        "params": {
+          "input": "testdata/geoproc/split_attributes.shp",
+          "target_workspace": "<out>",
+          "split_fields": "CLASS"
+        }
+      }
+    },
+    "sba_multi": {
+      "tool": "analysis.SplitByAttributes",
+      "args": [
+        "testdata/geoproc/split_attributes.shp",
+        "<out>",
+        "REGION;CLASS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "outputs": {
+        "East_1.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "Id",
+              "Integer",
+              6,
+              6,
+              0
+            ],
+            [
+              "REGION",
+              "String",
+              32,
+              0,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        },
+        "East_2.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "Id",
+              "Integer",
+              6,
+              6,
+              0
+            ],
+            [
+              "REGION",
+              "String",
+              32,
+              0,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        },
+        "West_1.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "Id",
+              "Integer",
+              6,
+              6,
+              0
+            ],
+            [
+              "REGION",
+              "String",
+              32,
+              0,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        },
+        "West_2.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "Id",
+              "Integer",
+              6,
+              6,
+              0
+            ],
+            [
+              "REGION",
+              "String",
+              32,
+              0,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        }
+      },
+      "run": {
+        "tool": "split_by_attributes",
+        "params": {
+          "input": "testdata/geoproc/split_attributes.shp",
+          "target_workspace": "<out>",
+          "split_fields": "REGION;CLASS"
+        }
+      }
+    },
+    "sba_reversed_fields": {
+      "tool": "analysis.SplitByAttributes",
+      "args": [
+        "testdata/geoproc/split_attributes.shp",
+        "<out>",
+        "CLASS;REGION"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "outputs": {
+        "1_East.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "Id",
+              "Integer",
+              6,
+              6,
+              0
+            ],
+            [
+              "REGION",
+              "String",
+              32,
+              0,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        },
+        "1_West.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "Id",
+              "Integer",
+              6,
+              6,
+              0
+            ],
+            [
+              "REGION",
+              "String",
+              32,
+              0,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        },
+        "2_East.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "Id",
+              "Integer",
+              6,
+              6,
+              0
+            ],
+            [
+              "REGION",
+              "String",
+              32,
+              0,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        },
+        "2_West.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "Id",
+              "Integer",
+              6,
+              6,
+              0
+            ],
+            [
+              "REGION",
+              "String",
+              32,
+              0,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        }
+      },
+      "run": {
+        "tool": "split_by_attributes",
+        "params": {
+          "input": "testdata/geoproc/split_attributes.shp",
+          "target_workspace": "<out>",
+          "split_fields": "CLASS;REGION"
+        }
+      }
+    },
+    "sba_names": {
+      "tool": "analysis.SplitByAttributes",
+      "args": [
+        "testdata/geoproc/split_attribute_names.shp",
+        "<out>",
+        "REGION"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "outputs": {
+        "7west.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "Id",
+              "Integer",
+              6,
+              6,
+              0
+            ],
+            [
+              "REGION",
+              "String",
+              32,
+              0,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        },
+        "A_B.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "Id",
+              "Integer",
+              6,
+              6,
+              0
+            ],
+            [
+              "REGION",
+              "String",
+              32,
+              0,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        },
+        "T.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "Id",
+              "Integer",
+              6,
+              6,
+              0
+            ],
+            [
+              "REGION",
+              "String",
+              32,
+              0,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        },
+        "T___path.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "Id",
+              "Integer",
+              6,
+              6,
+              0
+            ],
+            [
+              "REGION",
+              "String",
+              32,
+              0,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        },
+        "a-b.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "Id",
+              "Integer",
+              6,
+              6,
+              0
+            ],
+            [
+              "REGION",
+              "String",
+              32,
+              0,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        },
+        "a_b0.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "Id",
+              "Integer",
+              6,
+              6,
+              0
+            ],
+            [
+              "REGION",
+              "String",
+              32,
+              0,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        }
+      },
+      "run": {
+        "tool": "split_by_attributes",
+        "params": {
+          "input": "testdata/geoproc/split_attribute_names.shp",
+          "target_workspace": "<out>",
+          "split_fields": "REGION"
+        }
+      }
+    },
+    "sba_table_text": {
+      "tool": "analysis.SplitByAttributes",
+      "args": [
+        "testdata/geoproc/split_attribute_table.dbf",
+        "<out>",
+        "REGION"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "outputs": {
+        "East.dbf": {
+          "fields": [
+            [
+              "OID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Field1",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "REGION",
+              "String",
+              32,
+              0,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": null
+        },
+        "West.dbf": {
+          "fields": [
+            [
+              "OID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Field1",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "REGION",
+              "String",
+              32,
+              0,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": null
+        }
+      },
+      "run": {
+        "tool": "split_by_attributes",
+        "params": {
+          "input": "testdata/geoproc/split_attribute_table.dbf",
+          "target_workspace": "<out>",
+          "split_fields": "REGION"
+        }
+      }
+    },
+    "sba_table_multi": {
+      "tool": "analysis.SplitByAttributes",
+      "args": [
+        "testdata/geoproc/split_attribute_table.dbf",
+        "<out>",
+        "REGION;CLASS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "outputs": {
+        "East_1.dbf": {
+          "fields": [
+            [
+              "OID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Field1",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "REGION",
+              "String",
+              32,
+              0,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": null
+        },
+        "East_2.dbf": {
+          "fields": [
+            [
+              "OID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Field1",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "REGION",
+              "String",
+              32,
+              0,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": null
+        },
+        "West_1.dbf": {
+          "fields": [
+            [
+              "OID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Field1",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "REGION",
+              "String",
+              32,
+              0,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": null
+        },
+        "West_2.dbf": {
+          "fields": [
+            [
+              "OID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Field1",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "REGION",
+              "String",
+              32,
+              0,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": null
+        }
+      },
+      "run": {
+        "tool": "split_by_attributes",
+        "params": {
+          "input": "testdata/geoproc/split_attribute_table.dbf",
+          "target_workspace": "<out>",
+          "split_fields": "REGION;CLASS"
+        }
+      }
+    },
+    "sba_polygons": {
+      "tool": "analysis.SplitByAttributes",
+      "args": [
+        "testdata/geoproc/pairwise_neighbors.shp",
+        "<out>",
+        "GRP"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "outputs": {
+        "1.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "Id",
+              "Integer",
+              6,
+              6,
+              0
+            ],
+            [
+              "NAME",
+              "String",
+              8,
+              0,
+              0
+            ],
+            [
+              "GRP",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Polygon"
+        },
+        "2.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "Id",
+              "Integer",
+              6,
+              6,
+              0
+            ],
+            [
+              "NAME",
+              "String",
+              8,
+              0,
+              0
+            ],
+            [
+              "GRP",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Polygon"
+        },
+        "3.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "Id",
+              "Integer",
+              6,
+              6,
+              0
+            ],
+            [
+              "NAME",
+              "String",
+              8,
+              0,
+              0
+            ],
+            [
+              "GRP",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Polygon"
+        },
+        "4.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "Id",
+              "Integer",
+              6,
+              6,
+              0
+            ],
+            [
+              "NAME",
+              "String",
+              8,
+              0,
+              0
+            ],
+            [
+              "GRP",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Polygon"
+        },
+        "5.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "Id",
+              "Integer",
+              6,
+              6,
+              0
+            ],
+            [
+              "NAME",
+              "String",
+              8,
+              0,
+              0
+            ],
+            [
+              "GRP",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Polygon"
+        },
+        "6.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "Id",
+              "Integer",
+              6,
+              6,
+              0
+            ],
+            [
+              "NAME",
+              "String",
+              8,
+              0,
+              0
+            ],
+            [
+              "GRP",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Polygon"
+        },
+        "7.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "Id",
+              "Integer",
+              6,
+              6,
+              0
+            ],
+            [
+              "NAME",
+              "String",
+              8,
+              0,
+              0
+            ],
+            [
+              "GRP",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Polygon"
+        }
+      },
+      "run": {
+        "tool": "split_by_attributes",
+        "params": {
+          "input": "testdata/geoproc/pairwise_neighbors.shp",
+          "target_workspace": "<out>",
+          "split_fields": "GRP"
+        }
+      }
+    },
+    "sba_err_oid": {
+      "tool": "analysis.SplitByAttributes",
+      "args": [
+        "testdata/geoproc/split_attributes.shp",
+        "<out>",
+        "FID"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 003911: The field is not of type SHORT | LONG | FLOAT | DOUBLE | TEXT | DATE | BIGINTEGER | DATEONLY | TIMESTAMPOFFSET",
+        "Failed to execute (SplitByAttributes)."
+      ],
+      "outputs": {},
+      "run": {
+        "tool": "split_by_attributes",
+        "params": {
+          "input": "testdata/geoproc/split_attributes.shp",
+          "target_workspace": "<out>",
+          "split_fields": "FID"
+        }
+      }
+    },
+    "sba_err_field": {
+      "tool": "analysis.SplitByAttributes",
+      "args": [
+        "testdata/geoproc/split_attributes.shp",
+        "<out>",
+        "NO_SUCH"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000728: Field NO_SUCH does not exist within table",
+        "Failed to execute (SplitByAttributes)."
+      ],
+      "outputs": {},
+      "run": {
+        "tool": "split_by_attributes",
+        "params": {
+          "input": "testdata/geoproc/split_attributes.shp",
+          "target_workspace": "<out>",
+          "split_fields": "NO_SUCH"
+        }
+      }
+    },
+    "sba_err_no_fields": {
+      "tool": "analysis.SplitByAttributes",
+      "args": [
+        "testdata/geoproc/split_attributes.shp",
+        "<out>"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000735: Split Fields: Value is required",
+        "Failed to execute (SplitByAttributes)."
+      ],
+      "outputs": {},
+      "run": {
+        "tool": "split_by_attributes",
+        "params": {
+          "input": "testdata/geoproc/split_attributes.shp",
+          "target_workspace": "<out>"
+        }
+      }
     }
   }
 }

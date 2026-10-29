@@ -1,0 +1,60 @@
+{
+  "reverse": {
+    "A_B.shp": [
+      [
+        "A B"
+      ]
+    ],
+    "a_b0.shp": [
+      [
+        "a_b"
+      ]
+    ]
+  },
+  "case": {
+    "A0.shp": [
+      [
+        "A"
+      ]
+    ],
+    "a.shp": [
+      [
+        "a"
+      ]
+    ]
+  },
+  "punctuation": {
+    "9abc.shp": [
+      [
+        "9abc"
+      ]
+    ],
+    "_abc.shp": [
+      [
+        "_abc"
+      ]
+    ],
+    "a-b.shp": [
+      [
+        "a-b"
+      ]
+    ],
+    "a_b.shp": [
+      [
+        "a.b"
+      ]
+    ]
+  },
+  "existing": {
+    "East.shp": [
+      [
+        "East"
+      ]
+    ],
+    "East0.shp": [
+      [
+        "East"
+      ]
+    ]
+  }
+}

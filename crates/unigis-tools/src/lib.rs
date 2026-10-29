@@ -21,6 +21,7 @@ pub mod pycalc;
 pub mod registry;
 pub mod regression;
 pub mod spatstat;
+pub mod split_attributes;
 mod sql;
 pub mod swm;
 pub mod tables;

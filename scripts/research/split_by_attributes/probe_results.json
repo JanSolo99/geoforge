@@ -1,0 +1,892 @@
+{
+  "text": {
+    "outputs": {
+      "East.shp": {
+        "fields": [
+          [
+            "FID",
+            "OID",
+            4,
+            0,
+            0
+          ],
+          [
+            "Shape",
+            "Geometry",
+            0,
+            0,
+            0
+          ],
+          [
+            "Id",
+            "Integer",
+            6,
+            6,
+            0
+          ],
+          [
+            "REGION",
+            "String",
+            32,
+            0,
+            0
+          ],
+          [
+            "CLASS",
+            "Integer",
+            10,
+            10,
+            0
+          ]
+        ],
+        "rows": [
+          [
+            0,
+            "East",
+            1,
+            "POINT (500010 5000001)"
+          ],
+          [
+            0,
+            "East",
+            2,
+            "POINT (500030 5000003)"
+          ],
+          [
+            0,
+            "East",
+            1,
+            "POINT (500040 5000004)"
+          ]
+        ]
+      },
+      "West.shp": {
+        "fields": [
+          [
+            "FID",
+            "OID",
+            4,
+            0,
+            0
+          ],
+          [
+            "Shape",
+            "Geometry",
+            0,
+            0,
+            0
+          ],
+          [
+            "Id",
+            "Integer",
+            6,
+            6,
+            0
+          ],
+          [
+            "REGION",
+            "String",
+            32,
+            0,
+            0
+          ],
+          [
+            "CLASS",
+            "Integer",
+            10,
+            10,
+            0
+          ]
+        ],
+        "rows": [
+          [
+            0,
+            "West",
+            2,
+            "POINT (500000 5000000)"
+          ],
+          [
+            0,
+            "West",
+            1,
+            "POINT (500020 5000002)"
+          ]
+        ]
+      }
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 3:04:54 PM\nValue(s) East written to Z:\\tmp\\unigis-split-attributes-text\\East.shp.\nValue(s) West written to Z:\\tmp\\unigis-split-attributes-text\\West.shp.\nSucceeded at Thursday, October 29, 2026 3:04:54 PM (Elapsed Time: 0.26 seconds)"
+  },
+  "numeric": {
+    "outputs": {
+      "1.shp": {
+        "fields": [
+          [
+            "FID",
+            "OID",
+            4,
+            0,
+            0
+          ],
+          [
+            "Shape",
+            "Geometry",
+            0,
+            0,
+            0
+          ],
+          [
+            "Id",
+            "Integer",
+            6,
+            6,
+            0
+          ],
+          [
+            "REGION",
+            "String",
+            32,
+            0,
+            0
+          ],
+          [
+            "CLASS",
+            "Integer",
+            10,
+            10,
+            0
+          ]
+        ],
+        "rows": [
+          [
+            0,
+            "East",
+            1,
+            "POINT (500010 5000001)"
+          ],
+          [
+            0,
+            "West",
+            1,
+            "POINT (500020 5000002)"
+          ],
+          [
+            0,
+            "East",
+            1,
+            "POINT (500040 5000004)"
+          ]
+        ]
+      },
+      "2.shp": {
+        "fields": [
+          [
+            "FID",
+            "OID",
+            4,
+            0,
+            0
+          ],
+          [
+            "Shape",
+            "Geometry",
+            0,
+            0,
+            0
+          ],
+          [
+            "Id",
+            "Integer",
+            6,
+            6,
+            0
+          ],
+          [
+            "REGION",
+            "String",
+            32,
+            0,
+            0
+          ],
+          [
+            "CLASS",
+            "Integer",
+            10,
+            10,
+            0
+          ]
+        ],
+        "rows": [
+          [
+            0,
+            "West",
+            2,
+            "POINT (500000 5000000)"
+          ],
+          [
+            0,
+            "East",
+            2,
+            "POINT (500030 5000003)"
+          ]
+        ]
+      }
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 3:04:54 PM\nValue(s) 1 written to Z:\\tmp\\unigis-split-attributes-numeric\\1.shp.\nValue(s) 2 written to Z:\\tmp\\unigis-split-attributes-numeric\\2.shp.\nSucceeded at Thursday, October 29, 2026 3:04:54 PM (Elapsed Time: 0.23 seconds)"
+  },
+  "multi": {
+    "outputs": {
+      "East_1.shp": {
+        "fields": [
+          [
+            "FID",
+            "OID",
+            4,
+            0,
+            0
+          ],
+          [
+            "Shape",
+            "Geometry",
+            0,
+            0,
+            0
+          ],
+          [
+            "Id",
+            "Integer",
+            6,
+            6,
+            0
+          ],
+          [
+            "REGION",
+            "String",
+            32,
+            0,
+            0
+          ],
+          [
+            "CLASS",
+            "Integer",
+            10,
+            10,
+            0
+          ]
+        ],
+        "rows": [
+          [
+            0,
+            "East",
+            1,
+            "POINT (500010 5000001)"
+          ],
+          [
+            0,
+            "East",
+            1,
+            "POINT (500040 5000004)"
+          ]
+        ]
+      },
+      "East_2.shp": {
+        "fields": [
+          [
+            "FID",
+            "OID",
+            4,
+            0,
+            0
+          ],
+          [
+            "Shape",
+            "Geometry",
+            0,
+            0,
+            0
+          ],
+          [
+            "Id",
+            "Integer",
+            6,
+            6,
+            0
+          ],
+          [
+            "REGION",
+            "String",
+            32,
+            0,
+            0
+          ],
+          [
+            "CLASS",
+            "Integer",
+            10,
+            10,
+            0
+          ]
+        ],
+        "rows": [
+          [
+            0,
+            "East",
+            2,
+            "POINT (500030 5000003)"
+          ]
+        ]
+      },
+      "West_1.shp": {
+        "fields": [
+          [
+            "FID",
+            "OID",
+            4,
+            0,
+            0
+          ],
+          [
+            "Shape",
+            "Geometry",
+            0,
+            0,
+            0
+          ],
+          [
+            "Id",
+            "Integer",
+            6,
+            6,
+            0
+          ],
+          [
+            "REGION",
+            "String",
+            32,
+            0,
+            0
+          ],
+          [
+            "CLASS",
+            "Integer",
+            10,
+            10,
+            0
+          ]
+        ],
+        "rows": [
+          [
+            0,
+            "West",
+            1,
+            "POINT (500020 5000002)"
+          ]
+        ]
+      },
+      "West_2.shp": {
+        "fields": [
+          [
+            "FID",
+            "OID",
+            4,
+            0,
+            0
+          ],
+          [
+            "Shape",
+            "Geometry",
+            0,
+            0,
+            0
+          ],
+          [
+            "Id",
+            "Integer",
+            6,
+            6,
+            0
+          ],
+          [
+            "REGION",
+            "String",
+            32,
+            0,
+            0
+          ],
+          [
+            "CLASS",
+            "Integer",
+            10,
+            10,
+            0
+          ]
+        ],
+        "rows": [
+          [
+            0,
+            "West",
+            2,
+            "POINT (500000 5000000)"
+          ]
+        ]
+      }
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 3:04:54 PM\nValue(s) East, 1 written to Z:\\tmp\\unigis-split-attributes-multi\\East_1.shp.\nValue(s) East, 2 written to Z:\\tmp\\unigis-split-attributes-multi\\East_2.shp.\nValue(s) West, 1 written to Z:\\tmp\\unigis-split-attributes-multi\\West_1.shp.\nValue(s) West, 2 written to Z:\\tmp\\unigis-split-attributes-multi\\West_2.shp.\nSucceeded at Thursday, October 29, 2026 3:04:55 PM (Elapsed Time: 0.30 seconds)"
+  },
+  "names": {
+    "outputs": {
+      "7west.shp": {
+        "fields": [
+          [
+            "FID",
+            "OID",
+            4,
+            0,
+            0
+          ],
+          [
+            "Shape",
+            "Geometry",
+            0,
+            0,
+            0
+          ],
+          [
+            "Id",
+            "Integer",
+            6,
+            6,
+            0
+          ],
+          [
+            "REGION",
+            "String",
+            32,
+            0,
+            0
+          ],
+          [
+            "CLASS",
+            "Integer",
+            10,
+            10,
+            0
+          ]
+        ],
+        "rows": [
+          [
+            0,
+            "7west",
+            2,
+            "POINT (500010 5000001)"
+          ]
+        ]
+      },
+      "A_B.shp": {
+        "fields": [
+          [
+            "FID",
+            "OID",
+            4,
+            0,
+            0
+          ],
+          [
+            "Shape",
+            "Geometry",
+            0,
+            0,
+            0
+          ],
+          [
+            "Id",
+            "Integer",
+            6,
+            6,
+            0
+          ],
+          [
+            "REGION",
+            "String",
+            32,
+            0,
+            0
+          ],
+          [
+            "CLASS",
+            "Integer",
+            10,
+            10,
+            0
+          ]
+        ],
+        "rows": [
+          [
+            0,
+            "A B",
+            1,
+            "POINT (500000 5000000)"
+          ]
+        ]
+      },
+      "T.shp": {
+        "fields": [
+          [
+            "FID",
+            "OID",
+            4,
+            0,
+            0
+          ],
+          [
+            "Shape",
+            "Geometry",
+            0,
+            0,
+            0
+          ],
+          [
+            "Id",
+            "Integer",
+            6,
+            6,
+            0
+          ],
+          [
+            "REGION",
+            "String",
+            32,
+            0,
+            0
+          ],
+          [
+            "CLASS",
+            "Integer",
+            10,
+            10,
+            0
+          ]
+        ],
+        "rows": [
+          [
+            0,
+            " ",
+            6,
+            "POINT (500050 5000005)"
+          ]
+        ]
+      },
+      "T___path.shp": {
+        "fields": [
+          [
+            "FID",
+            "OID",
+            4,
+            0,
+            0
+          ],
+          [
+            "Shape",
+            "Geometry",
+            0,
+            0,
+            0
+          ],
+          [
+            "Id",
+            "Integer",
+            6,
+            6,
+            0
+          ],
+          [
+            "REGION",
+            "String",
+            32,
+            0,
+            0
+          ],
+          [
+            "CLASS",
+            "Integer",
+            10,
+            10,
+            0
+          ]
+        ],
+        "rows": [
+          [
+            0,
+            "../path",
+            5,
+            "POINT (500040 5000004)"
+          ]
+        ]
+      },
+      "a-b.shp": {
+        "fields": [
+          [
+            "FID",
+            "OID",
+            4,
+            0,
+            0
+          ],
+          [
+            "Shape",
+            "Geometry",
+            0,
+            0,
+            0
+          ],
+          [
+            "Id",
+            "Integer",
+            6,
+            6,
+            0
+          ],
+          [
+            "REGION",
+            "String",
+            32,
+            0,
+            0
+          ],
+          [
+            "CLASS",
+            "Integer",
+            10,
+            10,
+            0
+          ]
+        ],
+        "rows": [
+          [
+            0,
+            "a-b",
+            3,
+            "POINT (500020 5000002)"
+          ]
+        ]
+      },
+      "a_b0.shp": {
+        "fields": [
+          [
+            "FID",
+            "OID",
+            4,
+            0,
+            0
+          ],
+          [
+            "Shape",
+            "Geometry",
+            0,
+            0,
+            0
+          ],
+          [
+            "Id",
+            "Integer",
+            6,
+            6,
+            0
+          ],
+          [
+            "REGION",
+            "String",
+            32,
+            0,
+            0
+          ],
+          [
+            "CLASS",
+            "Integer",
+            10,
+            10,
+            0
+          ]
+        ],
+        "rows": [
+          [
+            0,
+            "a_b",
+            4,
+            "POINT (500030 5000003)"
+          ]
+        ]
+      }
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 3:04:55 PM\nValue(s)   written to Z:\\tmp\\unigis-split-attributes-names\\T.shp.\nValue(s) ../path written to Z:\\tmp\\unigis-split-attributes-names\\T___path.shp.\nValue(s) 7west written to Z:\\tmp\\unigis-split-attributes-names\\7west.shp.\nValue(s) a-b written to Z:\\tmp\\unigis-split-attributes-names\\a-b.shp.\nValue(s) A B written to Z:\\tmp\\unigis-split-attributes-names\\A_B.shp.\nValue(s) a_b written to Z:\\tmp\\unigis-split-attributes-names\\a_b0.shp.\nSucceeded at Thursday, October 29, 2026 3:04:55 PM (Elapsed Time: 0.38 seconds)"
+  },
+  "table": {
+    "outputs": {
+      "East_1.dbf": {
+        "fields": [
+          [
+            "OID",
+            "OID",
+            4,
+            0,
+            0
+          ],
+          [
+            "Field1",
+            "Integer",
+            10,
+            10,
+            0
+          ],
+          [
+            "REGION",
+            "String",
+            32,
+            0,
+            0
+          ],
+          [
+            "CLASS",
+            "Integer",
+            10,
+            10,
+            0
+          ]
+        ],
+        "rows": [
+          [
+            0,
+            "East",
+            1
+          ],
+          [
+            0,
+            "East",
+            1
+          ]
+        ]
+      },
+      "East_2.dbf": {
+        "fields": [
+          [
+            "OID",
+            "OID",
+            4,
+            0,
+            0
+          ],
+          [
+            "Field1",
+            "Integer",
+            10,
+            10,
+            0
+          ],
+          [
+            "REGION",
+            "String",
+            32,
+            0,
+            0
+          ],
+          [
+            "CLASS",
+            "Integer",
+            10,
+            10,
+            0
+          ]
+        ],
+        "rows": [
+          [
+            0,
+            "East",
+            2
+          ]
+        ]
+      },
+      "West_1.dbf": {
+        "fields": [
+          [
+            "OID",
+            "OID",
+            4,
+            0,
+            0
+          ],
+          [
+            "Field1",
+            "Integer",
+            10,
+            10,
+            0
+          ],
+          [
+            "REGION",
+            "String",
+            32,
+            0,
+            0
+          ],
+          [
+            "CLASS",
+            "Integer",
+            10,
+            10,
+            0
+          ]
+        ],
+        "rows": [
+          [
+            0,
+            "West",
+            1
+          ]
+        ]
+      },
+      "West_2.dbf": {
+        "fields": [
+          [
+            "OID",
+            "OID",
+            4,
+            0,
+            0
+          ],
+          [
+            "Field1",
+            "Integer",
+            10,
+            10,
+            0
+          ],
+          [
+            "REGION",
+            "String",
+            32,
+            0,
+            0
+          ],
+          [
+            "CLASS",
+            "Integer",
+            10,
+            10,
+            0
+          ]
+        ],
+        "rows": [
+          [
+            0,
+            "West",
+            2
+          ]
+        ]
+      }
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 3:04:55 PM\nValue(s) East, 1 written to Z:\\tmp\\unigis-split-attributes-table\\East_1.shp.\nValue(s) East, 2 written to Z:\\tmp\\unigis-split-attributes-table\\East_2.shp.\nValue(s) West, 1 written to Z:\\tmp\\unigis-split-attributes-table\\West_1.shp.\nValue(s) West, 2 written to Z:\\tmp\\unigis-split-attributes-table\\West_2.shp.\nSucceeded at Thursday, October 29, 2026 3:04:55 PM (Elapsed Time: 0.26 seconds)"
+  },
+  "oid": {
+    "error": "Failed to execute. Parameters are not valid.\nERROR 003911: The field is not of type SHORT | LONG | FLOAT | DOUBLE | TEXT | DATE | BIGINTEGER | DATEONLY | TIMESTAMPOFFSET\nFailed to execute (SplitByAttributes).\n",
+    "messages": "Start Time: Thursday, October 29, 2026 3:04:56 PM\nFailed to execute. Parameters are not valid.\nERROR 003911: The field is not of type SHORT | LONG | FLOAT | DOUBLE | TEXT | DATE | BIGINTEGER | DATEONLY | TIMESTAMPOFFSET\nFailed to execute (SplitByAttributes).\nFailed at Thursday, October 29, 2026 3:04:56 PM (Elapsed Time: 0.00 seconds)"
+  }
+}
