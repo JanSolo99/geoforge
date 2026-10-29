@@ -1,0 +1,1425 @@
+{
+  "plain": {
+    "status": "succeeded",
+    "messages": "Start Time: Friday, October 30, 2026 12:01:19 AM\nExecuting Extract Data from Geodatabase...\nExtract Data from Geodatabase successfully completed...\nSucceeded at Friday, October 30, 2026 12:01:19 AM (Elapsed Time: 0.18 seconds)",
+    "snapshot": {
+      "tables": {
+        "plain": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "nullable": false,
+              "required": true,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "nullable": true,
+              "required": true,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "KEY",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            }
+          ],
+          "rows": [
+            [
+              1,
+              0,
+              "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              2,
+              1,
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              2,
+              "{\"x\":500020,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            {
+              "name": "FDO_OBJECTID",
+              "fields": [
+                "OBJECTID"
+              ],
+              "unique": true,
+              "ascending": true
+            },
+            {
+              "name": "FDO_Shape",
+              "fields": [
+                "Shape"
+              ],
+              "unique": false,
+              "ascending": true
+            }
+          ]
+        }
+      },
+      "relationships": [],
+      "domains": []
+    },
+    "outputs": [
+      "",
+      "Z:\\tmp\\unigis-extract-probe\\plain.gdb"
+    ]
+  },
+  "table_default": {
+    "status": "succeeded",
+    "messages": "Start Time: Friday, October 30, 2026 12:01:20 AM\nExecuting Extract Data from Geodatabase...\nExtract Data from Geodatabase successfully completed...\nSucceeded at Friday, October 30, 2026 12:01:20 AM (Elapsed Time: 0.35 seconds)",
+    "snapshot": {
+      "tables": {
+        "observations": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "nullable": false,
+              "required": true,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "SITE_KEY",
+              "type": "Integer",
+              "alias": "SITE_KEY",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "NOTE",
+              "type": "String",
+              "alias": "Observation",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "a"
+            ],
+            [
+              2,
+              1,
+              "b"
+            ],
+            [
+              3,
+              3,
+              "c"
+            ]
+          ],
+          "indexes": [
+            {
+              "name": "FDO_OBJECTID",
+              "fields": [
+                "OBJECTID"
+              ],
+              "unique": true,
+              "ascending": true
+            },
+            {
+              "name": "G4SITE_KEY",
+              "fields": [
+                "SITE_KEY"
+              ],
+              "unique": false,
+              "ascending": true
+            }
+          ]
+        },
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "nullable": false,
+              "required": true,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "nullable": true,
+              "required": true,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "nullable": true,
+              "required": false,
+              "domain": "StatusDomain",
+              "default": 1
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "Site 1",
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              3,
+              1,
+              null,
+              "{\"x\":500030,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              4,
+              4,
+              2,
+              "Site 4",
+              "{\"x\":500040,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            {
+              "name": "FDO_OBJECTID",
+              "fields": [
+                "OBJECTID"
+              ],
+              "unique": true,
+              "ascending": true
+            },
+            {
+              "name": "FDO_Shape",
+              "fields": [
+                "Shape"
+              ],
+              "unique": false,
+              "ascending": true
+            },
+            {
+              "name": "I5KEY",
+              "fields": [
+                "KEY"
+              ],
+              "unique": false,
+              "ascending": true
+            }
+          ]
+        }
+      },
+      "relationships": [
+        "site_observations"
+      ],
+      "domains": [
+        "StatusDomain"
+      ]
+    },
+    "outputs": [
+      "",
+      "Z:\\tmp\\unigis-extract-probe\\table_default.gdb"
+    ]
+  },
+  "table_all": {
+    "status": "succeeded",
+    "messages": "Start Time: Friday, October 30, 2026 12:01:21 AM\nExecuting Extract Data from Geodatabase...\nExtract Data from Geodatabase successfully completed...\nSucceeded at Friday, October 30, 2026 12:01:21 AM (Elapsed Time: 0.34 seconds)",
+    "snapshot": {
+      "tables": {
+        "observations": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "nullable": false,
+              "required": true,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "SITE_KEY",
+              "type": "Integer",
+              "alias": "SITE_KEY",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "NOTE",
+              "type": "String",
+              "alias": "Observation",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "a"
+            ],
+            [
+              2,
+              1,
+              "b"
+            ],
+            [
+              3,
+              3,
+              "c"
+            ],
+            [
+              4,
+              9,
+              "unmatched"
+            ]
+          ],
+          "indexes": [
+            {
+              "name": "FDO_OBJECTID",
+              "fields": [
+                "OBJECTID"
+              ],
+              "unique": true,
+              "ascending": true
+            },
+            {
+              "name": "G4SITE_KEY",
+              "fields": [
+                "SITE_KEY"
+              ],
+              "unique": false,
+              "ascending": true
+            }
+          ]
+        },
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "nullable": false,
+              "required": true,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "nullable": true,
+              "required": true,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "nullable": true,
+              "required": false,
+              "domain": "StatusDomain",
+              "default": 1
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "Site 1",
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              3,
+              1,
+              null,
+              "{\"x\":500030,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              4,
+              4,
+              2,
+              "Site 4",
+              "{\"x\":500040,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            {
+              "name": "FDO_OBJECTID",
+              "fields": [
+                "OBJECTID"
+              ],
+              "unique": true,
+              "ascending": true
+            },
+            {
+              "name": "FDO_Shape",
+              "fields": [
+                "Shape"
+              ],
+              "unique": false,
+              "ascending": true
+            },
+            {
+              "name": "I5KEY",
+              "fields": [
+                "KEY"
+              ],
+              "unique": false,
+              "ascending": true
+            }
+          ]
+        }
+      },
+      "relationships": [
+        "site_observations"
+      ],
+      "domains": [
+        "StatusDomain"
+      ]
+    },
+    "outputs": [
+      "",
+      "Z:\\tmp\\unigis-extract-probe\\table_all.gdb"
+    ]
+  },
+  "related": {
+    "status": "succeeded",
+    "messages": "Start Time: Friday, October 30, 2026 12:01:21 AM\nExecuting Extract Data from Geodatabase...\nExtract Data from Geodatabase successfully completed...\nSucceeded at Friday, October 30, 2026 12:01:22 AM (Elapsed Time: 0.35 seconds)",
+    "snapshot": {
+      "tables": {
+        "observations": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "nullable": false,
+              "required": true,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "SITE_KEY",
+              "type": "Integer",
+              "alias": "SITE_KEY",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "NOTE",
+              "type": "String",
+              "alias": "Observation",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "a"
+            ],
+            [
+              2,
+              1,
+              "b"
+            ],
+            [
+              3,
+              3,
+              "c"
+            ]
+          ],
+          "indexes": [
+            {
+              "name": "FDO_OBJECTID",
+              "fields": [
+                "OBJECTID"
+              ],
+              "unique": true,
+              "ascending": true
+            },
+            {
+              "name": "G4SITE_KEY",
+              "fields": [
+                "SITE_KEY"
+              ],
+              "unique": false,
+              "ascending": true
+            }
+          ]
+        },
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "nullable": false,
+              "required": true,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "nullable": true,
+              "required": true,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "nullable": true,
+              "required": false,
+              "domain": "StatusDomain",
+              "default": 1
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "Site 1",
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              3,
+              1,
+              null,
+              "{\"x\":500030,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              4,
+              4,
+              2,
+              "Site 4",
+              "{\"x\":500040,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            {
+              "name": "FDO_OBJECTID",
+              "fields": [
+                "OBJECTID"
+              ],
+              "unique": true,
+              "ascending": true
+            },
+            {
+              "name": "FDO_Shape",
+              "fields": [
+                "Shape"
+              ],
+              "unique": false,
+              "ascending": true
+            },
+            {
+              "name": "I5KEY",
+              "fields": [
+                "KEY"
+              ],
+              "unique": false,
+              "ascending": true
+            }
+          ]
+        }
+      },
+      "relationships": [
+        "site_observations"
+      ],
+      "domains": [
+        "StatusDomain"
+      ]
+    },
+    "outputs": [
+      "",
+      "Z:\\tmp\\unigis-extract-probe\\related.gdb"
+    ]
+  },
+  "schema": {
+    "status": "succeeded",
+    "messages": "Start Time: Friday, October 30, 2026 12:01:22 AM\nExecuting Extract Data from Geodatabase...\nExtract Data from Geodatabase successfully completed...\nSucceeded at Friday, October 30, 2026 12:01:23 AM (Elapsed Time: 0.34 seconds)",
+    "snapshot": {
+      "tables": {
+        "observations": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "nullable": false,
+              "required": true,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "SITE_KEY",
+              "type": "Integer",
+              "alias": "SITE_KEY",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "NOTE",
+              "type": "String",
+              "alias": "Observation",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            }
+          ],
+          "rows": [],
+          "indexes": [
+            {
+              "name": "FDO_OBJECTID",
+              "fields": [
+                "OBJECTID"
+              ],
+              "unique": true,
+              "ascending": true
+            },
+            {
+              "name": "G4SITE_KEY",
+              "fields": [
+                "SITE_KEY"
+              ],
+              "unique": false,
+              "ascending": true
+            }
+          ]
+        },
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "nullable": false,
+              "required": true,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "nullable": true,
+              "required": true,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "nullable": true,
+              "required": false,
+              "domain": "StatusDomain",
+              "default": 1
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            }
+          ],
+          "rows": [],
+          "indexes": [
+            {
+              "name": "FDO_OBJECTID",
+              "fields": [
+                "OBJECTID"
+              ],
+              "unique": true,
+              "ascending": true
+            },
+            {
+              "name": "FDO_Shape",
+              "fields": [
+                "Shape"
+              ],
+              "unique": false,
+              "ascending": true
+            },
+            {
+              "name": "I5KEY",
+              "fields": [
+                "KEY"
+              ],
+              "unique": false,
+              "ascending": true
+            }
+          ]
+        }
+      },
+      "relationships": [
+        "site_observations"
+      ],
+      "domains": [
+        "StatusDomain"
+      ]
+    },
+    "outputs": [
+      "",
+      "Z:\\tmp\\unigis-extract-probe\\schema.gdb"
+    ]
+  },
+  "no_expand": {
+    "status": "succeeded",
+    "messages": "Start Time: Friday, October 30, 2026 12:01:23 AM\nExecuting Extract Data from Geodatabase...\nExtract Data from Geodatabase successfully completed...\nSucceeded at Friday, October 30, 2026 12:01:23 AM (Elapsed Time: 0.17 seconds)",
+    "snapshot": {
+      "tables": {
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "nullable": false,
+              "required": true,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "nullable": true,
+              "required": true,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "nullable": true,
+              "required": false,
+              "domain": "StatusDomain",
+              "default": 1
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "Site 1",
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              3,
+              1,
+              null,
+              "{\"x\":500030,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              4,
+              4,
+              2,
+              "Site 4",
+              "{\"x\":500040,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            {
+              "name": "FDO_OBJECTID",
+              "fields": [
+                "OBJECTID"
+              ],
+              "unique": true,
+              "ascending": true
+            },
+            {
+              "name": "FDO_Shape",
+              "fields": [
+                "Shape"
+              ],
+              "unique": false,
+              "ascending": true
+            },
+            {
+              "name": "I4KEY",
+              "fields": [
+                "KEY"
+              ],
+              "unique": false,
+              "ascending": true
+            }
+          ]
+        }
+      },
+      "relationships": [],
+      "domains": [
+        "StatusDomain"
+      ]
+    },
+    "outputs": [
+      "",
+      "Z:\\tmp\\unigis-extract-probe\\no_expand.gdb"
+    ]
+  },
+  "all_expanded": {
+    "status": "succeeded",
+    "messages": "Start Time: Friday, October 30, 2026 12:01:23 AM\nExecuting Extract Data from Geodatabase...\nExtract Data from Geodatabase successfully completed...\nSucceeded at Friday, October 30, 2026 12:01:24 AM (Elapsed Time: 0.35 seconds)",
+    "snapshot": {
+      "tables": {
+        "observations": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "nullable": false,
+              "required": true,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "SITE_KEY",
+              "type": "Integer",
+              "alias": "SITE_KEY",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "NOTE",
+              "type": "String",
+              "alias": "Observation",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "a"
+            ],
+            [
+              2,
+              1,
+              "b"
+            ],
+            [
+              3,
+              3,
+              "c"
+            ],
+            [
+              4,
+              9,
+              "unmatched"
+            ]
+          ],
+          "indexes": [
+            {
+              "name": "FDO_OBJECTID",
+              "fields": [
+                "OBJECTID"
+              ],
+              "unique": true,
+              "ascending": true
+            },
+            {
+              "name": "G4SITE_KEY",
+              "fields": [
+                "SITE_KEY"
+              ],
+              "unique": false,
+              "ascending": true
+            }
+          ]
+        },
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "nullable": false,
+              "required": true,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "nullable": true,
+              "required": true,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "nullable": true,
+              "required": false,
+              "domain": "StatusDomain",
+              "default": 1
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "Site 1",
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              3,
+              1,
+              null,
+              "{\"x\":500030,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              4,
+              4,
+              2,
+              "Site 4",
+              "{\"x\":500040,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            {
+              "name": "FDO_OBJECTID",
+              "fields": [
+                "OBJECTID"
+              ],
+              "unique": true,
+              "ascending": true
+            },
+            {
+              "name": "FDO_Shape",
+              "fields": [
+                "Shape"
+              ],
+              "unique": false,
+              "ascending": true
+            },
+            {
+              "name": "I5KEY",
+              "fields": [
+                "KEY"
+              ],
+              "unique": false,
+              "ascending": true
+            }
+          ]
+        }
+      },
+      "relationships": [
+        "site_observations"
+      ],
+      "domains": [
+        "StatusDomain"
+      ]
+    },
+    "outputs": [
+      "",
+      "Z:\\tmp\\unigis-extract-probe\\all_expanded.gdb"
+    ]
+  },
+  "both": {
+    "status": "succeeded",
+    "messages": "Start Time: Friday, October 30, 2026 12:01:24 AM\nExecuting Extract Data from Geodatabase...\nExtract Data from Geodatabase successfully completed...\nSucceeded at Friday, October 30, 2026 12:01:25 AM (Elapsed Time: 0.36 seconds)",
+    "snapshot": {
+      "tables": {
+        "observations": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "nullable": false,
+              "required": true,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "SITE_KEY",
+              "type": "Integer",
+              "alias": "SITE_KEY",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "NOTE",
+              "type": "String",
+              "alias": "Observation",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "a"
+            ],
+            [
+              2,
+              1,
+              "b"
+            ],
+            [
+              3,
+              3,
+              "c"
+            ],
+            [
+              4,
+              9,
+              "unmatched"
+            ]
+          ],
+          "indexes": [
+            {
+              "name": "FDO_OBJECTID",
+              "fields": [
+                "OBJECTID"
+              ],
+              "unique": true,
+              "ascending": true
+            },
+            {
+              "name": "G4SITE_KEY",
+              "fields": [
+                "SITE_KEY"
+              ],
+              "unique": false,
+              "ascending": true
+            }
+          ]
+        },
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "nullable": false,
+              "required": true,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "nullable": true,
+              "required": true,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "nullable": true,
+              "required": false,
+              "domain": "StatusDomain",
+              "default": 1
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "Site 1",
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              3,
+              1,
+              null,
+              "{\"x\":500030,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              4,
+              4,
+              2,
+              "Site 4",
+              "{\"x\":500040,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            {
+              "name": "FDO_OBJECTID",
+              "fields": [
+                "OBJECTID"
+              ],
+              "unique": true,
+              "ascending": true
+            },
+            {
+              "name": "FDO_Shape",
+              "fields": [
+                "Shape"
+              ],
+              "unique": false,
+              "ascending": true
+            },
+            {
+              "name": "I5KEY",
+              "fields": [
+                "KEY"
+              ],
+              "unique": false,
+              "ascending": true
+            }
+          ]
+        }
+      },
+      "relationships": [
+        "site_observations"
+      ],
+      "domains": [
+        "StatusDomain"
+      ]
+    },
+    "outputs": [
+      "",
+      "Z:\\tmp\\unigis-extract-probe\\both.gdb"
+    ]
+  },
+  "existing": {
+    "status": "succeeded",
+    "messages": "Start Time: Friday, October 30, 2026 12:01:25 AM\nExecuting Extract Data from Geodatabase...\nExtract Data from Geodatabase successfully completed...\nSucceeded at Friday, October 30, 2026 12:01:25 AM (Elapsed Time: 0.15 seconds)",
+    "snapshot": {
+      "tables": {
+        "plain": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "nullable": false,
+              "required": true,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "nullable": true,
+              "required": true,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "KEY",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            }
+          ],
+          "rows": [
+            [
+              1,
+              0,
+              "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              2,
+              1,
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              2,
+              "{\"x\":500020,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            {
+              "name": "FDO_OBJECTID",
+              "fields": [
+                "OBJECTID"
+              ],
+              "unique": true,
+              "ascending": true
+            },
+            {
+              "name": "FDO_Shape",
+              "fields": [
+                "Shape"
+              ],
+              "unique": false,
+              "ascending": true
+            }
+          ]
+        }
+      },
+      "relationships": [],
+      "domains": []
+    },
+    "outputs": [
+      "",
+      "Z:\\tmp\\unigis-extract-probe\\existing.gdb"
+    ]
+  },
+  "duplicate": {
+    "status": "succeeded",
+    "messages": "Start Time: Friday, October 30, 2026 12:01:26 AM\nExecuting Extract Data from Geodatabase...\nExtract Data from Geodatabase successfully completed...\nSucceeded at Friday, October 30, 2026 12:01:26 AM (Elapsed Time: 0.21 seconds)",
+    "snapshot": {
+      "tables": {
+        "plain": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "nullable": false,
+              "required": true,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "nullable": true,
+              "required": true,
+              "domain": "",
+              "default": null
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "KEY",
+              "nullable": true,
+              "required": false,
+              "domain": "",
+              "default": null
+            }
+          ],
+          "rows": [
+            [
+              1,
+              0,
+              "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              2,
+              1,
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              2,
+              "{\"x\":500020,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            {
+              "name": "FDO_OBJECTID",
+              "fields": [
+                "OBJECTID"
+              ],
+              "unique": true,
+              "ascending": true
+            },
+            {
+              "name": "FDO_Shape",
+              "fields": [
+                "Shape"
+              ],
+              "unique": false,
+              "ascending": true
+            }
+          ]
+        }
+      },
+      "relationships": [],
+      "domains": []
+    },
+    "outputs": [
+      "",
+      "Z:\\tmp\\unigis-extract-probe\\duplicate.gdb"
+    ]
+  }
+}

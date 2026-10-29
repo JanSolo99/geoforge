@@ -1,0 +1,4320 @@
+{
+  "edg_all_expanded.gdb": {
+    "matches": true,
+    "expected": {
+      "classes": {
+        "observations": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "SITE_KEY",
+              "type": "Integer",
+              "alias": "SITE_KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "NOTE",
+              "type": "String",
+              "alias": "Observation",
+              "length": 40,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "a"
+            ],
+            [
+              2,
+              1,
+              "b"
+            ],
+            [
+              3,
+              3,
+              "c"
+            ],
+            [
+              4,
+              9,
+              "unmatched"
+            ]
+          ],
+          "indexes": [
+            [
+              "objectid"
+            ],
+            [
+              "site_key"
+            ]
+          ]
+        },
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "length": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "length": 2,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "StatusDomain",
+              "default": 1,
+              "precision": 0
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "length": 30,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "Site 1",
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              3,
+              1,
+              null,
+              "{\"x\":500030,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              4,
+              4,
+              2,
+              "Site 4",
+              "{\"x\":500040,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            [
+              "key"
+            ],
+            [
+              "objectid"
+            ],
+            [
+              "shape"
+            ]
+          ]
+        }
+      },
+      "domains": [
+        {
+          "name": "StatusDomain",
+          "description": "Site status",
+          "type": "Short",
+          "kind": "CodedValue",
+          "split": "DefaultValue",
+          "merge": "DefaultValue",
+          "values": {
+            "1": "Active",
+            "2": "Closed"
+          }
+        }
+      ],
+      "relationships": {
+        "site_observations": {
+          "cardinality": "OneToMany",
+          "isComposite": false,
+          "isAttributed": false,
+          "originClassNames": [
+            "sites"
+          ],
+          "destinationClassNames": [
+            "observations"
+          ],
+          "originClassKeys": [
+            [
+              "KEY",
+              "OriginPrimary",
+              ""
+            ],
+            [
+              "SITE_KEY",
+              "OriginForeign",
+              ""
+            ]
+          ],
+          "destinationClassKeys": [],
+          "forwardPathLabel": "Observations",
+          "backwardPathLabel": "Site"
+        }
+      }
+    },
+    "actual": {
+      "classes": {
+        "observations": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "SITE_KEY",
+              "type": "Integer",
+              "alias": "SITE_KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "NOTE",
+              "type": "String",
+              "alias": "Observation",
+              "length": 40,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "a"
+            ],
+            [
+              2,
+              1,
+              "b"
+            ],
+            [
+              3,
+              3,
+              "c"
+            ],
+            [
+              4,
+              9,
+              "unmatched"
+            ]
+          ],
+          "indexes": [
+            [
+              "objectid"
+            ],
+            [
+              "site_key"
+            ]
+          ]
+        },
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "length": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "length": 2,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "StatusDomain",
+              "default": 1,
+              "precision": 0
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "length": 30,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "Site 1",
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              3,
+              1,
+              null,
+              "{\"x\":500030,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              4,
+              4,
+              2,
+              "Site 4",
+              "{\"x\":500040,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            [
+              "key"
+            ],
+            [
+              "objectid"
+            ],
+            [
+              "shape"
+            ]
+          ]
+        }
+      },
+      "domains": [
+        {
+          "name": "StatusDomain",
+          "description": "Site status",
+          "type": "Short",
+          "kind": "CodedValue",
+          "split": "DefaultValue",
+          "merge": "DefaultValue",
+          "values": {
+            "1": "Active",
+            "2": "Closed"
+          }
+        }
+      ],
+      "relationships": {
+        "site_observations": {
+          "cardinality": "OneToMany",
+          "isComposite": false,
+          "isAttributed": false,
+          "originClassNames": [
+            "sites"
+          ],
+          "destinationClassNames": [
+            "observations"
+          ],
+          "originClassKeys": [
+            [
+              "KEY",
+              "OriginPrimary",
+              ""
+            ],
+            [
+              "SITE_KEY",
+              "OriginForeign",
+              ""
+            ]
+          ],
+          "destinationClassKeys": [],
+          "forwardPathLabel": "Observations",
+          "backwardPathLabel": "Site"
+        }
+      }
+    }
+  },
+  "edg_both.gdb": {
+    "matches": true,
+    "expected": {
+      "classes": {
+        "observations": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "SITE_KEY",
+              "type": "Integer",
+              "alias": "SITE_KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "NOTE",
+              "type": "String",
+              "alias": "Observation",
+              "length": 40,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "a"
+            ],
+            [
+              2,
+              1,
+              "b"
+            ],
+            [
+              3,
+              3,
+              "c"
+            ],
+            [
+              4,
+              9,
+              "unmatched"
+            ]
+          ],
+          "indexes": [
+            [
+              "objectid"
+            ],
+            [
+              "site_key"
+            ]
+          ]
+        },
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "length": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "length": 2,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "StatusDomain",
+              "default": 1,
+              "precision": 0
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "length": 30,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "Site 1",
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              3,
+              1,
+              null,
+              "{\"x\":500030,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              4,
+              4,
+              2,
+              "Site 4",
+              "{\"x\":500040,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            [
+              "key"
+            ],
+            [
+              "objectid"
+            ],
+            [
+              "shape"
+            ]
+          ]
+        }
+      },
+      "domains": [
+        {
+          "name": "StatusDomain",
+          "description": "Site status",
+          "type": "Short",
+          "kind": "CodedValue",
+          "split": "DefaultValue",
+          "merge": "DefaultValue",
+          "values": {
+            "1": "Active",
+            "2": "Closed"
+          }
+        }
+      ],
+      "relationships": {
+        "site_observations": {
+          "cardinality": "OneToMany",
+          "isComposite": false,
+          "isAttributed": false,
+          "originClassNames": [
+            "sites"
+          ],
+          "destinationClassNames": [
+            "observations"
+          ],
+          "originClassKeys": [
+            [
+              "KEY",
+              "OriginPrimary",
+              ""
+            ],
+            [
+              "SITE_KEY",
+              "OriginForeign",
+              ""
+            ]
+          ],
+          "destinationClassKeys": [],
+          "forwardPathLabel": "Observations",
+          "backwardPathLabel": "Site"
+        }
+      }
+    },
+    "actual": {
+      "classes": {
+        "observations": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "SITE_KEY",
+              "type": "Integer",
+              "alias": "SITE_KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "NOTE",
+              "type": "String",
+              "alias": "Observation",
+              "length": 40,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "a"
+            ],
+            [
+              2,
+              1,
+              "b"
+            ],
+            [
+              3,
+              3,
+              "c"
+            ],
+            [
+              4,
+              9,
+              "unmatched"
+            ]
+          ],
+          "indexes": [
+            [
+              "objectid"
+            ],
+            [
+              "site_key"
+            ]
+          ]
+        },
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "length": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "length": 2,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "StatusDomain",
+              "default": 1,
+              "precision": 0
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "length": 30,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "Site 1",
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              3,
+              1,
+              null,
+              "{\"x\":500030,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              4,
+              4,
+              2,
+              "Site 4",
+              "{\"x\":500040,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            [
+              "key"
+            ],
+            [
+              "objectid"
+            ],
+            [
+              "shape"
+            ]
+          ]
+        }
+      },
+      "domains": [
+        {
+          "name": "StatusDomain",
+          "description": "Site status",
+          "type": "Short",
+          "kind": "CodedValue",
+          "split": "DefaultValue",
+          "merge": "DefaultValue",
+          "values": {
+            "1": "Active",
+            "2": "Closed"
+          }
+        }
+      ],
+      "relationships": {
+        "site_observations": {
+          "cardinality": "OneToMany",
+          "isComposite": false,
+          "isAttributed": false,
+          "originClassNames": [
+            "sites"
+          ],
+          "destinationClassNames": [
+            "observations"
+          ],
+          "originClassKeys": [
+            [
+              "KEY",
+              "OriginPrimary",
+              ""
+            ],
+            [
+              "SITE_KEY",
+              "OriginForeign",
+              ""
+            ]
+          ],
+          "destinationClassKeys": [],
+          "forwardPathLabel": "Observations",
+          "backwardPathLabel": "Site"
+        }
+      }
+    }
+  },
+  "edg_both_no_expand.gdb": {
+    "matches": true,
+    "expected": {
+      "classes": {
+        "observations": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "SITE_KEY",
+              "type": "Integer",
+              "alias": "SITE_KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "NOTE",
+              "type": "String",
+              "alias": "Observation",
+              "length": 40,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [],
+          "indexes": [
+            [
+              "objectid"
+            ],
+            [
+              "site_key"
+            ]
+          ]
+        },
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "length": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "length": 2,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "StatusDomain",
+              "default": 1,
+              "precision": 0
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "length": 30,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "Site 1",
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              3,
+              1,
+              null,
+              "{\"x\":500030,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              4,
+              4,
+              2,
+              "Site 4",
+              "{\"x\":500040,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            [
+              "key"
+            ],
+            [
+              "objectid"
+            ],
+            [
+              "shape"
+            ]
+          ]
+        }
+      },
+      "domains": [
+        {
+          "name": "StatusDomain",
+          "description": "Site status",
+          "type": "Short",
+          "kind": "CodedValue",
+          "split": "DefaultValue",
+          "merge": "DefaultValue",
+          "values": {
+            "1": "Active",
+            "2": "Closed"
+          }
+        }
+      ],
+      "relationships": {}
+    },
+    "actual": {
+      "classes": {
+        "observations": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "SITE_KEY",
+              "type": "Integer",
+              "alias": "SITE_KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "NOTE",
+              "type": "String",
+              "alias": "Observation",
+              "length": 40,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [],
+          "indexes": [
+            [
+              "objectid"
+            ],
+            [
+              "site_key"
+            ]
+          ]
+        },
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "length": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "length": 2,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "StatusDomain",
+              "default": 1,
+              "precision": 0
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "length": 30,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "Site 1",
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              3,
+              1,
+              null,
+              "{\"x\":500030,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              4,
+              4,
+              2,
+              "Site 4",
+              "{\"x\":500040,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            [
+              "key"
+            ],
+            [
+              "objectid"
+            ],
+            [
+              "shape"
+            ]
+          ]
+        }
+      },
+      "domains": [
+        {
+          "name": "StatusDomain",
+          "description": "Site status",
+          "type": "Short",
+          "kind": "CodedValue",
+          "split": "DefaultValue",
+          "merge": "DefaultValue",
+          "values": {
+            "1": "Active",
+            "2": "Closed"
+          }
+        }
+      ],
+      "relationships": {}
+    }
+  },
+  "edg_duplicate.gdb": {
+    "matches": true,
+    "expected": {
+      "classes": {
+        "plain": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "length": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              0,
+              "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              2,
+              1,
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              2,
+              "{\"x\":500020,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            [
+              "objectid"
+            ],
+            [
+              "shape"
+            ]
+          ]
+        }
+      },
+      "domains": [],
+      "relationships": {}
+    },
+    "actual": {
+      "classes": {
+        "plain": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "length": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              0,
+              "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              2,
+              1,
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              2,
+              "{\"x\":500020,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            [
+              "objectid"
+            ],
+            [
+              "shape"
+            ]
+          ]
+        }
+      },
+      "domains": [],
+      "relationships": {}
+    }
+  },
+  "edg_existing.gdb": {
+    "matches": true,
+    "expected": {
+      "classes": {
+        "observations": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "SITE_KEY",
+              "type": "Integer",
+              "alias": "SITE_KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "NOTE",
+              "type": "String",
+              "alias": "Observation",
+              "length": 40,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "a"
+            ],
+            [
+              2,
+              1,
+              "b"
+            ],
+            [
+              3,
+              3,
+              "c"
+            ]
+          ],
+          "indexes": [
+            [
+              "objectid"
+            ],
+            [
+              "site_key"
+            ]
+          ]
+        },
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "length": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "length": 2,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "StatusDomain",
+              "default": 1,
+              "precision": 0
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "length": 30,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "Site 1",
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              3,
+              1,
+              null,
+              "{\"x\":500030,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              4,
+              4,
+              2,
+              "Site 4",
+              "{\"x\":500040,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            [
+              "key"
+            ],
+            [
+              "objectid"
+            ],
+            [
+              "shape"
+            ]
+          ]
+        }
+      },
+      "domains": [
+        {
+          "name": "StatusDomain",
+          "description": "Site status",
+          "type": "Short",
+          "kind": "CodedValue",
+          "split": "DefaultValue",
+          "merge": "DefaultValue",
+          "values": {
+            "1": "Active",
+            "2": "Closed"
+          }
+        }
+      ],
+      "relationships": {
+        "site_observations": {
+          "cardinality": "OneToMany",
+          "isComposite": false,
+          "isAttributed": false,
+          "originClassNames": [
+            "sites"
+          ],
+          "destinationClassNames": [
+            "observations"
+          ],
+          "originClassKeys": [
+            [
+              "KEY",
+              "OriginPrimary",
+              ""
+            ],
+            [
+              "SITE_KEY",
+              "OriginForeign",
+              ""
+            ]
+          ],
+          "destinationClassKeys": [],
+          "forwardPathLabel": "Observations",
+          "backwardPathLabel": "Site"
+        }
+      }
+    },
+    "actual": {
+      "classes": {
+        "observations": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "SITE_KEY",
+              "type": "Integer",
+              "alias": "SITE_KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "NOTE",
+              "type": "String",
+              "alias": "Observation",
+              "length": 40,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "a"
+            ],
+            [
+              2,
+              1,
+              "b"
+            ],
+            [
+              3,
+              3,
+              "c"
+            ]
+          ],
+          "indexes": [
+            [
+              "objectid"
+            ],
+            [
+              "site_key"
+            ]
+          ]
+        },
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "length": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "length": 2,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "StatusDomain",
+              "default": 1,
+              "precision": 0
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "length": 30,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "Site 1",
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              3,
+              1,
+              null,
+              "{\"x\":500030,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              4,
+              4,
+              2,
+              "Site 4",
+              "{\"x\":500040,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            [
+              "key"
+            ],
+            [
+              "objectid"
+            ],
+            [
+              "shape"
+            ]
+          ]
+        }
+      },
+      "domains": [
+        {
+          "name": "StatusDomain",
+          "description": "Site status",
+          "type": "Short",
+          "kind": "CodedValue",
+          "split": "DefaultValue",
+          "merge": "DefaultValue",
+          "values": {
+            "1": "Active",
+            "2": "Closed"
+          }
+        }
+      ],
+      "relationships": {
+        "site_observations": {
+          "cardinality": "OneToMany",
+          "isComposite": false,
+          "isAttributed": false,
+          "originClassNames": [
+            "sites"
+          ],
+          "destinationClassNames": [
+            "observations"
+          ],
+          "originClassKeys": [
+            [
+              "KEY",
+              "OriginPrimary",
+              ""
+            ],
+            [
+              "SITE_KEY",
+              "OriginForeign",
+              ""
+            ]
+          ],
+          "destinationClassKeys": [],
+          "forwardPathLabel": "Observations",
+          "backwardPathLabel": "Site"
+        }
+      }
+    }
+  },
+  "edg_no_expand.gdb": {
+    "matches": true,
+    "expected": {
+      "classes": {
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "length": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "length": 2,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "StatusDomain",
+              "default": 1,
+              "precision": 0
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "length": 30,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "Site 1",
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              3,
+              1,
+              null,
+              "{\"x\":500030,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              4,
+              4,
+              2,
+              "Site 4",
+              "{\"x\":500040,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            [
+              "key"
+            ],
+            [
+              "objectid"
+            ],
+            [
+              "shape"
+            ]
+          ]
+        }
+      },
+      "domains": [
+        {
+          "name": "StatusDomain",
+          "description": "Site status",
+          "type": "Short",
+          "kind": "CodedValue",
+          "split": "DefaultValue",
+          "merge": "DefaultValue",
+          "values": {
+            "1": "Active",
+            "2": "Closed"
+          }
+        }
+      ],
+      "relationships": {}
+    },
+    "actual": {
+      "classes": {
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "length": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "length": 2,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "StatusDomain",
+              "default": 1,
+              "precision": 0
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "length": 30,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "Site 1",
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              3,
+              1,
+              null,
+              "{\"x\":500030,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              4,
+              4,
+              2,
+              "Site 4",
+              "{\"x\":500040,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            [
+              "key"
+            ],
+            [
+              "objectid"
+            ],
+            [
+              "shape"
+            ]
+          ]
+        }
+      },
+      "domains": [
+        {
+          "name": "StatusDomain",
+          "description": "Site status",
+          "type": "Short",
+          "kind": "CodedValue",
+          "split": "DefaultValue",
+          "merge": "DefaultValue",
+          "values": {
+            "1": "Active",
+            "2": "Closed"
+          }
+        }
+      ],
+      "relationships": {}
+    }
+  },
+  "edg_no_related.gdb": {
+    "matches": true,
+    "expected": {
+      "classes": {
+        "observations": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "SITE_KEY",
+              "type": "Integer",
+              "alias": "SITE_KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "NOTE",
+              "type": "String",
+              "alias": "Observation",
+              "length": 40,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [],
+          "indexes": [
+            [
+              "objectid"
+            ],
+            [
+              "site_key"
+            ]
+          ]
+        },
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "length": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "length": 2,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "StatusDomain",
+              "default": 1,
+              "precision": 0
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "length": 30,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "Site 1",
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              3,
+              1,
+              null,
+              "{\"x\":500030,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              4,
+              4,
+              2,
+              "Site 4",
+              "{\"x\":500040,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            [
+              "key"
+            ],
+            [
+              "objectid"
+            ],
+            [
+              "shape"
+            ]
+          ]
+        }
+      },
+      "domains": [
+        {
+          "name": "StatusDomain",
+          "description": "Site status",
+          "type": "Short",
+          "kind": "CodedValue",
+          "split": "DefaultValue",
+          "merge": "DefaultValue",
+          "values": {
+            "1": "Active",
+            "2": "Closed"
+          }
+        }
+      ],
+      "relationships": {
+        "site_observations": {
+          "cardinality": "OneToMany",
+          "isComposite": false,
+          "isAttributed": false,
+          "originClassNames": [
+            "sites"
+          ],
+          "destinationClassNames": [
+            "observations"
+          ],
+          "originClassKeys": [
+            [
+              "KEY",
+              "OriginPrimary",
+              ""
+            ],
+            [
+              "SITE_KEY",
+              "OriginForeign",
+              ""
+            ]
+          ],
+          "destinationClassKeys": [],
+          "forwardPathLabel": "Observations",
+          "backwardPathLabel": "Site"
+        }
+      }
+    },
+    "actual": {
+      "classes": {
+        "observations": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "SITE_KEY",
+              "type": "Integer",
+              "alias": "SITE_KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "NOTE",
+              "type": "String",
+              "alias": "Observation",
+              "length": 40,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [],
+          "indexes": [
+            [
+              "objectid"
+            ],
+            [
+              "site_key"
+            ]
+          ]
+        },
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "length": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "length": 2,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "StatusDomain",
+              "default": 1,
+              "precision": 0
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "length": 30,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "Site 1",
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              3,
+              1,
+              null,
+              "{\"x\":500030,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              4,
+              4,
+              2,
+              "Site 4",
+              "{\"x\":500040,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            [
+              "key"
+            ],
+            [
+              "objectid"
+            ],
+            [
+              "shape"
+            ]
+          ]
+        }
+      },
+      "domains": [
+        {
+          "name": "StatusDomain",
+          "description": "Site status",
+          "type": "Short",
+          "kind": "CodedValue",
+          "split": "DefaultValue",
+          "merge": "DefaultValue",
+          "values": {
+            "1": "Active",
+            "2": "Closed"
+          }
+        }
+      ],
+      "relationships": {
+        "site_observations": {
+          "cardinality": "OneToMany",
+          "isComposite": false,
+          "isAttributed": false,
+          "originClassNames": [
+            "sites"
+          ],
+          "destinationClassNames": [
+            "observations"
+          ],
+          "originClassKeys": [
+            [
+              "KEY",
+              "OriginPrimary",
+              ""
+            ],
+            [
+              "SITE_KEY",
+              "OriginForeign",
+              ""
+            ]
+          ],
+          "destinationClassKeys": [],
+          "forwardPathLabel": "Observations",
+          "backwardPathLabel": "Site"
+        }
+      }
+    }
+  },
+  "edg_plain.gdb": {
+    "matches": true,
+    "expected": {
+      "classes": {
+        "plain": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "length": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              0,
+              "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              2,
+              1,
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              2,
+              "{\"x\":500020,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            [
+              "objectid"
+            ],
+            [
+              "shape"
+            ]
+          ]
+        }
+      },
+      "domains": [],
+      "relationships": {}
+    },
+    "actual": {
+      "classes": {
+        "plain": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "length": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              0,
+              "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              2,
+              1,
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              2,
+              "{\"x\":500020,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            [
+              "objectid"
+            ],
+            [
+              "shape"
+            ]
+          ]
+        }
+      },
+      "domains": [],
+      "relationships": {}
+    }
+  },
+  "edg_related.gdb": {
+    "matches": true,
+    "expected": {
+      "classes": {
+        "observations": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "SITE_KEY",
+              "type": "Integer",
+              "alias": "SITE_KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "NOTE",
+              "type": "String",
+              "alias": "Observation",
+              "length": 40,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "a"
+            ],
+            [
+              2,
+              1,
+              "b"
+            ],
+            [
+              3,
+              3,
+              "c"
+            ]
+          ],
+          "indexes": [
+            [
+              "objectid"
+            ],
+            [
+              "site_key"
+            ]
+          ]
+        },
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "length": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "length": 2,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "StatusDomain",
+              "default": 1,
+              "precision": 0
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "length": 30,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "Site 1",
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              3,
+              1,
+              null,
+              "{\"x\":500030,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              4,
+              4,
+              2,
+              "Site 4",
+              "{\"x\":500040,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            [
+              "key"
+            ],
+            [
+              "objectid"
+            ],
+            [
+              "shape"
+            ]
+          ]
+        }
+      },
+      "domains": [
+        {
+          "name": "StatusDomain",
+          "description": "Site status",
+          "type": "Short",
+          "kind": "CodedValue",
+          "split": "DefaultValue",
+          "merge": "DefaultValue",
+          "values": {
+            "1": "Active",
+            "2": "Closed"
+          }
+        }
+      ],
+      "relationships": {
+        "site_observations": {
+          "cardinality": "OneToMany",
+          "isComposite": false,
+          "isAttributed": false,
+          "originClassNames": [
+            "sites"
+          ],
+          "destinationClassNames": [
+            "observations"
+          ],
+          "originClassKeys": [
+            [
+              "KEY",
+              "OriginPrimary",
+              ""
+            ],
+            [
+              "SITE_KEY",
+              "OriginForeign",
+              ""
+            ]
+          ],
+          "destinationClassKeys": [],
+          "forwardPathLabel": "Observations",
+          "backwardPathLabel": "Site"
+        }
+      }
+    },
+    "actual": {
+      "classes": {
+        "observations": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "SITE_KEY",
+              "type": "Integer",
+              "alias": "SITE_KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "NOTE",
+              "type": "String",
+              "alias": "Observation",
+              "length": 40,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "a"
+            ],
+            [
+              2,
+              1,
+              "b"
+            ],
+            [
+              3,
+              3,
+              "c"
+            ]
+          ],
+          "indexes": [
+            [
+              "objectid"
+            ],
+            [
+              "site_key"
+            ]
+          ]
+        },
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "length": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "length": 2,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "StatusDomain",
+              "default": 1,
+              "precision": 0
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "length": 30,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "Site 1",
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              3,
+              1,
+              null,
+              "{\"x\":500030,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              4,
+              4,
+              2,
+              "Site 4",
+              "{\"x\":500040,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            [
+              "key"
+            ],
+            [
+              "objectid"
+            ],
+            [
+              "shape"
+            ]
+          ]
+        }
+      },
+      "domains": [
+        {
+          "name": "StatusDomain",
+          "description": "Site status",
+          "type": "Short",
+          "kind": "CodedValue",
+          "split": "DefaultValue",
+          "merge": "DefaultValue",
+          "values": {
+            "1": "Active",
+            "2": "Closed"
+          }
+        }
+      ],
+      "relationships": {
+        "site_observations": {
+          "cardinality": "OneToMany",
+          "isComposite": false,
+          "isAttributed": false,
+          "originClassNames": [
+            "sites"
+          ],
+          "destinationClassNames": [
+            "observations"
+          ],
+          "originClassKeys": [
+            [
+              "KEY",
+              "OriginPrimary",
+              ""
+            ],
+            [
+              "SITE_KEY",
+              "OriginForeign",
+              ""
+            ]
+          ],
+          "destinationClassKeys": [],
+          "forwardPathLabel": "Observations",
+          "backwardPathLabel": "Site"
+        }
+      }
+    }
+  },
+  "edg_reverse.gdb": {
+    "matches": true,
+    "expected": {
+      "classes": {
+        "observations": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "SITE_KEY",
+              "type": "Integer",
+              "alias": "SITE_KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "NOTE",
+              "type": "String",
+              "alias": "Observation",
+              "length": 40,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "a"
+            ],
+            [
+              2,
+              1,
+              "b"
+            ],
+            [
+              3,
+              3,
+              "c"
+            ]
+          ],
+          "indexes": [
+            [
+              "objectid"
+            ],
+            [
+              "site_key"
+            ]
+          ]
+        },
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "length": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "length": 2,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "StatusDomain",
+              "default": 1,
+              "precision": 0
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "length": 30,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "Site 1",
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              3,
+              1,
+              null,
+              "{\"x\":500030,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              4,
+              4,
+              2,
+              "Site 4",
+              "{\"x\":500040,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            [
+              "key"
+            ],
+            [
+              "objectid"
+            ],
+            [
+              "shape"
+            ]
+          ]
+        }
+      },
+      "domains": [
+        {
+          "name": "StatusDomain",
+          "description": "Site status",
+          "type": "Short",
+          "kind": "CodedValue",
+          "split": "DefaultValue",
+          "merge": "DefaultValue",
+          "values": {
+            "1": "Active",
+            "2": "Closed"
+          }
+        }
+      ],
+      "relationships": {
+        "site_observations": {
+          "cardinality": "OneToMany",
+          "isComposite": false,
+          "isAttributed": false,
+          "originClassNames": [
+            "sites"
+          ],
+          "destinationClassNames": [
+            "observations"
+          ],
+          "originClassKeys": [
+            [
+              "KEY",
+              "OriginPrimary",
+              ""
+            ],
+            [
+              "SITE_KEY",
+              "OriginForeign",
+              ""
+            ]
+          ],
+          "destinationClassKeys": [],
+          "forwardPathLabel": "Observations",
+          "backwardPathLabel": "Site"
+        }
+      }
+    },
+    "actual": {
+      "classes": {
+        "observations": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "SITE_KEY",
+              "type": "Integer",
+              "alias": "SITE_KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "NOTE",
+              "type": "String",
+              "alias": "Observation",
+              "length": 40,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "a"
+            ],
+            [
+              2,
+              1,
+              "b"
+            ],
+            [
+              3,
+              3,
+              "c"
+            ]
+          ],
+          "indexes": [
+            [
+              "objectid"
+            ],
+            [
+              "site_key"
+            ]
+          ]
+        },
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "length": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "length": 2,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "StatusDomain",
+              "default": 1,
+              "precision": 0
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "length": 30,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "Site 1",
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              3,
+              1,
+              null,
+              "{\"x\":500030,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              4,
+              4,
+              2,
+              "Site 4",
+              "{\"x\":500040,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            [
+              "key"
+            ],
+            [
+              "objectid"
+            ],
+            [
+              "shape"
+            ]
+          ]
+        }
+      },
+      "domains": [
+        {
+          "name": "StatusDomain",
+          "description": "Site status",
+          "type": "Short",
+          "kind": "CodedValue",
+          "split": "DefaultValue",
+          "merge": "DefaultValue",
+          "values": {
+            "1": "Active",
+            "2": "Closed"
+          }
+        }
+      ],
+      "relationships": {
+        "site_observations": {
+          "cardinality": "OneToMany",
+          "isComposite": false,
+          "isAttributed": false,
+          "originClassNames": [
+            "sites"
+          ],
+          "destinationClassNames": [
+            "observations"
+          ],
+          "originClassKeys": [
+            [
+              "KEY",
+              "OriginPrimary",
+              ""
+            ],
+            [
+              "SITE_KEY",
+              "OriginForeign",
+              ""
+            ]
+          ],
+          "destinationClassKeys": [],
+          "forwardPathLabel": "Observations",
+          "backwardPathLabel": "Site"
+        }
+      }
+    }
+  },
+  "edg_schema.gdb": {
+    "matches": true,
+    "expected": {
+      "classes": {
+        "observations": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "SITE_KEY",
+              "type": "Integer",
+              "alias": "SITE_KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "NOTE",
+              "type": "String",
+              "alias": "Observation",
+              "length": 40,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [],
+          "indexes": [
+            [
+              "objectid"
+            ],
+            [
+              "site_key"
+            ]
+          ]
+        },
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "length": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "length": 2,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "StatusDomain",
+              "default": 1,
+              "precision": 0
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "length": 30,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [],
+          "indexes": [
+            [
+              "key"
+            ],
+            [
+              "objectid"
+            ],
+            [
+              "shape"
+            ]
+          ]
+        }
+      },
+      "domains": [
+        {
+          "name": "StatusDomain",
+          "description": "Site status",
+          "type": "Short",
+          "kind": "CodedValue",
+          "split": "DefaultValue",
+          "merge": "DefaultValue",
+          "values": {
+            "1": "Active",
+            "2": "Closed"
+          }
+        }
+      ],
+      "relationships": {
+        "site_observations": {
+          "cardinality": "OneToMany",
+          "isComposite": false,
+          "isAttributed": false,
+          "originClassNames": [
+            "sites"
+          ],
+          "destinationClassNames": [
+            "observations"
+          ],
+          "originClassKeys": [
+            [
+              "KEY",
+              "OriginPrimary",
+              ""
+            ],
+            [
+              "SITE_KEY",
+              "OriginForeign",
+              ""
+            ]
+          ],
+          "destinationClassKeys": [],
+          "forwardPathLabel": "Observations",
+          "backwardPathLabel": "Site"
+        }
+      }
+    },
+    "actual": {
+      "classes": {
+        "observations": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "SITE_KEY",
+              "type": "Integer",
+              "alias": "SITE_KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "NOTE",
+              "type": "String",
+              "alias": "Observation",
+              "length": 40,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [],
+          "indexes": [
+            [
+              "objectid"
+            ],
+            [
+              "site_key"
+            ]
+          ]
+        },
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "length": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "length": 2,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "StatusDomain",
+              "default": 1,
+              "precision": 0
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "length": 30,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [],
+          "indexes": [
+            [
+              "key"
+            ],
+            [
+              "objectid"
+            ],
+            [
+              "shape"
+            ]
+          ]
+        }
+      },
+      "domains": [
+        {
+          "name": "StatusDomain",
+          "description": "Site status",
+          "type": "Short",
+          "kind": "CodedValue",
+          "split": "DefaultValue",
+          "merge": "DefaultValue",
+          "values": {
+            "1": "Active",
+            "2": "Closed"
+          }
+        }
+      ],
+      "relationships": {
+        "site_observations": {
+          "cardinality": "OneToMany",
+          "isComposite": false,
+          "isAttributed": false,
+          "originClassNames": [
+            "sites"
+          ],
+          "destinationClassNames": [
+            "observations"
+          ],
+          "originClassKeys": [
+            [
+              "KEY",
+              "OriginPrimary",
+              ""
+            ],
+            [
+              "SITE_KEY",
+              "OriginForeign",
+              ""
+            ]
+          ],
+          "destinationClassKeys": [],
+          "forwardPathLabel": "Observations",
+          "backwardPathLabel": "Site"
+        }
+      }
+    }
+  },
+  "edg_schema_expanded.gdb": {
+    "matches": true,
+    "expected": {
+      "classes": {
+        "observations": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "SITE_KEY",
+              "type": "Integer",
+              "alias": "SITE_KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "NOTE",
+              "type": "String",
+              "alias": "Observation",
+              "length": 40,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "a"
+            ],
+            [
+              2,
+              1,
+              "b"
+            ],
+            [
+              3,
+              3,
+              "c"
+            ]
+          ],
+          "indexes": [
+            [
+              "objectid"
+            ],
+            [
+              "site_key"
+            ]
+          ]
+        },
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "length": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "length": 2,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "StatusDomain",
+              "default": 1,
+              "precision": 0
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "length": 30,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "Site 1",
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              3,
+              1,
+              null,
+              "{\"x\":500030,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              4,
+              4,
+              2,
+              "Site 4",
+              "{\"x\":500040,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            [
+              "key"
+            ],
+            [
+              "objectid"
+            ],
+            [
+              "shape"
+            ]
+          ]
+        }
+      },
+      "domains": [
+        {
+          "name": "StatusDomain",
+          "description": "Site status",
+          "type": "Short",
+          "kind": "CodedValue",
+          "split": "DefaultValue",
+          "merge": "DefaultValue",
+          "values": {
+            "1": "Active",
+            "2": "Closed"
+          }
+        }
+      ],
+      "relationships": {
+        "site_observations": {
+          "cardinality": "OneToMany",
+          "isComposite": false,
+          "isAttributed": false,
+          "originClassNames": [
+            "sites"
+          ],
+          "destinationClassNames": [
+            "observations"
+          ],
+          "originClassKeys": [
+            [
+              "KEY",
+              "OriginPrimary",
+              ""
+            ],
+            [
+              "SITE_KEY",
+              "OriginForeign",
+              ""
+            ]
+          ],
+          "destinationClassKeys": [],
+          "forwardPathLabel": "Observations",
+          "backwardPathLabel": "Site"
+        }
+      }
+    },
+    "actual": {
+      "classes": {
+        "observations": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "SITE_KEY",
+              "type": "Integer",
+              "alias": "SITE_KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "NOTE",
+              "type": "String",
+              "alias": "Observation",
+              "length": 40,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              "a"
+            ],
+            [
+              2,
+              1,
+              "b"
+            ],
+            [
+              3,
+              3,
+              "c"
+            ]
+          ],
+          "indexes": [
+            [
+              "objectid"
+            ],
+            [
+              "site_key"
+            ]
+          ]
+        },
+        "sites": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "Shape",
+              "type": "Geometry",
+              "alias": "Shape",
+              "length": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "KEY",
+              "type": "Integer",
+              "alias": "Site KEY",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "STATUS",
+              "type": "SmallInteger",
+              "alias": "Site STATUS",
+              "length": 2,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "StatusDomain",
+              "default": 1,
+              "precision": 0
+            },
+            {
+              "name": "LABEL",
+              "type": "String",
+              "alias": "Site LABEL",
+              "length": 30,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              1,
+              1,
+              "Site 1",
+              "{\"x\":500010,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              3,
+              3,
+              1,
+              null,
+              "{\"x\":500030,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ],
+            [
+              4,
+              4,
+              2,
+              "Site 4",
+              "{\"x\":500040,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+            ]
+          ],
+          "indexes": [
+            [
+              "key"
+            ],
+            [
+              "objectid"
+            ],
+            [
+              "shape"
+            ]
+          ]
+        }
+      },
+      "domains": [
+        {
+          "name": "StatusDomain",
+          "description": "Site status",
+          "type": "Short",
+          "kind": "CodedValue",
+          "split": "DefaultValue",
+          "merge": "DefaultValue",
+          "values": {
+            "1": "Active",
+            "2": "Closed"
+          }
+        }
+      ],
+      "relationships": {
+        "site_observations": {
+          "cardinality": "OneToMany",
+          "isComposite": false,
+          "isAttributed": false,
+          "originClassNames": [
+            "sites"
+          ],
+          "destinationClassNames": [
+            "observations"
+          ],
+          "originClassKeys": [
+            [
+              "KEY",
+              "OriginPrimary",
+              ""
+            ],
+            [
+              "SITE_KEY",
+              "OriginForeign",
+              ""
+            ]
+          ],
+          "destinationClassKeys": [],
+          "forwardPathLabel": "Observations",
+          "backwardPathLabel": "Site"
+        }
+      }
+    }
+  },
+  "edg_table_all.gdb": {
+    "matches": true,
+    "expected": {
+      "classes": {
+        "unrelated": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "VALUE",
+              "type": "Integer",
+              "alias": "VALUE",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              77
+            ]
+          ],
+          "indexes": [
+            [
+              "objectid"
+            ]
+          ]
+        }
+      },
+      "domains": [],
+      "relationships": {}
+    },
+    "actual": {
+      "classes": {
+        "unrelated": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "VALUE",
+              "type": "Integer",
+              "alias": "VALUE",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [
+            [
+              1,
+              77
+            ]
+          ],
+          "indexes": [
+            [
+              "objectid"
+            ]
+          ]
+        }
+      },
+      "domains": [],
+      "relationships": {}
+    }
+  },
+  "edg_table_default.gdb": {
+    "matches": true,
+    "expected": {
+      "classes": {
+        "unrelated": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "VALUE",
+              "type": "Integer",
+              "alias": "VALUE",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [],
+          "indexes": [
+            [
+              "objectid"
+            ]
+          ]
+        }
+      },
+      "domains": [],
+      "relationships": {}
+    },
+    "actual": {
+      "classes": {
+        "unrelated": {
+          "fields": [
+            {
+              "name": "OBJECTID",
+              "type": "OID",
+              "alias": "OBJECTID",
+              "length": 4,
+              "nullable": false,
+              "required": true,
+              "editable": false,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            },
+            {
+              "name": "VALUE",
+              "type": "Integer",
+              "alias": "VALUE",
+              "length": 4,
+              "nullable": true,
+              "required": false,
+              "editable": true,
+              "domain": "",
+              "default": null,
+              "precision": 0
+            }
+          ],
+          "rows": [],
+          "indexes": [
+            [
+              "objectid"
+            ]
+          ]
+        }
+      },
+      "domains": [],
+      "relationships": {}
+    }
+  }
+}

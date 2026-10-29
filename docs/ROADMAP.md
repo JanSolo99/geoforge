@@ -818,6 +818,12 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Adjust 3D Z (reverse, constant or field shift, US-survey unit conversion): 6 in-place `a3z_*`
       cases over point, line, polygon and multipoint Z shapefiles match ArcGIS. Evidence:
       `scripts/research/adjust_3d_z/README.md`.
+- [x] Extract Data From Geodatabase (`extract_data_from_geodatabase`): single-source
+  FileGDB standalone classes/tables, DATA/SCHEMA_ONLY, new/existing destination,
+  default/all table rows, simple relationship expansion/related rows, domains,
+  field aliases/defaults, OID gaps and single-field indexes. Unsupported output
+  formats, schema reuse, geometry filters and advanced datasets refused. Public
+  `edg_*` workspace references; scope/gaps in `scripts/research/extract_data/`.
 - [x] Validate Join (message table: unindexed join fields, no-match and row-count rows;
       one-to-one match count; self-join refusal): 4 `vj_*` cases + 1 refusal match ArcGIS for
       shapefile/dBASE tables. Evidence: `scripts/research/validate_join/README.md`.

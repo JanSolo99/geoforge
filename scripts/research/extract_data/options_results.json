@@ -1,0 +1,111 @@
+{
+  "table_default": {
+    "status": "succeeded",
+    "tables": {
+      "unrelated": []
+    },
+    "relationships": [],
+    "messages": "Start Time: Friday, October 30, 2026 12:02:30 AM\nExecuting Extract Data from Geodatabase...\nExtract Data from Geodatabase successfully completed...\nSucceeded at Friday, October 30, 2026 12:02:30 AM (Elapsed Time: 0.32 seconds)"
+  },
+  "table_all": {
+    "status": "succeeded",
+    "tables": {
+      "unrelated": [
+        [
+          1
+        ]
+      ]
+    },
+    "relationships": [],
+    "messages": "Start Time: Friday, October 30, 2026 12:02:30 AM\nExecuting Extract Data from Geodatabase...\nExtract Data from Geodatabase successfully completed...\nSucceeded at Friday, October 30, 2026 12:02:30 AM (Elapsed Time: 0.16 seconds)"
+  },
+  "no_related": {
+    "status": "succeeded",
+    "tables": {
+      "observations": [],
+      "sites": [
+        [
+          1
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ]
+      ]
+    },
+    "relationships": [
+      "site_observations"
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 12:02:30 AM\nExecuting Extract Data from Geodatabase...\nExtract Data from Geodatabase successfully completed...\nSucceeded at Friday, October 30, 2026 12:02:31 AM (Elapsed Time: 0.35 seconds)"
+  },
+  "schema_expanded": {
+    "status": "succeeded",
+    "tables": {
+      "observations": [],
+      "sites": [
+        [
+          1
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ]
+      ]
+    },
+    "relationships": [
+      "site_observations"
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 12:02:31 AM\nExecuting Extract Data from Geodatabase...\nExtract Data from Geodatabase successfully completed...\nSucceeded at Friday, October 30, 2026 12:02:31 AM (Elapsed Time: 0.37 seconds)"
+  },
+  "no_expand_default": {
+    "status": "succeeded",
+    "tables": {
+      "sites": [
+        [
+          1
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ]
+      ]
+    },
+    "relationships": [],
+    "messages": "Start Time: Friday, October 30, 2026 12:02:31 AM\nExecuting Extract Data from Geodatabase...\nExtract Data from Geodatabase successfully completed...\nSucceeded at Friday, October 30, 2026 12:02:32 AM (Elapsed Time: 0.22 seconds)"
+  },
+  "both_no_expand": {
+    "status": "succeeded",
+    "tables": {
+      "observations": [],
+      "sites": [
+        [
+          1
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ]
+      ]
+    },
+    "relationships": [],
+    "messages": "Start Time: Friday, October 30, 2026 12:02:32 AM\nExecuting Extract Data from Geodatabase...\nExtract Data from Geodatabase successfully completed...\nSucceeded at Friday, October 30, 2026 12:02:32 AM (Elapsed Time: 0.32 seconds)"
+  },
+  "missing": {
+    "status": "failed",
+    "error": "Failed to execute. Parameters are not valid.\nERROR 000732: Datasets to Extract: Dataset Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\extract_base.gdb\\absent does not exist or is not supported\nFailed to execute (ExtractDataFromGeodatabase).\n",
+    "messages": "Start Time: Friday, October 30, 2026 12:02:32 AM\nFailed to execute. Parameters are not valid.\nERROR 000732: Datasets to Extract: Dataset Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\extract_base.gdb\\absent does not exist or is not supported\nFailed to execute (ExtractDataFromGeodatabase).\nFailed at Friday, October 30, 2026 12:02:32 AM (Elapsed Time: 0.01 seconds)"
+  },
+  "empty": {
+    "status": "failed",
+    "error": "Failed to execute. Parameters are not valid.\nERROR 000735: Datasets to Extract: Value is required\nFailed to execute (ExtractDataFromGeodatabase).\n",
+    "messages": "Start Time: Friday, October 30, 2026 12:02:32 AM\nFailed to execute. Parameters are not valid.\nERROR 000735: Datasets to Extract: Value is required\nFailed to execute (ExtractDataFromGeodatabase).\nFailed at Friday, October 30, 2026 12:02:32 AM (Elapsed Time: 0.00 seconds)"
+  }
+}

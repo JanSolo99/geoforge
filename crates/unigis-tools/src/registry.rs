@@ -74,6 +74,12 @@ pub trait Context {
             "workspace outputs are not supported by this host".into(),
         ))
     }
+    /// Extract geodatabase datasets. Read-only hosts must fail explicitly.
+    fn extract_data(&self, _request: &crate::extract_data::Request) -> Result<()> {
+        Err(Error::Unsupported(
+            "geodatabase extraction is not supported by this host".into(),
+        ))
+    }
     /// Add fields/domains to an existing dataset. A read-only host must fail explicitly.
     fn add_schema_fields(
         &self,
@@ -3950,5 +3956,6 @@ pub static TOOLS: &[Tool] = &[
     crate::editor_tracking::DISABLE,
     crate::editor_tracking::ENABLE,
     crate::date_precision::MIGRATE,
+    crate::extract_data::TOOL,
     crate::neighbors::COUNT_OVERLAPPING_FEATURES,
 ];

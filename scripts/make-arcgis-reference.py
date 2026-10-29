@@ -77,6 +77,28 @@ DM = ROOT / "testdata" / "dm"
 
 CASES = {
     # name: (tool, args before the output, args after the output)
+    # Extraction cases save a complete output FileGDB, including schema and relationships.
+    **{f"edg_{name}": ("management.ExtractDataFromGeodatabase",
+        [";".join("'" + str(DATA / "extract_base.gdb" / item) + "'" for item in items)],
+        [extract, out_type, expand, related, all_rows])
+       for name, items, extract, out_type, expand, related, all_rows in [
+        ("plain", ["plain"], "DATA", "NEW_FILE_GEODATABASE", "USE_DEFAULTS", "GET_RELATED", "SCHEMA_ONLY_FOR_TABLES"),
+        ("table_default", ["unrelated"], "DATA", "NEW_FILE_GEODATABASE", "USE_DEFAULTS", "GET_RELATED", "SCHEMA_ONLY_FOR_TABLES"),
+        ("table_all", ["unrelated"], "DATA", "NEW_FILE_GEODATABASE", "USE_DEFAULTS", "GET_RELATED", "ALL_RECORDS_FOR_TABLES"),
+        ("related", ["sites"], "DATA", "NEW_FILE_GEODATABASE", "USE_DEFAULTS", "GET_RELATED", "SCHEMA_ONLY_FOR_TABLES"),
+        ("reverse", ["observations"], "DATA", "NEW_FILE_GEODATABASE", "USE_DEFAULTS", "GET_RELATED", "SCHEMA_ONLY_FOR_TABLES"),
+        ("schema", ["sites"], "SCHEMA_ONLY", "NEW_FILE_GEODATABASE", "USE_DEFAULTS", "GET_RELATED", "ALL_RECORDS_FOR_TABLES"),
+        ("no_expand", ["sites"], "DATA", "NEW_FILE_GEODATABASE", "DO_NOT_ADD", "GET_RELATED", "SCHEMA_ONLY_FOR_TABLES"),
+        ("no_related", ["sites"], "DATA", "NEW_FILE_GEODATABASE", "USE_DEFAULTS", "DO_NOT_GET_RELATED", "SCHEMA_ONLY_FOR_TABLES"),
+        ("schema_expanded", ["sites"], "DATA", "NEW_FILE_GEODATABASE", "ADD_WITH_SCHEMA_ONLY", "GET_RELATED", "SCHEMA_ONLY_FOR_TABLES"),
+        ("all_expanded", ["sites"], "DATA", "NEW_FILE_GEODATABASE", "ALL_ROWS", "GET_RELATED", "SCHEMA_ONLY_FOR_TABLES"),
+        ("both", ["sites", "observations"], "DATA", "NEW_FILE_GEODATABASE", "USE_DEFAULTS", "GET_RELATED", "ALL_RECORDS_FOR_TABLES"),
+        ("both_no_expand", ["sites", "observations"], "DATA", "NEW_FILE_GEODATABASE", "DO_NOT_ADD", "GET_RELATED", "SCHEMA_ONLY_FOR_TABLES"),
+        ("duplicate", ["plain", "plain"], "DATA", "NEW_FILE_GEODATABASE", "USE_DEFAULTS", "GET_RELATED", "SCHEMA_ONLY_FOR_TABLES"),
+        ("existing", ["sites"], "DATA", "GEODATABASE", "USE_DEFAULTS", "GET_RELATED", "SCHEMA_ONLY_FOR_TABLES"),
+        ("missing", ["absent"], "DATA", "NEW_FILE_GEODATABASE", "USE_DEFAULTS", "GET_RELATED", "SCHEMA_ONLY_FOR_TABLES"),
+        ("empty", [], "DATA", "NEW_FILE_GEODATABASE", "USE_DEFAULTS", "GET_RELATED", "SCHEMA_ONLY_FOR_TABLES"),
+    ]},
     "mdhp_single": ("management.MigrateDateFieldToHighPrecision", [DATA / "migrate_date_base.gdb" / "single"], ['D1']),
     "mdhp_multiple": ("management.MigrateDateFieldToHighPrecision", [DATA / "migrate_date_base.gdb" / "multiple"], ['D1;D2']),
     "mdhp_class_dates": ("management.MigrateDateFieldToHighPrecision", [DATA / "migrate_date_base.gdb" / "class_dates"], ['D1;D2']),
@@ -2090,6 +2112,7 @@ for _tool, _id in COMBINATORIAL:
 
 
 RUN = {
+    "management.ExtractDataFromGeodatabase": ("extract_data_from_geodatabase", ["in_data", "extract_type", "out_type", "out_geodatabase", "out_xml", "out_folder_path", "out_name", "expand_feature_classes_and_tables", "reuse_schema", "get_related_data", "extract_using_geometry_features", "geometry_filter_type", "all_records_for_tables"]),
     "gp.Nibble_sa": ("nibble", ["input", "mask", "output", "values", "nodata"]),
     "gp.Filter_sa": ("filter", ["input", "output", "filter_type", "ignore_nodata"]),
     "gp.Slice_sa": ("slice", ["input", "output", "number_zones", "slice_type", "base_output_zone"]),
@@ -2299,6 +2322,34 @@ result = dict(files=sorted(files),catalogs=catalogs)
             run=run_spec("management.DeleteMultiple",[template]))
 
 
+def extract_data_case(w, name, tool, before, after):
+    """Public workspace output retained for portable native schema/value comparison."""
+    extract, out_type, expand, related, all_rows = after
+    out = OUT / f"{name}.gdb"
+    if out.exists():
+        shutil.rmtree(out)
+    if out_type == "GEODATABASE":
+        w.call("run_tool", tool="management.CreateFileGDB", args=[str(OUT), out.name])
+    public = [before[0].replace(str(ROOT), win(ROOT)).replace("/", chr(92)),
+              extract, out_type, str(out) if out_type == "GEODATABASE" else "", "",
+              str(OUT) if out_type != "GEODATABASE" else "", out.name if out_type != "GEODATABASE" else "",
+              expand, "DO_NOT_REUSE", related, "", "INTERSECTS", all_rows]
+    r = w.call("run_tool", tool=tool, args=public)
+    args = [rel(before[0]), extract, out_type, "<out>" if out_type == "GEODATABASE" else "", "",
+            "<folder>" if out_type != "GEODATABASE" else "", "<name>" if out_type != "GEODATABASE" else "",
+            expand, "DO_NOT_REUSE", related, "", "INTERSECTS", all_rows]
+    if out.exists():
+        # ArcGIS locks are process-local and must not become reference artifacts.
+        for lock in out.glob("*.lock"):
+            try:
+                lock.unlink()
+            except PermissionError:
+                pass
+    return dict(tool=tool, args=args, status=r.get("status"), workspace_extract=True,
+                messages=[m["text"] for m in r.get("messages", []) if m["severity"] > 0],
+                run=run_spec(tool,args))
+
+
 def schema_edit_case(w, tool, before, after):
     """Save geodatabase schema-only edits as portable snapshots, retaining the source."""
     source = Path(before[0])
@@ -2375,7 +2426,10 @@ def main():
         manifest["cases"] = old["cases"]
         for name in only:
             for f in OUT.glob(f"{name}.*"):
-                f.unlink()
+                if f.is_dir():
+                    shutil.rmtree(f)
+                else:
+                    f.unlink()
             if (OUT / name).is_dir():
                 shutil.rmtree(OUT / name)
     else:
@@ -2393,6 +2447,10 @@ def main():
             for a in before:
                 if isinstance(a, Path) and a.suffix == ".tif":
                     w.call("python", code=f"arcpy.management.BuildRasterAttributeTable(r'{win(a)}', 'Overwrite')")
+        if tool == "management.ExtractDataFromGeodatabase":
+            manifest["cases"][name] = extract_data_case(w, name, tool, before, after)
+            print(f"{name}: {manifest['cases'][name]['status']}")
+            continue
         if tool == "management.DeleteMultiple":
             manifest["cases"][name] = delete_multiple_case(w, before[0])
             print(f"{name}: {manifest['cases'][name]['status']}")

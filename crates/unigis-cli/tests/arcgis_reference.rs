@@ -13,6 +13,9 @@ use unigis_testkit::{esri_area, esri_length, hausdorff};
 #[path = "common/dm_cases.rs"]
 mod dm_cases;
 
+#[path = "common/workspace_extract.rs"]
+mod workspace_extract;
+
 #[path = "common/catalog_edits.rs"]
 mod catalog_edits;
 #[path = "common/schema_edits.rs"]
@@ -4504,6 +4507,13 @@ fn tools_match_arcgis_output() {
         ) || PENDING_CASES.iter().any(|p| case.starts_with(p))
         {
             continue; // not done yet
+        }
+        if info["workspace_extract"] == true {
+            let diffs = workspace_extract::compare(case, info, &root, &out_dir);
+            if !diffs.is_empty() {
+                failures.push(format!("{case}:\n    {}", diffs.join("\n    ")));
+            }
+            continue;
         }
         if info.get("catalog_edit").is_some() {
             let diffs = catalog_edits::compare(case, info, &root, &out_dir);

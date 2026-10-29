@@ -94117,6 +94117,588 @@
           "geometry_property": "PX POINT_X;PY POINT_Y"
         }
       }
+    },
+    "edg_plain": {
+      "tool": "management.ExtractDataFromGeodatabase",
+      "args": [
+        "'testdata/geoproc/extract_base.gdb/plain'",
+        "DATA",
+        "NEW_FILE_GEODATABASE",
+        "",
+        "",
+        "<folder>",
+        "<name>",
+        "USE_DEFAULTS",
+        "DO_NOT_REUSE",
+        "GET_RELATED",
+        "",
+        "INTERSECTS",
+        "SCHEMA_ONLY_FOR_TABLES"
+      ],
+      "status": "succeeded",
+      "workspace_extract": true,
+      "messages": [],
+      "run": {
+        "tool": "extract_data_from_geodatabase",
+        "params": {
+          "in_data": "'testdata/geoproc/extract_base.gdb/plain'",
+          "extract_type": "DATA",
+          "out_type": "NEW_FILE_GEODATABASE",
+          "out_folder_path": "<folder>",
+          "out_name": "<name>",
+          "expand_feature_classes_and_tables": "USE_DEFAULTS",
+          "reuse_schema": "DO_NOT_REUSE",
+          "get_related_data": "GET_RELATED",
+          "geometry_filter_type": "INTERSECTS",
+          "all_records_for_tables": "SCHEMA_ONLY_FOR_TABLES"
+        }
+      }
+    },
+    "edg_table_default": {
+      "tool": "management.ExtractDataFromGeodatabase",
+      "args": [
+        "'testdata/geoproc/extract_base.gdb/unrelated'",
+        "DATA",
+        "NEW_FILE_GEODATABASE",
+        "",
+        "",
+        "<folder>",
+        "<name>",
+        "USE_DEFAULTS",
+        "DO_NOT_REUSE",
+        "GET_RELATED",
+        "",
+        "INTERSECTS",
+        "SCHEMA_ONLY_FOR_TABLES"
+      ],
+      "status": "succeeded",
+      "workspace_extract": true,
+      "messages": [],
+      "run": {
+        "tool": "extract_data_from_geodatabase",
+        "params": {
+          "in_data": "'testdata/geoproc/extract_base.gdb/unrelated'",
+          "extract_type": "DATA",
+          "out_type": "NEW_FILE_GEODATABASE",
+          "out_folder_path": "<folder>",
+          "out_name": "<name>",
+          "expand_feature_classes_and_tables": "USE_DEFAULTS",
+          "reuse_schema": "DO_NOT_REUSE",
+          "get_related_data": "GET_RELATED",
+          "geometry_filter_type": "INTERSECTS",
+          "all_records_for_tables": "SCHEMA_ONLY_FOR_TABLES"
+        }
+      }
+    },
+    "edg_table_all": {
+      "tool": "management.ExtractDataFromGeodatabase",
+      "args": [
+        "'testdata/geoproc/extract_base.gdb/unrelated'",
+        "DATA",
+        "NEW_FILE_GEODATABASE",
+        "",
+        "",
+        "<folder>",
+        "<name>",
+        "USE_DEFAULTS",
+        "DO_NOT_REUSE",
+        "GET_RELATED",
+        "",
+        "INTERSECTS",
+        "ALL_RECORDS_FOR_TABLES"
+      ],
+      "status": "succeeded",
+      "workspace_extract": true,
+      "messages": [],
+      "run": {
+        "tool": "extract_data_from_geodatabase",
+        "params": {
+          "in_data": "'testdata/geoproc/extract_base.gdb/unrelated'",
+          "extract_type": "DATA",
+          "out_type": "NEW_FILE_GEODATABASE",
+          "out_folder_path": "<folder>",
+          "out_name": "<name>",
+          "expand_feature_classes_and_tables": "USE_DEFAULTS",
+          "reuse_schema": "DO_NOT_REUSE",
+          "get_related_data": "GET_RELATED",
+          "geometry_filter_type": "INTERSECTS",
+          "all_records_for_tables": "ALL_RECORDS_FOR_TABLES"
+        }
+      }
+    },
+    "edg_related": {
+      "tool": "management.ExtractDataFromGeodatabase",
+      "args": [
+        "'testdata/geoproc/extract_base.gdb/sites'",
+        "DATA",
+        "NEW_FILE_GEODATABASE",
+        "",
+        "",
+        "<folder>",
+        "<name>",
+        "USE_DEFAULTS",
+        "DO_NOT_REUSE",
+        "GET_RELATED",
+        "",
+        "INTERSECTS",
+        "SCHEMA_ONLY_FOR_TABLES"
+      ],
+      "status": "succeeded",
+      "workspace_extract": true,
+      "messages": [],
+      "run": {
+        "tool": "extract_data_from_geodatabase",
+        "params": {
+          "in_data": "'testdata/geoproc/extract_base.gdb/sites'",
+          "extract_type": "DATA",
+          "out_type": "NEW_FILE_GEODATABASE",
+          "out_folder_path": "<folder>",
+          "out_name": "<name>",
+          "expand_feature_classes_and_tables": "USE_DEFAULTS",
+          "reuse_schema": "DO_NOT_REUSE",
+          "get_related_data": "GET_RELATED",
+          "geometry_filter_type": "INTERSECTS",
+          "all_records_for_tables": "SCHEMA_ONLY_FOR_TABLES"
+        }
+      }
+    },
+    "edg_reverse": {
+      "tool": "management.ExtractDataFromGeodatabase",
+      "args": [
+        "'testdata/geoproc/extract_base.gdb/observations'",
+        "DATA",
+        "NEW_FILE_GEODATABASE",
+        "",
+        "",
+        "<folder>",
+        "<name>",
+        "USE_DEFAULTS",
+        "DO_NOT_REUSE",
+        "GET_RELATED",
+        "",
+        "INTERSECTS",
+        "SCHEMA_ONLY_FOR_TABLES"
+      ],
+      "status": "succeeded",
+      "workspace_extract": true,
+      "messages": [],
+      "run": {
+        "tool": "extract_data_from_geodatabase",
+        "params": {
+          "in_data": "'testdata/geoproc/extract_base.gdb/observations'",
+          "extract_type": "DATA",
+          "out_type": "NEW_FILE_GEODATABASE",
+          "out_folder_path": "<folder>",
+          "out_name": "<name>",
+          "expand_feature_classes_and_tables": "USE_DEFAULTS",
+          "reuse_schema": "DO_NOT_REUSE",
+          "get_related_data": "GET_RELATED",
+          "geometry_filter_type": "INTERSECTS",
+          "all_records_for_tables": "SCHEMA_ONLY_FOR_TABLES"
+        }
+      }
+    },
+    "edg_schema": {
+      "tool": "management.ExtractDataFromGeodatabase",
+      "args": [
+        "'testdata/geoproc/extract_base.gdb/sites'",
+        "SCHEMA_ONLY",
+        "NEW_FILE_GEODATABASE",
+        "",
+        "",
+        "<folder>",
+        "<name>",
+        "USE_DEFAULTS",
+        "DO_NOT_REUSE",
+        "GET_RELATED",
+        "",
+        "INTERSECTS",
+        "ALL_RECORDS_FOR_TABLES"
+      ],
+      "status": "succeeded",
+      "workspace_extract": true,
+      "messages": [],
+      "run": {
+        "tool": "extract_data_from_geodatabase",
+        "params": {
+          "in_data": "'testdata/geoproc/extract_base.gdb/sites'",
+          "extract_type": "SCHEMA_ONLY",
+          "out_type": "NEW_FILE_GEODATABASE",
+          "out_folder_path": "<folder>",
+          "out_name": "<name>",
+          "expand_feature_classes_and_tables": "USE_DEFAULTS",
+          "reuse_schema": "DO_NOT_REUSE",
+          "get_related_data": "GET_RELATED",
+          "geometry_filter_type": "INTERSECTS",
+          "all_records_for_tables": "ALL_RECORDS_FOR_TABLES"
+        }
+      }
+    },
+    "edg_no_expand": {
+      "tool": "management.ExtractDataFromGeodatabase",
+      "args": [
+        "'testdata/geoproc/extract_base.gdb/sites'",
+        "DATA",
+        "NEW_FILE_GEODATABASE",
+        "",
+        "",
+        "<folder>",
+        "<name>",
+        "DO_NOT_ADD",
+        "DO_NOT_REUSE",
+        "GET_RELATED",
+        "",
+        "INTERSECTS",
+        "SCHEMA_ONLY_FOR_TABLES"
+      ],
+      "status": "succeeded",
+      "workspace_extract": true,
+      "messages": [],
+      "run": {
+        "tool": "extract_data_from_geodatabase",
+        "params": {
+          "in_data": "'testdata/geoproc/extract_base.gdb/sites'",
+          "extract_type": "DATA",
+          "out_type": "NEW_FILE_GEODATABASE",
+          "out_folder_path": "<folder>",
+          "out_name": "<name>",
+          "expand_feature_classes_and_tables": "DO_NOT_ADD",
+          "reuse_schema": "DO_NOT_REUSE",
+          "get_related_data": "GET_RELATED",
+          "geometry_filter_type": "INTERSECTS",
+          "all_records_for_tables": "SCHEMA_ONLY_FOR_TABLES"
+        }
+      }
+    },
+    "edg_no_related": {
+      "tool": "management.ExtractDataFromGeodatabase",
+      "args": [
+        "'testdata/geoproc/extract_base.gdb/sites'",
+        "DATA",
+        "NEW_FILE_GEODATABASE",
+        "",
+        "",
+        "<folder>",
+        "<name>",
+        "USE_DEFAULTS",
+        "DO_NOT_REUSE",
+        "DO_NOT_GET_RELATED",
+        "",
+        "INTERSECTS",
+        "SCHEMA_ONLY_FOR_TABLES"
+      ],
+      "status": "succeeded",
+      "workspace_extract": true,
+      "messages": [],
+      "run": {
+        "tool": "extract_data_from_geodatabase",
+        "params": {
+          "in_data": "'testdata/geoproc/extract_base.gdb/sites'",
+          "extract_type": "DATA",
+          "out_type": "NEW_FILE_GEODATABASE",
+          "out_folder_path": "<folder>",
+          "out_name": "<name>",
+          "expand_feature_classes_and_tables": "USE_DEFAULTS",
+          "reuse_schema": "DO_NOT_REUSE",
+          "get_related_data": "DO_NOT_GET_RELATED",
+          "geometry_filter_type": "INTERSECTS",
+          "all_records_for_tables": "SCHEMA_ONLY_FOR_TABLES"
+        }
+      }
+    },
+    "edg_schema_expanded": {
+      "tool": "management.ExtractDataFromGeodatabase",
+      "args": [
+        "'testdata/geoproc/extract_base.gdb/sites'",
+        "DATA",
+        "NEW_FILE_GEODATABASE",
+        "",
+        "",
+        "<folder>",
+        "<name>",
+        "ADD_WITH_SCHEMA_ONLY",
+        "DO_NOT_REUSE",
+        "GET_RELATED",
+        "",
+        "INTERSECTS",
+        "SCHEMA_ONLY_FOR_TABLES"
+      ],
+      "status": "succeeded",
+      "workspace_extract": true,
+      "messages": [],
+      "run": {
+        "tool": "extract_data_from_geodatabase",
+        "params": {
+          "in_data": "'testdata/geoproc/extract_base.gdb/sites'",
+          "extract_type": "DATA",
+          "out_type": "NEW_FILE_GEODATABASE",
+          "out_folder_path": "<folder>",
+          "out_name": "<name>",
+          "expand_feature_classes_and_tables": "ADD_WITH_SCHEMA_ONLY",
+          "reuse_schema": "DO_NOT_REUSE",
+          "get_related_data": "GET_RELATED",
+          "geometry_filter_type": "INTERSECTS",
+          "all_records_for_tables": "SCHEMA_ONLY_FOR_TABLES"
+        }
+      }
+    },
+    "edg_all_expanded": {
+      "tool": "management.ExtractDataFromGeodatabase",
+      "args": [
+        "'testdata/geoproc/extract_base.gdb/sites'",
+        "DATA",
+        "NEW_FILE_GEODATABASE",
+        "",
+        "",
+        "<folder>",
+        "<name>",
+        "ALL_ROWS",
+        "DO_NOT_REUSE",
+        "GET_RELATED",
+        "",
+        "INTERSECTS",
+        "SCHEMA_ONLY_FOR_TABLES"
+      ],
+      "status": "succeeded",
+      "workspace_extract": true,
+      "messages": [],
+      "run": {
+        "tool": "extract_data_from_geodatabase",
+        "params": {
+          "in_data": "'testdata/geoproc/extract_base.gdb/sites'",
+          "extract_type": "DATA",
+          "out_type": "NEW_FILE_GEODATABASE",
+          "out_folder_path": "<folder>",
+          "out_name": "<name>",
+          "expand_feature_classes_and_tables": "ALL_ROWS",
+          "reuse_schema": "DO_NOT_REUSE",
+          "get_related_data": "GET_RELATED",
+          "geometry_filter_type": "INTERSECTS",
+          "all_records_for_tables": "SCHEMA_ONLY_FOR_TABLES"
+        }
+      }
+    },
+    "edg_both": {
+      "tool": "management.ExtractDataFromGeodatabase",
+      "args": [
+        "'testdata/geoproc/extract_base.gdb/sites';'testdata/geoproc/extract_base.gdb/observations'",
+        "DATA",
+        "NEW_FILE_GEODATABASE",
+        "",
+        "",
+        "<folder>",
+        "<name>",
+        "USE_DEFAULTS",
+        "DO_NOT_REUSE",
+        "GET_RELATED",
+        "",
+        "INTERSECTS",
+        "ALL_RECORDS_FOR_TABLES"
+      ],
+      "status": "succeeded",
+      "workspace_extract": true,
+      "messages": [],
+      "run": {
+        "tool": "extract_data_from_geodatabase",
+        "params": {
+          "in_data": "'testdata/geoproc/extract_base.gdb/sites';'testdata/geoproc/extract_base.gdb/observations'",
+          "extract_type": "DATA",
+          "out_type": "NEW_FILE_GEODATABASE",
+          "out_folder_path": "<folder>",
+          "out_name": "<name>",
+          "expand_feature_classes_and_tables": "USE_DEFAULTS",
+          "reuse_schema": "DO_NOT_REUSE",
+          "get_related_data": "GET_RELATED",
+          "geometry_filter_type": "INTERSECTS",
+          "all_records_for_tables": "ALL_RECORDS_FOR_TABLES"
+        }
+      }
+    },
+    "edg_both_no_expand": {
+      "tool": "management.ExtractDataFromGeodatabase",
+      "args": [
+        "'testdata/geoproc/extract_base.gdb/sites';'testdata/geoproc/extract_base.gdb/observations'",
+        "DATA",
+        "NEW_FILE_GEODATABASE",
+        "",
+        "",
+        "<folder>",
+        "<name>",
+        "DO_NOT_ADD",
+        "DO_NOT_REUSE",
+        "GET_RELATED",
+        "",
+        "INTERSECTS",
+        "SCHEMA_ONLY_FOR_TABLES"
+      ],
+      "status": "succeeded",
+      "workspace_extract": true,
+      "messages": [],
+      "run": {
+        "tool": "extract_data_from_geodatabase",
+        "params": {
+          "in_data": "'testdata/geoproc/extract_base.gdb/sites';'testdata/geoproc/extract_base.gdb/observations'",
+          "extract_type": "DATA",
+          "out_type": "NEW_FILE_GEODATABASE",
+          "out_folder_path": "<folder>",
+          "out_name": "<name>",
+          "expand_feature_classes_and_tables": "DO_NOT_ADD",
+          "reuse_schema": "DO_NOT_REUSE",
+          "get_related_data": "GET_RELATED",
+          "geometry_filter_type": "INTERSECTS",
+          "all_records_for_tables": "SCHEMA_ONLY_FOR_TABLES"
+        }
+      }
+    },
+    "edg_duplicate": {
+      "tool": "management.ExtractDataFromGeodatabase",
+      "args": [
+        "'testdata/geoproc/extract_base.gdb/plain';'testdata/geoproc/extract_base.gdb/plain'",
+        "DATA",
+        "NEW_FILE_GEODATABASE",
+        "",
+        "",
+        "<folder>",
+        "<name>",
+        "USE_DEFAULTS",
+        "DO_NOT_REUSE",
+        "GET_RELATED",
+        "",
+        "INTERSECTS",
+        "SCHEMA_ONLY_FOR_TABLES"
+      ],
+      "status": "succeeded",
+      "workspace_extract": true,
+      "messages": [],
+      "run": {
+        "tool": "extract_data_from_geodatabase",
+        "params": {
+          "in_data": "'testdata/geoproc/extract_base.gdb/plain';'testdata/geoproc/extract_base.gdb/plain'",
+          "extract_type": "DATA",
+          "out_type": "NEW_FILE_GEODATABASE",
+          "out_folder_path": "<folder>",
+          "out_name": "<name>",
+          "expand_feature_classes_and_tables": "USE_DEFAULTS",
+          "reuse_schema": "DO_NOT_REUSE",
+          "get_related_data": "GET_RELATED",
+          "geometry_filter_type": "INTERSECTS",
+          "all_records_for_tables": "SCHEMA_ONLY_FOR_TABLES"
+        }
+      }
+    },
+    "edg_existing": {
+      "tool": "management.ExtractDataFromGeodatabase",
+      "args": [
+        "'testdata/geoproc/extract_base.gdb/sites'",
+        "DATA",
+        "GEODATABASE",
+        "<out>",
+        "",
+        "",
+        "",
+        "USE_DEFAULTS",
+        "DO_NOT_REUSE",
+        "GET_RELATED",
+        "",
+        "INTERSECTS",
+        "SCHEMA_ONLY_FOR_TABLES"
+      ],
+      "status": "succeeded",
+      "workspace_extract": true,
+      "messages": [],
+      "run": {
+        "tool": "extract_data_from_geodatabase",
+        "params": {
+          "in_data": "'testdata/geoproc/extract_base.gdb/sites'",
+          "extract_type": "DATA",
+          "out_type": "GEODATABASE",
+          "out_geodatabase": "<out>",
+          "expand_feature_classes_and_tables": "USE_DEFAULTS",
+          "reuse_schema": "DO_NOT_REUSE",
+          "get_related_data": "GET_RELATED",
+          "geometry_filter_type": "INTERSECTS",
+          "all_records_for_tables": "SCHEMA_ONLY_FOR_TABLES"
+        }
+      }
+    },
+    "edg_missing": {
+      "tool": "management.ExtractDataFromGeodatabase",
+      "args": [
+        "'testdata/geoproc/extract_base.gdb/absent'",
+        "DATA",
+        "NEW_FILE_GEODATABASE",
+        "",
+        "",
+        "<folder>",
+        "<name>",
+        "USE_DEFAULTS",
+        "DO_NOT_REUSE",
+        "GET_RELATED",
+        "",
+        "INTERSECTS",
+        "SCHEMA_ONLY_FOR_TABLES"
+      ],
+      "status": "failed",
+      "workspace_extract": true,
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000732: Datasets to Extract: Dataset /mnt/media/ArcGIS_Linux/testdata/geoproc/extract_base.gdb/absent does not exist or is not supported",
+        "Failed to execute (ExtractDataFromGeodatabase)."
+      ],
+      "run": {
+        "tool": "extract_data_from_geodatabase",
+        "params": {
+          "in_data": "'testdata/geoproc/extract_base.gdb/absent'",
+          "extract_type": "DATA",
+          "out_type": "NEW_FILE_GEODATABASE",
+          "out_folder_path": "<folder>",
+          "out_name": "<name>",
+          "expand_feature_classes_and_tables": "USE_DEFAULTS",
+          "reuse_schema": "DO_NOT_REUSE",
+          "get_related_data": "GET_RELATED",
+          "geometry_filter_type": "INTERSECTS",
+          "all_records_for_tables": "SCHEMA_ONLY_FOR_TABLES"
+        }
+      }
+    },
+    "edg_empty": {
+      "tool": "management.ExtractDataFromGeodatabase",
+      "args": [
+        "",
+        "DATA",
+        "NEW_FILE_GEODATABASE",
+        "",
+        "",
+        "<folder>",
+        "<name>",
+        "USE_DEFAULTS",
+        "DO_NOT_REUSE",
+        "GET_RELATED",
+        "",
+        "INTERSECTS",
+        "SCHEMA_ONLY_FOR_TABLES"
+      ],
+      "status": "failed",
+      "workspace_extract": true,
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000735: Datasets to Extract: Value is required",
+        "Failed to execute (ExtractDataFromGeodatabase)."
+      ],
+      "run": {
+        "tool": "extract_data_from_geodatabase",
+        "params": {
+          "extract_type": "DATA",
+          "out_type": "NEW_FILE_GEODATABASE",
+          "out_folder_path": "<folder>",
+          "out_name": "<name>",
+          "expand_feature_classes_and_tables": "USE_DEFAULTS",
+          "reuse_schema": "DO_NOT_REUSE",
+          "get_related_data": "GET_RELATED",
+          "geometry_filter_type": "INTERSECTS",
+          "all_records_for_tables": "SCHEMA_ONLY_FOR_TABLES"
+        }
+      }
     }
   }
 }

@@ -1,0 +1,14 @@
+{
+  "omitted": {
+    "sites": 3,
+    "observations": 0
+  },
+  "explicit_get": {
+    "sites": 3,
+    "observations": 3
+  },
+  "explicit_no": {
+    "sites": 3,
+    "observations": 0
+  }
+}

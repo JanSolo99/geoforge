@@ -81,6 +81,15 @@ Update this file when a gap is found or closed.
 - Probed and left: Zonal Fill (fill = boundary minimum but zones 1 and 2 of the zones raster share one value: merged-catchment rule unknown), Cut Fill (region numbering), Surface Area Ratio (neither Jenness nor 1/cos(slope) fits), Boundary Clean, Aggregate Points, Sample (column naming), Trim Line: no Z/M/curves, brute-force O(n^2), exact-length dangles kept (ArcGIS decides those ties by crossing-point rounding). Extend Line: no Z/M/curves; brute-force O(n^2) segment search; ArcGIS's inclusive exact-length behaviour on memory/geodatabase edits (vs strict on shapefiles) is not modelled.
 - Calculate Geometry Attributes: planar only; no Z/M, geodesic or coordinate-notation properties, no coordinate_system/coordinate_format, text targets untested. Evidence: `scripts/research/calculate_geometry_attributes/README.md`.
 - Adjust 3D Z: the z-domain check (ArcGIS leaves features whose new z leaves the class's z domain unchanged, WARNING 002631) is not made. Evidence: `scripts/research/adjust_3d_z/README.md`.
+- Extract Data From Geodatabase: one source FileGDB, standalone classes/tables and
+  simple non-OBJECTID key relationships only. Feature datasets, attributed/many-to-many/
+  OBJECTID-key relationships, tracking/COGO/attachments, geometry filters, schema reuse,
+  XML/mobile outputs and multiple sources are refused. Environment extent/output CRS,
+  selections, replica/GlobalID semantics and advanced extensions unverified. Keeps
+  source index names where ArcGIS regenerates DSID-based names; class-level aliases/
+  extension metadata are not copied. Chains/composite cascades, unusual key casing/
+  types and Z/M/curve data unverified. Loads rows in memory. Public controls and
+  dynamic related-data default: `scripts/research/extract_data/README.md`.
 - Validate Join: shapefile/dBASE tables only (geodatabase indexes and table names, invalid-character/workspace/OID checks and one-to-many messages not modelled); the match and row counts are not returned as values. Evidence: `scripts/research/validate_join/README.md`.
 - Convert Time Zone: IANA rules stand in for Windows ones (identical on all probes, 1999-2025); Mid-Atlantic and Kamchatka Standard Time refused (ArcGIS fails on the first); time-zone fields and date-only/timestamp-offset fields are not supported. Evidence: `scripts/research/convert_time_zone/README.md`.
 - Convert Temporal Field: no time zone conversion, no DATEONLY/TIMEONLY/TIMESTAMP_OFFSET outputs, only .NET-style patterns (no ArcGIS format keywords such as `Unix time`); unconverted rows of numeric outputs are null in ArcGIS's dBASE output but 0 in ours (our writer stores numeric nulls as 0). Evidence: `scripts/research/convert_time_field/README.md`.

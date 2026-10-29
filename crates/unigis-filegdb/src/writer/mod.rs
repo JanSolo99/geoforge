@@ -12,6 +12,7 @@ mod date_precision;
 mod domain_edit;
 mod edit;
 mod editor_tracking;
+mod extract;
 mod geometry;
 mod index_edit;
 mod keys;
@@ -46,6 +47,7 @@ pub use domain_edit::{
 };
 pub use edit::{TableEditor, delete_rows};
 pub use editor_tracking::{disable_editor_tracking, enable_editor_tracking};
+pub use extract::{Expand, ExtractOptions, extract_data};
 pub use index_edit::{add_attribute_index, remove_attribute_index};
 pub use rebuild::rebuild_attribute_indexes;
 pub use rewrite::{add_field, delete_fields, rewrite_table, truncate_table};
@@ -789,7 +791,7 @@ impl GeodatabaseWriter {
         } = t.writer.finish()?;
         let mut fields = t.fields.clone();
         for f in &mut fields {
-            f.high_precision = subsecond.contains(&f.name);
+            f.high_precision = f.high_precision || subsecond.contains(&f.name);
         }
         let mut def = t.def.clone();
         if let Some(d) = &mut def {

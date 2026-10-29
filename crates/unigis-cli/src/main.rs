@@ -2705,6 +2705,76 @@ fn main() -> ExitCode {
                 ) -> Result<()> {
                     write_workspace_outputs(Path::new(workspace), outputs)
                 }
+                fn extract_data(
+                    &self,
+                    request: &unigis_tools::extract_data::Request,
+                ) -> Result<()> {
+                    let mut source = None;
+                    let mut names = Vec::new();
+                    for input in &request.inputs {
+                        let Location::Geodatabase {
+                            gdb,
+                            item: Some(name),
+                        } = locate(Path::new(input))
+                        else {
+                            return Err(Error::Unsupported(
+                                "extraction requires FileGDB table or feature class paths".into(),
+                            ));
+                        };
+                        let actual = std::fs::canonicalize(&gdb).map_err(|e| Error::io(&gdb, e))?;
+                        if source.as_ref().is_some_and(|s| s != &actual) {
+                            return Err(Error::Unsupported(
+                                "extraction from multiple source geodatabases is not supported"
+                                    .into(),
+                            ));
+                        }
+                        source = Some(actual);
+                        names.push(name);
+                    }
+                    let source = source.ok_or_else(|| {
+                        Error::Unsupported(
+                            "ERROR 000735: Datasets to Extract: Value is required".into(),
+                        )
+                    })?;
+                    let destination = Path::new(&request.destination);
+                    if !destination
+                        .extension()
+                        .is_some_and(|e| e.eq_ignore_ascii_case("gdb"))
+                    {
+                        return Err(Error::Unsupported(
+                            "extraction destination must be a FileGDB".into(),
+                        ));
+                    }
+                    if request.create_new && !destination.parent().is_some_and(Path::is_dir) {
+                        return Err(Error::Unsupported(
+                            "geodatabase output folder must already exist".into(),
+                        ));
+                    }
+                    use unigis_filegdb::{Expand, ExtractOptions};
+                    let expand = match request.expand.as_str() {
+                        "USE_DEFAULTS" => Expand::Defaults,
+                        "ADD_WITH_SCHEMA_ONLY" => Expand::SchemaOnly,
+                        "ALL_ROWS" => Expand::AllRows,
+                        "DO_NOT_ADD" => Expand::None,
+                        _ => {
+                            return Err(Error::Unsupported(
+                                "invalid extraction expansion option".into(),
+                            ));
+                        }
+                    };
+                    unigis_filegdb::extract_data(
+                        &source,
+                        &names,
+                        destination,
+                        request.create_new,
+                        ExtractOptions {
+                            schema_only: request.schema_only,
+                            expand,
+                            related: request.related,
+                            all_table_rows: request.all_table_rows,
+                        },
+                    )
+                }
                 fn add_schema_fields(
                     &self,
                     input: &str,
