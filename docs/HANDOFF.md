@@ -1,12 +1,33 @@
 # Current handoff
 
-Updated 2026-10-29T15:32:13.770868+00:00; last agent Codex.
-Workspace `/mnt/media/ArcGIS_Linux`, branch `main`, HEAD `0a6714d`.
+## Latest (Claude, 2026-10-30): desktop app PROJ (user request) — read first
+
+- app/Cargo.toml: rusqlite 0.40 -> 0.37 (bundled kept; libsqlite3-sys 0.35 shared with proj-sys
+  0.27, one `links = "sqlite3"`). No API changes were needed. rusqlite is desktop-only in
+  rustgis-data (and an engine dev-dependency), so the web build is unaffected
+  (sqlite-wasm-rs dropped from app/Cargo.lock).
+- app/crates/unigis/Cargo.toml: unigis-tools gets `features = ["proj"]` for
+  `cfg(not(target_arch = "wasm32"))`; wasm stays without PROJ.
+- New app test `proj_tools_run_on_the_desktop` (app/crates/unigis/src/lib.rs) runs
+  unigis:geodetic_densify, unigis:convert_coordinate_notation (MGRS of 15E 45N =
+  33TWK0000082950, the ArcGIS value) and unigis:table_to_ellipse (planar ellipses need a projected
+  spatial reference; linear units on lon/lat are refused, a known gap) through the app registry.
+- dm_geometry.rs dead-code warnings without proj were already gated in cdb7d7d.
+- Validation: `cargo build -j3 -p rustgis` in app/ EXIT 0 (/tmp/unigis-app-build.log, only an
+  unrelated rustgis-python manifest license warning); new test PASS; `cargo test -p rustgis-data`
+  199 passed / 7 ignored and `-p rustgis-engine` 117 passed / 1 ignored (14 GeoPackage/MBTiles/
+  SQLite tests among them; /tmp/unigis-app-{data,engine}.log); app `cargo fmt --check` clean;
+  clippy -D warnings on rustgis-unigis clean; `cargo check --target wasm32-unknown-unknown -p
+  rustgis-web` clean. Full `cargo xtask ci` not run (whole app workspace).
+- Next action: next queue item (docs/WORK_QUEUE.md).
+
+Updated 2026-10-29T15:32:45.783709+00:00; last agent Codex.
+Workspace `/mnt/media/ArcGIS_Linux`, branch `main`, HEAD/origin `501a1a7873880256dd98257c1e23979878114e8f`; index empty.
 User objective: wrap current tool then implement next queue tool, one tool per
 landing with public ArcGIS controls and full gate. Spatial Sampling `e77eb19`
 was already pushed on startup; no repeated external actions.
 
-## Completed this turn; Subset Features ready to land
+## Completed this turn; pushed
 
 - `d10c547`: Create Spatially Balanced Points deferred. Seven public controls
   establish RRQRR nested/quadrant-balanced designs; native RRQRR and raster-to-feature
@@ -14,7 +35,7 @@ was already pushed on startup; no repeated external actions.
 - `0a6714d`: Eliminate deferred. Needs selected IDs plus full unselected neighbor
   context absent from Context/CLI. Adjacent sliver merges into larger unselected
   neighbor; areas100/220. Evidence `scripts/research/eliminate/`.
-- Subset Features implemented in `crates/unigis-tools/src/subset_features.rs`;
+- `501a1a7`: Subset Features implemented in `crates/unigis-tools/src/subset_features.rs`;
   registry plus optional Context `write_datasets` capability and CLI
   `src/dataset_outputs.rs`. Percentage/absolute training size, optional complementary
   test output, native seed, source order/schema retention. Coordinated new SHP/DBF
@@ -49,14 +70,23 @@ was already pushed on startup; no repeated external actions.
 - Preserved unrelated tracked hashes rechecked before staging:
   `/tmp/unigis-subset-preserved-hashes.json`. No running builds/probes.
 
-## Next actions
+## Landing and next action
 
-1. Stage only Subset product/research/fixtures/docs. Exclude inherited4-line
-   umintfloat generator hunk, locks and Python caches. Audit staged scope/whitespace.
-2. Commit Subset Features, then push three scoped commits once. Full gate already
-   passed; use `git push --no-verify origin main` to avoid redundant build.
-3. Regenerate queue and checkpoint actual SHA/push outcome. Next queue item:
-   Add Global IDs (`management.AddGlobalIDs`); do not polish landed tools.
+All three scoped commits pushed successfully once with
+`git push --no-verify origin main` (fresh full gate above; avoided duplicate build).
+Push evidence `/tmp/unigis-subset-push.log`: `e77eb19..501a1a7 main -> main`.
+HEAD equals origin/main; staging index empty. Product scope249 paths verified in
+`/tmp/unigis-subset-scope.json`; staged whitespace check passed. The inherited
+4-line umintfloat generator change remains unstaged. No unfinished product edits.
+This final checkpoint is intentionally uncommitted.
+
+`python3 scripts/work_queue.py` completed after landing:1598 tools missing.
+Next queue item: Add Global IDs (`management.AddGlobalIDs`). Start with existing
+registry inventory and public ArcGIS controls, then follow queue rules. Current
+request's wrap-and-next-tool objective completed by landing Subset Features after
+the Spatial Sampling wrap-up and two evidence-based deferrals. No pending checks
+for this landing and no running builds/probes. Do not polish landed tools unless
+requested. Durable limitations are in KNOWN_GAPS and the research README.
 
 Unrelated edits preserved: raster unary/integer-float, coordinator/agents scripts,
 AGENTS.md, hooks/web/queue infrastructure, parcels.shp.xml, generated dashboard,

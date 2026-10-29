@@ -2543,4 +2543,61 @@ mod tests {
             }
         }
     }
+
+    /// The tools that need PROJ run in the desktop app (the browser build has no PROJ).
+    #[cfg(not(target_arch = "wasm32"))]
+    #[test]
+    fn proj_tools_run_on_the_desktop() {
+        register();
+        let mut line = Dataset::new("line", GeometryType::Polyline, vec![Field::new("N", FieldType::Integer)]);
+        line.push(Some(Geometry::Line(vec![vec![Coord::new(0.0, 0.0), Coord::new(10.0, 0.0)]])), vec![Value::Int(1)]);
+        let mut pts = Dataset::new(
+            "pts",
+            GeometryType::Point,
+            vec![
+                Field::new("LON", FieldType::Double),
+                Field::new("LAT", FieldType::Double),
+                Field::new("MAJ", FieldType::Double),
+                Field::new("MIN", FieldType::Double),
+                Field::new("X", FieldType::Double),
+                Field::new("Y", FieldType::Double),
+            ],
+        );
+        pts.push(
+            Some(Geometry::Point(Coord::new(15.0, 45.0))),
+            vec![
+                Value::Float(15.0),
+                Value::Float(45.0),
+                Value::Float(2000.0),
+                Value::Float(1000.0),
+                Value::Float(500_000.0),
+                Value::Float(4_983_948.0),
+            ],
+        );
+        let layers = Layers(vec![line, pts]);
+        let dense = dataset(rustgis_analysis::run(
+            "unigis:geodetic_densify",
+            &layers,
+            &json!({"input": "line", "densify_method": "GEODESIC", "max_segment_length": "100 Kilometers"}),
+        ));
+        let vertices = match &dense.features[0].geometry {
+            Some(Geometry::Line(parts)) => parts.iter().map(Vec::len).sum::<usize>(),
+            _ => 0,
+        };
+        assert!(vertices > 2, "densified line has {vertices} vertices");
+        let notation = dataset(rustgis_analysis::run(
+            "unigis:convert_coordinate_notation",
+            &layers,
+            &json!({"input": "pts", "x_field": "LON", "y_field": "LAT", "input_format": "DD_2", "output_format": "MGRS"}),
+        ));
+        let i = notation.fields.iter().position(|f| f.name == "MGRS").expect("an MGRS field");
+        assert_eq!(notation.features[0].attrs[i], Value::Text("33TWK0000082950".into()));
+        // Planar ellipses: linear units need a projected coordinate system (UTM 33N here).
+        let ellipse = dataset(rustgis_analysis::run(
+            "unigis:table_to_ellipse",
+            &layers,
+            &json!({"input": "pts", "x_field": "X", "y_field": "Y", "major_field": "MAJ", "minor_field": "MIN", "distance_units": "METERS", "spatial_reference": "32633"}),
+        ));
+        assert!(matches!(ellipse.features[0].geometry, Some(Geometry::Polygon(_))));
+    }
 }
