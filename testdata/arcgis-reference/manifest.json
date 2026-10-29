@@ -86242,6 +86242,832 @@
           "output_field_script": "SCRIPT"
         }
       }
+    },
+    "ctf_date_iso": {
+      "tool": "management.ConvertTimeField",
+      "args": [
+        "testdata/geoproc/dates.dbf",
+        "<out>",
+        "D",
+        null,
+        "OUT",
+        "TEXT",
+        "yyyy-MM-dd"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 002125: Unable to convert part of the values from D to OUT."
+      ],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "GRP",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "D",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "E",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "OUT",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "convert_time_field",
+        "params": {
+          "input": "testdata/geoproc/dates.dbf",
+          "output": "<out>",
+          "input_time_field": "D",
+          "output_time_field": "OUT",
+          "output_time_type": "TEXT",
+          "output_time_format": "yyyy-MM-dd"
+        }
+      }
+    },
+    "ctf_date_us": {
+      "tool": "management.ConvertTimeField",
+      "args": [
+        "testdata/geoproc/dates.dbf",
+        "<out>",
+        "D",
+        null,
+        "OUT",
+        "TEXT",
+        "MM/dd/yyyy"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 002125: Unable to convert part of the values from D to OUT."
+      ],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "GRP",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "D",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "E",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "OUT",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "convert_time_field",
+        "params": {
+          "input": "testdata/geoproc/dates.dbf",
+          "output": "<out>",
+          "input_time_field": "D",
+          "output_time_field": "OUT",
+          "output_time_type": "TEXT",
+          "output_time_format": "MM/dd/yyyy"
+        }
+      }
+    },
+    "ctf_date_default_text": {
+      "tool": "management.ConvertTimeField",
+      "args": [
+        "testdata/geoproc/dates.dbf",
+        "<out>",
+        "D",
+        null,
+        "OUT",
+        "TEXT"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 002125: Unable to convert part of the values from D to OUT."
+      ],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "GRP",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "D",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "E",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "OUT",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "convert_time_field",
+        "params": {
+          "input": "testdata/geoproc/dates.dbf",
+          "output": "<out>",
+          "input_time_field": "D",
+          "output_time_field": "OUT",
+          "output_time_type": "TEXT"
+        }
+      }
+    },
+    "ctf_date_names": {
+      "tool": "management.ConvertTimeField",
+      "args": [
+        "testdata/geoproc/dates.dbf",
+        "<out>",
+        "E",
+        null,
+        "OUT",
+        "TEXT",
+        "dddd, dd MMMM yyyy"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 002125: Unable to convert part of the values from E to OUT."
+      ],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "GRP",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "D",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "E",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "OUT",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "convert_time_field",
+        "params": {
+          "input": "testdata/geoproc/dates.dbf",
+          "output": "<out>",
+          "input_time_field": "E",
+          "output_time_field": "OUT",
+          "output_time_type": "TEXT",
+          "output_time_format": "dddd, dd MMMM yyyy"
+        }
+      }
+    },
+    "ctf_text_compact": {
+      "tool": "management.ConvertTimeField",
+      "args": [
+        "testdata/geoproc/ctf_text.dbf",
+        "<out>",
+        "S1",
+        "yyyyMMdd",
+        "OUT",
+        "DATE"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 002125: Unable to convert part of the values from S1 to OUT."
+      ],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "S1",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "S2",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "S3",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "S4",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "N1",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "OUT",
+          "Date",
+          8,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "convert_time_field",
+        "params": {
+          "input": "testdata/geoproc/ctf_text.dbf",
+          "output": "<out>",
+          "input_time_field": "S1",
+          "input_time_format": "yyyyMMdd",
+          "output_time_field": "OUT",
+          "output_time_type": "DATE"
+        }
+      }
+    },
+    "ctf_text_us": {
+      "tool": "management.ConvertTimeField",
+      "args": [
+        "testdata/geoproc/ctf_text.dbf",
+        "<out>",
+        "S2",
+        "MM/dd/yyyy",
+        "OUT",
+        "DATE"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 002125: Unable to convert part of the values from S2 to OUT."
+      ],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "S1",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "S2",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "S3",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "S4",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "N1",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "OUT",
+          "Date",
+          8,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "convert_time_field",
+        "params": {
+          "input": "testdata/geoproc/ctf_text.dbf",
+          "output": "<out>",
+          "input_time_field": "S2",
+          "input_time_format": "MM/dd/yyyy",
+          "output_time_field": "OUT",
+          "output_time_type": "DATE"
+        }
+      }
+    },
+    "ctf_text_time": {
+      "tool": "management.ConvertTimeField",
+      "args": [
+        "testdata/geoproc/ctf_text.dbf",
+        "<out>",
+        "S3",
+        "yyyy-MM-dd HH:mm:ss",
+        "OUT",
+        "DATE"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 002125: Unable to convert part of the values from S3 to OUT."
+      ],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "S1",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "S2",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "S3",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "S4",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "N1",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "OUT",
+          "Date",
+          8,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "convert_time_field",
+        "params": {
+          "input": "testdata/geoproc/ctf_text.dbf",
+          "output": "<out>",
+          "input_time_field": "S3",
+          "input_time_format": "yyyy-MM-dd HH:mm:ss",
+          "output_time_field": "OUT",
+          "output_time_type": "DATE"
+        }
+      }
+    },
+    "ctf_text_month": {
+      "tool": "management.ConvertTimeField",
+      "args": [
+        "testdata/geoproc/ctf_text.dbf",
+        "<out>",
+        "S4",
+        "d MMMM yyyy",
+        "OUT",
+        "DATE"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 002125: Unable to convert part of the values from S4 to OUT."
+      ],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "S1",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "S2",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "S3",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "S4",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "N1",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "OUT",
+          "Date",
+          8,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "convert_time_field",
+        "params": {
+          "input": "testdata/geoproc/ctf_text.dbf",
+          "output": "<out>",
+          "input_time_field": "S4",
+          "input_time_format": "d MMMM yyyy",
+          "output_time_field": "OUT",
+          "output_time_type": "DATE"
+        }
+      }
+    },
+    "ctf_long_date": {
+      "tool": "management.ConvertTimeField",
+      "args": [
+        "testdata/geoproc/ctf_text.dbf",
+        "<out>",
+        "N1",
+        "yyyyMMdd",
+        "OUT",
+        "DATE"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 002125: Unable to convert part of the values from N1 to OUT."
+      ],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "S1",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "S2",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "S3",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "S4",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "N1",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "OUT",
+          "Date",
+          8,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "convert_time_field",
+        "params": {
+          "input": "testdata/geoproc/ctf_text.dbf",
+          "output": "<out>",
+          "input_time_field": "N1",
+          "input_time_format": "yyyyMMdd",
+          "output_time_field": "OUT",
+          "output_time_type": "DATE"
+        }
+      }
+    },
+    "ctf_text_to_text": {
+      "tool": "management.ConvertTimeField",
+      "args": [
+        "testdata/geoproc/ctf_text.dbf",
+        "<out>",
+        "S1",
+        "yyyyMMdd",
+        "OUT",
+        "TEXT",
+        "dd.MM.yyyy"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 002125: Unable to convert part of the values from S1 to OUT."
+      ],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "S1",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "S2",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "S3",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "S4",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "N1",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "OUT",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "convert_time_field",
+        "params": {
+          "input": "testdata/geoproc/ctf_text.dbf",
+          "output": "<out>",
+          "input_time_field": "S1",
+          "input_time_format": "yyyyMMdd",
+          "output_time_field": "OUT",
+          "output_time_type": "TEXT",
+          "output_time_format": "dd.MM.yyyy"
+        }
+      }
+    },
+    "ctf_err_none": {
+      "tool": "management.ConvertTimeField",
+      "args": [
+        "testdata/geoproc/ctf_text.dbf",
+        "<out>",
+        "S3",
+        null,
+        "OUT",
+        "DATE"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 002126: Unable to convert all of the values from S3 to OUT.",
+        "Failed to execute (ConvertTimeField)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "convert_time_field",
+        "params": {
+          "input": "testdata/geoproc/ctf_text.dbf",
+          "output": "<out>",
+          "input_time_field": "S3",
+          "output_time_field": "OUT",
+          "output_time_type": "DATE"
+        }
+      }
     }
   }
 }

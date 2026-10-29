@@ -502,6 +502,29 @@ fn generate_transects_along_lines(ctx: &dyn Context) -> Result<ToolOutput> {
     )
 }
 
+fn convert_time_field(ctx: &dyn Context) -> Result<Outcome> {
+    let t = find("convert_time_field")
+        .ok_or_else(|| Error::Unsupported("convert_time_field".into()))?;
+    let input = ctx.features("input")?;
+    let need = |k: &str| text(ctx, t, k).ok_or_else(|| Error::Unsupported(format!("missing {k}")));
+    let out = crate::temporal::convert_time_field(
+        input.as_ref(),
+        &need("input_time_field")?,
+        text(ctx, t, "input_time_format").as_deref(),
+        &need("output_time_field")?,
+        &text(ctx, t, "output_time_type").unwrap_or_else(|| "DATE".into()),
+        text(ctx, t, "output_time_format").as_deref(),
+    )?;
+    Ok(if input.geometry_kind().is_some() {
+        Outcome::Features(out)
+    } else {
+        Outcome::Table(TableOutput {
+            fields: out.fields,
+            rows: out.features.into_iter().map(|f| f.attributes).collect(),
+        })
+    })
+}
+
 fn batch_update_fields(ctx: &dyn Context) -> Result<Outcome> {
     let t = find("batch_update_fields")
         .ok_or_else(|| Error::Unsupported("batch_update_fields".into()))?;
@@ -2109,6 +2132,73 @@ pub static TOOLS: &[Tool] = &[
         output_suffix: "ODLinks",
         measures: false,
         run: Runner::Features(generate_origin_destination_links),
+    },
+    Tool {
+        id: "convert_time_field",
+        name: "Convert Temporal Field",
+        toolbox: "Data Management › Fields",
+        summary: "Writes a date field as text or numbers in a format, or reads text or numbers in a format into a date field (ArcGIS Pro Convert Temporal Field).",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Table",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "input_time_field",
+                label: "Input Time Field",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+                help: "The date, text or number field.",
+            },
+            Param {
+                name: "input_time_format",
+                label: "Input Time Format",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "For text or numeric input, e.g. `yyyyMMdd` or `MM/dd/yyyy HH:mm:ss`.",
+            },
+            Param {
+                name: "output_time_field",
+                label: "Output Time Field",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+                help: "The new field.",
+            },
+            Param {
+                name: "output_time_type",
+                label: "Output Time Type",
+                kind: Kind::Choice(&[
+                    "DATE",
+                    "TEXT",
+                    "LONG",
+                    "SHORT",
+                    "DOUBLE",
+                    "FLOAT",
+                    "BIGINTEGER",
+                ]),
+                required: false,
+                default: "DATE",
+                help: "",
+            },
+            Param {
+                name: "output_time_format",
+                label: "Output Time Format",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "For text or numeric output; text defaults to `yyyyMMddHHmmss`.",
+            },
+        ],
+        output_suffix: "Converted",
+        measures: false,
+        run: Runner::Dynamic(convert_time_field),
     },
     Tool {
         id: "batch_update_fields",

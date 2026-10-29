@@ -27,6 +27,7 @@ pub mod split_attributes;
 mod sql;
 pub mod swm;
 pub mod tables;
+pub mod temporal;
 pub mod trim;
 mod zm;
 

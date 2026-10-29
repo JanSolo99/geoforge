@@ -812,6 +812,9 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
       The angular numeric GARS boundary path remains separate follow-up work.
       Evidence: `scripts/research/coordinate_notation/grid/gars-boundaries.md`.
 
+- [x] Convert Temporal Field (date <-> text/number with .NET-style formats, lenient parsing,
+      WARNING 002125/ERROR 002126): 10 `ctf_*` in-place cases + 1 refusal match ArcGIS. Evidence:
+      `scripts/research/convert_time_field/README.md`.
 - [x] Batch Update Fields (definition-table columns; source copy with type conversion, blank
       type = source type, fixed-decimal rounding, scripts over output fields in dependency order;
       cycle/missing/type refusals): 3 `bfu_*` cases + 3 refusals match ArcGIS. Evidence:

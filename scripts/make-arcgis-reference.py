@@ -505,6 +505,17 @@ CASES = {
     "bfu_err_cycle": ("management.BatchUpdateFields", [DATA / "parcels.shp"], [DATA / "bfu_def_cycle.csv", None, "NAME", "SOURCE", "TYPE", "LEN", "ALIAS", "SCRIPT"]),
     "bfu_err_missing": ("management.BatchUpdateFields", [DATA / "parcels.shp"], [DATA / "bfu_def_missing.csv", None, "NAME", "SOURCE", "TYPE", "LEN", "ALIAS", "SCRIPT"]),
     "bfu_err_badtype": ("management.BatchUpdateFields", [DATA / "parcels.shp"], [DATA / "bfu_def_badtype.csv", None, "NAME", "SOURCE", "TYPE", "LEN", "ALIAS", "SCRIPT"]),
+    "ctf_date_iso": ("management.ConvertTimeField", [DATA / "dates.dbf"], ["D", None, "OUT", "TEXT", "yyyy-MM-dd"]),
+    "ctf_date_us": ("management.ConvertTimeField", [DATA / "dates.dbf"], ["D", None, "OUT", "TEXT", "MM/dd/yyyy"]),
+    "ctf_date_default_text": ("management.ConvertTimeField", [DATA / "dates.dbf"], ["D", None, "OUT", "TEXT"]),
+    "ctf_date_names": ("management.ConvertTimeField", [DATA / "dates.dbf"], ["E", None, "OUT", "TEXT", "dddd, dd MMMM yyyy"]),
+    "ctf_text_compact": ("management.ConvertTimeField", [DATA / "ctf_text.dbf"], ["S1", "yyyyMMdd", "OUT", "DATE"]),
+    "ctf_text_us": ("management.ConvertTimeField", [DATA / "ctf_text.dbf"], ["S2", "MM/dd/yyyy", "OUT", "DATE"]),
+    "ctf_text_time": ("management.ConvertTimeField", [DATA / "ctf_text.dbf"], ["S3", "yyyy-MM-dd HH:mm:ss", "OUT", "DATE"]),
+    "ctf_text_month": ("management.ConvertTimeField", [DATA / "ctf_text.dbf"], ["S4", "d MMMM yyyy", "OUT", "DATE"]),
+    "ctf_long_date": ("management.ConvertTimeField", [DATA / "ctf_text.dbf"], ["N1", "yyyyMMdd", "OUT", "DATE"]),
+    "ctf_text_to_text": ("management.ConvertTimeField", [DATA / "ctf_text.dbf"], ["S1", "yyyyMMdd", "OUT", "TEXT", "dd.MM.yyyy"]),
+    "ctf_err_none": ("management.ConvertTimeField", [DATA / "ctf_text.dbf"], ["S3", None, "OUT", "DATE"]),
     "fst_parcels_num": ("management.FieldStatisticsToTable", [DATA / "parcels.shp"], ["VALUE;ZONE;PARCEL_ID", "NUMERIC"]),
     "fst_parcels_text": ("management.FieldStatisticsToTable", [DATA / "parcels.shp"], ["NAME", "TEXT"]),
     "fst_streams_text": ("management.FieldStatisticsToTable", [DATA / "streams.shp"], ["NAME", "TEXT"]),
@@ -2040,6 +2051,7 @@ RUN = {
     "analysis.AssignWeightsByPairwiseComparison": ("assign_weights_by_pairwise_comparison", ["input_variables", "output", "add_comparison_matrix", "comparison_matrix"]),
     "management.AddSpatialJoin": ("add_spatial_join", ["target_features", "join_features", "output", "join_operation", "join_type", None, "match_option", "search_radius", "distance_field_name", "permanent_join"]),
     "management.BatchUpdateFields": ("batch_update_fields", ["input", "output", "field_definition_table", None, "output_field_name", "source_field_name", "output_field_type", "output_field_decimals_or_length", "output_field_alias", "output_field_script"]),
+    "management.ConvertTimeField": ("convert_time_field", ["input", "output", "input_time_field", "input_time_format", "output_time_field", "output_time_type", "output_time_format"]),
     "management.FieldStatisticsToTable": ("field_statistics_to_table", ["input", "output", "fields", "field_type", "group_by", "statistics"]),
     "management.EncodeField": ("encode_field", ["input", "output", "field", "method"]),
     "management.GeodeticDensify": ("geodetic_densify", ["input", "output", "densify_method", "max_segment_length"]),
@@ -2125,7 +2137,7 @@ MEMORY_OUT = {"analysis.SummarizeWithin", "analysis.SummarizeNearby", "analysis.
 CREATE_TOOLS = {"management.CreateFeatureclass", "management.CreateTable"}
 
 # In-place tools: the index of the input they edit (run on a copy written as the output).
-IN_PLACE = {"management.AddGPSMetadataFields": 0, "management.AddSpatialJoin": 0, "gp.ExtractMultiValuesToPoints_sa": 0, "edit.ExtendLine": 0, "edit.FlipLine": 0, "edit.TrimLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.EncodeField": 0, "management.AddGeometryAttributes": 0,
+IN_PLACE = {"management.AddGPSMetadataFields": 0, "management.ConvertTimeField": 0, "management.AddSpatialJoin": 0, "gp.ExtractMultiValuesToPoints_sa": 0, "edit.ExtendLine": 0, "edit.FlipLine": 0, "edit.TrimLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.EncodeField": 0, "management.AddGeometryAttributes": 0,
             "management.CalculateFields": 0, "management.StandardizeField": 0, "management.TransformField": 0, "management.ReclassifyField": 0, "management.DefineProjection": 0, "management.CalculateEndTime": 0}
 
 # Select Layer By Location cases, saved with Copy Features:
@@ -2256,7 +2268,7 @@ def main():
             print(f"{name}: {manifest['cases'][name]['status']}")
             continue
         out = OUT / (f"{name}.dbf" if tool in TABLE_OUT else f"{name}.shp")
-        if tool == "management.BatchUpdateFields" and str(before[0]).endswith(".dbf"):
+        if tool in ("management.BatchUpdateFields", "management.ConvertTimeField") and str(before[0]).endswith(".dbf"):
             out = OUT / f"{name}.dbf"  # a table in, a table out
         raster_projection = tool == "management.DefineProjection" and Path(str(before[0])).suffix.lower() in (".tif", ".tiff")
         if tool in RASTER_OUT or raster_projection:
@@ -2288,7 +2300,8 @@ def main():
                 if aux.exists():
                     shutil.copy2(aux, Path(str(out) + ".aux.xml"))
             else:
-                w.call("run_tool", tool="management.CopyFeatures", args=[str(before[k]), str(out)],
+                copy_tool = "management.CopyRows" if str(before[k]).endswith(".dbf") else "management.CopyFeatures"
+                w.call("run_tool", tool=copy_tool, args=[str(before[k]), str(out)],
                        env={"overwriteOutput": True})
             args = [str(out) if i == k else (a if isinstance(a, (list, int, float)) else str(a)) for i, a in enumerate(before)] + after
         elif tool == "management.MosaicToNewRaster":

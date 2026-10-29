@@ -19,7 +19,14 @@ Batch Update Fields (this run): crates/unigis-tools/src/batch_fields.rs + regist
 definition CSVs testdata/geoproc/bfu_def_*.csv; generator gets a .dbf output for a .dbf input of
 this tool. ug-vs-ArcGIS ogrinfo diff identical for the 3 outputs; refusal codes match. Gaps in
 KNOWN_GAPS. Validation: full scripts/check EXIT 0, 225 Rust passed / 5 ignored (/tmp/unigis-bfu-check2.log; first run failed on a clippy needless_range_loop, fixed).
-Next action after landing: next queue item (docs/WORK_QUEUE.md).
+Landed and pushed as 339b318.
+Convert Temporal Field (this run): crates/unigis-tools/src/temporal.rs + registry runner/entry
+`convert_time_field` + `pub mod temporal`; 11 ctf_* cases (IN_PLACE; the harness now copies
+.dbf inputs with CopyRows and writes .dbf outputs for this tool); fixture
+testdata/geoproc/ctf_text.dbf (recipe scripts/research/convert_time_field/make_inputs.py).
+ogrinfo diff identical for all 10 outputs; dropped ctf_date_long (numeric nulls blank in ArcGIS,
+0 from our dbf writer; in KNOWN_GAPS). Validation: full scripts/check EXIT 0, 227 Rust passed / 5 ignored (/tmp/unigis-ctf-check.log).
+Next action after landing: next queue item (docs/WORK_QUEUE.md; #2 Convert Time Zone).
 
 Updated 2026-10-29T05:06:20.186536+00:00; last agent Codex.
 Workspace /mnt/media/ArcGIS_Linux, main, HEAD and origin/main both
