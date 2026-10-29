@@ -899,3 +899,8 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
       14 public references and native field/read-only/value/no-op safety checks.
       Later native edit auto-stamping remains a gap. Research:
       scripts/research/enable_editor_tracking/README.md.
+
+- [x] Migrate Date Field To High Precision: FileGDB tables/classes, one/multiple
+      Date fields, metadata-only precision migration retaining values and aliases.
+      12 public references and byte-preservation/refusal/idempotence safety checks.
+      Research: scripts/research/migrate_date_precision/README.md.

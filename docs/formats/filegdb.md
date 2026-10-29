@@ -24,6 +24,14 @@ in the system catalog `a00000001` (fields `Name`, `FileFormat`). v10: a1..a8 res
 | 24 | i64 file size | i64 file size |
 | 32 | i64 offset of field section | same |
 
+## Date precision migration
+
+Public MigrateDateFieldToHighPrecision controls set GPFieldInfoEx.HighPrecision
+true while retaining raw f64 date-day values. The observed table version3 and
+field-section version4 remain unchanged, including already-high fields containing
+123ms; migration need not promote the physical header to version6. Other entry
+properties remain. Evidence: scripts/research/migrate_date_precision/.
+
 ## Field section
 `i32 size, i32 version (3=9.x, 4=10.x, 6=Pro 3.2 ext), u32 layer flags, i16 nfields`.
 Layer flags: `& 0xff` geometry type (0 none, 1 point, 2 multipoint, 3 polyline,

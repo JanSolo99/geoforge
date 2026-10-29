@@ -142,6 +142,17 @@ pub fn compare(case: &str, info: &Json, root: &Path, out_dir: &Path) -> Vec<Stri
                 "field schema differs\nours: {ours:?}\nArcGIS: {expected:?}"
             ));
         }
+        if let Some(expected) = info.get("date_precision") {
+            let precision: serde_json::Map<String, Json> = table
+                .all_fields()
+                .iter()
+                .filter(|f| f.field_type == unigis_filegdb::GdbFieldType::DateTime)
+                .map(|f| (f.name.clone(), json!(u8::from(f.high_precision))))
+                .collect();
+            if Json::Object(precision) != *expected {
+                diffs.push("Date precision flags differ from ArcGIS".into());
+            }
+        }
         if let Some(cogo) = info.get("cogo") {
             let items = unigis_filegdb::Table::open(copied.join("a00000004")).unwrap();
             let name_col = items

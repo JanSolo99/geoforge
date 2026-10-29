@@ -92263,6 +92263,590 @@
           "last_edit_date_field": "made"
         }
       }
+    },
+    "mdhp_single": {
+      "tool": "management.MigrateDateFieldToHighPrecision",
+      "args": [
+        "testdata/geoproc/migrate_date_base.gdb/single",
+        "D1"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "D1",
+            "aliasName": "First date",
+            "type": "Date",
+            "length": 8,
+            "precision": 1,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "D2",
+            "aliasName": "D2",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "OIDFieldName": "OBJECTID"
+      },
+      "domains": [],
+      "date_precision": {
+        "D1": 1,
+        "D2": 0
+      },
+      "run": {
+        "tool": "migrate_date_field_to_high_precision",
+        "params": {
+          "input": "testdata/geoproc/migrate_date_base.gdb/single",
+          "output": "<out>",
+          "date_fields": "D1"
+        }
+      }
+    },
+    "mdhp_multiple": {
+      "tool": "management.MigrateDateFieldToHighPrecision",
+      "args": [
+        "testdata/geoproc/migrate_date_base.gdb/multiple",
+        "D1;D2"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "D1",
+            "aliasName": "First date",
+            "type": "Date",
+            "length": 8,
+            "precision": 1,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "D2",
+            "aliasName": "D2",
+            "type": "Date",
+            "length": 8,
+            "precision": 1,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "OIDFieldName": "OBJECTID"
+      },
+      "domains": [],
+      "date_precision": {
+        "D1": 1,
+        "D2": 1
+      },
+      "run": {
+        "tool": "migrate_date_field_to_high_precision",
+        "params": {
+          "input": "testdata/geoproc/migrate_date_base.gdb/multiple",
+          "output": "<out>",
+          "date_fields": "D1;D2"
+        }
+      }
+    },
+    "mdhp_class_dates": {
+      "tool": "management.MigrateDateFieldToHighPrecision",
+      "args": [
+        "testdata/geoproc/migrate_date_base.gdb/class_dates",
+        "D1;D2"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape",
+            "aliasName": "Shape",
+            "type": "Geometry",
+            "length": 0,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "D1",
+            "aliasName": "First date",
+            "type": "Date",
+            "length": 8,
+            "precision": 1,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "D2",
+            "aliasName": "D2",
+            "type": "Date",
+            "length": 8,
+            "precision": 1,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "shapeType": "Point",
+        "hasZ": false,
+        "hasM": false,
+        "OIDFieldName": "OBJECTID",
+        "shapeFieldName": "Shape",
+        "spatialReference": {
+          "name": "WGS_1984_UTM_Zone_33N",
+          "factoryCode": 32633,
+          "type": "Projected",
+          "XYResolution": 0.0001,
+          "XYTolerance": 0.001
+        }
+      },
+      "domains": [],
+      "date_precision": {
+        "D1": 1,
+        "D2": 1
+      },
+      "run": {
+        "tool": "migrate_date_field_to_high_precision",
+        "params": {
+          "input": "testdata/geoproc/migrate_date_base.gdb/class_dates",
+          "output": "<out>",
+          "date_fields": "D1;D2"
+        }
+      }
+    },
+    "mdhp_empty": {
+      "tool": "management.MigrateDateFieldToHighPrecision",
+      "args": [
+        "testdata/geoproc/migrate_date_base.gdb/empty",
+        "D1"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "D1",
+            "aliasName": "First date",
+            "type": "Date",
+            "length": 8,
+            "precision": 1,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "D2",
+            "aliasName": "D2",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "OIDFieldName": "OBJECTID"
+      },
+      "domains": [],
+      "date_precision": {
+        "D1": 1,
+        "D2": 0
+      },
+      "run": {
+        "tool": "migrate_date_field_to_high_precision",
+        "params": {
+          "input": "testdata/geoproc/migrate_date_base.gdb/empty",
+          "output": "<out>",
+          "date_fields": "D1"
+        }
+      }
+    },
+    "mdhp_already": {
+      "tool": "management.MigrateDateFieldToHighPrecision",
+      "args": [
+        "testdata/geoproc/migrate_date_base.gdb/already",
+        "D1"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "D1",
+            "aliasName": "First date",
+            "type": "Date",
+            "length": 8,
+            "precision": 1,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "D2",
+            "aliasName": "D2",
+            "type": "Date",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "OIDFieldName": "OBJECTID"
+      },
+      "domains": [],
+      "date_precision": {
+        "D1": 1,
+        "D2": 0
+      },
+      "run": {
+        "tool": "migrate_date_field_to_high_precision",
+        "params": {
+          "input": "testdata/geoproc/migrate_date_base.gdb/already",
+          "output": "<out>",
+          "date_fields": "D1"
+        }
+      }
+    },
+    "mdhp_wrong": {
+      "tool": "management.MigrateDateFieldToHighPrecision",
+      "args": [
+        "testdata/geoproc/migrate_date_base.gdb/wrong",
+        "KEY"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 000640: Invalid field type for KEY; must be of type DATE.",
+        "Failed to execute (MigrateDateFieldToHighPrecision)."
+      ],
+      "schema_edit": true,
+      "run": {
+        "tool": "migrate_date_field_to_high_precision",
+        "params": {
+          "input": "testdata/geoproc/migrate_date_base.gdb/wrong",
+          "output": "<out>",
+          "date_fields": "KEY"
+        }
+      }
+    },
+    "mdhp_missing": {
+      "tool": "management.MigrateDateFieldToHighPrecision",
+      "args": [
+        "testdata/geoproc/migrate_date_base.gdb/missing",
+        "absent"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000728: Field absent does not exist within table",
+        "Failed to execute (MigrateDateFieldToHighPrecision)."
+      ],
+      "schema_edit": true,
+      "run": {
+        "tool": "migrate_date_field_to_high_precision",
+        "params": {
+          "input": "testdata/geoproc/migrate_date_base.gdb/missing",
+          "output": "<out>",
+          "date_fields": "absent"
+        }
+      }
+    },
+    "mdhp_mixed": {
+      "tool": "management.MigrateDateFieldToHighPrecision",
+      "args": [
+        "testdata/geoproc/migrate_date_base.gdb/mixed",
+        "D1;KEY"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 000640: Invalid field type for KEY; must be of type DATE.",
+        "Failed to execute (MigrateDateFieldToHighPrecision)."
+      ],
+      "schema_edit": true,
+      "run": {
+        "tool": "migrate_date_field_to_high_precision",
+        "params": {
+          "input": "testdata/geoproc/migrate_date_base.gdb/mixed",
+          "output": "<out>",
+          "date_fields": "D1;KEY"
+        }
+      }
+    },
+    "mdhp_duplicate": {
+      "tool": "management.MigrateDateFieldToHighPrecision",
+      "args": [
+        "testdata/geoproc/migrate_date_base.gdb/duplicate",
+        "D1;D1"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 000400: Duplicate inputs are not allowed",
+        "Failed to execute (MigrateDateFieldToHighPrecision)."
+      ],
+      "schema_edit": true,
+      "run": {
+        "tool": "migrate_date_field_to_high_precision",
+        "params": {
+          "input": "testdata/geoproc/migrate_date_base.gdb/duplicate",
+          "output": "<out>",
+          "date_fields": "D1;D1"
+        }
+      }
+    },
+    "mdhp_case_names": {
+      "tool": "management.MigrateDateFieldToHighPrecision",
+      "args": [
+        "testdata/geoproc/migrate_date_base.gdb/case_names",
+        "d1;d2"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "D1",
+            "aliasName": "First date",
+            "type": "Date",
+            "length": 8,
+            "precision": 1,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "D2",
+            "aliasName": "D2",
+            "type": "Date",
+            "length": 8,
+            "precision": 1,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          }
+        ],
+        "OIDFieldName": "OBJECTID"
+      },
+      "domains": [],
+      "date_precision": {
+        "D1": 1,
+        "D2": 1
+      },
+      "run": {
+        "tool": "migrate_date_field_to_high_precision",
+        "params": {
+          "input": "testdata/geoproc/migrate_date_base.gdb/case_names",
+          "output": "<out>",
+          "date_fields": "d1;d2"
+        }
+      }
+    },
+    "mdhp_no_fields": {
+      "tool": "management.MigrateDateFieldToHighPrecision",
+      "args": [
+        "testdata/geoproc/migrate_date_base.gdb/no_fields",
+        ""
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000735: Date Fields: Value is required",
+        "Failed to execute (MigrateDateFieldToHighPrecision)."
+      ],
+      "schema_edit": true,
+      "run": {
+        "tool": "migrate_date_field_to_high_precision",
+        "params": {
+          "input": "testdata/geoproc/migrate_date_base.gdb/no_fields",
+          "output": "<out>"
+        }
+      }
+    },
+    "mdhp_shapefile": {
+      "tool": "management.MigrateDateFieldToHighPrecision",
+      "args": [
+        "testdata/geoproc/migrate_date_shape.shp",
+        "<out>",
+        "D1"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 000214: Cannot edit class schema of mdhp_shapefile",
+        "Failed to execute (MigrateDateFieldToHighPrecision)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "run": {
+        "tool": "migrate_date_field_to_high_precision",
+        "params": {
+          "input": "testdata/geoproc/migrate_date_shape.shp",
+          "output": "<out>",
+          "date_fields": "D1"
+        }
+      }
     }
   }
 }

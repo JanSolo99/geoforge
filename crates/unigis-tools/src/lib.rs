@@ -6,6 +6,7 @@ mod angular_notation;
 pub mod batch_fields;
 pub mod cogo;
 pub mod construct;
+pub mod date_precision;
 pub mod delete_multiple;
 mod dm_data;
 mod dm_fields;

@@ -77,6 +77,18 @@ DM = ROOT / "testdata" / "dm"
 
 CASES = {
     # name: (tool, args before the output, args after the output)
+    "mdhp_single": ("management.MigrateDateFieldToHighPrecision", [DATA / "migrate_date_base.gdb" / "single"], ['D1']),
+    "mdhp_multiple": ("management.MigrateDateFieldToHighPrecision", [DATA / "migrate_date_base.gdb" / "multiple"], ['D1;D2']),
+    "mdhp_class_dates": ("management.MigrateDateFieldToHighPrecision", [DATA / "migrate_date_base.gdb" / "class_dates"], ['D1;D2']),
+    "mdhp_empty": ("management.MigrateDateFieldToHighPrecision", [DATA / "migrate_date_base.gdb" / "empty"], ['D1']),
+    "mdhp_already": ("management.MigrateDateFieldToHighPrecision", [DATA / "migrate_date_base.gdb" / "already"], ['D1']),
+    "mdhp_wrong": ("management.MigrateDateFieldToHighPrecision", [DATA / "migrate_date_base.gdb" / "wrong"], ['KEY']),
+    "mdhp_missing": ("management.MigrateDateFieldToHighPrecision", [DATA / "migrate_date_base.gdb" / "missing"], ['absent']),
+    "mdhp_mixed": ("management.MigrateDateFieldToHighPrecision", [DATA / "migrate_date_base.gdb" / "mixed"], ['D1;KEY']),
+    "mdhp_duplicate": ("management.MigrateDateFieldToHighPrecision", [DATA / "migrate_date_base.gdb" / "duplicate"], ['D1;D1']),
+    "mdhp_case_names": ("management.MigrateDateFieldToHighPrecision", [DATA / "migrate_date_base.gdb" / "case_names"], ['d1;d2']),
+    "mdhp_no_fields": ("management.MigrateDateFieldToHighPrecision", [DATA / "migrate_date_base.gdb" / "no_fields"], ['']),
+    "mdhp_shapefile": ("management.MigrateDateFieldToHighPrecision", [DATA / "migrate_date_shape.shp"], ["D1"]),
     "etrack_add_all": ("management.EnableEditorTracking", [DATA / "enable_tracking_base.gdb" / "add_all"], ['maker', 'made', 'changer', 'changed', 'ADD_FIELDS']),
     "etrack_table_add": ("management.EnableEditorTracking", [DATA / "enable_tracking_base.gdb" / "table_add"], ['maker', 'made', 'changer', 'changed', 'ADD_FIELDS']),
     "etrack_creator_only": ("management.EnableEditorTracking", [DATA / "enable_tracking_base.gdb" / "creator_only"], ['maker', '', '', '', 'ADD_FIELDS']),
@@ -2150,6 +2162,7 @@ RUN = {
     "management.AddGPSMetadataFields": ("add_gps_metadata_fields", ["input", "output", "include_offset_fields"]),
     "management.DisableCOGO": ("disable_cogo", ["input", "output"]),
     "management.EnableCOGO": ("enable_cogo", ["input", "output"]),
+    "management.MigrateDateFieldToHighPrecision": ("migrate_date_field_to_high_precision", ["input", "output", "date_fields"]),
     "management.DisableEditorTracking": ("disable_editor_tracking", ["input", "output", "creator", "creation_date", "last_editor", "last_edit_date"]),
     "management.EnableEditorTracking": ("enable_editor_tracking", ["input", "output", "creator_field", "creation_date_field", "last_editor_field", "last_edit_date_field", "add_fields", "record_dates_in"]),
     "management.DeleteMultiple": ("delete_multiple", ["in_data"]),
@@ -2195,7 +2208,7 @@ MEMORY_OUT = {"analysis.SummarizeWithin", "analysis.SummarizeNearby", "analysis.
 CREATE_TOOLS = {"management.CreateFeatureclass", "management.CreateTable"}
 
 # In-place tools: the index of the input they edit (run on a copy written as the output).
-IN_PLACE = {"management.EnableCOGO": 0, "management.DisableEditorTracking": 0, "management.DisableCOGO": 0, "management.AddGPSMetadataFields": 0, "management.ConvertTimeZone": 0, "management.ConvertTimeField": 0, "management.AddSpatialJoin": 0, "gp.ExtractMultiValuesToPoints_sa": 0, "edit.ExtendLine": 0, "edit.FlipLine": 0, "edit.TrimLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.EncodeField": 0, "management.AddGeometryAttributes": 0,
+IN_PLACE = {"management.MigrateDateFieldToHighPrecision": 0, "management.EnableCOGO": 0, "management.DisableEditorTracking": 0, "management.DisableCOGO": 0, "management.AddGPSMetadataFields": 0, "management.ConvertTimeZone": 0, "management.ConvertTimeField": 0, "management.AddSpatialJoin": 0, "gp.ExtractMultiValuesToPoints_sa": 0, "edit.ExtendLine": 0, "edit.FlipLine": 0, "edit.TrimLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.EncodeField": 0, "management.AddGeometryAttributes": 0,
             "management.CalculateFields": 0, "management.StandardizeField": 0, "management.TransformField": 0, "management.ReclassifyField": 0, "management.DefineProjection": 0, "management.CalculateEndTime": 0}
 
 # Select Layer By Location cases, saved with Copy Features:
@@ -2305,6 +2318,9 @@ for d in arcpy.da.ListDomains({win(copied)!r}):
             if tool in ("management.DisableEditorTracking", "management.EnableEditorTracking"):
                 tracking = w.call("python", code=f"d=arcpy.Describe({win(target)!r}); result = dict(properties={{p:getattr(d,p) for p in ['editorTrackingEnabled','creatorFieldName','createdAtFieldName','editorFieldName','editedAtFieldName','isTimeInUTC']}}, editable={{f.name:f.editable for f in arcpy.ListFields({win(target)!r})}})")
                 entry["editor_tracking"] = tracking["result"]
+            if tool == "management.MigrateDateFieldToHighPrecision":
+                precision = w.call("python", code=f"result = {{f.name:f.precision for f in arcpy.ListFields({win(target)!r}) if f.type=='Date'}}")
+                entry["date_precision"] = precision["result"]
             # A second call must be idempotent; snapshot both schema and domains.
             repeated = w.call("run_tool", tool=tool, args=args, env={"overwriteOutput": True})
             if repeated.get("status") != "succeeded":
@@ -2362,7 +2378,7 @@ def main():
             manifest["cases"][name] = delete_multiple_case(w, before[0])
             print(f"{name}: {manifest['cases'][name]['status']}")
             continue
-        if tool in ("management.AddGPSMetadataFields", "management.DisableCOGO", "management.EnableCOGO", "management.DisableEditorTracking", "management.EnableEditorTracking") and Path(before[0]).parent.suffix == ".gdb":
+        if tool in ("management.AddGPSMetadataFields", "management.DisableCOGO", "management.EnableCOGO", "management.DisableEditorTracking", "management.EnableEditorTracking", "management.MigrateDateFieldToHighPrecision") and Path(before[0]).parent.suffix == ".gdb":
             manifest["cases"][name] = schema_edit_case(w, tool, before, after)
             print(f"{name}: {manifest['cases'][name]['status']}")
             continue
@@ -2392,7 +2408,7 @@ def main():
             args = [str(before[0]), after[0], "memory", after[1]] + after[2:]
         elif tool in IN_PLACE:
             k = IN_PLACE[tool]
-            if tool in ("management.DisableCOGO", "management.EnableCOGO", "management.DisableEditorTracking"):
+            if tool in ("management.DisableCOGO", "management.EnableCOGO", "management.DisableEditorTracking", "management.MigrateDateFieldToHighPrecision"):
                 source = Path(before[k])
                 for sidecar in source.parent.glob(source.stem + ".*"):
                     if sidecar.is_file() and not sidecar.name.endswith(".lock"):
@@ -2474,7 +2490,7 @@ def main():
             "fields": [[f["name"], f["type"], f["length"], f["precision"], f["scale"]] for f in d.get("fields", [])],
             "shapeType": d.get("shapeType"),
         }
-        if tool in ("management.DisableCOGO", "management.EnableCOGO", "management.DisableEditorTracking"):
+        if tool in ("management.DisableCOGO", "management.EnableCOGO", "management.DisableEditorTracking", "management.MigrateDateFieldToHighPrecision"):
             manifest["cases"][name]["report_in_place"] = True
         spec = run_spec(tool, manifest["cases"][name]["args"])
         if spec:

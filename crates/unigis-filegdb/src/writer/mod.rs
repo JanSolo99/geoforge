@@ -8,6 +8,7 @@ mod alter;
 mod btree;
 mod catalog;
 mod cogo;
+mod date_precision;
 mod domain_edit;
 mod edit;
 mod editor_tracking;
@@ -37,6 +38,7 @@ use table::TableWriter;
 pub use alter::{FieldAlteration, alter_field, alter_fields, geodatabase_field_name};
 pub use catalog::{delete_domain, delete_item, rename_domain, rename_item};
 pub use cogo::{disable_cogo, enable_cogo};
+pub use date_precision::migrate_date_fields_to_high_precision;
 pub use domain_edit::{
     add_coded_value, alter_coded_value_description, alter_domain, create_domain,
     delete_coded_values, domain_rows, parse_domain_value, set_value_for_range, sort_coded_values,

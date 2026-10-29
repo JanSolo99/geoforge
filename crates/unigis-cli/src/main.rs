@@ -2750,6 +2750,15 @@ fn main() -> ExitCode {
                 ) -> Result<()> {
                     delete_multiple::run(items)
                 }
+                fn migrate_date_fields(&self, input: &str, fields: &[String]) -> Result<()> {
+                    let path = self
+                        .get(input)
+                        .ok_or_else(|| Error::Unsupported(format!("{input} is required")))?;
+                    match locate(Path::new(&path)) {
+                        Location::Geodatabase{gdb,item:Some(item)}=>unigis_filegdb::migrate_date_fields_to_high_precision(gdb,&item,fields),
+                        _=>Err(Error::Unsupported("ERROR 000214: Cannot edit class schema; use a FileGDB table or feature class".into())),
+                    }
+                }
                 fn enable_editor_tracking(
                     &self,
                     input: &str,

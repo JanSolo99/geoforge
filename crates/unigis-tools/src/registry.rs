@@ -103,6 +103,12 @@ pub trait Context {
             "COGO edits are not supported by this host".into(),
         ))
     }
+    /// Migrate Date fields; mutation must be supplied by the host.
+    fn migrate_date_fields(&self, _input: &str, _fields: &[String]) -> Result<()> {
+        Err(Error::Unsupported(
+            "date precision edits are not supported by this host".into(),
+        ))
+    }
     /// Enable tracking roles; mutation must be supplied by the host.
     fn enable_editor_tracking(
         &self,
@@ -3681,5 +3687,6 @@ pub static TOOLS: &[Tool] = &[
     crate::cogo::ENABLE,
     crate::editor_tracking::DISABLE,
     crate::editor_tracking::ENABLE,
+    crate::date_precision::MIGRATE,
     crate::neighbors::COUNT_OVERLAPPING_FEATURES,
 ];

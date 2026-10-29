@@ -23,8 +23,8 @@ pub use writer::{
     alter_domain, alter_field, alter_fields, assign_default_to_field, assign_domain_to_field,
     create_domain, delete_coded_values, delete_domain, delete_fields, delete_item, delete_rows,
     disable_cogo, disable_editor_tracking, domain_rows, enable_cogo, enable_editor_tracking,
-    geodatabase_field_name, parse_domain_value, rebuild_attribute_indexes, recover,
-    remove_attribute_index, remove_domain_from_field, remove_subtype, rename_domain, rename_item,
-    rewrite_table, set_default_subtype, set_subtype_field, set_value_for_range, sort_coded_values,
-    table_to_domain, truncate_table,
+    geodatabase_field_name, migrate_date_fields_to_high_precision, parse_domain_value,
+    rebuild_attribute_indexes, recover, remove_attribute_index, remove_domain_from_field,
+    remove_subtype, rename_domain, rename_item, rewrite_table, set_default_subtype,
+    set_subtype_field, set_value_for_range, sort_coded_values, table_to_domain, truncate_table,
 };

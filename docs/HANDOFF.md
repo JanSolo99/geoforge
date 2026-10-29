@@ -1,12 +1,40 @@
 # Current handoff
 
-Updated 2026-10-29T09:42:28.971136+00:00; last agent Codex.
-Workspace /mnt/media/ArcGIS_Linux, main; HEADc241a910b07493fae5797d62b3e84feeb1c877a9.
-143 scoped paths staged. User objective: finish/wrap current tool, then build next
+Updated 2026-10-29T09:44:00.347279+00:00; last agent Codex.
+Workspace /mnt/media/ArcGIS_Linux, main; HEAD and origin/main both
+99d534c604c4aea0ac5be4305c66e3c49eafd142. Index empty. User objective: finish/wrap current tool, then build next
 WORK_QUEUE tool, with public ArcGIS evidence, full gate and separate landing.
 Enable COGOc241a91 was already pushed/complete on startup. This turn implemented
-Enable Editor Tracking; validated and ready to commit/push. No extra agents or
-coordinators launched; inherited unrelated edits preserved.
+Enable Editor Tracking99d534c (143 scoped paths), observed pushc241a91..99d534c
+main->main. Objective completed; no unfinished product edits. Final handoff
+checkpoint intentionally uncommitted. No extra agents/coordinators launched;
+inherited unrelated edits preserved.
+
+## Current turn: Migrate Date Field To High Precision (uncommitted)
+
+Initial preparation failed because AlterField does not accept DATEHIGHPRECISION;
+no fixture saved then. Corrected probe uses public migration tool to prepare the
+already-high-precision field; separate /tmp/unigis-migrate-date-probe-fixed root.
+12 controls complete (6 successes,6 refusals), results/catalog format states in
+scripts/research/migrate_date_precision/. Source migrate_date_base.gdb saved once;
+shapefile fixture copied from disposable public control. Date precision0->1 and
+HighPrecision=true metadata only; aliases/values/NULL retained. Table/field header
+versions unchanged3/4. Already-high field retains123ms. Mixed valid/wrong types
+can PARTIALLY migrate in ArcGIS; native preflights atomically, documented gap.
+
+Native writer/date_precision.rs validates Date types/names/duplicates then splices
+HighPrecision markers within one journal, no user table rewrite. Registry/context/
+CLI FileGDB host added; other hosts explicitly fail. Date fields use semicolon
+lists, case-insensitive canonical matching. Two new safety tests protect user
+bytes, no-op/repeat identity and atomic refusals. Generic schema comparator checks
+precision flags.12 mdhp_* references generated PASS /tmp/unigis-mdhp-references.log.
+Targeted cargo test -j3 -p unigis-cli --test migrate_date_precision_safety --test
+arcgis_reference PASS4 /tmp/unigis-mdhp-tests.log (no warnings). Independent public
+ArcGIS reader PASS6 successes exact precision/schema/values/NULL/geometry,
+/tmp/unigis-migrate-date-native.{log,json}, saved native_reader_results.json.
+Formatting/Python syntax/whitespace, manifest2295 unchanged+12 and inherited hash
+preservation audits PASS. Docs ROADMAP/KNOWN_GAPS/formats updated. Full scripts/check
+starts now /tmp/unigis-mdhp-check.{log,exit,pid}; no commit until exit0. No extra agents/coordinators or external web publish.
 
 ## Completed implementation
 
@@ -72,12 +100,13 @@ coordinators launched; inherited unrelated edits preserved.
   preservation audits PASS. Filtered /tmp/unigis-etrack-stage.patch excludes the
   inherited4-line umintfloat generator hunk. No Cargo/Trunk/probes running.
 
-## Next actions
+## Next action
 
-1. Commit/push this validated tool per queue rules, regenerate queue.
-2. Final handoff with resulting HEAD/push evidence.
-3. Next queue item: Migrate Date Field To High Precision
-   (management.MigrateDateFieldToHighPrecision). Do not polish landed tools.
+Next queue item: Migrate Date Field To High Precision
+(management.MigrateDateFieldToHighPrecision). Queue regenerated after landing:
+1612 missing. Read roadmap/gaps/public reference, run ug tools and public controls.
+Do not polish landed tools unless requested. No Cargo/Trunk/ArcGIS probes running.
+Enable COGO was already complete on startup and was not repeated.
 
 ## Inherited unrelated work
 

@@ -1,0 +1,1797 @@
+{
+  "single": {
+    "arg": "D1",
+    "before": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "2020-01-02 03:04:05",
+          null
+        ],
+        [
+          2,
+          8,
+          null,
+          "2021-02-03 04:05:06"
+        ]
+      ]
+    },
+    "after": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 1,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "2020-01-02 03:04:05",
+          null
+        ],
+        [
+          2,
+          8,
+          null,
+          "2021-02-03 04:05:06"
+        ]
+      ]
+    },
+    "repeat": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 1,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "2020-01-02 03:04:05",
+          null
+        ],
+        [
+          2,
+          8,
+          null,
+          "2021-02-03 04:05:06"
+        ]
+      ]
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 8:44:36 PM\nSucceeded at Thursday, October 29, 2026 8:44:36 PM (Elapsed Time: 0.03 seconds)",
+    "repeat_messages": "Start Time: Thursday, October 29, 2026 8:44:36 PM\nSucceeded at Thursday, October 29, 2026 8:44:36 PM (Elapsed Time: 0.02 seconds)"
+  },
+  "multiple": {
+    "arg": "D1;D2",
+    "before": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "2020-01-02 03:04:05",
+          null
+        ],
+        [
+          2,
+          8,
+          null,
+          "2021-02-03 04:05:06"
+        ]
+      ]
+    },
+    "after": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 1,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 1,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "2020-01-02 03:04:05",
+          null
+        ],
+        [
+          2,
+          8,
+          null,
+          "2021-02-03 04:05:06"
+        ]
+      ]
+    },
+    "repeat": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 1,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 1,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "2020-01-02 03:04:05",
+          null
+        ],
+        [
+          2,
+          8,
+          null,
+          "2021-02-03 04:05:06"
+        ]
+      ]
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 8:44:36 PM\nSucceeded at Thursday, October 29, 2026 8:44:37 PM (Elapsed Time: 0.04 seconds)",
+    "repeat_messages": "Start Time: Thursday, October 29, 2026 8:44:37 PM\nSucceeded at Thursday, October 29, 2026 8:44:37 PM (Elapsed Time: 0.02 seconds)"
+  },
+  "class_dates": {
+    "arg": "D1;D2",
+    "before": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "2020-01-02 03:04:05",
+          null,
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ],
+        [
+          2,
+          8,
+          null,
+          "2021-02-03 04:05:06",
+          "{\"x\":500001,\"y\":5000001,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "after": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 1,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 1,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "2020-01-02 03:04:05",
+          null,
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ],
+        [
+          2,
+          8,
+          null,
+          "2021-02-03 04:05:06",
+          "{\"x\":500001,\"y\":5000001,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "repeat": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "nullable": true,
+          "required": true,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 1,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 1,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "2020-01-02 03:04:05",
+          null,
+          "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ],
+        [
+          2,
+          8,
+          null,
+          "2021-02-03 04:05:06",
+          "{\"x\":500001,\"y\":5000001,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ]
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 8:44:37 PM\nSucceeded at Thursday, October 29, 2026 8:44:37 PM (Elapsed Time: 0.04 seconds)",
+    "repeat_messages": "Start Time: Thursday, October 29, 2026 8:44:37 PM\nSucceeded at Thursday, October 29, 2026 8:44:37 PM (Elapsed Time: 0.03 seconds)"
+  },
+  "empty": {
+    "arg": "D1",
+    "before": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": []
+    },
+    "after": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 1,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": []
+    },
+    "repeat": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 1,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": []
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 8:44:37 PM\nSucceeded at Thursday, October 29, 2026 8:44:38 PM (Elapsed Time: 0.03 seconds)",
+    "repeat_messages": "Start Time: Thursday, October 29, 2026 8:44:38 PM\nSucceeded at Thursday, October 29, 2026 8:44:38 PM (Elapsed Time: 0.02 seconds)"
+  },
+  "already": {
+    "arg": "D1",
+    "before": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 1,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "2020-01-02 03:04:05.123000",
+          null
+        ],
+        [
+          2,
+          8,
+          null,
+          "2021-02-03 04:05:06"
+        ]
+      ]
+    },
+    "after": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 1,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "2020-01-02 03:04:05.123000",
+          null
+        ],
+        [
+          2,
+          8,
+          null,
+          "2021-02-03 04:05:06"
+        ]
+      ]
+    },
+    "repeat": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 1,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "2020-01-02 03:04:05.123000",
+          null
+        ],
+        [
+          2,
+          8,
+          null,
+          "2021-02-03 04:05:06"
+        ]
+      ]
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 8:44:38 PM\nSucceeded at Thursday, October 29, 2026 8:44:38 PM (Elapsed Time: 0.02 seconds)",
+    "repeat_messages": "Start Time: Thursday, October 29, 2026 8:44:38 PM\nSucceeded at Thursday, October 29, 2026 8:44:38 PM (Elapsed Time: 0.02 seconds)"
+  },
+  "wrong": {
+    "arg": "KEY",
+    "before": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "2020-01-02 03:04:05",
+          null
+        ],
+        [
+          2,
+          8,
+          null,
+          "2021-02-03 04:05:06"
+        ]
+      ]
+    },
+    "error": "ERROR 000640: Invalid field type for KEY; must be of type DATE.\nFailed to execute (MigrateDateFieldToHighPrecision).\n",
+    "messages": "Start Time: Thursday, October 29, 2026 8:44:38 PM\nERROR 000640: Invalid field type for KEY; must be of type DATE.\nFailed to execute (MigrateDateFieldToHighPrecision).\nFailed at Thursday, October 29, 2026 8:44:38 PM (Elapsed Time: 0.00 seconds)",
+    "after": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "2020-01-02 03:04:05",
+          null
+        ],
+        [
+          2,
+          8,
+          null,
+          "2021-02-03 04:05:06"
+        ]
+      ]
+    }
+  },
+  "missing": {
+    "arg": "absent",
+    "before": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "2020-01-02 03:04:05",
+          null
+        ],
+        [
+          2,
+          8,
+          null,
+          "2021-02-03 04:05:06"
+        ]
+      ]
+    },
+    "error": "Failed to execute. Parameters are not valid.\nERROR 000728: Field absent does not exist within table\nFailed to execute (MigrateDateFieldToHighPrecision).\n",
+    "messages": "Start Time: Thursday, October 29, 2026 8:44:39 PM\nFailed to execute. Parameters are not valid.\nERROR 000728: Field absent does not exist within table\nFailed to execute (MigrateDateFieldToHighPrecision).\nFailed at Thursday, October 29, 2026 8:44:39 PM (Elapsed Time: 0.00 seconds)",
+    "after": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "2020-01-02 03:04:05",
+          null
+        ],
+        [
+          2,
+          8,
+          null,
+          "2021-02-03 04:05:06"
+        ]
+      ]
+    }
+  },
+  "mixed": {
+    "arg": "D1;KEY",
+    "before": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "2020-01-02 03:04:05",
+          null
+        ],
+        [
+          2,
+          8,
+          null,
+          "2021-02-03 04:05:06"
+        ]
+      ]
+    },
+    "error": "ERROR 000640: Invalid field type for KEY; must be of type DATE.\nFailed to execute (MigrateDateFieldToHighPrecision).\n",
+    "messages": "Start Time: Thursday, October 29, 2026 8:44:39 PM\nERROR 000640: Invalid field type for KEY; must be of type DATE.\nFailed to execute (MigrateDateFieldToHighPrecision).\nFailed at Thursday, October 29, 2026 8:44:39 PM (Elapsed Time: 0.01 seconds)",
+    "after": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 1,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "2020-01-02 03:04:05",
+          null
+        ],
+        [
+          2,
+          8,
+          null,
+          "2021-02-03 04:05:06"
+        ]
+      ]
+    }
+  },
+  "duplicate": {
+    "arg": "D1;D1",
+    "before": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "2020-01-02 03:04:05",
+          null
+        ],
+        [
+          2,
+          8,
+          null,
+          "2021-02-03 04:05:06"
+        ]
+      ]
+    },
+    "error": "ERROR 000400: Duplicate inputs are not allowed\nFailed to execute (MigrateDateFieldToHighPrecision).\n",
+    "messages": "Start Time: Thursday, October 29, 2026 8:44:39 PM\nERROR 000400: Duplicate inputs are not allowed\nFailed to execute (MigrateDateFieldToHighPrecision).\nFailed at Thursday, October 29, 2026 8:44:39 PM (Elapsed Time: 0.00 seconds)",
+    "after": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "2020-01-02 03:04:05",
+          null
+        ],
+        [
+          2,
+          8,
+          null,
+          "2021-02-03 04:05:06"
+        ]
+      ]
+    }
+  },
+  "case_names": {
+    "arg": "d1;d2",
+    "before": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "2020-01-02 03:04:05",
+          null
+        ],
+        [
+          2,
+          8,
+          null,
+          "2021-02-03 04:05:06"
+        ]
+      ]
+    },
+    "after": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 1,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 1,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "2020-01-02 03:04:05",
+          null
+        ],
+        [
+          2,
+          8,
+          null,
+          "2021-02-03 04:05:06"
+        ]
+      ]
+    },
+    "repeat": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 1,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 1,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "2020-01-02 03:04:05",
+          null
+        ],
+        [
+          2,
+          8,
+          null,
+          "2021-02-03 04:05:06"
+        ]
+      ]
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 8:44:39 PM\nSucceeded at Thursday, October 29, 2026 8:44:40 PM (Elapsed Time: 0.04 seconds)",
+    "repeat_messages": "Start Time: Thursday, October 29, 2026 8:44:40 PM\nSucceeded at Thursday, October 29, 2026 8:44:40 PM (Elapsed Time: 0.02 seconds)"
+  },
+  "no_fields": {
+    "arg": "",
+    "before": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "2020-01-02 03:04:05",
+          null
+        ],
+        [
+          2,
+          8,
+          null,
+          "2021-02-03 04:05:06"
+        ]
+      ]
+    },
+    "error": "Failed to execute. Parameters are not valid.\nERROR 000735: Date Fields: Value is required\nFailed to execute (MigrateDateFieldToHighPrecision).\n",
+    "messages": "Start Time: Thursday, October 29, 2026 8:44:40 PM\nFailed to execute. Parameters are not valid.\nERROR 000735: Date Fields: Value is required\nFailed to execute (MigrateDateFieldToHighPrecision).\nFailed at Thursday, October 29, 2026 8:44:40 PM (Elapsed Time: 0.00 seconds)",
+    "after": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "nullable": false,
+          "required": true,
+          "editable": false,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D1",
+          "alias": "First date",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        },
+        {
+          "name": "D2",
+          "alias": "D2",
+          "type": "Date",
+          "length": 8,
+          "precision": 0,
+          "nullable": true,
+          "required": false,
+          "editable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          7,
+          "2020-01-02 03:04:05",
+          null
+        ],
+        [
+          2,
+          8,
+          null,
+          "2021-02-03 04:05:06"
+        ]
+      ]
+    }
+  },
+  "shape": {
+    "error": "ERROR 000214: Cannot edit class schema of point\nFailed to execute (MigrateDateFieldToHighPrecision).\n",
+    "messages": "Start Time: Thursday, October 29, 2026 8:44:40 PM\nERROR 000214: Cannot edit class schema of point\nFailed to execute (MigrateDateFieldToHighPrecision).\nFailed at Thursday, October 29, 2026 8:44:40 PM (Elapsed Time: 0.00 seconds)"
+  }
+}

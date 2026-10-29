@@ -205,3 +205,12 @@ Update this file when a gap is found or closed.
   combinations are unverified. Repeated/secondary ArcGIS diagnostics and unrelated
   catalog normalization are omitted. Evidence:
   scripts/research/enable_editor_tracking/README.md.
+
+- Migrate Date Field To High Precision: native FileGDB table/class paths only;
+  other hosts need the mutation capability. Native preflights entire lists: mixed
+  valid/wrong types leave all fields unchanged, while ArcGIS can partly migrate
+  before failing. Enterprise/mobile/layers/selections/unusual class extensions,
+  legacy stored subsecond fractions under second precision, domains/defaults/
+  subtypes, Z/M/curves and rare list syntax are unverified. No reverse migration;
+  unrelated catalog normalization not reproduced. Evidence:
+  scripts/research/migrate_date_precision/README.md.
