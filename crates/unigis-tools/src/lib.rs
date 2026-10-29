@@ -3,6 +3,7 @@
 //! and recorded in `testdata/arcgis-reference/manifest.json`.
 
 mod angular_notation;
+pub mod batch_fields;
 pub mod construct;
 mod dm_data;
 mod dm_fields;

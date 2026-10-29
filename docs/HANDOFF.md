@@ -14,9 +14,12 @@ Codex's uncommitted raster `umintfloat_*` generator block and the coordinator/qu
 Landed and pushed as 69f2687. Analyze deferred (ArcSDE only, ERROR 000186) in
 docs/WORK_QUEUE_DEFERRED.txt (that commit also carries the AddIncrementingIDField deferral line
 that was uncommitted in the tree).
-Next action: next queue item: Batch Update Fields (in progress, nothing implemented; probe
-findings in scripts/research/batch_update_fields/README.md, plan: registry tool over the
-definition-table columns, conversions per the notes, scripts via crate::pycalc in dependency order).
+Batch Update Fields (this run): crates/unigis-tools/src/batch_fields.rs + registry runner/entry
+`batch_update_fields` + `pub mod batch_fields`; 6 bfu_* cases (3 outputs, 3 refusals) with
+definition CSVs testdata/geoproc/bfu_def_*.csv; generator gets a .dbf output for a .dbf input of
+this tool. ug-vs-ArcGIS ogrinfo diff identical for the 3 outputs; refusal codes match. Gaps in
+KNOWN_GAPS. Validation: full scripts/check EXIT 0, 225 Rust passed / 5 ignored (/tmp/unigis-bfu-check2.log; first run failed on a clippy needless_range_loop, fixed).
+Next action after landing: next queue item (docs/WORK_QUEUE.md).
 
 Updated 2026-10-29T05:06:20.186536+00:00; last agent Codex.
 Workspace /mnt/media/ArcGIS_Linux, main, HEAD and origin/main both

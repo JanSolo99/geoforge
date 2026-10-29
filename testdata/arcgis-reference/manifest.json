@@ -85885,6 +85885,363 @@
           "permanent_join": "PERMANENT_FIELDS"
         }
       }
+    },
+    "bfu_parcels_basic": {
+      "tool": "management.BatchUpdateFields",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "testdata/geoproc/bfu_def_basic.csv",
+        null,
+        "NAME",
+        "SOURCE",
+        "TYPE",
+        "LEN",
+        "ALIAS",
+        "SCRIPT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "LABEL",
+          "String",
+          30,
+          0,
+          0
+        ],
+        [
+          "VRAW",
+          "Double",
+          19,
+          19,
+          0
+        ],
+        [
+          "VAL_K",
+          "Double",
+          19,
+          18,
+          2
+        ],
+        [
+          "ZONE_T",
+          "String",
+          5,
+          0,
+          0
+        ],
+        [
+          "BIG",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "batch_update_fields",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "field_definition_table": "testdata/geoproc/bfu_def_basic.csv",
+          "output_field_name": "NAME",
+          "source_field_name": "SOURCE",
+          "output_field_type": "TYPE",
+          "output_field_decimals_or_length": "LEN",
+          "output_field_alias": "ALIAS",
+          "output_field_script": "SCRIPT"
+        }
+      }
+    },
+    "bfu_parcels_types": {
+      "tool": "management.BatchUpdateFields",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "testdata/geoproc/bfu_def_types.csv",
+        null,
+        "NAME",
+        "SOURCE",
+        "TYPE",
+        "LEN",
+        "ALIAS",
+        "SCRIPT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "A",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "B",
+          "Double",
+          19,
+          18,
+          3
+        ],
+        [
+          "C",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "D",
+          "String",
+          19,
+          0,
+          0
+        ],
+        [
+          "F",
+          "Double",
+          19,
+          18,
+          1
+        ],
+        [
+          "G",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "batch_update_fields",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "field_definition_table": "testdata/geoproc/bfu_def_types.csv",
+          "output_field_name": "NAME",
+          "source_field_name": "SOURCE",
+          "output_field_type": "TYPE",
+          "output_field_decimals_or_length": "LEN",
+          "output_field_alias": "ALIAS",
+          "output_field_script": "SCRIPT"
+        }
+      }
+    },
+    "bfu_dates": {
+      "tool": "management.BatchUpdateFields",
+      "args": [
+        "testdata/geoproc/dates.dbf",
+        "<out>",
+        "testdata/geoproc/bfu_def_dates.csv",
+        null,
+        "NAME",
+        "SOURCE",
+        "TYPE",
+        "LEN",
+        "ALIAS",
+        "SCRIPT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ID2",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "WHEN",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "GRP_D",
+          "Double",
+          19,
+          18,
+          2
+        ],
+        [
+          "E2",
+          "Date",
+          8,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "batch_update_fields",
+        "params": {
+          "input": "testdata/geoproc/dates.dbf",
+          "output": "<out>",
+          "field_definition_table": "testdata/geoproc/bfu_def_dates.csv",
+          "output_field_name": "NAME",
+          "source_field_name": "SOURCE",
+          "output_field_type": "TYPE",
+          "output_field_decimals_or_length": "LEN",
+          "output_field_alias": "ALIAS",
+          "output_field_script": "SCRIPT"
+        }
+      }
+    },
+    "bfu_err_cycle": {
+      "tool": "management.BatchUpdateFields",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "testdata/geoproc/bfu_def_cycle.csv",
+        null,
+        "NAME",
+        "SOURCE",
+        "TYPE",
+        "LEN",
+        "ALIAS",
+        "SCRIPT"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 080464: Cyclic reference detected for Target Field 'VAL_K'.",
+        "Failed to execute (BatchUpdateFields)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "batch_update_fields",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "field_definition_table": "testdata/geoproc/bfu_def_cycle.csv",
+          "output_field_name": "NAME",
+          "source_field_name": "SOURCE",
+          "output_field_type": "TYPE",
+          "output_field_decimals_or_length": "LEN",
+          "output_field_alias": "ALIAS",
+          "output_field_script": "SCRIPT"
+        }
+      }
+    },
+    "bfu_err_missing": {
+      "tool": "management.BatchUpdateFields",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "testdata/geoproc/bfu_def_missing.csv",
+        null,
+        "NAME",
+        "SOURCE",
+        "TYPE",
+        "LEN",
+        "ALIAS",
+        "SCRIPT"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 080469: 'VAL_K' has a reference to a missing field(s): VALUE",
+        "Failed to execute (BatchUpdateFields)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "batch_update_fields",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "field_definition_table": "testdata/geoproc/bfu_def_missing.csv",
+          "output_field_name": "NAME",
+          "source_field_name": "SOURCE",
+          "output_field_type": "TYPE",
+          "output_field_decimals_or_length": "LEN",
+          "output_field_alias": "ALIAS",
+          "output_field_script": "SCRIPT"
+        }
+      }
+    },
+    "bfu_err_badtype": {
+      "tool": "management.BatchUpdateFields",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "testdata/geoproc/bfu_def_badtype.csv",
+        null,
+        "NAME",
+        "SOURCE",
+        "TYPE",
+        "LEN",
+        "ALIAS",
+        "SCRIPT"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 080466: Failed to change the data type for target field 'E'.",
+        "Failed to execute (BatchUpdateFields)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "batch_update_fields",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "field_definition_table": "testdata/geoproc/bfu_def_badtype.csv",
+          "output_field_name": "NAME",
+          "source_field_name": "SOURCE",
+          "output_field_type": "TYPE",
+          "output_field_decimals_or_length": "LEN",
+          "output_field_alias": "ALIAS",
+          "output_field_script": "SCRIPT"
+        }
+      }
     }
   }
 }

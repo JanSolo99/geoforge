@@ -812,6 +812,10 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
       The angular numeric GARS boundary path remains separate follow-up work.
       Evidence: `scripts/research/coordinate_notation/grid/gars-boundaries.md`.
 
+- [x] Batch Update Fields (definition-table columns; source copy with type conversion, blank
+      type = source type, fixed-decimal rounding, scripts over output fields in dependency order;
+      cycle/missing/type refusals): 3 `bfu_*` cases + 3 refusals match ArcGIS. Evidence:
+      `scripts/research/batch_update_fields/README.md`.
 - [x] Add Spatial Join (permanent fields: target fields, Join_Count, distance field, join
       fields; values of a one-to-one Spatial Join): 3 `asj_*` in-place cases match ArcGIS.
       Evidence: `scripts/research/add_spatial_join/README.md`.

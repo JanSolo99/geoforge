@@ -499,6 +499,12 @@ CASES = {
     "awp_err_name": ("analysis.AssignWeightsByPairwiseComparison", ["1A;B;C"], []),
     "awp_err_order": ("analysis.AssignWeightsByPairwiseComparison", ["A;B;C"], ["ADD_MATRIX", "Variables A C 5; A B 3; B C 2"]),
     "awp_err_value": ("analysis.AssignWeightsByPairwiseComparison", ["A;B;C"], ["ADD_MATRIX", "Variables A B 9.5; A C 1; B C 1"]),
+    "bfu_parcels_basic": ("management.BatchUpdateFields", [DATA / "parcels.shp"], [DATA / "bfu_def_basic.csv", None, "NAME", "SOURCE", "TYPE", "LEN", "ALIAS", "SCRIPT"]),
+    "bfu_parcels_types": ("management.BatchUpdateFields", [DATA / "parcels.shp"], [DATA / "bfu_def_types.csv", None, "NAME", "SOURCE", "TYPE", "LEN", "ALIAS", "SCRIPT"]),
+    "bfu_dates": ("management.BatchUpdateFields", [DATA / "dates.dbf"], [DATA / "bfu_def_dates.csv", None, "NAME", "SOURCE", "TYPE", "LEN", "ALIAS", "SCRIPT"]),
+    "bfu_err_cycle": ("management.BatchUpdateFields", [DATA / "parcels.shp"], [DATA / "bfu_def_cycle.csv", None, "NAME", "SOURCE", "TYPE", "LEN", "ALIAS", "SCRIPT"]),
+    "bfu_err_missing": ("management.BatchUpdateFields", [DATA / "parcels.shp"], [DATA / "bfu_def_missing.csv", None, "NAME", "SOURCE", "TYPE", "LEN", "ALIAS", "SCRIPT"]),
+    "bfu_err_badtype": ("management.BatchUpdateFields", [DATA / "parcels.shp"], [DATA / "bfu_def_badtype.csv", None, "NAME", "SOURCE", "TYPE", "LEN", "ALIAS", "SCRIPT"]),
     "fst_parcels_num": ("management.FieldStatisticsToTable", [DATA / "parcels.shp"], ["VALUE;ZONE;PARCEL_ID", "NUMERIC"]),
     "fst_parcels_text": ("management.FieldStatisticsToTable", [DATA / "parcels.shp"], ["NAME", "TEXT"]),
     "fst_streams_text": ("management.FieldStatisticsToTable", [DATA / "streams.shp"], ["NAME", "TEXT"]),
@@ -2033,6 +2039,7 @@ RUN = {
     "analysis.GenerateOriginDestinationLinks": ("generate_origin_destination_links", ["origin_features", "destination_features", "output", "origin_group_field", "destination_group_field", "line_type", "num_nearest", "search_distance", "distance_unit", "aggregate_links", "sum_fields"]),
     "analysis.AssignWeightsByPairwiseComparison": ("assign_weights_by_pairwise_comparison", ["input_variables", "output", "add_comparison_matrix", "comparison_matrix"]),
     "management.AddSpatialJoin": ("add_spatial_join", ["target_features", "join_features", "output", "join_operation", "join_type", None, "match_option", "search_radius", "distance_field_name", "permanent_join"]),
+    "management.BatchUpdateFields": ("batch_update_fields", ["input", "output", "field_definition_table", None, "output_field_name", "source_field_name", "output_field_type", "output_field_decimals_or_length", "output_field_alias", "output_field_script"]),
     "management.FieldStatisticsToTable": ("field_statistics_to_table", ["input", "output", "fields", "field_type", "group_by", "statistics"]),
     "management.EncodeField": ("encode_field", ["input", "output", "field", "method"]),
     "management.GeodeticDensify": ("geodetic_densify", ["input", "output", "densify_method", "max_segment_length"]),
@@ -2249,6 +2256,8 @@ def main():
             print(f"{name}: {manifest['cases'][name]['status']}")
             continue
         out = OUT / (f"{name}.dbf" if tool in TABLE_OUT else f"{name}.shp")
+        if tool == "management.BatchUpdateFields" and str(before[0]).endswith(".dbf"):
+            out = OUT / f"{name}.dbf"  # a table in, a table out
         raster_projection = tool == "management.DefineProjection" and Path(str(before[0])).suffix.lower() in (".tif", ".tiff")
         if tool in RASTER_OUT or raster_projection:
             out = OUT / f"{name}.tif"

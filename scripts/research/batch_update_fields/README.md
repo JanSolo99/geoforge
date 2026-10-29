@@ -1,6 +1,7 @@
-# Batch Update Fields (management.BatchUpdateFields), ArcGIS Pro 3.7 — probe notes
+# Batch Update Fields (management.BatchUpdateFields), ArcGIS Pro 3.7
 
-Not implemented yet. Probed with `arcpy.management.BatchUpdateFields(parcels.shp, out.shp,
+Implemented as `batch_update_fields` (crates/unigis-tools/src/batch_fields.rs); reference cases
+`bfu_*` with definition tables `testdata/geoproc/bfu_def_*.csv`. Probed with `arcpy.management.BatchUpdateFields(parcels.shp, out.shp,
 definition.csv, None, 'NAME', 'SOURCE', 'TYPE', 'LEN', 'ALIAS', 'SCRIPT')`.
 
 - The output holds only the fields listed in the definition table, in its row order (plus
@@ -17,5 +18,11 @@ definition.csv, None, 'NAME', 'SOURCE', 'TYPE', 'LEN', 'ALIAS', 'SCRIPT')`.
   ERROR 080469 "'VAL_K' has a reference to a missing field(s): VALUE"; a self reference fails
   with ERROR 080464 "Cyclic reference detected for Target Field 'VAL_K'".
 - Shapefile output drops aliases.
-Next: probe source-less rows without script (null?), DATE type, default text length rule,
-script result rounding, script_file parameter; then implement with crate::pycalc.
+- Doubles with fixed decimals are stored rounded half away from zero (1823.35 at one decimal
+  -> 1823.4, 5741.45 -> 5741.5), and scripts see the stored value (VRAW 1754.62 stored as 1755,
+  so `!VRAW! / 1000` at two decimals is 1.76).
+- A Date converted to TEXT uses the machine's locale (`07/02/2000 00:00:00` under Wine) and
+  widened the 30-character field to 32; not reproduced (we write `2000-02-07 00:00:00`).
+- A failing run still leaves a (partial) output in ArcGIS; we write nothing.
+- Not done: script_file (code blocks), DATE parsing from text, aliases (kept in our field
+  metadata, dropped by shapefiles like ArcGIS).

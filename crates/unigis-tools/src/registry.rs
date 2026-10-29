@@ -502,6 +502,69 @@ fn generate_transects_along_lines(ctx: &dyn Context) -> Result<ToolOutput> {
     )
 }
 
+fn batch_update_fields(ctx: &dyn Context) -> Result<Outcome> {
+    let t = find("batch_update_fields")
+        .ok_or_else(|| Error::Unsupported("batch_update_fields".into()))?;
+    let input = ctx.features("input")?;
+    let table = ctx.features("field_definition_table")?;
+    let column = |param: &str| -> Result<Option<usize>> {
+        let Some(name) = text(ctx, t, param).filter(|n| !n.trim().is_empty()) else {
+            return Ok(None);
+        };
+        table
+            .fields()
+            .iter()
+            .position(|f| f.name.eq_ignore_ascii_case(name.trim()))
+            .map(Some)
+            .ok_or_else(|| Error::Unsupported(format!("ERROR 000728: Field {name} does not exist")))
+    };
+    let name = column("output_field_name")?.ok_or_else(|| {
+        Error::Unsupported("ERROR 000735: Output Field Name: value is required".into())
+    })?;
+    let (source, kind, size, alias, script) = (
+        column("source_field_name")?,
+        column("output_field_type")?,
+        column("output_field_decimals_or_length")?,
+        column("output_field_alias")?,
+        column("output_field_script")?,
+    );
+    let cell = |row: &[Value], i: Option<usize>| -> Option<String> {
+        let v = &row[i?];
+        let s = match v {
+            Value::String(s) => s.trim().to_owned(),
+            Value::Null => return None,
+            other => crate::number(other).map(|n| n.to_string())?,
+        };
+        (!s.is_empty()).then_some(s)
+    };
+    let mut defs = Vec::new();
+    for f in table.features() {
+        let row = f?.attributes;
+        let Some(n) = cell(&row, Some(name)) else {
+            continue;
+        };
+        defs.push(crate::batch_fields::FieldDefinition {
+            name: n,
+            source: cell(&row, source),
+            field_type: cell(&row, kind),
+            size: cell(&row, size)
+                .and_then(|s| s.parse::<f64>().ok())
+                .map(|v| v as u32),
+            alias: cell(&row, alias),
+            script: cell(&row, script),
+        });
+    }
+    let out = crate::batch_fields::batch_update_fields(input.as_ref(), &defs)?;
+    Ok(if input.geometry_kind().is_some() {
+        Outcome::Features(out)
+    } else {
+        Outcome::Table(TableOutput {
+            fields: out.fields,
+            rows: out.features.into_iter().map(|f| f.attributes).collect(),
+        })
+    })
+}
+
 fn add_spatial_join(ctx: &dyn Context) -> Result<ToolOutput> {
     let t =
         find("add_spatial_join").ok_or_else(|| Error::Unsupported("add_spatial_join".into()))?;
@@ -2046,6 +2109,81 @@ pub static TOOLS: &[Tool] = &[
         output_suffix: "ODLinks",
         measures: false,
         run: Runner::Features(generate_origin_destination_links),
+    },
+    Tool {
+        id: "batch_update_fields",
+        name: "Batch Update Fields",
+        toolbox: "Data Management › Fields",
+        summary: "A copy with the fields a definition table lists: renamed, retyped or scripted (ArcGIS Pro Batch Update Fields).",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Table",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "field_definition_table",
+                label: "Field Definition Table",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "One row per output field.",
+            },
+            Param {
+                name: "output_field_name",
+                label: "Output Field Name",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "Column of the definition table with the output field names.",
+            },
+            Param {
+                name: "source_field_name",
+                label: "Source Field Name",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "Column with the input field each output field copies.",
+            },
+            Param {
+                name: "output_field_type",
+                label: "Output Field Type",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "Column with TEXT, SHORT, LONG, FLOAT, DOUBLE, DATE or BIGINTEGER (blank: the source's type).",
+            },
+            Param {
+                name: "output_field_decimals_or_length",
+                label: "Output Field Decimals Or Length",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "Column with the text length or the decimals.",
+            },
+            Param {
+                name: "output_field_alias",
+                label: "Output Field Alias",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "Column with the aliases.",
+            },
+            Param {
+                name: "output_field_script",
+                label: "Output Field Script",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "Column with Python expressions over the output fields, e.g. `!PID! * 10`.",
+            },
+        ],
+        output_suffix: "Updated",
+        measures: false,
+        run: Runner::Dynamic(batch_update_fields),
     },
     Tool {
         id: "add_spatial_join",
