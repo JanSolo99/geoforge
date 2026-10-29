@@ -1,0 +1,19 @@
+{
+  "file": {
+    "status": "failed",
+    "error": "Failed to execute. Parameters are not valid.\nERROR 000732: in_table: Dataset Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp does not exist or is not supported\nFailed to execute (GenerateDefinitionQueryFromSelection).\n",
+    "messages": "Start Time: Friday, October 30, 2026 12:29:32 AM\nFailed to execute. Parameters are not valid.\nERROR 000732: in_table: Dataset Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\parcels.shp does not exist or is not supported\nFailed to execute (GenerateDefinitionQueryFromSelection).\nFailed at Friday, October 30, 2026 12:29:32 AM (Elapsed Time: 0.01 seconds)"
+  },
+  "layer_no_selection": {
+    "status": "failed",
+    "error": "Failed to execute. Parameters are not valid.\nERROR 000346: Input must have a selection\nFailed to execute (GenerateDefinitionQueryFromSelection).\n",
+    "messages": "Start Time: Friday, October 30, 2026 12:29:32 AM\nFailed to execute. Parameters are not valid.\nERROR 000346: Input must have a selection\nFailed to execute (GenerateDefinitionQueryFromSelection).\nFailed at Friday, October 30, 2026 12:29:32 AM (Elapsed Time: 0.07 seconds)"
+  },
+  "layer_selected": {
+    "status": "succeeded",
+    "messages": "Start Time: Friday, October 30, 2026 12:29:32 AM\nSucceeded at Friday, October 30, 2026 12:29:32 AM (Elapsed Time: 0.22 seconds)",
+    "outputs": [
+      "definition_selection_probe"
+    ]
+  }
+}
