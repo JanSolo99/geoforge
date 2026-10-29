@@ -833,3 +833,9 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
       self/coincident links, centroids, empty output) match the ArcGIS controls.
       Geodesic and aggregated output remain gaps; findings in
       scripts/research/origin_destination/README.md.
+
+- [x] Pairwise Polygon Neighbors: optional ObjectID/report fields, projected
+      edge/node/area relationships, grouped hierarchy, BOTH_SIDES/NO_BOTH_SIDES,
+      output units.14 ArcGIS cases (176 rows plus2 refusals) match native output;
+      independent aligned-overlap and reversed-key controls cover Pairwise
+      differences. Full local gate passed; findings in scripts/research/pairwise_neighbors/.

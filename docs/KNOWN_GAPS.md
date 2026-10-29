@@ -118,3 +118,11 @@ Update this file when a gap is found or closed.
   destination input order in two probe sets (despite the parameter's nearest
   wording); native matches those controls. Evidence:
   `scripts/research/origin_destination/README.md`.
+
+- Pairwise Polygon Neighbors: projected WKT1, non-null text/32-bit integer report
+  fields, ordinary straight polygons and common units supported. Custom XY
+  tolerance, MAX_PRECISION, curves, null shapes, other report types/64-bit OIDs
+  are refused. Geographic/unknown CRS, sub-tolerance clustering, mixed contacts across
+  multipart components, environments, empty-output warning text, field collisions and unprobed output schemas remain
+  unsupported or unverified. Performance unmeasured. Evidence:
+  `scripts/research/pairwise_neighbors/README.md`.

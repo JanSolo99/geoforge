@@ -1,0 +1,104 @@
+{
+  "aligned_NO_AREA_OVERLAP": {
+    "fields": [
+      "src_OBJECTID",
+      "nbr_OBJECTID",
+      "LENGTH",
+      "NODE_COUNT"
+    ],
+    "rows": []
+  },
+  "aligned_AREA_OVERLAP": {
+    "fields": [
+      "src_OBJECTID",
+      "nbr_OBJECTID",
+      "AREA",
+      "LENGTH",
+      "NODE_COUNT"
+    ],
+    "rows": [
+      [
+        1,
+        2,
+        50.0,
+        0.0,
+        0
+      ],
+      [
+        2,
+        1,
+        50.0,
+        0.0,
+        0
+      ]
+    ]
+  },
+  "contained_edge_NO_AREA_OVERLAP": {
+    "fields": [
+      "src_OBJECTID",
+      "nbr_OBJECTID",
+      "LENGTH",
+      "NODE_COUNT"
+    ],
+    "rows": []
+  },
+  "contained_edge_AREA_OVERLAP": {
+    "fields": [
+      "src_OBJECTID",
+      "nbr_OBJECTID",
+      "AREA",
+      "LENGTH",
+      "NODE_COUNT"
+    ],
+    "rows": [
+      [
+        1,
+        2,
+        25.0,
+        0.0,
+        0
+      ],
+      [
+        2,
+        1,
+        25.0,
+        0.0,
+        0
+      ]
+    ]
+  },
+  "contained_middle_NO_AREA_OVERLAP": {
+    "fields": [
+      "src_OBJECTID",
+      "nbr_OBJECTID",
+      "LENGTH",
+      "NODE_COUNT"
+    ],
+    "rows": []
+  },
+  "contained_middle_AREA_OVERLAP": {
+    "fields": [
+      "src_OBJECTID",
+      "nbr_OBJECTID",
+      "AREA",
+      "LENGTH",
+      "NODE_COUNT"
+    ],
+    "rows": [
+      [
+        1,
+        2,
+        4.0,
+        0.0,
+        0
+      ],
+      [
+        2,
+        1,
+        4.0,
+        0.0,
+        0
+      ]
+    ]
+  }
+}

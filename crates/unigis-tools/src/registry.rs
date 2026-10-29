@@ -340,7 +340,7 @@ pub fn distance_in_units(text: &str, wkt: Option<&str>) -> Result<f64> {
 }
 
 /// An area in coordinate units squared; bare values already use those units.
-fn area_in_units(text: &str, wkt: Option<&str>) -> Result<f64> {
+pub(crate) fn area_in_units(text: &str, wkt: Option<&str>) -> Result<f64> {
     let text = text.trim();
     let split = text
         .find(|c: char| c.is_alphabetic() && c != 'e' && c != 'E')
@@ -3160,5 +3160,6 @@ pub static TOOLS: &[Tool] = &[
     crate::graphic_buffer::GRAPHIC_BUFFER,
     crate::neighbors::APPORTION_POLYGON,
     crate::neighbors::POLYGON_NEIGHBORS,
+    crate::pairwise_neighbors::TOOL,
     crate::neighbors::COUNT_OVERLAPPING_FEATURES,
 ];

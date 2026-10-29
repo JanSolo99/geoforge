@@ -15,6 +15,7 @@ pub(crate) mod grid_notation;
 pub mod neighbors;
 pub mod origin_destination;
 pub mod pairwise;
+pub mod pairwise_neighbors;
 pub mod planar;
 pub mod pycalc;
 pub mod registry;

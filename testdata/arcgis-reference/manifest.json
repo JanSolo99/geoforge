@@ -78635,6 +78635,838 @@
           "search_distance": 0.001
         }
       }
+    },
+    "ppn_squares": {
+      "tool": "analysis.PairwisePolygonNeighbors",
+      "args": [
+        "testdata/geoproc/squares.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "src_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "nbr_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "LENGTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "NODE_COUNT",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "pairwise_polygon_neighbors",
+        "params": {
+          "input": "testdata/geoproc/squares.shp",
+          "output": "<out>"
+        }
+      }
+    },
+    "ppn_squares_fields": {
+      "tool": "analysis.PairwisePolygonNeighbors",
+      "args": [
+        "testdata/geoproc/squares.shp",
+        "<out>",
+        "SQ_ID;NAME"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "src_SQ_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "nbr_SQ_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "src_NAME",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "nbr_NAME",
+          "String",
+          80,
+          0,
+          0
+        ],
+        [
+          "LENGTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "NODE_COUNT",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "pairwise_polygon_neighbors",
+        "params": {
+          "input": "testdata/geoproc/squares.shp",
+          "output": "<out>",
+          "fields": "SQ_ID;NAME"
+        }
+      }
+    },
+    "ppn_edges": {
+      "tool": "analysis.PairwisePolygonNeighbors",
+      "args": [
+        "testdata/geoproc/pairwise_neighbors.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "src_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "nbr_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "LENGTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "NODE_COUNT",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "pairwise_polygon_neighbors",
+        "params": {
+          "input": "testdata/geoproc/pairwise_neighbors.shp",
+          "output": "<out>"
+        }
+      }
+    },
+    "ppn_overlap": {
+      "tool": "analysis.PairwisePolygonNeighbors",
+      "args": [
+        "testdata/geoproc/pairwise_neighbors.shp",
+        "<out>",
+        "NAME",
+        "AREA_OVERLAP"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "src_NAME",
+          "String",
+          8,
+          0,
+          0
+        ],
+        [
+          "nbr_NAME",
+          "String",
+          8,
+          0,
+          0
+        ],
+        [
+          "AREA",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LENGTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "NODE_COUNT",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "pairwise_polygon_neighbors",
+        "params": {
+          "input": "testdata/geoproc/pairwise_neighbors.shp",
+          "output": "<out>",
+          "fields": "NAME",
+          "area_overlap": "AREA_OVERLAP"
+        }
+      }
+    },
+    "ppn_one_side": {
+      "tool": "analysis.PairwisePolygonNeighbors",
+      "args": [
+        "testdata/geoproc/pairwise_neighbors.shp",
+        "<out>",
+        "NAME",
+        "AREA_OVERLAP",
+        "NO_BOTH_SIDES"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "src_NAME",
+          "String",
+          8,
+          0,
+          0
+        ],
+        [
+          "nbr_NAME",
+          "String",
+          8,
+          0,
+          0
+        ],
+        [
+          "AREA",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LENGTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "NODE_COUNT",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "pairwise_polygon_neighbors",
+        "params": {
+          "input": "testdata/geoproc/pairwise_neighbors.shp",
+          "output": "<out>",
+          "fields": "NAME",
+          "area_overlap": "AREA_OVERLAP",
+          "both_sides": "NO_BOTH_SIDES"
+        }
+      }
+    },
+    "ppn_groups": {
+      "tool": "analysis.PairwisePolygonNeighbors",
+      "args": [
+        "testdata/geoproc/pairwise_neighbors.shp",
+        "<out>",
+        "GRP",
+        "AREA_OVERLAP"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "src_GRP",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "nbr_GRP",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "AREA",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LENGTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "NODE_COUNT",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "pairwise_polygon_neighbors",
+        "params": {
+          "input": "testdata/geoproc/pairwise_neighbors.shp",
+          "output": "<out>",
+          "fields": "GRP",
+          "area_overlap": "AREA_OVERLAP"
+        }
+      }
+    },
+    "ppn_groups_no_area": {
+      "tool": "analysis.PairwisePolygonNeighbors",
+      "args": [
+        "testdata/geoproc/pairwise_neighbors.shp",
+        "<out>",
+        "GRP"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "src_GRP",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "nbr_GRP",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "LENGTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "NODE_COUNT",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "pairwise_polygon_neighbors",
+        "params": {
+          "input": "testdata/geoproc/pairwise_neighbors.shp",
+          "output": "<out>",
+          "fields": "GRP"
+        }
+      }
+    },
+    "ppn_groups_one_side": {
+      "tool": "analysis.PairwisePolygonNeighbors",
+      "args": [
+        "testdata/geoproc/pairwise_neighbors.shp",
+        "<out>",
+        "GRP",
+        "AREA_OVERLAP",
+        "NO_BOTH_SIDES"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "src_GRP",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "nbr_GRP",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "AREA",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LENGTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "NODE_COUNT",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "pairwise_polygon_neighbors",
+        "params": {
+          "input": "testdata/geoproc/pairwise_neighbors.shp",
+          "output": "<out>",
+          "fields": "GRP",
+          "area_overlap": "AREA_OVERLAP",
+          "both_sides": "NO_BOTH_SIDES"
+        }
+      }
+    },
+    "ppn_multi_fields": {
+      "tool": "analysis.PairwisePolygonNeighbors",
+      "args": [
+        "testdata/geoproc/pairwise_neighbors.shp",
+        "<out>",
+        "GRP;NAME",
+        "AREA_OVERLAP"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "src_GRP",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "nbr_GRP",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "src_NAME",
+          "String",
+          8,
+          0,
+          0
+        ],
+        [
+          "nbr_NAME",
+          "String",
+          8,
+          0,
+          0
+        ],
+        [
+          "AREA",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LENGTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "NODE_COUNT",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "pairwise_polygon_neighbors",
+        "params": {
+          "input": "testdata/geoproc/pairwise_neighbors.shp",
+          "output": "<out>",
+          "fields": "GRP;NAME",
+          "area_overlap": "AREA_OVERLAP"
+        }
+      }
+    },
+    "ppn_oid_field": {
+      "tool": "analysis.PairwisePolygonNeighbors",
+      "args": [
+        "testdata/geoproc/pairwise_neighbors.shp",
+        "<out>",
+        "FID",
+        "AREA_OVERLAP"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "src_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "nbr_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "AREA",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LENGTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "NODE_COUNT",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "pairwise_polygon_neighbors",
+        "params": {
+          "input": "testdata/geoproc/pairwise_neighbors.shp",
+          "output": "<out>",
+          "fields": "FID",
+          "area_overlap": "AREA_OVERLAP"
+        }
+      }
+    },
+    "ppn_units": {
+      "tool": "analysis.PairwisePolygonNeighbors",
+      "args": [
+        "testdata/geoproc/pairwise_neighbors.shp",
+        "<out>",
+        "NAME",
+        "AREA_OVERLAP",
+        "BOTH_SIDES",
+        "",
+        "KILOMETERS",
+        "HECTARES"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "src_NAME",
+          "String",
+          8,
+          0,
+          0
+        ],
+        [
+          "nbr_NAME",
+          "String",
+          8,
+          0,
+          0
+        ],
+        [
+          "AREA",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LENGTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "NODE_COUNT",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "pairwise_polygon_neighbors",
+        "params": {
+          "input": "testdata/geoproc/pairwise_neighbors.shp",
+          "output": "<out>",
+          "fields": "NAME",
+          "area_overlap": "AREA_OVERLAP",
+          "both_sides": "BOTH_SIDES",
+          "out_linear_units": "KILOMETERS",
+          "out_area_units": "HECTARES"
+        }
+      }
+    },
+    "ppn_units_feet": {
+      "tool": "analysis.PairwisePolygonNeighbors",
+      "args": [
+        "testdata/geoproc/pairwise_neighbors.shp",
+        "<out>",
+        "NAME",
+        "AREA_OVERLAP",
+        "BOTH_SIDES",
+        "",
+        "FEET_INTERNATIONAL",
+        "SQUARE_FEET"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "src_NAME",
+          "String",
+          8,
+          0,
+          0
+        ],
+        [
+          "nbr_NAME",
+          "String",
+          8,
+          0,
+          0
+        ],
+        [
+          "AREA",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LENGTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "NODE_COUNT",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "pairwise_polygon_neighbors",
+        "params": {
+          "input": "testdata/geoproc/pairwise_neighbors.shp",
+          "output": "<out>",
+          "fields": "NAME",
+          "area_overlap": "AREA_OVERLAP",
+          "both_sides": "BOTH_SIDES",
+          "out_linear_units": "FEET_INTERNATIONAL",
+          "out_area_units": "SQUARE_FEET"
+        }
+      }
+    },
+    "ppn_err_line": {
+      "tool": "analysis.PairwisePolygonNeighbors",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 003917: The feature class geometry is not of type polygon",
+        "Failed to execute (PairwisePolygonNeighbors)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "pairwise_polygon_neighbors",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "output": "<out>"
+        }
+      }
+    },
+    "ppn_err_field": {
+      "tool": "analysis.PairwisePolygonNeighbors",
+      "args": [
+        "testdata/geoproc/squares.shp",
+        "<out>",
+        "NO_SUCH"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000728: Field NO_SUCH does not exist within table",
+        "Failed to execute (PairwisePolygonNeighbors)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "pairwise_polygon_neighbors",
+        "params": {
+          "input": "testdata/geoproc/squares.shp",
+          "output": "<out>",
+          "fields": "NO_SUCH"
+        }
+      }
     }
   }
 }

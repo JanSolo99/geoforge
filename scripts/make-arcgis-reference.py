@@ -989,6 +989,20 @@ CASES = {
     "mrb_wells_all": ("analysis.MultipleRingBuffer", [DATA / "wells.shp"], ["50;100", "Meters", "dist", "ALL"]),
     "mrb_parcels_outside": ("analysis.MultipleRingBuffer", [DATA / "parcels.shp"], ["10;30", "Meters", "dist", "ALL", "OUTSIDE_ONLY"]),
     "mrb_roads": ("analysis.MultipleRingBuffer", [DATA / "roads.shp"], ["20;40;60", "Meters"]),
+    "ppn_squares": ("analysis.PairwisePolygonNeighbors", [DATA / "squares.shp"], []),
+    "ppn_squares_fields": ("analysis.PairwisePolygonNeighbors", [DATA / "squares.shp"], ['SQ_ID;NAME']),
+    "ppn_edges": ("analysis.PairwisePolygonNeighbors", [DATA / "pairwise_neighbors.shp"], []),
+    "ppn_overlap": ("analysis.PairwisePolygonNeighbors", [DATA / "pairwise_neighbors.shp"], ['NAME', 'AREA_OVERLAP']),
+    "ppn_one_side": ("analysis.PairwisePolygonNeighbors", [DATA / "pairwise_neighbors.shp"], ['NAME', 'AREA_OVERLAP', 'NO_BOTH_SIDES']),
+    "ppn_groups": ("analysis.PairwisePolygonNeighbors", [DATA / "pairwise_neighbors.shp"], ['GRP', 'AREA_OVERLAP']),
+    "ppn_groups_no_area": ("analysis.PairwisePolygonNeighbors", [DATA / "pairwise_neighbors.shp"], ['GRP']),
+    "ppn_groups_one_side": ("analysis.PairwisePolygonNeighbors", [DATA / "pairwise_neighbors.shp"], ['GRP', 'AREA_OVERLAP', 'NO_BOTH_SIDES']),
+    "ppn_multi_fields": ("analysis.PairwisePolygonNeighbors", [DATA / "pairwise_neighbors.shp"], ['GRP;NAME', 'AREA_OVERLAP']),
+    "ppn_oid_field": ("analysis.PairwisePolygonNeighbors", [DATA / "pairwise_neighbors.shp"], ['FID', 'AREA_OVERLAP']),
+    "ppn_units": ("analysis.PairwisePolygonNeighbors", [DATA / "pairwise_neighbors.shp"], ['NAME', 'AREA_OVERLAP', 'BOTH_SIDES', '', 'KILOMETERS', 'HECTARES']),
+    "ppn_units_feet": ("analysis.PairwisePolygonNeighbors", [DATA / "pairwise_neighbors.shp"], ['NAME', 'AREA_OVERLAP', 'BOTH_SIDES', '', 'FEET_INTERNATIONAL', 'SQUARE_FEET']),
+    "ppn_err_line": ("analysis.PairwisePolygonNeighbors", [DATA / "roads.shp"], []),
+    "ppn_err_field": ("analysis.PairwisePolygonNeighbors", [DATA / "squares.shp"], ['NO_SUCH']),
     "pn_squares": ("analysis.PolygonNeighbors", [DATA / "squares.shp"], ["SQ_ID", "NO_AREA_OVERLAP", "BOTH_SIDES"]),
     "pn_squares_area": ("analysis.PolygonNeighbors", [DATA / "squares.shp"], ["SQ_ID;NAME", "AREA_OVERLAP", "BOTH_SIDES"]),
     "cof_clip": ("analysis.CountOverlappingFeatures", [str(DATA / "clip_areas.shp")], []),
@@ -2040,6 +2054,7 @@ RUN = {
     "gp.ComputeChangeRaster_ia": ("compute_change_raster", ["from_raster", "to_raster", "output", "change_type"]),
     "gp.CreateBinaryMask_ia": ("create_binary_mask", ["input", "output", "background_value"]),
     "management.GenerateTessellation": ("generate_tessellation", ["output", "extent", "shape", "size", "template"]),
+    "analysis.PairwisePolygonNeighbors": ("pairwise_polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides", "cluster_tolerance", "out_linear_units", "out_area_units", "precision"]),
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
     "analysis.CountOverlappingFeatures": ("count_overlapping_features", ["input", "output", "minimum_overlap_count"]),
     "gp.Lookup_sa": ("lookup", ["input", "lookup_field", "output"]),
@@ -2072,7 +2087,7 @@ WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable", "conversion.RasterToASCII", "conversion.RasterToFloat"}
 # Tools whose output is a table, written as <name>.dbf.
-TABLE_OUT = {"analysis.AssignWeightsByPairwiseComparison", "management.FieldStatisticsToTable", "gp.Sample_sa", "management.CopyRows", "gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa", "gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
+TABLE_OUT = {"analysis.PairwisePolygonNeighbors", "analysis.AssignWeightsByPairwiseComparison", "management.FieldStatisticsToTable", "gp.Sample_sa", "management.CopyRows", "gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa", "gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
              "management.TransposeFields", "management.PivotTable", "management.CreateTable", "analysis.PolygonNeighbors", "analysis.TabulateIntersection", "analysis.TableSelect"}
 # Tools whose ArcGIS output must be a geodatabase feature class or memory (copied to a shapefile).
 MEMORY_OUT = {"analysis.SummarizeWithin", "analysis.SummarizeNearby", "analysis.ApportionPolygon"}
