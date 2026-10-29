@@ -1,0 +1,17 @@
+{
+  "source_count": 3,
+  "selected_keys": [
+    2
+  ],
+  "output": [
+    [
+      1,
+      100.0
+    ],
+    [
+      3,
+      220.0
+    ]
+  ],
+  "messages": "Start Time: Friday, October 30, 2026 1:37:00 AM\nReading Features...\nCracking Features...\nAssembling Features...\nEliminated 1 feature(s)\nSucceeded at Friday, October 30, 2026 1:37:00 AM (Elapsed Time: 0.03 seconds)"
+}
