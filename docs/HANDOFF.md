@@ -2,240 +2,219 @@
 
 ## Latest state (Claude, 2026-10-29) — read this first
 
-Workspace /mnt/media/ArcGIS_Linux, branch main, all Claude work pushed (HEAD d7d507c or later).
-GitHub Actions minutes are exhausted: both workflows are manual-only; the gate is `scripts/check`
-(run by the pre-push hook, core.hooksPath=.githooks). Do not rely on or trigger hosted CI.
-Claude added this stretch (each with ArcGIS reference cases, details in the dated notes below):
-Convert Coordinate Notation (DD/DDM/DMS), Table To Ellipse (planar, plus adaptive ellipse
-densification in unigis-core curves.rs), Geodetic Densify (geodesic), Encode Field, Field
-Statistics To Table (NUMERIC or TEXT). Probed but not implemented: Trim Line (topological),
-Convert Time Zone (needs tz database), Add Incrementing ID Field (ArcSDE only).
-Uncommitted work in the tree belongs to Codex (unary integer-float multiband: local.rs,
-registry.rs, stats.rs, unary_band_safety.rs, its umintfloat_* cases in make-arcgis-reference.py,
-testdata/raster/unary_integer_float, scripts/research/unary_multiband/integer_float): do not
-commit or revert it. Never read or add NOTES.md or .worktrees. Stage explicit paths only; when
-committing make-arcgis-reference.py hunks, exclude Codex's umintfloat hunk (git apply --cached
---unidiff-zero of a filtered diff). If a push says "cannot lock ref", run `git fetch` and check
-`git status -sb`: the earlier push may already have landed.
-Next candidates: Extend Line / Trim Line (need a topology-aware test set), Convert Coordinate
-Notation non-DD input formats, Field Statistics To Table Date fields / combined NUMERIC+TEXT run, Aggregate Points,
-Rotate/Rescale rasters (after Codex finishes the raster files), items in docs/KNOWN_GAPS.md.
+Workspace /mnt/media/ArcGIS_Linux, branch main. Work now follows docs/WORK_QUEUE.md (one tool per
+landing, commit and push each; see its rules). This run wrapped up the uncommitted pile into four
+landings: 1b3a28e Convert Coordinate Notation inputs (Codex's angular/GARS/GEOREF work + Claude's
+UTM/MGRS/USNG input), 0643f03 Field Statistics To Table DATE, 510daa8 Extend Line, and Trim Line
+(the commit carrying this handoff). Shared files were staged per landing from the working copy
+(/tmp/fstg/stage.py), so each commit holds only its own lines. Validation: full scripts/check EXIT 0
+on the whole working tree (210 Rust passed / 5 ignored; /tmp/unigis-trim-check.log); push status
+is in the line below.
 
-Claude 2026-10-29 (this run): Field Statistics To Table group-by (`group_by=` param, tables.rs +
-registry.rs, 3 unit tests, 3 new `fst_parcels_*_by_*` reference cases + manifest annotate). ArcGIS
-probe (memory table with nulls): the group field leads the row (fresh field of its type: default
-width, no alias; text width = longest value), groups ascending (text by byte order: '' < B < a < b),
-rows with a NULL group value are dropped, the group field may also be summarized, Double/Float group
-fields fail with ERROR 003911. Manual ug-vs-ArcGIS dbf diff (ogrinfo) identical for all 3 cases.
-Validation status is in the line below; commit only explicit paths (tables.rs, registry.rs in
-unigis-tools, the 3 fst case hunks of make-arcgis-reference.py, manifest.json, the 9 new
-testdata/arcgis-reference/fst_parcels_*_by_* files, ROADMAP.md, HANDOFF.md).
-Validation: full scripts/check EXIT 0 (fmt, clippy -D warnings, workspace tests incl.
-tools_match_arcgis_output; log /tmp/unigis-fst-group-check.log). The run covered the working tree
-including Codex's uncommitted raster edits. Committed as "Add group-by field to Field Statistics To Table".
+Still uncommitted on purpose:
+- Codex's raster unary integer-float slice (crates/unigis-raster/src/{local,registry,stats}.rs,
+  crates/unigis-cli/tests/unary_band_safety.rs, the `umintfloat_*` CASES block in
+  scripts/make-arcgis-reference.py, testdata/raster/unary_integer_float/,
+  scripts/research/unary_multiband/integer_float/): Codex recorded comparisons as pending.
+- Coordinator/queue infrastructure not written by Claude: AGENTS.md, .githooks/post-commit,
+  scripts/agents-remote, tools/agent-coordinator/*, scripts/work_queue.py, docs/WORK_QUEUE*.{md,txt},
+  docs/dashboard.html. Never read/add NOTES.md or .worktrees; scratch_te/ is scratch.
 
-Claude 2026-10-29 (next run): Field Statistics To Table Output Statistics (`statistics=` param,
-"KEYWORD [Name];..." as arcpy's string form; `#` = default name). ArcGIS probe: keywords are the
-default column names upper-cased (MEDIAN, STANDARDDEVIATION, NUMBEROFUNIQUEVALUES, FIELDNAME...);
-exact-case only; unknown keywords ignored, none known -> full table; columns in list order after
-the group field; empty name -> default name; names sanitized like ValidateFieldName (My Med ->
-My_Med, 1sum -> F1sum, WARNING 000304 not reproduced); duplicate keyword ERROR 110415; numeric
-keyword in a TEXT run ERROR 000800; case-insensitive name clash (also with the group field) ERROR
-000210. 3 new success cases + 3 refusal cases (fst_err_*), 2 more unit tests. ug-vs-ArcGIS dbf
-diffs identical; refusal codes match.
-Validation: full scripts/check EXIT 0 (log /tmp/unigis-fst-stats-check.log; tree incl. Codex's
-uncommitted raster edits). Committed as "Add Output Statistics list to Field Statistics To Table".
+Next action: next queue item: Assign Weights By Pairwise Comparison (docs/WORK_QUEUE.md #1).
 
-Claude 2026-10-29 (third run): Convert Coordinate Notation grid outputs UTM_BANDS, UTM_ZONES, MGRS,
-USNG, GARS, GEOREF (new crates/unigis-tools/src/grid_notation.rs: Krüger n^6 TM + UPS, no PROJ;
-wired in construct.rs/registry.rs). Output field = format name, Text 255. ArcGIS rules found by
-probing 39 points (fixture testdata/geoproc/lonlat_grid.csv): UTM E/N floored to the metre, zone 2
-digits, E 6/N 7 digits; MGRS/USNG rounded to the metre before the 100 km letters (a southern point
-rounded to N 10 000 000 is written in band N); UTM to 84N/80S inclusive, else UPS with A/B/Y/Z by
-lon<0; UTM notations of UPS subtract 1 300 000 (north) / 800 000 (south) from E and N; Norway and
-Svalbard zone exceptions; UTM_ZONES hemisphere N for lat>=0. GARS: plain floor, lon 180 wraps to
-001, lat 90 stays in the top cell. GEOREF: minutes rounded to 0.001 with carry, clamped at the
-east/north edge to 59.999. Unit test checks 15 points x 6 formats; 6 new ccn_* reference cases
-(39 rows each) identical to ArcGIS by ogrinfo diff.
-Finding: GDAL 3.13 reading a FileGDB point (1e-9 resolution, origin -400) at -45.9999999 /
--45.99999999 prints POINT (-46.0 46.0) (exact with -xyRes 1e-12), which failed to_geodatabase's
-GDAL cross-check; the fixture point is -45.999996 instead (still a GEOREF minute carry).
-Validation: first scripts/check failed only on that to_geodatabase cross-check (6 ccn_* files);
-rerun after the fixture change EXIT 0 (/tmp/unigis-ccn-grid-check2.log; tree incl. Codex's
-uncommitted raster edits). Committed as "Add UTM, MGRS, USNG, GARS and GEOREF to Convert Coordinate Notation".
+Older notes follow (history; the commit list above supersedes their "uncommitted" remarks).
 
-Older notes (Codex, then Claude) follow.
+## Claude run (2026-10-29, after Codex) — read first
 
-Updated 2026-10-28T18:40:03.782995+00:00; last agent Codex.
-Workspace /mnt/media/ArcGIS_Linux; main; HEAD97043a1 PUSHED, remote main verified
-97043a1cc01d142feef3f2ab4eea3216cce3e2f8. Standing objective continuous development,
-frequent tested commits/pushes/dashboard updates. Alone; no agents/other Claude/
-Codex CLIs/coordinator. Cargo-j3, one build at a time. Preserve NOTES.md/.worktrees
-(never read/add), explicit staging only.
+Continued Codex's next action 2 (alternative): UTM_BANDS/UTM_ZONES/MGRS/USNG input. All edits
+UNCOMMITTED and interleaved with Codex's uncommitted coordinate-notation work in the same files
+(grid_notation.rs, construct.rs, registry.rs, coordinate_notation_safety.rs, make-arcgis-reference.py,
+manifest.json): commit the whole coordinate-notation slice together, or not at all.
+- grid_notation.rs: inverse Krüger TM, inverse UPS, parse_utm/parse_mgrs (+ unit test of 30 probed
+  strings). construct.rs: projected inputs dispatched as grid inputs; outputs limited to
+  DD_NUMERIC/DD_1/DD_2. registry.rs: input choices + help. Safety test: projected inputs refuse
+  DDM_1/DMS_2/GARS/MGRS without touching existing files.
+- Fixtures testdata/geoproc/grid_input_{mgrs,usng,utm_bands,utm_zones}.dbf (ArcGIS-made, recipe
+  CSVs + make_projected_inputs.py in scripts/research/coordinate_notation/grid/); 8 reference
+  cases ccn_grid_input_{mgrs,usng,utm_bands,utm_zones}_{dd_numeric,dd_1} + mgrs_dd_2. Findings:
+  grid/projected-inputs.md. ROADMAP and KNOWN_GAPS updated.
+- Incident: generating 'ccn_grid_input_*_dd_1' also regenerated Codex's gars_dd_1/georef_dd_1;
+  their manifest entries equal Codex's baseline (/tmp/unigis-gars-start-manifest.json, ignoring the
+  temp log path) and compare.py passes both.
+- Validation: compare.py PASS for all 8 new cases and the 2 regenerated ones; unit tests and
+  coordinate_notation_safety PASS. Full scripts/check: first run EXIT101 at clippy
+  (type_complexity in the new unit test; fixed with type aliases), rerun EXIT 0: 209 Rust passed,
+  5 ignored, Python/fmt/clippy -D warnings PASS (/tmp/unigis-ccn-proj-check2.log). Covers all
+  current tree edits (Codex's + this run). Nothing committed or pushed.
+- Follow-up (this run, 2026-10-29 later): arcpy projectAs reproduces CCN exactly; 70-sample
+  error survey saved (grid/projected_inverse_samples.json, findings appended to
+  grid/projected-inputs.md): error ~x^7 on the equator, sign flips with latitude, explodes near
+  the pole -> truncated series, formula not identified. Not modelled; guard unchanged.
+- Field Statistics To Table DATE (this run, uncommitted): tables.rs FieldStatisticsType
+  {Numeric, Text, Date} replaces the numeric flag; DATE columns Minimum/Maximum/Mean/Median/
+  Count/NumberofUniqueValues/Mode/LeastCommon/Range(text)/FirstQuartile/ThirdQuartile (dates,
+  quartiles interpolated like numbers, Mode/LeastCommon None on ties). Range text: years(365 d)
+  >365 d, months(30 d) >30 d, weeks >7 d, days >=1 d, hours >3600 s, minutes >60 s, seconds >=1 s,
+  else milliseconds; integer -> no decimals, else 1 decimal if within 1% relative, else 2
+  (fits 94/94 probes). SUM etc. in a DATE run -> ERROR 000800 listing the DATE columns.
+  registry.rs: field_type choice Date. Fixture testdata/geoproc/dates.dbf (recipe
+  scripts/research/field_statistics/make_dates.py); 4 cases fst_dates_date{,_by_grp,_stats},
+  fst_err_date_numeric_stat; ogrinfo diff identical; unit test date_ranges_match_arcgis.
+  Independent of the coordinate-notation slice except shared files (registry.rs,
+  make-arcgis-reference.py, manifest.json, ROADMAP/HANDOFF); tables.rs is only this change.
+  Validation: full scripts/check EXIT 0, 210 Rust passed / 5 ignored, Python/fmt/clippy PASS
+  (/tmp/unigis-fst-date-check.log; whole tree incl. Codex's and the projected-input edits).
+  Not committed (shared files hold Codex's uncommitted work).
+- Extend Line (this run, uncommitted): new crates/unigis-tools/src/extend.rs (only this
+  change), `pub mod extend` in lib.rs, registry entry/runner `extend_line` (input, length,
+  extend_to FEATURE|EXTENSION). Fixture testdata/geoproc/extend_lines.shp (recipe
+  scripts/research/extend_line/make_inputs.py), 6 ext_* cases (generator CASES + RUN +
+  IN_PLACE entries). Findings: scripts/research/extend_line/README.md. All 6 cases equal
+  ArcGIS (per-feature GeoJSON compare, 6 decimals). ROADMAP/KNOWN_GAPS updated.
+  Validation: full scripts/check EXIT 0, 210 Rust passed / 5 ignored, Python/fmt/clippy PASS
+  (/tmp/unigis-extend-check.log; includes tools_match_arcgis_output over the ext_* cases).
+- Trim Line (this run, uncommitted): new crates/unigis-tools/src/trim.rs (only this change),
+  `pub mod trim` in lib.rs, registry entry/runner `trim_line` (input, dangle_length,
+  delete_shorts DELETE_SHORT|KEEP_SHORT). Fixture testdata/geoproc/trim_lines.shp (recipe
+  scripts/research/trim_line/make_inputs.py), 8 trim_* cases (CASES + RUN + IN_PLACE).
+  Findings: scripts/research/trim_line/README.md (supersedes the older Trim Line probe notes
+  below). All 8 cases equal ArcGIS per feature (GeoJSON, 6 decimals, same feature counts).
+  Validation: full scripts/check EXIT 0, 210 Rust passed / 5 ignored, Python/fmt/clippy PASS
+  (/tmp/unigis-trim-check.log; includes tools_match_arcgis_output over the trim_* cases).
+- Next: Codex's angular GARS item, Aggregate Points, Field Statistics To Table combined
+  NUMERIC+TEXT run (needs two outputs).
 
-## Completed this session, all pushed/verified
+## Objective / result
 
-0eba1e7 inherited tessellation units/safety/Foot_US precision (31refs),014c027
-uncached integer Abs/Negate/Square bands (21),87338d2 unary band-loss guard,
-9142ac1 floating SquareRoot/Ln/Exp bands (12),97043a1 cached integer bands (36).
-First two local+normal push checks195Rust/5ignored, others196Rust/5ignored;
-8Python/fmt/clippy-Dwarnings PASS. Fresh recipes/scoped comparisons/dashboard/
-JS/Python/diff PASS per slice. Logs /tmp/unigis-{tess-area,intmulti,unary-guard,
-float-more,cached-multi}-*.log; cached successful fullcheck3, tess fullcheck3.
-Earlier c5064bc/598f777 remain ancestors; no external actions to repeat.
+Continue recorded next action: resolve GARS re-encoding boundaries. Separated
+numeric-input serialization from grid decoding with fresh black-box controls.
+Scoped grid-input GARS path now matches all 240 old controls plus 1,144 independent
+controls exactly, enabling GARS output for GARS/GEOREF inputs. Legacy angular
+path intentionally unchanged; a newly quantified numeric boundary gap remains.
+Scoped grid-input GARS slice complete. Final local `scripts/check` EXIT0:
+208 Rust passed, 5 ignored; 8 Python passed; fmt and clippy passed. Rare SBN
+layout differences remain documented and covered by strict fixture checks.
 
-Cached slice uses union of COMPLETE stored ranges, preserves per-band metadata,
-promotes nonnegative127 toU8, refuses invalid multiband ranges viaNaN planning
-extrema. No Raster fields added; new Output.covariance_statistics policy flag,
-no app policy constructors/field consumers (rg audit), no app edits. Direct GP
-stats differ from SA Raster.save: empty integer band + out-of-storage marker
-triggers stored0 statistics/COV initialization; diagonal sample variance, zero
-cross terms even for correlated bands. All36 strict final/fresh-recipe cases PASS,
-24source components unchanged. Seven-case guard preserves every existing byte.
-Evidence scripts/research/unary_multiband/cached +formats/raster-statistics.md.
-Failed check1 caught8 float-output regressions from overly broad stored0 policy;
-fixed by restricting to cached integer Abs/Negate/Square with integer OUTPUT.
-Fullcheck3/push passed196. Failed check2 was interrupted text-patch rerun.
+## Changes this run (uncommitted)
 
-## Active new slice: floating Log2/Sin/RoundUp bands
+- `crates/unigis-tools/src/grid_notation.rs`: GARS decoding in positive integer
+  grid ticks /12, origin subtraction last. New gars_from_grid: degree/radian
+  roundtrip then direct global five-minute tick floors, no snapping. One new
+  oracle-based boundary unit test. Generic angular encoder remains unchanged.
+- `construct.rs`: grid GARS branch and guard enabled; other projected-grid
+  outputs still refused. Registry help updated. coordinate_notation_safety.rs
+  retains eight unsupported combinations and exact output-byte preservation.
+- Four generator/manifest/reference additions: two ordinary GARS output cases
+  (81/87 rows) reused from saved research outputs, source attributes/counts
+  verified unchanged; no redundant external GP rerun. Two new typed DBF holdout
+  cases (652/492 rows), created/probed/generated with ArcGIS.
+- `testdata/geoproc/gars_boundary_{gars,georef}.{dbf,cpg,dbf.xml}`; reproducible
+  recipe CSVs under research/grid, generated by make_gars_boundary_inputs.py.
+- `crates/unigis-shapefile/tests/sbn.rs`: strict exact-entry/layout checks for
+  two boundary fixtures; four older exceptions unchanged. Format documentation
+  records six ancestor-retention differences; no SBN runtime changes.
+- Research scripts/results/models, README, ROADMAP, KNOWN_GAPS updated.
+  Durable findings/reproduction: `scripts/research/coordinate_notation/grid/gars-boundaries.md`.
 
-12private DIRECT GP controls succeeded, all2bands/F32 across F32/F64 cached and
-uncached. Source /tmp/unigis-float-unary-more; new controls
-/tmp/unigis-float-unary-next/probe.py and /tmp/unigis-float-unary-next-probe.log.
-Raw Root/private inputs have no PAM. Baseline12/12 safely refused before feature.
-Research scripts/research/unary_multiband/more (probe/observations/baseline,
-comparator template/README). Reuses fourTIFF/twoPAM sources and fresh recipe in
-../floating, no new source fixture files. GDAL file IO only, ArcGIS Pro3.7 GP oracle.
+## Evidence / decisions
 
-New local.rs support predicate permits floating Log2/Sin/RoundUp; existing per-
-band math handles them. CLI guard floats move to Log10/Cos/RoundDown, retains
-integer SquareRoot/Ln/Exp and malformed cached Abs (7refusal cases). Generator
-adds12umfloatnext_* cases. ROADMAP/KNOWN_GAPS edited. No app/API changes this slice.
-Inherited post-commit HTML/HANDOFF dirt; all other active edits new here.
+`probe_gars_numeric.py`: 1,920 numeric DD_2 inputs (240 corners, decoder-arithmetic
+variant and adjacent f64 neighbors); source CSV cursor preserves all f64 inputs.
+A 15-significant-digit conversion + degree/radian roundtrip + global tick floors
+predicts all numeric oracle outputs. Only135/240 numeric centers match saved
+GARS->GARS results; 239/240 cells ignore adjacent-ULP changes. This isolates
+numeric serialization from decoder math; inferred model, no claim about internals.
 
-## Running / validation
+For GARS input, origin subtraction after positive grid decoding plus angle
+roundtrip/global floors reproduces the saved240 holdout, including 116LR17->
+115LR29 and161AA34->161AA37. Fresh seed91762 adds652 GARS and492 GEOREF controls
+(480 random each, systematic subcells, short forms, precision2..9, edge/invalids).
+Model and native CLI match all1,144 new strings exactly. No coordinate comparison
+tolerances changed; SBN layout validation is separately documented below. Files: gars_numeric_results.json, gars_holdout_results.json,
+gars_model.py, encoder/decoder candidate scripts and probe_gars_*.py.
 
-cargo fmt PASS. cargo build-j3 unigis-cli RUNNING22492,
-/tmp/unigis-float-next-build.log; ONLY Cargo build.
-Reference generator 'umfloatnext_*' RUNNING81716,
-/tmp/unigis-float-next-references.log. Do not start full gate until manifest/ref
-writes finish. New feature not validated yet.
+`diagnose_gars_numeric.py` also measured1,169 legacy angular-output differences
+against those1,920 numeric oracle cases; the existing angular path stays unchanged.
+Before integrating that model, probe Double/Single/integer/text fields and source
+backends; do not assume all coordinate syntaxes use the same serialization.
+This confirmed gap is now explicitly in KNOWN_GAPS.
+
+## Validation
+
+- `cargo build -j3 -p unigis-cli` PASS, /tmp/unigis-gars-build.log. Final error
+  wording updated afterward; full gate recompiles that unchanged logic.
+- `python3 scripts/research/coordinate_notation/grid/compare_gars_controls.py`:
+  1,384 exact strings PASS, /tmp/unigis-gars-native-controls.log.
+- `python3 scripts/research/coordinate_notation/compare.py --prefix ccn_grid_input_ --count 22`:
+  22/22 PASS,3,080 rows, exact schema/text/geometry presence/warning counts,
+  numeric tolerance1e-8deg; /tmp/unigis-gars-grid-compare.log.
+- Default comparator12 angular cases PASS, /tmp/unigis-gars-angular-regression.log.
+  compare_carry_controls.py all5,634 exact PASS, /tmp/unigis-gars-carry-regression.log.
+  Updated compare_outputs.py all326 original GARS/GEOREF fields PASS,
+  /tmp/unigis-gars-old-grid-regression.log.
+- Diagnostic (not a passing angular compatibility claim): inferred numeric
+  model matches1,920; unchanged native angular path differs1,169;
+  /tmp/unigis-gars-angular-diagnostic.log.
+- First `scripts/check` EXIT101, /tmp/unigis-gars-check.log: full ArcGIS
+  comparison passed, then stale refusal list still included GARS (the attempted
+  edit missed rustfmt's one-line list). Corrected test to exactly the four
+  remaining projected formats, eight source/target combinations. No product fix
+  needed; new GARS conversion had correctly succeeded.
+- Second `scripts/check` EXIT101, /tmp/unigis-gars-check2.log: reached SBN
+  test; 651/657 indexes byte-identical, four existing exceptions plus two new
+  boundary fixture differences. Independent parser confirms identical headers,
+  record IDs and byte boxes (646/486 indexed records), consistent SBX offsets
+  and valid node bounds. Exactly three records per fixture sit one level higher
+  in ArcGIS, matching the documented retention gap. Diagnostic:
+  grid/inspect_boundary_indexes.py, /tmp/unigis-gars-index-comparison.json.
+  Added strict fixture-specific checks of exact six node moves plus headers,
+  IDs/boxes, SBX offsets, bin use/counts and tree containment. No runtime SBN
+  change. Focused `cargo test -j3 -p unigis-shapefile --test sbn -- --nocapture`
+  PASS (/tmp/unigis-gars-sbn-check.log):651 byte-identical,2 checked layouts,
+  only the four prior known exceptions. Format docs/ROADMAP/KNOWN_GAPS corrected
+  former blanket byte-identity claims.
+- Third `scripts/check` EXIT101 at clippy: two new constant chunks_exact uses;
+  corrected to as_chunks; /tmp/unigis-gars-check3.log.
+- Final `scripts/check` EXIT0, /tmp/unigis-gars-check4.log: 208 Rust passed,
+  5 ignored, 8 Python passed, fmt and clippy -D warnings passed. Covers all final
+  Rust edits and four reference additions, including ArcGIS comparisons, safety,
+  GDAL format checks and shapefile/geodatabase round trips.
+- Final Python syntax (31 files) and `git diff --check` PASS. Manifest audit:
+  all2,118 starting cases and metadata unchanged, exactly4 additions. Inherited
+  hash audit:14 files unchanged; scripts/agents-remote changed externally (below).
+  Baselines: /tmp/unigis-gars-start-{hashes,manifest}.json. Testkit/core/CSV/
+  raster/coordinator edits preserved. Independent index diagnostic now creates
+  temporary native copies itself and reproduces all six moves.
+
+## Inherited state
+
+All earlier angular/GARS/GEOREF/carry parsers, core has_object_id metadata, CSV
+synthetic-ID override, ORIG_OID policy, file-oracle leading-space normalization
+and OGR_WKT_ROUND=NO remain intact. Prior gate207Rust/5ignored+8Python/fmt/clippy
+PASS (/tmp/unigis-carry-check3.log). Relevant findings: grid/carry.md and
+`docs/formats/{shapefile-leading-spaces,gdal-wkt-rounding}.md`.
+
+Unfinished raster integer-float work (raster local/registry/stats, unary safety,
+umintfloat generator hunk, unary_integer_float fixtures/research) remains
+inherited;39 private controls in /tmp/unigis-integer-float-unary; integration/
+docs/final comparisons pending. Also inherited: dashboard, agents-remote,
+coordinator code/docs/tests and scratch_te/. Never read/add NOTES.md or .worktrees.
+Do not stage shared generator wholesale or commit/push unless requested.
 
 ## Next actions
 
-1. Finish build/generation; more/compare_native.py12cases; inspect any exact
-   float/pixel differences empirically, keep standard numerical tolerances clear.
-2. Fresh shared floating recipe + comparator input-folder override, source hash/
-   no-new-PAM verification; save artifacts. Update research docs/guard pointers.
-3. Dashboard--ci/JS/Python/diff; full scripts/check-j3 (expected196Rust, not yet
-   passed), own explicit commit/normal push hook/remote main verification.
-4. Continue roadmap after reading ROADMAP/KNOWN_GAPS. Integer floating-result
-   unary ops, remaining floating operators, stale/empty-source cache semantics
-   remain bounded candidates. Keep commits small and checkpoint during work.
+1. Grid-input GARS slice complete and validated; edits remain uncommitted. No
+   running builds or probes. Keep projected-grid output guards until verified.
+2. Next: isolate angular GARS serialization across source numeric types and
+   text formats, then apply the inferred model only where new controls prove it.
+   Numeric CSV data already explains 1,920 cases; avoid repeating those probes.
+   Alternatively begin UTM/MGRS/USNG input inversion.
+3. SBN ancestor-retention rule remains unresolved; exact known-layout checks
+   preserve all record/box/containment validation while documenting byte gaps.
+4. CSV inferred-coordinate schema, custom id_field/name collisions and 64-bit
+   ORIG_OID remain known gaps. Read roadmap/gaps before selecting work.
+   Hosted Actions exhausted: use local scripts/check, no hosted CI.
 
-Float-next scoped comparison:10/12 exactPASS,2F32Log2 cases differ at89 by1ULP;
-F64Log2/Sin/RoundUp exactPASS. /tmp/unigis-float-next-after.log. Native f64log2
-and log2f give6.47573328018; GP F32 gives6.47573375702. F32 natural-log base
-conversion candidates match that cell. log2_precision.json saves candidates.
-Additional private32value x2band GP Log2/Ln fingerprint RUNNING (tool session),
-/tmp/unigis-log2-precision/{make_inputs,probe}.py, candidates.json and
-/tmp/unigis-log2-precision-probe.log. No new precision code yet; full gate not run
-for float-next. Do not weaken tolerances before isolating arithmetic path.
-
-Precision solved:32/32values match F32ln*F32LOG2_E, versus28/32ln-division and
-18/32directlog2. Added F32-specific path (F64 unchanged), one32value x2band
-source fixture/testdata/raster/unary_log2_precision/input.tif and golden case.
-Now13umfloatnext_* refs. Strict13 original/fresh-recipe comparisons PASS,
-/tmp/unigis-float-next-after2.log and research/native_after.txt/recipe_verification.
-Shared source6hashes unchanged; raw/precision sources have no PAM; precision
-file byte-matches private oracle. Full gate RUNNING91778
-/tmp/unigis-float-next-check.log (only Cargo); dashboard--ci RUNNING48314.
-Research README/ROADMAP/KNOWN_GAPS updated. No next integer-float feature edits.
-
-Next-slice private GP probe RUNNING85922:39 integer-input SquareRoot/Ln/Exp
-controls (six types raw/cached plus cached nonpositive I16). Private folder
-/tmp/unigis-integer-float-unary/{make_inputs,probe}.py and profiles.json;
-/tmp/unigis-integer-float-unary-probe.log. Sources copied from frozen Root inputs
-with caches retained only for *_cached copies. No next-feature product edits.
-Current float-next JS/Python/diff checks PASS, explicit feature files staged;
-full gate still running, no additional Cargo allowed until it finishes.
-
-Final float-next validation: full scripts/check EXIT0,196Rust passed/5ignored,
-8Python/fmt/clippy-Dwarnings PASS (/tmp/unigis-float-next-check.log). Strict13
-original/fresh-recipe cases all exactPASS, including32value precision fixture.
-Dashboard--ci/JS/Python/diff PASS. Ready for explicit commit/normal push.
-Next private integer-float GP probe EXIT0:39/39, all2bands/F32. No corresponding
-product/manifest edits yet; metadata/precision inspection pending.
-
-Claude: Convert Coordinate Notation (DD_1/DD_2/DDM_1/DDM_2/DMS_1/DMS_2/DD_NUMERIC,
-decimal-degree lon/lat input) added as registry tool `convert_coordinate_notation`;
-7 `ccn_*` reference cases match ArcGIS. Shapefile output has no ORIG_OID (memory
-output does).
-Not done: UTM/MGRS/USNG/GARS/GEOREF output, non-DD input formats. Codex's
-umintfloat edits left untouched/unstaged.
-
-Claude: user is out of GitHub Actions minutes. Both workflows (.github/workflows/ci.yml,
-web-netlify.yml) now trigger only by workflow_dispatch. The CI gate is `scripts/check`,
-run by the pre-push hook (core.hooksPath=.githooks, already set). The Netlify web deploy
-no longer runs automatically: build with scripts/build-web.sh and deploy by hand if wanted.
-Dashboard's cached CI result will go stale. Not tested: a hosted run (deliberately not triggered).
-
-Claude: probed Trim Line (edit.TrimLine in_features {dangle_length} {DELETE_SHORT|KEEP_SHORT}); not
-implemented. Synthetic "+" and "T" networks show a topological rule set: a free end is trimmed back to
-the nearest crossing when that part is shorter than the length (vertical stub 5 beyond a crossing went
-at length 6; a 10 stub stayed). Whole isolated lines shorter than the length are deleted with
-DELETE_SHORT and kept with KEEP_SHORT; a whole feature touching others at one end (T stub, 30 long)
-is deleted at length 35 in BOTH modes. At length 200: DELETE_SHORT deletes everything, KEEP_SHORT
-keeps crossing lines untrimmed (both sides of a crossing shorter than the length). Not yet
-resolved: partial vs whole trimming for multi-crossing lines, and shared-endpoint chains. ug has no
-extend_line/trim_line/smooth_line/table_to_ellipse/integrate (vector) yet; Aggregate Points and Geodetic
-Densify are other open candidates. Working tree otherwise unchanged (Codex files untouched).
-
-Claude: Table To Ellipse (planar, Polygon/Line) added as registry tool `table_to_ellipse`
-(construct.rs, complete EllipticArc ring from the north end of the major axis, clockwise; only the
-used fields kept, MIN->MIN_). Complete ellipses now densify by bisecting the eccentric parameter
-until the midpoint is within 0.1 m of the chord (curves.rs `bisect_curve`): vertex counts match
-ArcGIS for 21 of 22 sizes tested (400x50 semi-axes: 96 vs 98). Positions are off by up to ~1e-5
-of the semi-axis (0.0014 m at 150 m; 0.37 m for a 1000x150 ellipse, so the ellipse_* test
-tolerance is 0.01 m and reference cases use moderate sizes). Not done: Geodesic method, huge
-ellipses (100 km: ArcGIS caps vertices differently), geographic CRS.
-
-Claude: Geodetic Densify (GEODESIC, explicit max length with optional unit; geographic or projected
-lines/polygons) added as `geodetic_densify`; 6 `gdd_*` cases match ArcGIS (n = ceil(len/dist) equal
-geodesic parts, direct from the segment start). Not done: default distance (omitted: ArcGIS used
-~49.75 km for a 5622 km segment, rule unknown), Loxodrome / Great elliptic / Normal section methods
-(probed: loxodrome keeps latitude, great elliptic differs from geodesic by ~5e-4 deg), Z/M, curves.
-
-Claude: probe survey, nothing implemented this turn. Add Incrementing ID Field is ArcSDE-only (ERROR 000186) so
-out of scope. Convert Time Zone is deterministic (UTC->Eastern 2024-01-15 12:00 -> 07:00; DST applied per date;
-DST flags shift by 1 h; Date output has ~1 microsecond float jitter when DST is applied) but needs a
-Windows-zone-name table and a tz database (no chrono-tz in the workspace; /usr/share/zoneinfo exists), and
-shapefile output drops the time. Field Statistics To Table needs a nested "Field Types" parameter
-(validator error with a plain field list); not yet decoded. Extend Line / Trim Line / Integrate are topological.
-Other open candidates: Subset Features (random split, likely untestable), Encode Field, Rotate/Rescale rasters
-(Codex owns raster files now). Working tree unchanged; Codex's files untouched.
-
-Claude: Encode Field (One-hot / One-cold) added as `encode_field`; 4 `enc_*` cases match ArcGIS (text and
-integer fields on streams/parcels shapefiles). Categories are sorted (text bytewise, numbers
-numerically), named OH_/OC_ + value with non-alphanumerics -> '_'; null rows stay null. Unverified:
-ArcGIS's de-duplication of colliding names (saw OH_b_1 for b/B, OH_a_b1..3 for 'a b','a-b','a_b'; we use _N),
-64-char name limit, Temporal method, DATE/BIGINTEGER fields.
-
-Claude: Field Statistics To Table added as `field_statistics_to_table` (one field type per run,
-NUMERIC or TEXT, no group-by / custom statistics). arcpy needs the Field Types argument as
-uppercase NUMERIC / TEXT (other keys raise KeyError in the validator). 4 `fst_*` cases match.
-Findings: sample std dev, population skewness and non-excess kurtosis, quartiles at (n-1)p
-interpolation, Outliers beyond 1.5 IQR; Mode/LeastCommon are None on ties (text: '[Multiple Values]',
-all-unique: '[All Unique Values]'); '' counts as a value, NULL as Nulls. Not done: Date fields,
-group_by_field, the Statistic list, a combined NUMERIC+TEXT run (ArcGIS writes two tables).
-Harness: the case runs into memory then copies the table to the output .dbf.
-
-Claude (state at last checkpoint): branch main == origin/main at 588fa36 (Field Statistics To Table). No GitHub
-Actions minutes: do not rely on hosted CI; run `scripts/check` (pre-push hook does). A push can report
-"cannot lock ref" if a previous interrupted push landed late; `git fetch && git status -sb` to confirm.
-Uncommitted work in the tree belongs to Codex (unary multiband integer-float: local.rs, registry.rs,
-stats.rs, unary_band_safety.rs, umintfloat_* cases in scripts/make-arcgis-reference.py, docs/dashboard.html,
-testdata/raster/unary_integer_float/, scripts/research/unary_multiband/integer_float/). Do not stage it
-unless continuing that slice. Next candidates: Field Statistics To Table group-by/statistics list,
-Convert Time Zone (needs tz table), Trim/Extend Line (topological, see probe notes above), MGRS/USNG
-notation output, Aggregate Points.
+Workspace observation: inherited scripts/agents-remote changed externally at
+2026-10-28T23:59:23Z after the starting hash capture. This task has not edited
+that file; preserve the new content. Other 14 inherited file hashes unchanged.

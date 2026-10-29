@@ -462,6 +462,24 @@ fn generate_transects_along_lines(ctx: &dyn Context) -> Result<ToolOutput> {
     )
 }
 
+fn trim_line(ctx: &dyn Context) -> Result<ToolOutput> {
+    let t = find("trim_line").ok_or_else(|| Error::Unsupported("trim_line".into()))?;
+    let fc = ctx.features("input")?;
+    let wkt = fc.spatial_reference_wkt();
+    let length = text(ctx, t, "dangle_length").ok_or_else(|| {
+        Error::Unsupported("ERROR 000735: Dangle Length: value is required".into())
+    })?;
+    let length = distance_in_units(&length, wkt)?;
+    let delete_short =
+        !text(ctx, t, "delete_shorts").is_some_and(|m| m.eq_ignore_ascii_case("KEEP_SHORT"));
+    crate::trim::trim_line(
+        fc.as_ref(),
+        length,
+        delete_short,
+        crate::default_xy_tolerance(wkt),
+    )
+}
+
 fn extend_line(ctx: &dyn Context) -> Result<ToolOutput> {
     let t = find("extend_line").ok_or_else(|| Error::Unsupported("extend_line".into()))?;
     let fc = ctx.features("input")?;
@@ -1752,6 +1770,41 @@ pub static TOOLS: &[Tool] = &[
         output_suffix: "Encoded",
         measures: false,
         run: Runner::Features(encode_field),
+    },
+    Tool {
+        id: "trim_line",
+        name: "Trim Line",
+        toolbox: "Editing › Tools",
+        summary: "Removes dangling line pieces shorter than a length (ArcGIS Pro Trim Line).",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Features",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "Lines.",
+            },
+            Param {
+                name: "dangle_length",
+                label: "Dangle Length",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+                help: "Dangles shorter than this are trimmed, for example `25 Meters`.",
+            },
+            Param {
+                name: "delete_shorts",
+                label: "Delete Short Features",
+                kind: Kind::Choice(&["DELETE_SHORT", "KEEP_SHORT"]),
+                required: false,
+                default: "DELETE_SHORT",
+                help: "Lines free at both ends made only of short dangles are deleted or kept unchanged.",
+            },
+        ],
+        output_suffix: "Trimmed",
+        measures: false,
+        run: Runner::Features(trim_line),
     },
     Tool {
         id: "extend_line",

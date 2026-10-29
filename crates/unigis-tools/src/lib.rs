@@ -21,6 +21,7 @@ pub mod spatstat;
 mod sql;
 pub mod swm;
 pub mod tables;
+pub mod trim;
 mod zm;
 
 pub use fieldmap::{FieldMapEntry, MapSource, parse_field_mapping, table_stem};

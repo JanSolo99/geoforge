@@ -76251,6 +76251,414 @@
           "extend_to": "EXTENSION"
         }
       }
+    },
+    "trim_15_delete": {
+      "tool": "edit.TrimLine",
+      "args": [
+        "testdata/geoproc/trim_lines.shp",
+        "<out>",
+        "15 Meters",
+        "DELETE_SHORT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          4,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "trim_line",
+        "params": {
+          "input": "testdata/geoproc/trim_lines.shp",
+          "output": "<out>",
+          "dangle_length": "15 Meters",
+          "delete_shorts": "DELETE_SHORT"
+        }
+      }
+    },
+    "trim_15_keep": {
+      "tool": "edit.TrimLine",
+      "args": [
+        "testdata/geoproc/trim_lines.shp",
+        "<out>",
+        "15 Meters",
+        "KEEP_SHORT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          4,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "trim_line",
+        "params": {
+          "input": "testdata/geoproc/trim_lines.shp",
+          "output": "<out>",
+          "dangle_length": "15 Meters",
+          "delete_shorts": "KEEP_SHORT"
+        }
+      }
+    },
+    "trim_25_delete": {
+      "tool": "edit.TrimLine",
+      "args": [
+        "testdata/geoproc/trim_lines.shp",
+        "<out>",
+        "25 Meters",
+        "DELETE_SHORT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          4,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "trim_line",
+        "params": {
+          "input": "testdata/geoproc/trim_lines.shp",
+          "output": "<out>",
+          "dangle_length": "25 Meters",
+          "delete_shorts": "DELETE_SHORT"
+        }
+      }
+    },
+    "trim_25_keep": {
+      "tool": "edit.TrimLine",
+      "args": [
+        "testdata/geoproc/trim_lines.shp",
+        "<out>",
+        "25 Meters",
+        "KEEP_SHORT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          4,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "trim_line",
+        "params": {
+          "input": "testdata/geoproc/trim_lines.shp",
+          "output": "<out>",
+          "dangle_length": "25 Meters",
+          "delete_shorts": "KEEP_SHORT"
+        }
+      }
+    },
+    "trim_35_delete": {
+      "tool": "edit.TrimLine",
+      "args": [
+        "testdata/geoproc/trim_lines.shp",
+        "<out>",
+        "35 Meters",
+        "DELETE_SHORT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          4,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "trim_line",
+        "params": {
+          "input": "testdata/geoproc/trim_lines.shp",
+          "output": "<out>",
+          "dangle_length": "35 Meters",
+          "delete_shorts": "DELETE_SHORT"
+        }
+      }
+    },
+    "trim_35_keep": {
+      "tool": "edit.TrimLine",
+      "args": [
+        "testdata/geoproc/trim_lines.shp",
+        "<out>",
+        "35 Meters",
+        "KEEP_SHORT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          4,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "trim_line",
+        "params": {
+          "input": "testdata/geoproc/trim_lines.shp",
+          "output": "<out>",
+          "dangle_length": "35 Meters",
+          "delete_shorts": "KEEP_SHORT"
+        }
+      }
+    },
+    "trim_60_delete": {
+      "tool": "edit.TrimLine",
+      "args": [
+        "testdata/geoproc/trim_lines.shp",
+        "<out>",
+        "60 Meters",
+        "DELETE_SHORT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          4,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "trim_line",
+        "params": {
+          "input": "testdata/geoproc/trim_lines.shp",
+          "output": "<out>",
+          "dangle_length": "60 Meters",
+          "delete_shorts": "DELETE_SHORT"
+        }
+      }
+    },
+    "trim_60_keep": {
+      "tool": "edit.TrimLine",
+      "args": [
+        "testdata/geoproc/trim_lines.shp",
+        "<out>",
+        "60 Meters",
+        "KEEP_SHORT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          4,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "trim_line",
+        "params": {
+          "input": "testdata/geoproc/trim_lines.shp",
+          "output": "<out>",
+          "dangle_length": "60 Meters",
+          "delete_shorts": "KEEP_SHORT"
+        }
+      }
     }
   }
 }

@@ -1012,6 +1012,14 @@ CASES = {
     "ext_15_extension": ("edit.ExtendLine", [DATA / "extend_lines.shp"], ["15 Meters", "EXTENSION"]),
     "ext_25_extension": ("edit.ExtendLine", [DATA / "extend_lines.shp"], ["25 Meters", "EXTENSION"]),
     "ext_50_extension": ("edit.ExtendLine", [DATA / "extend_lines.shp"], ["50 Meters", "EXTENSION"]),
+    "trim_15_delete": ("edit.TrimLine", [DATA / "trim_lines.shp"], ["15 Meters", "DELETE_SHORT"]),
+    "trim_15_keep": ("edit.TrimLine", [DATA / "trim_lines.shp"], ["15 Meters", "KEEP_SHORT"]),
+    "trim_25_delete": ("edit.TrimLine", [DATA / "trim_lines.shp"], ["25 Meters", "DELETE_SHORT"]),
+    "trim_25_keep": ("edit.TrimLine", [DATA / "trim_lines.shp"], ["25 Meters", "KEEP_SHORT"]),
+    "trim_35_delete": ("edit.TrimLine", [DATA / "trim_lines.shp"], ["35 Meters", "DELETE_SHORT"]),
+    "trim_35_keep": ("edit.TrimLine", [DATA / "trim_lines.shp"], ["35 Meters", "KEEP_SHORT"]),
+    "trim_60_delete": ("edit.TrimLine", [DATA / "trim_lines.shp"], ["60 Meters", "DELETE_SHORT"]),
+    "trim_60_keep": ("edit.TrimLine", [DATA / "trim_lines.shp"], ["60 Meters", "KEEP_SHORT"]),
     "flip_roads": ("edit.FlipLine", [DATA / "roads.shp"], []),
     "flip_streams": ("edit.FlipLine", [DATA / "streams.shp"], []),
     "gen_roads_20": ("edit.Generalize", [DATA / "roads.shp"], ["20 Meters"]),
@@ -1963,6 +1971,7 @@ RUN = {
     "gp.ReclassByASCIIFile_sa": ("reclass_by_ascii_file", ["input", "remap_file", "output", "missing_values"]),
     "edit.ExtendLine": ("extend_line", ["input", "output", "length", "extend_to"]),
     "edit.FlipLine": ("flip_line", ["input", "output"]),
+    "edit.TrimLine": ("trim_line", ["input", "output", "dangle_length", "delete_shorts"]),
     "management.FieldStatisticsToTable": ("field_statistics_to_table", ["input", "output", "fields", "field_type", "group_by", "statistics"]),
     "management.EncodeField": ("encode_field", ["input", "output", "field", "method"]),
     "management.GeodeticDensify": ("geodetic_densify", ["input", "output", "densify_method", "max_segment_length"]),
@@ -2045,7 +2054,7 @@ MEMORY_OUT = {"analysis.SummarizeWithin", "analysis.SummarizeNearby", "analysis.
 CREATE_TOOLS = {"management.CreateFeatureclass", "management.CreateTable"}
 
 # In-place tools: the index of the input they edit (run on a copy written as the output).
-IN_PLACE = {"gp.ExtractMultiValuesToPoints_sa": 0, "edit.ExtendLine": 0, "edit.FlipLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.EncodeField": 0, "management.AddGeometryAttributes": 0,
+IN_PLACE = {"gp.ExtractMultiValuesToPoints_sa": 0, "edit.ExtendLine": 0, "edit.FlipLine": 0, "edit.TrimLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.EncodeField": 0, "management.AddGeometryAttributes": 0,
             "management.CalculateFields": 0, "management.StandardizeField": 0, "management.TransformField": 0, "management.ReclassifyField": 0, "management.DefineProjection": 0, "management.CalculateEndTime": 0}
 
 # Select Layer By Location cases, saved with Copy Features:
