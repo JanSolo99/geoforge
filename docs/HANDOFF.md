@@ -36,8 +36,17 @@
   app/Cargo.lock carries chrono-tz (from Convert Time Zone). Validation: full scripts/check EXIT 0
   (245 Rust passed / 5 ignored, /tmp/unigis-wasmfix-check.log); `cargo check -p unigis-tools
   --no-default-features --target wasm32-unknown-unknown` clean (no warnings).
-- Next action after this fix: next queue item (docs/WORK_QUEUE.md; Create Database View is
-  enterprise/SQLite -- check before deferring).
+- Web fix landed and pushed as cdb7d7d.
+- Create Database View DEFERRED (docs/WORK_QUEUE_DEFERRED.txt): works on FileGDB in ArcGIS (a SQL
+  view catalog item read as a table), but needs FileGDB view catalog writing plus SQL evaluation
+  in the reader.
+- Next action: next queue item: Extract Data From Geodatabase (management.ExtractDataFromGeodatabase).
+  Parameters probed: in_data (datasets), extract_type DATA|SCHEMA_ONLY, out_type GEODATABASE|XML|
+  NEW_FILE_GDB|NEW_MOBILE_GDB, out_folder_path/out_name, get_related_data GET_RELATED (default),
+  geometry filter (INTERSECTS|CONTAINS), all_records_for_tables. Plan: scope to NEW_FILE_GDB with
+  feature classes/tables, DATA and SCHEMA_ONLY, domains (writer supports them) and relationship
+  classes (writer has add_relationship_class); needs a reference-harness comparison of a new
+  geodatabase output (see Codex's common/schema_edits.rs for gdb comparisons).
 
 Updated 2026-10-29T09:44:00.347279+00:00; last agent Codex.
 Workspace /mnt/media/ArcGIS_Linux, main; HEAD and origin/main both
