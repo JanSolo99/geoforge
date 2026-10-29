@@ -81,6 +81,12 @@ Update this file when a gap is found or closed.
 - Probed and left: Zonal Fill (fill = boundary minimum but zones 1 and 2 of the zones raster share one value: merged-catchment rule unknown), Cut Fill (region numbering), Surface Area Ratio (neither Jenness nor 1/cos(slope) fits), Boundary Clean, Aggregate Points, Sample (column naming), Trim Line: no Z/M/curves, brute-force O(n^2), exact-length dangles kept (ArcGIS decides those ties by crossing-point rounding). Extend Line: no Z/M/curves; brute-force O(n^2) segment search; ArcGIS's inclusive exact-length behaviour on memory/geodatabase edits (vs strict on shapefiles) is not modelled.
 - Calculate Geometry Attributes: planar only; no Z/M, geodesic or coordinate-notation properties, no coordinate_system/coordinate_format, text targets untested. Evidence: `scripts/research/calculate_geometry_attributes/README.md`.
 - Adjust 3D Z: the z-domain check (ArcGIS leaves features whose new z leaves the class's z domain unchanged, WARNING 002631) is not made. Evidence: `scripts/research/adjust_3d_z/README.md`.
+- Excel To Table: FileGDB date/time and mixed date columns, durations, long text
+  exceeding default widths, unsupported Excel errors and uncached formulas refused.
+  Only .xls/.xlsx to DBF/root FileGDB; external/discontiguous named ranges, advanced
+  formatting, Unicode naming and environments unverified. DBF dates drop time;
+  conservative text limits prevent truncation. Evidence/scope:
+  `scripts/research/excel_to_table/README.md` (26 public controls).
 - Add Global IDs: one FileGDB per batch; simple classes/tables/feature datasets.
   Enterprise/mobile, layers and advanced controller metadata unsupported/unverified.
   Automatic IDs on subsequent native inserts/copies, protection by other edit tools

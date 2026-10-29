@@ -1,0 +1,1124 @@
+{
+  "default_dbf": {
+    "status": "success",
+    "fields": [
+      {
+        "name": "OID",
+        "alias": "OID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "small",
+        "alias": "small",
+        "type": "Integer",
+        "length": 10,
+        "precision": 10,
+        "scale": 0
+      },
+      {
+        "name": "large",
+        "alias": "large",
+        "type": "Double",
+        "length": 19,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "decimal",
+        "alias": "decimal",
+        "type": "Double",
+        "length": 19,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "label",
+        "alias": "label",
+        "type": "String",
+        "length": 254,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "mixed",
+        "alias": "mixed",
+        "type": "String",
+        "length": 254,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "flag",
+        "alias": "flag",
+        "type": "Integer",
+        "length": 5,
+        "precision": 5,
+        "scale": 0
+      },
+      {
+        "name": "missing",
+        "alias": "missing",
+        "type": "String",
+        "length": 254,
+        "precision": 0,
+        "scale": 0
+      }
+    ],
+    "rows": [
+      [
+        1,
+        40000.0,
+        1.25,
+        "Alpha",
+        "2",
+        1,
+        " "
+      ],
+      [
+        -2,
+        -50000.0,
+        3.0,
+        "\u03b2eta",
+        "three",
+        0,
+        " "
+      ],
+      [
+        32767,
+        2147483648.0,
+        -2.5,
+        "A longer label",
+        " ",
+        0,
+        " "
+      ]
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 5:01:50 AM\nSucceeded at Friday, October 30, 2026 5:01:50 AM (Elapsed Time: 0.53 seconds)"
+  },
+  "default_gdb": {
+    "status": "success",
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "small",
+        "alias": "small",
+        "type": "Integer",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "large",
+        "alias": "large",
+        "type": "BigInteger",
+        "length": 8,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "decimal",
+        "alias": "decimal",
+        "type": "Double",
+        "length": 8,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "label",
+        "alias": "label",
+        "type": "String",
+        "length": 255,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "mixed",
+        "alias": "mixed",
+        "type": "String",
+        "length": 255,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "flag",
+        "alias": "flag",
+        "type": "SmallInteger",
+        "length": 2,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "missing",
+        "alias": "missing",
+        "type": "String",
+        "length": 255,
+        "precision": 0,
+        "scale": 0
+      }
+    ],
+    "rows": [
+      [
+        1,
+        40000,
+        1.25,
+        "Alpha",
+        "2",
+        1,
+        ""
+      ],
+      [
+        -2,
+        -50000,
+        3.0,
+        "\u03b2eta",
+        "three",
+        0,
+        null
+      ],
+      [
+        32767,
+        2147483648,
+        -2.5,
+        "A longer label",
+        "",
+        null,
+        ""
+      ]
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 5:01:50 AM\nSucceeded at Friday, October 30, 2026 5:01:51 AM (Elapsed Time: 0.38 seconds)"
+  },
+  "no_header_dbf": {
+    "status": "success",
+    "fields": [
+      {
+        "name": "OID",
+        "alias": "OID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "COL_A",
+        "alias": "COL_A",
+        "type": "String",
+        "length": 254,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "COL_B",
+        "alias": "COL_B",
+        "type": "String",
+        "length": 254,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "COL_C",
+        "alias": "COL_C",
+        "type": "String",
+        "length": 254,
+        "precision": 0,
+        "scale": 0
+      }
+    ],
+    "rows": [
+      [
+        "small",
+        "large",
+        "decimal"
+      ],
+      [
+        "1",
+        "40000",
+        "1.25"
+      ],
+      [
+        "-2",
+        "-50000",
+        "3"
+      ]
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 5:01:51 AM\nSucceeded at Friday, October 30, 2026 5:01:51 AM (Elapsed Time: 0.45 seconds)"
+  },
+  "no_header_gdb": {
+    "status": "success",
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "COL_A",
+        "alias": "COL_A",
+        "type": "String",
+        "length": 255,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "COL_B",
+        "alias": "COL_B",
+        "type": "String",
+        "length": 255,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "COL_C",
+        "alias": "COL_C",
+        "type": "String",
+        "length": 255,
+        "precision": 0,
+        "scale": 0
+      }
+    ],
+    "rows": [
+      [
+        "small",
+        "large",
+        "decimal"
+      ],
+      [
+        "1",
+        "40000",
+        "1.25"
+      ],
+      [
+        "-2",
+        "-50000",
+        "3"
+      ]
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 5:01:51 AM\nSucceeded at Friday, October 30, 2026 5:01:51 AM (Elapsed Time: 0.32 seconds)"
+  },
+  "range_dbf": {
+    "status": "success",
+    "fields": [
+      {
+        "name": "OID",
+        "alias": "OID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "large",
+        "alias": "large",
+        "type": "Integer",
+        "length": 10,
+        "precision": 10,
+        "scale": 0
+      },
+      {
+        "name": "decimal",
+        "alias": "decimal",
+        "type": "Double",
+        "length": 19,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "label",
+        "alias": "label",
+        "type": "String",
+        "length": 254,
+        "precision": 0,
+        "scale": 0
+      }
+    ],
+    "rows": [
+      [
+        40000,
+        1.25,
+        "Alpha"
+      ],
+      [
+        -50000,
+        3.0,
+        "\u03b2eta"
+      ]
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 5:01:52 AM\nSucceeded at Friday, October 30, 2026 5:01:52 AM (Elapsed Time: 0.44 seconds)"
+  },
+  "range_gdb": {
+    "status": "success",
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "large",
+        "alias": "large",
+        "type": "Integer",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "decimal",
+        "alias": "decimal",
+        "type": "Double",
+        "length": 8,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "label",
+        "alias": "label",
+        "type": "String",
+        "length": 255,
+        "precision": 0,
+        "scale": 0
+      }
+    ],
+    "rows": [
+      [
+        40000,
+        1.25,
+        "Alpha"
+      ],
+      [
+        -50000,
+        3.0,
+        "\u03b2eta"
+      ]
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 5:01:52 AM\nSucceeded at Friday, October 30, 2026 5:01:52 AM (Elapsed Time: 0.33 seconds)"
+  },
+  "names_dbf": {
+    "status": "success",
+    "fields": [
+      {
+        "name": "OID",
+        "alias": "OID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "bad_name",
+        "alias": "bad_name",
+        "type": "Integer",
+        "length": 10,
+        "precision": 10,
+        "scale": 0
+      },
+      {
+        "name": "bad_name_1",
+        "alias": "bad_name_1",
+        "type": "Integer",
+        "length": 10,
+        "precision": 10,
+        "scale": 0
+      },
+      {
+        "name": "COL_C",
+        "alias": "COL_C",
+        "type": "Integer",
+        "length": 10,
+        "precision": 10,
+        "scale": 0
+      },
+      {
+        "name": "a1st",
+        "alias": "a1st",
+        "type": "Integer",
+        "length": 10,
+        "precision": 10,
+        "scale": 0
+      },
+      {
+        "name": "OBJECTID_1",
+        "alias": "OBJECTID_1",
+        "type": "Integer",
+        "length": 10,
+        "precision": 10,
+        "scale": 0
+      },
+      {
+        "name": "select",
+        "alias": "select",
+        "type": "Integer",
+        "length": 10,
+        "precision": 10,
+        "scale": 0
+      }
+    ],
+    "rows": [
+      [
+        10,
+        20,
+        30,
+        40,
+        50,
+        60
+      ],
+      [
+        11,
+        21,
+        0,
+        41,
+        51,
+        61
+      ]
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 5:01:52 AM\nSucceeded at Friday, October 30, 2026 5:01:53 AM (Elapsed Time: 0.45 seconds)"
+  },
+  "names_gdb": {
+    "status": "success",
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "bad_name",
+        "alias": "bad name",
+        "type": "Integer",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "bad_name_1",
+        "alias": "bad-name",
+        "type": "Integer",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "COL_C",
+        "alias": "COL_C",
+        "type": "Integer",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "F1st",
+        "alias": "1st",
+        "type": "Integer",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "OBJECTID_1",
+        "alias": "OBJECTID",
+        "type": "Integer",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "select_",
+        "alias": "select",
+        "type": "Integer",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      }
+    ],
+    "rows": [
+      [
+        10,
+        20,
+        30,
+        40,
+        50,
+        60
+      ],
+      [
+        11,
+        21,
+        null,
+        41,
+        51,
+        61
+      ]
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 5:01:53 AM\nSucceeded at Friday, October 30, 2026 5:01:53 AM (Elapsed Time: 0.33 seconds)"
+  },
+  "offset_dbf": {
+    "status": "success",
+    "fields": [
+      {
+        "name": "OID",
+        "alias": "OID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "id",
+        "alias": "id",
+        "type": "String",
+        "length": 254,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "name",
+        "alias": "name",
+        "type": "String",
+        "length": 254,
+        "precision": 0,
+        "scale": 0
+      }
+    ],
+    "rows": [
+      [
+        " ",
+        " "
+      ],
+      [
+        "preamble",
+        " "
+      ],
+      [
+        "1",
+        "one"
+      ],
+      [
+        " ",
+        " "
+      ],
+      [
+        "2",
+        "two"
+      ]
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 5:01:53 AM\nSucceeded at Friday, October 30, 2026 5:01:54 AM (Elapsed Time: 0.46 seconds)"
+  },
+  "offset_gdb": {
+    "status": "success",
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "id",
+        "alias": "id",
+        "type": "String",
+        "length": 255,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "name",
+        "alias": "name",
+        "type": "String",
+        "length": 255,
+        "precision": 0,
+        "scale": 0
+      }
+    ],
+    "rows": [
+      [
+        "",
+        ""
+      ],
+      [
+        "preamble",
+        ""
+      ],
+      [
+        "1",
+        "one"
+      ],
+      [
+        "",
+        ""
+      ],
+      [
+        "2",
+        "two"
+      ]
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 5:01:54 AM\nSucceeded at Friday, October 30, 2026 5:01:54 AM (Elapsed Time: 0.33 seconds)"
+  },
+  "dates_dbf": {
+    "status": "success",
+    "fields": [
+      {
+        "name": "OID",
+        "alias": "OID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "day",
+        "alias": "day",
+        "type": "Date",
+        "length": 8,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "clock",
+        "alias": "clock",
+        "type": "Date",
+        "length": 8,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "stamp",
+        "alias": "stamp",
+        "type": "Date",
+        "length": 8,
+        "precision": 0,
+        "scale": 0
+      }
+    ],
+    "rows": [
+      [
+        "2024-02-29 00:00:00",
+        "1899-12-30 00:00:00",
+        "2024-02-29 00:00:00"
+      ],
+      [
+        null,
+        "1899-12-30 00:00:00",
+        "2025-01-02 00:00:00"
+      ]
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 5:01:54 AM\nSucceeded at Friday, October 30, 2026 5:01:55 AM (Elapsed Time: 0.47 seconds)"
+  },
+  "dates_gdb": {
+    "status": "success",
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "day",
+        "alias": "day",
+        "type": "DateOnly",
+        "length": 8,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "clock",
+        "alias": "clock",
+        "type": "TimeOnly",
+        "length": 8,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "stamp",
+        "alias": "stamp",
+        "type": "Date",
+        "length": 8,
+        "precision": 0,
+        "scale": 0
+      }
+    ],
+    "rows": [
+      [
+        "2024-02-29",
+        "13:45:30",
+        "2024-02-29 13:45:30"
+      ],
+      [
+        null,
+        "00:00:00",
+        "2025-01-02 00:00:00"
+      ]
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 5:01:55 AM\nSucceeded at Friday, October 30, 2026 5:01:55 AM (Elapsed Time: 0.34 seconds)"
+  },
+  "named_dbf": {
+    "status": "success",
+    "fields": [
+      {
+        "name": "OID",
+        "alias": "OID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "large",
+        "alias": "large",
+        "type": "Integer",
+        "length": 10,
+        "precision": 10,
+        "scale": 0
+      },
+      {
+        "name": "decimal",
+        "alias": "decimal",
+        "type": "Double",
+        "length": 19,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "label",
+        "alias": "label",
+        "type": "String",
+        "length": 254,
+        "precision": 0,
+        "scale": 0
+      }
+    ],
+    "rows": [
+      [
+        40000,
+        1.25,
+        "Alpha"
+      ],
+      [
+        -50000,
+        3.0,
+        "\u03b2eta"
+      ]
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 5:01:55 AM\nSucceeded at Friday, October 30, 2026 5:01:56 AM (Elapsed Time: 0.47 seconds)"
+  },
+  "named_gdb": {
+    "status": "success",
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "large",
+        "alias": "large",
+        "type": "Integer",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "decimal",
+        "alias": "decimal",
+        "type": "Double",
+        "length": 8,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "label",
+        "alias": "label",
+        "type": "String",
+        "length": 255,
+        "precision": 0,
+        "scale": 0
+      }
+    ],
+    "rows": [
+      [
+        40000,
+        1.25,
+        "Alpha"
+      ],
+      [
+        -50000,
+        3.0,
+        "\u03b2eta"
+      ]
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 5:01:56 AM\nSucceeded at Friday, October 30, 2026 5:01:56 AM (Elapsed Time: 0.34 seconds)"
+  },
+  "xls_dbf": {
+    "status": "success",
+    "fields": [
+      {
+        "name": "OID",
+        "alias": "OID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "id",
+        "alias": "id",
+        "type": "Integer",
+        "length": 10,
+        "precision": 10,
+        "scale": 0
+      },
+      {
+        "name": "value",
+        "alias": "value",
+        "type": "Double",
+        "length": 19,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "label",
+        "alias": "label",
+        "type": "String",
+        "length": 254,
+        "precision": 0,
+        "scale": 0
+      }
+    ],
+    "rows": [
+      [
+        1,
+        1.25,
+        "one"
+      ],
+      [
+        -2,
+        3.0,
+        "two"
+      ],
+      [
+        0,
+        0.0,
+        "three"
+      ]
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 5:01:56 AM\nSucceeded at Friday, October 30, 2026 5:01:57 AM (Elapsed Time: 1.33 seconds)"
+  },
+  "xls_gdb": {
+    "status": "success",
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "id",
+        "alias": "id",
+        "type": "Integer",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "value",
+        "alias": "value",
+        "type": "Double",
+        "length": 8,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "label",
+        "alias": "label",
+        "type": "String",
+        "length": 255,
+        "precision": 0,
+        "scale": 0
+      }
+    ],
+    "rows": [
+      [
+        1,
+        1.25,
+        "one"
+      ],
+      [
+        -2,
+        3.0,
+        "two"
+      ],
+      [
+        null,
+        null,
+        "three"
+      ]
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 5:01:57 AM\nSucceeded at Friday, October 30, 2026 5:01:58 AM (Elapsed Time: 0.34 seconds)"
+  },
+  "empty_dbf": {
+    "status": "error",
+    "error": "Traceback (most recent call last):\n\ufeff  File \"c:\\program files\\arcgis\\pro\\Resources\\ArcToolbox\\scripts\\ExcelToTable.py\", line 558, in <module>\n    ExcelToTableX.excel_to_table(**kwargs)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ufeff  File \"C:\\Program Files\\ArcGIS\\Pro\\Resources\\ArcToolbox\\Scripts\\ExcelToTableX.py\", line 625, in excel_to_table\n    with arcpy.da.InsertCursor(out_table, [f.name for f in out_fields]) as cursor:\n         ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ufeff  File \"C:\\Program Files\\ArcGIS\\Pro\\Resources\\ArcPy\\arcpy\\__init__.py\", line 2988, in factory\n    return cls(*args, **kwargs)\n\ufeffTypeError: 'field_names' must be string or non empty list or tuple of strings\n\ufeff\nFailed to execute (ExcelToTable).\n",
+    "messages": "Start Time: Friday, October 30, 2026 5:01:58 AM\nTraceback (most recent call last):\n\ufeff  File \"c:\\program files\\arcgis\\pro\\Resources\\ArcToolbox\\scripts\\ExcelToTable.py\", line 558, in <module>\n    ExcelToTableX.excel_to_table(**kwargs)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ufeff  File \"C:\\Program Files\\ArcGIS\\Pro\\Resources\\ArcToolbox\\Scripts\\ExcelToTableX.py\", line 625, in excel_to_table\n    with arcpy.da.InsertCursor(out_table, [f.name for f in out_fields]) as cursor:\n         ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ufeff  File \"C:\\Program Files\\ArcGIS\\Pro\\Resources\\ArcPy\\arcpy\\__init__.py\", line 2988, in factory\n    return cls(*args, **kwargs)\n\ufeffTypeError: 'field_names' must be string or non empty list or tuple of strings\n\ufeff\nFailed script Excel To Table...\nFailed to execute (ExcelToTable).\nFailed at Friday, October 30, 2026 5:01:58 AM (Elapsed Time: 0.46 seconds)"
+  },
+  "empty_gdb": {
+    "status": "error",
+    "error": "Traceback (most recent call last):\n\ufeff  File \"c:\\program files\\arcgis\\pro\\Resources\\ArcToolbox\\scripts\\ExcelToTable.py\", line 558, in <module>\n    ExcelToTableX.excel_to_table(**kwargs)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ufeff  File \"C:\\Program Files\\ArcGIS\\Pro\\Resources\\ArcToolbox\\Scripts\\ExcelToTableX.py\", line 625, in excel_to_table\n    with arcpy.da.InsertCursor(out_table, [f.name for f in out_fields]) as cursor:\n         ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ufeff  File \"C:\\Program Files\\ArcGIS\\Pro\\Resources\\ArcPy\\arcpy\\__init__.py\", line 2988, in factory\n    return cls(*args, **kwargs)\n\ufeffTypeError: 'field_names' must be string or non empty list or tuple of strings\n\ufeff\nFailed to execute (ExcelToTable).\n",
+    "messages": "Start Time: Friday, October 30, 2026 5:01:58 AM\nTraceback (most recent call last):\n\ufeff  File \"c:\\program files\\arcgis\\pro\\Resources\\ArcToolbox\\scripts\\ExcelToTable.py\", line 558, in <module>\n    ExcelToTableX.excel_to_table(**kwargs)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ufeff  File \"C:\\Program Files\\ArcGIS\\Pro\\Resources\\ArcToolbox\\Scripts\\ExcelToTableX.py\", line 625, in excel_to_table\n    with arcpy.da.InsertCursor(out_table, [f.name for f in out_fields]) as cursor:\n         ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ufeff  File \"C:\\Program Files\\ArcGIS\\Pro\\Resources\\ArcPy\\arcpy\\__init__.py\", line 2988, in factory\n    return cls(*args, **kwargs)\n\ufeffTypeError: 'field_names' must be string or non empty list or tuple of strings\n\ufeff\nFailed script Excel To Table...\nFailed to execute (ExcelToTable).\nFailed at Friday, October 30, 2026 5:01:59 AM (Elapsed Time: 0.29 seconds)"
+  },
+  "bad_sheet_dbf": {
+    "status": "error",
+    "error": "ERROR 003958: The Excel To Table tool does not support named ranges that only contain a single cell.\nTraceback (most recent call last):\n\ufeff  File \"c:\\program files\\arcgis\\pro\\Resources\\ArcToolbox\\scripts\\ExcelToTable.py\", line 558, in <module>\n    ExcelToTableX.excel_to_table(**kwargs)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ufeff  File \"C:\\Program Files\\ArcGIS\\Pro\\Resources\\ArcToolbox\\Scripts\\ExcelToTableX.py\", line 558, in excel_to_table\n    raise arcpy.ExecuteError(arcpy.GetIDMessage(3958))\n\ufeffarcgisscripting.ExecuteError: The Excel To Table tool does not support named ranges that only contain a single cell.\n\ufeff\nFailed to execute (ExcelToTable).\n",
+    "messages": "Start Time: Friday, October 30, 2026 5:01:59 AM\nERROR 003958: The Excel To Table tool does not support named ranges that only contain a single cell.\nTraceback (most recent call last):\n\ufeff  File \"c:\\program files\\arcgis\\pro\\Resources\\ArcToolbox\\scripts\\ExcelToTable.py\", line 558, in <module>\n    ExcelToTableX.excel_to_table(**kwargs)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ufeff  File \"C:\\Program Files\\ArcGIS\\Pro\\Resources\\ArcToolbox\\Scripts\\ExcelToTableX.py\", line 558, in excel_to_table\n    raise arcpy.ExecuteError(arcpy.GetIDMessage(3958))\n\ufeffarcgisscripting.ExecuteError: The Excel To Table tool does not support named ranges that only contain a single cell.\n\ufeff\nFailed script Excel To Table...\nFailed to execute (ExcelToTable).\nFailed at Friday, October 30, 2026 5:01:59 AM (Elapsed Time: 0.04 seconds)"
+  },
+  "bad_sheet_gdb": {
+    "status": "error",
+    "error": "ERROR 003958: The Excel To Table tool does not support named ranges that only contain a single cell.\nTraceback (most recent call last):\n\ufeff  File \"c:\\program files\\arcgis\\pro\\Resources\\ArcToolbox\\scripts\\ExcelToTable.py\", line 558, in <module>\n    ExcelToTableX.excel_to_table(**kwargs)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ufeff  File \"C:\\Program Files\\ArcGIS\\Pro\\Resources\\ArcToolbox\\Scripts\\ExcelToTableX.py\", line 558, in excel_to_table\n    raise arcpy.ExecuteError(arcpy.GetIDMessage(3958))\n\ufeffarcgisscripting.ExecuteError: The Excel To Table tool does not support named ranges that only contain a single cell.\n\ufeff\nFailed to execute (ExcelToTable).\n",
+    "messages": "Start Time: Friday, October 30, 2026 5:01:59 AM\nERROR 003958: The Excel To Table tool does not support named ranges that only contain a single cell.\nTraceback (most recent call last):\n\ufeff  File \"c:\\program files\\arcgis\\pro\\Resources\\ArcToolbox\\scripts\\ExcelToTable.py\", line 558, in <module>\n    ExcelToTableX.excel_to_table(**kwargs)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ufeff  File \"C:\\Program Files\\ArcGIS\\Pro\\Resources\\ArcToolbox\\Scripts\\ExcelToTableX.py\", line 558, in excel_to_table\n    raise arcpy.ExecuteError(arcpy.GetIDMessage(3958))\n\ufeffarcgisscripting.ExecuteError: The Excel To Table tool does not support named ranges that only contain a single cell.\n\ufeff\nFailed script Excel To Table...\nFailed to execute (ExcelToTable).\nFailed at Friday, October 30, 2026 5:01:59 AM (Elapsed Time: 0.05 seconds)"
+  },
+  "reverse_dbf": {
+    "status": "error",
+    "error": "Failed to execute. Parameters are not valid.\nERROR 002926: Invalid value for parameter cell_range: D3:B2.\nFailed to execute (ExcelToTable).\n",
+    "messages": "Start Time: Friday, October 30, 2026 5:01:59 AM\nFailed to execute. Parameters are not valid.\nERROR 002926: Invalid value for parameter cell_range: D3:B2.\nFailed to execute (ExcelToTable).\nFailed at Friday, October 30, 2026 5:01:59 AM (Elapsed Time: 0.01 seconds)"
+  },
+  "reverse_gdb": {
+    "status": "error",
+    "error": "Failed to execute. Parameters are not valid.\nERROR 002926: Invalid value for parameter cell_range: D3:B2.\nFailed to execute (ExcelToTable).\n",
+    "messages": "Start Time: Friday, October 30, 2026 5:01:59 AM\nFailed to execute. Parameters are not valid.\nERROR 002926: Invalid value for parameter cell_range: D3:B2.\nFailed to execute (ExcelToTable).\nFailed at Friday, October 30, 2026 5:01:59 AM (Elapsed Time: 0.01 seconds)"
+  },
+  "beyond_dbf": {
+    "status": "success",
+    "fields": [
+      {
+        "name": "OID",
+        "alias": "OID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "small",
+        "alias": "small",
+        "type": "Integer",
+        "length": 10,
+        "precision": 10,
+        "scale": 0
+      },
+      {
+        "name": "large",
+        "alias": "large",
+        "type": "Double",
+        "length": 19,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "decimal",
+        "alias": "decimal",
+        "type": "Double",
+        "length": 19,
+        "precision": 0,
+        "scale": 0
+      }
+    ],
+    "rows": [
+      [
+        -2,
+        -50000.0,
+        3.0
+      ],
+      [
+        32767,
+        2147483648.0,
+        -2.5
+      ]
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 5:01:59 AM\nSucceeded at Friday, October 30, 2026 5:01:59 AM (Elapsed Time: 0.45 seconds)"
+  },
+  "beyond_gdb": {
+    "status": "success",
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "small",
+        "alias": "small",
+        "type": "Integer",
+        "length": 4,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "large",
+        "alias": "large",
+        "type": "BigInteger",
+        "length": 8,
+        "precision": 0,
+        "scale": 0
+      },
+      {
+        "name": "decimal",
+        "alias": "decimal",
+        "type": "Double",
+        "length": 8,
+        "precision": 0,
+        "scale": 0
+      }
+    ],
+    "rows": [
+      [
+        -2,
+        -50000,
+        3.0
+      ],
+      [
+        32767,
+        2147483648,
+        -2.5
+      ]
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 5:01:59 AM\nSucceeded at Friday, October 30, 2026 5:02:00 AM (Elapsed Time: 0.34 seconds)"
+  },
+  "header_outside_dbf": {
+    "status": "error",
+    "error": "Traceback (most recent call last):\n\ufeff  File \"c:\\program files\\arcgis\\pro\\Resources\\ArcToolbox\\scripts\\ExcelToTable.py\", line 558, in <module>\n    ExcelToTableX.excel_to_table(**kwargs)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ufeff  File \"C:\\Program Files\\ArcGIS\\Pro\\Resources\\ArcToolbox\\Scripts\\ExcelToTableX.py\", line 585, in excel_to_table\n    out_fields = gen_out_fields(sheet, tableInfo, eval_count,\n                                check_for_MGRS=False, cell_range=cell_range,\n                                field_names_row=field_names_row,  )\n\ufeff  File \"C:\\Program Files\\ArcGIS\\Pro\\Resources\\ArcToolbox\\Scripts\\ExcelToTableX.py\", line 443, in gen_out_fields\n    out_fields[i].collect_cell_info(cell)\n    ~~~~~~~~~~^^^\n\ufeffIndexError: list index out of range\n\ufeff\nFailed to execute (ExcelToTable).\n",
+    "messages": "Start Time: Friday, October 30, 2026 5:02:00 AM\nTraceback (most recent call last):\n\ufeff  File \"c:\\program files\\arcgis\\pro\\Resources\\ArcToolbox\\scripts\\ExcelToTable.py\", line 558, in <module>\n    ExcelToTableX.excel_to_table(**kwargs)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ufeff  File \"C:\\Program Files\\ArcGIS\\Pro\\Resources\\ArcToolbox\\Scripts\\ExcelToTableX.py\", line 585, in excel_to_table\n    out_fields = gen_out_fields(sheet, tableInfo, eval_count,\n                                check_for_MGRS=False, cell_range=cell_range,\n                                field_names_row=field_names_row,  )\n\ufeff  File \"C:\\Program Files\\ArcGIS\\Pro\\Resources\\ArcToolbox\\Scripts\\ExcelToTableX.py\", line 443, in gen_out_fields\n    out_fields[i].collect_cell_info(cell)\n    ~~~~~~~~~~^^^\n\ufeffIndexError: list index out of range\n\ufeff\nFailed script Excel To Table...\nFailed to execute (ExcelToTable).\nFailed at Friday, October 30, 2026 5:02:00 AM (Elapsed Time: 0.05 seconds)"
+  },
+  "header_outside_gdb": {
+    "status": "error",
+    "error": "Traceback (most recent call last):\n\ufeff  File \"c:\\program files\\arcgis\\pro\\Resources\\ArcToolbox\\scripts\\ExcelToTable.py\", line 558, in <module>\n    ExcelToTableX.excel_to_table(**kwargs)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ufeff  File \"C:\\Program Files\\ArcGIS\\Pro\\Resources\\ArcToolbox\\Scripts\\ExcelToTableX.py\", line 585, in excel_to_table\n    out_fields = gen_out_fields(sheet, tableInfo, eval_count,\n                                check_for_MGRS=False, cell_range=cell_range,\n                                field_names_row=field_names_row,  )\n\ufeff  File \"C:\\Program Files\\ArcGIS\\Pro\\Resources\\ArcToolbox\\Scripts\\ExcelToTableX.py\", line 443, in gen_out_fields\n    out_fields[i].collect_cell_info(cell)\n    ~~~~~~~~~~^^^\n\ufeffIndexError: list index out of range\n\ufeff\nFailed to execute (ExcelToTable).\n",
+    "messages": "Start Time: Friday, October 30, 2026 5:02:00 AM\nTraceback (most recent call last):\n\ufeff  File \"c:\\program files\\arcgis\\pro\\Resources\\ArcToolbox\\scripts\\ExcelToTable.py\", line 558, in <module>\n    ExcelToTableX.excel_to_table(**kwargs)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ufeff  File \"C:\\Program Files\\ArcGIS\\Pro\\Resources\\ArcToolbox\\Scripts\\ExcelToTableX.py\", line 585, in excel_to_table\n    out_fields = gen_out_fields(sheet, tableInfo, eval_count,\n                                check_for_MGRS=False, cell_range=cell_range,\n                                field_names_row=field_names_row,  )\n\ufeff  File \"C:\\Program Files\\ArcGIS\\Pro\\Resources\\ArcToolbox\\Scripts\\ExcelToTableX.py\", line 443, in gen_out_fields\n    out_fields[i].collect_cell_info(cell)\n    ~~~~~~~~~~^^^\n\ufeffIndexError: list index out of range\n\ufeff\nFailed script Excel To Table...\nFailed to execute (ExcelToTable).\nFailed at Friday, October 30, 2026 5:02:00 AM (Elapsed Time: 0.05 seconds)"
+  }
+}

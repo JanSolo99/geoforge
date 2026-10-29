@@ -818,6 +818,16 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Adjust 3D Z (reverse, constant or field shift, US-survey unit conversion): 6 in-place `a3z_*`
       cases over point, line, polygon and multipoint Z shapefiles match ArcGIS. Evidence:
       `scripts/research/adjust_3d_z/README.md`.
+- [x] Excel To Table (`excel_to_table`): native .xls/.xlsx, first/selected sheet,
+  rectangular .xlsx named range, header row/column-letter names and cell ranges;
+  numeric/text/boolean schemas, NULLs, aliases and DBF dates.13 ArcGIS portable
+  references plus8 FileGDB schema/value controls; format/other limits in
+  `scripts/research/excel_to_table/README.md` and KNOWN_GAPS.
+- [ ] Make Query Table: deferred; session query-view handles/key identity and SQL
+  joins absent from Context/Outcome.3 public controls in
+  `scripts/research/make_query_table/` confirm FeatureLayer/TableView semantics.
+- [ ] Convert Personal Geodatabase: deferred; no MDB/ACCDB input parser or default
+  mobile geodatabase writer. FILE_GDB/XML alternatives still need the input parser.
 - [x] Add Global IDs (`add_global_ids`): in-place FileGDB class/table and simple
   feature-dataset expansion, batches in one workspace, UUID4 values, system field
   metadata/index and repeat stability. Eight public references plus rollback tests;

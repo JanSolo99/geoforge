@@ -1701,6 +1701,7 @@ fn add_fields(ctx: &dyn Context) -> Result<ToolOutput> {
 }
 
 pub static TOOLS: &[Tool] = &[
+    crate::excel::TOOL,
     Tool {
         id: "mean_center",
         name: "Mean Center",

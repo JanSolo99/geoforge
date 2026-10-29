@@ -77,6 +77,22 @@ DM = ROOT / "testdata" / "dm"
 
 CASES = {
     # name: (tool, args before the output, args after the output)
+    **{f"excel_{name}": ("conversion.ExcelToTable", [DATA / ("excel_input." + ext)], [sheet, header, cells])
+       for name, ext, sheet, header, cells in [
+        ("default", "xlsx", "", 1, ""),
+        ("no_header", "xlsx", "Data", 0, "A1:C3"),
+        ("range", "xlsx", "Data", 1, "B2:D3"),
+        ("names", "xlsx", "Names", 1, ""),
+        ("offset", "xlsx", "Offset", 3, ""),
+        ("dates", "xlsx", "Dates", 1, ""),
+        ("named", "xlsx", "Picked", 1, ""),
+        ("xls", "xls", "", 1, ""),
+        ("empty", "xlsx", "Empty", 1, ""),
+        ("bad_sheet", "xlsx", "Missing", 1, ""),
+        ("reverse", "xlsx", "Data", 1, "D3:B2"),
+        ("beyond", "xlsx", "Data", 1, "A3:C7"),
+        ("header_outside", "xlsx", "Data", 8, ""),
+    ]},
     **{f"gids_{name}": ("management.AddGlobalIDs", [DATA / "globalids_base.gdb" / name], [])
        for name in ["points", "repeat", "records", "empty", "collision", "group", "missing"]},
     "gids_batch": ("management.AddGlobalIDs", [DATA / "globalids_base.gdb" / n for n in ["points", "records"]], []),
@@ -2176,6 +2192,7 @@ for _tool, _id in COMBINATORIAL:
 
 
 RUN = {
+    "conversion.ExcelToTable": ("excel_to_table", ["input", "output", "sheet", "field_names_row", "cell_range"]),
     "management.AddGlobalIDs": ("add_global_ids", ["in_datasets"]),
     "management.SubsetFeatures": ("subset_features", ["input", "out_training_feature_class", "out_test_feature_class", "size_of_training_dataset", "subset_size_units"]),
     "management.CreateSpatialSamplingLocations": ("create_spatial_sampling_locations", ["input", "output", "sampling_method", "strata_id_field", "strata_count_method", "bin_shape", "bin_size", "h3_resolution", "num_samples", "num_samples_per_strata", "population_field", "geometry_type", "min_distance", "spatial_relationship"]),
@@ -2310,7 +2327,7 @@ WORKSPACE_OUT = {"analysis.Split", "analysis.SplitByAttributes"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable", "conversion.RasterToASCII", "conversion.RasterToFloat"}
 # Tools whose output is a table, written as <name>.dbf.
-TABLE_OUT = {"management.ValidateJoin", "analysis.PairwisePolygonNeighbors", "analysis.AssignWeightsByPairwiseComparison", "management.FieldStatisticsToTable", "gp.Sample_sa", "management.CopyRows", "gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa", "gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
+TABLE_OUT = {"conversion.ExcelToTable", "management.ValidateJoin", "analysis.PairwisePolygonNeighbors", "analysis.AssignWeightsByPairwiseComparison", "management.FieldStatisticsToTable", "gp.Sample_sa", "management.CopyRows", "gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa", "gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
              "management.TransposeFields", "management.PivotTable", "management.CreateTable", "analysis.PolygonNeighbors", "analysis.TabulateIntersection", "analysis.TableSelect"}
 # Tools whose ArcGIS output must be a geodatabase feature class or memory (copied to a shapefile).
 MEMORY_OUT = {"analysis.SummarizeWithin", "analysis.SummarizeNearby", "analysis.ApportionPolygon"}
@@ -2694,6 +2711,8 @@ def main():
             "fields": [[f["name"], f["type"], f["length"], f["precision"], f["scale"]] for f in d.get("fields", [])],
             "shapeType": d.get("shapeType"),
         }
+        if tool in TABLE_OUT:
+            manifest["cases"][name]["table_output"] = True
         if tool == "management.CreateSpatialSamplingLocations" and (not after[0] or after[0] != "SYSTEMATIC"):
             manifest["cases"][name]["stochastic_sampling"] = True
         if tool == "management.CreateRandomPoints":

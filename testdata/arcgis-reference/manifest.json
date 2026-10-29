@@ -97840,6 +97840,637 @@
           ]
         }
       }
+    },
+    "excel_default": {
+      "tool": "conversion.ExcelToTable",
+      "args": [
+        "testdata/geoproc/excel_input.xlsx",
+        "<out>",
+        "",
+        1,
+        ""
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "small",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "large",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "decimal",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "label",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "mixed",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "flag",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "missing",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "excel_to_table",
+        "params": {
+          "input": "testdata/geoproc/excel_input.xlsx",
+          "output": "<out>",
+          "field_names_row": 1
+        }
+      },
+      "table_output": true
+    },
+    "excel_no_header": {
+      "tool": "conversion.ExcelToTable",
+      "args": [
+        "testdata/geoproc/excel_input.xlsx",
+        "<out>",
+        "Data",
+        0,
+        "A1:C3"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "COL_A",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "COL_B",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "COL_C",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "excel_to_table",
+        "params": {
+          "input": "testdata/geoproc/excel_input.xlsx",
+          "output": "<out>",
+          "sheet": "Data",
+          "field_names_row": 0,
+          "cell_range": "A1:C3"
+        }
+      },
+      "table_output": true
+    },
+    "excel_range": {
+      "tool": "conversion.ExcelToTable",
+      "args": [
+        "testdata/geoproc/excel_input.xlsx",
+        "<out>",
+        "Data",
+        1,
+        "B2:D3"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "large",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "decimal",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "label",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "excel_to_table",
+        "params": {
+          "input": "testdata/geoproc/excel_input.xlsx",
+          "output": "<out>",
+          "sheet": "Data",
+          "field_names_row": 1,
+          "cell_range": "B2:D3"
+        }
+      },
+      "table_output": true
+    },
+    "excel_names": {
+      "tool": "conversion.ExcelToTable",
+      "args": [
+        "testdata/geoproc/excel_input.xlsx",
+        "<out>",
+        "Names",
+        1,
+        ""
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "bad_name",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "bad_name_1",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COL_C",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "a1st",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "OBJECTID_1",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "select",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "excel_to_table",
+        "params": {
+          "input": "testdata/geoproc/excel_input.xlsx",
+          "output": "<out>",
+          "sheet": "Names",
+          "field_names_row": 1
+        }
+      },
+      "table_output": true
+    },
+    "excel_offset": {
+      "tool": "conversion.ExcelToTable",
+      "args": [
+        "testdata/geoproc/excel_input.xlsx",
+        "<out>",
+        "Offset",
+        3,
+        ""
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "id",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "name",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "excel_to_table",
+        "params": {
+          "input": "testdata/geoproc/excel_input.xlsx",
+          "output": "<out>",
+          "sheet": "Offset",
+          "field_names_row": 3
+        }
+      },
+      "table_output": true
+    },
+    "excel_dates": {
+      "tool": "conversion.ExcelToTable",
+      "args": [
+        "testdata/geoproc/excel_input.xlsx",
+        "<out>",
+        "Dates",
+        1,
+        ""
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "day",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "clock",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "stamp",
+          "Date",
+          8,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "excel_to_table",
+        "params": {
+          "input": "testdata/geoproc/excel_input.xlsx",
+          "output": "<out>",
+          "sheet": "Dates",
+          "field_names_row": 1
+        }
+      },
+      "table_output": true
+    },
+    "excel_named": {
+      "tool": "conversion.ExcelToTable",
+      "args": [
+        "testdata/geoproc/excel_input.xlsx",
+        "<out>",
+        "Picked",
+        1,
+        ""
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "large",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "decimal",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "label",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "excel_to_table",
+        "params": {
+          "input": "testdata/geoproc/excel_input.xlsx",
+          "output": "<out>",
+          "sheet": "Picked",
+          "field_names_row": 1
+        }
+      },
+      "table_output": true
+    },
+    "excel_xls": {
+      "tool": "conversion.ExcelToTable",
+      "args": [
+        "testdata/geoproc/excel_input.xls",
+        "<out>",
+        "",
+        1,
+        ""
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "id",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "value",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "label",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "excel_to_table",
+        "params": {
+          "input": "testdata/geoproc/excel_input.xls",
+          "output": "<out>",
+          "field_names_row": 1
+        }
+      },
+      "table_output": true
+    },
+    "excel_empty": {
+      "tool": "conversion.ExcelToTable",
+      "args": [
+        "testdata/geoproc/excel_input.xlsx",
+        "<out>",
+        "Empty",
+        1,
+        ""
+      ],
+      "status": "failed",
+      "messages": [
+        "Traceback (most recent call last):\n\ufeff  File \"c:\\program files\\arcgis\\pro\\Resources\\ArcToolbox\\scripts\\ExcelToTable.py\", line 558, in <module>\n    ExcelToTableX.excel_to_table(**kwargs)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ufeff  File \"C:\\Program Files\\ArcGIS\\Pro\\Resources\\ArcToolbox\\Scripts\\ExcelToTableX.py\", line 625, in excel_to_table\n    with arcpy.da.InsertCursor(out_table, [f.name for f in out_fields]) as cursor:\n         ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ufeff  File \"C:\\Program Files\\ArcGIS\\Pro\\Resources\\ArcPy\\arcpy\\__init__.py\", line 2988, in factory\n    return cls(*args, **kwargs)\n\ufeffTypeError: 'field_names' must be string or non empty list or tuple of strings\n\ufeff",
+        "Failed to execute (ExcelToTable)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "excel_to_table",
+        "params": {
+          "input": "testdata/geoproc/excel_input.xlsx",
+          "output": "<out>",
+          "sheet": "Empty",
+          "field_names_row": 1
+        }
+      },
+      "table_output": true
+    },
+    "excel_bad_sheet": {
+      "tool": "conversion.ExcelToTable",
+      "args": [
+        "testdata/geoproc/excel_input.xlsx",
+        "<out>",
+        "Missing",
+        1,
+        ""
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 003958: The Excel To Table tool does not support named ranges that only contain a single cell.",
+        "Traceback (most recent call last):\n\ufeff  File \"c:\\program files\\arcgis\\pro\\Resources\\ArcToolbox\\scripts\\ExcelToTable.py\", line 558, in <module>\n    ExcelToTableX.excel_to_table(**kwargs)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ufeff  File \"C:\\Program Files\\ArcGIS\\Pro\\Resources\\ArcToolbox\\Scripts\\ExcelToTableX.py\", line 558, in excel_to_table\n    raise arcpy.ExecuteError(arcpy.GetIDMessage(3958))\n\ufeffarcgisscripting.ExecuteError: The Excel To Table tool does not support named ranges that only contain a single cell.\n\ufeff",
+        "Failed to execute (ExcelToTable)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "excel_to_table",
+        "params": {
+          "input": "testdata/geoproc/excel_input.xlsx",
+          "output": "<out>",
+          "sheet": "Missing",
+          "field_names_row": 1
+        }
+      },
+      "table_output": true
+    },
+    "excel_reverse": {
+      "tool": "conversion.ExcelToTable",
+      "args": [
+        "testdata/geoproc/excel_input.xlsx",
+        "<out>",
+        "Data",
+        1,
+        "D3:B2"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 002926: Invalid value for parameter cell_range: D3:B2.",
+        "Failed to execute (ExcelToTable)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "excel_to_table",
+        "params": {
+          "input": "testdata/geoproc/excel_input.xlsx",
+          "output": "<out>",
+          "sheet": "Data",
+          "field_names_row": 1,
+          "cell_range": "D3:B2"
+        }
+      },
+      "table_output": true
+    },
+    "excel_beyond": {
+      "tool": "conversion.ExcelToTable",
+      "args": [
+        "testdata/geoproc/excel_input.xlsx",
+        "<out>",
+        "Data",
+        1,
+        "A3:C7"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "small",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "large",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "decimal",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "excel_to_table",
+        "params": {
+          "input": "testdata/geoproc/excel_input.xlsx",
+          "output": "<out>",
+          "sheet": "Data",
+          "field_names_row": 1,
+          "cell_range": "A3:C7"
+        }
+      },
+      "table_output": true
+    },
+    "excel_header_outside": {
+      "tool": "conversion.ExcelToTable",
+      "args": [
+        "testdata/geoproc/excel_input.xlsx",
+        "<out>",
+        "Data",
+        8,
+        ""
+      ],
+      "status": "failed",
+      "messages": [
+        "Traceback (most recent call last):\n\ufeff  File \"c:\\program files\\arcgis\\pro\\Resources\\ArcToolbox\\scripts\\ExcelToTable.py\", line 558, in <module>\n    ExcelToTableX.excel_to_table(**kwargs)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\ufeff  File \"C:\\Program Files\\ArcGIS\\Pro\\Resources\\ArcToolbox\\Scripts\\ExcelToTableX.py\", line 585, in excel_to_table\n    out_fields = gen_out_fields(sheet, tableInfo, eval_count,\n                                check_for_MGRS=False, cell_range=cell_range,\n                                field_names_row=field_names_row,  )\n\ufeff  File \"C:\\Program Files\\ArcGIS\\Pro\\Resources\\ArcToolbox\\Scripts\\ExcelToTableX.py\", line 443, in gen_out_fields\n    out_fields[i].collect_cell_info(cell)\n    ~~~~~~~~~~^^^\n\ufeffIndexError: list index out of range\n\ufeff",
+        "Failed to execute (ExcelToTable)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "excel_to_table",
+        "params": {
+          "input": "testdata/geoproc/excel_input.xlsx",
+          "output": "<out>",
+          "sheet": "Data",
+          "field_names_row": 8
+        }
+      },
+      "table_output": true
     }
   }
 }

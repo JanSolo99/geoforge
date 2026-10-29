@@ -1,0 +1,64 @@
+{
+  "default": {
+    "status": "success",
+    "output": "query_probe_default",
+    "data_type": "FeatureLayer",
+    "catalog_path": "Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\globalids_base.gdb\\query_probe_default",
+    "count": 3,
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "type": "OID"
+      },
+      {
+        "name": "Shape",
+        "alias": "Shape",
+        "type": "Geometry"
+      },
+      {
+        "name": "KEY",
+        "alias": "KEY",
+        "type": "Integer"
+      }
+    ]
+  },
+  "projected": {
+    "status": "success",
+    "output": "query_probe_projected",
+    "data_type": "TableView",
+    "catalog_path": "Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\globalids_base.gdb\\query_probe_projected",
+    "count": 2,
+    "fields": [
+      {
+        "name": "points.OBJECTID",
+        "alias": "points.OBJECTID",
+        "type": "OID"
+      }
+    ]
+  },
+  "empty": {
+    "status": "success",
+    "output": "query_probe_empty",
+    "data_type": "FeatureLayer",
+    "catalog_path": "Z:\\mnt\\media\\ArcGIS_Linux\\testdata\\geoproc\\globalids_base.gdb\\query_probe_empty",
+    "count": 0,
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "type": "OID"
+      },
+      {
+        "name": "Shape",
+        "alias": "Shape",
+        "type": "Geometry"
+      },
+      {
+        "name": "KEY",
+        "alias": "KEY",
+        "type": "Integer"
+      }
+    ]
+  }
+}

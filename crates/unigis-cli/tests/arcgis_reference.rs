@@ -4556,8 +4556,9 @@ fn tools_match_arcgis_output() {
         }
         // Workspace tools (Split) write into a folder.
         // Table tools (Check Geometry) write a .dbf.
-        let table = reference.join(format!("{case}.dbf")).exists()
-            && !reference.join(format!("{case}.shp")).exists();
+        let table = info["table_output"] == true
+            || (reference.join(format!("{case}.dbf")).exists()
+                && !reference.join(format!("{case}.shp")).exists());
         // Text outputs (Features To JSON) are compared byte for byte.
         let text_ext = ["json", "geojson", "csv", "asc", "flt"]
             .into_iter()
@@ -4709,7 +4710,8 @@ fn tools_match_arcgis_output() {
             .unwrap();
         let mut diffs = Vec::new();
         if info["status"] == "failed" {
-            // ArcGIS refused: gf must refuse with the same error code.
+            // ArcGIS refused: require a handled CLI error, and the same numeric
+            // code when ArcGIS supplied one (Python exceptions can have none).
             let stderr = String::from_utf8_lossy(&run.stderr);
             let codes: Vec<&str> = info["messages"]
                 .as_array()
@@ -4720,7 +4722,9 @@ fn tools_match_arcgis_output() {
                 .flat_map(str::lines)
                 .filter_map(|l| l.strip_prefix("ERROR ")?.get(..6))
                 .collect();
-            if run.status.success() || !codes.iter().any(|c| stderr.contains(c)) {
+            if run.status.code() != Some(1)
+                || (!codes.is_empty() && !codes.iter().any(|c| stderr.contains(c)))
+            {
                 diffs.push(format!(
                     "ArcGIS failed with {codes:?}; gf: {}",
                     if run.status.success() {

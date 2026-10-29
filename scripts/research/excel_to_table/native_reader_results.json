@@ -1,0 +1,34 @@
+{
+  "default": {
+    "status": "matched",
+    "rows": 3
+  },
+  "no_header": {
+    "status": "matched",
+    "rows": 3
+  },
+  "range": {
+    "status": "matched",
+    "rows": 2
+  },
+  "names": {
+    "status": "matched",
+    "rows": 2
+  },
+  "offset": {
+    "status": "matched",
+    "rows": 5
+  },
+  "named": {
+    "status": "matched",
+    "rows": 2
+  },
+  "xls": {
+    "status": "matched",
+    "rows": 3
+  },
+  "beyond": {
+    "status": "matched",
+    "rows": 2
+  }
+}
