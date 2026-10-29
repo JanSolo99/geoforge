@@ -69296,6 +69296,7 @@
           "output": "<out>",
           "x_field": "LON",
           "y_field": "LAT",
+          "input_format": "DD_2",
           "output_format": "DD_1"
         }
       }
@@ -69373,6 +69374,7 @@
           "output": "<out>",
           "x_field": "LON",
           "y_field": "LAT",
+          "input_format": "DD_2",
           "output_format": "DD_2"
         }
       }
@@ -69443,6 +69445,7 @@
           "output": "<out>",
           "x_field": "LON",
           "y_field": "LAT",
+          "input_format": "DD_2",
           "output_format": "DDM_1"
         }
       }
@@ -69520,6 +69523,7 @@
           "output": "<out>",
           "x_field": "LON",
           "y_field": "LAT",
+          "input_format": "DD_2",
           "output_format": "DDM_2"
         }
       }
@@ -69590,6 +69594,7 @@
           "output": "<out>",
           "x_field": "LON",
           "y_field": "LAT",
+          "input_format": "DD_2",
           "output_format": "DMS_1"
         }
       }
@@ -69667,6 +69672,7 @@
           "output": "<out>",
           "x_field": "LON",
           "y_field": "LAT",
+          "input_format": "DD_2",
           "output_format": "DMS_2"
         }
       }
@@ -69744,6 +69750,7 @@
           "output": "<out>",
           "x_field": "LON",
           "y_field": "LAT",
+          "input_format": "DD_2",
           "output_format": "DD_NUMERIC"
         }
       }
@@ -72137,6 +72144,7 @@
           "output": "<out>",
           "x_field": "LON",
           "y_field": "LAT",
+          "input_format": "DD_2",
           "output_format": "UTM_BANDS"
         }
       }
@@ -72207,6 +72215,7 @@
           "output": "<out>",
           "x_field": "LON",
           "y_field": "LAT",
+          "input_format": "DD_2",
           "output_format": "UTM_ZONES"
         }
       }
@@ -72277,6 +72286,7 @@
           "output": "<out>",
           "x_field": "LON",
           "y_field": "LAT",
+          "input_format": "DD_2",
           "output_format": "MGRS"
         }
       }
@@ -72347,6 +72357,7 @@
           "output": "<out>",
           "x_field": "LON",
           "y_field": "LAT",
+          "input_format": "DD_2",
           "output_format": "USNG"
         }
       }
@@ -72417,6 +72428,7 @@
           "output": "<out>",
           "x_field": "LON",
           "y_field": "LAT",
+          "input_format": "DD_2",
           "output_format": "GARS"
         }
       }
@@ -72487,7 +72499,3081 @@
           "output": "<out>",
           "x_field": "LON",
           "y_field": "LAT",
+          "input_format": "DD_2",
           "output_format": "GEOREF"
+        }
+      }
+    },
+    "ccn_input_dd_1_dd_numeric": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/angular_dd_1.csv",
+        "<out>",
+        "COORDX",
+        null,
+        "DD_1",
+        "DD_NUMERIC",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 5 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation31.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORDX",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDLat",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DDLon",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/angular_dd_1.csv",
+          "output": "<out>",
+          "x_field": "COORDX",
+          "input_format": "DD_1",
+          "output_format": "DD_NUMERIC"
+        }
+      }
+    },
+    "ccn_input_dd_1_dms_1": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/angular_dd_1.csv",
+        "<out>",
+        "COORDX",
+        null,
+        "DD_1",
+        "DMS_1",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 5 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation32.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORDX",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DMSLatLon",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/angular_dd_1.csv",
+          "output": "<out>",
+          "x_field": "COORDX",
+          "input_format": "DD_1",
+          "output_format": "DMS_1"
+        }
+      }
+    },
+    "ccn_input_dd_2_dd_numeric": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/angular_dd_2.csv",
+        "<out>",
+        "COORDX",
+        "COORDY",
+        "DD_2",
+        "DD_NUMERIC",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 1 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation21.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORDX",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "COORDY",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDLat",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DDLon",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/angular_dd_2.csv",
+          "output": "<out>",
+          "x_field": "COORDX",
+          "y_field": "COORDY",
+          "input_format": "DD_2",
+          "output_format": "DD_NUMERIC"
+        }
+      }
+    },
+    "ccn_input_dd_2_dms_1": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/angular_dd_2.csv",
+        "<out>",
+        "COORDX",
+        "COORDY",
+        "DD_2",
+        "DMS_1",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 1 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation22.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORDX",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "COORDY",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DMSLatLon",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/angular_dd_2.csv",
+          "output": "<out>",
+          "x_field": "COORDX",
+          "y_field": "COORDY",
+          "input_format": "DD_2",
+          "output_format": "DMS_1"
+        }
+      }
+    },
+    "ccn_input_ddm_1_dd_numeric": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/angular_ddm_1.csv",
+        "<out>",
+        "COORDX",
+        null,
+        "DDM_1",
+        "DD_NUMERIC",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 1 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation33.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORDX",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDLat",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DDLon",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/angular_ddm_1.csv",
+          "output": "<out>",
+          "x_field": "COORDX",
+          "input_format": "DDM_1",
+          "output_format": "DD_NUMERIC"
+        }
+      }
+    },
+    "ccn_input_ddm_1_dms_1": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/angular_ddm_1.csv",
+        "<out>",
+        "COORDX",
+        null,
+        "DDM_1",
+        "DMS_1",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 1 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation34.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORDX",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DMSLatLon",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/angular_ddm_1.csv",
+          "output": "<out>",
+          "x_field": "COORDX",
+          "input_format": "DDM_1",
+          "output_format": "DMS_1"
+        }
+      }
+    },
+    "ccn_input_ddm_2_dd_numeric": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/angular_ddm_2.csv",
+        "<out>",
+        "COORDX",
+        "COORDY",
+        "DDM_2",
+        "DD_NUMERIC",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 1 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation25.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORDX",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "COORDY",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDLat",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DDLon",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/angular_ddm_2.csv",
+          "output": "<out>",
+          "x_field": "COORDX",
+          "y_field": "COORDY",
+          "input_format": "DDM_2",
+          "output_format": "DD_NUMERIC"
+        }
+      }
+    },
+    "ccn_input_ddm_2_dms_1": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/angular_ddm_2.csv",
+        "<out>",
+        "COORDX",
+        "COORDY",
+        "DDM_2",
+        "DMS_1",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 1 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation26.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORDX",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "COORDY",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DMSLatLon",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/angular_ddm_2.csv",
+          "output": "<out>",
+          "x_field": "COORDX",
+          "y_field": "COORDY",
+          "input_format": "DDM_2",
+          "output_format": "DMS_1"
+        }
+      }
+    },
+    "ccn_input_dms_1_dd_numeric": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/angular_dms_1.csv",
+        "<out>",
+        "COORDX",
+        null,
+        "DMS_1",
+        "DD_NUMERIC",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 3 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation35.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORDX",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDLat",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DDLon",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/angular_dms_1.csv",
+          "output": "<out>",
+          "x_field": "COORDX",
+          "input_format": "DMS_1",
+          "output_format": "DD_NUMERIC"
+        }
+      }
+    },
+    "ccn_input_dms_1_dms_1": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/angular_dms_1.csv",
+        "<out>",
+        "COORDX",
+        null,
+        "DMS_1",
+        "DMS_1",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 3 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation36.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORDX",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DMSLatLon",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/angular_dms_1.csv",
+          "output": "<out>",
+          "x_field": "COORDX",
+          "input_format": "DMS_1",
+          "output_format": "DMS_1"
+        }
+      }
+    },
+    "ccn_input_dms_2_dd_numeric": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/angular_dms_2.csv",
+        "<out>",
+        "COORDX",
+        "COORDY",
+        "DMS_2",
+        "DD_NUMERIC",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 1 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation29.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORDX",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "COORDY",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDLat",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DDLon",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/angular_dms_2.csv",
+          "output": "<out>",
+          "x_field": "COORDX",
+          "y_field": "COORDY",
+          "input_format": "DMS_2",
+          "output_format": "DD_NUMERIC"
+        }
+      }
+    },
+    "ccn_input_dms_2_dms_1": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/angular_dms_2.csv",
+        "<out>",
+        "COORDX",
+        "COORDY",
+        "DMS_2",
+        "DMS_1",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 1 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation30.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORDX",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "COORDY",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DMSLatLon",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/angular_dms_2.csv",
+          "output": "<out>",
+          "x_field": "COORDX",
+          "y_field": "COORDY",
+          "input_format": "DMS_2",
+          "output_format": "DMS_1"
+        }
+      }
+    },
+    "ccn_grid_input_gars_dd_numeric": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_input_gars.csv",
+        "<out>",
+        "COORD",
+        null,
+        "GARS",
+        "DD_NUMERIC",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 15 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation49.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDLat",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DDLon",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_input_gars.csv",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "GARS",
+          "output_format": "DD_NUMERIC"
+        }
+      }
+    },
+    "ccn_grid_input_georef_dd_numeric": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_input_georef.csv",
+        "<out>",
+        "COORD",
+        null,
+        "GEOREF",
+        "DD_NUMERIC",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 18 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation51.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDLat",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DDLon",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_input_georef.csv",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "GEOREF",
+          "output_format": "DD_NUMERIC"
+        }
+      }
+    },
+    "ccn_grid_input_gars_georef": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_input_gars.csv",
+        "<out>",
+        "COORD",
+        null,
+        "GARS",
+        "GEOREF",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 15 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation54.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "GEOREF",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_input_gars.csv",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "GARS",
+          "output_format": "GEOREF"
+        }
+      }
+    },
+    "ccn_grid_input_georef_georef": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_input_georef.csv",
+        "<out>",
+        "COORD",
+        null,
+        "GEOREF",
+        "GEOREF",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 18 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation56.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "GEOREF",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_input_georef.csv",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "GEOREF",
+          "output_format": "GEOREF"
+        }
+      }
+    },
+    "ccn_grid_input_gars_dd_1": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_input_gars.csv",
+        "<out>",
+        "COORD",
+        null,
+        "GARS",
+        "DD_1",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 15 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation92.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDLatLon",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_input_gars.csv",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "GARS",
+          "output_format": "DD_1"
+        }
+      }
+    },
+    "ccn_grid_input_georef_dd_1": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_input_georef.csv",
+        "<out>",
+        "COORD",
+        null,
+        "GEOREF",
+        "DD_1",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 18 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation93.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDLatLon",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_input_georef.csv",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "GEOREF",
+          "output_format": "DD_1"
+        }
+      }
+    },
+    "ccn_grid_input_gars_ddm_1": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_input_gars.csv",
+        "<out>",
+        "COORD",
+        null,
+        "GARS",
+        "DDM_1",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 15 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation59.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDMLatLon",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_input_gars.csv",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "GARS",
+          "output_format": "DDM_1"
+        }
+      }
+    },
+    "ccn_grid_input_gars_ddm_2": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_input_gars.csv",
+        "<out>",
+        "COORD",
+        null,
+        "GARS",
+        "DDM_2",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 15 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation60.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDMLat",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDMLon",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_input_gars.csv",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "GARS",
+          "output_format": "DDM_2"
+        }
+      }
+    },
+    "ccn_grid_input_gars_dms_1": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_input_gars.csv",
+        "<out>",
+        "COORD",
+        null,
+        "GARS",
+        "DMS_1",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 15 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation61.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DMSLatLon",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_input_gars.csv",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "GARS",
+          "output_format": "DMS_1"
+        }
+      }
+    },
+    "ccn_grid_input_gars_dms_2": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_input_gars.csv",
+        "<out>",
+        "COORD",
+        null,
+        "GARS",
+        "DMS_2",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 15 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation62.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DMSLat",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DMSLon",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_input_gars.csv",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "GARS",
+          "output_format": "DMS_2"
+        }
+      }
+    },
+    "ccn_grid_input_georef_ddm_1": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_input_georef.csv",
+        "<out>",
+        "COORD",
+        null,
+        "GEOREF",
+        "DDM_1",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 18 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation63.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDMLatLon",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_input_georef.csv",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "GEOREF",
+          "output_format": "DDM_1"
+        }
+      }
+    },
+    "ccn_grid_input_georef_ddm_2": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_input_georef.csv",
+        "<out>",
+        "COORD",
+        null,
+        "GEOREF",
+        "DDM_2",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 18 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation64.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDMLat",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDMLon",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_input_georef.csv",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "GEOREF",
+          "output_format": "DDM_2"
+        }
+      }
+    },
+    "ccn_grid_input_georef_dms_1": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_input_georef.csv",
+        "<out>",
+        "COORD",
+        null,
+        "GEOREF",
+        "DMS_1",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 18 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation65.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DMSLatLon",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_input_georef.csv",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "GEOREF",
+          "output_format": "DMS_1"
+        }
+      }
+    },
+    "ccn_grid_input_georef_dms_2": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_input_georef.csv",
+        "<out>",
+        "COORD",
+        null,
+        "GEOREF",
+        "DMS_2",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 18 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation66.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DMSLat",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DMSLon",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_input_georef.csv",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "GEOREF",
+          "output_format": "DMS_2"
+        }
+      }
+    },
+    "ccn_grid_input_precision_ddm_1": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_carry_precision.dbf",
+        "<out>",
+        "COORD",
+        null,
+        "GEOREF",
+        "DDM_1",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDMLatLon",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "ORIG_OID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_carry_precision.dbf",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "GEOREF",
+          "output_format": "DDM_1"
+        }
+      }
+    },
+    "ccn_grid_input_precision_ddm_2": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_carry_precision.dbf",
+        "<out>",
+        "COORD",
+        null,
+        "GEOREF",
+        "DDM_2",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDMLat",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDMLon",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "ORIG_OID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_carry_precision.dbf",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "GEOREF",
+          "output_format": "DDM_2"
+        }
+      }
+    },
+    "ccn_grid_input_precision_dms_1": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_carry_precision.dbf",
+        "<out>",
+        "COORD",
+        null,
+        "GEOREF",
+        "DMS_1",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DMSLatLon",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "ORIG_OID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_carry_precision.dbf",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "GEOREF",
+          "output_format": "DMS_1"
+        }
+      }
+    },
+    "ccn_grid_input_precision_dms_2": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_carry_precision.dbf",
+        "<out>",
+        "COORD",
+        null,
+        "GEOREF",
+        "DMS_2",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DMSLat",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DMSLon",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "ORIG_OID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_carry_precision.dbf",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "GEOREF",
+          "output_format": "DMS_2"
+        }
+      }
+    },
+    "ccn_grid_input_gars_gars": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_input_gars.csv",
+        "<out>",
+        "COORD",
+        null,
+        "GARS",
+        "GARS",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 15 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation53.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "GARS",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_input_gars.csv",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "GARS",
+          "output_format": "GARS"
+        }
+      }
+    },
+    "ccn_grid_input_georef_gars": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_input_georef.csv",
+        "<out>",
+        "COORD",
+        null,
+        "GEOREF",
+        "GARS",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 18 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation55.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "GARS",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_input_georef.csv",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "GEOREF",
+          "output_format": "GARS"
+        }
+      }
+    },
+    "ccn_grid_input_boundary_gars_gars": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/gars_boundary_gars.dbf",
+        "<out>",
+        "COORD",
+        null,
+        "GARS",
+        "GARS",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 6 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation70.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "GARS",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "ORIG_OID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/gars_boundary_gars.dbf",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "GARS",
+          "output_format": "GARS"
+        }
+      }
+    },
+    "ccn_grid_input_boundary_georef_gars": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/gars_boundary_georef.dbf",
+        "<out>",
+        "COORD",
+        null,
+        "GEOREF",
+        "GARS",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 7 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation71.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "GARS",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "ORIG_OID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/gars_boundary_georef.dbf",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "GEOREF",
+          "output_format": "GARS"
+        }
+      }
+    },
+    "ccn_grid_input_mgrs_dd_numeric": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_input_mgrs.dbf",
+        "<out>",
+        "COORD",
+        null,
+        "MGRS",
+        "DD_NUMERIC",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 6 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation82.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDLat",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DDLon",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_OID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_input_mgrs.dbf",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "MGRS",
+          "output_format": "DD_NUMERIC"
+        }
+      }
+    },
+    "ccn_grid_input_mgrs_dd_2": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_input_mgrs.dbf",
+        "<out>",
+        "COORD",
+        null,
+        "MGRS",
+        "DD_2",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 6 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation84.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDLat",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDLon",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "ORIG_OID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_input_mgrs.dbf",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "MGRS",
+          "output_format": "DD_2"
+        }
+      }
+    },
+    "ccn_grid_input_usng_dd_numeric": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_input_usng.dbf",
+        "<out>",
+        "COORD",
+        null,
+        "USNG",
+        "DD_NUMERIC",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 1 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation86.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDLat",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DDLon",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_OID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_input_usng.dbf",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "USNG",
+          "output_format": "DD_NUMERIC"
+        }
+      }
+    },
+    "ccn_grid_input_utm_bands_dd_numeric": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_input_utm_bands.dbf",
+        "<out>",
+        "COORD",
+        null,
+        "UTM_BANDS",
+        "DD_NUMERIC",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 3 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation88.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDLat",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DDLon",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_OID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_input_utm_bands.dbf",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "UTM_BANDS",
+          "output_format": "DD_NUMERIC"
+        }
+      }
+    },
+    "ccn_grid_input_utm_zones_dd_numeric": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_input_utm_zones.dbf",
+        "<out>",
+        "COORD",
+        null,
+        "UTM_ZONES",
+        "DD_NUMERIC",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 2 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation90.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDLat",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DDLon",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_OID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_input_utm_zones.dbf",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "UTM_ZONES",
+          "output_format": "DD_NUMERIC"
+        }
+      }
+    },
+    "ccn_grid_input_mgrs_dd_1": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_input_mgrs.dbf",
+        "<out>",
+        "COORD",
+        null,
+        "MGRS",
+        "DD_1",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 6 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation94.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDLatLon",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "ORIG_OID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_input_mgrs.dbf",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "MGRS",
+          "output_format": "DD_1"
+        }
+      }
+    },
+    "ccn_grid_input_usng_dd_1": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_input_usng.dbf",
+        "<out>",
+        "COORD",
+        null,
+        "USNG",
+        "DD_1",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 1 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation95.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDLatLon",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "ORIG_OID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_input_usng.dbf",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "USNG",
+          "output_format": "DD_1"
+        }
+      }
+    },
+    "ccn_grid_input_utm_bands_dd_1": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_input_utm_bands.dbf",
+        "<out>",
+        "COORD",
+        null,
+        "UTM_BANDS",
+        "DD_1",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 3 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation96.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDLatLon",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "ORIG_OID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_input_utm_bands.dbf",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "UTM_BANDS",
+          "output_format": "DD_1"
+        }
+      }
+    },
+    "ccn_grid_input_utm_zones_dd_1": {
+      "tool": "management.ConvertCoordinateNotation",
+      "args": [
+        "testdata/geoproc/grid_input_utm_zones.dbf",
+        "<out>",
+        "COORD",
+        null,
+        "UTM_ZONES",
+        "DD_1",
+        "",
+        4326
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 001293: Coordinate conversion failed for 2 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation97.log"
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COORD",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DDLatLon",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "ORIG_OID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "convert_coordinate_notation",
+        "params": {
+          "input": "testdata/geoproc/grid_input_utm_zones.dbf",
+          "output": "<out>",
+          "x_field": "COORD",
+          "input_format": "UTM_ZONES",
+          "output_format": "DD_1"
         }
       }
     }

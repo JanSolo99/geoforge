@@ -1,0 +1,132 @@
+{
+  "ccn_grid_input_gars_dms_1": {
+    "tool": "management.ConvertCoordinateNotation",
+    "args": [
+      "testdata/geoproc/grid_input_gars.csv",
+      "<out>",
+      "COORD",
+      null,
+      "GARS",
+      "DMS_1",
+      "",
+      4326
+    ],
+    "status": "succeeded",
+    "messages": [
+      "WARNING 001293: Coordinate conversion failed for 15 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation50.log"
+    ],
+    "fields": [
+      [
+        "FID",
+        "OID",
+        4,
+        0,
+        0
+      ],
+      [
+        "Shape",
+        "Geometry",
+        0,
+        0,
+        0
+      ],
+      [
+        "ID",
+        "Integer",
+        10,
+        10,
+        0
+      ],
+      [
+        "COORD",
+        "String",
+        254,
+        0,
+        0
+      ],
+      [
+        "DMSLatLon",
+        "String",
+        254,
+        0,
+        0
+      ]
+    ],
+    "shapeType": "Point",
+    "run": {
+      "tool": "convert_coordinate_notation",
+      "params": {
+        "input": "testdata/geoproc/grid_input_gars.csv",
+        "output": "<out>",
+        "x_field": "COORD",
+        "input_format": "GARS",
+        "output_format": "DMS_1"
+      }
+    }
+  },
+  "ccn_grid_input_georef_dms_1": {
+    "tool": "management.ConvertCoordinateNotation",
+    "args": [
+      "testdata/geoproc/grid_input_georef.csv",
+      "<out>",
+      "COORD",
+      null,
+      "GEOREF",
+      "DMS_1",
+      "",
+      4326
+    ],
+    "status": "succeeded",
+    "messages": [
+      "WARNING 001293: Coordinate conversion failed for 18 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation52.log"
+    ],
+    "fields": [
+      [
+        "FID",
+        "OID",
+        4,
+        0,
+        0
+      ],
+      [
+        "Shape",
+        "Geometry",
+        0,
+        0,
+        0
+      ],
+      [
+        "ID",
+        "Integer",
+        10,
+        10,
+        0
+      ],
+      [
+        "COORD",
+        "String",
+        254,
+        0,
+        0
+      ],
+      [
+        "DMSLatLon",
+        "String",
+        254,
+        0,
+        0
+      ]
+    ],
+    "shapeType": "Point",
+    "run": {
+      "tool": "convert_coordinate_notation",
+      "params": {
+        "input": "testdata/geoproc/grid_input_georef.csv",
+        "output": "<out>",
+        "x_field": "COORD",
+        "input_format": "GEOREF",
+        "output_format": "DMS_1"
+      }
+    }
+  }
+}

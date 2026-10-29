@@ -10,6 +10,11 @@ pub trait FeatureClass {
     fn has_m(&self) -> bool;
     /// Attribute fields, excluding the ObjectID and geometry fields.
     fn fields(&self) -> &[Field];
+    /// Whether the source exposes a native ObjectID. Text tables may synthesize
+    /// row identifiers for iteration without having an ObjectID in ArcGIS.
+    fn has_object_id(&self) -> bool {
+        true
+    }
     fn oid_field_name(&self) -> &str;
     fn shape_field_name(&self) -> &str;
     /// Esri WKT of the coordinate system, if defined.

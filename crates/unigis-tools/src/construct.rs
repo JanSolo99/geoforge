@@ -739,10 +739,16 @@ pub fn polygon_to_line(input: &dyn FeatureClass) -> Result<ToolOutput> {
     })
 }
 
+// A symmetric relative comparison fitting ArcGIS's grid-input carry controls.
+// Keep it scoped to decoded grids until angular-input boundary behavior is probed.
+fn grid_component_carries(value: f64) -> bool {
+    (value - 60.0).abs() <= 1e-4 * (1.0 + (value.abs() + 60.0) / 2.0)
+}
+
 /// One axis of a coordinate as ArcGIS Convert Coordinate Notation writes it: degrees (two digits
 /// for latitude, three for longitude), then minutes and seconds with eight decimals, and the
 /// hemisphere letter last (`45 40 44.04360000N`).
-fn notation_axis(value: f64, is_lat: bool, parts: u8) -> String {
+fn notation_axis(value: f64, is_lat: bool, parts: u8, grid_input: bool) -> String {
     let width = if is_lat { 2 } else { 3 };
     let hemi = match (is_lat, value < 0.0) {
         (true, true) => 'S',
@@ -757,7 +763,7 @@ fn notation_axis(value: f64, is_lat: bool, parts: u8) -> String {
         1 => format!("{a:0w$.8}", w = width + 9),
         2 => {
             let mut min = format!("{:011.8}", rem * 60.0);
-            if min.starts_with("60.") {
+            if min.starts_with("60.") || (grid_input && grid_component_carries(rem * 60.0)) {
                 deg += 1.0;
                 min = format!("{:011.8}", 0.0);
             }
@@ -770,7 +776,7 @@ fn notation_axis(value: f64, is_lat: bool, parts: u8) -> String {
                 sec = 0.0;
             }
             let mut s = format!("{sec:011.8}");
-            if s.starts_with("60.") {
+            if s.starts_with("60.") || (grid_input && grid_component_carries(sec)) {
                 min += 1.0;
                 s = format!("{:011.8}", 0.0);
             }
@@ -784,7 +790,7 @@ fn notation_axis(value: f64, is_lat: bool, parts: u8) -> String {
     format!("{body}{hemi}")
 }
 
-/// Convert Coordinate Notation from decimal-degree X/Y fields to `DD_1`, `DD_2`, `DDM_1`,
+/// Convert Coordinate Notation from angular fields to `DD_1`, `DD_2`, `DDM_1`,
 /// `DDM_2`, `DMS_1`, `DMS_2`, `DD_NUMERIC`, or the grid notations `UTM_BANDS`, `UTM_ZONES`,
 /// `MGRS`, `USNG`, `GARS` and `GEOREF` (observed against ArcGIS Pro 3.7; a grid notation is one
 /// text field named after the format). Points are the input coordinates; the input's fields come
@@ -793,11 +799,26 @@ pub fn convert_coordinate_notation(
     table: &dyn FeatureClass,
     x_field: &str,
     y_field: &str,
+    input_format: &str,
     output_format: &str,
     spatial_reference_wkt: Option<String>,
 ) -> Result<ToolOutput> {
     let pos = |n: &str| crate::field_positions(table, &[n.to_owned()]).map(|v| v[0]);
-    let (xi, yi) = (pos(x_field)?, pos(y_field)?);
+    let input_format = input_format.to_ascii_uppercase();
+    // A zero component count denotes the supported single-field grid inputs.
+    let projected_input = matches!(
+        input_format.as_str(),
+        "UTM_BANDS" | "UTM_ZONES" | "MGRS" | "USNG"
+    );
+    let (input_parts, input_single) =
+        if projected_input || matches!(input_format.as_str(), "GARS" | "GEOREF") {
+            (0, true)
+        } else {
+            crate::angular_notation::input_parts(&input_format)
+                .ok_or_else(|| err(format!("unsupported input format {input_format}")))?
+        };
+    let xi = pos(x_field)?;
+    let yi = (!input_single).then(|| pos(y_field)).transpose()?;
     let fmt = output_format.to_ascii_uppercase();
     let (prefix, parts, single) = match fmt.as_str() {
         "DD_1" => ("DD", 1, true),
@@ -810,6 +831,32 @@ pub fn convert_coordinate_notation(
         other if crate::grid_notation::grid_notation(other, 0.0, 0.0).is_some() => ("", 4, true),
         other => return Err(err(format!("output format {other}"))),
     };
+    // UTM/MGRS/USNG inputs: ArcGIS's inverse transverse Mercator differs from the exact one by
+    // up to ~3e-10 degrees at a zone edge, which shows in the minute and second digits of
+    // DDM/DMS text. Only the decimal-degree outputs are verified.
+    if projected_input && !matches!(fmt.as_str(), "DD_NUMERIC" | "DD_1" | "DD_2") {
+        return Err(err(format!(
+            "grid input output format {fmt} is not yet supported for {input_format} input"
+        )));
+    }
+    if input_parts == 0
+        && !matches!(
+            fmt.as_str(),
+            "DD_NUMERIC"
+                | "DD_1"
+                | "DD_2"
+                | "DDM_1"
+                | "DDM_2"
+                | "DMS_1"
+                | "DMS_2"
+                | "GEOREF"
+                | "GARS"
+        )
+    {
+        return Err(err(format!(
+            "grid input output format {fmt} is not yet supported: ArcGIS projected-grid boundaries are not validated"
+        )));
+    }
     let text = |len: u32, name: &str| {
         let mut f = Field::new(name, FieldType::String);
         f.length = len;
@@ -827,26 +874,60 @@ pub fn convert_coordinate_notation(
         fields.push(text(255, &format!("{prefix}Lat")));
         fields.push(text(255, &format!("{prefix}Lon")));
     }
+    let preserve_oid = table.has_object_id();
+    if preserve_oid {
+        push_unique(&mut fields, Field::new("ORIG_OID", FieldType::Integer));
+    }
     let mut features = Vec::new();
+    let mut failed = 0;
     for f in table.features() {
         let f = f?;
+        let coordinates = if input_parts == 0 {
+            match &f.attributes[xi] {
+                Value::String(text) => {
+                    crate::grid_notation::parse_grid_notation(&input_format, text)
+                }
+                _ => None,
+            }
+        } else {
+            crate::angular_notation::parse(
+                &f.attributes[xi],
+                yi.map(|i| &f.attributes[i]),
+                input_parts,
+            )
+        };
+        // GEOREF can decode beyond the geographic bounds: ArcGIS retains that
+        // geometry but reports failed conversion and leaves notation fields empty.
+        let output_coordinates = coordinates
+            .filter(|&(x, y)| (-180.0..=180.0).contains(&x) && (-90.0..=90.0).contains(&y));
         let (x, y) = (
-            crate::number(&f.attributes[xi]),
-            crate::number(&f.attributes[yi]),
+            output_coordinates.map(|p| p.0),
+            output_coordinates.map(|p| p.1),
         );
         let mut attributes = f.attributes.clone();
         match (x, y) {
             (Some(x), Some(y)) if parts == 4 => {
-                let notation = crate::grid_notation::grid_notation(&fmt, x, y).flatten();
+                let notation = if input_parts == 0 && fmt == "GARS" {
+                    crate::grid_notation::gars_from_grid(x, y)
+                } else {
+                    crate::grid_notation::grid_notation(&fmt, x, y).flatten()
+                };
                 attributes.push(notation.map_or(Value::Null, Value::String));
             }
             (Some(x), Some(y)) if parts == 0 => {
-                attributes.push(Value::Double(y));
-                attributes.push(Value::Double(x));
+                let numeric = |v: f64| {
+                    if input_parts == 0 {
+                        (v * 1e8).round() / 1e8
+                    } else {
+                        v
+                    }
+                };
+                attributes.push(Value::Double(numeric(y)));
+                attributes.push(Value::Double(numeric(x)));
             }
             (Some(x), Some(y)) => {
-                let lat = notation_axis(y, true, parts);
-                let lon = notation_axis(x, false, parts);
+                let lat = notation_axis(y, true, parts, input_parts == 0);
+                let lon = notation_axis(x, false, parts, input_parts == 0);
                 if single {
                     attributes.push(Value::String(format!("{lat} {lon}")));
                 } else {
@@ -855,13 +936,24 @@ pub fn convert_coordinate_notation(
                 }
             }
             _ => {
+                failed += 1;
                 let n = if parts == 0 || !single { 2 } else { 1 };
-                attributes.extend(std::iter::repeat_n(Value::Null, n));
+                let empty = if parts == 0 {
+                    Value::Double(0.0)
+                } else {
+                    Value::String(String::new())
+                };
+                attributes.extend(std::iter::repeat_n(empty, n));
             }
+        }
+        if preserve_oid {
+            attributes.push(Value::Integer(i32::try_from(f.oid).map_err(|_| {
+                err("64-bit ORIG_OID values are not supported by coordinate conversion yet")
+            })?));
         }
         features.push(Feature {
             oid: features.len() as i64,
-            geometry: x.zip(y).map(|(x, y)| Geometry::point(x, y)),
+            geometry: coordinates.map(|(x, y)| Geometry::point(x, y)),
             attributes,
         });
     }
@@ -872,7 +964,13 @@ pub fn convert_coordinate_notation(
         fields,
         spatial_reference_wkt,
         features,
-        messages: Vec::new(),
+        messages: if failed == 0 {
+            Vec::new()
+        } else {
+            vec![format!(
+                "WARNING 001293: Coordinate conversion failed for {failed} records."
+            )]
+        },
     })
 }
 
@@ -1060,4 +1158,34 @@ pub fn geodetic_densify(input: &dyn FeatureClass, max_length: f64) -> Result<Too
         features,
         messages: Vec::new(),
     })
+}
+
+#[cfg(test)]
+mod notation_tests {
+    use super::notation_axis;
+
+    #[test]
+    fn grid_carry_boundaries_match_arcgis() {
+        for (value, parts, expected) in [
+            (15.0 + 59.9939003 / 60.0, 2, "015 59.99390030E"),
+            (15.0 + 59.9939004 / 60.0, 2, "016 00.00000000E"),
+            (
+                15.0 + (4.0 + 59.993898 / 60.0) / 60.0,
+                3,
+                "015 04 59.99389800E",
+            ),
+            (
+                15.0 + (4.0 + 59.993904 / 60.0) / 60.0,
+                3,
+                "015 05 00.00000000E",
+            ),
+            (
+                -15.0 - (4.0 + 59.993904 / 60.0) / 60.0,
+                3,
+                "015 05 00.00000000W",
+            ),
+        ] {
+            assert_eq!(notation_axis(value, false, parts, true), expected);
+        }
+    }
 }

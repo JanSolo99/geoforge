@@ -67,8 +67,9 @@ text holding the `.dbt` block number; the memo text itself is not read.
 ## Spatial index (`.sbn` / `.sbx`)
 Worked out from the files ArcGIS writes (its tool outputs and `AddSpatialIndex` on
 point sets of 1–5000 features) with shapelib's `sbnsearch.c` as the outline.
-UniGIS's writer reproduces ArcGIS's files byte for byte on every reference output
-and on 10k-polygon / 20k-point sets.
+UniGIS's writer reproduces most reference indexes byte for byte, including the
+10k-polygon / 20k-point probes. Known layout differences remain below and in
+`crates/unigis-shapefile/tests/sbn.rs`.
 - Header (100 bytes): `0x0000270A`, `-400`, 16 zero bytes, file length in 16-bit
   words, record count (null shapes included), the extent as big-endian doubles
   (an empty shapefile's (0, 0, -1, -1) becomes NaN `0x7FF8000000000001`), zeros.
@@ -93,3 +94,16 @@ and on 10k-polygon / 20k-point sets.
   features (in either child order) reproduces it, and the latter breaks `r2pt_dem_nodata`.
 - `.sbx`: the same header (own length), then big-endian (offset, length) in words
   of each `.sbn` record.
+
+The 2026-10-29 GARS boundary holdouts expose the same ancestor-retention gap:
+`ccn_grid_input_boundary_gars_gars` indexes 646 non-null records, with records
+61/149/208 in ArcGIS node 3 versus native nodes 7/6/7.
+`ccn_grid_input_boundary_georef_gars` indexes 486 records, with records
+16/91/137 in ArcGIS nodes 2/6/2 versus native nodes 4/13/5.
+Both headers, all record IDs and all quantized boxes agree. Both layouts satisfy
+the binary tree's containment bounds; retaining a box at an ancestor remains
+searchable. This does not establish the cause of ArcGIS's placement choice.
+The regression test checks these exact moves, every box and record, headers,
+SBX offsets, bin counts and tree containment for both fixtures; other new
+layouts still require byte identity. Research diagnostic:
+`scripts/research/coordinate_notation/grid/inspect_boundary_indexes.py`.

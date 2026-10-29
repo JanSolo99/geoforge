@@ -146,6 +146,9 @@ impl FeatureClass for CsvTable {
     fn fields(&self) -> &[Field] {
         &self.fields
     }
+    fn has_object_id(&self) -> bool {
+        false
+    }
     fn oid_field_name(&self) -> &str {
         "ObjectID"
     }

@@ -214,6 +214,30 @@ fn gars(lon: f64, lat: f64) -> Option<String> {
     ))
 }
 
+/// GARS for decoded grid positions. ArcGIS grid corners use a degree/radian
+/// roundtrip followed by direct five-minute tick floors. Keep the operation
+/// order: snapping or staged fractional-cell arithmetic changes boundary cells.
+pub(crate) fn gars_from_grid(lon: f64, lat: f64) -> Option<String> {
+    if !(-180.0..=180.0).contains(&lon) || !(-90.0..=90.0).contains(&lat) {
+        return None;
+    }
+    let x = (((lon.to_radians().to_degrees() + 180.0) * 12.0).floor() as i64).rem_euclid(4320);
+    let y = (((lat.to_radians().to_degrees() + 90.0) * 12.0).floor() as i64).clamp(0, 2159);
+    let quadrant = match (y % 6 >= 3, x % 6 >= 3) {
+        (true, false) => 1,
+        (true, true) => 2,
+        (false, false) => 3,
+        (false, true) => 4,
+    };
+    let key = (2 - y % 3) * 3 + x % 3 + 1;
+    Some(format!(
+        "{:03}{}{}{quadrant}{key}",
+        x / 6 + 1,
+        LETTERS[y as usize / 6 / 24] as char,
+        LETTERS[y as usize / 6 % 24] as char
+    ))
+}
+
 /// GEOREF (`PKAA0740740734`): 15° tile letters, degree letters, then minutes to 0.001 of the
 /// longitude and the latitude (rounded, with carry; the east and north edges stay in the last
 /// tile at 59.999').
@@ -244,6 +268,303 @@ fn georef(lon: f64, lat: f64) -> Option<String> {
     ))
 }
 
+/// Decode the observed GARS/GEOREF single-field syntax. Coordinates identify
+/// the southwest corner of the selected cell, rather than its centre.
+/// GEOREF minute overflow is retained in geometry even outside geographic bounds;
+/// the caller separately validates the output notation fields.
+pub(crate) fn parse_grid_notation(format: &str, text: &str) -> Option<(f64, f64)> {
+    let normalized: Vec<u8> = text
+        .bytes()
+        .filter(|b| !b.is_ascii_whitespace())
+        .map(|b| b.to_ascii_uppercase())
+        .collect();
+    let s = normalized.as_slice();
+    let letter = |c: u8| LETTERS.iter().position(|b| *b == c);
+    let number = |digits: &[u8]| -> Option<f64> {
+        if !digits.iter().all(u8::is_ascii_digit) {
+            return None;
+        }
+        std::str::from_utf8(digits).ok()?.parse().ok()
+    };
+    match format {
+        "GARS" => {
+            if s.len() < 5 {
+                return None;
+            }
+            let band = number(&s[..3])?;
+            let row = letter(s[3])? * 24 + letter(s[4])?;
+            if !(1.0..=720.0).contains(&band) || row >= 360 {
+                return None;
+            }
+            // Decode in the positive grid frame, then subtract the origin last.
+            // This ordering is observable when a corner is re-encoded as GARS.
+            let mut x = (band as usize - 1) * 6;
+            let mut y = row * 6;
+            if let Some(&quadrant) = s.get(5) {
+                if !(b'1'..=b'4').contains(&quadrant) {
+                    return None;
+                }
+                if quadrant == b'2' || quadrant == b'4' {
+                    x += 3;
+                }
+                if quadrant == b'1' || quadrant == b'2' {
+                    y += 3;
+                }
+            }
+            if let Some(&key) = s.get(6) {
+                if !(b'1'..=b'9').contains(&key) {
+                    return None;
+                }
+                let index = key - b'1';
+                x += usize::from(index % 3);
+                y += usize::from(2 - index / 3);
+            }
+            // ArcGIS ignores characters following the first seven GARS characters.
+            Some((x as f64 / 12.0 - 180.0, y as f64 / 12.0 - 90.0))
+        }
+        "GEOREF" => {
+            if !(8..=22).contains(&s.len()) || !s.len().is_multiple_of(2) {
+                return None;
+            }
+            let (xt, yt, xd, yd) = (letter(s[0])?, letter(s[1])?, letter(s[2])?, letter(s[3])?);
+            if yt >= 12 || xd >= 15 || yd >= 15 {
+                return None;
+            }
+            let digits = (s.len() - 4) / 2;
+            let scale = 10_f64.powi(digits as i32 - 2) * 60.0;
+            Some((
+                (xt * 15 + xd) as f64 - 180.0 + number(&s[4..4 + digits])? / scale,
+                (yt * 15 + yd) as f64 - 90.0 + number(&s[4 + digits..])? / scale,
+            ))
+        }
+        "UTM_BANDS" | "UTM_ZONES" => parse_utm(s, format == "UTM_BANDS"),
+        "MGRS" | "USNG" => parse_mgrs(s),
+        _ => None,
+    }
+}
+
+/// Inverse transverse Mercator (Krüger series to n^6, scale 0.9996): latitude and longitude
+/// offset from the central meridian (radians) of easting/northing offsets in metres.
+fn inverse_transverse_mercator(x: f64, y: f64) -> (f64, f64) {
+    let n = F / (2.0 - F);
+    let (n2, n3) = (n * n, n * n * n);
+    let (n4, n5, n6) = (n3 * n, n3 * n2, n3 * n3);
+    let big_a = A / (1.0 + n) * (1.0 + n2 / 4.0 + n4 / 64.0 + n6 / 256.0);
+    let beta = [
+        n / 2.0 - 2.0 * n2 / 3.0 + 37.0 * n3 / 96.0 - n4 / 360.0 - 81.0 * n5 / 512.0
+            + 96199.0 * n6 / 604_800.0,
+        n2 / 48.0 + n3 / 15.0 - 437.0 * n4 / 1440.0 + 46.0 * n5 / 105.0
+            - 1_118_711.0 * n6 / 3_870_720.0,
+        17.0 * n3 / 480.0 - 37.0 * n4 / 840.0 - 209.0 * n5 / 4480.0 + 5569.0 * n6 / 90720.0,
+        4397.0 * n4 / 161_280.0 - 11.0 * n5 / 504.0 - 830_251.0 * n6 / 7_257_600.0,
+        4583.0 * n5 / 161_280.0 - 108_847.0 * n6 / 3_991_680.0,
+        20_648_693.0 * n6 / 638_668_800.0,
+    ];
+    let xi = y / (0.9996 * big_a);
+    let eta = x / (0.9996 * big_a);
+    let (mut xi_p, mut eta_p) = (xi, eta);
+    for (j, b) in beta.iter().enumerate() {
+        let k = 2.0 * (j + 1) as f64;
+        xi_p -= b * (k * xi).sin() * (k * eta).cosh();
+        eta_p -= b * (k * xi).cos() * (k * eta).sinh();
+    }
+    let tau_p = xi_p.sin() / (eta_p.sinh().powi(2) + xi_p.cos().powi(2)).sqrt();
+    let dlon = eta_p.sinh().atan2(xi_p.cos());
+    let e2 = F * (2.0 - F);
+    let e = e2.sqrt();
+    let mut tau = tau_p;
+    for _ in 0..10 {
+        let sigma = (e * (e * tau / (1.0 + tau * tau).sqrt()).atanh()).sinh();
+        let ti = tau * (1.0 + sigma * sigma).sqrt() - sigma * (1.0 + tau * tau).sqrt();
+        let delta = (tau_p - ti) / (1.0 + ti * ti).sqrt() * (1.0 + (1.0 - e2) * tau * tau)
+            / ((1.0 - e2) * (1.0 + tau * tau).sqrt());
+        tau += delta;
+        if delta.abs() < 1e-14 {
+            break;
+        }
+    }
+    (tau.atan(), dlon)
+}
+
+/// Inverse Universal Polar Stereographic (false origin 2 000 000 m): longitude and latitude in
+/// degrees.
+fn inverse_polar_stereographic(easting: f64, northing: f64, north: bool) -> (f64, f64) {
+    let e = (F * (2.0 - F)).sqrt();
+    let (dx, dy) = (easting - 2_000_000.0, northing - 2_000_000.0);
+    let rho = dx.hypot(dy);
+    let t = rho * ((1.0 + e).powf(1.0 + e) * (1.0 - e).powf(1.0 - e)).sqrt() / (2.0 * 0.994 * A);
+    let mut phi = PI / 2.0 - 2.0 * t.atan();
+    for _ in 0..20 {
+        let s = e * phi.sin();
+        let next = PI / 2.0 - 2.0 * (t * ((1.0 - s) / (1.0 + s)).powf(e / 2.0)).atan();
+        if (next - phi).abs() < 1e-15 {
+            phi = next;
+            break;
+        }
+        phi = next;
+    }
+    // The pole itself has longitude 0.
+    let lon = match (rho == 0.0, north) {
+        (true, _) => 0.0,
+        (false, true) => dx.atan2(-dy),
+        (false, false) => dx.atan2(dy),
+    };
+    let lat = if north { phi } else { -phi };
+    (lon.to_degrees(), lat.to_degrees())
+}
+
+/// Longitude and latitude of UTM `zone` easting/northing (northing with the 10 000 000 m false
+/// northing in the south).
+fn from_utm(zone: u32, north: bool, easting: f64, northing: f64) -> (f64, f64) {
+    let y = if north {
+        northing
+    } else {
+        northing - 10_000_000.0
+    };
+    let (lat, dlon) = inverse_transverse_mercator(easting - 500_000.0, y);
+    // Zones 1 and 60 reach across the antimeridian: wrap into -180..180.
+    let mut lon = f64::from(zone) * 6.0 - 183.0 + dlon.to_degrees();
+    if lon > 180.0 {
+        lon -= 360.0;
+    } else if lon < -180.0 {
+        lon += 360.0;
+    }
+    (lon, lat.to_degrees())
+}
+
+/// The leading 1- or 2-digit zone (1..=60) of `s`, and the rest.
+fn split_zone(s: &[u8]) -> Option<(Option<u32>, &[u8])> {
+    let digits = s.iter().take(2).take_while(|b| b.is_ascii_digit()).count();
+    if digits == 0 {
+        return Some((None, s));
+    }
+    let zone: u32 = std::str::from_utf8(&s[..digits]).ok()?.parse().ok()?;
+    (1..=60)
+        .contains(&zone)
+        .then_some((Some(zone), &s[digits..]))
+}
+
+/// UTM_BANDS (`33T 509614 5058379`) or UTM_ZONES (`33N5096145058379`), whitespace already
+/// removed: the digits split in half, the easting taking the shorter half (`509614` is E 509,
+/// N 614). Polar (UPS) positions carry no zone and are written relative to the MGRS polar grid
+/// origin.
+fn parse_utm(s: &[u8], bands: bool) -> Option<(f64, f64)> {
+    let (zone, rest) = split_zone(s)?;
+    let (&letter, digits) = rest.split_first()?;
+    if digits.len() < 2 || !digits.iter().all(u8::is_ascii_digit) {
+        return None;
+    }
+    let text = std::str::from_utf8(digits).ok()?;
+    let (e, n) = text.split_at(text.len() / 2);
+    let (easting, northing): (f64, f64) = (e.parse().ok()?, n.parse().ok()?);
+    match zone {
+        None => {
+            let north = match letter {
+                b'Y' | b'Z' => true,
+                b'A' | b'B' => false,
+                _ => return None,
+            };
+            let origin = if north { 1_300_000.0 } else { 800_000.0 };
+            Some(inverse_polar_stereographic(
+                easting + origin,
+                northing + origin,
+                north,
+            ))
+        }
+        Some(zone) => {
+            let north = if bands {
+                let band = b"CDEFGHJKLMNPQRSTUVWX".iter().position(|&b| b == letter)?;
+                band >= 10
+            } else {
+                match letter {
+                    b'N' => true,
+                    b'S' => false,
+                    _ => return None,
+                }
+            };
+            Some(from_utm(zone, north, easting, northing))
+        }
+    }
+}
+
+/// Column letters and false easting, row letters and false northing, and hemisphere of an MGRS
+/// polar grid.
+type PolarGrid = (&'static [u8], f64, &'static [u8], f64, bool);
+
+/// MGRS or USNG (whitespace already removed): zone and band (or a polar band alone), the 100 km
+/// square letters, then an even number (0..=10) of digits; a shorter reference is the south-west
+/// corner of its square. The band picks the 2 000 km cycle of the row letter.
+fn parse_mgrs(s: &[u8]) -> Option<(f64, f64)> {
+    let (zone, rest) = split_zone(s)?;
+    if rest.len() < 3 {
+        return None;
+    }
+    let (band, col, row, digits) = (rest[0], rest[1], rest[2], &rest[3..]);
+    if digits.len() > 10
+        || !digits.len().is_multiple_of(2)
+        || !digits.iter().all(u8::is_ascii_digit)
+    {
+        return None;
+    }
+    let half = digits.len() / 2;
+    let scale = 10_f64.powi(5 - half as i32);
+    let value = |d: &[u8]| -> Option<f64> {
+        if d.is_empty() {
+            Some(0.0)
+        } else {
+            Some(std::str::from_utf8(d).ok()?.parse::<f64>().ok()? * scale)
+        }
+    };
+    let (de, dn) = (value(&digits[..half])?, value(&digits[half..])?);
+    let index = |set: &[u8], c: u8| set.iter().position(|&b| b == c);
+    match zone {
+        None => {
+            let (cols, col_origin, rows, row_origin, north): PolarGrid = match band {
+                b'Y' => (
+                    b"RSTUXYZ",
+                    1_300_000.0,
+                    b"ABCDEFGHJKLMNP",
+                    1_300_000.0,
+                    true,
+                ),
+                b'Z' => (
+                    b"ABCFGHJ",
+                    2_000_000.0,
+                    b"ABCDEFGHJKLMNP",
+                    1_300_000.0,
+                    true,
+                ),
+                b'A' => (b"JKLPQRSTUXYZ", 800_000.0, LETTERS, 800_000.0, false),
+                b'B' => (b"ABCFGHJKLPQR", 2_000_000.0, LETTERS, 800_000.0, false),
+                _ => return None,
+            };
+            let easting = col_origin + index(cols, col)? as f64 * 100_000.0 + de;
+            let northing = row_origin + index(rows, row)? as f64 * 100_000.0 + dn;
+            Some(inverse_polar_stereographic(easting, northing, north))
+        }
+        Some(zone) => {
+            let bands = b"CDEFGHJKLMNPQRSTUVWX";
+            let band_index = bands.iter().position(|&b| b == band)?;
+            let cols: &[u8] = [b"ABCDEFGH", b"JKLMNPQR", b"STUVWXYZ"][((zone - 1) % 3) as usize];
+            let easting = (index(cols, col)? + 1) as f64 * 100_000.0 + de;
+            let rows = b"ABCDEFGHJKLMNPQRSTUV";
+            let offset = if zone % 2 == 0 { 5 } else { 0 };
+            let row_value = ((index(rows, row)? + 20 - offset) % 20) as f64 * 100_000.0;
+            // The bottom of the band on the central meridian, floored to 100 km.
+            let band_lat = -80.0 + 8.0 * band_index as f64;
+            let north = band_index >= 10;
+            let (_, y) = transverse_mercator(band_lat.to_radians(), 0.0);
+            let band_northing = if north { y } else { 10_000_000.0 + y };
+            let band_northing = (band_northing / 100_000.0).floor() * 100_000.0;
+            let mut northing = row_value + dn;
+            while northing < band_northing {
+                northing += 2_000_000.0;
+            }
+            Some(from_utm(zone, north, easting, northing))
+        }
+    }
+}
+
 /// The notation `format` (`UTM_BANDS`, `UTM_ZONES`, `MGRS`, `USNG`, `GARS`, `GEOREF`, upper
 /// case) of a WGS84 position; `None` for other formats.
 pub(crate) fn grid_notation(format: &str, lon: f64, lat: f64) -> Option<Option<String>> {
@@ -261,6 +582,77 @@ pub(crate) fn grid_notation(format: &str, lon: f64, lat: f64) -> Option<Option<S
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn gars_grid_boundaries_match_arcgis() {
+        for (format, input, expected) in [
+            ("GARS", "116LR17", "115LR29"),
+            ("GARS", "161AA34", "161AA37"),
+            ("GARS", "391MH32", "391MH32"),
+            ("GARS", "249NP46", "249NP46"),
+            ("GEOREF", "AAAA0000", "001AA37"),
+            ("GEOREF", "ZMQQ6060", "001QZ11"),
+        ] {
+            let (x, y) = parse_grid_notation(format, input).unwrap();
+            assert_eq!(gars_from_grid(x, y).as_deref(), Some(expected), "{input}");
+        }
+        assert!(gars_from_grid(181.0, 0.0).is_none());
+        assert!(gars_from_grid(0.0, f64::NAN).is_none());
+    }
+
+    #[test]
+    fn grid_inputs_match_arcgis() {
+        for (fmt, text, lon, lat) in [
+            ("GARS", "391MH", 15.0, 45.5),
+            ("GARS", "391MH1", 15.0, 45.75),
+            ("GARS", "391MH2", 15.25, 45.75),
+            ("GARS", "391MH4", 15.25, 45.5),
+            ("GARS", "391 MH 32", 15.083333333333, 45.666666666667),
+            ("GARS", "391MH31junk", 15.0, 45.666666666667),
+            ("GARS", "001AA11", -180.0, -89.583333333333),
+            ("GARS", "720QZ49", 179.916666666667, 89.5),
+            ("GEOREF", "pkaa0740740734", 15.12345, 45.6789),
+            ("GEOREF", "PKAA 07407 40734", 15.12345, 45.6789),
+            ("GEOREF", "PKAA0740", 15.116666666667, 45.666666666667),
+            (
+                "GEOREF",
+                "PKAA07407407340000",
+                15.123456666667,
+                46.223333333333,
+            ),
+            ("GEOREF", "PKAA6040", 16.0, 45.666666666667),
+            ("GEOREF", "ZMQQ6060", 180.0, 90.0),
+            ("GEOREF", "ZMQQ9999999999", 180.66665, 90.66665),
+        ] {
+            let (x, y) = parse_grid_notation(fmt, text).unwrap();
+            assert!(
+                (x - lon).abs() < 1e-10 && (y - lat).abs() < 1e-10,
+                "{fmt}: {text}: {x}, {y}"
+            );
+        }
+        for (fmt, text) in [
+            ("GARS", "000AA11"),
+            ("GARS", "721AA11"),
+            ("GARS", "001RA11"),
+            ("GARS", "001AI11"),
+            ("GARS", "391MH5"),
+            ("GARS", "391MH30"),
+            ("GARS", "391MH3junk"),
+            ("GARS", ""),
+            ("GEOREF", "PKAA"),
+            ("GEOREF", "PKAA07"),
+            ("GEOREF", "PKAA07407"),
+            ("GEOREF", "ZZAA0000"),
+            ("GEOREF", "NMRA0000"),
+            ("GEOREF", "NKII0000"),
+            ("GEOREF", "PKAA07407407340000000000"),
+            ("GEOREF", "PKAA-07404073"),
+            ("GEOREF", "PKAA0740740734.0"),
+            ("GEOREF", ""),
+        ] {
+            assert!(parse_grid_notation(fmt, text).is_none(), "{fmt}: {text}");
+        }
+    }
 
     /// ArcGIS Pro 3.7 outputs for points across zones, the Norway/Svalbard exceptions and UPS.
     #[test]
@@ -453,6 +845,95 @@ mod tests {
                 let got = grid_notation(f, *lon, *lat).unwrap().unwrap();
                 assert_eq!(&got, w, "{f} of {lon} {lat}");
             }
+        }
+    }
+}
+
+#[cfg(test)]
+mod projected_input_tests {
+    use super::parse_grid_notation;
+
+    /// ArcGIS Pro 3.7 DDLon/DDLat (rounded to 8 decimals) of projected-grid strings; `None` is
+    /// a failed conversion.
+    #[test]
+    fn projected_grid_inputs_match_arcgis() {
+        type Case = (&'static str, &'static str, Option<(f64, f64)>);
+        let cases: &[Case] = &[
+            ("MGRS", "33TWL0961558380", Some((15.12346077, 45.67890452))),
+            ("MGRS", "33twl0961558380", Some((15.12346077, 45.67890452))),
+            (
+                "MGRS",
+                "33T WL 09615 58380",
+                Some((15.12346077, 45.67890452)),
+            ),
+            ("MGRS", "33TWL09615838", Some((15.12339657, 45.67890459))),
+            ("MGRS", "33TWL096583", Some((15.12326658, 45.67818466))),
+            ("MGRS", "33TWL0958", Some((15.11555688, 45.67549246))),
+            ("MGRS", "33TWL", Some((15.0, 45.15347718))),
+            ("MGRS", "33TWL096155838", None),
+            ("MGRS", "3TWL0961558380", Some((-164.87653923, 45.67890452))),
+            ("MGRS", "ZAB0000044543", Some((0.0, 85.00000352))),
+            ("MGRS", "junk", None),
+            ("MGRS", "", None),
+            ("MGRS", "33XWL0961558380", Some((15.58841475, 81.58345108))),
+            ("MGRS", "33TWL09615583800", None),
+            ("USNG", "Z AB 00000 44543", Some((0.0, 85.00000352))),
+            (
+                "UTM_BANDS",
+                "33T 509614 5058379",
+                Some((15.12344791, 45.67889553)),
+            ),
+            (
+                "UTM_BANDS",
+                "33t509614 5058379",
+                Some((15.12344791, 45.67889553)),
+            ),
+            (
+                "UTM_BANDS",
+                "33T5096145058379",
+                Some((15.12344791, 45.67889553)),
+            ),
+            ("UTM_BANDS", "Z 700000 0144542", Some((0.0, 84.99999453))),
+            ("UTM_BANDS", "33T 509614.5 5058379.5", None),
+            (
+                "UTM_BANDS",
+                "3T 509614 5058379",
+                Some((-164.87655209, 45.67889553)),
+            ),
+            (
+                "UTM_ZONES",
+                "33N 509614 5058379",
+                Some((15.12344791, 45.67889553)),
+            ),
+            (
+                "UTM_ZONES",
+                "31S2217269972340",
+                Some((0.49999714, -0.2500089)),
+            ),
+            ("UTM_ZONES", "Z7000000144542", Some((0.0, 84.99999453))),
+            (
+                "UTM_ZONES",
+                "A10455260323936",
+                Some((-169.99998224, -81.9999931)),
+            ),
+            ("UTM_ZONES", "junk", None),
+            ("UTM_BANDS", "33T 509614", Some((10.51581624, 0.00553793))),
+            (
+                "UTM_BANDS",
+                "01P 171071 1106908",
+                Some((179.99999767, 9.99999226)),
+            ),
+            ("UTM_BANDS", "Z 700000 0700000", Some((0.0, 90.0))),
+            (
+                "MGRS",
+                "60PZS2892906909",
+                Some((-179.99999758, 10.00000129)),
+            ),
+        ];
+        let round = |v: f64| (v * 1e8).round() / 1e8;
+        for (format, text, want) in cases {
+            let got = parse_grid_notation(format, text).map(|(x, y)| (round(x), round(y)));
+            assert_eq!(got, *want, "{format} {text:?}");
         }
     }
 }

@@ -1,0 +1,132 @@
+{
+  "ccn_grid_input_gars_gars": {
+    "tool": "management.ConvertCoordinateNotation",
+    "args": [
+      "testdata/geoproc/grid_input_gars.csv",
+      "<out>",
+      "COORD",
+      null,
+      "GARS",
+      "GARS",
+      "",
+      4326
+    ],
+    "status": "succeeded",
+    "messages": [
+      "WARNING 001293: Coordinate conversion failed for 15 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation53.log"
+    ],
+    "fields": [
+      [
+        "FID",
+        "OID",
+        4,
+        0,
+        0
+      ],
+      [
+        "Shape",
+        "Geometry",
+        0,
+        0,
+        0
+      ],
+      [
+        "ID",
+        "Integer",
+        10,
+        10,
+        0
+      ],
+      [
+        "COORD",
+        "String",
+        254,
+        0,
+        0
+      ],
+      [
+        "GARS",
+        "String",
+        254,
+        0,
+        0
+      ]
+    ],
+    "shapeType": "Point",
+    "run": {
+      "tool": "convert_coordinate_notation",
+      "params": {
+        "input": "testdata/geoproc/grid_input_gars.csv",
+        "output": "<out>",
+        "x_field": "COORD",
+        "input_format": "GARS",
+        "output_format": "GARS"
+      }
+    }
+  },
+  "ccn_grid_input_georef_gars": {
+    "tool": "management.ConvertCoordinateNotation",
+    "args": [
+      "testdata/geoproc/grid_input_georef.csv",
+      "<out>",
+      "COORD",
+      null,
+      "GEOREF",
+      "GARS",
+      "",
+      4326
+    ],
+    "status": "succeeded",
+    "messages": [
+      "WARNING 001293: Coordinate conversion failed for 18 records. C:\\users\\jansolo\\AppData\\Local\\Temp\\ConvertCoordinateNotation55.log"
+    ],
+    "fields": [
+      [
+        "FID",
+        "OID",
+        4,
+        0,
+        0
+      ],
+      [
+        "Shape",
+        "Geometry",
+        0,
+        0,
+        0
+      ],
+      [
+        "ID",
+        "Integer",
+        10,
+        10,
+        0
+      ],
+      [
+        "COORD",
+        "String",
+        254,
+        0,
+        0
+      ],
+      [
+        "GARS",
+        "String",
+        254,
+        0,
+        0
+      ]
+    ],
+    "shapeType": "Point",
+    "run": {
+      "tool": "convert_coordinate_notation",
+      "params": {
+        "input": "testdata/geoproc/grid_input_georef.csv",
+        "output": "<out>",
+        "x_field": "COORD",
+        "input_format": "GEOREF",
+        "output_format": "GARS"
+      }
+    }
+  }
+}

@@ -384,6 +384,49 @@ CASES = {
     "csv_wells": ("conversion.ExportTable", [DATA / "wells.shp"], []),
     "csv_bad_lines": ("conversion.ExportTable", [DATA / "bad_lines.shp"], []),
     "csv_stations_back": ("conversion.ExportTable", [DATA / "stations.csv"], []),
+    "ccn_grid_input_gars_dd_numeric": ("management.ConvertCoordinateNotation", [DATA / "grid_input_gars.csv"], ["COORD", None, "GARS", "DD_NUMERIC", "", 4326]),
+    "ccn_grid_input_georef_dd_numeric": ("management.ConvertCoordinateNotation", [DATA / "grid_input_georef.csv"], ["COORD", None, "GEOREF", "DD_NUMERIC", "", 4326]),
+    "ccn_grid_input_gars_georef": ("management.ConvertCoordinateNotation", [DATA / "grid_input_gars.csv"], ["COORD", None, "GARS", "GEOREF", "", 4326]),
+    "ccn_grid_input_georef_georef": ("management.ConvertCoordinateNotation", [DATA / "grid_input_georef.csv"], ["COORD", None, "GEOREF", "GEOREF", "", 4326]),
+    "ccn_grid_input_gars_dd_1": ("management.ConvertCoordinateNotation", [DATA / "grid_input_gars.csv"], ["COORD", None, "GARS", "DD_1", "", 4326]),
+    "ccn_grid_input_georef_dd_1": ("management.ConvertCoordinateNotation", [DATA / "grid_input_georef.csv"], ["COORD", None, "GEOREF", "DD_1", "", 4326]),
+    "ccn_grid_input_gars_ddm_1": ("management.ConvertCoordinateNotation", [DATA / "grid_input_gars.csv"], ["COORD", None, "GARS", "DDM_1", "", 4326]),
+    "ccn_grid_input_gars_ddm_2": ("management.ConvertCoordinateNotation", [DATA / "grid_input_gars.csv"], ["COORD", None, "GARS", "DDM_2", "", 4326]),
+    "ccn_grid_input_gars_dms_1": ("management.ConvertCoordinateNotation", [DATA / "grid_input_gars.csv"], ["COORD", None, "GARS", "DMS_1", "", 4326]),
+    "ccn_grid_input_gars_dms_2": ("management.ConvertCoordinateNotation", [DATA / "grid_input_gars.csv"], ["COORD", None, "GARS", "DMS_2", "", 4326]),
+    "ccn_grid_input_georef_ddm_1": ("management.ConvertCoordinateNotation", [DATA / "grid_input_georef.csv"], ["COORD", None, "GEOREF", "DDM_1", "", 4326]),
+    "ccn_grid_input_georef_ddm_2": ("management.ConvertCoordinateNotation", [DATA / "grid_input_georef.csv"], ["COORD", None, "GEOREF", "DDM_2", "", 4326]),
+    "ccn_grid_input_georef_dms_1": ("management.ConvertCoordinateNotation", [DATA / "grid_input_georef.csv"], ["COORD", None, "GEOREF", "DMS_1", "", 4326]),
+    "ccn_grid_input_georef_dms_2": ("management.ConvertCoordinateNotation", [DATA / "grid_input_georef.csv"], ["COORD", None, "GEOREF", "DMS_2", "", 4326]),
+    "ccn_grid_input_precision_ddm_1": ("management.ConvertCoordinateNotation", [DATA / "grid_carry_precision.dbf"], ["COORD", None, "GEOREF", "DDM_1", "", 4326]),
+    "ccn_grid_input_precision_ddm_2": ("management.ConvertCoordinateNotation", [DATA / "grid_carry_precision.dbf"], ["COORD", None, "GEOREF", "DDM_2", "", 4326]),
+    "ccn_grid_input_precision_dms_1": ("management.ConvertCoordinateNotation", [DATA / "grid_carry_precision.dbf"], ["COORD", None, "GEOREF", "DMS_1", "", 4326]),
+    "ccn_grid_input_precision_dms_2": ("management.ConvertCoordinateNotation", [DATA / "grid_carry_precision.dbf"], ["COORD", None, "GEOREF", "DMS_2", "", 4326]),
+    "ccn_grid_input_gars_gars": ("management.ConvertCoordinateNotation", [DATA / "grid_input_gars.csv"], ["COORD", None, "GARS", "GARS", "", 4326]),
+    "ccn_grid_input_mgrs_dd_numeric": ("management.ConvertCoordinateNotation", [DATA / "grid_input_mgrs.dbf"], ["COORD", None, "MGRS", "DD_NUMERIC", "", 4326]),
+    "ccn_grid_input_mgrs_dd_1": ("management.ConvertCoordinateNotation", [DATA / "grid_input_mgrs.dbf"], ["COORD", None, "MGRS", "DD_1", "", 4326]),
+    "ccn_grid_input_mgrs_dd_2": ("management.ConvertCoordinateNotation", [DATA / "grid_input_mgrs.dbf"], ["COORD", None, "MGRS", "DD_2", "", 4326]),
+    "ccn_grid_input_usng_dd_numeric": ("management.ConvertCoordinateNotation", [DATA / "grid_input_usng.dbf"], ["COORD", None, "USNG", "DD_NUMERIC", "", 4326]),
+    "ccn_grid_input_usng_dd_1": ("management.ConvertCoordinateNotation", [DATA / "grid_input_usng.dbf"], ["COORD", None, "USNG", "DD_1", "", 4326]),
+    "ccn_grid_input_utm_bands_dd_numeric": ("management.ConvertCoordinateNotation", [DATA / "grid_input_utm_bands.dbf"], ["COORD", None, "UTM_BANDS", "DD_NUMERIC", "", 4326]),
+    "ccn_grid_input_utm_bands_dd_1": ("management.ConvertCoordinateNotation", [DATA / "grid_input_utm_bands.dbf"], ["COORD", None, "UTM_BANDS", "DD_1", "", 4326]),
+    "ccn_grid_input_utm_zones_dd_numeric": ("management.ConvertCoordinateNotation", [DATA / "grid_input_utm_zones.dbf"], ["COORD", None, "UTM_ZONES", "DD_NUMERIC", "", 4326]),
+    "ccn_grid_input_utm_zones_dd_1": ("management.ConvertCoordinateNotation", [DATA / "grid_input_utm_zones.dbf"], ["COORD", None, "UTM_ZONES", "DD_1", "", 4326]),
+    "ccn_grid_input_boundary_gars_gars": ("management.ConvertCoordinateNotation", [DATA / "gars_boundary_gars.dbf"], ["COORD", None, "GARS", "GARS", "", 4326]),
+    "ccn_grid_input_georef_gars": ("management.ConvertCoordinateNotation", [DATA / "grid_input_georef.csv"], ["COORD", None, "GEOREF", "GARS", "", 4326]),
+    "ccn_grid_input_boundary_georef_gars": ("management.ConvertCoordinateNotation", [DATA / "gars_boundary_georef.dbf"], ["COORD", None, "GEOREF", "GARS", "", 4326]),
+    "ccn_input_dd_1_dd_numeric": ("management.ConvertCoordinateNotation", [DATA / "angular_dd_1.csv"], ["COORDX", None, "DD_1", "DD_NUMERIC", "", 4326]),
+    "ccn_input_dd_1_dms_1": ("management.ConvertCoordinateNotation", [DATA / "angular_dd_1.csv"], ["COORDX", None, "DD_1", "DMS_1", "", 4326]),
+    "ccn_input_dd_2_dd_numeric": ("management.ConvertCoordinateNotation", [DATA / "angular_dd_2.csv"], ["COORDX", "COORDY", "DD_2", "DD_NUMERIC", "", 4326]),
+    "ccn_input_dd_2_dms_1": ("management.ConvertCoordinateNotation", [DATA / "angular_dd_2.csv"], ["COORDX", "COORDY", "DD_2", "DMS_1", "", 4326]),
+    "ccn_input_ddm_1_dd_numeric": ("management.ConvertCoordinateNotation", [DATA / "angular_ddm_1.csv"], ["COORDX", None, "DDM_1", "DD_NUMERIC", "", 4326]),
+    "ccn_input_ddm_1_dms_1": ("management.ConvertCoordinateNotation", [DATA / "angular_ddm_1.csv"], ["COORDX", None, "DDM_1", "DMS_1", "", 4326]),
+    "ccn_input_ddm_2_dd_numeric": ("management.ConvertCoordinateNotation", [DATA / "angular_ddm_2.csv"], ["COORDX", "COORDY", "DDM_2", "DD_NUMERIC", "", 4326]),
+    "ccn_input_ddm_2_dms_1": ("management.ConvertCoordinateNotation", [DATA / "angular_ddm_2.csv"], ["COORDX", "COORDY", "DDM_2", "DMS_1", "", 4326]),
+    "ccn_input_dms_1_dd_numeric": ("management.ConvertCoordinateNotation", [DATA / "angular_dms_1.csv"], ["COORDX", None, "DMS_1", "DD_NUMERIC", "", 4326]),
+    "ccn_input_dms_1_dms_1": ("management.ConvertCoordinateNotation", [DATA / "angular_dms_1.csv"], ["COORDX", None, "DMS_1", "DMS_1", "", 4326]),
+    "ccn_input_dms_2_dd_numeric": ("management.ConvertCoordinateNotation", [DATA / "angular_dms_2.csv"], ["COORDX", "COORDY", "DMS_2", "DD_NUMERIC", "", 4326]),
+    "ccn_input_dms_2_dms_1": ("management.ConvertCoordinateNotation", [DATA / "angular_dms_2.csv"], ["COORDX", "COORDY", "DMS_2", "DMS_1", "", 4326]),
     "ccn_dd_1": ("management.ConvertCoordinateNotation", [DATA / "lonlat.csv"], ["LON", "LAT", "DD_2", "DD_1", "", 4326]),
     "ccn_dd_2": ("management.ConvertCoordinateNotation", [DATA / "lonlat.csv"], ["LON", "LAT", "DD_2", "DD_2", "", 4326]),
     "ccn_ddm_1": ("management.ConvertCoordinateNotation", [DATA / "lonlat.csv"], ["LON", "LAT", "DD_2", "DDM_1", "", 4326]),
@@ -1913,15 +1956,15 @@ RUN = {
     "management.EncodeField": ("encode_field", ["input", "output", "field", "method"]),
     "management.GeodeticDensify": ("geodetic_densify", ["input", "output", "densify_method", "max_segment_length"]),
     "management.TableToEllipse": ("table_to_ellipse", ["input", "output", "x_field", "y_field", "major_field", "minor_field", "distance_units", "azimuth_field", "azimuth_units", None, "spatial_reference", None, "shape_type", "method"]),
-    "management.ConvertCoordinateNotation": ("convert_coordinate_notation", ["input", "output", "x_field", "y_field", None, "output_format"]),
-    "gp.ExtractByPoints_sa": ("extract_by_points", ["input", "points", "output", "extraction_area"]),
-    "gp.TopographicPositionIndex_sa": ("topographic_position_index", ["input", "output", "neighborhood"]),
-    "gp.TopHatTransform_sa": ("top_hat_transform", ["input", "output", "neighborhood", "analysis_type"]),
-    "gp.Test_sa": ("test", ["input", "where_clause", "output"]),
+    "management.ConvertCoordinateNotation": ("convert_coordinate_notation", ["input", "output", "x_field", "y_field", "input_format", "output_format"]),
     "edit.Generalize": ("generalize", ["input", "output", "tolerance"]),
     "management.CopyRaster": ("copy_raster", ["input", "output", None, None, "nodata_value", None, None, "pixel_type"]),
     "management.MosaicToNewRaster": ("mosaic_to_new_raster", ["inputs", "output", None, "pixel_type", "cellsize", None, "mosaic_method"]),
     "gp.ExtractByPolygon_sa": ("extract_by_polygon", ["input", "polygon", "output", "extraction_area"]),
+    "gp.ExtractByPoints_sa": ("extract_by_points", ["input", "points", "output", "extraction_area"]),
+    "gp.TopographicPositionIndex_sa": ("topographic_position_index", ["input", "output", "neighborhood"]),
+    "gp.TopHatTransform_sa": ("top_hat_transform", ["input", "output", "neighborhood", "analysis_type"]),
+    "gp.Test_sa": ("test", ["input", "where_clause", "output"]),
     "gp.Trend_sa": ("trend", ["input", "z_field", "output", "cell_size", "order"]),
     "gp.Rank_sa": ("rank", ["rank", "rasters", "output"]),
     "gp.Popularity_sa": ("popularity", ["rank", "rasters", "output"]),
@@ -2084,14 +2127,14 @@ def main():
             args = [str(a) for a in before] + [str(out)] + [str(a) if isinstance(a, Path) else a for a in after]
         elif tool in ("cartography.GridIndexFeatures", "gp.CreateConstantRaster_sa", "management.GenerateTessellation"):
             args = [str(out)] + [str(a) if isinstance(a, Path) else a for a in before + after]
-        elif tool in IN_PLACE:
-            k = IN_PLACE[tool]
-            if raster_projection:
-                # CopyRaster can replace the NoData value; preserve source bytes.
         elif tool == "management.FieldStatisticsToTable":
             # Writes <input>_FieldStatisticsToTable_<type> into the output location: run into
             # memory, then copy that table to the output below.
             args = [str(before[0]), after[0], "memory", after[1]] + after[2:]
+        elif tool in IN_PLACE:
+            k = IN_PLACE[tool]
+            if raster_projection:
+                # CopyRaster can replace the NoData value; preserve source bytes.
                 shutil.copy2(before[k], out)
                 aux = Path(str(before[k]) + ".aux.xml")
                 if aux.exists():
@@ -2128,16 +2171,16 @@ def main():
                 r = w.call("run_tool", tool=tool, args=safe_args, env={"overwriteOutput": True})
         else:
             r = w.call("run_tool", tool=tool, args=args, env={"overwriteOutput": True})
-        if tool in MEMORY_OUT and r.get("status") == "succeeded":
-            r2 = w.call("run_tool", tool="management.CopyFeatures", args=[mem, str(out)], env={"overwriteOutput": True})
-            w.call("python", code=f"arcpy.management.Delete('{mem}')")
-            if r2.get("status") != "succeeded":
         if tool == "management.FieldStatisticsToTable" and r.get("status") == "succeeded":
             w.call("python", code=(
                 "arcpy.env.workspace = 'memory'\n"
                 "tb = [t for t in arcpy.ListTables() if 'FieldStatisticsToTable' in t]\n"
                 f"arcpy.management.CopyRows('memory/' + tb[0], r'{out}')\n"
                 "for t in tb: arcpy.management.Delete('memory/' + t)\n"))
+        if tool in MEMORY_OUT and r.get("status") == "succeeded":
+            r2 = w.call("run_tool", tool="management.CopyFeatures", args=[mem, str(out)], env={"overwriteOutput": True})
+            w.call("python", code=f"arcpy.management.Delete('{mem}')")
+            if r2.get("status") != "succeeded":
                 r = r2
         if tool in WORKSPACE_OUT:
             outputs = {}

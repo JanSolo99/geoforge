@@ -474,7 +474,8 @@ fn convert_coordinate_notation(ctx: &dyn Context) -> Result<ToolOutput> {
     construct::convert_coordinate_notation(
         ctx.features("input")?.as_ref(),
         &need("x_field")?,
-        &need("y_field")?,
+        &text(ctx, t, "y_field").unwrap_or_default(),
+        &need("input_format")?,
         &need("output_format")?,
         Some(wgs84.esri_wkt().to_owned()),
     )
@@ -1454,7 +1455,7 @@ pub static TOOLS: &[Tool] = &[
         id: "convert_coordinate_notation",
         name: "Convert Coordinate Notation",
         toolbox: "Data Management › Features",
-        summary: "Writes decimal-degree X/Y fields as DD, DDM or DMS text (ArcGIS Pro Convert Coordinate Notation, DD input).",
+        summary: "Converts angular, GARS and GEOREF fields to DD, DDM, DMS and grid notations.",
         params: &[
             Param {
                 name: "input",
@@ -1462,14 +1463,14 @@ pub static TOOLS: &[Tool] = &[
                 kind: Kind::Features,
                 required: true,
                 default: "",
-                help: "A table with longitude and latitude fields in decimal degrees.",
+                help: "A table with angular, GARS or GEOREF coordinates.",
             },
             Param {
                 name: "x_field",
-                label: "X Field (Longitude)",
+                label: "X Field (Longitude or Coordinate)",
                 kind: Kind::Field {
                     of: "input",
-                    numeric: true,
+                    numeric: false,
                 },
                 required: true,
                 default: "",
@@ -1480,11 +1481,32 @@ pub static TOOLS: &[Tool] = &[
                 label: "Y Field (Latitude)",
                 kind: Kind::Field {
                     of: "input",
-                    numeric: true,
+                    numeric: false,
                 },
-                required: true,
+                required: false,
                 default: "",
-                help: "",
+                help: "Required for two-field input formats; ignored for single-field formats.",
+            },
+            Param {
+                name: "input_format",
+                label: "Input Coordinate Format",
+                kind: Kind::Choice(&[
+                    "DD_1",
+                    "DD_2",
+                    "DDM_1",
+                    "DDM_2",
+                    "DMS_1",
+                    "DMS_2",
+                    "GARS",
+                    "GEOREF",
+                    "UTM_BANDS",
+                    "UTM_ZONES",
+                    "MGRS",
+                    "USNG",
+                ]),
+                required: true,
+                default: "DD_2",
+                help: "Single-field angular formats use latitude then longitude unless hemispheres specify the axes. GARS/GEOREF inputs support DD_NUMERIC, angular text, GARS and GEOREF outputs; UTM_BANDS/UTM_ZONES/MGRS/USNG inputs support DD_NUMERIC, DD_1 and DD_2 outputs.",
             },
             Param {
                 name: "output_format",

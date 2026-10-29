@@ -1,0 +1,5 @@
+{"kind": "dbf", "hasOID": true, "oidField": "OID", "fields": ["OID", "Shape", "ID", "COORD", "DDLat", "DDLon", "ORIG_OID"], "values": [[0.08333164, 45.16666667, 0], [0.08333164, 45.16666667, 1], [0.08333164, 45.16666667, 2]]}
+{"kind": "shape", "hasOID": true, "oidField": "FID", "fields": ["OID", "Shape", "Id", "LON", "LAT", "DDLat", "DDLon", "ORIG_OID"], "values": [[15.123456, 45.678901, 0], [-73.9857, 40.7484, 1], [151.2093, -33.8688, 2]]}
+{"kind": "gdb", "hasOID": true, "oidField": "OBJECTID", "fields": ["OID", "Shape", "LON", "LAT", "DDLat", "DDLon", "ORIG_OID"], "values": [[15.123456, 45.678901, 1], [-73.9857, 40.7484, 2], [151.2093, -33.8688, 3]]}
+{"kind": "csv", "hasOID": false, "oidField": null, "fields": ["OID", "Shape", "LON", "LAT", "DDLat", "DDLon"], "values": [[15.123456, 45.678901], [-73.9857, 40.7484]]}
+  

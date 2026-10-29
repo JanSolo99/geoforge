@@ -1,0 +1,7 @@
+all_valid input [('ID', 'Integer'), ('COORD', 'String'), ('COORD_X', 'Double'), ('COORD_Y', 'Double')]
+all_valid output [('OID', 'OID'), ('Shape', 'Geometry'), ('ID', 'Integer'), ('COORD', 'String'), ('COORD_X', 'Double'), ('COORD_Y', 'Double'), ('DMSLatLon', 'String')]
+all_valid first [1, 1, "NKAA049998982100000000", 0.08333163666666667, 45.166666666666664, "45 10 00.00000000N 000 04 59.99389200E"]
+with_invalid input [('ID', 'Integer'), ('COORD', 'String'), ('COORD_X', 'Double'), ('COORD_Y', 'Double')]
+with_invalid output [('OID', 'OID'), ('Shape', 'Geometry'), ('ID', 'Integer'), ('COORD', 'String'), ('COORD_X', 'Double'), ('COORD_Y', 'Double'), ('DMSLatLon', 'String')]
+with_invalid first [1, 1, "NKAA049998982100000000", 0.08333163666666667, 45.166666666666664, "45 10 00.00000000N 000 04 59.99389200E"]
+  

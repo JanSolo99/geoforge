@@ -39,7 +39,8 @@ and verified against GDAL/OGR output on real data.
 - [x] Field mapping, null handling and value formatting verified against ArcGIS Pro 3.7
       through the ArcGIS bridge; `.dbf` output is byte-identical to ArcGIS's for the same input
 - [x] `.sbn/.sbx` spatial index: written with every shapefile and by `ug add-spatial-index`,
-      byte-identical to ArcGIS's on all reference outputs (format in docs/formats)
+      byte-identical on most references; rare layout gaps remain, with exact record/box
+      and tree checks for the GARS boundary cases (docs/formats/shapefile-arcgis.md)
 - [ ] `.shp.xml` metadata
 - [x] DOS and Mac code pages in `.dbf` by language driver ID (437, 737, 850, 852, 857,
       860, 861, 863, 865, 866, 10000, 10007, 10029; GDAL's LDID table, as ArcGIS reads
@@ -778,4 +779,41 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Convert Coordinate Notation (DD/DDM/DMS/DD_NUMERIC and UTM_BANDS/UTM_ZONES/MGRS/USNG/GARS/GEOREF output from lon/lat; 13 `ccn_*` cases), Table To Ellipse (planar; adaptive complete-ellipse densification; 5 `ellipse_*` cases), Geodetic Densify (geodesic; 6 `gdd_*` cases), Encode Field (One-hot/One-cold; 4 `enc_*` cases) and Field Statistics To Table (numeric/text, optional group-by field and Output Statistics list; 13 `fst_*` cases incl. 3 refusals) match ArcGIS; gaps are in docs/KNOWN_GAPS.md and docs/HANDOFF.md.
 - [x] CI gate runs locally (`scripts/check`, pre-push hook); GitHub workflows are manual-only because Actions minutes ran out.
 
-- [x] Convert Coordinate Notation (DD_1/DD_2/DDM_1/DDM_2/DMS_1/DMS_2/DD_NUMERIC/UTM_BANDS/UTM_ZONES/MGRS/USNG/GARS/GEOREF from lon/lat), Table To Ellipse (planar), Geodetic Densify (geodesic), Encode Field (one-hot/one-cold) and Field Statistics To Table (numeric/text): reference cases match ArcGIS; gaps in KNOWN_GAPS.md and HANDOFF.md. Not done: non-DD input formats and H3 output, geodesic ellipses, Trim/Extend Line, Convert Time Zone.
+- [x] Convert Coordinate Notation (DD_1/DD_2/DDM_1/DDM_2/DMS_1/DMS_2/DD_NUMERIC/UTM_BANDS/UTM_ZONES/MGRS/USNG/GARS/GEOREF from lon/lat), Table To Ellipse (planar), Geodetic Densify (geodesic), Encode Field (one-hot/one-cold) and Field Statistics To Table (numeric/text): reference cases match ArcGIS; gaps in KNOWN_GAPS.md and HANDOFF.md. Not done: DDM/DMS and grid outputs from projected-grid inputs, H3 output, geodesic ellipses, Trim/Extend Line, Convert Time Zone.
+
+- [x] Convert Coordinate Notation angular text inputs: DD/DDM/DMS single- and two-field
+      formats, hemisphere overrides/axis order, packed forms and invalid-row retention.
+      Twelve new ArcGIS reference cases compare numeric and DMS outputs, schema and NULL
+      geometry; `input_format` defaults to DD_2 for existing callers. Grid input parsing
+      and remaining grammar/projection limits: `scripts/research/coordinate_notation/README.md`.
+
+- [x] Convert Coordinate Notation GARS/GEOREF to decimal degrees and GEOREF:
+      cell/quadrant/keypad and minute precision variants, case/whitespace,
+      minute overflow and invalid-row retention. Six ArcGIS reference cases
+      cover 81 GARS and 87 GEOREF inputs. Unresolved output modes fail before
+      writing; a CLI guard preserves existing output files. Findings/remaining
+      grid-output boundary and angular carry rules:
+      `scripts/research/coordinate_notation/grid/README.md`. UTM/MGRS/USNG inputs remain.
+
+- [x] Convert Coordinate Notation grid-input DDM/DMS outputs: symmetric relative
+      carry-to-60 policy matches 5,634 exact ArcGIS sweep/refine controls across
+      both axes/hemispheres, plus 100 independent varied-cell precision controls.
+      Twelve new cases cover four formats, both GARS/GEOREF inputs and a typed
+      148-row DBF precision fixture. Default ORIG_OID retention follows explicit
+      source identity metadata (CSV has synthetic row IDs only); DBF/shapefile/GDB
+      controls match ArcGIS. GARS output boundaries have subsequent coverage below.
+      Evidence and CSV auto-coordinate schema gap: `scripts/research/coordinate_notation/grid/carry.md`.
+
+- [x] Convert Coordinate Notation GARS output from GARS/GEOREF inputs: positive
+      decoder frame/origin ordering, degree/radian roundtrip and direct tick
+      floors match 240 prior and 1,144 independent corner/precision controls.
+      Four reference cases cover 1,312 rows; two reuse unchanged saved ArcGIS
+      outputs. Existing 18 grid cases and 5,634 carry controls remain exact.
+      The angular numeric GARS boundary path remains separate follow-up work.
+      Evidence: `scripts/research/coordinate_notation/grid/gars-boundaries.md`.
+
+- [x] Convert Coordinate Notation UTM_BANDS/UTM_ZONES/MGRS/USNG input (Krüger inverse
+      transverse Mercator and UPS; reduced-precision MGRS, band-driven row cycles, polar
+      grids, antimeridian wrap) to DD_NUMERIC/DD_1/DD_2: 8 reference cases over 792 rows
+      match ArcGIS. DDM/DMS/grid outputs refused: ArcGIS's inverse differs by up to
+      ~3e-10 degrees. Evidence: `scripts/research/coordinate_notation/grid/projected-inputs.md`.

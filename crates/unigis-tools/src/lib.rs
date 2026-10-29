@@ -2,6 +2,7 @@
 //! output schema, feature order, messages) as observed through the ArcGIS bridge
 //! and recorded in `testdata/arcgis-reference/manifest.json`.
 
+mod angular_notation;
 pub mod construct;
 mod dm_data;
 mod dm_fields;

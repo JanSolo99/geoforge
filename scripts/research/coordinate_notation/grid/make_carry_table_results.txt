@@ -1,0 +1,2 @@
+{"path": "/mnt/media/ArcGIS_Linux/testdata/geoproc/grid_carry_precision.dbf", "fields": [["OID", "OID"], ["ID", "Integer"], ["COORD", "String"]], "count": 148}
+  

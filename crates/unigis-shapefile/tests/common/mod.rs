@@ -59,7 +59,26 @@ pub fn diff_file(path: &Path) -> Result<Vec<String>, String> {
         };
         ours += 1;
         match gdal.features.get(&feature.oid) {
-            Some(g) => diffs.extend(compare_feature(&feature, &names, g)),
+            Some(g) => {
+                // Shapelib's TRIM_DBF_WHITESPACE removes leading ASCII spaces.
+                // ArcGIS and the stored DBF character bytes retain them. Account
+                // only for that exact difference, keeping all other comparisons.
+                // Evidence: docs/formats/shapefile-leading-spaces.md. The native
+                // round-trip check separately requires the literal string value.
+                let mut normalized = g.clone();
+                for (name, value) in names.iter().zip(&feature.attributes) {
+                    if let unigis_core::Value::String(text) = value
+                        && text.starts_with(' ')
+                        && normalized.properties.get(*name).and_then(|v| v.as_str())
+                            == Some(text.trim_start_matches(' '))
+                    {
+                        normalized
+                            .properties
+                            .insert((*name).to_owned(), text.clone().into());
+                    }
+                }
+                diffs.extend(compare_feature(&feature, &names, &normalized));
+            }
             None => diffs.push(format!("FID {} not reported by GDAL", feature.oid)),
         }
     }

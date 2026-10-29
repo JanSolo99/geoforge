@@ -78,6 +78,10 @@ pub fn ogr_layer(path: &Path, layer: Option<&str>) -> Result<OgrLayer, String> {
 
     let mut text_cmd = Command::new("ogrinfo");
     text_cmd
+        // Display rounding can erase real coordinates close to integers when
+        // a driver reports storage precision (e.g. 16.999999998 -> 17.0).
+        // Keep the stored values for the file oracle; do not relax tolerances.
+        .env("OGR_WKT_ROUND", "NO")
         .args(["-q", "-nomd", "-fields=NO", "-geom=ISO_WKT"])
         .arg(path);
     match layer {
@@ -716,6 +720,45 @@ pub fn compare_feature_tol(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn ogr_keeps_stored_coordinates_close_to_integers() {
+        if !ogrinfo_available() || !gdal_version().is_some_and(|v| v >= (3, 9)) {
+            eprintln!("skipping near-integer precision probe: GDAL 3.9+ required for -xyRes");
+            return;
+        }
+        let folder = std::env::temp_dir().join(format!("unigis-wkt-round-{}", std::process::id()));
+        std::fs::create_dir(&folder).unwrap();
+        let source = folder.join("point.geojson");
+        std::fs::write(&source, r#"{"type":"FeatureCollection","features":[{"type":"Feature","properties":{},"geometry":{"type":"Point","coordinates":[25,16.999999998]}}]}"#).unwrap();
+        let output = folder.join("point.gdb");
+        run(Command::new("ogr2ogr")
+            .args([
+                "-f",
+                "OpenFileGDB",
+                "-nln",
+                "probe",
+                "-xyRes",
+                "0.000000001",
+            ])
+            .arg(&output)
+            .arg(&source))
+        .unwrap();
+        let layer = ogr_layer(&output, Some("probe")).unwrap();
+        assert_eq!(layer.features.len(), 1);
+        let point = wkt_sequences(
+            layer
+                .features
+                .values()
+                .next()
+                .unwrap()
+                .wkt
+                .as_ref()
+                .unwrap(),
+        );
+        assert!((point[0][0][1] - 16.999999998).abs() < 1e-10, "{point:?}");
+        std::fs::remove_dir_all(folder).unwrap();
+    }
 
     #[test]
     fn parses_nested_wkt_sequences() {
