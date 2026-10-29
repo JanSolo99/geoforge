@@ -77,6 +77,25 @@ DM = ROOT / "testdata" / "dm"
 
 CASES = {
     # name: (tool, args before the output, args after the output)
+    **{f"rnp_{name}": ("management.CreateRandomPoints", [], [fc, extent, n, gap, multi, size])
+       for name, fc, extent, n, gap, multi, size in [
+        ("extent", "", "0 0 20 10", "7", "0", "POINT", "10"),
+        ("zero", "", "0 0 20 10", "0", "0", "POINT", "10"),
+        ("negative", "", "0 0 20 10", "-2", "0", "POINT", "10"),
+        ("areas", DATA / "rnp_areas.shp", "", "2", "0", "POINT", "10"),
+        ("field", DATA / "rnp_areas.shp", "", "N", "GAP", "POINT", "10"),
+        ("lines", DATA / "rnp_lines.shp", "", "3", "2 Meters", "POINT", "10"),
+        ("line_field", DATA / "rnp_lines.shp", "", "N", "0", "POINT", "10"),
+        ("points", DATA / "rnp_points.shp", "", "3", "0", "POINT", "10"),
+        ("points_over", DATA / "rnp_points.shp", "", "10", "0", "POINT", "10"),
+        ("multi_extent", "", "0 0 20 10", "7", "0", "MULTIPOINT", "3"),
+        ("multi_areas", DATA / "rnp_areas.shp", "", "4", "0", "MULTIPOINT", "3"),
+        ("impossible", DATA / "rnp_areas.shp", "", "3", "100 Meters", "POINT", "10"),
+        ("ignored_extent", DATA / "rnp_areas.shp", "0 0 1 1", "1", "0", "POINT", "10"),
+        ("extent_source", "", DATA / "rnp_areas.shp", "4", "0", "POINT", "10"),
+        ("default_extent", "", "", "3", "0", "POINT", "10"),
+        ("negative_gap", DATA / "rnp_areas.shp", "", "3", "-1 Meters", "POINT", "10"),
+    ]},
     # Extraction cases save a complete output FileGDB, including schema and relationships.
     **{f"edg_{name}": ("management.ExtractDataFromGeodatabase",
         [";".join("'" + str(DATA / "extract_base.gdb" / item) + "'" for item in items)],
@@ -2112,6 +2131,7 @@ for _tool, _id in COMBINATORIAL:
 
 
 RUN = {
+    "management.CreateRandomPoints": ("create_random_points", ["output", "constraining_feature_class", "constraining_extent", "number_of_points_or_field", "minimum_allowed_distance", "create_multipoint_output", "multipoint_size"]),
     "management.ExtractDataFromGeodatabase": ("extract_data_from_geodatabase", ["in_data", "extract_type", "out_type", "out_geodatabase", "out_xml", "out_folder_path", "out_name", "expand_feature_classes_and_tables", "reuse_schema", "get_related_data", "extract_using_geometry_features", "geometry_filter_type", "all_records_for_tables"]),
     "gp.Nibble_sa": ("nibble", ["input", "mask", "output", "values", "nodata"]),
     "gp.Filter_sa": ("filter", ["input", "output", "filter_type", "ignore_nodata"]),
@@ -2247,7 +2267,7 @@ TABLE_OUT = {"management.ValidateJoin", "analysis.PairwisePolygonNeighbors", "an
 # Tools whose ArcGIS output must be a geodatabase feature class or memory (copied to a shapefile).
 MEMORY_OUT = {"analysis.SummarizeWithin", "analysis.SummarizeNearby", "analysis.ApportionPolygon"}
 # Tools that take the output folder and name rather than a path.
-CREATE_TOOLS = {"management.CreateFeatureclass", "management.CreateTable"}
+CREATE_TOOLS = {"management.CreateRandomPoints", "management.CreateFeatureclass", "management.CreateTable"}
 
 # In-place tools: the index of the input they edit (run on a copy written as the output).
 IN_PLACE = {"management.CalculateGeometryAttributes": 0, "management.Adjust3DZ": 0, "management.MigrateDateFieldToHighPrecision": 0, "management.EnableCOGO": 0, "management.DisableEditorTracking": 0, "management.DisableCOGO": 0, "management.AddGPSMetadataFields": 0, "management.ConvertTimeZone": 0, "management.ConvertTimeField": 0, "management.AddSpatialJoin": 0, "gp.ExtractMultiValuesToPoints_sa": 0, "edit.ExtendLine": 0, "edit.FlipLine": 0, "edit.TrimLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.EncodeField": 0, "management.AddGeometryAttributes": 0,
@@ -2567,6 +2587,8 @@ def main():
             "fields": [[f["name"], f["type"], f["length"], f["precision"], f["scale"]] for f in d.get("fields", [])],
             "shapeType": d.get("shapeType"),
         }
+        if tool == "management.CreateRandomPoints":
+            manifest["cases"][name]["stochastic_points"] = True
         if tool in ("management.DisableCOGO", "management.EnableCOGO", "management.DisableEditorTracking", "management.MigrateDateFieldToHighPrecision"):
             manifest["cases"][name]["report_in_place"] = True
         spec = run_spec(tool, manifest["cases"][name]["args"])

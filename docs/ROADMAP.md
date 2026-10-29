@@ -818,6 +818,11 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Adjust 3D Z (reverse, constant or field shift, US-survey unit conversion): 6 in-place `a3z_*`
       cases over point, line, polygon and multipoint Z shapefiles match ArcGIS. Evidence:
       `scripts/research/adjust_3d_z/README.md`.
+- [x] Create Random Points (`create_random_points`): planar extent/polygon/line
+  sampling and point subsets, per-feature count/distance fields, spacing/saturation,
+  multipoint chunks and CID/Id. Native reproducible seed; random coordinates differ
+  from ArcGIS.16 public property-reference cases and distribution/safety tests.
+  Scope/gaps: `scripts/research/create_random_points/README.md`.
 - [x] Extract Data From Geodatabase (`extract_data_from_geodatabase`): single-source
   FileGDB standalone classes/tables, DATA/SCHEMA_ONLY, new/existing destination,
   default/all table rows, simple relationship expansion/related rows, domains,

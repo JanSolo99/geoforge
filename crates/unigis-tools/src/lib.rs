@@ -26,6 +26,7 @@ pub mod pairwise;
 pub mod pairwise_neighbors;
 pub mod planar;
 pub mod pycalc;
+pub mod random_points;
 pub mod registry;
 pub mod regression;
 pub mod spatstat;

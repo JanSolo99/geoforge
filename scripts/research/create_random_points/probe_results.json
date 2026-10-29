@@ -1,0 +1,1273 @@
+{
+  "extent": {
+    "status": "succeeded",
+    "fields": [
+      {
+        "name": "FID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "precision": 0
+      },
+      {
+        "name": "Id",
+        "type": "Integer",
+        "length": 6,
+        "precision": 6
+      }
+    ],
+    "rows": [
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 18.392543089576066,
+          "y": 0.9852204960770905,
+          "spatialReference": {
+            "wkid": null
+          }
+        }
+      },
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 0.10642536450177431,
+          "y": 1.7162807215936482,
+          "spatialReference": {
+            "wkid": null
+          }
+        }
+      },
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 4.230953422375023,
+          "y": 0.021307480055838823,
+          "spatialReference": {
+            "wkid": null
+          }
+        }
+      },
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 8.550467644818127,
+          "y": 9.4162607495673,
+          "spatialReference": {
+            "wkid": null
+          }
+        }
+      },
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 8.400444430299103,
+          "y": 6.16006811382249,
+          "spatialReference": {
+            "wkid": null
+          }
+        }
+      },
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 15.003220071084797,
+          "y": 1.4812635560519993,
+          "spatialReference": {
+            "wkid": null
+          }
+        }
+      },
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 19.54712283331901,
+          "y": 1.5078733232803643,
+          "spatialReference": {
+            "wkid": null
+          }
+        }
+      }
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 12:33:52 AM\nSucceeded at Friday, October 30, 2026 12:33:52 AM (Elapsed Time: 0.01 seconds)",
+    "shape": "Point"
+  },
+  "zero": {
+    "status": "succeeded",
+    "fields": [
+      {
+        "name": "FID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "precision": 0
+      },
+      {
+        "name": "Id",
+        "type": "Integer",
+        "length": 6,
+        "precision": 6
+      }
+    ],
+    "rows": [],
+    "messages": "Start Time: Friday, October 30, 2026 12:33:52 AM\nWARNING 000117: Warning empty output generated.\nSucceeded at Friday, October 30, 2026 12:33:52 AM (Elapsed Time: 0.01 seconds)",
+    "shape": "Point"
+  },
+  "negative": {
+    "status": "failed",
+    "error": "Failed to execute. Parameters are not valid.\nERROR 000963: The Value can not be negative.\nFailed to execute (CreateRandomPoints).\n",
+    "messages": "Start Time: Friday, October 30, 2026 12:33:52 AM\nFailed to execute. Parameters are not valid.\nERROR 000963: The Value can not be negative.\nFailed to execute (CreateRandomPoints).\nFailed at Friday, October 30, 2026 12:33:52 AM (Elapsed Time: 0.00 seconds)"
+  },
+  "areas": {
+    "status": "succeeded",
+    "fields": [
+      {
+        "name": "FID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "precision": 0
+      },
+      {
+        "name": "CID",
+        "type": "Integer",
+        "length": 10,
+        "precision": 10
+      }
+    ],
+    "rows": [
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 500011.40691739507,
+          "y": 5000011.449532355,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 500012.33648513444,
+          "y": 5000015.769046578,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          1
+        ],
+        "geometry": {
+          "x": 500049.5471228333,
+          "y": 5000017.037472888,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          1
+        ],
+        "geometry": {
+          "x": 500048.4484663652,
+          "y": 5000016.984253353,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          2
+        ],
+        "geometry": {
+          "x": 500078.59099194873,
+          "y": 5000010.15985576,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          2
+        ],
+        "geometry": {
+          "x": 500066.35962520726,
+          "y": 5000018.787024948,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      }
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 12:33:52 AM\nSucceeded at Friday, October 30, 2026 12:33:52 AM (Elapsed Time: 0.04 seconds)",
+    "shape": "Point"
+  },
+  "field": {
+    "status": "succeeded",
+    "fields": [
+      {
+        "name": "FID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "precision": 0
+      },
+      {
+        "name": "CID",
+        "type": "Integer",
+        "length": 10,
+        "precision": 10
+      }
+    ],
+    "rows": [
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 500006.9206122169,
+          "y": 5000000.084367539,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 500000.11928224005,
+          "y": 5000019.314427986,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 500003.2823641505,
+          "y": 5000018.700654455,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          2
+        ],
+        "geometry": {
+          "x": 500077.000603131,
+          "y": 5000000.9493650915,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          2
+        ],
+        "geometry": {
+          "x": 500078.95036621485,
+          "y": 5000015.513574253,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          2
+        ],
+        "geometry": {
+          "x": 500063.3135332819,
+          "y": 5000017.422832907,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      }
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 12:33:52 AM\nSucceeded at Friday, October 30, 2026 12:33:53 AM (Elapsed Time: 0.02 seconds)",
+    "shape": "Point"
+  },
+  "lines": {
+    "status": "succeeded",
+    "fields": [
+      {
+        "name": "FID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "precision": 0
+      },
+      {
+        "name": "CID",
+        "type": "Integer",
+        "length": 10,
+        "precision": 10
+      }
+    ],
+    "rows": [
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 500000.8615024165,
+          "y": 5000000,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 500006.4103755399,
+          "y": 5000000,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 500014.4911097963,
+          "y": 5000000,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          1
+        ],
+        "geometry": {
+          "x": 500003.60914477176,
+          "y": 5000030,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          1
+        ],
+        "geometry": {
+          "x": 500015.58981366217,
+          "y": 5000030,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          1
+        ],
+        "geometry": {
+          "x": 500018.9022926263,
+          "y": 5000030,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      }
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 12:33:53 AM\nSucceeded at Friday, October 30, 2026 12:33:53 AM (Elapsed Time: 0.01 seconds)",
+    "shape": "Point"
+  },
+  "line_field": {
+    "status": "succeeded",
+    "fields": [
+      {
+        "name": "FID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "precision": 0
+      },
+      {
+        "name": "CID",
+        "type": "Integer",
+        "length": 10,
+        "precision": 10
+      }
+    ],
+    "rows": [
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 500001.07687802066,
+          "y": 5000000,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 500005.51296942483,
+          "y": 5000000,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 500013.11388724536,
+          "y": 5000000,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          1
+        ],
+        "geometry": {
+          "x": 500004.8437443315,
+          "y": 5000030,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          1
+        ],
+        "geometry": {
+          "x": 500018.2385542989,
+          "y": 5000030,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      }
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 12:33:53 AM\nSucceeded at Friday, October 30, 2026 12:33:53 AM (Elapsed Time: 0.01 seconds)",
+    "shape": "Point"
+  },
+  "points": {
+    "status": "succeeded",
+    "fields": [
+      {
+        "name": "FID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "precision": 0
+      },
+      {
+        "name": "CID",
+        "type": "Integer",
+        "length": 10,
+        "precision": 10
+      }
+    ],
+    "rows": [
+      {
+        "values": [
+          2
+        ],
+        "geometry": {
+          "x": 500020,
+          "y": 5000000,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          3
+        ],
+        "geometry": {
+          "x": 500030,
+          "y": 5000000,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          4
+        ],
+        "geometry": {
+          "x": 500040,
+          "y": 5000000,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      }
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 12:33:53 AM\nSucceeded at Friday, October 30, 2026 12:33:53 AM (Elapsed Time: 0.01 seconds)",
+    "shape": "Point"
+  },
+  "points_over": {
+    "status": "succeeded",
+    "fields": [
+      {
+        "name": "FID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "precision": 0
+      },
+      {
+        "name": "CID",
+        "type": "Integer",
+        "length": 10,
+        "precision": 10
+      }
+    ],
+    "rows": [
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 500000,
+          "y": 5000000,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          1
+        ],
+        "geometry": {
+          "x": 500010,
+          "y": 5000000,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          2
+        ],
+        "geometry": {
+          "x": 500020,
+          "y": 5000000,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          3
+        ],
+        "geometry": {
+          "x": 500030,
+          "y": 5000000,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          4
+        ],
+        "geometry": {
+          "x": 500040,
+          "y": 5000000,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      }
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 12:33:53 AM\nSucceeded at Friday, October 30, 2026 12:33:53 AM (Elapsed Time: 0.01 seconds)",
+    "shape": "Point"
+  },
+  "multi_extent": {
+    "status": "succeeded",
+    "fields": [
+      {
+        "name": "FID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "precision": 0
+      },
+      {
+        "name": "Id",
+        "type": "Integer",
+        "length": 6,
+        "precision": 6
+      }
+    ],
+    "rows": [
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "points": [
+            [
+              16.93163997028023,
+              5.03546746680513
+            ],
+            [
+              6.173010268248618,
+              3.447295541409403
+            ],
+            [
+              7.097431258298457,
+              0.5698681459762156
+            ]
+          ],
+          "spatialReference": {
+            "wkid": null
+          }
+        }
+      },
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "points": [
+            [
+              13.72181969229132,
+              7.297194155398756
+            ],
+            [
+              11.471116156317294,
+              2.290854847524315
+            ],
+            [
+              18.700654455460608,
+              9.597572872880846
+            ]
+          ],
+          "spatialReference": {
+            "wkid": null
+          }
+        }
+      },
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "points": [
+            [
+              0.6855720141902566,
+              9.15801657596603
+            ]
+          ],
+          "spatialReference": {
+            "wkid": null
+          }
+        }
+      }
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 12:33:53 AM\nSucceeded at Friday, October 30, 2026 12:33:53 AM (Elapsed Time: 0.01 seconds)",
+    "shape": "Multipoint"
+  },
+  "multi_areas": {
+    "status": "succeeded",
+    "fields": [
+      {
+        "name": "FID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "precision": 0
+      },
+      {
+        "name": "CID",
+        "type": "Integer",
+        "length": 10,
+        "precision": 10
+      }
+    ],
+    "rows": [
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "points": [
+            [
+              500019.3144279858,
+              5000019.195145746
+            ],
+            [
+              500006.0655044671,
+              5000011.471116156
+            ],
+            [
+              500005.13844401576,
+              5000006.278180308
+            ]
+          ],
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "points": [
+            [
+              500003.2823641505,
+              5000018.700654455
+            ]
+          ],
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "points": [
+            [
+              500042.05317108426,
+              5000010.853083651
+            ],
+            [
+              500035.3323313687,
+              5000008.747983105
+            ],
+            [
+              500046.3533911621,
+              5000012.859598291
+            ]
+          ],
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "points": [
+            [
+              500038.93822840415,
+              5000012.834113748
+            ]
+          ],
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "points": [
+            [
+              500067.5543188909,
+              5000000.136523466
+            ],
+            [
+              500076.0512380395,
+              5000017.000603131
+            ],
+            [
+              500073.51732223295,
+              5000018.119162493
+            ]
+          ],
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "points": [
+            [
+              500062.3788463231,
+              5000008.336458416
+            ]
+          ],
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      }
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 12:33:53 AM\nSucceeded at Friday, October 30, 2026 12:33:53 AM (Elapsed Time: 0.02 seconds)",
+    "shape": "Multipoint"
+  },
+  "impossible": {
+    "status": "succeeded",
+    "fields": [
+      {
+        "name": "FID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "precision": 0
+      },
+      {
+        "name": "CID",
+        "type": "Integer",
+        "length": 10,
+        "precision": 10
+      }
+    ],
+    "rows": [
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 500005.13844401576,
+          "y": 5000006.278180308,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          1
+        ],
+        "geometry": {
+          "x": 500033.2745269174,
+          "y": 5000001.683966848,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          2
+        ],
+        "geometry": {
+          "x": 500065.3323313687,
+          "y": 5000008.747983105,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      }
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 12:33:53 AM\nWARNING 000983: The specified number of points could not be created in all cases due to restrictions from the minimum allowed distance.\nSucceeded at Friday, October 30, 2026 12:33:53 AM (Elapsed Time: 0.02 seconds)",
+    "shape": "Point"
+  },
+  "ignored_extent": {
+    "status": "succeeded",
+    "fields": [
+      {
+        "name": "FID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "precision": 0
+      },
+      {
+        "name": "CID",
+        "type": "Integer",
+        "length": 10,
+        "precision": 10
+      }
+    ],
+    "rows": [
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 500006.93239864893,
+          "y": 5000013.105408917,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          1
+        ],
+        "geometry": {
+          "x": 500038.3162080031,
+          "y": 5000014.594388311,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          2
+        ],
+        "geometry": {
+          "x": 500077.8958002012,
+          "y": 5000019.195145746,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      }
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 12:33:53 AM\nSucceeded at Friday, October 30, 2026 12:33:53 AM (Elapsed Time: 0.02 seconds)",
+    "shape": "Point"
+  },
+  "extent_source": {
+    "status": "succeeded",
+    "fields": [
+      {
+        "name": "FID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "precision": 0
+      },
+      {
+        "name": "Id",
+        "type": "Integer",
+        "length": 6,
+        "precision": 6
+      }
+    ],
+    "rows": [
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 500067.7265598811,
+          "y": 5000010.070934934,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 500024.692041073,
+          "y": 5000006.894591083,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 500028.3897250332,
+          "y": 5000001.139736292,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      },
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 500054.88727876917,
+          "y": 5000014.594388311,
+          "spatialReference": {
+            "wkid": 32633,
+            "latestWkid": 32633
+          }
+        }
+      }
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 12:33:53 AM\nSucceeded at Friday, October 30, 2026 12:33:53 AM (Elapsed Time: 0.01 seconds)",
+    "shape": "Point"
+  },
+  "missing_extent": {
+    "status": "succeeded",
+    "fields": [
+      {
+        "name": "FID",
+        "type": "OID",
+        "length": 4,
+        "precision": 0
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "precision": 0
+      },
+      {
+        "name": "Id",
+        "type": "Integer",
+        "length": 6,
+        "precision": 6
+      }
+    ],
+    "rows": [
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 211.64549962850288,
+          "y": 125.88668667012826,
+          "spatialReference": {
+            "wkid": null
+          }
+        }
+      },
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 77.16262835310772,
+          "y": 86.18238853523508,
+          "spatialReference": {
+            "wkid": null
+          }
+        }
+      },
+      {
+        "values": [
+          0
+        ],
+        "geometry": {
+          "x": 88.71789072873071,
+          "y": 14.24670364940539,
+          "spatialReference": {
+            "wkid": null
+          }
+        }
+      }
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 12:33:53 AM\nSucceeded at Friday, October 30, 2026 12:33:53 AM (Elapsed Time: 0.01 seconds)",
+    "shape": "Point"
+  },
+  "extent_repeat": {
+    "rows": [
+      [
+        [
+          16.93163997028023,
+          5.03546746680513
+        ]
+      ],
+      [
+        [
+          6.173010268248618,
+          3.447295541409403
+        ]
+      ],
+      [
+        [
+          7.097431258298457,
+          0.5698681459762156
+        ]
+      ],
+      [
+        [
+          13.72181969229132,
+          7.297194155398756
+        ]
+      ],
+      [
+        [
+          11.471116156317294,
+          2.290854847524315
+        ]
+      ],
+      [
+        [
+          18.700654455460608,
+          9.597572872880846
+        ]
+      ],
+      [
+        [
+          0.6855720141902566,
+          9.15801657596603
+        ]
+      ]
+    ]
+  }
+}

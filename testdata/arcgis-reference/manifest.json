@@ -94699,6 +94699,774 @@
           "all_records_for_tables": "SCHEMA_ONLY_FOR_TABLES"
         }
       }
+    },
+    "rnp_extent": {
+      "tool": "management.CreateRandomPoints",
+      "args": [
+        "<out>",
+        "",
+        "0 0 20 10",
+        "7",
+        "0",
+        "POINT",
+        "10"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "stochastic_points": true,
+      "run": {
+        "tool": "create_random_points",
+        "params": {
+          "output": "<out>",
+          "constraining_extent": "0 0 20 10",
+          "number_of_points_or_field": "7",
+          "minimum_allowed_distance": "0",
+          "create_multipoint_output": "POINT",
+          "multipoint_size": "10"
+        }
+      }
+    },
+    "rnp_zero": {
+      "tool": "management.CreateRandomPoints",
+      "args": [
+        "<out>",
+        "",
+        "0 0 20 10",
+        "0",
+        "0",
+        "POINT",
+        "10"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000117: Warning empty output generated."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "stochastic_points": true,
+      "run": {
+        "tool": "create_random_points",
+        "params": {
+          "output": "<out>",
+          "constraining_extent": "0 0 20 10",
+          "number_of_points_or_field": "0",
+          "minimum_allowed_distance": "0",
+          "create_multipoint_output": "POINT",
+          "multipoint_size": "10"
+        }
+      }
+    },
+    "rnp_negative": {
+      "tool": "management.CreateRandomPoints",
+      "args": [
+        "<out>",
+        "",
+        "0 0 20 10",
+        "-2",
+        "0",
+        "POINT",
+        "10"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000963: The Value can not be negative.",
+        "Failed to execute (CreateRandomPoints)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "stochastic_points": true,
+      "run": {
+        "tool": "create_random_points",
+        "params": {
+          "output": "<out>",
+          "constraining_extent": "0 0 20 10",
+          "number_of_points_or_field": "-2",
+          "minimum_allowed_distance": "0",
+          "create_multipoint_output": "POINT",
+          "multipoint_size": "10"
+        }
+      }
+    },
+    "rnp_areas": {
+      "tool": "management.CreateRandomPoints",
+      "args": [
+        "<out>",
+        "testdata/geoproc/rnp_areas.shp",
+        "",
+        "2",
+        "0",
+        "POINT",
+        "10"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "stochastic_points": true,
+      "run": {
+        "tool": "create_random_points",
+        "params": {
+          "output": "<out>",
+          "constraining_feature_class": "testdata/geoproc/rnp_areas.shp",
+          "number_of_points_or_field": "2",
+          "minimum_allowed_distance": "0",
+          "create_multipoint_output": "POINT",
+          "multipoint_size": "10"
+        }
+      }
+    },
+    "rnp_field": {
+      "tool": "management.CreateRandomPoints",
+      "args": [
+        "<out>",
+        "testdata/geoproc/rnp_areas.shp",
+        "",
+        "N",
+        "GAP",
+        "POINT",
+        "10"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "stochastic_points": true,
+      "run": {
+        "tool": "create_random_points",
+        "params": {
+          "output": "<out>",
+          "constraining_feature_class": "testdata/geoproc/rnp_areas.shp",
+          "number_of_points_or_field": "N",
+          "minimum_allowed_distance": "GAP",
+          "create_multipoint_output": "POINT",
+          "multipoint_size": "10"
+        }
+      }
+    },
+    "rnp_lines": {
+      "tool": "management.CreateRandomPoints",
+      "args": [
+        "<out>",
+        "testdata/geoproc/rnp_lines.shp",
+        "",
+        "3",
+        "2 Meters",
+        "POINT",
+        "10"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "stochastic_points": true,
+      "run": {
+        "tool": "create_random_points",
+        "params": {
+          "output": "<out>",
+          "constraining_feature_class": "testdata/geoproc/rnp_lines.shp",
+          "number_of_points_or_field": "3",
+          "minimum_allowed_distance": "2 Meters",
+          "create_multipoint_output": "POINT",
+          "multipoint_size": "10"
+        }
+      }
+    },
+    "rnp_line_field": {
+      "tool": "management.CreateRandomPoints",
+      "args": [
+        "<out>",
+        "testdata/geoproc/rnp_lines.shp",
+        "",
+        "N",
+        "0",
+        "POINT",
+        "10"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "stochastic_points": true,
+      "run": {
+        "tool": "create_random_points",
+        "params": {
+          "output": "<out>",
+          "constraining_feature_class": "testdata/geoproc/rnp_lines.shp",
+          "number_of_points_or_field": "N",
+          "minimum_allowed_distance": "0",
+          "create_multipoint_output": "POINT",
+          "multipoint_size": "10"
+        }
+      }
+    },
+    "rnp_points": {
+      "tool": "management.CreateRandomPoints",
+      "args": [
+        "<out>",
+        "testdata/geoproc/rnp_points.shp",
+        "",
+        "3",
+        "0",
+        "POINT",
+        "10"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "stochastic_points": true,
+      "run": {
+        "tool": "create_random_points",
+        "params": {
+          "output": "<out>",
+          "constraining_feature_class": "testdata/geoproc/rnp_points.shp",
+          "number_of_points_or_field": "3",
+          "minimum_allowed_distance": "0",
+          "create_multipoint_output": "POINT",
+          "multipoint_size": "10"
+        }
+      }
+    },
+    "rnp_points_over": {
+      "tool": "management.CreateRandomPoints",
+      "args": [
+        "<out>",
+        "testdata/geoproc/rnp_points.shp",
+        "",
+        "10",
+        "0",
+        "POINT",
+        "10"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "stochastic_points": true,
+      "run": {
+        "tool": "create_random_points",
+        "params": {
+          "output": "<out>",
+          "constraining_feature_class": "testdata/geoproc/rnp_points.shp",
+          "number_of_points_or_field": "10",
+          "minimum_allowed_distance": "0",
+          "create_multipoint_output": "POINT",
+          "multipoint_size": "10"
+        }
+      }
+    },
+    "rnp_multi_extent": {
+      "tool": "management.CreateRandomPoints",
+      "args": [
+        "<out>",
+        "",
+        "0 0 20 10",
+        "7",
+        "0",
+        "MULTIPOINT",
+        "3"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ]
+      ],
+      "shapeType": "Multipoint",
+      "stochastic_points": true,
+      "run": {
+        "tool": "create_random_points",
+        "params": {
+          "output": "<out>",
+          "constraining_extent": "0 0 20 10",
+          "number_of_points_or_field": "7",
+          "minimum_allowed_distance": "0",
+          "create_multipoint_output": "MULTIPOINT",
+          "multipoint_size": "3"
+        }
+      }
+    },
+    "rnp_multi_areas": {
+      "tool": "management.CreateRandomPoints",
+      "args": [
+        "<out>",
+        "testdata/geoproc/rnp_areas.shp",
+        "",
+        "4",
+        "0",
+        "MULTIPOINT",
+        "3"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Multipoint",
+      "stochastic_points": true,
+      "run": {
+        "tool": "create_random_points",
+        "params": {
+          "output": "<out>",
+          "constraining_feature_class": "testdata/geoproc/rnp_areas.shp",
+          "number_of_points_or_field": "4",
+          "minimum_allowed_distance": "0",
+          "create_multipoint_output": "MULTIPOINT",
+          "multipoint_size": "3"
+        }
+      }
+    },
+    "rnp_impossible": {
+      "tool": "management.CreateRandomPoints",
+      "args": [
+        "<out>",
+        "testdata/geoproc/rnp_areas.shp",
+        "",
+        "3",
+        "100 Meters",
+        "POINT",
+        "10"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000983: The specified number of points could not be created in all cases due to restrictions from the minimum allowed distance."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "stochastic_points": true,
+      "run": {
+        "tool": "create_random_points",
+        "params": {
+          "output": "<out>",
+          "constraining_feature_class": "testdata/geoproc/rnp_areas.shp",
+          "number_of_points_or_field": "3",
+          "minimum_allowed_distance": "100 Meters",
+          "create_multipoint_output": "POINT",
+          "multipoint_size": "10"
+        }
+      }
+    },
+    "rnp_ignored_extent": {
+      "tool": "management.CreateRandomPoints",
+      "args": [
+        "<out>",
+        "testdata/geoproc/rnp_areas.shp",
+        "0 0 1 1",
+        "1",
+        "0",
+        "POINT",
+        "10"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "stochastic_points": true,
+      "run": {
+        "tool": "create_random_points",
+        "params": {
+          "output": "<out>",
+          "constraining_feature_class": "testdata/geoproc/rnp_areas.shp",
+          "constraining_extent": "0 0 1 1",
+          "number_of_points_or_field": "1",
+          "minimum_allowed_distance": "0",
+          "create_multipoint_output": "POINT",
+          "multipoint_size": "10"
+        }
+      }
+    },
+    "rnp_extent_source": {
+      "tool": "management.CreateRandomPoints",
+      "args": [
+        "<out>",
+        "",
+        "testdata/geoproc/rnp_areas.shp",
+        "4",
+        "0",
+        "POINT",
+        "10"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "stochastic_points": true,
+      "run": {
+        "tool": "create_random_points",
+        "params": {
+          "output": "<out>",
+          "constraining_extent": "testdata/geoproc/rnp_areas.shp",
+          "number_of_points_or_field": "4",
+          "minimum_allowed_distance": "0",
+          "create_multipoint_output": "POINT",
+          "multipoint_size": "10"
+        }
+      }
+    },
+    "rnp_default_extent": {
+      "tool": "management.CreateRandomPoints",
+      "args": [
+        "<out>",
+        "",
+        "",
+        "3",
+        "0",
+        "POINT",
+        "10"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "stochastic_points": true,
+      "run": {
+        "tool": "create_random_points",
+        "params": {
+          "output": "<out>",
+          "number_of_points_or_field": "3",
+          "minimum_allowed_distance": "0",
+          "create_multipoint_output": "POINT",
+          "multipoint_size": "10"
+        }
+      }
+    },
+    "rnp_negative_gap": {
+      "tool": "management.CreateRandomPoints",
+      "args": [
+        "<out>",
+        "testdata/geoproc/rnp_areas.shp",
+        "",
+        "3",
+        "-1 Meters",
+        "POINT",
+        "10"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000673: The inhibition distance cannot be negative",
+        "Failed to execute (CreateRandomPoints)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "stochastic_points": true,
+      "run": {
+        "tool": "create_random_points",
+        "params": {
+          "output": "<out>",
+          "constraining_feature_class": "testdata/geoproc/rnp_areas.shp",
+          "number_of_points_or_field": "3",
+          "minimum_allowed_distance": "-1 Meters",
+          "create_multipoint_output": "POINT",
+          "multipoint_size": "10"
+        }
+      }
     }
   }
 }

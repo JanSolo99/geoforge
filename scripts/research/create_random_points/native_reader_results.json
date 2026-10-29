@@ -1,0 +1,2604 @@
+{
+  "rnp_extent": {
+    "matches": true,
+    "errors": [],
+    "expected": {
+      "shape": "Point",
+      "crs": [
+        0,
+        "Unknown"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "Id",
+          "type": "Integer",
+          "length": 6,
+          "precision": 6,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "Id"
+        }
+      ],
+      "rows": [
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              3.043413539417088,
+              7.9588177730329335
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              7.948726681061089,
+              7.5586970266886055
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              18.441348527558148,
+              3.4923859243281186
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              9.613377791829407,
+              7.934415687341243
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              3.4606187837198377,
+              3.1345147569663823
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              16.838666615076363,
+              0.1414399710483849
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              18.804978732950985,
+              1.2505626236088574
+            ]
+          ]
+        }
+      ]
+    },
+    "actual": {
+      "shape": "Point",
+      "crs": [
+        0,
+        "Unknown"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "Id",
+          "type": "Integer",
+          "length": 6,
+          "precision": 6,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "Id"
+        }
+      ],
+      "rows": [
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              17.666216164272853,
+              4.3152799704851
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              0.5286754318519549,
+              9.708819781538285
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              2.1269338313442487,
+              3.2732576421812576
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              3.477357319193657,
+              7.71546556331567
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              4.913778976802627,
+              9.520306913678265
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              7.929359512576271,
+              7.610344216276269
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              10.479011833099026,
+              5.551675161334325
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "rnp_zero": {
+    "matches": true,
+    "errors": [],
+    "expected": {
+      "shape": "Point",
+      "crs": [
+        0,
+        "Unknown"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "Id",
+          "type": "Integer",
+          "length": 6,
+          "precision": 6,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "Id"
+        }
+      ],
+      "rows": []
+    },
+    "actual": {
+      "shape": "Point",
+      "crs": [
+        0,
+        "Unknown"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "Id",
+          "type": "Integer",
+          "length": 6,
+          "precision": 6,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "Id"
+        }
+      ],
+      "rows": []
+    }
+  },
+  "rnp_areas": {
+    "matches": true,
+    "errors": [],
+    "expected": {
+      "shape": "Point",
+      "crs": [
+        32633,
+        "WGS_1984_UTM_Zone_33N"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "CID",
+          "type": "Integer",
+          "length": 10,
+          "precision": 10,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "CID"
+        }
+      ],
+      "rows": [
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500010.2987859817,
+              5000008.626742824
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500001.12722751684,
+              5000010.092740129
+            ]
+          ]
+        },
+        {
+          "values": [
+            1
+          ],
+          "points": [
+            [
+              500030.37897561677,
+              5000004.0812468855
+            ]
+          ]
+        },
+        {
+          "values": [
+            1
+          ],
+          "points": [
+            [
+              500041.42787006684,
+              5000016.641224544
+            ]
+          ]
+        },
+        {
+          "values": [
+            2
+          ],
+          "points": [
+            [
+              500077.779474142,
+              5000009.643407897
+            ]
+          ]
+        },
+        {
+          "values": [
+            2
+          ],
+          "points": [
+            [
+              500078.32749105524,
+              5000007.929726043
+            ]
+          ]
+        }
+      ]
+    },
+    "actual": {
+      "shape": "Point",
+      "crs": [
+        32633,
+        "WGS_1984_UTM_Zone_33N"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "CID",
+          "type": "Integer",
+          "length": 10,
+          "precision": 10,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "CID"
+        }
+      ],
+      "rows": [
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500017.66621616425,
+              5000008.630559941
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500000.52867543185,
+              5000019.417639563
+            ]
+          ]
+        },
+        {
+          "values": [
+            1
+          ],
+          "points": [
+            [
+              500032.1269338314,
+              5000006.546515284
+            ]
+          ]
+        },
+        {
+          "values": [
+            1
+          ],
+          "points": [
+            [
+              500033.4773573192,
+              5000015.430931127
+            ]
+          ]
+        },
+        {
+          "values": [
+            2
+          ],
+          "points": [
+            [
+              500064.9137789768,
+              5000019.040613827
+            ]
+          ]
+        },
+        {
+          "values": [
+            2
+          ],
+          "points": [
+            [
+              500067.9293595126,
+              5000015.220688432
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "rnp_field": {
+    "matches": true,
+    "errors": [],
+    "expected": {
+      "shape": "Point",
+      "crs": [
+        32633,
+        "WGS_1984_UTM_Zone_33N"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "CID",
+          "type": "Integer",
+          "length": 10,
+          "precision": 10,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "CID"
+        }
+      ],
+      "rows": [
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500000.25262855925,
+              5000019.255186333
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500013.4921428468,
+              5000018.813977414
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500014.0568022523,
+              5000015.502775363
+            ]
+          ]
+        },
+        {
+          "values": [
+            2
+          ],
+          "points": [
+            [
+              500067.53291727044,
+              5000018.377724863
+            ]
+          ]
+        },
+        {
+          "values": [
+            2
+          ],
+          "points": [
+            [
+              500077.7925427491,
+              5000016.699778917
+            ]
+          ]
+        },
+        {
+          "values": [
+            2
+          ],
+          "points": [
+            [
+              500070.21173438523,
+              5000008.582784827
+            ]
+          ]
+        }
+      ]
+    },
+    "actual": {
+      "shape": "Point",
+      "crs": [
+        32633,
+        "WGS_1984_UTM_Zone_33N"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "CID",
+          "type": "Integer",
+          "length": 10,
+          "precision": 10,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "CID"
+        }
+      ],
+      "rows": [
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500017.66621616425,
+              5000008.630559941
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500000.52867543185,
+              5000019.417639563
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500002.1269338314,
+              5000006.546515284
+            ]
+          ]
+        },
+        {
+          "values": [
+            2
+          ],
+          "points": [
+            [
+              500063.4773573192,
+              5000015.430931127
+            ]
+          ]
+        },
+        {
+          "values": [
+            2
+          ],
+          "points": [
+            [
+              500064.9137789768,
+              5000019.040613827
+            ]
+          ]
+        },
+        {
+          "values": [
+            2
+          ],
+          "points": [
+            [
+              500067.9293595126,
+              5000015.220688432
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "rnp_lines": {
+    "matches": true,
+    "errors": [],
+    "expected": {
+      "shape": "Point",
+      "crs": [
+        32633,
+        "WGS_1984_UTM_Zone_33N"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "CID",
+          "type": "Integer",
+          "length": 10,
+          "precision": 10,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "CID"
+        }
+      ],
+      "rows": [
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500004.4753301684,
+              5000000
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500011.10565494845,
+              5000000
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500019.6685178839,
+              5000000
+            ]
+          ]
+        },
+        {
+          "values": [
+            1
+          ],
+          "points": [
+            [
+              500000.4443107366,
+              5000030
+            ]
+          ]
+        },
+        {
+          "values": [
+            1
+          ],
+          "points": [
+            [
+              500004.2209535933,
+              5000030
+            ]
+          ]
+        },
+        {
+          "values": [
+            1
+          ],
+          "points": [
+            [
+              500013.2959481302,
+              5000030
+            ]
+          ]
+        }
+      ]
+    },
+    "actual": {
+      "shape": "Point",
+      "crs": [
+        32633,
+        "WGS_1984_UTM_Zone_33N"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "CID",
+          "type": "Integer",
+          "length": 10,
+          "precision": 10,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "CID"
+        }
+      ],
+      "rows": [
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500017.66621616425,
+              5000000
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500008.630559941,
+              5000000
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500000.52867543185,
+              5000000
+            ]
+          ]
+        },
+        {
+          "values": [
+            1
+          ],
+          "points": [
+            [
+              500019.4176395631,
+              5000030
+            ]
+          ]
+        },
+        {
+          "values": [
+            1
+          ],
+          "points": [
+            [
+              500002.1269338314,
+              5000030
+            ]
+          ]
+        },
+        {
+          "values": [
+            1
+          ],
+          "points": [
+            [
+              500006.54651528434,
+              5000030
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "rnp_line_field": {
+    "matches": true,
+    "errors": [],
+    "expected": {
+      "shape": "Point",
+      "crs": [
+        32633,
+        "WGS_1984_UTM_Zone_33N"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "CID",
+          "type": "Integer",
+          "length": 10,
+          "precision": 10,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "CID"
+        }
+      ],
+      "rows": [
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500001.8732150584,
+              5000000
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500012.8683054676,
+              5000000
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500013.5087394759,
+              5000000
+            ]
+          ]
+        },
+        {
+          "values": [
+            1
+          ],
+          "points": [
+            [
+              500015.23655192327,
+              5000030
+            ]
+          ]
+        },
+        {
+          "values": [
+            1
+          ],
+          "points": [
+            [
+              500016.591185199,
+              5000030
+            ]
+          ]
+        }
+      ]
+    },
+    "actual": {
+      "shape": "Point",
+      "crs": [
+        32633,
+        "WGS_1984_UTM_Zone_33N"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "CID",
+          "type": "Integer",
+          "length": 10,
+          "precision": 10,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "CID"
+        }
+      ],
+      "rows": [
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500017.66621616425,
+              5000000
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500008.630559941,
+              5000000
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500000.52867543185,
+              5000000
+            ]
+          ]
+        },
+        {
+          "values": [
+            1
+          ],
+          "points": [
+            [
+              500019.4176395631,
+              5000030
+            ]
+          ]
+        },
+        {
+          "values": [
+            1
+          ],
+          "points": [
+            [
+              500002.1269338314,
+              5000030
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "rnp_points": {
+    "matches": true,
+    "errors": [],
+    "expected": {
+      "shape": "Point",
+      "crs": [
+        32633,
+        "WGS_1984_UTM_Zone_33N"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "CID",
+          "type": "Integer",
+          "length": 10,
+          "precision": 10,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "CID"
+        }
+      ],
+      "rows": [
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500000,
+              5000000
+            ]
+          ]
+        },
+        {
+          "values": [
+            3
+          ],
+          "points": [
+            [
+              500030,
+              5000000
+            ]
+          ]
+        },
+        {
+          "values": [
+            4
+          ],
+          "points": [
+            [
+              500040,
+              5000000
+            ]
+          ]
+        }
+      ]
+    },
+    "actual": {
+      "shape": "Point",
+      "crs": [
+        32633,
+        "WGS_1984_UTM_Zone_33N"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "CID",
+          "type": "Integer",
+          "length": 10,
+          "precision": 10,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "CID"
+        }
+      ],
+      "rows": [
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500000,
+              5000000
+            ]
+          ]
+        },
+        {
+          "values": [
+            2
+          ],
+          "points": [
+            [
+              500020,
+              5000000
+            ]
+          ]
+        },
+        {
+          "values": [
+            3
+          ],
+          "points": [
+            [
+              500030,
+              5000000
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "rnp_points_over": {
+    "matches": true,
+    "errors": [],
+    "expected": {
+      "shape": "Point",
+      "crs": [
+        32633,
+        "WGS_1984_UTM_Zone_33N"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "CID",
+          "type": "Integer",
+          "length": 10,
+          "precision": 10,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "CID"
+        }
+      ],
+      "rows": [
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500000,
+              5000000
+            ]
+          ]
+        },
+        {
+          "values": [
+            1
+          ],
+          "points": [
+            [
+              500010,
+              5000000
+            ]
+          ]
+        },
+        {
+          "values": [
+            2
+          ],
+          "points": [
+            [
+              500020,
+              5000000
+            ]
+          ]
+        },
+        {
+          "values": [
+            3
+          ],
+          "points": [
+            [
+              500030,
+              5000000
+            ]
+          ]
+        },
+        {
+          "values": [
+            4
+          ],
+          "points": [
+            [
+              500040,
+              5000000
+            ]
+          ]
+        }
+      ]
+    },
+    "actual": {
+      "shape": "Point",
+      "crs": [
+        32633,
+        "WGS_1984_UTM_Zone_33N"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "CID",
+          "type": "Integer",
+          "length": 10,
+          "precision": 10,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "CID"
+        }
+      ],
+      "rows": [
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500000,
+              5000000
+            ]
+          ]
+        },
+        {
+          "values": [
+            1
+          ],
+          "points": [
+            [
+              500010,
+              5000000
+            ]
+          ]
+        },
+        {
+          "values": [
+            2
+          ],
+          "points": [
+            [
+              500020,
+              5000000
+            ]
+          ]
+        },
+        {
+          "values": [
+            3
+          ],
+          "points": [
+            [
+              500030,
+              5000000
+            ]
+          ]
+        },
+        {
+          "values": [
+            4
+          ],
+          "points": [
+            [
+              500040,
+              5000000
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "rnp_multi_extent": {
+    "matches": true,
+    "errors": [],
+    "expected": {
+      "shape": "Multipoint",
+      "crs": [
+        0,
+        "Unknown"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "Id",
+          "type": "Integer",
+          "length": 6,
+          "precision": 6,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "Id"
+        }
+      ],
+      "rows": [
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              4.051672988571227,
+              0.6120283924974501
+            ],
+            [
+              6.814330429770052,
+              0.06188968429341912
+            ],
+            [
+              15.70556039456278,
+              0.6236745812930167
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              16.840954408980906,
+              0.3865499631501734
+            ],
+            [
+              3.3793512219563127,
+              2.834742295090109
+            ],
+            [
+              4.905313611961901,
+              5.653461089823395
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              13.604818084277213,
+              0.7024249085225165
+            ]
+          ]
+        }
+      ]
+    },
+    "actual": {
+      "shape": "Multipoint",
+      "crs": [
+        0,
+        "Unknown"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "Id",
+          "type": "Integer",
+          "length": 6,
+          "precision": 6,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "Id"
+        }
+      ],
+      "rows": [
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              17.666216164272853,
+              4.3152799704851
+            ],
+            [
+              0.5286754318519549,
+              9.708819781538285
+            ],
+            [
+              2.1269338313442487,
+              3.2732576421812576
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              3.477357319193657,
+              7.71546556331567
+            ],
+            [
+              4.913778976802627,
+              9.520306913678265
+            ],
+            [
+              7.929359512576271,
+              7.610344216276269
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              10.479011833099026,
+              5.551675161334325
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "rnp_multi_areas": {
+    "matches": true,
+    "errors": [],
+    "expected": {
+      "shape": "Multipoint",
+      "crs": [
+        32633,
+        "WGS_1984_UTM_Zone_33N"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "CID",
+          "type": "Integer",
+          "length": 10,
+          "precision": 10,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "CID"
+        }
+      ],
+      "rows": [
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500002.4928139057,
+              5000012.300182381
+            ],
+            [
+              500009.3747496698,
+              5000012.816341496
+            ],
+            [
+              500004.118283554,
+              5000003.772159447
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500001.8175282236,
+              5000009.520694674
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500038.7763642287,
+              5000004.702314478
+            ],
+            [
+              500030.4657906201,
+              5000001.491800272
+            ],
+            [
+              500039.08301518764,
+              5000008.369954755
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500048.236795282,
+              5000019.613770009
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500072.5922057871,
+              5000016.066527306
+            ],
+            [
+              500079.2258165637,
+              5000017.344730864
+            ],
+            [
+              500073.55519413017,
+              5000018.295459771
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500070.34414847847,
+              5000008.849925441
+            ]
+          ]
+        }
+      ]
+    },
+    "actual": {
+      "shape": "Multipoint",
+      "crs": [
+        32633,
+        "WGS_1984_UTM_Zone_33N"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "CID",
+          "type": "Integer",
+          "length": 10,
+          "precision": 10,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "CID"
+        }
+      ],
+      "rows": [
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500017.66621616425,
+              5000008.630559941
+            ],
+            [
+              500000.52867543185,
+              5000019.417639563
+            ],
+            [
+              500002.1269338314,
+              5000006.546515284
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500003.4773573192,
+              5000015.430931127
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500034.9137789768,
+              5000019.040613827
+            ],
+            [
+              500037.9293595126,
+              5000015.220688432
+            ],
+            [
+              500040.4790118331,
+              5000011.103350323
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500044.1644466948,
+              5000010.369643679
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500069.77829260967,
+              5000015.29757388
+            ],
+            [
+              500064.0939064348,
+              5000016.8831028575
+            ],
+            [
+              500077.1097948172,
+              5000013.204205716
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500078.5906813715,
+              5000006.584905192
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "rnp_impossible": {
+    "matches": true,
+    "errors": [],
+    "expected": {
+      "shape": "Point",
+      "crs": [
+        32633,
+        "WGS_1984_UTM_Zone_33N"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "CID",
+          "type": "Integer",
+          "length": 10,
+          "precision": 10,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "CID"
+        }
+      ],
+      "rows": [
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500005.1851378102,
+              5000015.695006098
+            ]
+          ]
+        },
+        {
+          "values": [
+            1
+          ],
+          "points": [
+            [
+              500032.9750562925,
+              5000002.979834373
+            ]
+          ]
+        },
+        {
+          "values": [
+            2
+          ],
+          "points": [
+            [
+              500074.1528252186,
+              5000007.450502156
+            ]
+          ]
+        }
+      ]
+    },
+    "actual": {
+      "shape": "Point",
+      "crs": [
+        32633,
+        "WGS_1984_UTM_Zone_33N"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "CID",
+          "type": "Integer",
+          "length": 10,
+          "precision": 10,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "CID"
+        }
+      ],
+      "rows": [
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500017.66621616425,
+              5000008.630559941
+            ]
+          ]
+        },
+        {
+          "values": [
+            1
+          ],
+          "points": [
+            [
+              500041.23058797646,
+              5000010.660216761
+            ]
+          ]
+        },
+        {
+          "values": [
+            2
+          ],
+          "points": [
+            [
+              500077.76363824704,
+              5000010.834261782
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "rnp_ignored_extent": {
+    "matches": true,
+    "errors": [],
+    "expected": {
+      "shape": "Point",
+      "crs": [
+        32633,
+        "WGS_1984_UTM_Zone_33N"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "CID",
+          "type": "Integer",
+          "length": 10,
+          "precision": 10,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "CID"
+        }
+      ],
+      "rows": [
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500014.58118251525,
+              5000017.433927567
+            ]
+          ]
+        },
+        {
+          "values": [
+            1
+          ],
+          "points": [
+            [
+              500032.28014863096,
+              5000019.582433985
+            ]
+          ]
+        },
+        {
+          "values": [
+            2
+          ],
+          "points": [
+            [
+              500064.1374991182,
+              5000007.529984652
+            ]
+          ]
+        }
+      ]
+    },
+    "actual": {
+      "shape": "Point",
+      "crs": [
+        32633,
+        "WGS_1984_UTM_Zone_33N"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "CID",
+          "type": "Integer",
+          "length": 10,
+          "precision": 10,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "CID"
+        }
+      ],
+      "rows": [
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500017.66621616425,
+              5000008.630559941
+            ]
+          ]
+        },
+        {
+          "values": [
+            1
+          ],
+          "points": [
+            [
+              500030.52867543185,
+              5000019.417639563
+            ]
+          ]
+        },
+        {
+          "values": [
+            2
+          ],
+          "points": [
+            [
+              500062.1269338314,
+              5000006.546515284
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "rnp_extent_source": {
+    "matches": true,
+    "errors": [],
+    "expected": {
+      "shape": "Point",
+      "crs": [
+        32633,
+        "WGS_1984_UTM_Zone_33N"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "Id",
+          "type": "Integer",
+          "length": 6,
+          "precision": 6,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "Id"
+        }
+      ],
+      "rows": [
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500061.1450170912,
+              5000009.827020434
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500012.855359409,
+              5000000.895957206
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500051.6177096404,
+              5000007.830077154
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500031.4762667753,
+              5000015.344300796
+            ]
+          ]
+        }
+      ]
+    },
+    "actual": {
+      "shape": "Point",
+      "crs": [
+        32633,
+        "WGS_1984_UTM_Zone_33N"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "Id",
+          "type": "Integer",
+          "length": 6,
+          "precision": 6,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "Id"
+        }
+      ],
+      "rows": [
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500070.6648646571,
+              5000008.630559941
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500002.1147017274,
+              5000019.417639563
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500008.5077353254,
+              5000006.546515284
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              500013.90942927677,
+              5000015.430931127
+            ]
+          ]
+        }
+      ]
+    }
+  },
+  "rnp_default_extent": {
+    "matches": true,
+    "errors": [],
+    "expected": {
+      "shape": "Point",
+      "crs": [
+        0,
+        "Unknown"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "Id",
+          "type": "Integer",
+          "length": 6,
+          "precision": 6,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "Id"
+        }
+      ],
+      "rows": [
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              154.55560042755678,
+              75.3501039580442
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              191.83762074681,
+              97.75020607048646
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              232.9672885243781,
+              125.30399771640077
+            ]
+          ]
+        }
+      ]
+    },
+    "actual": {
+      "shape": "Point",
+      "crs": [
+        0,
+        "Unknown"
+      ],
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "precision": 0,
+          "scale": 0,
+          "nullable": false,
+          "required": true,
+          "alias": "Shape"
+        },
+        {
+          "name": "Id",
+          "type": "Integer",
+          "length": 6,
+          "precision": 6,
+          "scale": 0,
+          "nullable": false,
+          "required": false,
+          "alias": "Id"
+        }
+      ],
+      "rows": [
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              220.82770205341066,
+              107.8819992621275
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              6.608442898149436,
+              242.72049453845713
+            ]
+          ]
+        },
+        {
+          "values": [
+            0
+          ],
+          "points": [
+            [
+              26.586672891803108,
+              81.83144105453144
+            ]
+          ]
+        }
+      ]
+    }
+  }
+}

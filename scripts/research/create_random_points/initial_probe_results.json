@@ -1,0 +1,123 @@
+{
+  "extent": {
+    "status": "failed",
+    "error": "Cannot find field 'CID'",
+    "messages": "Start Time: Friday, October 30, 2026 12:33:08 AM\nSucceeded at Friday, October 30, 2026 12:33:08 AM (Elapsed Time: 0.01 seconds)"
+  },
+  "zero": {
+    "status": "failed",
+    "error": "Cannot find field 'CID'",
+    "messages": "Start Time: Friday, October 30, 2026 12:33:08 AM\nWARNING 000117: Warning empty output generated.\nSucceeded at Friday, October 30, 2026 12:33:08 AM (Elapsed Time: 0.01 seconds)"
+  },
+  "negative": {
+    "status": "failed",
+    "error": "Failed to execute. Parameters are not valid.\nERROR 000963: The Value can not be negative.\nFailed to execute (CreateRandomPoints).\n",
+    "messages": "Start Time: Friday, October 30, 2026 12:33:08 AM\nFailed to execute. Parameters are not valid.\nERROR 000963: The Value can not be negative.\nFailed to execute (CreateRandomPoints).\nFailed at Friday, October 30, 2026 12:33:08 AM (Elapsed Time: 0.00 seconds)"
+  },
+  "areas": {
+    "status": "failed",
+    "error": "ERROR 000258: Output Z:\\tmp\\unigis-random-probe\\areas.shp already exists\nFailed to execute (CreateRandomPoints).\n",
+    "messages": "Start Time: Friday, October 30, 2026 12:33:08 AM\nERROR 000258: Output Z:\\tmp\\unigis-random-probe\\areas.shp already exists\nFailed to execute (CreateRandomPoints).\nFailed at Friday, October 30, 2026 12:33:08 AM (Elapsed Time: 0.01 seconds)"
+  },
+  "field": {
+    "status": "failed",
+    "error": "Failed to execute. Parameters are not valid.\nERROR 000732: Constraining Feature Class: Dataset Z:\\tmp\\unigis-random-probe\\areas.shp does not exist or is not supported\nFailed to execute (CreateRandomPoints).\n",
+    "messages": "Start Time: Friday, October 30, 2026 12:33:08 AM\nFailed to execute. Parameters are not valid.\nERROR 000732: Constraining Feature Class: Dataset Z:\\tmp\\unigis-random-probe\\areas.shp does not exist or is not supported\nFailed to execute (CreateRandomPoints).\nFailed at Friday, October 30, 2026 12:33:08 AM (Elapsed Time: 0.00 seconds)"
+  },
+  "lines": {
+    "status": "failed",
+    "error": "ERROR 000258: Output Z:\\tmp\\unigis-random-probe\\lines.shp already exists\nFailed to execute (CreateRandomPoints).\n",
+    "messages": "Start Time: Friday, October 30, 2026 12:33:08 AM\nERROR 000258: Output Z:\\tmp\\unigis-random-probe\\lines.shp already exists\nFailed to execute (CreateRandomPoints).\nFailed at Friday, October 30, 2026 12:33:08 AM (Elapsed Time: 0.01 seconds)"
+  },
+  "line_field": {
+    "status": "failed",
+    "error": "Failed to execute. Parameters are not valid.\nERROR 000732: Constraining Feature Class: Dataset Z:\\tmp\\unigis-random-probe\\lines.shp does not exist or is not supported\nFailed to execute (CreateRandomPoints).\n",
+    "messages": "Start Time: Friday, October 30, 2026 12:33:08 AM\nFailed to execute. Parameters are not valid.\nERROR 000732: Constraining Feature Class: Dataset Z:\\tmp\\unigis-random-probe\\lines.shp does not exist or is not supported\nFailed to execute (CreateRandomPoints).\nFailed at Friday, October 30, 2026 12:33:08 AM (Elapsed Time: 0.00 seconds)"
+  },
+  "points": {
+    "status": "failed",
+    "error": "ERROR 000258: Output Z:\\tmp\\unigis-random-probe\\points.shp already exists\nFailed to execute (CreateRandomPoints).\n",
+    "messages": "Start Time: Friday, October 30, 2026 12:33:08 AM\nERROR 000258: Output Z:\\tmp\\unigis-random-probe\\points.shp already exists\nFailed to execute (CreateRandomPoints).\nFailed at Friday, October 30, 2026 12:33:08 AM (Elapsed Time: 0.01 seconds)"
+  },
+  "points_over": {
+    "status": "failed",
+    "error": "Failed to execute. Parameters are not valid.\nERROR 000732: Constraining Feature Class: Dataset Z:\\tmp\\unigis-random-probe\\points.shp does not exist or is not supported\nFailed to execute (CreateRandomPoints).\n",
+    "messages": "Start Time: Friday, October 30, 2026 12:33:08 AM\nFailed to execute. Parameters are not valid.\nERROR 000732: Constraining Feature Class: Dataset Z:\\tmp\\unigis-random-probe\\points.shp does not exist or is not supported\nFailed to execute (CreateRandomPoints).\nFailed at Friday, October 30, 2026 12:33:08 AM (Elapsed Time: 0.00 seconds)"
+  },
+  "multi_extent": {
+    "status": "failed",
+    "error": "Cannot find field 'CID'",
+    "messages": "Start Time: Friday, October 30, 2026 12:33:08 AM\nSucceeded at Friday, October 30, 2026 12:33:08 AM (Elapsed Time: 0.01 seconds)"
+  },
+  "multi_areas": {
+    "status": "failed",
+    "error": "Failed to execute. Parameters are not valid.\nERROR 000732: Constraining Feature Class: Dataset Z:\\tmp\\unigis-random-probe\\areas.shp does not exist or is not supported\nFailed to execute (CreateRandomPoints).\n",
+    "messages": "Start Time: Friday, October 30, 2026 12:33:08 AM\nFailed to execute. Parameters are not valid.\nERROR 000732: Constraining Feature Class: Dataset Z:\\tmp\\unigis-random-probe\\areas.shp does not exist or is not supported\nFailed to execute (CreateRandomPoints).\nFailed at Friday, October 30, 2026 12:33:08 AM (Elapsed Time: 0.00 seconds)"
+  },
+  "impossible": {
+    "status": "failed",
+    "error": "Failed to execute. Parameters are not valid.\nERROR 000732: Constraining Feature Class: Dataset Z:\\tmp\\unigis-random-probe\\areas.shp does not exist or is not supported\nFailed to execute (CreateRandomPoints).\n",
+    "messages": "Start Time: Friday, October 30, 2026 12:33:08 AM\nFailed to execute. Parameters are not valid.\nERROR 000732: Constraining Feature Class: Dataset Z:\\tmp\\unigis-random-probe\\areas.shp does not exist or is not supported\nFailed to execute (CreateRandomPoints).\nFailed at Friday, October 30, 2026 12:33:08 AM (Elapsed Time: 0.00 seconds)"
+  },
+  "ignored_extent": {
+    "status": "failed",
+    "error": "Failed to execute. Parameters are not valid.\nERROR 000732: Constraining Feature Class: Dataset Z:\\tmp\\unigis-random-probe\\areas.shp does not exist or is not supported\nFailed to execute (CreateRandomPoints).\n",
+    "messages": "Start Time: Friday, October 30, 2026 12:33:08 AM\nFailed to execute. Parameters are not valid.\nERROR 000732: Constraining Feature Class: Dataset Z:\\tmp\\unigis-random-probe\\areas.shp does not exist or is not supported\nFailed to execute (CreateRandomPoints).\nFailed at Friday, October 30, 2026 12:33:08 AM (Elapsed Time: 0.00 seconds)"
+  },
+  "extent_source": {
+    "status": "failed",
+    "error": "Failed to execute. Parameters are not valid.\nERROR 000732: Constraining Extent: Dataset Z:\\tmp\\unigis-random-probe\\areas.shp does not exist or is not supported\nFailed to execute (CreateRandomPoints).\n",
+    "messages": "Start Time: Friday, October 30, 2026 12:33:08 AM\nFailed to execute. Parameters are not valid.\nERROR 000732: Constraining Extent: Dataset Z:\\tmp\\unigis-random-probe\\areas.shp does not exist or is not supported\nFailed to execute (CreateRandomPoints).\nFailed at Friday, October 30, 2026 12:33:08 AM (Elapsed Time: 0.00 seconds)"
+  },
+  "missing_extent": {
+    "status": "failed",
+    "error": "Cannot find field 'CID'",
+    "messages": "Start Time: Friday, October 30, 2026 12:33:08 AM\nSucceeded at Friday, October 30, 2026 12:33:08 AM (Elapsed Time: 0.01 seconds)"
+  },
+  "extent_repeat": {
+    "rows": [
+      [
+        [
+          2.6722803385928273,
+          2.774353784043342
+        ]
+      ],
+      [
+        [
+          13.176689599640667,
+          5.551628649700433
+        ]
+      ],
+      [
+        [
+          18.105928641743958,
+          5.884638179559261
+        ]
+      ],
+      [
+        [
+          1.0109775559976697,
+          2.655190892983228
+        ]
+      ],
+      [
+        [
+          13.290888485498726,
+          6.405451830942184
+        ]
+      ],
+      [
+        [
+          12.31610715854913,
+          4.363653615582734
+        ]
+      ],
+      [
+        [
+          9.455358874984086,
+          4.901570205111057
+        ]
+      ]
+    ]
+  }
+}

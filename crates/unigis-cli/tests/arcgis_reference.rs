@@ -13,6 +13,9 @@ use unigis_testkit::{esri_area, esri_length, hausdorff};
 #[path = "common/dm_cases.rs"]
 mod dm_cases;
 
+#[path = "common/random_points.rs"]
+mod random_points;
+
 #[path = "common/workspace_extract.rs"]
 mod workspace_extract;
 
@@ -4779,6 +4782,9 @@ fn tools_match_arcgis_output() {
                     around(&theirs)
                 ));
             }
+        } else if info["stochastic_points"] == true {
+            diffs =
+                random_points::compare(&out, &reference.join(format!("{case}.shp")), info, &root);
         } else if table {
             diffs = compare_tables(
                 &out,

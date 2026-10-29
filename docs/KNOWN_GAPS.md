@@ -81,6 +81,13 @@ Update this file when a gap is found or closed.
 - Probed and left: Zonal Fill (fill = boundary minimum but zones 1 and 2 of the zones raster share one value: merged-catchment rule unknown), Cut Fill (region numbering), Surface Area Ratio (neither Jenness nor 1/cos(slope) fits), Boundary Clean, Aggregate Points, Sample (column naming), Trim Line: no Z/M/curves, brute-force O(n^2), exact-length dangles kept (ArcGIS decides those ties by crossing-point rounding). Extend Line: no Z/M/curves; brute-force O(n^2) segment search; ArcGIS's inclusive exact-length behaviour on memory/geodatabase edits (vs strict on shapefiles) is not modelled.
 - Calculate Geometry Attributes: planar only; no Z/M, geodesic or coordinate-notation properties, no coordinate_system/coordinate_format, text targets untested. Evidence: `scripts/research/calculate_geometry_attributes/README.md`.
 - Adjust 3D Z: the z-domain check (ArcGIS leaves features whose new z leaves the class's z domain unchanged, WARNING 002631) is not made. Evidence: `scripts/research/adjust_3d_z/README.md`.
+- Create Random Points: planar sampling with native reproducible SplitMix64 seed0;
+  does not reproduce ArcGIS random streams or selected subset identities. Bounded
+  rejection may underfill dense/thin constraints; spacing applies across all parts
+  of a source feature. Curves and multipoint output from point constraints refused.
+  Environments, layer selections, geographic units/geodesics, Z/M and64-bit CID
+  unverified. Loads rows in memory;1million point limit. Public property-based
+  references and observed multipoint CID0: `scripts/research/create_random_points/README.md`.
 - Extract Data From Geodatabase: one source FileGDB, standalone classes/tables and
   simple non-OBJECTID key relationships only. Feature datasets, attributed/many-to-many/
   OBJECTID-key relationships, tracking/COGO/attachments, geometry filters, schema reuse,

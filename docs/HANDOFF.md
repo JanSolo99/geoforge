@@ -1,82 +1,87 @@
 # Current handoff
 
-Updated 2026-10-29T13:28:11.607574+00:00; last agent Codex.
-Workspace `/mnt/media/ArcGIS_Linux`, main; HEAD/origin main on startup and before
-landing `61c5ea8ec866abcbaecd1f36b81f5428f1c68497`.
+Updated 2026-10-29T13:55:17.799883+00:00; last agent Codex.
+Workspace `/mnt/media/ArcGIS_Linux`, main; HEAD `11dae9ada1afaf5b4204c39854f9bfb43d5481f0`.
+Origin/main8583fda before pending push. No Cargo/Trunk/ArcGIS probes running.
 
-## Objective and current state
+## Objective and state
 
-User: finish/wrap the tool in progress, then build the next WORK_QUEUE tool with
-public ArcGIS controls, reference cases, full gate and one scoped landing.
-Prior tools already pushed on startup; Create Database View deferred in61c5ea8.
-This turn implemented Extract Data From Geodatabase.981 scoped paths staged;
-full gate PASS, ready to commit/push. No incomplete product edits or running builds.
-No additional agent/coordinator or external web publish launched.
+Finish/wrap current tool, then build next WORK_QUEUE tool, public ArcGIS evidence,
+full gate, one tool per landing. Extract Data From Geodatabase8583fda was already
+pushed on startup and not repeated. Unrelated inherited edits preserved.
 
-## Implementation and evidence
+This turn deferred two tools with concrete public evidence, separate commits:
+-96474aa Generate Definition Query From Selection: file000732, unselected layer
+ 000346, selected standalone MakeFeatureLayer succeeds and updates/returns layer.
+  Shared Context/CLI lacks selection/highlight and mutable definition-query state.
+  No map needed in this control despite public docs. Research/probe saved in
+  scripts/research/definition_query_selection/.
+-11dae9a Generate Rectangles Along Lines:25 controls; common50+50m bend with30m
+  along/20m across needs3 adaptively placed rectangles, unlike regular stationing4;
+  chain/branch cross-links also absent. Research/source ral_* fixtures saved once
+  in scripts/research/rectangles_along_lines/ and testdata/geoproc/. No fitted or
+  straight-only implementation landed. WORK_QUEUE_DEFERRED entries committed.
 
-- `crates/unigis-filegdb/src/writer/extract.rs`: extraction from one FileGDB into
-  new/existing FileGDB, DATA/SCHEMA_ONLY, standalone classes/tables. Preserves
-  source field storage schema/defaults/aliases/domains/subtypes, coordinate
-  resolution, values/NULLs and OID gaps; copies single-field indexes and simple
-  relationships. Existing writes journaled; new outputs cleaned on failure.
-- `crates/unigis-tools/src/extract_data.rs`, optional Context host capability and
-  CLI host. Unsupported hosts fail explicitly. Default unfiltered tables are
-  schema-only, but GET_RELATED follows simple key relationships in both directions.
-  Expansion/default/all rows/DO_NOT_ADD covered. Source names matched case-insensitively.
-- ArcGIS dynamic default discovered: ADD_WITH_SCHEMA_ONLY with omitted related
-  flag yields0 observations; explicit GET_RELATED yields3. Implemented/tested.
-  First native reference run missed this one case; focused public probe resolved it.
-- Empty high-precision Date fields preserve metadata when no fractional rows are
-  written (`finish_table` retains existing precision flags). Safety regression added.
-- Feature datasets, advanced/OBJECTID-key relationships, tracking/COGO/attachments,
-  multiple sources, geometry filters, schema reuse, XML/mobile outputs refused.
-  Index names retained where ArcGIS regenerates DSID names; class-level alias/
-  extension metadata not copied. Further unverified scope in KNOWN_GAPS and
-  `scripts/research/extract_data/README.md`; no polishing requested.
-- Public immutable source `testdata/geoproc/extract_base.gdb` created/saved once
-  this turn; do not recreate. Public controls/results/default probe in
-  `scripts/research/extract_data/`.16 edg_* references (14 success,2 expected errors).
- 2323 old manifest cases unchanged;2339 total. Whole-workspace comparator checks
-  catalog/fields/defaults/precision/domains/subtypes/relations/index expressions/
-  OIDs/rows/geometry/CRS. ROADMAP and KNOWN_GAPS updated.
+Current tool Create Random Points implemented and fully validated;127 scoped paths
+ready to stage/land, then push all3 commits together. No incomplete product edits.
+No extra agents/coordinators, app edits, web builds or web publishing.
+
+## Implementation and durable evidence
+
+`crates/unigis-tools/src/random_points.rs` + shared registry entry create_random_points:
+planar extent/polygon (holes)/line sampling, point subsets; count/distance fields,
+spacing, warning000983 on saturation,000117 on empty; CID/Id, multipoint chunks.
+Sources override extent; extent may be coordinates or dataset. Counts per feature
+for polygons/lines, global for point subsets. Negative count000963/distance000673.
+Multipoint CID0 matches public shapefile observations. Reproducible native SplitMix64
+seed0 by default; native seed option. ArcGIS streams/selection identities differ.
+Bounded rejection can underfill dense/thin data; cross-part spacing stricter than
+ArcGIS. Curves/point-source multipoint output refused. Environment reprojection/
+selections/geographic units/ZM/advanced inputs unverified.1million point limit.
+ROADMAP/KNOWN_GAPS and scripts/research/create_random_points/README.md record scope.
+
+Immutable rnp_{areas,lines,points} source fixtures saved once before controls.
+Initial probe reused disposable input/output basenames and assumed CID for extents;
+failed snapshots saved transparently. Repo sources unaffected. Corrected controls
+use saved sources/distinct outputs. Fractional GAP0.6 and literal0.6 Meters both
+honored without rounding to1, confirmed publicly. Do not recreate fixtures.
+
+16 rnp_* public references (14 success/2 expected errors),2339 prior manifest cases
+unchanged,2355 total. Only this tool uses stochastic_points comparisons: exact
+schema/CRS/counts/chunks/per-source counts plus membership/subset identity/spacing/
+uniqueness. Existing exact reference comparisons/tolerances unchanged.
 
 ## Validation
 
-- `uv run -q --with 'mcp>=2' python scripts/make-arcgis-reference.py 'edg_*'`
-  PASS14 success/2 expected000732/000735 refusals; /tmp/unigis-extract-references.log.
-- Targeted `cargo test -j3 -p unigis-cli --test extract_data_safety --test arcgis_reference`
-  PASS5 (2 refs,3 safety) /tmp/unigis-extract-tests2.log. Fourth dynamic-default
-  safety test added afterwards and covered in full gate.
-- Independent public arcpy reader PASS ALL14 native outputs: exact field properties/
-  aliases/defaults/domains/rows/OIDs/geometry/relationships/indexed fields. Saved
-  native_reader_results.json; /tmp/unigis-extract-native.{log,json}. Disposable native
-  outputs /tmp/unigis-extract-native. No output rerun needed.
-- Final `scripts/check` EXIT0, /tmp/unigis-extract-check.{log,exit,pid}: 250 Rust
-  passed, 5 ignored; Python8/fmt/clippy -D warnings/no-default-features check PASS.
-  Includes all4 new safety tests and host refusal test, full ArcGIS references and
-  format/engine suites. Two initial gates stopped on clippy collapsible_if lints;
-  corrected, prior logs saved *-first/second.log/exit. No behavior changes after
-  reader validation; no product changes after final gate started.
-- Python syntax, artifact/no-lock audits, staged whitespace/scope and inherited
-  hash preservation PASS. Research JSON normalized Wine CRLF to LF with data intact.
+- `uv run -q --with 'mcp>=2' python scripts/make-arcgis-reference.py 'rnp_*'`
+  PASS14 success/2 expected errors, /tmp/unigis-random-references.log.
+- Initial targeted `cargo test -j3 -p unigis-cli --test arcgis_reference` matched15/16;
+  only negative-gap code wrong (000963 vs public000673). Corrected before full gate.
+- Independent public arcpy reader PASS ALL14 native success outputs against public
+  schema/count/constraint/spacing/chunk properties, saved native_reader_results.json;
+  /tmp/unigis-random-native.{log,json}. First reader had an ArcPy multipoint iteration
+  error; corrected via public geometry JSON, no native outputs regenerated.
+  Native outputs retained /tmp/unigis-random-native.
+- Final `scripts/check` EXIT0 /tmp/unigis-random-check.{log,exit,pid}:255 Rust passed,
+  5 ignored; Python8/fmt/clippy -D warnings/no-default-features PASS. Four new unit
+  tests cover uniform occupancy, seeds, polygon holes, line length weighting,
+  spacing/saturation/limits. CLI safety protects existing outputs for invalid values.
+  Full ArcGIS references and all format/engine suites passed. No product edits
+  after final gate began. Python syntax, inherited hashes/old manifest audits PASS.
 
 ## Next actions
 
-1. Commit the981 scoped staged paths, then push origin main (fresh full gate above;
-   avoid rerunning duplicate pre-push gate).
-2. Run python3 scripts/work_queue.py and record the actual next item/HEAD/push.
-3. Final checkpoint before stopping. No further product work needed for this tool.
+1. Stage only127 paths in /tmp/unigis-random-scope.json, excluding inherited4-line
+   umintfloat generator block. Scope/whitespace audit, commit tool separately.
+2. Push origin main (fresh full gate above; avoid duplicate pre-push gate), then
+   python3 scripts/work_queue.py and record actual next item/HEAD/push evidence.
+3. Final handoff checkpoint; no further Random Points polishing requested.
 
-## Inherited unrelated work (preserved)
+## Preserved unrelated work
 
-Raster local/registry/stats and unary safety/fixtures/research, generator4-line
-umintfloat hunk, AGENTS/hooks/agents-remote/coordinator, web publisher RAM guard/
-docs/service/timer, queue infrastructure and generated dashboard/WORK_QUEUE.
-These remain outside tool commit. Generator index excludes only inherited block.
-/tmp/unigis-extract-preserved-hashes.json protects unrelated tracked files; old
-/tmp/unigis-dm-inherited-hashes.json differs only for prior intentional WEB edits.
-Never read/add NOTES.md or .worktrees; scratch_te is scratch. Cargo -j3 max;
-no overlapping Cargo/Trunk; no manual web publish. /tmp currently5.7GiB available.
-Previous desktop-PROJ request log showed only read-only startup then usage limit,
-no edits; current user's queue request took precedence.
+Raster local/registry/stats, unary safety/fixtures/research, generator umintfloat,
+AGENTS/hooks/agents-remote/coordinator, web publisher RAM guard/docs/service/timer,
+queue infrastructure and generated dashboard/WORK_QUEUE remain outside commits.
+/tmp/unigis-rectangles-preserved-hashes.json records inherited tracked hashes.
+Never read/add NOTES.md or .worktrees; scratch_te scratch. Cargo-j3 max;
+no overlapping builds/manual web publishing. /tmp had5.7GiB available during gate.
