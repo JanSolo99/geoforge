@@ -502,6 +502,47 @@ fn generate_transects_along_lines(ctx: &dyn Context) -> Result<ToolOutput> {
     )
 }
 
+fn add_spatial_join(ctx: &dyn Context) -> Result<ToolOutput> {
+    let t =
+        find("add_spatial_join").ok_or_else(|| Error::Unsupported("add_spatial_join".into()))?;
+    let target = ctx.features("target_features")?;
+    let join = ctx.features("join_features")?;
+    let wkt = target.spatial_reference_wkt();
+    let match_option = text(ctx, t, "match_option").unwrap_or_else(|| "INTERSECT".into());
+    let opts = crate::SpatialJoinOptions {
+        // The permanent fields are those of a one-to-one join of every target feature,
+        // whatever the join operation and type (observed).
+        one_to_many: false,
+        keep_all: true,
+        match_option: crate::MatchOption::parse(&match_option)
+            .ok_or_else(|| Error::Unsupported(format!("match_option {match_option}")))?,
+        search_radius: text(ctx, t, "search_radius")
+            .filter(|r| !r.trim().is_empty())
+            .map(|r| distance_in_units(&r, wkt))
+            .transpose()?,
+        distance_field_name: text(ctx, t, "distance_field_name").filter(|d| !d.trim().is_empty()),
+        merge_rules: Vec::new(),
+        field_map: None,
+        target_name: String::new(),
+        join_name: String::new(),
+    };
+    let mut out = crate::spatial_join(target.as_ref(), join.as_ref(), &opts)?;
+    // Spatial Join writes Join_Count, the distance field, TARGET_FID, the target's fields and
+    // the join's; the joined target has its own fields first, then Join_Count, the distance
+    // field and the join's fields.
+    let head = 2 + usize::from(opts.distance_field_name.is_some());
+    let targets = target.fields().len();
+    let order: Vec<usize> = (head..head + targets)
+        .chain(0..head - 1)
+        .chain(head + targets..out.fields.len())
+        .collect();
+    out.fields = order.iter().map(|&i| out.fields[i].clone()).collect();
+    for f in &mut out.features {
+        f.attributes = order.iter().map(|&i| f.attributes[i].clone()).collect();
+    }
+    Ok(out)
+}
+
 fn trim_line(ctx: &dyn Context) -> Result<ToolOutput> {
     let t = find("trim_line").ok_or_else(|| Error::Unsupported("trim_line".into()))?;
     let fc = ctx.features("input")?;
@@ -2005,6 +2046,81 @@ pub static TOOLS: &[Tool] = &[
         output_suffix: "ODLinks",
         measures: false,
         run: Runner::Features(generate_origin_destination_links),
+    },
+    Tool {
+        id: "add_spatial_join",
+        name: "Add Spatial Join",
+        toolbox: "Data Management › Joins",
+        summary: "The target features with Join_Count and the attributes of the join features they match (ArcGIS Pro Add Spatial Join, permanent fields).",
+        params: &[
+            Param {
+                name: "target_features",
+                label: "Target Features",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "join_features",
+                label: "Join Features",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "join_operation",
+                label: "Join Operation",
+                kind: Kind::Choice(&["JOIN_ONE_TO_ONE", "JOIN_ONE_TO_MANY"]),
+                required: false,
+                default: "JOIN_ONE_TO_ONE",
+                help: "Permanent fields are one to one either way.",
+            },
+            Param {
+                name: "join_type",
+                label: "Keep All Target Features",
+                kind: Kind::Choice(&["KEEP_ALL", "KEEP_COMMON"]),
+                required: false,
+                default: "KEEP_ALL",
+                help: "Every target feature is kept either way.",
+            },
+            Param {
+                name: "match_option",
+                label: "Match Option",
+                kind: Kind::Text,
+                required: false,
+                default: "INTERSECT",
+                help: "As in Spatial Join, for example INTERSECT, WITHIN_A_DISTANCE or CLOSEST.",
+            },
+            Param {
+                name: "search_radius",
+                label: "Search Radius",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "For example `50 Meters`.",
+            },
+            Param {
+                name: "distance_field_name",
+                label: "Distance Field Name",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "Filled for CLOSEST, -1 otherwise.",
+            },
+            Param {
+                name: "permanent_join",
+                label: "Permanent Join",
+                kind: Kind::Choice(&["PERMANENT_FIELDS", "NO_PERMANENT_FIELDS"]),
+                required: false,
+                default: "PERMANENT_FIELDS",
+                help: "The output always holds the joined fields.",
+            },
+        ],
+        output_suffix: "SpatialJoin",
+        measures: false,
+        run: Runner::Features(add_spatial_join),
     },
     Tool {
         id: "assign_weights_by_pairwise_comparison",

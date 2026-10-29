@@ -85583,6 +85583,308 @@
           "output": "<out>"
         }
       }
+    },
+    "asj_parcels_wells": {
+      "tool": "management.AddSpatialJoin",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "JOIN_ONE_TO_ONE",
+        "KEEP_ALL",
+        null,
+        "INTERSECT",
+        null,
+        null,
+        "PERMANENT_FIELDS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "Join_Count",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "add_spatial_join",
+        "params": {
+          "target_features": "testdata/geoproc/parcels.shp",
+          "join_features": "testdata/geoproc/wells.shp",
+          "output": "<out>",
+          "join_operation": "JOIN_ONE_TO_ONE",
+          "join_type": "KEEP_ALL",
+          "match_option": "INTERSECT",
+          "permanent_join": "PERMANENT_FIELDS"
+        }
+      }
+    },
+    "asj_parcels_wells_dist": {
+      "tool": "management.AddSpatialJoin",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "JOIN_ONE_TO_ONE",
+        "KEEP_ALL",
+        null,
+        "WITHIN_A_DISTANCE",
+        "50 Meters",
+        "DIST",
+        "PERMANENT_FIELDS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "Join_Count",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "add_spatial_join",
+        "params": {
+          "target_features": "testdata/geoproc/parcels.shp",
+          "join_features": "testdata/geoproc/wells.shp",
+          "output": "<out>",
+          "join_operation": "JOIN_ONE_TO_ONE",
+          "join_type": "KEEP_ALL",
+          "match_option": "WITHIN_A_DISTANCE",
+          "search_radius": "50 Meters",
+          "distance_field_name": "DIST",
+          "permanent_join": "PERMANENT_FIELDS"
+        }
+      }
+    },
+    "asj_wells_parcels_closest": {
+      "tool": "management.AddSpatialJoin",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "JOIN_ONE_TO_ONE",
+        "KEEP_ALL",
+        null,
+        "CLOSEST",
+        null,
+        "NEAR_D",
+        "PERMANENT_FIELDS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Join_Count",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NEAR_D",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "add_spatial_join",
+        "params": {
+          "target_features": "testdata/geoproc/wells.shp",
+          "join_features": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "join_operation": "JOIN_ONE_TO_ONE",
+          "join_type": "KEEP_ALL",
+          "match_option": "CLOSEST",
+          "distance_field_name": "NEAR_D",
+          "permanent_join": "PERMANENT_FIELDS"
+        }
+      }
     }
   }
 }

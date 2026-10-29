@@ -812,6 +812,9 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
       The angular numeric GARS boundary path remains separate follow-up work.
       Evidence: `scripts/research/coordinate_notation/grid/gars-boundaries.md`.
 
+- [x] Add Spatial Join (permanent fields: target fields, Join_Count, distance field, join
+      fields; values of a one-to-one Spatial Join): 3 `asj_*` in-place cases match ArcGIS.
+      Evidence: `scripts/research/add_spatial_join/README.md`.
 - [x] Trim Line (DELETE_SHORT/KEEP_SHORT; cuts at crossings, touches, own parts and self
       crossings; per-part short features; input-geometry based): 8 `trim_*` cases on a 20-line
       fixture match ArcGIS. Evidence: `scripts/research/trim_line/README.md`.

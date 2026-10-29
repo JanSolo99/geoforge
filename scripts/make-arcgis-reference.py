@@ -204,6 +204,9 @@ CASES = {
     "near_wells_roads_loc": ("analysis.Near", [DATA / "wells.shp", DATA / "roads.shp"], ["", "LOCATION", "ANGLE"]),
     "near_wells_roads_100": ("analysis.Near", [DATA / "wells.shp", DATA / "roads.shp"], ["100 Meters"]),
     "near_parcels_wells": ("analysis.Near", [DATA / "parcels.shp", DATA / "wells.shp"], ["", "LOCATION", "ANGLE"]),
+    "asj_parcels_wells": ("management.AddSpatialJoin", [DATA / "parcels.shp", DATA / "wells.shp"], ["JOIN_ONE_TO_ONE", "KEEP_ALL", None, "INTERSECT", None, None, "PERMANENT_FIELDS"]),
+    "asj_parcels_wells_dist": ("management.AddSpatialJoin", [DATA / "parcels.shp", DATA / "wells.shp"], ["JOIN_ONE_TO_ONE", "KEEP_ALL", None, "WITHIN_A_DISTANCE", "50 Meters", "DIST", "PERMANENT_FIELDS"]),
+    "asj_wells_parcels_closest": ("management.AddSpatialJoin", [DATA / "wells.shp", DATA / "parcels.shp"], ["JOIN_ONE_TO_ONE", "KEEP_ALL", None, "CLOSEST", None, "NEAR_D", "PERMANENT_FIELDS"]),
     "sj_wells_parcels": ("analysis.SpatialJoin", [DATA / "wells.shp", DATA / "parcels.shp"], []),
     "sj_parcels_wells": ("analysis.SpatialJoin", [DATA / "parcels.shp", DATA / "wells.shp"], []),
     "sj_parcels_wells_common": ("analysis.SpatialJoin", [DATA / "parcels.shp", DATA / "wells.shp"], ["JOIN_ONE_TO_ONE", "KEEP_COMMON"]),
@@ -2029,6 +2032,7 @@ RUN = {
     "edit.TrimLine": ("trim_line", ["input", "output", "dangle_length", "delete_shorts"]),
     "analysis.GenerateOriginDestinationLinks": ("generate_origin_destination_links", ["origin_features", "destination_features", "output", "origin_group_field", "destination_group_field", "line_type", "num_nearest", "search_distance", "distance_unit", "aggregate_links", "sum_fields"]),
     "analysis.AssignWeightsByPairwiseComparison": ("assign_weights_by_pairwise_comparison", ["input_variables", "output", "add_comparison_matrix", "comparison_matrix"]),
+    "management.AddSpatialJoin": ("add_spatial_join", ["target_features", "join_features", "output", "join_operation", "join_type", None, "match_option", "search_radius", "distance_field_name", "permanent_join"]),
     "management.FieldStatisticsToTable": ("field_statistics_to_table", ["input", "output", "fields", "field_type", "group_by", "statistics"]),
     "management.EncodeField": ("encode_field", ["input", "output", "field", "method"]),
     "management.GeodeticDensify": ("geodetic_densify", ["input", "output", "densify_method", "max_segment_length"]),
@@ -2114,7 +2118,7 @@ MEMORY_OUT = {"analysis.SummarizeWithin", "analysis.SummarizeNearby", "analysis.
 CREATE_TOOLS = {"management.CreateFeatureclass", "management.CreateTable"}
 
 # In-place tools: the index of the input they edit (run on a copy written as the output).
-IN_PLACE = {"management.AddGPSMetadataFields": 0, "gp.ExtractMultiValuesToPoints_sa": 0, "edit.ExtendLine": 0, "edit.FlipLine": 0, "edit.TrimLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.EncodeField": 0, "management.AddGeometryAttributes": 0,
+IN_PLACE = {"management.AddGPSMetadataFields": 0, "management.AddSpatialJoin": 0, "gp.ExtractMultiValuesToPoints_sa": 0, "edit.ExtendLine": 0, "edit.FlipLine": 0, "edit.TrimLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.EncodeField": 0, "management.AddGeometryAttributes": 0,
             "management.CalculateFields": 0, "management.StandardizeField": 0, "management.TransformField": 0, "management.ReclassifyField": 0, "management.DefineProjection": 0, "management.CalculateEndTime": 0}
 
 # Select Layer By Location cases, saved with Copy Features:
