@@ -140,3 +140,8 @@ Update this file when a gap is found or closed.
   and unprobed attribute types remain unverified. Orphan files reserve stems
   conservatively; I/O errors are not multi-dataset transactional. Evidence:
   `scripts/research/split_by_attributes/README.md`.
+
+- Pairwise Integrate: not implemented. Public default-tolerance controls show
+  duplicate-point clustering unlike simple centroid averaging; intersection
+  noding alone does not implement its cluster/collapse behavior. Multi-input
+  in-place host support is also absent.33 controls: scripts/research/pairwise_integrate/README.md.

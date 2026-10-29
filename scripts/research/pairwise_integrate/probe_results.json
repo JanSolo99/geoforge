@@ -1,0 +1,378 @@
+{
+  "two_points": {
+    "before": [
+      [
+        0,
+        "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        1,
+        "{\"x\":500000.59999999963,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "after": [
+      [
+        0,
+        "{\"x\":500000.29999999981,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        1,
+        "{\"x\":500000.29999999981,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:40:13 PM\nFeatures were updated 2 times.\nSucceeded at Thursday, October 29, 2026 3:40:13 PM (Elapsed Time: 0.01 seconds)"
+  },
+  "two_points_reverse": {
+    "before": [
+      [
+        1,
+        "{\"x\":500000.59999999963,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        0,
+        "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "after": [
+      [
+        1,
+        "{\"x\":500000.29999999981,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        0,
+        "{\"x\":500000.29999999981,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:40:13 PM\nFeatures were updated 2 times.\nSucceeded at Thursday, October 29, 2026 3:40:13 PM (Elapsed Time: 0.01 seconds)"
+  },
+  "three_points": {
+    "before": [
+      [
+        0,
+        "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        1,
+        "{\"x\":500000.59999999963,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        2,
+        "{\"x\":500001.20000000019,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "after": [
+      [
+        0,
+        "{\"x\":500000.59999999963,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        1,
+        "{\"x\":500000.59999999963,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        2,
+        "{\"x\":500000.59999999963,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:40:13 PM\nFeatures were updated 3 times.\nSucceeded at Thursday, October 29, 2026 3:40:13 PM (Elapsed Time: 0.01 seconds)"
+  },
+  "three_points_reverse": {
+    "before": [
+      [
+        2,
+        "{\"x\":500001.20000000019,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        1,
+        "{\"x\":500000.59999999963,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        0,
+        "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "after": [
+      [
+        2,
+        "{\"x\":500000.59999999963,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        1,
+        "{\"x\":500000.59999999963,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        0,
+        "{\"x\":500000.59999999963,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:40:13 PM\nFeatures were updated 3 times.\nSucceeded at Thursday, October 29, 2026 3:40:13 PM (Elapsed Time: 0.01 seconds)"
+  },
+  "triangle": {
+    "before": [
+      [
+        0,
+        "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        1,
+        "{\"x\":500000.79999999981,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        2,
+        "{\"x\":500000,\"y\":5000000.8000000007,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "after": [
+      [
+        0,
+        "{\"x\":500000.26669999957,\"y\":5000000.2666999996,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        1,
+        "{\"x\":500000.26669999957,\"y\":5000000.2666999996,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        2,
+        "{\"x\":500000.26669999957,\"y\":5000000.2666999996,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:40:13 PM\nFeatures were updated 3 times.\nSucceeded at Thursday, October 29, 2026 3:40:13 PM (Elapsed Time: 0.01 seconds)"
+  },
+  "triangle_reverse": {
+    "before": [
+      [
+        2,
+        "{\"x\":500000,\"y\":5000000.8000000007,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        1,
+        "{\"x\":500000.79999999981,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        0,
+        "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "after": [
+      [
+        2,
+        "{\"x\":500000.26669999957,\"y\":5000000.2666999996,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        1,
+        "{\"x\":500000.26669999957,\"y\":5000000.2666999996,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        0,
+        "{\"x\":500000.26669999957,\"y\":5000000.2666999996,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:40:13 PM\nFeatures were updated 3 times.\nSucceeded at Thursday, October 29, 2026 3:40:13 PM (Elapsed Time: 0.01 seconds)"
+  },
+  "cross": {
+    "before": [
+      [
+        0,
+        "{\"paths\":[[[500000,5000000],[500010,5000010]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        1,
+        "{\"paths\":[[[500000,5000010],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "after": [
+      [
+        0,
+        "{\"paths\":[[[500000,5000000],[500005,5000005],[500010,5000010]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        1,
+        "{\"paths\":[[[500000,5000010],[500005,5000005],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:40:13 PM\nFeatures were updated 2 times.\nSucceeded at Thursday, October 29, 2026 3:40:13 PM (Elapsed Time: 0.01 seconds)"
+  },
+  "cross_reverse": {
+    "before": [
+      [
+        1,
+        "{\"paths\":[[[500000,5000010],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        0,
+        "{\"paths\":[[[500000,5000000],[500010,5000010]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "after": [
+      [
+        1,
+        "{\"paths\":[[[500000,5000010],[500005,5000005],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        0,
+        "{\"paths\":[[[500000,5000000],[500005,5000005],[500010,5000010]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:40:13 PM\nFeatures were updated 2 times.\nSucceeded at Thursday, October 29, 2026 3:40:13 PM (Elapsed Time: 0.01 seconds)"
+  },
+  "near_edge": {
+    "before": [
+      [
+        0,
+        "{\"paths\":[[[500000,5000000],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        1,
+        "{\"paths\":[[[500005,5000000.5999999996],[500005,5000010]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "after": [
+      [
+        0,
+        "{\"paths\":[[[500000,5000000],[500005,5000000.3000000007],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        1,
+        "{\"paths\":[[[500005,5000000.3000000007],[500005,5000010]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:40:13 PM\nFeatures were updated 2 times.\nSucceeded at Thursday, October 29, 2026 3:40:13 PM (Elapsed Time: 0.01 seconds)"
+  },
+  "near_edge_reverse": {
+    "before": [
+      [
+        1,
+        "{\"paths\":[[[500005,5000000.5999999996],[500005,5000010]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        0,
+        "{\"paths\":[[[500000,5000000],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "after": [
+      [
+        1,
+        "{\"paths\":[[[500005,5000000.3000000007],[500005,5000010]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        0,
+        "{\"paths\":[[[500000,5000000],[500005,5000000.3000000007],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:40:13 PM\nFeatures were updated 2 times.\nSucceeded at Thursday, October 29, 2026 3:40:13 PM (Elapsed Time: 0.01 seconds)"
+  },
+  "near_parallel": {
+    "before": [
+      [
+        0,
+        "{\"paths\":[[[500000,5000000],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        1,
+        "{\"paths\":[[[500000,5000000.5999999996],[500010,5000000.5999999996]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "after": [
+      [
+        0,
+        "{\"paths\":[[[500000,5000000.3000000007],[500010,5000000.3000000007]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        1,
+        "{\"paths\":[[[500000,5000000.3000000007],[500010,5000000.3000000007]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:40:14 PM\nFeatures were updated 2 times.\nSucceeded at Thursday, October 29, 2026 3:40:14 PM (Elapsed Time: 0.01 seconds)"
+  },
+  "near_parallel_reverse": {
+    "before": [
+      [
+        1,
+        "{\"paths\":[[[500000,5000000.5999999996],[500010,5000000.5999999996]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        0,
+        "{\"paths\":[[[500000,5000000],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "after": [
+      [
+        1,
+        "{\"paths\":[[[500000,5000000.3000000007],[500010,5000000.3000000007]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        0,
+        "{\"paths\":[[[500000,5000000.3000000007],[500010,5000000.3000000007]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:40:14 PM\nFeatures were updated 2 times.\nSucceeded at Thursday, October 29, 2026 3:40:14 PM (Elapsed Time: 0.01 seconds)"
+  },
+  "self_cross": {
+    "before": [
+      [
+        0,
+        "{\"paths\":[[[500000,5000000],[500010,5000010],[500000,5000010],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "after": [
+      [
+        0,
+        "{\"paths\":[[[500000,5000000],[500005,5000005],[500010,5000010],[500000,5000010],[500005,5000005],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:40:14 PM\nFeatures were updated 1 times.\nSucceeded at Thursday, October 29, 2026 3:40:14 PM (Elapsed Time: 0.01 seconds)"
+  },
+  "self_cross_reverse": {
+    "before": [
+      [
+        0,
+        "{\"paths\":[[[500000,5000000],[500010,5000010],[500000,5000010],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "after": [
+      [
+        0,
+        "{\"paths\":[[[500000,5000000],[500005,5000005],[500010,5000010],[500000,5000010],[500005,5000005],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:40:14 PM\nFeatures were updated 1 times.\nSucceeded at Thursday, October 29, 2026 3:40:14 PM (Elapsed Time: 0.01 seconds)"
+  },
+  "short": {
+    "before": [
+      [
+        0,
+        "{\"paths\":[[[500000,5000000],[500000.59999999963,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        1,
+        "{\"paths\":[[[500010,5000000],[500020,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "after": [
+      [
+        1,
+        "{\"paths\":[[[500010,5000000],[500020,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:40:14 PM\nFeatures were updated 1 times.\nSucceeded at Thursday, October 29, 2026 3:40:14 PM (Elapsed Time: 0.01 seconds)"
+  },
+  "short_reverse": {
+    "before": [
+      [
+        1,
+        "{\"paths\":[[[500010,5000000],[500020,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        0,
+        "{\"paths\":[[[500000,5000000],[500000.59999999963,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "after": [
+      [
+        1,
+        "{\"paths\":[[[500010,5000000],[500020,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:40:14 PM\nFeatures were updated 1 times.\nSucceeded at Thursday, October 29, 2026 3:40:14 PM (Elapsed Time: 0.01 seconds)"
+  }
+}

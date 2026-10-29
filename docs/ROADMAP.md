@@ -848,3 +848,7 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
       output preservation.11 ArcGIS cases; full local gate passed. Host workspace
       capability is explicit; other hosts and advanced types remain gaps.
       Findings: scripts/research/split_by_attributes/README.md.
+
+- [ ] Pairwise Integrate: deferred; default cluster/collapse behavior is absent
+      from native primitives.33 public controls, including default XY tolerance,
+      saved in scripts/research/pairwise_integrate/README.md.
