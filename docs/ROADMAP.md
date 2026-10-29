@@ -812,6 +812,9 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
       The angular numeric GARS boundary path remains separate follow-up work.
       Evidence: `scripts/research/coordinate_notation/grid/gars-boundaries.md`.
 
+- [x] Validate Join (message table: unindexed join fields, no-match and row-count rows;
+      one-to-one match count; self-join refusal): 4 `vj_*` cases + 1 refusal match ArcGIS for
+      shapefile/dBASE tables. Evidence: `scripts/research/validate_join/README.md`.
 - [x] Convert Time Zone (139 ArcGIS/Windows zone names via CLDR -> IANA rules with chrono-tz,
       DST-adjusted or standard-time input/output): 4 `ctz_*` cases + a 72-instant unit test
       match ArcGIS. Evidence: `scripts/research/convert_time_zone/README.md`.

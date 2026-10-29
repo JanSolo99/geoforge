@@ -544,6 +544,33 @@ fn generate_transects_along_lines(ctx: &dyn Context) -> Result<ToolOutput> {
     )
 }
 
+fn validate_join(ctx: &dyn Context) -> Result<Outcome> {
+    let t = find("validate_join").ok_or_else(|| Error::Unsupported("validate_join".into()))?;
+    let need = |k: &str| text(ctx, t, k).ok_or_else(|| Error::Unsupported(format!("missing {k}")));
+    let (in_path, join_path) = (need("input")?, need("join_table")?);
+    let same = in_path == join_path
+        || std::fs::canonicalize(&in_path)
+            .ok()
+            .zip(std::fs::canonicalize(&join_path).ok())
+            .is_some_and(|(a, b)| a == b);
+    let (input, join) = (ctx.features("input")?, ctx.features("join_table")?);
+    let (in_field, join_field) = (need("in_field")?, need("join_field")?);
+    let (_, table) = crate::validate_join::validate_join(
+        &crate::validate_join::JoinSide {
+            table: input.as_ref(),
+            field: &in_field,
+            name: crate::validate_join::table_name(&in_path),
+        },
+        &crate::validate_join::JoinSide {
+            table: join.as_ref(),
+            field: &join_field,
+            name: crate::validate_join::table_name(&join_path),
+        },
+        same,
+    )?;
+    Ok(Outcome::Table(table))
+}
+
 fn convert_time_zone(ctx: &dyn Context) -> Result<Outcome> {
     let t =
         find("convert_time_zone").ok_or_else(|| Error::Unsupported("convert_time_zone".into()))?;
@@ -2200,6 +2227,49 @@ pub static TOOLS: &[Tool] = &[
         output_suffix: "ODLinks",
         measures: false,
         run: Runner::Features(generate_origin_destination_links),
+    },
+    Tool {
+        id: "validate_join",
+        name: "Validate Join",
+        toolbox: "Data Management › Joins",
+        summary: "Checks an attribute join and writes ArcGIS's message table: field indexes, no matches, row counts (ArcGIS Pro Validate Join).",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Table",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "in_field",
+                label: "Input Join Field",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "join_table",
+                label: "Join Table",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "join_field",
+                label: "Join Table Field",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+                help: "",
+            },
+        ],
+        output_suffix: "ValidateJoin",
+        measures: false,
+        run: Runner::Dynamic(validate_join),
     },
     Tool {
         id: "convert_time_zone",

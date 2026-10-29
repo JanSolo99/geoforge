@@ -4680,7 +4680,10 @@ fn tools_match_arcgis_output() {
                 .as_array()
                 .unwrap()
                 .iter()
-                .filter_map(|m| m.as_str()?.strip_prefix("ERROR ")?.get(..6))
+                .filter_map(|m| m.as_str())
+                // One message may hold several lines (a WARNING then the ERROR).
+                .flat_map(str::lines)
+                .filter_map(|l| l.strip_prefix("ERROR ")?.get(..6))
                 .collect();
             if run.status.success() || !codes.iter().any(|c| stderr.contains(c)) {
                 diffs.push(format!(

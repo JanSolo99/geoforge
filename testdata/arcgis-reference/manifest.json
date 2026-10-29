@@ -92847,6 +92847,276 @@
           "date_fields": "D1"
         }
       }
+    },
+    "vj_parcels_dates": {
+      "tool": "management.ValidateJoin",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "ZONE",
+        "testdata/geoproc/dates.dbf",
+        "GRP",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "TYPE",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "TABLE_NAME",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "FIELD_NAME",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DESC_",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "validate_join",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "in_field": "ZONE",
+          "join_table": "testdata/geoproc/dates.dbf",
+          "join_field": "GRP",
+          "output": "<out>"
+        }
+      }
+    },
+    "vj_dates_parcels": {
+      "tool": "management.ValidateJoin",
+      "args": [
+        "testdata/geoproc/dates.dbf",
+        "GRP",
+        "testdata/geoproc/parcels.shp",
+        "ZONE",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "TYPE",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "TABLE_NAME",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "FIELD_NAME",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DESC_",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "validate_join",
+        "params": {
+          "input": "testdata/geoproc/dates.dbf",
+          "in_field": "GRP",
+          "join_table": "testdata/geoproc/parcels.shp",
+          "join_field": "ZONE",
+          "output": "<out>"
+        }
+      }
+    },
+    "vj_parcels_dates_few": {
+      "tool": "management.ValidateJoin",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "PARCEL_ID",
+        "testdata/geoproc/dates.dbf",
+        "GRP",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "TYPE",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "TABLE_NAME",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "FIELD_NAME",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DESC_",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "validate_join",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "in_field": "PARCEL_ID",
+          "join_table": "testdata/geoproc/dates.dbf",
+          "join_field": "GRP",
+          "output": "<out>"
+        }
+      }
+    },
+    "vj_parcels_dates_none": {
+      "tool": "management.ValidateJoin",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "VALUE",
+        "testdata/geoproc/dates.dbf",
+        "ID",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 003237: Join had no matches."
+      ],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "TYPE",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "TABLE_NAME",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "FIELD_NAME",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DESC_",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "validate_join",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "in_field": "VALUE",
+          "join_table": "testdata/geoproc/dates.dbf",
+          "join_field": "ID",
+          "output": "<out>"
+        }
+      }
+    },
+    "vj_err_self": {
+      "tool": "management.ValidateJoin",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "ZONE",
+        "testdata/geoproc/parcels.shp",
+        "ZONE",
+        "<out>"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "WARNING 000970: The join field ZONE in the table parcels is not indexed. To improve performance, we recommend that an index be created.\nERROR 001706: Cannot join a table to itself.",
+        "Failed to execute (ValidateJoin)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "validate_join",
+        "params": {
+          "input": "testdata/geoproc/parcels.shp",
+          "in_field": "ZONE",
+          "join_table": "testdata/geoproc/parcels.shp",
+          "join_field": "ZONE",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

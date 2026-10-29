@@ -580,6 +580,11 @@ CASES = {
     "ctz_utc_pacific_std": ("management.ConvertTimeZone", [DATA / "dates.dbf"], ["D", "UTC", "OUT", "Pacific Standard Time", "INPUT_ADJUSTED_FOR_DST", "OUTPUT_NOT_ADJUSTED_FOR_DST"]),
     "ctz_tonga_utc": ("management.ConvertTimeZone", [DATA / "dates.dbf"], ["E", "Tonga Standard Time", "OUT", "UTC", "INPUT_ADJUSTED_FOR_DST", "OUTPUT_ADJUSTED_FOR_DST"]),
     "ctz_utc_tokyo": ("management.ConvertTimeZone", [DATA / "dates.dbf"], ["E", "UTC", "OUT", "Tokyo Standard Time", "INPUT_ADJUSTED_FOR_DST", "OUTPUT_ADJUSTED_FOR_DST"]),
+    "vj_parcels_dates": ("management.ValidateJoin", [DATA / "parcels.shp", "ZONE", DATA / "dates.dbf", "GRP"], []),
+    "vj_dates_parcels": ("management.ValidateJoin", [DATA / "dates.dbf", "GRP", DATA / "parcels.shp", "ZONE"], []),
+    "vj_parcels_dates_few": ("management.ValidateJoin", [DATA / "parcels.shp", "PARCEL_ID", DATA / "dates.dbf", "GRP"], []),
+    "vj_parcels_dates_none": ("management.ValidateJoin", [DATA / "parcels.shp", "VALUE", DATA / "dates.dbf", "ID"], []),
+    "vj_err_self": ("management.ValidateJoin", [DATA / "parcels.shp", "ZONE", DATA / "parcels.shp", "ZONE"], []),
     "fst_parcels_num": ("management.FieldStatisticsToTable", [DATA / "parcels.shp"], ["VALUE;ZONE;PARCEL_ID", "NUMERIC"]),
     "fst_parcels_text": ("management.FieldStatisticsToTable", [DATA / "parcels.shp"], ["NAME", "TEXT"]),
     "fst_streams_text": ("management.FieldStatisticsToTable", [DATA / "streams.shp"], ["NAME", "TEXT"]),
@@ -2117,6 +2122,7 @@ RUN = {
     "management.BatchUpdateFields": ("batch_update_fields", ["input", "output", "field_definition_table", None, "output_field_name", "source_field_name", "output_field_type", "output_field_decimals_or_length", "output_field_alias", "output_field_script"]),
     "management.ConvertTimeField": ("convert_time_field", ["input", "output", "input_time_field", "input_time_format", "output_time_field", "output_time_type", "output_time_format"]),
     "management.ConvertTimeZone": ("convert_time_zone", ["input", "output", "input_time_field", "input_time_zone", "output_time_field", "output_time_zone", "input_dst", "output_dst"]),
+    "management.ValidateJoin": ("validate_join", ["input", "in_field", "join_table", "join_field", "output"]),
     "management.FieldStatisticsToTable": ("field_statistics_to_table", ["input", "output", "fields", "field_type", "group_by", "statistics"]),
     "management.EncodeField": ("encode_field", ["input", "output", "field", "method"]),
     "management.GeodeticDensify": ("geodetic_densify", ["input", "output", "densify_method", "max_segment_length"]),
@@ -2200,7 +2206,7 @@ WORKSPACE_OUT = {"analysis.Split", "analysis.SplitByAttributes"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable", "conversion.RasterToASCII", "conversion.RasterToFloat"}
 # Tools whose output is a table, written as <name>.dbf.
-TABLE_OUT = {"analysis.PairwisePolygonNeighbors", "analysis.AssignWeightsByPairwiseComparison", "management.FieldStatisticsToTable", "gp.Sample_sa", "management.CopyRows", "gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa", "gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
+TABLE_OUT = {"management.ValidateJoin", "analysis.PairwisePolygonNeighbors", "analysis.AssignWeightsByPairwiseComparison", "management.FieldStatisticsToTable", "gp.Sample_sa", "management.CopyRows", "gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa", "gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
              "management.TransposeFields", "management.PivotTable", "management.CreateTable", "analysis.PolygonNeighbors", "analysis.TabulateIntersection", "analysis.TableSelect"}
 # Tools whose ArcGIS output must be a geodatabase feature class or memory (copied to a shapefile).
 MEMORY_OUT = {"analysis.SummarizeWithin", "analysis.SummarizeNearby", "analysis.ApportionPolygon"}

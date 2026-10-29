@@ -1,5 +1,21 @@
 # Current handoff
 
+## Latest (Claude, 2026-10-29 evening) — read first
+
+- Codex's Migrate Date Field To High Precision (staged, its full gate EXIT 0 at
+  /tmp/unigis-mdhp-check.log, Codex's run hit a usage limit) was committed unchanged from the
+  index and pushed as 903bf21.
+- Validate Join (this run): crates/unigis-tools/src/validate_join.rs + registry runner/entry
+  `validate_join` + `pub mod validate_join`; 5 vj_* cases (TABLE_OUT); ogrinfo diff identical.
+  Notes scripts/research/validate_join/README.md; gaps in KNOWN_GAPS.
+  The reference test now reads ERROR codes from every line of a message (ArcGIS put
+  WARNING 000970 and ERROR 001706 in one message). Validation: full scripts/check EXIT 0,
+  245 Rust passed / 5 ignored (/tmp/unigis-vj-check2.log).
+- /tmp is a 7.3 GB tmpfs mostly used by /tmp/opencode (not ours); a pre-push gate failed once with
+  "No space left on device" in to_geodatabase; stale /tmp/gf-arcgis-ref-*, /tmp/gf-to-gdb-* dirs
+  from killed test runs can be removed.
+- Next action after landing: next queue item (docs/WORK_QUEUE.md: Adjust 3D Z).
+
 Updated 2026-10-29T09:44:00.347279+00:00; last agent Codex.
 Workspace /mnt/media/ArcGIS_Linux, main; HEAD and origin/main both
 99d534c604c4aea0ac5be4305c66e3c49eafd142. Index empty. User objective: finish/wrap current tool, then build next
@@ -34,7 +50,11 @@ ArcGIS reader PASS6 successes exact precision/schema/values/NULL/geometry,
 /tmp/unigis-migrate-date-native.{log,json}, saved native_reader_results.json.
 Formatting/Python syntax/whitespace, manifest2295 unchanged+12 and inherited hash
 preservation audits PASS. Docs ROADMAP/KNOWN_GAPS/formats updated. Full scripts/check
-starts now /tmp/unigis-mdhp-check.{log,exit,pid}; no commit until exit0. No extra agents/coordinators or external web publish.
+running /tmp/unigis-mdhp-check.{log,exit,pid}, PID1539872; Python8/fmt/clippy
+-D warnings PASS; full reference suite and both migration safety tests PASS,
+remaining workspace format/engine tests running; no overlapping Cargo/Trunk.
+123 scoped paths staged, source/staged whitespace and preservation audits PASS.
+No commit until exit0. No extra agents/coordinators or external web publish.
 
 ## Completed implementation
 
