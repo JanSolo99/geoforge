@@ -1,0 +1,323 @@
+{
+  "uniform4": {
+    "status": "succeeded",
+    "fields": [
+      {
+        "name": "FID",
+        "type": "OID",
+        "length": 4
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "length": 0
+      },
+      {
+        "name": "InclProb",
+        "type": "Single",
+        "length": 13
+      }
+    ],
+    "rows": [
+      [
+        1.0,
+        [
+          500125.0,
+          5000045.0
+        ]
+      ],
+      [
+        1.0,
+        [
+          500015.0,
+          5000095.0
+        ]
+      ],
+      [
+        1.0,
+        [
+          500005.0,
+          5000065.0
+        ]
+      ],
+      [
+        1.0,
+        [
+          500095.0,
+          5000105.0
+        ]
+      ]
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 1:30:33 AM\nSeed = 23\nSucceeded at Friday, October 30, 2026 1:30:33 AM (Elapsed Time: 0.05 seconds)"
+  },
+  "uniform8": {
+    "status": "succeeded",
+    "fields": [
+      {
+        "name": "FID",
+        "type": "OID",
+        "length": 4
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "length": 0
+      },
+      {
+        "name": "InclProb",
+        "type": "Single",
+        "length": 13
+      }
+    ],
+    "rows": [
+      [
+        1.0,
+        [
+          500095.0,
+          5000005.0
+        ]
+      ],
+      [
+        1.0,
+        [
+          500045.0,
+          5000085.0
+        ]
+      ],
+      [
+        1.0,
+        [
+          500005.0,
+          5000005.0
+        ]
+      ],
+      [
+        1.0,
+        [
+          500125.0,
+          5000105.0
+        ]
+      ],
+      [
+        1.0,
+        [
+          500125.0,
+          5000045.0
+        ]
+      ],
+      [
+        1.0,
+        [
+          500015.0,
+          5000095.0
+        ]
+      ],
+      [
+        1.0,
+        [
+          500005.0,
+          5000065.0
+        ]
+      ],
+      [
+        1.0,
+        [
+          500095.0,
+          5000105.0
+        ]
+      ]
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 1:30:33 AM\nSeed = 23\nSucceeded at Friday, October 30, 2026 1:30:33 AM (Elapsed Time: 0.01 seconds)"
+  },
+  "repeat4": {
+    "status": "succeeded",
+    "fields": [
+      {
+        "name": "FID",
+        "type": "OID",
+        "length": 4
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "length": 0
+      },
+      {
+        "name": "InclProb",
+        "type": "Single",
+        "length": 13
+      }
+    ],
+    "rows": [
+      [
+        1.0,
+        [
+          500125.0,
+          5000045.0
+        ]
+      ],
+      [
+        1.0,
+        [
+          500015.0,
+          5000095.0
+        ]
+      ],
+      [
+        1.0,
+        [
+          500005.0,
+          5000065.0
+        ]
+      ],
+      [
+        1.0,
+        [
+          500095.0,
+          5000105.0
+        ]
+      ]
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 1:30:33 AM\nSeed = 23\nSucceeded at Friday, October 30, 2026 1:30:33 AM (Elapsed Time: 0.01 seconds)"
+  },
+  "weighted": {
+    "status": "succeeded",
+    "fields": [
+      {
+        "name": "FID",
+        "type": "OID",
+        "length": 4
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "length": 0
+      },
+      {
+        "name": "InclProb",
+        "type": "Single",
+        "length": 13
+      }
+    ],
+    "rows": [
+      [
+        0.49333301186561584,
+        [
+          500075.0,
+          5000145.0
+        ]
+      ],
+      [
+        0.4300000071525574,
+        [
+          500065.0,
+          5000055.0
+        ]
+      ],
+      [
+        0.7466670274734497,
+        [
+          500115.0,
+          5000155.0
+        ]
+      ],
+      [
+        0.8100000023841858,
+        [
+          500125.0,
+          5000035.0
+        ]
+      ],
+      [
+        0.6200000047683716,
+        [
+          500095.0,
+          5000005.0
+        ]
+      ],
+      [
+        0.8100000023841858,
+        [
+          500125.0,
+          5000105.0
+        ]
+      ],
+      [
+        0.8100000023841858,
+        [
+          500125.0,
+          5000045.0
+        ]
+      ],
+      [
+        0.6200000047683716,
+        [
+          500095.0,
+          5000105.0
+        ]
+      ]
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 1:30:33 AM\nSeed = 23\nSucceeded at Friday, October 30, 2026 1:30:33 AM (Elapsed Time: 0.02 seconds)"
+  },
+  "sparse": {
+    "status": "succeeded",
+    "fields": [
+      {
+        "name": "FID",
+        "type": "OID",
+        "length": 4
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "length": 0
+      },
+      {
+        "name": "InclProb",
+        "type": "Single",
+        "length": 13
+      }
+    ],
+    "rows": [
+      [
+        1.0,
+        [
+          500035.0,
+          5000125.0
+        ]
+      ],
+      [
+        1.0,
+        [
+          500055.0,
+          5000105.0
+        ]
+      ],
+      [
+        1.0,
+        [
+          500095.0,
+          5000065.0
+        ]
+      ],
+      [
+        1.0,
+        [
+          500125.0,
+          5000035.0
+        ]
+      ]
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 1:30:33 AM\nSeed = 23\nSucceeded at Friday, October 30, 2026 1:30:33 AM (Elapsed Time: 0.02 seconds)"
+  },
+  "invalid": {
+    "status": "failed",
+    "error": "ERROR 045037: Raster 'Z:\\tmp\\unigis-balanced-probe\\invalid.tif' has values outside range [0;1]\nFailed to execute (CreateSpatiallyBalancedPoints).\n",
+    "messages": "Start Time: Friday, October 30, 2026 1:30:33 AM\nSeed = 23\nERROR 045037: Raster 'Z:\\tmp\\unigis-balanced-probe\\invalid.tif' has values outside range [0;1]\nFailed to execute (CreateSpatiallyBalancedPoints).\nFailed at Friday, October 30, 2026 1:30:33 AM (Elapsed Time: 0.02 seconds)"
+  },
+  "zero": {
+    "status": "failed",
+    "error": "Failed to execute. Parameters are not valid.\nERROR 000854: The value is out of the range from 1 to 2.14748e+09.\nFailed to execute (CreateSpatiallyBalancedPoints).\n",
+    "messages": "Start Time: Friday, October 30, 2026 1:30:33 AM\nFailed to execute. Parameters are not valid.\nERROR 000854: The value is out of the range from 1 to 2.14748e+09.\nFailed to execute (CreateSpatiallyBalancedPoints).\nFailed at Friday, October 30, 2026 1:30:33 AM (Elapsed Time: 0.01 seconds)"
+  }
+}
