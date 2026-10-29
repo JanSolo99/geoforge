@@ -109,3 +109,12 @@ Update this file when a gap is found or closed.
   comparisons supported; external matrix tables/files, consistency-ratio UI and
   field-name collisions/truncation remain unsupported or unverified. Evidence:
   `scripts/research/pairwise_weights/README.md`.
+
+- Generate Origin-Destination Links: planar, unaggregated links in a shared
+  projected WKT1 CRS are implemented. Geodesic/geographic/mixed-CRS links,
+  aggregation/statistics, noninteger or negative destination counts, fractional/
+  date groups and 64-bit OIDs are refused. Non-shapefile output schemas and Z/M
+  behavior remain unverified. ArcGIS 3.7 PLANAR count limits follow qualifying
+  destination input order in two probe sets (despite the parameter's nearest
+  wording); native matches those controls. Evidence:
+  `scripts/research/origin_destination/README.md`.

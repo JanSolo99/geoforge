@@ -1144,6 +1144,74 @@ fn copy_rows(ctx: &dyn Context) -> Result<Outcome> {
     Ok(Outcome::Table(table))
 }
 
+fn generate_origin_destination_links(ctx: &dyn Context) -> Result<ToolOutput> {
+    let t = find("generate_origin_destination_links").unwrap();
+    if text(ctx, t, "line_type").is_some_and(|v| !v.eq_ignore_ascii_case("PLANAR")) {
+        return Err(Error::Unsupported(
+            "GEODESIC links are not yet supported".into(),
+        ));
+    }
+    if text(ctx, t, "aggregate_links").is_some_and(|v| !v.eq_ignore_ascii_case("NO_AGGREGATE"))
+        || text(ctx, t, "sum_fields").is_some()
+    {
+        return Err(Error::Unsupported(
+            "aggregated links and summary fields are not yet supported".into(),
+        ));
+    }
+    let orig_group = text(ctx, t, "origin_group_field");
+    let dest_group = text(ctx, t, "destination_group_field");
+    if orig_group.is_some() != dest_group.is_some() {
+        return Err(Error::Unsupported(
+            "ERROR 000735: both group fields are required when grouping".into(),
+        ));
+    }
+    let nearest = text(ctx, t, "num_nearest")
+        .map(|v| -> Result<usize> {
+            let n = v
+                .parse::<f64>()
+                .map_err(|_| Error::Unsupported("invalid destination count".into()))?;
+            if !n.is_finite() || n < 0.0 || n.fract() != 0.0 || n > u32::MAX as f64 {
+                return Err(Error::Unsupported(
+                    "destination count must be a finite nonnegative integer".into(),
+                ));
+            }
+            Ok(n as usize)
+        })
+        .transpose()?;
+    let radius = text(ctx, t, "search_distance")
+        .map(|v| {
+            v.parse::<f64>()
+                .map_err(|_| Error::Unsupported("invalid search distance".into()))
+        })
+        .transpose()?;
+    let origin_path = ctx.get("origin_features");
+    let dest_path = ctx.get("destination_features");
+    let same_source = origin_path == dest_path
+        || origin_path
+            .as_ref()
+            .zip(dest_path.as_ref())
+            .is_some_and(|(a, b)| {
+                std::fs::canonicalize(a)
+                    .ok()
+                    .zip(std::fs::canonicalize(b).ok())
+                    .is_some_and(|(a, b)| a == b)
+            });
+    let origins = ctx.features("origin_features")?;
+    let destinations = ctx.features("destination_features")?;
+    let unit = text(ctx, t, "distance_unit");
+    crate::origin_destination::generate(
+        origins.as_ref(),
+        destinations.as_ref(),
+        &crate::origin_destination::Options {
+            groups: orig_group.as_deref().zip(dest_group.as_deref()),
+            num_nearest: nearest,
+            search_distance: radius,
+            distance_unit: unit.as_deref(),
+            same_source,
+        },
+    )
+}
+
 fn assign_weights_by_pairwise_comparison(ctx: &dyn Context) -> Result<Outcome> {
     let t = find("assign_weights_by_pairwise_comparison")
         .ok_or_else(|| Error::Unsupported("assign_weights_by_pairwise_comparison".into()))?;
@@ -1793,6 +1861,110 @@ pub static TOOLS: &[Tool] = &[
         output_suffix: "Encoded",
         measures: false,
         run: Runner::Features(encode_field),
+    },
+    Tool {
+        id: "generate_origin_destination_links",
+        name: "Generate Origin-Destination Links",
+        toolbox: "Analysis › Proximity",
+        summary: "Generate planar links between projected feature centroids, with groups, destination limits and search distances.",
+        params: &[
+            Param {
+                name: "origin_features",
+                label: "Origin Features",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "destination_features",
+                label: "Destination Features",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "origin_group_field",
+                label: "Origin Group Field",
+                kind: Kind::Field {
+                    of: "origin_features",
+                    numeric: false,
+                },
+                required: false,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "destination_group_field",
+                label: "Destination Group Field",
+                kind: Kind::Field {
+                    of: "destination_features",
+                    numeric: false,
+                },
+                required: false,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "line_type",
+                label: "Line Type",
+                kind: Kind::Choice(&["PLANAR", "GEODESIC"]),
+                required: false,
+                default: "PLANAR",
+                help: "Geodesic links are not yet supported.",
+            },
+            Param {
+                name: "num_nearest",
+                label: "Number of Nearest Destinations",
+                kind: Kind::Number,
+                required: false,
+                default: "",
+                help: "Zero or omitted means all. ArcGIS 3.7 PLANAR controls take qualifying destinations in input order.",
+            },
+            Param {
+                name: "search_distance",
+                label: "Search Distance",
+                kind: Kind::Number,
+                required: false,
+                default: "",
+                help: "Zero or omitted means unlimited; measured in Distance Unit.",
+            },
+            Param {
+                name: "distance_unit",
+                label: "Distance Unit",
+                kind: Kind::Choice(&[
+                    "METERS",
+                    "KILOMETERS",
+                    "MILES",
+                    "NAUTICALMILES",
+                    "YARDS",
+                    "FEET",
+                ]),
+                required: false,
+                default: "",
+                help: "Default: origin coordinate units.",
+            },
+            Param {
+                name: "aggregate_links",
+                label: "Aggregate Overlapping Links",
+                kind: Kind::Choice(&["NO_AGGREGATE", "AGGREGATE_OVERLAPPING"]),
+                required: false,
+                default: "NO_AGGREGATE",
+                help: "Aggregation is not yet supported.",
+            },
+            Param {
+                name: "sum_fields",
+                label: "Summary Fields",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "Summary fields are not yet supported.",
+            },
+        ],
+        output_suffix: "ODLinks",
+        measures: false,
+        run: Runner::Features(generate_origin_destination_links),
     },
     Tool {
         id: "assign_weights_by_pairwise_comparison",

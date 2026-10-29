@@ -827,3 +827,9 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Assign Weights By Pairwise Comparison: 2–9 variables, default equal weights,
       ordered pair strings/fractions, ADD_MATRIX and WEIGHTS_ONLY. Six successful
       ArcGIS cases and four refusals; findings in scripts/research/pairwise_weights/.
+
+- [x] Generate Origin-Destination Links: native planar implementation and 14
+      saved ArcGIS cases (groups, integer destination limits, search/units,
+      self/coincident links, centroids, empty output) match the ArcGIS controls.
+      Geodesic and aggregated output remain gaps; findings in
+      scripts/research/origin_destination/README.md.

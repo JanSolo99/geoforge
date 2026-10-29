@@ -77169,6 +77169,1472 @@
           "comparison_matrix": "Variables A B 9.5; A C 1; B C 1"
         }
       }
+    },
+    "odl_default": {
+      "tool": "analysis.GenerateOriginDestinationLinks",
+      "args": [
+        "testdata/geoproc/od_origins.shp",
+        "testdata/geoproc/od_destinations.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEST_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LINK_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "COLOR_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "generate_origin_destination_links",
+        "params": {
+          "origin_features": "testdata/geoproc/od_origins.shp",
+          "destination_features": "testdata/geoproc/od_destinations.shp",
+          "output": "<out>"
+        }
+      }
+    },
+    "odl_groups": {
+      "tool": "analysis.GenerateOriginDestinationLinks",
+      "args": [
+        "testdata/geoproc/od_origins.shp",
+        "testdata/geoproc/od_destinations.shp",
+        "<out>",
+        "GRP",
+        "GRP"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEST_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LINK_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "GROUP_ID",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "COLOR_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "generate_origin_destination_links",
+        "params": {
+          "origin_features": "testdata/geoproc/od_origins.shp",
+          "destination_features": "testdata/geoproc/od_destinations.shp",
+          "output": "<out>",
+          "origin_group_field": "GRP",
+          "destination_group_field": "GRP"
+        }
+      }
+    },
+    "odl_nearest": {
+      "tool": "analysis.GenerateOriginDestinationLinks",
+      "args": [
+        "testdata/geoproc/od_origins.shp",
+        "testdata/geoproc/od_destinations.shp",
+        "<out>",
+        "",
+        "",
+        "PLANAR",
+        1
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEST_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LINK_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "COLOR_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "generate_origin_destination_links",
+        "params": {
+          "origin_features": "testdata/geoproc/od_origins.shp",
+          "destination_features": "testdata/geoproc/od_destinations.shp",
+          "output": "<out>",
+          "line_type": "PLANAR",
+          "num_nearest": 1
+        }
+      }
+    },
+    "odl_search": {
+      "tool": "analysis.GenerateOriginDestinationLinks",
+      "args": [
+        "testdata/geoproc/od_origins.shp",
+        "testdata/geoproc/od_destinations.shp",
+        "<out>",
+        "",
+        "",
+        "PLANAR",
+        "",
+        100
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEST_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LINK_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "COLOR_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "generate_origin_destination_links",
+        "params": {
+          "origin_features": "testdata/geoproc/od_origins.shp",
+          "destination_features": "testdata/geoproc/od_destinations.shp",
+          "output": "<out>",
+          "line_type": "PLANAR",
+          "search_distance": 100
+        }
+      }
+    },
+    "odl_km": {
+      "tool": "analysis.GenerateOriginDestinationLinks",
+      "args": [
+        "testdata/geoproc/od_origins.shp",
+        "testdata/geoproc/od_destinations.shp",
+        "<out>",
+        "",
+        "",
+        "PLANAR",
+        2,
+        0.15,
+        "KILOMETERS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEST_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LINK_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "COLOR_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "generate_origin_destination_links",
+        "params": {
+          "origin_features": "testdata/geoproc/od_origins.shp",
+          "destination_features": "testdata/geoproc/od_destinations.shp",
+          "output": "<out>",
+          "line_type": "PLANAR",
+          "num_nearest": 2,
+          "search_distance": 0.15,
+          "distance_unit": "KILOMETERS"
+        }
+      }
+    },
+    "odl_same": {
+      "tool": "analysis.GenerateOriginDestinationLinks",
+      "args": [
+        "testdata/geoproc/od_origins.shp",
+        "testdata/geoproc/od_origins.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEST_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LINK_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "COLOR_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "generate_origin_destination_links",
+        "params": {
+          "origin_features": "testdata/geoproc/od_origins.shp",
+          "destination_features": "testdata/geoproc/od_origins.shp",
+          "output": "<out>"
+        }
+      }
+    },
+    "odl_reordered_nearest": {
+      "tool": "analysis.GenerateOriginDestinationLinks",
+      "args": [
+        "testdata/geoproc/od_more_origins.shp",
+        "testdata/geoproc/od_more_destinations.shp",
+        "<out>",
+        "",
+        "",
+        "PLANAR",
+        1
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEST_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LINK_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "COLOR_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "generate_origin_destination_links",
+        "params": {
+          "origin_features": "testdata/geoproc/od_more_origins.shp",
+          "destination_features": "testdata/geoproc/od_more_destinations.shp",
+          "output": "<out>",
+          "line_type": "PLANAR",
+          "num_nearest": 1
+        }
+      }
+    },
+    "odl_reordered_groups": {
+      "tool": "analysis.GenerateOriginDestinationLinks",
+      "args": [
+        "testdata/geoproc/od_more_origins.shp",
+        "testdata/geoproc/od_more_destinations.shp",
+        "<out>",
+        "GRP",
+        "GRP"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEST_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LINK_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "GROUP_ID",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "COLOR_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "generate_origin_destination_links",
+        "params": {
+          "origin_features": "testdata/geoproc/od_more_origins.shp",
+          "destination_features": "testdata/geoproc/od_more_destinations.shp",
+          "output": "<out>",
+          "origin_group_field": "GRP",
+          "destination_group_field": "GRP"
+        }
+      }
+    },
+    "odl_numeric_groups": {
+      "tool": "analysis.GenerateOriginDestinationLinks",
+      "args": [
+        "testdata/geoproc/od_more_origins.shp",
+        "testdata/geoproc/od_more_destinations.shp",
+        "<out>",
+        "NUM",
+        "NUM"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEST_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LINK_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "GROUP_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "COLOR_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "generate_origin_destination_links",
+        "params": {
+          "origin_features": "testdata/geoproc/od_more_origins.shp",
+          "destination_features": "testdata/geoproc/od_more_destinations.shp",
+          "output": "<out>",
+          "origin_group_field": "NUM",
+          "destination_group_field": "NUM"
+        }
+      }
+    },
+    "odl_group_nearest": {
+      "tool": "analysis.GenerateOriginDestinationLinks",
+      "args": [
+        "testdata/geoproc/od_more_origins.shp",
+        "testdata/geoproc/od_more_destinations.shp",
+        "<out>",
+        "GRP",
+        "GRP",
+        "PLANAR",
+        1
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEST_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LINK_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "GROUP_ID",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "COLOR_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "generate_origin_destination_links",
+        "params": {
+          "origin_features": "testdata/geoproc/od_more_origins.shp",
+          "destination_features": "testdata/geoproc/od_more_destinations.shp",
+          "output": "<out>",
+          "origin_group_field": "GRP",
+          "destination_group_field": "GRP",
+          "line_type": "PLANAR",
+          "num_nearest": 1
+        }
+      }
+    },
+    "odl_polygon": {
+      "tool": "analysis.GenerateOriginDestinationLinks",
+      "args": [
+        "testdata/geoproc/od_polygon.shp",
+        "testdata/geoproc/od_more_destinations.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEST_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LINK_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "COLOR_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "generate_origin_destination_links",
+        "params": {
+          "origin_features": "testdata/geoproc/od_polygon.shp",
+          "destination_features": "testdata/geoproc/od_more_destinations.shp",
+          "output": "<out>"
+        }
+      }
+    },
+    "odl_line": {
+      "tool": "analysis.GenerateOriginDestinationLinks",
+      "args": [
+        "testdata/geoproc/od_line.shp",
+        "testdata/geoproc/od_more_destinations.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEST_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LINK_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "COLOR_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "generate_origin_destination_links",
+        "params": {
+          "origin_features": "testdata/geoproc/od_line.shp",
+          "destination_features": "testdata/geoproc/od_more_destinations.shp",
+          "output": "<out>"
+        }
+      }
+    },
+    "odl_zero_limits": {
+      "tool": "analysis.GenerateOriginDestinationLinks",
+      "args": [
+        "testdata/geoproc/od_origins.shp",
+        "testdata/geoproc/od_destinations.shp",
+        "<out>",
+        "",
+        "",
+        "PLANAR",
+        0,
+        0
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEST_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LINK_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "COLOR_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "generate_origin_destination_links",
+        "params": {
+          "origin_features": "testdata/geoproc/od_origins.shp",
+          "destination_features": "testdata/geoproc/od_destinations.shp",
+          "output": "<out>",
+          "line_type": "PLANAR",
+          "num_nearest": 0,
+          "search_distance": 0
+        }
+      }
+    },
+    "odl_empty": {
+      "tool": "analysis.GenerateOriginDestinationLinks",
+      "args": [
+        "testdata/geoproc/od_polygon.shp",
+        "testdata/geoproc/od_destinations.shp",
+        "<out>",
+        "",
+        "",
+        "PLANAR",
+        "",
+        0.001
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000117: Warning empty output generated."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ORIG_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ORIG_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEST_X",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "DEST_Y",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "LINK_DIST",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "COLOR_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "generate_origin_destination_links",
+        "params": {
+          "origin_features": "testdata/geoproc/od_polygon.shp",
+          "destination_features": "testdata/geoproc/od_destinations.shp",
+          "output": "<out>",
+          "line_type": "PLANAR",
+          "search_distance": 0.001
+        }
+      }
     }
   }
 }
