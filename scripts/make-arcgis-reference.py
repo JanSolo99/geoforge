@@ -77,6 +77,29 @@ DM = ROOT / "testdata" / "dm"
 
 CASES = {
     # name: (tool, args before the output, args after the output)
+    **{f"ssl_{name}": ("management.CreateSpatialSamplingLocations", [DATA / "ssl_areas.shp"],
+        [method, field, allocation, shape, size, "7", count, per_stratum, population, geometry, gap, relation])
+       for name, method, field, allocation, shape, size, count, per_stratum, population, geometry, gap, relation in [
+        ("default", "", "", "", "", "", "", "", "", "", "", ""),
+        ("random", "RANDOM", "", "EQUAL", "HEXAGON", "", "7", "", "", "POINT", "0", "HAVE_THEIR_CENTER_IN"),
+        ("poly_equal", "STRAT_POLY", "", "EQUAL", "", "", "", "3", "", "", "0", ""),
+        ("poly_area", "STRAT_POLY", "", "PROP_AREA", "", "", "7", "", "", "", "0", ""),
+        ("poly_field", "STRAT_POLY", "", "FIELD", "", "", "", "", "POP", "", "0", ""),
+        ("poly_pop", "STRAT_POLY", "", "PROP_FIELD", "", "", "9", "", "POP", "", "0", ""),
+        ("id_equal", "STRAT_ID", "STRATUM", "EQUAL", "", "", "", "2", "", "", "0", ""),
+        ("id_area", "STRAT_ID", "STRATUM", "PROP_AREA", "", "", "7", "", "", "", "0", ""),
+        ("id_field", "STRAT_ID", "STRATUM", "FIELD", "", "", "", "", "POP", "", "0", ""),
+        ("id_pop", "STRAT_ID", "STRATUM", "PROP_FIELD", "", "", "9", "", "POP", "", "0", ""),
+        ("spaced", "RANDOM", "", "", "", "", "6", "", "", "", "3 Meters", ""),
+        ("impossible", "RANDOM", "", "", "", "", "4", "", "", "", "100 Meters", ""),
+        ("zero", "RANDOM", "", "", "", "", "0", "", "", "", "", ""),
+        ("negative", "RANDOM", "", "", "", "", "-1", "", "", "", "", ""),
+        ("id_missing", "STRAT_ID", "", "EQUAL", "", "", "", "2", "", "", "", ""),
+        *[(f"system_{shape.lower()}", "SYSTEMATIC", "", "", shape, "100 SquareMeters", "", "", "", "POINT", "", "HAVE_THEIR_CENTER_IN") for shape in ["SQUARE", "DIAMOND", "HEXAGON", "TRANSVERSE_HEXAGON", "TRIANGLE"]],
+        ("system_polygon", "SYSTEMATIC", "", "", "SQUARE", "100 SquareMeters", "", "", "", "POLYGON", "", "HAVE_THEIR_CENTER_IN"),
+        ("system_intersect", "SYSTEMATIC", "", "", "SQUARE", "100 SquareMeters", "", "", "", "POLYGON", "", "INTERSECT"),
+        ("system_within", "SYSTEMATIC", "", "", "SQUARE", "100 SquareMeters", "", "", "", "POLYGON", "", "COMPLETELY_WITHIN"),
+    ]},
     **{f"rnp_{name}": ("management.CreateRandomPoints", [], [fc, extent, n, gap, multi, size])
        for name, fc, extent, n, gap, multi, size in [
         ("extent", "", "0 0 20 10", "7", "0", "POINT", "10"),
@@ -2131,6 +2154,7 @@ for _tool, _id in COMBINATORIAL:
 
 
 RUN = {
+    "management.CreateSpatialSamplingLocations": ("create_spatial_sampling_locations", ["input", "output", "sampling_method", "strata_id_field", "strata_count_method", "bin_shape", "bin_size", "h3_resolution", "num_samples", "num_samples_per_strata", "population_field", "geometry_type", "min_distance", "spatial_relationship"]),
     "management.CreateRandomPoints": ("create_random_points", ["output", "constraining_feature_class", "constraining_extent", "number_of_points_or_field", "minimum_allowed_distance", "create_multipoint_output", "multipoint_size"]),
     "management.ExtractDataFromGeodatabase": ("extract_data_from_geodatabase", ["in_data", "extract_type", "out_type", "out_geodatabase", "out_xml", "out_folder_path", "out_name", "expand_feature_classes_and_tables", "reuse_schema", "get_related_data", "extract_using_geometry_features", "geometry_filter_type", "all_records_for_tables"]),
     "gp.Nibble_sa": ("nibble", ["input", "mask", "output", "values", "nodata"]),
@@ -2587,6 +2611,8 @@ def main():
             "fields": [[f["name"], f["type"], f["length"], f["precision"], f["scale"]] for f in d.get("fields", [])],
             "shapeType": d.get("shapeType"),
         }
+        if tool == "management.CreateSpatialSamplingLocations" and (not after[0] or after[0] != "SYSTEMATIC"):
+            manifest["cases"][name]["stochastic_sampling"] = True
         if tool == "management.CreateRandomPoints":
             manifest["cases"][name]["stochastic_points"] = True
         if tool in ("management.DisableCOGO", "management.EnableCOGO", "management.DisableEditorTracking", "management.MigrateDateFieldToHighPrecision"):

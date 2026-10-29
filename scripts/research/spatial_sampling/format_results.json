@@ -1,0 +1,58 @@
+{
+  "poly_equal": {
+    "cids": [
+      1,
+      1,
+      2,
+      2,
+      3,
+      3
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 12:59:57 AM\nSucceeded at Friday, October 30, 2026 12:59:58 AM (Elapsed Time: 0.54 seconds)"
+  },
+  "poly_area": {
+    "cids": [
+      0,
+      1,
+      1,
+      1,
+      1,
+      2,
+      2
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 12:59:58 AM\nSucceeded at Friday, October 30, 2026 12:59:59 AM (Elapsed Time: 1.19 seconds)"
+  },
+  "poly_pop": {
+    "cids": [
+      0,
+      1,
+      1,
+      2,
+      2,
+      2,
+      2
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 12:59:59 AM\nSucceeded at Friday, October 30, 2026 1:00:00 AM (Elapsed Time: 0.54 seconds)"
+  },
+  "id_equal": {
+    "cids": [
+      1,
+      1,
+      2,
+      2
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 1:00:00 AM\nSucceeded at Friday, October 30, 2026 1:00:00 AM (Elapsed Time: 0.50 seconds)"
+  },
+  "id_pop": {
+    "cids": [
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1
+    ],
+    "messages": "Start Time: Friday, October 30, 2026 1:00:00 AM\nSucceeded at Friday, October 30, 2026 1:00:01 AM (Elapsed Time: 0.51 seconds)"
+  }
+}

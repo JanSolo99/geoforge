@@ -3958,5 +3958,6 @@ pub static TOOLS: &[Tool] = &[
     crate::date_precision::MIGRATE,
     crate::extract_data::TOOL,
     crate::random_points::TOOL,
+    crate::spatial_sampling::TOOL,
     crate::neighbors::COUNT_OVERLAPPING_FEATURES,
 ];

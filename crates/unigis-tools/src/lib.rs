@@ -29,6 +29,7 @@ pub mod pycalc;
 pub mod random_points;
 pub mod registry;
 pub mod regression;
+pub mod spatial_sampling;
 pub mod spatstat;
 pub mod split_attributes;
 mod sql;

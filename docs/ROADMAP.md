@@ -818,6 +818,12 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Adjust 3D Z (reverse, constant or field shift, US-survey unit conversion): 6 in-place `a3z_*`
       cases over point, line, polygon and multipoint Z shapefiles match ArcGIS. Evidence:
       `scripts/research/adjust_3d_z/README.md`.
+- [x] Create Spatial Sampling Locations (`create_spatial_sampling_locations`):
+  polygon RANDOM, STRAT_POLY/STRAT_ID with equal/area/population allocations, spacing;
+  SYSTEMATIC with five area-unit bin shapes and point/polygon inclusion modes.
+ 23 public references; random contracts and strict systematic comparisons. Raster,
+  cluster, H3, count-based bin search and environments remain gaps. Research:
+  `scripts/research/spatial_sampling/README.md`.
 - [x] Create Random Points (`create_random_points`): planar extent/polygon/line
   sampling and point subsets, per-feature count/distance fields, spacing/saturation,
   multipoint chunks and CID/Id. Native reproducible seed; random coordinates differ

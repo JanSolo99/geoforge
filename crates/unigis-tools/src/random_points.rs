@@ -494,6 +494,32 @@ fn run(ctx: &dyn Context) -> Result<ToolOutput> {
     Ok(out)
 }
 
+/// Shared planar polygon sampler for sampling designs. Keeping this here lets
+/// each design choose its own grouping, allocation and warnings without changing
+/// Create Random Points semantics.
+pub(crate) fn polygon_points(
+    geometry: &Geometry,
+    count: usize,
+    distance: f64,
+    seed: u64,
+) -> Result<Vec<[f64; 2]>> {
+    let mut rng = Rng(seed);
+    let mut spacing = Spacing::new(distance);
+    let mut points = Vec::new();
+    let mut misses = 0;
+    while points.len() < count && misses < 10_000 {
+        if let Some(p) = sample(geometry, &mut rng)?
+            && spacing.accept(p)
+        {
+            points.push(p);
+            misses = 0;
+        } else {
+            misses += 1;
+        }
+    }
+    Ok(points)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

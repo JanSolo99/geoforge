@@ -95467,6 +95467,1400 @@
           "multipoint_size": "10"
         }
       }
+    },
+    "ssl_default": {
+      "tool": "management.CreateSpatialSamplingLocations",
+      "args": [
+        "testdata/geoproc/ssl_areas.shp",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "7",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "stochastic_sampling": true,
+      "run": {
+        "tool": "create_spatial_sampling_locations",
+        "params": {
+          "input": "testdata/geoproc/ssl_areas.shp",
+          "output": "<out>",
+          "h3_resolution": "7"
+        }
+      }
+    },
+    "ssl_random": {
+      "tool": "management.CreateSpatialSamplingLocations",
+      "args": [
+        "testdata/geoproc/ssl_areas.shp",
+        "<out>",
+        "RANDOM",
+        "",
+        "EQUAL",
+        "HEXAGON",
+        "",
+        "7",
+        "7",
+        "",
+        "",
+        "POINT",
+        "0",
+        "HAVE_THEIR_CENTER_IN"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "stochastic_sampling": true,
+      "run": {
+        "tool": "create_spatial_sampling_locations",
+        "params": {
+          "input": "testdata/geoproc/ssl_areas.shp",
+          "output": "<out>",
+          "sampling_method": "RANDOM",
+          "strata_count_method": "EQUAL",
+          "bin_shape": "HEXAGON",
+          "h3_resolution": "7",
+          "num_samples": "7",
+          "geometry_type": "POINT",
+          "min_distance": "0",
+          "spatial_relationship": "HAVE_THEIR_CENTER_IN"
+        }
+      }
+    },
+    "ssl_poly_equal": {
+      "tool": "management.CreateSpatialSamplingLocations",
+      "args": [
+        "testdata/geoproc/ssl_areas.shp",
+        "<out>",
+        "STRAT_POLY",
+        "",
+        "EQUAL",
+        "",
+        "",
+        "7",
+        "",
+        "3",
+        "",
+        "",
+        "0",
+        ""
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "stochastic_sampling": true,
+      "run": {
+        "tool": "create_spatial_sampling_locations",
+        "params": {
+          "input": "testdata/geoproc/ssl_areas.shp",
+          "output": "<out>",
+          "sampling_method": "STRAT_POLY",
+          "strata_count_method": "EQUAL",
+          "h3_resolution": "7",
+          "num_samples_per_strata": "3",
+          "min_distance": "0"
+        }
+      }
+    },
+    "ssl_poly_area": {
+      "tool": "management.CreateSpatialSamplingLocations",
+      "args": [
+        "testdata/geoproc/ssl_areas.shp",
+        "<out>",
+        "STRAT_POLY",
+        "",
+        "PROP_AREA",
+        "",
+        "",
+        "7",
+        "7",
+        "",
+        "",
+        "",
+        "0",
+        ""
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "stochastic_sampling": true,
+      "run": {
+        "tool": "create_spatial_sampling_locations",
+        "params": {
+          "input": "testdata/geoproc/ssl_areas.shp",
+          "output": "<out>",
+          "sampling_method": "STRAT_POLY",
+          "strata_count_method": "PROP_AREA",
+          "h3_resolution": "7",
+          "num_samples": "7",
+          "min_distance": "0"
+        }
+      }
+    },
+    "ssl_poly_field": {
+      "tool": "management.CreateSpatialSamplingLocations",
+      "args": [
+        "testdata/geoproc/ssl_areas.shp",
+        "<out>",
+        "STRAT_POLY",
+        "",
+        "FIELD",
+        "",
+        "",
+        "7",
+        "",
+        "",
+        "POP",
+        "",
+        "0",
+        ""
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "stochastic_sampling": true,
+      "run": {
+        "tool": "create_spatial_sampling_locations",
+        "params": {
+          "input": "testdata/geoproc/ssl_areas.shp",
+          "output": "<out>",
+          "sampling_method": "STRAT_POLY",
+          "strata_count_method": "FIELD",
+          "h3_resolution": "7",
+          "population_field": "POP",
+          "min_distance": "0"
+        }
+      }
+    },
+    "ssl_poly_pop": {
+      "tool": "management.CreateSpatialSamplingLocations",
+      "args": [
+        "testdata/geoproc/ssl_areas.shp",
+        "<out>",
+        "STRAT_POLY",
+        "",
+        "PROP_FIELD",
+        "",
+        "",
+        "7",
+        "9",
+        "",
+        "POP",
+        "",
+        "0",
+        ""
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "stochastic_sampling": true,
+      "run": {
+        "tool": "create_spatial_sampling_locations",
+        "params": {
+          "input": "testdata/geoproc/ssl_areas.shp",
+          "output": "<out>",
+          "sampling_method": "STRAT_POLY",
+          "strata_count_method": "PROP_FIELD",
+          "h3_resolution": "7",
+          "num_samples": "9",
+          "population_field": "POP",
+          "min_distance": "0"
+        }
+      }
+    },
+    "ssl_id_equal": {
+      "tool": "management.CreateSpatialSamplingLocations",
+      "args": [
+        "testdata/geoproc/ssl_areas.shp",
+        "<out>",
+        "STRAT_ID",
+        "STRATUM",
+        "EQUAL",
+        "",
+        "",
+        "7",
+        "",
+        "2",
+        "",
+        "",
+        "0",
+        ""
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "stochastic_sampling": true,
+      "run": {
+        "tool": "create_spatial_sampling_locations",
+        "params": {
+          "input": "testdata/geoproc/ssl_areas.shp",
+          "output": "<out>",
+          "sampling_method": "STRAT_ID",
+          "strata_id_field": "STRATUM",
+          "strata_count_method": "EQUAL",
+          "h3_resolution": "7",
+          "num_samples_per_strata": "2",
+          "min_distance": "0"
+        }
+      }
+    },
+    "ssl_id_area": {
+      "tool": "management.CreateSpatialSamplingLocations",
+      "args": [
+        "testdata/geoproc/ssl_areas.shp",
+        "<out>",
+        "STRAT_ID",
+        "STRATUM",
+        "PROP_AREA",
+        "",
+        "",
+        "7",
+        "7",
+        "",
+        "",
+        "",
+        "0",
+        ""
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "stochastic_sampling": true,
+      "run": {
+        "tool": "create_spatial_sampling_locations",
+        "params": {
+          "input": "testdata/geoproc/ssl_areas.shp",
+          "output": "<out>",
+          "sampling_method": "STRAT_ID",
+          "strata_id_field": "STRATUM",
+          "strata_count_method": "PROP_AREA",
+          "h3_resolution": "7",
+          "num_samples": "7",
+          "min_distance": "0"
+        }
+      }
+    },
+    "ssl_id_field": {
+      "tool": "management.CreateSpatialSamplingLocations",
+      "args": [
+        "testdata/geoproc/ssl_areas.shp",
+        "<out>",
+        "STRAT_ID",
+        "STRATUM",
+        "FIELD",
+        "",
+        "",
+        "7",
+        "",
+        "",
+        "POP",
+        "",
+        "0",
+        ""
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "stochastic_sampling": true,
+      "run": {
+        "tool": "create_spatial_sampling_locations",
+        "params": {
+          "input": "testdata/geoproc/ssl_areas.shp",
+          "output": "<out>",
+          "sampling_method": "STRAT_ID",
+          "strata_id_field": "STRATUM",
+          "strata_count_method": "FIELD",
+          "h3_resolution": "7",
+          "population_field": "POP",
+          "min_distance": "0"
+        }
+      }
+    },
+    "ssl_id_pop": {
+      "tool": "management.CreateSpatialSamplingLocations",
+      "args": [
+        "testdata/geoproc/ssl_areas.shp",
+        "<out>",
+        "STRAT_ID",
+        "STRATUM",
+        "PROP_FIELD",
+        "",
+        "",
+        "7",
+        "9",
+        "",
+        "POP",
+        "",
+        "0",
+        ""
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "stochastic_sampling": true,
+      "run": {
+        "tool": "create_spatial_sampling_locations",
+        "params": {
+          "input": "testdata/geoproc/ssl_areas.shp",
+          "output": "<out>",
+          "sampling_method": "STRAT_ID",
+          "strata_id_field": "STRATUM",
+          "strata_count_method": "PROP_FIELD",
+          "h3_resolution": "7",
+          "num_samples": "9",
+          "population_field": "POP",
+          "min_distance": "0"
+        }
+      }
+    },
+    "ssl_spaced": {
+      "tool": "management.CreateSpatialSamplingLocations",
+      "args": [
+        "testdata/geoproc/ssl_areas.shp",
+        "<out>",
+        "RANDOM",
+        "",
+        "",
+        "",
+        "",
+        "7",
+        "6",
+        "",
+        "",
+        "",
+        "3 Meters",
+        ""
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "stochastic_sampling": true,
+      "run": {
+        "tool": "create_spatial_sampling_locations",
+        "params": {
+          "input": "testdata/geoproc/ssl_areas.shp",
+          "output": "<out>",
+          "sampling_method": "RANDOM",
+          "h3_resolution": "7",
+          "num_samples": "6",
+          "min_distance": "3 Meters"
+        }
+      }
+    },
+    "ssl_impossible": {
+      "tool": "management.CreateSpatialSamplingLocations",
+      "args": [
+        "testdata/geoproc/ssl_areas.shp",
+        "<out>",
+        "RANDOM",
+        "",
+        "",
+        "",
+        "",
+        "7",
+        "4",
+        "",
+        "",
+        "",
+        "100 Meters",
+        ""
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 110547: The specified number of locations could not be created in all cases."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "CID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "stochastic_sampling": true,
+      "run": {
+        "tool": "create_spatial_sampling_locations",
+        "params": {
+          "input": "testdata/geoproc/ssl_areas.shp",
+          "output": "<out>",
+          "sampling_method": "RANDOM",
+          "h3_resolution": "7",
+          "num_samples": "4",
+          "min_distance": "100 Meters"
+        }
+      }
+    },
+    "ssl_zero": {
+      "tool": "management.CreateSpatialSamplingLocations",
+      "args": [
+        "testdata/geoproc/ssl_areas.shp",
+        "<out>",
+        "RANDOM",
+        "",
+        "",
+        "",
+        "",
+        "7",
+        "0",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000531: Value must be greater than zero",
+        "Failed to execute (CreateSpatialSamplingLocations)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "stochastic_sampling": true,
+      "run": {
+        "tool": "create_spatial_sampling_locations",
+        "params": {
+          "input": "testdata/geoproc/ssl_areas.shp",
+          "output": "<out>",
+          "sampling_method": "RANDOM",
+          "h3_resolution": "7",
+          "num_samples": "0"
+        }
+      }
+    },
+    "ssl_negative": {
+      "tool": "management.CreateSpatialSamplingLocations",
+      "args": [
+        "testdata/geoproc/ssl_areas.shp",
+        "<out>",
+        "RANDOM",
+        "",
+        "",
+        "",
+        "",
+        "7",
+        "-1",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000531: Value must be greater than zero",
+        "Failed to execute (CreateSpatialSamplingLocations)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "stochastic_sampling": true,
+      "run": {
+        "tool": "create_spatial_sampling_locations",
+        "params": {
+          "input": "testdata/geoproc/ssl_areas.shp",
+          "output": "<out>",
+          "sampling_method": "RANDOM",
+          "h3_resolution": "7",
+          "num_samples": "-1"
+        }
+      }
+    },
+    "ssl_id_missing": {
+      "tool": "management.CreateSpatialSamplingLocations",
+      "args": [
+        "testdata/geoproc/ssl_areas.shp",
+        "<out>",
+        "STRAT_ID",
+        "",
+        "EQUAL",
+        "",
+        "",
+        "7",
+        "",
+        "2",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000530: Value is required",
+        "Failed to execute (CreateSpatialSamplingLocations)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "stochastic_sampling": true,
+      "run": {
+        "tool": "create_spatial_sampling_locations",
+        "params": {
+          "input": "testdata/geoproc/ssl_areas.shp",
+          "output": "<out>",
+          "sampling_method": "STRAT_ID",
+          "strata_count_method": "EQUAL",
+          "h3_resolution": "7",
+          "num_samples_per_strata": "2"
+        }
+      }
+    },
+    "ssl_system_square": {
+      "tool": "management.CreateSpatialSamplingLocations",
+      "args": [
+        "testdata/geoproc/ssl_areas.shp",
+        "<out>",
+        "SYSTEMATIC",
+        "",
+        "",
+        "SQUARE",
+        "100 SquareMeters",
+        "7",
+        "",
+        "",
+        "",
+        "POINT",
+        "",
+        "HAVE_THEIR_CENTER_IN"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Shape_Leng",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Shape_Area",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "GRID_ID",
+          "String",
+          12,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "create_spatial_sampling_locations",
+        "params": {
+          "input": "testdata/geoproc/ssl_areas.shp",
+          "output": "<out>",
+          "sampling_method": "SYSTEMATIC",
+          "bin_shape": "SQUARE",
+          "bin_size": "100 SquareMeters",
+          "h3_resolution": "7",
+          "geometry_type": "POINT",
+          "spatial_relationship": "HAVE_THEIR_CENTER_IN"
+        }
+      }
+    },
+    "ssl_system_diamond": {
+      "tool": "management.CreateSpatialSamplingLocations",
+      "args": [
+        "testdata/geoproc/ssl_areas.shp",
+        "<out>",
+        "SYSTEMATIC",
+        "",
+        "",
+        "DIAMOND",
+        "100 SquareMeters",
+        "7",
+        "",
+        "",
+        "",
+        "POINT",
+        "",
+        "HAVE_THEIR_CENTER_IN"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Shape_Leng",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Shape_Area",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "GRID_ID",
+          "String",
+          12,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "create_spatial_sampling_locations",
+        "params": {
+          "input": "testdata/geoproc/ssl_areas.shp",
+          "output": "<out>",
+          "sampling_method": "SYSTEMATIC",
+          "bin_shape": "DIAMOND",
+          "bin_size": "100 SquareMeters",
+          "h3_resolution": "7",
+          "geometry_type": "POINT",
+          "spatial_relationship": "HAVE_THEIR_CENTER_IN"
+        }
+      }
+    },
+    "ssl_system_hexagon": {
+      "tool": "management.CreateSpatialSamplingLocations",
+      "args": [
+        "testdata/geoproc/ssl_areas.shp",
+        "<out>",
+        "SYSTEMATIC",
+        "",
+        "",
+        "HEXAGON",
+        "100 SquareMeters",
+        "7",
+        "",
+        "",
+        "",
+        "POINT",
+        "",
+        "HAVE_THEIR_CENTER_IN"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Shape_Leng",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Shape_Area",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "GRID_ID",
+          "String",
+          12,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "create_spatial_sampling_locations",
+        "params": {
+          "input": "testdata/geoproc/ssl_areas.shp",
+          "output": "<out>",
+          "sampling_method": "SYSTEMATIC",
+          "bin_shape": "HEXAGON",
+          "bin_size": "100 SquareMeters",
+          "h3_resolution": "7",
+          "geometry_type": "POINT",
+          "spatial_relationship": "HAVE_THEIR_CENTER_IN"
+        }
+      }
+    },
+    "ssl_system_transverse_hexagon": {
+      "tool": "management.CreateSpatialSamplingLocations",
+      "args": [
+        "testdata/geoproc/ssl_areas.shp",
+        "<out>",
+        "SYSTEMATIC",
+        "",
+        "",
+        "TRANSVERSE_HEXAGON",
+        "100 SquareMeters",
+        "7",
+        "",
+        "",
+        "",
+        "POINT",
+        "",
+        "HAVE_THEIR_CENTER_IN"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Shape_Leng",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Shape_Area",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "GRID_ID",
+          "String",
+          12,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "create_spatial_sampling_locations",
+        "params": {
+          "input": "testdata/geoproc/ssl_areas.shp",
+          "output": "<out>",
+          "sampling_method": "SYSTEMATIC",
+          "bin_shape": "TRANSVERSE_HEXAGON",
+          "bin_size": "100 SquareMeters",
+          "h3_resolution": "7",
+          "geometry_type": "POINT",
+          "spatial_relationship": "HAVE_THEIR_CENTER_IN"
+        }
+      }
+    },
+    "ssl_system_triangle": {
+      "tool": "management.CreateSpatialSamplingLocations",
+      "args": [
+        "testdata/geoproc/ssl_areas.shp",
+        "<out>",
+        "SYSTEMATIC",
+        "",
+        "",
+        "TRIANGLE",
+        "100 SquareMeters",
+        "7",
+        "",
+        "",
+        "",
+        "POINT",
+        "",
+        "HAVE_THEIR_CENTER_IN"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Shape_Leng",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Shape_Area",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "GRID_ID",
+          "String",
+          12,
+          0,
+          0
+        ],
+        [
+          "ORIG_FID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "create_spatial_sampling_locations",
+        "params": {
+          "input": "testdata/geoproc/ssl_areas.shp",
+          "output": "<out>",
+          "sampling_method": "SYSTEMATIC",
+          "bin_shape": "TRIANGLE",
+          "bin_size": "100 SquareMeters",
+          "h3_resolution": "7",
+          "geometry_type": "POINT",
+          "spatial_relationship": "HAVE_THEIR_CENTER_IN"
+        }
+      }
+    },
+    "ssl_system_polygon": {
+      "tool": "management.CreateSpatialSamplingLocations",
+      "args": [
+        "testdata/geoproc/ssl_areas.shp",
+        "<out>",
+        "SYSTEMATIC",
+        "",
+        "",
+        "SQUARE",
+        "100 SquareMeters",
+        "7",
+        "",
+        "",
+        "",
+        "POLYGON",
+        "",
+        "HAVE_THEIR_CENTER_IN"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Shape_Leng",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Shape_Area",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "GRID_ID",
+          "String",
+          12,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "create_spatial_sampling_locations",
+        "params": {
+          "input": "testdata/geoproc/ssl_areas.shp",
+          "output": "<out>",
+          "sampling_method": "SYSTEMATIC",
+          "bin_shape": "SQUARE",
+          "bin_size": "100 SquareMeters",
+          "h3_resolution": "7",
+          "geometry_type": "POLYGON",
+          "spatial_relationship": "HAVE_THEIR_CENTER_IN"
+        }
+      }
+    },
+    "ssl_system_intersect": {
+      "tool": "management.CreateSpatialSamplingLocations",
+      "args": [
+        "testdata/geoproc/ssl_areas.shp",
+        "<out>",
+        "SYSTEMATIC",
+        "",
+        "",
+        "SQUARE",
+        "100 SquareMeters",
+        "7",
+        "",
+        "",
+        "",
+        "POLYGON",
+        "",
+        "INTERSECT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Shape_Leng",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Shape_Area",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "GRID_ID",
+          "String",
+          12,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "create_spatial_sampling_locations",
+        "params": {
+          "input": "testdata/geoproc/ssl_areas.shp",
+          "output": "<out>",
+          "sampling_method": "SYSTEMATIC",
+          "bin_shape": "SQUARE",
+          "bin_size": "100 SquareMeters",
+          "h3_resolution": "7",
+          "geometry_type": "POLYGON",
+          "spatial_relationship": "INTERSECT"
+        }
+      }
+    },
+    "ssl_system_within": {
+      "tool": "management.CreateSpatialSamplingLocations",
+      "args": [
+        "testdata/geoproc/ssl_areas.shp",
+        "<out>",
+        "SYSTEMATIC",
+        "",
+        "",
+        "SQUARE",
+        "100 SquareMeters",
+        "7",
+        "",
+        "",
+        "",
+        "POLYGON",
+        "",
+        "COMPLETELY_WITHIN"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 110544: No sample locations were created.",
+        "Failed to execute (CreateSpatialSamplingLocations)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "create_spatial_sampling_locations",
+        "params": {
+          "input": "testdata/geoproc/ssl_areas.shp",
+          "output": "<out>",
+          "sampling_method": "SYSTEMATIC",
+          "bin_shape": "SQUARE",
+          "bin_size": "100 SquareMeters",
+          "h3_resolution": "7",
+          "geometry_type": "POLYGON",
+          "spatial_relationship": "COMPLETELY_WITHIN"
+        }
+      }
     }
   }
 }

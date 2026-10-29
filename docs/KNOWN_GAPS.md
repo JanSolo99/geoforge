@@ -81,6 +81,16 @@ Update this file when a gap is found or closed.
 - Probed and left: Zonal Fill (fill = boundary minimum but zones 1 and 2 of the zones raster share one value: merged-catchment rule unknown), Cut Fill (region numbering), Surface Area Ratio (neither Jenness nor 1/cos(slope) fits), Boundary Clean, Aggregate Points, Sample (column naming), Trim Line: no Z/M/curves, brute-force O(n^2), exact-length dangles kept (ArcGIS decides those ties by crossing-point rounding). Extend Line: no Z/M/curves; brute-force O(n^2) segment search; ArcGIS's inclusive exact-length behaviour on memory/geodatabase edits (vs strict on shapefiles) is not modelled.
 - Calculate Geometry Attributes: planar only; no Z/M, geodesic or coordinate-notation properties, no coordinate_system/coordinate_format, text targets untested. Evidence: `scripts/research/calculate_geometry_attributes/README.md`.
 - Adjust 3D Z: the z-domain check (ArcGIS leaves features whose new z leaves the class's z domain unchanged, WARNING 002631) is not made. Evidence: `scripts/research/adjust_3d_z/README.md`.
+- Create Spatial Sampling Locations: polygon random/stratified and area-sized
+  systematic designs only; raster study areas/strata, CLUSTER, H3 and bin-count
+  optimization unsupported. Native reproducible seed differs from ArcGIS streams;
+  bounded rejection may underfill dense/thin strata. Environments/selections,
+  custom XY resolution, geographic/engineering CRS, NULL population/strata, unusual
+  ID ordering, Z/M/curves and systematic FileGDB derived-field metadata unverified.
+  Uses standard intermediate XY resolution for grid measurements/centroids; only
+  projected-meter controls validated. Native failed requests preserve existing
+  outputs, while public110544 left an empty output family in the control. No
+  loosened comparison tolerances. Research: `scripts/research/spatial_sampling/README.md`.
 - Create Random Points: planar sampling with native reproducible SplitMix64 seed0;
   does not reproduce ArcGIS random streams or selected subset identities. Bounded
   rejection may underfill dense/thin constraints; spacing applies across all parts
