@@ -75945,6 +75945,312 @@
           "statistics": "SUM S"
         }
       }
+    },
+    "ext_15_feature": {
+      "tool": "edit.ExtendLine",
+      "args": [
+        "testdata/geoproc/extend_lines.shp",
+        "<out>",
+        "15 Meters",
+        "FEATURE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          4,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "extend_line",
+        "params": {
+          "input": "testdata/geoproc/extend_lines.shp",
+          "output": "<out>",
+          "length": "15 Meters",
+          "extend_to": "FEATURE"
+        }
+      }
+    },
+    "ext_50_feature": {
+      "tool": "edit.ExtendLine",
+      "args": [
+        "testdata/geoproc/extend_lines.shp",
+        "<out>",
+        "50 Meters",
+        "FEATURE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          4,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "extend_line",
+        "params": {
+          "input": "testdata/geoproc/extend_lines.shp",
+          "output": "<out>",
+          "length": "50 Meters",
+          "extend_to": "FEATURE"
+        }
+      }
+    },
+    "ext_100_feature": {
+      "tool": "edit.ExtendLine",
+      "args": [
+        "testdata/geoproc/extend_lines.shp",
+        "<out>",
+        "100 Meters",
+        "FEATURE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          4,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "extend_line",
+        "params": {
+          "input": "testdata/geoproc/extend_lines.shp",
+          "output": "<out>",
+          "length": "100 Meters",
+          "extend_to": "FEATURE"
+        }
+      }
+    },
+    "ext_15_extension": {
+      "tool": "edit.ExtendLine",
+      "args": [
+        "testdata/geoproc/extend_lines.shp",
+        "<out>",
+        "15 Meters",
+        "EXTENSION"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          4,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "extend_line",
+        "params": {
+          "input": "testdata/geoproc/extend_lines.shp",
+          "output": "<out>",
+          "length": "15 Meters",
+          "extend_to": "EXTENSION"
+        }
+      }
+    },
+    "ext_25_extension": {
+      "tool": "edit.ExtendLine",
+      "args": [
+        "testdata/geoproc/extend_lines.shp",
+        "<out>",
+        "25 Meters",
+        "EXTENSION"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          4,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "extend_line",
+        "params": {
+          "input": "testdata/geoproc/extend_lines.shp",
+          "output": "<out>",
+          "length": "25 Meters",
+          "extend_to": "EXTENSION"
+        }
+      }
+    },
+    "ext_50_extension": {
+      "tool": "edit.ExtendLine",
+      "args": [
+        "testdata/geoproc/extend_lines.shp",
+        "<out>",
+        "50 Meters",
+        "EXTENSION"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          4,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "extend_line",
+        "params": {
+          "input": "testdata/geoproc/extend_lines.shp",
+          "output": "<out>",
+          "length": "50 Meters",
+          "extend_to": "EXTENSION"
+        }
+      }
     }
   }
 }

@@ -462,6 +462,23 @@ fn generate_transects_along_lines(ctx: &dyn Context) -> Result<ToolOutput> {
     )
 }
 
+fn extend_line(ctx: &dyn Context) -> Result<ToolOutput> {
+    let t = find("extend_line").ok_or_else(|| Error::Unsupported("extend_line".into()))?;
+    let fc = ctx.features("input")?;
+    let wkt = fc.spatial_reference_wkt();
+    let length = text(ctx, t, "length")
+        .ok_or_else(|| Error::Unsupported("ERROR 000735: Length: value is required".into()))?;
+    let length = distance_in_units(&length, wkt)?;
+    let to_extensions =
+        text(ctx, t, "extend_to").is_some_and(|m| m.eq_ignore_ascii_case("EXTENSION"));
+    crate::extend::extend_line(
+        fc.as_ref(),
+        length,
+        to_extensions,
+        crate::default_xy_tolerance(wkt),
+    )
+}
+
 fn flip_line(ctx: &dyn Context) -> Result<ToolOutput> {
     construct::flip_line(ctx.features("input")?.as_ref())
 }
@@ -1735,6 +1752,41 @@ pub static TOOLS: &[Tool] = &[
         output_suffix: "Encoded",
         measures: false,
         run: Runner::Features(encode_field),
+    },
+    Tool {
+        id: "extend_line",
+        name: "Extend Line",
+        toolbox: "Editing › Tools",
+        summary: "Extends dangling line ends to the first line they reach (ArcGIS Pro Extend Line).",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Features",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "Lines.",
+            },
+            Param {
+                name: "length",
+                label: "Extend Length",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+                help: "The longest extension, for example `15 Meters`.",
+            },
+            Param {
+                name: "extend_to",
+                label: "Extend To",
+                kind: Kind::Choice(&["FEATURE", "EXTENSION"]),
+                required: false,
+                default: "FEATURE",
+                help: "EXTENSION also stops ends where they meet another end's extension.",
+            },
+        ],
+        output_suffix: "Extended",
+        measures: false,
+        run: Runner::Features(extend_line),
     },
     Tool {
         id: "field_statistics_to_table",

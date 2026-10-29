@@ -1006,6 +1006,12 @@ CASES = {
     "rba_dem_nodata": ("gp.ReclassByASCIIFile_sa", [RASTER / "dem.tif", RASTER / "remap_ascii1.txt"], ["NODATA"]),
     "rba_int": ("gp.ReclassByASCIIFile_sa", [RASTER / "landuse_u8.tif", RASTER / "remap_ascii2.txt"], ["DATA"]),
     "rba_int_nodata": ("gp.ReclassByASCIIFile_sa", [RASTER / "landuse_u8.tif", RASTER / "remap_ascii2.txt"], ["NODATA"]),
+    "ext_15_feature": ("edit.ExtendLine", [DATA / "extend_lines.shp"], ["15 Meters", "FEATURE"]),
+    "ext_50_feature": ("edit.ExtendLine", [DATA / "extend_lines.shp"], ["50 Meters", "FEATURE"]),
+    "ext_100_feature": ("edit.ExtendLine", [DATA / "extend_lines.shp"], ["100 Meters", "FEATURE"]),
+    "ext_15_extension": ("edit.ExtendLine", [DATA / "extend_lines.shp"], ["15 Meters", "EXTENSION"]),
+    "ext_25_extension": ("edit.ExtendLine", [DATA / "extend_lines.shp"], ["25 Meters", "EXTENSION"]),
+    "ext_50_extension": ("edit.ExtendLine", [DATA / "extend_lines.shp"], ["50 Meters", "EXTENSION"]),
     "flip_roads": ("edit.FlipLine", [DATA / "roads.shp"], []),
     "flip_streams": ("edit.FlipLine", [DATA / "streams.shp"], []),
     "gen_roads_20": ("edit.Generalize", [DATA / "roads.shp"], ["20 Meters"]),
@@ -1955,6 +1961,7 @@ RUN = {
     "management.GenerateTransectsAlongLines": ("generate_transects_along_lines", ["input", "output", "interval", "transect_length", "include_end_points"]),
     "cartography.GridIndexFeatures": ("grid_index_features", ["input", "output", "intersect_feature", None, None, "polygon_width", "polygon_height"]),
     "gp.ReclassByASCIIFile_sa": ("reclass_by_ascii_file", ["input", "remap_file", "output", "missing_values"]),
+    "edit.ExtendLine": ("extend_line", ["input", "output", "length", "extend_to"]),
     "edit.FlipLine": ("flip_line", ["input", "output"]),
     "management.FieldStatisticsToTable": ("field_statistics_to_table", ["input", "output", "fields", "field_type", "group_by", "statistics"]),
     "management.EncodeField": ("encode_field", ["input", "output", "field", "method"]),
@@ -2038,7 +2045,7 @@ MEMORY_OUT = {"analysis.SummarizeWithin", "analysis.SummarizeNearby", "analysis.
 CREATE_TOOLS = {"management.CreateFeatureclass", "management.CreateTable"}
 
 # In-place tools: the index of the input they edit (run on a copy written as the output).
-IN_PLACE = {"gp.ExtractMultiValuesToPoints_sa": 0, "edit.FlipLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.EncodeField": 0, "management.AddGeometryAttributes": 0,
+IN_PLACE = {"gp.ExtractMultiValuesToPoints_sa": 0, "edit.ExtendLine": 0, "edit.FlipLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.EncodeField": 0, "management.AddGeometryAttributes": 0,
             "management.CalculateFields": 0, "management.StandardizeField": 0, "management.TransformField": 0, "management.ReclassifyField": 0, "management.DefineProjection": 0, "management.CalculateEndTime": 0}
 
 # Select Layer By Location cases, saved with Copy Features:

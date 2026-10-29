@@ -779,7 +779,7 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Convert Coordinate Notation (DD/DDM/DMS/DD_NUMERIC and UTM_BANDS/UTM_ZONES/MGRS/USNG/GARS/GEOREF output from lon/lat; 13 `ccn_*` cases), Table To Ellipse (planar; adaptive complete-ellipse densification; 5 `ellipse_*` cases), Geodetic Densify (geodesic; 6 `gdd_*` cases), Encode Field (One-hot/One-cold; 4 `enc_*` cases) and Field Statistics To Table (numeric/text/date, optional group-by field and Output Statistics list; 17 `fst_*` cases incl. 4 refusals) match ArcGIS; gaps are in docs/KNOWN_GAPS.md and docs/HANDOFF.md.
 - [x] CI gate runs locally (`scripts/check`, pre-push hook); GitHub workflows are manual-only because Actions minutes ran out.
 
-- [x] Convert Coordinate Notation (DD_1/DD_2/DDM_1/DDM_2/DMS_1/DMS_2/DD_NUMERIC/UTM_BANDS/UTM_ZONES/MGRS/USNG/GARS/GEOREF from lon/lat), Table To Ellipse (planar), Geodetic Densify (geodesic), Encode Field (one-hot/one-cold) and Field Statistics To Table (numeric/text): reference cases match ArcGIS; gaps in KNOWN_GAPS.md and HANDOFF.md. Not done: DDM/DMS and grid outputs from projected-grid inputs, H3 output, geodesic ellipses, Trim/Extend Line, Convert Time Zone.
+- [x] Convert Coordinate Notation (DD_1/DD_2/DDM_1/DDM_2/DMS_1/DMS_2/DD_NUMERIC/UTM_BANDS/UTM_ZONES/MGRS/USNG/GARS/GEOREF from lon/lat), Table To Ellipse (planar), Geodetic Densify (geodesic), Encode Field (one-hot/one-cold) and Field Statistics To Table (numeric/text): reference cases match ArcGIS; gaps in KNOWN_GAPS.md and HANDOFF.md. Not done: DDM/DMS and grid outputs from projected-grid inputs, H3 output, geodesic ellipses, Trim Line, Convert Time Zone.
 
 - [x] Convert Coordinate Notation angular text inputs: DD/DDM/DMS single- and two-field
       formats, hemisphere overrides/axis order, packed forms and invalid-row retention.
@@ -812,6 +812,9 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
       The angular numeric GARS boundary path remains separate follow-up work.
       Evidence: `scripts/research/coordinate_notation/grid/gars-boundaries.md`.
 
+- [x] Extend Line (FEATURE and EXTENSION; sequential OID order, strict length as for
+      shapefile edits, potential-extension targets): 6 `ext_*` cases on a 28-line fixture match
+      ArcGIS. Evidence: `scripts/research/extend_line/README.md`.
 - [x] Convert Coordinate Notation UTM_BANDS/UTM_ZONES/MGRS/USNG input (Krüger inverse
       transverse Mercator and UPS; reduced-precision MGRS, band-driven row cycles, polar
       grids, antimeridian wrap) to DD_NUMERIC/DD_1/DD_2: 8 reference cases over 792 rows
