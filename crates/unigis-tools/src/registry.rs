@@ -85,6 +85,12 @@ pub trait Context {
             "schema edits are not supported by this host".into(),
         ))
     }
+    /// Delete explicitly named data items. Read-only hosts must refuse.
+    fn delete_items(&self, _items: &[crate::delete_multiple::DeleteItem]) -> Result<()> {
+        Err(Error::Unsupported(
+            "dataset deletion is not supported by this host".into(),
+        ))
+    }
     /// The coordinate system new data (a fishnet) gets when no template names one.
     fn default_spatial_reference_wkt(&self) -> Option<String> {
         None
@@ -3640,5 +3646,6 @@ pub static TOOLS: &[Tool] = &[
     crate::pairwise_neighbors::TOOL,
     crate::split_attributes::TOOL,
     crate::gps_metadata::TOOL,
+    crate::delete_multiple::TOOL,
     crate::neighbors::COUNT_OVERLAPPING_FEATURES,
 ];

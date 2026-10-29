@@ -77,6 +77,20 @@ DM = ROOT / "testdata" / "dm"
 
 CASES = {
     # name: (tool, args before the output, args after the output)
+    'dml_shape_table': ("management.DeleteMultiple", ["'<workspace>/points.shp' #;'<workspace>/table.dbf' #"], []),
+    'dml_gdb_items': ("management.DeleteMultiple", ["'<workspace>/data.gdb/points' FeatureClass;'<workspace>/data.gdb/table' #"], []),
+    'dml_gdb_workspace': ("management.DeleteMultiple", ["'<workspace>/data.gdb' #"], []),
+    'dml_duplicate': ("management.DeleteMultiple", ["'<workspace>/points.shp';'<workspace>/points.shp'"], []),
+    'dml_dbf_of_shape': ("management.DeleteMultiple", ["'<workspace>/points.dbf'"], []),
+    'dml_typed': ("management.DeleteMultiple", ["'<workspace>/points.shp' FeatureClass"], []),
+    'dml_type_hint': ("management.DeleteMultiple", ["'<workspace>/points.shp' RelationshipClass"], []),
+    'dml_quoted': ("management.DeleteMultiple", ["'<workspace>/points spaced.shp' #;'<workspace>/table.dbf' #"], []),
+    "dml_raster": ("management.DeleteMultiple", ["'<workspace>/grid.tif' #"], []),
+    'dml_plain_file': ("management.DeleteMultiple", ["'<workspace>/keep.txt' #"], []),
+    'dml_err_missing': ("management.DeleteMultiple", ["'<workspace>/absent.shp'"], []),
+    'dml_err_mixed_missing': ("management.DeleteMultiple", ["'<workspace>/points.shp';'<workspace>/absent.shp';'<workspace>/table.dbf'"], []),
+    'dml_err_empty': ("management.DeleteMultiple", [''], []),
+
     # Schema edits retain their geodatabase-only fields/domains in manifest snapshots.
     **{f"gps_{name}{suffix}": ("management.AddGPSMetadataFields", [DATA / "gps_metadata_base.gdb" / name], options)
        for name in ["point", "point_zm", "line", "polygon", "multipoint", "existing_receiver"]
@@ -2100,6 +2114,7 @@ RUN = {
     "gp.CreateBinaryMask_ia": ("create_binary_mask", ["input", "output", "background_value"]),
     "management.GenerateTessellation": ("generate_tessellation", ["output", "extent", "shape", "size", "template"]),
     "management.AddGPSMetadataFields": ("add_gps_metadata_fields", ["input", "output", "include_offset_fields"]),
+    "management.DeleteMultiple": ("delete_multiple", ["in_data"]),
     "analysis.SplitByAttributes": ("split_by_attributes", ["input", "target_workspace", "split_fields"]),
     "analysis.PairwisePolygonNeighbors": ("pairwise_polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides", "cluster_tolerance", "out_linear_units", "out_area_units", "precision"]),
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
@@ -2182,6 +2197,36 @@ def annotate():
         if spec:
             case["run"] = spec
     path.write_text(json.dumps(manifest, indent=2) + "\n")
+
+
+def delete_multiple_case(w, template):
+    """Destructive tools run exclusively against a disposable copy of their fixture."""
+    source = DATA / "delete_multiple"
+    with tempfile.TemporaryDirectory(prefix="unigis-delete-reference-") as temp:
+        copied = Path(temp) / "workspace"
+        shutil.copytree(source, copied, ignore=shutil.ignore_patterns("*.lock"))
+        actual = template.replace("<workspace>", win(copied))
+        r = w.call("run_tool", tool="management.DeleteMultiple", args=[actual])
+        response = w.call("python", code=f"""
+import os
+folder = {win(copied)!r}
+files = []
+catalogs = {{}}
+for base, dirs, names in os.walk(folder):
+    for name in list(dirs):
+        if name.lower().endswith('.gdb'):
+            gdb = os.path.join(base,name)
+            rel = os.path.relpath(gdb,folder).replace(chr(92),'/')
+            files.append(rel+'/')
+            catalogs[rel] = sorted(c.name for c in arcpy.Describe(gdb).children)
+            dirs.remove(name)
+    files.extend(os.path.relpath(os.path.join(base,n),folder).replace(chr(92),'/') for n in names if not n.endswith('.lock'))
+result = dict(files=sorted(files),catalogs=catalogs)
+""")
+        return dict(tool="management.DeleteMultiple",args=[template],status=r.get("status"),
+            messages=[m["text"] for m in r.get("messages",[]) if m["severity"]>0],
+            catalog_edit=dict(source=rel(source),expected=response["result"]),
+            run=run_spec("management.DeleteMultiple",[template]))
 
 
 def schema_edit_case(w, tool, before, after):
@@ -2268,6 +2313,10 @@ def main():
             for a in before:
                 if isinstance(a, Path) and a.suffix == ".tif":
                     w.call("python", code=f"arcpy.management.BuildRasterAttributeTable(r'{win(a)}', 'Overwrite')")
+        if tool == "management.DeleteMultiple":
+            manifest["cases"][name] = delete_multiple_case(w, before[0])
+            print(f"{name}: {manifest['cases'][name]['status']}")
+            continue
         if tool == "management.AddGPSMetadataFields" and Path(before[0]).parent.suffix == ".gdb":
             manifest["cases"][name] = schema_edit_case(w, tool, before, after)
             print(f"{name}: {manifest['cases'][name]['status']}")

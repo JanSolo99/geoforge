@@ -873,3 +873,8 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
       default/offset schemas,4 simple geometry types, Z/M, existing fields,
       domains and idempotence. Native FileGDB/CLI and optional host capability;
       full local gate passed. Research: scripts/research/gps_metadata/README.md.
+
+- [x] Delete Multiple: native preflight/deletion and13 ArcGIS reference cases
+      match ArcGIS; full local gate passed. Local shapefile/DBF/TIFF families,
+      regular files and FileGDB items/workspaces. Folder recycling and ambiguous
+      kind selection remain gaps. Research: scripts/research/delete_multiple/README.md.

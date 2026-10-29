@@ -87360,6 +87360,674 @@
           "output_dst": "OUTPUT_ADJUSTED_FOR_DST"
         }
       }
+    },
+    "dml_shape_table": {
+      "tool": "management.DeleteMultiple",
+      "args": [
+        "'<workspace>/points.shp' #;'<workspace>/table.dbf' #"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "catalog_edit": {
+        "source": "testdata/geoproc/delete_multiple",
+        "expected": {
+          "files": [
+            "data.gdb/",
+            "grid.tfw",
+            "grid.tif",
+            "grid.tif.aux.xml",
+            "grid.tif.vat.cpg",
+            "grid.tif.vat.dbf",
+            "grid.tif.xml",
+            "keep.txt",
+            "points spaced.cpg",
+            "points spaced.dbf",
+            "points spaced.prj",
+            "points spaced.shp",
+            "points spaced.shx",
+            "points.other.cpg",
+            "points.other.dbf",
+            "points.other.prj",
+            "points.other.shp",
+            "points.other.shx",
+            "points.txt"
+          ],
+          "catalogs": {
+            "data.gdb": [
+              "points",
+              "table"
+            ]
+          }
+        }
+      },
+      "run": {
+        "tool": "delete_multiple",
+        "params": {
+          "in_data": "'<workspace>/points.shp' #;'<workspace>/table.dbf' #"
+        }
+      }
+    },
+    "dml_gdb_items": {
+      "tool": "management.DeleteMultiple",
+      "args": [
+        "'<workspace>/data.gdb/points' FeatureClass;'<workspace>/data.gdb/table' #"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "catalog_edit": {
+        "source": "testdata/geoproc/delete_multiple",
+        "expected": {
+          "files": [
+            "data.gdb/",
+            "grid.tfw",
+            "grid.tif",
+            "grid.tif.aux.xml",
+            "grid.tif.vat.cpg",
+            "grid.tif.vat.dbf",
+            "grid.tif.xml",
+            "keep.txt",
+            "points spaced.cpg",
+            "points spaced.dbf",
+            "points spaced.prj",
+            "points spaced.shp",
+            "points spaced.shx",
+            "points.cpg",
+            "points.dbf",
+            "points.other.cpg",
+            "points.other.dbf",
+            "points.other.prj",
+            "points.other.shp",
+            "points.other.shx",
+            "points.prj",
+            "points.shp",
+            "points.shp.xml",
+            "points.shx",
+            "points.txt",
+            "table.cpg",
+            "table.dbf",
+            "table.dbf.xml"
+          ],
+          "catalogs": {
+            "data.gdb": []
+          }
+        }
+      },
+      "run": {
+        "tool": "delete_multiple",
+        "params": {
+          "in_data": "'<workspace>/data.gdb/points' FeatureClass;'<workspace>/data.gdb/table' #"
+        }
+      }
+    },
+    "dml_gdb_workspace": {
+      "tool": "management.DeleteMultiple",
+      "args": [
+        "'<workspace>/data.gdb' #"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "catalog_edit": {
+        "source": "testdata/geoproc/delete_multiple",
+        "expected": {
+          "files": [
+            "grid.tfw",
+            "grid.tif",
+            "grid.tif.aux.xml",
+            "grid.tif.vat.cpg",
+            "grid.tif.vat.dbf",
+            "grid.tif.xml",
+            "keep.txt",
+            "points spaced.cpg",
+            "points spaced.dbf",
+            "points spaced.prj",
+            "points spaced.shp",
+            "points spaced.shx",
+            "points.cpg",
+            "points.dbf",
+            "points.other.cpg",
+            "points.other.dbf",
+            "points.other.prj",
+            "points.other.shp",
+            "points.other.shx",
+            "points.prj",
+            "points.shp",
+            "points.shp.xml",
+            "points.shx",
+            "points.txt",
+            "table.cpg",
+            "table.dbf",
+            "table.dbf.xml"
+          ],
+          "catalogs": {}
+        }
+      },
+      "run": {
+        "tool": "delete_multiple",
+        "params": {
+          "in_data": "'<workspace>/data.gdb' #"
+        }
+      }
+    },
+    "dml_duplicate": {
+      "tool": "management.DeleteMultiple",
+      "args": [
+        "'<workspace>/points.shp';'<workspace>/points.shp'"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "catalog_edit": {
+        "source": "testdata/geoproc/delete_multiple",
+        "expected": {
+          "files": [
+            "data.gdb/",
+            "grid.tfw",
+            "grid.tif",
+            "grid.tif.aux.xml",
+            "grid.tif.vat.cpg",
+            "grid.tif.vat.dbf",
+            "grid.tif.xml",
+            "keep.txt",
+            "points spaced.cpg",
+            "points spaced.dbf",
+            "points spaced.prj",
+            "points spaced.shp",
+            "points spaced.shx",
+            "points.other.cpg",
+            "points.other.dbf",
+            "points.other.prj",
+            "points.other.shp",
+            "points.other.shx",
+            "points.txt",
+            "table.cpg",
+            "table.dbf",
+            "table.dbf.xml"
+          ],
+          "catalogs": {
+            "data.gdb": [
+              "points",
+              "table"
+            ]
+          }
+        }
+      },
+      "run": {
+        "tool": "delete_multiple",
+        "params": {
+          "in_data": "'<workspace>/points.shp';'<workspace>/points.shp'"
+        }
+      }
+    },
+    "dml_dbf_of_shape": {
+      "tool": "management.DeleteMultiple",
+      "args": [
+        "'<workspace>/points.dbf'"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "catalog_edit": {
+        "source": "testdata/geoproc/delete_multiple",
+        "expected": {
+          "files": [
+            "data.gdb/",
+            "grid.tfw",
+            "grid.tif",
+            "grid.tif.aux.xml",
+            "grid.tif.vat.cpg",
+            "grid.tif.vat.dbf",
+            "grid.tif.xml",
+            "keep.txt",
+            "points spaced.cpg",
+            "points spaced.dbf",
+            "points spaced.prj",
+            "points spaced.shp",
+            "points spaced.shx",
+            "points.other.cpg",
+            "points.other.dbf",
+            "points.other.prj",
+            "points.other.shp",
+            "points.other.shx",
+            "points.txt",
+            "table.cpg",
+            "table.dbf",
+            "table.dbf.xml"
+          ],
+          "catalogs": {
+            "data.gdb": [
+              "points",
+              "table"
+            ]
+          }
+        }
+      },
+      "run": {
+        "tool": "delete_multiple",
+        "params": {
+          "in_data": "'<workspace>/points.dbf'"
+        }
+      }
+    },
+    "dml_typed": {
+      "tool": "management.DeleteMultiple",
+      "args": [
+        "'<workspace>/points.shp' FeatureClass"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "catalog_edit": {
+        "source": "testdata/geoproc/delete_multiple",
+        "expected": {
+          "files": [
+            "data.gdb/",
+            "grid.tfw",
+            "grid.tif",
+            "grid.tif.aux.xml",
+            "grid.tif.vat.cpg",
+            "grid.tif.vat.dbf",
+            "grid.tif.xml",
+            "keep.txt",
+            "points spaced.cpg",
+            "points spaced.dbf",
+            "points spaced.prj",
+            "points spaced.shp",
+            "points spaced.shx",
+            "points.other.cpg",
+            "points.other.dbf",
+            "points.other.prj",
+            "points.other.shp",
+            "points.other.shx",
+            "points.txt",
+            "table.cpg",
+            "table.dbf",
+            "table.dbf.xml"
+          ],
+          "catalogs": {
+            "data.gdb": [
+              "points",
+              "table"
+            ]
+          }
+        }
+      },
+      "run": {
+        "tool": "delete_multiple",
+        "params": {
+          "in_data": "'<workspace>/points.shp' FeatureClass"
+        }
+      }
+    },
+    "dml_type_hint": {
+      "tool": "management.DeleteMultiple",
+      "args": [
+        "'<workspace>/points.shp' RelationshipClass"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "catalog_edit": {
+        "source": "testdata/geoproc/delete_multiple",
+        "expected": {
+          "files": [
+            "data.gdb/",
+            "grid.tfw",
+            "grid.tif",
+            "grid.tif.aux.xml",
+            "grid.tif.vat.cpg",
+            "grid.tif.vat.dbf",
+            "grid.tif.xml",
+            "keep.txt",
+            "points spaced.cpg",
+            "points spaced.dbf",
+            "points spaced.prj",
+            "points spaced.shp",
+            "points spaced.shx",
+            "points.other.cpg",
+            "points.other.dbf",
+            "points.other.prj",
+            "points.other.shp",
+            "points.other.shx",
+            "points.txt",
+            "table.cpg",
+            "table.dbf",
+            "table.dbf.xml"
+          ],
+          "catalogs": {
+            "data.gdb": [
+              "points",
+              "table"
+            ]
+          }
+        }
+      },
+      "run": {
+        "tool": "delete_multiple",
+        "params": {
+          "in_data": "'<workspace>/points.shp' RelationshipClass"
+        }
+      }
+    },
+    "dml_quoted": {
+      "tool": "management.DeleteMultiple",
+      "args": [
+        "'<workspace>/points spaced.shp' #;'<workspace>/table.dbf' #"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "catalog_edit": {
+        "source": "testdata/geoproc/delete_multiple",
+        "expected": {
+          "files": [
+            "data.gdb/",
+            "grid.tfw",
+            "grid.tif",
+            "grid.tif.aux.xml",
+            "grid.tif.vat.cpg",
+            "grid.tif.vat.dbf",
+            "grid.tif.xml",
+            "keep.txt",
+            "points.cpg",
+            "points.dbf",
+            "points.other.cpg",
+            "points.other.dbf",
+            "points.other.prj",
+            "points.other.shp",
+            "points.other.shx",
+            "points.prj",
+            "points.shp",
+            "points.shp.xml",
+            "points.shx",
+            "points.txt"
+          ],
+          "catalogs": {
+            "data.gdb": [
+              "points",
+              "table"
+            ]
+          }
+        }
+      },
+      "run": {
+        "tool": "delete_multiple",
+        "params": {
+          "in_data": "'<workspace>/points spaced.shp' #;'<workspace>/table.dbf' #"
+        }
+      }
+    },
+    "dml_raster": {
+      "tool": "management.DeleteMultiple",
+      "args": [
+        "'<workspace>/grid.tif' #"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "catalog_edit": {
+        "source": "testdata/geoproc/delete_multiple",
+        "expected": {
+          "files": [
+            "data.gdb/",
+            "keep.txt",
+            "points spaced.cpg",
+            "points spaced.dbf",
+            "points spaced.prj",
+            "points spaced.shp",
+            "points spaced.shx",
+            "points.cpg",
+            "points.dbf",
+            "points.other.cpg",
+            "points.other.dbf",
+            "points.other.prj",
+            "points.other.shp",
+            "points.other.shx",
+            "points.prj",
+            "points.shp",
+            "points.shp.xml",
+            "points.shx",
+            "points.txt",
+            "table.cpg",
+            "table.dbf",
+            "table.dbf.xml"
+          ],
+          "catalogs": {
+            "data.gdb": [
+              "points",
+              "table"
+            ]
+          }
+        }
+      },
+      "run": {
+        "tool": "delete_multiple",
+        "params": {
+          "in_data": "'<workspace>/grid.tif' #"
+        }
+      }
+    },
+    "dml_plain_file": {
+      "tool": "management.DeleteMultiple",
+      "args": [
+        "'<workspace>/keep.txt' #"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "catalog_edit": {
+        "source": "testdata/geoproc/delete_multiple",
+        "expected": {
+          "files": [
+            "data.gdb/",
+            "grid.tfw",
+            "grid.tif",
+            "grid.tif.aux.xml",
+            "grid.tif.vat.cpg",
+            "grid.tif.vat.dbf",
+            "grid.tif.xml",
+            "points spaced.cpg",
+            "points spaced.dbf",
+            "points spaced.prj",
+            "points spaced.shp",
+            "points spaced.shx",
+            "points.cpg",
+            "points.dbf",
+            "points.other.cpg",
+            "points.other.dbf",
+            "points.other.prj",
+            "points.other.shp",
+            "points.other.shx",
+            "points.prj",
+            "points.shp",
+            "points.shp.xml",
+            "points.shx",
+            "points.txt",
+            "table.cpg",
+            "table.dbf",
+            "table.dbf.xml"
+          ],
+          "catalogs": {
+            "data.gdb": [
+              "points",
+              "table"
+            ]
+          }
+        }
+      },
+      "run": {
+        "tool": "delete_multiple",
+        "params": {
+          "in_data": "'<workspace>/keep.txt' #"
+        }
+      }
+    },
+    "dml_err_missing": {
+      "tool": "management.DeleteMultiple",
+      "args": [
+        "'<workspace>/absent.shp'"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000732: Input Data Element: Dataset /tmp/unigis-delete-reference-7nnqk3_y/workspace/absent.shp does not exist or is not supported",
+        "Failed to execute (DeleteMultiple)."
+      ],
+      "catalog_edit": {
+        "source": "testdata/geoproc/delete_multiple",
+        "expected": {
+          "files": [
+            "data.gdb/",
+            "grid.tfw",
+            "grid.tif",
+            "grid.tif.aux.xml",
+            "grid.tif.vat.cpg",
+            "grid.tif.vat.dbf",
+            "grid.tif.xml",
+            "keep.txt",
+            "points spaced.cpg",
+            "points spaced.dbf",
+            "points spaced.prj",
+            "points spaced.shp",
+            "points spaced.shx",
+            "points.cpg",
+            "points.dbf",
+            "points.other.cpg",
+            "points.other.dbf",
+            "points.other.prj",
+            "points.other.shp",
+            "points.other.shx",
+            "points.prj",
+            "points.shp",
+            "points.shp.xml",
+            "points.shx",
+            "points.txt",
+            "table.cpg",
+            "table.dbf",
+            "table.dbf.xml"
+          ],
+          "catalogs": {
+            "data.gdb": [
+              "points",
+              "table"
+            ]
+          }
+        }
+      },
+      "run": {
+        "tool": "delete_multiple",
+        "params": {
+          "in_data": "'<workspace>/absent.shp'"
+        }
+      }
+    },
+    "dml_err_mixed_missing": {
+      "tool": "management.DeleteMultiple",
+      "args": [
+        "'<workspace>/points.shp';'<workspace>/absent.shp';'<workspace>/table.dbf'"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000732: Input Data Element: Dataset /tmp/unigis-delete-reference-aytso7tm/workspace/absent.shp does not exist or is not supported",
+        "Failed to execute (DeleteMultiple)."
+      ],
+      "catalog_edit": {
+        "source": "testdata/geoproc/delete_multiple",
+        "expected": {
+          "files": [
+            "data.gdb/",
+            "grid.tfw",
+            "grid.tif",
+            "grid.tif.aux.xml",
+            "grid.tif.vat.cpg",
+            "grid.tif.vat.dbf",
+            "grid.tif.xml",
+            "keep.txt",
+            "points spaced.cpg",
+            "points spaced.dbf",
+            "points spaced.prj",
+            "points spaced.shp",
+            "points spaced.shx",
+            "points.cpg",
+            "points.dbf",
+            "points.other.cpg",
+            "points.other.dbf",
+            "points.other.prj",
+            "points.other.shp",
+            "points.other.shx",
+            "points.prj",
+            "points.shp",
+            "points.shp.xml",
+            "points.shx",
+            "points.txt",
+            "table.cpg",
+            "table.dbf",
+            "table.dbf.xml"
+          ],
+          "catalogs": {
+            "data.gdb": [
+              "points",
+              "table"
+            ]
+          }
+        }
+      },
+      "run": {
+        "tool": "delete_multiple",
+        "params": {
+          "in_data": "'<workspace>/points.shp';'<workspace>/absent.shp';'<workspace>/table.dbf'"
+        }
+      }
+    },
+    "dml_err_empty": {
+      "tool": "management.DeleteMultiple",
+      "args": [
+        ""
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000735: Input Data Element: Value is required",
+        "Failed to execute (DeleteMultiple)."
+      ],
+      "catalog_edit": {
+        "source": "testdata/geoproc/delete_multiple",
+        "expected": {
+          "files": [
+            "data.gdb/",
+            "grid.tfw",
+            "grid.tif",
+            "grid.tif.aux.xml",
+            "grid.tif.vat.cpg",
+            "grid.tif.vat.dbf",
+            "grid.tif.xml",
+            "keep.txt",
+            "points spaced.cpg",
+            "points spaced.dbf",
+            "points spaced.prj",
+            "points spaced.shp",
+            "points spaced.shx",
+            "points.cpg",
+            "points.dbf",
+            "points.other.cpg",
+            "points.other.dbf",
+            "points.other.prj",
+            "points.other.shp",
+            "points.other.shx",
+            "points.prj",
+            "points.shp",
+            "points.shp.xml",
+            "points.shx",
+            "points.txt",
+            "table.cpg",
+            "table.dbf",
+            "table.dbf.xml"
+          ],
+          "catalogs": {
+            "data.gdb": [
+              "points",
+              "table"
+            ]
+          }
+        }
+      },
+      "run": {
+        "tool": "delete_multiple",
+        "params": {}
+      }
     }
   }
 }

@@ -14,6 +14,7 @@ use unigis_shapefile::{ShapefileReader, ShapefileWriter};
 use unigis_tools::{Dissolve, ToolOutput};
 
 mod aliases;
+mod delete_multiple;
 
 #[derive(Parser)]
 #[command(name = "ug", version, about = "UniGIS geoprocessing tools")]
@@ -2742,6 +2743,12 @@ fn main() -> ExitCode {
                         })
                         .collect();
                     unigis_filegdb::add_schema_fields(&gdb, &item, fields, &domains)
+                }
+                fn delete_items(
+                    &self,
+                    items: &[unigis_tools::delete_multiple::DeleteItem],
+                ) -> Result<()> {
+                    delete_multiple::run(items)
                 }
                 fn features(&self, name: &str) -> Result<Box<dyn FeatureClass + '_>> {
                     let path = self

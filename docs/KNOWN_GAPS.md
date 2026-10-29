@@ -160,3 +160,12 @@ Update this file when a gap is found or closed.
   fields are preserved even with other types, matching public controls. MultiPatch,
   enterprise/mobile/service inputs, selections and exotic subtype/schema behavior
   are unverified or refused. Evidence: scripts/research/gps_metadata/README.md.
+
+- Delete Multiple: local native formats/regular files only. Ordinary folders are
+  refused because the documented recycle-bin operation is unavailable; symlinks,
+  non-file sidecars, detected lock files and ambiguous FileGDB item kinds are also
+  refused. Data-type hints cannot select colliding kinds; lock ownership/staleness,
+  layers/services/enterprise/mobile data and other dataset sidecars are unverified.
+  TIFF pyramids (.ovr) are retained; only the saved TIFF sidecar family is removed.
+  Later I/O failures are not atomic across datasets. Evidence:
+  scripts/research/delete_multiple/README.md.
