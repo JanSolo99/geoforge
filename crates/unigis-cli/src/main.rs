@@ -2750,6 +2750,25 @@ fn main() -> ExitCode {
                 ) -> Result<()> {
                     delete_multiple::run(items)
                 }
+                fn disable_cogo(&self, input: &str) -> Result<()> {
+                    let path = self
+                        .get(input)
+                        .ok_or_else(|| Error::Unsupported(format!("{input} is required")))?;
+                    match locate(Path::new(&path)) {
+                        Location::Geodatabase {
+                            gdb,
+                            item: Some(item),
+                        } => unigis_filegdb::disable_cogo(&gdb, &item),
+                        Location::Shapefile(p)
+                            if p.extension().is_some_and(|e| e.eq_ignore_ascii_case("shp")) =>
+                        {
+                            Ok(())
+                        }
+                        _ => Err(Error::Unsupported(
+                            "COGO edits require a FileGDB feature class or shapefile".into(),
+                        )),
+                    }
+                }
                 fn features(&self, name: &str) -> Result<Box<dyn FeatureClass + '_>> {
                     let path = self
                         .get(name)

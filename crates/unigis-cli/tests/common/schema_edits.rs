@@ -142,6 +142,49 @@ pub fn compare(case: &str, info: &Json, root: &Path, out_dir: &Path) -> Vec<Stri
                 "field schema differs\nours: {ours:?}\nArcGIS: {expected:?}"
             ));
         }
+        if let Some(cogo) = info.get("cogo") {
+            let items = unigis_filegdb::Table::open(copied.join("a00000004")).unwrap();
+            let name_col = items
+                .fields()
+                .iter()
+                .position(|f| f.name == "Name")
+                .unwrap();
+            let def_col = items
+                .fields()
+                .iter()
+                .position(|f| f.name == "Definition")
+                .unwrap();
+            let row=items.features().map(Result::unwrap).find(|f|matches!(&f.attributes[name_col],Value::String(n) if n==dataset.to_str().unwrap())).unwrap();
+            let xml = match &row.attributes[def_col] {
+                Value::Xml(x) | Value::String(x) => x,
+                _ => panic!("missing definition"),
+            };
+            let doc = roxmltree::Document::parse(xml).unwrap();
+            let mut required = serde_json::Map::new();
+            for name in cogo["required"].as_object().unwrap().keys() {
+                let flag = doc
+                    .descendants()
+                    .filter(|n| n.is_element() && n.tag_name().name() == "GPFieldInfoEx")
+                    .find(|n| {
+                        n.children().any(|c| {
+                            c.is_element()
+                                && c.tag_name().name() == "Name"
+                                && c.text() == Some(name)
+                        })
+                    })
+                    .is_some_and(|n| {
+                        n.children().any(|c| {
+                            c.is_element()
+                                && c.tag_name().name() == "Required"
+                                && c.text() == Some("true")
+                        })
+                    });
+                required.insert(name.clone(), json!(flag));
+            }
+            if Json::Object(required) != cogo["required"] {
+                diffs.push("COGO required field markers differ".into());
+            }
+        }
         let mut domains:Vec<_>=gdb.domains().iter().map(|d|json!({
             "name":d.name,"description":d.description,"type":match d.field_type {FieldType::SmallInteger=>"Short",FieldType::String=>"Text",_=>panic!("unexpected domain type")},
             "split":format!("{:?}",d.split_policy),"merge":format!("{:?}",d.merge_policy),

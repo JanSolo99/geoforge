@@ -4542,6 +4542,23 @@ fn tools_match_arcgis_output() {
         } else {
             out_dir.join(format!("{case}.shp"))
         };
+        if info["report_in_place"] == true {
+            let source = root.join(info["run"]["params"]["input"].as_str().unwrap());
+            let stem = source.file_stem().unwrap().to_string_lossy();
+            let prefix = format!("{stem}.");
+            for entry in std::fs::read_dir(source.parent().unwrap()).unwrap() {
+                let entry = entry.unwrap();
+                let name = entry.file_name().to_string_lossy().into_owned();
+                if name.starts_with(&prefix) && entry.path().is_file() && !name.ends_with(".lock") {
+                    let target = out.with_file_name(format!(
+                        "{}{}",
+                        out.file_stem().unwrap().to_string_lossy(),
+                        &name[stem.len()..]
+                    ));
+                    std::fs::copy(entry.path(), target).unwrap();
+                }
+            }
+        }
         let mut args: Vec<String> = if let Some(run) = info.get("run") {
             // A tool of the registry: `ug run <id> name=value ...` from the manifest's parameters.
             let mut v: Vec<String> = vec!["run".into(), run["tool"].as_str().unwrap().into()];
@@ -4549,6 +4566,11 @@ fn tools_match_arcgis_output() {
                 let value = value
                     .as_str()
                     .map_or_else(|| value.to_string(), str::to_string);
+                let value = if info["report_in_place"] == true && name == "input" {
+                    out.display().to_string()
+                } else {
+                    value
+                };
                 v.push(format!("{name}={value}"));
             }
             v

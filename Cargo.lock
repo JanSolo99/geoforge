@@ -917,6 +917,7 @@ dependencies = [
  "chrono",
  "clap",
  "geographiclib-rs",
+ "roxmltree",
  "serde_json",
  "unigis-core",
  "unigis-csv",

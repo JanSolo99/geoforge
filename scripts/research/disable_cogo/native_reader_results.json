@@ -1,0 +1,71 @@
+{
+  "enabled": false,
+  "fields": [
+    {
+      "name": "OBJECTID",
+      "type": "OID",
+      "alias": "OBJECTID",
+      "required": true
+    },
+    {
+      "name": "Shape",
+      "type": "Geometry",
+      "alias": "Shape",
+      "required": true
+    },
+    {
+      "name": "Shape_Length",
+      "type": "Double",
+      "alias": "Shape_Length",
+      "required": true
+    },
+    {
+      "name": "KEY",
+      "type": "Integer",
+      "alias": "KEY",
+      "required": false
+    },
+    {
+      "name": "Direction",
+      "type": "Double",
+      "alias": "Direction",
+      "required": false
+    },
+    {
+      "name": "Distance",
+      "type": "Double",
+      "alias": "Distance",
+      "required": false
+    },
+    {
+      "name": "Radius",
+      "type": "Double",
+      "alias": "Radius",
+      "required": false
+    },
+    {
+      "name": "ArcLength",
+      "type": "Double",
+      "alias": "Arc Length",
+      "required": false
+    },
+    {
+      "name": "Radius2",
+      "type": "Double",
+      "alias": "Radius2",
+      "required": false
+    }
+  ],
+  "rows": [
+    [
+      1,
+      7,
+      90.0,
+      10.0,
+      null,
+      null,
+      null,
+      "{\"paths\":[[[500000,5000000],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+    ]
+  ]
+}

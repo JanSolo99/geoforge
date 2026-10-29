@@ -169,3 +169,10 @@ Update this file when a gap is found or closed.
   TIFF pyramids (.ovr) are retained; only the saved TIFF sidecar family is removed.
   Later I/O failures are not atomic across datasets. Evidence:
   scripts/research/delete_multiple/README.md.
+
+- Disable COGO: FileGDB paths and shapefiles only; other hosts need the optional
+  mutation capability. Dimension fields/values remain, Required markers removed.
+  Layer labels/symbology, enterprise/mobile data, selections and unusual class
+  extensions are unverified or unsupported. Native shapefile no-op omits002051
+  warnings; unrelated catalog normalization is preserved. Evidence:
+  scripts/research/disable_cogo/README.md.

@@ -1,0 +1,1234 @@
+{
+  "enabled": {
+    "before": {
+      "cogo": true,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "required": true,
+          "nullable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Shape_Length",
+          "alias": "Shape_Length",
+          "type": "Double",
+          "length": 8,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Direction",
+          "alias": "Direction",
+          "type": "Double",
+          "length": 8,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Distance",
+          "alias": "Distance",
+          "type": "Double",
+          "length": 8,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Radius",
+          "alias": "Radius",
+          "type": "Double",
+          "length": 8,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "ArcLength",
+          "alias": "Arc Length",
+          "type": "Double",
+          "length": 8,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Radius2",
+          "alias": "Radius2",
+          "type": "Double",
+          "length": 8,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          10.0,
+          7,
+          90.0,
+          10.0,
+          null,
+          null,
+          null,
+          "{\"paths\":[[[500000,5000000],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ],
+      "definition": null
+    },
+    "after": {
+      "cogo": false,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "required": true,
+          "nullable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Shape_Length",
+          "alias": "Shape_Length",
+          "type": "Double",
+          "length": 8,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Direction",
+          "alias": "Direction",
+          "type": "Double",
+          "length": 8,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Distance",
+          "alias": "Distance",
+          "type": "Double",
+          "length": 8,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Radius",
+          "alias": "Radius",
+          "type": "Double",
+          "length": 8,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "ArcLength",
+          "alias": "Arc Length",
+          "type": "Double",
+          "length": 8,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Radius2",
+          "alias": "Radius2",
+          "type": "Double",
+          "length": 8,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          10.0,
+          7,
+          90.0,
+          10.0,
+          null,
+          null,
+          null,
+          "{\"paths\":[[[500000,5000000],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ],
+      "definition": null
+    },
+    "repeat": {
+      "cogo": false,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "required": true,
+          "nullable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Shape_Length",
+          "alias": "Shape_Length",
+          "type": "Double",
+          "length": 8,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Direction",
+          "alias": "Direction",
+          "type": "Double",
+          "length": 8,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Distance",
+          "alias": "Distance",
+          "type": "Double",
+          "length": 8,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Radius",
+          "alias": "Radius",
+          "type": "Double",
+          "length": 8,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "ArcLength",
+          "alias": "Arc Length",
+          "type": "Double",
+          "length": 8,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Radius2",
+          "alias": "Radius2",
+          "type": "Double",
+          "length": 8,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          10.0,
+          7,
+          90.0,
+          10.0,
+          null,
+          null,
+          null,
+          "{\"paths\":[[[500000,5000000],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ],
+      "definition": null
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 7:05:19 PM\nSucceeded at Thursday, October 29, 2026 7:05:19 PM (Elapsed Time: 0.07 seconds)",
+    "repeat_messages": "Start Time: Thursday, October 29, 2026 7:05:19 PM\nWARNING 002044: This class is not COGO enabled\nSucceeded at Thursday, October 29, 2026 7:05:19 PM (Elapsed Time: 0.02 seconds)"
+  },
+  "empty_enabled": {
+    "before": {
+      "cogo": true,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "required": true,
+          "nullable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Shape_Length",
+          "alias": "Shape_Length",
+          "type": "Double",
+          "length": 8,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Direction",
+          "alias": "Direction",
+          "type": "Double",
+          "length": 8,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Distance",
+          "alias": "Distance",
+          "type": "Double",
+          "length": 8,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Radius",
+          "alias": "Radius",
+          "type": "Double",
+          "length": 8,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "ArcLength",
+          "alias": "Arc Length",
+          "type": "Double",
+          "length": 8,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Radius2",
+          "alias": "Radius2",
+          "type": "Double",
+          "length": 8,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [],
+      "definition": null
+    },
+    "after": {
+      "cogo": false,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "required": true,
+          "nullable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Shape_Length",
+          "alias": "Shape_Length",
+          "type": "Double",
+          "length": 8,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Direction",
+          "alias": "Direction",
+          "type": "Double",
+          "length": 8,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Distance",
+          "alias": "Distance",
+          "type": "Double",
+          "length": 8,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Radius",
+          "alias": "Radius",
+          "type": "Double",
+          "length": 8,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "ArcLength",
+          "alias": "Arc Length",
+          "type": "Double",
+          "length": 8,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Radius2",
+          "alias": "Radius2",
+          "type": "Double",
+          "length": 8,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [],
+      "definition": null
+    },
+    "repeat": {
+      "cogo": false,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "required": true,
+          "nullable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Shape_Length",
+          "alias": "Shape_Length",
+          "type": "Double",
+          "length": 8,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Direction",
+          "alias": "Direction",
+          "type": "Double",
+          "length": 8,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Distance",
+          "alias": "Distance",
+          "type": "Double",
+          "length": 8,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Radius",
+          "alias": "Radius",
+          "type": "Double",
+          "length": 8,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "ArcLength",
+          "alias": "Arc Length",
+          "type": "Double",
+          "length": 8,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Radius2",
+          "alias": "Radius2",
+          "type": "Double",
+          "length": 8,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [],
+      "definition": null
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 7:05:20 PM\nSucceeded at Thursday, October 29, 2026 7:05:20 PM (Elapsed Time: 0.07 seconds)",
+    "repeat_messages": "Start Time: Thursday, October 29, 2026 7:05:20 PM\nWARNING 002044: This class is not COGO enabled\nSucceeded at Thursday, October 29, 2026 7:05:20 PM (Elapsed Time: 0.02 seconds)"
+  },
+  "plain": {
+    "before": {
+      "cogo": false,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "required": true,
+          "nullable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Shape_Length",
+          "alias": "Shape_Length",
+          "type": "Double",
+          "length": 8,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          10.0,
+          7,
+          "{\"paths\":[[[500000,5000000],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ],
+      "definition": null
+    },
+    "after": {
+      "cogo": false,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "required": true,
+          "nullable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Shape_Length",
+          "alias": "Shape_Length",
+          "type": "Double",
+          "length": 8,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          10.0,
+          7,
+          "{\"paths\":[[[500000,5000000],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ],
+      "definition": null
+    },
+    "repeat": {
+      "cogo": false,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "required": true,
+          "nullable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Shape_Length",
+          "alias": "Shape_Length",
+          "type": "Double",
+          "length": 8,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          10.0,
+          7,
+          "{\"paths\":[[[500000,5000000],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ],
+      "definition": null
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 7:05:20 PM\nWARNING 002044: This class is not COGO enabled\nSucceeded at Thursday, October 29, 2026 7:05:20 PM (Elapsed Time: 0.02 seconds)",
+    "repeat_messages": "Start Time: Thursday, October 29, 2026 7:05:20 PM\nWARNING 002044: This class is not COGO enabled\nSucceeded at Thursday, October 29, 2026 7:05:20 PM (Elapsed Time: 0.02 seconds)"
+  },
+  "custom": {
+    "before": {
+      "cogo": false,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "required": true,
+          "nullable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Shape_Length",
+          "alias": "Shape_Length",
+          "type": "Double",
+          "length": 8,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Direction",
+          "alias": "My direction",
+          "type": "Double",
+          "length": 8,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          10.0,
+          7,
+          null,
+          "{\"paths\":[[[500000,5000000],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ],
+      "definition": null
+    },
+    "after": {
+      "cogo": false,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "required": true,
+          "nullable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Shape_Length",
+          "alias": "Shape_Length",
+          "type": "Double",
+          "length": 8,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Direction",
+          "alias": "My direction",
+          "type": "Double",
+          "length": 8,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          10.0,
+          7,
+          null,
+          "{\"paths\":[[[500000,5000000],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ],
+      "definition": null
+    },
+    "repeat": {
+      "cogo": false,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "required": true,
+          "nullable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Shape_Length",
+          "alias": "Shape_Length",
+          "type": "Double",
+          "length": 8,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Direction",
+          "alias": "My direction",
+          "type": "Double",
+          "length": 8,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [
+        [
+          1,
+          10.0,
+          7,
+          null,
+          "{\"paths\":[[[500000,5000000],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+        ]
+      ],
+      "definition": null
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 7:05:21 PM\nWARNING 002044: This class is not COGO enabled\nSucceeded at Thursday, October 29, 2026 7:05:21 PM (Elapsed Time: 0.03 seconds)",
+    "repeat_messages": "Start Time: Thursday, October 29, 2026 7:05:21 PM\nWARNING 002044: This class is not COGO enabled\nSucceeded at Thursday, October 29, 2026 7:05:21 PM (Elapsed Time: 0.02 seconds)"
+  },
+  "point": {
+    "before": {
+      "cogo": false,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "required": true,
+          "nullable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [],
+      "definition": null
+    },
+    "error": "Failed to execute. Parameters are not valid.\nERROR 003917: The feature class geometry is not of type polyline\nFailed to execute (DisableCOGO).\n",
+    "messages": "Start Time: Thursday, October 29, 2026 7:05:21 PM\nFailed to execute. Parameters are not valid.\nERROR 003917: The feature class geometry is not of type polyline\nFailed to execute (DisableCOGO).\nFailed at Thursday, October 29, 2026 7:05:21 PM (Elapsed Time: 0.00 seconds)",
+    "after": {
+      "cogo": false,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "required": true,
+          "nullable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [],
+      "definition": null
+    }
+  },
+  "polygon": {
+    "before": {
+      "cogo": false,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "required": true,
+          "nullable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Shape_Length",
+          "alias": "Shape_Length",
+          "type": "Double",
+          "length": 8,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Shape_Area",
+          "alias": "Shape_Area",
+          "type": "Double",
+          "length": 8,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [],
+      "definition": null
+    },
+    "error": "Failed to execute. Parameters are not valid.\nERROR 003917: The feature class geometry is not of type polyline\nFailed to execute (DisableCOGO).\n",
+    "messages": "Start Time: Thursday, October 29, 2026 7:05:21 PM\nFailed to execute. Parameters are not valid.\nERROR 003917: The feature class geometry is not of type polyline\nFailed to execute (DisableCOGO).\nFailed at Thursday, October 29, 2026 7:05:21 PM (Elapsed Time: 0.00 seconds)",
+    "after": {
+      "cogo": false,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "required": true,
+          "nullable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Shape_Length",
+          "alias": "Shape_Length",
+          "type": "Double",
+          "length": 8,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "Shape_Area",
+          "alias": "Shape_Area",
+          "type": "Double",
+          "length": 8,
+          "required": true,
+          "nullable": true,
+          "domain": ""
+        },
+        {
+          "name": "KEY",
+          "alias": "KEY",
+          "type": "Integer",
+          "length": 4,
+          "required": false,
+          "nullable": true,
+          "domain": ""
+        }
+      ],
+      "rows": [],
+      "definition": null
+    }
+  },
+  "table_only": {
+    "before": {
+      "cogo": null,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "required": true,
+          "nullable": false,
+          "domain": ""
+        }
+      ],
+      "rows": [],
+      "definition": null
+    },
+    "error": "Failed to execute. Parameters are not valid.\nERROR 000732: Input Line Features: Dataset Z:\\tmp\\unigis-disable-cogo-probe\\source.gdb\\table_only does not exist or is not supported\nFailed to execute (DisableCOGO).\n",
+    "messages": "Start Time: Thursday, October 29, 2026 7:05:22 PM\nFailed to execute. Parameters are not valid.\nERROR 000732: Input Line Features: Dataset Z:\\tmp\\unigis-disable-cogo-probe\\source.gdb\\table_only does not exist or is not supported\nFailed to execute (DisableCOGO).\nFailed at Thursday, October 29, 2026 7:05:22 PM (Elapsed Time: 0.00 seconds)",
+    "after": {
+      "cogo": null,
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "required": true,
+          "nullable": false,
+          "domain": ""
+        }
+      ],
+      "rows": [],
+      "definition": null
+    }
+  },
+  "shape": {
+    "before": {
+      "cogo": null,
+      "fields": [
+        {
+          "name": "FID",
+          "alias": "FID",
+          "type": "OID",
+          "length": 4,
+          "required": true,
+          "nullable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "required": true,
+          "nullable": false,
+          "domain": ""
+        },
+        {
+          "name": "Id",
+          "alias": "Id",
+          "type": "Integer",
+          "length": 6,
+          "required": false,
+          "nullable": false,
+          "domain": ""
+        }
+      ],
+      "rows": [],
+      "definition": null
+    },
+    "after": {
+      "cogo": null,
+      "fields": [
+        {
+          "name": "FID",
+          "alias": "FID",
+          "type": "OID",
+          "length": 4,
+          "required": true,
+          "nullable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "required": true,
+          "nullable": false,
+          "domain": ""
+        },
+        {
+          "name": "Id",
+          "alias": "Id",
+          "type": "Integer",
+          "length": 6,
+          "required": false,
+          "nullable": false,
+          "domain": ""
+        }
+      ],
+      "rows": [],
+      "definition": null
+    },
+    "repeat": {
+      "cogo": null,
+      "fields": [
+        {
+          "name": "FID",
+          "alias": "FID",
+          "type": "OID",
+          "length": 4,
+          "required": true,
+          "nullable": false,
+          "domain": ""
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "required": true,
+          "nullable": false,
+          "domain": ""
+        },
+        {
+          "name": "Id",
+          "alias": "Id",
+          "type": "Integer",
+          "length": 6,
+          "required": false,
+          "nullable": false,
+          "domain": ""
+        }
+      ],
+      "rows": [],
+      "definition": null
+    },
+    "messages": "Start Time: Thursday, October 29, 2026 7:05:22 PM\nWARNING 002051: Failed to set the required flag on field Direction\nWARNING 002051: Failed to set the required flag on field Distance\nWARNING 002051: Failed to set the required flag on field Radius\nWARNING 002051: Failed to set the required flag on field ArcLength\nWARNING 002051: Failed to set the required flag on field Radius2\nSucceeded at Thursday, October 29, 2026 7:05:22 PM (Elapsed Time: 0.00 seconds)",
+    "repeat_messages": "Start Time: Thursday, October 29, 2026 7:05:22 PM\nWARNING 002051: Failed to set the required flag on field Direction\nWARNING 002051: Failed to set the required flag on field Distance\nWARNING 002051: Failed to set the required flag on field Radius\nWARNING 002051: Failed to set the required flag on field ArcLength\nWARNING 002051: Failed to set the required flag on field Radius2\nSucceeded at Thursday, October 29, 2026 7:05:22 PM (Elapsed Time: 0.00 seconds)"
+  }
+}

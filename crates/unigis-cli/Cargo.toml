@@ -28,6 +28,7 @@ chrono.workspace = true
 workspace = true
 
 [dev-dependencies]
+roxmltree.workspace = true
 geographiclib-rs.workspace = true
 unigis-testkit.workspace = true
 unigis-raster.workspace = true

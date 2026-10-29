@@ -878,3 +878,8 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
       match ArcGIS; full local gate passed. Local shapefile/DBF/TIFF families,
       regular files and FileGDB items/workspaces. Folder recycling and ambiguous
       kind selection remain gaps. Research: scripts/research/delete_multiple/README.md.
+
+- [x] Disable COGO: native FileGDB metadata edit and shapefile no-op implemented;
+      8 ArcGIS references, original dimension fields/values retained. Full local
+      gate passed; layer styling and other hosts remain gaps. Research:
+      scripts/research/disable_cogo/README.md.
