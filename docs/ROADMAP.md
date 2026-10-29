@@ -839,3 +839,7 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
       output units.14 ArcGIS cases (176 rows plus2 refusals) match native output;
       independent aligned-overlap and reversed-key controls cover Pairwise
       differences. Full local gate passed; findings in scripts/research/pairwise_neighbors/.
+
+- [ ] Remove Overlap (multiple): deferred; default CENTER_LINE needs a medial-axis
+      partition primitive absent from the native engine.18 controls saved in
+      scripts/research/remove_overlap/; reason recorded in WORK_QUEUE_DEFERRED.txt.

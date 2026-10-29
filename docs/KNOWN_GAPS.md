@@ -126,3 +126,9 @@ Update this file when a gap is found or closed.
   multipart components, environments, empty-output warning text, field collisions and unprobed output schemas remain
   unsupported or unverified. Performance unmeasured. Evidence:
   `scripts/research/pairwise_neighbors/README.md`.
+
+- Remove Overlap (multiple) deferred: default CENTER_LINE requires medial-axis/branched
+  partitioning not present in the native engine. Even two equal rectangles yield
+  a bent boundary (areas325/275) unlike a centroid bisector (300/300). THIESSEN
+  and GRID controls are saved but no implementation is claimed. Evidence:
+  `scripts/research/remove_overlap/README.md`.

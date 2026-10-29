@@ -1,0 +1,681 @@
+{
+  "rectangles_CENTER_LINE": {
+    "fields": [
+      [
+        "OBJECTID",
+        "OID",
+        4
+      ],
+      [
+        "Shape",
+        "Geometry",
+        0
+      ],
+      [
+        "ORIG_FID",
+        "Integer",
+        0
+      ],
+      [
+        "NAME",
+        "String",
+        8
+      ]
+    ],
+    "rows": [
+      [
+        1,
+        "A",
+        "{\"rings\":[[[500020,5000000],[500000,5000000],[500000,5000020],[500020,5000020],[500015,5000015],[500015,5000005],[500020,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        325.0
+      ],
+      [
+        1,
+        "B",
+        "{\"rings\":[[[500030,5000000],[500020,5000000],[500015,5000005],[500015,5000015],[500020,5000020],[500030,5000020],[500030,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        275.0
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:01:07 PM\nSucceeded at Thursday, October 29, 2026 3:01:09 PM (Elapsed Time: 1.78 seconds)"
+  },
+  "rectangles_THIESSEN": {
+    "fields": [
+      [
+        "OBJECTID",
+        "OID",
+        4
+      ],
+      [
+        "Shape",
+        "Geometry",
+        0
+      ],
+      [
+        "ORIG_FID",
+        "Integer",
+        0
+      ],
+      [
+        "NAME",
+        "String",
+        8
+      ]
+    ],
+    "rows": [
+      [
+        1,
+        "A",
+        "{\"rings\":[[[500015,5000000],[500000,5000000],[500000,5000020],[500015,5000020],[500015,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        300.0
+      ],
+      [
+        1,
+        "B",
+        "{\"rings\":[[[500030,5000000],[500015,5000000],[500015,5000020],[500030,5000020],[500030,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        300.0
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:01:09 PM\nSucceeded at Thursday, October 29, 2026 3:01:09 PM (Elapsed Time: 0.02 seconds)"
+  },
+  "rectangles_GRID": {
+    "fields": [
+      [
+        "OBJECTID",
+        "OID",
+        4
+      ],
+      [
+        "Shape",
+        "Geometry",
+        0
+      ],
+      [
+        "ORIG_FID",
+        "Integer",
+        0
+      ],
+      [
+        "NAME",
+        "String",
+        8
+      ]
+    ],
+    "rows": [
+      [
+        1,
+        "A",
+        "{\"rings\":[[[500010,5000020],[500010,5000000],[500000,5000000],[500000,5000020],[500010,5000020]],[[500010,5000020],[500015,5000020],[500015,5000010],[500010,5000020]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        225.0
+      ],
+      [
+        1,
+        "B",
+        "{\"rings\":[[[500030,5000020],[500030,5000000],[500010,5000000],[500010,5000020],[500015,5000010],[500015,5000020],[500030,5000020]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        375.0
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:01:09 PM\nSucceeded at Thursday, October 29, 2026 3:01:09 PM (Elapsed Time: 0.03 seconds)"
+  },
+  "unequal_CENTER_LINE": {
+    "fields": [
+      [
+        "OBJECTID",
+        "OID",
+        4
+      ],
+      [
+        "Shape",
+        "Geometry",
+        0
+      ],
+      [
+        "ORIG_FID",
+        "Integer",
+        0
+      ],
+      [
+        "NAME",
+        "String",
+        8
+      ]
+    ],
+    "rows": [
+      [
+        1,
+        "A",
+        "{\"rings\":[[[500040,5000000],[500000,5000000],[500000,5000020],[500040,5000020],[500040,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        800.0
+      ],
+      [
+        1,
+        "B",
+        null,
+        null
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:01:09 PM\nSucceeded at Thursday, October 29, 2026 3:01:09 PM (Elapsed Time: 0.03 seconds)"
+  },
+  "unequal_THIESSEN": {
+    "fields": [
+      [
+        "OBJECTID",
+        "OID",
+        4
+      ],
+      [
+        "Shape",
+        "Geometry",
+        0
+      ],
+      [
+        "ORIG_FID",
+        "Integer",
+        0
+      ],
+      [
+        "NAME",
+        "String",
+        8
+      ]
+    ],
+    "rows": [
+      [
+        1,
+        "A",
+        "{\"rings\":[[[500040,5000000],[500000,5000000],[500000,5000020],[500040,5000020],[500040,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        800.0
+      ],
+      [
+        1,
+        "B",
+        null,
+        null
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:01:09 PM\nSucceeded at Thursday, October 29, 2026 3:01:09 PM (Elapsed Time: 0.02 seconds)"
+  },
+  "unequal_GRID": {
+    "fields": [
+      [
+        "OBJECTID",
+        "OID",
+        4
+      ],
+      [
+        "Shape",
+        "Geometry",
+        0
+      ],
+      [
+        "ORIG_FID",
+        "Integer",
+        0
+      ],
+      [
+        "NAME",
+        "String",
+        8
+      ]
+    ],
+    "rows": [
+      [
+        1,
+        "A",
+        "{\"rings\":[[[500040,5000000],[500000,5000000],[500000,5000020],[500040,5000020],[500040,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        800.0
+      ],
+      [
+        1,
+        "B",
+        null,
+        null
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:01:09 PM\nSucceeded at Thursday, October 29, 2026 3:01:09 PM (Elapsed Time: 0.02 seconds)"
+  },
+  "oblique_CENTER_LINE": {
+    "fields": [
+      [
+        "OBJECTID",
+        "OID",
+        4
+      ],
+      [
+        "Shape",
+        "Geometry",
+        0
+      ],
+      [
+        "ORIG_FID",
+        "Integer",
+        0
+      ],
+      [
+        "NAME",
+        "String",
+        8
+      ]
+    ],
+    "rows": [
+      [
+        1,
+        "A",
+        "{\"rings\":[[[500008.75,5000000],[500000,5000000],[500000,5000020],[500017.5,5000020],[500017.90369999968,5000017.9036999997],[500013.12509999983,5000010.8454999998],[500013.68250000011,5000006.3175000008],[500008.75,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        278.1631920074302
+      ],
+      [
+        1,
+        "B",
+        "{\"rings\":[[[500025,5000000],[500010,4999995],[500008.75,5000000],[500013.68250000011,5000006.3175000008],[500013.12509999983,5000010.8454999998],[500017.90369999968,5000017.9036999997],[500017.5,5000020],[500030,5000025],[500025,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        331.2118079925698
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:01:09 PM\nSucceeded at Thursday, October 29, 2026 3:01:09 PM (Elapsed Time: 0.03 seconds)"
+  },
+  "oblique_THIESSEN": {
+    "fields": [
+      [
+        "OBJECTID",
+        "OID",
+        4
+      ],
+      [
+        "Shape",
+        "Geometry",
+        0
+      ],
+      [
+        "ORIG_FID",
+        "Integer",
+        0
+      ],
+      [
+        "NAME",
+        "String",
+        8
+      ]
+    ],
+    "rows": [
+      [
+        1,
+        "A",
+        "{\"rings\":[[[500013.43549999967,5000000],[500000,5000000],[500000,5000020],[500017.5,5000020],[500014.11780000012,5000018.6470999997],[500013.43549999967,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        278.2824310237678
+      ],
+      [
+        1,
+        "B",
+        "{\"rings\":[[[500025,5000000],[500010,4999995],[500008.75,5000000],[500013.43549999967,5000000],[500014.11780000012,5000018.6470999997],[500030,5000025],[500025,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        331.09244397411624
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:01:09 PM\nSucceeded at Thursday, October 29, 2026 3:01:09 PM (Elapsed Time: 0.03 seconds)"
+  },
+  "oblique_GRID": {
+    "fields": [
+      [
+        "OBJECTID",
+        "OID",
+        4
+      ],
+      [
+        "Shape",
+        "Geometry",
+        0
+      ],
+      [
+        "ORIG_FID",
+        "Integer",
+        0
+      ],
+      [
+        "NAME",
+        "String",
+        8
+      ]
+    ],
+    "rows": [
+      [
+        1,
+        "A",
+        "{\"rings\":[[[500008.75,5000000],[500000,5000000],[500000,5000020],[500017.5,5000020],[500020,5000020],[500013.09619999956,5000009.9781999998],[500008.75,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        274.8346249968745
+      ],
+      [
+        1,
+        "B",
+        "{\"rings\":[[[500030,5000025],[500025,5000000],[500010,4999995],[500008.75,5000000],[500013.09619999956,5000009.9781999998],[500020,5000020],[500017.5,5000020],[500030,5000025]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        334.5403750031255
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:01:09 PM\nSucceeded at Thursday, October 29, 2026 3:01:09 PM (Elapsed Time: 0.03 seconds)"
+  },
+  "contained_CENTER_LINE": {
+    "fields": [
+      [
+        "OBJECTID",
+        "OID",
+        4
+      ],
+      [
+        "Shape",
+        "Geometry",
+        0
+      ],
+      [
+        "ORIG_FID",
+        "Integer",
+        0
+      ],
+      [
+        "NAME",
+        "String",
+        8
+      ]
+    ],
+    "rows": [
+      [
+        1,
+        "A",
+        "{\"rings\":[[[500040,5000000],[500000,5000000],[500000,5000040],[500040,5000040],[500040,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        1600.0
+      ],
+      [
+        1,
+        "B",
+        null,
+        null
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:01:09 PM\nSucceeded at Thursday, October 29, 2026 3:01:09 PM (Elapsed Time: 0.02 seconds)"
+  },
+  "contained_THIESSEN": {
+    "fields": [
+      [
+        "OBJECTID",
+        "OID",
+        4
+      ],
+      [
+        "Shape",
+        "Geometry",
+        0
+      ],
+      [
+        "ORIG_FID",
+        "Integer",
+        0
+      ],
+      [
+        "NAME",
+        "String",
+        8
+      ]
+    ],
+    "rows": [
+      [
+        1,
+        "A",
+        "{\"rings\":[[[500040,5000000],[500000,5000000],[500000,5000040],[500040,5000040],[500040,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        1600.0
+      ],
+      [
+        1,
+        "B",
+        null,
+        null
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:01:09 PM\nSucceeded at Thursday, October 29, 2026 3:01:10 PM (Elapsed Time: 0.02 seconds)"
+  },
+  "contained_GRID": {
+    "fields": [
+      [
+        "OBJECTID",
+        "OID",
+        4
+      ],
+      [
+        "Shape",
+        "Geometry",
+        0
+      ],
+      [
+        "ORIG_FID",
+        "Integer",
+        0
+      ],
+      [
+        "NAME",
+        "String",
+        8
+      ]
+    ],
+    "rows": [
+      [
+        1,
+        "A",
+        "{\"rings\":[[[500040,5000000],[500000,5000000],[500000,5000040],[500040,5000040],[500040,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        1600.0
+      ],
+      [
+        1,
+        "B",
+        null,
+        null
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:01:10 PM\nSucceeded at Thursday, October 29, 2026 3:01:10 PM (Elapsed Time: 0.02 seconds)"
+  },
+  "three_CENTER_LINE": {
+    "fields": [
+      [
+        "OBJECTID",
+        "OID",
+        4
+      ],
+      [
+        "Shape",
+        "Geometry",
+        0
+      ],
+      [
+        "ORIG_FID",
+        "Integer",
+        0
+      ],
+      [
+        "NAME",
+        "String",
+        8
+      ]
+    ],
+    "rows": [
+      [
+        1,
+        "A",
+        "{\"rings\":[[[500005,5000020],[500010,5000015],[500015,5000015],[500015,5000005],[500020,5000000],[500000,5000000],[500000,5000020],[500005,5000020]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        275.0
+      ],
+      [
+        1,
+        "B",
+        "{\"rings\":[[[500030,5000000],[500020,5000000],[500015,5000005],[500015,5000015],[500020,5000015],[500025,5000020],[500030,5000020],[500030,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        250.0
+      ],
+      [
+        1,
+        "C",
+        "{\"rings\":[[[500015,5000015],[500010,5000015],[500005,5000020],[500005,5000030],[500025,5000030],[500025,5000020],[500020,5000015],[500015,5000015]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        275.0
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:01:10 PM\nSucceeded at Thursday, October 29, 2026 3:01:10 PM (Elapsed Time: 0.03 seconds)"
+  },
+  "three_THIESSEN": {
+    "fields": [
+      [
+        "OBJECTID",
+        "OID",
+        4
+      ],
+      [
+        "Shape",
+        "Geometry",
+        0
+      ],
+      [
+        "ORIG_FID",
+        "Integer",
+        0
+      ],
+      [
+        "NAME",
+        "String",
+        8
+      ]
+    ],
+    "rows": [
+      [
+        1,
+        "A",
+        "{\"rings\":[[[500015,5000000],[500000,5000000],[500000,5000020],[500005,5000020],[500005,5000018.75],[500015,5000013.75],[500015,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        262.5
+      ],
+      [
+        1,
+        "B",
+        "{\"rings\":[[[500030,5000000],[500015,5000000],[500015,5000013.75],[500025,5000018.75],[500025,5000020],[500030,5000020],[500030,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        262.5
+      ],
+      [
+        1,
+        "C",
+        "{\"rings\":[[[500025,5000018.75],[500015,5000013.75],[500005,5000018.75],[500005,5000030],[500025,5000030],[500025,5000018.75]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        275.0
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:01:10 PM\nSucceeded at Thursday, October 29, 2026 3:01:10 PM (Elapsed Time: 0.03 seconds)"
+  },
+  "three_GRID": {
+    "error": "ERROR 999999: Something unexpected caused the tool to fail. Contact Esri Technical Support (http://esriurl.com/support) to Report a Bug, and refer to the error help for potential solutions or workarounds.\nCOM Error;\nFunction: BaseGPFunction::Execute;\nCOM Error;\nFunction: CGPRemoveOverlapMultipleExecutor::Execute;\nCOM Error;\nFunction: CGPRemoveOverlapMultipleExecutor::RunRemoveOverlap;\nCOM Error;\nFunction: BaseGPFunction::Execute;\nCOM Error;\nFunction: CGPRemoveOverlapExecutor::Execute;\nCOM Error;\nFunction: CGPRemoveOverlapExecutor::GenerateOutput;\nCOM Error;\nFunction: CRemoveOverlapExecutorGrid::VerifyResults;\nCOM Error;\nFunction: CRemoveOverlapExecutorGrid::GetHoles;\nError code: 0x80004005\nError description: COM Error;\nFunction: gp::exec;\nCreateFeatureClassName: The workspace InMemoryDB\\GPProMemoryWorkspace does not exist.\nFailed to execute (RemoveOverlapMultiple).\n",
+    "messages": "Start Time: Thursday, October 29, 2026 3:01:10 PM\nERROR 999999: Something unexpected caused the tool to fail. Contact Esri Technical Support (http://esriurl.com/support) to Report a Bug, and refer to the error help for potential solutions or workarounds.\nCOM Error;\nFunction: BaseGPFunction::Execute;\nCOM Error;\nFunction: CGPRemoveOverlapMultipleExecutor::Execute;\nCOM Error;\nFunction: CGPRemoveOverlapMultipleExecutor::RunRemoveOverlap;\nCOM Error;\nFunction: BaseGPFunction::Execute;\nCOM Error;\nFunction: CGPRemoveOverlapExecutor::Execute;\nCOM Error;\nFunction: CGPRemoveOverlapExecutor::GenerateOutput;\nCOM Error;\nFunction: CRemoveOverlapExecutorGrid::VerifyResults;\nCOM Error;\nFunction: CRemoveOverlapExecutorGrid::GetHoles;\nError code: 0x80004005\nError description: COM Error;\nFunction: gp::exec;\nCreateFeatureClassName: The workspace InMemoryDB\\GPProMemoryWorkspace does not exist.\nFailed to execute (RemoveOverlapMultiple).\nFailed at Thursday, October 29, 2026 3:01:10 PM (Elapsed Time: 0.08 seconds)"
+  },
+  "disjoint_CENTER_LINE": {
+    "fields": [
+      [
+        "OBJECTID",
+        "OID",
+        4
+      ],
+      [
+        "Shape",
+        "Geometry",
+        0
+      ],
+      [
+        "ORIG_FID",
+        "Integer",
+        0
+      ],
+      [
+        "NAME",
+        "String",
+        8
+      ]
+    ],
+    "rows": [
+      [
+        1,
+        "A",
+        "{\"rings\":[[[500010,5000000],[500000,5000000],[500000,5000010],[500010,5000010],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        100.0
+      ],
+      [
+        1,
+        "B",
+        "{\"rings\":[[[500040,5000000],[500030,5000000],[500030,5000010],[500040,5000010],[500040,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        100.0
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:01:10 PM\nSucceeded at Thursday, October 29, 2026 3:01:10 PM (Elapsed Time: 0.02 seconds)"
+  },
+  "disjoint_THIESSEN": {
+    "fields": [
+      [
+        "OBJECTID",
+        "OID",
+        4
+      ],
+      [
+        "Shape",
+        "Geometry",
+        0
+      ],
+      [
+        "ORIG_FID",
+        "Integer",
+        0
+      ],
+      [
+        "NAME",
+        "String",
+        8
+      ]
+    ],
+    "rows": [
+      [
+        1,
+        "A",
+        "{\"rings\":[[[500010,5000000],[500000,5000000],[500000,5000010],[500010,5000010],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        100.0
+      ],
+      [
+        1,
+        "B",
+        "{\"rings\":[[[500040,5000000],[500030,5000000],[500030,5000010],[500040,5000010],[500040,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        100.0
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:01:10 PM\nSucceeded at Thursday, October 29, 2026 3:01:10 PM (Elapsed Time: 0.02 seconds)"
+  },
+  "disjoint_GRID": {
+    "fields": [
+      [
+        "OBJECTID",
+        "OID",
+        4
+      ],
+      [
+        "Shape",
+        "Geometry",
+        0
+      ],
+      [
+        "ORIG_FID",
+        "Integer",
+        0
+      ],
+      [
+        "NAME",
+        "String",
+        8
+      ]
+    ],
+    "rows": [
+      [
+        1,
+        "A",
+        "{\"rings\":[[[500010,5000000],[500000,5000000],[500000,5000010],[500010,5000010],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        100.0
+      ],
+      [
+        1,
+        "B",
+        "{\"rings\":[[[500040,5000000],[500030,5000000],[500030,5000010],[500040,5000010],[500040,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+        100.0
+      ]
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:01:10 PM\nSucceeded at Thursday, October 29, 2026 3:01:10 PM (Elapsed Time: 0.02 seconds)"
+  }
+}
