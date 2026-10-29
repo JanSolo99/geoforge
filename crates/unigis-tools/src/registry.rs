@@ -1118,7 +1118,14 @@ fn field_statistics_to_table(ctx: &dyn Context) -> Result<Outcome> {
         .map(|f| f.trim().to_owned())
         .filter(|f| !f.is_empty())
         .collect();
-    let numeric = !text(ctx, t, "field_type").is_some_and(|f| f.eq_ignore_ascii_case("text"));
+    let kind = match text(ctx, t, "field_type")
+        .map(|f| f.to_ascii_uppercase())
+        .as_deref()
+    {
+        Some("TEXT") => tables::FieldStatisticsType::Text,
+        Some("DATE") => tables::FieldStatisticsType::Date,
+        _ => tables::FieldStatisticsType::Numeric,
+    };
     let group_by = text(ctx, t, "group_by").filter(|g| !g.trim().is_empty());
     // `KEYWORD [Output Name];...`
     let statistics: Vec<(String, String)> = text(ctx, t, "statistics")
@@ -1135,7 +1142,7 @@ fn field_statistics_to_table(ctx: &dyn Context) -> Result<Outcome> {
     Ok(Outcome::Table(tables::field_statistics_to_table(
         ctx.features("input")?.as_ref(),
         &fields,
-        numeric,
+        kind,
         group_by.as_deref().map(str::trim),
         &statistics,
     )?))
@@ -1733,7 +1740,7 @@ pub static TOOLS: &[Tool] = &[
         id: "field_statistics_to_table",
         name: "Field Statistics To Table",
         toolbox: "Data Management › Fields",
-        summary: "Descriptive statistics per field (ArcGIS Pro Field Statistics To Table), one field type per run, optionally per group.",
+        summary: "Descriptive statistics per field (ArcGIS Pro Field Statistics To Table), one field type (numeric, text or date) per run, optionally per group.",
         params: &[
             Param {
                 name: "input",
@@ -1754,7 +1761,7 @@ pub static TOOLS: &[Tool] = &[
             Param {
                 name: "field_type",
                 label: "Field Type",
-                kind: Kind::Choice(&["Numeric", "Text"]),
+                kind: Kind::Choice(&["Numeric", "Text", "Date"]),
                 required: false,
                 default: "Numeric",
                 help: "The kind of fields to summarize; others in the list are skipped.",

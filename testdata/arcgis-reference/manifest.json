@@ -75576,6 +75576,375 @@
           "output_format": "DD_1"
         }
       }
+    },
+    "fst_dates_date": {
+      "tool": "management.FieldStatisticsToTable",
+      "args": [
+        "testdata/geoproc/dates.dbf",
+        "<out>",
+        "D;E;ID",
+        "DATE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "FieldName",
+          "String",
+          1,
+          0,
+          0
+        ],
+        [
+          "Alias",
+          "String",
+          1,
+          0,
+          0
+        ],
+        [
+          "FieldType",
+          "String",
+          4,
+          0,
+          0
+        ],
+        [
+          "Nulls",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Minimum",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "Maximum",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "Mean",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "Median",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "Count",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NumberofUn",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Mode",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "LeastCommo",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "Range",
+          "String",
+          11,
+          0,
+          0
+        ],
+        [
+          "FirstQuart",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "ThirdQuart",
+          "Date",
+          8,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "field_statistics_to_table",
+        "params": {
+          "input": "testdata/geoproc/dates.dbf",
+          "output": "<out>",
+          "fields": "D;E;ID",
+          "field_type": "DATE"
+        }
+      }
+    },
+    "fst_dates_date_by_grp": {
+      "tool": "management.FieldStatisticsToTable",
+      "args": [
+        "testdata/geoproc/dates.dbf",
+        "<out>",
+        "D",
+        "DATE",
+        "GRP"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "GRP",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "FieldName",
+          "String",
+          1,
+          0,
+          0
+        ],
+        [
+          "Alias",
+          "String",
+          1,
+          0,
+          0
+        ],
+        [
+          "FieldType",
+          "String",
+          4,
+          0,
+          0
+        ],
+        [
+          "Nulls",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Minimum",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "Maximum",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "Mean",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "Median",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "Count",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NumberofUn",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Mode",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "LeastCommo",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "Range",
+          "String",
+          11,
+          0,
+          0
+        ],
+        [
+          "FirstQuart",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "ThirdQuart",
+          "Date",
+          8,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "field_statistics_to_table",
+        "params": {
+          "input": "testdata/geoproc/dates.dbf",
+          "output": "<out>",
+          "fields": "D",
+          "field_type": "DATE",
+          "group_by": "GRP"
+        }
+      }
+    },
+    "fst_dates_date_stats": {
+      "tool": "management.FieldStatisticsToTable",
+      "args": [
+        "testdata/geoproc/dates.dbf",
+        "<out>",
+        "D;E",
+        "DATE",
+        "",
+        "MODE Mo;RANGE;MEAN Avg;FIELDNAME"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Mo",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "Range",
+          "String",
+          11,
+          0,
+          0
+        ],
+        [
+          "Avg",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "FieldName",
+          "String",
+          1,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "field_statistics_to_table",
+        "params": {
+          "input": "testdata/geoproc/dates.dbf",
+          "output": "<out>",
+          "fields": "D;E",
+          "field_type": "DATE",
+          "statistics": "MODE Mo;RANGE;MEAN Avg;FIELDNAME"
+        }
+      }
+    },
+    "fst_err_date_numeric_stat": {
+      "tool": "management.FieldStatisticsToTable",
+      "args": [
+        "testdata/geoproc/dates.dbf",
+        "<out>",
+        "D",
+        "DATE",
+        "",
+        "SUM S"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000800: The value is not a member of FIELDNAME | ALIAS | FIELDTYPE | NULLS | MINIMUM | MAXIMUM | MEAN | MEDIAN | COUNT | NUMBEROFUNIQUEVALUES | MODE | LEASTCOMMON | RANGE | FIRSTQUARTILE | THIRDQUARTILE.",
+        "Failed to execute (FieldStatisticsToTable)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "field_statistics_to_table",
+        "params": {
+          "input": "testdata/geoproc/dates.dbf",
+          "output": "<out>",
+          "fields": "D",
+          "field_type": "DATE",
+          "statistics": "SUM S"
+        }
+      }
     }
   }
 }

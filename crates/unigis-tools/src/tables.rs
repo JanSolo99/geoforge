@@ -317,9 +317,18 @@ pub fn encode_field(input: &dyn FeatureClass, field: &str, method: &str) -> Resu
     })
 }
 
+/// The field type a Field Statistics To Table run summarizes.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum FieldStatisticsType {
+    Numeric,
+    Text,
+    Date,
+}
+
 /// Field Statistics To Table (one field type per run): a row per field with its null count,
-/// count, unique values, mode and least common value, and for numeric fields the usual moments
-/// and quartiles. Sample standard deviation, population skewness and (non-excess) kurtosis,
+/// count, unique values, mode and least common value, for numeric fields the usual moments and
+/// quartiles, and for date fields minimum, maximum, mean, median, quartiles and a Range text
+/// (see [`date_range_text`]). Sample standard deviation, population skewness and (non-excess) kurtosis,
 /// quartiles by linear interpolation at `(n-1)p`, outliers beyond 1.5 IQR (observed, ArcGIS Pro
 /// 3.7). With `group_by` (Short, Long, BigInteger, Text or a date type) the rows repeat per group
 /// value, ascending (text by byte order), led by the group field; rows with a null group value
@@ -329,10 +338,12 @@ pub fn encode_field(input: &dyn FeatureClass, field: &str, method: &str) -> Resu
 pub fn field_statistics_to_table(
     input: &dyn FeatureClass,
     field_names: &[String],
-    numeric: bool,
+    kind: FieldStatisticsType,
     group_by: Option<&str>,
     statistics: &[(String, String)],
 ) -> Result<TableOutput> {
+    let numeric = kind == FieldStatisticsType::Numeric;
+    let date = kind == FieldStatisticsType::Date;
     let fields = input.fields().to_vec();
     let mut picked = Vec::new();
     for n in field_names {
@@ -348,7 +359,12 @@ pub fn field_statistics_to_table(
                 | FieldType::Single
                 | FieldType::Double
         );
-        if is_numeric == numeric && (is_numeric || fields[i].field_type == FieldType::String) {
+        let wanted = match kind {
+            FieldStatisticsType::Numeric => is_numeric,
+            FieldStatisticsType::Text => fields[i].field_type == FieldType::String,
+            FieldStatisticsType::Date => fields[i].field_type == FieldType::Date,
+        };
+        if wanted {
             picked.push(i);
         }
     }
@@ -407,6 +423,7 @@ pub fn field_statistics_to_table(
                 FieldType::BigInteger => "BigInteger".to_owned(),
                 FieldType::Single => "Float".to_owned(),
                 FieldType::Double => "Double".to_owned(),
+                FieldType::Date => "Date".to_owned(),
                 _ => format!("Text ({})", f.length),
             };
             let nulls = rows_in
@@ -475,6 +492,45 @@ pub fn field_statistics_to_table(
                     opt(sd.map(|s| s / mean)),
                     opt((n > 2 && m2 > 0.0).then(|| moment(3) / m2.powf(1.5))),
                     opt((n > 2 && m2 > 0.0).then(|| moment(4) / (m2 * m2))),
+                ]);
+            } else if date {
+                // Milliseconds since the epoch.
+                let mut v: Vec<f64> = rows_in
+                    .iter()
+                    .filter_map(|r| match &r[i] {
+                        Value::Date(d) => Some(d.and_utc().timestamp_millis() as f64),
+                        _ => None,
+                    })
+                    .collect();
+                v.sort_by(f64::total_cmp);
+                let n = v.len();
+                let (counts, mode, least) =
+                    value_counts(&v.iter().map(|x| x.to_bits()).collect::<Vec<_>>());
+                let q = |p: f64| {
+                    let pos = (n as f64 - 1.0) * p;
+                    let lo = pos.floor() as usize;
+                    let hi = (lo + 1).min(n - 1);
+                    v[lo] + (v[hi] - v[lo]) * (pos - lo as f64)
+                };
+                let at = |ms: Option<f64>| {
+                    ms.and_then(|ms| chrono::DateTime::from_timestamp_millis(ms.round() as i64))
+                        .map_or(Value::Null, |d| Value::Date(d.naive_utc()))
+                };
+                let some = |f: &dyn Fn() -> f64| (n > 0).then(f);
+                row.extend([
+                    at(v.first().copied()),
+                    at(v.last().copied()),
+                    at(some(&|| v.iter().sum::<f64>() / n as f64)),
+                    at(some(&|| q(0.5))),
+                    Value::Integer(n as i32),
+                    Value::Integer(counts as i32),
+                    at(mode.map(f64::from_bits)),
+                    at(least.map(f64::from_bits)),
+                    v.first().zip(v.last()).map_or(Value::Null, |(a, b)| {
+                        Value::String(date_range_text((b - a) / 1000.0))
+                    }),
+                    at(some(&|| q(0.25))),
+                    at(some(&|| q(0.75))),
                 ]);
             } else {
                 let strings: Vec<&str> = rows_in
@@ -574,6 +630,23 @@ pub fn field_statistics_to_table(
             dbl("Skewness"),
             dbl("Kurtosis"),
         ]);
+    } else if date {
+        let day = |n: &str| Field::new(n, FieldType::Date);
+        let mut range = Field::new("Range", FieldType::String);
+        range.length = text_width(lead + 12);
+        cols.extend([
+            day("Minimum"),
+            day("Maximum"),
+            day("Mean"),
+            day("Median"),
+            Field::new("Count", FieldType::Integer),
+            Field::new("NumberofUniqueValues", FieldType::Integer),
+            day("Mode"),
+            day("LeastCommon"),
+            range,
+            day("FirstQuartile"),
+            day("ThirdQuartile"),
+        ]);
     } else {
         cols.push(Field::new("Count", FieldType::Integer));
         cols.push(Field::new("NumberofUniqueValues", FieldType::Integer));
@@ -584,7 +657,8 @@ pub fn field_statistics_to_table(
         }
     }
     // The statistics to keep, as (column index, output name). ArcGIS validates the keywords
-    // against the full list of both field types and rejects the numeric ones in a TEXT run.
+    // against the full list of all field types and rejects those of other types (e.g. SUM in
+    // a TEXT or DATE run).
     let mut picked_stats: Vec<(usize, String)> = Vec::new();
     for (k, (key, name)) in statistics.iter().enumerate() {
         if statistics[..k].iter().any(|(earlier, _)| earlier == key) {
@@ -634,6 +708,39 @@ pub fn field_statistics_to_table(
         fields: fields_out,
         rows,
     })
+}
+
+/// A date range as Field Statistics To Table writes it: in years (365 days) beyond 365 days,
+/// months (30 days) beyond 30, weeks beyond 7, days from one day, then hours, minutes, seconds
+/// and milliseconds. Whole amounts have no decimals; others one decimal when that is within 1%,
+/// else two (`200.1 years`, `1.33 months`, `3.7 months`, `60 seconds`; ArcGIS Pro 3.7).
+fn date_range_text(seconds: f64) -> String {
+    let days = seconds / 86_400.0;
+    let (v, unit) = if days > 365.0 {
+        (days / 365.0, "years")
+    } else if days > 30.0 {
+        (days / 30.0, "months")
+    } else if days > 7.0 {
+        (days / 7.0, "weeks")
+    } else if days >= 1.0 {
+        (days, "days")
+    } else if seconds > 3600.0 {
+        (seconds / 3600.0, "hours")
+    } else if seconds > 60.0 {
+        (seconds / 60.0, "minutes")
+    } else if seconds >= 1.0 {
+        (seconds, "seconds")
+    } else {
+        (seconds * 1000.0, "milliseconds")
+    };
+    let amount = if v.fract() == 0.0 {
+        format!("{v:.0}")
+    } else if (((v * 10.0).round() / 10.0) - v).abs() / v < 0.01 {
+        format!("{v:.1}")
+    } else {
+        format!("{v:.2}")
+    };
+    format!("{amount} {unit}")
 }
 
 /// The Field Statistics To Table keywords only a NUMERIC run accepts.
@@ -756,7 +863,14 @@ mod tests {
     #[test]
     fn field_statistics_groups_skip_nulls_and_sort_by_bytes() {
         let names = ["V".to_owned(), "S".to_owned()];
-        let t = field_statistics_to_table(&probe_table(), &names, true, Some("G"), &[]).unwrap();
+        let t = field_statistics_to_table(
+            &probe_table(),
+            &names,
+            FieldStatisticsType::Numeric,
+            Some("G"),
+            &[],
+        )
+        .unwrap();
         assert_eq!(t.fields[0].name, "G");
         assert_eq!(t.fields[0].length, 1);
         let keys: Vec<_> = t.rows.iter().map(|r| r[0].clone()).collect();
@@ -776,7 +890,14 @@ mod tests {
     #[test]
     fn field_statistics_group_by_short_drops_null_group_rows() {
         let names = ["V".to_owned()];
-        let t = field_statistics_to_table(&probe_table(), &names, true, Some("S"), &[]).unwrap();
+        let t = field_statistics_to_table(
+            &probe_table(),
+            &names,
+            FieldStatisticsType::Numeric,
+            Some("S"),
+            &[],
+        )
+        .unwrap();
         let keys: Vec<_> = t.rows.iter().map(|r| r[0].clone()).collect();
         let k: Vec<_> = [1, 2, 4, 5, 6, 7, 8].map(Value::SmallInteger).into();
         assert_eq!(keys, k);
@@ -788,9 +909,49 @@ mod tests {
     #[test]
     fn field_statistics_rejects_a_double_group_field() {
         let names = ["S".to_owned()];
-        let e =
-            field_statistics_to_table(&probe_table(), &names, true, Some("V"), &[]).unwrap_err();
+        let e = field_statistics_to_table(
+            &probe_table(),
+            &names,
+            FieldStatisticsType::Numeric,
+            Some("V"),
+            &[],
+        )
+        .unwrap_err();
         assert!(e.to_string().contains("003911"), "{e}");
+    }
+
+    #[test]
+    fn date_ranges_match_arcgis() {
+        for (days, want) in [
+            (29.0, "4.14 weeks"),
+            (30.0, "4.3 weeks"),
+            (31.0, "1.03 months"),
+            (60.0, "2 months"),
+            (100.0, "3.33 months"),
+            (110.0, "3.7 months"),
+            (365.0, "12.2 months"),
+            (366.0, "1.0 years"),
+            (550.0, "1.5 years"),
+            (851.0, "2.33 years"),
+            (1100.0, "3.0 years"),
+            (73049.0, "200.1 years"),
+            (7.0, "7 days"),
+            (7.5, "1.07 weeks"),
+            (1.0, "1 days"),
+        ] {
+            assert_eq!(date_range_text(days * 86_400.0), want, "{days} days");
+        }
+        for (seconds, want) in [
+            (0.0, "0 milliseconds"),
+            (60.0, "60 seconds"),
+            (61.0, "1.02 minutes"),
+            (3599.0, "60.0 minutes"),
+            (3600.0, "60 minutes"),
+            (3601.0, "1.0 hours"),
+            (86_399.0, "24.0 hours"),
+        ] {
+            assert_eq!(date_range_text(seconds), want, "{seconds} s");
+        }
     }
 
     fn stats(items: &[(&str, &str)]) -> Vec<(String, String)> {
@@ -809,7 +970,14 @@ mod tests {
             ("SUM", "1sum"),
             ("COUNT", ""),
         ]);
-        let t = field_statistics_to_table(&probe_table(), &names, true, Some("S"), &picks).unwrap();
+        let t = field_statistics_to_table(
+            &probe_table(),
+            &names,
+            FieldStatisticsType::Numeric,
+            Some("S"),
+            &picks,
+        )
+        .unwrap();
         let cols: Vec<_> = t.fields.iter().map(|f| f.name.as_str()).collect();
         assert_eq!(cols, ["S", "My_Med", "F1sum", "Count"]);
         assert_eq!(
@@ -825,7 +993,7 @@ mod tests {
         let all = field_statistics_to_table(
             &probe_table(),
             &names,
-            true,
+            FieldStatisticsType::Numeric,
             None,
             &stats(&[("median", "m")]),
         )
@@ -837,7 +1005,12 @@ mod tests {
     fn field_statistics_rejects_bad_statistic_lists() {
         let run = |numeric: bool, group: Option<&str>, items: &[(&str, &str)]| {
             let n = [if numeric { "V" } else { "G" }.to_owned()];
-            field_statistics_to_table(&probe_table(), &n, numeric, group, &stats(items))
+            let kind = if numeric {
+                FieldStatisticsType::Numeric
+            } else {
+                FieldStatisticsType::Text
+            };
+            field_statistics_to_table(&probe_table(), &n, kind, group, &stats(items))
                 .unwrap_err()
                 .to_string()
         };
