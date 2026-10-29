@@ -812,6 +812,9 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
       The angular numeric GARS boundary path remains separate follow-up work.
       Evidence: `scripts/research/coordinate_notation/grid/gars-boundaries.md`.
 
+- [x] Adjust 3D Z (reverse, constant or field shift, US-survey unit conversion): 6 in-place `a3z_*`
+      cases over point, line, polygon and multipoint Z shapefiles match ArcGIS. Evidence:
+      `scripts/research/adjust_3d_z/README.md`.
 - [x] Validate Join (message table: unindexed join fields, no-match and row-count rows;
       one-to-one match count; self-join refusal): 4 `vj_*` cases + 1 refusal match ArcGIS for
       shapefile/dBASE tables. Evidence: `scripts/research/validate_join/README.md`.

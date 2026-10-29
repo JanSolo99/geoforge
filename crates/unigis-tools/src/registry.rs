@@ -544,6 +544,26 @@ fn generate_transects_along_lines(ctx: &dyn Context) -> Result<ToolOutput> {
     )
 }
 
+fn adjust_3d_z(ctx: &dyn Context) -> Result<ToolOutput> {
+    let t = find("adjust_3d_z").ok_or_else(|| Error::Unsupported("adjust_3d_z".into()))?;
+    let input = ctx.features("input")?;
+    let (adjust, from, to) = (
+        text(ctx, t, "adjust_value"),
+        text(ctx, t, "from_units"),
+        text(ctx, t, "to_units"),
+    );
+    crate::adjust_z::adjust_3d_z(
+        input.as_ref(),
+        &crate::adjust_z::AdjustZ {
+            reverse: text(ctx, t, "reverse_sign")
+                .is_some_and(|r| r.eq_ignore_ascii_case("REVERSE")),
+            adjust: adjust.as_deref(),
+            from_units: from.as_deref(),
+            to_units: to.as_deref(),
+        },
+    )
+}
+
 fn validate_join(ctx: &dyn Context) -> Result<Outcome> {
     let t = find("validate_join").ok_or_else(|| Error::Unsupported("validate_join".into()))?;
     let need = |k: &str| text(ctx, t, k).ok_or_else(|| Error::Unsupported(format!("missing {k}")));
@@ -2227,6 +2247,73 @@ pub static TOOLS: &[Tool] = &[
         output_suffix: "ODLinks",
         measures: false,
         run: Runner::Features(generate_origin_destination_links),
+    },
+    Tool {
+        id: "adjust_3d_z",
+        name: "Adjust 3D Z",
+        toolbox: "Data Management › Features",
+        summary: "Shifts, converts or negates the z values of 3D features (ArcGIS Pro Adjust 3D Z).",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Features",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "Z-enabled features.",
+            },
+            Param {
+                name: "reverse_sign",
+                label: "Reverse Sign",
+                kind: Kind::Choice(&["NO_REVERSE", "REVERSE"]),
+                required: false,
+                default: "NO_REVERSE",
+                help: "",
+            },
+            Param {
+                name: "adjust_value",
+                label: "Adjust Value",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "A number or a numeric field added to every z (null counts as 0).",
+            },
+            Param {
+                name: "from_units",
+                label: "Convert From Units",
+                kind: Kind::Choice(&[
+                    "MILLIMETERS",
+                    "CENTIMETERS",
+                    "METERS",
+                    "INCHES",
+                    "FEET",
+                    "YARDS",
+                    "FATHOMS",
+                ]),
+                required: false,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "to_units",
+                label: "Convert To Units",
+                kind: Kind::Choice(&[
+                    "MILLIMETERS",
+                    "CENTIMETERS",
+                    "METERS",
+                    "INCHES",
+                    "FEET",
+                    "YARDS",
+                    "FATHOMS",
+                ]),
+                required: false,
+                default: "",
+                help: "",
+            },
+        ],
+        output_suffix: "AdjustedZ",
+        measures: true,
+        run: Runner::Features(adjust_3d_z),
     },
     Tool {
         id: "validate_join",

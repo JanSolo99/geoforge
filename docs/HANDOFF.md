@@ -14,7 +14,13 @@
 - /tmp is a 7.3 GB tmpfs mostly used by /tmp/opencode (not ours); a pre-push gate failed once with
   "No space left on device" in to_geodatabase; stale /tmp/gf-arcgis-ref-*, /tmp/gf-to-gdb-* dirs
   from killed test runs can be removed.
-- Next action after landing: next queue item (docs/WORK_QUEUE.md: Adjust 3D Z).
+- Validate Join landed and pushed as 001d7a1.
+- Adjust 3D Z (this run): crates/unigis-tools/src/adjust_z.rs + registry runner/entry
+  `adjust_3d_z`; 6 a3z_* IN_PLACE cases (Z shapefiles in testdata/shp); ogrinfo diff identical
+  except one z at 1e-14. Dropped a3z_m_mm (ArcGIS z-domain check, WARNING 002631; in
+  KNOWN_GAPS). Validation: full scripts/check EXIT 0, 245 Rust passed / 5 ignored
+  (/tmp/unigis-a3z-check.log).
+- Next action after landing: next queue item (docs/WORK_QUEUE.md: Calculate Geometry Attributes).
 
 Updated 2026-10-29T09:44:00.347279+00:00; last agent Codex.
 Workspace /mnt/media/ArcGIS_Linux, main; HEAD and origin/main both

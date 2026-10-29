@@ -93117,6 +93117,447 @@
           "output": "<out>"
         }
       }
+    },
+    "a3z_reverse": {
+      "tool": "management.Adjust3DZ",
+      "args": [
+        "testdata/shp/pointz.shp",
+        "<out>",
+        "REVERSE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "name",
+          "String",
+          40,
+          0,
+          0
+        ],
+        [
+          "count",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "ratio",
+          "Double",
+          19,
+          18,
+          11
+        ],
+        [
+          "born",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "flag",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "adjust_3d_z",
+        "params": {
+          "input": "testdata/shp/pointz.shp",
+          "output": "<out>",
+          "reverse_sign": "REVERSE"
+        }
+      }
+    },
+    "a3z_add": {
+      "tool": "management.Adjust3DZ",
+      "args": [
+        "testdata/shp/pointz.shp",
+        "<out>",
+        "NO_REVERSE",
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "name",
+          "String",
+          40,
+          0,
+          0
+        ],
+        [
+          "count",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "ratio",
+          "Double",
+          19,
+          18,
+          11
+        ],
+        [
+          "born",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "flag",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "adjust_3d_z",
+        "params": {
+          "input": "testdata/shp/pointz.shp",
+          "output": "<out>",
+          "reverse_sign": "NO_REVERSE",
+          "adjust_value": 10
+        }
+      }
+    },
+    "a3z_field": {
+      "tool": "management.Adjust3DZ",
+      "args": [
+        "testdata/shp/pointz.shp",
+        "<out>",
+        "NO_REVERSE",
+        "count"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "name",
+          "String",
+          40,
+          0,
+          0
+        ],
+        [
+          "count",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "ratio",
+          "Double",
+          19,
+          18,
+          11
+        ],
+        [
+          "born",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "flag",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "adjust_3d_z",
+        "params": {
+          "input": "testdata/shp/pointz.shp",
+          "output": "<out>",
+          "reverse_sign": "NO_REVERSE",
+          "adjust_value": "count"
+        }
+      }
+    },
+    "a3z_m_ft": {
+      "tool": "management.Adjust3DZ",
+      "args": [
+        "testdata/shp/polylinez.shp",
+        "<out>",
+        "NO_REVERSE",
+        null,
+        "METERS",
+        "FEET"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "name",
+          "String",
+          40,
+          0,
+          0
+        ],
+        [
+          "count",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "ratio",
+          "Double",
+          19,
+          18,
+          11
+        ],
+        [
+          "born",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "flag",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "adjust_3d_z",
+        "params": {
+          "input": "testdata/shp/polylinez.shp",
+          "output": "<out>",
+          "reverse_sign": "NO_REVERSE",
+          "from_units": "METERS",
+          "to_units": "FEET"
+        }
+      }
+    },
+    "a3z_all": {
+      "tool": "management.Adjust3DZ",
+      "args": [
+        "testdata/shp/polygonz.shp",
+        "<out>",
+        "REVERSE",
+        2.5,
+        "FEET",
+        "METERS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "name",
+          "String",
+          40,
+          0,
+          0
+        ],
+        [
+          "count",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "ratio",
+          "Double",
+          19,
+          18,
+          11
+        ],
+        [
+          "born",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "flag",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "adjust_3d_z",
+        "params": {
+          "input": "testdata/shp/polygonz.shp",
+          "output": "<out>",
+          "reverse_sign": "REVERSE",
+          "adjust_value": 2.5,
+          "from_units": "FEET",
+          "to_units": "METERS"
+        }
+      }
+    },
+    "a3z_multipoint": {
+      "tool": "management.Adjust3DZ",
+      "args": [
+        "testdata/shp/multipointz.shp",
+        "<out>",
+        "REVERSE",
+        -1,
+        "INCHES",
+        "CENTIMETERS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "name",
+          "String",
+          40,
+          0,
+          0
+        ],
+        [
+          "count",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "ratio",
+          "Double",
+          19,
+          18,
+          11
+        ],
+        [
+          "born",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "flag",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Multipoint",
+      "run": {
+        "tool": "adjust_3d_z",
+        "params": {
+          "input": "testdata/shp/multipointz.shp",
+          "output": "<out>",
+          "reverse_sign": "REVERSE",
+          "adjust_value": -1,
+          "from_units": "INCHES",
+          "to_units": "CENTIMETERS"
+        }
+      }
     }
   }
 }

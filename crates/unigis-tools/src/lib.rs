@@ -2,6 +2,7 @@
 //! output schema, feature order, messages) as observed through the ArcGIS bridge
 //! and recorded in `testdata/arcgis-reference/manifest.json`.
 
+pub mod adjust_z;
 mod angular_notation;
 pub mod batch_fields;
 pub mod cogo;
