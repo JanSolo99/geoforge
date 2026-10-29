@@ -1,0 +1,637 @@
+{
+  "default": {
+    "status": "succeeded",
+    "train": {
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "alias": "Shape"
+        },
+        {
+          "name": "KEY",
+          "type": "Integer",
+          "length": 10,
+          "alias": "KEY"
+        },
+        {
+          "name": "LABEL",
+          "type": "String",
+          "length": 20,
+          "alias": "LABEL"
+        },
+        {
+          "name": "SCORE",
+          "type": "Double",
+          "length": 19,
+          "alias": "SCORE"
+        }
+      ],
+      "keys": [
+        3,
+        4,
+        6,
+        7
+      ]
+    },
+    "test": {
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "alias": "Shape"
+        },
+        {
+          "name": "KEY",
+          "type": "Integer",
+          "length": 10,
+          "alias": "KEY"
+        },
+        {
+          "name": "LABEL",
+          "type": "String",
+          "length": 20,
+          "alias": "LABEL"
+        },
+        {
+          "name": "SCORE",
+          "type": "Double",
+          "length": 19,
+          "alias": "SCORE"
+        }
+      ],
+      "keys": [
+        1,
+        5,
+        8
+      ]
+    },
+    "messages": "Start Time: Friday, October 30, 2026 1:36:21 AM\nSucceeded at Friday, October 30, 2026 1:36:21 AM (Elapsed Time: 0.06 seconds)"
+  },
+  "percent33": {
+    "status": "succeeded",
+    "train": {
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "alias": "Shape"
+        },
+        {
+          "name": "KEY",
+          "type": "Integer",
+          "length": 10,
+          "alias": "KEY"
+        },
+        {
+          "name": "LABEL",
+          "type": "String",
+          "length": 20,
+          "alias": "LABEL"
+        },
+        {
+          "name": "SCORE",
+          "type": "Double",
+          "length": 19,
+          "alias": "SCORE"
+        }
+      ],
+      "keys": [
+        4,
+        7
+      ]
+    },
+    "test": {
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "alias": "Shape"
+        },
+        {
+          "name": "KEY",
+          "type": "Integer",
+          "length": 10,
+          "alias": "KEY"
+        },
+        {
+          "name": "LABEL",
+          "type": "String",
+          "length": 20,
+          "alias": "LABEL"
+        },
+        {
+          "name": "SCORE",
+          "type": "Double",
+          "length": 19,
+          "alias": "SCORE"
+        }
+      ],
+      "keys": [
+        1,
+        3,
+        5,
+        6,
+        8
+      ]
+    },
+    "messages": "Start Time: Friday, October 30, 2026 1:36:21 AM\nSucceeded at Friday, October 30, 2026 1:36:21 AM (Elapsed Time: 0.03 seconds)"
+  },
+  "abs3": {
+    "status": "succeeded",
+    "train": {
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "alias": "Shape"
+        },
+        {
+          "name": "KEY",
+          "type": "Integer",
+          "length": 10,
+          "alias": "KEY"
+        },
+        {
+          "name": "LABEL",
+          "type": "String",
+          "length": 20,
+          "alias": "LABEL"
+        },
+        {
+          "name": "SCORE",
+          "type": "Double",
+          "length": 19,
+          "alias": "SCORE"
+        }
+      ],
+      "keys": [
+        3,
+        4,
+        7
+      ]
+    },
+    "test": {
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "alias": "Shape"
+        },
+        {
+          "name": "KEY",
+          "type": "Integer",
+          "length": 10,
+          "alias": "KEY"
+        },
+        {
+          "name": "LABEL",
+          "type": "String",
+          "length": 20,
+          "alias": "LABEL"
+        },
+        {
+          "name": "SCORE",
+          "type": "Double",
+          "length": 19,
+          "alias": "SCORE"
+        }
+      ],
+      "keys": [
+        1,
+        5,
+        6,
+        8
+      ]
+    },
+    "messages": "Start Time: Friday, October 30, 2026 1:36:21 AM\nSucceeded at Friday, October 30, 2026 1:36:21 AM (Elapsed Time: 0.04 seconds)"
+  },
+  "abs36": {
+    "status": "succeeded",
+    "train": {
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "alias": "Shape"
+        },
+        {
+          "name": "KEY",
+          "type": "Integer",
+          "length": 10,
+          "alias": "KEY"
+        },
+        {
+          "name": "LABEL",
+          "type": "String",
+          "length": 20,
+          "alias": "LABEL"
+        },
+        {
+          "name": "SCORE",
+          "type": "Double",
+          "length": 19,
+          "alias": "SCORE"
+        }
+      ],
+      "keys": [
+        3,
+        4,
+        7
+      ]
+    },
+    "test": {
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "alias": "Shape"
+        },
+        {
+          "name": "KEY",
+          "type": "Integer",
+          "length": 10,
+          "alias": "KEY"
+        },
+        {
+          "name": "LABEL",
+          "type": "String",
+          "length": 20,
+          "alias": "LABEL"
+        },
+        {
+          "name": "SCORE",
+          "type": "Double",
+          "length": 19,
+          "alias": "SCORE"
+        }
+      ],
+      "keys": [
+        1,
+        5,
+        6,
+        8
+      ]
+    },
+    "messages": "Start Time: Friday, October 30, 2026 1:36:21 AM\nSucceeded at Friday, October 30, 2026 1:36:21 AM (Elapsed Time: 0.03 seconds)"
+  },
+  "zero": {
+    "status": "failed",
+    "error": "Failed to execute. Parameters are not valid.\nERROR 000854: The value is out of the range from 1 to 2.14748e+09.\nFailed to execute (SubsetFeatures).\n",
+    "messages": "Start Time: Friday, October 30, 2026 1:36:21 AM\nFailed to execute. Parameters are not valid.\nERROR 000854: The value is out of the range from 1 to 2.14748e+09.\nFailed to execute (SubsetFeatures).\nFailed at Friday, October 30, 2026 1:36:21 AM (Elapsed Time: 0.01 seconds)"
+  },
+  "all": {
+    "status": "succeeded",
+    "train": {
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "alias": "Shape"
+        },
+        {
+          "name": "KEY",
+          "type": "Integer",
+          "length": 10,
+          "alias": "KEY"
+        },
+        {
+          "name": "LABEL",
+          "type": "String",
+          "length": 20,
+          "alias": "LABEL"
+        },
+        {
+          "name": "SCORE",
+          "type": "Double",
+          "length": 19,
+          "alias": "SCORE"
+        }
+      ],
+      "keys": [
+        1,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "test": {
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "alias": "Shape"
+        },
+        {
+          "name": "KEY",
+          "type": "Integer",
+          "length": 10,
+          "alias": "KEY"
+        },
+        {
+          "name": "LABEL",
+          "type": "String",
+          "length": 20,
+          "alias": "LABEL"
+        },
+        {
+          "name": "SCORE",
+          "type": "Double",
+          "length": 19,
+          "alias": "SCORE"
+        }
+      ],
+      "keys": []
+    },
+    "messages": "Start Time: Friday, October 30, 2026 1:36:21 AM\nWARNING 040303: The input features, the output training feature class, or the output test feature class have no records.\nSucceeded at Friday, October 30, 2026 1:36:21 AM (Elapsed Time: 0.04 seconds)"
+  },
+  "too_many": {
+    "status": "succeeded",
+    "train": {
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "alias": "Shape"
+        },
+        {
+          "name": "KEY",
+          "type": "Integer",
+          "length": 10,
+          "alias": "KEY"
+        },
+        {
+          "name": "LABEL",
+          "type": "String",
+          "length": 20,
+          "alias": "LABEL"
+        },
+        {
+          "name": "SCORE",
+          "type": "Double",
+          "length": 19,
+          "alias": "SCORE"
+        }
+      ],
+      "keys": [
+        1,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    "test": {
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "alias": "Shape"
+        },
+        {
+          "name": "KEY",
+          "type": "Integer",
+          "length": 10,
+          "alias": "KEY"
+        },
+        {
+          "name": "LABEL",
+          "type": "String",
+          "length": 20,
+          "alias": "LABEL"
+        },
+        {
+          "name": "SCORE",
+          "type": "Double",
+          "length": 19,
+          "alias": "SCORE"
+        }
+      ],
+      "keys": []
+    },
+    "messages": "Start Time: Friday, October 30, 2026 1:36:21 AM\nSucceeded at Friday, October 30, 2026 1:36:21 AM (Elapsed Time: 0.04 seconds)"
+  },
+  "negative": {
+    "status": "failed",
+    "error": "Failed to execute. Parameters are not valid.\nERROR 000854: The value is out of the range from 1 to 2.14748e+09.\nFailed to execute (SubsetFeatures).\n",
+    "messages": "Start Time: Friday, October 30, 2026 1:36:21 AM\nFailed to execute. Parameters are not valid.\nERROR 000854: The value is out of the range from 1 to 2.14748e+09.\nFailed to execute (SubsetFeatures).\nFailed at Friday, October 30, 2026 1:36:21 AM (Elapsed Time: 0.01 seconds)"
+  },
+  "over_percent": {
+    "status": "failed",
+    "error": "Failed to execute. Parameters are not valid.\nERROR 000854: The value is out of the range from 2.22507e-308 to 100.\nFailed to execute (SubsetFeatures).\n",
+    "messages": "Start Time: Friday, October 30, 2026 1:36:21 AM\nFailed to execute. Parameters are not valid.\nERROR 000854: The value is out of the range from 2.22507e-308 to 100.\nFailed to execute (SubsetFeatures).\nFailed at Friday, October 30, 2026 1:36:21 AM (Elapsed Time: 0.01 seconds)"
+  },
+  "train_only": {
+    "status": "succeeded",
+    "train": {
+      "fields": [
+        {
+          "name": "FID",
+          "type": "OID",
+          "length": 4,
+          "alias": "FID"
+        },
+        {
+          "name": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "alias": "Shape"
+        },
+        {
+          "name": "KEY",
+          "type": "Integer",
+          "length": 10,
+          "alias": "KEY"
+        },
+        {
+          "name": "LABEL",
+          "type": "String",
+          "length": 20,
+          "alias": "LABEL"
+        },
+        {
+          "name": "SCORE",
+          "type": "Double",
+          "length": 19,
+          "alias": "SCORE"
+        }
+      ],
+      "keys": [
+        3,
+        4,
+        7
+      ]
+    },
+    "test": null,
+    "messages": "Start Time: Friday, October 30, 2026 1:36:21 AM\nSucceeded at Friday, October 30, 2026 1:36:21 AM (Elapsed Time: 0.03 seconds)"
+  },
+  "records": {
+    "status": "succeeded",
+    "train": {
+      "fields": [
+        {
+          "name": "OID",
+          "type": "OID",
+          "length": 4,
+          "alias": "OID"
+        },
+        {
+          "name": "KEY",
+          "type": "Integer",
+          "length": 10,
+          "alias": "KEY"
+        },
+        {
+          "name": "LABEL",
+          "type": "String",
+          "length": 20,
+          "alias": "LABEL"
+        },
+        {
+          "name": "SCORE",
+          "type": "Double",
+          "length": 19,
+          "alias": "SCORE"
+        }
+      ],
+      "keys": [
+        3,
+        4,
+        6,
+        7
+      ]
+    },
+    "test": {
+      "fields": [
+        {
+          "name": "OID",
+          "type": "OID",
+          "length": 4,
+          "alias": "OID"
+        },
+        {
+          "name": "KEY",
+          "type": "Integer",
+          "length": 10,
+          "alias": "KEY"
+        },
+        {
+          "name": "LABEL",
+          "type": "String",
+          "length": 20,
+          "alias": "LABEL"
+        },
+        {
+          "name": "SCORE",
+          "type": "Double",
+          "length": 19,
+          "alias": "SCORE"
+        }
+      ],
+      "keys": [
+        1,
+        5,
+        8
+      ]
+    },
+    "messages": "Start Time: Friday, October 30, 2026 1:36:21 AM\nSucceeded at Friday, October 30, 2026 1:36:21 AM (Elapsed Time: 0.03 seconds)"
+  },
+  "empty": {
+    "status": "failed",
+    "error": "ERROR 040303: The input features, the output training feature class, or the output test feature class have no records.\nFailed to execute (SubsetFeatures).\n",
+    "messages": "Start Time: Friday, October 30, 2026 1:36:21 AM\nERROR 040303: The input features, the output training feature class, or the output test feature class have no records.\nFailed to execute (SubsetFeatures).\nFailed at Friday, October 30, 2026 1:36:21 AM (Elapsed Time: 0.05 seconds)"
+  },
+  "defaults": {
+    "3": "50",
+    "4": "true"
+  }
+}

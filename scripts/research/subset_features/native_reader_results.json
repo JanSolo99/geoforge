@@ -1,0 +1,6300 @@
+{
+  "subf_default": {
+    "matches": true,
+    "errors": [],
+    "outputs": [
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "LABEL": "row 1",
+                "SCORE": 1.5
+              },
+              "geometry": {
+                "x": 500010,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 4,
+                "LABEL": "row 4",
+                "SCORE": 6.0
+              },
+              "geometry": {
+                "x": 500040,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": {
+                "x": 500060,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 8,
+                "LABEL": "row 8",
+                "SCORE": 12.0
+              },
+              "geometry": {
+                "x": 500080,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 3,
+                "LABEL": " ",
+                "SCORE": 4.5
+              },
+              "geometry": {
+                "x": 500030,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "LABEL": "row 5",
+                "SCORE": 7.5
+              },
+              "geometry": {
+                "x": 500050,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": {
+                "x": 500060,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 7,
+                "LABEL": "row 7",
+                "SCORE": 10.5
+              },
+              "geometry": {
+                "x": 500070,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 3,
+                "LABEL": " ",
+                "SCORE": 4.5
+              },
+              "geometry": {
+                "x": 500030,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "LABEL": "row 5",
+                "SCORE": 7.5
+              },
+              "geometry": {
+                "x": 500050,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 7,
+                "LABEL": "row 7",
+                "SCORE": 10.5
+              },
+              "geometry": {
+                "x": 500070,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "LABEL": "row 1",
+                "SCORE": 1.5
+              },
+              "geometry": {
+                "x": 500010,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 4,
+                "LABEL": "row 4",
+                "SCORE": 6.0
+              },
+              "geometry": {
+                "x": 500040,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 8,
+                "LABEL": "row 8",
+                "SCORE": 12.0
+              },
+              "geometry": {
+                "x": 500080,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "subf_percent33": {
+    "matches": true,
+    "errors": [],
+    "outputs": [
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 4,
+                "LABEL": "row 4",
+                "SCORE": 6.0
+              },
+              "geometry": {
+                "x": 500040,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 8,
+                "LABEL": "row 8",
+                "SCORE": 12.0
+              },
+              "geometry": {
+                "x": 500080,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 3,
+                "LABEL": " ",
+                "SCORE": 4.5
+              },
+              "geometry": {
+                "x": 500030,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 7,
+                "LABEL": "row 7",
+                "SCORE": 10.5
+              },
+              "geometry": {
+                "x": 500070,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "LABEL": "row 1",
+                "SCORE": 1.5
+              },
+              "geometry": {
+                "x": 500010,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 3,
+                "LABEL": "row 1",
+                "SCORE": 4.5
+              },
+              "geometry": {
+                "x": 500030,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "LABEL": "row 5",
+                "SCORE": 7.5
+              },
+              "geometry": {
+                "x": 500050,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": {
+                "x": 500060,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 7,
+                "LABEL": "row 7",
+                "SCORE": 10.5
+              },
+              "geometry": {
+                "x": 500070,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "LABEL": "row 1",
+                "SCORE": 1.5
+              },
+              "geometry": {
+                "x": 500010,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 4,
+                "LABEL": "row 4",
+                "SCORE": 6.0
+              },
+              "geometry": {
+                "x": 500040,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "LABEL": "row 5",
+                "SCORE": 7.5
+              },
+              "geometry": {
+                "x": 500050,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": {
+                "x": 500060,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 8,
+                "LABEL": "row 8",
+                "SCORE": 12.0
+              },
+              "geometry": {
+                "x": 500080,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "subf_abs3": {
+    "matches": true,
+    "errors": [],
+    "outputs": [
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 4,
+                "LABEL": "row 4",
+                "SCORE": 6.0
+              },
+              "geometry": {
+                "x": 500040,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "LABEL": "row 5",
+                "SCORE": 7.5
+              },
+              "geometry": {
+                "x": 500050,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 8,
+                "LABEL": "row 8",
+                "SCORE": 12.0
+              },
+              "geometry": {
+                "x": 500080,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 3,
+                "LABEL": " ",
+                "SCORE": 4.5
+              },
+              "geometry": {
+                "x": 500030,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": {
+                "x": 500060,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 7,
+                "LABEL": "row 7",
+                "SCORE": 10.5
+              },
+              "geometry": {
+                "x": 500070,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "LABEL": "row 1",
+                "SCORE": 1.5
+              },
+              "geometry": {
+                "x": 500010,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 3,
+                "LABEL": "row 1",
+                "SCORE": 4.5
+              },
+              "geometry": {
+                "x": 500030,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": {
+                "x": 500060,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 7,
+                "LABEL": "row 7",
+                "SCORE": 10.5
+              },
+              "geometry": {
+                "x": 500070,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "LABEL": "row 1",
+                "SCORE": 1.5
+              },
+              "geometry": {
+                "x": 500010,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 4,
+                "LABEL": "row 4",
+                "SCORE": 6.0
+              },
+              "geometry": {
+                "x": 500040,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "LABEL": "row 5",
+                "SCORE": 7.5
+              },
+              "geometry": {
+                "x": 500050,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 8,
+                "LABEL": "row 8",
+                "SCORE": 12.0
+              },
+              "geometry": {
+                "x": 500080,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "subf_abs36": {
+    "matches": true,
+    "errors": [],
+    "outputs": [
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 4,
+                "LABEL": "row 4",
+                "SCORE": 6.0
+              },
+              "geometry": {
+                "x": 500040,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "LABEL": "row 5",
+                "SCORE": 7.5
+              },
+              "geometry": {
+                "x": 500050,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 8,
+                "LABEL": "row 8",
+                "SCORE": 12.0
+              },
+              "geometry": {
+                "x": 500080,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 3,
+                "LABEL": " ",
+                "SCORE": 4.5
+              },
+              "geometry": {
+                "x": 500030,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": {
+                "x": 500060,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 7,
+                "LABEL": "row 7",
+                "SCORE": 10.5
+              },
+              "geometry": {
+                "x": 500070,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "LABEL": "row 1",
+                "SCORE": 1.5
+              },
+              "geometry": {
+                "x": 500010,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 3,
+                "LABEL": "row 1",
+                "SCORE": 4.5
+              },
+              "geometry": {
+                "x": 500030,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": {
+                "x": 500060,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 7,
+                "LABEL": "row 7",
+                "SCORE": 10.5
+              },
+              "geometry": {
+                "x": 500070,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "LABEL": "row 1",
+                "SCORE": 1.5
+              },
+              "geometry": {
+                "x": 500010,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 4,
+                "LABEL": "row 4",
+                "SCORE": 6.0
+              },
+              "geometry": {
+                "x": 500040,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "LABEL": "row 5",
+                "SCORE": 7.5
+              },
+              "geometry": {
+                "x": 500050,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 8,
+                "LABEL": "row 8",
+                "SCORE": 12.0
+              },
+              "geometry": {
+                "x": 500080,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "subf_abs19": {
+    "matches": true,
+    "errors": [],
+    "outputs": [
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 5,
+                "LABEL": "row 5",
+                "SCORE": 7.5
+              },
+              "geometry": {
+                "x": 500050,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 3,
+                "LABEL": " ",
+                "SCORE": 4.5
+              },
+              "geometry": {
+                "x": 500030,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "LABEL": "row 1",
+                "SCORE": 1.5
+              },
+              "geometry": {
+                "x": 500010,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 3,
+                "LABEL": "row 1",
+                "SCORE": 4.5
+              },
+              "geometry": {
+                "x": 500030,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 4,
+                "LABEL": "row 4",
+                "SCORE": 6.0
+              },
+              "geometry": {
+                "x": 500040,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": {
+                "x": 500060,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 7,
+                "LABEL": "row 7",
+                "SCORE": 10.5
+              },
+              "geometry": {
+                "x": 500070,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 8,
+                "LABEL": "row 8",
+                "SCORE": 12.0
+              },
+              "geometry": {
+                "x": 500080,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "LABEL": "row 1",
+                "SCORE": 1.5
+              },
+              "geometry": {
+                "x": 500010,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 4,
+                "LABEL": "row 4",
+                "SCORE": 6.0
+              },
+              "geometry": {
+                "x": 500040,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "LABEL": "row 5",
+                "SCORE": 7.5
+              },
+              "geometry": {
+                "x": 500050,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": {
+                "x": 500060,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 7,
+                "LABEL": "row 7",
+                "SCORE": 10.5
+              },
+              "geometry": {
+                "x": 500070,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 8,
+                "LABEL": "row 8",
+                "SCORE": 12.0
+              },
+              "geometry": {
+                "x": 500080,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "subf_tiny": {
+    "matches": true,
+    "errors": [],
+    "outputs": [
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": []
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": []
+        }
+      },
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "LABEL": "row 1",
+                "SCORE": 1.5
+              },
+              "geometry": {
+                "x": 500010,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 3,
+                "LABEL": "row 1",
+                "SCORE": 4.5
+              },
+              "geometry": {
+                "x": 500030,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 4,
+                "LABEL": "row 4",
+                "SCORE": 6.0
+              },
+              "geometry": {
+                "x": 500040,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "LABEL": "row 5",
+                "SCORE": 7.5
+              },
+              "geometry": {
+                "x": 500050,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": {
+                "x": 500060,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 7,
+                "LABEL": "row 7",
+                "SCORE": 10.5
+              },
+              "geometry": {
+                "x": 500070,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 8,
+                "LABEL": "row 8",
+                "SCORE": 12.0
+              },
+              "geometry": {
+                "x": 500080,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "LABEL": "row 1",
+                "SCORE": 1.5
+              },
+              "geometry": {
+                "x": 500010,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 3,
+                "LABEL": "row 1",
+                "SCORE": 4.5
+              },
+              "geometry": {
+                "x": 500030,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 4,
+                "LABEL": "row 4",
+                "SCORE": 6.0
+              },
+              "geometry": {
+                "x": 500040,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "LABEL": "row 5",
+                "SCORE": 7.5
+              },
+              "geometry": {
+                "x": 500050,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": {
+                "x": 500060,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 7,
+                "LABEL": "row 7",
+                "SCORE": 10.5
+              },
+              "geometry": {
+                "x": 500070,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 8,
+                "LABEL": "row 8",
+                "SCORE": 12.0
+              },
+              "geometry": {
+                "x": 500080,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "subf_all": {
+    "matches": true,
+    "errors": [],
+    "outputs": [
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "LABEL": "row 1",
+                "SCORE": 1.5
+              },
+              "geometry": {
+                "x": 500010,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 3,
+                "LABEL": "row 1",
+                "SCORE": 4.5
+              },
+              "geometry": {
+                "x": 500030,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 4,
+                "LABEL": "row 4",
+                "SCORE": 6.0
+              },
+              "geometry": {
+                "x": 500040,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "LABEL": "row 5",
+                "SCORE": 7.5
+              },
+              "geometry": {
+                "x": 500050,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": {
+                "x": 500060,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 7,
+                "LABEL": "row 7",
+                "SCORE": 10.5
+              },
+              "geometry": {
+                "x": 500070,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 8,
+                "LABEL": "row 8",
+                "SCORE": 12.0
+              },
+              "geometry": {
+                "x": 500080,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "LABEL": "row 1",
+                "SCORE": 1.5
+              },
+              "geometry": {
+                "x": 500010,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 3,
+                "LABEL": "row 1",
+                "SCORE": 4.5
+              },
+              "geometry": {
+                "x": 500030,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 4,
+                "LABEL": "row 4",
+                "SCORE": 6.0
+              },
+              "geometry": {
+                "x": 500040,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "LABEL": "row 5",
+                "SCORE": 7.5
+              },
+              "geometry": {
+                "x": 500050,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": {
+                "x": 500060,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 7,
+                "LABEL": "row 7",
+                "SCORE": 10.5
+              },
+              "geometry": {
+                "x": 500070,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 8,
+                "LABEL": "row 8",
+                "SCORE": 12.0
+              },
+              "geometry": {
+                "x": 500080,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": []
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": []
+        }
+      }
+    ]
+  },
+  "subf_too_many": {
+    "matches": true,
+    "errors": [],
+    "outputs": [
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "LABEL": "row 1",
+                "SCORE": 1.5
+              },
+              "geometry": {
+                "x": 500010,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 3,
+                "LABEL": "row 1",
+                "SCORE": 4.5
+              },
+              "geometry": {
+                "x": 500030,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 4,
+                "LABEL": "row 4",
+                "SCORE": 6.0
+              },
+              "geometry": {
+                "x": 500040,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "LABEL": "row 5",
+                "SCORE": 7.5
+              },
+              "geometry": {
+                "x": 500050,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": {
+                "x": 500060,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 7,
+                "LABEL": "row 7",
+                "SCORE": 10.5
+              },
+              "geometry": {
+                "x": 500070,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 8,
+                "LABEL": "row 8",
+                "SCORE": 12.0
+              },
+              "geometry": {
+                "x": 500080,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "LABEL": "row 1",
+                "SCORE": 1.5
+              },
+              "geometry": {
+                "x": 500010,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 3,
+                "LABEL": "row 1",
+                "SCORE": 4.5
+              },
+              "geometry": {
+                "x": 500030,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 4,
+                "LABEL": "row 4",
+                "SCORE": 6.0
+              },
+              "geometry": {
+                "x": 500040,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "LABEL": "row 5",
+                "SCORE": 7.5
+              },
+              "geometry": {
+                "x": 500050,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": {
+                "x": 500060,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 7,
+                "LABEL": "row 7",
+                "SCORE": 10.5
+              },
+              "geometry": {
+                "x": 500070,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 8,
+                "LABEL": "row 8",
+                "SCORE": 12.0
+              },
+              "geometry": {
+                "x": 500080,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": []
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": []
+        }
+      }
+    ]
+  },
+  "subf_train_only": {
+    "matches": true,
+    "errors": [],
+    "outputs": [
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "LABEL": "row 1",
+                "SCORE": 1.5
+              },
+              "geometry": {
+                "x": 500010,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 4,
+                "LABEL": "row 4",
+                "SCORE": 6.0
+              },
+              "geometry": {
+                "x": 500040,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": {
+                "x": 500060,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 3,
+                "LABEL": " ",
+                "SCORE": 4.5
+              },
+              "geometry": {
+                "x": 500030,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": {
+                "x": 500060,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 7,
+                "LABEL": "row 7",
+                "SCORE": 10.5
+              },
+              "geometry": {
+                "x": 500070,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "subf_records": {
+    "matches": true,
+    "errors": [],
+    "outputs": [
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "OID",
+              "alias": "OID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": null,
+          "crs": null,
+          "raw_system_names": [
+            "OID"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "LABEL": "row 1",
+                "SCORE": 1.5
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 4,
+                "LABEL": "row 4",
+                "SCORE": 6.0
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "LABEL": "row 5",
+                "SCORE": 7.5
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": null
+            }
+          ]
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "OID",
+              "alias": "OID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": null,
+          "crs": null,
+          "raw_system_names": [
+            "OID"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 3,
+                "LABEL": " ",
+                "SCORE": 4.5
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "LABEL": "row 5",
+                "SCORE": 7.5
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 7,
+                "LABEL": "row 7",
+                "SCORE": 10.5
+              },
+              "geometry": null
+            }
+          ]
+        }
+      },
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "OID",
+              "alias": "OID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": null,
+          "crs": null,
+          "raw_system_names": [
+            "OID"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 3,
+                "LABEL": " ",
+                "SCORE": 4.5
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 7,
+                "LABEL": "row 7",
+                "SCORE": 10.5
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 8,
+                "LABEL": "row 8",
+                "SCORE": 12.0
+              },
+              "geometry": null
+            }
+          ]
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "OID",
+              "alias": "OID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": null,
+          "crs": null,
+          "raw_system_names": [
+            "OID"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "LABEL": "row 1",
+                "SCORE": 1.5
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 4,
+                "LABEL": "row 4",
+                "SCORE": 6.0
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 8,
+                "LABEL": "row 8",
+                "SCORE": 12.0
+              },
+              "geometry": null
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "subf_records_all": {
+    "matches": true,
+    "errors": [],
+    "outputs": [
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "OID",
+              "alias": "OID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": null,
+          "crs": null,
+          "raw_system_names": [
+            "OID"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "LABEL": "row 1",
+                "SCORE": 1.5
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 3,
+                "LABEL": "row 1",
+                "SCORE": 4.5
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 4,
+                "LABEL": "row 4",
+                "SCORE": 6.0
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "LABEL": "row 5",
+                "SCORE": 7.5
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 7,
+                "LABEL": "row 7",
+                "SCORE": 10.5
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 8,
+                "LABEL": "row 8",
+                "SCORE": 12.0
+              },
+              "geometry": null
+            }
+          ]
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "OID",
+              "alias": "OID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": null,
+          "crs": null,
+          "raw_system_names": [
+            "OID"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "LABEL": "row 1",
+                "SCORE": 1.5
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 3,
+                "LABEL": "row 1",
+                "SCORE": 4.5
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 4,
+                "LABEL": "row 4",
+                "SCORE": 6.0
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "LABEL": "row 5",
+                "SCORE": 7.5
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 7,
+                "LABEL": "row 7",
+                "SCORE": 10.5
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 8,
+                "LABEL": "row 8",
+                "SCORE": 12.0
+              },
+              "geometry": null
+            }
+          ]
+        }
+      },
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "OID",
+              "alias": "OID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": null,
+          "crs": null,
+          "raw_system_names": [
+            "OID"
+          ],
+          "rows": []
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "OID",
+              "alias": "OID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": null,
+          "crs": null,
+          "raw_system_names": [
+            "OID"
+          ],
+          "rows": []
+        }
+      }
+    ]
+  },
+  "subf_records_train_only": {
+    "matches": true,
+    "errors": [],
+    "outputs": [
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "OID",
+              "alias": "OID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": null,
+          "crs": null,
+          "raw_system_names": [
+            "OID"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "LABEL": "row 1",
+                "SCORE": 1.5
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "LABEL": "row 5",
+                "SCORE": 7.5
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": null
+            }
+          ]
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "OID",
+              "alias": "OID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "LABEL",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": null,
+          "crs": null,
+          "raw_system_names": [
+            "OID"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 3,
+                "LABEL": " ",
+                "SCORE": 4.5
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 7,
+                "LABEL": "row 7",
+                "SCORE": 10.5
+              },
+              "geometry": null
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "gdb_points": {
+    "matches": true,
+    "errors": [],
+    "outputs": [
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "OBJECTID",
+              "alias": "OBJECTID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "Record key",
+              "type": "Integer",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "Record label",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 8,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "OBJECTID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 4,
+                "LABEL": "row 4",
+                "SCORE": 6.0
+              },
+              "geometry": {
+                "x": 500040,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "LABEL": "row 5",
+                "SCORE": 7.5
+              },
+              "geometry": {
+                "x": 500050,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": {
+                "x": 500060,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 7,
+                "LABEL": "row 7",
+                "SCORE": 10.5
+              },
+              "geometry": {
+                "x": 500070,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "OBJECTID",
+              "alias": "OBJECTID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "Record key",
+              "type": "Integer",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "Record label",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 8,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "OBJECTID",
+            "SHAPE"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 3,
+                "LABEL": null,
+                "SCORE": 4.5
+              },
+              "geometry": {
+                "x": 500030,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "LABEL": "row 5",
+                "SCORE": 7.5
+              },
+              "geometry": {
+                "x": 500050,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": {
+                "x": 500060,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 7,
+                "LABEL": "row 7",
+                "SCORE": 10.5
+              },
+              "geometry": {
+                "x": 500070,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "OBJECTID",
+              "alias": "OBJECTID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "Record key",
+              "type": "Integer",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "Record label",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 8,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "OBJECTID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "LABEL": "row 1",
+                "SCORE": 1.5
+              },
+              "geometry": {
+                "x": 500010,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 3,
+                "LABEL": null,
+                "SCORE": 4.5
+              },
+              "geometry": {
+                "x": 500030,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 8,
+                "LABEL": "row 8",
+                "SCORE": 12.0
+              },
+              "geometry": {
+                "x": 500080,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "OBJECTID",
+              "alias": "OBJECTID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "Record key",
+              "type": "Integer",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "Record label",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 8,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "OBJECTID",
+            "SHAPE"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "LABEL": "row 1",
+                "SCORE": 1.5
+              },
+              "geometry": {
+                "x": 500010,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 4,
+                "LABEL": "row 4",
+                "SCORE": 6.0
+              },
+              "geometry": {
+                "x": 500040,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 8,
+                "LABEL": "row 8",
+                "SCORE": 12.0
+              },
+              "geometry": {
+                "x": 500080,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "gdb_records": {
+    "matches": true,
+    "errors": [],
+    "outputs": [
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "OBJECTID",
+              "alias": "OBJECTID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "KEY",
+              "alias": "Record key",
+              "type": "Integer",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "Record label",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 8,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": null,
+          "crs": null,
+          "raw_system_names": [
+            "OBJECTID"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 4,
+                "LABEL": "row 4",
+                "SCORE": 6.0
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "LABEL": "row 5",
+                "SCORE": 7.5
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 7,
+                "LABEL": "row 7",
+                "SCORE": 10.5
+              },
+              "geometry": null
+            }
+          ]
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "OBJECTID",
+              "alias": "OBJECTID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "KEY",
+              "alias": "Record key",
+              "type": "Integer",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "Record label",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 8,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": null,
+          "crs": null,
+          "raw_system_names": [
+            "OBJECTID"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 3,
+                "LABEL": null,
+                "SCORE": 4.5
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "LABEL": "row 5",
+                "SCORE": 7.5
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 6,
+                "LABEL": "row 6",
+                "SCORE": 9.0
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 7,
+                "LABEL": "row 7",
+                "SCORE": 10.5
+              },
+              "geometry": null
+            }
+          ]
+        }
+      },
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "OBJECTID",
+              "alias": "OBJECTID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "KEY",
+              "alias": "Record key",
+              "type": "Integer",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "Record label",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 8,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": null,
+          "crs": null,
+          "raw_system_names": [
+            "OBJECTID"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "LABEL": "row 1",
+                "SCORE": 1.5
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 3,
+                "LABEL": null,
+                "SCORE": 4.5
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 8,
+                "LABEL": "row 8",
+                "SCORE": 12.0
+              },
+              "geometry": null
+            }
+          ]
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "OBJECTID",
+              "alias": "OBJECTID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "KEY",
+              "alias": "Record key",
+              "type": "Integer",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "LABEL",
+              "alias": "Record label",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "SCORE",
+              "alias": "SCORE",
+              "type": "Double",
+              "length": 8,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": null,
+          "crs": null,
+          "raw_system_names": [
+            "OBJECTID"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "LABEL": "row 1",
+                "SCORE": 1.5
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 4,
+                "LABEL": "row 4",
+                "SCORE": 6.0
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 8,
+                "LABEL": "row 8",
+                "SCORE": 12.0
+              },
+              "geometry": null
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "null_control": {
+    "matches": true,
+    "errors": [],
+    "outputs": [
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "TXT",
+              "alias": "TXT",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "NUM",
+              "alias": "NUM",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "INT",
+              "alias": "INT",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "TXT": " ",
+                "NUM": 0.0,
+                "INT": 0
+              },
+              "geometry": {
+                "x": 500010,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 2,
+                "TXT": "alpha",
+                "NUM": 7.5,
+                "INT": 9
+              },
+              "geometry": {
+                "x": 500020,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 3,
+                "TXT": "alpha",
+                "NUM": 7.5,
+                "INT": 9
+              },
+              "geometry": {
+                "x": 500030,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 4,
+                "TXT": " ",
+                "NUM": 0.0,
+                "INT": 0
+              },
+              "geometry": {
+                "x": 500040,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "TXT": " ",
+                "NUM": 0.0,
+                "INT": 0
+              },
+              "geometry": {
+                "x": 500050,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "FID",
+              "alias": "FID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "SHAPE",
+              "alias": "SHAPE",
+              "type": "Geometry",
+              "length": 0,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": true
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "TXT",
+              "alias": "TXT",
+              "type": "String",
+              "length": 20,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "NUM",
+              "alias": "NUM",
+              "type": "Double",
+              "length": 19,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "INT",
+              "alias": "INT",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": "Point",
+          "crs": 32633,
+          "raw_system_names": [
+            "FID",
+            "Shape"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "TXT": " ",
+                "NUM": 0.0,
+                "INT": 0
+              },
+              "geometry": {
+                "x": 500010,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 2,
+                "TXT": "alpha",
+                "NUM": 7.5,
+                "INT": 9
+              },
+              "geometry": {
+                "x": 500020,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 3,
+                "TXT": "alpha",
+                "NUM": 7.5,
+                "INT": 9
+              },
+              "geometry": {
+                "x": 500030,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 4,
+                "TXT": " ",
+                "NUM": 0.0,
+                "INT": 0
+              },
+              "geometry": {
+                "x": 500040,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "TXT": " ",
+                "NUM": 0.0,
+                "INT": 0
+              },
+              "geometry": {
+                "x": 500050,
+                "y": 5000000,
+                "spatialReference": {
+                  "wkid": 32633,
+                  "latestWkid": 32633
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "null_dates": {
+    "matches": true,
+    "errors": [],
+    "outputs": [
+      {
+        "expected": {
+          "schema": [
+            {
+              "name": "OID",
+              "alias": "OID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "STAMP",
+              "alias": "STAMP",
+              "type": "Date",
+              "length": 8,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": null,
+          "crs": null,
+          "raw_system_names": [
+            "OID"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "STAMP": null
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 2,
+                "STAMP": "2020-01-02 00:00:00"
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 3,
+                "STAMP": null
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 4,
+                "STAMP": "2021-02-03 00:00:00"
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "STAMP": null
+              },
+              "geometry": null
+            }
+          ]
+        },
+        "actual": {
+          "schema": [
+            {
+              "name": "OID",
+              "alias": "OID",
+              "type": "OID",
+              "length": 4,
+              "precision": 0,
+              "scale": 0,
+              "nullable": false,
+              "required": true,
+              "editable": false
+            },
+            {
+              "name": "KEY",
+              "alias": "KEY",
+              "type": "Integer",
+              "length": 10,
+              "precision": 10,
+              "scale": 0,
+              "nullable": false,
+              "required": false,
+              "editable": true
+            },
+            {
+              "name": "STAMP",
+              "alias": "STAMP",
+              "type": "Date",
+              "length": 8,
+              "precision": 0,
+              "scale": 0,
+              "nullable": true,
+              "required": false,
+              "editable": true
+            }
+          ],
+          "shape": null,
+          "crs": null,
+          "raw_system_names": [
+            "OID"
+          ],
+          "rows": [
+            {
+              "values": {
+                "KEY": 1,
+                "STAMP": null
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 2,
+                "STAMP": "2020-01-02 00:00:00"
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 3,
+                "STAMP": null
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 4,
+                "STAMP": "2021-02-03 00:00:00"
+              },
+              "geometry": null
+            },
+            {
+              "values": {
+                "KEY": 5,
+                "STAMP": null
+              },
+              "geometry": null
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -520,6 +520,17 @@ pub(crate) fn polygon_points(
     Ok(points)
 }
 
+/// Native reproducible record permutation, independent of ArcGIS RNG streams.
+pub(crate) fn shuffled_indices(count: usize, seed: u64) -> Vec<usize> {
+    let mut rng = Rng(seed);
+    let mut order: Vec<_> = (0..count).collect();
+    for i in (1..count).rev() {
+        let j = (rng.unit() * (i + 1) as f64) as usize;
+        order.swap(i, j);
+    }
+    order
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -14,6 +14,7 @@ use unigis_shapefile::{ShapefileReader, ShapefileWriter};
 use unigis_tools::{Dissolve, ToolOutput};
 
 mod aliases;
+mod dataset_outputs;
 mod delete_multiple;
 
 #[derive(Parser)]
@@ -2704,6 +2705,14 @@ fn main() -> ExitCode {
                     outputs: Vec<(String, registry::WorkspaceOutput)>,
                 ) -> Result<()> {
                     write_workspace_outputs(Path::new(workspace), outputs)
+                }
+                fn write_datasets(
+                    &self,
+                    source: &str,
+                    outputs: Vec<(String, registry::WorkspaceOutput)>,
+                ) -> Result<()> {
+                    let source = self.get(source).map(PathBuf::from);
+                    dataset_outputs::write(source.as_deref(), outputs)
                 }
                 fn extract_data(
                     &self,

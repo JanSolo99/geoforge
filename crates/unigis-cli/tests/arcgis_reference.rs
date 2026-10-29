@@ -13,6 +13,9 @@ use unigis_testkit::{esri_area, esri_length, hausdorff};
 #[path = "common/dm_cases.rs"]
 mod dm_cases;
 
+#[path = "common/subset_features.rs"]
+mod subset_features;
+
 #[path = "common/spatial_sampling.rs"]
 mod spatial_sampling;
 
@@ -4513,6 +4516,13 @@ fn tools_match_arcgis_output() {
         ) || PENDING_CASES.iter().any(|p| case.starts_with(p))
         {
             continue; // not done yet
+        }
+        if info["subset_partition"] == true {
+            let diffs = subset_features::compare(case, info, &root, &out_dir);
+            if !diffs.is_empty() {
+                failures.push(format!("{case}:\n    {}", diffs.join("\n    ")));
+            }
+            continue;
         }
         if info["workspace_extract"] == true {
             let diffs = workspace_extract::compare(case, info, &root, &out_dir);

@@ -818,6 +818,11 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Adjust 3D Z (reverse, constant or field shift, US-survey unit conversion): 6 in-place `a3z_*`
       cases over point, line, polygon and multipoint Z shapefiles match ArcGIS. Evidence:
       `scripts/research/adjust_3d_z/README.md`.
+- [x] Subset Features (`subset_features`): percentage/absolute training size,
+  optional complementary test output, feature/table schemas and input order,
+  native seeded sampling and observed DBF NULL conversion. Coordinated new folder
+  or same-FileGDB outputs;16 public partition references plus rollback/safety tests.
+  Limits and public evidence: `scripts/research/subset_features/README.md`.
 - [x] Create Spatial Sampling Locations (`create_spatial_sampling_locations`):
   polygon RANDOM, STRAT_POLY/STRAT_ID with equal/area/population allocations, spacing;
   SYSTEMATIC with five area-unit bin shapes and point/polygon inclusion modes.

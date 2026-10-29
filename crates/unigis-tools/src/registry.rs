@@ -74,6 +74,16 @@ pub trait Context {
             "workspace outputs are not supported by this host".into(),
         ))
     }
+    /// Write a named set of new datasets together. Hosts without output support fail explicitly.
+    fn write_datasets(
+        &self,
+        _source: &str,
+        _outputs: Vec<(String, WorkspaceOutput)>,
+    ) -> Result<()> {
+        Err(Error::Unsupported(
+            "dataset outputs are not supported by this host".into(),
+        ))
+    }
     /// Extract geodatabase datasets. Read-only hosts must fail explicitly.
     fn extract_data(&self, _request: &crate::extract_data::Request) -> Result<()> {
         Err(Error::Unsupported(
@@ -3959,5 +3969,6 @@ pub static TOOLS: &[Tool] = &[
     crate::extract_data::TOOL,
     crate::random_points::TOOL,
     crate::spatial_sampling::TOOL,
+    crate::subset_features::TOOL,
     crate::neighbors::COUNT_OVERLAPPING_FEATURES,
 ];

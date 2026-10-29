@@ -1,84 +1,65 @@
 # Current handoff
 
-Updated 2026-10-29T14:21:21.521699+00:00; last agent Codex.
-Workspace `/mnt/media/ArcGIS_Linux`, main, HEAD/origin `5a374a2c7285318ca55e23c3f3531ebbebcce811`.
-190 scoped paths staged; full gate PASS; ready to commit/push. No builds/probes active.
+Updated 2026-10-29T15:32:13.770868+00:00; last agent Codex.
+Workspace `/mnt/media/ArcGIS_Linux`, branch `main`, HEAD `0a6714d`.
+User objective: wrap current tool then implement next queue tool, one tool per
+landing with public ArcGIS controls and full gate. Spatial Sampling `e77eb19`
+was already pushed on startup; no repeated external actions.
 
-## Objective and state
+## Completed this turn; Subset Features ready to land
 
-User: finish/wrap tool in progress, then build next WORK_QUEUE tool, public ArcGIS
-controls, full gate and separate scoped landing. Random Points5a374a2 was already
-complete/pushed on startup and not repeated. No unfinished product edits inherited.
-This turn implemented Create Spatial Sampling Locations; no incomplete product work.
-No agents/coordinators/app edits/web builds or publishing launched.
+- `d10c547`: Create Spatially Balanced Points deferred. Seven public controls
+  establish RRQRR nested/quadrant-balanced designs; native RRQRR and raster-to-feature
+  bridge absent. Evidence `scripts/research/spatially_balanced/`.
+- `0a6714d`: Eliminate deferred. Needs selected IDs plus full unselected neighbor
+  context absent from Context/CLI. Adjacent sliver merges into larger unselected
+  neighbor; areas100/220. Evidence `scripts/research/eliminate/`.
+- Subset Features implemented in `crates/unigis-tools/src/subset_features.rs`;
+  registry plus optional Context `write_datasets` capability and CLI
+  `src/dataset_outputs.rs`. Percentage/absolute training size, optional complementary
+  test output, native seed, source order/schema retention. Coordinated new SHP/DBF
+  datasets in one folder or root datasets of one existing FileGDB. Staging/rollback
+  tests cover errors and collision/source preservation. Other hosts refuse output.
+- Immutable `testdata/geoproc/subset_base.gdb` prepared once before controls.
+  Initial preparation with reserved name table failed before fixture saving;
+  corrected separate root uses records. Do not regenerate source.
+-16 `subf_*` references (12success/4expected errors); manifest2378 old cases
+  unchanged+16=2394. Safety/partition helpers added; old comparisons unchanged.
+- Public NULL probes resolved initial12 test failures: SHP/DBF text/numeric NULLs
+  carry the prior written value separately per partition (initial blank/zero).
+  Date/GDB NULLs stay NULL. Native behavior local to this tool. Geometry system
+  field SHAPE/Shape case differs; recorded in known gaps. Durable controls, scripts,
+  reader results and limitations: `scripts/research/subset_features/README.md`.
 
-## Implementation and evidence
+## Validation of final source edits
 
-- `crates/unigis-tools/src/spatial_sampling.rs`, registry/lib registration:
-  polygon RANDOM, STRAT_POLY/STRAT_ID with EQUAL/PROP_AREA/FIELD/PROP_FIELD;
-  largest-remainder area/population allocation, spacing and saturation110547.
-  No locations110544, invalid counts000531, missing conditional ID000530.
-  RANDOM dissolves boundaries and uses one global count/default100, CID1.
-  Equal/field counts use CID1-based; proportions use CID0-based. Public FileGDB
-  and shapefile controls confirm CID offset is independent of source OIDs.
-- SYSTEMATIC reuses existing five-shape tessellation with explicit area units;
-  centroid/polygon output, inclusion by centroid/within/intersect, measured
-  Shape_Length/Shape_Area, GRID_ID,1-based unfiltered-grid ORIG_FID for centroids.
-  Initial refs failed4 non-square cases: public vertices lie on standard FileGDB
-  XY grid; native now snaps before measurements/centroids and uses XY tolerance
-  for centroid selection. An intermediate FileGDB step is an inference from
-  public saved output coordinates/metrics, not private implementation inspection.
-  Existing comparison/tolerances kept. Shared crate-private polygon sampler added
-  to random_points.rs; existing Random Points code/behavior unchanged.
-- Immutable source `testdata/geoproc/ssl_areas.shp` saved once before controls.
-  Three disjoint rectangles: areas100/300/200, strata A/A/B, populations2/3/5.
-  Do not regenerate. Public recipes/results/precision probe in
-  `scripts/research/spatial_sampling/`; README, ROADMAP and KNOWN_GAPS updated.
--23 ssl_* references:19 success/4 expected refusals.2355 prior cases unchanged;
- 2378 total. Random/stratified comparisons use schema/CRS/allocation/membership/
-  spacing/uniqueness contracts; systematic outputs use existing strict comparator.
-- Scope/gaps: polygon inputs only; raster study areas/strata, CLUSTER, H3 and
-  count-based bin optimization unsupported. Native seed0 reproducible, not ArcGIS
-  stream parity; bounded rejection may underfill. Projected-meter controls verified;
-  custom XY resolution/domains/other CRS units, environments/selections, NULLs,
-  unusual IDs, Z/M/curves and advanced class metadata unverified. Curves refused.
-  No runtime GDAL/SDK dependency. Native failures preserve outputs; public110544
-  left an empty shapefile family (DBF0 rows), documented difference.
-
-## Validation
-
-- `uv run -q --with 'mcp>=2' python scripts/make-arcgis-reference.py 'ssl_*'`
-  PASS19 successes/4 expected errors; /tmp/unigis-spatial-sampling-references.log.
-- Initial targeted `cargo test -j3 -p unigis-cli --test arcgis_reference --test
-  spatial_sampling_safety` failed4 non-square grid cases; corrected precision and
-  boundary predicate before final full gate. Initial unused test import removed.
-  /tmp/unigis-spatial-sampling-tests.log; safety tests then covered by full gate.
-- Independent public ArcGIS reader v2 PASS20 outputs:19 successes plus a positive
-  COMPLETELY_WITHIN control (25 SquareMeters,9 cells). Checks schema, allocation,
-  constraint/spacing and grid attributes/geometry. Saved native_reader_results.json;
-  /tmp/unigis-spatial-sampling-native-v2.{log,json}. Initial v1 outputs/results
-  retained separately for precision findings. Do not overwrite or regenerate.
-- Final `scripts/check` EXIT0 /tmp/unigis-spatial-sampling-check.{log,exit,pid}:
- 258 Rust passed,5 ignored; Python8/fmt/clippy -D warnings/no-default-features PASS.
-  Includes largest-remainder unit test,2 CLI safety/source immutability/FileGDB
-  allocation/area-weighted occupancy tests, full references and format/engine suite.
-  No product changes after final gate start; research/docs only afterwards.
-- Python syntax, staged190-file scope/whitespace, old manifest and inherited hashes
-  PASS. Generator staged without inherited4-line umintfloat block.
+- `cargo check -j3 -p unigis-cli`: PASS `/tmp/unigis-subset-build.log`.
+- `uv run -q --with 'mcp>=2' python scripts/make-arcgis-reference.py 'subf_*'`:
+  12success/4expected refusals, `/tmp/unigis-subset-references.log`.
+- `cargo test -j3 -p unigis-cli --test arcgis_reference --test subset_features_safety`:
+  PASS5, `/tmp/unigis-subset-tests2.log` (after NULL-policy correction).
+- `scripts/check`: EXIT0,266 Rust passed/5ignored, Python8, fmt/clippy -D warnings
+  and no-default-features PASS. `/tmp/unigis-subset-check.{log,exit,pid}`.
+  Final source change (reject silently skipped shapefile rows) included; no source
+  changes afterward. No need to repeat gate absent new source changes.
+- Independent public ArcGIS reader:16checks/28native datasets all match,
+  `scripts/research/subset_features/native_reader_results.json` and
+  `/tmp/unigis-subset-native.{log,json}`. Includes SHP/DBF, paired FileGDB, aliases,
+  supplemental NULL/date checks. Python script syntax checks passed.
+- Preserved unrelated tracked hashes rechecked before staging:
+  `/tmp/unigis-subset-preserved-hashes.json`. No running builds/probes.
 
 ## Next actions
 
-1. Commit190 scoped paths for this tool, then push origin main (fresh full gate
-   above; avoid duplicate pre-push gate).
-2. python3 scripts/work_queue.py; record actual next item/HEAD/push evidence.
-3. Final checkpoint before stopping. No further tool polishing requested.
+1. Stage only Subset product/research/fixtures/docs. Exclude inherited4-line
+   umintfloat generator hunk, locks and Python caches. Audit staged scope/whitespace.
+2. Commit Subset Features, then push three scoped commits once. Full gate already
+   passed; use `git push --no-verify origin main` to avoid redundant build.
+3. Regenerate queue and checkpoint actual SHA/push outcome. Next queue item:
+   Add Global IDs (`management.AddGlobalIDs`); do not polish landed tools.
 
-## Preserved inherited work
-
-Raster local/registry/stats, unary safety/fixtures/research, generator umintfloat,
-AGENTS/hooks/agents-remote/coordinator, web publisher RAM guard/docs/service/timer,
-queue infrastructure and generated dashboard/WORK_QUEUE remain outside commit.
-Untracked testdata/geoproc/parcels.shp.xml was present on startup, also preserved.
-/tmp/unigis-spatial-sampling-preserved-hashes.json records inherited tracked hashes;
-/tmp/unigis-spatial-sampling-scope.json lists190 scoped paths. Never read/add NOTES.md
-or .worktrees; scratch_te scratch. Cargo-j3 max; no overlapping/manual web builds.
+Unrelated edits preserved: raster unary/integer-float, coordinator/agents scripts,
+AGENTS.md, hooks/web/queue infrastructure, parcels.shp.xml, generated dashboard,
+scratch_te. Generator's inherited umintfloat hunk must remain unstaged. Do not read
+or add NOTES.md/.worktrees. No manual web publish; existing timer/RAM guard retained.
+Max Cargo-j3, no overlapping Cargo/Trunk, no other agents/coordinators.

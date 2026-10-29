@@ -96861,6 +96861,407 @@
           "spatial_relationship": "COMPLETELY_WITHIN"
         }
       }
+    },
+    "subf_default": {
+      "tool": "management.SubsetFeatures",
+      "args": [
+        "testdata/geoproc/subset_base.gdb/points",
+        "<out>/training.shp",
+        "<out>/testing.shp",
+        "",
+        ""
+      ],
+      "status": "succeeded",
+      "subset_partition": true,
+      "table_output": false,
+      "messages": [],
+      "run": {
+        "tool": "subset_features",
+        "params": {
+          "input": "testdata/geoproc/subset_base.gdb/points",
+          "out_training_feature_class": "<out>/training.shp",
+          "out_test_feature_class": "<out>/testing.shp"
+        }
+      }
+    },
+    "subf_percent33": {
+      "tool": "management.SubsetFeatures",
+      "args": [
+        "testdata/geoproc/subset_base.gdb/points",
+        "<out>/training.shp",
+        "<out>/testing.shp",
+        "33.3",
+        "PERCENTAGE_OF_INPUT"
+      ],
+      "status": "succeeded",
+      "subset_partition": true,
+      "table_output": false,
+      "messages": [],
+      "run": {
+        "tool": "subset_features",
+        "params": {
+          "input": "testdata/geoproc/subset_base.gdb/points",
+          "out_training_feature_class": "<out>/training.shp",
+          "out_test_feature_class": "<out>/testing.shp",
+          "size_of_training_dataset": "33.3",
+          "subset_size_units": "PERCENTAGE_OF_INPUT"
+        }
+      }
+    },
+    "subf_abs3": {
+      "tool": "management.SubsetFeatures",
+      "args": [
+        "testdata/geoproc/subset_base.gdb/points",
+        "<out>/training.shp",
+        "<out>/testing.shp",
+        "3",
+        "ABSOLUTE_VALUE"
+      ],
+      "status": "succeeded",
+      "subset_partition": true,
+      "table_output": false,
+      "messages": [],
+      "run": {
+        "tool": "subset_features",
+        "params": {
+          "input": "testdata/geoproc/subset_base.gdb/points",
+          "out_training_feature_class": "<out>/training.shp",
+          "out_test_feature_class": "<out>/testing.shp",
+          "size_of_training_dataset": "3",
+          "subset_size_units": "ABSOLUTE_VALUE"
+        }
+      }
+    },
+    "subf_abs36": {
+      "tool": "management.SubsetFeatures",
+      "args": [
+        "testdata/geoproc/subset_base.gdb/points",
+        "<out>/training.shp",
+        "<out>/testing.shp",
+        "3.6",
+        "ABSOLUTE_VALUE"
+      ],
+      "status": "succeeded",
+      "subset_partition": true,
+      "table_output": false,
+      "messages": [],
+      "run": {
+        "tool": "subset_features",
+        "params": {
+          "input": "testdata/geoproc/subset_base.gdb/points",
+          "out_training_feature_class": "<out>/training.shp",
+          "out_test_feature_class": "<out>/testing.shp",
+          "size_of_training_dataset": "3.6",
+          "subset_size_units": "ABSOLUTE_VALUE"
+        }
+      }
+    },
+    "subf_abs19": {
+      "tool": "management.SubsetFeatures",
+      "args": [
+        "testdata/geoproc/subset_base.gdb/points",
+        "<out>/training.shp",
+        "<out>/testing.shp",
+        "1.9",
+        "ABSOLUTE_VALUE"
+      ],
+      "status": "succeeded",
+      "subset_partition": true,
+      "table_output": false,
+      "messages": [],
+      "run": {
+        "tool": "subset_features",
+        "params": {
+          "input": "testdata/geoproc/subset_base.gdb/points",
+          "out_training_feature_class": "<out>/training.shp",
+          "out_test_feature_class": "<out>/testing.shp",
+          "size_of_training_dataset": "1.9",
+          "subset_size_units": "ABSOLUTE_VALUE"
+        }
+      }
+    },
+    "subf_tiny": {
+      "tool": "management.SubsetFeatures",
+      "args": [
+        "testdata/geoproc/subset_base.gdb/points",
+        "<out>/training.shp",
+        "<out>/testing.shp",
+        "1",
+        "PERCENTAGE_OF_INPUT"
+      ],
+      "status": "succeeded",
+      "subset_partition": true,
+      "table_output": false,
+      "messages": [
+        "WARNING 040303: The input features, the output training feature class, or the output test feature class have no records."
+      ],
+      "run": {
+        "tool": "subset_features",
+        "params": {
+          "input": "testdata/geoproc/subset_base.gdb/points",
+          "out_training_feature_class": "<out>/training.shp",
+          "out_test_feature_class": "<out>/testing.shp",
+          "size_of_training_dataset": "1",
+          "subset_size_units": "PERCENTAGE_OF_INPUT"
+        }
+      }
+    },
+    "subf_all": {
+      "tool": "management.SubsetFeatures",
+      "args": [
+        "testdata/geoproc/subset_base.gdb/points",
+        "<out>/training.shp",
+        "<out>/testing.shp",
+        "100",
+        "PERCENTAGE_OF_INPUT"
+      ],
+      "status": "succeeded",
+      "subset_partition": true,
+      "table_output": false,
+      "messages": [
+        "WARNING 040303: The input features, the output training feature class, or the output test feature class have no records."
+      ],
+      "run": {
+        "tool": "subset_features",
+        "params": {
+          "input": "testdata/geoproc/subset_base.gdb/points",
+          "out_training_feature_class": "<out>/training.shp",
+          "out_test_feature_class": "<out>/testing.shp",
+          "size_of_training_dataset": "100",
+          "subset_size_units": "PERCENTAGE_OF_INPUT"
+        }
+      }
+    },
+    "subf_too_many": {
+      "tool": "management.SubsetFeatures",
+      "args": [
+        "testdata/geoproc/subset_base.gdb/points",
+        "<out>/training.shp",
+        "<out>/testing.shp",
+        "99",
+        "ABSOLUTE_VALUE"
+      ],
+      "status": "succeeded",
+      "subset_partition": true,
+      "table_output": false,
+      "messages": [],
+      "run": {
+        "tool": "subset_features",
+        "params": {
+          "input": "testdata/geoproc/subset_base.gdb/points",
+          "out_training_feature_class": "<out>/training.shp",
+          "out_test_feature_class": "<out>/testing.shp",
+          "size_of_training_dataset": "99",
+          "subset_size_units": "ABSOLUTE_VALUE"
+        }
+      }
+    },
+    "subf_train_only": {
+      "tool": "management.SubsetFeatures",
+      "args": [
+        "testdata/geoproc/subset_base.gdb/points",
+        "<out>/training.shp",
+        "",
+        "3",
+        "ABSOLUTE_VALUE"
+      ],
+      "status": "succeeded",
+      "subset_partition": true,
+      "table_output": false,
+      "messages": [],
+      "run": {
+        "tool": "subset_features",
+        "params": {
+          "input": "testdata/geoproc/subset_base.gdb/points",
+          "out_training_feature_class": "<out>/training.shp",
+          "size_of_training_dataset": "3",
+          "subset_size_units": "ABSOLUTE_VALUE"
+        }
+      }
+    },
+    "subf_records": {
+      "tool": "management.SubsetFeatures",
+      "args": [
+        "testdata/geoproc/subset_base.gdb/records",
+        "<out>/training.dbf",
+        "<out>/testing.dbf",
+        "50",
+        "PERCENTAGE_OF_INPUT"
+      ],
+      "status": "succeeded",
+      "subset_partition": true,
+      "table_output": true,
+      "messages": [],
+      "run": {
+        "tool": "subset_features",
+        "params": {
+          "input": "testdata/geoproc/subset_base.gdb/records",
+          "out_training_feature_class": "<out>/training.dbf",
+          "out_test_feature_class": "<out>/testing.dbf",
+          "size_of_training_dataset": "50",
+          "subset_size_units": "PERCENTAGE_OF_INPUT"
+        }
+      }
+    },
+    "subf_records_all": {
+      "tool": "management.SubsetFeatures",
+      "args": [
+        "testdata/geoproc/subset_base.gdb/records",
+        "<out>/training.dbf",
+        "<out>/testing.dbf",
+        "100",
+        "PERCENTAGE_OF_INPUT"
+      ],
+      "status": "succeeded",
+      "subset_partition": true,
+      "table_output": true,
+      "messages": [
+        "WARNING 040303: The input features, the output training feature class, or the output test feature class have no records."
+      ],
+      "run": {
+        "tool": "subset_features",
+        "params": {
+          "input": "testdata/geoproc/subset_base.gdb/records",
+          "out_training_feature_class": "<out>/training.dbf",
+          "out_test_feature_class": "<out>/testing.dbf",
+          "size_of_training_dataset": "100",
+          "subset_size_units": "PERCENTAGE_OF_INPUT"
+        }
+      }
+    },
+    "subf_records_train_only": {
+      "tool": "management.SubsetFeatures",
+      "args": [
+        "testdata/geoproc/subset_base.gdb/records",
+        "<out>/training.dbf",
+        "",
+        "3",
+        "ABSOLUTE_VALUE"
+      ],
+      "status": "succeeded",
+      "subset_partition": true,
+      "table_output": true,
+      "messages": [],
+      "run": {
+        "tool": "subset_features",
+        "params": {
+          "input": "testdata/geoproc/subset_base.gdb/records",
+          "out_training_feature_class": "<out>/training.dbf",
+          "size_of_training_dataset": "3",
+          "subset_size_units": "ABSOLUTE_VALUE"
+        }
+      }
+    },
+    "subf_zero": {
+      "tool": "management.SubsetFeatures",
+      "args": [
+        "testdata/geoproc/subset_base.gdb/points",
+        "<out>/training.shp",
+        "<out>/testing.shp",
+        "0",
+        "ABSOLUTE_VALUE"
+      ],
+      "status": "failed",
+      "subset_partition": true,
+      "table_output": false,
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000854: The value is out of the range from 1 to 2.14748e+09.",
+        "Failed to execute (SubsetFeatures)."
+      ],
+      "run": {
+        "tool": "subset_features",
+        "params": {
+          "input": "testdata/geoproc/subset_base.gdb/points",
+          "out_training_feature_class": "<out>/training.shp",
+          "out_test_feature_class": "<out>/testing.shp",
+          "size_of_training_dataset": "0",
+          "subset_size_units": "ABSOLUTE_VALUE"
+        }
+      }
+    },
+    "subf_negative": {
+      "tool": "management.SubsetFeatures",
+      "args": [
+        "testdata/geoproc/subset_base.gdb/points",
+        "<out>/training.shp",
+        "<out>/testing.shp",
+        "-1",
+        "ABSOLUTE_VALUE"
+      ],
+      "status": "failed",
+      "subset_partition": true,
+      "table_output": false,
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000854: The value is out of the range from 1 to 2.14748e+09.",
+        "Failed to execute (SubsetFeatures)."
+      ],
+      "run": {
+        "tool": "subset_features",
+        "params": {
+          "input": "testdata/geoproc/subset_base.gdb/points",
+          "out_training_feature_class": "<out>/training.shp",
+          "out_test_feature_class": "<out>/testing.shp",
+          "size_of_training_dataset": "-1",
+          "subset_size_units": "ABSOLUTE_VALUE"
+        }
+      }
+    },
+    "subf_over_percent": {
+      "tool": "management.SubsetFeatures",
+      "args": [
+        "testdata/geoproc/subset_base.gdb/points",
+        "<out>/training.shp",
+        "<out>/testing.shp",
+        "101",
+        "PERCENTAGE_OF_INPUT"
+      ],
+      "status": "failed",
+      "subset_partition": true,
+      "table_output": false,
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000854: The value is out of the range from 2.22507e-308 to 100.",
+        "Failed to execute (SubsetFeatures)."
+      ],
+      "run": {
+        "tool": "subset_features",
+        "params": {
+          "input": "testdata/geoproc/subset_base.gdb/points",
+          "out_training_feature_class": "<out>/training.shp",
+          "out_test_feature_class": "<out>/testing.shp",
+          "size_of_training_dataset": "101",
+          "subset_size_units": "PERCENTAGE_OF_INPUT"
+        }
+      }
+    },
+    "subf_empty": {
+      "tool": "management.SubsetFeatures",
+      "args": [
+        "testdata/geoproc/subset_base.gdb/empty",
+        "<out>/training.shp",
+        "<out>/testing.shp",
+        "50",
+        "PERCENTAGE_OF_INPUT"
+      ],
+      "status": "failed",
+      "subset_partition": true,
+      "table_output": false,
+      "messages": [
+        "ERROR 040303: The input features, the output training feature class, or the output test feature class have no records.",
+        "Failed to execute (SubsetFeatures)."
+      ],
+      "run": {
+        "tool": "subset_features",
+        "params": {
+          "input": "testdata/geoproc/subset_base.gdb/empty",
+          "out_training_feature_class": "<out>/training.shp",
+          "out_test_feature_class": "<out>/testing.shp",
+          "size_of_training_dataset": "50",
+          "subset_size_units": "PERCENTAGE_OF_INPUT"
+        }
+      }
     }
   }
 }

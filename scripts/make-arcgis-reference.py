@@ -77,6 +77,25 @@ DM = ROOT / "testdata" / "dm"
 
 CASES = {
     # name: (tool, args before the output, args after the output)
+    **{f"subf_{name}": ("management.SubsetFeatures", [DATA / "subset_base.gdb" / item], [test, size, units])
+       for name, item, test, size, units in [
+        ("default", "points", True, "", ""),
+        ("percent33", "points", True, "33.3", "PERCENTAGE_OF_INPUT"),
+        ("abs3", "points", True, "3", "ABSOLUTE_VALUE"),
+        ("abs36", "points", True, "3.6", "ABSOLUTE_VALUE"),
+        ("abs19", "points", True, "1.9", "ABSOLUTE_VALUE"),
+        ("tiny", "points", True, "1", "PERCENTAGE_OF_INPUT"),
+        ("all", "points", True, "100", "PERCENTAGE_OF_INPUT"),
+        ("too_many", "points", True, "99", "ABSOLUTE_VALUE"),
+        ("train_only", "points", False, "3", "ABSOLUTE_VALUE"),
+        ("records", "records", True, "50", "PERCENTAGE_OF_INPUT"),
+        ("records_all", "records", True, "100", "PERCENTAGE_OF_INPUT"),
+        ("records_train_only", "records", False, "3", "ABSOLUTE_VALUE"),
+        ("zero", "points", True, "0", "ABSOLUTE_VALUE"),
+        ("negative", "points", True, "-1", "ABSOLUTE_VALUE"),
+        ("over_percent", "points", True, "101", "PERCENTAGE_OF_INPUT"),
+        ("empty", "empty", True, "50", "PERCENTAGE_OF_INPUT"),
+    ]},
     **{f"ssl_{name}": ("management.CreateSpatialSamplingLocations", [DATA / "ssl_areas.shp"],
         [method, field, allocation, shape, size, "7", count, per_stratum, population, geometry, gap, relation])
        for name, method, field, allocation, shape, size, count, per_stratum, population, geometry, gap, relation in [
@@ -2154,6 +2173,7 @@ for _tool, _id in COMBINATORIAL:
 
 
 RUN = {
+    "management.SubsetFeatures": ("subset_features", ["input", "out_training_feature_class", "out_test_feature_class", "size_of_training_dataset", "subset_size_units"]),
     "management.CreateSpatialSamplingLocations": ("create_spatial_sampling_locations", ["input", "output", "sampling_method", "strata_id_field", "strata_count_method", "bin_shape", "bin_size", "h3_resolution", "num_samples", "num_samples_per_strata", "population_field", "geometry_type", "min_distance", "spatial_relationship"]),
     "management.CreateRandomPoints": ("create_random_points", ["output", "constraining_feature_class", "constraining_extent", "number_of_points_or_field", "minimum_allowed_distance", "create_multipoint_output", "multipoint_size"]),
     "management.ExtractDataFromGeodatabase": ("extract_data_from_geodatabase", ["in_data", "extract_type", "out_type", "out_geodatabase", "out_xml", "out_folder_path", "out_name", "expand_feature_classes_and_tables", "reuse_schema", "get_related_data", "extract_using_geometry_features", "geometry_filter_type", "all_records_for_tables"]),
@@ -2366,6 +2386,22 @@ result = dict(files=sorted(files),catalogs=catalogs)
             run=run_spec("management.DeleteMultiple",[template]))
 
 
+def subset_case(w, name, tool, before, after):
+    """Save both sides of a random record partition, without demanding RNG parity."""
+    source = Path(before[0])
+    table = source.name == "records"
+    folder = OUT / name
+    folder.mkdir(exist_ok=False)
+    extension = "dbf" if table else "shp"
+    train = folder / f"training.{extension}"
+    test = folder / f"testing.{extension}"
+    requested, size, units = after
+    r = w.call("run_tool", tool=tool, args=[str(source), str(train), str(test) if requested else "", size, units])
+    args = [rel(source), f"<out>/training.{extension}", f"<out>/testing.{extension}" if requested else "", size, units]
+    return dict(tool=tool,args=args,status=r.get("status"),subset_partition=True,table_output=table,
+                messages=[m["text"] for m in r.get("messages",[]) if m["severity"]>0],run=run_spec(tool,args))
+
+
 def extract_data_case(w, name, tool, before, after):
     """Public workspace output retained for portable native schema/value comparison."""
     extract, out_type, expand, related, all_rows = after
@@ -2491,6 +2527,10 @@ def main():
             for a in before:
                 if isinstance(a, Path) and a.suffix == ".tif":
                     w.call("python", code=f"arcpy.management.BuildRasterAttributeTable(r'{win(a)}', 'Overwrite')")
+        if tool == "management.SubsetFeatures":
+            manifest["cases"][name] = subset_case(w, name, tool, before, after)
+            print(f"{name}: {manifest['cases'][name]['status']}")
+            continue
         if tool == "management.ExtractDataFromGeodatabase":
             manifest["cases"][name] = extract_data_case(w, name, tool, before, after)
             print(f"{name}: {manifest['cases'][name]['status']}")

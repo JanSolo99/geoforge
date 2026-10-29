@@ -33,6 +33,7 @@ pub mod spatial_sampling;
 pub mod spatstat;
 pub mod split_attributes;
 mod sql;
+pub mod subset_features;
 pub mod swm;
 pub mod tables;
 pub mod temporal;
