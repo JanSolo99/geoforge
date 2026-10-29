@@ -455,6 +455,16 @@ CASES = {
     "enc_name_cold": ("management.EncodeField", [DATA / "streams.shp"], ["NAME", "One-cold"]),
         "enc_zone_hot": ("management.EncodeField", [DATA / "parcels.shp"], ["ZONE", "One-hot"]),
     "enc_zone_cold": ("management.EncodeField", [DATA / "parcels.shp"], ["ZONE", "One-cold"]),
+    "awp_default": ("analysis.AssignWeightsByPairwiseComparison", ["A;B;C"], []),
+    "awp_three": ("analysis.AssignWeightsByPairwiseComparison", ["A;B;C"], ["ADD_MATRIX", "Variables A B 3; A C 5; B C 2"]),
+    "awp_three_weights_only": ("analysis.AssignWeightsByPairwiseComparison", ["A;B;C"], ["WEIGHTS_ONLY", "Variables A B 3; A C 5; B C 2"]),
+    "awp_four": ("analysis.AssignWeightsByPairwiseComparison", ["A;B;C;D"], ["ADD_MATRIX", "Variables A B 2; A C 1; A D 3; B C 4; B D 0.5; C D 4"]),
+    "awp_fraction": ("analysis.AssignWeightsByPairwiseComparison", ["elev;landuse;dist_road"], ["ADD_MATRIX", "Variables elev landuse 1/3; elev dist_road 2.2; landuse dist_road 0.333"]),
+    "awp_nine": ("analysis.AssignWeightsByPairwiseComparison", ["Slope;Landuse;Roads;Water;Soil;Aspect;Noise;Rail;Parks"], ["ADD_MATRIX", "Variables Slope Landuse 3; Slope Roads 1/5; Slope Water 9; Slope Soil 1/9; Slope Aspect 2; Slope Noise 0.5; Slope Rail 4; Slope Parks 7; Landuse Roads 1/3; Landuse Water 6; Landuse Soil 1; Landuse Aspect 8; Landuse Noise 1/7; Landuse Rail 5; Landuse Parks 0.25; Roads Water 2.2; Roads Soil 3; Roads Aspect 1/5; Roads Noise 9; Roads Rail 1/9; Roads Parks 2; Water Soil 0.5; Water Aspect 4; Water Noise 7; Water Rail 1/3; Water Parks 6; Soil Aspect 1; Soil Noise 8; Soil Rail 1/7; Soil Parks 5; Aspect Noise 0.25; Aspect Rail 2.2; Aspect Parks 3; Noise Rail 1/5; Noise Parks 9; Rail Parks 1/9"]),
+    "awp_err_count": ("analysis.AssignWeightsByPairwiseComparison", ["A"], []),
+    "awp_err_name": ("analysis.AssignWeightsByPairwiseComparison", ["1A;B;C"], []),
+    "awp_err_order": ("analysis.AssignWeightsByPairwiseComparison", ["A;B;C"], ["ADD_MATRIX", "Variables A C 5; A B 3; B C 2"]),
+    "awp_err_value": ("analysis.AssignWeightsByPairwiseComparison", ["A;B;C"], ["ADD_MATRIX", "Variables A B 9.5; A C 1; B C 1"]),
     "fst_parcels_num": ("management.FieldStatisticsToTable", [DATA / "parcels.shp"], ["VALUE;ZONE;PARCEL_ID", "NUMERIC"]),
     "fst_parcels_text": ("management.FieldStatisticsToTable", [DATA / "parcels.shp"], ["NAME", "TEXT"]),
     "fst_streams_text": ("management.FieldStatisticsToTable", [DATA / "streams.shp"], ["NAME", "TEXT"]),
@@ -1972,6 +1982,7 @@ RUN = {
     "edit.ExtendLine": ("extend_line", ["input", "output", "length", "extend_to"]),
     "edit.FlipLine": ("flip_line", ["input", "output"]),
     "edit.TrimLine": ("trim_line", ["input", "output", "dangle_length", "delete_shorts"]),
+    "analysis.AssignWeightsByPairwiseComparison": ("assign_weights_by_pairwise_comparison", ["input_variables", "output", "add_comparison_matrix", "comparison_matrix"]),
     "management.FieldStatisticsToTable": ("field_statistics_to_table", ["input", "output", "fields", "field_type", "group_by", "statistics"]),
     "management.EncodeField": ("encode_field", ["input", "output", "field", "method"]),
     "management.GeodeticDensify": ("geodetic_densify", ["input", "output", "densify_method", "max_segment_length"]),
@@ -2046,7 +2057,7 @@ WORKSPACE_OUT = {"analysis.Split"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable", "conversion.RasterToASCII", "conversion.RasterToFloat"}
 # Tools whose output is a table, written as <name>.dbf.
-TABLE_OUT = {"management.FieldStatisticsToTable", "gp.Sample_sa", "management.CopyRows", "gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa", "gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
+TABLE_OUT = {"analysis.AssignWeightsByPairwiseComparison", "management.FieldStatisticsToTable", "gp.Sample_sa", "management.CopyRows", "gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa", "gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
              "management.TransposeFields", "management.PivotTable", "management.CreateTable", "analysis.PolygonNeighbors", "analysis.TabulateIntersection", "analysis.TableSelect"}
 # Tools whose ArcGIS output must be a geodatabase feature class or memory (copied to a shapefile).
 MEMORY_OUT = {"analysis.SummarizeWithin", "analysis.SummarizeNearby", "analysis.ApportionPolygon"}

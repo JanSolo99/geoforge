@@ -823,3 +823,7 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
       grids, antimeridian wrap) to DD_NUMERIC/DD_1/DD_2: 8 reference cases over 792 rows
       match ArcGIS. DDM/DMS/grid outputs refused: ArcGIS's inverse differs by up to
       ~3e-10 degrees. Evidence: `scripts/research/coordinate_notation/grid/projected-inputs.md`.
+
+- [x] Assign Weights By Pairwise Comparison: 2–9 variables, default equal weights,
+      ordered pair strings/fractions, ADD_MATRIX and WEIGHTS_ONLY. Six successful
+      ArcGIS cases and four refusals; findings in scripts/research/pairwise_weights/.

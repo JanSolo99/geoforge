@@ -1144,6 +1144,29 @@ fn copy_rows(ctx: &dyn Context) -> Result<Outcome> {
     Ok(Outcome::Table(table))
 }
 
+fn assign_weights_by_pairwise_comparison(ctx: &dyn Context) -> Result<Outcome> {
+    let t = find("assign_weights_by_pairwise_comparison")
+        .ok_or_else(|| Error::Unsupported("assign_weights_by_pairwise_comparison".into()))?;
+    let variables: Vec<String> = text(ctx, t, "input_variables")
+        .ok_or_else(|| {
+            Error::Unsupported("ERROR 000735: Input Variables To Compare: value is required".into())
+        })?
+        .split(';')
+        .map(|v| v.trim().to_owned())
+        .filter(|v| !v.is_empty())
+        .collect();
+    let add_matrix = !text(ctx, t, "add_comparison_matrix")
+        .is_some_and(|m| m.eq_ignore_ascii_case("WEIGHTS_ONLY"));
+    let matrix = text(ctx, t, "comparison_matrix");
+    Ok(Outcome::Table(
+        crate::pairwise::assign_weights_by_pairwise_comparison(
+            &variables,
+            matrix.as_deref(),
+            add_matrix,
+        )?,
+    ))
+}
+
 fn field_statistics_to_table(ctx: &dyn Context) -> Result<Outcome> {
     let t = find("field_statistics_to_table")
         .ok_or_else(|| Error::Unsupported("field_statistics_to_table".into()))?;
@@ -1770,6 +1793,41 @@ pub static TOOLS: &[Tool] = &[
         output_suffix: "Encoded",
         measures: false,
         run: Runner::Features(encode_field),
+    },
+    Tool {
+        id: "assign_weights_by_pairwise_comparison",
+        name: "Assign Weights By Pairwise Comparison",
+        toolbox: "Analysis › Overlay",
+        summary: "Relative weights of 2 to 9 variables from pairwise comparisons (ArcGIS Pro Assign Weights By Pairwise Comparison).",
+        params: &[
+            Param {
+                name: "input_variables",
+                label: "Input Variables To Compare",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+                help: "Variable names separated by semicolons.",
+            },
+            Param {
+                name: "add_comparison_matrix",
+                label: "Add comparison matrix to output",
+                kind: Kind::Choice(&["ADD_MATRIX", "WEIGHTS_ONLY"]),
+                required: false,
+                default: "ADD_MATRIX",
+                help: "",
+            },
+            Param {
+                name: "comparison_matrix",
+                label: "Pairwise Comparison Matrix",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "`Variables A B 3; A C 5; B C 2`: each upper-triangle pair once, value 1/9..9; default all 1.",
+            },
+        ],
+        output_suffix: "Weights",
+        measures: false,
+        run: Runner::Dynamic(assign_weights_by_pairwise_comparison),
     },
     Tool {
         id: "trim_line",

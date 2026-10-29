@@ -76659,6 +76659,516 @@
           "delete_shorts": "KEEP_SHORT"
         }
       }
+    },
+    "awp_default": {
+      "tool": "analysis.AssignWeightsByPairwiseComparison",
+      "args": [
+        "A;B;C",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Variables",
+          "String",
+          50,
+          0,
+          0
+        ],
+        [
+          "A",
+          "Double",
+          13,
+          12,
+          6
+        ],
+        [
+          "B",
+          "Double",
+          13,
+          12,
+          6
+        ],
+        [
+          "C",
+          "Double",
+          13,
+          12,
+          6
+        ],
+        [
+          "Weights",
+          "Double",
+          13,
+          12,
+          6
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "assign_weights_by_pairwise_comparison",
+        "params": {
+          "input_variables": "A;B;C",
+          "output": "<out>"
+        }
+      }
+    },
+    "awp_three": {
+      "tool": "analysis.AssignWeightsByPairwiseComparison",
+      "args": [
+        "A;B;C",
+        "<out>",
+        "ADD_MATRIX",
+        "Variables A B 3; A C 5; B C 2"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Variables",
+          "String",
+          50,
+          0,
+          0
+        ],
+        [
+          "A",
+          "Double",
+          13,
+          12,
+          6
+        ],
+        [
+          "B",
+          "Double",
+          13,
+          12,
+          6
+        ],
+        [
+          "C",
+          "Double",
+          13,
+          12,
+          6
+        ],
+        [
+          "Weights",
+          "Double",
+          13,
+          12,
+          6
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "assign_weights_by_pairwise_comparison",
+        "params": {
+          "input_variables": "A;B;C",
+          "output": "<out>",
+          "add_comparison_matrix": "ADD_MATRIX",
+          "comparison_matrix": "Variables A B 3; A C 5; B C 2"
+        }
+      }
+    },
+    "awp_three_weights_only": {
+      "tool": "analysis.AssignWeightsByPairwiseComparison",
+      "args": [
+        "A;B;C",
+        "<out>",
+        "WEIGHTS_ONLY",
+        "Variables A B 3; A C 5; B C 2"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Variables",
+          "String",
+          50,
+          0,
+          0
+        ],
+        [
+          "Weights",
+          "Double",
+          13,
+          12,
+          6
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "assign_weights_by_pairwise_comparison",
+        "params": {
+          "input_variables": "A;B;C",
+          "output": "<out>",
+          "add_comparison_matrix": "WEIGHTS_ONLY",
+          "comparison_matrix": "Variables A B 3; A C 5; B C 2"
+        }
+      }
+    },
+    "awp_four": {
+      "tool": "analysis.AssignWeightsByPairwiseComparison",
+      "args": [
+        "A;B;C;D",
+        "<out>",
+        "ADD_MATRIX",
+        "Variables A B 2; A C 1; A D 3; B C 4; B D 0.5; C D 4"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Variables",
+          "String",
+          50,
+          0,
+          0
+        ],
+        [
+          "A",
+          "Double",
+          13,
+          12,
+          6
+        ],
+        [
+          "B",
+          "Double",
+          13,
+          12,
+          6
+        ],
+        [
+          "C",
+          "Double",
+          13,
+          12,
+          6
+        ],
+        [
+          "D",
+          "Double",
+          13,
+          12,
+          6
+        ],
+        [
+          "Weights",
+          "Double",
+          13,
+          12,
+          6
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "assign_weights_by_pairwise_comparison",
+        "params": {
+          "input_variables": "A;B;C;D",
+          "output": "<out>",
+          "add_comparison_matrix": "ADD_MATRIX",
+          "comparison_matrix": "Variables A B 2; A C 1; A D 3; B C 4; B D 0.5; C D 4"
+        }
+      }
+    },
+    "awp_fraction": {
+      "tool": "analysis.AssignWeightsByPairwiseComparison",
+      "args": [
+        "elev;landuse;dist_road",
+        "<out>",
+        "ADD_MATRIX",
+        "Variables elev landuse 1/3; elev dist_road 2.2; landuse dist_road 0.333"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Variables",
+          "String",
+          50,
+          0,
+          0
+        ],
+        [
+          "elev",
+          "Double",
+          13,
+          12,
+          6
+        ],
+        [
+          "landuse",
+          "Double",
+          13,
+          12,
+          6
+        ],
+        [
+          "dist_road",
+          "Double",
+          13,
+          12,
+          6
+        ],
+        [
+          "Weights",
+          "Double",
+          13,
+          12,
+          6
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "assign_weights_by_pairwise_comparison",
+        "params": {
+          "input_variables": "elev;landuse;dist_road",
+          "output": "<out>",
+          "add_comparison_matrix": "ADD_MATRIX",
+          "comparison_matrix": "Variables elev landuse 1/3; elev dist_road 2.2; landuse dist_road 0.333"
+        }
+      }
+    },
+    "awp_nine": {
+      "tool": "analysis.AssignWeightsByPairwiseComparison",
+      "args": [
+        "Slope;Landuse;Roads;Water;Soil;Aspect;Noise;Rail;Parks",
+        "<out>",
+        "ADD_MATRIX",
+        "Variables Slope Landuse 3; Slope Roads 1/5; Slope Water 9; Slope Soil 1/9; Slope Aspect 2; Slope Noise 0.5; Slope Rail 4; Slope Parks 7; Landuse Roads 1/3; Landuse Water 6; Landuse Soil 1; Landuse Aspect 8; Landuse Noise 1/7; Landuse Rail 5; Landuse Parks 0.25; Roads Water 2.2; Roads Soil 3; Roads Aspect 1/5; Roads Noise 9; Roads Rail 1/9; Roads Parks 2; Water Soil 0.5; Water Aspect 4; Water Noise 7; Water Rail 1/3; Water Parks 6; Soil Aspect 1; Soil Noise 8; Soil Rail 1/7; Soil Parks 5; Aspect Noise 0.25; Aspect Rail 2.2; Aspect Parks 3; Noise Rail 1/5; Noise Parks 9; Rail Parks 1/9"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Variables",
+          "String",
+          50,
+          0,
+          0
+        ],
+        [
+          "Slope",
+          "Double",
+          13,
+          12,
+          6
+        ],
+        [
+          "Landuse",
+          "Double",
+          13,
+          12,
+          6
+        ],
+        [
+          "Roads",
+          "Double",
+          13,
+          12,
+          6
+        ],
+        [
+          "Water",
+          "Double",
+          13,
+          12,
+          6
+        ],
+        [
+          "Soil",
+          "Double",
+          13,
+          12,
+          6
+        ],
+        [
+          "Aspect",
+          "Double",
+          13,
+          12,
+          6
+        ],
+        [
+          "Noise",
+          "Double",
+          13,
+          12,
+          6
+        ],
+        [
+          "Rail",
+          "Double",
+          13,
+          12,
+          6
+        ],
+        [
+          "Parks",
+          "Double",
+          13,
+          12,
+          6
+        ],
+        [
+          "Weights",
+          "Double",
+          13,
+          12,
+          6
+        ]
+      ],
+      "shapeType": null,
+      "run": {
+        "tool": "assign_weights_by_pairwise_comparison",
+        "params": {
+          "input_variables": "Slope;Landuse;Roads;Water;Soil;Aspect;Noise;Rail;Parks",
+          "output": "<out>",
+          "add_comparison_matrix": "ADD_MATRIX",
+          "comparison_matrix": "Variables Slope Landuse 3; Slope Roads 1/5; Slope Water 9; Slope Soil 1/9; Slope Aspect 2; Slope Noise 0.5; Slope Rail 4; Slope Parks 7; Landuse Roads 1/3; Landuse Water 6; Landuse Soil 1; Landuse Aspect 8; Landuse Noise 1/7; Landuse Rail 5; Landuse Parks 0.25; Roads Water 2.2; Roads Soil 3; Roads Aspect 1/5; Roads Noise 9; Roads Rail 1/9; Roads Parks 2; Water Soil 0.5; Water Aspect 4; Water Noise 7; Water Rail 1/3; Water Parks 6; Soil Aspect 1; Soil Noise 8; Soil Rail 1/7; Soil Parks 5; Aspect Noise 0.25; Aspect Rail 2.2; Aspect Parks 3; Noise Rail 1/5; Noise Parks 9; Rail Parks 1/9"
+        }
+      }
+    },
+    "awp_err_count": {
+      "tool": "analysis.AssignWeightsByPairwiseComparison",
+      "args": [
+        "A",
+        "<out>"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 004145: The number of input variables must be greater than 1 and smaller than 10.",
+        "Failed to execute (AssignWeightsByPairwiseComparison)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "assign_weights_by_pairwise_comparison",
+        "params": {
+          "input_variables": "A",
+          "output": "<out>"
+        }
+      }
+    },
+    "awp_err_name": {
+      "tool": "analysis.AssignWeightsByPairwiseComparison",
+      "args": [
+        "1A;B;C",
+        "<out>"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 004153: One or more input variable names are invalid.",
+        "Failed to execute (AssignWeightsByPairwiseComparison)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "assign_weights_by_pairwise_comparison",
+        "params": {
+          "input_variables": "1A;B;C",
+          "output": "<out>"
+        }
+      }
+    },
+    "awp_err_order": {
+      "tool": "analysis.AssignWeightsByPairwiseComparison",
+      "args": [
+        "A;B;C",
+        "<out>",
+        "ADD_MATRIX",
+        "Variables A C 5; A B 3; B C 2"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 004160: Input variable names do not match the variable names in the comparison matrix.",
+        "Failed to execute (AssignWeightsByPairwiseComparison)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "assign_weights_by_pairwise_comparison",
+        "params": {
+          "input_variables": "A;B;C",
+          "output": "<out>",
+          "add_comparison_matrix": "ADD_MATRIX",
+          "comparison_matrix": "Variables A C 5; A B 3; B C 2"
+        }
+      }
+    },
+    "awp_err_value": {
+      "tool": "analysis.AssignWeightsByPairwiseComparison",
+      "args": [
+        "A;B;C",
+        "<out>",
+        "ADD_MATRIX",
+        "Variables A B 9.5; A C 1; B C 1"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 004155: One or more comparison values are invalid.\nERROR 004155: One or more comparison values are invalid.",
+        "Failed to execute (AssignWeightsByPairwiseComparison)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "assign_weights_by_pairwise_comparison",
+        "params": {
+          "input_variables": "A;B;C",
+          "output": "<out>",
+          "add_comparison_matrix": "ADD_MATRIX",
+          "comparison_matrix": "Variables A B 9.5; A C 1; B C 1"
+        }
+      }
     }
   }
 }

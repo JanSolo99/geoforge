@@ -13,6 +13,7 @@ mod fieldmap;
 pub mod graphic_buffer;
 pub(crate) mod grid_notation;
 pub mod neighbors;
+pub mod pairwise;
 pub mod planar;
 pub mod pycalc;
 pub mod registry;
