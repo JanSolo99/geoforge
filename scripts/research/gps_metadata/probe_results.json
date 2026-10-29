@@ -1,0 +1,3252 @@
+{
+  "point": {
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "type": "OID",
+        "length": 4,
+        "nullable": false,
+        "required": true,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "Shape",
+        "alias": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "nullable": true,
+        "required": true,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_POSITIONSOURCETYPE",
+        "alias": "Position source type",
+        "type": "SmallInteger",
+        "length": 2,
+        "nullable": true,
+        "required": false,
+        "domain": "ESRI_POSITIONSOURCETYPE_DOMAIN",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_RECEIVER",
+        "alias": "Receiver Name",
+        "type": "String",
+        "length": 50,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_LATITUDE",
+        "alias": "Latitude",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_LONGITUDE",
+        "alias": "Longitude",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_ALTITUDE",
+        "alias": "Altitude",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_H_RMS",
+        "alias": "Horizontal Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_V_RMS",
+        "alias": "Vertical Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_FIXDATETIME",
+        "alias": "Fix Time",
+        "type": "Date",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_FIXTYPE",
+        "alias": "Fix Type",
+        "type": "SmallInteger",
+        "length": 2,
+        "nullable": true,
+        "required": false,
+        "domain": "ESRI_FIX_TYPE_DOMAIN",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CORRECTIONAGE",
+        "alias": "Correction Age",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_STATIONID",
+        "alias": "Station ID",
+        "type": "SmallInteger",
+        "length": 2,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_NUMSATS",
+        "alias": "Number of Satellites",
+        "type": "SmallInteger",
+        "length": 2,
+        "nullable": true,
+        "required": false,
+        "domain": "ESRI_NUM_SATS_DOMAIN",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_PDOP",
+        "alias": "PDOP",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_HDOP",
+        "alias": "HDOP",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_VDOP",
+        "alias": "VDOP",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_DIRECTION",
+        "alias": "Direction of travel (\u00b0)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_SPEED",
+        "alias": "Speed (km/h)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRISNSR_AZIMUTH",
+        "alias": "Compass reading (\u00b0)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_AVG_H_RMS",
+        "alias": "Average Horizontal Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_AVG_V_RMS",
+        "alias": "Average Vertical Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_AVG_POSITIONS",
+        "alias": "Averaged Positions",
+        "type": "SmallInteger",
+        "length": 2,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_H_STDDEV",
+        "alias": "Standard Deviation (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      }
+    ],
+    "domains": [
+      {
+        "name": "ESRI_NUM_SATS_DOMAIN",
+        "description": "Number of Satellites",
+        "type": "Short",
+        "kind": "Range",
+        "split": "DefaultValue",
+        "merge": "DefaultValue",
+        "values": [
+          0.0,
+          99.0
+        ]
+      },
+      {
+        "name": "ESRI_POSITIONSOURCETYPE_DOMAIN",
+        "description": "Position Source Type",
+        "type": "Short",
+        "kind": "CodedValue",
+        "split": "DefaultValue",
+        "merge": "DefaultValue",
+        "values": {
+          "0": "Unknown",
+          "1": "User defined",
+          "2": "Integrated (System) Location Provider",
+          "3": "External GNSS Receiver",
+          "4": "Network Location Provider",
+          "5": "Snapped"
+        }
+      },
+      {
+        "name": "ESRI_FIX_TYPE_DOMAIN",
+        "description": "Fix Type",
+        "type": "Short",
+        "kind": "CodedValue",
+        "split": "DefaultValue",
+        "merge": "DefaultValue",
+        "values": {
+          "0": "Fix not valid",
+          "1": "GPS",
+          "2": "Differential GPS",
+          "4": "RTK Fixed",
+          "5": "RTK Float"
+        }
+      }
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:42:13 PM\nSucceeded at Thursday, October 29, 2026 3:42:14 PM (Elapsed Time: 1.29 seconds)",
+    "repeat": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_POSITIONSOURCETYPE",
+          "alias": "Position source type",
+          "type": "SmallInteger",
+          "length": 2,
+          "nullable": true,
+          "required": false,
+          "domain": "ESRI_POSITIONSOURCETYPE_DOMAIN",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_RECEIVER",
+          "alias": "Receiver Name",
+          "type": "String",
+          "length": 50,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_LATITUDE",
+          "alias": "Latitude",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_LONGITUDE",
+          "alias": "Longitude",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_ALTITUDE",
+          "alias": "Altitude",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_H_RMS",
+          "alias": "Horizontal Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_V_RMS",
+          "alias": "Vertical Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_FIXDATETIME",
+          "alias": "Fix Time",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_FIXTYPE",
+          "alias": "Fix Type",
+          "type": "SmallInteger",
+          "length": 2,
+          "nullable": true,
+          "required": false,
+          "domain": "ESRI_FIX_TYPE_DOMAIN",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CORRECTIONAGE",
+          "alias": "Correction Age",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_STATIONID",
+          "alias": "Station ID",
+          "type": "SmallInteger",
+          "length": 2,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_NUMSATS",
+          "alias": "Number of Satellites",
+          "type": "SmallInteger",
+          "length": 2,
+          "nullable": true,
+          "required": false,
+          "domain": "ESRI_NUM_SATS_DOMAIN",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_PDOP",
+          "alias": "PDOP",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_HDOP",
+          "alias": "HDOP",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_VDOP",
+          "alias": "VDOP",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_DIRECTION",
+          "alias": "Direction of travel (\u00b0)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_SPEED",
+          "alias": "Speed (km/h)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRISNSR_AZIMUTH",
+          "alias": "Compass reading (\u00b0)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_AVG_H_RMS",
+          "alias": "Average Horizontal Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_AVG_V_RMS",
+          "alias": "Average Vertical Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_AVG_POSITIONS",
+          "alias": "Averaged Positions",
+          "type": "SmallInteger",
+          "length": 2,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_H_STDDEV",
+          "alias": "Standard Deviation (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        }
+      ],
+      "messages": "Start Time: Thursday, October 29, 2026 3:42:14 PM\nSucceeded at Thursday, October 29, 2026 3:42:14 PM (Elapsed Time: 0.10 seconds)"
+    }
+  },
+  "point_offset": {
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "type": "OID",
+        "length": 4,
+        "nullable": false,
+        "required": true,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "Shape",
+        "alias": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "nullable": true,
+        "required": true,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_POSITIONSOURCETYPE",
+        "alias": "Position source type",
+        "type": "SmallInteger",
+        "length": 2,
+        "nullable": true,
+        "required": false,
+        "domain": "ESRI_POSITIONSOURCETYPE_DOMAIN",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_RECEIVER",
+        "alias": "Receiver Name",
+        "type": "String",
+        "length": 50,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_LATITUDE",
+        "alias": "Latitude",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_LONGITUDE",
+        "alias": "Longitude",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_ALTITUDE",
+        "alias": "Altitude",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_H_RMS",
+        "alias": "Horizontal Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_V_RMS",
+        "alias": "Vertical Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_FIXDATETIME",
+        "alias": "Fix Time",
+        "type": "Date",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_FIXTYPE",
+        "alias": "Fix Type",
+        "type": "SmallInteger",
+        "length": 2,
+        "nullable": true,
+        "required": false,
+        "domain": "ESRI_FIX_TYPE_DOMAIN",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CORRECTIONAGE",
+        "alias": "Correction Age",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_STATIONID",
+        "alias": "Station ID",
+        "type": "SmallInteger",
+        "length": 2,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_NUMSATS",
+        "alias": "Number of Satellites",
+        "type": "SmallInteger",
+        "length": 2,
+        "nullable": true,
+        "required": false,
+        "domain": "ESRI_NUM_SATS_DOMAIN",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_PDOP",
+        "alias": "PDOP",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_HDOP",
+        "alias": "HDOP",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_VDOP",
+        "alias": "VDOP",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_DIRECTION",
+        "alias": "Direction of travel (\u00b0)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_SPEED",
+        "alias": "Speed (km/h)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRISNSR_AZIMUTH",
+        "alias": "Compass reading (\u00b0)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_AVG_H_RMS",
+        "alias": "Average Horizontal Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_AVG_V_RMS",
+        "alias": "Average Vertical Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_AVG_POSITIONS",
+        "alias": "Averaged Positions",
+        "type": "SmallInteger",
+        "length": 2,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_H_STDDEV",
+        "alias": "Standard Deviation (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRISNSR_OFFSET_METHOD",
+        "alias": "Offset method",
+        "type": "String",
+        "length": 255,
+        "nullable": true,
+        "required": false,
+        "domain": "ESRI_OFFSET_METHOD_DOMAIN",
+        "default": null
+      },
+      {
+        "name": "ESRISNSR_OFFSET_DEVICE",
+        "alias": "Rangefinder name",
+        "type": "String",
+        "length": 255,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_ANTENNA_HEIGHT",
+        "alias": "GNSS Antenna height (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRISNSR_OFFSET_LASER_HEIGHT",
+        "alias": "Rangefinder height (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRISNSR_OFFSET_LASER_TARGET_HT",
+        "alias": "Laser target height (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRISNSR_OFFSET_MAG_VAR",
+        "alias": "Rangefinder Magnetic variation (\u00b0)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP1_LATITUDE",
+        "alias": "CP1 Latitude",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP1_LONGITUDE",
+        "alias": "CP1 Longitude",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP1_ALTITUDE",
+        "alias": "CP1 Ellipsoidal height (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP1_H_RMS",
+        "alias": "CP1 Horizontal accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP1_V_RMS",
+        "alias": "CP1 Vertical accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP1_FIXDATETIME",
+        "alias": "CP1 Fix time",
+        "type": "Date",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP1_FIXTYPE",
+        "alias": "CP1 Fix type",
+        "type": "SmallInteger",
+        "length": 2,
+        "nullable": true,
+        "required": false,
+        "domain": "ESRI_FIX_TYPE_DOMAIN",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP1_CORR_AGE",
+        "alias": "CP1 Correction age",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP1_STATIONID",
+        "alias": "CP1 Station ID",
+        "type": "SmallInteger",
+        "length": 2,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP1_NUMSATS",
+        "alias": "CP1 Number of satellites",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP1_PDOP",
+        "alias": "CP1 PDOP",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP1_HDOP",
+        "alias": "CP1 HDOP",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP1_VDOP",
+        "alias": "CP1 VDOP",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP1_AVG_H_RMS",
+        "alias": "CP1 Average horizontal accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP1_AVG_V_RMS",
+        "alias": "CP1 Average vertical accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP1_AVG_POSITIONS",
+        "alias": "CP1 Averaged positions",
+        "type": "SmallInteger",
+        "length": 2,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP1_H_STDDEV",
+        "alias": "CP1 Standard deviation (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRISNSR_CP1_SLOPE_DIST",
+        "alias": "CP1 Laser slope distance (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRISNSR_CP1_INCLINATION",
+        "alias": "CP1 Laser inclination (\u00b0)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRISNSR_CP1_AZIMUTH",
+        "alias": "CP1 Laser azimuth (\u00b0)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP2_LATITUDE",
+        "alias": "CP2 Latitude",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP2_LONGITUDE",
+        "alias": "CP2 Longitude",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP2_ALTITUDE",
+        "alias": "CP2 Ellipsoidal height (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP2_H_RMS",
+        "alias": "CP2 Horizontal accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP2_V_RMS",
+        "alias": "CP2 Vertical accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP2_FIXDATETIME",
+        "alias": "CP2 Fix time",
+        "type": "Date",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP2_FIXTYPE",
+        "alias": "CP2 Fix type",
+        "type": "SmallInteger",
+        "length": 2,
+        "nullable": true,
+        "required": false,
+        "domain": "ESRI_FIX_TYPE_DOMAIN",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP2_CORR_AGE",
+        "alias": "CP2 Correction age",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP2_STATIONID",
+        "alias": "CP2 Station ID",
+        "type": "SmallInteger",
+        "length": 2,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP2_NUMSATS",
+        "alias": "CP2 Number of satellites",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP2_PDOP",
+        "alias": "CP2 PDOP",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP2_HDOP",
+        "alias": "CP2 HDOP",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP2_VDOP",
+        "alias": "CP2 VDOP",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP2_AVG_H_RMS",
+        "alias": "CP2 Average horizontal accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP2_AVG_V_RMS",
+        "alias": "CP2 Average vertical accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP2_AVG_POSITIONS",
+        "alias": "CP2 Averaged positions",
+        "type": "SmallInteger",
+        "length": 2,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_CP2_H_STDDEV",
+        "alias": "CP2 Standard deviation (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRISNSR_CP2_SLOPE_DIST",
+        "alias": "CP2 Laser slope distance (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRISNSR_CP2_INCLINATION",
+        "alias": "CP2 Laser inclination (\u00b0)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRISNSR_CP2_AZIMUTH",
+        "alias": "CP2 Laser azimuth (\u00b0)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      }
+    ],
+    "domains": [
+      {
+        "name": "ESRI_NUM_SATS_DOMAIN",
+        "description": "Number of Satellites",
+        "type": "Short",
+        "kind": "Range",
+        "split": "DefaultValue",
+        "merge": "DefaultValue",
+        "values": [
+          0.0,
+          99.0
+        ]
+      },
+      {
+        "name": "ESRI_POSITIONSOURCETYPE_DOMAIN",
+        "description": "Position Source Type",
+        "type": "Short",
+        "kind": "CodedValue",
+        "split": "DefaultValue",
+        "merge": "DefaultValue",
+        "values": {
+          "0": "Unknown",
+          "1": "User defined",
+          "2": "Integrated (System) Location Provider",
+          "3": "External GNSS Receiver",
+          "4": "Network Location Provider",
+          "5": "Snapped"
+        }
+      },
+      {
+        "name": "ESRI_FIX_TYPE_DOMAIN",
+        "description": "Fix Type",
+        "type": "Short",
+        "kind": "CodedValue",
+        "split": "DefaultValue",
+        "merge": "DefaultValue",
+        "values": {
+          "0": "Fix not valid",
+          "1": "GPS",
+          "2": "Differential GPS",
+          "4": "RTK Fixed",
+          "5": "RTK Float"
+        }
+      },
+      {
+        "name": "ESRI_OFFSET_METHOD_DOMAIN",
+        "description": "Offset Method Domain",
+        "type": "Text",
+        "kind": "CodedValue",
+        "split": "DefaultValue",
+        "merge": "DefaultValue",
+        "values": {
+          "azimuth-azimuth": "Azimuth-Azimuth",
+          "distance-angle": "Distance-Angle",
+          "distance-azimuth": "Distance-Azimuth",
+          "distance-distance": "Distance-Distance",
+          "azimuth-azimuth-backsight": "Azimuth-Azimuth-Backsight",
+          "distance-azimuth-backsight": "Distance-Azimuth-Backsight",
+          "distance-distance-backsight": "Distance-Distance-Backsight",
+          "user-defined": "User-Defined"
+        }
+      }
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:42:15 PM\nSucceeded at Thursday, October 29, 2026 3:42:17 PM (Elapsed Time: 2.31 seconds)",
+    "repeat": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_POSITIONSOURCETYPE",
+          "alias": "Position source type",
+          "type": "SmallInteger",
+          "length": 2,
+          "nullable": true,
+          "required": false,
+          "domain": "ESRI_POSITIONSOURCETYPE_DOMAIN",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_RECEIVER",
+          "alias": "Receiver Name",
+          "type": "String",
+          "length": 50,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_LATITUDE",
+          "alias": "Latitude",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_LONGITUDE",
+          "alias": "Longitude",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_ALTITUDE",
+          "alias": "Altitude",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_H_RMS",
+          "alias": "Horizontal Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_V_RMS",
+          "alias": "Vertical Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_FIXDATETIME",
+          "alias": "Fix Time",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_FIXTYPE",
+          "alias": "Fix Type",
+          "type": "SmallInteger",
+          "length": 2,
+          "nullable": true,
+          "required": false,
+          "domain": "ESRI_FIX_TYPE_DOMAIN",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CORRECTIONAGE",
+          "alias": "Correction Age",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_STATIONID",
+          "alias": "Station ID",
+          "type": "SmallInteger",
+          "length": 2,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_NUMSATS",
+          "alias": "Number of Satellites",
+          "type": "SmallInteger",
+          "length": 2,
+          "nullable": true,
+          "required": false,
+          "domain": "ESRI_NUM_SATS_DOMAIN",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_PDOP",
+          "alias": "PDOP",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_HDOP",
+          "alias": "HDOP",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_VDOP",
+          "alias": "VDOP",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_DIRECTION",
+          "alias": "Direction of travel (\u00b0)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_SPEED",
+          "alias": "Speed (km/h)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRISNSR_AZIMUTH",
+          "alias": "Compass reading (\u00b0)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_AVG_H_RMS",
+          "alias": "Average Horizontal Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_AVG_V_RMS",
+          "alias": "Average Vertical Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_AVG_POSITIONS",
+          "alias": "Averaged Positions",
+          "type": "SmallInteger",
+          "length": 2,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_H_STDDEV",
+          "alias": "Standard Deviation (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRISNSR_OFFSET_METHOD",
+          "alias": "Offset method",
+          "type": "String",
+          "length": 255,
+          "nullable": true,
+          "required": false,
+          "domain": "ESRI_OFFSET_METHOD_DOMAIN",
+          "default": null
+        },
+        {
+          "name": "ESRISNSR_OFFSET_DEVICE",
+          "alias": "Rangefinder name",
+          "type": "String",
+          "length": 255,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_ANTENNA_HEIGHT",
+          "alias": "GNSS Antenna height (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRISNSR_OFFSET_LASER_HEIGHT",
+          "alias": "Rangefinder height (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRISNSR_OFFSET_LASER_TARGET_HT",
+          "alias": "Laser target height (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRISNSR_OFFSET_MAG_VAR",
+          "alias": "Rangefinder Magnetic variation (\u00b0)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP1_LATITUDE",
+          "alias": "CP1 Latitude",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP1_LONGITUDE",
+          "alias": "CP1 Longitude",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP1_ALTITUDE",
+          "alias": "CP1 Ellipsoidal height (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP1_H_RMS",
+          "alias": "CP1 Horizontal accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP1_V_RMS",
+          "alias": "CP1 Vertical accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP1_FIXDATETIME",
+          "alias": "CP1 Fix time",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP1_FIXTYPE",
+          "alias": "CP1 Fix type",
+          "type": "SmallInteger",
+          "length": 2,
+          "nullable": true,
+          "required": false,
+          "domain": "ESRI_FIX_TYPE_DOMAIN",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP1_CORR_AGE",
+          "alias": "CP1 Correction age",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP1_STATIONID",
+          "alias": "CP1 Station ID",
+          "type": "SmallInteger",
+          "length": 2,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP1_NUMSATS",
+          "alias": "CP1 Number of satellites",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP1_PDOP",
+          "alias": "CP1 PDOP",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP1_HDOP",
+          "alias": "CP1 HDOP",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP1_VDOP",
+          "alias": "CP1 VDOP",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP1_AVG_H_RMS",
+          "alias": "CP1 Average horizontal accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP1_AVG_V_RMS",
+          "alias": "CP1 Average vertical accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP1_AVG_POSITIONS",
+          "alias": "CP1 Averaged positions",
+          "type": "SmallInteger",
+          "length": 2,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP1_H_STDDEV",
+          "alias": "CP1 Standard deviation (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRISNSR_CP1_SLOPE_DIST",
+          "alias": "CP1 Laser slope distance (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRISNSR_CP1_INCLINATION",
+          "alias": "CP1 Laser inclination (\u00b0)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRISNSR_CP1_AZIMUTH",
+          "alias": "CP1 Laser azimuth (\u00b0)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP2_LATITUDE",
+          "alias": "CP2 Latitude",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP2_LONGITUDE",
+          "alias": "CP2 Longitude",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP2_ALTITUDE",
+          "alias": "CP2 Ellipsoidal height (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP2_H_RMS",
+          "alias": "CP2 Horizontal accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP2_V_RMS",
+          "alias": "CP2 Vertical accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP2_FIXDATETIME",
+          "alias": "CP2 Fix time",
+          "type": "Date",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP2_FIXTYPE",
+          "alias": "CP2 Fix type",
+          "type": "SmallInteger",
+          "length": 2,
+          "nullable": true,
+          "required": false,
+          "domain": "ESRI_FIX_TYPE_DOMAIN",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP2_CORR_AGE",
+          "alias": "CP2 Correction age",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP2_STATIONID",
+          "alias": "CP2 Station ID",
+          "type": "SmallInteger",
+          "length": 2,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP2_NUMSATS",
+          "alias": "CP2 Number of satellites",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP2_PDOP",
+          "alias": "CP2 PDOP",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP2_HDOP",
+          "alias": "CP2 HDOP",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP2_VDOP",
+          "alias": "CP2 VDOP",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP2_AVG_H_RMS",
+          "alias": "CP2 Average horizontal accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP2_AVG_V_RMS",
+          "alias": "CP2 Average vertical accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP2_AVG_POSITIONS",
+          "alias": "CP2 Averaged positions",
+          "type": "SmallInteger",
+          "length": 2,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_CP2_H_STDDEV",
+          "alias": "CP2 Standard deviation (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRISNSR_CP2_SLOPE_DIST",
+          "alias": "CP2 Laser slope distance (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRISNSR_CP2_INCLINATION",
+          "alias": "CP2 Laser inclination (\u00b0)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRISNSR_CP2_AZIMUTH",
+          "alias": "CP2 Laser azimuth (\u00b0)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        }
+      ],
+      "messages": "Start Time: Thursday, October 29, 2026 3:42:17 PM\nSucceeded at Thursday, October 29, 2026 3:42:17 PM (Elapsed Time: 0.10 seconds)"
+    }
+  },
+  "polyline": {
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "type": "OID",
+        "length": 4,
+        "nullable": false,
+        "required": true,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "Shape",
+        "alias": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "nullable": true,
+        "required": true,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "Shape_Length",
+        "alias": "Shape_Length",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_AVG_H_RMS",
+        "alias": "Average Horizontal Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_AVG_V_RMS",
+        "alias": "Average Vertical Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_WORST_H_RMS",
+        "alias": "Worst Horizontal Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_WORST_V_RMS",
+        "alias": "Worst Vertical Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_WORST_FIXTYPE",
+        "alias": "Worst Fix Type",
+        "type": "SmallInteger",
+        "length": 2,
+        "nullable": true,
+        "required": false,
+        "domain": "ESRI_FIX_TYPE_DOMAIN",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_MANUAL_LOCATIONS",
+        "alias": "Number of Manual Locations",
+        "type": "Integer",
+        "length": 4,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      }
+    ],
+    "domains": [
+      {
+        "name": "ESRI_FIX_TYPE_DOMAIN",
+        "description": "Fix Type",
+        "type": "Short",
+        "kind": "CodedValue",
+        "split": "DefaultValue",
+        "merge": "DefaultValue",
+        "values": {
+          "0": "Fix not valid",
+          "1": "GPS",
+          "2": "Differential GPS",
+          "4": "RTK Fixed",
+          "5": "RTK Float"
+        }
+      }
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:42:17 PM\nSucceeded at Thursday, October 29, 2026 3:42:18 PM (Elapsed Time: 0.78 seconds)",
+    "repeat": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "Shape_Length",
+          "alias": "Shape_Length",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": true,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_AVG_H_RMS",
+          "alias": "Average Horizontal Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_AVG_V_RMS",
+          "alias": "Average Vertical Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_WORST_H_RMS",
+          "alias": "Worst Horizontal Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_WORST_V_RMS",
+          "alias": "Worst Vertical Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_WORST_FIXTYPE",
+          "alias": "Worst Fix Type",
+          "type": "SmallInteger",
+          "length": 2,
+          "nullable": true,
+          "required": false,
+          "domain": "ESRI_FIX_TYPE_DOMAIN",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_MANUAL_LOCATIONS",
+          "alias": "Number of Manual Locations",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        }
+      ],
+      "messages": "Start Time: Thursday, October 29, 2026 3:42:18 PM\nSucceeded at Thursday, October 29, 2026 3:42:18 PM (Elapsed Time: 0.19 seconds)"
+    }
+  },
+  "polyline_offset": {
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "type": "OID",
+        "length": 4,
+        "nullable": false,
+        "required": true,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "Shape",
+        "alias": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "nullable": true,
+        "required": true,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "Shape_Length",
+        "alias": "Shape_Length",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_AVG_H_RMS",
+        "alias": "Average Horizontal Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_AVG_V_RMS",
+        "alias": "Average Vertical Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_WORST_H_RMS",
+        "alias": "Worst Horizontal Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_WORST_V_RMS",
+        "alias": "Worst Vertical Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_WORST_FIXTYPE",
+        "alias": "Worst Fix Type",
+        "type": "SmallInteger",
+        "length": 2,
+        "nullable": true,
+        "required": false,
+        "domain": "ESRI_FIX_TYPE_DOMAIN",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_MANUAL_LOCATIONS",
+        "alias": "Number of Manual Locations",
+        "type": "Integer",
+        "length": 4,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      }
+    ],
+    "domains": [
+      {
+        "name": "ESRI_FIX_TYPE_DOMAIN",
+        "description": "Fix Type",
+        "type": "Short",
+        "kind": "CodedValue",
+        "split": "DefaultValue",
+        "merge": "DefaultValue",
+        "values": {
+          "0": "Fix not valid",
+          "1": "GPS",
+          "2": "Differential GPS",
+          "4": "RTK Fixed",
+          "5": "RTK Float"
+        }
+      }
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:42:19 PM\nSucceeded at Thursday, October 29, 2026 3:42:19 PM (Elapsed Time: 0.79 seconds)",
+    "repeat": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "Shape_Length",
+          "alias": "Shape_Length",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": true,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_AVG_H_RMS",
+          "alias": "Average Horizontal Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_AVG_V_RMS",
+          "alias": "Average Vertical Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_WORST_H_RMS",
+          "alias": "Worst Horizontal Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_WORST_V_RMS",
+          "alias": "Worst Vertical Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_WORST_FIXTYPE",
+          "alias": "Worst Fix Type",
+          "type": "SmallInteger",
+          "length": 2,
+          "nullable": true,
+          "required": false,
+          "domain": "ESRI_FIX_TYPE_DOMAIN",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_MANUAL_LOCATIONS",
+          "alias": "Number of Manual Locations",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        }
+      ],
+      "messages": "Start Time: Thursday, October 29, 2026 3:42:20 PM\nSucceeded at Thursday, October 29, 2026 3:42:20 PM (Elapsed Time: 0.19 seconds)"
+    }
+  },
+  "polygon": {
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "type": "OID",
+        "length": 4,
+        "nullable": false,
+        "required": true,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "Shape",
+        "alias": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "nullable": true,
+        "required": true,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "Shape_Length",
+        "alias": "Shape_Length",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "Shape_Area",
+        "alias": "Shape_Area",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_AVG_H_RMS",
+        "alias": "Average Horizontal Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_AVG_V_RMS",
+        "alias": "Average Vertical Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_WORST_H_RMS",
+        "alias": "Worst Horizontal Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_WORST_V_RMS",
+        "alias": "Worst Vertical Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_WORST_FIXTYPE",
+        "alias": "Worst Fix Type",
+        "type": "SmallInteger",
+        "length": 2,
+        "nullable": true,
+        "required": false,
+        "domain": "ESRI_FIX_TYPE_DOMAIN",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_MANUAL_LOCATIONS",
+        "alias": "Number of Manual Locations",
+        "type": "Integer",
+        "length": 4,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      }
+    ],
+    "domains": [
+      {
+        "name": "ESRI_FIX_TYPE_DOMAIN",
+        "description": "Fix Type",
+        "type": "Short",
+        "kind": "CodedValue",
+        "split": "DefaultValue",
+        "merge": "DefaultValue",
+        "values": {
+          "0": "Fix not valid",
+          "1": "GPS",
+          "2": "Differential GPS",
+          "4": "RTK Fixed",
+          "5": "RTK Float"
+        }
+      }
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:42:20 PM\nSucceeded at Thursday, October 29, 2026 3:42:21 PM (Elapsed Time: 0.82 seconds)",
+    "repeat": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "Shape_Length",
+          "alias": "Shape_Length",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": true,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "Shape_Area",
+          "alias": "Shape_Area",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": true,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_AVG_H_RMS",
+          "alias": "Average Horizontal Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_AVG_V_RMS",
+          "alias": "Average Vertical Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_WORST_H_RMS",
+          "alias": "Worst Horizontal Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_WORST_V_RMS",
+          "alias": "Worst Vertical Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_WORST_FIXTYPE",
+          "alias": "Worst Fix Type",
+          "type": "SmallInteger",
+          "length": 2,
+          "nullable": true,
+          "required": false,
+          "domain": "ESRI_FIX_TYPE_DOMAIN",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_MANUAL_LOCATIONS",
+          "alias": "Number of Manual Locations",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        }
+      ],
+      "messages": "Start Time: Thursday, October 29, 2026 3:42:21 PM\nSucceeded at Thursday, October 29, 2026 3:42:21 PM (Elapsed Time: 0.20 seconds)"
+    }
+  },
+  "polygon_offset": {
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "type": "OID",
+        "length": 4,
+        "nullable": false,
+        "required": true,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "Shape",
+        "alias": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "nullable": true,
+        "required": true,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "Shape_Length",
+        "alias": "Shape_Length",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "Shape_Area",
+        "alias": "Shape_Area",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_AVG_H_RMS",
+        "alias": "Average Horizontal Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_AVG_V_RMS",
+        "alias": "Average Vertical Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_WORST_H_RMS",
+        "alias": "Worst Horizontal Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_WORST_V_RMS",
+        "alias": "Worst Vertical Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_WORST_FIXTYPE",
+        "alias": "Worst Fix Type",
+        "type": "SmallInteger",
+        "length": 2,
+        "nullable": true,
+        "required": false,
+        "domain": "ESRI_FIX_TYPE_DOMAIN",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_MANUAL_LOCATIONS",
+        "alias": "Number of Manual Locations",
+        "type": "Integer",
+        "length": 4,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      }
+    ],
+    "domains": [
+      {
+        "name": "ESRI_FIX_TYPE_DOMAIN",
+        "description": "Fix Type",
+        "type": "Short",
+        "kind": "CodedValue",
+        "split": "DefaultValue",
+        "merge": "DefaultValue",
+        "values": {
+          "0": "Fix not valid",
+          "1": "GPS",
+          "2": "Differential GPS",
+          "4": "RTK Fixed",
+          "5": "RTK Float"
+        }
+      }
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:42:21 PM\nSucceeded at Thursday, October 29, 2026 3:42:22 PM (Elapsed Time: 0.79 seconds)",
+    "repeat": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "Shape_Length",
+          "alias": "Shape_Length",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": true,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "Shape_Area",
+          "alias": "Shape_Area",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": true,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_AVG_H_RMS",
+          "alias": "Average Horizontal Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_AVG_V_RMS",
+          "alias": "Average Vertical Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_WORST_H_RMS",
+          "alias": "Worst Horizontal Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_WORST_V_RMS",
+          "alias": "Worst Vertical Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_WORST_FIXTYPE",
+          "alias": "Worst Fix Type",
+          "type": "SmallInteger",
+          "length": 2,
+          "nullable": true,
+          "required": false,
+          "domain": "ESRI_FIX_TYPE_DOMAIN",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_MANUAL_LOCATIONS",
+          "alias": "Number of Manual Locations",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        }
+      ],
+      "messages": "Start Time: Thursday, October 29, 2026 3:42:22 PM\nSucceeded at Thursday, October 29, 2026 3:42:23 PM (Elapsed Time: 0.20 seconds)"
+    }
+  },
+  "multipoint": {
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "type": "OID",
+        "length": 4,
+        "nullable": false,
+        "required": true,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "Shape",
+        "alias": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "nullable": true,
+        "required": true,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_AVG_H_RMS",
+        "alias": "Average Horizontal Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_AVG_V_RMS",
+        "alias": "Average Vertical Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_WORST_H_RMS",
+        "alias": "Worst Horizontal Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_WORST_V_RMS",
+        "alias": "Worst Vertical Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_WORST_FIXTYPE",
+        "alias": "Worst Fix Type",
+        "type": "SmallInteger",
+        "length": 2,
+        "nullable": true,
+        "required": false,
+        "domain": "ESRI_FIX_TYPE_DOMAIN",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_MANUAL_LOCATIONS",
+        "alias": "Number of Manual Locations",
+        "type": "Integer",
+        "length": 4,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      }
+    ],
+    "domains": [
+      {
+        "name": "ESRI_FIX_TYPE_DOMAIN",
+        "description": "Fix Type",
+        "type": "Short",
+        "kind": "CodedValue",
+        "split": "DefaultValue",
+        "merge": "DefaultValue",
+        "values": {
+          "0": "Fix not valid",
+          "1": "GPS",
+          "2": "Differential GPS",
+          "4": "RTK Fixed",
+          "5": "RTK Float"
+        }
+      }
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:42:23 PM\nSucceeded at Thursday, October 29, 2026 3:42:24 PM (Elapsed Time: 0.80 seconds)",
+    "repeat": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_AVG_H_RMS",
+          "alias": "Average Horizontal Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_AVG_V_RMS",
+          "alias": "Average Vertical Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_WORST_H_RMS",
+          "alias": "Worst Horizontal Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_WORST_V_RMS",
+          "alias": "Worst Vertical Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_WORST_FIXTYPE",
+          "alias": "Worst Fix Type",
+          "type": "SmallInteger",
+          "length": 2,
+          "nullable": true,
+          "required": false,
+          "domain": "ESRI_FIX_TYPE_DOMAIN",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_MANUAL_LOCATIONS",
+          "alias": "Number of Manual Locations",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        }
+      ],
+      "messages": "Start Time: Thursday, October 29, 2026 3:42:24 PM\nSucceeded at Thursday, October 29, 2026 3:42:24 PM (Elapsed Time: 0.20 seconds)"
+    }
+  },
+  "multipoint_offset": {
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "type": "OID",
+        "length": 4,
+        "nullable": false,
+        "required": true,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "Shape",
+        "alias": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "nullable": true,
+        "required": true,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_AVG_H_RMS",
+        "alias": "Average Horizontal Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_AVG_V_RMS",
+        "alias": "Average Vertical Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_WORST_H_RMS",
+        "alias": "Worst Horizontal Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_WORST_V_RMS",
+        "alias": "Worst Vertical Accuracy (m)",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_WORST_FIXTYPE",
+        "alias": "Worst Fix Type",
+        "type": "SmallInteger",
+        "length": 2,
+        "nullable": true,
+        "required": false,
+        "domain": "ESRI_FIX_TYPE_DOMAIN",
+        "default": null
+      },
+      {
+        "name": "ESRIGNSS_MANUAL_LOCATIONS",
+        "alias": "Number of Manual Locations",
+        "type": "Integer",
+        "length": 4,
+        "nullable": true,
+        "required": false,
+        "domain": "",
+        "default": null
+      }
+    ],
+    "domains": [
+      {
+        "name": "ESRI_FIX_TYPE_DOMAIN",
+        "description": "Fix Type",
+        "type": "Short",
+        "kind": "CodedValue",
+        "split": "DefaultValue",
+        "merge": "DefaultValue",
+        "values": {
+          "0": "Fix not valid",
+          "1": "GPS",
+          "2": "Differential GPS",
+          "4": "RTK Fixed",
+          "5": "RTK Float"
+        }
+      }
+    ],
+    "messages": "Start Time: Thursday, October 29, 2026 3:42:24 PM\nSucceeded at Thursday, October 29, 2026 3:42:25 PM (Elapsed Time: 0.79 seconds)",
+    "repeat": {
+      "fields": [
+        {
+          "name": "OBJECTID",
+          "alias": "OBJECTID",
+          "type": "OID",
+          "length": 4,
+          "nullable": false,
+          "required": true,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "Shape",
+          "alias": "Shape",
+          "type": "Geometry",
+          "length": 0,
+          "nullable": true,
+          "required": true,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_AVG_H_RMS",
+          "alias": "Average Horizontal Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_AVG_V_RMS",
+          "alias": "Average Vertical Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_WORST_H_RMS",
+          "alias": "Worst Horizontal Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_WORST_V_RMS",
+          "alias": "Worst Vertical Accuracy (m)",
+          "type": "Double",
+          "length": 8,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_WORST_FIXTYPE",
+          "alias": "Worst Fix Type",
+          "type": "SmallInteger",
+          "length": 2,
+          "nullable": true,
+          "required": false,
+          "domain": "ESRI_FIX_TYPE_DOMAIN",
+          "default": null
+        },
+        {
+          "name": "ESRIGNSS_MANUAL_LOCATIONS",
+          "alias": "Number of Manual Locations",
+          "type": "Integer",
+          "length": 4,
+          "nullable": true,
+          "required": false,
+          "domain": "",
+          "default": null
+        }
+      ],
+      "messages": "Start Time: Thursday, October 29, 2026 3:42:25 PM\nSucceeded at Thursday, October 29, 2026 3:42:25 PM (Elapsed Time: 0.19 seconds)"
+    }
+  }
+}

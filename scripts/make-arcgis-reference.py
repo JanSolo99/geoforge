@@ -77,6 +77,12 @@ DM = ROOT / "testdata" / "dm"
 
 CASES = {
     # name: (tool, args before the output, args after the output)
+    # Schema edits retain their geodatabase-only fields/domains in manifest snapshots.
+    **{f"gps_{name}{suffix}": ("management.AddGPSMetadataFields", [DATA / "gps_metadata_base.gdb" / name], options)
+       for name in ["point", "point_zm", "line", "polygon", "multipoint", "existing_receiver"]
+       for suffix, options in [("", []), ("_offset", ["INCLUDE_OFFSET_FIELDS"])]},
+    "gps_err_table": ("management.AddGPSMetadataFields", [DATA / "gps_metadata_base.gdb" / "table_only"], []),
+    "gps_err_shapefile": ("management.AddGPSMetadataFields", [DATA / "wells.shp"], []),
     "clip_parcels": ("analysis.Clip", [DATA / "parcels.shp", DATA / "clip_areas.shp"], []),
     "clip_roads": ("analysis.Clip", [DATA / "roads.shp", DATA / "clip_areas.shp"], []),
     "clip_wells": ("analysis.Clip", [DATA / "wells.shp", DATA / "clip_areas.shp"], []),
@@ -2065,6 +2071,7 @@ RUN = {
     "gp.ComputeChangeRaster_ia": ("compute_change_raster", ["from_raster", "to_raster", "output", "change_type"]),
     "gp.CreateBinaryMask_ia": ("create_binary_mask", ["input", "output", "background_value"]),
     "management.GenerateTessellation": ("generate_tessellation", ["output", "extent", "shape", "size", "template"]),
+    "management.AddGPSMetadataFields": ("add_gps_metadata_fields", ["input", "output", "include_offset_fields"]),
     "analysis.SplitByAttributes": ("split_by_attributes", ["input", "target_workspace", "split_fields"]),
     "analysis.PairwisePolygonNeighbors": ("pairwise_polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides", "cluster_tolerance", "out_linear_units", "out_area_units", "precision"]),
     "analysis.PolygonNeighbors": ("polygon_neighbors", ["input", "output", "fields", "area_overlap", "both_sides"]),
@@ -2107,7 +2114,7 @@ MEMORY_OUT = {"analysis.SummarizeWithin", "analysis.SummarizeNearby", "analysis.
 CREATE_TOOLS = {"management.CreateFeatureclass", "management.CreateTable"}
 
 # In-place tools: the index of the input they edit (run on a copy written as the output).
-IN_PLACE = {"gp.ExtractMultiValuesToPoints_sa": 0, "edit.ExtendLine": 0, "edit.FlipLine": 0, "edit.TrimLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.EncodeField": 0, "management.AddGeometryAttributes": 0,
+IN_PLACE = {"management.AddGPSMetadataFields": 0, "gp.ExtractMultiValuesToPoints_sa": 0, "edit.ExtendLine": 0, "edit.FlipLine": 0, "edit.TrimLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.EncodeField": 0, "management.AddGeometryAttributes": 0,
             "management.CalculateFields": 0, "management.StandardizeField": 0, "management.TransformField": 0, "management.ReclassifyField": 0, "management.DefineProjection": 0, "management.CalculateEndTime": 0}
 
 # Select Layer By Location cases, saved with Copy Features:
@@ -2140,10 +2147,61 @@ def annotate():
     path = OUT / "manifest.json"
     manifest = json.loads(path.read_text())
     for case in manifest["cases"].values():
-        spec = run_spec(case["tool"], case["args"])
+        args = case["args"]
+        if case.get("schema_edit"):
+            args = [args[0], "<out>", *args[1:]]
+        spec = run_spec(case["tool"], args)
         if spec:
             case["run"] = spec
     path.write_text(json.dumps(manifest, indent=2) + "\n")
+
+
+def schema_edit_case(w, tool, before, after):
+    """Save geodatabase schema-only edits as portable snapshots, retaining the source."""
+    source = Path(before[0])
+    with tempfile.TemporaryDirectory(prefix="unigis-schema-reference-") as temp:
+        copied = Path(temp) / source.parent.name
+        shutil.copytree(source.parent, copied, ignore=shutil.ignore_patterns("*.lock"))
+        target = copied / source.name
+        args = [str(target)] + after
+        preserve_code = f"""
+preserved_fields = [f.name for f in arcpy.ListFields({win(target)!r}) if f.type != 'Geometry']
+preserved_rows = list(arcpy.da.SearchCursor({win(target)!r}, preserved_fields + ['SHAPE@JSON']))
+"""
+        w.call("python", code=preserve_code)
+        r = w.call("run_tool", tool=tool, args=args, env={"overwriteOutput": True})
+        entry = {
+            "tool": tool, "args": [rel(source)] + after, "status": r.get("status"),
+            "messages": [m["text"] for m in r.get("messages", []) if m["severity"] > 0],
+            "schema_edit": True,
+        }
+        if r.get("status") == "succeeded":
+            described = w.call("describe", path=str(target))
+            entry["schema"] = {k: described[k] for k in ("fields", "shapeType", "hasZ", "hasM", "OIDFieldName", "shapeFieldName", "spatialReference") if k in described}
+            code = f"""
+result = []
+for d in arcpy.da.ListDomains({win(copied)!r}):
+    result.append(dict(name=d.name,description=d.description,type=d.type,kind=d.domainType,
+        split=d.splitPolicy,merge=d.mergePolicy,
+        values=d.codedValues if d.domainType=='CodedValue' else list(d.range)))
+"""
+            response = w.call("python", code=code)
+            entry["domains"] = response["result"]
+            # A second call must be idempotent; snapshot both schema and domains.
+            repeated = w.call("run_tool", tool=tool, args=args, env={"overwriteOutput": True})
+            if repeated.get("status") != "succeeded":
+                raise RuntimeError(f"repeat schema edit failed: {repeated}")
+            repeated_schema = w.call("describe", path=str(target))
+            for key in ("fields", "shapeType", "hasZ", "hasM", "OIDFieldName", "shapeFieldName"):
+                if repeated_schema.get(key) != entry["schema"].get(key):
+                    raise RuntimeError(f"repeated schema edit changed {key}")
+            if w.call("python", code=code)["result"] != entry["domains"]:
+                raise RuntimeError("repeated schema edit changed domains")
+            preserved = w.call("python", code=f"result = preserved_rows == list(arcpy.da.SearchCursor({win(target)!r}, preserved_fields + ['SHAPE@JSON']))")
+            if preserved["result"] is not True:
+                raise RuntimeError("schema edit changed existing rows or geometries")
+        entry["run"] = run_spec(tool, [rel(source), "<out>"] + after)
+        return entry
 
 
 def main():
@@ -2182,6 +2240,10 @@ def main():
             for a in before:
                 if isinstance(a, Path) and a.suffix == ".tif":
                     w.call("python", code=f"arcpy.management.BuildRasterAttributeTable(r'{win(a)}', 'Overwrite')")
+        if tool == "management.AddGPSMetadataFields" and Path(before[0]).parent.suffix == ".gdb":
+            manifest["cases"][name] = schema_edit_case(w, tool, before, after)
+            print(f"{name}: {manifest['cases'][name]['status']}")
+            continue
         out = OUT / (f"{name}.dbf" if tool in TABLE_OUT else f"{name}.shp")
         raster_projection = tool == "management.DefineProjection" and Path(str(before[0])).suffix.lower() in (".tif", ".tiff")
         if tool in RASTER_OUT or raster_projection:

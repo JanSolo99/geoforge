@@ -1,0 +1,635 @@
+{
+  "fields": [
+    {
+      "name": "OBJECTID",
+      "aliasName": "OBJECTID",
+      "type": "OID",
+      "length": 4,
+      "isNullable": false,
+      "domain": ""
+    },
+    {
+      "name": "Shape",
+      "aliasName": "Shape",
+      "type": "Geometry",
+      "length": 0,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "KEY",
+      "aliasName": "Source key",
+      "type": "Integer",
+      "length": 4,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_POSITIONSOURCETYPE",
+      "aliasName": "ESRIGNSS_POSITIONSOURCETYPE",
+      "type": "SmallInteger",
+      "length": 2,
+      "isNullable": true,
+      "domain": "ESRI_POSITIONSOURCETYPE_DOMAIN"
+    },
+    {
+      "name": "ESRIGNSS_RECEIVER",
+      "aliasName": "Receiver Name",
+      "type": "String",
+      "length": 50,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_LATITUDE",
+      "aliasName": "Latitude",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_LONGITUDE",
+      "aliasName": "Longitude",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_ALTITUDE",
+      "aliasName": "Altitude",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_H_RMS",
+      "aliasName": "Horizontal Accuracy (m)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_V_RMS",
+      "aliasName": "Vertical Accuracy (m)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_FIXDATETIME",
+      "aliasName": "Fix Time",
+      "type": "Date",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_FIXTYPE",
+      "aliasName": "ESRIGNSS_FIXTYPE",
+      "type": "SmallInteger",
+      "length": 2,
+      "isNullable": true,
+      "domain": "ESRI_FIX_TYPE_DOMAIN"
+    },
+    {
+      "name": "ESRIGNSS_CORRECTIONAGE",
+      "aliasName": "Correction Age",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_STATIONID",
+      "aliasName": "Station ID",
+      "type": "SmallInteger",
+      "length": 2,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_NUMSATS",
+      "aliasName": "ESRIGNSS_NUMSATS",
+      "type": "SmallInteger",
+      "length": 2,
+      "isNullable": true,
+      "domain": "ESRI_NUM_SATS_DOMAIN"
+    },
+    {
+      "name": "ESRIGNSS_PDOP",
+      "aliasName": "PDOP",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_HDOP",
+      "aliasName": "HDOP",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_VDOP",
+      "aliasName": "VDOP",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_DIRECTION",
+      "aliasName": "Direction of travel (\u00b0)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_SPEED",
+      "aliasName": "Speed (km/h)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRISNSR_AZIMUTH",
+      "aliasName": "Compass reading (\u00b0)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_AVG_H_RMS",
+      "aliasName": "Average Horizontal Accuracy (m)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_AVG_V_RMS",
+      "aliasName": "Average Vertical Accuracy (m)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_AVG_POSITIONS",
+      "aliasName": "Averaged Positions",
+      "type": "SmallInteger",
+      "length": 2,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_H_STDDEV",
+      "aliasName": "Standard Deviation (m)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRISNSR_OFFSET_METHOD",
+      "aliasName": "ESRISNSR_OFFSET_METHOD",
+      "type": "String",
+      "length": 255,
+      "isNullable": true,
+      "domain": "ESRI_OFFSET_METHOD_DOMAIN"
+    },
+    {
+      "name": "ESRISNSR_OFFSET_DEVICE",
+      "aliasName": "Rangefinder name",
+      "type": "String",
+      "length": 255,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_ANTENNA_HEIGHT",
+      "aliasName": "GNSS Antenna height (m)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRISNSR_OFFSET_LASER_HEIGHT",
+      "aliasName": "Rangefinder height (m)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRISNSR_OFFSET_LASER_TARGET_HT",
+      "aliasName": "Laser target height (m)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRISNSR_OFFSET_MAG_VAR",
+      "aliasName": "Rangefinder Magnetic variation (\u00b0)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP1_LATITUDE",
+      "aliasName": "CP1 Latitude",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP1_LONGITUDE",
+      "aliasName": "CP1 Longitude",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP1_ALTITUDE",
+      "aliasName": "CP1 Ellipsoidal height (m)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP1_H_RMS",
+      "aliasName": "CP1 Horizontal accuracy (m)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP1_V_RMS",
+      "aliasName": "CP1 Vertical accuracy (m)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP1_FIXDATETIME",
+      "aliasName": "CP1 Fix time",
+      "type": "Date",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP1_FIXTYPE",
+      "aliasName": "ESRIGNSS_CP1_FIXTYPE",
+      "type": "SmallInteger",
+      "length": 2,
+      "isNullable": true,
+      "domain": "ESRI_FIX_TYPE_DOMAIN"
+    },
+    {
+      "name": "ESRIGNSS_CP1_CORR_AGE",
+      "aliasName": "CP1 Correction age",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP1_STATIONID",
+      "aliasName": "CP1 Station ID",
+      "type": "SmallInteger",
+      "length": 2,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP1_NUMSATS",
+      "aliasName": "CP1 Number of satellites",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP1_PDOP",
+      "aliasName": "CP1 PDOP",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP1_HDOP",
+      "aliasName": "CP1 HDOP",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP1_VDOP",
+      "aliasName": "CP1 VDOP",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP1_AVG_H_RMS",
+      "aliasName": "CP1 Average horizontal accuracy (m)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP1_AVG_V_RMS",
+      "aliasName": "CP1 Average vertical accuracy (m)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP1_AVG_POSITIONS",
+      "aliasName": "CP1 Averaged positions",
+      "type": "SmallInteger",
+      "length": 2,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP1_H_STDDEV",
+      "aliasName": "CP1 Standard deviation (m)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRISNSR_CP1_SLOPE_DIST",
+      "aliasName": "CP1 Laser slope distance (m)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRISNSR_CP1_INCLINATION",
+      "aliasName": "CP1 Laser inclination (\u00b0)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRISNSR_CP1_AZIMUTH",
+      "aliasName": "CP1 Laser azimuth (\u00b0)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP2_LATITUDE",
+      "aliasName": "CP2 Latitude",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP2_LONGITUDE",
+      "aliasName": "CP2 Longitude",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP2_ALTITUDE",
+      "aliasName": "CP2 Ellipsoidal height (m)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP2_H_RMS",
+      "aliasName": "CP2 Horizontal accuracy (m)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP2_V_RMS",
+      "aliasName": "CP2 Vertical accuracy (m)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP2_FIXDATETIME",
+      "aliasName": "CP2 Fix time",
+      "type": "Date",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP2_FIXTYPE",
+      "aliasName": "ESRIGNSS_CP2_FIXTYPE",
+      "type": "SmallInteger",
+      "length": 2,
+      "isNullable": true,
+      "domain": "ESRI_FIX_TYPE_DOMAIN"
+    },
+    {
+      "name": "ESRIGNSS_CP2_CORR_AGE",
+      "aliasName": "CP2 Correction age",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP2_STATIONID",
+      "aliasName": "CP2 Station ID",
+      "type": "SmallInteger",
+      "length": 2,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP2_NUMSATS",
+      "aliasName": "CP2 Number of satellites",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP2_PDOP",
+      "aliasName": "CP2 PDOP",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP2_HDOP",
+      "aliasName": "CP2 HDOP",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP2_VDOP",
+      "aliasName": "CP2 VDOP",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP2_AVG_H_RMS",
+      "aliasName": "CP2 Average horizontal accuracy (m)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP2_AVG_V_RMS",
+      "aliasName": "CP2 Average vertical accuracy (m)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP2_AVG_POSITIONS",
+      "aliasName": "CP2 Averaged positions",
+      "type": "SmallInteger",
+      "length": 2,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRIGNSS_CP2_H_STDDEV",
+      "aliasName": "CP2 Standard deviation (m)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRISNSR_CP2_SLOPE_DIST",
+      "aliasName": "CP2 Laser slope distance (m)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRISNSR_CP2_INCLINATION",
+      "aliasName": "CP2 Laser inclination (\u00b0)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    },
+    {
+      "name": "ESRISNSR_CP2_AZIMUTH",
+      "aliasName": "CP2 Laser azimuth (\u00b0)",
+      "type": "Double",
+      "length": 8,
+      "isNullable": true,
+      "domain": ""
+    }
+  ],
+  "rows": [
+    [
+      1,
+      7,
+      "{\"x\":500000,\"y\":5000000,\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}",
+      null,
+      null
+    ],
+    [
+      2,
+      11,
+      null,
+      null,
+      null
+    ]
+  ],
+  "domains": [
+    {
+      "name": "ESRI_NUM_SATS_DOMAIN",
+      "type": "Short",
+      "values": [
+        0.0,
+        99.0
+      ]
+    },
+    {
+      "name": "ESRI_FIX_TYPE_DOMAIN",
+      "type": "Short",
+      "values": {
+        "0": "Fix not valid",
+        "1": "GPS",
+        "2": "Differential GPS",
+        "4": "RTK Fixed",
+        "5": "RTK Float"
+      }
+    },
+    {
+      "name": "ESRI_POSITIONSOURCETYPE_DOMAIN",
+      "type": "Short",
+      "values": {
+        "0": "Unknown",
+        "1": "User defined",
+        "2": "Integrated (System) Location Provider",
+        "3": "External GNSS Receiver",
+        "4": "Network Location Provider",
+        "5": "Snapped"
+      }
+    },
+    {
+      "name": "ESRI_OFFSET_METHOD_DOMAIN",
+      "type": "Text",
+      "values": {
+        "azimuth-azimuth": "Azimuth-Azimuth",
+        "distance-angle": "Distance-Angle",
+        "distance-azimuth": "Distance-Azimuth",
+        "distance-distance": "Distance-Distance",
+        "azimuth-azimuth-backsight": "Azimuth-Azimuth-Backsight",
+        "distance-azimuth-backsight": "Distance-Azimuth-Backsight",
+        "distance-distance-backsight": "Distance-Distance-Backsight",
+        "user-defined": "User-Defined"
+      }
+    }
+  ]
+}

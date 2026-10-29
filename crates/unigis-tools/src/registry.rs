@@ -6,7 +6,7 @@
 //! of them without its own wiring (older tools still have a command and an application wrapper of
 //! their own).
 
-use unigis_core::{Error, FeatureClass, Result};
+use unigis_core::{Error, FeatureClass, Field, FieldType, Result, Value};
 
 use crate::construct::{self, Fishnet, Placement};
 use crate::planar;
@@ -45,6 +45,18 @@ pub enum WorkspaceOutput {
     Table(TableOutput),
 }
 
+/// A domain needed by an additive schema edit. Existing compatible domains are retained.
+pub struct SchemaDomain {
+    pub name: &'static str,
+    pub description: &'static str,
+    pub field_type: FieldType,
+    pub kind: SchemaDomainKind,
+}
+pub enum SchemaDomainKind {
+    Coded(Vec<(Value, String)>),
+    Range(Value, Value),
+}
+
 /// Tool parameters, input access and optional workspace output supplied by a host.
 pub trait Context {
     /// The parameter's value as text, when it was given and is not empty.
@@ -60,6 +72,17 @@ pub trait Context {
     ) -> Result<()> {
         Err(Error::Unsupported(
             "workspace outputs are not supported by this host".into(),
+        ))
+    }
+    /// Add fields/domains to an existing dataset. A read-only host must fail explicitly.
+    fn add_schema_fields(
+        &self,
+        _input: &str,
+        _fields: &[Field],
+        _domains: &[SchemaDomain],
+    ) -> Result<()> {
+        Err(Error::Unsupported(
+            "schema edits are not supported by this host".into(),
         ))
     }
     /// The coordinate system new data (a fishnet) gets when no template names one.
@@ -3179,5 +3202,6 @@ pub static TOOLS: &[Tool] = &[
     crate::neighbors::POLYGON_NEIGHBORS,
     crate::pairwise_neighbors::TOOL,
     crate::split_attributes::TOOL,
+    crate::gps_metadata::TOOL,
     crate::neighbors::COUNT_OVERLAPPING_FEATURES,
 ];

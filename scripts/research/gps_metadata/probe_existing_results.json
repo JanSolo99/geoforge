@@ -1,0 +1,734 @@
+{
+  "existing_field": {
+    "error": null,
+    "messages": "Start Time: Thursday, October 29, 2026 3:44:06 PM\nSucceeded at Thursday, October 29, 2026 3:44:07 PM (Elapsed Time: 1.29 seconds)",
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "type": "OID",
+        "alias": "OBJECTID",
+        "length": 4,
+        "domain": ""
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "alias": "Shape",
+        "length": 0,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_RECEIVER",
+        "type": "String",
+        "alias": "Custom alias",
+        "length": 7,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_POSITIONSOURCETYPE",
+        "type": "SmallInteger",
+        "alias": "Position source type",
+        "length": 2,
+        "domain": "ESRI_POSITIONSOURCETYPE_DOMAIN"
+      },
+      {
+        "name": "ESRIGNSS_LATITUDE",
+        "type": "Double",
+        "alias": "Latitude",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_LONGITUDE",
+        "type": "Double",
+        "alias": "Longitude",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_ALTITUDE",
+        "type": "Double",
+        "alias": "Altitude",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_H_RMS",
+        "type": "Double",
+        "alias": "Horizontal Accuracy (m)",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_V_RMS",
+        "type": "Double",
+        "alias": "Vertical Accuracy (m)",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_FIXDATETIME",
+        "type": "Date",
+        "alias": "Fix Time",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_FIXTYPE",
+        "type": "SmallInteger",
+        "alias": "Fix Type",
+        "length": 2,
+        "domain": "ESRI_FIX_TYPE_DOMAIN"
+      },
+      {
+        "name": "ESRIGNSS_CORRECTIONAGE",
+        "type": "Double",
+        "alias": "Correction Age",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_STATIONID",
+        "type": "SmallInteger",
+        "alias": "Station ID",
+        "length": 2,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_NUMSATS",
+        "type": "SmallInteger",
+        "alias": "Number of Satellites",
+        "length": 2,
+        "domain": "ESRI_NUM_SATS_DOMAIN"
+      },
+      {
+        "name": "ESRIGNSS_PDOP",
+        "type": "Double",
+        "alias": "PDOP",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_HDOP",
+        "type": "Double",
+        "alias": "HDOP",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_VDOP",
+        "type": "Double",
+        "alias": "VDOP",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_DIRECTION",
+        "type": "Double",
+        "alias": "Direction of travel (\u00b0)",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_SPEED",
+        "type": "Double",
+        "alias": "Speed (km/h)",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRISNSR_AZIMUTH",
+        "type": "Double",
+        "alias": "Compass reading (\u00b0)",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_AVG_H_RMS",
+        "type": "Double",
+        "alias": "Average Horizontal Accuracy (m)",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_AVG_V_RMS",
+        "type": "Double",
+        "alias": "Average Vertical Accuracy (m)",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_AVG_POSITIONS",
+        "type": "SmallInteger",
+        "alias": "Averaged Positions",
+        "length": 2,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_H_STDDEV",
+        "type": "Double",
+        "alias": "Standard Deviation (m)",
+        "length": 8,
+        "domain": ""
+      }
+    ],
+    "domains": [
+      {
+        "name": "ESRI_NUM_SATS_DOMAIN",
+        "type": "Short",
+        "description": "Number of Satellites",
+        "values": [
+          0.0,
+          99.0
+        ]
+      },
+      {
+        "name": "ESRI_POSITIONSOURCETYPE_DOMAIN",
+        "type": "Short",
+        "description": "Position Source Type",
+        "values": {
+          "0": "Unknown",
+          "1": "User defined",
+          "2": "Integrated (System) Location Provider",
+          "3": "External GNSS Receiver",
+          "4": "Network Location Provider",
+          "5": "Snapped"
+        }
+      },
+      {
+        "name": "ESRI_FIX_TYPE_DOMAIN",
+        "type": "Short",
+        "description": "Fix Type",
+        "values": {
+          "0": "Fix not valid",
+          "1": "GPS",
+          "2": "Differential GPS",
+          "4": "RTK Fixed",
+          "5": "RTK Float"
+        }
+      }
+    ]
+  },
+  "wrong_type": {
+    "error": null,
+    "messages": "Start Time: Thursday, October 29, 2026 3:44:07 PM\nSucceeded at Thursday, October 29, 2026 3:44:09 PM (Elapsed Time: 1.28 seconds)",
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "type": "OID",
+        "alias": "OBJECTID",
+        "length": 4,
+        "domain": ""
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "alias": "Shape",
+        "length": 0,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_RECEIVER",
+        "type": "Integer",
+        "alias": "Custom alias",
+        "length": 4,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_POSITIONSOURCETYPE",
+        "type": "SmallInteger",
+        "alias": "Position source type",
+        "length": 2,
+        "domain": "ESRI_POSITIONSOURCETYPE_DOMAIN"
+      },
+      {
+        "name": "ESRIGNSS_LATITUDE",
+        "type": "Double",
+        "alias": "Latitude",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_LONGITUDE",
+        "type": "Double",
+        "alias": "Longitude",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_ALTITUDE",
+        "type": "Double",
+        "alias": "Altitude",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_H_RMS",
+        "type": "Double",
+        "alias": "Horizontal Accuracy (m)",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_V_RMS",
+        "type": "Double",
+        "alias": "Vertical Accuracy (m)",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_FIXDATETIME",
+        "type": "Date",
+        "alias": "Fix Time",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_FIXTYPE",
+        "type": "SmallInteger",
+        "alias": "Fix Type",
+        "length": 2,
+        "domain": "ESRI_FIX_TYPE_DOMAIN"
+      },
+      {
+        "name": "ESRIGNSS_CORRECTIONAGE",
+        "type": "Double",
+        "alias": "Correction Age",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_STATIONID",
+        "type": "SmallInteger",
+        "alias": "Station ID",
+        "length": 2,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_NUMSATS",
+        "type": "SmallInteger",
+        "alias": "Number of Satellites",
+        "length": 2,
+        "domain": "ESRI_NUM_SATS_DOMAIN"
+      },
+      {
+        "name": "ESRIGNSS_PDOP",
+        "type": "Double",
+        "alias": "PDOP",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_HDOP",
+        "type": "Double",
+        "alias": "HDOP",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_VDOP",
+        "type": "Double",
+        "alias": "VDOP",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_DIRECTION",
+        "type": "Double",
+        "alias": "Direction of travel (\u00b0)",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_SPEED",
+        "type": "Double",
+        "alias": "Speed (km/h)",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRISNSR_AZIMUTH",
+        "type": "Double",
+        "alias": "Compass reading (\u00b0)",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_AVG_H_RMS",
+        "type": "Double",
+        "alias": "Average Horizontal Accuracy (m)",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_AVG_V_RMS",
+        "type": "Double",
+        "alias": "Average Vertical Accuracy (m)",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_AVG_POSITIONS",
+        "type": "SmallInteger",
+        "alias": "Averaged Positions",
+        "length": 2,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_H_STDDEV",
+        "type": "Double",
+        "alias": "Standard Deviation (m)",
+        "length": 8,
+        "domain": ""
+      }
+    ],
+    "domains": [
+      {
+        "name": "ESRI_NUM_SATS_DOMAIN",
+        "type": "Short",
+        "description": "Number of Satellites",
+        "values": [
+          0.0,
+          99.0
+        ]
+      },
+      {
+        "name": "ESRI_POSITIONSOURCETYPE_DOMAIN",
+        "type": "Short",
+        "description": "Position Source Type",
+        "values": {
+          "0": "Unknown",
+          "1": "User defined",
+          "2": "Integrated (System) Location Provider",
+          "3": "External GNSS Receiver",
+          "4": "Network Location Provider",
+          "5": "Snapped"
+        }
+      },
+      {
+        "name": "ESRI_FIX_TYPE_DOMAIN",
+        "type": "Short",
+        "description": "Fix Type",
+        "values": {
+          "0": "Fix not valid",
+          "1": "GPS",
+          "2": "Differential GPS",
+          "4": "RTK Fixed",
+          "5": "RTK Float"
+        }
+      }
+    ]
+  },
+  "existing_domain": {
+    "error": "ERROR 000355: Invalid coded value domain.\nFailed to execute (AddGPSMetadataFields).\n",
+    "messages": "Start Time: Thursday, October 29, 2026 3:44:09 PM\nERROR 000355: Invalid coded value domain.\nFailed script Add GPS Metadata Fields...\nFailed to execute (AddGPSMetadataFields).\nFailed at Thursday, October 29, 2026 3:44:09 PM (Elapsed Time: 0.33 seconds)",
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "type": "OID",
+        "alias": "OBJECTID",
+        "length": 4,
+        "domain": ""
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "alias": "Shape",
+        "length": 0,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_POSITIONSOURCETYPE",
+        "type": "SmallInteger",
+        "alias": "Position source type",
+        "length": 2,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_RECEIVER",
+        "type": "String",
+        "alias": "Receiver Name",
+        "length": 50,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_LATITUDE",
+        "type": "Double",
+        "alias": "Latitude",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_LONGITUDE",
+        "type": "Double",
+        "alias": "Longitude",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_ALTITUDE",
+        "type": "Double",
+        "alias": "Altitude",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_H_RMS",
+        "type": "Double",
+        "alias": "Horizontal Accuracy (m)",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_V_RMS",
+        "type": "Double",
+        "alias": "Vertical Accuracy (m)",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_FIXDATETIME",
+        "type": "Date",
+        "alias": "Fix Time",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_FIXTYPE",
+        "type": "SmallInteger",
+        "alias": "Fix Type",
+        "length": 2,
+        "domain": "ESRI_FIX_TYPE_DOMAIN"
+      },
+      {
+        "name": "ESRIGNSS_CORRECTIONAGE",
+        "type": "Double",
+        "alias": "Correction Age",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_STATIONID",
+        "type": "SmallInteger",
+        "alias": "Station ID",
+        "length": 2,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_NUMSATS",
+        "type": "SmallInteger",
+        "alias": "Number of Satellites",
+        "length": 2,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_PDOP",
+        "type": "Double",
+        "alias": "PDOP",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_HDOP",
+        "type": "Double",
+        "alias": "HDOP",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_VDOP",
+        "type": "Double",
+        "alias": "VDOP",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_DIRECTION",
+        "type": "Double",
+        "alias": "Direction of travel (\u00b0)",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_SPEED",
+        "type": "Double",
+        "alias": "Speed (km/h)",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRISNSR_AZIMUTH",
+        "type": "Double",
+        "alias": "Compass reading (\u00b0)",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_AVG_H_RMS",
+        "type": "Double",
+        "alias": "Average Horizontal Accuracy (m)",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_AVG_V_RMS",
+        "type": "Double",
+        "alias": "Average Vertical Accuracy (m)",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_AVG_POSITIONS",
+        "type": "SmallInteger",
+        "alias": "Averaged Positions",
+        "length": 2,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_H_STDDEV",
+        "type": "Double",
+        "alias": "Standard Deviation (m)",
+        "length": 8,
+        "domain": ""
+      }
+    ],
+    "domains": [
+      {
+        "name": "ESRI_FIX_TYPE_DOMAIN",
+        "type": "Short",
+        "description": "Custom domain",
+        "values": {
+          "9": "Custom"
+        }
+      }
+    ]
+  },
+  "wrong_domain_type": {
+    "error": "ERROR 000355: Invalid coded value domain.\nERROR 000356: Invalid domain type.\nERROR 000852: Cannot add field ESRIGNSS_FIXTYPE to Z:\\tmp\\unigis-gps-existing\\wrong_domain_type.gdb\\data\nFailed to execute (AddFields).\n\n\nFailed to execute (AddGPSMetadataFields).\n",
+    "messages": "Start Time: Thursday, October 29, 2026 3:44:10 PM\nERROR 000355: Invalid coded value domain.\nERROR 000356: Invalid domain type.\nERROR 000852: Cannot add field ESRIGNSS_FIXTYPE to Z:\\tmp\\unigis-gps-existing\\wrong_domain_type.gdb\\data\nFailed to execute (AddFields).\n\n\nFailed script Add GPS Metadata Fields...\nFailed to execute (AddGPSMetadataFields).\nFailed at Thursday, October 29, 2026 3:44:10 PM (Elapsed Time: 0.19 seconds)",
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "type": "OID",
+        "alias": "OBJECTID",
+        "length": 4,
+        "domain": ""
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "alias": "Shape",
+        "length": 0,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_POSITIONSOURCETYPE",
+        "type": "SmallInteger",
+        "alias": "Position source type",
+        "length": 2,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_RECEIVER",
+        "type": "String",
+        "alias": "Receiver Name",
+        "length": 50,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_LATITUDE",
+        "type": "Double",
+        "alias": "Latitude",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_LONGITUDE",
+        "type": "Double",
+        "alias": "Longitude",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_ALTITUDE",
+        "type": "Double",
+        "alias": "Altitude",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_H_RMS",
+        "type": "Double",
+        "alias": "Horizontal Accuracy (m)",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_V_RMS",
+        "type": "Double",
+        "alias": "Vertical Accuracy (m)",
+        "length": 8,
+        "domain": ""
+      },
+      {
+        "name": "ESRIGNSS_FIXDATETIME",
+        "type": "Date",
+        "alias": "Fix Time",
+        "length": 8,
+        "domain": ""
+      }
+    ],
+    "domains": [
+      {
+        "name": "ESRI_FIX_TYPE_DOMAIN",
+        "type": "Text",
+        "description": "Custom domain",
+        "values": {
+          "nine": "Custom"
+        }
+      }
+    ]
+  },
+  "table": {
+    "error": "Failed to execute. Parameters are not valid.\nERROR 000732: Input Features: Dataset Z:\\tmp\\unigis-gps-existing\\table.gdb\\data does not exist or is not supported\nFailed to execute (AddGPSMetadataFields).\n",
+    "messages": "Start Time: Thursday, October 29, 2026 3:44:10 PM\nFailed to execute. Parameters are not valid.\nERROR 000732: Input Features: Dataset Z:\\tmp\\unigis-gps-existing\\table.gdb\\data does not exist or is not supported\nFailed to execute (AddGPSMetadataFields).\nFailed at Thursday, October 29, 2026 3:44:10 PM (Elapsed Time: 0.01 seconds)",
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "type": "OID",
+        "alias": "OBJECTID",
+        "length": 4,
+        "domain": ""
+      }
+    ],
+    "domains": []
+  },
+  "shapefile": {
+    "error": "ERROR 000656: A Shapefile is not supported by this tool.\nFailed to execute (AddGPSMetadataFields).\n",
+    "messages": "Start Time: Thursday, October 29, 2026 3:44:10 PM\nERROR 000656: A Shapefile is not supported by this tool.\nFailed script Add GPS Metadata Fields...\nFailed to execute (AddGPSMetadataFields).\nFailed at Thursday, October 29, 2026 3:44:11 PM (Elapsed Time: 0.03 seconds)",
+    "fields": [
+      {
+        "name": "FID",
+        "type": "OID",
+        "alias": "FID",
+        "length": 4,
+        "domain": ""
+      },
+      {
+        "name": "Shape",
+        "type": "Geometry",
+        "alias": "Shape",
+        "length": 0,
+        "domain": ""
+      },
+      {
+        "name": "Id",
+        "type": "Integer",
+        "alias": "Id",
+        "length": 6,
+        "domain": ""
+      }
+    ],
+    "domains": []
+  }
+}

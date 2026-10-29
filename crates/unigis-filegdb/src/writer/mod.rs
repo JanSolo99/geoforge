@@ -14,6 +14,7 @@ mod index_edit;
 mod keys;
 mod rebuild;
 mod rewrite;
+mod schema_add;
 mod subtype_edit;
 mod system_rows;
 mod table;
@@ -42,6 +43,7 @@ pub use edit::{TableEditor, delete_rows};
 pub use index_edit::{add_attribute_index, remove_attribute_index};
 pub use rebuild::rebuild_attribute_indexes;
 pub use rewrite::{add_field, delete_fields, rewrite_table, truncate_table};
+pub use schema_add::add_schema_fields;
 pub use subtype_edit::{
     add_subtype, assign_default_to_field, assign_domain_to_field, remove_domain_from_field,
     remove_subtype, set_default_subtype, set_subtype_field,

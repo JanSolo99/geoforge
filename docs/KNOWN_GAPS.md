@@ -149,3 +149,10 @@ Update this file when a gap is found or closed.
 - Add Full-Text Index: no supported database backend. ArcGIS explicitly excludes
   FileGDB (ERROR002764); SQLite/mobile/enterprise formats are not implemented.
   Evidence: scripts/research/full_text_index/README.md.
+
+- Add GPS Metadata Fields: FileGDB mutation through CLI only; other hosts need
+  the optional schema-edit capability. Conflicting metadata domains fail000355
+  before any changes (ArcGIS may partly add fields before failing). Existing
+  fields are preserved even with other types, matching public controls. MultiPatch,
+  enterprise/mobile/service inputs, selections and exotic subtype/schema behavior
+  are unverified or refused. Evidence: scripts/research/gps_metadata/README.md.

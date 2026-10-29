@@ -2704,6 +2704,45 @@ fn main() -> ExitCode {
                 ) -> Result<()> {
                     write_workspace_outputs(Path::new(workspace), outputs)
                 }
+                fn add_schema_fields(
+                    &self,
+                    input: &str,
+                    fields: &[Field],
+                    domains: &[registry::SchemaDomain],
+                ) -> Result<()> {
+                    let path = self
+                        .get(input)
+                        .ok_or_else(|| Error::Unsupported(format!("{input} is required")))?;
+                    let Location::Geodatabase {
+                        gdb,
+                        item: Some(item),
+                    } = locate(Path::new(&path))
+                    else {
+                        return Err(Error::Unsupported("ERROR 000656: A Shapefile is not supported by this tool; use a FileGDB feature class".into()));
+                    };
+                    let domains: Vec<_> = domains
+                        .iter()
+                        .map(|d| unigis_filegdb::Domain {
+                            name: d.name.into(),
+                            description: d.description.into(),
+                            field_type: d.field_type,
+                            split_policy: unigis_filegdb::SplitPolicy::DefaultValue,
+                            merge_policy: unigis_filegdb::MergePolicy::DefaultValue,
+                            kind: match &d.kind {
+                                registry::SchemaDomainKind::Coded(values) => {
+                                    unigis_filegdb::DomainKind::Coded(values.clone())
+                                }
+                                registry::SchemaDomainKind::Range(lo, hi) => {
+                                    unigis_filegdb::DomainKind::Range {
+                                        min: lo.clone(),
+                                        max: hi.clone(),
+                                    }
+                                }
+                            },
+                        })
+                        .collect();
+                    unigis_filegdb::add_schema_fields(&gdb, &item, fields, &domains)
+                }
                 fn features(&self, name: &str) -> Result<Box<dyn FeatureClass + '_>> {
                     let path = self
                         .get(name)

@@ -855,3 +855,8 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 
 - [ ] Add Full-Text Index: deferred; requires unsupported SQLite/mobile/enterprise
       database backend. FileGDB control ERROR002764; scripts/research/full_text_index/.
+
+- [x] Add GPS Metadata Fields: native implementation and14 public ArcGIS cases;
+      default/offset schemas,4 simple geometry types, Z/M, existing fields,
+      domains and idempotence. Native FileGDB/CLI and optional host capability;
+      full local gate passed. Research: scripts/research/gps_metadata/README.md.

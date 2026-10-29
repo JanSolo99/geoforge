@@ -10,6 +10,7 @@ mod dm_geometry;
 pub mod dm_tools;
 pub mod extend;
 mod fieldmap;
+pub mod gps_metadata;
 pub mod graphic_buffer;
 pub(crate) mod grid_notation;
 pub mod neighbors;

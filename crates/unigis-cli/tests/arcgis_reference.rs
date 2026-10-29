@@ -13,6 +13,9 @@ use unigis_testkit::{esri_area, esri_length, hausdorff};
 #[path = "common/dm_cases.rs"]
 mod dm_cases;
 
+#[path = "common/schema_edits.rs"]
+mod schema_edits;
+
 /// The `ug` arguments reproducing each ArcGIS case.
 fn gf_args(case: &str) -> Vec<&'static str> {
     let d = "testdata/geoproc";
@@ -4499,6 +4502,13 @@ fn tools_match_arcgis_output() {
         ) || PENDING_CASES.iter().any(|p| case.starts_with(p))
         {
             continue; // not done yet
+        }
+        if info["schema_edit"] == true {
+            let diffs = schema_edits::compare(case, info, &root, &out_dir);
+            if !diffs.is_empty() {
+                failures.push(format!("{case}:\n    {}", diffs.join("\n    ")));
+            }
+            continue;
         }
         // Workspace tools (Split) write into a folder.
         // Table tools (Check Geometry) write a .dbf.

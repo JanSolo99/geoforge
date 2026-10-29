@@ -1,84 +1,88 @@
 # Current handoff
 
-Updated 2026-10-29T04:40:19.818270+00:00; last agent Codex.
-Workspace `/mnt/media/ArcGIS_Linux`, main, HEAD
-`e07a10eeb6020f856092d9a51191c16ccb649ba5` (equals origin/main).
+Updated 2026-10-29T05:05:30.346722+00:00; last agent Codex.
+Workspace /mnt/media/ArcGIS_Linux, main, HEAD80a23a2. origin/main stille07a10e.
+User objective: wrap current tool, then build next eligible WORK_QUEUE tool;
+one tool per landing, time box/defer stuck tools. No other agents/coordinators.
 
-## Objective / completed landings
+## Completed before this turn
 
-User requested wrapping current work then building the next WORK_QUEUE tool,
-under time box and one-tool-per-landing rules. No extra agents/coordinators.
-Prior Pairwise neighbors338d0b9 was complete before this task; do not repeat it.
+Split By Attributes e07a10e already committed/pushed, full gate passed; no
+unfinished product edits inherited. Earlier Remove Overlap deferral272b70f and
+Pairwise Polygon Neighbors338d0b9 also pushed. Do not repeat those actions.
 
-Remove Overlap (multiple) DEFERRED in272b70f, committed/pushed (observed
-338d0b9..272b70f to origin/main).18 public ArcGIS controls saved in
-scripts/research/remove_overlap/. Default CENTER_LINE produces a branched cut
-and325/275 areas for equal overlapping rectangles, rather than centroid/Thiessen
-300/300. Native engine lacks a matching boundary partitioner. No runtime stub or
-completed implementation claimed. Deferral/known gap/roadmap/evidence recorded.
+## This turn / decisions
 
-Split By Attributes COMPLETE in e07a10e, committed/pushed (observed
-272b70f..e07a10e to origin/main).252 scoped paths; no unfinished product edits.
+- Pairwise Integrate DEFERRED, docs-only commit1e78736 (not pushed).33 public
+  controls in scripts/research/pairwise_integrate/. Native helpers lack matching
+  cluster/collapse; default0.001 m duplicate-point control0,0,0.0006 ->0.0001,
+  unlike simple centroid. No crossing-only stub or implementation claimed.
+- Add Full-Text Index DEFERRED, docs-only commit80a23a2 (not pushed). Official
+  docs require unsupported SQLite/mobile/enterprise backend; FileGDB excluded.
+  Disposable ArcGIS ERROR002764, scripts/research/full_text_index/.
+- Next eligible Add GPS Metadata Fields IMPLEMENTED, not committed/pushed yet.
+  tools/gps_metadata.rs builds public ArcGIS3.7 schemas:22 default point fields,
+  68 with offsets,6 for lines/polygons/multipoints; offset ignored for these.
+  Matches observed aliases/order/types/domains, not differing current web table.
+- Generic optional registry Context::add_schema_fields/SchemaDomain: read-only
+  hosts explicitly fail; CLI implements native FileGDB edits. No app changes.
+  filegdb/writer/schema_add.rs journals domain creation, field append/row rewrite,
+  domain assignment and alias metadata updates. Existing fields/values retained;
+  conflicting metadata domains refused000355 before changes (ArcGIS may partly
+  edit before failing). Existing identity/indexes/OIDs/geometry/Z/M/CRS retained.
+-14 gps_* references:12 successful schema snapshots,2 expected errors000732/
+  000656. Source gps_metadata_base.gdb:4 geometry types,point ZM,existing receiver,
+  table and source/null geometry rows. Generic generator schema snapshots and
+  common/schema_edits.rs comparator preserve geodatabase fields/domains without
+  shapefile conversion. All2,198 prior manifest cases unchanged;14 additions.
+- Two public probe batches and fixture recipe in scripts/research/gps_metadata/.
+  Research README, roadmap and gaps updated (roadmap not checked complete yet).
 
-- split_attributes.rs: pure grouping by non-null text/32-bit integer tuples,
-  stable case-insensitive key order; schema, attributes, geometry and source row
-  order retained. Folder naming and unique allocation match saved controls.
-- Optional registry Context write_workspace capability and WorkspaceOutput;
-  CLI implements folder shapefile/DBF writing, reserves names before writing,
-  and preserves existing datasets. Other hosts explicitly fail without that
-  capability; no app files changed. Geodatabase targets/advanced types in gaps.
-- Generic reference generator/comparator workspace branches now cover standalone
-  DBF tables and check process success, including empty sets. Existing comparison
-  tolerances retained.
-- 11 sba_* cases:8 successful workspaces,31 datasets,48 rows,3 expected errors.
-  Source fixtures split_attributes.*,split_attribute_names.*,
-  split_attribute_table.* in testdata/geoproc; complete reference folders saved.
-- 3 unit controls and2 CLI safety tests. Recipes/results/compare.py/README under
-  scripts/research/split_by_attributes/. Naming, case/normalization collisions,
-  old-output preservation and host fallback are covered. Reuse saved probes.
+## Validation / important finding
 
-## Validation / evidence
+- Public probes and14 reference generation PASS, /tmp/unigis-gps-reference.log.
+  Initial generation compared changing whole-Describe metadata; fixed to compare
+  actual schema/domains/rows. Saved snapshots remove ephemeral paths only.
+- Initial native build PASS /tmp/unigis-gps-build.log. First comparator compile
+  lacked trait import, fixed. Targeted full reference comparison matched12 GPS
+  successes but failed shapefile refusal due RUN output mapping, fixed/annotated
+  without repeating ArcGIS. Existing tolerances/skips untouched.
+- cargo test -j3 -p unigis-cli --test gps_metadata_safety PASS2 before alias fix:
+  conflicting-domain preflight and byte-exact rollback after domain creation/
+  row rewrite then failed assignment; /tmp/unigis-gps-safety.log.
+- Independent ArcGIS read found domain-bound aliases absent in GPFieldInfoEx,
+  despite native physical aliases matching. First gate STOPPED after Python8/
+  fmt/clippy passed; tests incomplete (do not claim pass). Fixed with existing
+  alter_field alias metadata operation inside same transaction. Added raw catalog
+  XML alias and independent GDAL format-reader assertions to comparator.
+- cargo build -j3 -p unigis-cli PASS after fix, /tmp/unigis-gps-build-fixed.log.
+- Independent ArcGIS read of fresh native offset result PASS:71 fields including
+  exact aliases,4 domains,2 original rows/null geometry. Saved native_reader_*.json
+  and probe_native_reader.py; /tmp/unigis-gps-native-reader-fixed.log. No probes
+  running. Scratch /tmp/unigis-gps-native-reader{,-fixed}.gdb; reuse evidence.
+- Python syntax/JSON/source whitespace/inherited hash audits PASS. Baseline
+  /tmp/unigis-rom-start-hashes.json;11 unrelated tracked files unchanged.
+- Full scripts/check EXIT0:225 Rust passed,5 ignored; Python8/fmt/clippy PASS.
+  /tmp/unigis-gps-check-fixed.{log,exit}. Covers final source, all14 GPS cases,
+  raw catalog/GDAL alias checks, read-only-host/safety tests, full workspace and
+  native shapefile/FileGDB/index/roundtrip checks. No builds/probes running.
+- Staged/source whitespace, Python syntax/JSON, prior-case preservation and scoped
+  index audit PASS.121 GPS-only paths staged; generator patch excludes inherited
+ 4-line raster hunk (/tmp/unigis-gps-stage.patch). No product changes after gate.
 
-- cargo build -j3 -p unigis-cli PASS /tmp/unigis-sba-build.log.
-- cargo test -j3 -p unigis-tools split_attributes -- --nocapture PASS3,
-  /tmp/unigis-sba-unit.log.
-- python3 scripts/research/split_by_attributes/compare.py PASS11 cases/31
-  datasets/48 rows (names/schema/attributes), /tmp/unigis-sba-compare.log.
-- ArcGIS generation/annotation completed /tmp/unigis-sba-references.log. All
-  2,187 prior manifest cases unchanged,11 additions. No regeneration needed.
-- Full scripts/check EXIT0:222 Rust passed,5 ignored,Python8/fmt/clippy PASS,
-  /tmp/unigis-sba-check.{log,exit}. Covers final Rust, full ArcGIS geometry/
-  schema/row comparisons, CLI safety2, prior tools and format/index/round trips.
-- Python syntax/source/staged whitespace checks PASS; scoped/preservation audits
-  PASS. Deferral7 paths and Split252 paths landed separately. No running builds
-  or probes; index empty. Final handoff checkpoint intentionally uncommitted.
+## Concrete next actions
 
-## Next action
-
-Pairwise Integrate deferred in1e78736 (committed, not yet pushed):33 public
-controls in scripts/research/pairwise_integrate/. All3 bridge batches completed;
-JSON/syntax/whitespace passed. No runtime implementation. Default clustering
-and collapse absent from native helpers; see research README for evidence.
-Add Full-Text Index deferred this turn: official docs exclude FileGDB, disposable
-ArcGIS control ERROR002764. Unsupported SQLite/mobile/enterprise backend.
-Research scripts/research/full_text_index/. Deferral-only docs landing next.
-Neither deferral has been pushed; push separately after local gate.
-Current tool: Add GPS Metadata Fields. Eight public schema/domain cases plus
-repeat calls complete, scripts/research/gps_metadata/probe{,_results.json}.
-Point default22 fields, offset68; lines/polygons/multipoints6 fields, offset
-ignored. ArcGIS3.7 differs from public docs (AVG_POSITIONS is SHORT, position
-source domain adds5 Snapped). Repeating succeeds without duplicate fields.
-Next: implement native FileGDB schema edit, registry/CLI capability, saved
-reference controls and full scripts/check; then scoped commit/push.
-No Cargo or probes running; inherited edits preserved.
+1. Full gate passed; commit GPS-only staged121 paths now. Pairwise/full-text
+   docs commits1e78736/80a23a2 remain separate and not yet pushed.
+2. Push all3 validated distinct commits, regenerate queue and final checkpoint.
+   Actual next queue item confirmed: Add Spatial Join (management.AddSpatialJoin).
+   Preserve all inherited edits below; no polishing landed/deferred tools.
 
 ## Inherited edits to preserve
 
 Raster unary integer-float local/registry/stats,unary safety,generator umintfloat
-hunk,fixtures/research and coordinator/queue infrastructure AGENTS,hooks,
+hunk,fixtures/research; coordinator/queue infrastructure AGENTS,hooks,
 agents-remote,coordinator code/docs/tests,work_queue.py/WORK_QUEUE files,dashboard.
-The user's prior AddIncrementingIDField deferral remains an unstaged edit in
-WORK_QUEUE_DEFERRED.txt; it was intentionally excluded from our new deferral
-file's staged content. Baseline hashes /tmp/unigis-rom-start-hashes.json; unrelated
-files unchanged except expected generated dashboard updates. Never read/add
-NOTES.md or .worktrees; scratch_te/ scratch. No overlapping Cargo builds; -j3.
+The user's AddIncrementingIDField line remains unstaged in WORK_QUEUE_DEFERRED.txt;
+only our deferrals were committed. Never read/add NOTES.md or .worktrees;
+scratch_te/ scratch. No overlapping Cargo builds; -j3. No agents/coordinators.
