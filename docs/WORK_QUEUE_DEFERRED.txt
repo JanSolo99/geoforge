@@ -1,5 +1,8 @@
 # Tools set aside from docs/WORK_QUEUE.md: `alias.FunctionName  reason` (one per line).
 # Remove a line to put the tool back in the queue.
+management.AddIncrementingIDField  ArcSDE/enterprise geodatabase only (ERROR 000186 on file data)
+
 analysis.RemoveOverlapMultiple  Default CENTER_LINE needs medial-axis/branched boundary partitioning absent from native engine; equal overlapping rectangles produce325/275 areas rather than centroid-bisector300/300.18 ArcGIS controls saved in scripts/research/remove_overlap/; defer instead of landing a nondefault-only or fitted implementation.
 analysis.PairwiseIntegrate  Native geometry engine lacks compatible cluster/collapse and multi-input in-place integration; default-tolerance duplicate-point averaging differs from simple centroid,33 public controls in scripts/research/pairwise_integrate/.
 management.AddFullTextIndex  Requires SQLite/mobile/enterprise full-text backend not supported by native formats; FileGDB explicitly unsupported, public ArcGIS ERROR002764 control in scripts/research/full_text_index/.
+management.Analyze  ArcSDE/enterprise geodatabase only (ERROR 000186 "Only support datasets served through ArcSDE" on file geodatabase and shapefile)

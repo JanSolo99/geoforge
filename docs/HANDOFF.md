@@ -11,8 +11,12 @@ names) in KNOWN_GAPS; notes in scripts/research/add_spatial_join/README.md. ug-v
 ogrinfo diff identical for the 3 cases (one CLOSEST distance differs by 1e-10, within the test
 tolerance). Validation: full scripts/check EXIT 0, 225 Rust passed / 5 ignored (/tmp/unigis-asj-check.log). Commit stages explicit paths and excludes
 Codex's uncommitted raster `umintfloat_*` generator block and the coordinator/queue files.
-Next action after landing: next queue item (docs/WORK_QUEUE.md; #2 Analyze is enterprise-only,
-check deferral).
+Landed and pushed as 69f2687. Analyze deferred (ArcSDE only, ERROR 000186) in
+docs/WORK_QUEUE_DEFERRED.txt (that commit also carries the AddIncrementingIDField deferral line
+that was uncommitted in the tree).
+Next action: next queue item: Batch Update Fields (in progress, nothing implemented; probe
+findings in scripts/research/batch_update_fields/README.md, plan: registry tool over the
+definition-table columns, conversions per the notes, scripts via crate::pycalc in dependency order).
 
 Updated 2026-10-29T05:06:20.186536+00:00; last agent Codex.
 Workspace /mnt/media/ArcGIS_Linux, main, HEAD and origin/main both
