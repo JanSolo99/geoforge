@@ -20,7 +20,14 @@
   except one z at 1e-14. Dropped a3z_m_mm (ArcGIS z-domain check, WARNING 002631; in
   KNOWN_GAPS). Validation: full scripts/check EXIT 0, 245 Rust passed / 5 ignored
   (/tmp/unigis-a3z-check.log).
-- Next action after landing: next queue item (docs/WORK_QUEUE.md: Calculate Geometry Attributes).
+- Adjust 3D Z landed and pushed as d34a600.
+- Calculate Geometry Attributes (this run): crates/unigis-tools/src/calc_geometry.rs (maps keywords
+  onto add_geometry_attributes, plus hole/curve counts) + registry runner/entry; fixtures
+  testdata/geoproc/cga_{parcels,roads,wells}.shp (recipe in
+  scripts/research/calculate_geometry_attributes/); 5 cga_* IN_PLACE cases; ogrinfo diff identical.
+  Validation: full scripts/check EXIT 0, 245 Rust passed / 5 ignored (/tmp/unigis-cga-check.log).
+- Next action after landing: next queue item (docs/WORK_QUEUE.md; Create Database View is
+  enterprise/SQLite -- check before deferring).
 
 Updated 2026-10-29T09:44:00.347279+00:00; last agent Codex.
 Workspace /mnt/media/ArcGIS_Linux, main; HEAD and origin/main both

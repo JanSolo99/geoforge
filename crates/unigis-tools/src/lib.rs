@@ -5,6 +5,7 @@
 pub mod adjust_z;
 mod angular_notation;
 pub mod batch_fields;
+pub mod calc_geometry;
 pub mod cogo;
 pub mod construct;
 pub mod date_precision;

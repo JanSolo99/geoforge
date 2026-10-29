@@ -591,6 +591,11 @@ CASES = {
     "a3z_m_ft": ("management.Adjust3DZ", [ROOT / "testdata" / "shp" / "polylinez.shp"], ["NO_REVERSE", None, "METERS", "FEET"]),
     "a3z_all": ("management.Adjust3DZ", [ROOT / "testdata" / "shp" / "polygonz.shp"], ["REVERSE", 2.5, "FEET", "METERS"]),
     "a3z_multipoint": ("management.Adjust3DZ", [ROOT / "testdata" / "shp" / "multipointz.shp"], ["REVERSE", -1, "INCHES", "CENTIMETERS"]),
+    "cga_parcels": ("management.CalculateGeometryAttributes", [DATA / "cga_parcels.shp"], ["AREA_D AREA;PERIM_D PERIMETER_LENGTH;CX CENTROID_X;CY CENTROID_Y;IX INSIDE_X;IY INSIDE_Y;XMIN EXTENT_MIN_X;YMAX EXTENT_MAX_Y;PARTS PART_COUNT;PNTS POINT_COUNT;HOLES HOLE_COUNT;AREA_L AREA"]),
+    "cga_parcels_units": ("management.CalculateGeometryAttributes", [DATA / "cga_parcels.shp"], ["AREA_D AREA;PERIM_D PERIMETER_LENGTH", "KILOMETERS", "HECTARES"]),
+    "cga_roads": ("management.CalculateGeometryAttributes", [DATA / "cga_roads.shp"], ["LEN_D LENGTH;SX LINE_START_X;SY LINE_START_Y;EX LINE_END_X;EY LINE_END_Y;BEAR LINE_BEARING;PNTS POINT_COUNT"]),
+    "cga_roads_feet": ("management.CalculateGeometryAttributes", [DATA / "cga_roads.shp"], ["LEN_D LENGTH", "FEET_US"]),
+    "cga_wells": ("management.CalculateGeometryAttributes", [DATA / "cga_wells.shp"], ["PX POINT_X;PY POINT_Y"]),
     "fst_parcels_num": ("management.FieldStatisticsToTable", [DATA / "parcels.shp"], ["VALUE;ZONE;PARCEL_ID", "NUMERIC"]),
     "fst_parcels_text": ("management.FieldStatisticsToTable", [DATA / "parcels.shp"], ["NAME", "TEXT"]),
     "fst_streams_text": ("management.FieldStatisticsToTable", [DATA / "streams.shp"], ["NAME", "TEXT"]),
@@ -2130,6 +2135,7 @@ RUN = {
     "management.ConvertTimeZone": ("convert_time_zone", ["input", "output", "input_time_field", "input_time_zone", "output_time_field", "output_time_zone", "input_dst", "output_dst"]),
     "management.ValidateJoin": ("validate_join", ["input", "in_field", "join_table", "join_field", "output"]),
     "management.Adjust3DZ": ("adjust_3d_z", ["input", "output", "reverse_sign", "adjust_value", "from_units", "to_units"]),
+    "management.CalculateGeometryAttributes": ("calculate_geometry_attributes", ["input", "output", "geometry_property", "length_unit", "area_unit"]),
     "management.FieldStatisticsToTable": ("field_statistics_to_table", ["input", "output", "fields", "field_type", "group_by", "statistics"]),
     "management.EncodeField": ("encode_field", ["input", "output", "field", "method"]),
     "management.GeodeticDensify": ("geodetic_densify", ["input", "output", "densify_method", "max_segment_length"]),
@@ -2221,7 +2227,7 @@ MEMORY_OUT = {"analysis.SummarizeWithin", "analysis.SummarizeNearby", "analysis.
 CREATE_TOOLS = {"management.CreateFeatureclass", "management.CreateTable"}
 
 # In-place tools: the index of the input they edit (run on a copy written as the output).
-IN_PLACE = {"management.Adjust3DZ": 0, "management.MigrateDateFieldToHighPrecision": 0, "management.EnableCOGO": 0, "management.DisableEditorTracking": 0, "management.DisableCOGO": 0, "management.AddGPSMetadataFields": 0, "management.ConvertTimeZone": 0, "management.ConvertTimeField": 0, "management.AddSpatialJoin": 0, "gp.ExtractMultiValuesToPoints_sa": 0, "edit.ExtendLine": 0, "edit.FlipLine": 0, "edit.TrimLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.EncodeField": 0, "management.AddGeometryAttributes": 0,
+IN_PLACE = {"management.CalculateGeometryAttributes": 0, "management.Adjust3DZ": 0, "management.MigrateDateFieldToHighPrecision": 0, "management.EnableCOGO": 0, "management.DisableEditorTracking": 0, "management.DisableCOGO": 0, "management.AddGPSMetadataFields": 0, "management.ConvertTimeZone": 0, "management.ConvertTimeField": 0, "management.AddSpatialJoin": 0, "gp.ExtractMultiValuesToPoints_sa": 0, "edit.ExtendLine": 0, "edit.FlipLine": 0, "edit.TrimLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.EncodeField": 0, "management.AddGeometryAttributes": 0,
             "management.CalculateFields": 0, "management.StandardizeField": 0, "management.TransformField": 0, "management.ReclassifyField": 0, "management.DefineProjection": 0, "management.CalculateEndTime": 0}
 
 # Select Layer By Location cases, saved with Copy Features:

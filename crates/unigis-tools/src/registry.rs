@@ -544,6 +544,50 @@ fn generate_transects_along_lines(ctx: &dyn Context) -> Result<ToolOutput> {
     )
 }
 
+fn calculate_geometry_attributes(ctx: &dyn Context) -> Result<ToolOutput> {
+    let t = find("calculate_geometry_attributes")
+        .ok_or_else(|| Error::Unsupported("calculate_geometry_attributes".into()))?;
+    let input = ctx.features("input")?;
+    let pairs: Vec<(String, String)> = text(ctx, t, "geometry_property")
+        .ok_or_else(|| {
+            Error::Unsupported("ERROR 000735: Geometry Attributes: value is required".into())
+        })?
+        .split(';')
+        .filter_map(|item| {
+            let mut w = item.split_whitespace();
+            Some((w.next()?.to_owned(), w.next()?.to_owned()))
+        })
+        .collect();
+    let unit = |k: &str| {
+        text(ctx, t, k)
+            .map(|u| u.trim().to_ascii_uppercase())
+            .unwrap_or_default()
+    };
+    let length = match unit("length_unit").as_str() {
+        "" | "METERS" => 1.0,
+        "KILOMETERS" => 1000.0,
+        "FEET_INT" => 0.3048,
+        "FEET_US" => 1200.0 / 3937.0,
+        "YARDS_INT" => 0.9144,
+        "YARDS_US" => 3600.0 / 3937.0,
+        "MILES_INT" => 1609.344,
+        "MILES_US" => 6_336_000.0 / 3937.0,
+        "NAUTICAL_MILES_INT" => 1852.0,
+        other => return Err(Error::Unsupported(format!("length unit {other}"))),
+    };
+    let area = match unit("area_unit").as_str() {
+        "" | "SQUARE_METERS" => 1.0,
+        "SQUARE_KILOMETERS" => 1e6,
+        "HECTARES" => 1e4,
+        "ACRES" => 4046.8564224,
+        "SQUARE_FEET_INT" => 0.09290304,
+        "SQUARE_YARDS_INT" => 0.83612736,
+        "SQUARE_MILES_INT" => 2_589_988.110336,
+        other => return Err(Error::Unsupported(format!("area unit {other}"))),
+    };
+    crate::calc_geometry::calculate_geometry_attributes(input.as_ref(), &pairs, length, area)
+}
+
 fn adjust_3d_z(ctx: &dyn Context) -> Result<ToolOutput> {
     let t = find("adjust_3d_z").ok_or_else(|| Error::Unsupported("adjust_3d_z".into()))?;
     let input = ctx.features("input")?;
@@ -2247,6 +2291,49 @@ pub static TOOLS: &[Tool] = &[
         output_suffix: "ODLinks",
         measures: false,
         run: Runner::Features(generate_origin_destination_links),
+    },
+    Tool {
+        id: "calculate_geometry_attributes",
+        name: "Calculate Geometry Attributes",
+        toolbox: "Data Management › Fields",
+        summary: "Writes geometry properties (area, length, centroid, extent, counts, ...) into existing fields (ArcGIS Pro Calculate Geometry Attributes, planar).",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Features",
+                kind: Kind::Features,
+                required: true,
+                default: "",
+                help: "",
+            },
+            Param {
+                name: "geometry_property",
+                label: "Geometry Attributes",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+                help: "`FIELD PROPERTY` pairs separated by semicolons, e.g. `AREA_D AREA;CX CENTROID_X`.",
+            },
+            Param {
+                name: "length_unit",
+                label: "Length Unit",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "KILOMETERS, METERS, FEET_INT, FEET_US, YARDS_INT, YARDS_US, MILES_INT, MILES_US, NAUTICAL_MILES_INT.",
+            },
+            Param {
+                name: "area_unit",
+                label: "Area Unit",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+                help: "SQUARE_KILOMETERS, HECTARES, SQUARE_METERS, ACRES, SQUARE_FEET_INT, SQUARE_YARDS_INT, SQUARE_MILES_INT.",
+            },
+        ],
+        output_suffix: "Geometry",
+        measures: true,
+        run: Runner::Features(calculate_geometry_attributes),
     },
     Tool {
         id: "adjust_3d_z",

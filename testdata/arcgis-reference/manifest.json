@@ -93558,6 +93558,565 @@
           "to_units": "CENTIMETERS"
         }
       }
+    },
+    "cga_parcels": {
+      "tool": "management.CalculateGeometryAttributes",
+      "args": [
+        "testdata/geoproc/cga_parcels.shp",
+        "<out>",
+        "AREA_D AREA;PERIM_D PERIMETER_LENGTH;CX CENTROID_X;CY CENTROID_Y;IX INSIDE_X;IY INSIDE_Y;XMIN EXTENT_MIN_X;YMAX EXTENT_MAX_Y;PARTS PART_COUNT;PNTS POINT_COUNT;HOLES HOLE_COUNT;AREA_L AREA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "AREA_D",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "PERIM_D",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "CX",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "CY",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "IX",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "IY",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "XMIN",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "YMAX",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "PARTS",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "PNTS",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "HOLES",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "AREA_L",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "calculate_geometry_attributes",
+        "params": {
+          "input": "testdata/geoproc/cga_parcels.shp",
+          "output": "<out>",
+          "geometry_property": "AREA_D AREA;PERIM_D PERIMETER_LENGTH;CX CENTROID_X;CY CENTROID_Y;IX INSIDE_X;IY INSIDE_Y;XMIN EXTENT_MIN_X;YMAX EXTENT_MAX_Y;PARTS PART_COUNT;PNTS POINT_COUNT;HOLES HOLE_COUNT;AREA_L AREA"
+        }
+      }
+    },
+    "cga_parcels_units": {
+      "tool": "management.CalculateGeometryAttributes",
+      "args": [
+        "testdata/geoproc/cga_parcels.shp",
+        "<out>",
+        "AREA_D AREA;PERIM_D PERIMETER_LENGTH",
+        "KILOMETERS",
+        "HECTARES"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "AREA_D",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "PERIM_D",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "CX",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "CY",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "IX",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "IY",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "XMIN",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "YMAX",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "PARTS",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "PNTS",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "HOLES",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "AREA_L",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "calculate_geometry_attributes",
+        "params": {
+          "input": "testdata/geoproc/cga_parcels.shp",
+          "output": "<out>",
+          "geometry_property": "AREA_D AREA;PERIM_D PERIMETER_LENGTH",
+          "length_unit": "KILOMETERS",
+          "area_unit": "HECTARES"
+        }
+      }
+    },
+    "cga_roads": {
+      "tool": "management.CalculateGeometryAttributes",
+      "args": [
+        "testdata/geoproc/cga_roads.shp",
+        "<out>",
+        "LEN_D LENGTH;SX LINE_START_X;SY LINE_START_Y;EX LINE_END_X;EY LINE_END_Y;BEAR LINE_BEARING;PNTS POINT_COUNT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "LEN_D",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "SX",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "SY",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "EX",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "EY",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "BEAR",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "PNTS",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "calculate_geometry_attributes",
+        "params": {
+          "input": "testdata/geoproc/cga_roads.shp",
+          "output": "<out>",
+          "geometry_property": "LEN_D LENGTH;SX LINE_START_X;SY LINE_START_Y;EX LINE_END_X;EY LINE_END_Y;BEAR LINE_BEARING;PNTS POINT_COUNT"
+        }
+      }
+    },
+    "cga_roads_feet": {
+      "tool": "management.CalculateGeometryAttributes",
+      "args": [
+        "testdata/geoproc/cga_roads.shp",
+        "<out>",
+        "LEN_D LENGTH",
+        "FEET_US"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "LEN_D",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "SX",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "SY",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "EX",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "EY",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "BEAR",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "PNTS",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "calculate_geometry_attributes",
+        "params": {
+          "input": "testdata/geoproc/cga_roads.shp",
+          "output": "<out>",
+          "geometry_property": "LEN_D LENGTH",
+          "length_unit": "FEET_US"
+        }
+      }
+    },
+    "cga_wells": {
+      "tool": "management.CalculateGeometryAttributes",
+      "args": [
+        "testdata/geoproc/cga_wells.shp",
+        "<out>",
+        "PX POINT_X;PY POINT_Y"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "PX",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "PY",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "calculate_geometry_attributes",
+        "params": {
+          "input": "testdata/geoproc/cga_wells.shp",
+          "output": "<out>",
+          "geometry_property": "PX POINT_X;PY POINT_Y"
+        }
+      }
     }
   }
 }
