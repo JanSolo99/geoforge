@@ -15,6 +15,7 @@ mod editor_tracking;
 mod extract;
 mod geometry;
 mod global_ids;
+mod import_fields;
 mod index_edit;
 mod keys;
 mod rebuild;
@@ -122,6 +123,7 @@ pub struct GeodatabaseWriter {
     spatial_refs: Vec<GeometryDef>,
     domains: Vec<DomainItem>,
     rng: u64,
+    standard_geometry_fields: bool,
     /// Set when adding to a geodatabase that already exists.
     existing: Option<Existing>,
     /// The transaction adding to an existing geodatabase: committed by `finish`; a
@@ -159,6 +161,7 @@ pub struct TableBuilder {
     has_m: bool,
     def: Option<GeometryDef>,
     fields: Vec<GdbField>,
+    standard_geometry_fields: bool,
 }
 
 impl TableBuilder {
@@ -175,12 +178,19 @@ impl TableBuilder {
                 "geometry in a table without a geometry field".into(),
             ));
         }
+        self.writer.measure_next = self.standard_geometry_fields;
         self.writer
             .push(feature.geometry.as_ref(), &feature.attributes)
     }
 }
 
 impl GeodatabaseWriter {
+    /// Opt into ArcGIS import schemas: Shape spelling, calculated length/area
+    /// metadata and measure recomputation. Existing writer users retain their mode.
+    pub fn use_standard_geometry_fields(&mut self) {
+        self.standard_geometry_fields = true;
+    }
+
     /// Creates a new, empty `.gdb` directory. Fails if `dir` already exists.
     pub fn create(dir: impl AsRef<Path>) -> Result<Self> {
         let dir = dir.as_ref().to_path_buf();
@@ -194,6 +204,7 @@ impl GeodatabaseWriter {
             ^ (u64::from(std::process::id()) << 32);
         Ok(Self {
             dir,
+            standard_geometry_fields: false,
             next_table: 9,
             tables: Vec::new(),
             items: Vec::new(),
@@ -304,6 +315,7 @@ impl GeodatabaseWriter {
             ^ (u64::from(std::process::id()) << 32);
         Ok(Self {
             dir,
+            standard_geometry_fields: false,
             next_table,
             tables,
             items: Vec::new(),
@@ -718,6 +730,11 @@ impl GeodatabaseWriter {
             })
     }
 
+    /// Whether a class, table, relationship or feature dataset already reserves a name.
+    pub fn dataset_name_exists(&self, name: &str) -> bool {
+        self.name_taken(name)
+    }
+
     /// The next DSID: one past every item definition so far.
     fn next_dsid(&self) -> usize {
         let base = self
@@ -746,7 +763,16 @@ impl GeodatabaseWriter {
         }
         let mut gdb_fields = vec![field("OBJECTID", GdbFieldType::ObjectId, false, 4)];
         if let Some(def) = &def {
-            let mut f = field("SHAPE", GdbFieldType::Geometry, true, 0);
+            let mut f = field(
+                if self.standard_geometry_fields {
+                    "Shape"
+                } else {
+                    "SHAPE"
+                },
+                GdbFieldType::Geometry,
+                true,
+                0,
+            );
             f.geometry = Some(def.clone());
             gdb_fields.push(f);
         }
@@ -778,6 +804,7 @@ impl GeodatabaseWriter {
             has_m,
             def,
             fields: gdb_fields,
+            standard_geometry_fields: self.standard_geometry_fields,
         })
     }
 
@@ -818,7 +845,16 @@ impl GeodatabaseWriter {
                     0x40,
                     &spatial_entries(&envelopes, grid),
                 )?;
-                write_gdbindexes(&base.with_extension("gdbindexes"), true, &index_names)?;
+                write_gdbindexes_for(
+                    &base.with_extension("gdbindexes"),
+                    "OBJECTID",
+                    Some(if t.standard_geometry_fields {
+                        "Shape"
+                    } else {
+                        "SHAPE"
+                    }),
+                    &index_names,
+                )?;
                 if !self.spatial_refs.iter().any(|s| same_sr(s, d)) {
                     self.spatial_refs.push(d.clone());
                 }
@@ -838,6 +874,9 @@ impl GeodatabaseWriter {
             &fields,
             t.subtypes.as_ref(),
         );
+        if t.standard_geometry_fields {
+            definition = import_fields::definition(&definition, t.kind, &fields)?;
+        }
         if let Some(ds) = &t.dataset {
             // A class in a feature dataset has the dataset's name in its path.
             let (from, to) = (
@@ -1359,7 +1398,13 @@ fn item_values(item: &Item) -> Vec<Value> {
         Some(k) => (
             TYPE_FEATURE_CLASS,
             Value::Integer(geometry_code(k)),
-            Value::String("SHAPE".to_owned()),
+            Value::String(
+                item.field_names
+                    .iter()
+                    .find(|n| n.eq_ignore_ascii_case("shape"))
+                    .cloned()
+                    .unwrap_or_else(|| "SHAPE".into()),
+            ),
         ),
         None => (TYPE_TABLE, Value::Null, Value::Null),
     };

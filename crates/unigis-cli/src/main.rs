@@ -16,6 +16,7 @@ use unigis_tools::{Dissolve, ToolOutput};
 mod aliases;
 mod dataset_outputs;
 mod delete_multiple;
+mod feature_class_to_geodatabase;
 
 #[derive(Parser)]
 #[command(name = "ug", version, about = "UniGIS geoprocessing tools")]
@@ -2693,6 +2694,13 @@ fn main() -> ExitCode {
             }
             struct Args(std::collections::HashMap<String, String>);
             impl registry::Context for Args {
+                fn import_feature_classes(
+                    &self,
+                    inputs: &[String],
+                    target: &str,
+                ) -> Result<Vec<String>> {
+                    feature_class_to_geodatabase::run(inputs, Path::new(target))
+                }
                 fn get(&self, name: &str) -> Option<String> {
                     self.0
                         .get(name)

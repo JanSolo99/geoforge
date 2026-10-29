@@ -77,6 +77,22 @@ DM = ROOT / "testdata" / "dm"
 
 CASES = {
     # name: (tool, args before the output, args after the output)
+    **{f"fctg_{name}": ("conversion.FeatureClassToGeodatabase", [[str(DATA / item) for item in items]], [])
+       for name, items in [
+        ("single", ["parcels.shp"]),
+        ("batch", ["parcels.shp", "roads.shp", "wells.shp"]),
+        ("repeat", ["parcels.shp", "parcels.shp"]),
+        ("collision", ["parcels.shp"]),
+        ("dataset", ["parcels.shp"]),
+        ("gdb", ["globalids_base.gdb/points"]),
+        ("empty", ["globalids_base.gdb/empty"]),
+        ("properties", ["extract_base.gdb/sites"]),
+        ("polygon_gdb", ["fctg_seed.gdb/parcels"]),
+        ("name", ["fctg_names/9 bad-name.shp"]),
+        ("table", ["globalids_base.gdb/records"]),
+        ("bad_batch", ["parcels.shp", "missing.shp"]),
+        ("missing_output", ["parcels.shp"]),
+    ]},
     **{f"excel_{name}": ("conversion.ExcelToTable", [DATA / ("excel_input." + ext)], [sheet, header, cells])
        for name, ext, sheet, header, cells in [
         ("default", "xlsx", "", 1, ""),
@@ -2192,6 +2208,7 @@ for _tool, _id in COMBINATORIAL:
 
 
 RUN = {
+    "conversion.FeatureClassToGeodatabase": ("feature_class_to_geodatabase", ["input_features", "output_geodatabase"]),
     "conversion.ExcelToTable": ("excel_to_table", ["input", "output", "sheet", "field_names_row", "cell_range"]),
     "management.AddGlobalIDs": ("add_global_ids", ["in_datasets"]),
     "management.SubsetFeatures": ("subset_features", ["input", "out_training_feature_class", "out_test_feature_class", "size_of_training_dataset", "subset_size_units"]),
@@ -2458,6 +2475,32 @@ def subset_case(w, name, tool, before, after):
                 messages=[m["text"] for m in r.get("messages",[]) if m["severity"]>0],run=run_spec(tool,args))
 
 
+def feature_import_case(w, name, tool, before):
+    """Retain complete ArcGIS output and immutable setup workspace for batch imports."""
+    seeded = name in {"fctg_collision", "fctg_dataset"}
+    seed = DATA / ("fctg_seed.gdb" if seeded else "fctg_empty.gdb")
+    suffix = "/group" if name == "fctg_dataset" else ""
+    out = OUT / f"{name}.gdb"
+    if out.exists():
+        shutil.rmtree(out)
+    missing = name == "fctg_missing_output"
+    if not missing:
+        w.call("run_tool", tool="management.Copy", args=[str(seed), str(out)])
+    target = str(out) + suffix
+    r = w.call("run_tool", tool=tool, args=[before[0], target])
+    args = [";".join(rel(p) for p in before[0]), "<out>" + suffix]
+    if out.exists():
+        for lock in out.glob("*.lock"):
+            try:
+                lock.unlink()
+            except PermissionError:
+                pass
+    return dict(tool=tool, args=args, status=r.get("status"),
+                workspace_reference=dict(seed=None if missing else rel(seed)),
+                messages=[m["text"] for m in r.get("messages", []) if m["severity"] > 0],
+                run=run_spec(tool, args))
+
+
 def extract_data_case(w, name, tool, before, after):
     """Public workspace output retained for portable native schema/value comparison."""
     extract, out_type, expand, related, all_rows = after
@@ -2583,6 +2626,10 @@ def main():
             for a in before:
                 if isinstance(a, Path) and a.suffix == ".tif":
                     w.call("python", code=f"arcpy.management.BuildRasterAttributeTable(r'{win(a)}', 'Overwrite')")
+        if tool == "conversion.FeatureClassToGeodatabase":
+            manifest["cases"][name] = feature_import_case(w, name, tool, before)
+            print(f"{name}: {manifest['cases'][name]['status']}")
+            continue
         if tool == "management.AddGlobalIDs":
             manifest["cases"][name] = global_ids_case(w,tool,before)
             print(f"{name}: {manifest['cases'][name]['status']}")

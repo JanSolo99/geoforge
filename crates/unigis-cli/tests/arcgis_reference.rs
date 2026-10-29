@@ -22,6 +22,9 @@ mod spatial_sampling;
 #[path = "common/random_points.rs"]
 mod random_points;
 
+#[path = "common/workspace_reference.rs"]
+mod workspace_reference;
+
 #[path = "common/workspace_extract.rs"]
 mod workspace_extract;
 
@@ -4521,6 +4524,13 @@ fn tools_match_arcgis_output() {
         }
         if info["subset_partition"] == true {
             let diffs = subset_features::compare(case, info, &root, &out_dir);
+            if !diffs.is_empty() {
+                failures.push(format!("{case}:\n    {}", diffs.join("\n    ")));
+            }
+            continue;
+        }
+        if info.get("workspace_reference").is_some() {
+            let diffs = workspace_reference::compare(case, info, &root, &out_dir);
             if !diffs.is_empty() {
                 failures.push(format!("{case}:\n    {}", diffs.join("\n    ")));
             }

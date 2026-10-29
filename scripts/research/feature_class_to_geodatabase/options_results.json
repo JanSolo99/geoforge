@@ -1,0 +1,842 @@
+{
+  "properties": {
+    "status": "success",
+    "tables": {
+      "sites": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "alias": "OBJECTID",
+            "type": "OID",
+            "nullable": false,
+            "required": true,
+            "editable": false,
+            "domain": "",
+            "default": null
+          },
+          {
+            "name": "Shape",
+            "alias": "Shape",
+            "type": "Geometry",
+            "nullable": true,
+            "required": true,
+            "editable": true,
+            "domain": "",
+            "default": null
+          },
+          {
+            "name": "KEY",
+            "alias": "Site KEY",
+            "type": "Integer",
+            "nullable": true,
+            "required": false,
+            "editable": true,
+            "domain": "",
+            "default": null
+          },
+          {
+            "name": "STATUS",
+            "alias": "Site STATUS",
+            "type": "SmallInteger",
+            "nullable": true,
+            "required": false,
+            "editable": true,
+            "domain": "",
+            "default": 1
+          },
+          {
+            "name": "LABEL",
+            "alias": "Site LABEL",
+            "type": "String",
+            "nullable": true,
+            "required": false,
+            "editable": true,
+            "domain": "",
+            "default": null
+          }
+        ],
+        "rows": [
+          [
+            1,
+            1,
+            1,
+            "Site 1"
+          ],
+          [
+            2,
+            3,
+            1,
+            null
+          ],
+          [
+            3,
+            4,
+            2,
+            "Site 4"
+          ]
+        ],
+        "indexes": [
+          {
+            "name": "FDO_OBJECTID",
+            "fields": [
+              "OBJECTID"
+            ]
+          },
+          {
+            "name": "FDO_Shape",
+            "fields": [
+              "Shape"
+            ]
+          }
+        ]
+      }
+    },
+    "domains": []
+  },
+  "polygon_gdb": {
+    "status": "success",
+    "tables": {
+      "parcels": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "alias": "OBJECTID",
+            "type": "OID",
+            "nullable": false,
+            "required": true,
+            "editable": false,
+            "domain": "",
+            "default": null
+          },
+          {
+            "name": "Shape",
+            "alias": "Shape",
+            "type": "Geometry",
+            "nullable": true,
+            "required": true,
+            "editable": true,
+            "domain": "",
+            "default": null
+          },
+          {
+            "name": "PARCEL_ID",
+            "alias": "PARCEL_ID",
+            "type": "Integer",
+            "nullable": true,
+            "required": false,
+            "editable": true,
+            "domain": "",
+            "default": null
+          },
+          {
+            "name": "NAME",
+            "alias": "NAME",
+            "type": "String",
+            "nullable": true,
+            "required": false,
+            "editable": true,
+            "domain": "",
+            "default": null
+          },
+          {
+            "name": "VALUE",
+            "alias": "VALUE",
+            "type": "Double",
+            "nullable": true,
+            "required": false,
+            "editable": true,
+            "domain": "",
+            "default": null
+          },
+          {
+            "name": "ZONE",
+            "alias": "ZONE",
+            "type": "Integer",
+            "nullable": true,
+            "required": false,
+            "editable": true,
+            "domain": "",
+            "default": null
+          },
+          {
+            "name": "Shape_Length",
+            "alias": "Shape_Length",
+            "type": "Double",
+            "nullable": true,
+            "required": true,
+            "editable": false,
+            "domain": "",
+            "default": null
+          },
+          {
+            "name": "Shape_Area",
+            "alias": "Shape_Area",
+            "type": "Double",
+            "nullable": true,
+            "required": true,
+            "editable": false,
+            "domain": "",
+            "default": null
+          }
+        ],
+        "rows": [
+          [
+            1,
+            1,
+            "Lot 1",
+            8597.94,
+            1,
+            384.0,
+            9216.0
+          ],
+          [
+            2,
+            2,
+            "Lot 2",
+            3943.01,
+            2,
+            384.0,
+            9216.0
+          ],
+          [
+            3,
+            3,
+            "Lot 3",
+            4805.88,
+            3,
+            384.0,
+            9216.0
+          ],
+          [
+            4,
+            4,
+            "Lot 4",
+            1889.5,
+            0,
+            384.0,
+            9216.0
+          ],
+          [
+            5,
+            5,
+            "Lot 5",
+            1754.62,
+            1,
+            504.0,
+            8316.0
+          ],
+          [
+            6,
+            6,
+            "Lot 6",
+            5900.9,
+            2,
+            384.0,
+            9216.0
+          ],
+          [
+            7,
+            7,
+            "Lot 7",
+            6047.8,
+            3,
+            384.0,
+            9216.0
+          ],
+          [
+            8,
+            8,
+            "Lot 8",
+            8502.57,
+            0,
+            556.0,
+            8256.0
+          ],
+          [
+            9,
+            9,
+            "Lot 9",
+            8658.8,
+            1,
+            384.0,
+            9216.0
+          ],
+          [
+            10,
+            10,
+            "Lot 10",
+            5607.71,
+            2,
+            504.0,
+            8316.0
+          ],
+          [
+            11,
+            11,
+            "Lot 11",
+            349.8,
+            3,
+            384.0,
+            9216.0
+          ],
+          [
+            12,
+            12,
+            "Lot 12",
+            1823.35,
+            0,
+            384.0,
+            9216.0
+          ],
+          [
+            13,
+            13,
+            "Lot 13",
+            3349.07,
+            1,
+            384.0,
+            9216.0
+          ],
+          [
+            14,
+            14,
+            "Lot 14",
+            551.72,
+            2,
+            384.0,
+            9216.0
+          ],
+          [
+            15,
+            15,
+            "Lot 15",
+            7231.69,
+            3,
+            504.0,
+            8316.0
+          ],
+          [
+            16,
+            16,
+            "Lot 16",
+            7713.37,
+            0,
+            384.0,
+            9216.0
+          ],
+          [
+            17,
+            17,
+            "Lot 17",
+            2079.62,
+            1,
+            384.0,
+            9216.0
+          ],
+          [
+            18,
+            18,
+            "Lot 18",
+            6374.34,
+            2,
+            384.0,
+            9216.0
+          ],
+          [
+            19,
+            19,
+            "Lot 19",
+            9856.91,
+            3,
+            384.0,
+            9216.0
+          ],
+          [
+            20,
+            20,
+            "Lot 20",
+            5741.45,
+            0,
+            504.0,
+            8316.0
+          ],
+          [
+            21,
+            21,
+            "Lot 21",
+            3292.7,
+            1,
+            384.0,
+            9216.0
+          ],
+          [
+            22,
+            22,
+            "Lot 22",
+            7372.38,
+            2,
+            384.0,
+            9216.0
+          ],
+          [
+            23,
+            23,
+            "Lot 23",
+            589.95,
+            3,
+            384.0,
+            9216.0
+          ],
+          [
+            24,
+            24,
+            "Lot 24",
+            5026.57,
+            0,
+            384.0,
+            9216.0
+          ],
+          [
+            25,
+            25,
+            "Lot 25",
+            551.57,
+            1,
+            504.0,
+            8316.0
+          ],
+          [
+            26,
+            26,
+            "Lot 26",
+            509.26,
+            2,
+            384.0,
+            9216.0
+          ],
+          [
+            27,
+            27,
+            "Lot 27",
+            8614.3,
+            3,
+            384.0,
+            9216.0
+          ],
+          [
+            28,
+            28,
+            "Lot 28",
+            4259.07,
+            0,
+            384.0,
+            9216.0
+          ],
+          [
+            29,
+            29,
+            "Lot 29",
+            2129.19,
+            1,
+            384.0,
+            9216.0
+          ],
+          [
+            30,
+            30,
+            "Lot 30",
+            3577.05,
+            2,
+            504.0,
+            8316.0
+          ],
+          [
+            31,
+            31,
+            "Lot 31",
+            4236.06,
+            3,
+            384.0,
+            9216.0
+          ],
+          [
+            32,
+            32,
+            "Lot 32",
+            7996.89,
+            0,
+            384.0,
+            9216.0
+          ],
+          [
+            33,
+            33,
+            "Lot 33",
+            6212.11,
+            1,
+            384.0,
+            9216.0
+          ],
+          [
+            34,
+            34,
+            "Lot 34",
+            6903.47,
+            2,
+            384.0,
+            9216.0
+          ],
+          [
+            35,
+            35,
+            "Lot 35",
+            7780.04,
+            3,
+            504.0,
+            8316.0
+          ],
+          [
+            36,
+            36,
+            "Lot 36",
+            2107.39,
+            0,
+            384.0,
+            9216.0
+          ]
+        ],
+        "indexes": [
+          {
+            "name": "FDO_OBJECTID",
+            "fields": [
+              "OBJECTID"
+            ]
+          },
+          {
+            "name": "FDO_Shape",
+            "fields": [
+              "Shape"
+            ]
+          }
+        ]
+      }
+    },
+    "domains": []
+  },
+  "name": {
+    "status": "success",
+    "tables": {
+      "T9_bad_name": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "alias": "OBJECTID",
+            "type": "OID",
+            "nullable": false,
+            "required": true,
+            "editable": false,
+            "domain": "",
+            "default": null
+          },
+          {
+            "name": "Shape",
+            "alias": "Shape",
+            "type": "Geometry",
+            "nullable": true,
+            "required": true,
+            "editable": true,
+            "domain": "",
+            "default": null
+          },
+          {
+            "name": "WELL_ID",
+            "alias": "WELL_ID",
+            "type": "Integer",
+            "nullable": true,
+            "required": false,
+            "editable": true,
+            "domain": "",
+            "default": null
+          },
+          {
+            "name": "DEPTH",
+            "alias": "DEPTH",
+            "type": "Double",
+            "nullable": true,
+            "required": false,
+            "editable": true,
+            "domain": "",
+            "default": null
+          }
+        ],
+        "rows": [
+          [
+            1,
+            1,
+            70.0
+          ],
+          [
+            2,
+            2,
+            68.1
+          ],
+          [
+            3,
+            3,
+            10.0
+          ],
+          [
+            4,
+            4,
+            180.5
+          ],
+          [
+            5,
+            5,
+            68.4
+          ],
+          [
+            6,
+            6,
+            36.1
+          ],
+          [
+            7,
+            7,
+            107.3
+          ],
+          [
+            8,
+            8,
+            185.2
+          ],
+          [
+            9,
+            9,
+            112.7
+          ],
+          [
+            10,
+            10,
+            88.3
+          ],
+          [
+            11,
+            11,
+            119.7
+          ],
+          [
+            12,
+            12,
+            191.8
+          ],
+          [
+            13,
+            13,
+            60.8
+          ],
+          [
+            14,
+            14,
+            159.0
+          ],
+          [
+            15,
+            15,
+            5.7
+          ],
+          [
+            16,
+            16,
+            33.0
+          ],
+          [
+            17,
+            17,
+            138.2
+          ],
+          [
+            18,
+            18,
+            99.4
+          ],
+          [
+            19,
+            19,
+            194.4
+          ],
+          [
+            20,
+            20,
+            118.2
+          ],
+          [
+            21,
+            21,
+            192.3
+          ],
+          [
+            22,
+            22,
+            131.2
+          ],
+          [
+            23,
+            23,
+            115.4
+          ],
+          [
+            24,
+            24,
+            122.5
+          ],
+          [
+            25,
+            25,
+            196.9
+          ],
+          [
+            26,
+            26,
+            56.4
+          ],
+          [
+            27,
+            27,
+            1.1
+          ],
+          [
+            28,
+            28,
+            56.1
+          ],
+          [
+            29,
+            29,
+            48.4
+          ],
+          [
+            30,
+            30,
+            126.4
+          ],
+          [
+            31,
+            31,
+            144.5
+          ],
+          [
+            32,
+            32,
+            42.9
+          ],
+          [
+            33,
+            33,
+            119.7
+          ],
+          [
+            34,
+            34,
+            100.4
+          ],
+          [
+            35,
+            35,
+            190.5
+          ],
+          [
+            36,
+            36,
+            167.5
+          ],
+          [
+            37,
+            37,
+            191.3
+          ],
+          [
+            38,
+            38,
+            97.1
+          ],
+          [
+            39,
+            39,
+            3.3
+          ],
+          [
+            40,
+            40,
+            82.5
+          ],
+          [
+            41,
+            41,
+            59.0
+          ],
+          [
+            42,
+            42,
+            168.2
+          ],
+          [
+            43,
+            43,
+            46.6
+          ],
+          [
+            44,
+            44,
+            82.6
+          ],
+          [
+            45,
+            45,
+            141.5
+          ],
+          [
+            46,
+            46,
+            188.8
+          ],
+          [
+            47,
+            47,
+            89.6
+          ],
+          [
+            48,
+            48,
+            81.9
+          ],
+          [
+            49,
+            49,
+            168.4
+          ],
+          [
+            50,
+            50,
+            37.2
+          ]
+        ],
+        "indexes": [
+          {
+            "name": "FDO_OBJECTID",
+            "fields": [
+              "OBJECTID"
+            ]
+          },
+          {
+            "name": "FDO_Shape",
+            "fields": [
+              "Shape"
+            ]
+          }
+        ]
+      }
+    },
+    "domains": []
+  }
+}

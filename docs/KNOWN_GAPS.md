@@ -81,6 +81,16 @@ Update this file when a gap is found or closed.
 - Probed and left: Zonal Fill (fill = boundary minimum but zones 1 and 2 of the zones raster share one value: merged-catchment rule unknown), Cut Fill (region numbering), Surface Area Ratio (neither Jenness nor 1/cos(slope) fits), Boundary Clean, Aggregate Points, Sample (column naming), Trim Line: no Z/M/curves, brute-force O(n^2), exact-length dangles kept (ArcGIS decides those ties by crossing-point rounding). Extend Line: no Z/M/curves; brute-force O(n^2) segment search; ArcGIS's inclusive exact-length behaviour on memory/geodatabase edits (vs strict on shapefiles) is not modelled.
 - Calculate Geometry Attributes: planar only; no Z/M, geodesic or coordinate-notation properties, no coordinate_system/coordinate_format, text targets untested. Evidence: `scripts/research/calculate_geometry_attributes/README.md`.
 - Adjust 3D Z: the z-domain check (ArcGIS leaves features whose new z leaves the class's z domain unchanged, WARNING 002631) is not made. Evidence: `scripts/research/adjust_3d_z/README.md`.
+- Feature Class To Geodatabase: SHP/FileGDB feature inputs and existing FileGDB
+  outputs only; session layers/selections and nondefault environments unsupported.
+  GlobalID/blob/raster/XML fields, multipatch and nonstandard geometry-measure
+  field names refused; ASCII names up to150
+  characters. Z/M/curves, advanced metadata, class aliases, high-precision dates,
+  64-bit OIDs, datum transformations and custom CRS unverified. Source WKT rounding
+  may differ from ArcGIS binary WKT; canonical CRS and exact XY storage checked.
+  Imported classes get ArcGIS's regenerated WKT, but the catalog definition omits
+  ArcGIS's <WKID>/<LatestWKID> elements.
+  Evidence: `scripts/research/feature_class_to_geodatabase/README.md`.
 - Excel To Table: FileGDB date/time and mixed date columns, durations, long text
   exceeding default widths, unsupported Excel errors and uncached formulas refused.
   Only .xls/.xlsx to DBF/root FileGDB; external/discontiguous named ranges, advanced

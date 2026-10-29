@@ -1,0 +1,42 @@
+{
+  "fctg_single": {
+    "status": "matched",
+    "tables": 1
+  },
+  "fctg_batch": {
+    "status": "matched",
+    "tables": 3
+  },
+  "fctg_repeat": {
+    "status": "matched",
+    "tables": 2
+  },
+  "fctg_collision": {
+    "status": "matched",
+    "tables": 2
+  },
+  "fctg_dataset": {
+    "status": "matched",
+    "tables": 2
+  },
+  "fctg_gdb": {
+    "status": "matched",
+    "tables": 1
+  },
+  "fctg_empty": {
+    "status": "matched",
+    "tables": 1
+  },
+  "fctg_properties": {
+    "status": "matched",
+    "tables": 1
+  },
+  "fctg_polygon_gdb": {
+    "status": "matched",
+    "tables": 1
+  },
+  "fctg_name": {
+    "status": "matched",
+    "tables": 1
+  }
+}

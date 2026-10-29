@@ -59,6 +59,13 @@ pub enum SchemaDomainKind {
 
 /// Tool parameters, input access and optional workspace output supplied by a host.
 pub trait Context {
+    /// Import a complete feature batch; read-only hosts must refuse.
+    fn import_feature_classes(&self, _inputs: &[String], _target: &str) -> Result<Vec<String>> {
+        Err(Error::Unsupported(
+            "feature-class imports are not supported by this host".into(),
+        ))
+    }
+
     /// Mutate the supplied datasets; unsupported hosts must refuse explicitly.
     fn add_global_ids(&self, _input: &str) -> Result<()> {
         Err(Error::Unsupported(
@@ -1701,6 +1708,7 @@ fn add_fields(ctx: &dyn Context) -> Result<ToolOutput> {
 }
 
 pub static TOOLS: &[Tool] = &[
+    crate::feature_class_to_geodatabase::TOOL,
     crate::excel::TOOL,
     Tool {
         id: "mean_center",

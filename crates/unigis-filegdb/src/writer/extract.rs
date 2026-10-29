@@ -278,6 +278,7 @@ pub fn extract_data(
                 raw.push_at(f.oid as u64, f.geometry.as_ref(), &f.attributes)?;
             }
             let t = TableBuilder {
+                standard_geometry_fields: false,
                 subtypes: s.table.subtypes().cloned(),
                 dataset: None,
                 name: name.clone(),

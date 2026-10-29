@@ -98471,6 +98471,265 @@
         }
       },
       "table_output": true
+    },
+    "fctg_single": {
+      "tool": "conversion.FeatureClassToGeodatabase",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "workspace_reference": {
+        "seed": "testdata/geoproc/fctg_empty.gdb"
+      },
+      "messages": [],
+      "run": {
+        "tool": "feature_class_to_geodatabase",
+        "params": {
+          "input_features": "testdata/geoproc/parcels.shp",
+          "output_geodatabase": "<out>"
+        }
+      }
+    },
+    "fctg_batch": {
+      "tool": "conversion.FeatureClassToGeodatabase",
+      "args": [
+        "testdata/geoproc/parcels.shp;testdata/geoproc/roads.shp;testdata/geoproc/wells.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "workspace_reference": {
+        "seed": "testdata/geoproc/fctg_empty.gdb"
+      },
+      "messages": [],
+      "run": {
+        "tool": "feature_class_to_geodatabase",
+        "params": {
+          "input_features": "testdata/geoproc/parcels.shp;testdata/geoproc/roads.shp;testdata/geoproc/wells.shp",
+          "output_geodatabase": "<out>"
+        }
+      }
+    },
+    "fctg_repeat": {
+      "tool": "conversion.FeatureClassToGeodatabase",
+      "args": [
+        "testdata/geoproc/parcels.shp;testdata/geoproc/parcels.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "workspace_reference": {
+        "seed": "testdata/geoproc/fctg_empty.gdb"
+      },
+      "messages": [],
+      "run": {
+        "tool": "feature_class_to_geodatabase",
+        "params": {
+          "input_features": "testdata/geoproc/parcels.shp;testdata/geoproc/parcels.shp",
+          "output_geodatabase": "<out>"
+        }
+      }
+    },
+    "fctg_collision": {
+      "tool": "conversion.FeatureClassToGeodatabase",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "workspace_reference": {
+        "seed": "testdata/geoproc/fctg_seed.gdb"
+      },
+      "messages": [],
+      "run": {
+        "tool": "feature_class_to_geodatabase",
+        "params": {
+          "input_features": "testdata/geoproc/parcels.shp",
+          "output_geodatabase": "<out>"
+        }
+      }
+    },
+    "fctg_dataset": {
+      "tool": "conversion.FeatureClassToGeodatabase",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>/group"
+      ],
+      "status": "succeeded",
+      "workspace_reference": {
+        "seed": "testdata/geoproc/fctg_seed.gdb"
+      },
+      "messages": [],
+      "run": {
+        "tool": "feature_class_to_geodatabase",
+        "params": {
+          "input_features": "testdata/geoproc/parcels.shp",
+          "output_geodatabase": "<out>/group"
+        }
+      }
+    },
+    "fctg_gdb": {
+      "tool": "conversion.FeatureClassToGeodatabase",
+      "args": [
+        "testdata/geoproc/globalids_base.gdb/points",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "workspace_reference": {
+        "seed": "testdata/geoproc/fctg_empty.gdb"
+      },
+      "messages": [],
+      "run": {
+        "tool": "feature_class_to_geodatabase",
+        "params": {
+          "input_features": "testdata/geoproc/globalids_base.gdb/points",
+          "output_geodatabase": "<out>"
+        }
+      }
+    },
+    "fctg_empty": {
+      "tool": "conversion.FeatureClassToGeodatabase",
+      "args": [
+        "testdata/geoproc/globalids_base.gdb/empty",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "workspace_reference": {
+        "seed": "testdata/geoproc/fctg_empty.gdb"
+      },
+      "messages": [],
+      "run": {
+        "tool": "feature_class_to_geodatabase",
+        "params": {
+          "input_features": "testdata/geoproc/globalids_base.gdb/empty",
+          "output_geodatabase": "<out>"
+        }
+      }
+    },
+    "fctg_properties": {
+      "tool": "conversion.FeatureClassToGeodatabase",
+      "args": [
+        "testdata/geoproc/extract_base.gdb/sites",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "workspace_reference": {
+        "seed": "testdata/geoproc/fctg_empty.gdb"
+      },
+      "messages": [],
+      "run": {
+        "tool": "feature_class_to_geodatabase",
+        "params": {
+          "input_features": "testdata/geoproc/extract_base.gdb/sites",
+          "output_geodatabase": "<out>"
+        }
+      }
+    },
+    "fctg_polygon_gdb": {
+      "tool": "conversion.FeatureClassToGeodatabase",
+      "args": [
+        "testdata/geoproc/fctg_seed.gdb/parcels",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "workspace_reference": {
+        "seed": "testdata/geoproc/fctg_empty.gdb"
+      },
+      "messages": [],
+      "run": {
+        "tool": "feature_class_to_geodatabase",
+        "params": {
+          "input_features": "testdata/geoproc/fctg_seed.gdb/parcels",
+          "output_geodatabase": "<out>"
+        }
+      }
+    },
+    "fctg_name": {
+      "tool": "conversion.FeatureClassToGeodatabase",
+      "args": [
+        "testdata/geoproc/fctg_names/9 bad-name.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "workspace_reference": {
+        "seed": "testdata/geoproc/fctg_empty.gdb"
+      },
+      "messages": [],
+      "run": {
+        "tool": "feature_class_to_geodatabase",
+        "params": {
+          "input_features": "testdata/geoproc/fctg_names/9 bad-name.shp",
+          "output_geodatabase": "<out>"
+        }
+      }
+    },
+    "fctg_table": {
+      "tool": "conversion.FeatureClassToGeodatabase",
+      "args": [
+        "testdata/geoproc/globalids_base.gdb/records",
+        "<out>"
+      ],
+      "status": "failed",
+      "workspace_reference": {
+        "seed": "testdata/geoproc/fctg_empty.gdb"
+      },
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000732: Input Features: Dataset /mnt/media/ArcGIS_Linux/testdata/geoproc/globalids_base.gdb/records does not exist or is not supported",
+        "Failed to execute (FeatureClassToGeodatabase)."
+      ],
+      "run": {
+        "tool": "feature_class_to_geodatabase",
+        "params": {
+          "input_features": "testdata/geoproc/globalids_base.gdb/records",
+          "output_geodatabase": "<out>"
+        }
+      }
+    },
+    "fctg_bad_batch": {
+      "tool": "conversion.FeatureClassToGeodatabase",
+      "args": [
+        "testdata/geoproc/parcels.shp;testdata/geoproc/missing.shp",
+        "<out>"
+      ],
+      "status": "failed",
+      "workspace_reference": {
+        "seed": "testdata/geoproc/fctg_empty.gdb"
+      },
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000732: Input Features: Dataset /mnt/media/ArcGIS_Linux/testdata/geoproc/missing.shp does not exist or is not supported",
+        "Failed to execute (FeatureClassToGeodatabase)."
+      ],
+      "run": {
+        "tool": "feature_class_to_geodatabase",
+        "params": {
+          "input_features": "testdata/geoproc/parcels.shp;testdata/geoproc/missing.shp",
+          "output_geodatabase": "<out>"
+        }
+      }
+    },
+    "fctg_missing_output": {
+      "tool": "conversion.FeatureClassToGeodatabase",
+      "args": [
+        "testdata/geoproc/parcels.shp",
+        "<out>"
+      ],
+      "status": "failed",
+      "workspace_reference": {
+        "seed": null
+      },
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000732: Output Geodatabase: Dataset /mnt/media/ArcGIS_Linux/testdata/arcgis-reference/fctg_missing_output.gdb does not exist or is not supported",
+        "Failed to execute (FeatureClassToGeodatabase)."
+      ],
+      "run": {
+        "tool": "feature_class_to_geodatabase",
+        "params": {
+          "input_features": "testdata/geoproc/parcels.shp",
+          "output_geodatabase": "<out>"
+        }
+      }
     }
   }
 }

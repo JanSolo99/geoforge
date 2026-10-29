@@ -818,6 +818,11 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Adjust 3D Z (reverse, constant or field shift, US-survey unit conversion): 6 in-place `a3z_*`
       cases over point, line, polygon and multipoint Z shapefiles match ArcGIS. Evidence:
       `scripts/research/adjust_3d_z/README.md`.
+- [x] Feature Class To Geodatabase (`feature_class_to_geodatabase`): SHP/FileGDB
+  batches to existing FileGDB root or feature dataset, unique names, OID reset,
+  aliases/defaults/NULLs and calculated required geometry fields.13 public
+  workspace references, independent native ArcGIS reader and rollback checks;
+  scope/gaps: `scripts/research/feature_class_to_geodatabase/README.md`.
 - [x] Excel To Table (`excel_to_table`): native .xls/.xlsx, first/selected sheet,
   rectangular .xlsx named range, header row/column-letter names and cell ranges;
   numeric/text/boolean schemas, NULLs, aliases and DBF dates.13 ArcGIS portable
