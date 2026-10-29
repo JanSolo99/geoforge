@@ -91,6 +91,12 @@ pub trait Context {
             "dataset deletion is not supported by this host".into(),
         ))
     }
+    /// Enable COGO in the named input; read-only hosts fail explicitly.
+    fn enable_cogo(&self, _input: &str) -> Result<()> {
+        Err(Error::Unsupported(
+            "COGO edits are not supported by this host".into(),
+        ))
+    }
     /// Disable COGO in the named input; hosts without mutation support fail explicitly.
     fn disable_cogo(&self, _input: &str) -> Result<()> {
         Err(Error::Unsupported(
@@ -3660,6 +3666,7 @@ pub static TOOLS: &[Tool] = &[
     crate::gps_metadata::TOOL,
     crate::delete_multiple::TOOL,
     crate::cogo::DISABLE,
+    crate::cogo::ENABLE,
     crate::editor_tracking::DISABLE,
     crate::neighbors::COUNT_OVERLAPPING_FEATURES,
 ];

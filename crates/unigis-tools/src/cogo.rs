@@ -19,7 +19,25 @@ pub const DISABLE: Tool = Tool {
     measures: false,
     run: Runner::Report(disable),
 };
-fn disable(ctx: &dyn Context) -> Result<Report> {
+pub const ENABLE: Tool = Tool {
+    id: "enable_cogo",
+    name: "Enable COGO",
+    toolbox: "Data Management › COGO",
+    summary: "Enables COGO on line features, adding missing dimension fields and retaining existing values.",
+    params: DISABLE.params,
+    output_suffix: "cogo_enabled",
+    measures: false,
+    run: Runner::Report(enable),
+};
+fn enable(ctx: &dyn Context) -> Result<Report> {
+    validate_lines(ctx)?;
+    ctx.enable_cogo("input")?;
+    Ok(Report {
+        rows: vec![],
+        messages: vec!["COGO enabled".into()],
+    })
+}
+fn validate_lines(ctx: &dyn Context) -> Result<()> {
     let input = ctx.features("input")?;
     match input.geometry_kind() {
         None => {
@@ -36,6 +54,10 @@ fn disable(ctx: &dyn Context) -> Result<Report> {
         }
     }
     drop(input);
+    Ok(())
+}
+fn disable(ctx: &dyn Context) -> Result<Report> {
+    validate_lines(ctx)?;
     ctx.disable_cogo("input")?;
     Ok(Report {
         rows: vec![],
@@ -58,6 +80,12 @@ mod tests {
                 unreachable!()
             }
         }
+        assert!(
+            Host.enable_cogo("input")
+                .unwrap_err()
+                .to_string()
+                .contains("COGO edits are not supported by this host")
+        );
         assert!(
             Host.disable_cogo("input")
                 .unwrap_err()

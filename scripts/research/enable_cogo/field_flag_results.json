@@ -1,0 +1,52 @@
+{
+  "before": {
+    "plain": {},
+    "partial": {
+      "Direction": 5
+    },
+    "existing": {
+      "Direction": 5,
+      "Distance": 5,
+      "Radius": 5,
+      "ArcLength": 5,
+      "Radius2": 5
+    },
+    "enabled": {
+      "Direction": 7,
+      "Distance": 7,
+      "Radius": 7,
+      "ArcLength": 7,
+      "Radius2": 7
+    }
+  },
+  "after": {
+    "plain": {
+      "Direction": 7,
+      "Distance": 7,
+      "Radius": 7,
+      "ArcLength": 7,
+      "Radius2": 7
+    },
+    "partial": {
+      "Direction": 7,
+      "Distance": 7,
+      "Radius": 7,
+      "ArcLength": 7,
+      "Radius2": 7
+    },
+    "existing": {
+      "Direction": 7,
+      "Distance": 7,
+      "Radius": 7,
+      "ArcLength": 7,
+      "Radius2": 5
+    },
+    "enabled": {
+      "Direction": 7,
+      "Distance": 7,
+      "Radius": 7,
+      "ArcLength": 7,
+      "Radius2": 7
+    }
+  }
+}

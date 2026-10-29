@@ -185,3 +185,12 @@ Update this file when a gap is found or closed.
   fill roles left enabled by selective disable. Unrelated ArcGIS catalog extent/index
   normalization is not reproduced. Evidence:
   scripts/research/disable_editor_tracking/README.md.
+
+- Enable COGO: FileGDB line feature class paths; other hosts need the mutation
+  capability. Layer labeling/symbology, enterprise/mobile data and selections are
+  unsupported; unusual class extensions, curves/Z/M, nonstandard field casing and
+  custom dimension defaults/domains remain unverified. Adding fields can rewrite
+  layout/index bytes. All five native physical required flags are normalized;
+  ArcGIS's complete-existing Radius2 descriptor exception and unrelated catalog
+  extent/index normalization are not reproduced. Evidence:
+  scripts/research/enable_cogo/README.md.

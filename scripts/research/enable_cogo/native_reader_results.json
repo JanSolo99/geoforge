@@ -1,0 +1,574 @@
+{
+  "plain": {
+    "cogo": true,
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "type": "OID",
+        "length": 4,
+        "nullable": false,
+        "required": true,
+        "editable": false,
+        "domain": ""
+      },
+      {
+        "name": "Shape",
+        "alias": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "Shape_Length",
+        "alias": "Shape_Length",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": false,
+        "domain": ""
+      },
+      {
+        "name": "KEY",
+        "alias": "KEY",
+        "type": "Integer",
+        "length": 4,
+        "nullable": true,
+        "required": false,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "Direction",
+        "alias": "Direction",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "Distance",
+        "alias": "Distance",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "Radius",
+        "alias": "Radius",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "ArcLength",
+        "alias": "Arc Length",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "Radius2",
+        "alias": "Radius2",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      }
+    ],
+    "rows": [
+      [
+        1,
+        10.0,
+        7,
+        null,
+        null,
+        null,
+        null,
+        null,
+        "{\"paths\":[[[500000,5000000],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        3,
+        10.0,
+        9,
+        null,
+        null,
+        null,
+        null,
+        null,
+        "{\"paths\":[[[500000,5000000],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ]
+  },
+  "empty": {
+    "cogo": true,
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "type": "OID",
+        "length": 4,
+        "nullable": false,
+        "required": true,
+        "editable": false,
+        "domain": ""
+      },
+      {
+        "name": "Shape",
+        "alias": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "Shape_Length",
+        "alias": "Shape_Length",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": false,
+        "domain": ""
+      },
+      {
+        "name": "KEY",
+        "alias": "KEY",
+        "type": "Integer",
+        "length": 4,
+        "nullable": true,
+        "required": false,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "Direction",
+        "alias": "Direction",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "Distance",
+        "alias": "Distance",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "Radius",
+        "alias": "Radius",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "ArcLength",
+        "alias": "Arc Length",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "Radius2",
+        "alias": "Radius2",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      }
+    ],
+    "rows": []
+  },
+  "partial": {
+    "cogo": true,
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "type": "OID",
+        "length": 4,
+        "nullable": false,
+        "required": true,
+        "editable": false,
+        "domain": ""
+      },
+      {
+        "name": "Shape",
+        "alias": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "Shape_Length",
+        "alias": "Shape_Length",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": false,
+        "domain": ""
+      },
+      {
+        "name": "KEY",
+        "alias": "KEY",
+        "type": "Integer",
+        "length": 4,
+        "nullable": true,
+        "required": false,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "Direction",
+        "alias": "Direction",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "Distance",
+        "alias": "Distance",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "Radius",
+        "alias": "Radius",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "ArcLength",
+        "alias": "Arc Length",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "Radius2",
+        "alias": "Radius2",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      }
+    ],
+    "rows": [
+      [
+        1,
+        10.0,
+        7,
+        90.0,
+        null,
+        null,
+        null,
+        null,
+        "{\"paths\":[[[500000,5000000],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        3,
+        10.0,
+        9,
+        90.0,
+        null,
+        null,
+        null,
+        null,
+        "{\"paths\":[[[500000,5000000],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ]
+  },
+  "existing": {
+    "cogo": true,
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "type": "OID",
+        "length": 4,
+        "nullable": false,
+        "required": true,
+        "editable": false,
+        "domain": ""
+      },
+      {
+        "name": "Shape",
+        "alias": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "Shape_Length",
+        "alias": "Shape_Length",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": false,
+        "domain": ""
+      },
+      {
+        "name": "KEY",
+        "alias": "KEY",
+        "type": "Integer",
+        "length": 4,
+        "nullable": true,
+        "required": false,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "Direction",
+        "alias": "Direction",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "Distance",
+        "alias": "Distance",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "Radius",
+        "alias": "Radius",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "ArcLength",
+        "alias": "Arc Length",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "Radius2",
+        "alias": "Radius2",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      }
+    ],
+    "rows": [
+      [
+        1,
+        10.0,
+        7,
+        90.0,
+        null,
+        null,
+        null,
+        null,
+        "{\"paths\":[[[500000,5000000],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        3,
+        10.0,
+        9,
+        90.0,
+        null,
+        null,
+        null,
+        null,
+        "{\"paths\":[[[500000,5000000],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ]
+  },
+  "enabled": {
+    "cogo": true,
+    "fields": [
+      {
+        "name": "OBJECTID",
+        "alias": "OBJECTID",
+        "type": "OID",
+        "length": 4,
+        "nullable": false,
+        "required": true,
+        "editable": false,
+        "domain": ""
+      },
+      {
+        "name": "Shape",
+        "alias": "Shape",
+        "type": "Geometry",
+        "length": 0,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "Shape_Length",
+        "alias": "Shape_Length",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": false,
+        "domain": ""
+      },
+      {
+        "name": "KEY",
+        "alias": "KEY",
+        "type": "Integer",
+        "length": 4,
+        "nullable": true,
+        "required": false,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "Direction",
+        "alias": "Direction",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "Distance",
+        "alias": "Distance",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "Radius",
+        "alias": "Radius",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "ArcLength",
+        "alias": "Arc Length",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      },
+      {
+        "name": "Radius2",
+        "alias": "Radius2",
+        "type": "Double",
+        "length": 8,
+        "nullable": true,
+        "required": true,
+        "editable": true,
+        "domain": ""
+      }
+    ],
+    "rows": [
+      [
+        1,
+        10.0,
+        7,
+        90.0,
+        null,
+        null,
+        null,
+        null,
+        "{\"paths\":[[[500000,5000000],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ],
+      [
+        3,
+        10.0,
+        9,
+        90.0,
+        null,
+        null,
+        null,
+        null,
+        "{\"paths\":[[[500000,5000000],[500010,5000000]]],\"spatialReference\":{\"wkid\":32633,\"latestWkid\":32633}}"
+      ]
+    ]
+  }
+}

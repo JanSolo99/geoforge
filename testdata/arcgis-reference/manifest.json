@@ -90021,6 +90021,853 @@
           "creator": "garbage"
         }
       }
+    },
+    "ecogo_plain": {
+      "tool": "management.EnableCOGO",
+      "args": [
+        "testdata/geoproc/enable_cogo_base.gdb/plain"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape",
+            "aliasName": "Shape",
+            "type": "Geometry",
+            "length": 0,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape_Length",
+            "aliasName": "Shape_Length",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "Direction",
+            "aliasName": "Direction",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Distance",
+            "aliasName": "Distance",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Radius",
+            "aliasName": "Radius",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "ArcLength",
+            "aliasName": "Arc Length",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Radius2",
+            "aliasName": "Radius2",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          }
+        ],
+        "shapeType": "Polyline",
+        "hasZ": false,
+        "hasM": false,
+        "OIDFieldName": "OBJECTID",
+        "shapeFieldName": "Shape",
+        "spatialReference": {
+          "name": "WGS_1984_UTM_Zone_33N",
+          "factoryCode": 32633,
+          "type": "Projected",
+          "XYResolution": 0.0001,
+          "XYTolerance": 0.001
+        }
+      },
+      "domains": [],
+      "cogo": {
+        "enabled": true,
+        "required": {
+          "Direction": true,
+          "Distance": true,
+          "Radius": true,
+          "ArcLength": true,
+          "Radius2": true
+        }
+      },
+      "run": {
+        "tool": "enable_cogo",
+        "params": {
+          "input": "testdata/geoproc/enable_cogo_base.gdb/plain",
+          "output": "<out>"
+        }
+      }
+    },
+    "ecogo_empty": {
+      "tool": "management.EnableCOGO",
+      "args": [
+        "testdata/geoproc/enable_cogo_base.gdb/empty"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape",
+            "aliasName": "Shape",
+            "type": "Geometry",
+            "length": 0,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape_Length",
+            "aliasName": "Shape_Length",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "Direction",
+            "aliasName": "Direction",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Distance",
+            "aliasName": "Distance",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Radius",
+            "aliasName": "Radius",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "ArcLength",
+            "aliasName": "Arc Length",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Radius2",
+            "aliasName": "Radius2",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          }
+        ],
+        "shapeType": "Polyline",
+        "hasZ": false,
+        "hasM": false,
+        "OIDFieldName": "OBJECTID",
+        "shapeFieldName": "Shape",
+        "spatialReference": {
+          "name": "WGS_1984_UTM_Zone_33N",
+          "factoryCode": 32633,
+          "type": "Projected",
+          "XYResolution": 0.0001,
+          "XYTolerance": 0.001
+        }
+      },
+      "domains": [],
+      "cogo": {
+        "enabled": true,
+        "required": {
+          "Direction": true,
+          "Distance": true,
+          "Radius": true,
+          "ArcLength": true,
+          "Radius2": true
+        }
+      },
+      "run": {
+        "tool": "enable_cogo",
+        "params": {
+          "input": "testdata/geoproc/enable_cogo_base.gdb/empty",
+          "output": "<out>"
+        }
+      }
+    },
+    "ecogo_partial": {
+      "tool": "management.EnableCOGO",
+      "args": [
+        "testdata/geoproc/enable_cogo_base.gdb/partial"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000012: Direction already exists",
+        "WARNING 002046: Alias updated for field Direction"
+      ],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape",
+            "aliasName": "Shape",
+            "type": "Geometry",
+            "length": 0,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape_Length",
+            "aliasName": "Shape_Length",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "Direction",
+            "aliasName": "Direction",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Distance",
+            "aliasName": "Distance",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Radius",
+            "aliasName": "Radius",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "ArcLength",
+            "aliasName": "Arc Length",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Radius2",
+            "aliasName": "Radius2",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          }
+        ],
+        "shapeType": "Polyline",
+        "hasZ": false,
+        "hasM": false,
+        "OIDFieldName": "OBJECTID",
+        "shapeFieldName": "Shape",
+        "spatialReference": {
+          "name": "WGS_1984_UTM_Zone_33N",
+          "factoryCode": 32633,
+          "type": "Projected",
+          "XYResolution": 0.0001,
+          "XYTolerance": 0.001
+        }
+      },
+      "domains": [],
+      "cogo": {
+        "enabled": true,
+        "required": {
+          "Direction": true,
+          "Distance": true,
+          "Radius": true,
+          "ArcLength": true,
+          "Radius2": true
+        }
+      },
+      "run": {
+        "tool": "enable_cogo",
+        "params": {
+          "input": "testdata/geoproc/enable_cogo_base.gdb/partial",
+          "output": "<out>"
+        }
+      }
+    },
+    "ecogo_existing": {
+      "tool": "management.EnableCOGO",
+      "args": [
+        "testdata/geoproc/enable_cogo_base.gdb/existing"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 000012: Direction already exists",
+        "WARNING 002046: Alias updated for field Direction",
+        "WARNING 000012: Distance already exists",
+        "WARNING 002046: Alias updated for field Distance",
+        "WARNING 000012: Radius already exists",
+        "WARNING 002046: Alias updated for field Radius",
+        "WARNING 000012: ArcLength already exists",
+        "WARNING 002046: Alias updated for field ArcLength",
+        "WARNING 000012: Radius2 already exists",
+        "WARNING 002046: Alias updated for field Radius2"
+      ],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape",
+            "aliasName": "Shape",
+            "type": "Geometry",
+            "length": 0,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape_Length",
+            "aliasName": "Shape_Length",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "Direction",
+            "aliasName": "Direction",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Distance",
+            "aliasName": "Distance",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Radius",
+            "aliasName": "Radius",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "ArcLength",
+            "aliasName": "Arc Length",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Radius2",
+            "aliasName": "Radius2",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          }
+        ],
+        "shapeType": "Polyline",
+        "hasZ": false,
+        "hasM": false,
+        "OIDFieldName": "OBJECTID",
+        "shapeFieldName": "Shape",
+        "spatialReference": {
+          "name": "WGS_1984_UTM_Zone_33N",
+          "factoryCode": 32633,
+          "type": "Projected",
+          "XYResolution": 0.0001,
+          "XYTolerance": 0.001
+        }
+      },
+      "domains": [],
+      "cogo": {
+        "enabled": true,
+        "required": {
+          "Direction": true,
+          "Distance": true,
+          "Radius": true,
+          "ArcLength": true,
+          "Radius2": true
+        }
+      },
+      "run": {
+        "tool": "enable_cogo",
+        "params": {
+          "input": "testdata/geoproc/enable_cogo_base.gdb/existing",
+          "output": "<out>"
+        }
+      }
+    },
+    "ecogo_wrong_string": {
+      "tool": "management.EnableCOGO",
+      "args": [
+        "testdata/geoproc/enable_cogo_base.gdb/wrong_string"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 002045: Wrong type on field Direction",
+        "Failed to execute (EnableCOGO)."
+      ],
+      "schema_edit": true,
+      "run": {
+        "tool": "enable_cogo",
+        "params": {
+          "input": "testdata/geoproc/enable_cogo_base.gdb/wrong_string",
+          "output": "<out>"
+        }
+      }
+    },
+    "ecogo_wrong_integer": {
+      "tool": "management.EnableCOGO",
+      "args": [
+        "testdata/geoproc/enable_cogo_base.gdb/wrong_integer"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 002045: Wrong type on field Direction",
+        "Failed to execute (EnableCOGO)."
+      ],
+      "schema_edit": true,
+      "run": {
+        "tool": "enable_cogo",
+        "params": {
+          "input": "testdata/geoproc/enable_cogo_base.gdb/wrong_integer",
+          "output": "<out>"
+        }
+      }
+    },
+    "ecogo_point": {
+      "tool": "management.EnableCOGO",
+      "args": [
+        "testdata/geoproc/enable_cogo_base.gdb/point"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 003917: The feature class geometry is not of type polyline",
+        "Failed to execute (EnableCOGO)."
+      ],
+      "schema_edit": true,
+      "run": {
+        "tool": "enable_cogo",
+        "params": {
+          "input": "testdata/geoproc/enable_cogo_base.gdb/point",
+          "output": "<out>"
+        }
+      }
+    },
+    "ecogo_polygon": {
+      "tool": "management.EnableCOGO",
+      "args": [
+        "testdata/geoproc/enable_cogo_base.gdb/polygon"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 003917: The feature class geometry is not of type polyline",
+        "Failed to execute (EnableCOGO)."
+      ],
+      "schema_edit": true,
+      "run": {
+        "tool": "enable_cogo",
+        "params": {
+          "input": "testdata/geoproc/enable_cogo_base.gdb/polygon",
+          "output": "<out>"
+        }
+      }
+    },
+    "ecogo_table_only": {
+      "tool": "management.EnableCOGO",
+      "args": [
+        "testdata/geoproc/enable_cogo_base.gdb/table_only"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000732: Input Line Features: Dataset /tmp/unigis-schema-reference-gpp_vgo9/enable_cogo_base.gdb/table_only does not exist or is not supported",
+        "Failed to execute (EnableCOGO)."
+      ],
+      "schema_edit": true,
+      "run": {
+        "tool": "enable_cogo",
+        "params": {
+          "input": "testdata/geoproc/enable_cogo_base.gdb/table_only",
+          "output": "<out>"
+        }
+      }
+    },
+    "ecogo_enabled": {
+      "tool": "management.EnableCOGO",
+      "args": [
+        "testdata/geoproc/enable_cogo_base.gdb/enabled"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 002043: This class is already COGO enabled"
+      ],
+      "schema_edit": true,
+      "schema": {
+        "fields": [
+          {
+            "name": "OBJECTID",
+            "aliasName": "OBJECTID",
+            "type": "OID",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": false,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape",
+            "aliasName": "Shape",
+            "type": "Geometry",
+            "length": 0,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Shape_Length",
+            "aliasName": "Shape_Length",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "KEY",
+            "aliasName": "KEY",
+            "type": "Integer",
+            "length": 4,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": false
+          },
+          {
+            "name": "Direction",
+            "aliasName": "Direction",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Distance",
+            "aliasName": "Distance",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Radius",
+            "aliasName": "Radius",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "ArcLength",
+            "aliasName": "Arc Length",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          },
+          {
+            "name": "Radius2",
+            "aliasName": "Radius2",
+            "type": "Double",
+            "length": 8,
+            "precision": 0,
+            "scale": 0,
+            "isNullable": true,
+            "domain": "",
+            "required": true
+          }
+        ],
+        "shapeType": "Polyline",
+        "hasZ": false,
+        "hasM": false,
+        "OIDFieldName": "OBJECTID",
+        "shapeFieldName": "Shape",
+        "spatialReference": {
+          "name": "WGS_1984_UTM_Zone_33N",
+          "factoryCode": 32633,
+          "type": "Projected",
+          "XYResolution": 0.0001,
+          "XYTolerance": 0.001
+        }
+      },
+      "domains": [],
+      "cogo": {
+        "enabled": true,
+        "required": {
+          "Direction": true,
+          "Distance": true,
+          "Radius": true,
+          "ArcLength": true,
+          "Radius2": true
+        }
+      },
+      "run": {
+        "tool": "enable_cogo",
+        "params": {
+          "input": "testdata/geoproc/enable_cogo_base.gdb/enabled",
+          "output": "<out>"
+        }
+      }
+    },
+    "ecogo_shapefile": {
+      "tool": "management.EnableCOGO",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "<out>"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000156: Input must be a feature class",
+        "Failed to execute (EnableCOGO)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "run": {
+        "tool": "enable_cogo",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

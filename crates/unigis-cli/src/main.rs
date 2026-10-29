@@ -2759,6 +2759,20 @@ fn main() -> ExitCode {
                         _ => Err(Error::Unsupported("ERROR 001216: Editor Tracking not supported for dataset; use a FileGDB feature class, table or feature dataset".into())),
                     }
                 }
+                fn enable_cogo(&self, input: &str) -> Result<()> {
+                    let path = self
+                        .get(input)
+                        .ok_or_else(|| Error::Unsupported(format!("{input} is required")))?;
+                    match locate(Path::new(&path)) {
+                        Location::Geodatabase {
+                            gdb,
+                            item: Some(item),
+                        } => unigis_filegdb::enable_cogo(&gdb, &item),
+                        _ => Err(Error::Unsupported(
+                            "ERROR 000156: Input must be a feature class".into(),
+                        )),
+                    }
+                }
                 fn disable_cogo(&self, input: &str) -> Result<()> {
                     let path = self
                         .get(input)

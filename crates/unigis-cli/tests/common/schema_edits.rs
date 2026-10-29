@@ -283,7 +283,26 @@ pub fn compare(case: &str, info: &Json, root: &Path, out_dir: &Path) -> Vec<Stri
                 ));
             }
         }
-        if table.fields()[..old_fields.len()] != old_fields {
+        let mut preserved_fields = old_fields.clone();
+        if info["tool"] == "management.EnableCOGO" {
+            // Public EnableCOGO resets existing dimension aliases; every other
+            // field property and all existing values must remain unchanged.
+            for field in &mut preserved_fields {
+                if let Some((_, alias)) = [
+                    ("Direction", "Direction"),
+                    ("Distance", "Distance"),
+                    ("Radius", "Radius"),
+                    ("ArcLength", "Arc Length"),
+                    ("Radius2", "Radius2"),
+                ]
+                .iter()
+                .find(|(name, _)| field.name.eq_ignore_ascii_case(name))
+                {
+                    field.alias = (*alias != field.name).then(|| alias.to_string());
+                }
+            }
+        }
+        if table.fields()[..old_fields.len()] != preserved_fields {
             diffs.push("existing field definition changed".into());
         }
         let first_fields = table.fields().to_vec();

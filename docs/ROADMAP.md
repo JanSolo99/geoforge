@@ -888,3 +888,8 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
       default and four selective disable options preserve fields/values/time basis.
       13 ArcGIS references plus dataset/byte-preservation safety checks. Research:
       scripts/research/disable_editor_tracking/README.md.
+
+- [x] Enable COGO: native FileGDB line classes, five dimension fields/required
+      markers and canonical aliases; retains existing values and OID holes.
+      11 ArcGIS references plus refusal/idempotence safety controls. Research:
+      scripts/research/enable_cogo/README.md.

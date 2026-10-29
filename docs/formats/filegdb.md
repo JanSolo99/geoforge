@@ -43,6 +43,12 @@ field editability. Both catalog role/editability metadata and these flag bytes
 must change together; rows, defaults and the UTC basis remain unchanged. Saved
 public-tool/file-format controls: scripts/research/disable_editor_tracking/.
 
+Enable COGO controls set the five dimension aliases and Required=true in
+GPFieldInfoEx, and normally set the physical required mask0x02 (5 to 7; new
+nullable doubles are7). In the complete-existing-fields control ArcGIS left
+Radius2 at5 despite Required=true in Describe/catalog, even after repeat; native
+normalizes it to7. Evidence: scripts/research/enable_cogo/field_flag_results.json.
+
 - string: `i32 maxlen, u8 flag, varuint len + default bytes` (the length is always
   present, contrary to the spec's "if flag & 4"; verified on ArcGIS-written files)
 - objectid: `u8 width (4|8), u8 flag`
