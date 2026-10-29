@@ -714,6 +714,9 @@ CASES = {
     "cga_roads": ("management.CalculateGeometryAttributes", [DATA / "cga_roads.shp"], ["LEN_D LENGTH;SX LINE_START_X;SY LINE_START_Y;EX LINE_END_X;EY LINE_END_Y;BEAR LINE_BEARING;PNTS POINT_COUNT"]),
     "cga_roads_feet": ("management.CalculateGeometryAttributes", [DATA / "cga_roads.shp"], ["LEN_D LENGTH", "FEET_US"]),
     "cga_wells": ("management.CalculateGeometryAttributes", [DATA / "cga_wells.shp"], ["PX POINT_X;PY POINT_Y"]),
+    "fc2shp_batch": ("conversion.FeatureClassToShapefile", [[DATA / "extract_base.gdb" / "sites", DATA / "globalids_base.gdb" / "points", DATA / "parcels.shp", DATA / "globalids_base.gdb" / "empty"]], []),
+    "fc2shp_repeat": ("conversion.FeatureClassToShapefile", [[DATA / "parcels.shp", DATA / "parcels.shp", DATA / "roads.shp"]], []),
+    "fc2shp_err_missing": ("conversion.FeatureClassToShapefile", [[DATA / "parcels.shp", DATA / "missing.shp"]], []),
     "fst_parcels_num": ("management.FieldStatisticsToTable", [DATA / "parcels.shp"], ["VALUE;ZONE;PARCEL_ID", "NUMERIC"]),
     "fst_parcels_text": ("management.FieldStatisticsToTable", [DATA / "parcels.shp"], ["NAME", "TEXT"]),
     "fst_streams_text": ("management.FieldStatisticsToTable", [DATA / "streams.shp"], ["NAME", "TEXT"]),
@@ -2261,6 +2264,7 @@ RUN = {
     "management.ValidateJoin": ("validate_join", ["input", "in_field", "join_table", "join_field", "output"]),
     "management.Adjust3DZ": ("adjust_3d_z", ["input", "output", "reverse_sign", "adjust_value", "from_units", "to_units"]),
     "management.CalculateGeometryAttributes": ("calculate_geometry_attributes", ["input", "output", "geometry_property", "length_unit", "area_unit"]),
+    "conversion.FeatureClassToShapefile": ("feature_class_to_shapefile", ["input_features", "output_folder"]),
     "management.FieldStatisticsToTable": ("field_statistics_to_table", ["input", "output", "fields", "field_type", "group_by", "statistics"]),
     "management.EncodeField": ("encode_field", ["input", "output", "field", "method"]),
     "management.GeodeticDensify": ("geodetic_densify", ["input", "output", "densify_method", "max_segment_length"]),
@@ -2340,7 +2344,7 @@ RASTER_OUT = {"gp.CreateBinaryMask_ia", "gp.ComputeChangeRaster_ia", "gp.Diff_ia
               "gp.CostDistance_sa", "gp.CostBackLink_sa", "gp.CostAllocation_sa", "gp.CostPath_sa", "gp.Corridor_sa", "gp.Filter_sa", "gp.Nibble_sa", "gp.ReclassByTable_sa",
               "gp.Sink_sa", "gp.Pick_sa", "management.Flip", "management.Mirror", "management.Shift", "management.Clip",
               "gp.Slice_sa", "gp.ExtractByAttributes_sa", "gp.ExtractByRectangle_sa", "gp.ExtractByCircle_sa", "gp.Lookup_sa"}
-WORKSPACE_OUT = {"analysis.Split", "analysis.SplitByAttributes"}
+WORKSPACE_OUT = {"conversion.FeatureClassToShapefile", "analysis.Split", "analysis.SplitByAttributes"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable", "conversion.RasterToASCII", "conversion.RasterToFloat"}
 # Tools whose output is a table, written as <name>.dbf.
@@ -2385,6 +2389,8 @@ def annotate():
     path = OUT / "manifest.json"
     manifest = json.loads(path.read_text())
     for case in manifest["cases"].values():
+        if "args" not in case:
+            continue  # cases recorded by their own runner (Add Global IDs)
         args = case["args"]
         if case.get("schema_edit"):
             args = [args[0], "<out>", *args[1:]]
@@ -2667,7 +2673,9 @@ def main():
         if tool in WORKSPACE_OUT:
             out = OUT / name
             out.mkdir()
-            args = [str(a) for a in before] + [str(out)] + [str(a) if isinstance(a, Path) else a for a in after]
+            # A list argument is a multivalue (several input datasets); the bridge translates
+            # each path of a list, not paths inside a joined string.
+            args = [list(map(str, a)) if isinstance(a, list) else str(a) for a in before] + [str(out)] + [str(a) if isinstance(a, Path) else a for a in after]
         elif tool in ("cartography.GridIndexFeatures", "gp.CreateConstantRaster_sa", "management.GenerateTessellation"):
             args = [str(out)] + [str(a) if isinstance(a, Path) else a for a in before + after]
         elif tool == "management.FieldStatisticsToTable":
@@ -2742,7 +2750,7 @@ def main():
                 }
             manifest["cases"][name] = {
                 "tool": tool,
-                "args": [str(Path(a).relative_to(ROOT)) if isinstance(a, Path) else a for a in before] + ["<out>"] + after,
+                "args": [";".join(rel(x) for x in a) if isinstance(a, list) else str(Path(a).relative_to(ROOT)) if isinstance(a, Path) else a for a in before] + ["<out>"] + after,
                 "status": r.get("status"),
                 "messages": [m["text"] for m in r.get("messages", []) if m["severity"] > 0],
                 "outputs": outputs,

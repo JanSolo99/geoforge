@@ -2701,6 +2701,13 @@ fn main() -> ExitCode {
                 ) -> Result<Vec<String>> {
                     feature_class_to_geodatabase::run(inputs, Path::new(target))
                 }
+                fn export_shapefiles(
+                    &self,
+                    inputs: &[String],
+                    folder: &str,
+                ) -> Result<Vec<String>> {
+                    export_shapefiles(inputs, Path::new(folder))
+                }
                 fn get(&self, name: &str) -> Option<String> {
                     self.0
                         .get(name)
@@ -7153,6 +7160,54 @@ fn density_input(path: &Path, field: &str) -> Result<DensityInput> {
         .and_then(|c| c.wkid())
         .map(|(_, latest)| latest);
     Ok((features, epsg, fc.geometry_kind()))
+}
+
+/// Feature Class To Shapefile: every input converted (as Feature Class To Feature Class) before
+/// any is written, then written as `<name>.shp` in `folder`, `<name>_1.shp`, ... when taken.
+fn export_shapefiles(inputs: &[String], folder: &Path) -> Result<Vec<String>> {
+    if !folder.is_dir() {
+        return Err(Error::Unsupported(format!(
+            "ERROR 000732: Output Folder: Dataset {} does not exist or is not supported",
+            folder.display()
+        )));
+    }
+    let mut planned = Vec::new();
+    for input in inputs {
+        let path = Path::new(input);
+        let (fc, _) = open_feature_class(path).map_err(|_| {
+            Error::Unsupported(format!(
+                "ERROR 000732: Input Features: Dataset {input} does not exist or is not supported"
+            ))
+        })?;
+        let out = unigis_tools::feature_class_to_feature_class(
+            fc.as_ref(),
+            &catalog_path(path),
+            None,
+            None,
+        )?;
+        let stem = path
+            .file_stem()
+            .map(|s| s.to_string_lossy().into_owned())
+            .unwrap_or_else(|| "output".into());
+        planned.push((stem, out, source_gdb(path)));
+    }
+    let mut written: Vec<String> = Vec::new();
+    for (stem, out, gdb) in planned {
+        let taken = |n: &str| {
+            written.iter().any(|w| w.eq_ignore_ascii_case(n))
+                || folder.join(format!("{n}.shp")).exists()
+                || folder.join(format!("{n}.dbf")).exists()
+        };
+        let mut name = stem.clone();
+        let mut k = 0;
+        while taken(&name) {
+            k += 1;
+            name = format!("{stem}_{k}");
+        }
+        write_output(out, &folder.join(format!("{name}.shp")), gdb.as_deref())?;
+        written.push(name);
+    }
+    Ok(written)
 }
 
 fn rasterize_input(path: &Path, field: &str) -> Result<RasterizeInput> {

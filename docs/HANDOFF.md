@@ -12,6 +12,14 @@ native ArcGIS reader check: 10/10 matched (/tmp/unigis-fctg-native-reader.log).
 Validation: full scripts/check EXIT 0, 275 Rust passed / 5 ignored (/tmp/unigis-fctg-fullcheck.log). Commit scope: Codex's FCTG files (see below), generator
 without the umintfloat block; exclude raster/coordinator/hook/AGENTS/web files and the untracked
 scripts/publish-web-dist.sh, scripts/web-build-memory.py (not part of this tool).
+Landed and pushed as 342fdd7.
+Feature Class To Shapefile (this run): crates/unigis-tools/src/feature_class_to_shapefile.rs +
+Context::export_shapefiles (registry) + CLI host fn export_shapefiles (main.rs, converts every
+input with feature_class_to_feature_class before writing); 3 fc2shp_* WORKSPACE_OUT cases. The
+generator now passes list arguments as lists (the bridge translates list elements) and
+--annotate skips cases without args (Codex's gids_* cases made it crash). ogrinfo diff identical.
+Validation: full scripts/check EXIT 0, 275 Rust passed / 5 ignored (/tmp/unigis-fc2shp-check.log).
+Next action after landing: next queue item (docs/WORK_QUEUE.md: Features To GPX).
 
 Updated 2026-10-29T18:49:14.455806+00:00; last agent Codex.
 Workspace `/mnt/media/ArcGIS_Linux`, main, HEAD b20d66d2fcbf56bbae05b0591da78ad853e6b7c8.

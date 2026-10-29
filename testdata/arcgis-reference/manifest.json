@@ -98730,6 +98730,329 @@
           "output_geodatabase": "<out>"
         }
       }
+    },
+    "fc2shp_batch": {
+      "tool": "conversion.FeatureClassToShapefile",
+      "args": [
+        "testdata/geoproc/extract_base.gdb/sites;testdata/geoproc/globalids_base.gdb/points;testdata/geoproc/parcels.shp;testdata/geoproc/globalids_base.gdb/empty",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "outputs": {
+        "empty.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "KEY",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        },
+        "parcels.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "PARCEL_ID",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "NAME",
+              "String",
+              20,
+              0,
+              0
+            ],
+            [
+              "VALUE",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "ZONE",
+              "Integer",
+              5,
+              5,
+              0
+            ]
+          ],
+          "shapeType": "Polygon"
+        },
+        "points.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "KEY",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        },
+        "sites.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "KEY",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "STATUS",
+              "Integer",
+              5,
+              5,
+              0
+            ],
+            [
+              "LABEL",
+              "String",
+              30,
+              0,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        }
+      },
+      "run": {
+        "tool": "feature_class_to_shapefile",
+        "params": {
+          "input_features": "testdata/geoproc/extract_base.gdb/sites;testdata/geoproc/globalids_base.gdb/points;testdata/geoproc/parcels.shp;testdata/geoproc/globalids_base.gdb/empty",
+          "output_folder": "<out>"
+        }
+      }
+    },
+    "fc2shp_repeat": {
+      "tool": "conversion.FeatureClassToShapefile",
+      "args": [
+        "testdata/geoproc/parcels.shp;testdata/geoproc/parcels.shp;testdata/geoproc/roads.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "outputs": {
+        "parcels.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "PARCEL_ID",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "NAME",
+              "String",
+              20,
+              0,
+              0
+            ],
+            [
+              "VALUE",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "ZONE",
+              "Integer",
+              5,
+              5,
+              0
+            ]
+          ],
+          "shapeType": "Polygon"
+        },
+        "parcels_1.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "PARCEL_ID",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "NAME",
+              "String",
+              20,
+              0,
+              0
+            ],
+            [
+              "VALUE",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "ZONE",
+              "Integer",
+              5,
+              5,
+              0
+            ]
+          ],
+          "shapeType": "Polygon"
+        },
+        "roads.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "ROAD_ID",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "CLASS",
+              "Integer",
+              5,
+              5,
+              0
+            ]
+          ],
+          "shapeType": "Polyline"
+        }
+      },
+      "run": {
+        "tool": "feature_class_to_shapefile",
+        "params": {
+          "input_features": "testdata/geoproc/parcels.shp;testdata/geoproc/parcels.shp;testdata/geoproc/roads.shp",
+          "output_folder": "<out>"
+        }
+      }
+    },
+    "fc2shp_err_missing": {
+      "tool": "conversion.FeatureClassToShapefile",
+      "args": [
+        "testdata/geoproc/parcels.shp;testdata/geoproc/missing.shp",
+        "<out>"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000732: Input Features: Dataset /mnt/media/ArcGIS_Linux/testdata/geoproc/missing.shp does not exist or is not supported",
+        "Failed to execute (FeatureClassToShapefile)."
+      ],
+      "outputs": {},
+      "run": {
+        "tool": "feature_class_to_shapefile",
+        "params": {
+          "input_features": "testdata/geoproc/parcels.shp;testdata/geoproc/missing.shp",
+          "output_folder": "<out>"
+        }
+      }
     }
   }
 }
