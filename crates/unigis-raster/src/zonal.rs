@@ -521,3 +521,135 @@ pub fn zonal_table(
     }
     (fields, rows)
 }
+
+/// `ZonalFill(in_zone_raster, in_weight_raster)`: every cell of a zone gets the zone's spill level
+/// — the lowest, over pairs of 8-neighbours with one cell inside the zone and one outside it, of
+/// the higher weight of the two (a NoData weight drops out; NoData zone cells count as another
+/// zone). Cells on the bottom and right raster edges also spill at their own weight; the top and
+/// left edges do not (ArcGIS Pro 3.7, 30 random grids). Float weights give Float32, integer weights
+/// the narrowest integer type for the values.
+pub fn zonal_fill(zones: &Raster, weight: &Raster) -> Option<Raster> {
+    if (zones.width, zones.height) != (weight.width, weight.height) {
+        return None;
+    }
+    let (w, h) = (zones.width, zones.height);
+    let zone = |c: usize, r: usize| zones.get(c, r).map(|v| v as i64);
+    let mut level: std::collections::HashMap<Option<i64>, f64> = std::collections::HashMap::new();
+    let mut lower = |key: Option<i64>, v: f64| {
+        let e = level.entry(key).or_insert(f64::INFINITY);
+        if v < *e {
+            *e = v;
+        }
+    };
+    for r in 0..h {
+        for c in 0..w {
+            let Some(z) = zone(c, r) else { continue };
+            let here = weight.get(c, r);
+            for (dc, dr) in [
+                (-1, -1),
+                (0, -1),
+                (1, -1),
+                (-1, 0),
+                (1, 0),
+                (-1, 1),
+                (0, 1),
+                (1, 1),
+            ] {
+                let (nc, nr) = (c as i64 + dc, r as i64 + dr);
+                if nc < 0 || nr < 0 || nc >= w as i64 || nr >= h as i64 {
+                    // Beyond the bottom or right edge (not only beyond the top or left).
+                    if (nr >= h as i64 || nc >= w as i64)
+                        && let Some(v) = here
+                    {
+                        lower(Some(z), v);
+                    }
+                    continue;
+                }
+                let (nc, nr) = (nc as usize, nr as usize);
+                if zone(nc, nr) == Some(z) {
+                    continue;
+                }
+                let v = match (here, weight.get(nc, nr)) {
+                    (Some(a), Some(b)) => a.max(b),
+                    (Some(a), None) | (None, Some(a)) => a,
+                    (None, None) => continue,
+                };
+                lower(Some(z), v);
+            }
+        }
+    }
+    let float = weight.data_type.is_float();
+    let values: Vec<f64> = level.values().copied().filter(|v| v.is_finite()).collect();
+    let (min, max) = values
+        .iter()
+        .fold((f64::INFINITY, f64::NEG_INFINITY), |(a, b), &v| {
+            (a.min(v), b.max(v))
+        });
+    let (t, nodata) = if float {
+        (DataType::F32, f64::from(f32::MIN))
+    } else if values.is_empty() {
+        (DataType::U8, 255.0)
+    } else {
+        integer_output(min, max, true)
+    };
+    let mut out = zones.like(t);
+    out.nodata = Some(nodata);
+    out.bands = vec![
+        (0..h)
+            .flat_map(|r| (0..w).map(move |c| (c, r)))
+            .map(|(c, r)| {
+                zone(c, r)
+                    .and_then(|z| level.get(&Some(z)).copied())
+                    .filter(|v| v.is_finite())
+                    .map_or(nodata, |v| t.store(v))
+            })
+            .collect(),
+    ];
+    Some(out)
+}
+
+#[cfg(test)]
+mod zonal_fill_tests {
+    use super::*;
+
+    fn grid(values: &[Vec<f64>], t: DataType) -> Raster {
+        let (h, w) = (values.len(), values[0].len());
+        let mut r = Raster::new(w, h, t, [0.0, 1.0, 0.0, h as f64, 0.0, -1.0]);
+        r.nodata = Some(-9999.0);
+        r.bands[0] = values.concat();
+        r
+    }
+
+    #[test]
+    fn spill_levels_as_arcgis_gives_them() {
+        // ArcGIS Pro 3.7 on a 6 x 6 grid: zone 0 spills into zone 3 at 15, zone 1 at its own
+        // boundary minimum 17, zone 2 at 37.
+        let z: Vec<Vec<f64>> = [
+            [0, 0, 0, 0, 0, 3],
+            [0, 1, 1, 1, 0, 0],
+            [0, 1, 1, 1, 0, 0],
+            [0, 1, 1, 1, 0, 0],
+            [0, 0, 0, 2, 2, 2],
+            [0, 0, 0, 2, 2, 2],
+        ]
+        .iter()
+        .map(|r| r.iter().map(|&v| f64::from(v)).collect())
+        .collect();
+        let mut w: Vec<Vec<f64>> = (0..6)
+            .map(|r| (0..6).map(|c| f64::from(r * 6 + c) + 10.0).collect())
+            .collect();
+        w[2][2] = 1.0;
+        w[0][0] = 0.0;
+        let out = zonal_fill(&grid(&z, DataType::I32), &grid(&w, DataType::F32)).unwrap();
+        let at = |r: usize, c: usize| out.bands[0][r * 6 + c];
+        assert_eq!(
+            (at(0, 0), at(2, 2), at(5, 5), at(0, 5)),
+            (15.0, 17.0, 37.0, 15.0)
+        );
+        // Bottom and right edges spill, the top and left do not.
+        let z = vec![vec![1.0, 1.0, 0.0], vec![1.0, 1.0, 0.0]];
+        let w = vec![vec![5.0, 6.0, 1.0], vec![7.0, 8.0, 2.0]];
+        let out = zonal_fill(&grid(&z, DataType::I32), &grid(&w, DataType::I32)).unwrap();
+        assert_eq!(out.bands[0], vec![6.0, 6.0, 1.0, 6.0, 6.0, 1.0]);
+    }
+}

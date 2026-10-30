@@ -105653,6 +105653,86 @@
           "output": "<out>"
         }
       }
+    },
+    "zf_dem": {
+      "tool": "gp.ZonalFill_sa",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "testdata/raster/dem.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "zonal_fill",
+        "params": {
+          "in_zone_raster": "testdata/raster/dem_int16_packbits.tif",
+          "in_weight_raster": "testdata/raster/dem.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "zf_dem_nodata": {
+      "tool": "gp.ZonalFill_sa",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "testdata/raster/dem_nodata.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "zonal_fill",
+        "params": {
+          "in_zone_raster": "testdata/raster/dem_int16_packbits.tif",
+          "in_weight_raster": "testdata/raster/dem_nodata.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "zf_int_weights": {
+      "tool": "gp.ZonalFill_sa",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "zonal_fill",
+        "params": {
+          "in_zone_raster": "testdata/raster/dem_int16_packbits.tif",
+          "in_weight_raster": "testdata/raster/dem_int16_packbits.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "zf_landuse": {
+      "tool": "gp.ZonalFill_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "testdata/raster/landuse_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "zonal_fill",
+        "params": {
+          "in_zone_raster": "testdata/raster/landuse_u8.tif",
+          "in_weight_raster": "testdata/raster/landuse_u8.tif",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

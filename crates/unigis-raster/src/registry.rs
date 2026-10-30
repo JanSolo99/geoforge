@@ -274,6 +274,15 @@ fn extract_by_attributes(ctx: &dyn Context) -> Result<Output> {
     )
 }
 
+fn zonal_fill(ctx: &dyn Context) -> Result<Output> {
+    let out = crate::zonal::zonal_fill(
+        &ctx.raster("in_zone_raster")?,
+        &ctx.raster("in_weight_raster")?,
+    )
+    .ok_or_else(|| Error::Unsupported("the zone and weight rasters must share a grid".into()))?;
+    with_statistics(out, true)
+}
+
 fn rescale_by_function(ctx: &dyn Context) -> Result<Output> {
     let text = ctx
         .get("transformation_function")
@@ -2411,6 +2420,16 @@ pub static TOOLS: &[Tool] = &[
             },
         ],
         run: extract_by_attributes,
+    },
+    Tool {
+        id: "zonal_fill",
+        name: "Zonal Fill",
+        summary: "Fills each zone with the lowest weight along its boundary at which it spills (the higher weight of each cell pair across the boundary).",
+        params: &[
+            raster("in_zone_raster", "Input zone raster", true),
+            raster("in_weight_raster", "Input weight raster", true),
+        ],
+        run: zonal_fill,
     },
     Tool {
         id: "rescale_by_function",

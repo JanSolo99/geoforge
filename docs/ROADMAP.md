@@ -861,6 +861,9 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
   letters before/after, symbols, colons, packed), signed decimal pairs, MGRS and banded UTM; the
   Precision formula, context text, document dates (12 notations) and file fields as ArcGIS writes
   them. 6 ArcGIS `eld_*` references (machine/time fields Filename/Modified/Scanned not compared).
+- [x] Zonal Fill (`zonal_fill`): each zone's spill level (min over 8-neighbour pairs across its
+  boundary of the higher weight; ArcGIS also spills on the bottom/right raster edges only), fitted
+  on 30 random grids (scripts/research/zonal_fill/); 4 ArcGIS `zf_*` references.
 - [x] Add Surface Information (`add_surface_information`, CLI runner): points (Z) and lines (Z min/
   max/mean, surface length, min/max/average slope) from a raster surface. Lines are cut to the
   raster extent, segments split into ceil(length / sampling distance) steps; heights bilinear with

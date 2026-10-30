@@ -125,6 +125,11 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
   raster-registry entry (placeholder runner, like Extract Multi Values); 9 `asi_*` references PASS.
   Polygons not done (KNOWN_GAPS) — next step if resumed: SURFACE_AREA / polygon slopes.
 
+## Queue: Zonal Fill — committed, landing
+
+- `unigis-raster/src/zonal.rs::zonal_fill` + registry; 4 `zf_*` references PASS; unit test; clippy.
+  Rule fitted on 30 random ArcGIS grids (scripts/research/zonal_fill/).
+
 ## Next
 
 - Next: `scripts/lane claim` for the next queue tool.

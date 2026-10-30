@@ -1837,6 +1837,11 @@ CASES = {
     "cnr_extent": ("gp.CreateNormalRaster_sa", [], [10, "0 0 1000 500"]),
     "cnr_odd": ("gp.CreateNormalRaster_sa", [], [7, "1 2 50 33"]),
     "cnr_small": ("gp.CreateNormalRaster_sa", [], [0.5, "0 0 3 2"]),
+    # Zonal Fill: integer elevations as zones; float and integer weights.
+    "zf_dem": ("gp.ZonalFill_sa", [RASTER / "dem_int16_packbits.tif", RASTER / "dem.tif"], []),
+    "zf_dem_nodata": ("gp.ZonalFill_sa", [RASTER / "dem_int16_packbits.tif", RASTER / "dem_nodata.tif"], []),
+    "zf_int_weights": ("gp.ZonalFill_sa", [RASTER / "dem_int16_packbits.tif", RASTER / "dem_int16_packbits.tif"], []),
+    "zf_landuse": ("gp.ZonalFill_sa", [RASTER / "landuse_u8.tif", RASTER / "landuse_u8.tif"], []),
     "cc_int5": ("gp.CreateConstantRaster_sa", [5], ["INTEGER", 10, "500000 5000000 500100 5000050"]),
     "cc_float": ("gp.CreateConstantRaster_sa", [2.5], ["FLOAT", 10, "500000 5000000 500100 5000050"]),
     "cc_neg7": ("gp.CreateConstantRaster_sa", [-7], ["INTEGER", 5, "500003 5000002 500103 5000052"]),
@@ -2342,6 +2347,7 @@ for _tool, _id in COMBINATORIAL:
 
 
 RUN = {
+    "gp.ZonalFill_sa": ("zonal_fill", ["in_zone_raster", "in_weight_raster", "output"]),
     "gp.AddSurfaceInformation_sa": ("add_surface_information", ["input", "in_surface", "out_property", "output", "method", "sample_distance", "z_factor"]),
     "gp.RescaleByFunction_sa": ("rescale_by_function", ["input", "output", "transformation_function", "from_scale", "to_scale"]),
     "gp.CreateNormalRaster_sa": ("create_normal_raster", ["output", "cell_size", "extent"]),
@@ -2481,7 +2487,7 @@ def run_spec(tool, args):
 
 
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
-RASTER_OUT = {"gp.RescaleByFunction_sa", "gp.CreateNormalRaster_sa", "gp.CreateBinaryMask_ia", "gp.ComputeChangeRaster_ia", "gp.Diff_ia", "gp.Over_ia", "gp.LineStatistics_sa", "gp.PointStatistics_sa", "gp.SnapPourPoint_sa", "gp.FocalFlow_sa", "gp.DistanceAccumulation_sa", "gp.DistanceAllocation_sa", "gp.EucBackDirection_sa", "gp.EqualToFrequency_sa", "gp.GreaterThanFrequency_sa", "gp.LessThanFrequency_sa", "conversion.ASCIIToRaster", "conversion.FloatToRaster", "conversion.MultipatchToRaster", "management.CompositeBands", "gp.CreateConstantRaster_sa", "gp.InList_sa", "gp.LowestPosition_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
+RASTER_OUT = {"gp.ZonalFill_sa", "gp.RescaleByFunction_sa", "gp.CreateNormalRaster_sa", "gp.CreateBinaryMask_ia", "gp.ComputeChangeRaster_ia", "gp.Diff_ia", "gp.Over_ia", "gp.LineStatistics_sa", "gp.PointStatistics_sa", "gp.SnapPourPoint_sa", "gp.FocalFlow_sa", "gp.DistanceAccumulation_sa", "gp.DistanceAllocation_sa", "gp.EucBackDirection_sa", "gp.EqualToFrequency_sa", "gp.GreaterThanFrequency_sa", "gp.LessThanFrequency_sa", "conversion.ASCIIToRaster", "conversion.FloatToRaster", "conversion.MultipatchToRaster", "management.CompositeBands", "gp.CreateConstantRaster_sa", "gp.InList_sa", "gp.LowestPosition_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
               "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa",
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",
