@@ -724,6 +724,8 @@ CASES = {
     "mpr_default": ("conversion.MultipatchToRaster", [ROOT / "testdata" / "shp" / "multipatch.shp"], []),
     "mpr_max1": ("conversion.MultipatchToRaster", [ROOT / "testdata" / "shp" / "multipatch.shp"], [1, "MAXIMUM_HEIGHT"]),
     "mpr_min1": ("conversion.MultipatchToRaster", [ROOT / "testdata" / "shp" / "multipatch.shp"], [1, "MINIMUM_HEIGHT"]),
+    "rtof_default": ("conversion.RasterToOtherFormat", [[RASTER / "landuse_u8.tif", RASTER / "dem.tif"]], []),
+    "rtof_tiff": ("conversion.RasterToOtherFormat", [RASTER / "dem_f64.tif"], ["TIFF"]),
     "fst_parcels_num": ("management.FieldStatisticsToTable", [DATA / "parcels.shp"], ["VALUE;ZONE;PARCEL_ID", "NUMERIC"]),
     "fst_parcels_text": ("management.FieldStatisticsToTable", [DATA / "parcels.shp"], ["NAME", "TEXT"]),
     "fst_streams_text": ("management.FieldStatisticsToTable", [DATA / "streams.shp"], ["NAME", "TEXT"]),
@@ -2274,6 +2276,7 @@ RUN = {
     "conversion.FeatureClassToShapefile": ("feature_class_to_shapefile", ["input_features", "output_folder"]),
     "conversion.GPXtoFeatures": ("gpx_to_features", ["input_gpx_file", "output", "output_type"]),
     "conversion.MultipatchToRaster": ("multipatch_to_raster", ["input", "output", "cell_size", "cell_assignment_method"]),
+    "conversion.RasterToOtherFormat": ("raster_to_other_format", ["input_rasters", "output_workspace", "raster_format"]),
     "management.FieldStatisticsToTable": ("field_statistics_to_table", ["input", "output", "fields", "field_type", "group_by", "statistics"]),
     "management.EncodeField": ("encode_field", ["input", "output", "field", "method"]),
     "management.GeodeticDensify": ("geodetic_densify", ["input", "output", "densify_method", "max_segment_length"]),
@@ -2353,7 +2356,7 @@ RASTER_OUT = {"gp.CreateBinaryMask_ia", "gp.ComputeChangeRaster_ia", "gp.Diff_ia
               "gp.CostDistance_sa", "gp.CostBackLink_sa", "gp.CostAllocation_sa", "gp.CostPath_sa", "gp.Corridor_sa", "gp.Filter_sa", "gp.Nibble_sa", "gp.ReclassByTable_sa",
               "gp.Sink_sa", "gp.Pick_sa", "management.Flip", "management.Mirror", "management.Shift", "management.Clip",
               "gp.Slice_sa", "gp.ExtractByAttributes_sa", "gp.ExtractByRectangle_sa", "gp.ExtractByCircle_sa", "gp.Lookup_sa"}
-WORKSPACE_OUT = {"conversion.FeatureClassToShapefile", "analysis.Split", "analysis.SplitByAttributes"}
+WORKSPACE_OUT = {"conversion.FeatureClassToShapefile", "conversion.RasterToOtherFormat", "analysis.Split", "analysis.SplitByAttributes"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable", "conversion.RasterToASCII", "conversion.RasterToFloat"}
 # Tools whose output is a table, written as <name>.dbf.
@@ -2750,7 +2753,7 @@ def main():
                 r = r2
         if tool in WORKSPACE_OUT:
             outputs = {}
-            datasets = [*out.glob("*.shp"), *(p for p in out.glob("*.dbf") if not p.with_suffix(".shp").exists())]
+            datasets = [*out.glob("*.shp"), *(p for p in out.glob("*.dbf") if not p.with_suffix(".shp").exists()), *out.glob("*.tif")]
             for shp in sorted(datasets):
                 d = w.call("describe", path=str(shp))
                 outputs[shp.name] = {

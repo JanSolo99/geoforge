@@ -6514,10 +6514,7 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
         }
         map.insert(k.to_string(), v.to_string());
     }
-    let output = map
-        .get("output")
-        .cloned()
-        .ok_or_else(|| Error::Unsupported("output=<path> is required".into()))?;
+    let output = map.get("output").cloned();
     struct Args(std::collections::HashMap<String, String>);
     impl registry::Context for Args {
         fn get(&self, name: &str) -> Option<String> {
@@ -6624,6 +6621,10 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
             Ok(columns)
         }
     }
+    if spec.id == "raster_to_other_format" {
+        return run_raster_to_other_format(&Args(map));
+    }
+    let output = output.ok_or_else(|| Error::Unsupported("output=<path> is required".into()))?;
     if spec.id == "sample" {
         return run_sample(&Args(map), &output);
     }
@@ -6723,6 +6724,65 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
     } else {
         write_raster_with_tags(Path::new(&output), &out.raster, true, None, out.nodata_tag)
     }
+}
+
+fn run_raster_to_other_format(ctx: &dyn unigis_raster::registry::Context) -> Result<()> {
+    let inputs = ctx.get("input_rasters").ok_or_else(|| {
+        Error::Unsupported("ERROR 000735: Input Rasters: value is required".into())
+    })?;
+    let workspace = ctx.get("output_workspace").ok_or_else(|| {
+        Error::Unsupported("ERROR 000735: Output Workspace: value is required".into())
+    })?;
+    if ctx
+        .get("raster_format")
+        .is_some_and(|format| !format.eq_ignore_ascii_case("TIFF"))
+    {
+        return Err(Error::Unsupported(
+            "ERROR 000067: Raster Format: only TIFF is supported".into(),
+        ));
+    }
+    let workspace = Path::new(&workspace);
+    if !workspace.is_dir() {
+        return Err(Error::Unsupported(format!(
+            "ERROR 000732: Output Workspace: {} is not a folder",
+            workspace.display()
+        )));
+    }
+    for input in inputs
+        .split(';')
+        .map(|path| path.trim().trim_matches('\''))
+        .filter(|path| !path.is_empty())
+    {
+        let source = Path::new(input);
+        let mut raster = unigis_raster::read_geotiff(source)?;
+        if raster.nodata.is_none() {
+            raster.nodata = match raster.data_type {
+                unigis_raster::DataType::F32 => Some(f64::from(3.4e38_f32)),
+                unigis_raster::DataType::F64 => Some(1.79e308),
+                _ => None,
+            };
+        }
+        let stem = source
+            .file_stem()
+            .map(|name| name.to_string_lossy().into_owned())
+            .ok_or_else(|| Error::Unsupported(format!("invalid raster name: {input}")))?;
+        let mut suffix = 0;
+        let output = loop {
+            let name = if suffix == 0 {
+                format!("{stem}.tif")
+            } else {
+                format!("{stem}_{suffix}.tif")
+            };
+            let candidate = workspace.join(name);
+            if !candidate.exists() {
+                break candidate;
+            }
+            suffix += 1;
+        };
+        write_raster_with(&output, &raster, true)?;
+        println!("Wrote {}", output.display());
+    }
+    Ok(())
 }
 
 /// Sample: one row per point with its id, X, Y and the value of each raster. Values are rounded

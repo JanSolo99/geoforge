@@ -495,6 +495,12 @@ binary_fn!(bitwise_xor_tool, BitwiseXor);
 binary_fn!(bitwise_left_shift_tool, BitwiseLeftShift);
 binary_fn!(bitwise_right_shift_tool, BitwiseRightShift);
 
+fn raster_to_other_format(_ctx: &dyn Context) -> Result<Output> {
+    Err(Error::Unsupported(
+        "Raster To Other Format requires a writable workspace host".into(),
+    ))
+}
+
 /// The raster is passed through; `ug run` writes it as text (see `run_raster_tool`).
 fn raster_to_ascii(ctx: &dyn Context) -> Result<Output> {
     with_statistics(ctx.raster("input")?, false)
@@ -1339,6 +1345,29 @@ pub static TOOLS: &[Tool] = &[
         summary: "Writes a raster as an Esri ASCII grid (the output path is the .asc file).",
         params: &[raster("input", "Input Raster", true)],
         run: raster_to_ascii,
+    },
+    Tool {
+        id: "raster_to_other_format",
+        name: "Raster To Other Format",
+        summary: "Converts one or more rasters to uniquely named GeoTIFFs in an existing folder.",
+        params: &[
+            Param {
+                name: "input_rasters",
+                label: "Input Rasters",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            Param {
+                name: "output_workspace",
+                label: "Output Workspace",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            option("raster_format", "Raster Format", &["TIFF"], "TIFF"),
+        ],
+        run: raster_to_other_format,
     },
     Tool {
         id: "combinatorial_and",

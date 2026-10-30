@@ -823,6 +823,10 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
       MAXIMUM_HEIGHT/MINIMUM_HEIGHT, Float32 Z interpolation at cell centers. Three `mpr_*`
       ArcGIS references match grid, cells and NoData; convex ring fans and other multipatch
       part types are converted to triangles. Concave ring surfaces remain a known gap.
+- [x] Raster To Other Format (`raster_to_other_format`): default/explicit TIFF batch conversion
+      into an existing folder with ArcGIS's `_1` collision naming and floating-point default
+      NoData markers. Two workspace references match grid, cells and statistics; other formats
+      and ArcGIS's world-file/metadata sidecars remain known gaps.
 - [x] Calculate Geometry Attributes (planar properties into existing fields, length/area units):
       5 in-place `cga_*` cases over polygons, lines and points match ArcGIS. Evidence:
       `scripts/research/calculate_geometry_attributes/README.md`.

@@ -99423,6 +99423,56 @@
           "cell_assignment_method": "MINIMUM_HEIGHT"
         }
       }
+    },
+    "rtof_default": {
+      "tool": "conversion.RasterToOtherFormat",
+      "args": [
+        "testdata/raster/landuse_u8.tif;testdata/raster/dem.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "outputs": {
+        "dem.tif": {
+          "fields": [],
+          "shapeType": null
+        },
+        "landuse_u8.tif": {
+          "fields": [],
+          "shapeType": null
+        }
+      },
+      "run": {
+        "tool": "raster_to_other_format",
+        "params": {
+          "input_rasters": "testdata/raster/landuse_u8.tif;testdata/raster/dem.tif",
+          "output_workspace": "<out>"
+        }
+      }
+    },
+    "rtof_tiff": {
+      "tool": "conversion.RasterToOtherFormat",
+      "args": [
+        "testdata/raster/dem_f64.tif",
+        "<out>",
+        "TIFF"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "outputs": {
+        "dem_f64.tif": {
+          "fields": [],
+          "shapeType": null
+        }
+      },
+      "run": {
+        "tool": "raster_to_other_format",
+        "params": {
+          "input_rasters": "testdata/raster/dem_f64.tif",
+          "output_workspace": "<out>",
+          "raster_format": "TIFF"
+        }
+      }
     }
   }
 }

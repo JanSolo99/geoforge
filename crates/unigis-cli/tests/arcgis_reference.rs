@@ -4757,6 +4757,7 @@ fn tools_match_arcgis_output() {
                 .filter_map(|e| e.ok()?.file_name().into_string().ok())
                 .filter(|n| {
                     n.ends_with(".shp")
+                        || n.ends_with(".tif")
                         || (n.ends_with(".dbf") && !out.join(n).with_extension("shp").exists())
                 })
                 .collect();
@@ -4773,6 +4774,8 @@ fn tools_match_arcgis_output() {
                             &reference.join(case).join(name),
                             &o["fields"],
                         )
+                    } else if name.ends_with(".tif") {
+                        compare_rasters(case, &out.join(name), &reference.join(case).join(name))
                     } else {
                         compare(
                             case,
