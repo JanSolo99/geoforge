@@ -86,11 +86,10 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
 - Probes and findings: `scripts/research/extract_scanned_lines/` (README, probe.py); lines in
   `docs/WORK_QUEUE_DEFERRED.txt`.
 
-## Queue: Raster to Polyline — claimed 2026-10-30
+## Queue: Raster to Polyline — deferred
 
-- Plan: probe ArcGIS (background_value, minimum_dangle_length, simplify, raster_field,
-  create_multipart_features, max_vertices_per_feature); reuse unigis-raster's Raster To Polygon
-  tracing where possible.
+- Graph/ordering model established, SIMPLIFY rule not: `scripts/research/raster_to_polyline/README.md`
+  (worth resuming: NO_SIMPLIFY is close to done as a model).
 
 ## Next
 
