@@ -107194,6 +107194,110 @@
           "contour_values": "210;211;260"
         }
       }
+    },
+    "fdist_vertical": {
+      "tool": "gp.FlowDistance_sa",
+      "args": [
+        "testdata/arcgis-reference/streams_hydro.tif",
+        "testdata/arcgis-reference/fill_hydro.tif",
+        "<out>",
+        "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+        "VERTICAL",
+        "D8"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "flow_distance",
+        "params": {
+          "in_stream_raster": "testdata/arcgis-reference/streams_hydro.tif",
+          "in_surface_raster": "testdata/arcgis-reference/fill_hydro.tif",
+          "output": "<out>",
+          "in_flow_direction_raster": "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+          "distance_type": "VERTICAL",
+          "flow_direction_type": "D8"
+        }
+      }
+    },
+    "fdist_horizontal": {
+      "tool": "gp.FlowDistance_sa",
+      "args": [
+        "testdata/arcgis-reference/streams_hydro.tif",
+        "testdata/arcgis-reference/fill_hydro.tif",
+        "<out>",
+        "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+        "HORIZONTAL",
+        "D8"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "flow_distance",
+        "params": {
+          "in_stream_raster": "testdata/arcgis-reference/streams_hydro.tif",
+          "in_surface_raster": "testdata/arcgis-reference/fill_hydro.tif",
+          "output": "<out>",
+          "in_flow_direction_raster": "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+          "distance_type": "HORIZONTAL",
+          "flow_direction_type": "D8"
+        }
+      }
+    },
+    "fdist_raw_vertical": {
+      "tool": "gp.FlowDistance_sa",
+      "args": [
+        "testdata/arcgis-reference/streams_hydro.tif",
+        "testdata/raster/hydro.tif",
+        "<out>",
+        "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+        "VERTICAL",
+        "D8"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "flow_distance",
+        "params": {
+          "in_stream_raster": "testdata/arcgis-reference/streams_hydro.tif",
+          "in_surface_raster": "testdata/raster/hydro.tif",
+          "output": "<out>",
+          "in_flow_direction_raster": "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+          "distance_type": "VERTICAL",
+          "flow_direction_type": "D8"
+        }
+      }
+    },
+    "fdist_nodata": {
+      "tool": "gp.FlowDistance_sa",
+      "args": [
+        "testdata/arcgis-reference/streams_hydro.tif",
+        "testdata/arcgis-reference/fill_hydro_nodata.tif",
+        "<out>",
+        "testdata/arcgis-reference/flowdir_hydro_nodata.tif",
+        "VERTICAL",
+        "D8"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "flow_distance",
+        "params": {
+          "in_stream_raster": "testdata/arcgis-reference/streams_hydro.tif",
+          "in_surface_raster": "testdata/arcgis-reference/fill_hydro_nodata.tif",
+          "output": "<out>",
+          "in_flow_direction_raster": "testdata/arcgis-reference/flowdir_hydro_nodata.tif",
+          "distance_type": "VERTICAL",
+          "flow_direction_type": "D8"
+        }
+      }
     }
   }
 }

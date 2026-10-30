@@ -871,6 +871,9 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
   letters before/after, symbols, colons, packed), signed decimal pairs, MGRS and banded UTM; the
   Precision formula, context text, document dates (12 notations) and file fields as ArcGIS writes
   them. 6 ArcGIS `eld_*` references (machine/time fields Filename/Modified/Scanned not compared).
+- [x] Flow Distance (`flow_distance`) with a D8 flow direction raster: vertical (height drop) or
+  horizontal (path length) distance to the first stream cell, accumulated upstream in single
+  precision; no statistics. 4 ArcGIS `fdist_*` references.
 - [x] Contour List (`contour_list`): Contour's tracing at listed values (`a;b;c`; duplicates once,
   out-of-range values give nothing; Id/Contour fields, value-descending order). 3 ArcGIS `cl_*`
   references. contour_type (polygons) not supported.

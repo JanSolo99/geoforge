@@ -161,6 +161,10 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
 
 ## Queue: Feature Preserving Smoothing — deferred (prototype in scripts/research/feature_preserving_smoothing/)
 
+## Queue: Flow Distance — committed, landing
+
+- `hydro::flow_distance` (D8) + registry; 4 `fdist_*` references PASS; MFD refused (KNOWN_GAPS).
+
 ## Pitfall: ArcGIS sidecars in testdata
 
 Running ArcGIS on fixture rasters can leave untracked `testdata/raster/*.aux.xml` / `*.vat.dbf`

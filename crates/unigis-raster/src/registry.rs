@@ -274,6 +274,32 @@ fn extract_by_attributes(ctx: &dyn Context) -> Result<Output> {
     )
 }
 
+fn flow_distance(ctx: &dyn Context) -> Result<Output> {
+    let Some(_) = ctx.get("in_flow_direction_raster") else {
+        return Err(Error::Unsupported(
+            "Flow Distance without a flow direction raster (MFD from the surface) is not supported yet".into(),
+        ));
+    };
+    if let Some(t) = ctx.get("flow_direction_type")
+        && !t.eq_ignore_ascii_case("D8")
+    {
+        return Err(Error::Unsupported(format!(
+            "flow direction type {t}: only D8 is supported yet"
+        )));
+    }
+    let vertical =
+        !choice(ctx, "flow_distance", "distance_type").eq_ignore_ascii_case("HORIZONTAL");
+    let out = crate::hydro::flow_distance(
+        &ctx.raster("in_stream_raster")?,
+        &ctx.raster("in_surface_raster")?,
+        &ctx.raster("in_flow_direction_raster")?,
+        vertical,
+    )
+    .ok_or_else(|| Error::Unsupported("the rasters must share a grid".into()))?;
+    // ArcGIS writes no statistics for Flow Distance (observed).
+    with_statistics(out, false)
+}
+
 fn contour_list_unsupported(_: &dyn Context) -> Result<Output> {
     Err(Error::Unsupported(
         "Contour List writes features; run it through `ug run`".into(),
@@ -2596,6 +2622,33 @@ pub static TOOLS: &[Tool] = &[
             },
         ],
         run: extract_by_attributes,
+    },
+    Tool {
+        id: "flow_distance",
+        name: "Flow Distance",
+        summary: "Distance along the D8 flow path from each cell to the nearest stream (vertical or horizontal).",
+        params: &[
+            raster("in_stream_raster", "Input stream raster", true),
+            raster("in_surface_raster", "Input surface raster", true),
+            raster(
+                "in_flow_direction_raster",
+                "Input flow direction raster",
+                false,
+            ),
+            option(
+                "distance_type",
+                "Distance type",
+                &["VERTICAL", "HORIZONTAL"],
+                "VERTICAL",
+            ),
+            option(
+                "flow_direction_type",
+                "Flow direction type",
+                &["D8", "MFD", "DINF"],
+                "D8",
+            ),
+        ],
+        run: flow_distance,
     },
     Tool {
         id: "contour_list",

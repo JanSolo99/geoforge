@@ -765,3 +765,57 @@ pub fn snap_pour_point(points: &[(f64, f64, f64)], accumulation: &Raster, snap: 
     }
     out
 }
+
+/// Flow Distance with a D8 flow direction raster: for each cell, the distance along its flow path
+/// to the first stream cell (any non-NoData cell of `streams`), horizontal (path length) or
+/// vertical (height drop on `surface`). Distances accumulate from the stream upwards in single
+/// precision, one step at a time, as ArcGIS's agree to within its rounding; a path that leaves the
+/// raster or ends without reaching a stream is NoData. Float32, NoData 3.4e38 (ArcGIS Pro 3.7).
+pub fn flow_distance(
+    streams: &Raster,
+    surface: &Raster,
+    directions: &Raster,
+    vertical: bool,
+) -> Option<Raster> {
+    let (w, h) = (directions.width, directions.height);
+    if (streams.width, streams.height) != (w, h) || (surface.width, surface.height) != (w, h) {
+        return None;
+    }
+    let n = w * h;
+    let down = downstream_cells(directions);
+    let valid: Vec<bool> = (0..n).map(|i| value(directions, i).is_some()).collect();
+    let stream = |i: usize| value(streams, i).is_some();
+    let z = |i: usize| value(surface, i).map(|v| v as f32);
+    let step = |i: usize, j: usize| -> f32 {
+        let diagonal = i % w != j % w && i / w != j / w;
+        (if diagonal {
+            directions.cell_width().hypot(directions.cell_height())
+        } else if i % w != j % w {
+            directions.cell_width()
+        } else {
+            directions.cell_height()
+        }) as f32
+    };
+    let order = upstream_first(&down, &valid);
+    let mut dist: Vec<Option<f32>> = (0..n).map(|i| stream(i).then_some(0.0)).collect();
+    for &i in order.iter().rev() {
+        if dist[i].is_some() {
+            continue;
+        }
+        let Some(j) = down[i] else { continue };
+        let Some(dj) = dist[j] else { continue };
+        dist[i] = if vertical {
+            match (z(i), z(j)) {
+                (Some(zi), Some(zj)) => Some(dj + (zi - zj)),
+                _ => None,
+            }
+        } else {
+            Some(dj + step(i, j))
+        };
+    }
+    let mut out = directions.like(DataType::F32);
+    let nodata = f64::from(3.4e38_f32);
+    out.nodata = Some(nodata);
+    out.bands[0] = dist.iter().map(|d| d.map_or(nodata, f64::from)).collect();
+    Some(out)
+}
