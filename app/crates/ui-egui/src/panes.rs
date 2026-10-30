@@ -670,7 +670,8 @@ fn folder_browser(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
         {
             app.table.folder = Some(p.to_path_buf());
         }
-        ui.label(egui::RichText::new(dir.display().to_string()).small().weak());
+        let resp = ui.add(egui::Label::new(egui::RichText::new(dir.display().to_string()).small().weak()).sense(Sense::click()));
+        resp.on_hover_text(tl!("Right-click to create data here")).context_menu(|ui| new_in_folder(app, ui, &dir));
     });
     let Ok(rd) = std::fs::read_dir(&dir) else {
         ui.label(egui::RichText::new(tl!("Can't read this folder")).small().weak());
@@ -709,26 +710,37 @@ fn folder_browser(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
         let lower = name.to_lowercase();
         // A geodatabase or GeoPackage opens in place, listing its feature classes.
         if (is_dir && lower.ends_with(".gdb")) || (!is_dir && lower.ends_with(".gpkg")) {
-            egui::CollapsingHeader::new(egui::RichText::new(&name).size(12.0)).id_salt(("catalog-db", &path)).default_open(false).show(
-                ui,
-                |ui| match rustgis_engine::data::source::layers(&path) {
-                    Ok(layers) => {
-                        for l in layers {
-                            ui.horizontal(|ui| {
-                                let (r, _) = ui.allocate_exact_size(vec2(16.0, 16.0), Sense::hover());
-                                icons::paint(ui.painter(), r, "add_data", t.icon, t.accent);
-                                let resp = ui.add(egui::Label::new(egui::RichText::new(&l).size(12.0)).sense(Sense::click()));
-                                if resp.on_hover_text(tl!("Double-click to add")).double_clicked() {
-                                    let _ = app.run("layer.addData", json!({"path": path.display().to_string(), "layer": l, "name": l}));
-                                }
-                            });
+            let header = egui::CollapsingHeader::new(egui::RichText::new(&name).size(12.0))
+                .id_salt(("catalog-db", &path))
+                .default_open(false)
+                .show(ui, |ui| {
+                    // A file geodatabase as ArcGIS shows it: feature datasets with their classes.
+                    #[cfg(feature = "unigis")]
+                    if is_dir && geodatabase_tree(app, ui, &path, t) {
+                        return;
+                    }
+                    match rustgis_engine::data::source::layers(&path) {
+                        Ok(layers) => {
+                            for l in layers {
+                                ui.horizontal(|ui| {
+                                    let (r, _) = ui.allocate_exact_size(vec2(16.0, 16.0), Sense::hover());
+                                    icons::paint(ui.painter(), r, "add_data", t.icon, t.accent);
+                                    let resp = ui.add(egui::Label::new(egui::RichText::new(&l).size(12.0)).sense(Sense::click()));
+                                    if resp.on_hover_text(tl!("Double-click to add")).double_clicked() {
+                                        let _ =
+                                            app.run("layer.addData", json!({"path": path.display().to_string(), "layer": l, "name": l}));
+                                    }
+                                });
+                            }
+                        }
+                        Err(e) => {
+                            ui.label(egui::RichText::new(e.to_string()).small().color(t.red));
                         }
                     }
-                    Err(e) => {
-                        ui.label(egui::RichText::new(e.to_string()).small().color(t.red));
-                    }
-                },
-            );
+                });
+            if is_dir {
+                header.header_response.context_menu(|ui| new_in_geodatabase(app, ui, &path));
+            }
             continue;
         }
         ui.horizontal(|ui| {
@@ -743,6 +755,9 @@ fn folder_browser(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
             icons::paint(ui.painter(), r, icon, t.icon, t.accent);
             let resp = ui.add(egui::Label::new(egui::RichText::new(&name).size(12.0)).sense(Sense::click()));
             let resp = resp.on_hover_text(tl!(if is_dir { "Open folder" } else { "Double-click to add" }));
+            if is_dir {
+                resp.context_menu(|ui| new_in_folder(app, ui, &path));
+            }
             if resp.double_clicked() || (is_dir && resp.clicked()) {
                 if is_dir {
                     app.table.folder = Some(path.clone());
@@ -760,6 +775,130 @@ fn folder_browser(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
             }
         });
     }
+}
+
+/// ArcGIS Pro's New menu of the Catalog: each entry opens a tool that creates data, with the
+/// location filled in. The Catalog reads folders and geodatabases afresh, so the new item shows.
+fn new_menu(app: &mut RustGisApp, ui: &mut Ui, items: &[(&'static str, &str, Value)]) {
+    ui.menu_button(tl!("New"), |ui| {
+        for (label, tool, values) in items {
+            if ui.button(tl!(*label)).clicked() {
+                let _ = app.run("ui.gp.open", json!({"tool": format!("unigis:{tool}"), "values": values}));
+                ui.close();
+            }
+        }
+    });
+}
+
+/// `stem` + `ext`, numbered (`stem1`, `stem2`, ...) until `taken` says it is free.
+fn free_name(stem: &str, ext: &str, taken: impl Fn(&str) -> bool) -> String {
+    (0..1000)
+        .map(|k| if k == 0 { format!("{stem}{ext}") } else { format!("{stem}{k}{ext}") })
+        .find(|n| !taken(n))
+        .unwrap_or_else(|| format!("{stem}{ext}"))
+}
+
+fn new_in_folder(app: &mut RustGisApp, ui: &mut Ui, dir: &std::path::Path) {
+    let d = dir.display().to_string();
+    let shapefile = dir.join(free_name("NewShapefile", ".shp", |n| dir.join(n).exists()));
+    new_menu(
+        app,
+        ui,
+        &[
+            ("Folder", "create_folder", json!({"out_folder_path": d})),
+            ("File Geodatabase", "create_file_gdb", json!({"out_folder_path": d})),
+            ("Mobile Geodatabase", "create_mobile_gdb", json!({"out_folder_path": d})),
+            ("Shapefile", "create_feature_class", json!({"output": shapefile.display().to_string()})),
+        ],
+    );
+}
+
+/// A name no table or feature class of the geodatabase has.
+fn free_in_geodatabase(gdb: &std::path::Path, stem: &str) -> String {
+    #[cfg(feature = "unigis")]
+    if let Some(c) = geodatabase_contents(gdb) {
+        return free_name(stem, "", |n| {
+            c.items.iter().any(|(_, m, _)| m.eq_ignore_ascii_case(n)) || c.feature_datasets.iter().any(|m| m.eq_ignore_ascii_case(n))
+        });
+    }
+    let _ = gdb;
+    stem.to_string()
+}
+
+fn new_in_geodatabase(app: &mut RustGisApp, ui: &mut Ui, gdb: &std::path::Path) {
+    let fc = gdb.join(free_in_geodatabase(gdb, "NewFeatureClass"));
+    let table = gdb.join(free_in_geodatabase(gdb, "NewTable"));
+    new_menu(
+        app,
+        ui,
+        &[
+            ("Feature Class", "create_feature_class", json!({"output": fc.display().to_string()})),
+            ("Feature Dataset", "create_feature_dataset", json!({"out_dataset_path": gdb.display().to_string()})),
+            ("Table", "create_table", json!({"output": table.display().to_string()})),
+        ],
+    );
+}
+
+#[cfg(feature = "unigis")]
+fn new_in_feature_dataset(app: &mut RustGisApp, ui: &mut Ui, gdb: &std::path::Path, dataset: &str) {
+    let fc = gdb.join(dataset).join(free_in_geodatabase(gdb, "NewFeatureClass"));
+    new_menu(app, ui, &[("Feature Class", "create_feature_class", json!({"output": fc.display().to_string()}))]);
+}
+
+/// What a file geodatabase holds, read again when its catalog table changes.
+#[cfg(feature = "unigis")]
+fn geodatabase_contents(gdb: &std::path::Path) -> Option<rustgis_engine::unigis::workspace::GeodatabaseContents> {
+    type Cached = (Option<std::time::SystemTime>, Option<rustgis_engine::unigis::workspace::GeodatabaseContents>);
+    thread_local! {
+        static CACHE: std::cell::RefCell<HashMap<std::path::PathBuf, Cached>> = std::cell::RefCell::new(HashMap::new());
+    }
+    let stamp = std::fs::metadata(gdb.join("a00000004.gdbtable")).and_then(|m| m.modified()).ok();
+    CACHE.with(|c| {
+        let mut c = c.borrow_mut();
+        if let Some((s, contents)) = c.get(gdb)
+            && *s == stamp
+        {
+            return contents.clone();
+        }
+        let contents = rustgis_engine::unigis::workspace::geodatabase_contents(gdb).ok();
+        c.insert(gdb.to_path_buf(), (stamp, contents.clone()));
+        contents
+    })
+}
+
+/// A file geodatabase's feature datasets (each with a New menu) and items; `false` when it
+/// can't be read natively.
+#[cfg(feature = "unigis")]
+fn geodatabase_tree(app: &mut RustGisApp, ui: &mut Ui, gdb: &std::path::Path, t: &Tokens) -> bool {
+    let Some(contents) = geodatabase_contents(gdb) else { return false };
+    let item = |app: &mut RustGisApp, ui: &mut Ui, name: &str, spatial: bool| {
+        ui.horizontal(|ui| {
+            let (r, _) = ui.allocate_exact_size(vec2(16.0, 16.0), Sense::hover());
+            icons::paint(ui.painter(), r, if spatial { "add_data" } else { "table" }, t.icon, t.accent);
+            let resp = ui.add(egui::Label::new(egui::RichText::new(name).size(12.0)).sense(Sense::click()));
+            if resp.on_hover_text(tl!("Double-click to add")).double_clicked() {
+                let _ = app.run("layer.addData", json!({"path": gdb.display().to_string(), "layer": name, "name": name}));
+            }
+        });
+    };
+    for fds in &contents.feature_datasets {
+        let header = egui::CollapsingHeader::new(egui::RichText::new(fds).size(12.0))
+            .id_salt(("catalog-fds", gdb, fds))
+            .default_open(false)
+            .show(ui, |ui| {
+                for (_, name, spatial) in contents.items.iter().filter(|(d, _, _)| d.as_deref() == Some(fds.as_str())) {
+                    item(app, ui, name, *spatial);
+                }
+            });
+        header.header_response.context_menu(|ui| new_in_feature_dataset(app, ui, gdb, fds));
+    }
+    for (_, name, spatial) in contents.items.iter().filter(|(d, _, _)| d.is_none()) {
+        item(app, ui, name, *spatial);
+    }
+    if contents.items.is_empty() && contents.feature_datasets.is_empty() {
+        ui.label(egui::RichText::new(tl!("Empty: right-click the geodatabase to add data")).small().weak());
+    }
+    true
 }
 
 /// `tools` grouped by the `depth`-th part of their toolbox (`GeoLibre › Raster › General`), one

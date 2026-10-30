@@ -28,6 +28,9 @@ pub struct Geodatabase {
     relationships: Vec<RelationshipClass>,
 }
 
+/// The `GDB_Items` type of feature datasets.
+const FEATURE_DATASET_TYPE: &str = "{74737149-DCB5-4257-8904-B9724E32A530}";
+
 impl Geodatabase {
     pub fn open(dir: impl AsRef<Path>) -> Result<Self> {
         let dir = dir.as_ref().to_path_buf();
@@ -48,10 +51,12 @@ impl Geodatabase {
         let mut definitions = HashMap::new();
         let mut domains = Vec::new();
         let mut relationships = Vec::new();
+        let mut typed_datasets = Vec::new();
         if let Some((_, id)) = all.iter().find(|(n, _)| n == "GDB_Items")
             && let Ok(items) = Table::open(table_path(&dir, *id))
         {
             let def_i = field_index(&items, "Definition").ok();
+            let type_i = field_index(&items, "Type").ok();
             if let (Ok(ni), Ok(pi)) = (field_index(&items, "Name"), field_index(&items, "Path")) {
                 for row in items.features().flatten() {
                     let (Value::String(n), Value::String(p)) =
@@ -59,6 +64,13 @@ impl Geodatabase {
                     else {
                         continue;
                     };
+                    // A feature dataset, empty or not, by its item type.
+                    if let Some(Value::String(t) | Value::Guid(t)) =
+                        type_i.map(|i| &row.attributes[i])
+                        && t.eq_ignore_ascii_case(FEATURE_DATASET_TYPE)
+                    {
+                        typed_datasets.push(n.clone());
+                    }
                     paths.push((n.clone(), p.clone()));
                     let Some(Value::Xml(xml)) = def_i.map(|i| &row.attributes[i]) else {
                         continue;
@@ -112,6 +124,7 @@ impl Geodatabase {
                 }
             }
         }
+        feature_datasets.extend(typed_datasets);
         feature_datasets.sort_unstable();
         feature_datasets.dedup();
 

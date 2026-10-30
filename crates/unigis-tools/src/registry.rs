@@ -211,7 +211,8 @@ pub struct Tool {
     pub toolbox: &'static str,
     pub summary: &'static str,
     pub params: &'static [Param],
-    /// The name of the result when none is given: `<input>_<suffix>`.
+    /// The name of the result when none is given: `<input>_<suffix>`. Empty for tools that
+    /// write on disk themselves and have no output to name (Create Folder, Add Field).
     pub output_suffix: &'static str,
     /// Whether the tool measures distances or areas: an application holding longitude/latitude
     /// data then runs it in the data's UTM zone, as ArcGIS does on projected data.

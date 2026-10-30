@@ -869,6 +869,12 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
   incl. refusals, then the whole schema). Found on the way: new geodatabase classes use `Shape` and
   get Shape_Length/Shape_Area; Create Feature Class/Create Table add `Id`/`Field1` only to
   shapefiles/dBASE; subtype edits keep the default subtype and field default as ArcGIS does.
+- [x] Desktop Catalog: ArcGIS Pro's New menu (right-click a folder: Folder, File Geodatabase,
+  Mobile Geodatabase, Shapefile; a .gdb: Feature Class, Feature Dataset, Table; a feature dataset:
+  Feature Class) opens the tool with the location filled in; geodatabases list their feature
+  datasets and refresh after edits. Registry tools whose output names a path on disk (a .gdb item or
+  .shp) write it there (`unigis_tools::workspace::write_features`). Empty feature datasets are now
+  read (by item type). Checked with `ui_shot` screenshots and ArcGIS reading the results.
 - [x] Add Global IDs (`add_global_ids`): in-place FileGDB class/table and simple
   feature-dataset expansion, batches in one workspace, UUID4 values, system field
   metadata/index and repeat stability. Eight public references plus rollback tests;

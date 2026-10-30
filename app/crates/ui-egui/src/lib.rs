@@ -946,6 +946,28 @@ impl RustGisApp {
             "ui.gp.open" => {
                 let tool = p.get("tool").and_then(Value::as_str).and_then(rustgis_engine::analysis::tool);
                 self.gp.open(tool.map(|t| t.id), &self.session);
+                // Parameters given with the tool (the Catalog's New menu: the location).
+                if let (Some(spec), Some(Value::Object(values))) = (tool, p.get("values")) {
+                    // Optional inputs it doesn't give start empty (no template from the active layer).
+                    for q in spec.params.iter().filter(|q| !q.required && !values.contains_key(q.name)) {
+                        if matches!(
+                            q.kind,
+                            rustgis_engine::analysis::ParamKind::Layer
+                                | rustgis_engine::analysis::ParamKind::PolygonLayer
+                                | rustgis_engine::analysis::ParamKind::PointLayer
+                                | rustgis_engine::analysis::ParamKind::RasterLayer
+                                | rustgis_engine::analysis::ParamKind::VectorLayer
+                        ) {
+                            self.gp.values.remove(q.name);
+                        }
+                    }
+                    for (name, v) in values {
+                        if let Some(param) = spec.params.iter().find(|q| q.name == name) {
+                            let v = v.as_str().map_or_else(|| v.to_string(), str::to_string);
+                            self.gp.values.insert(param.name, v);
+                        }
+                    }
+                }
                 // A standalone table to run the tool on, by its id.
                 if let Some(id) = p.get("table").and_then(Value::as_u64).and_then(|id| u32::try_from(id).ok()) {
                     self.gp.pick_table(id, &self.session);

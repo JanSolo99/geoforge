@@ -48,7 +48,10 @@ pub(crate) fn params_of(t: &'static Tool) -> &'static [P] {
             help: p.help,
         })
         .collect();
-    params.push(OUTPUT);
+    // Tools that write on disk themselves (Create Folder, Add Field) have no output to name.
+    if !t.output_suffix.is_empty() || !matches!(t.run, registry::Runner::Report(_)) {
+        params.push(OUTPUT);
+    }
     let all: &'static [P] = Box::leak(params.into_boxed_slice());
     cache.push((t.id, all));
     all
@@ -92,7 +95,28 @@ pub(crate) fn run(t: &'static Tool, inp: &dyn Inputs, p: &Json) -> Result<ToolRe
     let ctx = Ctx { inp, p, work: &work };
     let first = t.params.iter().filter(|q| q.kind == Kind::Features).map(|q| text(p, q.name)).find(|n| !n.is_empty());
     let default = first.map_or_else(|| t.output_suffix.to_string(), |n| format!("{n}_{}", t.output_suffix));
+    // An output named by a path (`C:/data/city.gdb/parcels`, `/data/roads.shp`) is written there
+    // and added to the map under its name, as ArcGIS does.
+    let output = text(p, "output");
+    let path = std::path::Path::new(output);
+    let on_disk = (output.contains('/') || output.contains('\\')) && unigis_tools::workspace::writable_path(path);
+    if on_disk && t.measures {
+        return Err(format!("{}: this tool writes its result to the map; export it from there", t.name));
+    }
+    let stem = path.file_stem().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
+    let created = format!("Created {output}");
     match registry::run(t, &ctx).map_err(|e| e.to_string())? {
+        registry::Outcome::Features(out) if on_disk => {
+            unigis_tools::workspace::write_features(path, out.clone()).map_err(|e| e.to_string())?;
+            let mut r = finish_in(out, stem, &work)?;
+            r.messages.insert(0, created);
+            Ok(r)
+        }
+        registry::Outcome::Table(table) if on_disk => {
+            unigis_tools::workspace::write_table(path, table.clone()).map_err(|e| e.to_string())?;
+            let ds = crate::table_dataset(table, stem);
+            Ok(ToolResult { output: Output::Table(ds), messages: vec![created] })
+        }
         registry::Outcome::Features(out) => finish_in(out, out_name(p, default), &work),
         // The tables (OLS coefficients and diagnostics) are not added to the map; their values
         // are in the messages.

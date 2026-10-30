@@ -5358,6 +5358,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "unigis-shapefile"
+version = "0.0.1"
+dependencies = [
+ "chrono",
+ "encoding_rs",
+ "thiserror 2.0.21",
+ "unigis-core",
+]
+
+[[package]]
 name = "unigis-tools"
 version = "0.0.1"
 dependencies = [
@@ -5372,6 +5382,7 @@ dependencies = [
  "unigis-geometry",
  "unigis-gpkg",
  "unigis-proj",
+ "unigis-shapefile",
 ]
 
 [[package]]

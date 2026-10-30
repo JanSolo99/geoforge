@@ -16,7 +16,7 @@ workspace = true
 
 [dependencies]
 rustgis-engine = { workspace = true, features = ["geolibre", "unigis"] }
-rustgis-ui-egui = { workspace = true }
+rustgis-ui-egui = { workspace = true, features = ["unigis"] }
 eframe = { workspace = true, features = ["default_fonts", "links", "wgpu", "accesskit", "wayland", "x11"] }
 egui = { workspace = true }
 serde_json = { workspace = true }

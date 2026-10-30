@@ -1945,3 +1945,9 @@ Data Management Tools	Veri Yönetimi (Araçlar)
 Editing Tools	Düzenleme (Araçlar)
 Spatial Analyst Tools	Spatial Analyst (Araçlar)
 Spatial Statistics Tools	Spatial Statistics (Araçlar)
+File Geodatabase	Dosya coğrafi veritabanı
+Mobile Geodatabase	Mobil coğrafi veritabanı
+Feature Class	Detay sınıfı
+Feature Dataset	Detay veri kümesi
+Right-click to create data here	Burada veri oluşturmak için sağ tıklayın
+Empty: right-click the geodatabase to add data	Boş: veri eklemek için coğrafi veritabanına sağ tıklayın

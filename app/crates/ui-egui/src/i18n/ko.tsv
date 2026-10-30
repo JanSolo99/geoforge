@@ -1945,3 +1945,9 @@ Data Management Tools	데이터 관리 (도구)
 Editing Tools	편집 (도구)
 Spatial Analyst Tools	Spatial Analyst (도구)
 Spatial Statistics Tools	Spatial Statistics (도구)
+File Geodatabase	파일 지오데이터베이스
+Mobile Geodatabase	모바일 지오데이터베이스
+Feature Class	피처 클래스
+Feature Dataset	피처 데이터셋
+Right-click to create data here	마우스 오른쪽 버튼을 클릭하여 여기에 데이터 만들기
+Empty: right-click the geodatabase to add data	비어 있음: 지오데이터베이스를 마우스 오른쪽 버튼으로 클릭하여 데이터 추가

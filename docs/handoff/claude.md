@@ -41,7 +41,7 @@ location inside a .gdb 000792; missing location 000732; `*` in a name 999999; ve
 writes the old 8-table layout (we refuse: KNOWN_GAPS). Multi-dot names behave oddly (not probed).
 Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge recovered after a while.
 
-## Slice 2 — committed, landing
+## Slice 2 — landed on main (92afc02)
 
 - `crates/unigis-tools/src/gdb_schema.rs`: 23 schema tools in the registry (ArcGIS names/defaults
   from `GetParameterInfo`); new `registry::Kind::Path` (dataset/workspace by path; app maps it to
@@ -61,7 +61,19 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
 - Lane worktree has an untracked symlink `testdata/large` → main checkout's copy (needed by
   `unigis-filegdb` oracle tests in `scripts/check`; other lanes lack it too). Never commit it.
 
+## Slice 3 — committed, landing
+
+- Catalog New menus, native gdb tree (feature datasets; cache by `a00000004.gdbtable` mtime),
+  `ui.gp.open` `"values"` prefill (optional layer inputs start empty, so no template from the
+  active layer), path outputs written to disk by the app (`workspace::write_features/write_table`),
+  "Output Name" hidden for message-only tools, reader lists empty feature datasets by item type,
+  `ui_shot` `right_click` and `"last": true`. 6 strings in all 16 i18n catalogs.
+- Verified by screenshots (/tmp/ugc/shots, not committed): folder/gdb/feature-dataset menus, the
+  prefilled dialogs, Run creating a folder, a mobile gdb, NewFeatureClass (free name increments) and
+  Transport/NewFeatureClass; ArcGIS read them (dataset SR, OBJECTID/Shape only).
+
 ## Next
 
-- Slice 3: Catalog New menus in `app/crates/ui-egui/src/panes.rs` (`folder_browser`), prefilled
-  `ui.gp.open`; app needs output-to-disk for Create Feature Class / Create Table into a gdb.
+- User request (slices 1–3) is complete once this lands; then `scripts/lane claim` for queue work.
+- Possible follow-ups (not requested): Catalog New for mobile geodatabases (needs a mobile reader),
+  ArcGIS-style blank names instead of NewFeatureClass placeholders.

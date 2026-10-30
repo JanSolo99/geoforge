@@ -1945,3 +1945,9 @@ Data Management Tools	მონაცემთა მართვა (ხელ�
 Editing Tools	რედაქტირება (ხელსაწყოები)
 Spatial Analyst Tools	Spatial Analyst (ხელსაწყოები)
 Spatial Statistics Tools	Spatial Statistics (ხელსაწყოები)
+File Geodatabase	ფაილური გეომონაცემთა ბაზა
+Mobile Geodatabase	მობილური გეომონაცემთა ბაზა
+Feature Class	ობიექტების კლასი
+Feature Dataset	ობიექტების მონაცემთა ნაკრები
+Right-click to create data here	დააწკაპუნეთ მარჯვენა ღილაკით, რომ აქ შექმნათ მონაცემები
+Empty: right-click the geodatabase to add data	ცარიელია: მონაცემების დასამატებლად დააწკაპუნეთ გეომონაცემთა ბაზაზე მარჯვენა ღილაკით

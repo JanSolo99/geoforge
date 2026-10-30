@@ -3,7 +3,7 @@
 //! `cargo run -p rustgis-ui-egui --example ui_shot -- script.jsonl`
 //!
 //! The script is JSON lines: `{"cmd": id, "params": {...}}` runs a command (ui.* included),
-//! `{"shot": "/abs/out.png"}` saves the window, `{"steps": n}` runs frames, `{"sleep": ms}` runs frames for that long, `{"click": label}` clicks the first widget whose label contains it (is it, with `"exact": true`), `{"search": text}` fills the Tools pane's search, `{"dark": true}`
+//! `{"shot": "/abs/out.png"}` saves the window, `{"steps": n}` runs frames, `{"sleep": ms}` runs frames for that long, `{"click": label}` clicks the first widget whose label contains it (is it, with `"exact": true`, the last match with `"last": true`; `{"right_click": label}` opens its context menu), `{"search": text}` fills the Tools pane's search, `{"dark": true}`
 //! switches theme, and `{"width": w, "height": h}` on the first line sets the size (default
 //! 1480×900 at 2×). The window opens the World Atlas sample.
 
@@ -75,13 +75,25 @@ fn main() {
             }
         } else if let Some(label) = l.get("click").and_then(|v| v.as_str()) {
             // `"exact": true`: the label is the whole of it (an Add button, not Add Data).
+            // `"last": true`: the last match (a popup menu's entry, drawn above the rest).
+            let last = l.get("last").and_then(|v| v.as_bool()) == Some(true);
             let node = if l.get("exact").and_then(|v| v.as_bool()) == Some(true) {
-                harness.query_all_by_label(label).next()
+                if last { harness.query_all_by_label(label).last() } else { harness.query_all_by_label(label).next() }
+            } else if last {
+                harness.query_all_by_label_contains(label).last()
             } else {
                 harness.query_all_by_label_contains(label).next()
             };
             match node {
                 Some(node) => node.click(),
+                None => eprintln!("nothing labelled '{label}'"),
+            }
+            for _ in 0..3 {
+                harness.step();
+            }
+        } else if let Some(label) = l.get("right_click").and_then(|v| v.as_str()) {
+            match harness.query_all_by_label_contains(label).next() {
+                Some(node) => node.click_secondary(),
                 None => eprintln!("nothing labelled '{label}'"),
             }
             for _ in 0..3 {

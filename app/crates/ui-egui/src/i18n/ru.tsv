@@ -1945,3 +1945,9 @@ Data Management Tools	Управление данными (Инструмент�
 Editing Tools	Редактирование (Инструменты)
 Spatial Analyst Tools	Spatial Analyst (Инструменты)
 Spatial Statistics Tools	Spatial Statistics (Инструменты)
+File Geodatabase	Файловая база геоданных
+Mobile Geodatabase	Мобильная база геоданных
+Feature Class	Класс пространственных объектов
+Feature Dataset	Набор классов объектов
+Right-click to create data here	Щёлкните правой кнопкой, чтобы создать здесь данные
+Empty: right-click the geodatabase to add data	Пусто: щёлкните базу геоданных правой кнопкой, чтобы добавить данные

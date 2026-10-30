@@ -26,6 +26,9 @@ use serde_json::Value as Json;
 use unigis_core as gf;
 use unigis_tools as tools;
 
+/// Folders and geodatabases on disk (the Catalog lists geodatabases with it).
+pub use unigis_tools::workspace;
+
 /// Tool ids get this prefix, so they never clash with the built-in tools.
 pub const PREFIX: &str = "unigis:";
 

@@ -1945,3 +1945,9 @@ Data Management Tools	数据管理 (工具)
 Editing Tools	编辑 (工具)
 Spatial Analyst Tools	Spatial Analyst (工具)
 Spatial Statistics Tools	Spatial Statistics (工具)
+File Geodatabase	文件地理数据库
+Mobile Geodatabase	移动地理数据库
+Feature Class	要素类
+Feature Dataset	要素数据集
+Right-click to create data here	右键单击以在此处创建数据
+Empty: right-click the geodatabase to add data	空：右键单击地理数据库以添加数据

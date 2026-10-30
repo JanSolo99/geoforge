@@ -141,9 +141,215 @@ fn create_mobile_gdb(ctx: &dyn Context) -> Result<Report> {
     Ok(derived("out_gdb", &gdb))
 }
 
+/// What a file geodatabase holds, for a catalog view: its feature datasets, and its tables and
+/// feature classes with the feature dataset each is in.
+#[derive(Debug, Clone, Default, PartialEq)]
+pub struct GeodatabaseContents {
+    pub feature_datasets: Vec<String>,
+    /// `(feature dataset, name, is a feature class)`.
+    pub items: Vec<(Option<String>, String, bool)>,
+}
+
+/// The contents of the file geodatabase at `gdb`.
+pub fn geodatabase_contents(gdb: &Path) -> Result<GeodatabaseContents> {
+    imp::geodatabase_contents(gdb)
+}
+
+/// Writes a tool's features as a new dataset on disk: a feature class in a file geodatabase
+/// (`city.gdb/name`, `city.gdb/Dataset/name`, which takes the dataset's coordinate system) or a
+/// shapefile (`.shp`). Laid out as ArcGIS creates them (`Shape`, Shape_Length / Shape_Area).
+pub fn write_features(path: &Path, out: crate::ToolOutput) -> Result<()> {
+    imp::write_features(path, out)
+}
+
+/// Writes a table as a new geodatabase table (`city.gdb/name`).
+pub fn write_table(path: &Path, table: crate::TableOutput) -> Result<()> {
+    imp::write_table(path, table)
+}
+
+/// Whether `path` names a dataset on disk that [`write_features`] can create: inside a file
+/// geodatabase, or a `.shp` in an existing folder.
+pub fn writable_path(path: &Path) -> bool {
+    if path
+        .ancestors()
+        .skip(1)
+        .any(|p| p.join("a00000001.gdbtable").is_file())
+    {
+        return true;
+    }
+    path.extension()
+        .is_some_and(|e| e.eq_ignore_ascii_case("shp"))
+        && path.parent().is_some_and(Path::is_dir)
+}
+
 #[cfg(feature = "gdb")]
 mod imp {
     use super::*;
+    use crate::{TableOutput, ToolOutput};
+    use unigis_core::{Feature, Field, FieldType, GeometryKind, Value};
+    use unigis_filegdb::{Geodatabase, GeodatabaseWriter};
+
+    pub fn geodatabase_contents(gdb: &Path) -> Result<GeodatabaseContents> {
+        let g = Geodatabase::open(gdb)?;
+        let mut items = Vec::new();
+        for e in g.entries() {
+            let spatial = g
+                .open_table(&e.name)
+                .is_ok_and(|t| t.shape_field().is_some());
+            items.push((e.feature_dataset.clone(), e.name.clone(), spatial));
+        }
+        Ok(GeodatabaseContents {
+            feature_datasets: g.feature_datasets().to_vec(),
+            items,
+        })
+    }
+
+    /// The geodatabase, feature dataset and name `path` names.
+    fn in_geodatabase(path: &Path) -> Option<(PathBuf, Option<String>, String)> {
+        let gdb = path
+            .ancestors()
+            .skip(1)
+            .find(|p| p.join("a00000001.gdbtable").is_file())?;
+        let rest: Vec<String> = path
+            .strip_prefix(gdb)
+            .ok()?
+            .components()
+            .map(|c| c.as_os_str().to_string_lossy().into_owned())
+            .collect();
+        match rest.as_slice() {
+            [name] => Some((gdb.to_path_buf(), None, name.clone())),
+            [ds, name] => Some((gdb.to_path_buf(), Some(ds.clone()), name.clone())),
+            _ => None,
+        }
+    }
+
+    pub fn write_features(path: &Path, mut out: ToolOutput) -> Result<()> {
+        let Some((gdb, dataset, name)) = in_geodatabase(path) else {
+            return write_shapefile(path, out);
+        };
+        let mut w = GeodatabaseWriter::open_existing(&gdb)?;
+        let own_measures = out.fields.iter().any(|f| {
+            f.name.eq_ignore_ascii_case("Shape_Length") || f.name.eq_ignore_ascii_case("Shape_Area")
+        });
+        if !own_measures {
+            for (measure, wanted) in [
+                (
+                    "Shape_Length",
+                    matches!(out.kind, GeometryKind::Polyline | GeometryKind::Polygon),
+                ),
+                ("Shape_Area", out.kind == GeometryKind::Polygon),
+            ] {
+                if wanted {
+                    out.fields.push(Field::new(measure, FieldType::Double));
+                    for f in &mut out.features {
+                        f.attributes.push(Value::Null);
+                    }
+                }
+            }
+            w.use_standard_geometry_fields();
+        }
+        let mut t = match &dataset {
+            Some(ds) => {
+                let target = w
+                    .feature_dataset_srs(ds)
+                    .ok_or_else(|| err(format!("ERROR 000732: Dataset {ds} does not exist")))?;
+                if !out.features.is_empty()
+                    && target.is_some()
+                    && out.spatial_reference_wkt.is_some()
+                    && target != out.spatial_reference_wkt
+                {
+                    return Err(err(
+                        "features in another coordinate system than the feature dataset's are not projected here yet",
+                    ));
+                }
+                w.create_feature_class_in(ds, &name, out.kind, out.has_z, out.has_m, &out.fields)?
+            }
+            None => w.create_table(
+                &name,
+                Some(out.kind),
+                out.has_z,
+                out.has_m,
+                &out.fields,
+                out.spatial_reference_wkt.as_deref(),
+            )?,
+        };
+        for f in &out.features {
+            t.write(f)?;
+        }
+        w.finish_table(t)?;
+        w.finish()
+    }
+
+    fn write_shapefile(path: &Path, out: ToolOutput) -> Result<()> {
+        if !path
+            .extension()
+            .is_some_and(|e| e.eq_ignore_ascii_case("shp"))
+        {
+            return Err(err(format!(
+                "{}: name a .shp file or a dataset inside a file geodatabase",
+                path.display()
+            )));
+        }
+        if path.exists() {
+            return Err(err(format!(
+                "ERROR 000258: Output {} already exists",
+                path.display()
+            )));
+        }
+        let mut fields = out.fields.clone();
+        // A .dbf needs a field; ArcGIS's default for a new shapefile is "Id".
+        let placeholder = fields.is_empty();
+        if placeholder {
+            let mut id = Field::new("Id", FieldType::Integer);
+            id.precision = 6;
+            fields.push(id);
+        }
+        let mut w = unigis_shapefile::ShapefileWriter::create(
+            path,
+            out.kind,
+            out.has_z,
+            out.has_m,
+            &fields,
+            out.spatial_reference_wkt.as_deref(),
+        )?;
+        for f in out.features {
+            let f = if placeholder {
+                Feature {
+                    attributes: vec![Value::Integer(0)],
+                    ..f
+                }
+            } else {
+                f
+            };
+            w.write(&f)?;
+        }
+        w.finish()
+    }
+
+    pub fn write_table(path: &Path, table: TableOutput) -> Result<()> {
+        let (gdb, None, name) = in_geodatabase(path).ok_or_else(|| {
+            err(format!(
+                "{}: name a table inside a file geodatabase",
+                path.display()
+            ))
+        })?
+        else {
+            return Err(err(
+                "tables go in the geodatabase, not in a feature dataset",
+            ));
+        };
+        let mut w = GeodatabaseWriter::open_existing(&gdb)?;
+        let mut t = w.create_table(&name, None, false, false, &table.fields, None)?;
+        for (i, row) in table.rows.iter().enumerate() {
+            t.write(&Feature {
+                oid: i as i64 + 1,
+                geometry: None,
+                attributes: row.clone(),
+            })?;
+        }
+        w.finish_table(t)?;
+        w.finish()
+    }
 
     pub fn create_file_gdb(gdb: &Path) -> Result<()> {
         unigis_filegdb::GeodatabaseWriter::create(gdb)?.finish()
@@ -161,6 +367,18 @@ mod imp {
 
     fn unsupported() -> Error {
         err("geodatabases can't be created in this build")
+    }
+
+    pub fn geodatabase_contents(_: &Path) -> Result<GeodatabaseContents> {
+        Err(unsupported())
+    }
+
+    pub fn write_features(_: &Path, _: crate::ToolOutput) -> Result<()> {
+        Err(unsupported())
+    }
+
+    pub fn write_table(_: &Path, _: crate::TableOutput) -> Result<()> {
+        Err(unsupported())
     }
 
     pub fn create_file_gdb(_: &Path) -> Result<()> {
@@ -185,7 +403,7 @@ pub const CREATE_FOLDER: Tool = Tool {
         ),
         text("out_name", "Folder Name", ""),
     ],
-    output_suffix: "Folder",
+    output_suffix: "",
     measures: false,
     run: Runner::Report(create_folder),
 };
@@ -211,7 +429,7 @@ pub const CREATE_FILE_GDB: Tool = Tool {
             help: "The ArcGIS release whose geodatabase layout to write.",
         },
     ],
-    output_suffix: "gdb",
+    output_suffix: "",
     measures: false,
     run: Runner::Report(create_file_gdb),
 };
@@ -233,7 +451,7 @@ pub const CREATE_MOBILE_GDB: Tool = Tool {
             "`.geodatabase` is added.",
         ),
     ],
-    output_suffix: "geodatabase",
+    output_suffix: "",
     measures: false,
     run: Runner::Report(create_mobile_gdb),
 };

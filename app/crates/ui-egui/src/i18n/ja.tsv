@@ -1945,3 +1945,9 @@ Data Management Tools	データ管理 (ツール)
 Editing Tools	編集 (ツール)
 Spatial Analyst Tools	Spatial Analyst (ツール)
 Spatial Statistics Tools	Spatial Statistics (ツール)
+File Geodatabase	ファイル ジオデータベース
+Mobile Geodatabase	モバイル ジオデータベース
+Feature Class	フィーチャクラス
+Feature Dataset	フィーチャ データセット
+Right-click to create data here	右クリックしてここにデータを作成
+Empty: right-click the geodatabase to add data	空: ジオデータベースを右クリックしてデータを追加

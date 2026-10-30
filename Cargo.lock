@@ -1151,6 +1151,7 @@ dependencies = [
  "unigis-geometry",
  "unigis-gpkg",
  "unigis-proj",
+ "unigis-shapefile",
 ]
 
 [[package]]

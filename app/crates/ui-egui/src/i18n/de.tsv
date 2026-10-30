@@ -1945,3 +1945,9 @@ Data Management Tools	Datenverwaltung (Werkzeuge)
 Editing Tools	Bearbeitung (Werkzeuge)
 Spatial Analyst Tools	Spatial Analyst (Werkzeuge)
 Spatial Statistics Tools	Spatial Statistics (Werkzeuge)
+File Geodatabase	Datei-Geodatabase
+Mobile Geodatabase	Mobile Geodatabase
+Feature Class	Feature-Class
+Feature Dataset	Feature-Dataset
+Right-click to create data here	Rechtsklick, um hier Daten anzulegen
+Empty: right-click the geodatabase to add data	Leer: Rechtsklick auf die Geodatabase, um Daten hinzuzufügen

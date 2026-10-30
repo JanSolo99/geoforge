@@ -19,6 +19,8 @@ pub use rustgis_geom as geom;
 pub use rustgis_map as map;
 pub use rustgis_plugins as plugins;
 pub use rustgis_render as render;
+#[cfg(feature = "unigis")]
+pub use rustgis_unigis as unigis;
 
 use std::path::PathBuf;
 

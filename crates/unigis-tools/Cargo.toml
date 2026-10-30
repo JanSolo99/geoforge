@@ -15,6 +15,7 @@ unigis-geometry.workspace = true
 unigis-proj = { workspace = true, optional = true }
 unigis-filegdb = { workspace = true, optional = true }
 unigis-gpkg = { workspace = true, optional = true }
+unigis-shapefile = { workspace = true, optional = true }
 rstar.workspace = true
 spade.workspace = true
 calamine = { version = "0.37", features = ["chrono"] }
@@ -26,7 +27,7 @@ default = ["proj", "gdb"]
 proj = ["dep:unigis-proj"]
 # Workspace tools that write geodatabases (Create File Geodatabase, ...). The browser build
 # goes without.
-gdb = ["dep:unigis-filegdb", "dep:unigis-gpkg"]
+gdb = ["dep:unigis-filegdb", "dep:unigis-gpkg", "dep:unigis-shapefile"]
 
 [lints]
 workspace = true
