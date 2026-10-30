@@ -1,0 +1,13 @@
+# Builds the web app from origin/main and pushes it to web-dist for Netlify (scripts/publish-web-dist.sh).
+#   cp tools/agent-coordinator/unigis-web-dist.{service,timer} ~/.config/systemd/user/
+#   systemctl --user daemon-reload && systemctl --user enable --now unigis-web-dist.timer
+[Unit]
+Description=UniGIS web build to the web-dist branch (Netlify)
+
+[Service]
+Type=oneshot
+WorkingDirectory=/mnt/media/ArcGIS_Linux
+Environment=PATH=%h/.local/bin:%h/.cargo/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/mnt/media/ArcGIS_Linux/scripts/publish-web-dist.sh
+TimeoutStartSec=4h
+Nice=10

@@ -1,3 +1,5 @@
 #!/bin/sh
 # Rebuilds docs/dashboard.html (offline) after each commit.
 python3 "$(dirname "$0")/../scripts/dashboard/build.py" >/dev/null 2>&1 || true
+# Re-ranks docs/WORK_QUEUE.md (missing ArcGIS tools).
+python3 "$(dirname "$0")/../scripts/work_queue.py" >/dev/null 2>&1 || true

@@ -18,6 +18,7 @@ spec.loader.exec_module(module)
 
 CLAUDE_ID = "11111111-1111-4111-8111-111111111111"
 CODEX_ID = "22222222-2222-4222-8222-222222222222"
+KIMI_ID = "ses_kimi_333333"
 
 
 class CoordinatorTests(unittest.TestCase):
@@ -51,7 +52,7 @@ class CoordinatorTests(unittest.TestCase):
             "claude": "--dangerously-skip-permissions",
             "codex": "--dangerously-bypass-approvals-and-sandbox",
         }
-        sessions = {"claude": CLAUDE_ID, "codex": CODEX_ID}
+        sessions = {"claude": CLAUDE_ID, "codex": CODEX_ID, "kimi": KIMI_ID}
         for agent in module.AGENTS:
             for native in (False, True):
                 for resumed in (False, True):
@@ -61,6 +62,14 @@ class CoordinatorTests(unittest.TestCase):
                         with patch.object(module.shutil, "which", return_value=executable):
                             command, session = self.coordinator.command(agent, "Continue", native)
                         self.assertEqual(command[0], executable)
+                        if agent == "kimi":
+                            # Kimi rejects --prompt with --auto; --auto is native-only.
+                            self.assertEqual("--auto" in command, native)
+                            self.assertEqual(command[-2:] == ["-p", "Continue"], not native)
+                            self.assertEqual(module.KIMI_MODEL, command[command.index("-m") + 1])
+                            if resumed:
+                                self.assertEqual(command[command.index("-S") + 1], KIMI_ID)
+                            continue
                         self.assertIn(flags[agent], command[:command.index("--")])
                         self.assertNotIn("workspace-write", command)
                         self.assertNotIn("acceptEdits", command)
@@ -104,12 +113,16 @@ print(json.dumps({{'type': 'turn.completed'}}), end='')
 ''')
         with patch.object(module.shutil, "which", side_effect=lambda name: {"claude": claude, "codex": codex}[name]):
             self.assertEqual(self.run_turn("Fix the current task"), 0)
-            self.assertEqual(self.coordinator.state["agent"], "codex")
+            # Claude stays preferred but is skipped while its limit lasts.
+            self.assertEqual(self.coordinator.state["agent"], "claude")
+            self.assertFalse(self.coordinator.available("claude"))
             self.assertIn("claude", self.coordinator.state["sessions"])
             self.assertEqual(self.coordinator.state["sessions"]["codex"], CODEX_ID)
             self.assertEqual(self.run_turn("Continue with verification"), 0)
-            self.coordinator.state["agent"] = "claude"
-            self.coordinator.save()
+            # Without fallback a limited preference waits; /switch retries it now.
+            self.assertEqual(self.run_turn(fallback=False), 1)
+            with self.coordinator.lock() as fd:
+                self.coordinator.handle("/switch claude", fd)
             self.assertEqual(self.run_turn(fallback=False), 1)
         requests = [json.loads(path.read_text()) for path in self.coordinator.directory.glob("*/request.json")]
         self.assertEqual(len(requests), 4)
@@ -148,7 +161,7 @@ print(json.dumps({{'type': 'turn.completed'}}))
             self.assertEqual(self.coordinator.daemon(fd, poll=0, sleep=lambda _: None), 0)
         prompts = (self.root / "prompts.txt").read_text().splitlines()
         self.assertEqual(prompts, ["first remote task", "second remote task",
-                                   "Continue the task in docs/HANDOFF.md."])
+                                   module.DEFAULT_TASK.splitlines()[0]])
         self.assertIn("keepalive", (remote / "daemon.log").read_text())
 
     def test_successful_reply_about_limits_does_not_trigger_fallback(self):
@@ -176,6 +189,85 @@ sys.exit(1)
             self.assertEqual(which.call_count, 1)
             self.assertEqual(self.coordinator.state["agent"], "claude")
             self.assertNotIn("claude", self.coordinator.state["sessions"])
+
+    def test_capacity_error_hands_over_and_reset_time_is_parsed(self):
+        codex = self.executable("codex", f'''
+import json, sys
+print(json.dumps({{'type': 'thread.started', 'thread_id': {CODEX_ID!r}}}))
+print(json.dumps({{'type': 'turn.failed', 'error': {{'message': 'Selected model is at capacity. Please try a different model.'}}}}))
+sys.exit(1)
+''')
+        claude = self.executable("claude", '''
+import json
+print(json.dumps({'type': 'result', 'is_error': False, 'result': 'done'}))
+''')
+        with self.coordinator.lock():
+            self.coordinator.state["agent"] = "codex"
+            self.coordinator.save()
+        with patch.object(module.shutil, "which", side_effect=lambda name: {"claude": claude, "codex": codex}[name]):
+            self.assertEqual(self.run_turn(), 0)
+        self.assertEqual(self.coordinator.state["last_run"]["agent"], "claude")
+        until = module.dt.datetime.fromisoformat(self.coordinator.state["limited_until"]["codex"])
+        self.assertLessEqual(until - module.dt.datetime.now(module.dt.timezone.utc), module.TRANSIENT_WAIT)
+        current = module.dt.datetime(2026, 10, 28, 15, 12, tzinfo=module.dt.timezone.utc)
+        reset = module.reset_time(["You've hit your session limit · resets 5:40am (Australia/Sydney)"], current)
+        self.assertEqual((reset.hour, reset.minute, str(reset.tzinfo)), (5, 40, "Australia/Sydney"))
+        self.assertGreater(module.reset_time(["try again at 1:49 AM."], current), current)
+
+    def test_kimi_turn_records_session_and_hands_over_on_rate_limit(self):
+        kimi = self.executable("kimi", f'''
+import json, os, pathlib, sys
+assert os.environ.get('KIMI_CODE_TRUST_WORKSPACE') == '1'
+assert sys.argv[sys.argv.index('-m') + 1] == 'kimi-code/k3.1-pro'
+calls = pathlib.Path('kimi-calls.txt')
+n = int(calls.read_text()) + 1 if calls.exists() else 1
+calls.write_text(str(n))
+if n == 1:
+    assert '-S' not in sys.argv
+    print(json.dumps({{'role': 'assistant', 'content': 'Working', 'tool_calls': [{{'type': 'function', 'id': 't1', 'function': {{'name': 'Shell', 'arguments': '{{}}'}}}}]}}))
+    print(json.dumps({{'role': 'tool', 'tool_call_id': 't1', 'content': 'ok'}}))
+    print(json.dumps({{'role': 'meta', 'type': 'session.resume_hint', 'session_id': {KIMI_ID!r}}}))
+else:
+    assert sys.argv[sys.argv.index('-S') + 1] == {KIMI_ID!r}
+    print('provider.rate_limit: Too many requests, retry later', file=sys.stderr)
+    sys.exit(1)
+''')
+        claude = self.executable("claude", '''
+import json
+print(json.dumps({'type': 'result', 'is_error': False, 'result': 'done'}))
+''')
+        with self.coordinator.lock() as fd:
+            self.coordinator.handle("/switch kimi", fd)
+        with patch.object(module.shutil, "which", side_effect=lambda name: {"claude": claude, "kimi": kimi}.get(name)):
+            self.assertEqual(self.run_turn(), 0)
+            self.assertEqual(self.coordinator.state["sessions"]["kimi"], KIMI_ID)
+            self.assertEqual(self.coordinator.state["last_run"]["agent"], "kimi")
+            # Rate limited: the request goes to the next agent (codex is not installed here).
+            with patch.object(module.shutil, "which", side_effect=lambda name: {"claude": claude, "kimi": kimi}.get(name)):
+                self.run_turn()
+        self.assertFalse(self.coordinator.available("kimi"))
+        self.assertEqual(self.coordinator.state["agent"], "kimi")
+
+    def test_oversized_session_starts_fresh(self):
+        home = self.root / "claude-home"
+        transcript = home / "projects" / "-x" / f"{CLAUDE_ID}.jsonl"
+        transcript.parent.mkdir(parents=True)
+        transcript.write_bytes(b"x" * 2048)
+        with self.coordinator.lock(), patch.dict(os.environ, {"CLAUDE_CONFIG_DIR": str(home)}), \
+                patch.object(module, "MAX_SESSION_MB", 0.001), contextlib.redirect_stdout(io.StringIO()):
+            self.coordinator.state["sessions"]["claude"] = CLAUDE_ID
+            self.coordinator.rotate_if_large("claude")
+            self.assertNotIn("claude", self.coordinator.state["sessions"])
+
+    def test_headless_daemon_refuses_cli(self):
+        with self.coordinator.lock() as fd, patch.object(module.shutil, "which") as which:
+            remote = self.coordinator.remote_dirs()
+            (remote / "inbox" / "001.cmd").write_text("/cli")
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                self.coordinator.daemon(fd, keepalive=False, poll=0, sleep=lambda _: None, max_cycles=1)
+            which.assert_not_called()
+        self.assertIn("needs a terminal", out.getvalue())
 
     def test_lock_blocks_other_coordinators_and_is_inherited_by_children(self):
         with self.coordinator.lock() as fd:

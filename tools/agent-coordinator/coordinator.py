@@ -18,18 +18,40 @@ import time
 import uuid
 
 ROOT = Path(__file__).resolve().parents[2]
-AGENTS = ("claude", "codex")
+AGENTS = ("claude", "codex", "kimi")
+# Kimi Code CLI: its installer puts it outside PATH; the model is a config.toml alias.
+KIMI_MODEL = os.environ.get("UNIGIS_AGENTS_KIMI_MODEL", "kimi-code/k3.1-pro")
+KIMI_FALLBACK = Path.home() / ".kimi-code" / "bin" / "kimi"
 LIMIT = re.compile(
     r"rate[_ -]?limit|usage[_ -]?limit|usage limit|quota[_ -]?exceeded|"
     r"you(?:'|’)ve (?:hit|reached) your limit|too many requests|"
     r"insufficient_quota|limit reached|hit your (?:usage )?limit", re.I
 )
-DEFAULT_TASK = "Continue the task in docs/HANDOFF.md."
+# Provider outages: hand over like a usage limit, but retry the provider sooner.
+TRANSIENT = re.compile(
+    r"at capacity|overloaded|temporarily unavailable|service unavailable|"
+    r"try a different model|stream disconnected|internal server error", re.I
+)
+# "try again at 1:49 AM" (Codex), "resets 5:40am (Australia/Sydney)" (Claude).
+RESET = re.compile(r"(?:try again at|resets(?: at)?)\s+(\d{1,2})(?::(\d{2}))?\s*([ap]\.?m\.?)"
+                   r"(?:\s*\(([\w/+-]+)\))?", re.I)
+LIMIT_WAIT = dt.timedelta(minutes=30)      # usage limit without a stated reset time
+TRANSIENT_WAIT = dt.timedelta(minutes=10)  # capacity / overload
+# A resumed conversation re-sends its whole history on every model call; past this size the
+# coordinator starts a fresh one and lets docs/HANDOFF.md carry the context.
+MAX_SESSION_MB = float(os.environ.get("UNIGIS_AGENTS_MAX_SESSION_MB", "25"))
+# Parallel lanes (scripts/lane): one agent per git worktree, landing on main one at a time.
+LANE_TASK = ("Continue: finish the tool your lane has claimed (your lane handoff), or claim the next "
+             "one with `scripts/lane claim`; build it following docs/WORK_QUEUE.md's rules, then "
+             "`scripts/lane land`.")
+SHIM = Path(__file__).resolve().parent / "bin"
+DEFAULT_TASK = ("Continue: finish or wrap up the tool in progress (docs/HANDOFF.md), then build the "
+                "next tool in docs/WORK_QUEUE.md, following its rules.")
 HELP = """Type a task to send it to the selected agent.
-/switch claude|codex   Select the other agent; context is carried automatically
+/switch claude|codex|kimi  Prefer that agent (clears its recorded limit); context carries over
 /session AGENT UUID    Link an existing stopped session (do not run it elsewhere)
 /new [AGENT]           Start a fresh conversation on the next turn
-/auto on|off           Switch once on a reported usage limit (default: on)
+/auto on|off           Use the other agent while one is limited (default: on)
 /status                Show sessions, last run, and workspace
 /handoff               Show the shared handoff
 /cli [AGENT]           Open the native CLI with full access and interactive tools
@@ -48,6 +70,27 @@ def save_json(path, value):
     temporary.replace(path)
 
 
+def reset_time(errors, current=None):
+    """When a reported limit lifts, as an aware datetime, or None if no time is given."""
+    for error in errors:
+        match = RESET.search(error)
+        if not match:
+            continue
+        hour, minute = int(match[1]) % 12, int(match[2] or 0)
+        hour += 12 if match[3].lower().startswith("p") else 0
+        zone = None
+        if match[4]:
+            with contextlib.suppress(Exception):
+                from zoneinfo import ZoneInfo
+                zone = ZoneInfo(match[4])
+        local = (current or dt.datetime.now(dt.timezone.utc)).astimezone(zone)
+        moment = local.replace(hour=hour, minute=minute, second=0, microsecond=0)
+        if moment <= local:
+            moment += dt.timedelta(days=1)
+        return moment
+    return None
+
+
 def git(root, *args):
     return subprocess.check_output(
         ["git", *args], cwd=root, text=True, stderr=subprocess.DEVNULL
@@ -55,17 +98,23 @@ def git(root, *args):
 
 
 class Coordinator:
-    def __init__(self, root=ROOT):
+    def __init__(self, root=ROOT, lane=None):
+        self.lane = lane
+        if lane:
+            root = lane_root(root, lane)
         self.root = root.resolve()
-        # Git common-dir also gives separate worktrees the same advisory lock.
+        # Git common-dir also gives separate worktrees the same advisory lock; a lane has its own.
         common = Path(git(self.root, "rev-parse", "--git-common-dir"))
         self.common = (self.root / common).resolve()
         self.directory = self.common / "agent-coordinator"
-        self.directory.mkdir(mode=0o700, exist_ok=True)
+        if lane:
+            self.directory = self.directory / "lanes" / lane
+        self.directory.mkdir(mode=0o700, parents=True, exist_ok=True)
         os.chmod(self.directory, 0o700)
         self.state_path = self.directory / "state.json"
         self.state = {}
         self.auto = True
+        self.headless = False
 
     def load(self):
         self.state = json.loads(self.state_path.read_text()) if self.state_path.exists() else {}
@@ -75,6 +124,7 @@ class Coordinator:
         self.state.setdefault("workspace", str(self.root))
         self.state.setdefault("agent", "claude")
         self.state.setdefault("sessions", {})
+        self.state.setdefault("limited_until", {})
 
     def save(self):
         save_json(self.state_path, self.state)
@@ -93,9 +143,55 @@ class Coordinator:
         self.load()
         print(f"Workspace: {self.root}\nSelected: {self.state['agent']}")
         for agent in AGENTS:
-            print(f"{agent}: {self.state['sessions'].get(agent, '(new session)')}")
+            limited = self.state["limited_until"].get(agent)
+            note = f"  (limited until {limited})" if limited and not self.available(agent) else ""
+            print(f"{agent}: {self.state['sessions'].get(agent, '(new session)')}{note}")
         print(f"Last run: {json.dumps(self.state.get('last_run', {}))}")
         print(f"Local logs: {self.directory}")
+
+    def available(self, agent):
+        until = self.state.get("limited_until", {}).get(agent)
+        return not until or dt.datetime.fromisoformat(until) <= dt.datetime.now(dt.timezone.utc)
+
+    def next_available(self):
+        times = [dt.datetime.fromisoformat(t) for a, t in self.state["limited_until"].items()
+                 if not self.available(a)]
+        return min(times) if times else None
+
+    def mark_limited(self, agent, result):
+        current = dt.datetime.now(dt.timezone.utc)
+        until = reset_time(result["errors"], current)
+        if until is None:
+            until = current + (TRANSIENT_WAIT if result["status"] == "unavailable" else LIMIT_WAIT)
+        self.state["limited_until"][agent] = until.astimezone(dt.timezone.utc).isoformat(timespec="seconds")
+        self.save()
+        print(f"[{agent} unavailable until {until.astimezone():%a %H:%M}]", flush=True)
+
+    def transcript(self, agent, session):
+        """The CLI's stored conversation file for a session, if it can be found."""
+        if agent == "claude":
+            base = Path(os.environ.get("CLAUDE_CONFIG_DIR", Path.home() / ".claude")) / "projects"
+            pattern = f"*/{session}.jsonl"
+        elif agent == "kimi":
+            base = Path.home() / ".kimi-code" / "sessions"
+            pattern = f"**/*{session}*"
+        else:
+            base = Path(os.environ.get("CODEX_HOME", Path.home() / ".codex")) / "sessions"
+            pattern = f"**/rollout-*{session}.jsonl"
+        return next(base.glob(pattern), None) if base.is_dir() else None
+
+    def rotate_if_large(self, agent):
+        session = self.state["sessions"].get(agent)
+        path = session and self.transcript(agent, session)
+        if not path:
+            return
+        files = path.rglob("*") if path.is_dir() else [path]
+        size = sum(f.stat().st_size for f in files if f.is_file()) / 2**20
+        if size > MAX_SESSION_MB:
+            print(f"[{agent} session {session[:8]} is {size:.0f} MB; starting a fresh one, "
+                  "context comes from docs/HANDOFF.md]", flush=True)
+            self.state["sessions"].pop(agent)
+            self.save()
 
     def prompt(self, task, previous=None):
         context = ""
@@ -107,8 +203,16 @@ class Coordinator:
                 "Some actions may already have completed; inspect the working tree "
                 "and avoid repeating external actions.\n"
             )
+        if self.lane:
+            context += (
+                f"\nYou are lane `{self.lane}`, working in the worktree {self.root} on branch "
+                f"lane/{self.lane} while other lanes (other agents in other worktrees) work in "
+                "parallel. Follow AGENTS.md's 'Parallel lanes' section: claim a tool with "
+                "`scripts/lane claim`, use your lane handoff instead of docs/HANDOFF.md, commit on "
+                "your branch and land with `scripts/lane land` (never push main directly).\n"
+            )
         return (
-            "You are working through the shared Claude/Codex coordinator. "
+            "You are working through the shared Claude/Codex/Kimi coordinator. "
             "Read AGENTS.md, CLAUDE.md and docs/HANDOFF.md now, even in a resumed "
             "conversation. Check branch, status and relevant diffs. The latest user "
             "request below takes precedence over older handoff or chat context. "
@@ -122,6 +226,8 @@ class Coordinator:
 
     def command(self, agent, prompt, native=False):
         executable = shutil.which(agent)
+        if not executable and agent == "kimi" and os.access(KIMI_FALLBACK, os.X_OK):
+            executable = str(KIMI_FALLBACK)
         if not executable:
             raise RuntimeError(f"{agent} is not installed or is not on PATH.")
         session = self.state["sessions"].get(agent)
@@ -136,6 +242,17 @@ class Coordinator:
             if not native:
                 command += ["-p", "--verbose", "--output-format", "stream-json"]
             command += ["--", prompt]
+            return command, session
+        if agent == "kimi":
+            # Prompt mode already runs in Kimi's never-ask mode and rejects --auto;
+            # --auto only covers the interactive /cli launch.
+            command = [executable, "-m", KIMI_MODEL]
+            if native:
+                command += ["--auto"]
+            if session:
+                command += ["-S", session]
+            if not native:
+                command += ["--output-format", "stream-json", "-p", prompt]
             return command, session
         command = [executable, "-C", str(self.root),
                    "--dangerously-bypass-approvals-and-sandbox"]
@@ -157,7 +274,23 @@ class Coordinator:
         # Ignore subagent events: their session IDs and failures are not this run's.
         if event.get("parent_tool_use_id"):
             return
-        if agent == "codex":
+        if agent == "kimi":
+            role = event.get("role")
+            if role == "meta" and kind == "session.resume_hint":
+                # Written only after a turn completes.
+                result["session"] = event.get("session_id") or result["session"]
+                result["completed"] = True
+            elif role == "meta" and kind == "turn.step.retrying":
+                print(f"[retrying: {event.get('error_message', '')}]", flush=True)
+            elif role == "assistant":
+                if event.get("content"):
+                    print(event["content"], flush=True)
+                for call in event.get("tool_calls") or []:
+                    print(f"[tool] {call.get('function', {}).get('name', '')}", flush=True)
+            elif kind == "error":
+                result["errors"].append(f"{event.get('code', '')}: {event.get('message', '')}")
+                result["failed"] = True
+        elif agent == "codex":
             if kind == "thread.started" and event.get("thread_id"):
                 result["session"] = event["thread_id"]
             if kind == "item.completed":
@@ -195,7 +328,20 @@ class Coordinator:
             self.state["sessions"][agent] = result["session"]
             self.save()
 
+    def child_env(self, agent):
+        env = dict(os.environ)
+        if agent == "kimi":
+            # Lets Kimi load the project's MCP servers (the ArcGIS bridge) without a prompt.
+            env["KIMI_CODE_TRUST_WORKSPACE"] = "1"
+        if self.lane:
+            # The cargo shim shares a few build slots between lanes so they fit in memory.
+            env.update(UNIGIS_LANE=self.lane, CARGO_BUILD_JOBS="3",
+                       PATH=f"{SHIM}{os.pathsep}{env.get('PATH', '')}")
+        return env
+
     def run(self, agent, task, lock_fd, native=False, previous=None):
+        if not native:
+            self.rotate_if_large(agent)
         prompt = self.prompt(task, previous)
         command, session = self.command(agent, prompt, native)
         run_id = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%S") + "-" + uuid.uuid4().hex[:8]
@@ -220,6 +366,8 @@ class Coordinator:
         try:
             child = subprocess.Popen(
                 command, cwd=self.root, start_new_session=not native,
+                # Lets Kimi load the project's MCP servers (the ArcGIS bridge) without a prompt.
+                env=self.child_env(agent),
                 stdin=None if native else subprocess.DEVNULL,
                 stdout=None if native else subprocess.PIPE,
                 stderr=None if native else subprocess.PIPE,
@@ -262,6 +410,9 @@ class Coordinator:
                                             print(text, flush=True)
                                 elif text:
                                     print(text, file=sys.stderr, flush=True)
+                                    # Kimi reports a failed turn ("provider.rate_limit: …") on stderr.
+                                    if agent == "kimi" and not text.startswith("Warning"):
+                                        result["errors"].append(text)
                             if not data:
                                 selector.unregister(key.fileobj)
                                 key.fileobj.close()
@@ -300,6 +451,8 @@ class Coordinator:
                 result["status"] = "completed"
             elif any(LIMIT.search(error) for error in result["errors"]):
                 result["status"] = "usage_limit"
+            elif any(TRANSIENT.search(error) for error in result["errors"]):
+                result["status"] = "unavailable"
             else:
                 result["status"] = "failed"
             result.update(exit_code=child.returncode, finished=now())
@@ -314,15 +467,29 @@ class Coordinator:
         return result
 
     def turn(self, task, lock_fd, fallback=True):
-        agent = self.state["agent"]
+        """Run the task on the selected agent, or on the other one while it is limited.
+
+        The selection is a preference: once a limit lifts, turns go back to it.
+        """
+        preferred = self.state["agent"]
+        order = [preferred] + ([a for a in AGENTS if a != preferred] if fallback else [])
+        candidates = [agent for agent in order if self.available(agent)]
+        if not candidates:
+            print(f"[no agent available until {self.next_available().astimezone():%a %H:%M}; "
+                  "/switch AGENT retries one now]", flush=True)
+            return 1
+        if candidates[0] != preferred:
+            print(f"[{preferred} is limited; using {candidates[0]}]", flush=True)
         previous = self.state.get("last_run")
-        result = self.run(agent, task, lock_fd, previous=previous)
-        if fallback and result["status"] == "usage_limit":
-            other = "codex" if agent == "claude" else "claude"
-            print(f"{agent} reported a limit; handing the unfinished request to {other}.")
-            self.state["agent"] = other
-            self.save()
-            result = self.run(other, task, lock_fd, previous=result)
+        for index, agent in enumerate(candidates):
+            result = self.run(agent, task, lock_fd, previous=previous)
+            if result["status"] not in ("usage_limit", "unavailable"):
+                break
+            self.mark_limited(agent, result)
+            previous = result
+            if index + 1 < len(candidates):
+                print(f"{agent} is {result['status'].replace('_', ' ')}; handing the unfinished "
+                      f"request to {candidates[index + 1]}.", flush=True)
         return 0 if result["status"] == "completed" else 1
 
     def handle(self, line, lock_fd):
@@ -342,15 +509,22 @@ class Coordinator:
             print((self.root / "docs/HANDOFF.md").read_text())
         elif command == "/switch" and len(args) == 1 and args[0] in AGENTS:
             self.state["agent"] = args[0]
+            self.state["limited_until"].pop(args[0], None)
             self.save()
         elif command == "/session" and len(args) == 2 and args[0] in AGENTS:
-            self.state["sessions"][args[0]] = str(uuid.UUID(args[1]))
+            if args[0] != "kimi":
+                args[1] = str(uuid.UUID(args[1]))
+            elif not re.fullmatch(r"[\w-]{6,}", args[1]):
+                raise ValueError("not a Kimi session ID")
+            self.state["sessions"][args[0]] = args[1]
             self.save()
         elif command == "/new" and len(args) <= 1 and (not args or args[0] in AGENTS):
             self.state["sessions"].pop(args[0] if args else self.state["agent"], None)
             self.save()
         elif command == "/auto" and args in (["on"], ["off"]):
             self.auto = args == ["on"]
+        elif command == "/cli" and self.headless:
+            print("/cli needs a terminal; use `agents-remote chat` and /cli there.")
         elif command == "/cli" and len(args) <= 1 and (not args or args[0] in AGENTS):
             agent = args[0] if args else self.state["agent"]
             self.run(agent, "Continue the task in docs/HANDOFF.md.", lock_fd,
@@ -387,9 +561,11 @@ class Coordinator:
         os.chmod(remote, 0o700)
         return remote
 
-    def write_remote_status(self, remote, state, task="", failures=0):
+    def write_remote_status(self, remote, state, task="", failures=0, **extra):
         save_json(remote / "status.json", {
-            "time": now(), "state": state, "agent": self.state.get("agent"),
+            **extra, "time": now(), "state": state, "agent": self.state.get("agent"),
+            "limited_until": {a: t for a, t in self.state.get("limited_until", {}).items()
+                                              if not self.available(a)},
             "task": task[:300], "failures": failures,
             "paused": (remote / "PAUSE").exists(),
             "last_run": self.state.get("last_run", {}),
@@ -405,6 +581,7 @@ class Coordinator:
         after failures. Files named PAUSE and STOP in the remote directory pause and end the loop.
         """
         remote = self.remote_dirs()
+        self.headless = True
         failures = 0
         cycles = 0
         with (remote / "daemon.log").open("a", buffering=1) as log, \
@@ -424,7 +601,7 @@ class Coordinator:
                 try:
                     if item is not None:
                         text = item.read_text().strip()
-                        self.write_remote_status(remote, "running", text, failures)
+                        self.write_remote_status(remote, "running", text, failures, started=now())
                         print(f"[{now()}] {item.name}: {text[:200]}")
                         code = 0
                         if item.suffix == ".cmd":
@@ -434,14 +611,22 @@ class Coordinator:
                         item.rename(remote / "done" / f"{item.name}.exit{code}")
                         failures = failures + 1 if code else 0
                     elif keepalive and not paused:
-                        self.write_remote_status(remote, "running", idle_task, failures)
+                        self.write_remote_status(remote, "running", idle_task, failures, started=now())
                         print(f"[{now()}] keepalive: {idle_task}")
                         code = self.turn(idle_task, lock_fd, self.auto)
                         failures = failures + 1 if code else 0
                         if code:
                             wait = min(60 * 2 ** (failures - 1), 1800)
-                            print(f"[{now()}] turn did not complete; waiting {wait}s")
-                            self.write_remote_status(remote, "backoff", idle_task, failures)
+                            reset = self.next_available()
+                            usable = AGENTS if self.auto else (self.state["agent"],)
+                            if reset and not any(self.available(a) for a in usable):
+                                # Both limited: sleep until the first reset, not a blind backoff.
+                                seconds = (reset - dt.datetime.now(dt.timezone.utc)).total_seconds()
+                                wait = max(60, min(seconds + 60, 6 * 3600))
+                            print(f"[{now()}] turn did not complete; waiting {wait:.0f}s")
+                            until = (dt.datetime.now(dt.timezone.utc)
+                                     + dt.timedelta(seconds=wait)).isoformat(timespec="seconds")
+                            self.write_remote_status(remote, "backoff", idle_task, failures, until=until)
                             waited = 0.0
                             while waited < wait and not (remote / "STOP").exists():
                                 sleep(poll)
@@ -472,6 +657,16 @@ class _Tee:
             stream.flush()
 
 
+def lane_root(root, lane):
+    """A lane's worktree (created by `scripts/lane setup`)."""
+    if not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,30}", lane):
+        raise ValueError(f"bad lane name {lane!r}")
+    path = Path(root).resolve() / ".worktrees" / f"lane-{lane}"
+    if not path.is_dir():
+        raise RuntimeError(f"lane {lane} has no worktree; run scripts/lane setup {lane} AGENT")
+    return path
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--agent", choices=AGENTS, help="Initial agent (otherwise reuse selection)")
@@ -480,20 +675,28 @@ def main():
     parser.add_argument("--task", help="Run one task and exit; otherwise open the interactive coordinator")
     parser.add_argument("--daemon", action="store_true",
                         help="Run headless: take tasks from the remote inbox (see REMOTE.md)")
+    parser.add_argument("--cli", nargs="?", const="", choices=("", *AGENTS), metavar="AGENT",
+                        help="Open the native CLI on the coordinator's session, then exit")
+    parser.add_argument("--lane", help="Run as a parallel lane in .worktrees/lane-NAME (scripts/lane)")
     parser.add_argument("--no-keepalive", action="store_true",
                         help="With --daemon, wait for inbox tasks instead of re-sending the handoff task")
     args = parser.parse_args()
-    coordinator = Coordinator()
+    coordinator = Coordinator(lane=args.lane)
     if args.status:
         coordinator.status()
         return 0
     with coordinator.lock() as lock_fd:
         if args.agent:
             coordinator.state["agent"] = args.agent
-        coordinator.auto = not args.no_fallback
+        # A lane is one agent; other agents work in their own lanes.
+        coordinator.auto = not args.no_fallback and not args.lane
         coordinator.save()
+        if args.cli is not None:
+            coordinator.handle(f"/cli {args.cli}".strip(), lock_fd)
+            return 0
         if args.daemon:
-            return coordinator.daemon(lock_fd, keepalive=not args.no_keepalive)
+            idle = LANE_TASK if args.lane else DEFAULT_TASK
+            return coordinator.daemon(lock_fd, keepalive=not args.no_keepalive, idle_task=idle)
         if args.task:
             return coordinator.turn(args.task, lock_fd, coordinator.auto)
         if not sys.stdin.isatty():

@@ -14,6 +14,17 @@ The coordinator is a local Python program, with no model of its own and no extra
 dependencies. It invokes the installed CLIs using their existing authentication
 and configuration; it does not set API keys or change authentication providers.
 
+## Agents
+
+Three CLIs can take turns: Claude Code (`claude`), Codex (`codex`) and Kimi Code (`kimi`,
+found in `~/.kimi-code/bin` if it is not on PATH). Kimi runs `kimi -m kimi-code/k3.1-pro`
+(`UNIGIS_AGENTS_KIMI_MODEL` picks another alias from `~/.kimi-code/config.toml`) with its
+stream-json prompt mode, which already runs in never-ask mode; `--auto` is added for the
+interactive `/cli` launch only, since Kimi rejects `--prompt` together with `--auto`. Kimi
+resumes with `-S ID` and loads MCP servers from `~/.kimi-code/mcp.json`
+(the ArcGIS bridge is configured there). When the selected agent is limited, the request goes
+to the next available one in the order claude, codex, kimi.
+
 ## Switching and existing sessions
 
 ```text
@@ -40,18 +51,30 @@ Use `/session codex UUID` for Codex. Link sessions belonging to this checkout.
 The ID is a resume target, not a live connection to the old terminal. The
 coordinator does not send messages to or interrupt an already running CLI.
 
-## Usage limits
+## Usage limits, outages and long sessions
 
 Automatic fallback is on by default. If a turn ends with a recognized usage-limit
-error in the CLI's structured events, the coordinator sends the unfinished request
-and log locations to the other agent. It waits for the first process to exit and
-switches at most once per user request. The other agent remains selected afterward.
-If both are limited, it stops; use `/switch` when you want to retry a provider.
+error ("hit your limit") or a provider outage ("model is at capacity", "overloaded")
+in the CLI's structured events, the coordinator sends the unfinished request and
+log locations to the other agent. It records when the limited agent is usable
+again: the reset time the CLI states ("resets 5:40am", "try again at 1:49 AM"),
+otherwise 30 minutes for a limit and 10 for an outage. Until then turns go straight
+to the other agent; afterwards they return to the selected one. The selection is
+a preference and fallback never changes it. If both are limited, the daemon sleeps
+until the first reset. `/switch AGENT` clears that agent's recorded limit to retry
+it now.
 
 Authentication, permissions, network errors, and ordinary tool failures do not
 trigger fallback. Text about rate limits in successful answers or tool output is
 not treated as a provider limit. Unknown CLI error formats require `/switch`.
 Use `/auto off` to disable automatic switching, or `--no-fallback` on launch.
+
+A resumed conversation re-sends its whole history on every model call, so a
+session that runs for days makes every turn slow and expensive. When a session's
+stored transcript (`~/.claude/projects/*/ID.jsonl`, `~/.codex/sessions/**/rollout-*ID.jsonl`)
+passes 25 MB (`UNIGIS_AGENTS_MAX_SESSION_MB`), the next turn starts a fresh
+session; `docs/HANDOFF.md` and the previous run's logs carry the context. `/new`
+does the same by hand.
 
 Agents checkpoint `docs/HANDOFF.md` during work. The coordinator also snapshots it
 before and after each turn and records the original request and Git status, so an
@@ -115,6 +138,7 @@ Enter `/help` for the available commands. Other entry points:
 
 ```sh
 ./scripts/agents --status
+./scripts/agents --cli claude   # native CLI on the coordinator's session
 ./scripts/agents --agent codex
 ./scripts/agents --agent claude --task "Continue the task in docs/HANDOFF.md"
 ./scripts/agents --no-fallback --task "Inspect the current changes"

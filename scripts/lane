@@ -1,0 +1,225 @@
+#!/usr/bin/env python3
+"""Parallel lanes: several agents build different tools at once, each in its own worktree.
+
+    scripts/lane setup NAME AGENT   create .worktrees/lane-NAME (branch lane/NAME, from origin/main)
+    scripts/lane claim              (in a lane) claim the next free tool of docs/WORK_QUEUE.md
+    scripts/lane release [TOOL]     give a claim back (all of this lane's without TOOL)
+    scripts/lane land               rebase on origin/main, run scripts/check, push to main
+    scripts/lane status             lanes, their agents, claims and branches
+
+A lane is one agent in one worktree with its own build directory (on /home, via a `target`
+symlink) and its own coordinator (`scripts/agents --daemon --lane NAME`). Claims stop two lanes
+building the same tool; landing takes a lock so only one lane rebases, checks and pushes at a time.
+Rebase conflicts in generated files (docs/WORK_QUEUE.md, docs/dashboard.html) resolve themselves;
+any other conflict stops the landing and is left for the agent to resolve.
+"""
+import contextlib
+import datetime as dt
+import fcntl
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parents[1]
+GENERATED = {"docs/WORK_QUEUE.md", "docs/dashboard.html"}
+CLAIM_HOURS = 24
+
+
+def git(*args, cwd=None, check=True):
+    return subprocess.run(["git", *args], cwd=cwd or Path.cwd(), capture_output=True, text=True,
+                          check=check).stdout.strip()
+
+
+def main_root():
+    """The main checkout (the parent of the shared .git), from any worktree."""
+    common = Path(git("rev-parse", "--path-format=absolute", "--git-common-dir", cwd=ROOT))
+    return common.parent
+
+
+
+def state_dir():
+    common = Path(git("rev-parse", "--path-format=absolute", "--git-common-dir", cwd=ROOT))
+    path = common / "agent-coordinator"
+    path.mkdir(mode=0o700, parents=True, exist_ok=True)
+    return path
+
+
+@contextlib.contextmanager
+def locked(name, wait_message=None):
+    with (state_dir() / name).open("a+") as handle:
+        try:
+            fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            if wait_message:
+                print(wait_message, flush=True)
+            fcntl.flock(handle, fcntl.LOCK_EX)
+        yield
+
+
+def current_lane():
+    lane = os.environ.get("UNIGIS_LANE")
+    if not lane:
+        branch = git("branch", "--show-current", check=False)
+        lane = branch.removeprefix("lane/") if branch.startswith("lane/") else ""
+    if not lane:
+        sys.exit("not in a lane (no UNIGIS_LANE and the branch is not lane/NAME)")
+    return lane
+
+
+def load_claims():
+    path = state_dir() / "claims.json"
+    claims = json.loads(path.read_text()) if path.exists() else {}
+    cutoff = dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=CLAIM_HOURS)
+    return {k: v for k, v in claims.items() if dt.datetime.fromisoformat(v["time"]) > cutoff}
+
+
+def save_claims(claims):
+    path = state_dir() / "claims.json"
+    tmp = path.with_suffix(".tmp")
+    tmp.write_text(json.dumps(claims, indent=2) + "\n")
+    tmp.replace(path)
+
+
+def setup(name, agent):
+    root = main_root()
+    path = root / ".worktrees" / f"lane-{name}"
+    if not path.exists():
+        git("fetch", "-q", "origin", "main", cwd=root)
+        git("worktree", "add", "-q", "-B", f"lane/{name}", str(path), "origin/main", cwd=root)
+        print(f"created {path} on lane/{name}")
+    # Each lane builds into its own directory on the fast, roomy home disk.
+    target = Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache")) / "unigis-lanes" / name / "target"
+    target.mkdir(parents=True, exist_ok=True)
+    link = path / "target"
+    if not link.exists() and not link.is_symlink():
+        link.symlink_to(target)
+    lane_state = state_dir() / "lanes" / name
+    lane_state.mkdir(parents=True, exist_ok=True)
+    state_file = lane_state / "state.json"
+    state = json.loads(state_file.read_text()) if state_file.exists() else {}
+    state.update(workspace=str(path), agent=agent)
+    state.setdefault("sessions", {})
+    state_file.write_text(json.dumps(state, indent=2) + "\n")
+    handoff = path / "docs" / "handoff" / f"{name}.md"
+    if not handoff.exists():
+        handoff.parent.mkdir(parents=True, exist_ok=True)
+        handoff.write_text(f"# Lane {name} handoff\n\nAgent: {agent}. No tool claimed yet: run "
+                           "`scripts/lane claim`.\n")
+    print(f"lane {name}: agent {agent}, worktree {path}, build directory {target}")
+
+
+def claim():
+    lane = current_lane()
+    sys.path.insert(0, str(ROOT / "scripts"))
+    from work_queue import NAMES, queue  # noqa: E402
+    with locked("claims.lock"):
+        claims = load_claims()
+        mine = [tool for tool, c in claims.items() if c["lane"] == lane]
+        if mine:
+            print(f"lane {lane} already has {', '.join(mine)}: finish and land it, or "
+                  "`scripts/lane release` first")
+            return
+        missing, *_ = queue()
+        for item in missing:
+            key = f"{item['alias']}.{item['name']}"
+            if key not in claims:
+                claims[key] = {"lane": lane, "title": item["title"],
+                               "time": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")}
+                save_claims(claims)
+                print(f"claimed {item['title']} ({NAMES.get(item['alias'], item['alias'])}, "
+                      f"arcpy {key}) {item['url']}")
+                return
+        print("nothing left to claim")
+
+
+def release(tool=None):
+    lane = current_lane()
+    with locked("claims.lock"):
+        claims = load_claims()
+        drop = [k for k, c in claims.items() if c["lane"] == lane and (tool in (None, k, c["title"]))]
+        for key in drop:
+            del claims[key]
+        save_claims(claims)
+    print("released", ", ".join(drop) or "nothing")
+
+
+def conflicted():
+    return [p for p in git("diff", "--name-only", "--diff-filter=U", check=False).splitlines() if p]
+
+
+def land():
+    lane = current_lane()
+    if git("status", "--porcelain", "--untracked-files=no", check=False):
+        sys.exit("commit (or stash) your changes before landing")
+    with locked("landing.lock", "another lane is landing; waiting for it…"):
+        git("fetch", "-q", "origin", "main")
+        rebase = subprocess.run(["git", "rebase", "origin/main"], capture_output=True, text=True)
+        while rebase.returncode != 0:
+            files = conflicted()
+            if not files or set(files) - GENERATED:
+                subprocess.run(["git", "rebase", "--abort"], capture_output=True)
+                sys.exit("rebase onto origin/main stopped on conflicts in: " + ", ".join(files or ["?"])
+                         + "\nResolve them: `git rebase origin/main`, fix, `git add`, "
+                         "`git rebase --continue`, then `scripts/lane land` again.")
+            for path in files:  # generated: keep main's copy; the post-commit hook rebuilds it
+                git("checkout", "--ours", "--", path)
+                git("add", "--", path)
+            rebase = subprocess.run(["git", "-c", "core.editor=true", "rebase", "--continue"],
+                                    capture_output=True, text=True)
+        ahead = git("rev-list", "--count", "origin/main..HEAD")
+        if ahead == "0":
+            print("nothing to land: the branch has no commits beyond origin/main")
+            return
+        print(f"rebased {ahead} commit(s) on origin/main; running scripts/check…", flush=True)
+        if subprocess.run([str(ROOT / "scripts/check")]).returncode != 0:
+            sys.exit("scripts/check failed: fix it, commit, and run `scripts/lane land` again")
+        # The same check the pre-push hook would repeat has just passed on this commit.
+        push = subprocess.run(["git", "push", "--no-verify", "origin", "HEAD:main"],
+                              capture_output=True, text=True)
+        if push.returncode != 0:
+            sys.exit("push failed (main moved?): run `scripts/lane land` again\n" + push.stderr)
+    print(f"landed {ahead} commit(s) from lane {lane} on main")
+    release()
+
+
+def status():
+    root = main_root()
+    claims = load_claims()
+    lanes = sorted((state_dir() / "lanes").glob("*/state.json")) if (state_dir() / "lanes").exists() else []
+    if not lanes:
+        print("no lanes yet: scripts/lane setup NAME AGENT")
+    for path in lanes:
+        name = path.parent.name
+        state = json.loads(path.read_text())
+        worktree = root / ".worktrees" / f"lane-{name}"
+        ahead = git("rev-list", "--count", "origin/main..HEAD", cwd=worktree, check=False) if worktree.exists() else "?"
+        held = [c["title"] for c in claims.values() if c["lane"] == name]
+        print(f"{name:10} agent {state.get('agent', '?'):7} {ahead} commit(s) to land   "
+              f"claim: {', '.join(held) or '-'}")
+
+
+def main(argv):
+    if not argv:
+        print(__doc__)
+        return 0
+    cmd, rest = argv[0], argv[1:]
+    if cmd == "setup" and len(rest) == 2 and rest[1] in ("claude", "codex", "kimi"):
+        setup(*rest)
+    elif cmd == "claim" and not rest:
+        claim()
+    elif cmd == "release" and len(rest) <= 1:
+        release(*rest)
+    elif cmd == "land" and not rest:
+        land()
+    elif cmd == "status" and not rest:
+        status()
+    else:
+        print(__doc__)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

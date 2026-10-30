@@ -55,11 +55,16 @@ Queued tasks run in order before any keepalive "continue". Commands (`/switch`, 
 
 Only one process can *own* the coordinator, so the interactive `./scripts/agents` and the
 daemon cannot run together. Run the daemon (it keeps working when you leave) and use
-`./scripts/agents-remote chat` as your prompt at the machine: it looks like the normal
-coordinator (type a task, `/switch codex`, `/pause`, `/status`), streams the daemon's log, and
-you can quit and re-open it at any time without stopping the work. Over SSH from your phone it
-is the same command. Only `/cli` (the native Claude/Codex TUI) needs the interactive
-coordinator: `agents-remote stop`, run `./scripts/agents`, and start the service again after.
+`./scripts/agents-remote` (no arguments, or `chat`) as your prompt at the machine or over SSH.
+It shows a short status, streams the daemon's log, and you can quit and re-open it at any time
+without stopping the work. A line queues a task; `/status`, `/queue`, `/log`, `/handoff` look
+around; `/start`, `/stop`, `/pause`, `/resume`, `/clear` control the daemon and its queue;
+`/switch`, `/new`, `/auto`, `/session` go to the daemon (malformed ones are rejected at the
+prompt). If the daemon is not running, the prompt says so instead of silently queueing.
+
+`/cli [AGENT]` (or `agents-remote cli`) opens the native Claude/Codex TUI on the coordinator's
+session in your terminal: it asks the daemon to stop after the current turn, waits, runs the
+CLI, and starts the daemon again when you exit. The headless daemon itself refuses `/cli`.
 
 ## Optional web page and progress dashboard (tailnet only)
 
@@ -78,8 +83,7 @@ your tailnet, no one else can reach it. Do not use `tailscale funnel` (that is p
 
 - State and the remote files live under `.git/agent-coordinator/remote/` (inbox, done,
   status.json, daemon.log, PAUSE, STOP), private to your user.
-- `/cli` (native interactive Claude/Codex) is not available headless; use the interactive
-  coordinator at the machine for that.
+- `/cli` needs a terminal: use it from `agents-remote chat`, which hands the session over.
 - The daemon runs with full access like the interactive coordinator (see README).
 - The headless coordinator cannot log in to a provider for you: if Claude or Codex logs out, the
   turns fail and the daemon backs off; log in again in a terminal, then `resume` is automatic.

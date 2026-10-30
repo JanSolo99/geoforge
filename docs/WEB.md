@@ -25,6 +25,25 @@ Add new site › Import an existing project › GitHub › `geoforge`, set **Bra
 hosts the files (the branch carries its own `netlify.toml`); each push to `main` redeploys it
 once the build above finishes. The token and secret steps are then not needed.
 
+## From this machine (while GitHub Actions is off)
+
+`scripts/publish-web-dist.sh` builds `origin/main` in its own worktree (`~/.cache/unigis-web`) and
+force-pushes the result to `web-dist`, which Netlify deploys. It does nothing if `web-dist` already
+holds that commit's build. To keep memory free (about 8 GB) it holds new coordinator turns, waits
+for the current one and any other Cargo build, requires at least **9 GiB available RAM**
+(including 1 GiB headroom above the build estimate), and builds with **one Cargo job**. A file
+lock prevents simultaneous publisher instances. The RAM check includes finite cgroup-v2
+limits and runs again immediately before Trunk starts; low RAM makes the publisher wait
+(up to two hours), rather than starting another large build. A user timer runs it every
+4 hours:
+
+```sh
+cp tools/agent-coordinator/unigis-web-dist.{service,timer} ~/.config/systemd/user/
+systemctl --user daemon-reload && systemctl --user enable --now unigis-web-dist.timer
+scripts/publish-web-dist.sh --check-resources # read-only RAM check; does not publish
+systemctl --user start unigis-web-dist      # publish now; journalctl --user -u unigis-web-dist -f
+```
+
 ## By hand
 
 ```sh
