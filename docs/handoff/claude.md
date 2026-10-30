@@ -1,6 +1,6 @@
 # Lane claude handoff
 
-Updated 2026-10-30 (Claude), worktree `.worktrees/lane-claude`, branch `lane/claude`.
+Updated 2026-10-30, end of session (Claude), worktree `.worktrees/lane-claude`, branch `lane/claude`.
 
 ## User request (takes precedence over the queue; no queue tool claimed)
 
@@ -72,16 +72,17 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
   prefilled dialogs, Run creating a folder, a mobile gdb, NewFeatureClass (free name increments) and
   Transport/NewFeatureClass; ArcGIS read them (dataset SR, OBJECTID/Shape only).
 
-## Queue: Table To Geodatabase — committed, landing
+## Queue: Table To Geodatabase — landed on main
 
 - Registry `table_to_geodatabase` (`unigis-tools/src/feature_class_to_geodatabase.rs` TABLE_TOOL,
   `Context::import_tables`); CLI `feature_class_to_geodatabase::run_tables` (shared `import` with a
   table mode: dBASE/CSV/gdb tables/shapefiles → tables, CSV text 8000, feature-dataset target
   000732). 8 `ttg_*` references via the generalized `feature_import_case`.
-- Validation: `UNIGIS_REFERENCE_CASES=ttg_,fctg_` reference test PASS; full gate in `lane land`.
+- Validation: `UNIGIS_REFERENCE_CASES=ttg_,fctg_` reference test PASS; full `scripts/check` PASS in
+  `scripts/lane land`; claim released.
 
 ## Next
 
-- User request (slices 1–3) complete. After Table To Geodatabase lands: `scripts/lane claim`.
+- No claim held. Next: `scripts/lane claim` and follow docs/WORK_QUEUE.md.
 - Possible follow-ups (not requested): Catalog New for mobile geodatabases (needs a mobile reader),
   ArcGIS-style blank names instead of NewFeatureClass placeholders.
