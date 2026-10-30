@@ -4917,7 +4917,7 @@ fn tools_match_arcgis_output() {
                 info,
                 &root,
             );
-        } else if case.starts_with("eld_") {
+        } else if case.starts_with("eld_") || case.starts_with("elt_") {
             diffs = extract_locations::compare(&out, &reference.join(format!("{case}.shp")));
         } else if info["stochastic_points"] == true {
             diffs =

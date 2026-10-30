@@ -694,14 +694,51 @@ fn fields() -> Vec<Field> {
     ]
 }
 
+/// Where the text came from, for the Name, Filename, File_Type and Modified fields.
+pub struct Source {
+    pub name: String,
+    pub filename: String,
+    pub file_type: String,
+    pub modified: String,
+}
+
+impl Source {
+    /// A document on disk.
+    pub fn file(path: &Path, modified: &str) -> Source {
+        Source {
+            name: path
+                .file_name()
+                .map(|n| n.to_string_lossy().into_owned())
+                .unwrap_or_default(),
+            filename: path.display().to_string(),
+            file_type: path
+                .extension()
+                .map(|e| e.to_string_lossy().to_uppercase())
+                .unwrap_or_default(),
+            modified: modified.to_owned(),
+        }
+    }
+
+    /// Text given to Extract Locations From Text: named `Text`, no file (ArcGIS writes a space),
+    /// modified when scanned.
+    pub fn text(scanned: &str) -> Source {
+        Source {
+            name: "Text".into(),
+            filename: " ".into(),
+            file_type: " ".into(),
+            modified: scanned.to_owned(),
+        }
+    }
+}
+
 /// The points of a document's text.
-pub fn extract(
-    text: &str,
-    path: &Path,
-    modified: &str,
-    scanned: &str,
-    notations: &Notations,
-) -> ToolOutput {
+pub fn extract(text: &str, source: &Source, scanned: &str, notations: &Notations) -> ToolOutput {
+    let Source {
+        name,
+        filename,
+        file_type,
+        modified,
+    } = source;
     // Line breaks read as spaces.
     let t: Vec<char> = text
         .chars()
@@ -725,14 +762,6 @@ pub fn extract(
         .map(|d| t[d.start..d.end].iter().collect::<String>())
         .collect::<Vec<_>>()
         .join(", ");
-    let name = path
-        .file_name()
-        .map(|n| n.to_string_lossy().into_owned())
-        .unwrap_or_default();
-    let file_type = path
-        .extension()
-        .map(|e| e.to_string_lossy().to_uppercase())
-        .unwrap_or_default();
     let features = find_coordinates(&t, notations)
         .into_iter()
         .enumerate()
@@ -744,7 +773,7 @@ pub fn extract(
                 oid: k as i64 + 1,
                 geometry: Some(Geometry::point(f.lon, f.lat)),
                 attributes: vec![
-                    Value::String(clip(&name, 50)),
+                    Value::String(clip(name, 50)),
                     Value::String(pre.trim_end().to_owned()),
                     Value::String(clip(&ext, 120)),
                     Value::String(f.kind.to_owned()),
@@ -756,8 +785,8 @@ pub fn extract(
                     date(sorted.last().copied()),
                     Value::String(clip(&all, 254)),
                     Value::String(clip(&written, 254)),
-                    Value::String(clip(&path.display().to_string(), 254)),
-                    Value::String(clip(&file_type, 10)),
+                    Value::String(clip(filename, 254)),
+                    Value::String(clip(file_type, 10)),
                     Value::String(modified.to_owned()),
                     Value::String(scanned.to_owned()),
                 ],
@@ -803,20 +832,35 @@ fn run(ctx: &dyn Context) -> Result<ToolOutput> {
         .and_then(|m| m.modified())
         .map(|m| stamp(m.into()))
         .unwrap_or_default();
-    let notations = Notations {
+    Ok(extract(
+        &text,
+        &Source::file(path, &modified),
+        &stamp(Local::now()),
+        &notations(ctx),
+    ))
+}
+
+fn notations(ctx: &dyn Context) -> Notations {
+    Notations {
         dd: flag(ctx, "coord_dd_latlon", "FIND_DD_LATLON")
             || flag(ctx, "coord_dd_xyplain", "FIND_DD_XYPLAIN"),
         dm: flag(ctx, "coord_dm_latlon", "FIND_DM_LATLON"),
         dms: flag(ctx, "coord_dms_latlon", "FIND_DMS_LATLON"),
         utm: flag(ctx, "coord_utm", "FIND_UTM_MAINWORLD"),
         mgrs: flag(ctx, "coord_mgrs", "FIND_MGRS_MAINWORLD"),
-    };
+    }
+}
+
+fn run_text(ctx: &dyn Context) -> Result<ToolOutput> {
+    let text = ctx
+        .get("in_text")
+        .ok_or_else(|| err("ERROR 000735: Input Text: Value is required"))?;
+    let scanned = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
     Ok(extract(
         &text,
-        path,
-        &modified,
-        &stamp(Local::now()),
-        &notations,
+        &Source::text(&scanned),
+        &scanned,
+        &notations(ctx),
     ))
 }
 
@@ -883,6 +927,57 @@ pub const TOOL: Tool = Tool {
     output_suffix: "Locations",
     measures: false,
     run: Runner::Features(run),
+};
+
+/// `arcpy.conversion.ExtractLocationsText(in_text, out_feature_class, ...)`.
+pub const TEXT_TOOL: Tool = Tool {
+    id: "extract_locations_text",
+    name: "Extract Locations From Text",
+    toolbox: "Conversion › From Document",
+    summary: "Points for the coordinates written in a text (DD, DM, DMS, UTM, MGRS), with the text around them and the dates it mentions (ArcGIS Pro Extract Locations From Text).",
+    params: &[
+        Param {
+            name: "in_text",
+            label: "Input Text",
+            kind: Kind::Text,
+            required: true,
+            default: "",
+            help: "The text to search.",
+        },
+        choice(
+            "coord_dd_latlon",
+            "Decimal degrees (lat/lon)",
+            &["FIND_DD_LATLON", "DONT_FIND_DD_LATLON"],
+        ),
+        choice(
+            "coord_dd_xyplain",
+            "Decimal degrees (signed pair)",
+            &["FIND_DD_XYPLAIN", "DONT_FIND_DD_XYPLAIN"],
+        ),
+        choice(
+            "coord_dm_latlon",
+            "Degrees decimal minutes",
+            &["FIND_DM_LATLON", "DONT_FIND_DM_LATLON"],
+        ),
+        choice(
+            "coord_dms_latlon",
+            "Degrees minutes seconds",
+            &["FIND_DMS_LATLON", "DONT_FIND_DMS_LATLON"],
+        ),
+        choice(
+            "coord_utm",
+            "UTM",
+            &["FIND_UTM_MAINWORLD", "DONT_FIND_UTM_MAINWORLD"],
+        ),
+        choice(
+            "coord_mgrs",
+            "MGRS",
+            &["FIND_MGRS_MAINWORLD", "DONT_FIND_MGRS_MAINWORLD"],
+        ),
+    ],
+    output_suffix: "Locations",
+    measures: false,
+    run: Runner::Features(run_text),
 };
 
 #[cfg(test)]

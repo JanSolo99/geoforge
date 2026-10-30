@@ -133,6 +133,11 @@ CASES = {
     ]},
     # Extract Locations From Document: in_template, then the notation switches (DD lat/lon,
     # DD xy degrees, DD plain, DM, DM xy, DMS, DMS xy, DMS separated, UTM, UPS N, UPS S, MGRS).
+    "elt_basic": ("conversion.ExtractLocationsText", ["Camp at 34.0522 N, 118.2437 W on 2024-03-15.\nThen 18SUJ2348306479 on March 21, 2024."], []),
+    "elt_mixed": ("conversion.ExtractLocationsText", [(DATA / "eld_mixed.txt").read_text()], []),
+    "elt_none": ("conversion.ExtractLocationsText", ["No coordinates here, only 2023-12-01 and 3.14159."], []),
+    "elt_no_grids": ("conversion.ExtractLocationsText", [(DATA / "eld_mixed.txt").read_text()],
+                     ["", "", "", "", "", "", "", "", "", "DONT_FIND_UTM_MAINWORLD", "", "", "DONT_FIND_MGRS_MAINWORLD"]),
     "eld_mixed": ("conversion.ExtractLocationsDocument", [DATA / "eld_mixed.txt"], []),
     "eld_plain": ("conversion.ExtractLocationsDocument", [DATA / "eld_plain.txt"], []),
     "eld_none": ("conversion.ExtractLocationsDocument", [DATA / "eld_none.txt"], []),
@@ -2279,6 +2284,7 @@ for _tool, _id in COMBINATORIAL:
 
 
 RUN = {
+    "conversion.ExtractLocationsText": ("extract_locations_text", ["in_text", "output", "", "coord_dd_latlon", "", "coord_dd_xyplain", "coord_dm_latlon", "", "coord_dms_latlon", "", "", "coord_utm", "", "", "coord_mgrs"]),
     "conversion.ExtractLocationsDocument": ("extract_locations_document", ["in_file", "output", "", "coord_dd_latlon", "", "coord_dd_xyplain", "coord_dm_latlon", "", "coord_dms_latlon", "", "", "coord_utm", "", "", "coord_mgrs"]),
     "conversion.TableToGeodatabase": ("table_to_geodatabase", ["input_table", "output_geodatabase"]),
     "management.CreateFolder": ("create_folder", ["out_folder_path", "out_name"]),

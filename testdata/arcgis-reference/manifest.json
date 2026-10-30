@@ -102819,6 +102819,601 @@
           "coord_dms_latlon": "DONT_FIND_DMS_LATLON"
         }
       }
+    },
+    "elt_basic": {
+      "tool": "conversion.ExtractLocationsText",
+      "args": [
+        "Camp at 34.0522 N, 118.2437 W on 2024-03-15.\nThen 18SUJ2348306479 on March 21, 2024.",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Name",
+          "String",
+          50,
+          0,
+          0
+        ],
+        [
+          "Pre_Text",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "Ext_Text",
+          "String",
+          120,
+          0,
+          0
+        ],
+        [
+          "Ext_Type",
+          "String",
+          50,
+          0,
+          0
+        ],
+        [
+          "Post_Text",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "Precision",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Std_Coord",
+          "String",
+          30,
+          0,
+          0
+        ],
+        [
+          "First_Date",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "Early_Date",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "Late_Date",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "All_Dates",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "ExDateText",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "Filename",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "File_Type",
+          "String",
+          10,
+          0,
+          0
+        ],
+        [
+          "Modified",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "Scanned",
+          "String",
+          20,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "extract_locations_text",
+        "params": {
+          "in_text": "Camp at 34.0522 N, 118.2437 W on 2024-03-15.\nThen 18SUJ2348306479 on March 21, 2024.",
+          "output": "<out>"
+        }
+      }
+    },
+    "elt_mixed": {
+      "tool": "conversion.ExtractLocationsText",
+      "args": [
+        "Field report, survey team B. The first camp was set at 34.0522 N, 118.2437 W near the river on 2024-03-15.\nThe second camp (40 26 46 N 79 58 56 W) followed on March 21, 2024, with a resupply at N51.5074 W0.1278.\nGrid references from the map sheet: 18SUJ2348306479 and 18S UJ 234 064; the coarse square 4QFJ1234 was also noted.\nA UTM fix reads 17N 630084 4833438, and another 56H 334786 6252080 was relayed on 3/18/2024.\nDegrees and minutes: 40 26.767 N 79 58.933 W, packed 4026.77N 07958.93W, and 402646N 0795856W.\nNot locations: version 1.2.3, phone 555-1234, -34.0522 N, 118.2437 W, the year 2024, and 34, -118.\nLater notes dated 22 March 2024 and 24077 mention 12.5, 7.25 and -33.9, 151.2 again.\n",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Name",
+          "String",
+          50,
+          0,
+          0
+        ],
+        [
+          "Pre_Text",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "Ext_Text",
+          "String",
+          120,
+          0,
+          0
+        ],
+        [
+          "Ext_Type",
+          "String",
+          50,
+          0,
+          0
+        ],
+        [
+          "Post_Text",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "Precision",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Std_Coord",
+          "String",
+          30,
+          0,
+          0
+        ],
+        [
+          "First_Date",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "Early_Date",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "Late_Date",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "All_Dates",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "ExDateText",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "Filename",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "File_Type",
+          "String",
+          10,
+          0,
+          0
+        ],
+        [
+          "Modified",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "Scanned",
+          "String",
+          20,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "extract_locations_text",
+        "params": {
+          "in_text": "Field report, survey team B. The first camp was set at 34.0522 N, 118.2437 W near the river on 2024-03-15.\nThe second camp (40 26 46 N 79 58 56 W) followed on March 21, 2024, with a resupply at N51.5074 W0.1278.\nGrid references from the map sheet: 18SUJ2348306479 and 18S UJ 234 064; the coarse square 4QFJ1234 was also noted.\nA UTM fix reads 17N 630084 4833438, and another 56H 334786 6252080 was relayed on 3/18/2024.\nDegrees and minutes: 40 26.767 N 79 58.933 W, packed 4026.77N 07958.93W, and 402646N 0795856W.\nNot locations: version 1.2.3, phone 555-1234, -34.0522 N, 118.2437 W, the year 2024, and 34, -118.\nLater notes dated 22 March 2024 and 24077 mention 12.5, 7.25 and -33.9, 151.2 again.\n",
+          "output": "<out>"
+        }
+      }
+    },
+    "elt_none": {
+      "tool": "conversion.ExtractLocationsText",
+      "args": [
+        "No coordinates here, only 2023-12-01 and 3.14159.",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Name",
+          "String",
+          50,
+          0,
+          0
+        ],
+        [
+          "Pre_Text",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "Ext_Text",
+          "String",
+          120,
+          0,
+          0
+        ],
+        [
+          "Ext_Type",
+          "String",
+          50,
+          0,
+          0
+        ],
+        [
+          "Post_Text",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "Precision",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Std_Coord",
+          "String",
+          30,
+          0,
+          0
+        ],
+        [
+          "First_Date",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "Early_Date",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "Late_Date",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "All_Dates",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "ExDateText",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "Filename",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "File_Type",
+          "String",
+          10,
+          0,
+          0
+        ],
+        [
+          "Modified",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "Scanned",
+          "String",
+          20,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "extract_locations_text",
+        "params": {
+          "in_text": "No coordinates here, only 2023-12-01 and 3.14159.",
+          "output": "<out>"
+        }
+      }
+    },
+    "elt_no_grids": {
+      "tool": "conversion.ExtractLocationsText",
+      "args": [
+        "Field report, survey team B. The first camp was set at 34.0522 N, 118.2437 W near the river on 2024-03-15.\nThe second camp (40 26 46 N 79 58 56 W) followed on March 21, 2024, with a resupply at N51.5074 W0.1278.\nGrid references from the map sheet: 18SUJ2348306479 and 18S UJ 234 064; the coarse square 4QFJ1234 was also noted.\nA UTM fix reads 17N 630084 4833438, and another 56H 334786 6252080 was relayed on 3/18/2024.\nDegrees and minutes: 40 26.767 N 79 58.933 W, packed 4026.77N 07958.93W, and 402646N 0795856W.\nNot locations: version 1.2.3, phone 555-1234, -34.0522 N, 118.2437 W, the year 2024, and 34, -118.\nLater notes dated 22 March 2024 and 24077 mention 12.5, 7.25 and -33.9, 151.2 again.\n",
+        "<out>",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "DONT_FIND_UTM_MAINWORLD",
+        "",
+        "",
+        "DONT_FIND_MGRS_MAINWORLD"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Name",
+          "String",
+          50,
+          0,
+          0
+        ],
+        [
+          "Pre_Text",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "Ext_Text",
+          "String",
+          120,
+          0,
+          0
+        ],
+        [
+          "Ext_Type",
+          "String",
+          50,
+          0,
+          0
+        ],
+        [
+          "Post_Text",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "Precision",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Std_Coord",
+          "String",
+          30,
+          0,
+          0
+        ],
+        [
+          "First_Date",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "Early_Date",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "Late_Date",
+          "Date",
+          8,
+          0,
+          0
+        ],
+        [
+          "All_Dates",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "ExDateText",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "Filename",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "File_Type",
+          "String",
+          10,
+          0,
+          0
+        ],
+        [
+          "Modified",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "Scanned",
+          "String",
+          20,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "extract_locations_text",
+        "params": {
+          "in_text": "Field report, survey team B. The first camp was set at 34.0522 N, 118.2437 W near the river on 2024-03-15.\nThe second camp (40 26 46 N 79 58 56 W) followed on March 21, 2024, with a resupply at N51.5074 W0.1278.\nGrid references from the map sheet: 18SUJ2348306479 and 18S UJ 234 064; the coarse square 4QFJ1234 was also noted.\nA UTM fix reads 17N 630084 4833438, and another 56H 334786 6252080 was relayed on 3/18/2024.\nDegrees and minutes: 40 26.767 N 79 58.933 W, packed 4026.77N 07958.93W, and 402646N 0795856W.\nNot locations: version 1.2.3, phone 555-1234, -34.0522 N, 118.2437 W, the year 2024, and 34, -118.\nLater notes dated 22 March 2024 and 24077 mention 12.5, 7.25 and -33.9, 151.2 again.\n",
+          "output": "<out>",
+          "coord_utm": "DONT_FIND_UTM_MAINWORLD",
+          "coord_mgrs": "DONT_FIND_MGRS_MAINWORLD"
+        }
+      }
     }
   }
 }

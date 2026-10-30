@@ -850,6 +850,8 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
   letters before/after, symbols, colons, packed), signed decimal pairs, MGRS and banded UTM; the
   Precision formula, context text, document dates (12 notations) and file fields as ArcGIS writes
   them. 6 ArcGIS `eld_*` references (machine/time fields Filename/Modified/Scanned not compared).
+- [x] Extract Locations From Text (`extract_locations_text`): the same engine on a text string
+  (Name `Text`, no file); 4 ArcGIS `elt_*` references.
 - [x] Table To Geodatabase (`table_to_geodatabase`): dBASE, CSV (text length 8000), geodatabase
   tables and shapefiles (written as tables, as ArcGIS does) into an existing file geodatabase, with
   `_1`, `_2` names, in one transaction (shared with Feature Class To Geodatabase). 8 ArcGIS `ttg_*`
