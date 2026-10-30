@@ -69,6 +69,13 @@ pub trait Context {
         ))
     }
 
+    /// Import tables (and feature classes) into a geodatabase; read-only hosts must refuse.
+    fn import_tables(&self, _inputs: &[String], _target: &str) -> Result<Vec<String>> {
+        Err(Error::Unsupported(
+            "table imports are not supported by this host".into(),
+        ))
+    }
+
     /// Mutate the supplied datasets; unsupported hosts must refuse explicitly.
     fn add_global_ids(&self, _input: &str) -> Result<()> {
         Err(Error::Unsupported(
@@ -1744,6 +1751,7 @@ fn add_fields(ctx: &dyn Context) -> Result<ToolOutput> {
 
 pub static TOOLS: &[Tool] = &[
     crate::feature_class_to_geodatabase::TOOL,
+    crate::feature_class_to_geodatabase::TABLE_TOOL,
     crate::excel::TOOL,
     Tool {
         id: "mean_center",

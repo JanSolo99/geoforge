@@ -49,6 +49,60 @@ fn run(ctx: &dyn Context) -> Result<Report> {
         messages: names,
     })
 }
+/// `arcpy.conversion.TableToGeodatabase(Input_Table, Output_Geodatabase)`.
+pub const TABLE_TOOL: Tool = Tool {
+    id: "table_to_geodatabase",
+    name: "Table To Geodatabase",
+    toolbox: "Conversion › To Geodatabase",
+    summary: "Imports tables (dBASE, CSV, geodatabase tables) into an existing file geodatabase, allocating unique names.",
+    params: &[
+        Param {
+            name: "input_table",
+            label: "Input Table",
+            kind: Kind::Text,
+            required: true,
+            default: "",
+            help: "Semicolon-separated table paths; optional single quotes around each path.",
+        },
+        Param {
+            name: "output_geodatabase",
+            label: "Output Geodatabase",
+            kind: Kind::Path,
+            required: true,
+            default: "",
+            help: "An existing file geodatabase. Existing items are kept; new names get _1, _2, etc.",
+        },
+    ],
+    output_suffix: "",
+    measures: false,
+    run: Runner::Report(run_tables),
+};
+
+fn run_tables(ctx: &dyn Context) -> Result<Report> {
+    let input = ctx.get("input_table").unwrap_or_default();
+    let inputs: Vec<_> = input
+        .split(';')
+        .map(|p| p.trim().trim_matches('\'').to_owned())
+        .filter(|p| !p.is_empty())
+        .collect();
+    if inputs.is_empty() {
+        return Err(Error::Unsupported(
+            "ERROR 000735: Input Table: Value is required".into(),
+        ));
+    }
+    let target = ctx.get("output_geodatabase").ok_or_else(|| {
+        Error::Unsupported("ERROR 000735: Output Geodatabase: Value is required".into())
+    })?;
+    let names = ctx.import_tables(&inputs, &target)?;
+    Ok(Report {
+        rows: vec![],
+        messages: names
+            .into_iter()
+            .chain([format!("Derived_Geodatabase: {target}")])
+            .collect(),
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

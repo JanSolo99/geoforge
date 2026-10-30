@@ -101639,6 +101639,170 @@
           "output_folder": "<out>"
         }
       }
+    },
+    "ttg_single": {
+      "tool": "conversion.TableToGeodatabase",
+      "args": [
+        "testdata/geoproc/dates.dbf",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "workspace_reference": {
+        "seed": "testdata/geoproc/fctg_empty.gdb"
+      },
+      "messages": [],
+      "run": {
+        "tool": "table_to_geodatabase",
+        "params": {
+          "input_table": "testdata/geoproc/dates.dbf",
+          "output_geodatabase": "<out>"
+        }
+      }
+    },
+    "ttg_batch": {
+      "tool": "conversion.TableToGeodatabase",
+      "args": [
+        "testdata/geoproc/dates.dbf;testdata/geoproc/bfu_def_basic.csv;testdata/geoproc/split_attribute_table.dbf",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "workspace_reference": {
+        "seed": "testdata/geoproc/fctg_empty.gdb"
+      },
+      "messages": [],
+      "run": {
+        "tool": "table_to_geodatabase",
+        "params": {
+          "input_table": "testdata/geoproc/dates.dbf;testdata/geoproc/bfu_def_basic.csv;testdata/geoproc/split_attribute_table.dbf",
+          "output_geodatabase": "<out>"
+        }
+      }
+    },
+    "ttg_repeat": {
+      "tool": "conversion.TableToGeodatabase",
+      "args": [
+        "testdata/geoproc/dates.dbf;testdata/geoproc/dates.dbf",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "workspace_reference": {
+        "seed": "testdata/geoproc/fctg_empty.gdb"
+      },
+      "messages": [],
+      "run": {
+        "tool": "table_to_geodatabase",
+        "params": {
+          "input_table": "testdata/geoproc/dates.dbf;testdata/geoproc/dates.dbf",
+          "output_geodatabase": "<out>"
+        }
+      }
+    },
+    "ttg_gdb": {
+      "tool": "conversion.TableToGeodatabase",
+      "args": [
+        "testdata/geoproc/globalids_base.gdb/records",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "workspace_reference": {
+        "seed": "testdata/geoproc/fctg_empty.gdb"
+      },
+      "messages": [],
+      "run": {
+        "tool": "table_to_geodatabase",
+        "params": {
+          "input_table": "testdata/geoproc/globalids_base.gdb/records",
+          "output_geodatabase": "<out>"
+        }
+      }
+    },
+    "ttg_collision": {
+      "tool": "conversion.TableToGeodatabase",
+      "args": [
+        "testdata/geoproc/parcels.shp;testdata/geoproc/dates.dbf",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "workspace_reference": {
+        "seed": "testdata/geoproc/fctg_seed.gdb"
+      },
+      "messages": [],
+      "run": {
+        "tool": "table_to_geodatabase",
+        "params": {
+          "input_table": "testdata/geoproc/parcels.shp;testdata/geoproc/dates.dbf",
+          "output_geodatabase": "<out>"
+        }
+      }
+    },
+    "ttg_dataset": {
+      "tool": "conversion.TableToGeodatabase",
+      "args": [
+        "testdata/geoproc/dates.dbf",
+        "<out>/group"
+      ],
+      "status": "failed",
+      "workspace_reference": {
+        "seed": "testdata/geoproc/fctg_seed.gdb"
+      },
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000732: Output Geodatabase: Dataset /mnt/media/ArcGIS_Linux/.worktrees/lane-claude/testdata/arcgis-reference/ttg_dataset.gdb/group does not exist or is not supported",
+        "Failed to execute (TableToGeodatabase)."
+      ],
+      "run": {
+        "tool": "table_to_geodatabase",
+        "params": {
+          "input_table": "testdata/geoproc/dates.dbf",
+          "output_geodatabase": "<out>/group"
+        }
+      }
+    },
+    "ttg_bad_batch": {
+      "tool": "conversion.TableToGeodatabase",
+      "args": [
+        "testdata/geoproc/dates.dbf;testdata/geoproc/missing.dbf",
+        "<out>"
+      ],
+      "status": "failed",
+      "workspace_reference": {
+        "seed": "testdata/geoproc/fctg_empty.gdb"
+      },
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000732: Input Table: Dataset /mnt/media/ArcGIS_Linux/.worktrees/lane-claude/testdata/geoproc/missing.dbf does not exist or is not supported",
+        "Failed to execute (TableToGeodatabase)."
+      ],
+      "run": {
+        "tool": "table_to_geodatabase",
+        "params": {
+          "input_table": "testdata/geoproc/dates.dbf;testdata/geoproc/missing.dbf",
+          "output_geodatabase": "<out>"
+        }
+      }
+    },
+    "ttg_missing_output": {
+      "tool": "conversion.TableToGeodatabase",
+      "args": [
+        "testdata/geoproc/dates.dbf",
+        "<out>"
+      ],
+      "status": "failed",
+      "workspace_reference": {
+        "seed": null
+      },
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000732: Output Geodatabase: Dataset /mnt/media/ArcGIS_Linux/.worktrees/lane-claude/testdata/arcgis-reference/ttg_missing_output.gdb does not exist or is not supported",
+        "Failed to execute (TableToGeodatabase)."
+      ],
+      "run": {
+        "tool": "table_to_geodatabase",
+        "params": {
+          "input_table": "testdata/geoproc/dates.dbf",
+          "output_geodatabase": "<out>"
+        }
+      }
     }
   }
 }

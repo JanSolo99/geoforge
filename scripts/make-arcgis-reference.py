@@ -120,6 +120,17 @@ CASES = {
         ("bad_batch", ["parcels.shp", "missing.shp"]),
         ("missing_output", ["parcels.shp"]),
     ]},
+    **{f"ttg_{name}": ("conversion.TableToGeodatabase", [[str(DATA / item) for item in items]], [])
+       for name, items in [
+        ("single", ["dates.dbf"]),
+        ("batch", ["dates.dbf", "bfu_def_basic.csv", "split_attribute_table.dbf"]),
+        ("repeat", ["dates.dbf", "dates.dbf"]),
+        ("gdb", ["globalids_base.gdb/records"]),
+        ("collision", ["parcels.shp", "dates.dbf"]),
+        ("dataset", ["dates.dbf"]),
+        ("bad_batch", ["dates.dbf", "missing.dbf"]),
+        ("missing_output", ["dates.dbf"]),
+    ]},
     **{f"excel_{name}": ("conversion.ExcelToTable", [DATA / ("excel_input." + ext)], [sheet, header, cells])
        for name, ext, sheet, header, cells in [
         ("default", "xlsx", "", 1, ""),
@@ -2252,6 +2263,7 @@ for _tool, _id in COMBINATORIAL:
 
 
 RUN = {
+    "conversion.TableToGeodatabase": ("table_to_geodatabase", ["input_table", "output_geodatabase"]),
     "management.CreateFolder": ("create_folder", ["out_folder_path", "out_name"]),
     "management.CreateFileGDB": ("create_file_gdb", ["out_folder_path", "out_name", "out_version"]),
     "management.CreateMobileGDB": ("create_mobile_gdb", ["out_folder_path", "out_name"]),
@@ -2695,13 +2707,14 @@ def gdb_scenario_case(w, steps):
 
 def feature_import_case(w, name, tool, before):
     """Retain complete ArcGIS output and immutable setup workspace for batch imports."""
-    seeded = name in {"fctg_collision", "fctg_dataset"}
+    kind = name.split("_", 1)[1]
+    seeded = kind in {"collision", "dataset"}
     seed = DATA / ("fctg_seed.gdb" if seeded else "fctg_empty.gdb")
-    suffix = "/group" if name == "fctg_dataset" else ""
+    suffix = "/group" if kind == "dataset" else ""
     out = OUT / f"{name}.gdb"
     if out.exists():
         shutil.rmtree(out)
-    missing = name == "fctg_missing_output"
+    missing = kind == "missing_output"
     if not missing:
         w.call("run_tool", tool="management.Copy", args=[str(seed), str(out)])
     target = str(out) + suffix
@@ -2849,7 +2862,7 @@ def main():
             for a in before:
                 if isinstance(a, Path) and a.suffix == ".tif":
                     w.call("python", code=f"arcpy.management.BuildRasterAttributeTable(r'{win(a)}', 'Overwrite')")
-        if tool == "conversion.FeatureClassToGeodatabase":
+        if tool in ("conversion.FeatureClassToGeodatabase", "conversion.TableToGeodatabase"):
             manifest["cases"][name] = feature_import_case(w, name, tool, before)
             print(f"{name}: {manifest['cases'][name]['status']}")
             continue

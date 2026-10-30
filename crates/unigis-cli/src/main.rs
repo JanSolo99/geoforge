@@ -2701,6 +2701,9 @@ fn main() -> ExitCode {
                 ) -> Result<Vec<String>> {
                     feature_class_to_geodatabase::run(inputs, Path::new(target))
                 }
+                fn import_tables(&self, inputs: &[String], target: &str) -> Result<Vec<String>> {
+                    feature_class_to_geodatabase::run_tables(inputs, Path::new(target))
+                }
                 fn export_shapefiles(
                     &self,
                     inputs: &[String],

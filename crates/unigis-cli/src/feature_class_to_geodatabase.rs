@@ -40,8 +40,22 @@ fn name(raw: &str, reserved: &mut HashSet<String>, writer: &GeodatabaseWriter) -
     Ok(candidate)
 }
 pub(super) fn run(inputs: &[String], target: &Path) -> Result<Vec<String>> {
-    let invalid_output =
-        || bad("ERROR 000732: Output Geodatabase does not exist or is not supported");
+    import(inputs, target, false)
+}
+
+/// Table To Geodatabase: tables (dBASE, CSV, geodatabase tables) and feature classes, into the
+/// geodatabase itself (not a feature dataset).
+pub(super) fn run_tables(inputs: &[String], target: &Path) -> Result<Vec<String>> {
+    import(inputs, target, true)
+}
+
+fn import(inputs: &[String], target: &Path, tables: bool) -> Result<Vec<String>> {
+    let invalid_output = || {
+        bad(format!(
+            "ERROR 000732: Output Geodatabase: Dataset {} does not exist or is not supported",
+            target.display()
+        ))
+    };
     let Location::Geodatabase { gdb, item: dataset } = locate(target) else {
         return Err(invalid_output());
     };
@@ -62,7 +76,7 @@ pub(super) fn run(inputs: &[String], target: &Path) -> Result<Vec<String>> {
     let mut writer = GeodatabaseWriter::open_existing(&gdb)?;
     writer.use_standard_geometry_fields();
     if let Some(ds) = &dataset
-        && writer.feature_dataset_srs(ds).is_none()
+        && (tables || writer.feature_dataset_srs(ds).is_none())
     {
         return Err(invalid_output());
     }
@@ -87,21 +101,28 @@ pub(super) fn run(inputs: &[String], target: &Path) -> Result<Vec<String>> {
     for input in inputs {
         let path = Path::new(input);
         let source_gdb = matches!(locate(path), Location::Geodatabase { .. });
-        if !source_gdb
-            && !path
-                .extension()
-                .is_some_and(|e| e.eq_ignore_ascii_case("shp"))
-        {
-            return Err(bad(
-                "ERROR 000732: Input Features must be a shapefile or FileGDB feature class",
-            ));
+        let ext = |e: &str| path.extension().is_some_and(|x| x.eq_ignore_ascii_case(e));
+        let label = if tables {
+            "Input Table"
+        } else {
+            "Input Features"
+        };
+        let missing = || {
+            bad(format!(
+                "ERROR 000732: {label}: Dataset {input} does not exist or is not supported"
+            ))
+        };
+        let csv = ext("csv") || ext("txt");
+        if !source_gdb && !ext("shp") && !(tables && (ext("dbf") || csv)) {
+            return Err(missing());
         }
-        let (fc, _) = open_feature_class(path)
-            .map_err(|e| bad(format!("ERROR 000732: Input Features {input}: {e}")))?;
-        let kind = fc
-            .geometry_kind()
-            .ok_or_else(|| bad("ERROR 000732: Input Features is not a feature class"))?;
-        if kind == GeometryKind::MultiPatch {
+        let (fc, _) = open_feature_class(path).map_err(|_| missing())?;
+        // Table To Geodatabase writes every input as a table, feature classes too.
+        let kind = if tables { None } else { fc.geometry_kind() };
+        if kind.is_none() && !tables {
+            return Err(bad("ERROR 000732: Input Features is not a feature class"));
+        }
+        if kind == Some(GeometryKind::MultiPatch) {
             return Err(bad("Multipatch feature imports are not yet supported"));
         }
         let raw = if source_gdb {
@@ -115,11 +136,14 @@ pub(super) fn run(inputs: &[String], target: &Path) -> Result<Vec<String>> {
         let mut fields = fc.fields().to_vec();
         // These names can be ordinary user attributes on other geometry types;
         // do not let the import writer reinterpret and recompute their values.
-        if fields.iter().any(|f| {
-            (f.name.eq_ignore_ascii_case("Shape_Length")
-                && !matches!(kind, GeometryKind::Polyline | GeometryKind::Polygon))
-                || (f.name.eq_ignore_ascii_case("Shape_Area") && kind != GeometryKind::Polygon)
-        }) {
+        if kind.is_some()
+            && fields.iter().any(|f| {
+                (f.name.eq_ignore_ascii_case("Shape_Length")
+                    && !matches!(kind, Some(GeometryKind::Polyline | GeometryKind::Polygon)))
+                    || (f.name.eq_ignore_ascii_case("Shape_Area")
+                        && kind != Some(GeometryKind::Polygon))
+            })
+        {
             return Err(bad(
                 "Nonstandard geometry-measure field names are not yet supported",
             ));
@@ -137,6 +161,10 @@ pub(super) fn run(inputs: &[String], target: &Path) -> Result<Vec<String>> {
             if !source_gdb {
                 field.nullable = true;
             }
+            // ArcGIS reads CSV text as 8000 characters.
+            if csv && field.field_type == FieldType::String {
+                field.length = 8000;
+            }
             field.domain = None;
             field.precision = 0;
             field.scale = 0;
@@ -149,12 +177,17 @@ pub(super) fn run(inputs: &[String], target: &Path) -> Result<Vec<String>> {
             field.name = name;
         }
         let mut features = fc.features().collect::<Result<Vec<_>>>()?;
+        if kind.is_none() {
+            for f in &mut features {
+                f.geometry = None;
+            }
+        }
         for (field_name, active) in [
             (
                 "Shape_Length",
-                matches!(kind, GeometryKind::Polyline | GeometryKind::Polygon),
+                matches!(kind, Some(GeometryKind::Polyline | GeometryKind::Polygon)),
             ),
-            ("Shape_Area", kind == GeometryKind::Polygon),
+            ("Shape_Area", kind == Some(GeometryKind::Polygon)),
         ] {
             if !active {
                 continue;
@@ -179,8 +212,9 @@ pub(super) fn run(inputs: &[String], target: &Path) -> Result<Vec<String>> {
         }
         planned.push((
             output_name,
+            kind.is_some(),
             ToolOutput {
-                kind,
+                kind: kind.unwrap_or(GeometryKind::Point),
                 has_z: fc.has_z(),
                 has_m: fc.has_m(),
                 fields,
@@ -200,8 +234,8 @@ pub(super) fn run(inputs: &[String], target: &Path) -> Result<Vec<String>> {
         .and_then(|d| writer.feature_dataset_srs(d))
         .flatten();
     let mut created = Vec::new();
-    for (name, mut out) in planned {
-        if let Some(wkt) = &target_wkt {
+    for (name, spatial, mut out) in planned {
+        if let Some(wkt) = target_wkt.as_ref().filter(|_| spatial) {
             out = super::project_to(out, wkt)?;
         }
         let mut table = match &dataset {
@@ -215,7 +249,7 @@ pub(super) fn run(inputs: &[String], target: &Path) -> Result<Vec<String>> {
             )?,
             None => writer.create_table(
                 &name,
-                Some(out.kind),
+                spatial.then_some(out.kind),
                 out.has_z,
                 out.has_m,
                 &out.fields,

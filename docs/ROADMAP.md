@@ -841,6 +841,10 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
   aliases/defaults/NULLs and calculated required geometry fields.13 public
   workspace references, independent native ArcGIS reader and rollback checks;
   scope/gaps: `scripts/research/feature_class_to_geodatabase/README.md`.
+- [x] Table To Geodatabase (`table_to_geodatabase`): dBASE, CSV (text length 8000), geodatabase
+  tables and shapefiles (written as tables, as ArcGIS does) into an existing file geodatabase, with
+  `_1`, `_2` names, in one transaction (shared with Feature Class To Geodatabase). 8 ArcGIS `ttg_*`
+  workspace references incl. feature-dataset, missing input/output refusals (000732).
 - [x] Excel To Table (`excel_to_table`): native .xls/.xlsx, first/selected sheet,
   rectangular .xlsx named range, header row/column-letter names and cell ranges;
   numeric/text/boolean schemas, NULLs, aliases and DBF dates.13 ArcGIS portable

@@ -61,7 +61,7 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
 - Lane worktree has an untracked symlink `testdata/large` → main checkout's copy (needed by
   `unigis-filegdb` oracle tests in `scripts/check`; other lanes lack it too). Never commit it.
 
-## Slice 3 — committed, landing
+## Slice 3 — landed on main (98033e4); user request complete
 
 - Catalog New menus, native gdb tree (feature datasets; cache by `a00000004.gdbtable` mtime),
   `ui.gp.open` `"values"` prefill (optional layer inputs start empty, so no template from the
@@ -72,8 +72,16 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
   prefilled dialogs, Run creating a folder, a mobile gdb, NewFeatureClass (free name increments) and
   Transport/NewFeatureClass; ArcGIS read them (dataset SR, OBJECTID/Shape only).
 
+## Queue: Table To Geodatabase — committed, landing
+
+- Registry `table_to_geodatabase` (`unigis-tools/src/feature_class_to_geodatabase.rs` TABLE_TOOL,
+  `Context::import_tables`); CLI `feature_class_to_geodatabase::run_tables` (shared `import` with a
+  table mode: dBASE/CSV/gdb tables/shapefiles → tables, CSV text 8000, feature-dataset target
+  000732). 8 `ttg_*` references via the generalized `feature_import_case`.
+- Validation: `UNIGIS_REFERENCE_CASES=ttg_,fctg_` reference test PASS; full gate in `lane land`.
+
 ## Next
 
-- User request (slices 1–3) is complete once this lands; then `scripts/lane claim` for queue work.
+- User request (slices 1–3) complete. After Table To Geodatabase lands: `scripts/lane claim`.
 - Possible follow-ups (not requested): Catalog New for mobile geodatabases (needs a mobile reader),
   ArcGIS-style blank names instead of NewFeatureClass placeholders.
