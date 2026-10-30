@@ -157,6 +157,10 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
 
 ## Queue: Derive Continuous Flow — deferred (depression-flat routing differs from Fill+D8 in 232 cells)
 
+## Queue: Derive Stream As Line / As Raster — deferred (depend on Derive Continuous Flow)
+
+## Queue: Feature Preserving Smoothing — deferred (prototype in scripts/research/feature_preserving_smoothing/)
+
 ## Pitfall: ArcGIS sidecars in testdata
 
 Running ArcGIS on fixture rasters can leave untracked `testdata/raster/*.aux.xml` / `*.vat.dbf`
