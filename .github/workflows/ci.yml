@@ -1,9 +1,15 @@
 name: CI
 
-# Manual only: the project's gate runs locally (scripts/check, via the pre-push hook) so no
-# Actions minutes are used. Start this by hand from the Actions tab if a hosted run is wanted.
+# Every push to main, as a second opinion on the local gate (scripts/check, run by the pre-push
+# hook and by `scripts/lane land`). Actions minutes are free for this public repository.
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   CARGO_TERM_COLOR: always

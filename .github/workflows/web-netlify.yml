@@ -1,7 +1,10 @@
 name: Deploy web app to Netlify
 
-# Manual only, to avoid using Actions minutes; build locally with scripts/build-web.sh.
+# Every push to main (Actions minutes are free for this public repository); also by hand.
+# The newest push wins: an older build still running is cancelled.
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:

@@ -25,7 +25,10 @@ Add new site › Import an existing project › GitHub › `geoforge`, set **Bra
 hosts the files (the branch carries its own `netlify.toml`); each push to `main` redeploys it
 once the build above finishes. The token and secret steps are then not needed.
 
-## From this machine (while GitHub Actions is off)
+## From this machine (fallback)
+
+The repository is public, so GitHub Actions builds and publishes on every push to `main` at no
+cost. The local publisher below is only needed if Actions is unavailable.
 
 `scripts/publish-web-dist.sh` builds `origin/main` in its own worktree (`~/.cache/unigis-web`) and
 force-pushes the result to `web-dist`, which Netlify deploys. It does nothing if `web-dist` already
