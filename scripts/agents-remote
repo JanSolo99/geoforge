@@ -409,7 +409,7 @@ def live(brief=False):
     waiting, finished = queue()
     return {
         "state": state, "paused": (REMOTE / "PAUSE").exists(),
-        "preferred": s.get("agent"), "agent": last.get("agent") if working else None,
+        "preferred": s.get("agent") or coordinator_state().get("agent"), "agent": last.get("agent") if working else None,
         "task": s.get("task", "") if working else "", "started": s.get("started") if working else None,
         "idle_for": idle_for, "retry_at": s.get("until") if state == "waiting" else None,
         "limits": {a: t for a, t in (s.get("limited_until") or {}).items()
