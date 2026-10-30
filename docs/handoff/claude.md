@@ -81,6 +81,17 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
 - Validation: `UNIGIS_REFERENCE_CASES=ttg_,fctg_` reference test PASS; full `scripts/check` PASS in
   `scripts/lane land`; claim released.
 
+## Queue: Extract Scanned Lines / Polygons — deferred (ArcScan smoothing/tracing undocumented)
+
+- Probes and findings: `scripts/research/extract_scanned_lines/` (README, probe.py); lines in
+  `docs/WORK_QUEUE_DEFERRED.txt`.
+
+## Queue: Raster to Polyline — claimed 2026-10-30
+
+- Plan: probe ArcGIS (background_value, minimum_dangle_length, simplify, raster_field,
+  create_multipart_features, max_vertices_per_feature); reuse unigis-raster's Raster To Polygon
+  tracing where possible.
+
 ## Next
 
 - No claim held. Next: `scripts/lane claim` and follow docs/WORK_QUEUE.md.
