@@ -213,6 +213,9 @@ print(json.dumps({'type': 'result', 'is_error': False, 'result': 'done'}))
         reset = module.reset_time(["You've hit your session limit · resets 5:40am (Australia/Sydney)"], current)
         self.assertEqual((reset.hour, reset.minute, str(reset.tzinfo)), (5, 40, "Australia/Sydney"))
         self.assertGreater(module.reset_time(["try again at 1:49 AM."], current), current)
+        weekly = module.reset_time(["or try again at Nov 4th, 2026 8:49 PM."], current)
+        self.assertEqual((weekly.year, weekly.month, weekly.day, weekly.hour, weekly.minute),
+                         (2026, 11, 4, 20, 49))
 
     def test_kimi_turn_records_session_and_hands_over_on_rate_limit(self):
         kimi = self.executable("kimi", f'''

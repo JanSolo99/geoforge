@@ -33,8 +33,11 @@ TRANSIENT = re.compile(
     r"try a different model|stream disconnected|internal server error", re.I
 )
 # "try again at 1:49 AM" (Codex), "resets 5:40am (Australia/Sydney)" (Claude).
-RESET = re.compile(r"(?:try again at|resets(?: at)?)\s+(\d{1,2})(?::(\d{2}))?\s*([ap]\.?m\.?)"
+# "try again at 1:49 AM", "try again at Nov 4th, 2026 8:49 PM" (Codex), "resets 5:40am (Australia/Sydney)".
+RESET = re.compile(r"(?:try again at|resets(?: at)?)\s+(?:([A-Z][a-z]{2})[a-z]*\.?\s+(\d{1,2})"
+                   r"(?:st|nd|rd|th)?,?\s+(?:(\d{4}),?\s+)?)?(\d{1,2})(?::(\d{2}))?\s*([ap]\.?m\.?)"
                    r"(?:\s*\(([\w/+-]+)\))?", re.I)
+MONTHS = "jan feb mar apr may jun jul aug sep oct nov dec".split()
 LIMIT_WAIT = dt.timedelta(minutes=30)      # usage limit without a stated reset time
 TRANSIENT_WAIT = dt.timedelta(minutes=10)  # capacity / overload
 # A resumed conversation re-sends its whole history on every model call; past this size the
@@ -76,16 +79,21 @@ def reset_time(errors, current=None):
         match = RESET.search(error)
         if not match:
             continue
-        hour, minute = int(match[1]) % 12, int(match[2] or 0)
-        hour += 12 if match[3].lower().startswith("p") else 0
+        month, day, year, hour, minute, half, zone_name = match.groups()
+        hour, minute = int(hour) % 12 + (12 if half.lower().startswith("p") else 0), int(minute or 0)
         zone = None
-        if match[4]:
+        if zone_name:
             with contextlib.suppress(Exception):
                 from zoneinfo import ZoneInfo
-                zone = ZoneInfo(match[4])
+                zone = ZoneInfo(zone_name)
         local = (current or dt.datetime.now(dt.timezone.utc)).astimezone(zone)
         moment = local.replace(hour=hour, minute=minute, second=0, microsecond=0)
-        if moment <= local:
+        if month and month.lower() in MONTHS:
+            moment = moment.replace(year=int(year or local.year), month=MONTHS.index(month.lower()) + 1,
+                                    day=int(day))
+            if moment <= local and not year:
+                moment = moment.replace(year=moment.year + 1)
+        elif moment <= local:
             moment += dt.timedelta(days=1)
         return moment
     return None
