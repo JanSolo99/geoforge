@@ -1,16 +1,16 @@
 # Lane kimi handoff
 
-Updated 2026-10-30T17:33:44+11:00; last agent Kimi.
-Workspace `/mnt/media/ArcGIS_Linux/.worktrees/lane-kimi`, branch `lane/kimi`, HEAD `a389a35cf5d6746e684c8b4ac68a3fc9c566fdc8` plus uncommitted Table To dBASE edits.
+Updated 2026-10-30T18:30:53+11:00; last agent Kimi.
+Workspace `/mnt/media/ArcGIS_Linux/.worktrees/lane-kimi`, branch `lane/kimi`, HEAD `0282361a0e179d4cf04be28f318e91894ec9afee` plus uncommitted Table To Excel edits.
 User objective: finish one claimed queue tool, validate it against ArcGIS Pro, run the full gate, commit and land with `scripts/lane land`.
 
-## Table To dBASE — full gate passed
+## Table To Excel — full gate passed
 
-- Claimed `conversion.TableToDBASE` after releasing the stale Raster To Geodatabase claim and rebasing onto `origin/main`.
-- Added `table_to_dbase` in `crates/unigis-tools/src/table_to_dbase.rs`, its registry entry and CLI `export_dbase` bridge. DBF/FileGDB tables, shapefile attributes and CSV are copied through the native table/DBF writer; all inputs are read before output is written.
-- ArcGIS Pro 3.7 generated five `tt2db_*` workspace references. Exact repeated inputs and same-stem SHP/DBF inputs each produced one output, not the documentation's numeric suffix; implementation de-duplicates names case-insensitively, with the later table replacing the earlier planned output.
-- Unsupported inputs and unverified collision/environment behavior are recorded in `docs/KNOWN_GAPS.md`; the landed scope is in `docs/ROADMAP.md`.
-- Validation inherited from the prior session: `cargo fmt --all && cargo test -j3 -p unigis-cli --test arcgis_reference tools_match_arcgis_output -- --exact` PASS (entire manifest, including five new cases), covering the implementation edits before documentation-only changes.
-- Current session: `git diff --check` PASS; `scripts/check` PASS at 17:33 on all current edits (dashboard unit tests, fmt, clippy with warnings denied, no-default-features check, complete workspace tests and doc tests).
-- Test-data recovery: the first gate found `testdata/large` absent; `scripts/fetch-testdata.sh` fetched it. A new upstream `_unz_openfilegdb_nonEditable_default.gdb` fixture caused an unrelated pre-existing reader/GDAL oracle mismatch, so only that newly downloaded fixture was removed to match the existing checkout's corpus; `cargo test -j3 -p unigis-filegdb --test oracle` and the subsequent full gate then passed. No unrelated source was changed.
-- Next: regenerate the queue/dashboard, commit all scoped files, run `scripts/lane land`, and verify main/queue status.
+- Claimed `conversion.TableToExcel`; ArcGIS Pro generated five `tt2xl_*.xlsx` references and one 000732 missing-input refusal. The reference generator and manifest support `.xlsx` output and semicolon-separated multivalue inputs.
+- Added `table_to_excel` to the shared registry and CLI host bridge. Native ZIP/OOXML output supports multiple sheets, ObjectIDs, nulls, numeric/text/GUID/XML values, Excel Date/DateOnly/TimeOnly serials and timestamp-offset ISO text. Geometry is omitted; aliases, FileGDB coded domains and subtype descriptions are implemented. All inputs are read before output is written.
+- ArcGIS-observed sheet names include `stations.csv` and companion-SHP `sales.dbf` → `sales.shp`; repeats get `_1`. Names are sanitized/truncated to Excel's 31-character limit and de-duplicated case-insensitively.
+- Legacy `.xls`, BLOB/raster fields and unsupported hosts fail explicitly. Unverified subtype, newer date, naming, overwrite and environment behavior is recorded in `docs/KNOWN_GAPS.md`.
+- Focused six-case reference test and complete unfiltered manifest test PASS (`cargo test -j3 -p unigis-cli --test arcgis_reference tools_match_arcgis_output -- --exact`, 431.37 s). `git diff --check` PASS. Queue/dashboard regenerated; incidental bridge bytecode edit restored.
+- ArcGIS Pro 3.7 `conversion.ExcelToTable` successfully imported our generated `target/tt2xl-smoke.xlsx` (`sites`, aliases/domain descriptions enabled) to `target/tt2xl-roundtrip.dbf`; native describe confirms three rows and expected headers.
+- `scripts/check` PASS in 440.62 s on all current edits: 8 dashboard tests, formatting, clippy with warnings denied, no-default-features check, complete workspace tests and doc tests. An earlier identical run was killed only by its 300 s command timeout.
+- Next: commit all scoped files as `Add Table To Excel`, inspect hook changes, then `scripts/lane land` and verify main/queue status.

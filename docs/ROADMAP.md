@@ -818,6 +818,10 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Table To dBASE (`table_to_dbase`): batch DBF/FileGDB table, shapefile-attribute and CSV
       export into a folder. Five `tt2db_*` references match ArcGIS, including repeated/same-stem
       input de-duplication and missing-input refusal.
+- [x] Table To Excel (`table_to_excel`): native .xlsx worksheets for DBF/FileGDB tables,
+      shapefile attributes and CSV, ObjectIDs, nulls, Excel dates, aliases and coded-domain/
+      subtype descriptions. Six `tt2xl_*` references cover multi-sheet order, repeated names
+      and missing-input refusal; legacy .xls output is refused (KNOWN_GAPS).
 - [x] GPX To Features (`gpx_to_features`): waypoints, routes and tracks as PointZM,
       or tracks as single-part PolylineZM; 4 `gpx_*` shapefile references match ArcGIS,
       including carried point metadata and the WGS 1984 vertical CRS. Evidence:

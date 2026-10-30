@@ -101803,6 +101803,128 @@
           "output_geodatabase": "<out>"
         }
       }
+    },
+    "tt2xl_dbf": {
+      "tool": "conversion.TableToExcel",
+      "args": [
+        "testdata/dm/sales.dbf",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "excel_output": true,
+      "run": {
+        "tool": "table_to_excel",
+        "params": {
+          "input_table": "testdata/dm/sales.dbf",
+          "output_excel_file": "<out>"
+        }
+      }
+    },
+    "tt2xl_multi": {
+      "tool": "conversion.TableToExcel",
+      "args": [
+        "testdata/geoproc/extract_base.gdb/sites;testdata/geoproc/globalids_base.gdb/records;testdata/geoproc/stations.csv",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "excel_output": true,
+      "run": {
+        "tool": "table_to_excel",
+        "params": {
+          "input_table": "testdata/geoproc/extract_base.gdb/sites;testdata/geoproc/globalids_base.gdb/records;testdata/geoproc/stations.csv",
+          "output_excel_file": "<out>"
+        }
+      }
+    },
+    "tt2xl_alias_domain": {
+      "tool": "conversion.TableToExcel",
+      "args": [
+        "testdata/geoproc/extract_base.gdb/sites",
+        "<out>",
+        true,
+        true
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "excel_output": true,
+      "run": {
+        "tool": "table_to_excel",
+        "params": {
+          "input_table": "testdata/geoproc/extract_base.gdb/sites",
+          "output_excel_file": "<out>",
+          "use_field_alias_as_column_header": true,
+          "use_domain_and_subtype_description": true
+        }
+      }
+    },
+    "tt2xl_repeat": {
+      "tool": "conversion.TableToExcel",
+      "args": [
+        "testdata/dm/sales.dbf;testdata/dm/sales.dbf",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "excel_output": true,
+      "run": {
+        "tool": "table_to_excel",
+        "params": {
+          "input_table": "testdata/dm/sales.dbf;testdata/dm/sales.dbf",
+          "output_excel_file": "<out>"
+        }
+      }
+    },
+    "tt2xl_dates": {
+      "tool": "conversion.TableToExcel",
+      "args": [
+        "testdata/geoproc/migrate_date_base.gdb/class_dates",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "excel_output": true,
+      "run": {
+        "tool": "table_to_excel",
+        "params": {
+          "input_table": "testdata/geoproc/migrate_date_base.gdb/class_dates",
+          "output_excel_file": "<out>"
+        }
+      }
+    },
+    "tt2xl_err_missing": {
+      "tool": "conversion.TableToExcel",
+      "args": [
+        "testdata/dm/sales.dbf;testdata/geoproc/missing.dbf",
+        "<out>"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000732: Input Table: Dataset /mnt/media/ArcGIS_Linux/.worktrees/lane-kimi/testdata/geoproc/missing.dbf does not exist or is not supported",
+        "Failed to execute (TableToExcel)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "excel_output": true,
+      "run": {
+        "tool": "table_to_excel",
+        "params": {
+          "input_table": "testdata/dm/sales.dbf;testdata/geoproc/missing.dbf",
+          "output_excel_file": "<out>"
+        }
+      }
     }
   }
 }

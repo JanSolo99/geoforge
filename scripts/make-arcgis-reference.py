@@ -755,6 +755,12 @@ CASES = {
     "fc2shp_batch": ("conversion.FeatureClassToShapefile", [[DATA / "extract_base.gdb" / "sites", DATA / "globalids_base.gdb" / "points", DATA / "parcels.shp", DATA / "globalids_base.gdb" / "empty"]], []),
     "fc2shp_repeat": ("conversion.FeatureClassToShapefile", [[DATA / "parcels.shp", DATA / "parcels.shp", DATA / "roads.shp"]], []),
     "fc2shp_err_missing": ("conversion.FeatureClassToShapefile", [[DATA / "parcels.shp", DATA / "missing.shp"]], []),
+    "tt2xl_dbf": ("conversion.TableToExcel", [[DM / "sales.dbf"]], []),
+    "tt2xl_multi": ("conversion.TableToExcel", [[DATA / "extract_base.gdb" / "sites", DATA / "globalids_base.gdb" / "records", DATA / "stations.csv"]], []),
+    "tt2xl_alias_domain": ("conversion.TableToExcel", [[DATA / "extract_base.gdb" / "sites"]], [True, True]),
+    "tt2xl_repeat": ("conversion.TableToExcel", [[DM / "sales.dbf", DM / "sales.dbf"]], []),
+    "tt2xl_dates": ("conversion.TableToExcel", [[DATA / "migrate_date_base.gdb" / "class_dates"]], []),
+    "tt2xl_err_missing": ("conversion.TableToExcel", [[DM / "sales.dbf", DATA / "missing.dbf"]], []),
     "tt2db_batch": ("conversion.TableToDBASE", [[DM / "sales.dbf", DATA / "globalids_base.gdb" / "records", DATA / "parcels.shp"]], []),
     "tt2db_repeat": ("conversion.TableToDBASE", [[DM / "sales.dbf", DM / "sales.dbf", DATA / "globalids_base.gdb" / "records"]], []),
     "tt2db_collision": ("conversion.TableToDBASE", [[DATA / "parcels.shp", DATA / "parcels.dbf"]], []),
@@ -2269,6 +2275,7 @@ RUN = {
     "management.CreateMobileGDB": ("create_mobile_gdb", ["out_folder_path", "out_name"]),
     "conversion.FeatureClassToGeodatabase": ("feature_class_to_geodatabase", ["input_features", "output_geodatabase"]),
     "conversion.ExcelToTable": ("excel_to_table", ["input", "output", "sheet", "field_names_row", "cell_range"]),
+    "conversion.TableToExcel": ("table_to_excel", ["input_table", "output_excel_file", "use_field_alias_as_column_header", "use_domain_and_subtype_description"]),
     "management.AddGlobalIDs": ("add_global_ids", ["in_datasets"]),
     "management.SubsetFeatures": ("subset_features", ["input", "out_training_feature_class", "out_test_feature_class", "size_of_training_dataset", "subset_size_units"]),
     "management.CreateSpatialSamplingLocations": ("create_spatial_sampling_locations", ["input", "output", "sampling_method", "strata_id_field", "strata_count_method", "bin_shape", "bin_size", "h3_resolution", "num_samples", "num_samples_per_strata", "population_field", "geometry_type", "min_distance", "spatial_relationship"]),
@@ -2405,6 +2412,7 @@ RASTER_OUT = {"gp.CreateBinaryMask_ia", "gp.ComputeChangeRaster_ia", "gp.Diff_ia
               "gp.Sink_sa", "gp.Pick_sa", "management.Flip", "management.Mirror", "management.Shift", "management.Clip",
               "gp.Slice_sa", "gp.ExtractByAttributes_sa", "gp.ExtractByRectangle_sa", "gp.ExtractByCircle_sa", "gp.Lookup_sa"}
 WORKSPACE_OUT = {"conversion.FeatureClassToShapefile", "conversion.TableToDBASE", "conversion.RasterToOtherFormat", "analysis.Split", "analysis.SplitByAttributes"}
+EXCEL_OUT = {"conversion.TableToExcel"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable", "conversion.RasterToASCII", "conversion.RasterToFloat"}
 # Tools whose output is a table, written as <name>.dbf.
@@ -2896,6 +2904,8 @@ def main():
         raster_projection = tool == "management.DefineProjection" and Path(str(before[0])).suffix.lower() in (".tif", ".tiff")
         if tool in RASTER_OUT or raster_projection:
             out = OUT / f"{name}.tif"
+        if tool in EXCEL_OUT:
+            out = OUT / f"{name}.xlsx"
         if tool in TEXT_OUT:
             out = OUT / (f"{name}.geojson" if "GEOJSON" in after else f"{name}.json")
             if tool == "conversion.ExportTable":
@@ -2907,6 +2917,7 @@ def main():
         if tool in WORKSPACE_OUT:
             out = OUT / name
             out.mkdir()
+        if tool in WORKSPACE_OUT | EXCEL_OUT:
             # A list argument is a multivalue (several input datasets); the bridge translates
             # each path of a list, not paths inside a joined string.
             args = [list(map(str, a)) if isinstance(a, list) else str(a) for a in before] + [str(out)] + [str(a) if isinstance(a, Path) else a for a in after]
@@ -2991,10 +3002,10 @@ def main():
             }
             print(f"{name}: {r.get('status')} {sorted(outputs)} {manifest['cases'][name]['messages']}")
             continue
-        d = w.call("describe", path=str(out)) if r.get("status") == "succeeded" and tool not in TEXT_OUT | RASTER_OUT and not raster_projection else {}
+        d = w.call("describe", path=str(out)) if r.get("status") == "succeeded" and tool not in TEXT_OUT | RASTER_OUT | EXCEL_OUT and not raster_projection else {}
         manifest["cases"][name] = {
             "tool": tool,
-            "args": [rel(a) for a in before] + ["<out>"] + [rel(a) for a in after],
+            "args": [";".join(rel(x) for x in a) if isinstance(a, list) else rel(a) for a in before] + ["<out>"] + [rel(a) for a in after],
             "status": r.get("status"),
             "messages": [m["text"] for m in r.get("messages", []) if m["severity"] > 0],
             "fields": [[f["name"], f["type"], f["length"], f["precision"], f["scale"]] for f in d.get("fields", [])],
@@ -3002,6 +3013,8 @@ def main():
         }
         if tool in TABLE_OUT:
             manifest["cases"][name]["table_output"] = True
+        if tool in EXCEL_OUT:
+            manifest["cases"][name]["excel_output"] = True
         if tool == "management.CreateSpatialSamplingLocations" and (not after[0] or after[0] != "SYSTEMATIC"):
             manifest["cases"][name]["stochastic_sampling"] = True
         if tool == "management.CreateRandomPoints":

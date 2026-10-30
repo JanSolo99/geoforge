@@ -2714,6 +2714,15 @@ fn main() -> ExitCode {
                 fn export_dbase(&self, inputs: &[String], folder: &str) -> Result<Vec<String>> {
                     export_dbase(inputs, Path::new(folder))
                 }
+                fn export_excel(
+                    &self,
+                    inputs: &[String],
+                    output: &str,
+                    use_aliases: bool,
+                    use_descriptions: bool,
+                ) -> Result<Vec<String>> {
+                    export_excel(inputs, Path::new(output), use_aliases, use_descriptions)
+                }
                 fn get(&self, name: &str) -> Option<String> {
                     self.0
                         .get(name)
@@ -7360,6 +7369,200 @@ fn export_dbase(inputs: &[String], folder: &Path) -> Result<Vec<String>> {
         names.push(name);
     }
     Ok(names)
+}
+
+fn export_excel(
+    inputs: &[String],
+    output: &Path,
+    use_aliases: bool,
+    use_descriptions: bool,
+) -> Result<Vec<String>> {
+    if !output
+        .extension()
+        .is_some_and(|e| e.eq_ignore_ascii_case("xlsx"))
+    {
+        return Err(Error::Unsupported(
+            "Table To Excel currently supports .xlsx output only; legacy .xls is not supported"
+                .into(),
+        ));
+    }
+    let mut sheets = Vec::new();
+    for input in inputs {
+        let path = Path::new(input);
+        let missing = || {
+            Error::Unsupported(format!(
+                "ERROR 000732: Input Table: Dataset {input} does not exist or is not supported"
+            ))
+        };
+        let mut sheet = match locate(path) {
+            Location::Geodatabase {
+                gdb,
+                item: Some(item),
+            } => {
+                let geodatabase = Geodatabase::open(&gdb).map_err(|_| missing())?;
+                let table = geodatabase.open_table(&item).map_err(|_| missing())?;
+                excel_sheet(
+                    path,
+                    &table,
+                    Some(&geodatabase),
+                    table.subtypes(),
+                    use_aliases,
+                    use_descriptions,
+                )?
+            }
+            _ => {
+                let (table, _) = open_feature_class(path).map_err(|_| missing())?;
+                excel_sheet(
+                    path,
+                    table.as_ref(),
+                    None,
+                    None,
+                    use_aliases,
+                    use_descriptions,
+                )?
+            }
+        };
+        let base = sheet.name.clone();
+        let mut suffix = 1;
+        while sheets
+            .iter()
+            .any(|s: &unigis_tools::table_to_excel::ExcelSheet| {
+                s.name.eq_ignore_ascii_case(&sheet.name)
+            })
+        {
+            let ending = format!("_{suffix}");
+            let keep = 31usize.saturating_sub(ending.len());
+            sheet.name = format!("{}{ending}", base.chars().take(keep).collect::<String>());
+            suffix += 1;
+        }
+        sheets.push(sheet);
+    }
+    unigis_tools::table_to_excel::write_workbook(output, &sheets)?;
+    Ok(sheets.into_iter().map(|s| s.name).collect())
+}
+
+fn excel_sheet(
+    path: &Path,
+    table: &dyn FeatureClass,
+    gdb: Option<&Geodatabase>,
+    subtypes: Option<&unigis_filegdb::Subtypes>,
+    use_aliases: bool,
+    use_descriptions: bool,
+) -> Result<unigis_tools::table_to_excel::ExcelSheet> {
+    let fields: Vec<(usize, &Field)> = table
+        .fields()
+        .iter()
+        .enumerate()
+        .filter(|(_, f)| f.field_type != FieldType::Geometry)
+        .collect();
+    if fields
+        .iter()
+        .any(|(_, f)| matches!(f.field_type, FieldType::Blob | FieldType::Raster))
+    {
+        return Err(Error::Unsupported(
+            "Table To Excel does not support BLOB or raster fields".into(),
+        ));
+    }
+    let mut headers = Vec::new();
+    if table.has_object_id() {
+        headers.push(table.oid_field_name().to_owned());
+    }
+    headers.extend(fields.iter().map(|(_, f)| {
+        if use_aliases {
+            f.alias
+                .as_deref()
+                .filter(|a| !a.is_empty())
+                .unwrap_or(&f.name)
+                .to_owned()
+        } else {
+            f.name.clone()
+        }
+    }));
+    let subtype_field = subtypes.and_then(|st| {
+        table
+            .fields()
+            .iter()
+            .position(|f| f.name.eq_ignore_ascii_case(&st.field))
+    });
+    let mut rows = Vec::new();
+    for feature in table.features() {
+        let feature = feature?;
+        let subtype = subtypes.and_then(|st| {
+            let code = match feature.attributes.get(subtype_field?)? {
+                Value::SmallInteger(v) => i64::from(*v),
+                Value::Integer(v) => i64::from(*v),
+                Value::BigInteger(v) => *v,
+                _ => return None,
+            };
+            st.subtypes.iter().find(|s| s.code == code)
+        });
+        let mut row = Vec::new();
+        if table.has_object_id() {
+            row.push(
+                i32::try_from(feature.oid)
+                    .map_or_else(|_| Value::BigInteger(feature.oid), Value::Integer),
+            );
+        }
+        for &(index, field) in &fields {
+            let mut value = feature.attributes[index].clone();
+            if use_descriptions && !value.is_null() {
+                if subtype_field == Some(index) {
+                    if let Some(subtype) = subtype {
+                        value = Value::String(subtype.name.clone());
+                    }
+                } else {
+                    let domain = subtype
+                        .and_then(|st| {
+                            st.fields
+                                .iter()
+                                .find(|f| f.field.eq_ignore_ascii_case(&field.name))
+                        })
+                        .and_then(|f| f.domain.as_ref())
+                        .or(field.domain.as_ref());
+                    if let Some(description) =
+                        domain.and_then(|name| coded_domain_description(gdb?, name, &value))
+                    {
+                        value = Value::String(description);
+                    }
+                }
+            }
+            row.push(value);
+        }
+        rows.push(row);
+    }
+    let input_name = if path
+        .extension()
+        .is_some_and(|e| e.eq_ignore_ascii_case("dbf"))
+        && path.with_extension("shp").is_file()
+    {
+        path.with_extension("shp")
+    } else {
+        path.to_path_buf()
+    };
+    let raw_name = input_name
+        .file_name()
+        .map(|s| s.to_string_lossy().into_owned())
+        .unwrap_or_else(|| "Sheet".into());
+    let name = raw_name.replace(['[', ']', ':', '*', '?', '/', '\\'], "_");
+    let name = name.trim_matches('\'');
+    let name = if name.is_empty() { "Sheet" } else { name };
+    Ok(unigis_tools::table_to_excel::ExcelSheet {
+        name: name.chars().take(31).collect(),
+        headers,
+        rows,
+    })
+}
+
+fn coded_domain_description(gdb: &Geodatabase, name: &str, value: &Value) -> Option<String> {
+    let unigis_filegdb::DomainKind::Coded(codes) = &gdb.domain(name)?.kind else {
+        return None;
+    };
+    codes
+        .iter()
+        .find(|(code, _)| {
+            unigis_filegdb::compare_values(code, value).is_some_and(std::cmp::Ordering::is_eq)
+        })
+        .map(|(_, description)| description.clone())
 }
 
 fn rasterize_input(path: &Path, field: &str) -> Result<RasterizeInput> {

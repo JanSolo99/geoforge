@@ -19,6 +19,7 @@ unigis-shapefile = { workspace = true, optional = true }
 rstar.workspace = true
 spade.workspace = true
 calamine = { version = "0.37", features = ["chrono"] }
+zip = { version = "9.1.3", default-features = false, features = ["deflate"] }
 
 [features]
 default = ["proj", "gdb"]

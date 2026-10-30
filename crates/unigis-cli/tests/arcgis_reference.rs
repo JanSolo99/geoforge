@@ -4502,6 +4502,62 @@ fn raster_comparison_detects_missing_or_changed_later_bands() {
     std::fs::remove_dir_all(dir).unwrap();
 }
 
+fn compare_excel(ours: &Path, theirs: &Path) -> Vec<String> {
+    use calamine::{Data, DataType, Reader};
+    let mut diffs = Vec::new();
+    let mut ours = match calamine::open_workbook_auto(ours) {
+        Ok(w) => w,
+        Err(e) => return vec![format!("cannot read our workbook: {e}")],
+    };
+    let mut theirs = match calamine::open_workbook_auto(theirs) {
+        Ok(w) => w,
+        Err(e) => return vec![format!("cannot read ArcGIS workbook: {e}")],
+    };
+    if ours.sheet_names() != theirs.sheet_names() {
+        return vec![format!(
+            "sheets: ours {:?}, ArcGIS {:?}",
+            ours.sheet_names(),
+            theirs.sheet_names()
+        )];
+    }
+    for sheet in ours.sheet_names() {
+        let (a, b) = match (ours.worksheet_range(&sheet), theirs.worksheet_range(&sheet)) {
+            (Ok(a), Ok(b)) => (a, b),
+            (a, b) => {
+                diffs.push(format!("{sheet}: cannot read worksheets: {a:?} / {b:?}"));
+                continue;
+            }
+        };
+        let rows = a.height().max(b.height());
+        let cols = a.width().max(b.width());
+        for row in 0..rows {
+            for col in 0..cols {
+                let empty = Data::Empty;
+                let x = a.get((row, col)).unwrap_or(&empty);
+                let y = b.get((row, col)).unwrap_or(&empty);
+                let equal = match (x, y) {
+                    (Data::Empty, Data::Empty) => true,
+                    (Data::String(a), Data::String(b)) => a == b,
+                    (Data::Bool(a), Data::Bool(b)) => a == b,
+                    (Data::DateTime(a), Data::DateTime(b)) => a.as_datetime() == b.as_datetime(),
+                    _ => match (x.as_f64(), y.as_f64()) {
+                        (Some(a), Some(b)) => (a - b).abs() <= 1e-9 * a.abs().max(b.abs()).max(1.0),
+                        _ => false,
+                    },
+                };
+                if !equal {
+                    diffs.push(format!(
+                        "{sheet} row {} col {}: ours {x:?}, ArcGIS {y:?}",
+                        row + 1,
+                        col + 1
+                    ));
+                }
+            }
+        }
+    }
+    diffs
+}
+
 #[test]
 fn tools_match_arcgis_output() {
     let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
@@ -4601,8 +4657,11 @@ fn tools_match_arcgis_output() {
             .find(|e| reference.join(format!("{case}.{e}")).exists());
         // Spatial Analyst outputs are GeoTIFFs, compared cell by cell.
         let raster = reference.join(format!("{case}.tif")).exists();
+        let excel = info["excel_output"] == true;
         let out = if let Some(ext) = text_ext {
             out_dir.join(format!("{case}.{ext}"))
+        } else if excel {
+            out_dir.join(format!("{case}.xlsx"))
         } else if raster {
             out_dir.join(format!("{case}.tif"))
         } else if info.get("outputs").is_some() {
@@ -4818,6 +4877,8 @@ fn tools_match_arcgis_output() {
                 "gf failed: {}",
                 String::from_utf8_lossy(&run.stderr)
             ));
+        } else if excel {
+            diffs = compare_excel(&out, &reference.join(format!("{case}.xlsx")));
         } else if raster {
             diffs = compare_rasters(case, &out, &reference.join(format!("{case}.tif")));
         } else if let Some(ext) = text_ext {

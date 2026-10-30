@@ -111,6 +111,18 @@ pub trait Context {
             "dBASE export is not supported by this host".into(),
         ))
     }
+    /// Export tables as worksheets in one Excel workbook, returning the sheet names written.
+    fn export_excel(
+        &self,
+        _inputs: &[String],
+        _output: &str,
+        _use_aliases: bool,
+        _use_descriptions: bool,
+    ) -> Result<Vec<String>> {
+        Err(Error::Unsupported(
+            "Excel export is not supported by this host".into(),
+        ))
+    }
     /// Write a named set of new datasets together. Hosts without output support fail explicitly.
     fn write_datasets(
         &self,
@@ -4047,6 +4059,7 @@ pub static TOOLS: &[Tool] = &[
     crate::gps_metadata::TOOL,
     crate::feature_class_to_shapefile::TOOL,
     crate::table_to_dbase::TOOL,
+    crate::table_to_excel::TOOL,
     crate::delete_multiple::TOOL,
     crate::workspace::CREATE_FOLDER,
     crate::workspace::CREATE_FILE_GDB,
