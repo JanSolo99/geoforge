@@ -1,21 +1,17 @@
 # Lane kimi handoff
 
-Updated 2026-10-30; last agent Kimi.
-Workspace `/mnt/media/ArcGIS_Linux/.worktrees/lane-kimi`, branch `lane/kimi`, HEAD `c34e1ba7d2f4beb7d37731946f3af3a1f0ad1655`, matching `origin/main`.
-User objective completed: implement one claimed queue tool with ArcGIS references, pass the full gate, commit and land with `scripts/lane land`.
+Updated 2026-10-31; last agent Kimi.
+Workspace `/mnt/media/ArcGIS_Linux/.worktrees/lane-kimi`, branch `lane/kimi`, HEAD `c2a41b3dd77456415bcf98ec4afe57a53d6492ef`, matching `origin/main` before this tool's edits.
+User objective: implement claimed `sa.InterpolateShape` with ArcGIS references, pass the full gate, commit and land with `scripts/lane land`.
 
-## Raster To Polyline — landed
+## Interpolate Shape — implemented and validated
 
-- Landed `conversion.RasterToPolyline` on main as `c34e1ba` (`Add Raster To Polyline`); the lane claim is released and there are zero commits left to land.
-- Implemented the four-neighbor foreground cell graph, degree-two arc merging, raster-ordered nodes/arcs and `arcid`/`grid_code`/`from_node`/`to_node` in `crates/unigis-raster/src/conversion.rs`; registry and CLI feature output are wired.
-- Five ArcGIS Pro 3.7 references cover default/ZERO, NODATA, NO_SIMPLIFY, a 100 m dangle request and float refusal. Saved NO_SIMPLIFY and dangle outputs equal default on landuse; remaining limitations are recorded in `docs/KNOWN_GAPS.md`.
-- Focused five-case reference test and complete manifest reference test PASS. `scripts/check` PASS before the rebase and again through `scripts/lane land` on the rebased commit (exit 0, 340.069 s).
-- Rebase preserved all 2,499 main manifest cases and added the five `r2line_*` cases; the queue was regenerated from the merged registry. Incidental dashboard hook edits were reverted before landing.
+- Confirmed the ten-parameter ArcGIS signature and probed points, lines, polygons, BILINEAR/NEAREST, densification, clipping, NoData, raster edges and Z/M behavior.
+- Implemented registry metadata and the CLI feature-output host. DENSIFY uses bilinear values, clips lines to the raster extent and evenly subdivides each clipped segment into `ceil(length / sample_distance)` parts. VERTICES_ONLY supports nearest/bilinear and excludes a feature when any vertex cannot be sampled. Output Z replaces input Z; new M values are NaN by default or linearly interpolated with `INTERPOLATE_M_VALUE`. Non-1 Z factors add ArcGIS's vertical CRS with unit `1 / z_factor`.
+- Added small `interpolate_pts.shp` and `interpolate_lines.shp` fixtures and nine successfully generated `ish_*` ArcGIS Pro 3.7 references covering points, lines, polygons, methods, densification, NoData and both M modes.
+- Focused reference command PASS: `UNIGIS_REFERENCE_CASES=ish_ cargo test -j3 -p unigis-cli --test arcgis_reference tools_match_arcgis_output -- --nocapture`.
+- Complete manifest comparator PASS with the same command without `UNIGIS_REFERENCE_CASES` (75.33 s), covering all 2,540 manifest cases. Roadmap, known gaps and the generated work queue are updated; incidental bridge bytecode was restored.
+- Default-parameter CLI smoke PASS: `ug run interpolate_shape` on `dem.tif` and `interpolate_lines.shp` wrote three features and nonempty SHP/DBF outputs.
+- `scripts/check` PASS (background task `bash-01nm1cru`, exit code 0) on the final tool edits. `git diff --check` also passes; the working tree contains only the scoped tool files, fixtures, references and documentation.
 
-## Lowest Position — full gate passed
-
-- Claimed `sa.LowestPosition`. Added the shared-registry wrapper around the existing ArcGIS-tested `unigis-raster::overlay::position` engine; no core algorithm change was needed.
-- ArcGIS Pro 3.7 generated `lp_u8`, `lp_float`, `lp_nodata` and `lp_tie`, confirming first-input ties, strict NoData and count-dependent integer NoData markers. Generator `RUN`/raster-output mappings and all reference sidecars are saved.
-- Focused four-case reference test PASS; complete manifest reference test PASS in 70.89 s. Queue regenerated to 1572 missing with Rescale by Function next. Manifest JSON and `git diff --check` PASS.
-- `scripts/check` PASS, exit 0 in 355.615 s, covering formatting, Clippy and all workspace tests. Incidental ArcGIS bridge bytecode was restored.
-- Roadmap and known gaps updated. Next: scoped commit `Add Lowest Position`, revert hook-only dashboard output, then `scripts/lane land`.
+Next actions: stage only this tool's files, commit as `Add Interpolate Shape`, then `scripts/lane land`.

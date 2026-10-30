@@ -1012,6 +1012,13 @@ fn extract_multi_unsupported(_: &dyn Context) -> Result<Output> {
     ))
 }
 
+/// Interpolate Shape writes features, which the command line produces (`run_interpolate_shape`).
+fn interpolate_shape_unsupported(_: &dyn Context) -> Result<Output> {
+    Err(Error::Unsupported(
+        "Interpolate Shape writes features; run it through `ug run`".into(),
+    ))
+}
+
 fn point_statistics(ctx: &dyn Context) -> Result<Output> {
     use crate::interpolate::{PointNeighborhood, PointStatistic};
     let field = ctx.get("field").unwrap_or_default();
@@ -1989,6 +1996,73 @@ pub static TOOLS: &[Tool] = &[
             ),
         ],
         run: extract_multi_unsupported,
+    },
+    Tool {
+        id: "interpolate_shape",
+        name: "Interpolate Shape",
+        summary: "Creates 3D features by interpolating z-values from a raster surface.",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Surface",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            Param {
+                name: "features",
+                label: "Input Feature Class",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            Param {
+                name: "sample_distance",
+                label: "Sample Distance",
+                kind: Kind::Number,
+                required: false,
+                default: "",
+            },
+            Param {
+                name: "z_factor",
+                label: "Z Factor",
+                kind: Kind::Number,
+                required: false,
+                default: "1",
+            },
+            option(
+                "method",
+                "Interpolation Method",
+                &["BILINEAR", "NEAREST"],
+                "BILINEAR",
+            ),
+            option(
+                "vertices_only",
+                "Interpolate Only At Vertices",
+                &["DENSIFY", "VERTICES_ONLY"],
+                "DENSIFY",
+            ),
+            Param {
+                name: "pyramid_level_resolution",
+                label: "Pyramid Level Resolution",
+                kind: Kind::Number,
+                required: false,
+                default: "0",
+            },
+            option(
+                "preserve_features",
+                "Preserve Features Outside The Surface",
+                &["EXCLUDE", "PRESERVE"],
+                "EXCLUDE",
+            ),
+            option(
+                "interpolate_m_value",
+                "Interpolate M Values For Densified Vertices",
+                &["NO_INTERPOLATE_M_VALUE", "INTERPOLATE_M_VALUE"],
+                "NO_INTERPOLATE_M_VALUE",
+            ),
+        ],
+        run: interpolate_shape_unsupported,
     },
     Tool {
         id: "point_statistics",

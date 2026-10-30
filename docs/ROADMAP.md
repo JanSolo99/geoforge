@@ -448,6 +448,12 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         points grouped by spatial tile (order engine-internal; the probe cases compare by PID). Not
         done: ADD_ATTRIBUTES ALL joining a raster attribute table, geodatabase NoData (assumed null),
         the app tool and arcpy entry, points in another coordinate system than the raster
+  - [x] Interpolate Shape on raster surfaces (`ug run interpolate_shape`): points, multipoints,
+        polylines and polygons; BILINEAR/NEAREST at vertices, bilinear DENSIFY with extent clipping
+        and equal segment subdivision, Z factors and their vertical CRS, M retention/interpolation,
+        and NoData/outside-surface exclusion. Nine `ish_*` references match Pro 3.7. Not done:
+        triangulated surfaces, PRESERVE extrapolation, true curves and partial densification through
+        NoData areas
   - [x] Point To Raster / Feature To Raster on points: MOST_FREQUENT ties go to the first
         feature; integer fields stay 32-bit (polygons and lines narrow them), COUNT is signed
         8-bit, MEAN of integers single; RANGE and STANDARD_DEVIATION (sample, single, NoData for

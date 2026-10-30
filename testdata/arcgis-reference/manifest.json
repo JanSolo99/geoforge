@@ -104422,6 +104422,596 @@
           "output": "<out>"
         }
       }
+    },
+    "ish_points": {
+      "tool": "gp.InterpolateShape_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/geoproc/wells.shp",
+        "<out>",
+        "",
+        1,
+        "BILINEAR",
+        "VERTICES_ONLY",
+        0,
+        "EXCLUDE",
+        "NO_INTERPOLATE_M_VALUE"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 050113: 10 input features had null geometries; no output features were generated from them.",
+        "WARNING 050114: 10 input geometries were not interpolated, possibly due to not being within the surface extent."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "interpolate_shape",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "features": "testdata/geoproc/wells.shp",
+          "output": "<out>",
+          "z_factor": 1,
+          "method": "BILINEAR",
+          "vertices_only": "VERTICES_ONLY",
+          "pyramid_level_resolution": 0,
+          "preserve_features": "EXCLUDE",
+          "interpolate_m_value": "NO_INTERPOLATE_M_VALUE"
+        }
+      }
+    },
+    "ish_nodata_bilinear": {
+      "tool": "gp.InterpolateShape_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "testdata/geoproc/interpolate_pts.shp",
+        "<out>",
+        "",
+        1,
+        "BILINEAR",
+        "VERTICES_ONLY",
+        0,
+        "EXCLUDE",
+        "NO_INTERPOLATE_M_VALUE"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 050113: 4 input features had null geometries; no output features were generated from them.",
+        "WARNING 050114: 4 input geometries were not interpolated, possibly due to not being within the surface extent."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "PROBE_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "interpolate_shape",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "features": "testdata/geoproc/interpolate_pts.shp",
+          "output": "<out>",
+          "z_factor": 1,
+          "method": "BILINEAR",
+          "vertices_only": "VERTICES_ONLY",
+          "pyramid_level_resolution": 0,
+          "preserve_features": "EXCLUDE",
+          "interpolate_m_value": "NO_INTERPOLATE_M_VALUE"
+        }
+      }
+    },
+    "ish_nodata_nearest": {
+      "tool": "gp.InterpolateShape_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "testdata/geoproc/interpolate_pts.shp",
+        "<out>",
+        "",
+        1,
+        "NEAREST",
+        "VERTICES_ONLY",
+        0,
+        "EXCLUDE",
+        "NO_INTERPOLATE_M_VALUE"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 050113: 5 input features had null geometries; no output features were generated from them.",
+        "WARNING 050114: 5 input geometries were not interpolated, possibly due to not being within the surface extent."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "PROBE_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "interpolate_shape",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "features": "testdata/geoproc/interpolate_pts.shp",
+          "output": "<out>",
+          "z_factor": 1,
+          "method": "NEAREST",
+          "vertices_only": "VERTICES_ONLY",
+          "pyramid_level_resolution": 0,
+          "preserve_features": "EXCLUDE",
+          "interpolate_m_value": "NO_INTERPOLATE_M_VALUE"
+        }
+      }
+    },
+    "ish_nodata_lines": {
+      "tool": "gp.InterpolateShape_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "testdata/geoproc/interpolate_lines.shp",
+        "<out>",
+        "",
+        1,
+        "BILINEAR",
+        "VERTICES_ONLY",
+        0,
+        "EXCLUDE",
+        "NO_INTERPOLATE_M_VALUE"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 050113: 3 input features had null geometries; no output features were generated from them.",
+        "WARNING 050114: 3 input geometries were not interpolated, possibly due to not being within the surface extent."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "PROBE_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "interpolate_shape",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "features": "testdata/geoproc/interpolate_lines.shp",
+          "output": "<out>",
+          "z_factor": 1,
+          "method": "BILINEAR",
+          "vertices_only": "VERTICES_ONLY",
+          "pyramid_level_resolution": 0,
+          "preserve_features": "EXCLUDE",
+          "interpolate_m_value": "NO_INTERPOLATE_M_VALUE"
+        }
+      }
+    },
+    "ish_lines": {
+      "tool": "gp.InterpolateShape_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        100,
+        2,
+        "BILINEAR",
+        "DENSIFY",
+        0,
+        "EXCLUDE",
+        "NO_INTERPOLATE_M_VALUE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "interpolate_shape",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "features": "testdata/geoproc/roads.shp",
+          "output": "<out>",
+          "sample_distance": 100,
+          "z_factor": 2,
+          "method": "BILINEAR",
+          "vertices_only": "DENSIFY",
+          "pyramid_level_resolution": 0,
+          "preserve_features": "EXCLUDE",
+          "interpolate_m_value": "NO_INTERPOLATE_M_VALUE"
+        }
+      }
+    },
+    "ish_lines_nearest": {
+      "tool": "gp.InterpolateShape_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/geoproc/roads.shp",
+        "<out>",
+        "",
+        1,
+        "NEAREST",
+        "VERTICES_ONLY",
+        0,
+        "EXCLUDE",
+        "NO_INTERPOLATE_M_VALUE"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 050113: 2 input features had null geometries; no output features were generated from them.",
+        "WARNING 050114: 2 input geometries were not interpolated, possibly due to not being within the surface extent."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "interpolate_shape",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "features": "testdata/geoproc/roads.shp",
+          "output": "<out>",
+          "z_factor": 1,
+          "method": "NEAREST",
+          "vertices_only": "VERTICES_ONLY",
+          "pyramid_level_resolution": 0,
+          "preserve_features": "EXCLUDE",
+          "interpolate_m_value": "NO_INTERPOLATE_M_VALUE"
+        }
+      }
+    },
+    "ish_polygons": {
+      "tool": "gp.InterpolateShape_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/geoproc/parcels.shp",
+        "<out>",
+        "",
+        1,
+        "BILINEAR",
+        "VERTICES_ONLY",
+        0,
+        "EXCLUDE",
+        "NO_INTERPOLATE_M_VALUE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "PARCEL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "NAME",
+          "String",
+          20,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ZONE",
+          "Integer",
+          5,
+          5,
+          0
+        ]
+      ],
+      "shapeType": "Polygon",
+      "run": {
+        "tool": "interpolate_shape",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "features": "testdata/geoproc/parcels.shp",
+          "output": "<out>",
+          "z_factor": 1,
+          "method": "BILINEAR",
+          "vertices_only": "VERTICES_ONLY",
+          "pyramid_level_resolution": 0,
+          "preserve_features": "EXCLUDE",
+          "interpolate_m_value": "NO_INTERPOLATE_M_VALUE"
+        }
+      }
+    },
+    "ish_zm": {
+      "tool": "gp.InterpolateShape_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/geoproc/roads_zm.shp",
+        "<out>",
+        100,
+        1,
+        "BILINEAR",
+        "DENSIFY",
+        0,
+        "EXCLUDE",
+        "INTERPOLATE_M_VALUE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          9,
+          9,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "interpolate_shape",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "features": "testdata/geoproc/roads_zm.shp",
+          "output": "<out>",
+          "sample_distance": 100,
+          "z_factor": 1,
+          "method": "BILINEAR",
+          "vertices_only": "DENSIFY",
+          "pyramid_level_resolution": 0,
+          "preserve_features": "EXCLUDE",
+          "interpolate_m_value": "INTERPOLATE_M_VALUE"
+        }
+      }
+    },
+    "ish_zm_no_m": {
+      "tool": "gp.InterpolateShape_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/geoproc/roads_zm.shp",
+        "<out>",
+        100,
+        1,
+        "BILINEAR",
+        "DENSIFY",
+        0,
+        "EXCLUDE",
+        "NO_INTERPOLATE_M_VALUE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          9,
+          9,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          9,
+          9,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "interpolate_shape",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "features": "testdata/geoproc/roads_zm.shp",
+          "output": "<out>",
+          "sample_distance": 100,
+          "z_factor": 1,
+          "method": "BILINEAR",
+          "vertices_only": "DENSIFY",
+          "pyramid_level_resolution": 0,
+          "preserve_features": "EXCLUDE",
+          "interpolate_m_value": "NO_INTERPOLATE_M_VALUE"
+        }
+      }
     }
   }
 }

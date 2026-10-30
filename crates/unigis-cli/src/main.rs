@@ -6672,6 +6672,9 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
     if spec.id == "extract_multi_values_to_points" {
         return run_extract_multi_values(&Args(map), &output);
     }
+    if spec.id == "interpolate_shape" {
+        return run_interpolate_shape(&Args(map), &output);
+    }
     let parameters = Args(map);
     let out = registry::run(spec, &parameters)?;
     if spec.id == "raster_to_float" {
@@ -7080,6 +7083,401 @@ fn sample_value(
         _ if float_out => Value::Single(v as f32),
         _ => Value::Integer(v as i32),
     }
+}
+
+#[derive(Clone, Copy)]
+struct SurfaceVertex {
+    xy: [f64; 2],
+    m: f64,
+}
+
+fn surface_vertex(g: &unigis_core::Geometry, i: usize) -> SurfaceVertex {
+    SurfaceVertex {
+        xy: g.xy[i],
+        m: g.m.as_ref().map_or(f64::NAN, |m| m[i]),
+    }
+}
+
+fn surface_lerp(a: SurfaceVertex, b: SurfaceVertex, t: f64, interpolate_m: bool) -> SurfaceVertex {
+    if t == 0.0 {
+        return a;
+    }
+    if t == 1.0 {
+        return b;
+    }
+    SurfaceVertex {
+        xy: [
+            a.xy[0] + (b.xy[0] - a.xy[0]) * t,
+            a.xy[1] + (b.xy[1] - a.xy[1]) * t,
+        ],
+        m: if interpolate_m && a.m.is_finite() && b.m.is_finite() {
+            a.m + (b.m - a.m) * t
+        } else {
+            f64::NAN
+        },
+    }
+}
+
+fn clip_surface_segment(a: [f64; 2], b: [f64; 2], extent: [f64; 4]) -> Option<(f64, f64)> {
+    let d = [b[0] - a[0], b[1] - a[1]];
+    let p = [-d[0], d[0], -d[1], d[1]];
+    let q = [
+        a[0] - extent[0],
+        extent[1] - a[0],
+        a[1] - extent[2],
+        extent[3] - a[1],
+    ];
+    let (mut t0, mut t1) = (0.0_f64, 1.0_f64);
+    for (&p, &q) in p.iter().zip(&q) {
+        if p == 0.0 {
+            if q < 0.0 {
+                return None;
+            }
+            continue;
+        }
+        let t = q / p;
+        if p < 0.0 {
+            t0 = t0.max(t);
+        } else {
+            t1 = t1.min(t);
+        }
+        if t0 > t1 {
+            return None;
+        }
+    }
+    Some((t0, t1))
+}
+
+fn clip_surface_line(
+    g: &unigis_core::Geometry,
+    extent: [f64; 4],
+    interpolate_m: bool,
+) -> Option<unigis_core::Geometry> {
+    let mut runs: Vec<Vec<SurfaceVertex>> = Vec::new();
+    for range in g.part_ranges() {
+        let mut run = Vec::new();
+        for i in range.clone().take(range.len().saturating_sub(1)) {
+            let a = surface_vertex(g, i);
+            let b = surface_vertex(g, i + 1);
+            let Some((t0, t1)) = clip_surface_segment(a.xy, b.xy, extent) else {
+                if run.len() > 1 {
+                    runs.push(std::mem::take(&mut run));
+                } else {
+                    run.clear();
+                }
+                continue;
+            };
+            let ca = surface_lerp(a, b, t0, interpolate_m);
+            let cb = surface_lerp(a, b, t1, interpolate_m);
+            if run.is_empty() {
+                run.push(ca);
+            } else if run.last().is_some_and(|v: &SurfaceVertex| v.xy != ca.xy) {
+                if run.len() > 1 {
+                    runs.push(std::mem::take(&mut run));
+                } else {
+                    run.clear();
+                }
+                run.push(ca);
+            }
+            if run.last().is_some_and(|v| v.xy != cb.xy) {
+                run.push(cb);
+            }
+            if t1 < 1.0 && run.len() > 1 {
+                runs.push(std::mem::take(&mut run));
+            }
+        }
+        if run.len() > 1 {
+            runs.push(run);
+        }
+    }
+    if runs.is_empty() {
+        return None;
+    }
+    let has_m = g.m.is_some();
+    let mut out = unigis_core::Geometry::point(0.0, 0.0);
+    out.kind = g.kind;
+    out.parts = Vec::new();
+    out.xy = Vec::new();
+    let mut m = Vec::new();
+    for run in runs {
+        out.parts.push(out.xy.len() as u32);
+        for v in run {
+            out.xy.push(v.xy);
+            m.push(v.m);
+        }
+    }
+    out.m = has_m.then_some(m);
+    Some(out)
+}
+
+fn densify_surface_geometry(
+    g: &unigis_core::Geometry,
+    distance: f64,
+    interpolate_m: bool,
+) -> unigis_core::Geometry {
+    if matches!(
+        g.kind,
+        unigis_core::GeometryKind::Point | unigis_core::GeometryKind::Multipoint
+    ) {
+        return g.clone();
+    }
+    let mut out = unigis_core::Geometry::point(0.0, 0.0);
+    out.kind = g.kind;
+    out.parts = Vec::new();
+    out.xy = Vec::new();
+    let mut m = Vec::new();
+    for range in g.part_ranges() {
+        out.parts.push(out.xy.len() as u32);
+        for i in range.clone() {
+            let a = surface_vertex(g, i);
+            out.xy.push(a.xy);
+            m.push(a.m);
+            if i + 1 >= range.end {
+                continue;
+            }
+            let b = surface_vertex(g, i + 1);
+            let length = (b.xy[0] - a.xy[0]).hypot(b.xy[1] - a.xy[1]);
+            let n = (length / distance).ceil().max(1.0) as usize;
+            for k in 1..n {
+                let v = surface_lerp(a, b, k as f64 / n as f64, interpolate_m);
+                out.xy.push(v.xy);
+                m.push(v.m);
+            }
+        }
+    }
+    out.m = g.m.as_ref().map(|_| m);
+    out
+}
+
+fn interpolate_surface_z(r: &unigis_raster::Raster, x: f64, y: f64, bilinear: bool) -> Option<f64> {
+    let t = r.transform;
+    let cx = (x - t[0]) / t[1];
+    let cy = (t[3] - y) / -t[5];
+    if !cx.is_finite() || !cy.is_finite() {
+        return None;
+    }
+    let (w, h) = (r.width as f64, r.height as f64);
+    if !bilinear {
+        if !(cx >= 0.0 && cx < w && cy > 0.0 && cy <= h) {
+            return None;
+        }
+        let index = |v: f64| (v.ceil() as i64 - 1).max(0);
+        return r.get(index(cx) as usize, index(cy) as usize);
+    }
+    if !(cx >= 0.0 && cx <= w && cy >= 0.0 && cy <= h) {
+        return None;
+    }
+    let (fx, fy) = (cx - 0.5, cy - 0.5);
+    let (c0, r0) = (fx.floor() as i64, fy.floor() as i64);
+    let (dx, dy) = (fx - c0 as f64, fy - r0 as f64);
+    let at = |c: i64, rr: i64| {
+        if c < 0 || rr < 0 || c >= r.width as i64 || rr >= r.height as i64 {
+            None
+        } else {
+            r.get(c as usize, rr as usize)
+        }
+    };
+    let corners = [
+        (at(c0, r0), (1.0 - dx) * (1.0 - dy)),
+        (at(c0 + 1, r0), dx * (1.0 - dy)),
+        (at(c0, r0 + 1), (1.0 - dx) * dy),
+        (at(c0 + 1, r0 + 1), dx * dy),
+    ];
+    let weight: f64 = corners
+        .iter()
+        .filter(|(v, wt)| v.is_some() && *wt > 0.0)
+        .map(|(_, wt)| *wt)
+        .sum();
+    (weight > 0.0).then(|| {
+        corners
+            .iter()
+            .filter_map(|(v, wt)| v.filter(|_| *wt > 0.0).map(|v| v * wt))
+            .sum::<f64>()
+            / weight
+    })
+}
+
+fn run_interpolate_shape(ctx: &dyn unigis_raster::registry::Context, output: &str) -> Result<()> {
+    use unigis_core::{Geometry, GeometryKind};
+    let input = ctx
+        .get("input")
+        .ok_or_else(|| Error::Unsupported("input is required".into()))?;
+    let features = ctx
+        .get("features")
+        .ok_or_else(|| Error::Unsupported("features is required".into()))?;
+    let raster = unigis_raster::read_geotiff(Path::new(&input))?;
+    let (fc, _) = open_feature_class(Path::new(&features))?;
+    let kind = fc
+        .geometry_kind()
+        .ok_or_else(|| Error::Unsupported("input features have no geometry".into()))?;
+    if kind == GeometryKind::MultiPatch {
+        return Err(Error::Unsupported(
+            "Interpolate Shape does not support multipatch input".into(),
+        ));
+    }
+    let densify = !ctx
+        .get("vertices_only")
+        .is_some_and(|v| v.eq_ignore_ascii_case("VERTICES_ONLY"));
+    let method = ctx.get("method").unwrap_or_else(|| "BILINEAR".into());
+    if !method.eq_ignore_ascii_case("BILINEAR") && !method.eq_ignore_ascii_case("NEAREST") {
+        return Err(Error::Unsupported(format!(
+            "unsupported interpolation method: {method}"
+        )));
+    }
+    let bilinear = densify || method.eq_ignore_ascii_case("BILINEAR");
+    let interpolate_m = ctx
+        .get("interpolate_m_value")
+        .is_some_and(|v| v.eq_ignore_ascii_case("INTERPOLATE_M_VALUE"));
+    if ctx
+        .get("preserve_features")
+        .is_some_and(|v| v.eq_ignore_ascii_case("PRESERVE"))
+    {
+        return Err(Error::Unsupported(
+            "Interpolate Shape PRESERVE is not implemented".into(),
+        ));
+    }
+    let pyramid = ctx
+        .get("pyramid_level_resolution")
+        .filter(|v| !v.is_empty())
+        .map_or(Ok(0.0), |v| {
+            v.parse::<f64>()
+                .map_err(|_| Error::Unsupported(format!("invalid pyramid level resolution: {v}")))
+        })?;
+    if pyramid != 0.0 {
+        return Err(Error::Unsupported(
+            "Interpolate Shape raster input only supports pyramid level resolution 0".into(),
+        ));
+    }
+    let z_factor = ctx
+        .get("z_factor")
+        .filter(|v| !v.is_empty())
+        .map_or(Ok(1.0), |v| {
+            v.parse::<f64>()
+                .map_err(|_| Error::Unsupported(format!("invalid z factor: {v}")))
+        })?;
+    if !z_factor.is_finite() {
+        return Err(Error::Unsupported("z factor must be finite".into()));
+    }
+    let cell_size = raster.transform[1].abs();
+    let distance = ctx
+        .get("sample_distance")
+        .filter(|v| !v.is_empty())
+        .map_or(Ok(cell_size), |v| {
+            v.parse::<f64>()
+                .map_err(|_| Error::Unsupported(format!("invalid sample distance: {v}")))
+        })?;
+    if densify && !(distance.is_finite() && distance > 0.0) {
+        return Err(Error::Unsupported(
+            "sample distance must be greater than zero".into(),
+        ));
+    }
+    let extent = [
+        raster.transform[0],
+        raster.transform[0] + raster.transform[1] * raster.width as f64,
+        raster.transform[3] + raster.transform[5] * raster.height as f64,
+        raster.transform[3],
+    ];
+    let extent_polygon = Geometry {
+        kind: GeometryKind::Polygon,
+        parts: vec![0],
+        part_types: None,
+        xy: vec![
+            [extent[0], extent[2]],
+            [extent[0], extent[3]],
+            [extent[1], extent[3]],
+            [extent[1], extent[2]],
+            [extent[0], extent[2]],
+        ],
+        z: None,
+        m: None,
+        curves: Vec::new(),
+    };
+    let clip_area = unigis_geometry::clip::ClipArea::new([&extent_polygon])?;
+    let has_m = fc.has_m();
+    let mut output_features = Vec::new();
+    for feature in fc.features() {
+        let mut feature = feature?;
+        let Some(g) = &feature.geometry else {
+            continue;
+        };
+        if g.has_curves() {
+            return Err(Error::Unsupported(
+                "Interpolate Shape does not yet support true curves".into(),
+            ));
+        }
+        let mut g = if densify {
+            match kind {
+                GeometryKind::Polyline => {
+                    let Some(g) = clip_surface_line(g, extent, interpolate_m) else {
+                        continue;
+                    };
+                    densify_surface_geometry(&g, distance, interpolate_m)
+                }
+                GeometryKind::Polygon => {
+                    let outside = g.xy.iter().any(|p| {
+                        p[0] < extent[0] || p[0] > extent[1] || p[1] < extent[2] || p[1] > extent[3]
+                    });
+                    let clipped = if outside {
+                        unigis_geometry::clip::clip(g, &clip_area)?
+                    } else {
+                        Some(g.clone())
+                    };
+                    let Some(g) = clipped else {
+                        continue;
+                    };
+                    densify_surface_geometry(&g, distance, interpolate_m)
+                }
+                _ => g.clone(),
+            }
+        } else {
+            g.clone()
+        };
+        let mut z = Vec::with_capacity(g.xy.len());
+        let mut valid = true;
+        for p in &g.xy {
+            let Some(value) = interpolate_surface_z(&raster, p[0], p[1], bilinear) else {
+                valid = false;
+                break;
+            };
+            z.push(value * z_factor);
+        }
+        if !valid {
+            continue;
+        }
+        g.z = Some(z);
+        if has_m && g.m.is_none() {
+            g.m = Some(vec![f64::NAN; g.xy.len()]);
+        }
+        feature.geometry = Some(g);
+        output_features.push(feature);
+    }
+    let spatial_reference_wkt = fc.spatial_reference_wkt().map(|wkt| {
+        let normalized = unigis_proj::Crs::from_wkt(wkt)
+            .map(|crs| crs.arcgis_wkt())
+            .unwrap_or_else(|_| wkt.to_owned());
+        if z_factor == 1.0 || normalized.contains(",VERTCS[") {
+            normalized
+        } else {
+            format!(
+                "{normalized},VERTCS[\"Unknown VCS from ArcInfo Workstation\",VDATUM[\"Unknown\"],PARAMETER[\"Vertical_Shift\",0.0],PARAMETER[\"Direction\",1.0],UNIT[\"User_Defined_Unit\",{}]]",
+                1.0 / z_factor
+            )
+        }
+    });
+    write_output_as(
+        ToolOutput {
+            kind,
+            has_z: true,
+            has_m,
+            fields: fc.fields().to_vec(),
+            spatial_reference_wkt,
+            features: output_features,
+            messages: Vec::new(),
+        },
+        Path::new(output),
+        None,
+        false,
+    )
 }
 
 /// Extract Multi Values To Points: the points with one added field per raster (named as given, or
