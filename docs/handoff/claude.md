@@ -130,10 +130,16 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
 - `unigis-raster/src/zonal.rs::zonal_fill` + registry; 4 `zf_*` references PASS; unit test; clippy.
   Rule fitted on 30 random ArcGIS grids (scripts/research/zonal_fill/).
 
-## Queue: Zonal Geometry — committed, landing
+## Queue: Zonal Geometry — landed on main (full scripts/check PASS)
 
 - `unigis-raster/src/zonal.rs::zonal_geometry` + registry; 9 `zg_*` references PASS; unit tests; clippy.
   Thickness = chamfer distance (1 / 1.414) to the nearest point of another zone's cell (probed).
+
+## Pitfall: ArcGIS sidecars in testdata
+
+Running ArcGIS on fixture rasters can leave untracked `testdata/raster/*.aux.xml` / `*.vat.dbf`
+files next to the inputs; they change other tools' inputs and made `scripts/check` fail once.
+After generating references, check `git status --short testdata/` and delete such untracked files.
 
 ## Next
 
