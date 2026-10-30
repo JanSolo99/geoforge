@@ -101,7 +101,7 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
 - Validation: `UNIGIS_REFERENCE_CASES=eld_` PASS; unit tests PASS; clippy -D warnings PASS;
   no-default-features check PASS; full `scripts/check` PASS in `lane land`. Gaps in KNOWN_GAPS.
 
-## Queue: Extract Locations From Text — committed, landing
+## Queue: Extract Locations From Text — landed on main (full scripts/check PASS)
 
 - `TEXT_TOOL` in `unigis-tools/src/extract_locations.rs` (shared engine; `Source::text`), 4 `elt_*`
   references; `UNIGIS_REFERENCE_CASES=elt_,eld_` PASS, clippy PASS.
