@@ -91,8 +91,15 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
 - Graph/ordering model established, SIMPLIFY rule not: `scripts/research/raster_to_polyline/README.md`
   (worth resuming: NO_SIMPLIFY is close to done as a model).
 
+## Queue: CAD To Geodatabase — deferred (no native CAD reader; see WORK_QUEUE_DEFERRED)
+
+## Queue: Extract Locations From Document — research started, not implemented
+
+- Findings: `scripts/research/extract_locations_document/README.md`. Claim is released by
+  `lane land`; it should be the next item `scripts/lane claim` returns.
+
 ## Next
 
-- No claim held. Next: `scripts/lane claim` and follow docs/WORK_QUEUE.md.
+- Next: `scripts/lane claim` (expect Extract Locations From Document) and continue from its README.
 - Possible follow-ups (not requested): Catalog New for mobile geodatabases (needs a mobile reader),
   ArcGIS-style blank names instead of NewFeatureClass placeholders.
