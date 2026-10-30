@@ -153,6 +153,8 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
 - `contour::contour_list` (Contour now calls it), CLI `write_contours` shared with Contour, registry
   placeholder; 3 `cl_*` references and the existing contour cases PASS.
 
+## Queue: Cut Fill — deferred (pixel type rule unknown; notes scripts/research/cut_fill/)
+
 ## Pitfall: ArcGIS sidecars in testdata
 
 Running ArcGIS on fixture rasters can leave untracked `testdata/raster/*.aux.xml` / `*.vat.dbf`
