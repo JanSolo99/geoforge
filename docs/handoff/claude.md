@@ -106,7 +106,7 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
 - `TEXT_TOOL` in `unigis-tools/src/extract_locations.rs` (shared engine; `Source::text`), 4 `elt_*`
   references; `UNIGIS_REFERENCE_CASES=elt_,eld_` PASS, clippy PASS.
 
-## Queue: Create Normal Raster — committed, landing
+## Queue: Create Normal Raster — landed on main (full scripts/check PASS)
 
 - `unigis-raster` `extract::normal_raster` + registry `create_normal_raster`; 5 `cnr_*` references
   with the statistical comparator `compare_normal_rasters` (5 standard errors; ArcGIS's sample
