@@ -1199,6 +1199,20 @@ fn composite_bands(ctx: &dyn Context) -> Result<Output> {
     with_statistics(crate::composite::composite_bands(&inputs)?, true)
 }
 
+fn lowest_position(ctx: &dyn Context) -> Result<Output> {
+    let inputs = ctx
+        .get("inputs")
+        .unwrap_or_default()
+        .split(';')
+        .filter(|p| !p.trim().is_empty())
+        .map(|p| ctx.raster_at(p.trim()))
+        .collect::<Result<Vec<_>>>()?;
+    let rasters: Vec<&Raster> = inputs.iter().collect();
+    let raster = crate::overlay::position(&rasters, false)
+        .ok_or_else(|| Error::Unsupported("the rasters do not overlap".into()))?;
+    with_statistics(raster, true)
+}
+
 fn ascii_to_raster(ctx: &dyn Context) -> Result<Output> {
     let input = ctx.get("input").unwrap_or_default();
     let integer = choice(ctx, "ascii_to_raster", "data_type").eq_ignore_ascii_case("INTEGER");
@@ -1301,6 +1315,19 @@ pub static TOOLS: &[Tool] = &[
             default: "",
         }],
         run: composite_bands,
+    },
+    Tool {
+        id: "lowest_position",
+        name: "Lowest Position",
+        summary: "Returns the 1-based position of the first raster with the lowest cell value.",
+        params: &[Param {
+            name: "inputs",
+            label: "Input Rasters or Constant Values",
+            kind: Kind::Text,
+            required: true,
+            default: "",
+        }],
+        run: lowest_position,
     },
     Tool {
         id: "pick",

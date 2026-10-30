@@ -1293,6 +1293,10 @@ CASES = {
     "pick_const": ("gp.Pick_sa", [RASTER / "landuse_u8.tif", "10;20;30;40;50"], []),
     "pick_float": ("gp.Pick_sa", [RASTER / "landuse_u8.tif", "1.5;2.5;3.5;4.5;5.5"], []),
     "pick_raster": ("gp.Pick_sa", [RASTER / "landuse_u8.tif", str(RASTER / "patches_i16.tif") + ";7;" + str(RASTER / "classes_u8.tif")], []),
+    "lp_u8": ("gp.LowestPosition_sa", [f"{RASTER / 'landuse_u8.tif'};{RASTER / 'classes_u8.tif'}"], []),
+    "lp_float": ("gp.LowestPosition_sa", [f"{RASTER / 'dem.tif'};{RASTER / 'dem_int16_packbits.tif'};{RASTER / 'dem_f64.tif'}"], []),
+    "lp_nodata": ("gp.LowestPosition_sa", [f"{RASTER / 'dem_nodata.tif'};{RASTER / 'dem.tif'}"], []),
+    "lp_tie": ("gp.LowestPosition_sa", [f"{RASTER / 'landuse_u8.tif'};{RASTER / 'landuse_u8.tif'};{RASTER / 'landuse_u8.tif'}"], []),
     "flip_dem": ("management.Flip", [RASTER / "dem.tif"], []),
     "flip_landuse": ("management.Flip", [RASTER / "landuse_u8.tif"], []),
     "mirror_dem": ("management.Mirror", [RASTER / "dem.tif"], []),
@@ -2343,6 +2347,7 @@ RUN = {
     "gp.ExtractByCircle_sa": ("extract_by_circle", ["input", "center_point", "radius", "output", "extraction_area"]),
     "gp.Sink_sa": ("sink", ["input", "output"]),
     "gp.Pick_sa": ("pick", ["position", "items", "output"]),
+    "gp.LowestPosition_sa": ("lowest_position", ["inputs", "output"]),
     "management.Flip": ("flip", ["input", "output"]),
     "management.Mirror": ("mirror", ["input", "output"]),
     "management.Shift": ("shift", ["input", "output", "x_value", "y_value"]),
@@ -2455,7 +2460,7 @@ def run_spec(tool, args):
 
 
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
-RASTER_OUT = {"gp.RescaleByFunction_sa", "gp.CreateNormalRaster_sa", "gp.CreateBinaryMask_ia", "gp.ComputeChangeRaster_ia", "gp.Diff_ia", "gp.Over_ia", "gp.LineStatistics_sa", "gp.PointStatistics_sa", "gp.SnapPourPoint_sa", "gp.FocalFlow_sa", "gp.DistanceAccumulation_sa", "gp.DistanceAllocation_sa", "gp.EucBackDirection_sa", "gp.EqualToFrequency_sa", "gp.GreaterThanFrequency_sa", "gp.LessThanFrequency_sa", "conversion.ASCIIToRaster", "conversion.FloatToRaster", "conversion.MultipatchToRaster", "management.CompositeBands", "gp.CreateConstantRaster_sa", "gp.InList_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
+RASTER_OUT = {"gp.RescaleByFunction_sa", "gp.CreateNormalRaster_sa", "gp.CreateBinaryMask_ia", "gp.ComputeChangeRaster_ia", "gp.Diff_ia", "gp.Over_ia", "gp.LineStatistics_sa", "gp.PointStatistics_sa", "gp.SnapPourPoint_sa", "gp.FocalFlow_sa", "gp.DistanceAccumulation_sa", "gp.DistanceAllocation_sa", "gp.EucBackDirection_sa", "gp.EqualToFrequency_sa", "gp.GreaterThanFrequency_sa", "gp.LessThanFrequency_sa", "conversion.ASCIIToRaster", "conversion.FloatToRaster", "conversion.MultipatchToRaster", "management.CompositeBands", "gp.CreateConstantRaster_sa", "gp.InList_sa", "gp.LowestPosition_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
               "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa",
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",

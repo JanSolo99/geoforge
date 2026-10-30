@@ -477,8 +477,10 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         appearance, Weighted Overlay rounding half up to S8, the seven fuzzy functions and hedges,
         Fuzzy Overlay AND/OR/PRODUCT/SUM/GAMMA. Integer outputs are typed for the range the inputs'
         statistics allow (not the values found), values 0..1 giving NoData 16, wide signed input
-        staying S32. Not done: Weighted Overlay RESTRICTED, value fields other than VALUE, the
-        Combine/Weighted Overlay attribute tables, `ug weighted-overlay`
+        staying S32. The shared registry exposes Lowest Position; four `lp_*` references cover
+        integer/mixed inputs, first-input ties and strict NoData. Not done: Weighted Overlay
+        RESTRICTED, value fields other than VALUE, the Combine/Weighted Overlay attribute tables,
+        `ug weighted-overlay`
   - [x] Construction tools on the shared registry (`unigis-tools::construct`): Densify, Generate
         Points Along Lines, Create Fishnet and Polygon To Line (IGNORE_NEIGHBORS), 24 runs matching
         Pro 3.7 (`testdata/arcgis-reference/construct.json`, probes in `scripts/research/construct/`):

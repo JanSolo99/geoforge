@@ -104350,6 +104350,78 @@
           "to_scale": 10
         }
       }
+    },
+    "lp_u8": {
+      "tool": "gp.LowestPosition_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif;testdata/raster/classes_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "lowest_position",
+        "params": {
+          "inputs": "testdata/raster/landuse_u8.tif;testdata/raster/classes_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "lp_float": {
+      "tool": "gp.LowestPosition_sa",
+      "args": [
+        "testdata/raster/dem.tif;testdata/raster/dem_int16_packbits.tif;testdata/raster/dem_f64.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "lowest_position",
+        "params": {
+          "inputs": "testdata/raster/dem.tif;testdata/raster/dem_int16_packbits.tif;testdata/raster/dem_f64.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "lp_nodata": {
+      "tool": "gp.LowestPosition_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif;testdata/raster/dem.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "lowest_position",
+        "params": {
+          "inputs": "testdata/raster/dem_nodata.tif;testdata/raster/dem.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "lp_tie": {
+      "tool": "gp.LowestPosition_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif;testdata/raster/landuse_u8.tif;testdata/raster/landuse_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "lowest_position",
+        "params": {
+          "inputs": "testdata/raster/landuse_u8.tif;testdata/raster/landuse_u8.tif;testdata/raster/landuse_u8.tif",
+          "output": "<out>"
+        }
+      }
     }
   }
 }
