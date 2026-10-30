@@ -101,6 +101,8 @@ pub(crate) fn run(t: &'static Tool, inp: &dyn Inputs, p: &Json) -> Result<ToolRe
             let m = vec![format!("{}: {} rows", ds.name, ds.features.len())];
             Ok(ToolResult { output: Output::Table(ds), messages: m })
         }
+        // Tools that only write on disk (Create File Geodatabase) report their messages.
+        registry::Outcome::Report(r) if r.rows.is_empty() => Ok(ToolResult { output: Output::Layers(Vec::new()), messages: r.messages }),
         registry::Outcome::Report(r) => {
             // A table of the values, and the same lines as messages.
             let mut ds = Dataset::new(

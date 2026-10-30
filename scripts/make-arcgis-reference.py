@@ -77,6 +77,33 @@ DM = ROOT / "testdata" / "dm"
 
 CASES = {
     # name: (tool, args before the output, args after the output)
+    # Workspace creation, run in a copy of testdata/geoproc/workspace_create (<workspace>).
+    **{f"wsc_{name}": (tool, [*args], [])
+       for name, tool, args in [
+        ("folder", "management.CreateFolder", ["<workspace>", "f1"]),
+        ("folder_existing", "management.CreateFolder", ["<workspace>", "existing"]),
+        ("folder_spaces", "management.CreateFolder", ["<workspace>", "two words"]),
+        ("folder_missing", "management.CreateFolder", ["<workspace>/missing", "f"]),
+        ("folder_bad_name", "management.CreateFolder", ["<workspace>", "a*b"]),
+        ("folder_on_file", "management.CreateFolder", ["<workspace>", "taken.geodatabase"]),
+        ("folder_empty_name", "management.CreateFolder", ["<workspace>", ""]),
+        ("fgdb", "management.CreateFileGDB", ["<workspace>", "g1"]),
+        ("fgdb_suffix", "management.CreateFileGDB", ["<workspace>", "g2.gdb"]),
+        ("fgdb_extension", "management.CreateFileGDB", ["<workspace>", "g8.txt"]),
+        ("fgdb_v10", "management.CreateFileGDB", ["<workspace>", "g3", "10.0"]),
+        ("fgdb_current", "management.CreateFileGDB", ["<workspace>", "g4", "CURRENT"]),
+        ("fgdb_bad_version", "management.CreateFileGDB", ["<workspace>", "g5", "11"]),
+        ("fgdb_taken", "management.CreateFileGDB", ["<workspace>", "taken"]),
+        ("fgdb_missing", "management.CreateFileGDB", ["<workspace>/missing", "g"]),
+        ("fgdb_in_gdb", "management.CreateFileGDB", ["<workspace>/taken.gdb", "g"]),
+        ("fgdb_bad_name", "management.CreateFileGDB", ["<workspace>", "a*b"]),
+        ("mgdb", "management.CreateMobileGDB", ["<workspace>", "m1"]),
+        ("mgdb_suffix", "management.CreateMobileGDB", ["<workspace>", "m2.geodatabase"]),
+        ("mgdb_extension", "management.CreateMobileGDB", ["<workspace>", "m3.sqlite"]),
+        ("mgdb_taken", "management.CreateMobileGDB", ["<workspace>", "taken"]),
+        ("mgdb_missing", "management.CreateMobileGDB", ["<workspace>/missing", "m"]),
+        ("mgdb_in_gdb", "management.CreateMobileGDB", ["<workspace>/taken.gdb", "m"]),
+    ]},
     **{f"fctg_{name}": ("conversion.FeatureClassToGeodatabase", [[str(DATA / item) for item in items]], [])
        for name, items in [
         ("single", ["parcels.shp"]),
@@ -2220,6 +2247,9 @@ for _tool, _id in COMBINATORIAL:
 
 
 RUN = {
+    "management.CreateFolder": ("create_folder", ["out_folder_path", "out_name"]),
+    "management.CreateFileGDB": ("create_file_gdb", ["out_folder_path", "out_name", "out_version"]),
+    "management.CreateMobileGDB": ("create_mobile_gdb", ["out_folder_path", "out_name"]),
     "conversion.FeatureClassToGeodatabase": ("feature_class_to_geodatabase", ["input_features", "output_geodatabase"]),
     "conversion.ExcelToTable": ("excel_to_table", ["input", "output", "sheet", "field_names_row", "cell_range"]),
     "management.AddGlobalIDs": ("add_global_ids", ["in_datasets"]),
@@ -2493,6 +2523,49 @@ def subset_case(w, name, tool, before, after):
                 messages=[m["text"] for m in r.get("messages",[]) if m["severity"]>0],run=run_spec(tool,args))
 
 
+WORKSPACE_CREATE = {"management.CreateFolder", "management.CreateFileGDB", "management.CreateMobileGDB"}
+
+
+def workspace_create_case(w, tool, template):
+    """Create Folder / File GDB / Mobile GDB in a disposable copy of their fixture folder: the
+    folder's listing afterwards and the derived output, both relative to the copy."""
+    source = DATA / "workspace_create"
+    with tempfile.TemporaryDirectory(prefix="unigis-create-reference-") as temp:
+        copied = Path(temp) / "workspace"
+        shutil.copytree(source, copied)
+        actual = [a.replace("<workspace>", str(copied)) for a in template]
+        r = w.call("run_tool", tool=tool, args=actual)
+        out = r.get("outputs") or []
+        derived = str(out[0]).replace("//", "/") if r.get("status") == "succeeded" and out else None
+        wine_derived = win(derived) if derived else None
+        response = w.call("python", code=f"""
+import os
+arcpy.management.ClearWorkspaceCache()
+folder = {win(copied)!r}
+derived = {wine_derived!r}
+entries = []
+for base, dirs, names in os.walk(folder):
+    for name in list(dirs):
+        entries.append(os.path.relpath(os.path.join(base, name), folder).replace(chr(92), '/') + '/')
+        if name.lower().endswith('.gdb'):
+            dirs.remove(name)
+    for name in names:
+        if not name.endswith(('.lock', '-shm', '-wal', '-conch')):
+            entries.append(os.path.relpath(os.path.join(base, name), folder).replace(chr(92), '/'))
+workspace = None
+if derived and derived.lower().endswith(('.gdb', '.geodatabase')):
+    d = arcpy.Describe(derived)
+    workspace = dict(children=sorted(c.name for c in d.children), factory=d.workspaceFactoryProgID)
+arcpy.management.ClearWorkspaceCache()
+result = dict(entries=sorted(entries), workspace=workspace)
+""")
+        output = derived.replace(str(copied), "<workspace>") if derived else None
+        return dict(tool=tool, args=template, status=r.get("status"),
+                    messages=[m["text"] for m in r.get("messages", []) if m["severity"] > 0],
+                    workspace_create=dict(source=rel(source), expected=response["result"], output=output),
+                    run=run_spec(tool, template))
+
+
 def feature_import_case(w, name, tool, before):
     """Retain complete ArcGIS output and immutable setup workspace for batch imports."""
     seeded = name in {"fctg_collision", "fctg_dataset"}
@@ -2658,6 +2731,10 @@ def main():
             continue
         if tool == "management.ExtractDataFromGeodatabase":
             manifest["cases"][name] = extract_data_case(w, name, tool, before, after)
+            print(f"{name}: {manifest['cases'][name]['status']}")
+            continue
+        if tool in WORKSPACE_CREATE:
+            manifest["cases"][name] = workspace_create_case(w, tool, before)
             print(f"{name}: {manifest['cases'][name]['status']}")
             continue
         if tool == "management.DeleteMultiple":

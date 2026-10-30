@@ -850,6 +850,13 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
   mobile geodatabase writer. FILE_GDB/XML alternatives still need the input parser.
 - [ ] Mobile Geodatabase To File Geodatabase: deferred; native formats have no mobile
   geodatabase reader for the source catalog, tables and ST_Geometry features.
+- [x] Create Folder, Create File Geodatabase, Create Mobile Geodatabase (`create_folder`,
+  `create_file_gdb`, `create_mobile_gdb`, `unigis-tools/src/workspace.rs`): 23 ArcGIS
+  `wsc_*` references (names, extension replacement, collisions, 000732/000735/000792/000800/
+  999999 refusals, the new workspace's contents). The mobile geodatabase is ArcGIS's empty
+  schema written by our SQLite writer (`unigis-gpkg/src/mobile.rs`, seed from
+  `scripts/research/mobile_gdb_seed.py`); ArcGIS opens it and creates classes, datasets and
+  domains in it. File geodatabase versions 9.2/9.3 are refused (KNOWN_GAPS).
 - [x] Add Global IDs (`add_global_ids`): in-place FileGDB class/table and simple
   feature-dataset expansion, batches in one workspace, UUID4 values, system field
   metadata/index and repeat stability. Eight public references plus rollback tests;

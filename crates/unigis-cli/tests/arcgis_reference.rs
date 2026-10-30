@@ -34,6 +34,8 @@ mod catalog_edits;
 mod global_ids;
 #[path = "common/schema_edits.rs"]
 mod schema_edits;
+#[path = "common/workspace_create.rs"]
+mod workspace_create;
 
 /// The `ug` arguments reproducing each ArcGIS case.
 fn gf_args(case: &str) -> Vec<&'static str> {
@@ -4538,6 +4540,13 @@ fn tools_match_arcgis_output() {
         }
         if info["workspace_extract"] == true {
             let diffs = workspace_extract::compare(case, info, &root, &out_dir);
+            if !diffs.is_empty() {
+                failures.push(format!("{case}:\n    {}", diffs.join("\n    ")));
+            }
+            continue;
+        }
+        if info.get("workspace_create").is_some() {
+            let diffs = workspace_create::compare(case, info, &root, &out_dir);
             if !diffs.is_empty() {
                 failures.push(format!("{case}:\n    {}", diffs.join("\n    ")));
             }

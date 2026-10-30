@@ -45,6 +45,7 @@ pub mod temporal;
 pub mod timezone;
 pub mod trim;
 pub mod validate_join;
+pub mod workspace;
 mod zm;
 
 pub use fieldmap::{FieldMapEntry, MapSource, parse_field_mapping, table_stem};

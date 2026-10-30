@@ -1147,7 +1147,9 @@ dependencies = [
  "rstar",
  "spade",
  "unigis-core",
+ "unigis-filegdb",
  "unigis-geometry",
+ "unigis-gpkg",
  "unigis-proj",
 ]
 

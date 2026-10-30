@@ -22,4 +22,4 @@ unigis-tools = { path = "../../../crates/unigis-tools", default-features = false
 # browser build has no C toolchain for it. The app's rusqlite stays on the libsqlite3-sys that
 # proj-sys links (one `links = "sqlite3"` crate per build).
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-unigis-tools = { path = "../../../crates/unigis-tools", features = ["proj"] }
+unigis-tools = { path = "../../../crates/unigis-tools", features = ["proj", "gdb"] }

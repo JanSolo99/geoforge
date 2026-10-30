@@ -99473,6 +99473,753 @@
           "raster_format": "TIFF"
         }
       }
+    },
+    "wsc_folder": {
+      "tool": "management.CreateFolder",
+      "args": [
+        "<workspace>",
+        "f1"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "workspace_create": {
+        "source": "testdata/geoproc/workspace_create",
+        "expected": {
+          "entries": [
+            "existing/",
+            "existing/.keep",
+            "f1/",
+            "taken.gdb/",
+            "taken.geodatabase"
+          ],
+          "workspace": null
+        },
+        "output": "<workspace>/f1"
+      },
+      "run": {
+        "tool": "create_folder",
+        "params": {
+          "out_folder_path": "<workspace>",
+          "out_name": "f1"
+        }
+      }
+    },
+    "wsc_folder_existing": {
+      "tool": "management.CreateFolder",
+      "args": [
+        "<workspace>",
+        "existing"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "workspace_create": {
+        "source": "testdata/geoproc/workspace_create",
+        "expected": {
+          "entries": [
+            "existing/",
+            "existing/.keep",
+            "taken.gdb/",
+            "taken.geodatabase"
+          ],
+          "workspace": null
+        },
+        "output": "<workspace>/existing"
+      },
+      "run": {
+        "tool": "create_folder",
+        "params": {
+          "out_folder_path": "<workspace>",
+          "out_name": "existing"
+        }
+      }
+    },
+    "wsc_folder_spaces": {
+      "tool": "management.CreateFolder",
+      "args": [
+        "<workspace>",
+        "two words"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "workspace_create": {
+        "source": "testdata/geoproc/workspace_create",
+        "expected": {
+          "entries": [
+            "existing/",
+            "existing/.keep",
+            "taken.gdb/",
+            "taken.geodatabase",
+            "two words/"
+          ],
+          "workspace": null
+        },
+        "output": "<workspace>/two words"
+      },
+      "run": {
+        "tool": "create_folder",
+        "params": {
+          "out_folder_path": "<workspace>",
+          "out_name": "two words"
+        }
+      }
+    },
+    "wsc_folder_missing": {
+      "tool": "management.CreateFolder",
+      "args": [
+        "<workspace>/missing",
+        "f"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000732: Folder Location: Dataset /tmp/unigis-create-reference-3ti_lg0s/workspace/missing does not exist or is not supported",
+        "Failed to execute (CreateFolder)."
+      ],
+      "workspace_create": {
+        "source": "testdata/geoproc/workspace_create",
+        "expected": {
+          "entries": [
+            "existing/",
+            "existing/.keep",
+            "taken.gdb/",
+            "taken.geodatabase"
+          ],
+          "workspace": null
+        },
+        "output": null
+      },
+      "run": {
+        "tool": "create_folder",
+        "params": {
+          "out_folder_path": "<workspace>/missing",
+          "out_name": "f"
+        }
+      }
+    },
+    "wsc_folder_bad_name": {
+      "tool": "management.CreateFolder",
+      "args": [
+        "<workspace>",
+        "a*b"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 999999: Something unexpected caused the tool to fail. Contact Esri Technical Support (http://esriurl.com/support) to Report a Bug, and refer to the error help for potential solutions or workarounds.",
+        "Failed to execute (CreateFolder)."
+      ],
+      "workspace_create": {
+        "source": "testdata/geoproc/workspace_create",
+        "expected": {
+          "entries": [
+            "existing/",
+            "existing/.keep",
+            "taken.gdb/",
+            "taken.geodatabase"
+          ],
+          "workspace": null
+        },
+        "output": null
+      },
+      "run": {
+        "tool": "create_folder",
+        "params": {
+          "out_folder_path": "<workspace>",
+          "out_name": "a*b"
+        }
+      }
+    },
+    "wsc_folder_on_file": {
+      "tool": "management.CreateFolder",
+      "args": [
+        "<workspace>",
+        "taken.geodatabase"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 999999: Something unexpected caused the tool to fail. Contact Esri Technical Support (http://esriurl.com/support) to Report a Bug, and refer to the error help for potential solutions or workarounds.",
+        "Failed to execute (CreateFolder)."
+      ],
+      "workspace_create": {
+        "source": "testdata/geoproc/workspace_create",
+        "expected": {
+          "entries": [
+            "existing/",
+            "existing/.keep",
+            "taken.gdb/",
+            "taken.geodatabase"
+          ],
+          "workspace": null
+        },
+        "output": null
+      },
+      "run": {
+        "tool": "create_folder",
+        "params": {
+          "out_folder_path": "<workspace>",
+          "out_name": "taken.geodatabase"
+        }
+      }
+    },
+    "wsc_folder_empty_name": {
+      "tool": "management.CreateFolder",
+      "args": [
+        "<workspace>",
+        ""
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000735: Folder Name: Value is required",
+        "Failed to execute (CreateFolder)."
+      ],
+      "workspace_create": {
+        "source": "testdata/geoproc/workspace_create",
+        "expected": {
+          "entries": [
+            "existing/",
+            "existing/.keep",
+            "taken.gdb/",
+            "taken.geodatabase"
+          ],
+          "workspace": null
+        },
+        "output": null
+      },
+      "run": {
+        "tool": "create_folder",
+        "params": {
+          "out_folder_path": "<workspace>"
+        }
+      }
+    },
+    "wsc_fgdb": {
+      "tool": "management.CreateFileGDB",
+      "args": [
+        "<workspace>",
+        "g1"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "workspace_create": {
+        "source": "testdata/geoproc/workspace_create",
+        "expected": {
+          "entries": [
+            "existing/",
+            "existing/.keep",
+            "g1.gdb/",
+            "taken.gdb/",
+            "taken.geodatabase"
+          ],
+          "workspace": {
+            "children": [],
+            "factory": "esriDataSourcesGDB.FileGDBWorkspaceFactory"
+          }
+        },
+        "output": "<workspace>/g1.gdb"
+      },
+      "run": {
+        "tool": "create_file_gdb",
+        "params": {
+          "out_folder_path": "<workspace>",
+          "out_name": "g1"
+        }
+      }
+    },
+    "wsc_fgdb_suffix": {
+      "tool": "management.CreateFileGDB",
+      "args": [
+        "<workspace>",
+        "g2.gdb"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "workspace_create": {
+        "source": "testdata/geoproc/workspace_create",
+        "expected": {
+          "entries": [
+            "existing/",
+            "existing/.keep",
+            "g2.gdb/",
+            "taken.gdb/",
+            "taken.geodatabase"
+          ],
+          "workspace": {
+            "children": [],
+            "factory": "esriDataSourcesGDB.FileGDBWorkspaceFactory"
+          }
+        },
+        "output": "<workspace>/g2.gdb"
+      },
+      "run": {
+        "tool": "create_file_gdb",
+        "params": {
+          "out_folder_path": "<workspace>",
+          "out_name": "g2.gdb"
+        }
+      }
+    },
+    "wsc_fgdb_extension": {
+      "tool": "management.CreateFileGDB",
+      "args": [
+        "<workspace>",
+        "g8.txt"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "workspace_create": {
+        "source": "testdata/geoproc/workspace_create",
+        "expected": {
+          "entries": [
+            "existing/",
+            "existing/.keep",
+            "g8.gdb/",
+            "taken.gdb/",
+            "taken.geodatabase"
+          ],
+          "workspace": {
+            "children": [],
+            "factory": "esriDataSourcesGDB.FileGDBWorkspaceFactory"
+          }
+        },
+        "output": "<workspace>/g8.gdb"
+      },
+      "run": {
+        "tool": "create_file_gdb",
+        "params": {
+          "out_folder_path": "<workspace>",
+          "out_name": "g8.txt"
+        }
+      }
+    },
+    "wsc_fgdb_v10": {
+      "tool": "management.CreateFileGDB",
+      "args": [
+        "<workspace>",
+        "g3",
+        "10.0"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "workspace_create": {
+        "source": "testdata/geoproc/workspace_create",
+        "expected": {
+          "entries": [
+            "existing/",
+            "existing/.keep",
+            "g3.gdb/",
+            "taken.gdb/",
+            "taken.geodatabase"
+          ],
+          "workspace": {
+            "children": [],
+            "factory": "esriDataSourcesGDB.FileGDBWorkspaceFactory"
+          }
+        },
+        "output": "<workspace>/g3.gdb"
+      },
+      "run": {
+        "tool": "create_file_gdb",
+        "params": {
+          "out_folder_path": "<workspace>",
+          "out_name": "g3",
+          "out_version": "10.0"
+        }
+      }
+    },
+    "wsc_fgdb_current": {
+      "tool": "management.CreateFileGDB",
+      "args": [
+        "<workspace>",
+        "g4",
+        "CURRENT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "workspace_create": {
+        "source": "testdata/geoproc/workspace_create",
+        "expected": {
+          "entries": [
+            "existing/",
+            "existing/.keep",
+            "g4.gdb/",
+            "taken.gdb/",
+            "taken.geodatabase"
+          ],
+          "workspace": {
+            "children": [],
+            "factory": "esriDataSourcesGDB.FileGDBWorkspaceFactory"
+          }
+        },
+        "output": "<workspace>/g4.gdb"
+      },
+      "run": {
+        "tool": "create_file_gdb",
+        "params": {
+          "out_folder_path": "<workspace>",
+          "out_name": "g4",
+          "out_version": "CURRENT"
+        }
+      }
+    },
+    "wsc_fgdb_bad_version": {
+      "tool": "management.CreateFileGDB",
+      "args": [
+        "<workspace>",
+        "g5",
+        "11"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000800: The value is not a member of CURRENT | 10.0 | 9.3 | 9.2.",
+        "Failed to execute (CreateFileGDB)."
+      ],
+      "workspace_create": {
+        "source": "testdata/geoproc/workspace_create",
+        "expected": {
+          "entries": [
+            "existing/",
+            "existing/.keep",
+            "taken.gdb/",
+            "taken.geodatabase"
+          ],
+          "workspace": null
+        },
+        "output": null
+      },
+      "run": {
+        "tool": "create_file_gdb",
+        "params": {
+          "out_folder_path": "<workspace>",
+          "out_name": "g5",
+          "out_version": "11"
+        }
+      }
+    },
+    "wsc_fgdb_taken": {
+      "tool": "management.CreateFileGDB",
+      "args": [
+        "<workspace>",
+        "taken"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 000258: Output /tmp/unigis-create-reference-0wiaebjp/workspace/taken.gdb already exists",
+        "Failed to execute (CreateFileGDB)."
+      ],
+      "workspace_create": {
+        "source": "testdata/geoproc/workspace_create",
+        "expected": {
+          "entries": [
+            "existing/",
+            "existing/.keep",
+            "taken.gdb/",
+            "taken.geodatabase"
+          ],
+          "workspace": null
+        },
+        "output": null
+      },
+      "run": {
+        "tool": "create_file_gdb",
+        "params": {
+          "out_folder_path": "<workspace>",
+          "out_name": "taken"
+        }
+      }
+    },
+    "wsc_fgdb_missing": {
+      "tool": "management.CreateFileGDB",
+      "args": [
+        "<workspace>/missing",
+        "g"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000732: File GDB Location: Dataset /tmp/unigis-create-reference-cy3iijqr/workspace/missing does not exist or is not supported",
+        "Failed to execute (CreateFileGDB)."
+      ],
+      "workspace_create": {
+        "source": "testdata/geoproc/workspace_create",
+        "expected": {
+          "entries": [
+            "existing/",
+            "existing/.keep",
+            "taken.gdb/",
+            "taken.geodatabase"
+          ],
+          "workspace": null
+        },
+        "output": null
+      },
+      "run": {
+        "tool": "create_file_gdb",
+        "params": {
+          "out_folder_path": "<workspace>/missing",
+          "out_name": "g"
+        }
+      }
+    },
+    "wsc_fgdb_in_gdb": {
+      "tool": "management.CreateFileGDB",
+      "args": [
+        "<workspace>/taken.gdb",
+        "g"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 000792: Cannot write output to target folder /tmp/unigis-create-reference-6fxl95zi/workspace/taken.gdb.",
+        "Failed to execute (CreateFileGDB)."
+      ],
+      "workspace_create": {
+        "source": "testdata/geoproc/workspace_create",
+        "expected": {
+          "entries": [
+            "existing/",
+            "existing/.keep",
+            "taken.gdb/",
+            "taken.geodatabase"
+          ],
+          "workspace": null
+        },
+        "output": null
+      },
+      "run": {
+        "tool": "create_file_gdb",
+        "params": {
+          "out_folder_path": "<workspace>/taken.gdb",
+          "out_name": "g"
+        }
+      }
+    },
+    "wsc_fgdb_bad_name": {
+      "tool": "management.CreateFileGDB",
+      "args": [
+        "<workspace>",
+        "a*b"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 999999: Something unexpected caused the tool to fail. Contact Esri Technical Support (http://esriurl.com/support) to Report a Bug, and refer to the error help for potential solutions or workarounds.",
+        "Failed to execute (CreateFileGDB)."
+      ],
+      "workspace_create": {
+        "source": "testdata/geoproc/workspace_create",
+        "expected": {
+          "entries": [
+            "existing/",
+            "existing/.keep",
+            "taken.gdb/",
+            "taken.geodatabase"
+          ],
+          "workspace": null
+        },
+        "output": null
+      },
+      "run": {
+        "tool": "create_file_gdb",
+        "params": {
+          "out_folder_path": "<workspace>",
+          "out_name": "a*b"
+        }
+      }
+    },
+    "wsc_mgdb": {
+      "tool": "management.CreateMobileGDB",
+      "args": [
+        "<workspace>",
+        "m1"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "workspace_create": {
+        "source": "testdata/geoproc/workspace_create",
+        "expected": {
+          "entries": [
+            "existing/",
+            "existing/.keep",
+            "m1.geodatabase",
+            "taken.gdb/",
+            "taken.geodatabase"
+          ],
+          "workspace": {
+            "children": [],
+            "factory": "esriDataSourcesGDB.SqliteWorkspaceFactory"
+          }
+        },
+        "output": "<workspace>/m1.geodatabase"
+      },
+      "run": {
+        "tool": "create_mobile_gdb",
+        "params": {
+          "out_folder_path": "<workspace>",
+          "out_name": "m1"
+        }
+      }
+    },
+    "wsc_mgdb_suffix": {
+      "tool": "management.CreateMobileGDB",
+      "args": [
+        "<workspace>",
+        "m2.geodatabase"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "workspace_create": {
+        "source": "testdata/geoproc/workspace_create",
+        "expected": {
+          "entries": [
+            "existing/",
+            "existing/.keep",
+            "m2.geodatabase",
+            "taken.gdb/",
+            "taken.geodatabase"
+          ],
+          "workspace": {
+            "children": [],
+            "factory": "esriDataSourcesGDB.SqliteWorkspaceFactory"
+          }
+        },
+        "output": "<workspace>/m2.geodatabase"
+      },
+      "run": {
+        "tool": "create_mobile_gdb",
+        "params": {
+          "out_folder_path": "<workspace>",
+          "out_name": "m2.geodatabase"
+        }
+      }
+    },
+    "wsc_mgdb_extension": {
+      "tool": "management.CreateMobileGDB",
+      "args": [
+        "<workspace>",
+        "m3.sqlite"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "workspace_create": {
+        "source": "testdata/geoproc/workspace_create",
+        "expected": {
+          "entries": [
+            "existing/",
+            "existing/.keep",
+            "m3.geodatabase",
+            "taken.gdb/",
+            "taken.geodatabase"
+          ],
+          "workspace": {
+            "children": [],
+            "factory": "esriDataSourcesGDB.SqliteWorkspaceFactory"
+          }
+        },
+        "output": "<workspace>/m3.geodatabase"
+      },
+      "run": {
+        "tool": "create_mobile_gdb",
+        "params": {
+          "out_folder_path": "<workspace>",
+          "out_name": "m3.sqlite"
+        }
+      }
+    },
+    "wsc_mgdb_taken": {
+      "tool": "management.CreateMobileGDB",
+      "args": [
+        "<workspace>",
+        "taken"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 000258: Output /tmp/unigis-create-reference-zqel4d9y/workspace/taken.geodatabase already exists",
+        "Failed to execute (CreateMobileGDB)."
+      ],
+      "workspace_create": {
+        "source": "testdata/geoproc/workspace_create",
+        "expected": {
+          "entries": [
+            "existing/",
+            "existing/.keep",
+            "taken.gdb/",
+            "taken.geodatabase"
+          ],
+          "workspace": null
+        },
+        "output": null
+      },
+      "run": {
+        "tool": "create_mobile_gdb",
+        "params": {
+          "out_folder_path": "<workspace>",
+          "out_name": "taken"
+        }
+      }
+    },
+    "wsc_mgdb_missing": {
+      "tool": "management.CreateMobileGDB",
+      "args": [
+        "<workspace>/missing",
+        "m"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000732: Mobile Geodatabase Location: Dataset /tmp/unigis-create-reference-roz5ret5/workspace/missing does not exist or is not supported",
+        "Failed to execute (CreateMobileGDB)."
+      ],
+      "workspace_create": {
+        "source": "testdata/geoproc/workspace_create",
+        "expected": {
+          "entries": [
+            "existing/",
+            "existing/.keep",
+            "taken.gdb/",
+            "taken.geodatabase"
+          ],
+          "workspace": null
+        },
+        "output": null
+      },
+      "run": {
+        "tool": "create_mobile_gdb",
+        "params": {
+          "out_folder_path": "<workspace>/missing",
+          "out_name": "m"
+        }
+      }
+    },
+    "wsc_mgdb_in_gdb": {
+      "tool": "management.CreateMobileGDB",
+      "args": [
+        "<workspace>/taken.gdb",
+        "m"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 000792: Cannot write output to target folder /tmp/unigis-create-reference-p22n0qmi/workspace/taken.gdb.",
+        "Failed to execute (CreateMobileGDB)."
+      ],
+      "workspace_create": {
+        "source": "testdata/geoproc/workspace_create",
+        "expected": {
+          "entries": [
+            "existing/",
+            "existing/.keep",
+            "taken.gdb/",
+            "taken.geodatabase"
+          ],
+          "workspace": null
+        },
+        "output": null
+      },
+      "run": {
+        "tool": "create_mobile_gdb",
+        "params": {
+          "out_folder_path": "<workspace>/taken.gdb",
+          "out_name": "m"
+        }
+      }
     }
   }
 }

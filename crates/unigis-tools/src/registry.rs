@@ -236,9 +236,8 @@ pub fn validate(tool: &Tool, ctx: &dyn Context) -> Result<()> {
         match p.kind {
             Kind::Choice(options) if !options.iter().any(|o| o.eq_ignore_ascii_case(&v)) => {
                 return Err(Error::Unsupported(format!(
-                    "ERROR 000067: {}: {v} is not one of {}",
-                    p.label,
-                    options.join(", ")
+                    "ERROR 000800: The value is not a member of {}.",
+                    options.join(" | ")
                 )));
             }
             Kind::Number if v.trim().parse::<f64>().is_err() => {
@@ -4029,6 +4028,9 @@ pub static TOOLS: &[Tool] = &[
     crate::gps_metadata::TOOL,
     crate::feature_class_to_shapefile::TOOL,
     crate::delete_multiple::TOOL,
+    crate::workspace::CREATE_FOLDER,
+    crate::workspace::CREATE_FILE_GDB,
+    crate::workspace::CREATE_MOBILE_GDB,
     crate::cogo::DISABLE,
     crate::cogo::ENABLE,
     crate::editor_tracking::DISABLE,

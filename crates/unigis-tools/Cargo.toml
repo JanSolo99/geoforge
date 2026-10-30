@@ -13,15 +13,20 @@ roxmltree.workspace = true
 unigis-core.workspace = true
 unigis-geometry.workspace = true
 unigis-proj = { workspace = true, optional = true }
+unigis-filegdb = { workspace = true, optional = true }
+unigis-gpkg = { workspace = true, optional = true }
 rstar.workspace = true
 spade.workspace = true
 calamine = { version = "0.37", features = ["chrono"] }
 
 [features]
-default = ["proj"]
+default = ["proj", "gdb"]
 # Project (needs PROJ). The RustGIS app builds without it: PROJ's build pins an older SQLite
 # binding than the app's.
 proj = ["dep:unigis-proj"]
+# Workspace tools that write geodatabases (Create File Geodatabase, ...). The browser build
+# goes without.
+gdb = ["dep:unigis-filegdb", "dep:unigis-gpkg"]
 
 [lints]
 workspace = true
