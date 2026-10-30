@@ -103508,6 +103508,296 @@
           "extent": "0 0 3 2"
         }
       }
+    },
+    "r2line_nosimplify": {
+      "tool": "conversion.RasterToPolyline",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "ZERO",
+        0,
+        "NO_SIMPLIFY",
+        "Value"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "arcid",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "grid_code",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "from_node",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "to_node",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "raster_to_polyline",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "output": "<out>",
+          "background_value": "ZERO",
+          "minimum_dangle_length": 0,
+          "simplify": "NO_SIMPLIFY",
+          "raster_field": "Value"
+        }
+      }
+    },
+    "r2line_nodata": {
+      "tool": "conversion.RasterToPolyline",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "NODATA",
+        0,
+        "SIMPLIFY",
+        "Value"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "arcid",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "grid_code",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "from_node",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "to_node",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "raster_to_polyline",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "output": "<out>",
+          "background_value": "NODATA",
+          "minimum_dangle_length": 0,
+          "simplify": "SIMPLIFY",
+          "raster_field": "Value"
+        }
+      }
+    },
+    "r2line_dangle": {
+      "tool": "conversion.RasterToPolyline",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>",
+        "ZERO",
+        100,
+        "SIMPLIFY",
+        "Value"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "arcid",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "grid_code",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "from_node",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "to_node",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "raster_to_polyline",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "output": "<out>",
+          "background_value": "ZERO",
+          "minimum_dangle_length": 100,
+          "simplify": "SIMPLIFY",
+          "raster_field": "Value"
+        }
+      }
+    },
+    "r2line_float": {
+      "tool": "conversion.RasterToPolyline",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000864: Input raster: The input is not within the defined domain.\r\nERROR 000969: The input raster is not integer type.\nERROR 000864: Field: The input is not within the defined domain.\r\nERROR 000889: Invalid field type.",
+        "Failed to execute (RasterToPolyline)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_to_polyline",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "r2line_landuse": {
+      "tool": "conversion.RasterToPolyline",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "arcid",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "grid_code",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "from_node",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "to_node",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "raster_to_polyline",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

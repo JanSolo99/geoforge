@@ -6663,6 +6663,9 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
         return run_raster_to_other_format(&Args(map));
     }
     let output = output.ok_or_else(|| Error::Unsupported("output=<path> is required".into()))?;
+    if spec.id == "raster_to_polyline" {
+        return run_raster_to_polyline(&Args(map), &output);
+    }
     if spec.id == "sample" {
         return run_sample(&Args(map), &output);
     }
@@ -6762,6 +6765,77 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
     } else {
         write_raster_with_tags(Path::new(&output), &out.raster, true, None, out.nodata_tag)
     }
+}
+
+fn run_raster_to_polyline(ctx: &dyn unigis_raster::registry::Context, output: &str) -> Result<()> {
+    let r = ctx.raster("input")?;
+    if r.data_type.is_float() {
+        return Err(Error::Unsupported(
+            "ERROR 000864: Input raster: The input is not within the defined domain.\r\nERROR 000969: The input raster is not integer type.\nERROR 000864: Field: The input is not within the defined domain.\r\nERROR 000889: Invalid field type."
+                .into(),
+        ));
+    }
+    let include_zero = match ctx.get("background_value").as_deref() {
+        None | Some("ZERO") => false,
+        Some("NODATA") => true,
+        Some(other) => return Err(Error::Unsupported(format!("background value {other}"))),
+    };
+    if let Some(length) = ctx.get("minimum_dangle_length") {
+        length.parse::<f64>().map_err(|_| {
+            Error::Unsupported(format!("minimum dangle length {length} is not numeric"))
+        })?;
+    }
+    if ctx
+        .get("simplify")
+        .is_some_and(|s| !["SIMPLIFY", "NO_SIMPLIFY"].contains(&s.as_str()))
+    {
+        return Err(Error::Unsupported(
+            "simplify must be SIMPLIFY or NO_SIMPLIFY".into(),
+        ));
+    }
+    if ctx
+        .get("raster_field")
+        .is_some_and(|f| !f.eq_ignore_ascii_case("Value"))
+    {
+        return Err(Error::Unsupported(
+            "only the Value raster field is supported".into(),
+        ));
+    }
+    let features = unigis_raster::conversion::raster_to_polylines(&r, include_zero)
+        .into_iter()
+        .enumerate()
+        .map(|(i, line)| {
+            let mut g = unigis_core::Geometry::point(0.0, 0.0);
+            g.kind = unigis_core::GeometryKind::Polyline;
+            g.parts = vec![0];
+            g.xy = line.points;
+            Feature {
+                oid: i as i64,
+                geometry: Some(g),
+                attributes: vec![
+                    Value::Integer(i as i32 + 1),
+                    Value::Integer(line.value as i32),
+                    Value::Integer(line.from_node as i32),
+                    Value::Integer(line.to_node as i32),
+                ],
+            }
+        })
+        .collect();
+    let out = ToolOutput {
+        kind: unigis_core::GeometryKind::Polyline,
+        has_z: false,
+        has_m: false,
+        fields: vec![
+            Field::new("arcid", FieldType::Integer),
+            Field::new("grid_code", FieldType::Integer),
+            Field::new("from_node", FieldType::Integer),
+            Field::new("to_node", FieldType::Integer),
+        ],
+        spatial_reference_wkt: raster_wkt(&r)?,
+        features,
+        messages: Vec::new(),
+    };
+    write_output(out, Path::new(output), None)
 }
 
 fn run_raster_to_other_format(ctx: &dyn unigis_raster::registry::Context) -> Result<()> {

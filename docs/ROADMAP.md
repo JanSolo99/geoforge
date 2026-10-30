@@ -830,6 +830,9 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
       MAXIMUM_HEIGHT/MINIMUM_HEIGHT, Float32 Z interpolation at cell centers. Three `mpr_*`
       ArcGIS references match grid, cells and NoData; convex ring fans and other multipatch
       part types are converted to triangles. Concave ring surfaces remain a known gap.
+- [x] Raster To Polyline (`raster_to_polyline`): integer-raster cell-center networks with
+      ZERO/NODATA background selection, degree-two path merging, node IDs and arc/grid codes.
+      Five `r2line_*` references match default, NO_SIMPLIFY, NODATA, dangle and float refusal.
 - [x] Raster To Other Format (`raster_to_other_format`): default/explicit TIFF batch conversion
       into an existing folder with ArcGIS's `_1` collision naming and floating-point default
       NoData markers. Two workspace references match grid, cells and statistics; other formats

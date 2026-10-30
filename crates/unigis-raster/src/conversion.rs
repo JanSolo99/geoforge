@@ -1,4 +1,4 @@
-//! Raster to vector conversion: Raster To Point and Raster To Polygon.
+//! Raster to vector conversion: Raster To Point, Raster To Polyline and Raster To Polygon.
 
 use std::collections::HashMap;
 
@@ -21,6 +21,153 @@ pub fn raster_to_points(r: &Raster) -> Vec<([f64; 2], f64)> {
         }
     }
     out
+}
+
+/// One arc of Raster To Polyline: its value, endpoint node IDs and cell-center vertices.
+#[derive(Debug, Clone)]
+pub struct RegionPolyline {
+    pub value: f64,
+    pub from_node: usize,
+    pub to_node: usize,
+    pub points: Vec<[f64; 2]>,
+}
+
+#[derive(Debug)]
+struct CellArc {
+    cells: Vec<usize>,
+}
+
+/// Raster To Polyline: connect four-adjacent foreground cell centers, merging each pair of arcs
+/// at a degree-two cell. Nodes and arcs follow ArcGIS's raster scan order.
+pub fn raster_to_polylines(r: &Raster, include_zero: bool) -> Vec<RegionPolyline> {
+    let (w, h) = (r.width, r.height);
+    let foreground = |i: usize| {
+        r.get(i % w, i / w)
+            .is_some_and(|v| include_zero || v != 0.0)
+    };
+    let degree = |i: usize| {
+        let (x, y) = (i % w, i / w);
+        usize::from(x > 0 && foreground(i - 1))
+            + usize::from(x + 1 < w && foreground(i + 1))
+            + usize::from(y > 0 && foreground(i - w))
+            + usize::from(y + 1 < h && foreground(i + w))
+    };
+    let mut node = vec![0; w * h];
+    let mut nodes = 0;
+    for (i, node_id) in node.iter_mut().enumerate() {
+        if foreground(i) && degree(i) != 2 {
+            nodes += 1;
+            *node_id = nodes;
+        }
+    }
+
+    let mut arcs: Vec<Option<CellArc>> = Vec::new();
+    let mut endpoints: HashMap<usize, Vec<usize>> = HashMap::new();
+    for i in 0..w * h {
+        if !foreground(i) {
+            continue;
+        }
+        let (x, y) = (i % w, i / w);
+        for j in [
+            x + 1 < w && foreground(i + 1),
+            y + 1 < h && foreground(i + w),
+        ]
+        .into_iter()
+        .enumerate()
+        .filter_map(|(axis, yes)| yes.then_some(if axis == 0 { i + 1 } else { i + w }))
+        {
+            let id = arcs.len();
+            arcs.push(Some(CellArc { cells: vec![i, j] }));
+            endpoints.entry(i).or_default().push(id);
+            endpoints.entry(j).or_default().push(id);
+        }
+    }
+
+    // 0/1 = left/right, 2/3 = up/down. Opposite pairs use their natural direction; corners
+    // start at left, down, up, right, respectively, as in ArcGIS's output.
+    let side = |center: usize, next: usize| match next {
+        n if n + 1 == center => 0,
+        n if n == center + 1 => 1,
+        n if n + w == center => 2,
+        _ => 3,
+    };
+    for center in 0..w * h {
+        if !foreground(center) || degree(center) != 2 {
+            continue;
+        }
+        let ids = endpoints
+            .remove(&center)
+            .expect("degree-two cell has two arcs");
+        let a = arcs[ids[0]].take().expect("arc is active");
+        let b = arcs[ids[1]].take().expect("arc is active");
+        let outward = |mut arc: CellArc| {
+            if arc.cells[0] != center {
+                arc.cells.reverse();
+            }
+            arc
+        };
+        let (a, b) = (outward(a), outward(b));
+        let sides = (side(center, a.cells[1]), side(center, b.cells[1]));
+        let start_side = if sides.0 ^ sides.1 == 1 {
+            sides.0.min(sides.1)
+        } else {
+            [sides.0, sides.1]
+                .into_iter()
+                .min_by_key(|s| match s {
+                    0 => 0,
+                    3 => 1,
+                    2 => 2,
+                    _ => 3,
+                })
+                .expect("two sides")
+        };
+        let (mut start, end) = if sides.0 == start_side {
+            (a, b)
+        } else {
+            (b, a)
+        };
+        start.cells.reverse();
+        start.cells.extend(end.cells.into_iter().skip(1));
+        let first = start.cells[0];
+        let last = *start.cells.last().expect("arc has an endpoint");
+        let id = arcs.len();
+        arcs.push(Some(start));
+        endpoints.entry(first).or_default().push(id);
+        endpoints.entry(last).or_default().push(id);
+    }
+
+    let mut arcs: Vec<CellArc> = arcs.into_iter().flatten().collect();
+    arcs.sort_by_key(|arc| {
+        let anchor = *arc.cells.iter().max().expect("arc has cells");
+        let position = arc.cells.iter().position(|&i| i == anchor).expect("anchor");
+        let neighbor = if position + 1 < arc.cells.len() {
+            arc.cells[position + 1]
+        } else {
+            arc.cells[position - 1]
+        };
+        (anchor, usize::from(anchor % w == neighbor % w))
+    });
+    let map = |i: usize| {
+        let (c, rr) = (i % w, i / w);
+        let (c, rr) = (c as f64 + 0.5, rr as f64 + 0.5);
+        let t = &r.transform;
+        [t[0] + t[1] * c + t[2] * rr, t[3] + t[4] * c + t[5] * rr]
+    };
+    arcs.into_iter()
+        .map(|arc| {
+            let value_cell = if arc.cells.len() > 2 {
+                arc.cells[1]
+            } else {
+                arc.cells[0]
+            };
+            RegionPolyline {
+                value: r.bands[0][value_cell],
+                from_node: node[arc.cells[0]],
+                to_node: node[*arc.cells.last().expect("arc has an endpoint")],
+                points: arc.cells.into_iter().map(map).collect(),
+            }
+        })
+        .collect()
 }
 
 /// A directed edge between two grid corners (column, row).

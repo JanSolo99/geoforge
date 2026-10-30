@@ -501,6 +501,12 @@ fn raster_to_other_format(_ctx: &dyn Context) -> Result<Output> {
     ))
 }
 
+fn raster_to_polyline(_ctx: &dyn Context) -> Result<Output> {
+    Err(Error::Unsupported(
+        "Raster To Polyline requires a feature output host".into(),
+    ))
+}
+
 /// The raster is passed through; `ug run` writes it as text (see `run_raster_tool`).
 fn raster_to_ascii(ctx: &dyn Context) -> Result<Output> {
     with_statistics(ctx.raster("input")?, false)
@@ -1387,6 +1393,35 @@ pub static TOOLS: &[Tool] = &[
             option("raster_format", "Raster Format", &["TIFF"], "TIFF"),
         ],
         run: raster_to_other_format,
+    },
+    Tool {
+        id: "raster_to_polyline",
+        name: "Raster to Polyline",
+        summary: "Converts an integer raster to a node/arc polyline feature class.",
+        params: &[
+            raster("input", "Input raster", true),
+            option(
+                "background_value",
+                "Background value",
+                &["ZERO", "NODATA"],
+                "ZERO",
+            ),
+            Param {
+                name: "minimum_dangle_length",
+                label: "Minimum dangle length",
+                kind: Kind::Text,
+                required: false,
+                default: "0",
+            },
+            option(
+                "simplify",
+                "Simplify polylines",
+                &["SIMPLIFY", "NO_SIMPLIFY"],
+                "SIMPLIFY",
+            ),
+            option("raster_field", "Field", &["Value"], "Value"),
+        ],
+        run: raster_to_polyline,
     },
     Tool {
         id: "combinatorial_and",
