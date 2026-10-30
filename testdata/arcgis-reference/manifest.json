@@ -103798,6 +103798,558 @@
           "output": "<out>"
         }
       }
+    },
+    "rbf_mssmall": {
+      "tool": "gp.RescaleByFunction_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "MSSMALL # # # # # #",
+        1,
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rescale_by_function",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "transformation_function": "MSSMALL # # # # # #",
+          "from_scale": 1,
+          "to_scale": 10
+        }
+      }
+    },
+    "rbf_mslarge": {
+      "tool": "gp.RescaleByFunction_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "MSLARGE # # # # # #",
+        1,
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rescale_by_function",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "transformation_function": "MSLARGE # # # # # #",
+          "from_scale": 1,
+          "to_scale": 10
+        }
+      }
+    },
+    "rbf_linear": {
+      "tool": "gp.RescaleByFunction_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "LINEAR # # # # # #",
+        1,
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rescale_by_function",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "transformation_function": "LINEAR # # # # # #",
+          "from_scale": 1,
+          "to_scale": 10
+        }
+      }
+    },
+    "rbf_exponential": {
+      "tool": "gp.RescaleByFunction_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "EXPONENTIAL # # # # # #",
+        1,
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rescale_by_function",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "transformation_function": "EXPONENTIAL # # # # # #",
+          "from_scale": 1,
+          "to_scale": 10
+        }
+      }
+    },
+    "rbf_gaussian": {
+      "tool": "gp.RescaleByFunction_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "GAUSSIAN # # # # # #",
+        1,
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rescale_by_function",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "transformation_function": "GAUSSIAN # # # # # #",
+          "from_scale": 1,
+          "to_scale": 10
+        }
+      }
+    },
+    "rbf_large": {
+      "tool": "gp.RescaleByFunction_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "LARGE # # # # # #",
+        1,
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rescale_by_function",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "transformation_function": "LARGE # # # # # #",
+          "from_scale": 1,
+          "to_scale": 10
+        }
+      }
+    },
+    "rbf_logarithm": {
+      "tool": "gp.RescaleByFunction_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "LOGARITHM # # # # # #",
+        1,
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rescale_by_function",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "transformation_function": "LOGARITHM # # # # # #",
+          "from_scale": 1,
+          "to_scale": 10
+        }
+      }
+    },
+    "rbf_logisticdecay": {
+      "tool": "gp.RescaleByFunction_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "LOGISTICDECAY # # # # # # #",
+        1,
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rescale_by_function",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "transformation_function": "LOGISTICDECAY # # # # # # #",
+          "from_scale": 1,
+          "to_scale": 10
+        }
+      }
+    },
+    "rbf_logisticgrowth": {
+      "tool": "gp.RescaleByFunction_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "LOGISTICGROWTH # # # # # # #",
+        1,
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rescale_by_function",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "transformation_function": "LOGISTICGROWTH # # # # # # #",
+          "from_scale": 1,
+          "to_scale": 10
+        }
+      }
+    },
+    "rbf_near": {
+      "tool": "gp.RescaleByFunction_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "NEAR # # # # # #",
+        1,
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rescale_by_function",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "transformation_function": "NEAR # # # # # #",
+          "from_scale": 1,
+          "to_scale": 10
+        }
+      }
+    },
+    "rbf_power": {
+      "tool": "gp.RescaleByFunction_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "POWER # # # # # #",
+        1,
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rescale_by_function",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "transformation_function": "POWER # # # # # #",
+          "from_scale": 1,
+          "to_scale": 10
+        }
+      }
+    },
+    "rbf_small": {
+      "tool": "gp.RescaleByFunction_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "SMALL # # # # # #",
+        1,
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rescale_by_function",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "transformation_function": "SMALL # # # # # #",
+          "from_scale": 1,
+          "to_scale": 10
+        }
+      }
+    },
+    "rbf_symmetriclinear": {
+      "tool": "gp.RescaleByFunction_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "SYMMETRICLINEAR # # # # # #",
+        1,
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rescale_by_function",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "transformation_function": "SYMMETRICLINEAR # # # # # #",
+          "from_scale": 1,
+          "to_scale": 10
+        }
+      }
+    },
+    "rbf_linear_params": {
+      "tool": "gp.RescaleByFunction_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "LINEAR 220 280 # # # #",
+        1,
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rescale_by_function",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "transformation_function": "LINEAR 220 280 # # # #",
+          "from_scale": 1,
+          "to_scale": 10
+        }
+      }
+    },
+    "rbf_gaussian_params": {
+      "tool": "gp.RescaleByFunction_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "GAUSSIAN 250 0.001 # # # #",
+        0,
+        100
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rescale_by_function",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "transformation_function": "GAUSSIAN 250 0.001 # # # #",
+          "from_scale": 0,
+          "to_scale": 100
+        }
+      }
+    },
+    "rbf_mssmall_mult": {
+      "tool": "gp.RescaleByFunction_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "MSSMALL 1.2 0.5 # # # #",
+        1,
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rescale_by_function",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "transformation_function": "MSSMALL 1.2 0.5 # # # #",
+          "from_scale": 1,
+          "to_scale": 10
+        }
+      }
+    },
+    "rbf_linear_thresholds": {
+      "tool": "gp.RescaleByFunction_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "LINEAR # # 220 0 280 NoData",
+        1,
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rescale_by_function",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "transformation_function": "LINEAR # # 220 0 280 NoData",
+          "from_scale": 1,
+          "to_scale": 10
+        }
+      }
+    },
+    "rbf_exponential_thresholds": {
+      "tool": "gp.RescaleByFunction_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "EXPONENTIAL # # 220 # 280 #",
+        1,
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rescale_by_function",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "transformation_function": "EXPONENTIAL # # 220 # 280 #",
+          "from_scale": 1,
+          "to_scale": 10
+        }
+      }
+    },
+    "rbf_large_params": {
+      "tool": "gp.RescaleByFunction_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "LARGE 250 3 # # # #",
+        1,
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rescale_by_function",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "transformation_function": "LARGE 250 3 # # # #",
+          "from_scale": 1,
+          "to_scale": 10
+        }
+      }
+    },
+    "rbf_logistic_y": {
+      "tool": "gp.RescaleByFunction_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "LOGISTICGROWTH # # 5 # # # #",
+        1,
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rescale_by_function",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "transformation_function": "LOGISTICGROWTH # # 5 # # # #",
+          "from_scale": 1,
+          "to_scale": 10
+        }
+      }
+    },
+    "rbf_power_zero": {
+      "tool": "gp.RescaleByFunction_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "POWER # # # # # #",
+        0,
+        5
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rescale_by_function",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "transformation_function": "POWER # # # # # #",
+          "from_scale": 0,
+          "to_scale": 5
+        }
+      }
+    },
+    "rbf_reversed": {
+      "tool": "gp.RescaleByFunction_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "LINEAR # # # # # #",
+        10,
+        1
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rescale_by_function",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "transformation_function": "LINEAR # # # # # #",
+          "from_scale": 10,
+          "to_scale": 1
+        }
+      }
+    },
+    "rbf_near_thresholds_outside": {
+      "tool": "gp.RescaleByFunction_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "NEAR # # 150 # 400 #",
+        1,
+        10
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "rescale_by_function",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "transformation_function": "NEAR # # 150 # 400 #",
+          "from_scale": 1,
+          "to_scale": 10
+        }
+      }
     }
   }
 }

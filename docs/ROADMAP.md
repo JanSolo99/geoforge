@@ -853,6 +853,10 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
   letters before/after, symbols, colons, packed), signed decimal pairs, MGRS and banded UTM; the
   Precision formula, context text, document dates (12 notations) and file fields as ArcGIS writes
   them. 6 ArcGIS `eld_*` references (machine/time fields Filename/Modified/Scanned not compared).
+- [x] Rescale by Function (`rescale_by_function`, `unigis-raster/src/rescale.rs`): all 13
+  transformation functions with Esri's published formulas and defaults (sample standard deviation
+  for MS functions, LogisticDecay as growth with 99 %), thresholds, below/above values, any
+  evaluation scale. 23 ArcGIS `rbf_*` references; notes in scripts/research/rescale_by_function/.
 - [x] Create Normal Raster (`create_normal_raster`): Float32 standard-normal values, NoData 3.4e38,
   the Create Constant Raster grid, defaults 250 x 250 cells of cell size 1. ArcGIS's generators
   (ACM599, Mersenne Twister) are seeded in a way not reproduced (seeded runs repeat, but match no

@@ -113,6 +113,12 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
   checked too). Probe: seeded ArcGIS runs repeat; no standard MT19937 seeding matched the uniforms.
 - Validation: `UNIGIS_REFERENCE_CASES=cnr_` PASS on 6 runs with fresh seeds; unit test; clippy.
 
+## Queue: Rescale by Function — committed, landing
+
+- `unigis-raster/src/rescale.rs` + registry `rescale_by_function`; 23 `rbf_*` references
+  (`UNIGIS_REFERENCE_CASES=rbf_` PASS); unit tests; clippy. Statistics presence optional for rbf_
+  (ArcGIS inconsistent); research in scripts/research/rescale_by_function/README.md.
+
 ## Next
 
 - Next: `scripts/lane claim` for the next queue tool.

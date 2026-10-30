@@ -27,6 +27,7 @@ pub mod overlay;
 pub mod rasterize;
 pub mod registry;
 pub mod resample;
+pub mod rescale;
 pub mod sample;
 pub mod stats;
 pub mod stats_metadata;

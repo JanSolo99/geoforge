@@ -809,6 +809,30 @@ CASES = {
     "fst_err_double_group": ("management.FieldStatisticsToTable", [DATA / "parcels.shp"], ["ZONE", "NUMERIC", "VALUE"]),
     "xy_stations": ("management.XYTableToPoint", [DATA / "stations.csv"], ["X", "Y", "", 32633]),
     "xy_stations_z": ("management.XYTableToPoint", [DATA / "stations.csv"], ["X", "Y", "ELEV", 32633]),
+    # Rescale by Function: every function at its defaults, then parameters and thresholds.
+    "rbf_mssmall": ("gp.RescaleByFunction_sa", [RASTER / "dem_nodata.tif"], ["MSSMALL # # # # # #", 1, 10]),
+    "rbf_mslarge": ("gp.RescaleByFunction_sa", [RASTER / "dem_nodata.tif"], ["MSLARGE # # # # # #", 1, 10]),
+    "rbf_linear": ("gp.RescaleByFunction_sa", [RASTER / "dem_nodata.tif"], ["LINEAR # # # # # #", 1, 10]),
+    "rbf_exponential": ("gp.RescaleByFunction_sa", [RASTER / "dem_nodata.tif"], ["EXPONENTIAL # # # # # #", 1, 10]),
+    "rbf_gaussian": ("gp.RescaleByFunction_sa", [RASTER / "dem_nodata.tif"], ["GAUSSIAN # # # # # #", 1, 10]),
+    "rbf_large": ("gp.RescaleByFunction_sa", [RASTER / "dem_nodata.tif"], ["LARGE # # # # # #", 1, 10]),
+    "rbf_logarithm": ("gp.RescaleByFunction_sa", [RASTER / "dem_nodata.tif"], ["LOGARITHM # # # # # #", 1, 10]),
+    "rbf_logisticdecay": ("gp.RescaleByFunction_sa", [RASTER / "dem_nodata.tif"], ["LOGISTICDECAY # # # # # # #", 1, 10]),
+    "rbf_logisticgrowth": ("gp.RescaleByFunction_sa", [RASTER / "dem_nodata.tif"], ["LOGISTICGROWTH # # # # # # #", 1, 10]),
+    "rbf_near": ("gp.RescaleByFunction_sa", [RASTER / "dem_nodata.tif"], ["NEAR # # # # # #", 1, 10]),
+    "rbf_power": ("gp.RescaleByFunction_sa", [RASTER / "dem_nodata.tif"], ["POWER # # # # # #", 1, 10]),
+    "rbf_small": ("gp.RescaleByFunction_sa", [RASTER / "dem_nodata.tif"], ["SMALL # # # # # #", 1, 10]),
+    "rbf_symmetriclinear": ("gp.RescaleByFunction_sa", [RASTER / "dem_nodata.tif"], ["SYMMETRICLINEAR # # # # # #", 1, 10]),
+    "rbf_linear_params": ("gp.RescaleByFunction_sa", [RASTER / "dem_nodata.tif"], ["LINEAR 220 280 # # # #", 1, 10]),
+    "rbf_gaussian_params": ("gp.RescaleByFunction_sa", [RASTER / "dem_nodata.tif"], ["GAUSSIAN 250 0.001 # # # #", 0, 100]),
+    "rbf_mssmall_mult": ("gp.RescaleByFunction_sa", [RASTER / "dem_nodata.tif"], ["MSSMALL 1.2 0.5 # # # #", 1, 10]),
+    "rbf_linear_thresholds": ("gp.RescaleByFunction_sa", [RASTER / "dem_nodata.tif"], ["LINEAR # # 220 0 280 NoData", 1, 10]),
+    "rbf_exponential_thresholds": ("gp.RescaleByFunction_sa", [RASTER / "dem_nodata.tif"], ["EXPONENTIAL # # 220 # 280 #", 1, 10]),
+    "rbf_large_params": ("gp.RescaleByFunction_sa", [RASTER / "dem_nodata.tif"], ["LARGE 250 3 # # # #", 1, 10]),
+    "rbf_logistic_y": ("gp.RescaleByFunction_sa", [RASTER / "dem_nodata.tif"], ["LOGISTICGROWTH # # 5 # # # #", 1, 10]),
+    "rbf_power_zero": ("gp.RescaleByFunction_sa", [RASTER / "dem_nodata.tif"], ["POWER # # # # # #", 0, 5]),
+    "rbf_reversed": ("gp.RescaleByFunction_sa", [RASTER / "dem_nodata.tif"], ["LINEAR # # # # # #", 10, 1]),
+    "rbf_near_thresholds_outside": ("gp.RescaleByFunction_sa", [RASTER / "dem_nodata.tif"], ["NEAR # # 150 # 400 #", 1, 10]),
     "slope_dem": ("gp.Slope_sa", [RASTER / "dem.tif"], ["DEGREE", 1, "PLANAR", "METER"]),
     "slope_dem_percent_z": ("gp.Slope_sa", [RASTER / "dem.tif"], ["PERCENT_RISE", 2.5, "PLANAR", "METER"]),
     "slope_dem_nodata": ("gp.Slope_sa", [RASTER / "dem_nodata.tif"], ["DEGREE", 1, "PLANAR", "METER"]),
@@ -2295,6 +2319,7 @@ for _tool, _id in COMBINATORIAL:
 
 
 RUN = {
+    "gp.RescaleByFunction_sa": ("rescale_by_function", ["input", "output", "transformation_function", "from_scale", "to_scale"]),
     "gp.CreateNormalRaster_sa": ("create_normal_raster", ["output", "cell_size", "extent"]),
     "conversion.ExtractLocationsText": ("extract_locations_text", ["in_text", "output", "", "coord_dd_latlon", "", "coord_dd_xyplain", "coord_dm_latlon", "", "coord_dms_latlon", "", "", "coord_utm", "", "", "coord_mgrs"]),
     "conversion.ExtractLocationsDocument": ("extract_locations_document", ["in_file", "output", "", "coord_dd_latlon", "", "coord_dd_xyplain", "coord_dm_latlon", "", "coord_dms_latlon", "", "", "coord_utm", "", "", "coord_mgrs"]),
@@ -2430,7 +2455,7 @@ def run_spec(tool, args):
 
 
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
-RASTER_OUT = {"gp.CreateNormalRaster_sa", "gp.CreateBinaryMask_ia", "gp.ComputeChangeRaster_ia", "gp.Diff_ia", "gp.Over_ia", "gp.LineStatistics_sa", "gp.PointStatistics_sa", "gp.SnapPourPoint_sa", "gp.FocalFlow_sa", "gp.DistanceAccumulation_sa", "gp.DistanceAllocation_sa", "gp.EucBackDirection_sa", "gp.EqualToFrequency_sa", "gp.GreaterThanFrequency_sa", "gp.LessThanFrequency_sa", "conversion.ASCIIToRaster", "conversion.FloatToRaster", "conversion.MultipatchToRaster", "management.CompositeBands", "gp.CreateConstantRaster_sa", "gp.InList_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
+RASTER_OUT = {"gp.RescaleByFunction_sa", "gp.CreateNormalRaster_sa", "gp.CreateBinaryMask_ia", "gp.ComputeChangeRaster_ia", "gp.Diff_ia", "gp.Over_ia", "gp.LineStatistics_sa", "gp.PointStatistics_sa", "gp.SnapPourPoint_sa", "gp.FocalFlow_sa", "gp.DistanceAccumulation_sa", "gp.DistanceAllocation_sa", "gp.EucBackDirection_sa", "gp.EqualToFrequency_sa", "gp.GreaterThanFrequency_sa", "gp.LessThanFrequency_sa", "conversion.ASCIIToRaster", "conversion.FloatToRaster", "conversion.MultipatchToRaster", "management.CompositeBands", "gp.CreateConstantRaster_sa", "gp.InList_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
               "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa",
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",

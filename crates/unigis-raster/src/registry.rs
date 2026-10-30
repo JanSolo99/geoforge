@@ -274,6 +274,29 @@ fn extract_by_attributes(ctx: &dyn Context) -> Result<Output> {
     )
 }
 
+fn rescale_by_function(ctx: &dyn Context) -> Result<Output> {
+    let text = ctx
+        .get("transformation_function")
+        .unwrap_or_else(|| "MSSMALL # # # # # #".into());
+    let t = crate::rescale::Transformation::parse(&text).ok_or_else(|| {
+        Error::Unsupported(format!("ERROR 000800: transformation function {text}"))
+    })?;
+    let scale = |name: &str, default: f64| -> Result<f64> {
+        match ctx.get(name) {
+            Some(v) => v
+                .trim()
+                .parse()
+                .map_err(|_| Error::Unsupported(format!("ERROR 000094: {name} {v}"))),
+            None => Ok(default),
+        }
+    };
+    let (from, to) = (scale("from_scale", 1.0)?, scale("to_scale", 10.0)?);
+    with_statistics(
+        crate::rescale::rescale_by_function(&ctx.raster("input")?, &t, from, to),
+        true,
+    )
+}
+
 fn slice(ctx: &dyn Context) -> Result<Output> {
     let zones: usize = ctx
         .get("number_zones")
@@ -2243,6 +2266,36 @@ pub static TOOLS: &[Tool] = &[
             },
         ],
         run: extract_by_attributes,
+    },
+    Tool {
+        id: "rescale_by_function",
+        name: "Rescale by Function",
+        summary: "Cell values through a transformation function (Linear, Gaussian, Logistic, MSSmall, ...) onto an evaluation scale.",
+        params: &[
+            raster("input", "Input Raster", true),
+            Param {
+                name: "transformation_function",
+                label: "Transformation function",
+                kind: Kind::Text,
+                required: false,
+                default: "MSSMALL # # # # # #",
+            },
+            Param {
+                name: "from_scale",
+                label: "From scale",
+                kind: Kind::Number,
+                required: false,
+                default: "1",
+            },
+            Param {
+                name: "to_scale",
+                label: "To scale",
+                kind: Kind::Number,
+                required: false,
+                default: "10",
+            },
+        ],
+        run: rescale_by_function,
     },
     Tool {
         id: "slice",

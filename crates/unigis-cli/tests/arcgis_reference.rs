@@ -4428,9 +4428,17 @@ fn compare_rasters(case: &str, ours: &Path, arcgis: &Path) -> Vec<String> {
     } else if bad > 4 {
         diffs.push(format!("{bad} cells differ"));
     }
-    diffs.extend(compare_statistics(ours, arcgis, b.bands.len(), bad > 0));
+    let mut statistics = compare_statistics(ours, arcgis, b.bands.len(), bad > 0);
+    // Rescale by Function: whether ArcGIS writes statistics varies between identical runs (the same
+    // case had them in one batch and not in the next two), so only their values are compared.
+    if STATISTICS_OPTIONAL.iter().any(|p| case.starts_with(p)) {
+        statistics.retain(|d| !d.contains("where ArcGIS has none"));
+    }
+    diffs.extend(statistics);
     diffs
 }
+
+const STATISTICS_OPTIONAL: &[&str] = &["rbf_"];
 
 /// A `STATISTICS_<key>` value of a `<raster>.aux.xml`.
 fn aux_statistic(raster: &Path, key: &str, band: usize) -> Option<f64> {
