@@ -30,6 +30,8 @@ mod workspace_extract;
 
 #[path = "common/catalog_edits.rs"]
 mod catalog_edits;
+#[path = "common/gdb_scenario.rs"]
+mod gdb_scenario;
 #[path = "common/global_ids.rs"]
 mod global_ids;
 #[path = "common/schema_edits.rs"]
@@ -4510,7 +4512,15 @@ fn tools_match_arcgis_output() {
     let out_dir = std::env::temp_dir().join(format!("gf-arcgis-ref-{}", std::process::id()));
     std::fs::create_dir_all(&out_dir).unwrap();
     let mut failures = Vec::new();
+    // `UNIGIS_REFERENCE_CASES=wsc_,gsc_` runs only the cases with those prefixes.
+    let only = std::env::var("UNIGIS_REFERENCE_CASES").ok();
     for (case, info) in manifest["cases"].as_object().unwrap() {
+        if only
+            .as_deref()
+            .is_some_and(|o| !o.split(',').any(|p| case.starts_with(p)))
+        {
+            continue;
+        }
         // Datum grids are downloaded by PROJ on demand: opt in with PROJ_NETWORK=ON.
         if case.starts_with("project_nad27_")
             && std::env::var("PROJ_NETWORK").as_deref() != Ok("ON")
@@ -4540,6 +4550,13 @@ fn tools_match_arcgis_output() {
         }
         if info["workspace_extract"] == true {
             let diffs = workspace_extract::compare(case, info, &root, &out_dir);
+            if !diffs.is_empty() {
+                failures.push(format!("{case}:\n    {}", diffs.join("\n    ")));
+            }
+            continue;
+        }
+        if info.get("gdb_scenario").is_some() {
+            let diffs = gdb_scenario::compare(case, info, &out_dir);
             if !diffs.is_empty() {
                 failures.push(format!("{case}:\n    {}", diffs.join("\n    ")));
             }

@@ -34,6 +34,7 @@ pub(crate) fn params_of(t: &'static Tool) -> &'static [P] {
                 Kind::Number => K::Number,
                 Kind::Text => K::Text,
                 Kind::Bool => K::Bool,
+                Kind::Path => K::Path,
             },
             required: p.required,
             // The application keeps defaults as JSON text.

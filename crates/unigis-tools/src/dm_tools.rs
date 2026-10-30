@@ -168,6 +168,7 @@ fn create_feature_class(ctx: &dyn Context) -> Result<ToolOutput> {
         .transpose()?;
     dm_data::create_feature_class(
         &get(ctx, "geometry_type", "POINT"),
+        output_is(ctx, "shp"),
         template.as_deref(),
         awareness("has_m")?,
         awareness("has_z")?,
@@ -180,7 +181,19 @@ fn create_table(ctx: &dyn Context) -> Result<Outcome> {
         .get("template")
         .map(|_| ctx.features("template"))
         .transpose()?;
-    Ok(Outcome::Table(dm_data::create_table(template.as_deref())))
+    Ok(Outcome::Table(dm_data::create_table(
+        template.as_deref(),
+        output_is(ctx, "dbf"),
+    )))
+}
+
+/// Whether the output path has the extension `ext` (the host writes a shapefile or dBASE table).
+fn output_is(ctx: &dyn Context, ext: &str) -> bool {
+    ctx.get("output").is_some_and(|o| {
+        std::path::Path::new(&o)
+            .extension()
+            .is_some_and(|e| e.eq_ignore_ascii_case(ext))
+    })
 }
 
 /// WKT text with every number cut to 15 significant digits, as ArcGIS writes a coordinate system

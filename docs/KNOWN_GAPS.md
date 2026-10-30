@@ -52,6 +52,7 @@ Update this file when a gap is found or closed.
 | Multiple Ring Buffer, Create Thiessen Polygons | Probed against ArcGIS (`scripts/research/construct/probe1.py`); ring and cell ordering not analysed yet |
 | Spatial Statistics | 48 of 63 tools (GWR, Incremental Spatial Autocorrelation, Generate Network Spatial Weights, ...) |
 | Create File Geodatabase | Versions 9.2 and 9.3 (ArcGIS writes the older 8-system-table layout) are refused; names with more than one dot (`a.b.c`) are not probed: ArcGIS reports `a.b.gdb` but writes elsewhere |
+| Geodatabase schema tools (registry) | File geodatabases only (no mobile geodatabase or shapefile inputs); Add Field types RASTER/DATEHIGHPRECISION and REQUIRED; Add Attribute Index on several fields or UNIQUE; Set Subtype Field CLEAR_SUBTYPE_FIELD; Domain To Table into a geodatabase names its ObjectID `OBJECTID` (ArcGIS: `OID`); Shape_Length/Area of new classes are computed on stored (densified) geometry |
 | Formats | LAS/LAZ, NetCDF/HDF, KML, DXF/DWG, Esri Grid/IMG, TIN, mobile geodatabase, `.shp.xml`, compressed `.cdf` |
 | Network Analyst, 3D Analyst, Geostatistical Analyst, Cartography | Not started |
 

@@ -14,7 +14,7 @@ Updated 2026-10-30 (Claude), worktree `.worktrees/lane-claude`, branch `lane/cla
    geodatabase → Feature Class / Feature Dataset / Table; feature dataset → Feature Class), each
    opening the tool dialog prefilled with the location; Catalog refreshes afterwards.
 
-## Slice 1 — done in this session (commit on lane/claude, landing)
+## Slice 1 — landed on main (93b6348)
 
 - `crates/unigis-tools/src/workspace.rs`: `create_folder`, `create_file_gdb`, `create_mobile_gdb`
   (Report runner; messages `out_folder:` / `out_file_gdb:` / `out_gdb:` with the derived path).
@@ -41,11 +41,27 @@ location inside a .gdb 000792; missing location 000732; `*` in a name 999999; ve
 writes the old 8-table layout (we refuse: KNOWN_GAPS). Multi-dot names behave oddly (not probed).
 Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge recovered after a while.
 
+## Slice 2 — committed, landing
+
+- `crates/unigis-tools/src/gdb_schema.rs`: 23 schema tools in the registry (ArcGIS names/defaults
+  from `GetParameterInfo`); new `registry::Kind::Path` (dataset/workspace by path; app maps it to
+  `ParamKind::Path`). Paths `city.gdb[/fds]/table`; missing table 000732; Add Field same-type
+  duplicate = WARNING 000012 success, other type ERROR 000012; 000310 digit-first names.
+- Scenario references `gsc_build` / `gsc_edit` (`GDB_SCENARIOS`, `gdb_scenario_case` in the
+  generator; comparator `crates/unigis-cli/tests/common/gdb_scenario.rs`). Test filter:
+  `UNIGIS_REFERENCE_CASES=gsc_,wsc_`.
+- Fixes found by the scenarios: CLI `write_geodatabase` uses the writer's ArcGIS layout (`Shape`,
+  Shape_Length/Area added and computed) unless the output brings its own measure fields (copies
+  keep exact values — `to_geodatabase` test); Create Feature Class/Create Table add `Id`/`Field1`
+  only for .shp/.dbf outputs; filegdb subtype edits: RemoveSubtype only moves the default when it
+  removes it, physical field defaults synced after SetSubtypeField/SetDefaultSubtype/RemoveSubtype.
+- Validation: unigis-filegdb/-cli/-tools/-gpkg tests PASS (incl. full reference manifest and
+  to_geodatabase after the copy fix); clippy -D warnings PASS; no-default-features check PASS;
+  app `cargo check -p rustgis-unigis` PASS. ArcGIS read our scenario output and a buffer class.
+- Lane worktree has an untracked symlink `testdata/large` → main checkout's copy (needed by
+  `unigis-filegdb` oracle tests in `scripts/check`; other lanes lack it too). Never commit it.
+
 ## Next
 
-- Slice 2: geodatabase schema tools as registry entries (reuse the unigis_filegdb functions the
-  CLI handlers in `crates/unigis-cli/src/main.rs` ~1893–2420 call; helpers alter_field_type,
-  domain_split_policy, codes, gdb_table there). Check parameter names/defaults with
-  `arcpy.GetParameterInfo` via the bridge.
 - Slice 3: Catalog New menus in `app/crates/ui-egui/src/panes.rs` (`folder_browser`), prefilled
   `ui.gp.open`; app needs output-to-disk for Create Feature Class / Create Table into a gdb.

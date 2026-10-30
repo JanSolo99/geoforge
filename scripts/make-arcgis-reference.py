@@ -2566,6 +2566,127 @@ result = dict(entries=sorted(entries), workspace=workspace)
                     run=run_spec(tool, template))
 
 
+# Geodatabase scenarios: tool steps run one after the other on a new file geodatabase, then the
+# geodatabase's whole schema compared. Each step: (arcpy tool, keyword arguments, registry id,
+# registry parameters replacing some of the keywords). `<ws>` is a new, empty folder.
+GDB = "<ws>/t.gdb"
+GDB_SCENARIOS = {
+    "gsc_build": [
+        ("management.CreateFileGDB", dict(out_folder_path="<ws>", out_name="t"), "create_file_gdb", None),
+        ("management.CreateFeatureDataset", dict(out_dataset_path=GDB, out_name="fds", spatial_reference=4326), "create_feature_dataset", None),
+        ("management.CreateFeatureclass", dict(out_path=GDB + "/fds", out_name="pts", geometry_type="POINT", spatial_reference=4326), "create_feature_class", dict(output=GDB + "/fds/pts", geometry_type="POINT", spatial_reference="4326")),
+        ("management.CreateFeatureclass", dict(out_path=GDB, out_name="pol", geometry_type="POLYGON", spatial_reference=4326), "create_feature_class", dict(output=GDB + "/pol", geometry_type="POLYGON", spatial_reference="4326")),
+        ("management.CreateTable", dict(out_path=GDB, out_name="tab"), "create_table", dict(output=GDB + "/tab")),
+        ("management.AddField", dict(in_table=GDB + "/fds/pts", field_name="kind", field_type="SHORT"), "add_field", None),
+        ("management.AddField", dict(in_table=GDB + "/fds/pts", field_name="label", field_type="TEXT", field_length=40, field_alias="A label"), "add_field", None),
+        ("management.AddField", dict(in_table=GDB + "/tab", field_name="pid", field_type="LONG"), "add_field", None),
+        ("management.AddField", dict(in_table=GDB + "/tab", field_name="pid", field_type="LONG"), "add_field", None),
+        ("management.AddField", dict(in_table=GDB + "/tab", field_name="tmp", field_type="DOUBLE"), "add_field", None),
+        ("management.DeleteField", dict(in_table=GDB + "/tab", drop_field="tmp"), "delete_field", None),
+        ("management.CreateDomain", dict(in_workspace=GDB, domain_name="kinds", domain_description="Kinds"), "create_domain", None),
+        ("management.AddCodedValueToDomain", dict(in_workspace=GDB, domain_name="kinds", code="1", code_description="One"), "add_coded_value_to_domain", None),
+        ("management.AddCodedValueToDomain", dict(in_workspace=GDB, domain_name="kinds", code="2", code_description="Two"), "add_coded_value_to_domain", None),
+        ("management.AddCodedValueToDomain", dict(in_workspace=GDB, domain_name="kinds", code="3", code_description="Three"), "add_coded_value_to_domain", None),
+        ("management.DeleteCodedValueFromDomain", dict(in_workspace=GDB, domain_name="kinds", code="3"), "delete_coded_value_from_domain", None),
+        ("management.SortCodedValueDomain", dict(in_workspace=GDB, domain_name="kinds", sort_by="DESCRIPTION", sort_order="DESCENDING"), "sort_coded_value_domain", None),
+        ("management.AlterDomain", dict(in_workspace=GDB, domain_name="kinds", new_domain_description="Kinds of points"), "alter_domain", None),
+        ("management.CreateDomain", dict(in_workspace=GDB, domain_name="rng", domain_description="Range", field_type="LONG", domain_type="RANGE"), "create_domain", None),
+        ("management.SetValueForRangeDomain", dict(in_workspace=GDB, domain_name="rng", min_value="0", max_value="100"), "set_value_for_range_domain", None),
+        ("management.AssignDomainToField", dict(in_table=GDB + "/fds/pts", field_name="kind", domain_name="kinds"), "assign_domain_to_field", None),
+        ("management.SetSubtypeField", dict(in_table=GDB + "/fds/pts", field="kind"), "set_subtype_field", None),
+        ("management.AddSubtype", dict(in_table=GDB + "/fds/pts", subtype_code=1, subtype_description="One"), "add_subtype", None),
+        ("management.AddSubtype", dict(in_table=GDB + "/fds/pts", subtype_code=2, subtype_description="Two"), "add_subtype", None),
+        ("management.AddSubtype", dict(in_table=GDB + "/fds/pts", subtype_code=1, subtype_description="Again"), "add_subtype", None),
+        ("management.SetDefaultSubtype", dict(in_table=GDB + "/fds/pts", subtype_code=2), "set_default_subtype", None),
+        ("management.AssignDefaultToField", dict(in_table=GDB + "/fds/pts", field_name="label", default_value="none"), "assign_default_to_field", None),
+        ("management.AddIndex", dict(in_table=GDB + "/tab", fields="pid", index_name="pid_idx"), "add_index", None),
+        ("management.AlterField", dict(in_table=GDB + "/tab", field="pid", new_field_name="parent", new_field_alias="Parent"), "alter_field", None),
+        ("management.CreateRelationshipClass", dict(origin_table=GDB + "/fds/pts", destination_table=GDB + "/tab", out_relationship_class=GDB + "/pts_tab", relationship_type="SIMPLE", forward_label="has", backward_label="of", message_direction="NONE", cardinality="ONE_TO_MANY", attributed="NONE", origin_primary_key="OBJECTID", origin_foreign_key="parent"), "create_relationship_class", None),
+        ("management.DomainToTable", dict(in_workspace=GDB, domain_name="kinds", out_table="<ws>/kinds.dbf", code_field="code", description_field="descr"), "domain_to_table", dict(in_workspace=GDB, domain_name="kinds", output="<ws>/kinds.dbf", code_field="code", description_field="descr")),
+        ("management.CreateFeatureDataset", dict(out_dataset_path=GDB, out_name="fds", spatial_reference=4326), "create_feature_dataset", None),
+    ],
+    "gsc_edit": [
+        ("management.CreateFileGDB", dict(out_folder_path="<ws>", out_name="t"), "create_file_gdb", None),
+        ("management.CreateTable", dict(out_path=GDB, out_name="tab"), "create_table", dict(output=GDB + "/tab")),
+        ("management.AddField", dict(in_table=GDB + "/tab", field_name="a", field_type="SHORT"), "add_field", None),
+        ("management.AddField", dict(in_table=GDB + "/tab", field_name="b", field_type="TEXT", field_alias="Bee"), "add_field", None),
+        ("management.AddField", dict(in_table=GDB + "/tab", field_name="c", field_type="DOUBLE", field_is_nullable="NON_NULLABLE"), "add_field", None),
+        ("management.AddField", dict(in_table=GDB + "/tab", field_name="d", field_type="BIGINTEGER"), "add_field", None),
+        ("management.AddField", dict(in_table=GDB + "/tab", field_name="e", field_type="GUID"), "add_field", None),
+        ("management.AddField", dict(in_table=GDB + "/tab", field_name="f", field_type="DATEONLY"), "add_field", None),
+        ("management.DeleteField", dict(in_table=GDB + "/tab", drop_field="a;b;d;e;f", method="KEEP_FIELDS"), "delete_field", None),
+        ("management.CreateDomain", dict(in_workspace=GDB, domain_name="dom", field_type="SHORT"), "create_domain", None),
+        ("management.AssignDomainToField", dict(in_table=GDB + "/tab", field_name="a", domain_name="dom"), "assign_domain_to_field", None),
+        ("management.DeleteDomain", dict(in_workspace=GDB, domain_name="dom"), "delete_domain", None),
+        ("management.RemoveDomainFromField", dict(in_table=GDB + "/tab", field_name="a"), "remove_domain_from_field", None),
+        ("management.DeleteDomain", dict(in_workspace=GDB, domain_name="dom"), "delete_domain", None),
+        ("management.AddIndex", dict(in_table=GDB + "/tab", fields="a", index_name="a_idx"), "add_index", None),
+        ("management.AddIndex", dict(in_table=GDB + "/tab", fields="d", index_name="d_idx"), "add_index", None),
+        ("management.RemoveIndex", dict(in_table=GDB + "/tab", index_name="a_idx"), "remove_index", None),
+        ("management.SetSubtypeField", dict(in_table=GDB + "/tab", field="a"), "set_subtype_field", None),
+        ("management.AddSubtype", dict(in_table=GDB + "/tab", subtype_code=1, subtype_description="x"), "add_subtype", None),
+        ("management.AddSubtype", dict(in_table=GDB + "/tab", subtype_code=2, subtype_description="y"), "add_subtype", None),
+        ("management.RemoveSubtype", dict(in_table=GDB + "/tab", subtype_code="1"), "remove_subtype", None),
+        ("management.AlterField", dict(in_table=GDB + "/tab", field="b", clear_field_alias="CLEAR_ALIAS"), "alter_field", None),
+        ("management.AlterField", dict(in_table=GDB + "/tab", field="f", new_field_name="g", new_field_alias="Gee"), "alter_field", None),
+        ("management.AddField", dict(in_table=GDB + "/tab", field_name="9bad", field_type="LONG"), "add_field", None),
+        ("management.AddField", dict(in_table=GDB + "/missing", field_name="z", field_type="LONG"), "add_field", None),
+    ],
+}
+
+GDB_SNAPSHOT = """
+def gdb_snapshot(gdb):
+    arcpy.management.ClearWorkspaceCache()
+    out = dict(items=[], tables={}, domains=[], relationships=[])
+    def walk(desc, prefix):
+        for c in desc.children:
+            out["items"].append(prefix + c.name + ("/" if c.dataType == "FeatureDataset" else ""))
+            path = c.catalogPath
+            if c.dataType == "FeatureDataset":
+                walk(c, prefix + c.name + "/")
+            elif c.dataType in ("FeatureClass", "Table"):
+                subtypes = [dict(code=k, name=v["Name"], default=v["Default"], field=v["SubtypeField"])
+                            for k, v in sorted(arcpy.da.ListSubtypes(path).items()) if v["SubtypeField"]]
+                out["tables"][c.name] = dict(
+                    fields=[dict(name=f.name, type=f.type, length=f.length, alias=f.aliasName, domain=f.domain,
+                                 default=f.defaultValue, nullable=f.isNullable) for f in arcpy.ListFields(path)],
+                    indexes=sorted([i.name, [f.name for f in i.fields]] for i in arcpy.ListIndexes(path)
+                                   if not i.name.upper().startswith("FDO_")),
+                    subtypes=subtypes)
+            elif c.dataType == "RelationshipClass":
+                out["relationships"].append(dict(name=c.name, cardinality=c.cardinality,
+                    origin=list(c.originClassNames), destination=list(c.destinationClassNames),
+                    forward=c.forwardPathLabel, backward=c.backwardPathLabel, composite=c.isComposite,
+                    notification=c.notification, keys=[[k[0], k[1]] for k in c.originClassKeys] + [[k[0], k[1]] for k in c.destinationClassKeys]))
+    walk(arcpy.Describe(gdb), "")
+    out["items"].sort()
+    for d in sorted(arcpy.da.ListDomains(gdb), key=lambda d: d.name):
+        out["domains"].append(dict(name=d.name, description=d.description, type=d.type, kind=d.domainType,
+            split=d.splitPolicy, merge=d.mergePolicy,
+            values=[[str(k), v] for k, v in d.codedValues.items()] if d.domainType == "CodedValue" else [str(v) for v in d.range]))
+    arcpy.management.ClearWorkspaceCache()
+    return out
+"""
+
+
+def gdb_scenario_case(w, steps):
+    """Runs the steps in ArcGIS in a new folder; records each step's status and messages, then
+    the geodatabase's schema."""
+    with tempfile.TemporaryDirectory(prefix="unigis-gdb-scenario-") as temp:
+        place = lambda v: v.replace("<ws>", temp) if isinstance(v, str) else v
+        recorded = []
+        for tool, kwargs, rid, params in steps:
+            r = w.call("run_tool", tool=tool, kwargs={k: place(v) for k, v in kwargs.items()})
+            run = {k: str(v) for k, v in (params or kwargs).items()}
+            recorded.append(dict(tool=tool, status=r.get("status"),
+                                 messages=[m["text"].replace(temp, "<ws>") for m in r.get("messages", []) if m["severity"] > 1],
+                                 run=dict(tool=rid, params=run)))
+        response = w.call("python", code=GDB_SNAPSHOT + f"\nresult = gdb_snapshot({win(Path(temp) / 't.gdb')!r})")
+        if "result" not in response:
+            raise RuntimeError(f"snapshot failed: {response}")
+        return dict(tool="scenario", gdb_scenario=dict(steps=recorded, snapshot=response["result"]))
+
+
 def feature_import_case(w, name, tool, before):
     """Retain complete ArcGIS output and immutable setup workspace for batch imports."""
     seeded = name in {"fctg_collision", "fctg_dataset"}
@@ -2683,8 +2804,8 @@ def main():
     if sys.argv[1:] == ["--annotate"]:
         return annotate()
     # Arguments may be glob patterns, such as `blk_*`.
-    only = {n for a in sys.argv[1:] for n in (fnmatch.filter([*CASES, *SELECT], a) or [a])}
-    unknown = only - set(CASES) - set(SELECT)
+    only = {n for a in sys.argv[1:] for n in (fnmatch.filter([*CASES, *SELECT, *GDB_SCENARIOS], a) or [a])}
+    unknown = only - set(CASES) - set(SELECT) - set(GDB_SCENARIOS)
     if unknown:
         sys.exit(f"unknown cases: {sorted(unknown)}")
     w = server.worker
@@ -2706,6 +2827,11 @@ def main():
         if OUT.exists():
             shutil.rmtree(OUT)
         OUT.mkdir(parents=True)
+    for name, steps in GDB_SCENARIOS.items():
+        if only and name not in only:
+            continue
+        manifest["cases"][name] = gdb_scenario_case(w, steps)
+        print(f"{name}: {[s['status'] for s in manifest['cases'][name]['gdb_scenario']['steps']]}")
     for name, (tool, before, after) in CASES.items():
         if only and name not in only:
             continue

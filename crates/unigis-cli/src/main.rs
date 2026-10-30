@@ -8,7 +8,7 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 use clap::{Parser, Subcommand};
-use unigis_core::{Error, Feature, FeatureClass, Field, FieldType, Result, Value};
+use unigis_core::{Error, Feature, FeatureClass, Field, FieldType, GeometryKind, Result, Value};
 use unigis_filegdb::Geodatabase;
 use unigis_shapefile::{ShapefileReader, ShapefileWriter};
 use unigis_tools::{Dissolve, ToolOutput};
@@ -5346,6 +5346,27 @@ fn write_geodatabase(
     source_gdb: Option<&Path>,
     dataset: Option<&str>,
 ) -> Result<()> {
+    let mut out = out;
+    // Data that brings its own Shape_Length / Shape_Area (a copy) keeps those values; otherwise
+    // the class is laid out as ArcGIS creates one: `Shape`, and for lines and polygons measure
+    // fields the writer fills in.
+    let own_measures = out.fields.iter().any(|f| {
+        f.name.eq_ignore_ascii_case("Shape_Length") || f.name.eq_ignore_ascii_case("Shape_Area")
+    });
+    for (measure, wanted) in [
+        (
+            "Shape_Length",
+            matches!(out.kind, GeometryKind::Polyline | GeometryKind::Polygon),
+        ),
+        ("Shape_Area", out.kind == GeometryKind::Polygon),
+    ] {
+        if wanted && !own_measures {
+            out.fields.push(Field::new(measure, FieldType::Double));
+            for f in &mut out.features {
+                f.attributes.push(Value::Null);
+            }
+        }
+    }
     let names = geodatabase_field_names(&out.fields);
     let fields: Vec<Field> = out
         .fields
@@ -5357,6 +5378,9 @@ fn write_geodatabase(
         })
         .collect();
     let mut w = open_geodatabase_writer(gdb)?;
+    if !own_measures {
+        w.use_standard_geometry_fields();
+    }
     // Like ArcGIS, carry over the attribute domains the copied fields use.
     if let Some(source) = source_gdb {
         let src = Geodatabase::open(source)?;
@@ -5368,7 +5392,6 @@ fn write_geodatabase(
     }
     // In a feature dataset the class takes the dataset's coordinate system: the output is
     // projected to it (as ArcGIS does), unless it has none or says the same.
-    let mut out = out;
     if let Some(ds) = dataset
         && let Some(Some(target)) = w.feature_dataset_srs(ds)
     {

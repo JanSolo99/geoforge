@@ -53,7 +53,7 @@ pub fn geometry_kind(name: &str) -> Option<GeometryKind> {
     })
 }
 
-fn attribute_fields(template: Option<&dyn FeatureClass>, default: Field) -> Vec<Field> {
+fn attribute_fields(template: Option<&dyn FeatureClass>, default: Option<Field>) -> Vec<Field> {
     match template {
         Some(t) => t
             .fields()
@@ -66,7 +66,7 @@ fn attribute_fields(template: Option<&dyn FeatureClass>, default: Field) -> Vec<
             })
             .cloned()
             .collect(),
-        None => vec![default],
+        None => default.into_iter().collect(),
     }
 }
 
@@ -77,9 +77,11 @@ fn long_field(name: &str) -> Field {
 }
 
 /// `arcpy.management.CreateFeatureclass(out_path, out_name, geometry_type, template, has_m,
-/// has_z, spatial_reference)`.
+/// has_z, spatial_reference)`. A shapefile without a template gets ArcGIS's placeholder field
+/// `Id` (`shapefile`); a geodatabase or memory class has none.
 pub fn create_feature_class(
     geometry_type: &str,
+    shapefile: bool,
     template: Option<&dyn FeatureClass>,
     has_m: Awareness,
     has_z: Awareness,
@@ -94,17 +96,18 @@ pub fn create_feature_class(
         kind,
         has_z: has_z.resolve(template.map(|t| t.has_z())),
         has_m: has_m.resolve(template.map(|t| t.has_m())),
-        fields: attribute_fields(template, long_field("Id")),
+        fields: attribute_fields(template, shapefile.then(|| long_field("Id"))),
         spatial_reference_wkt,
         features: Vec::new(),
         messages: Vec::new(),
     })
 }
 
-/// `arcpy.management.CreateTable(out_path, out_name, template)`.
-pub fn create_table(template: Option<&dyn FeatureClass>) -> TableOutput {
+/// `arcpy.management.CreateTable(out_path, out_name, template)`. A dBASE table without a
+/// template gets ArcGIS's placeholder field `Field1`; a geodatabase table has none.
+pub fn create_table(template: Option<&dyn FeatureClass>, dbase: bool) -> TableOutput {
     TableOutput {
-        fields: attribute_fields(template, long_field("Field1")),
+        fields: attribute_fields(template, dbase.then(|| long_field("Field1"))),
         rows: Vec::new(),
     }
 }

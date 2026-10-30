@@ -857,6 +857,15 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
   schema written by our SQLite writer (`unigis-gpkg/src/mobile.rs`, seed from
   `scripts/research/mobile_gdb_seed.py`); ArcGIS opens it and creates classes, datasets and
   domains in it. File geodatabase versions 9.2/9.3 are refused (KNOWN_GAPS).
+- [x] Geodatabase schema tools in the shared registry (`unigis-tools/src/gdb_schema.rs`, so the
+  app's Geoprocessing pane runs them): Create Feature Dataset, Create/Delete/Alter Domain, Add/
+  Delete Coded Value, Set Value For Range Domain, Sort Coded Value Domain, Domain To Table, Table To
+  Domain, Assign/Remove Domain, Assign Default To Field, Set Subtype Field, Add/Remove Subtype, Set
+  Default Subtype, Add/Remove Attribute Index, Add/Delete/Alter Field, Create Relationship Class.
+  ArcGIS parameter names/defaults (`GetParameterInfo`); two `gsc_*` scenario references (57 steps
+  incl. refusals, then the whole schema). Found on the way: new geodatabase classes use `Shape` and
+  get Shape_Length/Shape_Area; Create Feature Class/Create Table add `Id`/`Field1` only to
+  shapefiles/dBASE; subtype edits keep the default subtype and field default as ArcGIS does.
 - [x] Add Global IDs (`add_global_ids`): in-place FileGDB class/table and simple
   feature-dataset expansion, batches in one workspace, UUID4 values, system field
   metadata/index and repeat stability. Eight public references plus rollback tests;

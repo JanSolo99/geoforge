@@ -691,7 +691,8 @@ pub fn set_subtype_field(dir: impl AsRef<Path>, table: &str, field_name: &str) -
                 }],
             );
         }
-        store(dir, &t, def)
+        store(dir, &t, def)?;
+        sync_table_defaults(dir, table)
     })
 }
 
@@ -733,8 +734,9 @@ pub fn add_subtype(dir: impl AsRef<Path>, table: &str, code: i64, name: &str) ->
     })
 }
 
-/// `RemoveSubtype`: removes the subtypes with these codes. The default code moves to the first
-/// subtype left (0 when none is).
+/// `RemoveSubtype`: removes the subtypes with these codes. When the default subtype is among
+/// them, the default code moves to the first subtype left (0 when none is); otherwise it stays,
+/// even when it is not a subtype's code (ArcGIS Pro 3.7).
 pub fn remove_subtype(dir: impl AsRef<Path>, table: &str, codes: &[i64]) -> Result<()> {
     let dir = dir.as_ref();
     super::txn::atomic(dir, || -> Result<()> {
@@ -762,13 +764,14 @@ pub fn remove_subtype(dir: impl AsRef<Path>, table: &str, codes: &[i64]) -> Resu
         drop(doc);
         let left: Vec<i64> = have.into_iter().filter(|c| !codes.contains(c)).collect();
         let current = default_code(&def);
-        if !left.contains(&current) {
+        if codes.contains(&current) {
             let new = left.first().copied().unwrap_or(0);
             def = set_simple(&def, "DefaultSubtypeCode", &new.to_string());
             let v = code_value(&t, new)?;
             def = change_field_info(&t, &def, &key, Change::Keep, DefaultChange::Set(&v))?;
         }
-        store(dir, &t, def)
+        store(dir, &t, def)?;
+        sync_table_defaults(dir, table)
     })
 }
 
@@ -789,7 +792,8 @@ pub fn set_default_subtype(dir: impl AsRef<Path>, table: &str, code: i64) -> Res
         let v = code_value(&t, code)?;
         let mut def = set_simple(&t.def, "DefaultSubtypeCode", &code.to_string());
         def = change_field_info(&t, &def, &key, Change::Keep, DefaultChange::Set(&v))?;
-        store(dir, &t, def)
+        store(dir, &t, def)?;
+        sync_table_defaults(dir, table)
     })
 }
 
@@ -1101,29 +1105,38 @@ pub fn assign_default_to_field(
             },
         )?;
         store(dir, &t, def.clone())?;
-        // The table's own field definitions take the defaults the definition now gives.
-        let t = load_target(dir, table)?;
-        let defaults = xml_defaults(&t);
-        let table_file = Table::open(base(dir, t.table_id))?;
-        let mut rows = Vec::new();
-        for r in table_file.features() {
-            let f = r?;
-            rows.push((Some(f.oid as u64), f));
-        }
-        let fields: Vec<unigis_core::Field> = table_file
-            .fields()
-            .iter()
-            .map(|f| {
-                let mut f = f.clone();
-                f.default = defaults
-                    .iter()
-                    .find(|(n, _)| n.eq_ignore_ascii_case(&f.name))
-                    .map(|(_, v)| v.clone());
-                f
-            })
-            .collect();
-        rewrite_table(base(dir, t.table_id), &fields, &rows)?;
-        let _ = decode_default;
-        Ok(())
+        sync_table_defaults(dir, table)
     })
+}
+
+/// Gives the table's own field definitions the defaults its item definition now lists (the
+/// subtype field's default follows the default subtype).
+fn sync_table_defaults(dir: &Path, table: &str) -> Result<()> {
+    let t = load_target(dir, table)?;
+    let defaults = xml_defaults(&t);
+    let table_file = Table::open(base(dir, t.table_id))?;
+    let mut rows = Vec::new();
+    for r in table_file.features() {
+        let f = r?;
+        rows.push((Some(f.oid as u64), f));
+    }
+    let fields: Vec<unigis_core::Field> = table_file
+        .fields()
+        .iter()
+        .map(|f| {
+            let mut f = f.clone();
+            f.default = defaults
+                .iter()
+                .find(|(n, _)| n.eq_ignore_ascii_case(&f.name))
+                .map(|(_, v)| v.clone());
+            f
+        })
+        .collect();
+    if fields == table_file.fields() {
+        return Ok(());
+    }
+    drop(table_file);
+    rewrite_table(base(dir, t.table_id), &fields, &rows)?;
+    let _ = decode_default;
+    Ok(())
 }

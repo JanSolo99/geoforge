@@ -100220,6 +100220,1066 @@
           "out_name": "m"
         }
       }
+    },
+    "gsc_build": {
+      "tool": "scenario",
+      "gdb_scenario": {
+        "steps": [
+          {
+            "tool": "management.CreateFileGDB",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "create_file_gdb",
+              "params": {
+                "out_folder_path": "<ws>",
+                "out_name": "t"
+              }
+            }
+          },
+          {
+            "tool": "management.CreateFeatureDataset",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "create_feature_dataset",
+              "params": {
+                "out_dataset_path": "<ws>/t.gdb",
+                "out_name": "fds",
+                "spatial_reference": "4326"
+              }
+            }
+          },
+          {
+            "tool": "management.CreateFeatureclass",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "create_feature_class",
+              "params": {
+                "output": "<ws>/t.gdb/fds/pts",
+                "geometry_type": "POINT",
+                "spatial_reference": "4326"
+              }
+            }
+          },
+          {
+            "tool": "management.CreateFeatureclass",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "create_feature_class",
+              "params": {
+                "output": "<ws>/t.gdb/pol",
+                "geometry_type": "POLYGON",
+                "spatial_reference": "4326"
+              }
+            }
+          },
+          {
+            "tool": "management.CreateTable",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "create_table",
+              "params": {
+                "output": "<ws>/t.gdb/tab"
+              }
+            }
+          },
+          {
+            "tool": "management.AddField",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "add_field",
+              "params": {
+                "in_table": "<ws>/t.gdb/fds/pts",
+                "field_name": "kind",
+                "field_type": "SHORT"
+              }
+            }
+          },
+          {
+            "tool": "management.AddField",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "add_field",
+              "params": {
+                "in_table": "<ws>/t.gdb/fds/pts",
+                "field_name": "label",
+                "field_type": "TEXT",
+                "field_length": "40",
+                "field_alias": "A label"
+              }
+            }
+          },
+          {
+            "tool": "management.AddField",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "add_field",
+              "params": {
+                "in_table": "<ws>/t.gdb/tab",
+                "field_name": "pid",
+                "field_type": "LONG"
+              }
+            }
+          },
+          {
+            "tool": "management.AddField",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "add_field",
+              "params": {
+                "in_table": "<ws>/t.gdb/tab",
+                "field_name": "pid",
+                "field_type": "LONG"
+              }
+            }
+          },
+          {
+            "tool": "management.AddField",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "add_field",
+              "params": {
+                "in_table": "<ws>/t.gdb/tab",
+                "field_name": "tmp",
+                "field_type": "DOUBLE"
+              }
+            }
+          },
+          {
+            "tool": "management.DeleteField",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "delete_field",
+              "params": {
+                "in_table": "<ws>/t.gdb/tab",
+                "drop_field": "tmp"
+              }
+            }
+          },
+          {
+            "tool": "management.CreateDomain",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "create_domain",
+              "params": {
+                "in_workspace": "<ws>/t.gdb",
+                "domain_name": "kinds",
+                "domain_description": "Kinds"
+              }
+            }
+          },
+          {
+            "tool": "management.AddCodedValueToDomain",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "add_coded_value_to_domain",
+              "params": {
+                "in_workspace": "<ws>/t.gdb",
+                "domain_name": "kinds",
+                "code": "1",
+                "code_description": "One"
+              }
+            }
+          },
+          {
+            "tool": "management.AddCodedValueToDomain",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "add_coded_value_to_domain",
+              "params": {
+                "in_workspace": "<ws>/t.gdb",
+                "domain_name": "kinds",
+                "code": "2",
+                "code_description": "Two"
+              }
+            }
+          },
+          {
+            "tool": "management.AddCodedValueToDomain",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "add_coded_value_to_domain",
+              "params": {
+                "in_workspace": "<ws>/t.gdb",
+                "domain_name": "kinds",
+                "code": "3",
+                "code_description": "Three"
+              }
+            }
+          },
+          {
+            "tool": "management.DeleteCodedValueFromDomain",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "delete_coded_value_from_domain",
+              "params": {
+                "in_workspace": "<ws>/t.gdb",
+                "domain_name": "kinds",
+                "code": "3"
+              }
+            }
+          },
+          {
+            "tool": "management.SortCodedValueDomain",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "sort_coded_value_domain",
+              "params": {
+                "in_workspace": "<ws>/t.gdb",
+                "domain_name": "kinds",
+                "sort_by": "DESCRIPTION",
+                "sort_order": "DESCENDING"
+              }
+            }
+          },
+          {
+            "tool": "management.AlterDomain",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "alter_domain",
+              "params": {
+                "in_workspace": "<ws>/t.gdb",
+                "domain_name": "kinds",
+                "new_domain_description": "Kinds of points"
+              }
+            }
+          },
+          {
+            "tool": "management.CreateDomain",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "create_domain",
+              "params": {
+                "in_workspace": "<ws>/t.gdb",
+                "domain_name": "rng",
+                "domain_description": "Range",
+                "field_type": "LONG",
+                "domain_type": "RANGE"
+              }
+            }
+          },
+          {
+            "tool": "management.SetValueForRangeDomain",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "set_value_for_range_domain",
+              "params": {
+                "in_workspace": "<ws>/t.gdb",
+                "domain_name": "rng",
+                "min_value": "0",
+                "max_value": "100"
+              }
+            }
+          },
+          {
+            "tool": "management.AssignDomainToField",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "assign_domain_to_field",
+              "params": {
+                "in_table": "<ws>/t.gdb/fds/pts",
+                "field_name": "kind",
+                "domain_name": "kinds"
+              }
+            }
+          },
+          {
+            "tool": "management.SetSubtypeField",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "set_subtype_field",
+              "params": {
+                "in_table": "<ws>/t.gdb/fds/pts",
+                "field": "kind"
+              }
+            }
+          },
+          {
+            "tool": "management.AddSubtype",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "add_subtype",
+              "params": {
+                "in_table": "<ws>/t.gdb/fds/pts",
+                "subtype_code": "1",
+                "subtype_description": "One"
+              }
+            }
+          },
+          {
+            "tool": "management.AddSubtype",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "add_subtype",
+              "params": {
+                "in_table": "<ws>/t.gdb/fds/pts",
+                "subtype_code": "2",
+                "subtype_description": "Two"
+              }
+            }
+          },
+          {
+            "tool": "management.AddSubtype",
+            "status": "failed",
+            "messages": [
+              "ERROR 160129: The subtype already exists.",
+              "Failed to execute (AddSubtype)."
+            ],
+            "run": {
+              "tool": "add_subtype",
+              "params": {
+                "in_table": "<ws>/t.gdb/fds/pts",
+                "subtype_code": "1",
+                "subtype_description": "Again"
+              }
+            }
+          },
+          {
+            "tool": "management.SetDefaultSubtype",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "set_default_subtype",
+              "params": {
+                "in_table": "<ws>/t.gdb/fds/pts",
+                "subtype_code": "2"
+              }
+            }
+          },
+          {
+            "tool": "management.AssignDefaultToField",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "assign_default_to_field",
+              "params": {
+                "in_table": "<ws>/t.gdb/fds/pts",
+                "field_name": "label",
+                "default_value": "none"
+              }
+            }
+          },
+          {
+            "tool": "management.AddIndex",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "add_index",
+              "params": {
+                "in_table": "<ws>/t.gdb/tab",
+                "fields": "pid",
+                "index_name": "pid_idx"
+              }
+            }
+          },
+          {
+            "tool": "management.AlterField",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "alter_field",
+              "params": {
+                "in_table": "<ws>/t.gdb/tab",
+                "field": "pid",
+                "new_field_name": "parent",
+                "new_field_alias": "Parent"
+              }
+            }
+          },
+          {
+            "tool": "management.CreateRelationshipClass",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "create_relationship_class",
+              "params": {
+                "origin_table": "<ws>/t.gdb/fds/pts",
+                "destination_table": "<ws>/t.gdb/tab",
+                "out_relationship_class": "<ws>/t.gdb/pts_tab",
+                "relationship_type": "SIMPLE",
+                "forward_label": "has",
+                "backward_label": "of",
+                "message_direction": "NONE",
+                "cardinality": "ONE_TO_MANY",
+                "attributed": "NONE",
+                "origin_primary_key": "OBJECTID",
+                "origin_foreign_key": "parent"
+              }
+            }
+          },
+          {
+            "tool": "management.DomainToTable",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "domain_to_table",
+              "params": {
+                "in_workspace": "<ws>/t.gdb",
+                "domain_name": "kinds",
+                "output": "<ws>/kinds.dbf",
+                "code_field": "code",
+                "description_field": "descr"
+              }
+            }
+          },
+          {
+            "tool": "management.CreateFeatureDataset",
+            "status": "failed",
+            "messages": [
+              "ERROR 000258: Output <ws>/t.gdb/fds already exists",
+              "Failed to execute (CreateFeatureDataset)."
+            ],
+            "run": {
+              "tool": "create_feature_dataset",
+              "params": {
+                "out_dataset_path": "<ws>/t.gdb",
+                "out_name": "fds",
+                "spatial_reference": "4326"
+              }
+            }
+          }
+        ],
+        "snapshot": {
+          "items": [
+            "fds/",
+            "fds/pts",
+            "pol",
+            "pts_tab",
+            "tab"
+          ],
+          "tables": {
+            "pts": {
+              "fields": [
+                {
+                  "name": "OBJECTID",
+                  "type": "OID",
+                  "length": 4,
+                  "alias": "OBJECTID",
+                  "domain": "",
+                  "default": null,
+                  "nullable": false
+                },
+                {
+                  "name": "Shape",
+                  "type": "Geometry",
+                  "length": 0,
+                  "alias": "Shape",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "kind",
+                  "type": "SmallInteger",
+                  "length": 2,
+                  "alias": "kind",
+                  "domain": "kinds",
+                  "default": 2,
+                  "nullable": true
+                },
+                {
+                  "name": "label",
+                  "type": "String",
+                  "length": 40,
+                  "alias": "A label",
+                  "domain": "",
+                  "default": "none",
+                  "nullable": true
+                }
+              ],
+              "indexes": [],
+              "subtypes": [
+                {
+                  "code": 1,
+                  "name": "One",
+                  "default": false,
+                  "field": "kind"
+                },
+                {
+                  "code": 2,
+                  "name": "Two",
+                  "default": true,
+                  "field": "kind"
+                }
+              ]
+            },
+            "pol": {
+              "fields": [
+                {
+                  "name": "OBJECTID",
+                  "type": "OID",
+                  "length": 4,
+                  "alias": "OBJECTID",
+                  "domain": "",
+                  "default": null,
+                  "nullable": false
+                },
+                {
+                  "name": "Shape",
+                  "type": "Geometry",
+                  "length": 0,
+                  "alias": "Shape",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "Shape_Length",
+                  "type": "Double",
+                  "length": 8,
+                  "alias": "Shape_Length",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "Shape_Area",
+                  "type": "Double",
+                  "length": 8,
+                  "alias": "Shape_Area",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                }
+              ],
+              "indexes": [],
+              "subtypes": []
+            },
+            "tab": {
+              "fields": [
+                {
+                  "name": "OBJECTID",
+                  "type": "OID",
+                  "length": 4,
+                  "alias": "OBJECTID",
+                  "domain": "",
+                  "default": null,
+                  "nullable": false
+                },
+                {
+                  "name": "parent",
+                  "type": "Integer",
+                  "length": 4,
+                  "alias": "Parent",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                }
+              ],
+              "indexes": [
+                [
+                  "pid_idx",
+                  [
+                    "parent"
+                  ]
+                ]
+              ],
+              "subtypes": []
+            }
+          },
+          "domains": [
+            {
+              "name": "kinds",
+              "description": "Kinds of points",
+              "type": "Short",
+              "kind": "CodedValue",
+              "split": "DefaultValue",
+              "merge": "DefaultValue",
+              "values": [
+                [
+                  "2",
+                  "Two"
+                ],
+                [
+                  "1",
+                  "One"
+                ]
+              ]
+            },
+            {
+              "name": "rng",
+              "description": "Range",
+              "type": "Long",
+              "kind": "Range",
+              "split": "DefaultValue",
+              "merge": "DefaultValue",
+              "values": [
+                "0.0",
+                "100.0"
+              ]
+            }
+          ],
+          "relationships": [
+            {
+              "name": "pts_tab",
+              "cardinality": "OneToMany",
+              "origin": [
+                "pts"
+              ],
+              "destination": [
+                "tab"
+              ],
+              "forward": "has",
+              "backward": "of",
+              "composite": false,
+              "notification": "None",
+              "keys": [
+                [
+                  "OBJECTID",
+                  "OriginPrimary"
+                ],
+                [
+                  "parent",
+                  "OriginForeign"
+                ]
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "gsc_edit": {
+      "tool": "scenario",
+      "gdb_scenario": {
+        "steps": [
+          {
+            "tool": "management.CreateFileGDB",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "create_file_gdb",
+              "params": {
+                "out_folder_path": "<ws>",
+                "out_name": "t"
+              }
+            }
+          },
+          {
+            "tool": "management.CreateTable",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "create_table",
+              "params": {
+                "output": "<ws>/t.gdb/tab"
+              }
+            }
+          },
+          {
+            "tool": "management.AddField",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "add_field",
+              "params": {
+                "in_table": "<ws>/t.gdb/tab",
+                "field_name": "a",
+                "field_type": "SHORT"
+              }
+            }
+          },
+          {
+            "tool": "management.AddField",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "add_field",
+              "params": {
+                "in_table": "<ws>/t.gdb/tab",
+                "field_name": "b",
+                "field_type": "TEXT",
+                "field_alias": "Bee"
+              }
+            }
+          },
+          {
+            "tool": "management.AddField",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "add_field",
+              "params": {
+                "in_table": "<ws>/t.gdb/tab",
+                "field_name": "c",
+                "field_type": "DOUBLE",
+                "field_is_nullable": "NON_NULLABLE"
+              }
+            }
+          },
+          {
+            "tool": "management.AddField",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "add_field",
+              "params": {
+                "in_table": "<ws>/t.gdb/tab",
+                "field_name": "d",
+                "field_type": "BIGINTEGER"
+              }
+            }
+          },
+          {
+            "tool": "management.AddField",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "add_field",
+              "params": {
+                "in_table": "<ws>/t.gdb/tab",
+                "field_name": "e",
+                "field_type": "GUID"
+              }
+            }
+          },
+          {
+            "tool": "management.AddField",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "add_field",
+              "params": {
+                "in_table": "<ws>/t.gdb/tab",
+                "field_name": "f",
+                "field_type": "DATEONLY"
+              }
+            }
+          },
+          {
+            "tool": "management.DeleteField",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "delete_field",
+              "params": {
+                "in_table": "<ws>/t.gdb/tab",
+                "drop_field": "a;b;d;e;f",
+                "method": "KEEP_FIELDS"
+              }
+            }
+          },
+          {
+            "tool": "management.CreateDomain",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "create_domain",
+              "params": {
+                "in_workspace": "<ws>/t.gdb",
+                "domain_name": "dom",
+                "field_type": "SHORT"
+              }
+            }
+          },
+          {
+            "tool": "management.AssignDomainToField",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "assign_domain_to_field",
+              "params": {
+                "in_table": "<ws>/t.gdb/tab",
+                "field_name": "a",
+                "domain_name": "dom"
+              }
+            }
+          },
+          {
+            "tool": "management.DeleteDomain",
+            "status": "failed",
+            "messages": [
+              "ERROR 002630: The domain is being used as a default domain.",
+              "Failed to execute (DeleteDomain)."
+            ],
+            "run": {
+              "tool": "delete_domain",
+              "params": {
+                "in_workspace": "<ws>/t.gdb",
+                "domain_name": "dom"
+              }
+            }
+          },
+          {
+            "tool": "management.RemoveDomainFromField",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "remove_domain_from_field",
+              "params": {
+                "in_table": "<ws>/t.gdb/tab",
+                "field_name": "a"
+              }
+            }
+          },
+          {
+            "tool": "management.DeleteDomain",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "delete_domain",
+              "params": {
+                "in_workspace": "<ws>/t.gdb",
+                "domain_name": "dom"
+              }
+            }
+          },
+          {
+            "tool": "management.AddIndex",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "add_index",
+              "params": {
+                "in_table": "<ws>/t.gdb/tab",
+                "fields": "a",
+                "index_name": "a_idx"
+              }
+            }
+          },
+          {
+            "tool": "management.AddIndex",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "add_index",
+              "params": {
+                "in_table": "<ws>/t.gdb/tab",
+                "fields": "d",
+                "index_name": "d_idx"
+              }
+            }
+          },
+          {
+            "tool": "management.RemoveIndex",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "remove_index",
+              "params": {
+                "in_table": "<ws>/t.gdb/tab",
+                "index_name": "a_idx"
+              }
+            }
+          },
+          {
+            "tool": "management.SetSubtypeField",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "set_subtype_field",
+              "params": {
+                "in_table": "<ws>/t.gdb/tab",
+                "field": "a"
+              }
+            }
+          },
+          {
+            "tool": "management.AddSubtype",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "add_subtype",
+              "params": {
+                "in_table": "<ws>/t.gdb/tab",
+                "subtype_code": "1",
+                "subtype_description": "x"
+              }
+            }
+          },
+          {
+            "tool": "management.AddSubtype",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "add_subtype",
+              "params": {
+                "in_table": "<ws>/t.gdb/tab",
+                "subtype_code": "2",
+                "subtype_description": "y"
+              }
+            }
+          },
+          {
+            "tool": "management.RemoveSubtype",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "remove_subtype",
+              "params": {
+                "in_table": "<ws>/t.gdb/tab",
+                "subtype_code": "1"
+              }
+            }
+          },
+          {
+            "tool": "management.AlterField",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "alter_field",
+              "params": {
+                "in_table": "<ws>/t.gdb/tab",
+                "field": "b",
+                "clear_field_alias": "CLEAR_ALIAS"
+              }
+            }
+          },
+          {
+            "tool": "management.AlterField",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "alter_field",
+              "params": {
+                "in_table": "<ws>/t.gdb/tab",
+                "field": "f",
+                "new_field_name": "g",
+                "new_field_alias": "Gee"
+              }
+            }
+          },
+          {
+            "tool": "management.AddField",
+            "status": "failed",
+            "messages": [
+              "Failed to execute. Parameters are not valid.",
+              "ERROR 000310: The Field name must not start with a number",
+              "Failed to execute (AddField)."
+            ],
+            "run": {
+              "tool": "add_field",
+              "params": {
+                "in_table": "<ws>/t.gdb/tab",
+                "field_name": "9bad",
+                "field_type": "LONG"
+              }
+            }
+          },
+          {
+            "tool": "management.AddField",
+            "status": "failed",
+            "messages": [
+              "Failed to execute. Parameters are not valid.",
+              "ERROR 000732: Input Table: Dataset <ws>/t.gdb/missing does not exist or is not supported",
+              "Failed to execute (AddField)."
+            ],
+            "run": {
+              "tool": "add_field",
+              "params": {
+                "in_table": "<ws>/t.gdb/missing",
+                "field_name": "z",
+                "field_type": "LONG"
+              }
+            }
+          }
+        ],
+        "snapshot": {
+          "items": [
+            "tab"
+          ],
+          "tables": {
+            "tab": {
+              "fields": [
+                {
+                  "name": "OBJECTID",
+                  "type": "OID",
+                  "length": 4,
+                  "alias": "OBJECTID",
+                  "domain": "",
+                  "default": null,
+                  "nullable": false
+                },
+                {
+                  "name": "a",
+                  "type": "SmallInteger",
+                  "length": 2,
+                  "alias": "a",
+                  "domain": "",
+                  "default": 0,
+                  "nullable": true
+                },
+                {
+                  "name": "b",
+                  "type": "String",
+                  "length": 255,
+                  "alias": "b",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "d",
+                  "type": "BigInteger",
+                  "length": 8,
+                  "alias": "d",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "e",
+                  "type": "Guid",
+                  "length": 38,
+                  "alias": "e",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "g",
+                  "type": "DateOnly",
+                  "length": 8,
+                  "alias": "Gee",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                }
+              ],
+              "indexes": [
+                [
+                  "d_idx",
+                  [
+                    "d"
+                  ]
+                ]
+              ],
+              "subtypes": [
+                {
+                  "code": 2,
+                  "name": "y",
+                  "default": false,
+                  "field": "a"
+                }
+              ]
+            }
+          },
+          "domains": [],
+          "relationships": []
+        }
+      }
     }
   }
 }
