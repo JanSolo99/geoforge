@@ -888,6 +888,11 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
   transformation functions with Esri's published formulas and defaults (sample standard deviation
   for MS functions, LogisticDecay as growth with 99 %), thresholds, below/above values, any
   evaluation scale. 23 ArcGIS `rbf_*` references; notes in scripts/research/rescale_by_function/.
+- [x] Create Random Raster (`create_random_raster`): Float32 uniform values in [0, 1), NoData
+  3.4e38, optional seed, the Create Constant Raster grid and defaults 250 x 250 cells of cell size
+  1. Six `crr_*` references compare grid/type/NoData exactly and values statistically
+  (`compare_uniform_rasters`, ArcGIS's sample checked the same way); ArcGIS's stream is not
+  reproduced, including for explicit seeds.
 - [x] Create Normal Raster (`create_normal_raster`): Float32 standard-normal values, NoData 3.4e38,
   the Create Constant Raster grid, defaults 250 x 250 cells of cell size 1. ArcGIS's generators
   (ACM599, Mersenne Twister) are seeded in a way not reproduced (seeded runs repeat, but match no

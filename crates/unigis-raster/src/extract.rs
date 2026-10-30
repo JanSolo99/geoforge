@@ -510,6 +510,26 @@ pub fn normal_raster(cell: f64, extent: (f64, f64, f64, f64), seed: u64) -> Opti
     Some(out)
 }
 
+/// Create Random Raster: Float32 values uniformly distributed in [0, 1), NoData 3.4e38, on the
+/// Create Constant Raster grid. ArcGIS's random stream is not reproduced; `seed` fixes ours.
+pub fn random_raster(cell: f64, extent: (f64, f64, f64, f64), seed: u64) -> Option<Raster> {
+    let mut out = constant_raster(0.0, false, cell, extent)?;
+    out.nodata = Some(f64::from(3.4e38_f32));
+    let mut state = seed;
+    out.bands[0] = out.bands[0]
+        .iter()
+        .map(|_| {
+            state = state.wrapping_add(0x9E37_79B9_7F4A_7C15);
+            let mut z = state;
+            z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+            z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+            z ^= z >> 31;
+            DataType::F32.store((z >> 11) as f64 / (1u64 << 53) as f64)
+        })
+        .collect();
+    Some(out)
+}
+
 pub fn constant_raster(
     value: f64,
     integer: bool,
@@ -541,7 +561,7 @@ pub fn constant_raster(
 }
 
 #[cfg(test)]
-mod normal_tests {
+mod random_raster_tests {
     use super::*;
 
     #[test]
@@ -554,6 +574,23 @@ mod normal_tests {
         let sd = (v.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / n).sqrt();
         assert!(mean.abs() < 0.03 && (sd - 1.0).abs() < 0.03, "{mean} {sd}");
         let again = normal_raster(1.0, (0.0, 0.0, 200.0, 100.0), 7).unwrap();
+        assert_eq!(again.bands, r.bands);
+    }
+
+    #[test]
+    fn random_raster_is_uniform() {
+        let r = random_raster(1.0, (0.0, 0.0, 200.0, 100.0), 7).unwrap();
+        assert_eq!((r.width, r.height), (200, 100));
+        let v = &r.bands[0];
+        assert!(v.iter().all(|x| (0.0..1.0).contains(x)));
+        let n = v.len() as f64;
+        let mean = v.iter().sum::<f64>() / n;
+        let sd = (v.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / n).sqrt();
+        assert!(
+            (mean - 0.5).abs() < 0.01 && (sd - (1.0 / 12.0f64).sqrt()).abs() < 0.01,
+            "{mean} {sd}"
+        );
+        let again = random_raster(1.0, (0.0, 0.0, 200.0, 100.0), 7).unwrap();
         assert_eq!(again.bands, r.bands);
     }
 }

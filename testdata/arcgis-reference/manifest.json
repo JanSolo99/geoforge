@@ -106931,6 +106931,122 @@
           "geometry_type": "THICKNESS"
         }
       }
+    },
+    "crr_default": {
+      "tool": "gp.CreateRandomRaster_sa",
+      "args": [
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "create_random_raster",
+        "params": {
+          "output": "<out>"
+        }
+      }
+    },
+    "crr_cell5": {
+      "tool": "gp.CreateRandomRaster_sa",
+      "args": [
+        "<out>",
+        "",
+        5
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "create_random_raster",
+        "params": {
+          "output": "<out>",
+          "cell_size": 5
+        }
+      }
+    },
+    "crr_extent": {
+      "tool": "gp.CreateRandomRaster_sa",
+      "args": [
+        "<out>",
+        "",
+        10,
+        "0 0 1000 500"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "create_random_raster",
+        "params": {
+          "output": "<out>",
+          "cell_size": 10,
+          "extent": "0 0 1000 500"
+        }
+      }
+    },
+    "crr_odd": {
+      "tool": "gp.CreateRandomRaster_sa",
+      "args": [
+        "<out>",
+        "",
+        7,
+        "1 2 50 33"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "create_random_raster",
+        "params": {
+          "output": "<out>",
+          "cell_size": 7,
+          "extent": "1 2 50 33"
+        }
+      }
+    },
+    "crr_small": {
+      "tool": "gp.CreateRandomRaster_sa",
+      "args": [
+        "<out>",
+        "",
+        0.5,
+        "0 0 3 2"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "create_random_raster",
+        "params": {
+          "output": "<out>",
+          "cell_size": 0.5,
+          "extent": "0 0 3 2"
+        }
+      }
+    },
+    "crr_seed": {
+      "tool": "gp.CreateRandomRaster_sa",
+      "args": [
+        "<out>",
+        42
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "create_random_raster",
+        "params": {
+          "output": "<out>",
+          "seed_value": 42
+        }
+      }
     }
   }
 }
