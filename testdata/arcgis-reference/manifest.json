@@ -99053,6 +99053,314 @@
           "output_folder": "<out>"
         }
       }
+    },
+    "gpx_points": {
+      "tool": "conversion.GPXtoFeatures",
+      "args": [
+        "testdata/geoproc/gpx_sample.gpx",
+        "<out>",
+        "POINTS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "Name",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "Descript",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "Type",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "Comment",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "Symbol",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DateTimeS",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "Elevation",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "gpx_to_features",
+        "params": {
+          "input_gpx_file": "testdata/geoproc/gpx_sample.gpx",
+          "output": "<out>",
+          "output_type": "POINTS"
+        }
+      }
+    },
+    "gpx_lines": {
+      "tool": "conversion.GPXtoFeatures",
+      "args": [
+        "testdata/geoproc/gpx_sample.gpx",
+        "<out>",
+        "TRACKS_AS_LINES"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "Name",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "Descript",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "Type",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "gpx_to_features",
+        "params": {
+          "input_gpx_file": "testdata/geoproc/gpx_sample.gpx",
+          "output": "<out>",
+          "output_type": "TRACKS_AS_LINES"
+        }
+      }
+    },
+    "gpx_sticky_points": {
+      "tool": "conversion.GPXtoFeatures",
+      "args": [
+        "testdata/geoproc/gpx_sticky.gpx",
+        "<out>",
+        "POINTS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "Name",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "Descript",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "Type",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "Comment",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "Symbol",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "DateTimeS",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "Elevation",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "gpx_to_features",
+        "params": {
+          "input_gpx_file": "testdata/geoproc/gpx_sticky.gpx",
+          "output": "<out>",
+          "output_type": "POINTS"
+        }
+      }
+    },
+    "gpx_sticky_lines": {
+      "tool": "conversion.GPXtoFeatures",
+      "args": [
+        "testdata/geoproc/gpx_sticky.gpx",
+        "<out>",
+        "TRACKS_AS_LINES"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          6,
+          6,
+          0
+        ],
+        [
+          "Name",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "Descript",
+          "String",
+          254,
+          0,
+          0
+        ],
+        [
+          "Type",
+          "String",
+          254,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "gpx_to_features",
+        "params": {
+          "input_gpx_file": "testdata/geoproc/gpx_sticky.gpx",
+          "output": "<out>",
+          "output_type": "TRACKS_AS_LINES"
+        }
+      }
     }
   }
 }

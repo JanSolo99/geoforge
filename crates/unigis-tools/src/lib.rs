@@ -22,6 +22,7 @@ pub mod feature_class_to_shapefile;
 mod fieldmap;
 pub mod global_ids;
 pub mod gps_metadata;
+pub mod gpx;
 pub mod graphic_buffer;
 pub(crate) mod grid_notation;
 pub mod neighbors;

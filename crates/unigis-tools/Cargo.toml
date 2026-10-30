@@ -9,6 +9,7 @@ publish.workspace = true
 [dependencies]
 chrono.workspace = true
 chrono-tz.workspace = true
+roxmltree.workspace = true
 unigis-core.workspace = true
 unigis-geometry.workspace = true
 unigis-proj = { workspace = true, optional = true }

@@ -1143,6 +1143,7 @@ dependencies = [
  "calamine",
  "chrono",
  "chrono-tz",
+ "roxmltree",
  "rstar",
  "spade",
  "unigis-core",

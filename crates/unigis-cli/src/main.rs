@@ -2968,7 +2968,8 @@ fn main() -> ExitCode {
                 registry::Outcome::Features(out) => {
                     let source = registry::Context::get(&ctx, "input")
                         .and_then(|i| source_gdb(Path::new(&i)));
-                    let own_wkt = !matches!(spec.id, "copy" | "define_projection");
+                    let own_wkt =
+                        !matches!(spec.id, "copy" | "define_projection" | "gpx_to_features");
                     write_output_as(out, Path::new(&output), source.as_deref(), own_wkt)
                 }
                 registry::Outcome::Table(t) => write_table(&t, Path::new(&output)),

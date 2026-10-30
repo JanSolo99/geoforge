@@ -580,6 +580,24 @@ fn generate_transects_along_lines(ctx: &dyn Context) -> Result<ToolOutput> {
     )
 }
 
+fn gpx_to_features(ctx: &dyn Context) -> Result<ToolOutput> {
+    let t = find("gpx_to_features").ok_or_else(|| Error::Unsupported("gpx_to_features".into()))?;
+    let path = text(ctx, t, "input_gpx_file").ok_or_else(|| {
+        Error::Unsupported("ERROR 000735: Input GPX File: value is required".into())
+    })?;
+    let content = std::fs::read_to_string(&path).map_err(|e| {
+        Error::Unsupported(format!(
+            "ERROR 000732: Input GPX File: {path} cannot be read: {e}"
+        ))
+    })?;
+    let lines =
+        text(ctx, t, "output_type").is_some_and(|o| o.eq_ignore_ascii_case("TRACKS_AS_LINES"));
+    let shapefile = ctx
+        .get("output")
+        .is_some_and(|o| o.to_ascii_lowercase().ends_with(".shp"));
+    crate::gpx::gpx_to_features(&content, lines, shapefile)
+}
+
 fn calculate_geometry_attributes(ctx: &dyn Context) -> Result<ToolOutput> {
     let t = find("calculate_geometry_attributes")
         .ok_or_else(|| Error::Unsupported("calculate_geometry_attributes".into()))?;
@@ -2347,6 +2365,33 @@ pub static TOOLS: &[Tool] = &[
         output_suffix: "ODLinks",
         measures: false,
         run: Runner::Features(generate_origin_destination_links),
+    },
+    Tool {
+        id: "gpx_to_features",
+        name: "GPX To Features",
+        toolbox: "Conversion › From GPS",
+        summary: "GPX waypoints, track and route points as points, or tracks as lines (ArcGIS Pro GPX To Features).",
+        params: &[
+            Param {
+                name: "input_gpx_file",
+                label: "Input GPX File",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+                help: "A .gpx file.",
+            },
+            Param {
+                name: "output_type",
+                label: "Output Type",
+                kind: Kind::Choice(&["POINTS", "TRACKS_AS_LINES"]),
+                required: false,
+                default: "POINTS",
+                help: "",
+            },
+        ],
+        output_suffix: "GPX",
+        measures: true,
+        run: Runner::Features(gpx_to_features),
     },
     Tool {
         id: "calculate_geometry_attributes",

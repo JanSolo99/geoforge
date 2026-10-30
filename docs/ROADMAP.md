@@ -815,6 +815,10 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Feature Class To Shapefile (batch into a folder, input names with _1/_2 on collision):
       2 folder-output `fc2shp_*` cases + 1 refusal match ArcGIS. Evidence:
       `scripts/research/feature_class_to_shapefile/README.md`.
+- [x] GPX To Features (`gpx_to_features`): waypoints, routes and tracks as PointZM,
+      or tracks as single-part PolylineZM; 4 `gpx_*` shapefile references match ArcGIS,
+      including carried point metadata and the WGS 1984 vertical CRS. Evidence:
+      `scripts/research/gpx_to_features/README.md`.
 - [x] Calculate Geometry Attributes (planar properties into existing fields, length/area units):
       5 in-place `cga_*` cases over polygons, lines and points match ArcGIS. Evidence:
       `scripts/research/calculate_geometry_attributes/README.md`.
