@@ -448,6 +448,11 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         points grouped by spatial tile (order engine-internal; the probe cases compare by PID). Not
         done: ADD_ATTRIBUTES ALL joining a raster attribute table, geodatabase NoData (assumed null),
         the app tool and arcpy entry, points in another coordinate system than the raster
+  - [x] Zonal Geometry on aligned single-band integer raster zones (`ug run zonal_geometry`):
+        AREA, PERIMETER, THICKNESS and CENTROID on the existing cell grid. Eighteen `zg_*` references
+        match Pro 3.7, including constant-zone thickness and centroid collisions. Not done: feature
+        zones, non-VALUE zone fields, multiband/float/rotated inputs, cell-size or environment
+        changes, and centroid ellipse value-attribute-table fields.
   - [x] Zonal Characterization on aligned single-band raster zones and values (`ug run
         zonal_characterization`): table output, all 15 statistics, per-request counts and custom
         field names, strict NoData row omission, multiple percentiles with nearest/linear
@@ -724,7 +729,7 @@ no sandbox skip/filter flags. Formatting, full workspace/all-targets clippy with
 validation passes 173 tests (5 ignored). GDAL provider checks use a writable
 cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md`.
 
-- Zonal Histogram and Tabulate Area (Spatial Analyst, `ug zonal-histogram`, `ug tabulate-area`): 12 ArcGIS cases; Zonal Geometry still to do (see KNOWN_GAPS).
+- Zonal Histogram and Tabulate Area (Spatial Analyst, `ug zonal-histogram`, `ug tabulate-area`): 12 ArcGIS cases; Zonal Geometry as Table still to do (see KNOWN_GAPS).
 - Cost Distance, Cost Back Link and Cost Allocation (`ug cost-distance`, `cost-back-link`, `cost-allocation`): 14 ArcGIS cases, distances exact; see KNOWN_GAPS for ties.
 - Corridor, Filter (LOW/HIGH, `ug filter`) and Nibble (`ug nibble`; ties take the smallest value): 15 ArcGIS cases.
 - Add/Remove Attribute Index for file geodatabase tables (`ug add-index`, `remove-index`; single field, file for file equal to ArcGIS on 20 operations). Spatial index add/remove and multi-field indexes are not done.
@@ -866,11 +871,6 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
   letters before/after, symbols, colons, packed), signed decimal pairs, MGRS and banded UTM; the
   Precision formula, context text, document dates (12 notations) and file fields as ArcGIS writes
   them. 6 ArcGIS `eld_*` references (machine/time fields Filename/Modified/Scanned not compared).
-- [x] Zonal Geometry (`zonal_geometry`): AREA, PERIMETER (edges facing another zone or the
-  border), THICKNESS (largest chamfer distance, axis 1 / diagonal 1.414, from a cell centre to the
-  nearest point of another zone's cell; the border does not count; 10000 without another zone) and
-  CENTROID (zone value in the cell holding the mean of the cell centres). 9 ArcGIS `zg_*`
-  references.
 - [x] Zonal Fill (`zonal_fill`): each zone's spill level (min over 8-neighbour pairs across its
   boundary of the higher weight; ArcGIS also spills on the bottom/right raster edges only), fitted
   on 30 random grids (scripts/research/zonal_fill/); 4 ArcGIS `zf_*` references.

@@ -1,20 +1,19 @@
 # Lane kimi handoff
 
-Updated 2026-10-31T04:13:53+11:00; last agent Kimi.
-Workspace `/mnt/media/ArcGIS_Linux/.worktrees/lane-kimi`, branch `lane/kimi`, HEAD `b6b6c143a8ba33a533e6eac7496ab21d0c3c7be8`, matching `origin/main` after landing.
-User objective: implement the next claimed queue tool with ArcGIS references, pass the full gate, commit and land with `scripts/lane land`.
+Updated 2026-10-31T08:38:31+11:00; last agent Kimi.
+Workspace `/mnt/media/ArcGIS_Linux/.worktrees/lane-kimi`, branch `lane/kimi`, HEAD `7ebec0a841242bc55c0092023ec66ee3dcbd0d30`; `origin/main` has since advanced by two commits.
+User objective: finish claimed `sa.ZonalGeometry`, validate against ArcGIS, update documentation, commit and land with `scripts/lane land`.
 
-## Previous tool
+## Zonal Geometry — validated, landing pending
 
-- `sa.InterpolateShape` landed as `b6b6c143a8ba33a533e6eac7496ab21d0c3c7be8`; focused/full comparators and both full gates passed.
+- Inherited from the previous session: raster registry dispatch/metadata, AREA/PERIMETER/THICKNESS/CENTROID implementation, generator cases and nine Pro 3.7 `zg_*` references. Current-session edits: nonfinite thickness becomes `100000.0`, matching ArcGIS when one zone covers the whole raster, and the zone-field condition was collapsed for Clippy.
+- Scope is aligned single-band integer, north-up raster zones on their existing grid. Feature zones, non-VALUE fields, multiband/float/rotated inputs, nondefault cell sizes/environments and centroid ellipse VAT attributes are documented as gaps. Zonal Geometry as Table remains the claude lane's separate claim.
+- Validation on the current uncommitted code: focused `UNIGIS_REFERENCE_CASES=zg_ cargo test -j3 -p unigis-cli --test arcgis_reference tools_match_arcgis_output -- --nocapture` PASS (nine cases); full manifest comparator PASS (76.96 s); `cargo fmt --all` and `git diff --check` PASS; complete `scripts/check` PASS (333.142 s) after fixing one `clippy::collapsible_if` warning.
+- `origin/main` commit `04be4a93c5bcb0ecbbdb3f172c53221ae28123bd` independently landed another Zonal Geometry implementation with nine different references. During landing, preserve both reference sets and adapt/retain its unit tests where useful; validate all 18 cases on the combined code. Do not overwrite the other lane's table-tool work.
+- Roadmap/gaps and queue updated (1564 missing); incidental bridge bytecode and generated constant-input VAT files removed. All 48 intended files are staged; scoped commit and `scripts/lane land` remain.
 
-## Zonal Characterization — validated, commit/land pending
+Next action: commit as `Add Zonal Geometry`, land and resolve duplicate-tool conflicts by preserving both reference sets, then verify `HEAD == origin/main` and claim release.
 
-- `scripts/lane claim` selected `sa.ZonalCharacterization` because Add Surface Information was already claimed by another lane. Base HEAD `b6b6c143a8ba33a533e6eac7496ab21d0c3c7be8`; the branch is now two commits behind `origin/main`, so landing will rebase and preserve those landings.
-- ArcGIS Pro 3.7 probes established per-request Double count columns, statistic-only custom names, strict NoData row omission and circular mean/std formulas. Generated eight references with `uv run -q --with "mcp>=2" python scripts/make-arcgis-reference.py 'zc_*'`: `zc_mean`, `zc_multi`, `zc_int_all`, `zc_counts`, `zc_custom`, `zc_strict`, `zc_percentile`, `zc_circular`.
-- Implemented aligned single-band raster zones/values and DBF table output, all 15 statistics, count/custom-name columns, strict NoData, multiple percentiles and circular mean/std in `crates/unigis-raster/src/zonal.rs`, registry metadata and CLI dispatch. Unsupported feature/multidimensional/multiband/differing-grid modes are refused and recorded in `docs/KNOWN_GAPS.md`; roadmap updated.
-- Scoped the ArcGIS DBF collision name for default statistic fields in this tool only: when the raster name's first ten characters end in `_`, use its first nine plus `1`; no global shapefile-writer change.
-- Validation on the uncommitted edits: `cargo check -j3 -p unigis-cli` PASS; focused `UNIGIS_REFERENCE_CASES=zc_ cargo test -j3 -p unigis-cli --test arcgis_reference tools_match_arcgis_output -- --nocapture` PASS after the naming fix; full manifest comparator without the environment filter PASS (101.78 s). `cargo fmt --all` PASS. The first `scripts/check` stopped on two redundant-pattern Clippy errors in the circular branches; after replacing them with `is_some()`, the complete `scripts/check` rerun PASS (exit 0, 386.316 s). Incidental `tools/arcgis-bridge/__pycache__` edits were restored.
-- `python3 scripts/work_queue.py` regenerated the queue: 1568 missing; manifest JSON and `git diff --check` PASS.
+## Zonal Characterization — landed
 
-Next actions: stage only this tool's files, commit `Add Zonal Characterization`, then `scripts/lane land`; resolve any rebase conflicts by preserving both lanes' entries.
+- `sa.ZonalCharacterization` landed as `7ebec0a841242bc55c0092023ec66ee3dcbd0d30`; eight references, focused/full comparators and complete `scripts/check` passed. `sa.InterpolateShape` previously landed as `b6b6c143a8ba33a533e6eac7496ab21d0c3c7be8`.

@@ -1255,6 +1255,15 @@ CASES = {
     "zgt_landuse": ("gp.ZonalGeometryAsTable_sa", [RASTER / "zt_landuse.tif", "Value"], []),
     "zgt_classes": ("gp.ZonalGeometryAsTable_sa", [RASTER / "zt_classes.tif", "Value"], []),
     "zgt_zones4": ("gp.ZonalGeometryAsTable_sa", [RASTER / "zt_zones4.tif", "Value"], []),
+    "zg_area_i32": ("gp.ZonalGeometry_sa", [RASTER / "tab_zones_i32.tif", "Value"], ["AREA"]),
+    "zg_perimeter_i32": ("gp.ZonalGeometry_sa", [RASTER / "tab_zones_i32.tif", "Value"], ["PERIMETER"]),
+    "zg_thickness_i32": ("gp.ZonalGeometry_sa", [RASTER / "tab_zones_i32.tif", "Value"], ["THICKNESS"]),
+    "zg_centroid_i32": ("gp.ZonalGeometry_sa", [RASTER / "tab_zones_i32.tif", "Value"], ["CENTROID"]),
+    "zg_area_zones25": ("gp.ZonalGeometry_sa", [RASTER / "zt_zones25.tif", "Value"], ["AREA"]),
+    "zg_perimeter_zones25": ("gp.ZonalGeometry_sa", [RASTER / "zt_zones25.tif", "Value"], ["PERIMETER"]),
+    "zg_thickness_zones25": ("gp.ZonalGeometry_sa", [RASTER / "zt_zones25.tif", "Value"], ["THICKNESS"]),
+    "zg_centroid_zones25": ("gp.ZonalGeometry_sa", [RASTER / "zt_zones25.tif", "Value"], ["CENTROID"]),
+    "zg_thickness_const": ("gp.ZonalGeometry_sa", [RASTER / "unary_cached/constant1.tif", "Value"], ["THICKNESS"]),
     "cdist_basic": ("gp.CostDistance_sa", [RASTER / "cost_src_i16.tif", RASTER / "cost_f32.tif"], []),
     "cdist_int": ("gp.CostDistance_sa", [RASTER / "cost_src_i16.tif", RASTER / "cost_int16.tif"], []),
     "cdist_const": ("gp.CostDistance_sa", [RASTER / "cost_src_one.tif", RASTER / "cost_const1.tif"], []),
@@ -2365,7 +2374,7 @@ for _tool, _id in COMBINATORIAL:
 
 
 RUN = {
-    "gp.ZonalGeometry_sa": ("zonal_geometry", ["input", "zone_field", "output", "geometry_type"]),
+    "gp.ZonalGeometry_sa": ("zonal_geometry", ["in_zone_data", "zone_field", "output", "geometry_type", "cell_size"]),
     "gp.ZonalFill_sa": ("zonal_fill", ["in_zone_raster", "in_weight_raster", "output"]),
     "gp.AddSurfaceInformation_sa": ("add_surface_information", ["input", "in_surface", "out_property", "output", "method", "sample_distance", "z_factor"]),
     "gp.RescaleByFunction_sa": ("rescale_by_function", ["input", "output", "transformation_function", "from_scale", "to_scale"]),

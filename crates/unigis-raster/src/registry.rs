@@ -275,28 +275,32 @@ fn extract_by_attributes(ctx: &dyn Context) -> Result<Output> {
 }
 
 fn zonal_geometry(ctx: &dyn Context) -> Result<Output> {
-    use crate::zonal::ZoneGeometry as G;
-    let what = match choice(ctx, "zonal_geometry", "geometry_type")
-        .to_ascii_uppercase()
-        .as_str()
-    {
-        "AREA" => G::Area,
-        "PERIMETER" => G::Perimeter,
-        "THICKNESS" => G::Thickness,
-        "CENTROID" => G::Centroid,
-        other => return Err(Error::Unsupported(format!("geometry type {other}"))),
-    };
+    let zones = ctx.raster("in_zone_data")?;
     if let Some(field) = ctx.get("zone_field")
-        && !field.eq_ignore_ascii_case("Value")
+        && !field.eq_ignore_ascii_case("VALUE")
     {
-        return Err(Error::Unsupported(format!(
-            "zone field {field}: only Value is supported yet"
-        )));
+        return Err(Error::Unsupported(
+            "Zonal Geometry currently supports only the VALUE zone field".into(),
+        ));
     }
-    with_statistics(
-        crate::zonal::zonal_geometry(&ctx.raster("input")?, what),
-        true,
+    if let Some(text) = ctx.get("cell_size") {
+        let cell: f64 = text.parse().map_err(|_| {
+            Error::Unsupported("cell_size must be the input raster's cell size".into())
+        })?;
+        if cell <= 0.0
+            || (cell - zones.cell_width()).abs() > 1e-9 * cell.max(1.0)
+            || (cell - zones.cell_height()).abs() > 1e-9 * cell.max(1.0)
+        {
+            return Err(Error::Unsupported(
+                "Zonal Geometry currently requires the input raster's cell size".into(),
+            ));
+        }
+    }
+    let geometry = crate::zonal::ZonalGeometryType::parse(
+        &ctx.get("geometry_type").unwrap_or_else(|| "AREA".into()),
     )
+    .ok_or_else(|| Error::Unsupported("unknown Zonal Geometry type".into()))?;
+    with_statistics(crate::zonal::zonal_geometry(&zones, geometry)?, true)
 }
 
 fn zonal_fill(ctx: &dyn Context) -> Result<Output> {
@@ -2535,22 +2539,29 @@ pub static TOOLS: &[Tool] = &[
     Tool {
         id: "zonal_geometry",
         name: "Zonal Geometry",
-        summary: "Each zone's area, perimeter, thickness or centroid, as a raster.",
+        summary: "Calculates area, perimeter, thickness or centroids for each raster zone.",
         params: &[
-            raster("input", "Input raster or feature zone data", true),
+            raster("in_zone_data", "Input Raster or Feature Zone Data", true),
             Param {
                 name: "zone_field",
-                label: "Zone field",
+                label: "Zone Field",
                 kind: Kind::Text,
-                required: false,
+                required: true,
                 default: "Value",
             },
             option(
                 "geometry_type",
-                "Geometry type",
+                "Geometry Type",
                 &["AREA", "PERIMETER", "THICKNESS", "CENTROID"],
                 "AREA",
             ),
+            Param {
+                name: "cell_size",
+                label: "Output Cell Size",
+                kind: Kind::Number,
+                required: false,
+                default: "",
+            },
         ],
         run: zonal_geometry,
     },
