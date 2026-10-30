@@ -135,10 +135,13 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
 - `unigis-raster/src/zonal.rs::zonal_geometry` + registry; 9 `zg_*` references PASS; unit tests; clippy.
   Thickness = chamfer distance (1 / 1.414) to the nearest point of another zone's cell (probed).
 
-## Queue: Zonal Geometry as Table — committed, landing
+## Queue: Zonal Geometry as Table — landed on main (b7c65f4, full scripts/check PASS)
 
 - `zonal::zonal_geometry_table` + CLI runner (table) + registry placeholder; `zgt_*` cases un-skipped
   (run entries via `--annotate`); PASS. Two-pass centred moments were needed for last-digit match.
+- The kimi lane landed its own Zonal Geometry (f6451fe) over mine (04be4a9): its `zonal.rs`
+  implementation replaced mine and both reference sets (18 `zg_*`) are kept. The table tool now
+  uses its `zonal_geometry` / `zonal_thickness`; all 18 + 5 cases pass on the combined code.
 
 ## Pitfall: ArcGIS sidecars in testdata
 
