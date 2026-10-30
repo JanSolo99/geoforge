@@ -819,6 +819,10 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
       or tracks as single-part PolylineZM; 4 `gpx_*` shapefile references match ArcGIS,
       including carried point metadata and the WGS 1984 vertical CRS. Evidence:
       `scripts/research/gpx_to_features/README.md`.
+- [x] Multipatch To Raster (`multipatch_to_raster`): default and explicit cell sizes,
+      MAXIMUM_HEIGHT/MINIMUM_HEIGHT, Float32 Z interpolation at cell centers. Three `mpr_*`
+      ArcGIS references match grid, cells and NoData; convex ring fans and other multipatch
+      part types are converted to triangles. Concave ring surfaces remain a known gap.
 - [x] Calculate Geometry Attributes (planar properties into existing fields, length/area units):
       5 in-place `cga_*` cases over polygons, lines and points match ArcGIS. Evidence:
       `scripts/research/calculate_geometry_attributes/README.md`.
@@ -840,6 +844,8 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
   `scripts/research/make_query_table/` confirm FeatureLayer/TableView semantics.
 - [ ] Convert Personal Geodatabase: deferred; no MDB/ACCDB input parser or default
   mobile geodatabase writer. FILE_GDB/XML alternatives still need the input parser.
+- [ ] Mobile Geodatabase To File Geodatabase: deferred; native formats have no mobile
+  geodatabase reader for the source catalog, tables and ST_Geometry features.
 - [x] Add Global IDs (`add_global_ids`): in-place FileGDB class/table and simple
   feature-dataset expansion, batches in one workspace, UUID4 values, system field
   metadata/index and repeat stability. Eight public references plus rollback tests;

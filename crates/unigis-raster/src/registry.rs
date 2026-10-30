@@ -65,6 +65,13 @@ pub trait Context {
             "this tool needs point features, which this context cannot read".into(),
         ))
     }
+    /// The multipatch geometries of the feature layer and its EPSG code.
+    fn multipatches(&self, name: &str) -> Result<(Vec<unigis_core::Geometry>, Option<u32>)> {
+        let _ = name;
+        Err(Error::Unsupported(
+            "this tool needs multipatch features, which this context cannot read".into(),
+        ))
+    }
 }
 
 /// A tool's result: the raster, and whether ArcGIS writes statistics (`.aux.xml`) beside it.
@@ -1155,6 +1162,16 @@ fn float_to_raster(ctx: &dyn Context) -> Result<Output> {
     )
 }
 
+fn multipatch_to_raster(ctx: &dyn Context) -> Result<Output> {
+    let (features, epsg) = ctx.multipatches("input")?;
+    let cell = ctx.get("cell_size").and_then(|v| v.trim().parse().ok());
+    let maximum = choice(ctx, "multipatch_to_raster", "cell_assignment_method")
+        .eq_ignore_ascii_case("MAXIMUM_HEIGHT");
+    let raster = crate::rasterize::multipatches_to_raster(&features, cell, maximum, epsg)
+        .ok_or_else(|| Error::Unsupported("no multipatch surface or invalid cell size".into()))?;
+    with_statistics(raster, false)
+}
+
 pub static TOOLS: &[Tool] = &[
     Tool {
         id: "ascii_to_raster",
@@ -1189,6 +1206,34 @@ pub static TOOLS: &[Tool] = &[
             default: "",
         }],
         run: float_to_raster,
+    },
+    Tool {
+        id: "multipatch_to_raster",
+        name: "Multipatch To Raster",
+        summary: "Converts multipatch surfaces to a floating-point elevation raster.",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Multipatch Features",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            Param {
+                name: "cell_size",
+                label: "Output Cell Size",
+                kind: Kind::Number,
+                required: false,
+                default: "",
+            },
+            option(
+                "cell_assignment_method",
+                "Cell Assignment Method",
+                &["MAXIMUM_HEIGHT", "MINIMUM_HEIGHT"],
+                "MAXIMUM_HEIGHT",
+            ),
+        ],
+        run: multipatch_to_raster,
     },
     Tool {
         id: "composite_bands",

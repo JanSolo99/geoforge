@@ -6579,6 +6579,26 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
             }
             Ok((samples, epsg))
         }
+        fn multipatches(&self, name: &str) -> Result<(Vec<unigis_core::Geometry>, Option<u32>)> {
+            let path = self
+                .get(name)
+                .ok_or_else(|| Error::Unsupported(format!("{name} is required")))?;
+            let (fc, _) = open_feature_class(Path::new(&path))?;
+            let mut geometries = Vec::new();
+            for feature in fc.features() {
+                if let Some(g) = feature?.geometry
+                    && g.kind == unigis_core::GeometryKind::MultiPatch
+                {
+                    geometries.push(g);
+                }
+            }
+            let epsg = fc
+                .spatial_reference_wkt()
+                .and_then(|w| unigis_proj::Crs::from_wkt(w).ok())
+                .and_then(|c| c.wkid())
+                .map(|(_, latest)| latest);
+            Ok((geometries, epsg))
+        }
         fn attribute_table(&self, name: &str) -> Result<Vec<(String, Vec<f64>)>> {
             let path = self
                 .get(name)

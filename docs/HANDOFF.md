@@ -1,35 +1,44 @@
 # Current handoff
 
-Updated 2026-10-30T11:47:05+11:00; last agent Kimi.
-Workspace `/mnt/media/ArcGIS_Linux`, main, HEAD c4384eaa4ed67b446aef6ed0af5af4b247a3f9f7.
+Updated 2026-10-30T12:34:10+11:00; last agent Kimi.
+Workspace `/mnt/media/ArcGIS_Linux`, main, HEAD 750e91efdbb478b2ef005033635bd683648d5cc1.
 User objective: finish the current queue tool, then build the next eligible tool under the queue
 rules (ArcGIS references, full gate, scoped commit/push).
 
-## GPX To Features — validated, ready to land
+## GPX To Features — landed
 
-- The two recorded failed coordinator attempts only failed at launch (`--prompt` with `--auto`);
-  their logs contain no agent events. GPX edits were already present in the working tree.
-- `crates/unigis-tools/src/gpx.rs` parses GPX with roxmltree; registry id `gpx_to_features`,
-  parameters `input_gpx_file`, `output`, `output_type` (`POINTS` default or `TRACKS_AS_LINES`).
-- POINTS writes tracks, routes, then waypoints as PointZM with ArcGIS shapefile fields. Lines
-  writes one single-part PolylineZM per track, joining segments. Four ArcGIS Pro references cover
-  both modes and carried desc/cmt/sym metadata. `crates/unigis-cli/src/main.rs` preserves GPX's
-  exact compound WGS84/vertical WKT rather than normalizing it to WGS_1984_3D.
-- Initial comparator failures were fixed: vertical CRS, single-part lines (the old probe note was
-  wrong; actual ArcGIS references and full geometry comparison prove single-part), exact WKT.
-- Validation: `cargo test -j3 -p unigis-cli --test arcgis_reference
-  tools_match_arcgis_output -- --exact` PASS (all manifest cases; four GPX included).
-- Full `scripts/check` PASS, exit 0 (`/tmp/unigis-gpx-check.log`, second run with extended timeout;
-  the first reached final tests without failures but hit the 300 s command limit).
-- Next: commit/push only GPX files, regenerate queue. Mobile Geodatabase To File Geodatabase has a
-  concrete missing-reader defer recorded unstaged; Multipatch to Raster has default/max/min ArcGIS
-  probes in `/tmp/unigis-mpr-*.tif` and is the next feasible tool.
+- Commit `750e91e` is pushed on main. Four ArcGIS Pro references match, including PointZM/
+  single-part PolylineZM geometry, carried metadata and the compound WGS84/vertical WKT.
+- Validation before landing: `cargo test -j3 -p unigis-cli --test arcgis_reference
+  tools_match_arcgis_output -- --exact` PASS; full `scripts/check` and pre-push gate PASS.
+
+## Multipatch to Raster — validated, ready to land
+
+- Mobile Geodatabase To File Geodatabase is deferred for the absent native mobile-geodatabase
+  reader; its `docs/WORK_QUEUE_DEFERRED.txt` and `docs/ROADMAP.md` entries are staged here.
+- Implemented `multipatch_to_raster` in `crates/unigis-raster/src/rasterize.rs`, its registry
+  entry and CLI Context bridge. Triangle chunks/strips/fans and convex ring fans interpolate Z at
+  cell centers, skipping vertical triangles. Output is Float32 with `f32::MIN` NoData, a widened
+  extent grid and MAXIMUM_HEIGHT default. `MAX_CELLS` is enforced. Concave rings/holes, the
+  histogram-only PAM sidecar and nondefault environments are recorded in `docs/KNOWN_GAPS.md`.
+- Three ArcGIS Pro 3.7 references (`mpr_default`, `mpr_max1`, `mpr_min1`) are saved with manifest
+  run annotations. Strict triangle containment and ArcGIS's distinct stored-top/sampling-top FP
+  evaluation order were needed for the default case; no statistics sidecar is written.
+- The standalone generator twice timed out starting a second ArcGIS worker after 300 s. The
+  existing healthy MCP ArcGIS bridge then ran all three tools successfully and wrote the final
+  reference files; manifest entries were added in the generator's exact format. Do not claim the
+  standalone generator or `--annotate` ran successfully.
+- Validation: `cargo check -j3 -p unigis-cli` PASS; `cargo test -j3 -p unigis-cli --test
+  arcgis_reference tools_match_arcgis_output -- --exact` PASS (entire manifest, three MPR cases);
+  full `scripts/check` PASS, exit 0, after one Clippy-only correction (`/tmp/unigis-mpr-check.log`).
+- Next: commit/push the 21 scoped files, regenerate the queue, then next queue item:
+  Raster To Geodatabase.
 
 ## Working tree safety / unrelated edits
 
 Preserve inherited raster (`unary_integer_float`), coordinator/hooks/AGENTS/web and other edits.
-Do not read/add NOTES.md or .worktrees. The `umintfloat` generator hunk is unrelated and must not
-be staged with GPX. GPX scope is Cargo.lock, unigis-cli/src/main.rs, unigis-tools Cargo/lib/
-registry/gpx, the gpx CASES/RUN hunks in scripts/make-arcgis-reference.py, gpx research fixtures/
-README, testdata/geoproc/gpx_{sample,sticky}.gpx, manifest and all gpx_* shapefile sidecars,
-ROADMAP/KNOWN_GAPS/HANDOFF.
+`crates/unigis-raster/src/registry.rs` has unrelated covariance hunks and
+`scripts/make-arcgis-reference.py` has an unrelated `umintfloat` hunk: do not stage those hunks.
+Do not read/add NOTES.md or .worktrees. Multipatch scope is rasterize/registry and the CLI bridge,
+its generator CASES/RUN/RASTER_OUT hunks, generated manifest/references, the Mobile defer, ROADMAP,
+any newly evidenced KNOWN_GAPS entry and HANDOFF.

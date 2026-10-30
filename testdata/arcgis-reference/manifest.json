@@ -99361,6 +99361,68 @@
           "output_type": "TRACKS_AS_LINES"
         }
       }
+    },
+    "mpr_default": {
+      "tool": "conversion.MultipatchToRaster",
+      "args": [
+        "testdata/shp/multipatch.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "multipatch_to_raster",
+        "params": {
+          "input": "testdata/shp/multipatch.shp",
+          "output": "<out>"
+        }
+      }
+    },
+    "mpr_max1": {
+      "tool": "conversion.MultipatchToRaster",
+      "args": [
+        "testdata/shp/multipatch.shp",
+        "<out>",
+        1,
+        "MAXIMUM_HEIGHT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "multipatch_to_raster",
+        "params": {
+          "input": "testdata/shp/multipatch.shp",
+          "output": "<out>",
+          "cell_size": 1,
+          "cell_assignment_method": "MAXIMUM_HEIGHT"
+        }
+      }
+    },
+    "mpr_min1": {
+      "tool": "conversion.MultipatchToRaster",
+      "args": [
+        "testdata/shp/multipatch.shp",
+        "<out>",
+        1,
+        "MINIMUM_HEIGHT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "multipatch_to_raster",
+        "params": {
+          "input": "testdata/shp/multipatch.shp",
+          "output": "<out>",
+          "cell_size": 1,
+          "cell_assignment_method": "MINIMUM_HEIGHT"
+        }
+      }
     }
   }
 }

@@ -721,6 +721,9 @@ CASES = {
     "gpx_lines": ("conversion.GPXtoFeatures", [DATA / "gpx_sample.gpx"], ["TRACKS_AS_LINES"]),
     "gpx_sticky_points": ("conversion.GPXtoFeatures", [DATA / "gpx_sticky.gpx"], ["POINTS"]),
     "gpx_sticky_lines": ("conversion.GPXtoFeatures", [DATA / "gpx_sticky.gpx"], ["TRACKS_AS_LINES"]),
+    "mpr_default": ("conversion.MultipatchToRaster", [ROOT / "testdata" / "shp" / "multipatch.shp"], []),
+    "mpr_max1": ("conversion.MultipatchToRaster", [ROOT / "testdata" / "shp" / "multipatch.shp"], [1, "MAXIMUM_HEIGHT"]),
+    "mpr_min1": ("conversion.MultipatchToRaster", [ROOT / "testdata" / "shp" / "multipatch.shp"], [1, "MINIMUM_HEIGHT"]),
     "fst_parcels_num": ("management.FieldStatisticsToTable", [DATA / "parcels.shp"], ["VALUE;ZONE;PARCEL_ID", "NUMERIC"]),
     "fst_parcels_text": ("management.FieldStatisticsToTable", [DATA / "parcels.shp"], ["NAME", "TEXT"]),
     "fst_streams_text": ("management.FieldStatisticsToTable", [DATA / "streams.shp"], ["NAME", "TEXT"]),
@@ -2270,6 +2273,7 @@ RUN = {
     "management.CalculateGeometryAttributes": ("calculate_geometry_attributes", ["input", "output", "geometry_property", "length_unit", "area_unit"]),
     "conversion.FeatureClassToShapefile": ("feature_class_to_shapefile", ["input_features", "output_folder"]),
     "conversion.GPXtoFeatures": ("gpx_to_features", ["input_gpx_file", "output", "output_type"]),
+    "conversion.MultipatchToRaster": ("multipatch_to_raster", ["input", "output", "cell_size", "cell_assignment_method"]),
     "management.FieldStatisticsToTable": ("field_statistics_to_table", ["input", "output", "fields", "field_type", "group_by", "statistics"]),
     "management.EncodeField": ("encode_field", ["input", "output", "field", "method"]),
     "management.GeodeticDensify": ("geodetic_densify", ["input", "output", "densify_method", "max_segment_length"]),
@@ -2338,7 +2342,7 @@ def run_spec(tool, args):
 
 
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
-RASTER_OUT = {"gp.CreateBinaryMask_ia", "gp.ComputeChangeRaster_ia", "gp.Diff_ia", "gp.Over_ia", "gp.LineStatistics_sa", "gp.PointStatistics_sa", "gp.SnapPourPoint_sa", "gp.FocalFlow_sa", "gp.DistanceAccumulation_sa", "gp.DistanceAllocation_sa", "gp.EucBackDirection_sa", "gp.EqualToFrequency_sa", "gp.GreaterThanFrequency_sa", "gp.LessThanFrequency_sa", "conversion.ASCIIToRaster", "conversion.FloatToRaster", "management.CompositeBands", "gp.CreateConstantRaster_sa", "gp.InList_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
+RASTER_OUT = {"gp.CreateBinaryMask_ia", "gp.ComputeChangeRaster_ia", "gp.Diff_ia", "gp.Over_ia", "gp.LineStatistics_sa", "gp.PointStatistics_sa", "gp.SnapPourPoint_sa", "gp.FocalFlow_sa", "gp.DistanceAccumulation_sa", "gp.DistanceAllocation_sa", "gp.EucBackDirection_sa", "gp.EqualToFrequency_sa", "gp.GreaterThanFrequency_sa", "gp.LessThanFrequency_sa", "conversion.ASCIIToRaster", "conversion.FloatToRaster", "conversion.MultipatchToRaster", "management.CompositeBands", "gp.CreateConstantRaster_sa", "gp.InList_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
               "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa",
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",

@@ -1,11 +1,11 @@
-//! Vector to raster conversion: Feature To Raster, Polygon To Raster and Point
-//! To Raster.
+//! Vector to raster conversion, including Feature/Polygon/Point To Raster and
+//! Multipatch To Raster.
 //!
-//! The output grid starts at the lower-left corner of the features' extent (for
+//! The vector grid starts at the lower-left corner of the features' extent (for
 //! points and lines first widened by half a cell on every side) and has
 //! round(extent / cell size) columns and rows.
 
-use unigis_core::{Geometry, GeometryKind};
+use unigis_core::{Geometry, GeometryKind, PartType};
 
 use crate::{DataType, Raster};
 
@@ -118,6 +118,120 @@ fn finish(mut r: Raster, kind: ValueKind) -> Raster {
         };
     }
     r
+}
+
+/// Multipatch To Raster: interpolate each surface triangle at the cell centers.
+pub fn multipatches_to_raster(
+    features: &[Geometry],
+    cell: Option<f64>,
+    maximum: bool,
+    epsg: Option<u32>,
+) -> Option<Raster> {
+    let mut bounds: Option<(f64, f64, f64, f64)> = None;
+    for p in features
+        .iter()
+        .filter(|g| g.kind == GeometryKind::MultiPatch)
+        .flat_map(|g| &g.xy)
+    {
+        bounds = Some(match bounds {
+            None => (p[0], p[1], p[0], p[1]),
+            Some((a, b, c, d)) => (a.min(p[0]), b.min(p[1]), c.max(p[0]), d.max(p[1])),
+        });
+    }
+    let (x0, y0, x1, y1) = bounds?;
+    let cell = cell.unwrap_or_else(|| (x1 - x0).min(y1 - y0) / 250.0);
+    if !cell.is_finite() || cell <= 0.0 {
+        return None;
+    }
+    let cols_f = ((x1 - x0) / cell).round().max(0.0) + 1.0;
+    let rows_f = ((y1 - y0) / cell).round().max(0.0) + 1.0;
+    if !cols_f.is_finite() || !rows_f.is_finite() || cols_f * rows_f > crate::MAX_CELLS as f64 {
+        return None;
+    }
+    let (w, h) = (cols_f as usize, rows_f as usize);
+    let origin = [x0 - cell / 2.0, y0 - cell / 2.0 + rows_f * cell];
+    let mut r = Raster::new(
+        w,
+        h,
+        DataType::F64,
+        [origin[0], cell, 0.0, origin[1], 0.0, -cell],
+    );
+    r.bands[0] = vec![f64::NAN; w * h];
+    r.epsg = epsg;
+
+    let mut triangles = Vec::new();
+    for g in features
+        .iter()
+        .filter(|g| g.kind == GeometryKind::MultiPatch)
+    {
+        let Some(z) = &g.z else { continue };
+        for (range, part_type) in g
+            .part_ranges()
+            .zip(g.part_types.as_deref().unwrap_or_default())
+        {
+            let indices: Vec<usize> = range.collect();
+            let mut push = |a: usize, b: usize, c: usize| {
+                triangles.push([a, b, c].map(|i| {
+                    let p = indices[i];
+                    [g.xy[p][0], g.xy[p][1], z[p]]
+                }));
+            };
+            match part_type {
+                PartType::TriangleStrip => {
+                    for i in 0..indices.len().saturating_sub(2) {
+                        push(i, i + 1, i + 2);
+                    }
+                }
+                PartType::Triangles => {
+                    for i in (0..indices.len().saturating_sub(2)).step_by(3) {
+                        push(i, i + 1, i + 2);
+                    }
+                }
+                PartType::TriangleFan
+                | PartType::OuterRing
+                | PartType::InnerRing
+                | PartType::FirstRing
+                | PartType::Ring => {
+                    for i in 1..indices.len().saturating_sub(1) {
+                        push(0, i, i + 1);
+                    }
+                }
+            }
+        }
+    }
+
+    for [a, b, c] in triangles {
+        let d = (b[1] - c[1]) * (a[0] - c[0]) + (c[0] - b[0]) * (a[1] - c[1]);
+        if d == 0.0 || !d.is_finite() {
+            continue;
+        }
+        let c0 =
+            (((a[0].min(b[0]).min(c[0]) - origin[0]) / cell).floor()).clamp(0.0, w as f64) as usize;
+        let c1 =
+            (((a[0].max(b[0]).max(c[0]) - origin[0]) / cell).ceil()).clamp(0.0, w as f64) as usize;
+        let r0 =
+            (((origin[1] - a[1].max(b[1]).max(c[1])) / cell).floor()).clamp(0.0, h as f64) as usize;
+        let r1 =
+            (((origin[1] - a[1].min(b[1]).min(c[1])) / cell).ceil()).clamp(0.0, h as f64) as usize;
+        for row in r0..r1 {
+            let y = y1 + cell / 2.0 - (row as f64 + 0.5) * cell;
+            for col in c0..c1 {
+                let x = origin[0] + (col as f64 + 0.5) * cell;
+                let wa = ((b[1] - c[1]) * (x - c[0]) + (c[0] - b[0]) * (y - c[1])) / d;
+                let wb = ((c[1] - a[1]) * (x - c[0]) + (a[0] - c[0]) * (y - c[1])) / d;
+                let wc = 1.0 - wa - wb;
+                if wa < 0.0 || wb < 0.0 || wc < 0.0 {
+                    continue;
+                }
+                let z = wa * a[2] + wb * b[2] + wc * c[2];
+                let value = &mut r.bands[0][row * w + col];
+                if value.is_nan() || (maximum && z > *value) || (!maximum && z < *value) {
+                    *value = z;
+                }
+            }
+        }
+    }
+    Some(finish(r, ValueKind::Single))
 }
 
 fn rings(g: &Geometry) -> Vec<&[[f64; 2]]> {
