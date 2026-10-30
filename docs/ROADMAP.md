@@ -448,6 +448,11 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         points grouped by spatial tile (order engine-internal; the probe cases compare by PID). Not
         done: ADD_ATTRIBUTES ALL joining a raster attribute table, geodatabase NoData (assumed null),
         the app tool and arcpy entry, points in another coordinate system than the raster
+  - [x] Zonal Characterization on aligned single-band raster zones and values (`ug run
+        zonal_characterization`): table output, all 15 statistics, per-request counts and custom
+        field names, strict NoData row omission, multiple percentiles with nearest/linear
+        interpolation, and circular mean/std. Eight `zc_*` references match Pro 3.7. Not done:
+        feature zones/output, multidimensional data and differing analysis grids
   - [x] Interpolate Shape on raster surfaces (`ug run interpolate_shape`): points, multipoints,
         polylines and polygons; BILINEAR/NEAREST at vertices, bilinear DENSIFY with extent clipping
         and equal segment subdivision, Z factors and their vertical CRS, M retention/interpolation,

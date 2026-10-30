@@ -105733,6 +105733,768 @@
           "output": "<out>"
         }
       }
+    },
+    "zc_mean": {
+      "tool": "gp.ZonalCharacterization_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "testdata/raster/dem_nodata.tif MEAN",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "dem_nodata",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_noda_1",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "table_output": true,
+      "run": {
+        "tool": "zonal_characterization",
+        "params": {
+          "in_zone_data": "testdata/raster/zones.tif",
+          "in_value_rasters_statistics": "testdata/raster/dem_nodata.tif MEAN",
+          "output": "<out>"
+        }
+      }
+    },
+    "zc_multi": {
+      "tool": "gp.ZonalCharacterization_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "testdata/raster/dem_nodata.tif MEAN;testdata/raster/dem_nodata.tif MAXIMUM;testdata/raster/dem_int16_packbits.tif MAJORITY;testdata/raster/dem_int16_packbits.tif SUM",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "dem_nodata",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_noda_1",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_noda_2",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_noda_3",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_int16_",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_int161",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "dem_int1_1",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_int1_2",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "table_output": true,
+      "run": {
+        "tool": "zonal_characterization",
+        "params": {
+          "in_zone_data": "testdata/raster/zones.tif",
+          "in_value_rasters_statistics": "testdata/raster/dem_nodata.tif MEAN;testdata/raster/dem_nodata.tif MAXIMUM;testdata/raster/dem_int16_packbits.tif MAJORITY;testdata/raster/dem_int16_packbits.tif SUM",
+          "output": "<out>"
+        }
+      }
+    },
+    "zc_int_all": {
+      "tool": "gp.ZonalCharacterization_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "testdata/raster/dem_int16_packbits.tif MEAN;testdata/raster/dem_int16_packbits.tif MAJORITY;testdata/raster/dem_int16_packbits.tif MAJORITY_COUNT;testdata/raster/dem_int16_packbits.tif MAJORITY_PERCENT;testdata/raster/dem_int16_packbits.tif MAXIMUM;testdata/raster/dem_int16_packbits.tif MEDIAN;testdata/raster/dem_int16_packbits.tif MINIMUM;testdata/raster/dem_int16_packbits.tif MINORITY;testdata/raster/dem_int16_packbits.tif MINORITY_COUNT;testdata/raster/dem_int16_packbits.tif MINORITY_PERCENT;testdata/raster/dem_int16_packbits.tif PERCENTILE;testdata/raster/dem_int16_packbits.tif RANGE;testdata/raster/dem_int16_packbits.tif STD;testdata/raster/dem_int16_packbits.tif SUM;testdata/raster/dem_int16_packbits.tif VARIETY",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "dem_int16_",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_int161",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_int1_1",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_int1_2",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "dem_int1_3",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_int1_4",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "dem_int1_5",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_int1_6",
+          "Single",
+          13,
+          0,
+          0
+        ],
+        [
+          "dem_int1_7",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_int1_8",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "dem_int1_9",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_int_10",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "dem_int_11",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_int_12",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "dem_int_13",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_int_14",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "dem_int_15",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_int_16",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "dem_int_17",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_int_18",
+          "Single",
+          13,
+          0,
+          0
+        ],
+        [
+          "dem_int_19",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_int_20",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "dem_int_21",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_int_22",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "dem_int_23",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_int_24",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_int_25",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_int_26",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_int_27",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_int_28",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "table_output": true,
+      "run": {
+        "tool": "zonal_characterization",
+        "params": {
+          "in_zone_data": "testdata/raster/zones.tif",
+          "in_value_rasters_statistics": "testdata/raster/dem_int16_packbits.tif MEAN;testdata/raster/dem_int16_packbits.tif MAJORITY;testdata/raster/dem_int16_packbits.tif MAJORITY_COUNT;testdata/raster/dem_int16_packbits.tif MAJORITY_PERCENT;testdata/raster/dem_int16_packbits.tif MAXIMUM;testdata/raster/dem_int16_packbits.tif MEDIAN;testdata/raster/dem_int16_packbits.tif MINIMUM;testdata/raster/dem_int16_packbits.tif MINORITY;testdata/raster/dem_int16_packbits.tif MINORITY_COUNT;testdata/raster/dem_int16_packbits.tif MINORITY_PERCENT;testdata/raster/dem_int16_packbits.tif PERCENTILE;testdata/raster/dem_int16_packbits.tif RANGE;testdata/raster/dem_int16_packbits.tif STD;testdata/raster/dem_int16_packbits.tif SUM;testdata/raster/dem_int16_packbits.tif VARIETY",
+          "output": "<out>"
+        }
+      }
+    },
+    "zc_counts": {
+      "tool": "gp.ZonalCharacterization_sa",
+      "args": [
+        "testdata/raster/zones_25m.tif",
+        "testdata/raster/classes_u8.tif MAJORITY_COUNT;testdata/raster/classes_u8.tif MAJORITY_PERCENT;testdata/raster/classes_u8.tif MINORITY_COUNT;testdata/raster/classes_u8.tif MINORITY_PERCENT",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "classes_u8",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "classes__1",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "classes__2",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "classes__3",
+          "Single",
+          13,
+          0,
+          0
+        ],
+        [
+          "classes__4",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "classes__5",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "classes__6",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "classes__7",
+          "Single",
+          13,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "table_output": true,
+      "run": {
+        "tool": "zonal_characterization",
+        "params": {
+          "in_zone_data": "testdata/raster/zones_25m.tif",
+          "in_value_rasters_statistics": "testdata/raster/classes_u8.tif MAJORITY_COUNT;testdata/raster/classes_u8.tif MAJORITY_PERCENT;testdata/raster/classes_u8.tif MINORITY_COUNT;testdata/raster/classes_u8.tif MINORITY_PERCENT",
+          "output": "<out>"
+        }
+      }
+    },
+    "zc_custom": {
+      "tool": "gp.ZonalCharacterization_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "testdata/raster/dem_int16_packbits.tif MEAN ELEV_AVG",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "dem_int16_",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "ELEV_AVG",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "table_output": true,
+      "run": {
+        "tool": "zonal_characterization",
+        "params": {
+          "in_zone_data": "testdata/raster/zones.tif",
+          "in_value_rasters_statistics": "testdata/raster/dem_int16_packbits.tif MEAN ELEV_AVG",
+          "output": "<out>"
+        }
+      }
+    },
+    "zc_strict": {
+      "tool": "gp.ZonalCharacterization_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "testdata/raster/dem_nodata.tif MEAN;testdata/raster/dem_nodata.tif SUM",
+        "<out>",
+        "",
+        "Value",
+        "NODATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "dem_nodata",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_noda_1",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_noda_2",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_noda_3",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "table_output": true,
+      "run": {
+        "tool": "zonal_characterization",
+        "params": {
+          "in_zone_data": "testdata/raster/zones.tif",
+          "in_value_rasters_statistics": "testdata/raster/dem_nodata.tif MEAN;testdata/raster/dem_nodata.tif SUM",
+          "output": "<out>",
+          "zone_field": "Value",
+          "ignore_nodata": "NODATA"
+        }
+      }
+    },
+    "zc_percentile": {
+      "tool": "gp.ZonalCharacterization_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "testdata/raster/dem_int16_packbits.tif PERCENTILE;testdata/raster/dem_nodata.tif PERCENTILE",
+        "<out>",
+        "",
+        "Value",
+        "DATA",
+        "25;75",
+        "AUTO_DETECT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "dem_int16_",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_int161",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "dem_int1_1",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "dem_nodata",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_noda_1",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_noda_2",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "table_output": true,
+      "run": {
+        "tool": "zonal_characterization",
+        "params": {
+          "in_zone_data": "testdata/raster/zones.tif",
+          "in_value_rasters_statistics": "testdata/raster/dem_int16_packbits.tif PERCENTILE;testdata/raster/dem_nodata.tif PERCENTILE",
+          "output": "<out>",
+          "zone_field": "Value",
+          "ignore_nodata": "DATA",
+          "percentile_values": "25;75",
+          "percentile_interpolation_type": "AUTO_DETECT"
+        }
+      }
+    },
+    "zc_circular": {
+      "tool": "gp.ZonalCharacterization_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "testdata/raster/dem_nodata.tif MEAN;testdata/raster/dem_nodata.tif STD",
+        "<out>",
+        "",
+        "Value",
+        "DATA",
+        "",
+        "AUTO_DETECT",
+        "CIRCULAR",
+        360
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "VALUE",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "dem_nodata",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_noda_1",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_noda_2",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "dem_noda_3",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "table_output": true,
+      "run": {
+        "tool": "zonal_characterization",
+        "params": {
+          "in_zone_data": "testdata/raster/zones.tif",
+          "in_value_rasters_statistics": "testdata/raster/dem_nodata.tif MEAN;testdata/raster/dem_nodata.tif STD",
+          "output": "<out>",
+          "zone_field": "Value",
+          "ignore_nodata": "DATA",
+          "percentile_interpolation_type": "AUTO_DETECT",
+          "circular_calculation": "CIRCULAR",
+          "circular_wrap_value": 360
+        }
+      }
     }
   }
 }

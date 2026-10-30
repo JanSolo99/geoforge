@@ -653,3 +653,316 @@ mod zonal_fill_tests {
         assert_eq!(out.bands[0], vec![6.0, 6.0, 1.0, 6.0, 6.0, 1.0]);
     }
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CharacterizationStatistic {
+    Mean,
+    Majority,
+    MajorityCount,
+    MajorityPercent,
+    Maximum,
+    Median,
+    Minimum,
+    Minority,
+    MinorityCount,
+    MinorityPercent,
+    Percentile,
+    Range,
+    Std,
+    Sum,
+    Variety,
+}
+
+impl CharacterizationStatistic {
+    pub fn parse(s: &str) -> Option<Self> {
+        use CharacterizationStatistic::*;
+        Some(match s.to_ascii_uppercase().as_str() {
+            "MEAN" => Mean,
+            "MAJORITY" => Majority,
+            "MAJORITY_COUNT" => MajorityCount,
+            "MAJORITY_PERCENT" => MajorityPercent,
+            "MAXIMUM" => Maximum,
+            "MEDIAN" => Median,
+            "MINIMUM" => Minimum,
+            "MINORITY" => Minority,
+            "MINORITY_COUNT" => MinorityCount,
+            "MINORITY_PERCENT" => MinorityPercent,
+            "PERCENTILE" => Percentile,
+            "RANGE" => Range,
+            "STD" => Std,
+            "SUM" => Sum,
+            "VARIETY" => Variety,
+            _ => return None,
+        })
+    }
+
+    fn suffix(self) -> &'static str {
+        use CharacterizationStatistic::*;
+        match self {
+            Mean => "MEAN",
+            Majority => "MAJORITY",
+            MajorityCount => "MAJORITY_COUNT",
+            MajorityPercent => "MAJORITY_PERCENT",
+            Maximum => "MAXIMUM",
+            Median => "MEDIAN",
+            Minimum => "MINIMUM",
+            Minority => "MINORITY",
+            MinorityCount => "MINORITY_COUNT",
+            MinorityPercent => "MINORITY_PERCENT",
+            Percentile => "PERCENTILE",
+            Range => "RANGE",
+            Std => "STD",
+            Sum => "SUM",
+            Variety => "VARIETY",
+        }
+    }
+}
+
+pub struct CharacterizationRequest {
+    pub name: String,
+    pub values: Raster,
+    pub statistic: CharacterizationStatistic,
+    pub field_name: Option<String>,
+}
+
+/// Zonal Characterization on aligned rasters. Each request contributes a count and one statistic
+/// column (one per requested percentile). Strict NoData mode omits a zone affected in any input.
+pub fn zonal_characterization(
+    zones: &Raster,
+    requests: &[CharacterizationRequest],
+    ignore_nodata: bool,
+    percentiles: &[f64],
+    percentile_linear: Option<bool>,
+    circular_wrap: Option<f64>,
+) -> unigis_core::Result<(Vec<unigis_core::Field>, Vec<Vec<unigis_core::Value>>)> {
+    use CharacterizationStatistic::*;
+    use unigis_core::{Error, Field, FieldType, Value};
+
+    let mut order = Vec::new();
+    let mut per_zone: Vec<BTreeMap<i64, (Vec<f64>, bool)>> = vec![BTreeMap::new(); requests.len()];
+    for i in 0..zones.width * zones.height {
+        let z = zones.bands[0][i];
+        if zones.is_nodata(z) {
+            continue;
+        }
+        let key = z as i64;
+        if !per_zone[0].contains_key(&key) {
+            order.push(key);
+        }
+        for (request, column) in requests.iter().zip(&mut per_zone) {
+            let entry = column.entry(key).or_default();
+            let v = request.values.bands[0][i];
+            if request.values.is_nodata(v) {
+                entry.1 = true;
+            } else {
+                entry.0.push(v);
+            }
+        }
+    }
+
+    let mut fields = vec![Field::new("VALUE", FieldType::Integer)];
+    for request in requests {
+        let integer = !request.values.data_type.is_float();
+        if !integer
+            && matches!(
+                request.statistic,
+                Majority
+                    | MajorityCount
+                    | MajorityPercent
+                    | Minority
+                    | MinorityCount
+                    | MinorityPercent
+                    | Variety
+            )
+        {
+            return Err(Error::Unsupported(format!(
+                "{} requires an integer value raster",
+                request.statistic.suffix()
+            )));
+        }
+        if circular_wrap.is_some()
+            && !matches!(
+                request.statistic,
+                Mean | Std | Majority | Minority | Variety
+            )
+        {
+            return Err(Error::Unsupported(format!(
+                "circular {} is not supported",
+                request.statistic.suffix()
+            )));
+        }
+        fields.push(Field::new(
+            format!("{}_COUNT", request.name),
+            FieldType::Double,
+        ));
+        let base = request.field_name.clone().unwrap_or_else(|| {
+            let name = if request
+                .name
+                .get(..10)
+                .is_some_and(|prefix| prefix.ends_with('_'))
+            {
+                format!("{}1", &request.name[..9])
+            } else {
+                request.name.clone()
+            };
+            format!(
+                "{}_{}{}",
+                name,
+                if circular_wrap.is_some() { "C_" } else { "" },
+                request.statistic.suffix()
+            )
+        });
+        let statistic_type = match request.statistic {
+            MajorityCount | MinorityCount | Variety => FieldType::Integer,
+            MajorityPercent | MinorityPercent => FieldType::Single,
+            Majority | Minority | Maximum | Median | Minimum | Range if integer => {
+                FieldType::Integer
+            }
+            Percentile if integer && percentile_linear != Some(true) => FieldType::Integer,
+            _ => FieldType::Double,
+        };
+        let count = if request.statistic == Percentile {
+            percentiles.len()
+        } else {
+            1
+        };
+        for i in 0..count {
+            fields.push(Field::new(
+                if i == 0 {
+                    base.clone()
+                } else {
+                    format!("{base}_{i}")
+                },
+                statistic_type,
+            ));
+        }
+    }
+
+    let mut rows = Vec::new();
+    for key in order {
+        if !ignore_nodata
+            && per_zone
+                .iter()
+                .any(|column| column.get(&key).is_some_and(|entry| entry.1))
+        {
+            continue;
+        }
+        let mut row = vec![Value::Integer(key as i32)];
+        for (request, column) in requests.iter().zip(&mut per_zone) {
+            let entry = column.remove(&key).unwrap_or_default();
+            let integer = !request.values.data_type.is_float();
+            let n = entry.0.len();
+            row.push(Value::Double(n as f64));
+            let outputs = if request.statistic == Percentile {
+                percentiles.len()
+            } else {
+                1
+            };
+            if n == 0 {
+                row.extend((0..outputs).map(|_| Value::Null));
+                continue;
+            }
+            let mut values = entry.0;
+            if let Some(wrap) = circular_wrap {
+                for value in &mut values {
+                    *value = value.rem_euclid(wrap);
+                }
+            }
+            values.sort_by(f64::total_cmp);
+            let sum: f64 = values.iter().sum();
+            let mean = sum / n as f64;
+            let mut runs: Vec<(f64, usize)> = Vec::new();
+            for &value in &values {
+                match runs.last_mut() {
+                    Some((last, count)) if *last == value => *count += 1,
+                    _ => runs.push((value, 1)),
+                }
+            }
+            let majority = runs.iter().fold(
+                runs[0],
+                |best, run| if run.1 > best.1 { *run } else { best },
+            );
+            let minority = runs.iter().fold(
+                runs[0],
+                |best, run| if run.1 < best.1 { *run } else { best },
+            );
+            let circular_moments = || {
+                let wrap = circular_wrap.unwrap_or(360.0);
+                let scale = std::f64::consts::TAU / wrap;
+                let sin = values.iter().map(|v| (v * scale).sin()).sum::<f64>() / n as f64;
+                let cos = values.iter().map(|v| (v * scale).cos()).sum::<f64>() / n as f64;
+                (sin, cos, wrap)
+            };
+            let numeric = |value: f64, integral: bool| {
+                if integral {
+                    Value::Integer(value as i32)
+                } else {
+                    Value::Double(value)
+                }
+            };
+            match request.statistic {
+                Mean => {
+                    let value = if circular_wrap.is_some() {
+                        let (sin, cos, wrap) = circular_moments();
+                        sin.atan2(cos).rem_euclid(std::f64::consts::TAU) * wrap
+                            / std::f64::consts::TAU
+                    } else {
+                        mean
+                    };
+                    row.push(Value::Double(value));
+                }
+                Std => {
+                    let value = if circular_wrap.is_some() {
+                        let (sin, cos, wrap) = circular_moments();
+                        (-2.0 * sin.hypot(cos).ln()).sqrt() * wrap / std::f64::consts::TAU
+                    } else {
+                        (values.iter().map(|v| (v - mean) * (v - mean)).sum::<f64>() / n as f64)
+                            .sqrt()
+                    };
+                    row.push(Value::Double(value));
+                }
+                Sum => row.push(Value::Double(sum)),
+                Maximum => row.push(numeric(values[n - 1], integer)),
+                Minimum => row.push(numeric(values[0], integer)),
+                Range => row.push(numeric(values[n - 1] - values[0], integer)),
+                Median => {
+                    let median = (values[(n - 1) / 2] + values[n / 2]) / 2.0;
+                    row.push(numeric(
+                        if integer { median.floor() } else { median },
+                        integer,
+                    ));
+                }
+                Majority => row.push(numeric(majority.0, integer)),
+                Minority => row.push(numeric(minority.0, integer)),
+                MajorityCount => row.push(Value::Integer(majority.1 as i32)),
+                MinorityCount => row.push(Value::Integer(minority.1 as i32)),
+                MajorityPercent | MinorityPercent => {
+                    let count = if request.statistic == MajorityPercent {
+                        majority.1
+                    } else {
+                        minority.1
+                    };
+                    let percent = (count as f64 / n as f64 * 100.0 * 1e4).round() / 1e4;
+                    row.push(Value::Single(percent as f32));
+                }
+                Variety => row.push(Value::Integer(runs.len() as i32)),
+                Percentile => {
+                    let linear = percentile_linear.unwrap_or(!integer);
+                    for percentile in percentiles {
+                        let position = percentile / 100.0 * (n - 1) as f64;
+                        let value = if linear {
+                            let low = position.floor() as usize;
+                            let high = (low + 1).min(n - 1);
+                            values[low] + (values[high] - values[low]) * (position - low as f64)
+                        } else {
+                            values[position.round() as usize]
+                        };
+                        row.push(numeric(value, integer && !linear));
+                    }
+                }
+            }
+        }
+        rows.push(row);
+    }
+    Ok((fields, rows))
+}

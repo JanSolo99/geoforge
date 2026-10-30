@@ -6678,6 +6678,9 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
     if spec.id == "add_surface_information" {
         return run_add_surface_information(&Args(map), &output);
     }
+    if spec.id == "zonal_characterization" {
+        return run_zonal_characterization(&Args(map), &output);
+    }
     let parameters = Args(map);
     let out = registry::run(spec, &parameters)?;
     if spec.id == "raster_to_float" {
@@ -7298,6 +7301,204 @@ fn interpolate_surface_z(r: &unigis_raster::Raster, x: f64, y: f64, bilinear: bo
             .sum::<f64>()
             / weight
     })
+}
+
+fn zonal_value_table_tokens(text: &str) -> Result<Vec<String>> {
+    let mut tokens = Vec::new();
+    let mut token = String::new();
+    let mut quote = None;
+    for c in text.chars() {
+        match (quote, c) {
+            (Some(q), c) if c == q => quote = None,
+            (Some(_), c) => token.push(c),
+            (None, '\'' | '"') => quote = Some(c),
+            (None, c) if c.is_whitespace() => {
+                if !token.is_empty() {
+                    tokens.push(std::mem::take(&mut token));
+                }
+            }
+            (None, c) => token.push(c),
+        }
+    }
+    if quote.is_some() {
+        return Err(Error::Unsupported(
+            "Input Value Rasters: unmatched quote".into(),
+        ));
+    }
+    if !token.is_empty() {
+        tokens.push(token);
+    }
+    Ok(tokens)
+}
+
+fn run_zonal_characterization(
+    ctx: &dyn unigis_raster::registry::Context,
+    output: &str,
+) -> Result<()> {
+    use unigis_raster::zonal::{CharacterizationRequest, CharacterizationStatistic};
+
+    if ctx.get("out_statistics_features").is_some() {
+        return Err(Error::Unsupported(
+            "Zonal Characterization feature output is not implemented".into(),
+        ));
+    }
+    if ctx
+        .get("process_as_multidimensional")
+        .is_some_and(|v| v.eq_ignore_ascii_case("ALL_SLICES"))
+    {
+        return Err(Error::Unsupported(
+            "Zonal Characterization ALL_SLICES is not implemented".into(),
+        ));
+    }
+    if ctx
+        .get("zone_field")
+        .is_some_and(|v| !v.eq_ignore_ascii_case("VALUE"))
+    {
+        return Err(Error::Unsupported(
+            "Zonal Characterization currently supports raster VALUE zones only".into(),
+        ));
+    }
+    let zone_path = ctx
+        .get("in_zone_data")
+        .ok_or_else(|| Error::Unsupported("in_zone_data is required".into()))?;
+    let zone_source = unigis_raster::read_geotiff(Path::new(&zone_path))?;
+    if zone_source.data_type.is_float() || zone_source.bands.len() != 1 {
+        return Err(Error::Unsupported(
+            "Zonal Characterization zones must be a single-band integer raster".into(),
+        ));
+    }
+    let value_table = ctx
+        .get("in_value_rasters_statistics")
+        .ok_or_else(|| Error::Unsupported("in_value_rasters_statistics is required".into()))?;
+    let mut requests = Vec::new();
+    let mut analysis_zones = None;
+    for entry in value_table.split(';').filter(|s| !s.trim().is_empty()) {
+        let tokens = zonal_value_table_tokens(entry)?;
+        let (path, statistic, field_name) = match tokens.as_slice() {
+            [path, statistic] => (path, statistic, None),
+            [path, statistic, field_name] => (path, statistic, Some(field_name.clone())),
+            _ => {
+                return Err(Error::Unsupported(
+                    "Input Value Rasters entries must be: raster statistic [field_name]".into(),
+                ));
+            }
+        };
+        let statistic = CharacterizationStatistic::parse(statistic).ok_or_else(|| {
+            Error::Unsupported(format!("Zonal Characterization statistic {statistic}"))
+        })?;
+        let values = unigis_raster::read_geotiff(Path::new(path))?;
+        if values.bands.len() != 1 {
+            return Err(Error::Unsupported(
+                "Zonal Characterization currently supports single-band value rasters".into(),
+            ));
+        }
+        let (zones, values) = unigis_raster::resample::zones_on_value_grid(&zone_source, &values)
+            .ok_or_else(|| {
+            Error::Unsupported("zone and value rasters do not overlap".into())
+        })?;
+        if let Some(base) = &analysis_zones {
+            let base: &unigis_raster::Raster = base;
+            if base.width != zones.width
+                || base.height != zones.height
+                || base.transform != zones.transform
+            {
+                return Err(Error::Unsupported(
+                    "Zonal Characterization currently requires value rasters on one analysis grid"
+                        .into(),
+                ));
+            }
+        } else {
+            analysis_zones = Some(zones);
+        }
+        let name = Path::new(path)
+            .file_stem()
+            .unwrap_or_default()
+            .to_string_lossy()
+            .into_owned();
+        requests.push(CharacterizationRequest {
+            name,
+            values,
+            statistic,
+            field_name,
+        });
+    }
+    if requests.is_empty() {
+        return Err(Error::Unsupported(
+            "Input Value Rasters: at least one entry is required".into(),
+        ));
+    }
+    let percentiles = ctx.get("percentile_values").unwrap_or_else(|| "90".into());
+    let percentiles: Vec<f64> = percentiles
+        .trim_matches(|c| c == '[' || c == ']')
+        .split(|c: char| c == ';' || c == ',' || c.is_whitespace())
+        .filter(|v| !v.is_empty())
+        .map(|v| {
+            v.parse::<f64>()
+                .ok()
+                .filter(|p| (0.0..=100.0).contains(p))
+                .ok_or_else(|| Error::Unsupported(format!("Percentile Values: {v}")))
+        })
+        .collect::<Result<_>>()?;
+    if percentiles.is_empty() {
+        return Err(Error::Unsupported(
+            "Percentile Values: at least one value is required".into(),
+        ));
+    }
+    let percentile_linear = match ctx
+        .get("percentile_interpolation_type")
+        .unwrap_or_else(|| "AUTO_DETECT".into())
+        .to_ascii_uppercase()
+        .as_str()
+    {
+        "AUTO_DETECT" => None,
+        "NEAREST" => Some(false),
+        "LINEAR" => Some(true),
+        other => {
+            return Err(Error::Unsupported(format!(
+                "percentile interpolation {other}"
+            )));
+        }
+    };
+    let ignore_nodata = match ctx
+        .get("ignore_nodata")
+        .unwrap_or_else(|| "DATA".into())
+        .to_ascii_uppercase()
+        .as_str()
+    {
+        "DATA" => true,
+        "NODATA" => false,
+        other => return Err(Error::Unsupported(format!("ignore_nodata {other}"))),
+    };
+    let circular = ctx
+        .get("circular_calculation")
+        .is_some_and(|v| v.eq_ignore_ascii_case("CIRCULAR"));
+    let circular_wrap = if circular {
+        let wrap = ctx
+            .get("circular_wrap_value")
+            .unwrap_or_else(|| "360".into())
+            .parse::<f64>()
+            .map_err(|_| Error::Unsupported("Circular Wrap Value is not a number".into()))?;
+        if !wrap.is_finite() || wrap <= 0.0 {
+            return Err(Error::Unsupported(
+                "Circular Wrap Value must be positive".into(),
+            ));
+        }
+        Some(wrap)
+    } else {
+        None
+    };
+    let (fields, rows) = unigis_raster::zonal::zonal_characterization(
+        analysis_zones.as_ref().unwrap(),
+        &requests,
+        ignore_nodata,
+        &percentiles,
+        percentile_linear,
+        circular_wrap,
+    )?;
+    write_table(
+        &unigis_tools::TableOutput { fields, rows },
+        Path::new(output),
+    )
 }
 
 fn run_interpolate_shape(ctx: &dyn unigis_raster::registry::Context, output: &str) -> Result<()> {

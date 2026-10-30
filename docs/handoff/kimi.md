@@ -1,17 +1,20 @@
 # Lane kimi handoff
 
-Updated 2026-10-31; last agent Kimi.
-Workspace `/mnt/media/ArcGIS_Linux/.worktrees/lane-kimi`, branch `lane/kimi`, HEAD `c2a41b3dd77456415bcf98ec4afe57a53d6492ef`, matching `origin/main` before this tool's edits.
-User objective: implement claimed `sa.InterpolateShape` with ArcGIS references, pass the full gate, commit and land with `scripts/lane land`.
+Updated 2026-10-31T04:13:53+11:00; last agent Kimi.
+Workspace `/mnt/media/ArcGIS_Linux/.worktrees/lane-kimi`, branch `lane/kimi`, HEAD `b6b6c143a8ba33a533e6eac7496ab21d0c3c7be8`, matching `origin/main` after landing.
+User objective: implement the next claimed queue tool with ArcGIS references, pass the full gate, commit and land with `scripts/lane land`.
 
-## Interpolate Shape — implemented and validated
+## Previous tool
 
-- Confirmed the ten-parameter ArcGIS signature and probed points, lines, polygons, BILINEAR/NEAREST, densification, clipping, NoData, raster edges and Z/M behavior.
-- Implemented registry metadata and the CLI feature-output host. DENSIFY uses bilinear values, clips lines to the raster extent and evenly subdivides each clipped segment into `ceil(length / sample_distance)` parts. VERTICES_ONLY supports nearest/bilinear and excludes a feature when any vertex cannot be sampled. Output Z replaces input Z; new M values are NaN by default or linearly interpolated with `INTERPOLATE_M_VALUE`. Non-1 Z factors add ArcGIS's vertical CRS with unit `1 / z_factor`.
-- Added small `interpolate_pts.shp` and `interpolate_lines.shp` fixtures and nine successfully generated `ish_*` ArcGIS Pro 3.7 references covering points, lines, polygons, methods, densification, NoData and both M modes.
-- Focused reference command PASS: `UNIGIS_REFERENCE_CASES=ish_ cargo test -j3 -p unigis-cli --test arcgis_reference tools_match_arcgis_output -- --nocapture`.
-- Complete manifest comparator PASS with the same command without `UNIGIS_REFERENCE_CASES` (75.33 s), covering all 2,540 manifest cases. Roadmap, known gaps and the generated work queue are updated; incidental bridge bytecode was restored.
-- Default-parameter CLI smoke PASS: `ug run interpolate_shape` on `dem.tif` and `interpolate_lines.shp` wrote three features and nonempty SHP/DBF outputs.
-- `scripts/check` PASS (background task `bash-01nm1cru`, exit code 0) on the final tool edits. `git diff --check` also passes; the working tree contains only the scoped tool files, fixtures, references and documentation.
+- `sa.InterpolateShape` landed as `b6b6c143a8ba33a533e6eac7496ab21d0c3c7be8`; focused/full comparators and both full gates passed.
 
-Next actions: stage only this tool's files, commit as `Add Interpolate Shape`, then `scripts/lane land`.
+## Zonal Characterization — validated, commit/land pending
+
+- `scripts/lane claim` selected `sa.ZonalCharacterization` because Add Surface Information was already claimed by another lane. Base HEAD `b6b6c143a8ba33a533e6eac7496ab21d0c3c7be8`; the branch is now two commits behind `origin/main`, so landing will rebase and preserve those landings.
+- ArcGIS Pro 3.7 probes established per-request Double count columns, statistic-only custom names, strict NoData row omission and circular mean/std formulas. Generated eight references with `uv run -q --with "mcp>=2" python scripts/make-arcgis-reference.py 'zc_*'`: `zc_mean`, `zc_multi`, `zc_int_all`, `zc_counts`, `zc_custom`, `zc_strict`, `zc_percentile`, `zc_circular`.
+- Implemented aligned single-band raster zones/values and DBF table output, all 15 statistics, count/custom-name columns, strict NoData, multiple percentiles and circular mean/std in `crates/unigis-raster/src/zonal.rs`, registry metadata and CLI dispatch. Unsupported feature/multidimensional/multiband/differing-grid modes are refused and recorded in `docs/KNOWN_GAPS.md`; roadmap updated.
+- Scoped the ArcGIS DBF collision name for default statistic fields in this tool only: when the raster name's first ten characters end in `_`, use its first nine plus `1`; no global shapefile-writer change.
+- Validation on the uncommitted edits: `cargo check -j3 -p unigis-cli` PASS; focused `UNIGIS_REFERENCE_CASES=zc_ cargo test -j3 -p unigis-cli --test arcgis_reference tools_match_arcgis_output -- --nocapture` PASS after the naming fix; full manifest comparator without the environment filter PASS (101.78 s). `cargo fmt --all` PASS. The first `scripts/check` stopped on two redundant-pattern Clippy errors in the circular branches; after replacing them with `is_some()`, the complete `scripts/check` rerun PASS (exit 0, 386.316 s). Incidental `tools/arcgis-bridge/__pycache__` edits were restored.
+- `python3 scripts/work_queue.py` regenerated the queue: 1568 missing; manifest JSON and `git diff --check` PASS.
+
+Next actions: stage only this tool's files, commit `Add Zonal Characterization`, then `scripts/lane land`; resolve any rebase conflicts by preserving both lanes' entries.

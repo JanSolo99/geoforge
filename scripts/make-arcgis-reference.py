@@ -1041,6 +1041,14 @@ CASES = {
     "zst_classes_all": ("gp.ZonalStatisticsAsTable_sa", [RASTER / "zones_25m.tif", "Value", RASTER / "classes_u8.tif"], ["DATA", "ALL"]),
     "zst_25m_all": ("gp.ZonalStatisticsAsTable_sa", [RASTER / "zones_25m.tif", "Value", RASTER / "dem_nodata.tif"], ["DATA", "ALL"]),
     "zst_4m_int_all": ("gp.ZonalStatisticsAsTable_sa", [RASTER / "zones_4m.tif", "Value", RASTER / "dem_int16_packbits.tif"], ["DATA", "ALL"]),
+    "zc_mean": ("gp.ZonalCharacterization_sa", [RASTER / "zones.tif", [[RASTER / "dem_nodata.tif", "MEAN"]]], []),
+    "zc_multi": ("gp.ZonalCharacterization_sa", [RASTER / "zones.tif", [[RASTER / "dem_nodata.tif", "MEAN"], [RASTER / "dem_nodata.tif", "MAXIMUM"], [RASTER / "dem_int16_packbits.tif", "MAJORITY"], [RASTER / "dem_int16_packbits.tif", "SUM"]]], []),
+    "zc_int_all": ("gp.ZonalCharacterization_sa", [RASTER / "zones.tif", [[RASTER / "dem_int16_packbits.tif", stat] for stat in ["MEAN", "MAJORITY", "MAJORITY_COUNT", "MAJORITY_PERCENT", "MAXIMUM", "MEDIAN", "MINIMUM", "MINORITY", "MINORITY_COUNT", "MINORITY_PERCENT", "PERCENTILE", "RANGE", "STD", "SUM", "VARIETY"]]], []),
+    "zc_counts": ("gp.ZonalCharacterization_sa", [RASTER / "zones_25m.tif", [[RASTER / "classes_u8.tif", "MAJORITY_COUNT"], [RASTER / "classes_u8.tif", "MAJORITY_PERCENT"], [RASTER / "classes_u8.tif", "MINORITY_COUNT"], [RASTER / "classes_u8.tif", "MINORITY_PERCENT"]]], []),
+    "zc_custom": ("gp.ZonalCharacterization_sa", [RASTER / "zones.tif", [[RASTER / "dem_int16_packbits.tif", "MEAN", "ELEV_AVG"]]], []),
+    "zc_strict": ("gp.ZonalCharacterization_sa", [RASTER / "zones.tif", [[RASTER / "dem_nodata.tif", "MEAN"], [RASTER / "dem_nodata.tif", "SUM"]]], ["", "Value", "NODATA"]),
+    "zc_percentile": ("gp.ZonalCharacterization_sa", [RASTER / "zones.tif", [[RASTER / "dem_int16_packbits.tif", "PERCENTILE"], [RASTER / "dem_nodata.tif", "PERCENTILE"]]], ["", "Value", "DATA", "25;75", "AUTO_DETECT"]),
+    "zc_circular": ("gp.ZonalCharacterization_sa", [RASTER / "zones.tif", [[RASTER / "dem_nodata.tif", "MEAN"], [RASTER / "dem_nodata.tif", "STD"]]], ["", "Value", "DATA", "", "AUTO_DETECT", "CIRCULAR", 360]),
     "hillshade_shadows_315_15": ("gp.HillShade_sa", [RASTER / "dem.tif"], [315, 15, "SHADOWS", 3]),
     "hillshade_shadows_200_25": ("gp.HillShade_sa", [RASTER / "dem_nodata.tif"], [200, 25, "SHADOWS", 2]),
     "viewshed_hill": ("gp.Viewshed_sa", [RASTER / "dem.tif", RASTER / "observer_hill.shp"], []),
@@ -2454,6 +2462,7 @@ RUN = {
     "gp.Sample_sa": ("sample", ["input", "locations", "output", "resampling", "unique_id_field"]),
     "gp.ExtractMultiValuesToPoints_sa": ("extract_multi_values_to_points", ["input", "rasters", "output", "interpolate"]),
     "gp.InterpolateShape_sa": ("interpolate_shape", ["input", "features", "output", "sample_distance", "z_factor", "method", "vertices_only", "pyramid_level_resolution", "preserve_features", "interpolate_m_value"]),
+    "gp.ZonalCharacterization_sa": ("zonal_characterization", ["in_zone_data", "in_value_rasters_statistics", "output", "out_statistics_features", "zone_field", "ignore_nodata", "percentile_values", "percentile_interpolation_type", "circular_calculation", "circular_wrap_value", "process_as_multidimensional", "add_zone_attributes"]),
     "gp.PointStatistics_sa": ("point_statistics", ["input", "field", "output", "cell_size", "neighborhood", "statistic"]),
     "gp.LineStatistics_sa": ("line_statistics", ["input", "field", "output", "cell_size", "search_radius", "statistic"]),
     "gp.Diff_ia": ("diff", ["in1", "in2", "output"]),
@@ -2503,7 +2512,7 @@ EXCEL_OUT = {"conversion.TableToExcel"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable", "conversion.RasterToASCII", "conversion.RasterToFloat"}
 # Tools whose output is a table, written as <name>.dbf.
-TABLE_OUT = {"conversion.ExcelToTable", "management.ValidateJoin", "analysis.PairwisePolygonNeighbors", "analysis.AssignWeightsByPairwiseComparison", "management.FieldStatisticsToTable", "gp.Sample_sa", "management.CopyRows", "gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa", "gp.ZonalStatisticsAsTable_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
+TABLE_OUT = {"conversion.ExcelToTable", "management.ValidateJoin", "analysis.PairwisePolygonNeighbors", "analysis.AssignWeightsByPairwiseComparison", "management.FieldStatisticsToTable", "gp.Sample_sa", "management.CopyRows", "gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa", "gp.ZonalStatisticsAsTable_sa", "gp.ZonalCharacterization_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
              "management.TransposeFields", "management.PivotTable", "management.CreateTable", "analysis.PolygonNeighbors", "analysis.TabulateIntersection", "analysis.TableSelect"}
 # Tools whose ArcGIS output must be a geodatabase feature class or memory (copied to a shapefile).
 MEMORY_OUT = {"analysis.SummarizeWithin", "analysis.SummarizeNearby", "analysis.ApportionPolygon"}
@@ -3039,6 +3048,8 @@ def main():
         elif tool == "conversion.FeatureClassToFeatureClass":
             # (in_features, out_path, out_name, where_clause, field_mapping)
             args = [str(before[0]), str(out.parent), out.stem] + after
+        elif tool == "gp.ZonalCharacterization_sa":
+            args = [str(before[0]), [[str(x) for x in entry] for entry in before[1]], str(out)] + after
         else:
             args = [str(a) for a in before] + [str(out)] + [str(a) if isinstance(a, Path) else a for a in after]
         if tool in MEMORY_OUT:
@@ -3092,7 +3103,7 @@ def main():
         d = w.call("describe", path=str(out)) if r.get("status") == "succeeded" and tool not in TEXT_OUT | RASTER_OUT | EXCEL_OUT and not raster_projection else {}
         manifest["cases"][name] = {
             "tool": tool,
-            "args": [";".join(rel(x) for x in a) if isinstance(a, list) else rel(a) for a in before] + ["<out>"] + [rel(a) for a in after],
+            "args": [";".join(" ".join(rel(x) for x in entry) for entry in a) if tool == "gp.ZonalCharacterization_sa" and isinstance(a, list) else ";".join(rel(x) for x in a) if isinstance(a, list) else rel(a) for a in before] + ["<out>"] + [rel(a) for a in after],
             "status": r.get("status"),
             "messages": [m["text"] for m in r.get("messages", []) if m["severity"] > 0],
             "fields": [[f["name"], f["type"], f["length"], f["precision"], f["scale"]] for f in d.get("fields", [])],

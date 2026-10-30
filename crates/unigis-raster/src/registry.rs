@@ -1034,6 +1034,12 @@ fn interpolate_shape_unsupported(_: &dyn Context) -> Result<Output> {
     ))
 }
 
+fn zonal_characterization_unsupported(_: &dyn Context) -> Result<Output> {
+    Err(Error::Unsupported(
+        "Zonal Characterization writes a table; run it through `ug run`".into(),
+    ))
+}
+
 fn point_statistics(ctx: &dyn Context) -> Result<Output> {
     use crate::interpolate::{PointNeighborhood, PointStatistic};
     let field = ctx.get("field").unwrap_or_default();
@@ -2116,6 +2122,86 @@ pub static TOOLS: &[Tool] = &[
             ),
         ],
         run: interpolate_shape_unsupported,
+    },
+    Tool {
+        id: "zonal_characterization",
+        name: "Zonal Characterization",
+        summary: "Summarizes multiple value rasters within each zone as a table.",
+        params: &[
+            Param {
+                name: "in_zone_data",
+                label: "Input Raster or Feature Zones",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            Param {
+                name: "in_value_rasters_statistics",
+                label: "Input Value Rasters",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            Param {
+                name: "out_statistics_features",
+                label: "Output Statistics Feature Class",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+            },
+            Param {
+                name: "zone_field",
+                label: "Zone Field",
+                kind: Kind::Text,
+                required: false,
+                default: "Value",
+            },
+            option(
+                "ignore_nodata",
+                "Ignore NoData in Calculations",
+                &["DATA", "NODATA"],
+                "DATA",
+            ),
+            Param {
+                name: "percentile_values",
+                label: "Percentile Values",
+                kind: Kind::Text,
+                required: false,
+                default: "90",
+            },
+            option(
+                "percentile_interpolation_type",
+                "Percentile Interpolation Type",
+                &["AUTO_DETECT", "NEAREST", "LINEAR"],
+                "AUTO_DETECT",
+            ),
+            option(
+                "circular_calculation",
+                "Calculate Circular Statistics",
+                &["ARITHMETIC", "CIRCULAR"],
+                "ARITHMETIC",
+            ),
+            Param {
+                name: "circular_wrap_value",
+                label: "Circular Wrap Value",
+                kind: Kind::Number,
+                required: false,
+                default: "360",
+            },
+            option(
+                "process_as_multidimensional",
+                "Process as Multidimensional",
+                &["CURRENT_SLICE", "ALL_SLICES"],
+                "CURRENT_SLICE",
+            ),
+            option(
+                "add_zone_attributes",
+                "Append Zone Attributes to Output Features",
+                &["ZONE_FIELD_ONLY", "ALL"],
+                "ZONE_FIELD_ONLY",
+            ),
+        ],
+        run: zonal_characterization_unsupported,
     },
     Tool {
         id: "point_statistics",
