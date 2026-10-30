@@ -17,6 +17,7 @@ pub mod dm_tools;
 pub mod editor_tracking;
 pub mod excel;
 pub mod extend;
+pub mod extract_locations;
 pub mod feature_class_to_geodatabase;
 pub mod feature_class_to_shapefile;
 mod fieldmap;

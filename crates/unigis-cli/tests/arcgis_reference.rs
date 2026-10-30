@@ -19,6 +19,8 @@ mod subset_features;
 #[path = "common/spatial_sampling.rs"]
 mod spatial_sampling;
 
+#[path = "common/extract_locations.rs"]
+mod extract_locations;
 #[path = "common/random_points.rs"]
 mod random_points;
 
@@ -4915,6 +4917,8 @@ fn tools_match_arcgis_output() {
                 info,
                 &root,
             );
+        } else if case.starts_with("eld_") {
+            diffs = extract_locations::compare(&out, &reference.join(format!("{case}.shp")));
         } else if info["stochastic_points"] == true {
             diffs =
                 random_points::compare(&out, &reference.join(format!("{case}.shp")), info, &root);

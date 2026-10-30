@@ -93,13 +93,16 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
 
 ## Queue: CAD To Geodatabase — deferred (no native CAD reader; see WORK_QUEUE_DEFERRED)
 
-## Queue: Extract Locations From Document — research started, not implemented
+## Queue: Extract Locations From Document — committed, landing
 
-- Findings: `scripts/research/extract_locations_document/README.md`. Claim is released by
-  `lane land`; it should be the next item `scripts/lane claim` returns.
+- `unigis-tools/src/extract_locations.rs` (registry `extract_locations_document`), unit tests,
+  6 `eld_*` references (testdata/geoproc/eld_*.txt; comparator
+  `crates/unigis-cli/tests/common/extract_locations.rs` skips Filename/Modified/Scanned).
+- Validation: `UNIGIS_REFERENCE_CASES=eld_` PASS; unit tests PASS; clippy -D warnings PASS;
+  no-default-features check PASS; full gate in `lane land`. Gaps in KNOWN_GAPS.
 
 ## Next
 
-- Next: `scripts/lane claim` (expect Extract Locations From Document) and continue from its README.
+- Next: `scripts/lane claim` for the next queue tool.
 - Possible follow-ups (not requested): Catalog New for mobile geodatabases (needs a mobile reader),
   ArcGIS-style blank names instead of NewFeatureClass placeholders.

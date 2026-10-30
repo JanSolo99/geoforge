@@ -1765,6 +1765,7 @@ pub static TOOLS: &[Tool] = &[
     crate::feature_class_to_geodatabase::TOOL,
     crate::feature_class_to_geodatabase::TABLE_TOOL,
     crate::excel::TOOL,
+    crate::extract_locations::TOOL,
     Tool {
         id: "mean_center",
         name: "Mean Center",

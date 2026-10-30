@@ -1,0 +1,2 @@
+This memo has no coordinates at all, only dates: 2023-12-01, Jan 5 2024 and 05/06/2023.
+Numbers such as 3.14159, 42 and 2.71828 are not positions.

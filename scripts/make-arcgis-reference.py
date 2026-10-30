@@ -131,6 +131,16 @@ CASES = {
         ("bad_batch", ["dates.dbf", "missing.dbf"]),
         ("missing_output", ["dates.dbf"]),
     ]},
+    # Extract Locations From Document: in_template, then the notation switches (DD lat/lon,
+    # DD xy degrees, DD plain, DM, DM xy, DMS, DMS xy, DMS separated, UTM, UPS N, UPS S, MGRS).
+    "eld_mixed": ("conversion.ExtractLocationsDocument", [DATA / "eld_mixed.txt"], []),
+    "eld_plain": ("conversion.ExtractLocationsDocument", [DATA / "eld_plain.txt"], []),
+    "eld_none": ("conversion.ExtractLocationsDocument", [DATA / "eld_none.txt"], []),
+    "eld_long": ("conversion.ExtractLocationsDocument", [DATA / "eld_long.txt"], []),
+    "eld_no_grids": ("conversion.ExtractLocationsDocument", [DATA / "eld_mixed.txt"],
+                     ["", "", "", "", "", "", "", "", "", "DONT_FIND_UTM_MAINWORLD", "", "", "DONT_FIND_MGRS_MAINWORLD"]),
+    "eld_no_dms": ("conversion.ExtractLocationsDocument", [DATA / "eld_mixed.txt"],
+                   ["", "", "", "", "DONT_FIND_DM_LATLON", "", "DONT_FIND_DMS_LATLON"]),
     **{f"excel_{name}": ("conversion.ExcelToTable", [DATA / ("excel_input." + ext)], [sheet, header, cells])
        for name, ext, sheet, header, cells in [
         ("default", "xlsx", "", 1, ""),
@@ -2269,6 +2279,7 @@ for _tool, _id in COMBINATORIAL:
 
 
 RUN = {
+    "conversion.ExtractLocationsDocument": ("extract_locations_document", ["in_file", "output", "", "coord_dd_latlon", "", "coord_dd_xyplain", "coord_dm_latlon", "", "coord_dms_latlon", "", "", "coord_utm", "", "", "coord_mgrs"]),
     "conversion.TableToGeodatabase": ("table_to_geodatabase", ["input_table", "output_geodatabase"]),
     "management.CreateFolder": ("create_folder", ["out_folder_path", "out_name"]),
     "management.CreateFileGDB": ("create_file_gdb", ["out_folder_path", "out_name", "out_version"]),

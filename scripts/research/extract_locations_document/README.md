@@ -1,4 +1,4 @@
-# Extract Locations From Document — research started (2026-10-30)
+# Extract Locations From Document — implemented (2026-10-30)
 
 `arcpy.conversion.ExtractLocationsDocument(in_file, out_feature_class, in_template, ...)`: 40
 parameters (11 coordinate notations on/off — DD lat/lon, DD x/y degrees, DD plain, DM lat/lon,
@@ -29,3 +29,20 @@ Late_Date, All_Dates, ExDateText, Filename, File_Type, Modified, Scanned.
   whole-second DMS 31 m, 1 m MGRS/UTM) — formula not yet identified.
 
 Next: probe each notation's grammar and edge cases, the precision formula, .docx/.pdf inputs.
+
+## Rules established in the second round (implemented, `eld_*` references)
+
+- Precision: DD min(lat step, lon step x cos(lat)) x 111319.49 m; DM/DMS min(lat step, lon step)
+  x 111319.49 m (no cosine); rounded, at least 1. MGRS 10^(5 - digits/2); UTM 1.
+- A match may not start right after a letter, digit, sign or decimal point (`-34.05 N, ...` and
+  `a34.05N` are not taken); a hemisphere letter may precede (`N34.05`, `N 79`) or follow, and a
+  period right after a final letter is part of the match (`79 58 56 W.`).
+- Signed decimal pairs need decimals on both values; integers alone (`34, -118`) and `--`
+  separators are not taken; `,` `;` `/` or spaces separate; a first value beyond 90 makes the
+  pair longitude first. Trailing degree signs are not part of Ext_Text.
+- With DM/DMS switched off the text is re-read with fewer parts (`40 26.767 N 79 58.933 W` gives the
+  DD pair `N 79` / `58.933 W`).
+- UTM needs a band letter (`17 630084 4833438` is not taken); `56S` is the northern band S.
+- Dates: all of yyyy-mm-dd, yyyy/mm/dd, yyyymmdd, yymmdd, yyjjj, m/d/yyyy, mm/dd/yy, m-d-yyyy,
+  `March 21, 2024`, `22 March 2024`, `Mar 23 2024`, `24 Mar 24`; not `26.03.2024`.
+- Context: line breaks become spaces; 254 characters each side, right-trimmed.
