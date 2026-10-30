@@ -155,6 +155,8 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
 
 ## Queue: Cut Fill — deferred (pixel type rule unknown; notes scripts/research/cut_fill/)
 
+## Queue: Derive Continuous Flow — deferred (depression-flat routing differs from Fill+D8 in 232 cells)
+
 ## Pitfall: ArcGIS sidecars in testdata
 
 Running ArcGIS on fixture rasters can leave untracked `testdata/raster/*.aux.xml` / `*.vat.dbf`
