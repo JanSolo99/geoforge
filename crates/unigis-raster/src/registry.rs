@@ -1006,6 +1006,12 @@ fn sample_unsupported(_: &dyn Context) -> Result<Output> {
 
 /// Extract Multi Values To Points writes the points with new fields; the command line builds it
 /// (`run_extract_multi_values` in the CLI).
+fn add_surface_unsupported(_: &dyn Context) -> Result<Output> {
+    Err(Error::Unsupported(
+        "Add Surface Information edits features; run it through `ug run`".into(),
+    ))
+}
+
 fn extract_multi_unsupported(_: &dyn Context) -> Result<Output> {
     Err(Error::Unsupported(
         "Extract Multi Values To Points writes features; run it through `ug run`".into(),
@@ -1968,6 +1974,44 @@ pub static TOOLS: &[Tool] = &[
             },
         ],
         run: sample_unsupported,
+    },
+    Tool {
+        id: "add_surface_information",
+        name: "Add Surface Information",
+        summary: "Adds surface elevation (points) or profile statistics (lines) from a raster surface to features.",
+        params: &[
+            Param {
+                name: "input",
+                label: "Input Features",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            raster("in_surface", "Input Surface", true),
+            Param {
+                name: "out_property",
+                label: "Output Property",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            option("method", "Method", &["LINEAR", "BILINEAR"], "LINEAR"),
+            Param {
+                name: "sample_distance",
+                label: "Sampling Distance",
+                kind: Kind::Number,
+                required: false,
+                default: "",
+            },
+            Param {
+                name: "z_factor",
+                label: "Z Factor",
+                kind: Kind::Number,
+                required: false,
+                default: "1",
+            },
+        ],
+        run: add_surface_unsupported,
     },
     Tool {
         id: "extract_multi_values_to_points",

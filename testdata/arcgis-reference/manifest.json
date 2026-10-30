@@ -105012,6 +105012,647 @@
           "interpolate_m_value": "NO_INTERPOLATE_M_VALUE"
         }
       }
+    },
+    "asi_wells_z": {
+      "tool": "gp.AddSurfaceInformation_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "testdata/raster/dem.tif",
+        "Z",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Z",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "add_surface_information",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "in_surface": "testdata/raster/dem.tif",
+          "out_property": "Z",
+          "output": "<out>"
+        }
+      }
+    },
+    "asi_wells_bilinear": {
+      "tool": "gp.AddSurfaceInformation_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "testdata/raster/dem.tif",
+        "Z",
+        "<out>",
+        "BILINEAR"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Z",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "add_surface_information",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "in_surface": "testdata/raster/dem.tif",
+          "out_property": "Z",
+          "output": "<out>",
+          "method": "BILINEAR"
+        }
+      }
+    },
+    "asi_wells_zfactor": {
+      "tool": "gp.AddSurfaceInformation_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "testdata/raster/dem.tif",
+        "Z",
+        "<out>",
+        "LINEAR",
+        "",
+        0.3048
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Z",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "add_surface_information",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "in_surface": "testdata/raster/dem.tif",
+          "out_property": "Z",
+          "output": "<out>",
+          "method": "LINEAR",
+          "z_factor": 0.3048
+        }
+      }
+    },
+    "asi_wells_nodata": {
+      "tool": "gp.AddSurfaceInformation_sa",
+      "args": [
+        "testdata/geoproc/wells.shp",
+        "testdata/raster/dem_nodata.tif",
+        "Z",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "WELL_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "DEPTH",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Z",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "add_surface_information",
+        "params": {
+          "input": "testdata/geoproc/wells.shp",
+          "in_surface": "testdata/raster/dem_nodata.tif",
+          "out_property": "Z",
+          "output": "<out>"
+        }
+      }
+    },
+    "asi_roads_all": {
+      "tool": "gp.AddSurfaceInformation_sa",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "testdata/raster/dem.tif",
+        "Z_MIN;Z_MAX;Z_MEAN;SURFACE_LENGTH;MIN_SLOPE;MAX_SLOPE;AVG_SLOPE",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "Z_Min",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Z_Max",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Z_Mean",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "SLength",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Min_Slope",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Max_Slope",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Avg_Slope",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "add_surface_information",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "in_surface": "testdata/raster/dem.tif",
+          "out_property": "Z_MIN;Z_MAX;Z_MEAN;SURFACE_LENGTH;MIN_SLOPE;MAX_SLOPE;AVG_SLOPE",
+          "output": "<out>"
+        }
+      }
+    },
+    "asi_roads_some": {
+      "tool": "gp.AddSurfaceInformation_sa",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "testdata/raster/dem.tif",
+        "AVG_SLOPE;Z_MEAN;SURFACE_LENGTH",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "Avg_Slope",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Z_Mean",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "SLength",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "add_surface_information",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "in_surface": "testdata/raster/dem.tif",
+          "out_property": "AVG_SLOPE;Z_MEAN;SURFACE_LENGTH",
+          "output": "<out>"
+        }
+      }
+    },
+    "asi_roads_sample": {
+      "tool": "gp.AddSurfaceInformation_sa",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "testdata/raster/dem.tif",
+        "Z_MIN;Z_MAX;Z_MEAN;SURFACE_LENGTH;MIN_SLOPE;MAX_SLOPE;AVG_SLOPE",
+        "<out>",
+        "LINEAR",
+        25
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "Z_Min",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Z_Max",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Z_Mean",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "SLength",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Min_Slope",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Max_Slope",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Avg_Slope",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "add_surface_information",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "in_surface": "testdata/raster/dem.tif",
+          "out_property": "Z_MIN;Z_MAX;Z_MEAN;SURFACE_LENGTH;MIN_SLOPE;MAX_SLOPE;AVG_SLOPE",
+          "output": "<out>",
+          "method": "LINEAR",
+          "sample_distance": 25
+        }
+      }
+    },
+    "asi_roads_nodata": {
+      "tool": "gp.AddSurfaceInformation_sa",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "testdata/raster/dem_nodata.tif",
+        "Z_MIN;Z_MAX;Z_MEAN;SURFACE_LENGTH;MIN_SLOPE;MAX_SLOPE;AVG_SLOPE",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "ROAD_ID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "CLASS",
+          "Integer",
+          5,
+          5,
+          0
+        ],
+        [
+          "Z_Min",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Z_Max",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Z_Mean",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "SLength",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Min_Slope",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Max_Slope",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "Avg_Slope",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "add_surface_information",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "in_surface": "testdata/raster/dem_nodata.tif",
+          "out_property": "Z_MIN;Z_MAX;Z_MEAN;SURFACE_LENGTH;MIN_SLOPE;MAX_SLOPE;AVG_SLOPE",
+          "output": "<out>"
+        }
+      }
+    },
+    "asi_roads_bad": {
+      "tool": "gp.AddSurfaceInformation_sa",
+      "args": [
+        "testdata/geoproc/roads.shp",
+        "testdata/raster/dem.tif",
+        "Z",
+        "<out>"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 000622: Failed to execute (AddSurfaceInformation). Parameters are not valid.",
+        "ERROR 000800: The value is not a member of Z_MIN | Z_MAX | Z_MEAN | SURFACE_LENGTH | MIN_SLOPE | MAX_SLOPE | AVG_SLOPE.",
+        "Failed to execute (AddSurfaceInformation)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "add_surface_information",
+        "params": {
+          "input": "testdata/geoproc/roads.shp",
+          "in_surface": "testdata/raster/dem.tif",
+          "out_property": "Z",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

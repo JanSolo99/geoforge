@@ -861,6 +861,12 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
   letters before/after, symbols, colons, packed), signed decimal pairs, MGRS and banded UTM; the
   Precision formula, context text, document dates (12 notations) and file fields as ArcGIS writes
   them. 6 ArcGIS `eld_*` references (machine/time fields Filename/Modified/Scanned not compared).
+- [x] Add Surface Information (`add_surface_information`, CLI runner): points (Z) and lines (Z min/
+  max/mean, surface length, min/max/average slope) from a raster surface. Lines are cut to the
+  raster extent, segments split into ceil(length / sampling distance) steps; heights bilinear with
+  edge clamping and NoData neighbours renormalized (NoData only when all four are); mean and average
+  slope 3D-length weighted, slopes in percent; fields in the order requested. 9 ArcGIS `asi_*`
+  references.
 - [x] Rescale by Function (`rescale_by_function`, `unigis-raster/src/rescale.rs`): all 13
   transformation functions with Esri's published formulas and defaults (sample standard deviation
   for MS functions, LogisticDecay as growth with 99 %), thresholds, below/above values, any

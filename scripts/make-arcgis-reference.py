@@ -994,6 +994,16 @@ CASES = {
     "pd_wells_wedge_wrap": ("gp.PointDensity_sa", [DATA / "wells.shp", "NONE"], [30, "Wedge 120 300 60 MAP", "SQUARE_METERS"]),
     "ld_roads": ("gp.LineDensity_sa", [DATA / "roads.shp", "NONE"], [25, 100, "SQUARE_KILOMETERS"]),
     "ld_roads_class": ("gp.LineDensity_sa", [DATA / "roads.shp", "CLASS"], [30, 80, "SQUARE_METERS"]),
+    # Add Surface Information (in place; points and lines).
+    "asi_wells_z": ("gp.AddSurfaceInformation_sa", [DATA / "wells.shp", RASTER / "dem.tif", "Z"], []),
+    "asi_wells_bilinear": ("gp.AddSurfaceInformation_sa", [DATA / "wells.shp", RASTER / "dem.tif", "Z"], ["BILINEAR"]),
+    "asi_wells_zfactor": ("gp.AddSurfaceInformation_sa", [DATA / "wells.shp", RASTER / "dem.tif", "Z"], ["LINEAR", "", 0.3048]),
+    "asi_wells_nodata": ("gp.AddSurfaceInformation_sa", [DATA / "wells.shp", RASTER / "dem_nodata.tif", "Z"], []),
+    "asi_roads_all": ("gp.AddSurfaceInformation_sa", [DATA / "roads.shp", RASTER / "dem.tif", "Z_MIN;Z_MAX;Z_MEAN;SURFACE_LENGTH;MIN_SLOPE;MAX_SLOPE;AVG_SLOPE"], []),
+    "asi_roads_some": ("gp.AddSurfaceInformation_sa", [DATA / "roads.shp", RASTER / "dem.tif", "AVG_SLOPE;Z_MEAN;SURFACE_LENGTH"], []),
+    "asi_roads_sample": ("gp.AddSurfaceInformation_sa", [DATA / "roads.shp", RASTER / "dem.tif", "Z_MIN;Z_MAX;Z_MEAN;SURFACE_LENGTH;MIN_SLOPE;MAX_SLOPE;AVG_SLOPE"], ["LINEAR", 25]),
+    "asi_roads_nodata": ("gp.AddSurfaceInformation_sa", [DATA / "roads.shp", RASTER / "dem_nodata.tif", "Z_MIN;Z_MAX;Z_MEAN;SURFACE_LENGTH;MIN_SLOPE;MAX_SLOPE;AVG_SLOPE"], []),
+    "asi_roads_bad": ("gp.AddSurfaceInformation_sa", [DATA / "roads.shp", RASTER / "dem.tif", "Z"], []),
     "evp_wells_dem": ("gp.ExtractValuesToPoints_sa", [DATA / "wells.shp", RASTER / "dem.tif"], []),
     "evp_wells_dem_interp": ("gp.ExtractValuesToPoints_sa", [DATA / "wells.shp", RASTER / "dem.tif"], ["INTERPOLATE"]),
     "evp_probe_nodata": ("gp.ExtractValuesToPoints_sa", [RASTER / "evp_points.shp", RASTER / "dem_nodata.tif"], []),
@@ -2332,6 +2342,7 @@ for _tool, _id in COMBINATORIAL:
 
 
 RUN = {
+    "gp.AddSurfaceInformation_sa": ("add_surface_information", ["input", "in_surface", "out_property", "output", "method", "sample_distance", "z_factor"]),
     "gp.RescaleByFunction_sa": ("rescale_by_function", ["input", "output", "transformation_function", "from_scale", "to_scale"]),
     "gp.CreateNormalRaster_sa": ("create_normal_raster", ["output", "cell_size", "extent"]),
     "conversion.ExtractLocationsText": ("extract_locations_text", ["in_text", "output", "", "coord_dd_latlon", "", "coord_dd_xyplain", "coord_dm_latlon", "", "coord_dms_latlon", "", "", "coord_utm", "", "", "coord_mgrs"]),
@@ -2494,7 +2505,7 @@ MEMORY_OUT = {"analysis.SummarizeWithin", "analysis.SummarizeNearby", "analysis.
 CREATE_TOOLS = {"management.CreateRandomPoints", "management.CreateFeatureclass", "management.CreateTable"}
 
 # In-place tools: the index of the input they edit (run on a copy written as the output).
-IN_PLACE = {"management.CalculateGeometryAttributes": 0, "management.Adjust3DZ": 0, "management.MigrateDateFieldToHighPrecision": 0, "management.EnableCOGO": 0, "management.DisableEditorTracking": 0, "management.DisableCOGO": 0, "management.AddGPSMetadataFields": 0, "management.ConvertTimeZone": 0, "management.ConvertTimeField": 0, "management.AddSpatialJoin": 0, "gp.ExtractMultiValuesToPoints_sa": 0, "edit.ExtendLine": 0, "edit.FlipLine": 0, "edit.TrimLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.EncodeField": 0, "management.AddGeometryAttributes": 0,
+IN_PLACE = {"gp.AddSurfaceInformation_sa": 0, "management.CalculateGeometryAttributes": 0, "management.Adjust3DZ": 0, "management.MigrateDateFieldToHighPrecision": 0, "management.EnableCOGO": 0, "management.DisableEditorTracking": 0, "management.DisableCOGO": 0, "management.AddGPSMetadataFields": 0, "management.ConvertTimeZone": 0, "management.ConvertTimeField": 0, "management.AddSpatialJoin": 0, "gp.ExtractMultiValuesToPoints_sa": 0, "edit.ExtendLine": 0, "edit.FlipLine": 0, "edit.TrimLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.EncodeField": 0, "management.AddGeometryAttributes": 0,
             "management.CalculateFields": 0, "management.StandardizeField": 0, "management.TransformField": 0, "management.ReclassifyField": 0, "management.DefineProjection": 0, "management.CalculateEndTime": 0}
 
 # Select Layer By Location cases, saved with Copy Features:

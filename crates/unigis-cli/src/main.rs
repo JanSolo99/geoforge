@@ -6675,6 +6675,9 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
     if spec.id == "interpolate_shape" {
         return run_interpolate_shape(&Args(map), &output);
     }
+    if spec.id == "add_surface_information" {
+        return run_add_surface_information(&Args(map), &output);
+    }
     let parameters = Args(map);
     let out = registry::run(spec, &parameters)?;
     if spec.id == "raster_to_float" {
@@ -7483,6 +7486,257 @@ fn run_interpolate_shape(ctx: &dyn unigis_raster::registry::Context, output: &st
 /// Extract Multi Values To Points: the points with one added field per raster (named as given, or
 /// by the raster's file stem, cut to 10 characters), holding the raster's value at the point as
 /// in Sample. Integer rasters give integers, except with BILINEAR (single floats).
+/// The surface height at `(x, y)`: bilinear between the four cell centres around it, positions
+/// beyond the outermost centres taking the edge (ArcGIS's surface interpolation); `None` outside
+/// the raster or where all four neighbours are NoData.
+fn surface_z(r: &unigis_raster::Raster, x: f64, y: f64) -> Option<f64> {
+    let t = r.transform;
+    let (cx, cy) = ((x - t[0]) / t[1], (t[3] - y) / -t[5]);
+    if !(cx >= 0.0 && cy >= 0.0 && cx <= r.width as f64 && cy <= r.height as f64) {
+        return None;
+    }
+    let fx = (cx - 0.5).clamp(0.0, (r.width - 1) as f64);
+    let fy = (cy - 0.5).clamp(0.0, (r.height - 1) as f64);
+    let (c0, r0) = (fx.floor() as usize, fy.floor() as usize);
+    let (c1, r1) = ((c0 + 1).min(r.width - 1), (r0 + 1).min(r.height - 1));
+    let (dx, dy) = (fx - c0 as f64, fy - r0 as f64);
+    let mut sum = 0.0;
+    let mut weight = 0.0;
+    for (c, rr, w) in [
+        (c0, r0, (1.0 - dx) * (1.0 - dy)),
+        (c1, r0, dx * (1.0 - dy)),
+        (c0, r1, (1.0 - dx) * dy),
+        (c1, r1, dx * dy),
+    ] {
+        if w == 0.0 {
+            continue;
+        }
+        if let Some(v) = r.get(c, rr) {
+            sum += v * w;
+            weight += w;
+        }
+    }
+    // NoData neighbours drop out and the weights renormalize; NoData only when all are.
+    (weight > 0.0).then(|| sum / weight)
+}
+
+/// The part of the segment `a`..`b` inside the rectangle (Liang-Barsky), if any.
+fn clip_segment(
+    a: [f64; 2],
+    b: [f64; 2],
+    (x0, y0, x1, y1): (f64, f64, f64, f64),
+) -> Option<([f64; 2], [f64; 2])> {
+    let (dx, dy) = (b[0] - a[0], b[1] - a[1]);
+    let (mut t0, mut t1) = (0.0_f64, 1.0_f64);
+    for (p, q) in [
+        (-dx, a[0] - x0),
+        (dx, x1 - a[0]),
+        (-dy, a[1] - y0),
+        (dy, y1 - a[1]),
+    ] {
+        if p == 0.0 {
+            if q < 0.0 {
+                return None;
+            }
+        } else {
+            let r = q / p;
+            if p < 0.0 {
+                t0 = t0.max(r);
+            } else {
+                t1 = t1.min(r);
+            }
+        }
+    }
+    (t0 <= t1).then(|| {
+        (
+            [a[0] + t0 * dx, a[1] + t0 * dy],
+            [a[0] + t1 * dx, a[1] + t1 * dy],
+        )
+    })
+}
+
+/// `arcpy.sa.AddSurfaceInformation(in_feature_class, in_surface, out_property, method,
+/// sample_distance, z_factor)` for points (Z) and lines (Z_MIN, Z_MAX, Z_MEAN, SURFACE_LENGTH,
+/// MIN_SLOPE, MAX_SLOPE, AVG_SLOPE). A line is cut to the raster extent and each segment split into
+/// equal steps no longer than the sampling distance (the cell size by default); its profile gives
+/// the 3D length, the 3D-length-weighted mean height and percent slope, and the extreme heights and
+/// segment slopes (observed, ArcGIS Pro 3.7).
+/// A step of a surface profile: 2D length, 3D length, start and end height.
+type Step = (f64, f64, f64, f64);
+
+fn run_add_surface_information(
+    ctx: &dyn unigis_raster::registry::Context,
+    output: &str,
+) -> Result<()> {
+    use unigis_core::{Field, FieldType, GeometryKind};
+    let input = ctx.get("input").ok_or_else(|| {
+        Error::Unsupported("ERROR 000735: Input Features: value is required".into())
+    })?;
+    let (fc, _) = open_feature_class(Path::new(&input))?;
+    let surface = ctx.raster("in_surface")?;
+    let z_factor: f64 = ctx
+        .get("z_factor")
+        .and_then(|v| v.trim().parse().ok())
+        .unwrap_or(1.0);
+    let wanted: Vec<String> = ctx
+        .get("out_property")
+        .unwrap_or_default()
+        .split(';')
+        .map(|p| p.trim().to_ascii_uppercase())
+        .filter(|p| !p.is_empty())
+        .collect();
+    let kind = fc.geometry_kind();
+    let allowed: &[(&str, &str)] = match kind {
+        Some(GeometryKind::Point) => &[("Z", "Z")],
+        Some(GeometryKind::Polyline) => &[
+            ("Z_MIN", "Z_Min"),
+            ("Z_MAX", "Z_Max"),
+            ("Z_MEAN", "Z_Mean"),
+            ("SURFACE_LENGTH", "SLength"),
+            ("MIN_SLOPE", "Min_Slope"),
+            ("MAX_SLOPE", "Max_Slope"),
+            ("AVG_SLOPE", "Avg_Slope"),
+        ],
+        _ => {
+            return Err(Error::Unsupported(
+                "Add Surface Information on polygons and multipoints is not supported yet".into(),
+            ));
+        }
+    };
+    for w in &wanted {
+        if !allowed.iter().any(|(k, _)| k == w) {
+            let names: Vec<&str> = allowed.iter().map(|(k, _)| *k).collect();
+            return Err(Error::Unsupported(format!(
+                "ERROR 000800: The value is not a member of {}.",
+                names.join(" | ")
+            )));
+        }
+    }
+    if wanted.is_empty() {
+        return Err(Error::Unsupported(
+            "ERROR 000735: Output Property: value is required".into(),
+        ));
+    }
+    // Fields in the order the properties are given.
+    let mut chosen: Vec<(&str, &str)> = Vec::new();
+    for w in &wanted {
+        if let Some(&p) = allowed.iter().find(|(k, _)| k == w)
+            && !chosen.contains(&p)
+        {
+            chosen.push(p);
+        }
+    }
+    let t = surface.transform;
+    let extent = (
+        t[0],
+        t[3] + t[5] * surface.height as f64,
+        t[0] + t[1] * surface.width as f64,
+        t[3],
+    );
+    let step = ctx
+        .get("sample_distance")
+        .and_then(|v| v.trim().parse::<f64>().ok())
+        .filter(|v| *v > 0.0)
+        .unwrap_or(t[1]);
+    let mut fields = fc.fields().to_vec();
+    for (_, name) in &chosen {
+        fields.push(Field::new(*name, FieldType::Double));
+    }
+    let mut features = Vec::new();
+    for f in fc.features() {
+        let mut f = f?;
+        let mut values: Vec<Option<f64>> = vec![None; chosen.len()];
+        if let Some(g) = &f.geometry {
+            if kind == Some(GeometryKind::Point) {
+                let p = g.xy[0];
+                values[0] = surface_z(&surface, p[0], p[1]).map(|z| z * z_factor);
+            } else {
+                // The profile, part by part: (2D length, 3D length, start z, end z) of each step.
+                // NoData samples are skipped; the profile joins the valid samples around them.
+                let mut steps: Vec<Step> = Vec::new();
+                let mut zs: Vec<f64> = Vec::new();
+                let starts: Vec<usize> = g.parts.iter().map(|&p| p as usize).collect();
+                let ends: Vec<usize> = starts.iter().skip(1).copied().chain([g.xy.len()]).collect();
+                for (k, &start) in starts.iter().enumerate() {
+                    let ring = &g.xy[start..ends[k]];
+                    let mut last: Option<(f64, f64, f64)> = None;
+                    for w in ring.windows(2) {
+                        let Some((a, b)) = clip_segment(w[0], w[1], extent) else {
+                            continue;
+                        };
+                        let len = (b[0] - a[0]).hypot(b[1] - a[1]);
+                        let n = ((len / step).ceil() as usize).max(1);
+                        for i in 0..=n {
+                            let s = i as f64 / n as f64;
+                            let (x, y) = (a[0] + s * (b[0] - a[0]), a[1] + s * (b[1] - a[1]));
+                            let Some(z) = surface_z(&surface, x, y).map(|z| z * z_factor) else {
+                                continue;
+                            };
+                            if let Some((x0, y0, z0)) = last {
+                                let d = (x - x0).hypot(y - y0);
+                                if d > 0.0 {
+                                    steps.push((d, d.hypot(z - z0), z0, z));
+                                }
+                            }
+                            zs.push(z);
+                            last = Some((x, y, z));
+                        }
+                    }
+                }
+                if !zs.is_empty() {
+                    let length3: f64 = steps.iter().map(|s| s.1).sum();
+                    let slopes: Vec<f64> = steps
+                        .iter()
+                        .filter(|s| s.0 > 0.0)
+                        .map(|s| (s.3 - s.2).abs() / s.0 * 100.0)
+                        .collect();
+                    let weighted = |v: &dyn Fn(&Step) -> f64| {
+                        (length3 > 0.0)
+                            .then(|| steps.iter().map(|s| v(s) * s.1).sum::<f64>() / length3)
+                    };
+                    for (slot, (key, _)) in values.iter_mut().zip(&chosen) {
+                        *slot = match *key {
+                            "Z_MIN" => zs.iter().copied().reduce(f64::min),
+                            "Z_MAX" => zs.iter().copied().reduce(f64::max),
+                            "Z_MEAN" => weighted(&|s| (s.2 + s.3) / 2.0),
+                            "SURFACE_LENGTH" => Some(length3),
+                            "MIN_SLOPE" => slopes.iter().copied().reduce(f64::min),
+                            "MAX_SLOPE" => slopes.iter().copied().reduce(f64::max),
+                            _ => weighted(&|s| {
+                                if s.0 > 0.0 {
+                                    (s.3 - s.2).abs() / s.0 * 100.0
+                                } else {
+                                    0.0
+                                }
+                            }),
+                        };
+                    }
+                }
+            }
+        }
+        f.attributes.extend(
+            values
+                .into_iter()
+                .map(|v| v.map_or(Value::Double(0.0), Value::Double)),
+        );
+        features.push(f);
+    }
+    write_output_as(
+        ToolOutput {
+            kind: kind.unwrap_or(GeometryKind::Point),
+            has_z: fc.has_z(),
+            has_m: fc.has_m(),
+            fields,
+            spatial_reference_wkt: fc.spatial_reference_wkt().map(str::to_owned),
+            features,
+            messages: Vec::new(),
+        },
+        Path::new(output),
+        None,
+        true,
+    )
+}
+
 fn run_extract_multi_values(
     ctx: &dyn unigis_raster::registry::Context,
     output: &str,
