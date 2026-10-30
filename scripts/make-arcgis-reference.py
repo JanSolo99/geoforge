@@ -1779,6 +1779,12 @@ CASES = {
     "inl_u8_mixed": ("gp.InList_sa", [RASTER / "landuse_u8.tif", f"{RASTER / 'patches_i16.tif'};3"], []),
     "inl_patches": ("gp.InList_sa", [RASTER / "patches_i16.tif", "2;7"], []),
     "inl_dem": ("gp.InList_sa", [RASTER / "dem.tif", "200;250.5"], []),
+    # Create Normal Raster: random values, compared statistically (cnr_ in arcgis_reference.rs).
+    "cnr_default": ("gp.CreateNormalRaster_sa", [], []),
+    "cnr_cell5": ("gp.CreateNormalRaster_sa", [], [5]),
+    "cnr_extent": ("gp.CreateNormalRaster_sa", [], [10, "0 0 1000 500"]),
+    "cnr_odd": ("gp.CreateNormalRaster_sa", [], [7, "1 2 50 33"]),
+    "cnr_small": ("gp.CreateNormalRaster_sa", [], [0.5, "0 0 3 2"]),
     "cc_int5": ("gp.CreateConstantRaster_sa", [5], ["INTEGER", 10, "500000 5000000 500100 5000050"]),
     "cc_float": ("gp.CreateConstantRaster_sa", [2.5], ["FLOAT", 10, "500000 5000000 500100 5000050"]),
     "cc_neg7": ("gp.CreateConstantRaster_sa", [-7], ["INTEGER", 5, "500003 5000002 500103 5000052"]),
@@ -2284,6 +2290,7 @@ for _tool, _id in COMBINATORIAL:
 
 
 RUN = {
+    "gp.CreateNormalRaster_sa": ("create_normal_raster", ["output", "cell_size", "extent"]),
     "conversion.ExtractLocationsText": ("extract_locations_text", ["in_text", "output", "", "coord_dd_latlon", "", "coord_dd_xyplain", "coord_dm_latlon", "", "coord_dms_latlon", "", "", "coord_utm", "", "", "coord_mgrs"]),
     "conversion.ExtractLocationsDocument": ("extract_locations_document", ["in_file", "output", "", "coord_dd_latlon", "", "coord_dd_xyplain", "coord_dm_latlon", "", "coord_dms_latlon", "", "", "coord_utm", "", "", "coord_mgrs"]),
     "conversion.TableToGeodatabase": ("table_to_geodatabase", ["input_table", "output_geodatabase"]),
@@ -2417,7 +2424,7 @@ def run_spec(tool, args):
 
 
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
-RASTER_OUT = {"gp.CreateBinaryMask_ia", "gp.ComputeChangeRaster_ia", "gp.Diff_ia", "gp.Over_ia", "gp.LineStatistics_sa", "gp.PointStatistics_sa", "gp.SnapPourPoint_sa", "gp.FocalFlow_sa", "gp.DistanceAccumulation_sa", "gp.DistanceAllocation_sa", "gp.EucBackDirection_sa", "gp.EqualToFrequency_sa", "gp.GreaterThanFrequency_sa", "gp.LessThanFrequency_sa", "conversion.ASCIIToRaster", "conversion.FloatToRaster", "conversion.MultipatchToRaster", "management.CompositeBands", "gp.CreateConstantRaster_sa", "gp.InList_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
+RASTER_OUT = {"gp.CreateNormalRaster_sa", "gp.CreateBinaryMask_ia", "gp.ComputeChangeRaster_ia", "gp.Diff_ia", "gp.Over_ia", "gp.LineStatistics_sa", "gp.PointStatistics_sa", "gp.SnapPourPoint_sa", "gp.FocalFlow_sa", "gp.DistanceAccumulation_sa", "gp.DistanceAllocation_sa", "gp.EucBackDirection_sa", "gp.EqualToFrequency_sa", "gp.GreaterThanFrequency_sa", "gp.LessThanFrequency_sa", "conversion.ASCIIToRaster", "conversion.FloatToRaster", "conversion.MultipatchToRaster", "management.CompositeBands", "gp.CreateConstantRaster_sa", "gp.InList_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
               "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa",
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",

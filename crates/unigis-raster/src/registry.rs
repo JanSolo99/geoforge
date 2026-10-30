@@ -876,6 +876,25 @@ fn create_constant_raster(ctx: &dyn Context) -> Result<Output> {
     with_statistics(raster, true)
 }
 
+/// Create Normal Raster: without settings, cell size 1 and 250 x 250 cells from 0, 0 (ArcGIS's
+/// defaults without environment settings).
+fn create_normal_raster(ctx: &dyn Context) -> Result<Output> {
+    let cell: f64 = ctx
+        .get("cell_size")
+        .and_then(|v| v.trim().parse().ok())
+        .unwrap_or(1.0);
+    let e = match ctx.get("extent") {
+        Some(text) => parse_numbers(&text, 4, "Extent")?,
+        None => vec![0.0, 0.0, 250.0 * cell, 250.0 * cell],
+    };
+    let seed = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |d| d.as_nanos() as u64);
+    let raster = crate::extract::normal_raster(cell, (e[0], e[1], e[2], e[3]), seed)
+        .ok_or_else(|| Error::Unsupported("ERROR 000094: bad cell size or extent".into()))?;
+    with_statistics(raster, true)
+}
+
 fn euclidean_back_direction(ctx: &dyn Context) -> Result<Output> {
     let max = ctx
         .get("maximum_distance")
@@ -1724,6 +1743,28 @@ pub static TOOLS: &[Tool] = &[
             },
         ],
         run: create_constant_raster,
+    },
+    Tool {
+        id: "create_normal_raster",
+        name: "Create Normal Raster",
+        summary: "A raster of random values from the standard normal distribution (mean 0, standard deviation 1).",
+        params: &[
+            Param {
+                name: "cell_size",
+                label: "Output cell size",
+                kind: Kind::Number,
+                required: false,
+                default: "",
+            },
+            Param {
+                name: "extent",
+                label: "Output extent",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+            },
+        ],
+        run: create_normal_raster,
     },
     Tool {
         id: "euclidean_back_direction",

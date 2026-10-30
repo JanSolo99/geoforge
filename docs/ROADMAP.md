@@ -850,6 +850,11 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
   letters before/after, symbols, colons, packed), signed decimal pairs, MGRS and banded UTM; the
   Precision formula, context text, document dates (12 notations) and file fields as ArcGIS writes
   them. 6 ArcGIS `eld_*` references (machine/time fields Filename/Modified/Scanned not compared).
+- [x] Create Normal Raster (`create_normal_raster`): Float32 standard-normal values, NoData 3.4e38,
+  the Create Constant Raster grid, defaults 250 x 250 cells of cell size 1. ArcGIS's generators
+  (ACM599, Mersenne Twister) are seeded in a way not reproduced (seeded runs repeat, but match no
+  standard MT19937 seeding), so 5 `cnr_*` references compare grid/type/NoData exactly and values
+  statistically (`compare_normal_rasters`, ArcGIS's sample checked the same way).
 - [x] Extract Locations From Text (`extract_locations_text`): the same engine on a text string
   (Name `Text`, no file); 4 ArcGIS `elt_*` references.
 - [x] Table To Geodatabase (`table_to_geodatabase`): dBASE, CSV (text length 8000), geodatabase

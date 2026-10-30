@@ -106,6 +106,13 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
 - `TEXT_TOOL` in `unigis-tools/src/extract_locations.rs` (shared engine; `Source::text`), 4 `elt_*`
   references; `UNIGIS_REFERENCE_CASES=elt_,eld_` PASS, clippy PASS.
 
+## Queue: Create Normal Raster — committed, landing
+
+- `unigis-raster` `extract::normal_raster` + registry `create_normal_raster`; 5 `cnr_*` references
+  with the statistical comparator `compare_normal_rasters` (5 standard errors; ArcGIS's sample
+  checked too). Probe: seeded ArcGIS runs repeat; no standard MT19937 seeding matched the uniforms.
+- Validation: `UNIGIS_REFERENCE_CASES=cnr_` PASS on 6 runs with fresh seeds; unit test; clippy.
+
 ## Next
 
 - Next: `scripts/lane claim` for the next queue tool.

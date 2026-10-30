@@ -4272,6 +4272,57 @@ const KNOWN_RASTER_DIFFERENCES: &[(&str, usize)] = &[
 
 /// Grid, cell type, NoData, coordinate system and every cell; float cells within
 /// 1e-5 relative (ArcGIS computes in single precision in places).
+/// Create Normal Raster: random values. The grid, type and NoData exactly; the values by
+/// statistics that ArcGIS's own sample must pass too (mean, standard deviation and the share within
+/// one standard deviation, each within five standard errors of the normal distribution's).
+fn compare_normal_rasters(ours: &Path, arcgis: &Path) -> Vec<String> {
+    let (a, b) = match (
+        unigis_raster::read_geotiff(ours),
+        unigis_raster::read_geotiff(arcgis),
+    ) {
+        (Ok(a), Ok(b)) => (a, b),
+        (a, b) => return vec![format!("read: ours {:?}, ArcGIS {:?}", a.err(), b.err())],
+    };
+    let mut diffs = Vec::new();
+    if (a.width, a.height, a.transform, a.data_type, a.nodata)
+        != (b.width, b.height, b.transform, b.data_type, b.nodata)
+    {
+        diffs.push(format!(
+            "grid: ours {}x{} {:?} {:?} {:?}, ArcGIS {}x{} {:?} {:?} {:?}",
+            a.width,
+            a.height,
+            a.transform,
+            a.data_type,
+            a.nodata,
+            b.width,
+            b.height,
+            b.transform,
+            b.data_type,
+            b.nodata
+        ));
+    }
+    for (who, r) in [("ours", &a), ("ArcGIS", &b)] {
+        let v: Vec<f64> = r.bands[0].clone();
+        let n = v.len() as f64;
+        if v.iter().any(|x| !x.is_finite() || r.is_nodata(*x)) {
+            diffs.push(format!("{who}: NoData or non-finite cells"));
+        }
+        let mean = v.iter().sum::<f64>() / n;
+        let sd = (v.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / n).sqrt();
+        let within = v.iter().filter(|x| x.abs() <= 1.0).count() as f64 / n;
+        let p = 0.682_689_492;
+        if mean.abs() > 5.0 / n.sqrt()
+            || (sd - 1.0).abs() > 5.0 * (0.5 / n).sqrt()
+            || (within - p).abs() > 5.0 * (p * (1.0 - p) / n).sqrt()
+        {
+            diffs.push(format!(
+                "{who}: mean {mean}, standard deviation {sd}, within 1: {within} (n = {n})"
+            ));
+        }
+    }
+    diffs
+}
+
 fn compare_rasters(case: &str, ours: &Path, arcgis: &Path) -> Vec<String> {
     let (a, b) = match (
         unigis_raster::read_geotiff(ours),
@@ -4881,6 +4932,8 @@ fn tools_match_arcgis_output() {
             ));
         } else if excel {
             diffs = compare_excel(&out, &reference.join(format!("{case}.xlsx")));
+        } else if raster && case.starts_with("cnr_") {
+            diffs = compare_normal_rasters(&out, &reference.join(format!("{case}.tif")));
         } else if raster {
             diffs = compare_rasters(case, &out, &reference.join(format!("{case}.tif")));
         } else if let Some(ext) = text_ext {

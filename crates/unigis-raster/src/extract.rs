@@ -478,6 +478,38 @@ pub fn test(input: &Raster, clause: &ValueClause) -> Raster {
 /// extent (columns and rows rounded). Integer output takes the smallest type holding the value
 /// (the NoData of the 1/2/4/8-bit layouts as for other integer outputs; -2147483647 for 32-bit
 /// signed), float output is 32-bit float.
+/// `CreateNormalRaster(cell_size, extent)`: Float32 values drawn from the standard normal
+/// distribution (mean 0, standard deviation 1), NoData 3.4e38, on the grid Create Constant Raster
+/// uses. ArcGIS's generators (ACM599, Mersenne Twister) are seeded in a way not reproduced here,
+/// so the values match ArcGIS's statistically, not cell by cell; `seed` fixes ours.
+pub fn normal_raster(cell: f64, extent: (f64, f64, f64, f64), seed: u64) -> Option<Raster> {
+    let mut out = constant_raster(0.0, false, cell, extent)?;
+    out.nodata = Some(f64::from(3.4e38_f32));
+    let mut state = seed;
+    // SplitMix64: uniform in (0, 1].
+    let mut uniform = || {
+        state = state.wrapping_add(0x9E37_79B9_7F4A_7C15);
+        let mut z = state;
+        z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+        z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+        z ^= z >> 31;
+        ((z >> 11) as f64 + 1.0) / (1u64 << 53) as f64
+    };
+    let n = out.bands[0].len();
+    let mut values = Vec::with_capacity(n + 1);
+    while values.len() < n {
+        // Box-Muller: two independent normal values from two uniform ones.
+        let (u1, u2) = (uniform(), uniform());
+        let r = (-2.0 * u1.ln()).sqrt();
+        let a = std::f64::consts::TAU * u2;
+        values.push(r * a.cos());
+        values.push(r * a.sin());
+    }
+    values.truncate(n);
+    out.bands[0] = values.into_iter().map(|v| DataType::F32.store(v)).collect();
+    Some(out)
+}
+
 pub fn constant_raster(
     value: f64,
     integer: bool,
@@ -506,4 +538,22 @@ pub fn constant_raster(
     out.nodata = Some(nodata);
     out.bands[0] = vec![stored; width * height];
     Some(out)
+}
+
+#[cfg(test)]
+mod normal_tests {
+    use super::*;
+
+    #[test]
+    fn normal_raster_is_standard_normal() {
+        let r = normal_raster(1.0, (0.0, 0.0, 200.0, 100.0), 7).unwrap();
+        assert_eq!((r.width, r.height), (200, 100));
+        let v = &r.bands[0];
+        let n = v.len() as f64;
+        let mean = v.iter().sum::<f64>() / n;
+        let sd = (v.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / n).sqrt();
+        assert!(mean.abs() < 0.03 && (sd - 1.0).abs() < 0.03, "{mean} {sd}");
+        let again = normal_raster(1.0, (0.0, 0.0, 200.0, 100.0), 7).unwrap();
+        assert_eq!(again.bands, r.bands);
+    }
 }
