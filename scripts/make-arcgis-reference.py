@@ -744,6 +744,11 @@ CASES = {
     "fc2shp_batch": ("conversion.FeatureClassToShapefile", [[DATA / "extract_base.gdb" / "sites", DATA / "globalids_base.gdb" / "points", DATA / "parcels.shp", DATA / "globalids_base.gdb" / "empty"]], []),
     "fc2shp_repeat": ("conversion.FeatureClassToShapefile", [[DATA / "parcels.shp", DATA / "parcels.shp", DATA / "roads.shp"]], []),
     "fc2shp_err_missing": ("conversion.FeatureClassToShapefile", [[DATA / "parcels.shp", DATA / "missing.shp"]], []),
+    "tt2db_batch": ("conversion.TableToDBASE", [[DM / "sales.dbf", DATA / "globalids_base.gdb" / "records", DATA / "parcels.shp"]], []),
+    "tt2db_repeat": ("conversion.TableToDBASE", [[DM / "sales.dbf", DM / "sales.dbf", DATA / "globalids_base.gdb" / "records"]], []),
+    "tt2db_collision": ("conversion.TableToDBASE", [[DATA / "parcels.shp", DATA / "parcels.dbf"]], []),
+    "tt2db_csv": ("conversion.TableToDBASE", [[DATA / "stations.csv"]], []),
+    "tt2db_err_missing": ("conversion.TableToDBASE", [[DM / "sales.dbf", DATA / "missing.dbf"]], []),
     "gpx_points": ("conversion.GPXtoFeatures", [DATA / "gpx_sample.gpx"], ["POINTS"]),
     "gpx_lines": ("conversion.GPXtoFeatures", [DATA / "gpx_sample.gpx"], ["TRACKS_AS_LINES"]),
     "gpx_sticky_points": ("conversion.GPXtoFeatures", [DATA / "gpx_sticky.gpx"], ["POINTS"]),
@@ -2304,6 +2309,7 @@ RUN = {
     "management.Adjust3DZ": ("adjust_3d_z", ["input", "output", "reverse_sign", "adjust_value", "from_units", "to_units"]),
     "management.CalculateGeometryAttributes": ("calculate_geometry_attributes", ["input", "output", "geometry_property", "length_unit", "area_unit"]),
     "conversion.FeatureClassToShapefile": ("feature_class_to_shapefile", ["input_features", "output_folder"]),
+    "conversion.TableToDBASE": ("table_to_dbase", ["input_tables", "output_folder"]),
     "conversion.GPXtoFeatures": ("gpx_to_features", ["input_gpx_file", "output", "output_type"]),
     "conversion.MultipatchToRaster": ("multipatch_to_raster", ["input", "output", "cell_size", "cell_assignment_method"]),
     "conversion.RasterToOtherFormat": ("raster_to_other_format", ["input_rasters", "output_workspace", "raster_format"]),
@@ -2386,7 +2392,7 @@ RASTER_OUT = {"gp.CreateBinaryMask_ia", "gp.ComputeChangeRaster_ia", "gp.Diff_ia
               "gp.CostDistance_sa", "gp.CostBackLink_sa", "gp.CostAllocation_sa", "gp.CostPath_sa", "gp.Corridor_sa", "gp.Filter_sa", "gp.Nibble_sa", "gp.ReclassByTable_sa",
               "gp.Sink_sa", "gp.Pick_sa", "management.Flip", "management.Mirror", "management.Shift", "management.Clip",
               "gp.Slice_sa", "gp.ExtractByAttributes_sa", "gp.ExtractByRectangle_sa", "gp.ExtractByCircle_sa", "gp.Lookup_sa"}
-WORKSPACE_OUT = {"conversion.FeatureClassToShapefile", "conversion.RasterToOtherFormat", "analysis.Split", "analysis.SplitByAttributes"}
+WORKSPACE_OUT = {"conversion.FeatureClassToShapefile", "conversion.TableToDBASE", "conversion.RasterToOtherFormat", "analysis.Split", "analysis.SplitByAttributes"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable", "conversion.RasterToASCII", "conversion.RasterToFloat"}
 # Tools whose output is a table, written as <name>.dbf.

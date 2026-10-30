@@ -101280,6 +101280,365 @@
           "relationships": []
         }
       }
+    },
+    "tt2db_batch": {
+      "tool": "conversion.TableToDBASE",
+      "args": [
+        "testdata/dm/sales.dbf;testdata/geoproc/globalids_base.gdb/records;testdata/geoproc/parcels.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "outputs": {
+        "parcels.dbf": {
+          "fields": [
+            [
+              "OID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "PARCEL_ID",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "NAME",
+              "String",
+              20,
+              0,
+              0
+            ],
+            [
+              "VALUE",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "ZONE",
+              "Integer",
+              5,
+              5,
+              0
+            ]
+          ],
+          "shapeType": null
+        },
+        "records.dbf": {
+          "fields": [
+            [
+              "OID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "KEY",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": null
+        },
+        "sales.dbf": {
+          "fields": [
+            [
+              "OID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "REGION",
+              "String",
+              80,
+              0,
+              0
+            ],
+            [
+              "YEAR",
+              "Integer",
+              9,
+              9,
+              0
+            ],
+            [
+              "PRODUCT",
+              "String",
+              80,
+              0,
+              0
+            ],
+            [
+              "AMOUNT",
+              "Double",
+              19,
+              18,
+              15
+            ],
+            [
+              "UNITS",
+              "Integer",
+              9,
+              9,
+              0
+            ]
+          ],
+          "shapeType": null
+        }
+      },
+      "run": {
+        "tool": "table_to_dbase",
+        "params": {
+          "input_tables": "testdata/dm/sales.dbf;testdata/geoproc/globalids_base.gdb/records;testdata/geoproc/parcels.shp",
+          "output_folder": "<out>"
+        }
+      }
+    },
+    "tt2db_repeat": {
+      "tool": "conversion.TableToDBASE",
+      "args": [
+        "testdata/dm/sales.dbf;testdata/dm/sales.dbf;testdata/geoproc/globalids_base.gdb/records",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "outputs": {
+        "records.dbf": {
+          "fields": [
+            [
+              "OID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "KEY",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": null
+        },
+        "sales.dbf": {
+          "fields": [
+            [
+              "OID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "REGION",
+              "String",
+              80,
+              0,
+              0
+            ],
+            [
+              "YEAR",
+              "Integer",
+              9,
+              9,
+              0
+            ],
+            [
+              "PRODUCT",
+              "String",
+              80,
+              0,
+              0
+            ],
+            [
+              "AMOUNT",
+              "Double",
+              19,
+              18,
+              15
+            ],
+            [
+              "UNITS",
+              "Integer",
+              9,
+              9,
+              0
+            ]
+          ],
+          "shapeType": null
+        }
+      },
+      "run": {
+        "tool": "table_to_dbase",
+        "params": {
+          "input_tables": "testdata/dm/sales.dbf;testdata/dm/sales.dbf;testdata/geoproc/globalids_base.gdb/records",
+          "output_folder": "<out>"
+        }
+      }
+    },
+    "tt2db_csv": {
+      "tool": "conversion.TableToDBASE",
+      "args": [
+        "testdata/geoproc/stations.csv",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "outputs": {
+        "stations.dbf": {
+          "fields": [
+            [
+              "OID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "STATION",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "X",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "Y",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "ELEV",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "NAME",
+              "String",
+              254,
+              0,
+              0
+            ],
+            [
+              "ACTIVE",
+              "Integer",
+              10,
+              10,
+              0
+            ]
+          ],
+          "shapeType": null
+        }
+      },
+      "run": {
+        "tool": "table_to_dbase",
+        "params": {
+          "input_tables": "testdata/geoproc/stations.csv",
+          "output_folder": "<out>"
+        }
+      }
+    },
+    "tt2db_err_missing": {
+      "tool": "conversion.TableToDBASE",
+      "args": [
+        "testdata/dm/sales.dbf;testdata/geoproc/missing.dbf",
+        "<out>"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000732: Input Tables: Dataset /mnt/media/ArcGIS_Linux/.worktrees/lane-kimi/testdata/geoproc/missing.dbf does not exist or is not supported",
+        "Failed to execute (TableToDBASE)."
+      ],
+      "outputs": {},
+      "run": {
+        "tool": "table_to_dbase",
+        "params": {
+          "input_tables": "testdata/dm/sales.dbf;testdata/geoproc/missing.dbf",
+          "output_folder": "<out>"
+        }
+      }
+    },
+    "tt2db_collision": {
+      "tool": "conversion.TableToDBASE",
+      "args": [
+        "testdata/geoproc/parcels.shp;testdata/geoproc/parcels.dbf",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "outputs": {
+        "parcels.dbf": {
+          "fields": [
+            [
+              "OID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "PARCEL_ID",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "NAME",
+              "String",
+              20,
+              0,
+              0
+            ],
+            [
+              "VALUE",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "ZONE",
+              "Integer",
+              5,
+              5,
+              0
+            ]
+          ],
+          "shapeType": null
+        }
+      },
+      "run": {
+        "tool": "table_to_dbase",
+        "params": {
+          "input_tables": "testdata/geoproc/parcels.shp;testdata/geoproc/parcels.dbf",
+          "output_folder": "<out>"
+        }
+      }
     }
   }
 }

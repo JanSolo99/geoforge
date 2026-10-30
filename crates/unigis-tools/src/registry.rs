@@ -97,6 +97,13 @@ pub trait Context {
             "shapefile export is not supported by this host".into(),
         ))
     }
+    /// Export tables as dBASE files into an existing folder, returning the names written.
+    /// Hosts without file output fail explicitly.
+    fn export_dbase(&self, _inputs: &[String], _folder: &str) -> Result<Vec<String>> {
+        Err(Error::Unsupported(
+            "dBASE export is not supported by this host".into(),
+        ))
+    }
     /// Write a named set of new datasets together. Hosts without output support fail explicitly.
     fn write_datasets(
         &self,
@@ -4030,6 +4037,7 @@ pub static TOOLS: &[Tool] = &[
     crate::split_attributes::TOOL,
     crate::gps_metadata::TOOL,
     crate::feature_class_to_shapefile::TOOL,
+    crate::table_to_dbase::TOOL,
     crate::delete_multiple::TOOL,
     crate::workspace::CREATE_FOLDER,
     crate::workspace::CREATE_FILE_GDB,

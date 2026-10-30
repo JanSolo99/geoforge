@@ -41,6 +41,7 @@ pub mod split_attributes;
 mod sql;
 pub mod subset_features;
 pub mod swm;
+pub mod table_to_dbase;
 pub mod tables;
 pub mod temporal;
 pub mod timezone;

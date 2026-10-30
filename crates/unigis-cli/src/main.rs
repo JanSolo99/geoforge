@@ -2708,6 +2708,9 @@ fn main() -> ExitCode {
                 ) -> Result<Vec<String>> {
                     export_shapefiles(inputs, Path::new(folder))
                 }
+                fn export_dbase(&self, inputs: &[String], folder: &str) -> Result<Vec<String>> {
+                    export_dbase(inputs, Path::new(folder))
+                }
                 fn get(&self, name: &str) -> Option<String> {
                     self.0
                         .get(name)
@@ -7312,6 +7315,48 @@ fn export_shapefiles(inputs: &[String], folder: &Path) -> Result<Vec<String>> {
         written.push(name);
     }
     Ok(written)
+}
+
+fn export_dbase(inputs: &[String], folder: &Path) -> Result<Vec<String>> {
+    if !folder.is_dir() {
+        return Err(Error::Unsupported(format!(
+            "ERROR 000732: Output Folder: Dataset {} does not exist or is not supported",
+            folder.display()
+        )));
+    }
+    let mut planned: Vec<(String, unigis_tools::TableOutput)> = Vec::new();
+    for input in inputs {
+        let path = Path::new(input);
+        let (fc, _) = open_feature_class(path).map_err(|_| {
+            Error::Unsupported(format!(
+                "ERROR 000732: Input Tables: Dataset {input} does not exist or is not supported"
+            ))
+        })?;
+        let mut table = unigis_tools::tables::copy_rows(fc.as_ref(), None)?;
+        for field in &mut table.fields {
+            if field.field_type == FieldType::Double && field.precision > 0 {
+                field.precision = field.precision.min(19 - u32::from(field.scale > 0));
+            }
+        }
+        let stem = path
+            .file_stem()
+            .map(|s| s.to_string_lossy().into_owned())
+            .unwrap_or_else(|| "output".into());
+        if let Some((_, previous)) = planned
+            .iter_mut()
+            .find(|(name, _)| name.eq_ignore_ascii_case(&stem))
+        {
+            *previous = table;
+        } else {
+            planned.push((stem, table));
+        }
+    }
+    let mut names = Vec::new();
+    for (name, table) in planned {
+        write_table(&table, &folder.join(format!("{name}.dbf")))?;
+        names.push(name);
+    }
+    Ok(names)
 }
 
 fn rasterize_input(path: &Path, field: &str) -> Result<RasterizeInput> {
