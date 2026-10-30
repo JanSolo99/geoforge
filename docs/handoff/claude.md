@@ -119,7 +119,7 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
   (`UNIGIS_REFERENCE_CASES=rbf_` PASS); unit tests; clippy. Statistics presence optional for rbf_
   (ArcGIS inconsistent); research in scripts/research/rescale_by_function/README.md.
 
-## Queue: Add Surface Information — committed, landing
+## Queue: Add Surface Information — landed on main (full scripts/check PASS)
 
 - CLI `run_add_surface_information` + `surface_z` / `clip_segment` in `crates/unigis-cli/src/main.rs`,
   raster-registry entry (placeholder runner, like Extract Multi Values); 9 `asi_*` references PASS.
