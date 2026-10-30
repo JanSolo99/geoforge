@@ -143,6 +143,11 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
   implementation replaced mine and both reference sets (18 `zg_*`) are kept. The table tool now
   uses its `zonal_geometry` / `zonal_thickness`; all 18 + 5 cases pass on the combined code.
 
+## Queue: Adjust Raster to Stream / Adjust Stream to Raster — deferred (2026-10-31)
+
+- Raster to Stream: ArcGIS fails with ERROR 160327 on every input. Stream to Raster: own path
+  tracing not identified. Notes: scripts/research/adjust_stream_to_raster/README.md.
+
 ## Pitfall: ArcGIS sidecars in testdata
 
 Running ArcGIS on fixture rasters can leave untracked `testdata/raster/*.aux.xml` / `*.vat.dbf`
