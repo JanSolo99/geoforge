@@ -1195,6 +1195,90 @@ pub fn zonal_geometry(zones: &Raster, geometry: ZonalGeometryType) -> unigis_cor
     Ok(out)
 }
 
+/// `ZonalGeometryAsTable(in_zone_data, "Value")`: one row per zone (ascending) with VALUE, AREA,
+/// PERIMETER and THICKNESS as [`zonal_geometry`] measures them, the centroid of the cell centres,
+/// and the ellipse of the same area and second moments (of the cell centres): its semi-axes and the
+/// major axis' angle counter-clockwise from the x axis, 0..180 (ArcGIS Pro 3.7). All Single.
+pub fn zonal_geometry_table(
+    zones: &Raster,
+) -> unigis_core::Result<(Vec<unigis_core::Field>, Vec<Vec<unigis_core::Value>>)> {
+    use unigis_core::{Field, FieldType, Value};
+    let (w, h) = (zones.width, zones.height);
+    let t = zones.transform;
+    let cell = t[1].abs();
+    let zone = |c: usize, r: usize| zones.get(c, r).map(|v| v as i64);
+    let area = zonal_geometry(zones, ZonalGeometryType::Area)?;
+    let perimeter = zonal_geometry(zones, ZonalGeometryType::Perimeter)?;
+    let thickness = zonal_thickness(zones);
+    // Per zone: the cells' centres in local coordinates (from the grid origin), and the first cell
+    // (for area / perimeter). Moments are taken about the mean (two passes), as ArcGIS's agree to
+    // the last digit that way.
+    let mut cells: std::collections::BTreeMap<i64, (Vec<(f64, f64)>, usize)> = Default::default();
+    for r in 0..h {
+        for c in 0..w {
+            let Some(z) = zone(c, r) else { continue };
+            let e = cells.entry(z).or_insert((Vec::new(), r * w + c));
+            e.0.push(((c as f64 + 0.5) * t[1], (r as f64 + 0.5) * t[5]));
+        }
+    }
+    let single = |v: f64| Value::Single(v as f32);
+    let rows = cells
+        .into_iter()
+        .map(|(z, (xy, first))| {
+            let n = xy.len() as f64;
+            let mx = xy.iter().map(|p| p.0).sum::<f64>() / n;
+            let my = xy.iter().map(|p| p.1).sum::<f64>() / n;
+            let vxx = xy.iter().map(|p| (p.0 - mx).powi(2)).sum::<f64>() / n;
+            let vyy = xy.iter().map(|p| (p.1 - my).powi(2)).sum::<f64>() / n;
+            let vxy = xy.iter().map(|p| (p.0 - mx) * (p.1 - my)).sum::<f64>() / n;
+            let (mx, my) = (t[0] + mx, t[3] + my);
+            let half = (vxx + vyy) / 2.0;
+            let root = (((vxx - vyy) / 2.0).powi(2) + vxy * vxy).sqrt();
+            let (l1, l2) = (half + root, (half - root).max(0.0));
+            let zone_area = n * cell * cell;
+            let (major, minor) = if l2 > 0.0 {
+                let ratio = (l1 / l2).sqrt();
+                let a = (zone_area * ratio / std::f64::consts::PI).sqrt();
+                (a, zone_area / (std::f64::consts::PI * a))
+            } else {
+                let a = (zone_area / std::f64::consts::PI).sqrt();
+                (a, a)
+            };
+            let angle = (0.5 * (2.0 * vxy).atan2(vxx - vyy))
+                .to_degrees()
+                .rem_euclid(180.0);
+            vec![
+                Value::Integer(z as i32),
+                single(area.bands[0][first]),
+                single(perimeter.bands[0][first]),
+                single(thickness.get(&z).copied().unwrap_or(0.0)),
+                single(mx),
+                single(my),
+                single(major),
+                single(minor),
+                single(angle),
+            ]
+        })
+        .collect();
+    let mut value = Field::new("VALUE", FieldType::Integer);
+    value.length = 10;
+    value.precision = 10;
+    let mut fields = vec![value];
+    for name in [
+        "AREA",
+        "PERIMETER",
+        "THICKNESS",
+        "XCENTROID",
+        "YCENTROID",
+        "MAJORAXIS",
+        "MINORAXIS",
+        "ORIENTATIO",
+    ] {
+        fields.push(Field::new(name, FieldType::Single));
+    }
+    Ok((fields, rows))
+}
+
 #[cfg(test)]
 mod zonal_geometry_tests {
     use super::*;

@@ -4644,10 +4644,8 @@ fn tools_match_arcgis_output() {
         {
             continue;
         }
-        if matches!(
-            info["tool"].as_str(),
-            Some("gp.ZonalGeometryAsTable_sa" | "gp.CostPath_sa")
-        ) || PENDING_CASES.iter().any(|p| case.starts_with(p))
+        if matches!(info["tool"].as_str(), Some("gp.CostPath_sa"))
+            || PENDING_CASES.iter().any(|p| case.starts_with(p))
         {
             continue; // not done yet
         }

@@ -274,6 +274,12 @@ fn extract_by_attributes(ctx: &dyn Context) -> Result<Output> {
     )
 }
 
+fn zonal_geometry_table_unsupported(_: &dyn Context) -> Result<Output> {
+    Err(Error::Unsupported(
+        "Zonal Geometry as Table writes a table; run it through `ug run`".into(),
+    ))
+}
+
 fn zonal_geometry(ctx: &dyn Context) -> Result<Output> {
     let zones = ctx.raster("in_zone_data")?;
     if let Some(field) = ctx.get("zone_field")
@@ -2535,6 +2541,22 @@ pub static TOOLS: &[Tool] = &[
             },
         ],
         run: extract_by_attributes,
+    },
+    Tool {
+        id: "zonal_geometry_as_table",
+        name: "Zonal Geometry as Table",
+        summary: "A table of each zone's area, perimeter, thickness, centroid and equivalent ellipse.",
+        params: &[
+            raster("input", "Input raster or feature zone data", true),
+            Param {
+                name: "zone_field",
+                label: "Zone field",
+                kind: Kind::Text,
+                required: false,
+                default: "Value",
+            },
+        ],
+        run: zonal_geometry_table_unsupported,
     },
     Tool {
         id: "zonal_geometry",

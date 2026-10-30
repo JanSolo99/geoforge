@@ -6678,6 +6678,24 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
     if spec.id == "add_surface_information" {
         return run_add_surface_information(&Args(map), &output);
     }
+    if spec.id == "zonal_geometry_as_table" {
+        if let Some(field) = map.get("zone_field")
+            && !field.eq_ignore_ascii_case("Value")
+        {
+            return Err(Error::Unsupported(format!(
+                "zone field {field}: only Value is supported yet"
+            )));
+        }
+        let zones = unigis_raster::read_geotiff(Path::new(
+            map.get("input")
+                .ok_or_else(|| Error::Unsupported("input is required".into()))?,
+        ))?;
+        let (fields, rows) = unigis_raster::zonal::zonal_geometry_table(&zones)?;
+        return write_table(
+            &unigis_tools::TableOutput { fields, rows },
+            Path::new(&output),
+        );
+    }
     if spec.id == "zonal_characterization" {
         return run_zonal_characterization(&Args(map), &output);
     }

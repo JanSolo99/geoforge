@@ -2375,6 +2375,7 @@ for _tool, _id in COMBINATORIAL:
 
 RUN = {
     "gp.ZonalGeometry_sa": ("zonal_geometry", ["in_zone_data", "zone_field", "output", "geometry_type", "cell_size"]),
+    "gp.ZonalGeometryAsTable_sa": ("zonal_geometry_as_table", ["input", "zone_field", "output"]),
     "gp.ZonalFill_sa": ("zonal_fill", ["in_zone_raster", "in_weight_raster", "output"]),
     "gp.AddSurfaceInformation_sa": ("add_surface_information", ["input", "in_surface", "out_property", "output", "method", "sample_distance", "z_factor"]),
     "gp.RescaleByFunction_sa": ("rescale_by_function", ["input", "output", "transformation_function", "from_scale", "to_scale"]),

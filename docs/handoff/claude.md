@@ -135,6 +135,11 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
 - `unigis-raster/src/zonal.rs::zonal_geometry` + registry; 9 `zg_*` references PASS; unit tests; clippy.
   Thickness = chamfer distance (1 / 1.414) to the nearest point of another zone's cell (probed).
 
+## Queue: Zonal Geometry as Table — committed, landing
+
+- `zonal::zonal_geometry_table` + CLI runner (table) + registry placeholder; `zgt_*` cases un-skipped
+  (run entries via `--annotate`); PASS. Two-pass centred moments were needed for last-digit match.
+
 ## Pitfall: ArcGIS sidecars in testdata
 
 Running ArcGIS on fixture rasters can leave untracked `testdata/raster/*.aux.xml` / `*.vat.dbf`

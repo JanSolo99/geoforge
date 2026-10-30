@@ -35555,7 +35555,15 @@
           0
         ]
       ],
-      "shapeType": null
+      "shapeType": null,
+      "run": {
+        "tool": "zonal_geometry_as_table",
+        "params": {
+          "input": "testdata/raster/tab_zones_i32.tif",
+          "zone_field": "Value",
+          "output": "<out>"
+        }
+      }
     },
     "zgt_zones25": {
       "tool": "gp.ZonalGeometryAsTable_sa",
@@ -35638,7 +35646,15 @@
           0
         ]
       ],
-      "shapeType": null
+      "shapeType": null,
+      "run": {
+        "tool": "zonal_geometry_as_table",
+        "params": {
+          "input": "testdata/raster/zt_zones25.tif",
+          "zone_field": "Value",
+          "output": "<out>"
+        }
+      }
     },
     "zgt_landuse": {
       "tool": "gp.ZonalGeometryAsTable_sa",
@@ -35721,7 +35737,15 @@
           0
         ]
       ],
-      "shapeType": null
+      "shapeType": null,
+      "run": {
+        "tool": "zonal_geometry_as_table",
+        "params": {
+          "input": "testdata/raster/zt_landuse.tif",
+          "zone_field": "Value",
+          "output": "<out>"
+        }
+      }
     },
     "zgt_classes": {
       "tool": "gp.ZonalGeometryAsTable_sa",
@@ -35804,7 +35828,15 @@
           0
         ]
       ],
-      "shapeType": null
+      "shapeType": null,
+      "run": {
+        "tool": "zonal_geometry_as_table",
+        "params": {
+          "input": "testdata/raster/zt_classes.tif",
+          "zone_field": "Value",
+          "output": "<out>"
+        }
+      }
     },
     "zgt_zones4": {
       "tool": "gp.ZonalGeometryAsTable_sa",
@@ -35887,7 +35919,15 @@
           0
         ]
       ],
-      "shapeType": null
+      "shapeType": null,
+      "run": {
+        "tool": "zonal_geometry_as_table",
+        "params": {
+          "input": "testdata/raster/zt_zones4.tif",
+          "zone_field": "Value",
+          "output": "<out>"
+        }
+      }
     },
     "cdist_basic": {
       "tool": "gp.CostDistance_sa",
