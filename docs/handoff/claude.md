@@ -148,6 +148,11 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
 - Raster to Stream: ArcGIS fails with ERROR 160327 on every input. Stream to Raster: own path
   tracing not identified. Notes: scripts/research/adjust_stream_to_raster/README.md.
 
+## Queue: Contour List — committed, landing
+
+- `contour::contour_list` (Contour now calls it), CLI `write_contours` shared with Contour, registry
+  placeholder; 3 `cl_*` references and the existing contour cases PASS.
+
 ## Pitfall: ArcGIS sidecars in testdata
 
 Running ArcGIS on fixture rasters can leave untracked `testdata/raster/*.aux.xml` / `*.vat.dbf`

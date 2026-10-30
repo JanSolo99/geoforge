@@ -107047,6 +107047,153 @@
           "seed_value": 42
         }
       }
+    },
+    "cl_dem": {
+      "tool": "gp.ContourList_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "230;200;215.5;500;200"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Contour",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "contour_list",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "contour_values": "230;200;215.5;500;200"
+        }
+      }
+    },
+    "cl_dem_nodata": {
+      "tool": "gp.ContourList_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "195;250.25;300"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Contour",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "contour_list",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "contour_values": "195;250.25;300"
+        }
+      }
+    },
+    "cl_int16": {
+      "tool": "gp.ContourList_sa",
+      "args": [
+        "testdata/raster/dem_int16_packbits.tif",
+        "<out>",
+        "210;211;260"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "Id",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Contour",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "contour_list",
+        "params": {
+          "input": "testdata/raster/dem_int16_packbits.tif",
+          "output": "<out>",
+          "contour_values": "210;211;260"
+        }
+      }
     }
   }
 }

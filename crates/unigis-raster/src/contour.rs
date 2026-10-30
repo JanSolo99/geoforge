@@ -53,22 +53,32 @@ pub fn level_count(r: &Raster, interval: f64, base: f64) -> i64 {
 
 /// Contours at `base + k * interval` between the raster's minimum and maximum.
 pub fn contour(r: &Raster, interval: f64, base: f64) -> Vec<ContourLine> {
-    let (w, h) = (r.width, r.height);
     let valid: Vec<f64> = r.bands[0]
         .iter()
         .copied()
         .filter(|v| !r.is_nodata(*v))
         .collect();
-    if valid.is_empty() || interval <= 0.0 || w < 2 || h < 2 {
+    if valid.is_empty() || interval <= 0.0 || level_count(r, interval, base) > MAX_LEVELS {
         return Vec::new();
     }
     let lo = valid.iter().copied().fold(f64::INFINITY, f64::min);
     let hi = valid.iter().copied().fold(f64::NEG_INFINITY, f64::max);
-    if level_count(r, interval, base) > MAX_LEVELS {
-        return Vec::new();
-    }
     let k0 = ((lo - base) / interval).ceil() as i64;
     let k1 = ((hi - base) / interval).floor() as i64;
+    let levels: Vec<f64> = (k0..=k1).map(|k| base + k as f64 * interval).collect();
+    contour_list(r, &levels)
+}
+
+/// Contour List: contours at the given values (duplicates once; values outside the raster's range
+/// give nothing), ordered as Contour orders them.
+pub fn contour_list(r: &Raster, levels: &[f64]) -> Vec<ContourLine> {
+    let (w, h) = (r.width, r.height);
+    if w < 2 || h < 2 || r.bands[0].iter().all(|v| r.is_nodata(*v)) {
+        return Vec::new();
+    }
+    let mut levels: Vec<f64> = levels.iter().copied().filter(|v| v.is_finite()).collect();
+    levels.sort_by(f64::total_cmp);
+    levels.dedup();
     let t = &r.transform;
     let xy = |n: Node| -> [f64; 2] {
         let (row, col) = match n {
@@ -99,8 +109,7 @@ pub fn contour(r: &Raster, interval: f64, base: f64) -> Vec<ContourLine> {
         }
     };
     let mut lines = Vec::new();
-    for k in k0..=k1 {
-        let level = base + k as f64 * interval;
+    for &level in &levels {
         let crossing = |e: Edge| -> [f64; 2] {
             let (za, zb) = (z(e.0), z(e.1));
             let f = (level - za) / (zb - za);

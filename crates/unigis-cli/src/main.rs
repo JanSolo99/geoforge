@@ -3730,35 +3730,7 @@ fn main() -> ExitCode {
                 )));
             }
             let lines = unigis_raster::contour::contour(&r, contour_interval, base_contour);
-            let features = lines
-                .into_iter()
-                .enumerate()
-                .map(|(i, l)| {
-                    let mut g = unigis_core::Geometry::point(0.0, 0.0);
-                    g.kind = unigis_core::GeometryKind::Polyline;
-                    g.parts = vec![0];
-                    g.xy = l.points;
-                    Feature {
-                        oid: i as i64,
-                        geometry: Some(g),
-                        attributes: vec![Value::Integer(i as i32 + 1), Value::Double(l.value)],
-                    }
-                })
-                .collect();
-            let wkt = raster_wkt(&r)?;
-            let out = ToolOutput {
-                kind: unigis_core::GeometryKind::Polyline,
-                has_z: false,
-                has_m: false,
-                fields: vec![
-                    Field::new("Id", FieldType::Integer),
-                    Field::new("Contour", FieldType::Double),
-                ],
-                spatial_reference_wkt: wkt,
-                features,
-                messages: Vec::new(),
-            };
-            write_output(out, &out_polyline_features, None)
+            write_contours(lines, &r, &out_polyline_features)
         })(),
         Tool::Basin {
             in_flow_direction_raster,
@@ -6678,6 +6650,31 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
     if spec.id == "add_surface_information" {
         return run_add_surface_information(&Args(map), &output);
     }
+    if spec.id == "contour_list" {
+        let r = unigis_raster::read_geotiff(Path::new(
+            map.get("input")
+                .ok_or_else(|| Error::Unsupported("input is required".into()))?,
+        ))?;
+        let levels = map
+            .get("contour_values")
+            .map(String::as_str)
+            .unwrap_or_default()
+            .split([';', ',', ' '])
+            .filter(|v| !v.trim().is_empty())
+            .map(|v| {
+                v.trim().parse::<f64>().map_err(|_| {
+                    Error::Unsupported(format!("ERROR 000800: contour value {v} is not a number"))
+                })
+            })
+            .collect::<Result<Vec<f64>>>()?;
+        if levels.is_empty() {
+            return Err(Error::Unsupported(
+                "ERROR 000735: Contour values: value is required".into(),
+            ));
+        }
+        let lines = unigis_raster::contour::contour_list(&r, &levels);
+        return write_contours(lines, &r, Path::new(&output));
+    }
     if spec.id == "zonal_geometry_as_table" {
         if let Some(field) = map.get("zone_field")
             && !field.eq_ignore_ascii_case("Value")
@@ -7954,6 +7951,42 @@ fn run_add_surface_information(
         None,
         true,
     )
+}
+
+/// Contour lines as ArcGIS writes them: `Id` 1.. and the `Contour` value.
+fn write_contours(
+    lines: Vec<unigis_raster::contour::ContourLine>,
+    r: &unigis_raster::Raster,
+    output: &Path,
+) -> Result<()> {
+    let features = lines
+        .into_iter()
+        .enumerate()
+        .map(|(i, l)| {
+            let mut g = unigis_core::Geometry::point(0.0, 0.0);
+            g.kind = unigis_core::GeometryKind::Polyline;
+            g.parts = vec![0];
+            g.xy = l.points;
+            Feature {
+                oid: i as i64,
+                geometry: Some(g),
+                attributes: vec![Value::Integer(i as i32 + 1), Value::Double(l.value)],
+            }
+        })
+        .collect();
+    let out = ToolOutput {
+        kind: unigis_core::GeometryKind::Polyline,
+        has_z: false,
+        has_m: false,
+        fields: vec![
+            Field::new("Id", FieldType::Integer),
+            Field::new("Contour", FieldType::Double),
+        ],
+        spatial_reference_wkt: raster_wkt(r)?,
+        features,
+        messages: Vec::new(),
+    };
+    write_output(out, output, None)
 }
 
 fn run_extract_multi_values(

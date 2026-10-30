@@ -274,6 +274,12 @@ fn extract_by_attributes(ctx: &dyn Context) -> Result<Output> {
     )
 }
 
+fn contour_list_unsupported(_: &dyn Context) -> Result<Output> {
+    Err(Error::Unsupported(
+        "Contour List writes features; run it through `ug run`".into(),
+    ))
+}
+
 fn zonal_geometry_table_unsupported(_: &dyn Context) -> Result<Output> {
     Err(Error::Unsupported(
         "Zonal Geometry as Table writes a table; run it through `ug run`".into(),
@@ -2590,6 +2596,22 @@ pub static TOOLS: &[Tool] = &[
             },
         ],
         run: extract_by_attributes,
+    },
+    Tool {
+        id: "contour_list",
+        name: "Contour List",
+        summary: "Contour lines at the listed values.",
+        params: &[
+            raster("input", "Input raster", true),
+            Param {
+                name: "contour_values",
+                label: "Contour values",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+        ],
+        run: contour_list_unsupported,
     },
     Tool {
         id: "zonal_geometry_as_table",

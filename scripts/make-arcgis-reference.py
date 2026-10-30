@@ -929,6 +929,9 @@ CASES = {
     "con_zones_const": ("gp.Con_sa", [RASTER / "zones.tif", 1], [0, "Value = 7"]),
     "con_no_false": ("gp.Con_sa", [RASTER / "dem_nodata.tif", RASTER / "dem_nodata.tif"], ["", "Value > 250"]),
     "setnull_zones": ("gp.SetNull_sa", [RASTER / "zones.tif", RASTER / "dem.tif"], ["Value = 7"]),
+    "cl_dem": ("gp.ContourList_sa", [RASTER / "dem.tif"], ["230;200;215.5;500;200"]),
+    "cl_dem_nodata": ("gp.ContourList_sa", [RASTER / "dem_nodata.tif"], ["195;250.25;300"]),
+    "cl_int16": ("gp.ContourList_sa", [RASTER / "dem_int16_packbits.tif"], ["210;211;260"]),
     "contour_dem_20": ("gp.Contour_sa", [RASTER / "dem.tif"], [20, 0]),
     "contour_dem_nodata_15": ("gp.Contour_sa", [RASTER / "dem_nodata.tif"], [15, 5]),
     "contour_int16_25": ("gp.Contour_sa", [RASTER / "dem_int16_packbits.tif"], [25, 0]),
@@ -2381,6 +2384,7 @@ for _tool, _id in COMBINATORIAL:
 
 
 RUN = {
+    "gp.ContourList_sa": ("contour_list", ["input", "output", "contour_values"]),
     "gp.ZonalGeometry_sa": ("zonal_geometry", ["in_zone_data", "zone_field", "output", "geometry_type", "cell_size"]),
     "gp.ZonalGeometryAsTable_sa": ("zonal_geometry_as_table", ["input", "zone_field", "output"]),
     "gp.ZonalFill_sa": ("zonal_fill", ["in_zone_raster", "in_weight_raster", "output"]),
