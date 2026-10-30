@@ -966,3 +966,214 @@ pub fn zonal_characterization(
     }
     Ok((fields, rows))
 }
+
+/// What Zonal Geometry measures.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ZoneGeometry {
+    Area,
+    Perimeter,
+    Thickness,
+    Centroid,
+}
+
+/// The chamfer distance (axis 1, diagonal 1.414) from a cell centre to the nearest point of a cell
+/// `dx`, `dy` cells away.
+fn chamfer(dx: i64, dy: i64) -> f64 {
+    let a = (dx.abs() as f64 - 0.5).max(0.0);
+    let b = (dy.abs() as f64 - 0.5).max(0.0);
+    1.414 * a.min(b) + (a - b).abs()
+}
+
+/// `ZonalGeometry(in_zone_data, "Value", geometry_type)` (ArcGIS Pro 3.7, observed):
+/// - AREA: the zone's cell count times the cell area; PERIMETER: its cell edges facing another zone
+///   or the raster border, times the cell size (Float32).
+/// - THICKNESS: the largest distance from a zone cell's centre to the nearest cell of another zone
+///   (NoData counts as another zone, the raster border does not), measured with the chamfer metric
+///   above, times the cell size; 10000 for a zone with no other zone in the raster.
+/// - CENTROID: the zone value in the cell holding the mean of its cell centres, NoData elsewhere
+///   (32-bit signed).
+pub fn zonal_geometry(zones: &Raster, what: ZoneGeometry) -> Raster {
+    use std::collections::HashMap;
+    let (w, h) = (zones.width, zones.height);
+    let cell = zones.transform[1].abs();
+    let zone = |c: usize, r: usize| zones.get(c, r).map(|v| v as i64);
+    let mut out = zones.like(if what == ZoneGeometry::Centroid {
+        DataType::I32
+    } else {
+        DataType::F32
+    });
+    let nodata = if what == ZoneGeometry::Centroid {
+        -2_147_483_647.0
+    } else {
+        f64::from(f32::MIN)
+    };
+    out.nodata = Some(nodata);
+    let mut value: HashMap<i64, f64> = HashMap::new();
+    match what {
+        ZoneGeometry::Area | ZoneGeometry::Perimeter => {
+            for r in 0..h {
+                for c in 0..w {
+                    let Some(z) = zone(c, r) else { continue };
+                    let add = if what == ZoneGeometry::Area {
+                        cell * cell
+                    } else {
+                        let edges = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+                            .iter()
+                            .filter(|(dc, dr)| {
+                                let (nc, nr) = (c as i64 + dc, r as i64 + dr);
+                                nc < 0
+                                    || nr < 0
+                                    || nc >= w as i64
+                                    || nr >= h as i64
+                                    || zone(nc as usize, nr as usize) != Some(z)
+                            })
+                            .count();
+                        edges as f64 * cell
+                    };
+                    *value.entry(z).or_insert(0.0) += add;
+                }
+            }
+        }
+        ZoneGeometry::Thickness => {
+            for r in 0..h {
+                for c in 0..w {
+                    let Some(z) = zone(c, r) else { continue };
+                    // Search square rings outwards until no nearer cell can be found.
+                    let mut best = f64::INFINITY;
+                    let limit = w.max(h) as i64;
+                    for k in 1..=limit {
+                        if k as f64 - 0.5 > best {
+                            break;
+                        }
+                        for dr in -k..=k {
+                            for dc in -k..=k {
+                                if dr.abs() != k && dc.abs() != k {
+                                    continue;
+                                }
+                                let (nc, nr) = (c as i64 + dc, r as i64 + dr);
+                                if nc < 0 || nr < 0 || nc >= w as i64 || nr >= h as i64 {
+                                    continue;
+                                }
+                                if zone(nc as usize, nr as usize) != Some(z) {
+                                    best = best.min(chamfer(dc, dr));
+                                }
+                            }
+                        }
+                    }
+                    let e = value.entry(z).or_insert(f64::NEG_INFINITY);
+                    let d = if best.is_finite() {
+                        best * cell
+                    } else {
+                        10_000.0
+                    };
+                    *e = e.max(d);
+                }
+            }
+        }
+        ZoneGeometry::Centroid => {
+            let mut sums: HashMap<i64, (f64, f64, f64)> = HashMap::new();
+            for r in 0..h {
+                for c in 0..w {
+                    if let Some(z) = zone(c, r) {
+                        let e = sums.entry(z).or_insert((0.0, 0.0, 0.0));
+                        e.0 += c as f64 + 0.5;
+                        e.1 += r as f64 + 0.5;
+                        e.2 += 1.0;
+                    }
+                }
+            }
+            let mut band = vec![nodata; w * h];
+            let mut keys: Vec<_> = sums.keys().copied().collect();
+            keys.sort_unstable();
+            for z in keys {
+                let (sx, sy, n) = sums[&z];
+                let (c, r) = ((sx / n).floor() as usize, (sy / n).floor() as usize);
+                if c < w && r < h {
+                    band[r * w + c] = z as f64;
+                }
+            }
+            out.bands = vec![band];
+            return out;
+        }
+    }
+    out.bands = vec![
+        (0..h)
+            .flat_map(|r| (0..w).map(move |c| (c, r)))
+            .map(|(c, r)| {
+                zone(c, r)
+                    .and_then(|z| value.get(&z))
+                    .map_or(nodata, |&v| DataType::F32.store(v))
+            })
+            .collect(),
+    ];
+    out
+}
+
+#[cfg(test)]
+mod zonal_geometry_tests {
+    use super::*;
+
+    fn grid(rows: &[&[i32]], cell: f64) -> Raster {
+        let (h, w) = (rows.len(), rows[0].len());
+        let mut r = Raster::new(
+            w,
+            h,
+            DataType::I32,
+            [0.0, cell, 0.0, h as f64 * cell, 0.0, -cell],
+        );
+        r.nodata = Some(-9999.0);
+        r.bands[0] = rows
+            .iter()
+            .flat_map(|r| r.iter().map(|&v| f64::from(v)))
+            .collect();
+        r
+    }
+
+    #[test]
+    fn thickness_as_arcgis_measures_it() {
+        let t = |rows: &[&[i32]], cell: f64| {
+            zonal_geometry(&grid(rows, cell), ZoneGeometry::Thickness).bands[0].clone()
+        };
+        let f = |v: f64| f64::from(v as f32);
+        assert_eq!(
+            t(&[&[0, 1, 0], &[1, 1, 1], &[0, 1, 0]], 1.0)[..2],
+            [0.5, f(0.707)]
+        );
+        assert_eq!(
+            t(
+                &[
+                    &[2, 1, 1, 1, 1, 1],
+                    &[1, 1, 1, 1, 1, 1],
+                    &[1, 1, 1, 1, 1, 1]
+                ],
+                2.0
+            )[1],
+            f(10.242)
+        );
+        assert_eq!(t(&[&[1, 1], &[1, 1]], 1.0)[0], 10_000.0);
+    }
+
+    #[test]
+    fn area_perimeter_centroid() {
+        let z = grid(
+            &[
+                &[0, 0, 0, 0, 0, 0, 0, 2],
+                &[0, 1, 1, 1, 1, 1, 0, 0],
+                &[0, 1, 1, 1, 1, 1, 0, 0],
+                &[0, 1, 3, 1, 1, 1, 0, 0],
+                &[0, 1, 1, 1, 1, 1, 0, 0],
+                &[0, 0, 0, 0, 0, 0, 2, 2],
+            ],
+            2.0,
+        );
+        let a = zonal_geometry(&z, ZoneGeometry::Area).bands[0].clone();
+        assert_eq!((a[0], a[9], a[26], a[7]), (100.0, 76.0, 4.0, 12.0));
+        let p = zonal_geometry(&z, ZoneGeometry::Perimeter).bands[0].clone();
+        assert_eq!((p[0], p[9], p[26], p[7]), (92.0, 44.0, 8.0, 20.0));
+        let c = zonal_geometry(&z, ZoneGeometry::Centroid).bands[0].clone();
+        assert_eq!(
+            (c[2 * 8 + 3], c[2 * 8 + 4], c[3 * 8 + 2], c[3 * 8 + 7]),
+            (1.0, 0.0, 3.0, 2.0)
+        );
+    }
+}

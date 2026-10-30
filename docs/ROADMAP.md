@@ -866,6 +866,11 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
   letters before/after, symbols, colons, packed), signed decimal pairs, MGRS and banded UTM; the
   Precision formula, context text, document dates (12 notations) and file fields as ArcGIS writes
   them. 6 ArcGIS `eld_*` references (machine/time fields Filename/Modified/Scanned not compared).
+- [x] Zonal Geometry (`zonal_geometry`): AREA, PERIMETER (edges facing another zone or the
+  border), THICKNESS (largest chamfer distance, axis 1 / diagonal 1.414, from a cell centre to the
+  nearest point of another zone's cell; the border does not count; 10000 without another zone) and
+  CENTROID (zone value in the cell holding the mean of the cell centres). 9 ArcGIS `zg_*`
+  references.
 - [x] Zonal Fill (`zonal_fill`): each zone's spill level (min over 8-neighbour pairs across its
   boundary of the higher weight; ArcGIS also spills on the bottom/right raster edges only), fitted
   on 30 random grids (scripts/research/zonal_fill/); 4 ArcGIS `zf_*` references.

@@ -274,6 +274,31 @@ fn extract_by_attributes(ctx: &dyn Context) -> Result<Output> {
     )
 }
 
+fn zonal_geometry(ctx: &dyn Context) -> Result<Output> {
+    use crate::zonal::ZoneGeometry as G;
+    let what = match choice(ctx, "zonal_geometry", "geometry_type")
+        .to_ascii_uppercase()
+        .as_str()
+    {
+        "AREA" => G::Area,
+        "PERIMETER" => G::Perimeter,
+        "THICKNESS" => G::Thickness,
+        "CENTROID" => G::Centroid,
+        other => return Err(Error::Unsupported(format!("geometry type {other}"))),
+    };
+    if let Some(field) = ctx.get("zone_field")
+        && !field.eq_ignore_ascii_case("Value")
+    {
+        return Err(Error::Unsupported(format!(
+            "zone field {field}: only Value is supported yet"
+        )));
+    }
+    with_statistics(
+        crate::zonal::zonal_geometry(&ctx.raster("input")?, what),
+        true,
+    )
+}
+
 fn zonal_fill(ctx: &dyn Context) -> Result<Output> {
     let out = crate::zonal::zonal_fill(
         &ctx.raster("in_zone_raster")?,
@@ -2506,6 +2531,28 @@ pub static TOOLS: &[Tool] = &[
             },
         ],
         run: extract_by_attributes,
+    },
+    Tool {
+        id: "zonal_geometry",
+        name: "Zonal Geometry",
+        summary: "Each zone's area, perimeter, thickness or centroid, as a raster.",
+        params: &[
+            raster("input", "Input raster or feature zone data", true),
+            Param {
+                name: "zone_field",
+                label: "Zone field",
+                kind: Kind::Text,
+                required: false,
+                default: "Value",
+            },
+            option(
+                "geometry_type",
+                "Geometry type",
+                &["AREA", "PERIMETER", "THICKNESS", "CENTROID"],
+                "AREA",
+            ),
+        ],
+        run: zonal_geometry,
     },
     Tool {
         id: "zonal_fill",

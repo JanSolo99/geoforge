@@ -63,6 +63,7 @@ Update this file when a gap is found or closed.
 | Extract Locations From Document / Text | Documents: plain text only (no .docx/.pdf/.html/.kml); the DD x/y-degrees, DD plain toggle split, DM x/y-minutes, DMS x/y-seconds and separated-DMS families, UPS and polar MGRS, comma decimals, prefer lon/lat, custom locations/attributes, fuzzy match, max/ignore counts, date ranges, templates and std_coord_fmt other than DD are not implemented; two-digit years read as 20yy |
 | Create Normal Raster | Values are not ArcGIS's cell for cell (its seeded ACM599 / Mersenne Twister streams are not reproduced); the randomGenerator, cellSize, extent and snapRaster environments are not read |
 | Add Surface Information | Polygons (SURFACE_AREA and polygon slopes) and multipoints are refused; TIN, terrain and LAS surfaces; the Natural Neighbors and Conflate methods, pyramid level and noise filtering; only `ug run` (no registry runner for the app) |
+| Zonal Geometry | Zone field other than Value, feature zone input, the cell_size parameter |
 | Formats | LAS/LAZ, NetCDF/HDF, KML, DXF/DWG, Esri Grid/IMG, TIN, mobile geodatabase, `.shp.xml`, compressed `.cdf` |
 | Network Analyst, 3D Analyst, Geostatistical Analyst, Cartography | Not started |
 

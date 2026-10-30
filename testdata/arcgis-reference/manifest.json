@@ -106495,6 +106495,204 @@
           "circular_wrap_value": 360
         }
       }
+    },
+    "zg_landuse_area": {
+      "tool": "gp.ZonalGeometry_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "Value",
+        "<out>",
+        "AREA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "zonal_geometry",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "zone_field": "Value",
+          "output": "<out>",
+          "geometry_type": "AREA"
+        }
+      }
+    },
+    "zg_landuse_perimeter": {
+      "tool": "gp.ZonalGeometry_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "Value",
+        "<out>",
+        "PERIMETER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "zonal_geometry",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "zone_field": "Value",
+          "output": "<out>",
+          "geometry_type": "PERIMETER"
+        }
+      }
+    },
+    "zg_landuse_thickness": {
+      "tool": "gp.ZonalGeometry_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "Value",
+        "<out>",
+        "THICKNESS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "zonal_geometry",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "zone_field": "Value",
+          "output": "<out>",
+          "geometry_type": "THICKNESS"
+        }
+      }
+    },
+    "zg_landuse_centroid": {
+      "tool": "gp.ZonalGeometry_sa",
+      "args": [
+        "testdata/raster/landuse_u8.tif",
+        "Value",
+        "<out>",
+        "CENTROID"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "zonal_geometry",
+        "params": {
+          "input": "testdata/raster/landuse_u8.tif",
+          "zone_field": "Value",
+          "output": "<out>",
+          "geometry_type": "CENTROID"
+        }
+      }
+    },
+    "zg_zones_thickness": {
+      "tool": "gp.ZonalGeometry_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "Value",
+        "<out>",
+        "THICKNESS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "zonal_geometry",
+        "params": {
+          "input": "testdata/raster/zones.tif",
+          "zone_field": "Value",
+          "output": "<out>",
+          "geometry_type": "THICKNESS"
+        }
+      }
+    },
+    "zg_zones_centroid": {
+      "tool": "gp.ZonalGeometry_sa",
+      "args": [
+        "testdata/raster/zones.tif",
+        "Value",
+        "<out>",
+        "CENTROID"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "zonal_geometry",
+        "params": {
+          "input": "testdata/raster/zones.tif",
+          "zone_field": "Value",
+          "output": "<out>",
+          "geometry_type": "CENTROID"
+        }
+      }
+    },
+    "zg_patches_perimeter": {
+      "tool": "gp.ZonalGeometry_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "Value",
+        "<out>",
+        "PERIMETER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "zonal_geometry",
+        "params": {
+          "input": "testdata/raster/patches_i16.tif",
+          "zone_field": "Value",
+          "output": "<out>",
+          "geometry_type": "PERIMETER"
+        }
+      }
+    },
+    "zg_patches_thickness": {
+      "tool": "gp.ZonalGeometry_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "Value",
+        "<out>",
+        "THICKNESS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "zonal_geometry",
+        "params": {
+          "input": "testdata/raster/patches_i16.tif",
+          "zone_field": "Value",
+          "output": "<out>",
+          "geometry_type": "THICKNESS"
+        }
+      }
+    },
+    "zg_patches_area": {
+      "tool": "gp.ZonalGeometry_sa",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "Value",
+        "<out>",
+        "AREA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "zonal_geometry",
+        "params": {
+          "input": "testdata/raster/patches_i16.tif",
+          "zone_field": "Value",
+          "output": "<out>",
+          "geometry_type": "AREA"
+        }
+      }
     }
   }
 }
