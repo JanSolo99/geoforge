@@ -874,6 +874,10 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Flow Distance (`flow_distance`) with a D8 flow direction raster: vertical (height drop) or
   horizontal (path length) distance to the first stream cell, accumulated upstream in single
   precision; no statistics. 4 ArcGIS `fdist_*` references.
+- [x] Geodesic Flow Direction (`geodesic_flow_direction`), D8: Flow Direction's drops measured
+  with WGS84 ellipsoid distances (meridian/prime-vertical radii at each neighbour step's mid
+  latitude) for geographic rasters; projected rasters give Flow Direction. Square-cell size
+  recomputed from the extent like ArcGIS; no statistics. 4 ArcGIS `gfd_*` references.
 - [x] Contour List (`contour_list`): Contour's tracing at listed values (`a;b;c`; duplicates once,
   out-of-range values give nothing; Id/Contour fields, value-descending order). 3 ArcGIS `cl_*`
   references. contour_type (polygons) not supported.

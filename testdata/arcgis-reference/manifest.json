@@ -107298,6 +107298,86 @@
           "flow_direction_type": "D8"
         }
       }
+    },
+    "gfd_geographic": {
+      "tool": "gp.GeodesicFlowDirection_sa",
+      "args": [
+        "testdata/raster/dem_geographic.tif",
+        "<out>",
+        "NORMAL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "geodesic_flow_direction",
+        "params": {
+          "input": "testdata/raster/dem_geographic.tif",
+          "output": "<out>",
+          "force_flow": "NORMAL"
+        }
+      }
+    },
+    "gfd_geographic_force": {
+      "tool": "gp.GeodesicFlowDirection_sa",
+      "args": [
+        "testdata/raster/dem_geographic.tif",
+        "<out>",
+        "FORCE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "geodesic_flow_direction",
+        "params": {
+          "input": "testdata/raster/dem_geographic.tif",
+          "output": "<out>",
+          "force_flow": "FORCE"
+        }
+      }
+    },
+    "gfd_projected": {
+      "tool": "gp.GeodesicFlowDirection_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "NORMAL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "geodesic_flow_direction",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "force_flow": "NORMAL"
+        }
+      }
+    },
+    "gfd_hydro": {
+      "tool": "gp.GeodesicFlowDirection_sa",
+      "args": [
+        "testdata/raster/hydro.tif",
+        "<out>",
+        "NORMAL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "geodesic_flow_direction",
+        "params": {
+          "input": "testdata/raster/hydro.tif",
+          "output": "<out>",
+          "force_flow": "NORMAL"
+        }
+      }
     }
   }
 }

@@ -165,6 +165,13 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
 
 - `hydro::flow_distance` (D8) + registry; 4 `fdist_*` references PASS; MFD refused (KNOWN_GAPS).
 
+## Queue: Geodesic Flow Direction — landed
+
+- `hydro::geodesic_flow_direction` (WGS84 distances via `flow_direction_with`), registry
+  `geodesic_flow_direction`, 4 `gfd_*` references (fixture `testdata/raster/dem_geographic.tif`).
+  ArcGIS writes square cells sized from the X extent (0.0001 → 9.999999999999786e-5) and no
+  statistics. `gfd_hydro` shares Flow Direction's 3 allowed flat cells. MFD/DINF refused.
+
 ## Pitfall: ArcGIS sidecars in testdata
 
 Running ArcGIS on fixture rasters can leave untracked `testdata/raster/*.aux.xml` / `*.vat.dbf`

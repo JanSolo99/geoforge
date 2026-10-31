@@ -162,6 +162,56 @@ fn pick(codes: &[u8]) -> u8 {
 /// ArcGIS's flat resolution is only approximated: large flats (integer DEMs)
 /// differ in places.
 pub fn flow_direction(dem: &Raster, force_edges: bool) -> Raster {
+    flow_direction_with(dem, force_edges, &|_, dx, dy| {
+        if dx != 0 && dy != 0 {
+            std::f64::consts::SQRT_2
+        } else {
+            1.0
+        }
+    })
+}
+
+/// Geodesic Flow Direction (D8): as [`flow_direction`], with the drop to each neighbour divided by
+/// the distance on the WGS84 ellipsoid between the two cell centres when the raster is in a
+/// geographic coordinate system (east-west along the parallel, north-south along the meridian, at
+/// the pair's mean latitude; diagonals combine both). A projected raster gives Flow Direction's
+/// result (observed identical on dem.tif).
+pub fn geodesic_flow_direction(dem: &Raster, force_edges: bool) -> Raster {
+    let geographic = dem
+        .epsg
+        .is_some_and(|e| crate::geographic_crs::GEOGRAPHIC_EPSG.contains(&e));
+    if !geographic {
+        return flow_direction(dem, force_edges);
+    }
+    let t = dem.transform;
+    let (a, f) = (6_378_137.0_f64, 1.0 / 298.257_223_563);
+    let e2 = f * (2.0 - f);
+    let (dlon, dlat) = (t[1].abs().to_radians(), t[5].abs().to_radians());
+    let lat_of_row = |row: f64| (t[3] + t[5] * (row + 0.5)).to_radians();
+    let mut out = flow_direction_with(dem, force_edges, &move |row, dx, dy| {
+        let phi = lat_of_row(row as f64 + dy as f64 / 2.0);
+        let s = 1.0 - e2 * phi.sin().powi(2);
+        let ew = a * phi.cos() / s.sqrt() * dlon * dx.unsigned_abs() as f64;
+        let ns = a * (1.0 - e2) / s.powf(1.5) * dlat * dy.unsigned_abs() as f64;
+        ew.hypot(ns)
+    });
+    // ArcGIS stores the cell size recomputed from the X extent (0.0001 becomes
+    // 9.999999999999786e-5) and uses it for both axes of square cells.
+    let w = dem.width as f64;
+    let size = ((t[0] + w * t[1]) - t[0]) / w;
+    if t[1] == -t[5] {
+        out.transform[1] = size;
+        out.transform[5] = -size;
+    }
+    out
+}
+
+/// Flow Direction with the distance from a cell in `row` to its neighbour `dx`, `dy` cells away.
+fn flow_direction_with(
+    dem: &Raster,
+    force_edges: bool,
+    distance: &dyn Fn(usize, isize, isize) -> f64,
+) -> Raster {
     let (w, h) = (dem.width, dem.height);
     let n = w * h;
     let mut out = dem.like(DataType::U8);
@@ -203,14 +253,10 @@ pub fn flow_direction(dem: &Raster, force_edges: bool) -> Raster {
         let edge = x == 0 || y == 0 || x + 1 == w || y + 1 == h;
         let mut best = 0.0;
         let mut codes: Vec<u8> = Vec::new();
-        for (code, j, diagonal) in neighbors(dem, i) {
+        for (code, j, _) in neighbors(dem, i) {
             let Some(nv) = z[j] else { continue };
-            let drop = (v - nv)
-                / if diagonal {
-                    std::f64::consts::SQRT_2
-                } else {
-                    1.0
-                };
+            let (dx, dy) = ((j % w) as isize - x as isize, (j / w) as isize - y as isize);
+            let drop = (v - nv) / distance(y, dx, dy);
             if drop > best {
                 best = drop;
                 codes.clear();
@@ -237,11 +283,7 @@ pub fn flow_direction(dem: &Raster, force_edges: bool) -> Raster {
                 let Some(v2) = z[y2 as usize * w + x2 as usize] else {
                     continue;
                 };
-                let run = if dx != 0 && dy != 0 {
-                    2.0 * std::f64::consts::SQRT_2
-                } else {
-                    2.0
-                };
+                let run = distance(y, 2 * dx, 2 * dy);
                 let drop = (v - v2) / run;
                 if drop > best {
                     best = drop;

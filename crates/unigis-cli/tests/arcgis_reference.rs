@@ -4264,6 +4264,8 @@ const KNOWN_RASTER_DIFFERENCES: &[(&str, usize)] = &[
     ("flowdir_hydro_filled", 5),
     ("flowdir_hydro_force", 5),
     ("flowdir_hydro_raw", 3),
+    // Geodesic Flow Direction on a projected raster is Flow Direction (same known flat cells).
+    ("gfd_hydro", 3),
     ("flowdir_hydro_nodata", 5),
     ("flowdir_hydro_int", 930),
     // A center between NoData cells that ArcGIS fills from its neighbors.

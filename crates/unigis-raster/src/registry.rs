@@ -274,6 +274,26 @@ fn extract_by_attributes(ctx: &dyn Context) -> Result<Output> {
     )
 }
 
+fn geodesic_flow_direction(ctx: &dyn Context) -> Result<Output> {
+    if let Some(t) = ctx.get("flow_direction_type")
+        && !t.eq_ignore_ascii_case("D8")
+    {
+        return Err(Error::Unsupported(format!(
+            "flow direction type {t}: only D8 is supported yet"
+        )));
+    }
+    if ctx.get("out_drop_raster").is_some() {
+        return Err(Error::Unsupported(
+            "the output drop raster is not supported yet".into(),
+        ));
+    }
+    let force = choice(ctx, "geodesic_flow_direction", "force_flow").eq_ignore_ascii_case("FORCE");
+    with_statistics(
+        crate::hydro::geodesic_flow_direction(&ctx.raster("input")?, force),
+        false,
+    )
+}
+
 fn flow_distance(ctx: &dyn Context) -> Result<Output> {
     let Some(_) = ctx.get("in_flow_direction_raster") else {
         return Err(Error::Unsupported(
@@ -2622,6 +2642,27 @@ pub static TOOLS: &[Tool] = &[
             },
         ],
         run: extract_by_attributes,
+    },
+    Tool {
+        id: "geodesic_flow_direction",
+        name: "Geodesic Flow Direction",
+        summary: "D8 flow direction with geodesic cell distances for rasters in geographic coordinates.",
+        params: &[
+            raster("input", "Input surface raster", true),
+            option(
+                "force_flow",
+                "Force all edge cells to flow outward",
+                &["NORMAL", "FORCE"],
+                "NORMAL",
+            ),
+            option(
+                "flow_direction_type",
+                "Flow direction type",
+                &["D8", "MFD", "DINF"],
+                "D8",
+            ),
+        ],
+        run: geodesic_flow_direction,
     },
     Tool {
         id: "flow_distance",
