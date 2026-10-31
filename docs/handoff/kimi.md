@@ -1,18 +1,21 @@
 # Lane kimi handoff
 
-Updated 2026-10-31T09:14:35+11:00; last agent Kimi.
-Workspace `/mnt/media/ArcGIS_Linux/.worktrees/lane-kimi`, branch `lane/kimi`, HEAD `f6451fe101aca17a2cce7f3f4a89ab712a94de73`; `origin/main` has since advanced by two commits.
-User objective: implement claimed `sa.CreateRandomRaster`, add ArcGIS references, pass the full gate, commit and land with `scripts/lane land`.
+Updated 2026-10-31T13:47:24+11:00; last agent Kimi.
+Workspace `/mnt/media/ArcGIS_Linux/.worktrees/lane-kimi`, branch `lane/kimi`, HEAD `77b65da7df80c13d1057e7d6bcefcdab188ca667`; `origin/main` has advanced by eight commits.
+User objective: finish claimed `sa.ContourWithBarriers` under the queue time box, then commit and land with `scripts/lane land`.
 
-## Create Random Raster — validated, commit and landing pending
+## Contour with Barriers — deferred, landing pending
 
-- Added `create_random_raster` registry metadata/dispatch and `random_raster` in `crates/unigis-raster/src/extract.rs`: Float32 uniform `[0, 1)`, NoData `3.4e38`, optional deterministic seed, default 250 x 250 grid and cell-size/extent handling shared with Create Constant/Normal Raster behavior. ArcGIS's stream is not reproduced.
-- ArcGIS `GetParameterInfo` found `out_raster, seed_value, cell_size, extent`; the first generator attempt misplaced cell size because seed was omitted. Corrected all cases and added explicit seed coverage. Six successful `crr_*` references cover default, seed 42, cell size, extent and two rounded grids.
-- Added `compare_uniform_rasters`: exact grid/type/NoData, value range and uniform mean/SD/share checks applied to both ours and ArcGIS. Added deterministic/statistical unit coverage.
-- Validation on current uncommitted code: focused `UNIGIS_REFERENCE_CASES=crr_ cargo test -j3 -p unigis-cli --test arcgis_reference tools_match_arcgis_output -- --nocapture` PASS (six cases); standalone full manifest comparator PASS (87.38 s); `cargo fmt --all && git diff --check && scripts/check` PASS, exit 0 (343.772 s).
-- Roadmap/gaps updated and queue regenerated (1562 missing, next `Zonal Geometry as Table`). No incidental tracked changes remain. Scoped commit and landing remain.
+- No implementation was written because the base geometry did not converge. Added `sa.ContourWithBarriers` to `docs/WORK_QUEUE_DEFERRED.txt`; queue regeneration reports 1558 missing, next `Contour List`.
+- ArcGIS Pro 3.7 plain/barrier controls are saved in `scripts/research/contour_barriers/` (18 sidecars, no new code). Plain dem interval20 produces13 polylines with `Contour`/`Type`; the barrier produces14 and splits only the affected level220 line.
+- Unlike regular Contour, output reaches the outer raster boundary and can change open lines into closed rings through the half-cell outer/NoData model. Closed-line vertices lie near regular Contour geometry but are not exact vertices or a Douglas-Peucker subset; the vertex-selection/surface rule remains unidentified, so an approximation would not meet the compatibility goal.
+- ArcGIS signature and documentation were probed: only polyline output is currently honored; Type1 normal,2 indexed,3 explicit. No Rust/manifest changes and no validation builds were needed.
 
-Next action: stage the three Rust files, generator, documentation, manifest and all `crr_*` sidecars; commit as `Add Create Random Raster`, land while preserving other lanes' changes, and verify `HEAD == origin/main` and claim release.
+Next action: release the claim, commit the deferral/controls/handoff as `Defer Contour with Barriers`, land, then take the next free queue tool.
+
+## Create Random Raster — landed
+
+- `sa.CreateRandomRaster` landed as `77b65da7df80c13d1057e7d6bcefcdab188ca667`; six references and both complete gates passed. Post-landing generated queue and handoff updates remain intentionally uncommitted.
 
 ## Zonal Geometry — landed
 
