@@ -922,6 +922,9 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Observer Points (`observer_points`): Viewshed's visibility as a bit mask (observer k adds
   2^(k−1), up to 16), ArcGIS's type and NoData. 3 ArcGIS `op_*` references (~1% of cells differ
   where sight lines graze the terrain, as for Viewshed).
+- [x] Delete Colormap (`delete_colormap`): removes an embedded TIFF palette (appended IFD,
+  photometric 1, as ArcGIS); a `.clr` sidecar is left alone and the run succeeds (ArcGIS does
+  the same); no colormap → ERROR 000235. 3 `dcm_*` references.
 - [x] Add Colormap (`add_colormap`): .clr file or template raster; 8-bit unsigned GeoTIFFs with
   values 0..255 get an embedded TIFF palette (IFD patched, pixels untouched, replaces any
   palette), other integer rasters a normalized `<raster>.clr` sidecar; ArcGIS's 000199 / 000250.

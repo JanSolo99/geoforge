@@ -519,6 +519,12 @@ fn observer_points_unsupported(_: &dyn Context) -> Result<Output> {
     ))
 }
 
+fn delete_colormap_unsupported(_: &dyn Context) -> Result<Output> {
+    Err(Error::Unsupported(
+        "Delete Colormap edits the raster file in place; run it through `ug run`".into(),
+    ))
+}
+
 fn add_colormap_unsupported(_: &dyn Context) -> Result<Output> {
     Err(Error::Unsupported(
         "Add Colormap edits the raster file in place; run it through `ug run`".into(),
@@ -3196,6 +3202,13 @@ pub static TOOLS: &[Tool] = &[
             ),
         ],
         run: observer_points_unsupported,
+    },
+    Tool {
+        id: "delete_colormap",
+        name: "Delete Colormap",
+        summary: "Removes the colormap embedded in a raster dataset.",
+        params: &[raster("input", "Input Raster", true)],
+        run: delete_colormap_unsupported,
     },
     Tool {
         id: "add_colormap",

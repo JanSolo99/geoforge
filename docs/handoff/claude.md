@@ -283,6 +283,16 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
 - Validation: `UNIGIS_REFERENCE_CASES=acm_` PASS (7 cases, negative check confirmed); unit tests;
   GDAL reads our palette (Color Table, pixels unchanged).
 
+## Queue: Delete Colormap — landed
+
+- `colormap::delete_colormap` (shares `rewrite_palette` with Add Colormap), `ug run
+  delete_colormap` (validates before copying; `copy_raster_files` helper shared with
+  add_colormap), registry placeholder. The generator's in-place raster copy now carries `.clr`.
+- ArcGIS: embedded palette removed by appending an IFD (photometric 1); a sidecar-only raster
+  "succeeds" with the file and `.clr` unchanged (repeatable); neither → ERROR 000235.
+- Validation: `UNIGIS_REFERENCE_CASES=dcm_,acm_` PASS; colormap unit tests PASS; GDAL sees no
+  Color Table on our output.
+
 ## Pitfall: ArcGIS sidecars in testdata
 
 Running ArcGIS on fixture rasters can leave untracked `testdata/raster/*.aux.xml` / `*.vat.dbf`
@@ -291,6 +301,6 @@ After generating references, check `git status --short testdata/` and delete suc
 
 ## Next
 
-- Next queue item: `scripts/lane claim` (after Add Colormap).
+- Next queue item: `scripts/lane claim` (after Delete Colormap).
 - Possible follow-ups (not requested): Catalog New for mobile geodatabases (needs a mobile reader),
   ArcGIS-style blank names instead of NewFeatureClass placeholders.

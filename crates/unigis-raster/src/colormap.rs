@@ -210,6 +210,28 @@ pub fn apply(raster: &Path, data_type: DataType, entries: &[Entry]) -> Result<()
 /// Patches a palette into a classic TIFF: a copy of the first IFD with photometric 3 and
 /// the colormap is appended and the header pointed at it; pixel data stays where it is.
 pub fn write_tiff_colormap(path: &Path, table: &[[u16; 3]; 256]) -> Result<()> {
+    rewrite_palette(path, Some(table))
+}
+
+/// Data Management Delete Colormap: removes an embedded TIFF palette the way ArcGIS does (a
+/// copy of the first IFD with photometric 1 and no colormap is appended). A `.clr` sidecar
+/// is left alone (ArcGIS reports success and changes nothing); a raster with neither fails
+/// with ERROR 000235.
+pub fn delete_colormap(path: &Path) -> Result<()> {
+    if read_tiff_colormap(path)?.is_some() {
+        return rewrite_palette(path, None);
+    }
+    if sidecar_path(path).exists() {
+        return Ok(());
+    }
+    Err(Error::Unsupported(
+        "ERROR 000235: Input raster does not have a colormap".into(),
+    ))
+}
+
+/// Appends a copy of the first IFD with `table` as its palette (photometric 3), or without
+/// a palette (photometric 1), and points the header at it.
+fn rewrite_palette(path: &Path, table: Option<&[[u16; 3]; 256]>) -> Result<()> {
     let mut bytes = fs::read(path).map_err(|e| Error::io(path, e))?;
     let tiff = Tiff::parse(&bytes, path)?;
     let le = tiff.little_endian;
@@ -220,7 +242,7 @@ pub fn write_tiff_colormap(path: &Path, table: &[[u16; 3]; 256]) -> Result<()> {
     }
     let map_offset = bytes.len() as u32;
     for channel in 0..3 {
-        for entry in table {
+        for entry in table.into_iter().flatten() {
             bytes.extend_from_slice(&put16(entry[channel]));
         }
     }
@@ -238,9 +260,11 @@ pub fn write_tiff_colormap(path: &Path, table: &[[u16; 3]; 256]) -> Result<()> {
         raw[8..12].copy_from_slice(&value);
         entries.push(raw);
     };
-    let [a, b] = put16(3);
+    let [a, b] = put16(if table.is_some() { 3 } else { 1 });
     entry(PHOTOMETRIC, 1, [a, b, 0, 0]);
-    entry(COLORMAP, 768, put32(map_offset));
+    if table.is_some() {
+        entry(COLORMAP, 768, put32(map_offset));
+    }
     let tag_of = |raw: &[u8; 12]| {
         if le {
             u16::from_le_bytes([raw[0], raw[1]])
@@ -367,6 +391,10 @@ mod tests {
         assert_eq!(map[7], [2570, 5140, 7710]);
         assert_eq!(map[0], [0, 0, 0]);
         assert_eq!(crate::read_geotiff(&tif).unwrap().bands, r.bands);
+        delete_colormap(&tif).unwrap();
+        assert!(read_tiff_colormap(&tif).unwrap().is_none());
+        assert_eq!(crate::read_geotiff(&tif).unwrap().bands, r.bands);
+        assert!(delete_colormap(&tif).is_err());
         fs::remove_dir_all(&dir).ok();
     }
 }

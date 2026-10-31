@@ -111132,6 +111132,64 @@
           "output": "<out>"
         }
       }
+    },
+    "dcm_embedded": {
+      "tool": "management.DeleteColormap",
+      "args": [
+        "testdata/arcgis-reference/acm_clr.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "delete_colormap",
+        "params": {
+          "input": "testdata/arcgis-reference/acm_clr.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "dcm_sidecar": {
+      "tool": "management.DeleteColormap",
+      "args": [
+        "testdata/arcgis-reference/acm_int16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "delete_colormap",
+        "params": {
+          "input": "testdata/arcgis-reference/acm_int16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "dcm_none": {
+      "tool": "management.DeleteColormap",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000235: Input raster does not have a colormap",
+        "Failed to execute (DeleteColormap)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "delete_colormap",
+        "params": {
+          "input": "testdata/raster/classes_u8.tif",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

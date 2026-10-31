@@ -6693,6 +6693,25 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
     if spec.id == "visibility" {
         return run_visibility(&map, Path::new(&output));
     }
+    if spec.id == "delete_colormap" {
+        let input = map
+            .get("input")
+            .map(|v| v.trim())
+            .filter(|v| !v.is_empty())
+            .ok_or_else(|| {
+                Error::Unsupported("ERROR 000735: Input Raster: value is required".into())
+            })?;
+        let has_colormap = unigis_raster::colormap::read_tiff_colormap(Path::new(input))?.is_some()
+            || unigis_raster::colormap::sidecar_path(Path::new(input)).exists();
+        if !has_colormap {
+            return Err(Error::Unsupported(
+                "ERROR 000235: Input raster does not have a colormap".into(),
+            ));
+        }
+        let output = Path::new(&output);
+        copy_raster_files(Path::new(input), output)?;
+        return unigis_raster::colormap::delete_colormap(output);
+    }
     if spec.id == "add_colormap" {
         let get = |k: &str| map.get(k).map(|v| v.trim()).filter(|v| !v.is_empty());
         let input = get("input").ok_or_else(|| {
@@ -6704,18 +6723,7 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
             get("input_CLR_file").map(Path::new),
         )?;
         let data_type = unigis_raster::colormap::check_raster(Path::new(input))?;
-        // In place, like ArcGIS, unless a separate output is named: then a byte copy.
-        if Path::new(input) != output {
-            std::fs::copy(input, output).map_err(|e| Error::io(input, e))?;
-            for ext in [".aux.xml", ".clr"] {
-                let side = format!("{input}{ext}");
-                if Path::new(&side).exists() {
-                    let mut to = output.as_os_str().to_owned();
-                    to.push(ext);
-                    std::fs::copy(&side, &to).map_err(|e| Error::io(&side, e))?;
-                }
-            }
-        }
+        copy_raster_files(Path::new(input), output)?;
         return unigis_raster::colormap::apply(output, data_type, &entries);
     }
     if spec.id == "validate_flow_direction" {
@@ -8422,6 +8430,25 @@ fn read_observers_with(
         }
     }
     Ok(observers)
+}
+
+/// For in-place raster tools run with a separate output: a byte copy of the GeoTIFF and its
+/// `.aux.xml` / `.clr` sidecars (nothing when input and output are the same file).
+fn copy_raster_files(input: &Path, output: &Path) -> Result<()> {
+    if input == output {
+        return Ok(());
+    }
+    std::fs::copy(input, output).map_err(|e| Error::io(input, e))?;
+    for ext in [".aux.xml", ".clr"] {
+        let mut side = input.as_os_str().to_owned();
+        side.push(ext);
+        if Path::new(&side).exists() {
+            let mut to = output.as_os_str().to_owned();
+            to.push(ext);
+            std::fs::copy(&side, &to).map_err(|e| Error::io(Path::new(&side), e))?;
+        }
+    }
+    Ok(())
 }
 
 /// Spatial Analyst Visibility through `ug run`: Viewshed (FREQUENCY) or Observer Points
