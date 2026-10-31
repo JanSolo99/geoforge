@@ -916,6 +916,9 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
   Heron) and optional area raster (`out_area_raster`); HORIZONTAL ratio exact including edges
   and NoData (available triangles only); z units. ARC_CHORD approximated with Horn's plane
   (~5e-5 relative). 5 ArcGIS `sar_*` references.
+- [x] Validate Flow Direction (`validate_flow_direction`, D8): loop cells as points (LoopID,
+  FlowDir, Col, Row) in ArcGIS's order (raster-order traces, each loop from its entry cell);
+  no output when valid. 2 ArcGIS `vfd_*` references (fixture `flowdir_loops.tif`: 6 loops).
 - [x] Contour List (`contour_list`): Contour's tracing at listed values (`a;b;c`; duplicates once,
   out-of-range values give nothing; Id/Contour fields, value-descending order). 3 ArcGIS `cl_*`
   references. contour_type (polygons) not supported.

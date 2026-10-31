@@ -503,6 +503,12 @@ fn surface_area_ratio(ctx: &dyn Context) -> Result<Output> {
     })
 }
 
+fn validate_flow_direction_unsupported(_: &dyn Context) -> Result<Output> {
+    Err(Error::Unsupported(
+        "Validate Flow Direction writes points; run it through `ug run`".into(),
+    ))
+}
+
 fn stream_to_feature_unsupported(_: &dyn Context) -> Result<Output> {
     Err(Error::Unsupported(
         "Stream to Feature writes polylines; run it through `ug run`".into(),
@@ -3128,6 +3134,21 @@ pub static TOOLS: &[Tool] = &[
             ),
         ],
         run: surface_area_ratio,
+    },
+    Tool {
+        id: "validate_flow_direction",
+        name: "Validate Flow Direction",
+        summary: "Finds loops in a D8 flow direction raster and writes their cells as points.",
+        params: &[
+            raster("input", "Input flow direction raster", true),
+            option(
+                "flow_direction_type",
+                "Flow direction type",
+                &["D8", "MFD"],
+                "D8",
+            ),
+        ],
+        run: validate_flow_direction_unsupported,
     },
     Tool {
         id: "stream_to_feature",

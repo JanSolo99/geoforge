@@ -6678,6 +6678,70 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
         let lines = unigis_raster::contour::contour_list(&r, &levels);
         return write_contours(lines, &r, Path::new(&output));
     }
+    if spec.id == "validate_flow_direction" {
+        if map
+            .get("flow_direction_type")
+            .is_some_and(|t| !t.eq_ignore_ascii_case("D8"))
+        {
+            return Err(Error::Unsupported(
+                "flow direction type MFD is not supported yet".into(),
+            ));
+        }
+        let directions = unigis_raster::read_geotiff(Path::new(
+            map.get("input")
+                .ok_or_else(|| Error::Unsupported("input is required".into()))?,
+        ))?;
+        if directions.data_type.is_float() {
+            return Err(Error::Unsupported(
+                "ERROR 000969: The input raster is not integer type.".into(),
+            ));
+        }
+        let cells = unigis_raster::hydro::flow_direction_loops(&directions);
+        if cells.is_empty() {
+            // ArcGIS writes no feature class in this case.
+            println!("Flow Direction is valid. No loops found.");
+            return Ok(());
+        }
+        let t = directions.transform;
+        let loops = cells.last().map_or(0, |c| c.0);
+        let features = cells
+            .into_iter()
+            .enumerate()
+            .map(|(i, (id, code, col, row))| Feature {
+                oid: i as i64,
+                geometry: Some(unigis_core::Geometry::point(
+                    t[0] + (col as f64 + 0.5) * t[1],
+                    t[3] + (row as f64 + 0.5) * t[5],
+                )),
+                attributes: vec![
+                    Value::Integer(id as i32),
+                    Value::Integer(code as i32),
+                    Value::Integer(col as i32),
+                    Value::Integer(row as i32),
+                ],
+            })
+            .collect();
+        let field = |name: &str| {
+            let mut f = Field::new(name, FieldType::Integer);
+            f.length = 10;
+            f
+        };
+        let out = ToolOutput {
+            kind: unigis_core::GeometryKind::Point,
+            has_z: false,
+            has_m: false,
+            fields: vec![
+                field("LoopID"),
+                field("FlowDir"),
+                field("Col"),
+                field("Row"),
+            ],
+            spatial_reference_wkt: raster_wkt(&directions)?,
+            features,
+            messages: vec![format!("{loops} loops found.")],
+        };
+        return write_output(out, Path::new(&output), None);
+    }
     if spec.id == "stream_to_feature" {
         let read = |k: &str| -> Result<unigis_raster::Raster> {
             unigis_raster::read_geotiff(Path::new(

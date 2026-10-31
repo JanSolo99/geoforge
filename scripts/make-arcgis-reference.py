@@ -947,6 +947,8 @@ CASES = {
     "sar_dem_feet": ("gp.SurfaceAreaRatio_sa", [RASTER / "dem.tif"], [OUT / "sar_dem_feet_area.tif", "FOOT", "HORIZONTAL"]),
     "sar_dem_nodata": ("gp.SurfaceAreaRatio_sa", [RASTER / "dem_nodata.tif"], [OUT / "sar_dem_nodata_area.tif", "METER", "HORIZONTAL"]),
     "sar_hydro": ("gp.SurfaceAreaRatio_sa", [RASTER / "hydro.tif"], [OUT / "sar_hydro_area.tif", "METER", "HORIZONTAL"]),
+    "vfd_loops": ("gp.ValidateFlowDirection_sa", [RASTER / "flowdir_loops.tif"], ["D8"]),
+    "vfd_hydro_raw": ("gp.ValidateFlowDirection_sa", [OUT / "flowdir_hydro_raw.tif"], ["D8"]),
     "stf_links": ("gp.StreamToFeature_sa", [OUT / "streamlink_hydro.tif", OUT / "flowdir_hydro_filled.tif"], ["SIMPLIFY"]),
     "stf_links_raw": ("gp.StreamToFeature_sa", [OUT / "streamlink_hydro.tif", OUT / "flowdir_hydro_filled.tif"], ["NO_SIMPLIFY"]),
     "stf_streams": ("gp.StreamToFeature_sa", [OUT / "streams_hydro.tif", OUT / "flowdir_hydro_filled.tif"], ["SIMPLIFY"]),
@@ -2472,6 +2474,7 @@ RUN = {
     # The scale raster (second output) is compared by second_raster_outputs_match_arcgis.
     # The surface area raster (second output) is compared by second_raster_outputs_match_arcgis.
     "gp.SurfaceAreaRatio_sa": ("surface_area_ratio", ["input", "output", None, "z_unit", "planar_area_type"]),
+    "gp.ValidateFlowDirection_sa": ("validate_flow_direction", ["input", "output", "flow_direction_type"]),
     "gp.StreamToFeature_sa": ("stream_to_feature", ["in_stream_raster", "in_flow_direction_raster", "output", "simplify"]),
     "gp.StorageCapacity_sa": ("storage_capacity", ["input", "output", "in_zone_data", "zone_field", "analysis_type", "min_elevation", "max_elevation", "increment_type", "increment", "z_unit"]),
     "gp.RasterCalculator_sa": ("raster_calculator", ["expression", "output"]),

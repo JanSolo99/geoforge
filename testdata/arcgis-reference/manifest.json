@@ -110563,6 +110563,136 @@
           "planar_area_type": "HORIZONTAL"
         }
       }
+    },
+    "vfd_loops": {
+      "tool": "gp.ValidateFlowDirection_sa",
+      "args": [
+        "testdata/raster/flowdir_loops.tif",
+        "<out>",
+        "D8"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "6 loops found."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "LoopID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "FlowDir",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Col",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Row",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "validate_flow_direction",
+        "params": {
+          "input": "testdata/raster/flowdir_loops.tif",
+          "output": "<out>",
+          "flow_direction_type": "D8"
+        }
+      }
+    },
+    "vfd_hydro_raw": {
+      "tool": "gp.ValidateFlowDirection_sa",
+      "args": [
+        "testdata/arcgis-reference/flowdir_hydro_raw.tif",
+        "<out>",
+        "D8"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "1 loops found."
+      ],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "LoopID",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "FlowDir",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Col",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "Row",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Point",
+      "run": {
+        "tool": "validate_flow_direction",
+        "params": {
+          "input": "testdata/arcgis-reference/flowdir_hydro_raw.tif",
+          "output": "<out>",
+          "flow_direction_type": "D8"
+        }
+      }
     }
   }
 }

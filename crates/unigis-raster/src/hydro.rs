@@ -1328,3 +1328,55 @@ pub fn stream_to_feature(streams: &Raster, directions: &Raster, simplify: bool) 
     }
     out
 }
+
+/// Spatial Analyst Validate Flow Direction (D8): the cells of each loop as
+/// (loop id, direction code, column, row). Cells are traced downstream in raster order; a loop
+/// is reported when a trace returns to a cell of its own path, from that cell in flow order
+/// (as ArcGIS lists them). Paths end at NoData, invalid codes and the raster edge.
+pub fn flow_direction_loops(directions: &Raster) -> Vec<(u32, u32, usize, usize)> {
+    let (w, h) = (directions.width, directions.height);
+    let n = w * h;
+    let next = |i: usize| -> Option<usize> {
+        let (dr, dc) = d8_step(value(directions, i)?)?;
+        let (r, c) = ((i / w) as isize + dr, (i % w) as isize + dc);
+        (r >= 0 && c >= 0 && (r as usize) < h && (c as usize) < w)
+            .then(|| r as usize * w + c as usize)
+    };
+    // 0 unvisited, 1 on the current path, 2 done.
+    let mut state = vec![0u8; n];
+    let mut loops = Vec::new();
+    let mut found = 0u32;
+    let mut path = Vec::new();
+    for start in 0..n {
+        if state[start] != 0 {
+            continue;
+        }
+        path.clear();
+        let mut cur = Some(start);
+        while let Some(i) = cur {
+            match state[i] {
+                0 => {
+                    state[i] = 1;
+                    path.push(i);
+                    cur = next(i);
+                }
+                1 => {
+                    found += 1;
+                    let id = found;
+                    let at = path.iter().position(|&p| p == i).unwrap();
+                    loops.extend(
+                        path[at..].iter().map(|&p| {
+                            (id, value(directions, p).unwrap_or(0.0) as u32, p % w, p / w)
+                        }),
+                    );
+                    break;
+                }
+                _ => break,
+            }
+        }
+        for &p in &path {
+            state[p] = 2;
+        }
+    }
+    loops
+}

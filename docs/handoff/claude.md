@@ -235,6 +235,13 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
   vector-area planes, ArcGIS Slope PLANAR/GEODESIC and UTM scale factors — none exact (median
   7e-6, max 5e-5 relative). Allowed 7041 cells in `sar_dem`. Revisit only if asked.
 
+## Queue: Validate Flow Direction — landed
+
+- `hydro::flow_direction_loops` + `ug run validate_flow_direction` branch (points, no output
+  when valid, like ArcGIS). New fixture `testdata/raster/flowdir_loops.tif` (6 loops).
+- Pitfall: generating references while the MCP bridge's ArcGIS session is also running gave a
+  truncated result once (3 of 6 loops); rerunning alone was correct. Run one worker at a time.
+
 ## Pitfall: ArcGIS sidecars in testdata
 
 Running ArcGIS on fixture rasters can leave untracked `testdata/raster/*.aux.xml` / `*.vat.dbf`
