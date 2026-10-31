@@ -1,0 +1,42 @@
+# UniGIS in the browser (the eframe web runner in app/apps/rustgis-web, built with Trunk).
+# The WebAssembly build is too heavy for Netlify's build image, so it is built in CI or locally
+# (scripts/build-web.sh) and the finished site is deployed:
+#   .github/workflows/web-netlify.yml   on every push to main
+#   scripts/deploy-netlify.sh           by hand
+[build]
+  publish = "."
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Hashed build files never change.
+[[headers]]
+  for = "/*.wasm"
+  [headers.values]
+    Content-Type = "application/wasm"
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# The shell and the service worker must be revalidated or a new build is never picked up.
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+    Cache-Control = "no-cache"
