@@ -884,6 +884,11 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
   (`out_geomorphons_raster`, Int16); cell or ground search/skip distances, z units, NoData,
   skip-distance NoData border, geographic rasters on a 6 371 km sphere. 11 ArcGIS `gml_*`
   references (both outputs, cell for cell).
+- [x] Multiscale Surface Deviation (`multiscale_surface_deviation`): largest DEV
+  ((z − mean) / population std) over clipped square neighbourhoods n₀ + ⌊(Δn·k)^p⌋ cells,
+  distances rounded half up to cells, squares in single precision like ArcGIS; optional scale
+  raster (`out_scale_raster`, in the distance units). 8 ArcGIS `msd_*` references (both outputs;
+  a few cells differ at scales below 4 cells).
 - [x] Contour List (`contour_list`): Contour's tracing at listed values (`a;b;c`; duplicates once,
   out-of-range values give nothing; Id/Contour fields, value-descending order). 3 ArcGIS `cl_*`
   references. contour_type (polygons) not supported.

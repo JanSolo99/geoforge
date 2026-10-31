@@ -24,6 +24,7 @@ pub mod hydro;
 pub mod interpolate;
 pub mod local;
 pub mod mathfn;
+pub mod multiscale;
 pub mod overlay;
 pub mod rasterize;
 pub mod registry;

@@ -107697,6 +107697,242 @@
           "z_unit": "METER"
         }
       }
+    },
+    "msd_dem": {
+      "tool": "gp.MultiscaleSurfaceDeviation_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "testdata/arcgis-reference/msd_dem_scale.tif",
+        "CELLS",
+        null,
+        null,
+        null,
+        null,
+        "CPU_ONLY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "multiscale_surface_deviation",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "distance_units": "CELLS",
+          "analysis_target_device": "CPU_ONLY"
+        }
+      }
+    },
+    "msd_dem_nonlinear": {
+      "tool": "gp.MultiscaleSurfaceDeviation_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "testdata/arcgis-reference/msd_dem_nonlinear_scale.tif",
+        "CELLS",
+        2,
+        20,
+        1,
+        1.5,
+        "CPU_ONLY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "multiscale_surface_deviation",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "distance_units": "CELLS",
+          "min_scale": 2,
+          "max_scale": 20,
+          "base_increment": 1,
+          "nonlinearity": 1.5,
+          "analysis_target_device": "CPU_ONLY"
+        }
+      }
+    },
+    "msd_dem_meters": {
+      "tool": "gp.MultiscaleSurfaceDeviation_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "testdata/arcgis-reference/msd_dem_meters_scale.tif",
+        "METERS",
+        25,
+        95,
+        15,
+        1,
+        "CPU_ONLY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "multiscale_surface_deviation",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "distance_units": "METERS",
+          "min_scale": 25,
+          "max_scale": 95,
+          "base_increment": 15,
+          "nonlinearity": 1,
+          "analysis_target_device": "CPU_ONLY"
+        }
+      }
+    },
+    "msd_dem_meters_default": {
+      "tool": "gp.MultiscaleSurfaceDeviation_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "testdata/arcgis-reference/msd_dem_meters_default_scale.tif",
+        "METERS",
+        null,
+        null,
+        null,
+        null,
+        "CPU_ONLY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "multiscale_surface_deviation",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "distance_units": "METERS",
+          "analysis_target_device": "CPU_ONLY"
+        }
+      }
+    },
+    "msd_dem_feet": {
+      "tool": "gp.MultiscaleSurfaceDeviation_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "testdata/arcgis-reference/msd_dem_feet_scale.tif",
+        "FEET",
+        40,
+        120,
+        40,
+        1,
+        "CPU_ONLY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "multiscale_surface_deviation",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "distance_units": "FEET",
+          "min_scale": 40,
+          "max_scale": 120,
+          "base_increment": 40,
+          "nonlinearity": 1,
+          "analysis_target_device": "CPU_ONLY"
+        }
+      }
+    },
+    "msd_dem_nodata": {
+      "tool": "gp.MultiscaleSurfaceDeviation_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "testdata/arcgis-reference/msd_dem_nodata_scale.tif",
+        "CELLS",
+        2,
+        6,
+        1,
+        1,
+        "CPU_ONLY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "multiscale_surface_deviation",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "distance_units": "CELLS",
+          "min_scale": 2,
+          "max_scale": 6,
+          "base_increment": 1,
+          "nonlinearity": 1,
+          "analysis_target_device": "CPU_ONLY"
+        }
+      }
+    },
+    "msd_hydro": {
+      "tool": "gp.MultiscaleSurfaceDeviation_sa",
+      "args": [
+        "testdata/raster/hydro.tif",
+        "<out>",
+        "testdata/arcgis-reference/msd_hydro_scale.tif",
+        "CELLS",
+        null,
+        null,
+        null,
+        null,
+        "CPU_ONLY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "multiscale_surface_deviation",
+        "params": {
+          "input": "testdata/raster/hydro.tif",
+          "output": "<out>",
+          "distance_units": "CELLS",
+          "analysis_target_device": "CPU_ONLY"
+        }
+      }
+    },
+    "msd_geographic": {
+      "tool": "gp.MultiscaleSurfaceDeviation_sa",
+      "args": [
+        "testdata/raster/dem_geographic.tif",
+        "<out>",
+        "testdata/arcgis-reference/msd_geographic_scale.tif",
+        "CELLS",
+        2,
+        6,
+        1,
+        1,
+        "CPU_ONLY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "multiscale_surface_deviation",
+        "params": {
+          "input": "testdata/raster/dem_geographic.tif",
+          "output": "<out>",
+          "distance_units": "CELLS",
+          "min_scale": 2,
+          "max_scale": 6,
+          "base_increment": 1,
+          "nonlinearity": 1,
+          "analysis_target_device": "CPU_ONLY"
+        }
+      }
     }
   }
 }

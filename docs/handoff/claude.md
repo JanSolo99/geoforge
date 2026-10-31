@@ -179,7 +179,17 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
   sign from `max + min` angle vs threshold; diagonals limited by distance (cells: k·√2 ≤ n);
   cells strictly nearer than the skip distance are ignored; NoData/edge stops a line (no cell →
   flat); skip gives a NoData border (cells: round half down; ground: ceil, ≤ ½ cell → none);
-  geographic: sphere R 6 371 000 m. `geomorphons_match_arcgis` compares the second output.
+  geographic: sphere R 6 371 000 m. `second_raster_outputs_match_arcgis` compares the second output.
+
+## Queue: Multiscale Surface Deviation — landed
+
+- `multiscale::{scales, multiscale_surface_deviation}`, registry `multiscale_surface_deviation`
+  (second output `out_scale_raster` via `Output.extra`), 8 `msd_*` references; the second-output
+  test is now `second_raster_outputs_match_arcgis` (geomorphons + scales). Findings: ArcGIS
+  squares z in f32 then sums in f64 (exact for scales ≥ 4 cells; below that a few cells match
+  pure f64 instead — allowed in KNOWN_RASTER_DIFFERENCES); default scales 4..13 cells;
+  deviation NoData 3.4e38, scale NoData −f32::MAX; geographic transform per axis for the
+  deviation raster but square for the scale raster.
 
 ## Pitfall: ArcGIS sidecars in testdata
 

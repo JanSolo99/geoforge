@@ -314,10 +314,9 @@ fn geodesic_flow_direction(ctx: &dyn Context) -> Result<Output> {
     )
 }
 
-fn geomorphon_landforms(ctx: &dyn Context) -> Result<Output> {
-    use crate::geomorphon::{Distance, Parameters};
-    let units = choice(ctx, "geomorphon_landforms", "distance_units").to_ascii_uppercase();
-    let metres = match units.as_str() {
+/// Metres per unit of a Spatial Analyst distance-units keyword (None for CELLS).
+fn distance_unit_metres(units: &str) -> Result<Option<f64>> {
+    Ok(match units.to_ascii_uppercase().as_str() {
         "CELLS" => None,
         "METERS" => Some(1.0),
         "CENTIMETERS" => Some(0.01),
@@ -327,7 +326,67 @@ fn geomorphon_landforms(ctx: &dyn Context) -> Result<Output> {
         "YARD" | "YARDS" => Some(0.9144),
         "MILES" => Some(1609.344),
         other => return Err(Error::Unsupported(format!("distance units {other}"))),
+    })
+}
+
+fn multiscale_surface_deviation(ctx: &dyn Context) -> Result<Output> {
+    let dem = ctx.raster("input")?;
+    let metres = distance_unit_metres(&choice(
+        ctx,
+        "multiscale_surface_deviation",
+        "distance_units",
+    ))?;
+    let geographic = dem
+        .epsg
+        .is_some_and(|e| crate::geographic_crs::GEOGRAPHIC_EPSG.contains(&e));
+    if metres.is_some() && geographic {
+        return Err(Error::Unsupported(
+            "linear distance units on a geographic raster are not supported yet (use CELLS)".into(),
+        ));
+    }
+    let cell = dem.transform[1].abs();
+    // Distances in cells, rounded half up (ArcGIS: 25 m on 10 m cells is 3 cells).
+    let cells = |name: &str, default: f64| -> usize {
+        let v = ctx.get(name).and_then(|v| v.trim().parse::<f64>().ok());
+        let c = match (v, metres) {
+            (None, _) => default,
+            (Some(v), None) => v,
+            (Some(v), Some(m)) => v * m / cell,
+        };
+        ((c + 0.5 + 1e-9).floor() as usize).max(1)
     };
+    let (min, max) = (cells("min_scale", 4.0), cells("max_scale", 13.0));
+    if max < min {
+        return Err(Error::Unsupported(
+            "the maximum scale must not be less than the minimum".into(),
+        ));
+    }
+    let scales = crate::multiscale::scales(
+        min,
+        max,
+        cells("base_increment", 1.0),
+        number_or(ctx, "nonlinearity", 1.0),
+    );
+    let (mut deviation, mut scale) = crate::multiscale::multiscale_surface_deviation(
+        &dem,
+        &scales,
+        metres.map_or(1.0, |m| cell / m),
+    );
+    if geographic {
+        // ArcGIS sizes the deviation raster's axes separately but the scale raster's square.
+        crate::geographic_crs::recompute_cell_size_per_axis(&mut deviation);
+        crate::geographic_crs::recompute_cell_size(&mut scale);
+    }
+    Ok(Output {
+        covariance_statistics: true,
+        extra: vec![("out_scale_raster", scale)],
+        ..with_statistics(deviation, true)?
+    })
+}
+
+fn geomorphon_landforms(ctx: &dyn Context) -> Result<Output> {
+    use crate::geomorphon::{Distance, Parameters};
+    let metres = distance_unit_metres(&choice(ctx, "geomorphon_landforms", "distance_units"))?;
     let distance = |name: &str| {
         let v = number_or(
             ctx,
@@ -2719,6 +2778,47 @@ pub static TOOLS: &[Tool] = &[
             },
         ],
         run: extract_by_attributes,
+    },
+    Tool {
+        id: "multiscale_surface_deviation",
+        name: "Multiscale Surface Deviation",
+        summary: "Largest deviation from the mean elevation over a range of neighbourhood sizes, and the size where it occurs.",
+        params: &[
+            raster("input", "Input surface raster", true),
+            Param {
+                name: "out_scale_raster",
+                label: "Output scale raster",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+            },
+            option(
+                "distance_units",
+                "Distance units",
+                &[
+                    "CELLS",
+                    "METERS",
+                    "CENTIMETERS",
+                    "KILOMETERS",
+                    "INCHES",
+                    "FEET",
+                    "YARDS",
+                    "MILES",
+                ],
+                "CELLS",
+            ),
+            num_param("min_scale", "Minimum neighborhood distance", ""),
+            num_param("max_scale", "Maximum neighborhood distance", ""),
+            num_param("base_increment", "Base distance increment", ""),
+            num_param("nonlinearity", "Nonlinearity factor", "1"),
+            option(
+                "analysis_target_device",
+                "Target device for analysis",
+                &["GPU_THEN_CPU", "GPU_ONLY", "CPU_ONLY"],
+                "GPU_THEN_CPU",
+            ),
+        ],
+        run: multiscale_surface_deviation,
     },
     Tool {
         id: "geomorphon_landforms",

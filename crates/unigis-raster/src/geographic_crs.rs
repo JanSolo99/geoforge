@@ -81,3 +81,12 @@ pub(crate) fn recompute_cell_size(r: &mut crate::Raster) {
         r.transform[5] = -size;
     }
 }
+
+/// Like [`recompute_cell_size`] but each axis from its own extent (Multiscale Surface
+/// Deviation: 0.0001 becomes 9.999999999999786e-5 across and 1.0000000000000379e-4 down).
+pub(crate) fn recompute_cell_size_per_axis(r: &mut crate::Raster) {
+    let t = r.transform;
+    let (w, h) = (r.width as f64, r.height as f64);
+    r.transform[1] = ((t[0] + w * t[1]) - t[0]) / w;
+    r.transform[5] = ((t[3] + h * t[5]) - t[3]) / h;
+}

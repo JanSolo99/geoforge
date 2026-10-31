@@ -65,6 +65,7 @@ Update this file when a gap is found or closed.
 | Create Normal / Random Raster | Values are not ArcGIS's cell for cell (its seeded ACM599 / Mersenne Twister streams are not reproduced, including explicit Create Random Raster seeds); the randomGenerator, cellSize, extent and snapRaster environments are not read |
 | Add Surface Information | Polygons (SURFACE_AREA and polygon slopes) and multipoints are refused; TIN, terrain and LAS surfaces; the Natural Neighbors and Conflate methods, pyramid level and noise filtering; only `ug run` (no registry runner for the app) |
 | Flow Distance | MFD and D-Infinity flow (the default without a flow direction raster), statistics_type |
+| Multiscale Surface Deviation | Linear distance units on geographic rasters; at scales below 4 cells a few low-variance cells differ from ArcGIS (its squaring precision there is not identified); GPU path not distinguished |
 | Geomorphon Landforms | Projected rasters with non-metre linear units (distances assumed in metres); non-square projected cells and the geographic skip border are unverified; the landforms raster's Landform text column in the attribute table |
 | Geodesic Flow Direction | MFD and D-Infinity, out_drop_raster; geographic datums other than WGS84's ellipsoid; flats resolved as Flow Direction (a few cells differ) |
 | Formats | LAS/LAZ, NetCDF/HDF, KML, DXF/DWG, Esri Grid/IMG, TIN, mobile geodatabase, `.shp.xml`, compressed `.cdf` |

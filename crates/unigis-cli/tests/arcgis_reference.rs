@@ -4266,6 +4266,13 @@ const KNOWN_RASTER_DIFFERENCES: &[(&str, usize)] = &[
     ("flowdir_hydro_raw", 3),
     // Geodesic Flow Direction on a projected raster is Flow Direction (same known flat cells).
     ("gfd_hydro", 3),
+    // Multiscale Surface Deviation below 4 cells: a few low-variance windows where ArcGIS's
+    // squares are not the single-precision ones it uses everywhere else (not identified).
+    ("msd_dem_nonlinear", 7),
+    ("msd_dem_meters", 8),
+    ("msd_dem_feet", 22),
+    ("msd_dem_nodata", 9),
+    ("msd_geographic", 9),
     ("flowdir_hydro_nodata", 5),
     ("flowdir_hydro_int", 930),
     // A center between NoData cells that ArcGIS fills from its neighbors.
@@ -4571,26 +4578,32 @@ fn compare_statistics(ours: &Path, arcgis: &Path, bands: usize, cells_differ: bo
     diffs
 }
 
-/// Geomorphon Landforms' second output (the geomorphons raster) against ArcGIS's
-/// `<case>_geomorphons.tif`; the landforms raster is compared by `tools_match_arcgis_output`.
+/// Second raster outputs against ArcGIS's `<case>_<suffix>.tif`: Geomorphon Landforms'
+/// geomorphons and Multiscale Surface Deviation's scales (the first outputs are compared by
+/// `tools_match_arcgis_output`).
 #[test]
-fn geomorphons_match_arcgis() {
+fn second_raster_outputs_match_arcgis() {
     let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
     let reference = root.join("testdata/arcgis-reference");
     let manifest: serde_json::Value =
         serde_json::from_str(&std::fs::read_to_string(reference.join("manifest.json")).unwrap())
             .unwrap();
-    let out_dir = std::env::temp_dir().join(format!("ug-geomorphons-{}", std::process::id()));
+    let out_dir = std::env::temp_dir().join(format!("ug-second-outputs-{}", std::process::id()));
     std::fs::create_dir_all(&out_dir).unwrap();
     let mut failures = Vec::new();
     let mut cases = 0;
     for (case, info) in manifest["cases"].as_object().unwrap() {
-        if info["tool"] != "gp.GeomorphonLandforms_sa" {
-            continue;
-        }
+        let (param, suffix) = match info["tool"].as_str() {
+            Some("gp.GeomorphonLandforms_sa") => ("out_geomorphons_raster", "geomorphons"),
+            Some("gp.MultiscaleSurfaceDeviation_sa") => ("out_scale_raster", "scale"),
+            _ => continue,
+        };
         cases += 1;
-        let ours = out_dir.join(format!("{case}_geomorphons.tif"));
-        let mut args = vec!["run".to_string(), "geomorphon_landforms".into()];
+        let ours = out_dir.join(format!("{case}_{suffix}.tif"));
+        let mut args = vec![
+            "run".to_string(),
+            info["run"]["tool"].as_str().unwrap().into(),
+        ];
         for (name, value) in info["run"]["params"].as_object().unwrap() {
             let value = value
                 .as_str()
@@ -4602,7 +4615,7 @@ fn geomorphons_match_arcgis() {
             };
             args.push(format!("{name}={value}"));
         }
-        args.push(format!("out_geomorphons_raster={}", ours.display()));
+        args.push(format!("{param}={}", ours.display()));
         let run = Command::new(env!("CARGO_BIN_EXE_ug"))
             .current_dir(&root)
             .args(&args)
@@ -4613,11 +4626,7 @@ fn geomorphons_match_arcgis() {
             "{case}: {}",
             String::from_utf8_lossy(&run.stderr)
         );
-        let diffs = compare_rasters(
-            case,
-            &ours,
-            &reference.join(format!("{case}_geomorphons.tif")),
-        );
+        let diffs = compare_rasters(case, &ours, &reference.join(format!("{case}_{suffix}.tif")));
         if !diffs.is_empty() {
             failures.push(format!("{case}:\n    {}", diffs.join("\n    ")));
         }
