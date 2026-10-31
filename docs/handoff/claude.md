@@ -242,6 +242,12 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
 - Pitfall: generating references while the MCP bridge's ArcGIS session is also running gave a
   truncated result once (3 of 6 loops); rerunning alone was correct. Run one worker at a time.
 
+## Queue: Observer Points — landed
+
+- `surface::observer_points` (viewshed refactored into `visible_cells` + `observer_raster`),
+  `ug run observer_points` branch with shared `read_observers`. Cells differ only where
+  Viewshed's do; improving the sight-line model would fix both.
+
 ## Pitfall: ArcGIS sidecars in testdata
 
 Running ArcGIS on fixture rasters can leave untracked `testdata/raster/*.aux.xml` / `*.vat.dbf`

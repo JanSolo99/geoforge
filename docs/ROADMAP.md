@@ -919,6 +919,9 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Validate Flow Direction (`validate_flow_direction`, D8): loop cells as points (LoopID,
   FlowDir, Col, Row) in ArcGIS's order (raster-order traces, each loop from its entry cell);
   no output when valid. 2 ArcGIS `vfd_*` references (fixture `flowdir_loops.tif`: 6 loops).
+- [x] Observer Points (`observer_points`): Viewshed's visibility as a bit mask (observer k adds
+  2^(k−1), up to 16), ArcGIS's type and NoData. 3 ArcGIS `op_*` references (~1% of cells differ
+  where sight lines graze the terrain, as for Viewshed).
 - [x] Contour List (`contour_list`): Contour's tracing at listed values (`a;b;c`; duplicates once,
   out-of-range values give nothing; Id/Contour fields, value-descending order). 3 ArcGIS `cl_*`
   references. contour_type (polygons) not supported.

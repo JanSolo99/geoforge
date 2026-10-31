@@ -110693,6 +110693,68 @@
           "flow_direction_type": "D8"
         }
       }
+    },
+    "op_two": {
+      "tool": "gp.ObserverPoints_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/observers.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "observer_points",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "in_observer_point_features": "testdata/raster/observers.shp",
+          "output": "<out>"
+        }
+      }
+    },
+    "op_hill": {
+      "tool": "gp.ObserverPoints_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/observer_hill.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "observer_points",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "in_observer_point_features": "testdata/raster/observer_hill.shp",
+          "output": "<out>"
+        }
+      }
+    },
+    "op_two_z2": {
+      "tool": "gp.ObserverPoints_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/observers.shp",
+        "<out>",
+        2
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "observer_points",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "in_observer_point_features": "testdata/raster/observers.shp",
+          "output": "<out>",
+          "z_factor": 2
+        }
+      }
     }
   }
 }

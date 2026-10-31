@@ -4259,6 +4259,10 @@ const KNOWN_RASTER_DIFFERENCES: &[(&str, usize)] = &[
     ("viewshed_hill", 199),
     ("viewshed_two", 309),
     ("viewshed_hill_z2", 199),
+    // Observer Points uses Viewshed's visibility test (same grazing sight lines).
+    ("op_two", 309),
+    ("op_hill", 199),
+    ("op_two_z2", 310),
     ("hillshade_shadows_315_15", 3),
     ("hillshade_shadows_200_25", 29),
     ("flowdir_hydro_filled", 5),

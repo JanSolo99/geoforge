@@ -503,6 +503,12 @@ fn surface_area_ratio(ctx: &dyn Context) -> Result<Output> {
     })
 }
 
+fn observer_points_unsupported(_: &dyn Context) -> Result<Output> {
+    Err(Error::Unsupported(
+        "Observer Points reads observer features; run it through `ug run`".into(),
+    ))
+}
+
 fn validate_flow_direction_unsupported(_: &dyn Context) -> Result<Output> {
     Err(Error::Unsupported(
         "Validate Flow Direction writes points; run it through `ug run`".into(),
@@ -3134,6 +3140,34 @@ pub static TOOLS: &[Tool] = &[
             ),
         ],
         run: surface_area_ratio,
+    },
+    Tool {
+        id: "observer_points",
+        name: "Observer Points",
+        summary: "Which observer points (up to 16, as a bit mask) see each cell of a surface.",
+        params: &[
+            raster("input", "Input raster", true),
+            Param {
+                name: "in_observer_point_features",
+                label: "Input point observer features",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            num_param("z_factor", "Z factor", "1"),
+            option(
+                "curvature_correction",
+                "Use earth curvature corrections",
+                &["FLAT_EARTH", "CURVED_EARTH"],
+                "FLAT_EARTH",
+            ),
+            num_param(
+                "refractivity_coefficient",
+                "Refractivity coefficient",
+                "0.13",
+            ),
+        ],
+        run: observer_points_unsupported,
     },
     Tool {
         id: "validate_flow_direction",

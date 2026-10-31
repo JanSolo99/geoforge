@@ -4658,29 +4658,7 @@ fn main() -> ExitCode {
             z_factor,
         } => (|| {
             let dem = unigis_raster::read_geotiff(&in_raster)?;
-            let (fc, _) = open_feature_class(&in_observer_features)?;
-            let offset_field = fc
-                .fields()
-                .iter()
-                .position(|f| f.name.eq_ignore_ascii_case("OFFSETA"));
-            let mut observers = Vec::new();
-            for f in fc.features() {
-                let f = f?;
-                let offset = match offset_field.map(|i| &f.attributes[i]) {
-                    Some(Value::Double(v)) => *v,
-                    Some(Value::Single(v)) => *v as f64,
-                    Some(Value::Integer(v)) => *v as f64,
-                    Some(Value::SmallInteger(v)) => *v as f64,
-                    _ => 1.0,
-                };
-                for p in f.geometry.iter().flat_map(|g| g.xy.iter()) {
-                    observers.push(unigis_raster::surface::Observer {
-                        x: p[0],
-                        y: p[1],
-                        offset,
-                    });
-                }
-            }
+            let observers = read_observers(&in_observer_features)?;
             write_raster(
                 &out_raster,
                 &unigis_raster::surface::viewshed(&dem, &observers, z_factor),
@@ -6678,6 +6656,37 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
         let lines = unigis_raster::contour::contour_list(&r, &levels);
         return write_contours(lines, &r, Path::new(&output));
     }
+    if spec.id == "observer_points" {
+        if map
+            .get("curvature_correction")
+            .is_some_and(|v| v.eq_ignore_ascii_case("CURVED_EARTH"))
+            || map.contains_key("out_agl_raster")
+        {
+            return Err(Error::Unsupported(
+                "Observer Points: earth curvature correction and the AGL raster are not supported yet"
+                    .into(),
+            ));
+        }
+        let get = |k: &str| {
+            map.get(k)
+                .ok_or_else(|| Error::Unsupported(format!("{k} is required")))
+        };
+        let dem = unigis_raster::read_geotiff(Path::new(get("input")?))?;
+        let observers = read_observers(Path::new(get("in_observer_point_features")?))?;
+        if observers.len() > 16 {
+            return Err(Error::Unsupported(
+                "Observer Points takes at most 16 observers".into(),
+            ));
+        }
+        let z_factor = map
+            .get("z_factor")
+            .and_then(|v| v.trim().parse().ok())
+            .unwrap_or(1.0);
+        return write_raster(
+            Path::new(&output),
+            &unigis_raster::surface::observer_points(&dem, &observers, z_factor),
+        );
+    }
     if spec.id == "validate_flow_direction" {
         if map
             .get("flow_direction_type")
@@ -8340,6 +8349,34 @@ fn run_add_surface_information(
 }
 
 /// Contour lines as ArcGIS writes them: `Id` 1.. and the `Contour` value.
+/// Observer points (OFFSETA, default 1) for Viewshed and Observer Points, in feature order.
+fn read_observers(path: &Path) -> Result<Vec<unigis_raster::surface::Observer>> {
+    let (fc, _) = open_feature_class(path)?;
+    let offset_field = fc
+        .fields()
+        .iter()
+        .position(|f| f.name.eq_ignore_ascii_case("OFFSETA"));
+    let mut observers = Vec::new();
+    for f in fc.features() {
+        let f = f?;
+        let offset = match offset_field.map(|i| &f.attributes[i]) {
+            Some(Value::Double(v)) => *v,
+            Some(Value::Single(v)) => *v as f64,
+            Some(Value::Integer(v)) => *v as f64,
+            Some(Value::SmallInteger(v)) => *v as f64,
+            _ => 1.0,
+        };
+        for p in f.geometry.iter().flat_map(|g| g.xy.iter()) {
+            observers.push(unigis_raster::surface::Observer {
+                x: p[0],
+                y: p[1],
+                offset,
+            });
+        }
+    }
+    Ok(observers)
+}
+
 fn write_contours(
     lines: Vec<unigis_raster::contour::ContourLine>,
     r: &unigis_raster::Raster,
