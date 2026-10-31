@@ -17,6 +17,7 @@ pub mod focal;
 pub mod frequency;
 pub mod generalize;
 mod geographic_crs;
+pub mod geomorphon;
 mod geotiff;
 pub mod grid_import;
 pub mod hydro;

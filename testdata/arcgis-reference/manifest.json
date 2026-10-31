@@ -107378,6 +107378,325 @@
           "force_flow": "NORMAL"
         }
       }
+    },
+    "gml_dem": {
+      "tool": "gp.GeomorphonLandforms_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "testdata/arcgis-reference/gml_dem_geomorphons.tif",
+        1,
+        "CELLS",
+        10,
+        0,
+        "METER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "geomorphon_landforms",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "angle_threshold": 1,
+          "distance_units": "CELLS",
+          "search_distance": 10,
+          "skip_distance": 0,
+          "z_unit": "METER"
+        }
+      }
+    },
+    "gml_dem_skip": {
+      "tool": "gp.GeomorphonLandforms_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "testdata/arcgis-reference/gml_dem_skip_geomorphons.tif",
+        2.5,
+        "CELLS",
+        6,
+        2,
+        "METER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "geomorphon_landforms",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "angle_threshold": 2.5,
+          "distance_units": "CELLS",
+          "search_distance": 6,
+          "skip_distance": 2,
+          "z_unit": "METER"
+        }
+      }
+    },
+    "gml_dem_cells_frac": {
+      "tool": "gp.GeomorphonLandforms_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "testdata/arcgis-reference/gml_dem_cells_frac_geomorphons.tif",
+        1,
+        "CELLS",
+        10.5,
+        1.5,
+        "METER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "geomorphon_landforms",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "angle_threshold": 1,
+          "distance_units": "CELLS",
+          "search_distance": 10.5,
+          "skip_distance": 1.5,
+          "z_unit": "METER"
+        }
+      }
+    },
+    "gml_dem_meters": {
+      "tool": "gp.GeomorphonLandforms_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "testdata/arcgis-reference/gml_dem_meters_geomorphons.tif",
+        1,
+        "METERS",
+        75,
+        25,
+        "METER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "geomorphon_landforms",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "angle_threshold": 1,
+          "distance_units": "METERS",
+          "search_distance": 75,
+          "skip_distance": 25,
+          "z_unit": "METER"
+        }
+      }
+    },
+    "gml_dem_meters_small_skip": {
+      "tool": "gp.GeomorphonLandforms_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "testdata/arcgis-reference/gml_dem_meters_small_skip_geomorphons.tif",
+        1,
+        "METERS",
+        80,
+        5,
+        "METER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "geomorphon_landforms",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "angle_threshold": 1,
+          "distance_units": "METERS",
+          "search_distance": 80,
+          "skip_distance": 5,
+          "z_unit": "METER"
+        }
+      }
+    },
+    "gml_dem_km": {
+      "tool": "gp.GeomorphonLandforms_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "testdata/arcgis-reference/gml_dem_km_geomorphons.tif",
+        1,
+        "KILOMETERS",
+        0.08,
+        0,
+        "METER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "geomorphon_landforms",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "angle_threshold": 1,
+          "distance_units": "KILOMETERS",
+          "search_distance": 0.08,
+          "skip_distance": 0,
+          "z_unit": "METER"
+        }
+      }
+    },
+    "gml_dem_feet_z": {
+      "tool": "gp.GeomorphonLandforms_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "testdata/arcgis-reference/gml_dem_feet_z_geomorphons.tif",
+        1,
+        "CELLS",
+        10,
+        0,
+        "FOOT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "geomorphon_landforms",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "angle_threshold": 1,
+          "distance_units": "CELLS",
+          "search_distance": 10,
+          "skip_distance": 0,
+          "z_unit": "FOOT"
+        }
+      }
+    },
+    "gml_dem_nodata": {
+      "tool": "gp.GeomorphonLandforms_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "testdata/arcgis-reference/gml_dem_nodata_geomorphons.tif",
+        1,
+        "CELLS",
+        8,
+        2,
+        "METER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "geomorphon_landforms",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "angle_threshold": 1,
+          "distance_units": "CELLS",
+          "search_distance": 8,
+          "skip_distance": 2,
+          "z_unit": "METER"
+        }
+      }
+    },
+    "gml_hydro": {
+      "tool": "gp.GeomorphonLandforms_sa",
+      "args": [
+        "testdata/raster/hydro.tif",
+        "<out>",
+        "testdata/arcgis-reference/gml_hydro_geomorphons.tif",
+        1,
+        "CELLS",
+        10,
+        0,
+        "METER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "geomorphon_landforms",
+        "params": {
+          "input": "testdata/raster/hydro.tif",
+          "output": "<out>",
+          "angle_threshold": 1,
+          "distance_units": "CELLS",
+          "search_distance": 10,
+          "skip_distance": 0,
+          "z_unit": "METER"
+        }
+      }
+    },
+    "gml_geographic": {
+      "tool": "gp.GeomorphonLandforms_sa",
+      "args": [
+        "testdata/raster/dem_geographic.tif",
+        "<out>",
+        "testdata/arcgis-reference/gml_geographic_geomorphons.tif",
+        1,
+        "CELLS",
+        10,
+        0,
+        "METER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "geomorphon_landforms",
+        "params": {
+          "input": "testdata/raster/dem_geographic.tif",
+          "output": "<out>",
+          "angle_threshold": 1,
+          "distance_units": "CELLS",
+          "search_distance": 10,
+          "skip_distance": 0,
+          "z_unit": "METER"
+        }
+      }
+    },
+    "gml_geographic_meters": {
+      "tool": "gp.GeomorphonLandforms_sa",
+      "args": [
+        "testdata/raster/dem_geographic.tif",
+        "<out>",
+        "testdata/arcgis-reference/gml_geographic_meters_geomorphons.tif",
+        1,
+        "METERS",
+        50,
+        0,
+        "METER"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "geomorphon_landforms",
+        "params": {
+          "input": "testdata/raster/dem_geographic.tif",
+          "output": "<out>",
+          "angle_threshold": 1,
+          "distance_units": "METERS",
+          "search_distance": 50,
+          "skip_distance": 0,
+          "z_unit": "METER"
+        }
+      }
     }
   }
 }

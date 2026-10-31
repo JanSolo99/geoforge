@@ -6698,6 +6698,11 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
     }
     let parameters = Args(map);
     let out = registry::run(spec, &parameters)?;
+    for (name, raster) in &out.extra {
+        if let Some(path) = registry::Context::get(&parameters, name) {
+            write_raster_with(Path::new(&path), raster, true)?;
+        }
+    }
     if spec.id == "raster_to_float" {
         let path = Path::new(&output);
         std::fs::write(path, unigis_raster::conversion::to_float(&out.raster))

@@ -69,3 +69,15 @@ pub(crate) const GEOGRAPHIC_EPSG: &[u32] = &[
     11134, 11162, 11163, 11188, 11189, 11198, 11199, 11214, 11215, 11223, 11225, 11226, 11307,
     11392, 11393, 11461, 11466, 11472, 11473, 11546, 11547, 20033, 20040, 20041, 20045, 20046,
 ];
+
+/// ArcGIS stores a geographic output's cell size recomputed from the X extent (0.0001 becomes
+/// 9.999999999999786e-5) and uses it for both axes of square cells.
+pub(crate) fn recompute_cell_size(r: &mut crate::Raster) {
+    let t = r.transform;
+    let w = r.width as f64;
+    if t[1] == -t[5] {
+        let size = ((t[0] + w * t[1]) - t[0]) / w;
+        r.transform[1] = size;
+        r.transform[5] = -size;
+    }
+}

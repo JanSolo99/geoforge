@@ -195,14 +195,7 @@ pub fn geodesic_flow_direction(dem: &Raster, force_edges: bool) -> Raster {
         let ns = a * (1.0 - e2) / s.powf(1.5) * dlat * dy.unsigned_abs() as f64;
         ew.hypot(ns)
     });
-    // ArcGIS stores the cell size recomputed from the X extent (0.0001 becomes
-    // 9.999999999999786e-5) and uses it for both axes of square cells.
-    let w = dem.width as f64;
-    let size = ((t[0] + w * t[1]) - t[0]) / w;
-    if t[1] == -t[5] {
-        out.transform[1] = size;
-        out.transform[5] = -size;
-    }
+    crate::geographic_crs::recompute_cell_size(&mut out);
     out
 }
 

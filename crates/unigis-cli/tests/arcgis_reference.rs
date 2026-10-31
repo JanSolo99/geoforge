@@ -4571,6 +4571,62 @@ fn compare_statistics(ours: &Path, arcgis: &Path, bands: usize, cells_differ: bo
     diffs
 }
 
+/// Geomorphon Landforms' second output (the geomorphons raster) against ArcGIS's
+/// `<case>_geomorphons.tif`; the landforms raster is compared by `tools_match_arcgis_output`.
+#[test]
+fn geomorphons_match_arcgis() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let reference = root.join("testdata/arcgis-reference");
+    let manifest: serde_json::Value =
+        serde_json::from_str(&std::fs::read_to_string(reference.join("manifest.json")).unwrap())
+            .unwrap();
+    let out_dir = std::env::temp_dir().join(format!("ug-geomorphons-{}", std::process::id()));
+    std::fs::create_dir_all(&out_dir).unwrap();
+    let mut failures = Vec::new();
+    let mut cases = 0;
+    for (case, info) in manifest["cases"].as_object().unwrap() {
+        if info["tool"] != "gp.GeomorphonLandforms_sa" {
+            continue;
+        }
+        cases += 1;
+        let ours = out_dir.join(format!("{case}_geomorphons.tif"));
+        let mut args = vec!["run".to_string(), "geomorphon_landforms".into()];
+        for (name, value) in info["run"]["params"].as_object().unwrap() {
+            let value = value
+                .as_str()
+                .map_or_else(|| value.to_string(), str::to_string);
+            let value = if value == "<out>" {
+                out_dir.join(format!("{case}.tif")).display().to_string()
+            } else {
+                value
+            };
+            args.push(format!("{name}={value}"));
+        }
+        args.push(format!("out_geomorphons_raster={}", ours.display()));
+        let run = Command::new(env!("CARGO_BIN_EXE_ug"))
+            .current_dir(&root)
+            .args(&args)
+            .output()
+            .unwrap();
+        assert!(
+            run.status.success(),
+            "{case}: {}",
+            String::from_utf8_lossy(&run.stderr)
+        );
+        let diffs = compare_rasters(
+            case,
+            &ours,
+            &reference.join(format!("{case}_geomorphons.tif")),
+        );
+        if !diffs.is_empty() {
+            failures.push(format!("{case}:\n    {}", diffs.join("\n    ")));
+        }
+    }
+    std::fs::remove_dir_all(&out_dir).ok();
+    assert!(cases > 0);
+    assert!(failures.is_empty(), "{}", failures.join("\n"));
+}
+
 #[test]
 fn raster_comparison_detects_missing_or_changed_later_bands() {
     use unigis_raster::{Compression, DataType, Raster, write_geotiff};

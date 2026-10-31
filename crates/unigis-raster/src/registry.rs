@@ -86,6 +86,8 @@ pub struct Output {
     pub empty_band_statistics: bool,
     /// Include GP-recomputed covariance statistics after stored-cell normalization.
     pub covariance_statistics: bool,
+    /// Secondary rasters, written to the path given by the named output parameter (if any).
+    pub extra: Vec<(&'static str, Raster)>,
 }
 
 pub struct Tool {
@@ -171,6 +173,22 @@ const fn option(
     }
 }
 
+const fn num_param(name: &'static str, label: &'static str, default: &'static str) -> Param {
+    Param {
+        name,
+        label,
+        kind: Kind::Number,
+        required: false,
+        default,
+    }
+}
+
+fn number_or(ctx: &dyn Context, name: &str, default: f64) -> f64 {
+    ctx.get(name)
+        .and_then(|v| v.trim().parse().ok())
+        .unwrap_or(default)
+}
+
 fn nibble(ctx: &dyn Context) -> Result<Output> {
     let input = ctx.raster("input")?;
     let mask = ctx.raster("mask")?;
@@ -188,6 +206,7 @@ fn nibble(ctx: &dyn Context) -> Result<Output> {
         empty_band_statistics: false,
         covariance_statistics: false,
         nodata_tag: None,
+        extra: Vec::new(),
     })
 }
 
@@ -224,6 +243,7 @@ fn with_statistics(raster: Raster, statistics: bool) -> Result<Output> {
         empty_band_statistics: false,
         covariance_statistics: false,
         nodata_tag: None,
+        extra: Vec::new(),
     })
 }
 
@@ -292,6 +312,63 @@ fn geodesic_flow_direction(ctx: &dyn Context) -> Result<Output> {
         crate::hydro::geodesic_flow_direction(&ctx.raster("input")?, force),
         false,
     )
+}
+
+fn geomorphon_landforms(ctx: &dyn Context) -> Result<Output> {
+    use crate::geomorphon::{Distance, Parameters};
+    let units = choice(ctx, "geomorphon_landforms", "distance_units").to_ascii_uppercase();
+    let metres = match units.as_str() {
+        "CELLS" => None,
+        "METERS" => Some(1.0),
+        "CENTIMETERS" => Some(0.01),
+        "KILOMETERS" => Some(1000.0),
+        "INCHES" => Some(0.0254),
+        "FEET" => Some(0.3048),
+        "YARD" | "YARDS" => Some(0.9144),
+        "MILES" => Some(1609.344),
+        other => return Err(Error::Unsupported(format!("distance units {other}"))),
+    };
+    let distance = |name: &str| {
+        let v = number_or(
+            ctx,
+            name,
+            if name == "search_distance" { 10.0 } else { 0.0 },
+        );
+        match metres {
+            None => Distance::Cells(v),
+            Some(m) => Distance::Ground(v * m),
+        }
+    };
+    let z_factor = match choice(ctx, "geomorphon_landforms", "z_unit")
+        .to_ascii_uppercase()
+        .as_str()
+    {
+        "INCH" => 0.0254,
+        "FOOT" => 0.3048,
+        "FOOT_US" => 1200.0 / 3937.0,
+        "YARD" => 0.9144,
+        "MILE_US" => 1609.347218694437,
+        "NAUTICAL_MILE" => 1852.0,
+        "MILLIMETER" => 0.001,
+        "CENTIMETER" => 0.01,
+        "DECIMETER" => 0.1,
+        "METER" => 1.0,
+        "KILOMETER" => 1000.0,
+        other => return Err(Error::Unsupported(format!("ERROR 000864: Z unit: {other}"))),
+    };
+    let parameters = Parameters {
+        angle_threshold: number_or(ctx, "angle_threshold", 1.0),
+        search: distance("search_distance"),
+        skip: distance("skip_distance"),
+        z_factor,
+    };
+    let (landforms, geomorphons) =
+        crate::geomorphon::geomorphon_landforms(&ctx.raster("input")?, &parameters);
+    Ok(Output {
+        covariance_statistics: true,
+        extra: vec![("out_geomorphons_raster", geomorphons)],
+        ..with_statistics(landforms, true)?
+    })
 }
 
 fn flow_distance(ctx: &dyn Context) -> Result<Output> {
@@ -2642,6 +2719,58 @@ pub static TOOLS: &[Tool] = &[
             },
         ],
         run: extract_by_attributes,
+    },
+    Tool {
+        id: "geomorphon_landforms",
+        name: "Geomorphon Landforms",
+        summary: "Classifies each cell into one of ten landforms from the line-of-sight pattern of its 8 directions.",
+        params: &[
+            raster("input", "Input surface raster", true),
+            Param {
+                name: "out_geomorphons_raster",
+                label: "Output geomorphons raster",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+            },
+            num_param("angle_threshold", "Angle threshold (degrees)", "1"),
+            option(
+                "distance_units",
+                "Distance units",
+                &[
+                    "CELLS",
+                    "METERS",
+                    "CENTIMETERS",
+                    "KILOMETERS",
+                    "INCHES",
+                    "FEET",
+                    "YARDS",
+                    "MILES",
+                ],
+                "CELLS",
+            ),
+            num_param("search_distance", "Search distance", "10"),
+            num_param("skip_distance", "Skip distance", "0"),
+            option(
+                "z_unit",
+                "Z unit",
+                &[
+                    "INCH",
+                    "FOOT",
+                    "FOOT_US",
+                    "YARD",
+                    "MILE_US",
+                    "NAUTICAL_MILE",
+                    "MILLIMETER",
+                    "CENTIMETER",
+                    "DECIMETER",
+                    "METER",
+                    "KILOMETER",
+                ],
+                "METER",
+            ),
+        ],
+        run: geomorphon_landforms,
     },
     Tool {
         id: "geodesic_flow_direction",

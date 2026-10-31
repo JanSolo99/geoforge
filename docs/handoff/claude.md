@@ -172,6 +172,15 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
   ArcGIS writes square cells sized from the X extent (0.0001 → 9.999999999999786e-5) and no
   statistics. `gfd_hydro` shares Flow Direction's 3 allowed flat cells. MFD/DINF refused.
 
+## Queue: Geomorphon Landforms — landed
+
+- `geomorphon::geomorphon_landforms`; the raster registry `Output` gained `extra` (secondary
+  rasters written by `ug run` to the named output parameter). ArcGIS rules found by probing:
+  sign from `max + min` angle vs threshold; diagonals limited by distance (cells: k·√2 ≤ n);
+  cells strictly nearer than the skip distance are ignored; NoData/edge stops a line (no cell →
+  flat); skip gives a NoData border (cells: round half down; ground: ceil, ≤ ½ cell → none);
+  geographic: sphere R 6 371 000 m. `geomorphons_match_arcgis` compares the second output.
+
 ## Pitfall: ArcGIS sidecars in testdata
 
 Running ArcGIS on fixture rasters can leave untracked `testdata/raster/*.aux.xml` / `*.vat.dbf`

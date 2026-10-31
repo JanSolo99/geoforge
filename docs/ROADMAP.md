@@ -878,6 +878,12 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
   with WGS84 ellipsoid distances (meridian/prime-vertical radii at each neighbour step's mid
   latitude) for geographic rasters; projected rasters give Flow Direction. Square-cell size
   recomputed from the extent like ArcGIS; no statistics. 4 ArcGIS `gfd_*` references.
+- [x] Geomorphon Landforms (`geomorphon_landforms`): 8-direction line-of-sight ternary
+  patterns (max + min elevation angle against the flatness threshold), the ten landforms
+  (Int8) and the optional rotation/reflection-minimal geomorphon code raster
+  (`out_geomorphons_raster`, Int16); cell or ground search/skip distances, z units, NoData,
+  skip-distance NoData border, geographic rasters on a 6 371 km sphere. 11 ArcGIS `gml_*`
+  references (both outputs, cell for cell).
 - [x] Contour List (`contour_list`): Contour's tracing at listed values (`a;b;c`; duplicates once,
   out-of-range values give nothing; Id/Contour fields, value-descending order). 3 ArcGIS `cl_*`
   references. contour_type (polygons) not supported.
