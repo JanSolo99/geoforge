@@ -6675,6 +6675,46 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
         let lines = unigis_raster::contour::contour_list(&r, &levels);
         return write_contours(lines, &r, Path::new(&output));
     }
+    if spec.id == "storage_capacity" {
+        if map.contains_key("in_zone_data") {
+            return Err(Error::Unsupported(
+                "Storage Capacity zones are not supported yet".into(),
+            ));
+        }
+        let surface = unigis_raster::read_geotiff(Path::new(
+            map.get("input")
+                .ok_or_else(|| Error::Unsupported("input is required".into()))?,
+        ))?;
+        let number = |k: &str| map.get(k).and_then(|v| v.trim().parse::<f64>().ok());
+        let analysis = map
+            .get("analysis_type")
+            .map_or("AREA_VOLUME".into(), |v| v.to_ascii_uppercase());
+        let by_value = map
+            .get("increment_type")
+            .is_some_and(|v| v.eq_ignore_ascii_case("VALUE_OF_INCREMENT"));
+        let options = unigis_raster::zonal_tables::StorageCapacity {
+            area: analysis != "VOLUME",
+            volume: analysis != "AREA",
+            min: number("min_elevation"),
+            max: number("max_elevation"),
+            increments: if by_value {
+                Err(number("increment").ok_or_else(|| {
+                    Error::Unsupported("ERROR 000735: Increment: value is required".into())
+                })?)
+            } else {
+                Ok(number("increment").map_or(10, |n| n as usize))
+            },
+            z_metres: unigis_raster::registry::z_unit_metres(
+                map.get("z_unit").map_or("METER", String::as_str),
+            )?,
+        };
+        let (fields, rows) =
+            unigis_raster::zonal_tables::storage_capacity_table(&surface, &options)?;
+        return write_table(
+            &unigis_tools::TableOutput { fields, rows },
+            Path::new(&output),
+        );
+    }
     if spec.id == "zonal_geometry_as_table" {
         if let Some(field) = map.get("zone_field")
             && !field.eq_ignore_ascii_case("Value")

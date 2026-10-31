@@ -211,6 +211,13 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
   `/` is true division (integer rasters → F32), the Divide function keeps integer division;
   arcpy has no `Sqrt` (use SquareRoot). Intermediate types match the per-tool rules.
 
+## Queue: Storage Capacity — landed (without zones)
+
+- `zonal_tables::storage_capacity_table` + `ug run storage_capacity` table branch in main.rs;
+  `registry::z_unit_metres` now shared (Geomorphon uses it). Area counts z ≤ level; volume =
+  Σ f32(level − z) · cell area / z_unit², ZONE_CODE 1. Next for this tool: zones (raster on a
+  different grid is resampled by ArcGIS; polygons) — `combine_polys.shp` is a candidate fixture.
+
 ## Pitfall: ArcGIS sidecars in testdata
 
 Running ArcGIS on fixture rasters can leave untracked `testdata/raster/*.aux.xml` / `*.vat.dbf`

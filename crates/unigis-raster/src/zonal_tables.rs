@@ -221,3 +221,92 @@ pub fn tabulate_area(
         Ok((fields, rows))
     }
 }
+
+/// Storage Capacity's analysis options (without zones).
+pub struct StorageCapacity {
+    pub area: bool,
+    pub volume: bool,
+    pub min: Option<f64>,
+    pub max: Option<f64>,
+    /// `Ok(n)`: n increments; `Err(step)`: levels `step` apart.
+    pub increments: std::result::Result<usize, f64>,
+    /// Metres per unit of the surface's z values (volumes are in z units cubed).
+    pub z_metres: f64,
+}
+
+/// Storage Capacity: for each elevation level, the area of the cells at or below it and the
+/// volume between the level and those cells (ZONE_CODE 1 for the whole surface). Depths are
+/// single precision (level − z), summed in double, as ArcGIS's volumes agree that way.
+pub fn storage_capacity_table(
+    surface: &Raster,
+    options: &StorageCapacity,
+) -> unigis_core::Result<(Vec<unigis_core::Field>, Vec<Vec<unigis_core::Value>>)> {
+    use unigis_core::{Error, Field, FieldType, Value};
+    let values: Vec<f32> = surface.bands[0]
+        .iter()
+        .filter(|v| !surface.is_nodata(**v))
+        .map(|&v| v as f32)
+        .collect();
+    if values.is_empty() {
+        return Err(Error::Unsupported("the surface has no data".into()));
+    }
+    let lo = options
+        .min
+        .unwrap_or_else(|| values.iter().fold(f64::INFINITY, |m, &v| m.min(v as f64)));
+    let hi = options.max.unwrap_or_else(|| {
+        values
+            .iter()
+            .fold(f64::NEG_INFINITY, |m, &v| m.max(v as f64))
+    });
+    let levels: Vec<f64> = match options.increments {
+        Ok(n) => {
+            let n = n.max(1);
+            (0..=n)
+                .map(|i| lo + (hi - lo) * i as f64 / n as f64)
+                .collect()
+        }
+        Err(step) if step > 0.0 => {
+            let mut v: Vec<f64> = (0..)
+                .map(|i| lo + i as f64 * step)
+                .take_while(|&h| h < hi)
+                .collect();
+            v.push(hi);
+            v
+        }
+        Err(_) => return Err(Error::Unsupported("the increment must be positive".into())),
+    };
+    let cell_area = (surface.transform[1] * surface.transform[5]).abs();
+    let volume_area = cell_area / (options.z_metres * options.z_metres);
+    let rows = levels
+        .iter()
+        .map(|&h| {
+            let level = h as f32;
+            let (mut count, mut depth) = (0usize, 0.0f64);
+            for &z in &values {
+                if z <= level {
+                    count += 1;
+                    depth += f64::from(level - z);
+                }
+            }
+            let mut row = vec![Value::Integer(1), Value::Double(h)];
+            if options.area {
+                row.push(Value::Double(count as f64 * cell_area));
+            }
+            if options.volume {
+                row.push(Value::Double(depth * volume_area));
+            }
+            row
+        })
+        .collect();
+    let mut zone = Field::new("ZONE_CODE", FieldType::Integer);
+    zone.length = 10;
+    zone.precision = 10;
+    let mut fields = vec![zone, Field::new("ELEVATION", FieldType::Double)];
+    if options.area {
+        fields.push(Field::new("AREA", FieldType::Double));
+    }
+    if options.volume {
+        fields.push(Field::new("VOLUME", FieldType::Double));
+    }
+    Ok((fields, rows))
+}

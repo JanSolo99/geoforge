@@ -946,6 +946,14 @@ CASES = {
     "gfd_geographic_force": ("gp.GeodesicFlowDirection_sa", [RASTER / "dem_geographic.tif"], ["FORCE"]),
     "gfd_projected": ("gp.GeodesicFlowDirection_sa", [RASTER / "dem.tif"], ["NORMAL"]),
     "gfd_hydro": ("gp.GeodesicFlowDirection_sa", [RASTER / "hydro.tif"], ["NORMAL"]),
+    "stc_dem": ("gp.StorageCapacity_sa", [RASTER / "dem.tif"], [None, None, None, None, None, None, None, None]),
+    "stc_dem_area": ("gp.StorageCapacity_sa", [RASTER / "dem.tif"], [None, None, 'AREA', None, None, None, None, None]),
+    "stc_dem_volume": ("gp.StorageCapacity_sa", [RASTER / "dem.tif"], [None, None, 'VOLUME', None, None, None, None, None]),
+    "stc_dem_range": ("gp.StorageCapacity_sa", [RASTER / "dem.tif"], [None, None, 'AREA_VOLUME', 200, 260, 'NUMBER_OF_INCREMENTS', None, None]),
+    "stc_dem_step": ("gp.StorageCapacity_sa", [RASTER / "dem.tif"], [None, None, 'AREA_VOLUME', None, None, 'VALUE_OF_INCREMENT', 25, None]),
+    "stc_dem_feet": ("gp.StorageCapacity_sa", [RASTER / "dem.tif"], [None, None, 'AREA_VOLUME', None, None, None, None, 'FOOT']),
+    "stc_dem_five": ("gp.StorageCapacity_sa", [RASTER / "dem.tif"], [None, None, 'AREA_VOLUME', None, None, 'NUMBER_OF_INCREMENTS', 5, None]),
+    "stc_dem_nodata": ("gp.StorageCapacity_sa", [RASTER / "dem_nodata.tif"], [None, None, None, None, None, None, None, None]),
     "rc_times": ("gp.RasterCalculator_sa", [f'"{RASTER}/dem.tif" * 2'], []),
     "rc_plus_float": ("gp.RasterCalculator_sa", [f'"{RASTER}/dem.tif" + 0.5'], []),
     "rc_con": ("gp.RasterCalculator_sa", [f'Con("{RASTER}/dem.tif" > 200, 1, 0)'], []),
@@ -2445,6 +2453,7 @@ RUN = {
     "gp.GeodesicFlowDirection_sa": ("geodesic_flow_direction", ["input", "output", "force_flow"]),
     # The geomorphons raster (second output) is compared by second_raster_outputs_match_arcgis.
     # The scale raster (second output) is compared by second_raster_outputs_match_arcgis.
+    "gp.StorageCapacity_sa": ("storage_capacity", ["input", "output", "in_zone_data", "zone_field", "analysis_type", "min_elevation", "max_elevation", "increment_type", "increment", "z_unit"]),
     "gp.RasterCalculator_sa": ("raster_calculator", ["expression", "output"]),
     "gp.MultiscaleSurfacePercentile_sa": ("multiscale_surface_percentile", ["input", "output", None, "distance_units", "min_scale", "max_scale", "base_increment", "nonlinearity", "analysis_target_device"]),
     "gp.MultiscaleSurfaceDifference_sa": ("multiscale_surface_difference", ["input", "output", None, "distance_units", "min_scale", "max_scale", "increment", "analysis_target_device"]),
@@ -2612,7 +2621,7 @@ EXCEL_OUT = {"conversion.TableToExcel"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable", "conversion.RasterToASCII", "conversion.RasterToFloat"}
 # Tools whose output is a table, written as <name>.dbf.
-TABLE_OUT = {"conversion.ExcelToTable", "management.ValidateJoin", "analysis.PairwisePolygonNeighbors", "analysis.AssignWeightsByPairwiseComparison", "management.FieldStatisticsToTable", "gp.Sample_sa", "management.CopyRows", "gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa", "gp.ZonalStatisticsAsTable_sa", "gp.ZonalCharacterization_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
+TABLE_OUT = {"gp.StorageCapacity_sa", "conversion.ExcelToTable", "management.ValidateJoin", "analysis.PairwisePolygonNeighbors", "analysis.AssignWeightsByPairwiseComparison", "management.FieldStatisticsToTable", "gp.Sample_sa", "management.CopyRows", "gp.ZonalHistogram_sa", "gp.TabulateArea_sa", "gp.ZonalGeometryAsTable_sa", "gp.ZonalStatisticsAsTable_sa", "gp.ZonalCharacterization_sa", "management.CheckGeometry", "analysis.Statistics", "analysis.Frequency", "analysis.GenerateNearTable", "management.FindIdentical",
              "management.TransposeFields", "management.PivotTable", "management.CreateTable", "analysis.PolygonNeighbors", "analysis.TabulateIntersection", "analysis.TableSelect"}
 # Tools whose ArcGIS output must be a geodatabase feature class or memory (copied to a shapefile).
 MEMORY_OUT = {"analysis.SummarizeWithin", "analysis.SummarizeNearby", "analysis.ApportionPolygon"}

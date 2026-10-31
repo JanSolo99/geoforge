@@ -901,6 +901,9 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
   (`/` true division → float for integers, `%` Mod, `**` Power, comparisons, `& | ^ ~`, shifts,
   unary −) and the local functions by arcpy name (Con, SetNull, IsNull, Int, Float, math,
   trigonometric, Boolean and comparison functions). 18 ArcGIS `rc_*` references.
+- [x] Storage Capacity (`storage_capacity`, table): per elevation level (n increments or a
+  step, between the data or given min/max) the area at or below it and the volume (f32 depths
+  summed in double; z units scale the volume). 8 ArcGIS `stc_*` references. Zones not yet.
 - [x] Contour List (`contour_list`): Contour's tracing at listed values (`a;b;c`; duplicates once,
   out-of-range values give nothing; Id/Contour fields, value-descending order). 3 ArcGIS `cl_*`
   references. contour_type (polygons) not supported.

@@ -108603,6 +108603,510 @@
           "output": "<out>"
         }
       }
+    },
+    "stc_dem": {
+      "tool": "gp.StorageCapacity_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ZONE_CODE",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ELEVATION",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "AREA",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "VOLUME",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "table_output": true,
+      "run": {
+        "tool": "storage_capacity",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "stc_dem_area": {
+      "tool": "gp.StorageCapacity_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        null,
+        null,
+        "AREA",
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ZONE_CODE",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ELEVATION",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "AREA",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "table_output": true,
+      "run": {
+        "tool": "storage_capacity",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "analysis_type": "AREA"
+        }
+      }
+    },
+    "stc_dem_volume": {
+      "tool": "gp.StorageCapacity_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        null,
+        null,
+        "VOLUME",
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ZONE_CODE",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ELEVATION",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "VOLUME",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "table_output": true,
+      "run": {
+        "tool": "storage_capacity",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "analysis_type": "VOLUME"
+        }
+      }
+    },
+    "stc_dem_range": {
+      "tool": "gp.StorageCapacity_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        null,
+        null,
+        "AREA_VOLUME",
+        200,
+        260,
+        "NUMBER_OF_INCREMENTS",
+        null,
+        null
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ZONE_CODE",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ELEVATION",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "AREA",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "VOLUME",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "table_output": true,
+      "run": {
+        "tool": "storage_capacity",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "analysis_type": "AREA_VOLUME",
+          "min_elevation": 200,
+          "max_elevation": 260,
+          "increment_type": "NUMBER_OF_INCREMENTS"
+        }
+      }
+    },
+    "stc_dem_step": {
+      "tool": "gp.StorageCapacity_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        null,
+        null,
+        "AREA_VOLUME",
+        null,
+        null,
+        "VALUE_OF_INCREMENT",
+        25,
+        null
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ZONE_CODE",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ELEVATION",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "AREA",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "VOLUME",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "table_output": true,
+      "run": {
+        "tool": "storage_capacity",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "analysis_type": "AREA_VOLUME",
+          "increment_type": "VALUE_OF_INCREMENT",
+          "increment": 25
+        }
+      }
+    },
+    "stc_dem_feet": {
+      "tool": "gp.StorageCapacity_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        null,
+        null,
+        "AREA_VOLUME",
+        null,
+        null,
+        null,
+        null,
+        "FOOT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ZONE_CODE",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ELEVATION",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "AREA",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "VOLUME",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "table_output": true,
+      "run": {
+        "tool": "storage_capacity",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "analysis_type": "AREA_VOLUME",
+          "z_unit": "FOOT"
+        }
+      }
+    },
+    "stc_dem_five": {
+      "tool": "gp.StorageCapacity_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        null,
+        null,
+        "AREA_VOLUME",
+        null,
+        null,
+        "NUMBER_OF_INCREMENTS",
+        5,
+        null
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ZONE_CODE",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ELEVATION",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "AREA",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "VOLUME",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "table_output": true,
+      "run": {
+        "tool": "storage_capacity",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "analysis_type": "AREA_VOLUME",
+          "increment_type": "NUMBER_OF_INCREMENTS",
+          "increment": 5
+        }
+      }
+    },
+    "stc_dem_nodata": {
+      "tool": "gp.StorageCapacity_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "OID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "ZONE_CODE",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "ELEVATION",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "AREA",
+          "Double",
+          19,
+          0,
+          0
+        ],
+        [
+          "VOLUME",
+          "Double",
+          19,
+          0,
+          0
+        ]
+      ],
+      "shapeType": null,
+      "table_output": true,
+      "run": {
+        "tool": "storage_capacity",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

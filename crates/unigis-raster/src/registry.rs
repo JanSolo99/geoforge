@@ -314,6 +314,24 @@ fn geodesic_flow_direction(ctx: &dyn Context) -> Result<Output> {
     )
 }
 
+/// Metres per unit of a Spatial Analyst z-unit keyword.
+pub fn z_unit_metres(unit: &str) -> Result<f64> {
+    Ok(match unit.to_ascii_uppercase().as_str() {
+        "INCH" => 0.0254,
+        "FOOT" => 0.3048,
+        "FOOT_US" => 1200.0 / 3937.0,
+        "YARD" => 0.9144,
+        "MILE_US" => 1609.347218694437,
+        "NAUTICAL_MILE" => 1852.0,
+        "MILLIMETER" => 0.001,
+        "CENTIMETER" => 0.01,
+        "DECIMETER" => 0.1,
+        "METER" => 1.0,
+        "KILOMETER" => 1000.0,
+        other => return Err(Error::Unsupported(format!("ERROR 000864: Z unit: {other}"))),
+    })
+}
+
 /// Metres per unit of a Spatial Analyst distance-units keyword (None for CELLS).
 fn distance_unit_metres(units: &str) -> Result<Option<f64>> {
     Ok(match units.to_ascii_uppercase().as_str() {
@@ -426,23 +444,7 @@ fn geomorphon_landforms(ctx: &dyn Context) -> Result<Output> {
             Some(m) => Distance::Ground(v * m),
         }
     };
-    let z_factor = match choice(ctx, "geomorphon_landforms", "z_unit")
-        .to_ascii_uppercase()
-        .as_str()
-    {
-        "INCH" => 0.0254,
-        "FOOT" => 0.3048,
-        "FOOT_US" => 1200.0 / 3937.0,
-        "YARD" => 0.9144,
-        "MILE_US" => 1609.347218694437,
-        "NAUTICAL_MILE" => 1852.0,
-        "MILLIMETER" => 0.001,
-        "CENTIMETER" => 0.01,
-        "DECIMETER" => 0.1,
-        "METER" => 1.0,
-        "KILOMETER" => 1000.0,
-        other => return Err(Error::Unsupported(format!("ERROR 000864: Z unit: {other}"))),
-    };
+    let z_factor = z_unit_metres(&choice(ctx, "geomorphon_landforms", "z_unit"))?;
     let parameters = Parameters {
         angle_threshold: number_or(ctx, "angle_threshold", 1.0),
         search: distance("search_distance"),
@@ -487,6 +489,12 @@ fn flow_distance(ctx: &dyn Context) -> Result<Output> {
 fn contour_list_unsupported(_: &dyn Context) -> Result<Output> {
     Err(Error::Unsupported(
         "Contour List writes features; run it through `ug run`".into(),
+    ))
+}
+
+fn storage_capacity_unsupported(_: &dyn Context) -> Result<Output> {
+    Err(Error::Unsupported(
+        "Storage Capacity writes a table; run it through `ug run`".into(),
     ))
 }
 
@@ -3057,6 +3065,48 @@ pub static TOOLS: &[Tool] = &[
             },
         ],
         run: contour_list_unsupported,
+    },
+    Tool {
+        id: "storage_capacity",
+        name: "Storage Capacity",
+        summary: "A table of the area and volume below a series of elevation levels of a surface.",
+        params: &[
+            raster("input", "Input surface raster", true),
+            option(
+                "analysis_type",
+                "Analysis type",
+                &["AREA_VOLUME", "AREA", "VOLUME"],
+                "AREA_VOLUME",
+            ),
+            num_param("min_elevation", "Minimum elevation", ""),
+            num_param("max_elevation", "Maximum elevation", ""),
+            option(
+                "increment_type",
+                "Increment type",
+                &["NUMBER_OF_INCREMENTS", "VALUE_OF_INCREMENT"],
+                "NUMBER_OF_INCREMENTS",
+            ),
+            num_param("increment", "Increment", ""),
+            option(
+                "z_unit",
+                "Z unit",
+                &[
+                    "INCH",
+                    "FOOT",
+                    "FOOT_US",
+                    "YARD",
+                    "MILE_US",
+                    "NAUTICAL_MILE",
+                    "MILLIMETER",
+                    "CENTIMETER",
+                    "DECIMETER",
+                    "METER",
+                    "KILOMETER",
+                ],
+                "METER",
+            ),
+        ],
+        run: storage_capacity_unsupported,
     },
     Tool {
         id: "zonal_geometry_as_table",
