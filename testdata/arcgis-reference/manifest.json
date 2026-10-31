@@ -110978,6 +110978,160 @@
           "z_factor": 2
         }
       }
+    },
+    "acm_clr": {
+      "tool": "management.AddColormap",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "",
+        "testdata/raster/classes.clr",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "add_colormap",
+        "params": {
+          "input": "testdata/raster/classes_u8.tif",
+          "input_CLR_file": "testdata/raster/classes.clr",
+          "output": "<out>"
+        }
+      }
+    },
+    "acm_replace": {
+      "tool": "management.AddColormap",
+      "args": [
+        "testdata/arcgis-reference/acm_clr.tif",
+        "",
+        "testdata/raster/classes_alt.clr",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "add_colormap",
+        "params": {
+          "input": "testdata/arcgis-reference/acm_clr.tif",
+          "input_CLR_file": "testdata/raster/classes_alt.clr",
+          "output": "<out>"
+        }
+      }
+    },
+    "acm_template": {
+      "tool": "management.AddColormap",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "testdata/arcgis-reference/acm_clr.tif",
+        "",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "add_colormap",
+        "params": {
+          "input": "testdata/raster/classes_u8.tif",
+          "in_template_raster": "testdata/arcgis-reference/acm_clr.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "acm_wide": {
+      "tool": "management.AddColormap",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "",
+        "testdata/raster/classes_wide.clr",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "add_colormap",
+        "params": {
+          "input": "testdata/raster/classes_u8.tif",
+          "input_CLR_file": "testdata/raster/classes_wide.clr",
+          "output": "<out>"
+        }
+      }
+    },
+    "acm_int16": {
+      "tool": "management.AddColormap",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "",
+        "testdata/raster/classes.clr",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "add_colormap",
+        "params": {
+          "input": "testdata/raster/patches_i16.tif",
+          "input_CLR_file": "testdata/raster/classes.clr",
+          "output": "<out>"
+        }
+      }
+    },
+    "acm_float": {
+      "tool": "management.AddColormap",
+      "args": [
+        "testdata/raster/dem.tif",
+        "",
+        "testdata/raster/classes.clr",
+        "<out>"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 000199: Failed to add Colormap",
+        "Failed to execute (AddColormap)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "add_colormap",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "input_CLR_file": "testdata/raster/classes.clr",
+          "output": "<out>"
+        }
+      }
+    },
+    "acm_template_none": {
+      "tool": "management.AddColormap",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "testdata/raster/dem.tif",
+        "",
+        "<out>"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000250: The template raster dataset does not have a colormap",
+        "Failed to execute (AddColormap)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "add_colormap",
+        "params": {
+          "input": "testdata/raster/classes_u8.tif",
+          "in_template_raster": "testdata/raster/dem.tif",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

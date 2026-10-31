@@ -7,6 +7,7 @@
 
 pub mod blockops;
 pub mod calculator;
+pub mod colormap;
 pub mod composite;
 pub mod contour;
 pub mod conversion;

@@ -519,6 +519,12 @@ fn observer_points_unsupported(_: &dyn Context) -> Result<Output> {
     ))
 }
 
+fn add_colormap_unsupported(_: &dyn Context) -> Result<Output> {
+    Err(Error::Unsupported(
+        "Add Colormap edits the raster file in place; run it through `ug run`".into(),
+    ))
+}
+
 fn visibility_unsupported(_: &dyn Context) -> Result<Output> {
     Err(Error::Unsupported(
         "Visibility reads observer features; run it through `ug run`".into(),
@@ -3190,6 +3196,23 @@ pub static TOOLS: &[Tool] = &[
             ),
         ],
         run: observer_points_unsupported,
+    },
+    Tool {
+        id: "add_colormap",
+        name: "Add Colormap",
+        summary: "Adds or replaces a raster's colormap from a template raster or a .clr file.",
+        params: &[
+            raster("input", "Input Raster", true),
+            Param {
+                name: "in_template_raster",
+                label: "Input Template Raster",
+                kind: Kind::Raster,
+                required: false,
+                default: "",
+            },
+            text("input_CLR_file", "Input .clr or .act File", ""),
+        ],
+        run: add_colormap_unsupported,
     },
     Tool {
         id: "visibility",

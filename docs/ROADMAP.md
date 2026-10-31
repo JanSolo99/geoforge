@@ -922,6 +922,10 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Observer Points (`observer_points`): Viewshed's visibility as a bit mask (observer k adds
   2^(k−1), up to 16), ArcGIS's type and NoData. 3 ArcGIS `op_*` references (~1% of cells differ
   where sight lines graze the terrain, as for Viewshed).
+- [x] Add Colormap (`add_colormap`): .clr file or template raster; 8-bit unsigned GeoTIFFs with
+  values 0..255 get an embedded TIFF palette (IFD patched, pixels untouched, replaces any
+  palette), other integer rasters a normalized `<raster>.clr` sidecar; ArcGIS's 000199 / 000250.
+  Our GeoTIFF reader now reads palette TIFFs; the reference test compares colormaps. 7 `acm_*`.
 - [x] Visibility (`visibility`): ArcGIS gives exactly Viewshed (FREQUENCY) / Observer Points
   (OBSERVERS) output; ZERO/NODATA non-visible cells (same type and NoData), z-factor, observer
   offset field. 4 ArcGIS `vis_*` references (Viewshed's ~1% grazing cells differ).

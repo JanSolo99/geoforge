@@ -4413,6 +4413,14 @@ fn compare_rasters(case: &str, ours: &Path, arcgis: &Path) -> Vec<String> {
         (a, b) => return vec![format!("read: ours {:?}, ArcGIS {:?}", a.err(), b.err())],
     };
     let mut diffs = Vec::new();
+    // Colormaps: an embedded palette, else a `.clr` sidecar (Add Colormap).
+    match (
+        unigis_raster::colormap::read_colormap(ours),
+        unigis_raster::colormap::read_colormap(arcgis),
+    ) {
+        (Ok(x), Ok(y)) if x == y => {}
+        (x, y) => diffs.push(format!("colormap: ours {x:?}, ArcGIS {y:?}")),
+    }
     if (a.width, a.height) != (b.width, b.height) {
         return vec![format!(
             "size: ours {}x{}, ArcGIS {}x{}",

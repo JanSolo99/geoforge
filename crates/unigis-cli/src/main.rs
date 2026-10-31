@@ -6693,6 +6693,31 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
     if spec.id == "visibility" {
         return run_visibility(&map, Path::new(&output));
     }
+    if spec.id == "add_colormap" {
+        let get = |k: &str| map.get(k).map(|v| v.trim()).filter(|v| !v.is_empty());
+        let input = get("input").ok_or_else(|| {
+            Error::Unsupported("ERROR 000735: Input Raster: value is required".into())
+        })?;
+        let output = Path::new(&output);
+        let entries = unigis_raster::colormap::source_entries(
+            get("in_template_raster").map(Path::new),
+            get("input_CLR_file").map(Path::new),
+        )?;
+        let data_type = unigis_raster::colormap::check_raster(Path::new(input))?;
+        // In place, like ArcGIS, unless a separate output is named: then a byte copy.
+        if Path::new(input) != output {
+            std::fs::copy(input, output).map_err(|e| Error::io(input, e))?;
+            for ext in [".aux.xml", ".clr"] {
+                let side = format!("{input}{ext}");
+                if Path::new(&side).exists() {
+                    let mut to = output.as_os_str().to_owned();
+                    to.push(ext);
+                    std::fs::copy(&side, &to).map_err(|e| Error::io(&side, e))?;
+                }
+            }
+        }
+        return unigis_raster::colormap::apply(output, data_type, &entries);
+    }
     if spec.id == "validate_flow_direction" {
         if map
             .get("flow_direction_type")

@@ -271,6 +271,18 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
 - Worth doing when asked: make Viewshed's sight line exact — it fixes Viewshed, Observer Points
   and Visibility (~1% cells) at once.
 
+## Queue: Add Colormap — landed
+
+- `unigis-raster/src/colormap.rs` (parse .clr, read embedded/sidecar colormaps, TIFF IFD patch,
+  `without_palette` so `read_geotiff` decodes palette TIFFs), `ug run add_colormap` branch,
+  registry placeholder. `compare_rasters` now compares colormaps for every raster case.
+- ArcGIS rules (probed /tmp/acm): U8 + all values ≤255 → embedded palette (tag 320, ×257, unlisted
+  entries black, replaces existing); otherwise (I16/U16, value 300) → `<raster>.clr` sidecar with
+  `v r g b` lines, comments dropped, embedded palette untouched; template colormap from either
+  form; float → ERROR 000199; template without colormap → ERROR 000250.
+- Validation: `UNIGIS_REFERENCE_CASES=acm_` PASS (7 cases, negative check confirmed); unit tests;
+  GDAL reads our palette (Color Table, pixels unchanged).
+
 ## Pitfall: ArcGIS sidecars in testdata
 
 Running ArcGIS on fixture rasters can leave untracked `testdata/raster/*.aux.xml` / `*.vat.dbf`
@@ -279,6 +291,6 @@ After generating references, check `git status --short testdata/` and delete suc
 
 ## Next
 
-- Next queue item: `scripts/lane claim` (after Visibility).
+- Next queue item: `scripts/lane claim` (after Add Colormap).
 - Possible follow-ups (not requested): Catalog New for mobile geodatabases (needs a mobile reader),
   ArcGIS-style blank names instead of NewFeatureClass placeholders.

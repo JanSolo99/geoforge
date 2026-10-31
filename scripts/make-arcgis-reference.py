@@ -1131,6 +1131,13 @@ CASES = {
     "zc_circular": ("gp.ZonalCharacterization_sa", [RASTER / "zones.tif", [[RASTER / "dem_nodata.tif", "MEAN"], [RASTER / "dem_nodata.tif", "STD"]]], ["", "Value", "DATA", "", "AUTO_DETECT", "CIRCULAR", 360]),
     "hillshade_shadows_315_15": ("gp.HillShade_sa", [RASTER / "dem.tif"], [315, 15, "SHADOWS", 3]),
     "hillshade_shadows_200_25": ("gp.HillShade_sa", [RASTER / "dem_nodata.tif"], [200, 25, "SHADOWS", 2]),
+    "acm_clr": ("management.AddColormap", [RASTER / "classes_u8.tif", "", RASTER / "classes.clr"], []),
+    "acm_replace": ("management.AddColormap", [OUT / "acm_clr.tif", "", RASTER / "classes_alt.clr"], []),
+    "acm_template": ("management.AddColormap", [RASTER / "classes_u8.tif", OUT / "acm_clr.tif", ""], []),
+    "acm_wide": ("management.AddColormap", [RASTER / "classes_u8.tif", "", RASTER / "classes_wide.clr"], []),
+    "acm_int16": ("management.AddColormap", [RASTER / "patches_i16.tif", "", RASTER / "classes.clr"], []),
+    "acm_float": ("management.AddColormap", [RASTER / "dem.tif", "", RASTER / "classes.clr"], []),
+    "acm_template_none": ("management.AddColormap", [RASTER / "classes_u8.tif", RASTER / "dem.tif", ""], []),
     "vis_two": ("gp.Visibility_sa", [RASTER / "dem.tif", RASTER / "observers.shp"], []),
     "vis_two_observers_nodata": ("gp.Visibility_sa", [RASTER / "dem.tif", RASTER / "observers.shp"], ["", "OBSERVERS", "NODATA"]),
     "vis_hill_nodata": ("gp.Visibility_sa", [RASTER / "dem.tif", RASTER / "observer_hill.shp"], ["", "FREQUENCY", "NODATA"]),
@@ -2487,6 +2494,7 @@ RUN = {
     # The surface area raster (second output) is compared by second_raster_outputs_match_arcgis.
     "gp.SurfaceAreaRatio_sa": ("surface_area_ratio", ["input", "output", None, "z_unit", "planar_area_type"]),
     "gp.ObserverPoints_sa": ("observer_points", ["input", "in_observer_point_features", "output", "z_factor"]),
+    "management.AddColormap": ("add_colormap", ["input", "in_template_raster", "input_CLR_file", "output"]),
     "gp.Visibility_sa": ("visibility", ["input", "in_observer_features", "output", None, "analysis_type", "nonvisible_cell_value", "z_factor"]),
     "gp.Viewshed2_sa": ("geodesic_viewshed", ["input", "in_observer_features", "output", None, "analysis_type", "vertical_error", None, "refractivity_coefficient", "surface_offset", "observer_elevation", "observer_offset"]),
     "gp.ValidateFlowDirection_sa": ("validate_flow_direction", ["input", "output", "flow_direction_type"]),
@@ -2668,7 +2676,7 @@ MEMORY_OUT = {"analysis.SummarizeWithin", "analysis.SummarizeNearby", "analysis.
 CREATE_TOOLS = {"management.CreateRandomPoints", "management.CreateFeatureclass", "management.CreateTable"}
 
 # In-place tools: the index of the input they edit (run on a copy written as the output).
-IN_PLACE = {"gp.AddSurfaceInformation_sa": 0, "management.CalculateGeometryAttributes": 0, "management.Adjust3DZ": 0, "management.MigrateDateFieldToHighPrecision": 0, "management.EnableCOGO": 0, "management.DisableEditorTracking": 0, "management.DisableCOGO": 0, "management.AddGPSMetadataFields": 0, "management.ConvertTimeZone": 0, "management.ConvertTimeField": 0, "management.AddSpatialJoin": 0, "gp.ExtractMultiValuesToPoints_sa": 0, "edit.ExtendLine": 0, "edit.FlipLine": 0, "edit.TrimLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.EncodeField": 0, "management.AddGeometryAttributes": 0,
+IN_PLACE = {"management.AddColormap": 0, "gp.AddSurfaceInformation_sa": 0, "management.CalculateGeometryAttributes": 0, "management.Adjust3DZ": 0, "management.MigrateDateFieldToHighPrecision": 0, "management.EnableCOGO": 0, "management.DisableEditorTracking": 0, "management.DisableCOGO": 0, "management.AddGPSMetadataFields": 0, "management.ConvertTimeZone": 0, "management.ConvertTimeField": 0, "management.AddSpatialJoin": 0, "gp.ExtractMultiValuesToPoints_sa": 0, "edit.ExtendLine": 0, "edit.FlipLine": 0, "edit.TrimLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.EncodeField": 0, "management.AddGeometryAttributes": 0,
             "management.CalculateFields": 0, "management.StandardizeField": 0, "management.TransformField": 0, "management.ReclassifyField": 0, "management.DefineProjection": 0, "management.CalculateEndTime": 0}
 
 # Select Layer By Location cases, saved with Copy Features:
@@ -3145,7 +3153,7 @@ def main():
         out = OUT / (f"{name}.dbf" if tool in TABLE_OUT else f"{name}.shp")
         if tool in ("management.BatchUpdateFields", "management.ConvertTimeField", "management.ConvertTimeZone") and str(before[0]).endswith(".dbf"):
             out = OUT / f"{name}.dbf"  # a table in, a table out
-        raster_projection = tool == "management.DefineProjection" and Path(str(before[0])).suffix.lower() in (".tif", ".tiff")
+        raster_projection = tool == "management.AddColormap" or tool == "management.DefineProjection" and Path(str(before[0])).suffix.lower() in (".tif", ".tiff")
         if tool in RASTER_OUT or raster_projection:
             out = OUT / f"{name}.tif"
         if tool in EXCEL_OUT:

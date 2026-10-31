@@ -40,10 +40,24 @@ pub enum Compression {
 /// Reads a GeoTIFF (striped or tiled; uncompressed, LZW, Deflate, PackBits or
 /// JPEG; any predictor) into memory.
 pub fn read_geotiff(path: &Path) -> Result<Raster> {
+    if let Some(bytes) = crate::colormap::without_palette(path)? {
+        // The decoder refuses palette images; the indices are the cell values.
+        let dec = Decoder::new(std::io::Cursor::new(bytes))
+            .map_err(|e| tiff_error(path, e))?
+            .with_limits(Limits::unlimited());
+        return read_decoder(dec, path);
+    }
     let file = File::open(path).map_err(|e| Error::io(path, e))?;
-    let mut dec = Decoder::new(BufReader::new(file))
+    let dec = Decoder::new(BufReader::new(file))
         .map_err(|e| tiff_error(path, e))?
         .with_limits(Limits::unlimited());
+    read_decoder(dec, path)
+}
+
+fn read_decoder<R: std::io::Read + std::io::Seek>(
+    mut dec: Decoder<R>,
+    path: &Path,
+) -> Result<Raster> {
     let err = |e| tiff_error(path, e);
 
     let (width, height) = dec.dimensions().map_err(err)?;
