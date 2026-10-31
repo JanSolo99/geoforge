@@ -351,6 +351,175 @@ fn visible_cells(dem: &Raster, o: &Observer, z_factor: f64) -> Option<Vec<bool>>
     Some(seen)
 }
 
+/// An observer for [`geodesic_viewshed`]: map position, height above the surface and an
+/// optional absolute elevation that replaces the surface elevation under it.
+#[derive(Debug, Clone, Copy)]
+pub struct GeodesicObserver {
+    pub x: f64,
+    pub y: f64,
+    pub offset: f64,
+    pub elevation: Option<f64>,
+}
+
+/// Geodesic Viewshed options (ArcGIS defaults: FREQUENCY, refractivity 0.13, no target offset).
+#[derive(Debug, Clone, Copy)]
+pub struct GeodesicViewshedOptions {
+    /// OBSERVERS: a bit mask of the observers (in input order) that see each cell;
+    /// otherwise FREQUENCY, how many see it.
+    pub observers_mask: bool,
+    pub refractivity: f64,
+    /// Added to every target cell's elevation (ArcGIS's surface offset).
+    pub surface_offset: f64,
+}
+
+/// Mean earth radius for the curvature drop of a projected surface.
+const EARTH_RADIUS: f64 = 6_371_008.8;
+
+/// Spatial Analyst Geodesic Viewshed (Viewshed2) on a projected surface. Each target cell
+/// centre gets its own sight line, cut into equal steps of about one cell (the length over
+/// the rounded number of cells); the ground at a step is the inverse-distance (power 1)
+/// mean of the 7 nearest cell centres, and both ground and target drop by
+/// d²(1 − refractivity)/2R for earth curvature. A step at or above the sight line hides the
+/// target; steps within 1.5 cells of the observer are not tested. The observer stands on the
+/// bilinear surface half a cell right of and below its position (ArcGIS's observer elevation
+/// was found to be the mean of the 2×2 cells there). Fitted on probes; ArcGIS's exact kernel
+/// is not identified, so about 0.5–1% of cells near grazing sight lines differ.
+/// Cells no observer sees are NoData (255 for FREQUENCY, 0 for OBSERVERS), like ArcGIS.
+pub fn geodesic_viewshed(
+    dem: &Raster,
+    observers: &[GeodesicObserver],
+    opts: &GeodesicViewshedOptions,
+) -> Raster {
+    let (w, h) = (dem.width, dem.height);
+    let mut sums: Vec<Option<u64>> = (0..w * h)
+        .map(|i| (!dem.is_nodata(dem.bands[0][i])).then_some(0))
+        .collect();
+    for (k, o) in observers.iter().enumerate() {
+        let Some(seen) = geodesic_visible_cells(dem, o, opts) else {
+            continue;
+        };
+        let weight = if opts.observers_mask { 1u64 << k } else { 1 };
+        for (s, v) in sums.iter_mut().zip(seen) {
+            if v && let Some(s) = s.as_mut() {
+                *s += weight;
+            }
+        }
+    }
+    let max = sums.iter().flatten().copied().max().unwrap_or(0);
+    let (data_type, nodata) = match (opts.observers_mask, max) {
+        (true, m) if m <= u8::MAX as u64 => (DataType::U8, 0.0),
+        (true, m) if m <= u16::MAX as u64 => (DataType::U16, 0.0),
+        (true, _) => (DataType::U32, 0.0),
+        (false, m) if m < u8::MAX as u64 => (DataType::U8, u8::MAX as f64),
+        (false, _) => (DataType::U16, u16::MAX as f64),
+    };
+    let mut out = dem.like(data_type);
+    out.nodata = Some(nodata);
+    out.bands[0] = sums
+        .into_iter()
+        .map(|s| match s {
+            Some(s) if s > 0 => s as f64,
+            _ => nodata,
+        })
+        .collect();
+    out
+}
+
+/// Inverse-distance mean of the 7 nearest valid cell centres around grid point (px, py)
+/// (cell-centre coordinates); exact at a cell centre.
+fn idw7(dem: &Raster, px: f64, py: f64) -> Option<f64> {
+    let (x0, y0) = (px.floor() as i64, py.floor() as i64);
+    let mut near: Vec<(f64, f64)> = Vec::with_capacity(25);
+    for a in -2..=2 {
+        for b in -2..=2 {
+            let (cx, cy) = (x0 + a, y0 + b);
+            if cx < 0 || cy < 0 || cx >= dem.width as i64 || cy >= dem.height as i64 {
+                continue;
+            }
+            if let Some(z) = dem.get(cx as usize, cy as usize) {
+                near.push(((px - cx as f64).hypot(py - cy as f64), z));
+            }
+        }
+    }
+    near.sort_by(|p, q| p.0.total_cmp(&q.0));
+    let first = near.first()?;
+    if first.0 < 1e-9 {
+        return Some(first.1);
+    }
+    let (num, den) = near.iter().take(7).fold((0.0, 0.0), |(n, d), &(dist, z)| {
+        (n + z / dist, d + 1.0 / dist)
+    });
+    Some(num / den)
+}
+
+/// Bilinear surface at grid point (px, py) (cell-centre coordinates), clamped to the raster.
+fn bilinear(dem: &Raster, px: f64, py: f64) -> Option<f64> {
+    let cx = px.clamp(0.0, (dem.width - 1) as f64);
+    let cy = py.clamp(0.0, (dem.height - 1) as f64);
+    let (x0, y0) = (cx.floor() as usize, cy.floor() as usize);
+    let (x1, y1) = ((x0 + 1).min(dem.width - 1), (y0 + 1).min(dem.height - 1));
+    let (fx, fy) = (cx - x0 as f64, cy - y0 as f64);
+    let (a, b) = (dem.get(x0, y0)?, dem.get(x1, y0)?);
+    let (c, d) = (dem.get(x0, y1)?, dem.get(x1, y1)?);
+    Some((a * (1.0 - fx) + b * fx) * (1.0 - fy) + (c * (1.0 - fx) + d * fx) * fy)
+}
+
+/// The cells one Geodesic Viewshed observer sees (None when it is off the raster or on NoData).
+fn geodesic_visible_cells(
+    dem: &Raster,
+    o: &GeodesicObserver,
+    opts: &GeodesicViewshedOptions,
+) -> Option<Vec<bool>> {
+    let (w, h) = (dem.width, dem.height);
+    let t = &dem.transform;
+    let cell = t[1].abs();
+    let ox = (o.x - t[0]) / t[1] - 0.5;
+    let oy = (o.y - t[3]) / t[5] - 0.5;
+    if ox < -0.5 || oy < -0.5 || ox >= w as f64 - 0.5 || oy >= h as f64 - 0.5 {
+        return None;
+    }
+    dem.get((ox + 0.5) as usize, (oy + 0.5) as usize)?;
+    let z0 = match o.elevation {
+        Some(e) => e,
+        None => bilinear(dem, ox + 0.5, oy + 0.5)?,
+    } + o.offset;
+    let drop =
+        |cells: f64| (cells * cell).powi(2) * (1.0 - opts.refractivity) / (2.0 * EARTH_RADIUS);
+    let mut seen = vec![false; w * h];
+    for row in 0..h {
+        for col in 0..w {
+            let Some(z) = dem.get(col, row) else { continue };
+            let (dx, dy) = (col as f64 - ox, row as f64 - oy);
+            let len = dx.hypot(dy);
+            let tz = z + opts.surface_offset - drop(len);
+            let n = len.round().max(1.0);
+            let step = len / n;
+            let mut visible = true;
+            let mut i = 1.0;
+            loop {
+                let s = i * step;
+                i += 1.0;
+                if s >= len - 1e-9 {
+                    break;
+                }
+                if s <= 1.5 {
+                    continue;
+                }
+                let f = s / len;
+                let Some(e) = idw7(dem, ox + dx * f, oy + dy * f) else {
+                    continue;
+                };
+                if e - drop(s) >= z0 + (tz - z0) * f {
+                    visible = false;
+                    break;
+                }
+            }
+            seen[row * w + col] = visible;
+        }
+    }
+    Some(seen)
+}
+
 /// Spatial Analyst Surface Area Ratio: (ratio, surface area) Float32 rasters. The surface
 /// area is Jenness's (2004): the 8 triangles from the cell centre to each pair of adjacent
 /// neighbours, clipped to the cell (sides halved), by Heron's formula; z is scaled to metres by
@@ -430,4 +599,35 @@ pub fn surface_area_ratio(dem: &Raster, z_factor: f64, arc_chord: bool) -> (Rast
         }
     }
     (ratio, area)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// ArcGIS probe (41×41 flat surface, one 6 m cell 4 cells east of the observer):
+    /// the cells straight behind it are hidden, rows well beside it stay visible.
+    #[test]
+    fn geodesic_viewshed_bump_shadow() {
+        let mut dem = Raster::new(41, 41, DataType::F32, [0.0, 10.0, 0.0, 410.0, 0.0, -10.0]);
+        dem.bands[0][20 * 41 + 24] = 6.0;
+        let observer = GeodesicObserver {
+            x: 205.0,
+            y: 205.0,
+            offset: 1.0,
+            elevation: None,
+        };
+        let opts = GeodesicViewshedOptions {
+            observers_mask: false,
+            refractivity: 0.13,
+            surface_offset: 0.0,
+        };
+        let out = geodesic_viewshed(&dem, &[observer], &opts);
+        let at = |c: usize, r: usize| out.bands[0][r * 41 + c];
+        assert_eq!(out.nodata, Some(255.0));
+        assert_eq!(at(24, 20), 1.0);
+        assert!((25..41).all(|c| at(c, 20) == 255.0));
+        assert!((20..41).all(|c| at(c, 12) == 1.0 && at(c, 28) == 1.0));
+        assert_eq!(at(0, 0), 1.0);
+    }
 }

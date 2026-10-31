@@ -110755,6 +110755,132 @@
           "z_factor": 2
         }
       }
+    },
+    "vs2_hill": {
+      "tool": "gp.Viewshed2_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/observer_hill.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "geodesic_viewshed",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "in_observer_features": "testdata/raster/observer_hill.shp",
+          "output": "<out>"
+        }
+      }
+    },
+    "vs2_two": {
+      "tool": "gp.Viewshed2_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/observers.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "geodesic_viewshed",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "in_observer_features": "testdata/raster/observers.shp",
+          "output": "<out>"
+        }
+      }
+    },
+    "vs2_two_observers": {
+      "tool": "gp.Viewshed2_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/observers.shp",
+        "<out>",
+        "",
+        "OBSERVERS"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "geodesic_viewshed",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "in_observer_features": "testdata/raster/observers.shp",
+          "output": "<out>",
+          "analysis_type": "OBSERVERS"
+        }
+      }
+    },
+    "vs2_hill_offset10": {
+      "tool": "gp.Viewshed2_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/observer_hill.shp",
+        "<out>",
+        "",
+        "FREQUENCY",
+        "0 Meters",
+        "",
+        0.13,
+        "0 Meters",
+        "",
+        "10 Meters"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "geodesic_viewshed",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "in_observer_features": "testdata/raster/observer_hill.shp",
+          "output": "<out>",
+          "analysis_type": "FREQUENCY",
+          "vertical_error": "0 Meters",
+          "refractivity_coefficient": 0.13,
+          "surface_offset": "0 Meters",
+          "observer_offset": "10 Meters"
+        }
+      }
+    },
+    "vs2_two_surface2": {
+      "tool": "gp.Viewshed2_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/observers.shp",
+        "<out>",
+        "",
+        "FREQUENCY",
+        "0 Meters",
+        "",
+        0.13,
+        "2 Meters"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "geodesic_viewshed",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "in_observer_features": "testdata/raster/observers.shp",
+          "output": "<out>",
+          "analysis_type": "FREQUENCY",
+          "vertical_error": "0 Meters",
+          "refractivity_coefficient": 0.13,
+          "surface_offset": "2 Meters"
+        }
+      }
     }
   }
 }

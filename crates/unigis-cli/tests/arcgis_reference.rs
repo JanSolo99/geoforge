@@ -4263,6 +4263,13 @@ const KNOWN_RASTER_DIFFERENCES: &[(&str, usize)] = &[
     ("op_two", 309),
     ("op_hill", 199),
     ("op_two_z2", 310),
+    // Geodesic Viewshed: the ground kernel between cell centres is fitted (7-nearest IDW), not
+    // identified; grazing sight lines differ (about 0.5-1% of cells).
+    ("vs2_hill", 81),
+    ("vs2_two", 153),
+    ("vs2_two_observers", 153),
+    ("vs2_hill_offset10", 77),
+    ("vs2_two_surface2", 111),
     ("hillshade_shadows_315_15", 3),
     ("hillshade_shadows_200_25", 29),
     ("flowdir_hydro_filled", 5),

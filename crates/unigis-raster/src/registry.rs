@@ -173,6 +173,16 @@ const fn option(
     }
 }
 
+const fn text(name: &'static str, label: &'static str, default: &'static str) -> Param {
+    Param {
+        name,
+        label,
+        kind: Kind::Text,
+        required: false,
+        default,
+    }
+}
+
 const fn num_param(name: &'static str, label: &'static str, default: &'static str) -> Param {
     Param {
         name,
@@ -506,6 +516,12 @@ fn surface_area_ratio(ctx: &dyn Context) -> Result<Output> {
 fn observer_points_unsupported(_: &dyn Context) -> Result<Output> {
     Err(Error::Unsupported(
         "Observer Points reads observer features; run it through `ug run`".into(),
+    ))
+}
+
+fn geodesic_viewshed_unsupported(_: &dyn Context) -> Result<Output> {
+    Err(Error::Unsupported(
+        "Geodesic Viewshed reads observer features; run it through `ug run`".into(),
     ))
 }
 
@@ -3168,6 +3184,43 @@ pub static TOOLS: &[Tool] = &[
             ),
         ],
         run: observer_points_unsupported,
+    },
+    Tool {
+        id: "geodesic_viewshed",
+        name: "Geodesic Viewshed",
+        summary: "How many observers (or which, as a bit mask) see each cell of a projected surface.",
+        params: &[
+            raster("input", "Input raster", true),
+            Param {
+                name: "in_observer_features",
+                label: "Input point or polyline observer features",
+                kind: Kind::Text,
+                required: true,
+                default: "",
+            },
+            option(
+                "analysis_type",
+                "Analysis type",
+                &["FREQUENCY", "OBSERVERS"],
+                "FREQUENCY",
+            ),
+            text("vertical_error", "Vertical error", "0 Meters"),
+            num_param(
+                "refractivity_coefficient",
+                "Refractivity coefficient",
+                "0.13",
+            ),
+            text("surface_offset", "Surface offset", "0 Meters"),
+            text("observer_elevation", "Observer elevation", ""),
+            text("observer_offset", "Observer offset", "1 Meters"),
+            option(
+                "analysis_method",
+                "Analysis method",
+                &["ALL_SIGHTLINES", "PERIMETER_SIGHTLINES"],
+                "ALL_SIGHTLINES",
+            ),
+        ],
+        run: geodesic_viewshed_unsupported,
     },
     Tool {
         id: "validate_flow_direction",

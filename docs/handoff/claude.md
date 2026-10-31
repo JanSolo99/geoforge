@@ -1,6 +1,6 @@
 # Lane claude handoff
 
-Updated 2026-10-30, end of session (Claude), worktree `.worktrees/lane-claude`, branch `lane/claude`.
+Updated 2026-10-31 (Claude), worktree `.worktrees/lane-claude`, branch `lane/claude`.
 
 ## User request (takes precedence over the queue; no queue tool claimed)
 
@@ -248,6 +248,19 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
   `ug run observer_points` branch with shared `read_observers`. Cells differ only where
   Viewshed's do; improving the sight-line model would fix both.
 
+## Queue: Geodesic Viewshed — landed (approximate)
+
+- `surface::geodesic_viewshed` + `ug run geodesic_viewshed` (`run_geodesic_viewshed` in main.rs),
+  registry entry (placeholder runner), `Raster::is_geographic`. 5 `vs2_*` references; allowed
+  differing cells in KNOWN_RASTER_DIFFERENCES (81/153/153/77/111, ~0.5–1%).
+- Found by probing (notes + scripts in scripts/research/geodesic_viewshed/): NoData for unseen
+  cells (255 FREQUENCY, 0 OBSERVERS); observer elevation = 2×2 mean right/below the observer cell;
+  steps within 1.5 cells skipped; on-axis steps hit cell centres. Off-axis kernel not identified
+  (7-nearest IDW p1 with L/round(L) steps fits best). Geographic surfaces, AGL, radii, angles,
+  vertical error, perimeter sight lines refused (KNOWN_GAPS).
+- Validation: `UNIGIS_REFERENCE_CASES=vs2_,op_,viewshed_` PASS; unit test PASS; clippy -D
+  warnings PASS on unigis-raster/-cli. Full `scripts/check` runs in `scripts/lane land`.
+
 ## Pitfall: ArcGIS sidecars in testdata
 
 Running ArcGIS on fixture rasters can leave untracked `testdata/raster/*.aux.xml` / `*.vat.dbf`
@@ -256,6 +269,6 @@ After generating references, check `git status --short testdata/` and delete suc
 
 ## Next
 
-- Next: `scripts/lane claim` for the next queue tool.
+- Next queue item: `scripts/lane claim` (after Geodesic Viewshed: Visibility is next in the queue).
 - Possible follow-ups (not requested): Catalog New for mobile geodatabases (needs a mobile reader),
   ArcGIS-style blank names instead of NewFeatureClass placeholders.

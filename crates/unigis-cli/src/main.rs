@@ -6687,6 +6687,9 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
             &unigis_raster::surface::observer_points(&dem, &observers, z_factor),
         );
     }
+    if spec.id == "geodesic_viewshed" {
+        return run_geodesic_viewshed(&map, Path::new(&output));
+    }
     if spec.id == "validate_flow_direction" {
         if map
             .get("flow_direction_type")
@@ -8375,6 +8378,128 @@ fn read_observers(path: &Path) -> Result<Vec<unigis_raster::surface::Observer>> 
         }
     }
     Ok(observers)
+}
+
+/// Spatial Analyst Geodesic Viewshed (Viewshed2) through `ug run`: FREQUENCY or OBSERVERS on a
+/// projected surface, with observer offset/elevation and surface offset as linear units or
+/// observer fields.
+fn run_geodesic_viewshed(
+    map: &std::collections::HashMap<String, String>,
+    output: &Path,
+) -> Result<()> {
+    let get = |k: &str| map.get(k).map(|v| v.trim()).filter(|v| !v.is_empty());
+    let unsupported = |what: &str| {
+        Err(Error::Unsupported(format!(
+            "Geodesic Viewshed: {what} is not supported yet"
+        )))
+    };
+    for k in [
+        "out_agl_raster",
+        "out_observer_region_relationship_table",
+        "inner_radius",
+        "outer_radius",
+    ] {
+        if get(k).is_some() {
+            return unsupported(k);
+        }
+    }
+    if get("vertical_error").is_some_and(|v| parse_distance(v, None).is_ok_and(|e| e != 0.0)) {
+        return unsupported("a vertical error");
+    }
+    if get("analysis_method").is_some_and(|m| !m.eq_ignore_ascii_case("ALL_SIGHTLINES")) {
+        return unsupported("PERIMETER_SIGHTLINES");
+    }
+    for (k, default) in [
+        ("horizontal_start_angle", 0.0),
+        ("horizontal_end_angle", 360.0),
+        ("vertical_upper_angle", 90.0),
+        ("vertical_lower_angle", -90.0),
+    ] {
+        if get(k).is_some_and(|v| v.parse::<f64>().ok() != Some(default)) {
+            return unsupported(k);
+        }
+    }
+    let observers_mask = match get("analysis_type") {
+        None => false,
+        Some(t) if t.eq_ignore_ascii_case("FREQUENCY") => false,
+        Some(t) if t.eq_ignore_ascii_case("OBSERVERS") => true,
+        Some(_) => {
+            return Err(Error::Unsupported(
+                "ERROR 000800: The value is not a member of FREQUENCY | OBSERVERS.".into(),
+            ));
+        }
+    };
+    let input = get("input").ok_or_else(|| Error::Unsupported("input is required".into()))?;
+    let dem = unigis_raster::read_geotiff(Path::new(input))?;
+    if dem.is_geographic() {
+        return unsupported("a geographic surface");
+    }
+    let features = get("in_observer_features")
+        .ok_or_else(|| Error::Unsupported("in_observer_features is required".into()))?;
+    let (fc, _) = open_feature_class(Path::new(features))?;
+    // A linear unit ("10 Meters") or the name of a numeric observer field.
+    let per_observer = |spec: Option<&str>| -> Result<Option<Result<f64, usize>>> {
+        let Some(spec) = spec else { return Ok(None) };
+        if let Some(i) = fc
+            .fields()
+            .iter()
+            .position(|f| f.name.eq_ignore_ascii_case(spec))
+        {
+            return Ok(Some(Err(i)));
+        }
+        Ok(Some(Ok(parse_distance(spec, None)?)))
+    };
+    let offset = per_observer(get("observer_offset"))?.unwrap_or(Ok(1.0));
+    let elevation = per_observer(get("observer_elevation"))?;
+    let surface_offset = match per_observer(get("surface_offset"))? {
+        None => 0.0,
+        Some(Ok(v)) => v,
+        Some(Err(_)) => return unsupported("a surface offset field"),
+    };
+    let refractivity = match get("refractivity_coefficient") {
+        None => 0.13,
+        Some(v) => v
+            .parse()
+            .map_err(|_| Error::Unsupported(format!("invalid refractivity coefficient `{v}`")))?,
+    };
+    let number = |f: &unigis_core::Feature, v: Result<f64, usize>| match v {
+        Ok(v) => Some(v),
+        Err(i) => match &f.attributes[i] {
+            Value::Double(v) => Some(*v),
+            Value::Single(v) => Some(f64::from(*v)),
+            Value::Integer(v) => Some(f64::from(*v)),
+            Value::SmallInteger(v) => Some(f64::from(*v)),
+            _ => None,
+        },
+    };
+    let mut observers = Vec::new();
+    for f in fc.features() {
+        let f = f?;
+        let offset = number(&f, offset).unwrap_or(0.0);
+        let elevation = elevation.and_then(|e| number(&f, e));
+        for p in f.geometry.iter().flat_map(|g| g.xy.iter()) {
+            observers.push(unigis_raster::surface::GeodesicObserver {
+                x: p[0],
+                y: p[1],
+                offset,
+                elevation,
+            });
+        }
+    }
+    if observers_mask && observers.len() > 32 {
+        return Err(Error::Unsupported(
+            "Geodesic Viewshed OBSERVERS takes at most 32 observers".into(),
+        ));
+    }
+    let opts = unigis_raster::surface::GeodesicViewshedOptions {
+        observers_mask,
+        refractivity,
+        surface_offset,
+    };
+    write_raster(
+        output,
+        &unigis_raster::surface::geodesic_viewshed(&dem, &observers, &opts),
+    )
 }
 
 fn write_contours(

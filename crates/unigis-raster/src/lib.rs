@@ -119,6 +119,12 @@ impl Raster {
         }
     }
 
+    /// Whether the raster's coordinate system is a known geographic (lat/lon) one.
+    pub fn is_geographic(&self) -> bool {
+        self.epsg
+            .is_some_and(|e| geographic_crs::GEOGRAPHIC_EPSG.contains(&e))
+    }
+
     /// A single-band raster on the same grid and coordinate system as `self`.
     pub fn like(&self, data_type: DataType) -> Self {
         Raster {
