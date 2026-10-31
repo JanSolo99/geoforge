@@ -6690,6 +6690,9 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
     if spec.id == "geodesic_viewshed" {
         return run_geodesic_viewshed(&map, Path::new(&output));
     }
+    if spec.id == "visibility" {
+        return run_visibility(&map, Path::new(&output));
+    }
     if spec.id == "validate_flow_direction" {
         if map
             .get("flow_direction_type")
@@ -8354,11 +8357,27 @@ fn run_add_surface_information(
 /// Contour lines as ArcGIS writes them: `Id` 1.. and the `Contour` value.
 /// Observer points (OFFSETA, default 1) for Viewshed and Observer Points, in feature order.
 fn read_observers(path: &Path) -> Result<Vec<unigis_raster::surface::Observer>> {
+    read_observers_with(path, None)
+}
+
+/// [`read_observers`] with the observer offset from a named field (Visibility's
+/// `observer_offset`); a missing named field is an error.
+fn read_observers_with(
+    path: &Path,
+    offset_field: Option<&str>,
+) -> Result<Vec<unigis_raster::surface::Observer>> {
     let (fc, _) = open_feature_class(path)?;
-    let offset_field = fc
+    let name = offset_field.unwrap_or("OFFSETA");
+    let field = fc
         .fields()
         .iter()
-        .position(|f| f.name.eq_ignore_ascii_case("OFFSETA"));
+        .position(|f| f.name.eq_ignore_ascii_case(name));
+    if field.is_none() && offset_field.is_some() {
+        return Err(Error::Unsupported(format!(
+            "observer offset field `{name}` not found"
+        )));
+    }
+    let offset_field = field;
     let mut observers = Vec::new();
     for f in fc.features() {
         let f = f?;
@@ -8378,6 +8397,83 @@ fn read_observers(path: &Path) -> Result<Vec<unigis_raster::surface::Observer>> 
         }
     }
     Ok(observers)
+}
+
+/// Spatial Analyst Visibility through `ug run`: Viewshed (FREQUENCY) or Observer Points
+/// (OBSERVERS) with ArcGIS's identical output, non-visible cells 0 or NoData.
+fn run_visibility(map: &std::collections::HashMap<String, String>, output: &Path) -> Result<()> {
+    let get = |k: &str| map.get(k).map(|v| v.trim()).filter(|v| !v.is_empty());
+    if get("curvature_correction").is_some_and(|v| v.eq_ignore_ascii_case("CURVED_EARTH")) {
+        return Err(Error::Unsupported(
+            "Visibility: earth curvature correction is not supported yet".into(),
+        ));
+    }
+    for k in [
+        "out_agl_raster",
+        "surface_offset",
+        "observer_elevation",
+        "inner_radius",
+        "outer_radius",
+        "horizontal_start_angle",
+        "horizontal_end_angle",
+        "vertical_upper_angle",
+        "vertical_lower_angle",
+    ] {
+        if get(k).is_some() {
+            return Err(Error::Unsupported(format!(
+                "Visibility: {k} is not supported yet"
+            )));
+        }
+    }
+    let observers_mask = match get("analysis_type") {
+        None => false,
+        Some(t) if t.eq_ignore_ascii_case("FREQUENCY") => false,
+        Some(t) if t.eq_ignore_ascii_case("OBSERVERS") => true,
+        Some(_) => {
+            return Err(Error::Unsupported(
+                "ERROR 000800: The value is not a member of FREQUENCY | OBSERVERS.".into(),
+            ));
+        }
+    };
+    let nonvisible_nodata = match get("nonvisible_cell_value") {
+        None => false,
+        Some(v) if v.eq_ignore_ascii_case("ZERO") => false,
+        Some(v) if v.eq_ignore_ascii_case("NODATA") => true,
+        Some(_) => {
+            return Err(Error::Unsupported(
+                "ERROR 000800: The value is not a member of ZERO | NODATA.".into(),
+            ));
+        }
+    };
+    let input = get("input").ok_or_else(|| Error::Unsupported("input is required".into()))?;
+    let features = get("in_observer_features")
+        .ok_or_else(|| Error::Unsupported("in_observer_features is required".into()))?;
+    let dem = unigis_raster::read_geotiff(Path::new(input))?;
+    let observers = read_observers_with(Path::new(features), get("observer_offset"))?;
+    let z_factor = match get("z_factor") {
+        None => 1.0,
+        Some(v) => v
+            .parse()
+            .map_err(|_| Error::Unsupported(format!("invalid z factor `{v}`")))?,
+    };
+    let mut out = if observers_mask {
+        if observers.len() > 32 {
+            return Err(Error::Unsupported(
+                "Visibility OBSERVERS takes at most 32 observers".into(),
+            ));
+        }
+        unigis_raster::surface::observer_points(&dem, &observers, z_factor)
+    } else {
+        unigis_raster::surface::viewshed(&dem, &observers, z_factor)
+    };
+    if nonvisible_nodata && let Some(nodata) = out.nodata {
+        for v in &mut out.bands[0] {
+            if *v == 0.0 {
+                *v = nodata;
+            }
+        }
+    }
+    write_raster(output, &out)
 }
 
 /// Spatial Analyst Geodesic Viewshed (Viewshed2) through `ug run`: FREQUENCY or OBSERVERS on a

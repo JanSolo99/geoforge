@@ -4263,6 +4263,11 @@ const KNOWN_RASTER_DIFFERENCES: &[(&str, usize)] = &[
     ("op_two", 309),
     ("op_hill", 199),
     ("op_two_z2", 310),
+    // Visibility is Viewshed / Observer Points (same grazing sight lines).
+    ("vis_two", 309),
+    ("vis_two_observers_nodata", 309),
+    ("vis_hill_nodata", 199),
+    ("vis_two_z2_nodata", 310),
     // Geodesic Viewshed: the ground kernel between cell centres is fitted (7-nearest IDW), not
     // identified; grazing sight lines differ (about 0.5-1% of cells).
     ("vs2_hill", 81),

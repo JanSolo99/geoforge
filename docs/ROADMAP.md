@@ -922,6 +922,9 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Observer Points (`observer_points`): Viewshed's visibility as a bit mask (observer k adds
   2^(k−1), up to 16), ArcGIS's type and NoData. 3 ArcGIS `op_*` references (~1% of cells differ
   where sight lines graze the terrain, as for Viewshed).
+- [x] Visibility (`visibility`): ArcGIS gives exactly Viewshed (FREQUENCY) / Observer Points
+  (OBSERVERS) output; ZERO/NODATA non-visible cells (same type and NoData), z-factor, observer
+  offset field. 4 ArcGIS `vis_*` references (Viewshed's ~1% grazing cells differ).
 - [x] Geodesic Viewshed (`geodesic_viewshed`, approximate): FREQUENCY / OBSERVERS on projected
   surfaces, observer offset/elevation (unit or field), surface offset, refractivity; one sight line
   per cell centre, cell-size steps, ground by 7-nearest IDW (fitted), observer on the 2×2 mean.

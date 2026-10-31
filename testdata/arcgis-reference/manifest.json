@@ -110881,6 +110881,103 @@
           "surface_offset": "2 Meters"
         }
       }
+    },
+    "vis_two": {
+      "tool": "gp.Visibility_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/observers.shp",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "visibility",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "in_observer_features": "testdata/raster/observers.shp",
+          "output": "<out>"
+        }
+      }
+    },
+    "vis_two_observers_nodata": {
+      "tool": "gp.Visibility_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/observers.shp",
+        "<out>",
+        "",
+        "OBSERVERS",
+        "NODATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "visibility",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "in_observer_features": "testdata/raster/observers.shp",
+          "output": "<out>",
+          "analysis_type": "OBSERVERS",
+          "nonvisible_cell_value": "NODATA"
+        }
+      }
+    },
+    "vis_hill_nodata": {
+      "tool": "gp.Visibility_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/observer_hill.shp",
+        "<out>",
+        "",
+        "FREQUENCY",
+        "NODATA"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "visibility",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "in_observer_features": "testdata/raster/observer_hill.shp",
+          "output": "<out>",
+          "analysis_type": "FREQUENCY",
+          "nonvisible_cell_value": "NODATA"
+        }
+      }
+    },
+    "vis_two_z2_nodata": {
+      "tool": "gp.Visibility_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "testdata/raster/observers.shp",
+        "<out>",
+        "",
+        "FREQUENCY",
+        "NODATA",
+        2
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "visibility",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "in_observer_features": "testdata/raster/observers.shp",
+          "output": "<out>",
+          "analysis_type": "FREQUENCY",
+          "nonvisible_cell_value": "NODATA",
+          "z_factor": 2
+        }
+      }
     }
   }
 }

@@ -261,6 +261,16 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
 - Validation: `UNIGIS_REFERENCE_CASES=vs2_,op_,viewshed_` PASS; unit test PASS; clippy -D
   warnings PASS on unigis-raster/-cli. Full `scripts/check` runs in `scripts/lane land`.
 
+## Queue: Visibility — landed
+
+- `run_visibility` in main.rs (`ug run visibility`) + registry placeholder; `read_observers_with`
+  takes Visibility's observer_offset field. ArcGIS's Visibility output equals its own Viewshed /
+  Observer Points exactly (0 cells differ, same type/NoData); NODATA mode only turns 0 into the
+  NoData value. 4 `vis_*` references, allowed cells = Viewshed's (309/309/199/310).
+- Validation: `UNIGIS_REFERENCE_CASES=vis_,viewshed_,op_,vs2_` PASS; clippy -D warnings PASS.
+- Worth doing when asked: make Viewshed's sight line exact — it fixes Viewshed, Observer Points
+  and Visibility (~1% cells) at once.
+
 ## Pitfall: ArcGIS sidecars in testdata
 
 Running ArcGIS on fixture rasters can leave untracked `testdata/raster/*.aux.xml` / `*.vat.dbf`
@@ -269,6 +279,6 @@ After generating references, check `git status --short testdata/` and delete suc
 
 ## Next
 
-- Next queue item: `scripts/lane claim` (after Geodesic Viewshed: Visibility is next in the queue).
+- Next queue item: `scripts/lane claim` (after Visibility).
 - Possible follow-ups (not requested): Catalog New for mobile geodatabases (needs a mobile reader),
   ArcGIS-style blank names instead of NewFeatureClass placeholders.

@@ -69,6 +69,7 @@ Update this file when a gap is found or closed.
 | Flow Distance | MFD and D-Infinity flow (the default without a flow direction raster), statistics_type |
 | Observer Points | Viewshed's sight-line approximation (~1% of cells); earth curvature/refraction, the AGL raster, OFFSETB/AZIMUTH/VERT/RADIUS fields; the VAT's OBSn columns; only `ug run` |
 | Geodesic Viewshed | Ground between cell centres fitted (7-nearest IDW, ~0.5–1% of cells differ); geographic surfaces, the AGL raster, the observer-region table, vertical error, inner/outer radius, view angles, PERIMETER_SIGHTLINES, surface offset fields; only `ug run` |
+| Visibility | Viewshed's sight-line approximation (~1% of cells); earth curvature, the AGL raster, surface offset / observer elevation / radius / angle fields (only an observer offset field); polyline observers as vertices; the VAT's OBSn columns; only `ug run` |
 | Validate Flow Direction | MFD flow direction rasters; only `ug run` |
 | Surface Area Ratio | ARC_CHORD (default): ArcGIS's plane of best fit is not identified — Horn's, least-squares, PCA, corner and vector-area planes and its own Slope raster all differ by up to ~5e-5 relative; geographic rasters |
 | Stream to Feature | Only `ug run` (no app runner); non-square cells and loops in flow directions untested |
