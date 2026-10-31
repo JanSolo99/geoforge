@@ -67,6 +67,7 @@ Update this file when a gap is found or closed.
 | Create Normal / Random Raster | Values are not ArcGIS's cell for cell (its seeded ACM599 / Mersenne Twister streams are not reproduced, including explicit Create Random Raster seeds); the randomGenerator, cellSize, extent and snapRaster environments are not read |
 | Add Surface Information | Polygons (SURFACE_AREA and polygon slopes) and multipoints are refused; TIN, terrain and LAS surfaces; the Natural Neighbors and Conflate methods, pyramid level and noise filtering; only `ug run` (no registry runner for the app) |
 | Flow Distance | MFD and D-Infinity flow (the default without a flow direction raster), statistics_type |
+| Surface Area Ratio | ARC_CHORD (default): ArcGIS's plane of best fit is not identified — Horn's, least-squares, PCA, corner and vector-area planes and its own Slope raster all differ by up to ~5e-5 relative; geographic rasters |
 | Stream to Feature | Only `ug run` (no app runner); non-square cells and loops in flow directions untested |
 | Storage Capacity | Zones (raster or feature, zone_field), the output chart; only `ug run` (no app runner) |
 | Raster Calculator | Layer names / `%name%` references, `//` on rasters, Con/SetNull where clauses, chained comparisons, focal/zonal/other non-local functions, environment settings (extent, cell size, mask) |

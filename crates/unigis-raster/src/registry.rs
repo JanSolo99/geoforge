@@ -492,6 +492,17 @@ fn contour_list_unsupported(_: &dyn Context) -> Result<Output> {
     ))
 }
 
+fn surface_area_ratio(ctx: &dyn Context) -> Result<Output> {
+    let z = z_unit_metres(&choice(ctx, "surface_area_ratio", "z_unit"))?;
+    let arc_chord =
+        choice(ctx, "surface_area_ratio", "planar_area_type").eq_ignore_ascii_case("ARC_CHORD");
+    let (ratio, area) = crate::surface::surface_area_ratio(&ctx.raster("input")?, z, arc_chord);
+    Ok(Output {
+        extra: vec![("out_area_raster", area)],
+        ..with_statistics(ratio, true)?
+    })
+}
+
 fn stream_to_feature_unsupported(_: &dyn Context) -> Result<Output> {
     Err(Error::Unsupported(
         "Stream to Feature writes polylines; run it through `ug run`".into(),
@@ -3077,6 +3088,46 @@ pub static TOOLS: &[Tool] = &[
             },
         ],
         run: contour_list_unsupported,
+    },
+    Tool {
+        id: "surface_area_ratio",
+        name: "Surface Area Ratio",
+        summary: "Ratio of each cell's 3D surface area (Jenness triangles) to its planar area, and the surface area.",
+        params: &[
+            raster("input", "Input surface raster", true),
+            Param {
+                name: "out_area_raster",
+                label: "Output surface area raster",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+            },
+            option(
+                "z_unit",
+                "Z unit",
+                &[
+                    "INCH",
+                    "FOOT",
+                    "FOOT_US",
+                    "YARD",
+                    "MILE_US",
+                    "NAUTICAL_MILE",
+                    "MILLIMETER",
+                    "CENTIMETER",
+                    "DECIMETER",
+                    "METER",
+                    "KILOMETER",
+                ],
+                "METER",
+            ),
+            option(
+                "planar_area_type",
+                "Planar area type",
+                &["HORIZONTAL", "ARC_CHORD"],
+                "ARC_CHORD",
+            ),
+        ],
+        run: surface_area_ratio,
     },
     Tool {
         id: "stream_to_feature",

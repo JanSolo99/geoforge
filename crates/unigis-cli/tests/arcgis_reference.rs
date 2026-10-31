@@ -4273,6 +4273,9 @@ const KNOWN_RASTER_DIFFERENCES: &[(&str, usize)] = &[
     ("msd_dem_feet", 22),
     ("msd_dem_nodata", 9),
     ("msd_geographic", 9),
+    // Surface Area Ratio ARC_CHORD: Horn's plane stands in for ArcGIS's (unidentified) plane of
+    // best fit; ratios agree to ~5e-5 relative.
+    ("sar_dem", 7041),
     ("flowdir_hydro_nodata", 5),
     ("flowdir_hydro_int", 930),
     // A center between NoData cells that ArcGIS fills from its neighbors.
@@ -4595,6 +4598,7 @@ fn second_raster_outputs_match_arcgis() {
     for (case, info) in manifest["cases"].as_object().unwrap() {
         let (param, suffix) = match info["tool"].as_str() {
             Some("gp.GeomorphonLandforms_sa") => ("out_geomorphons_raster", "geomorphons"),
+            Some("gp.SurfaceAreaRatio_sa") => ("out_area_raster", "area"),
             Some(
                 "gp.MultiscaleSurfaceDeviation_sa"
                 | "gp.MultiscaleSurfaceDifference_sa"

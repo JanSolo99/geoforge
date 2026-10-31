@@ -110452,6 +110452,117 @@
           "max_connection_distance": "50 Meters"
         }
       }
+    },
+    "sar_dem": {
+      "tool": "gp.SurfaceAreaRatio_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "testdata/arcgis-reference/sar_dem_area.tif"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "surface_area_ratio",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "sar_dem_horizontal": {
+      "tool": "gp.SurfaceAreaRatio_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "testdata/arcgis-reference/sar_dem_horizontal_area.tif",
+        "METER",
+        "HORIZONTAL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "surface_area_ratio",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "z_unit": "METER",
+          "planar_area_type": "HORIZONTAL"
+        }
+      }
+    },
+    "sar_dem_feet": {
+      "tool": "gp.SurfaceAreaRatio_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "testdata/arcgis-reference/sar_dem_feet_area.tif",
+        "FOOT",
+        "HORIZONTAL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "surface_area_ratio",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "z_unit": "FOOT",
+          "planar_area_type": "HORIZONTAL"
+        }
+      }
+    },
+    "sar_dem_nodata": {
+      "tool": "gp.SurfaceAreaRatio_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "testdata/arcgis-reference/sar_dem_nodata_area.tif",
+        "METER",
+        "HORIZONTAL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "surface_area_ratio",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "z_unit": "METER",
+          "planar_area_type": "HORIZONTAL"
+        }
+      }
+    },
+    "sar_hydro": {
+      "tool": "gp.SurfaceAreaRatio_sa",
+      "args": [
+        "testdata/raster/hydro.tif",
+        "<out>",
+        "testdata/arcgis-reference/sar_hydro_area.tif",
+        "METER",
+        "HORIZONTAL"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "surface_area_ratio",
+        "params": {
+          "input": "testdata/raster/hydro.tif",
+          "output": "<out>",
+          "z_unit": "METER",
+          "planar_area_type": "HORIZONTAL"
+        }
+      }
     }
   }
 }

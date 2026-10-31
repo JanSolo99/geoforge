@@ -325,3 +325,84 @@ pub fn viewshed(dem: &Raster, observers: &[Observer], z_factor: f64) -> Raster {
     out.bands[0] = counts.into_iter().map(|c| c.unwrap_or(nodata)).collect();
     out
 }
+
+/// Spatial Analyst Surface Area Ratio: (ratio, surface area) Float32 rasters. The surface
+/// area is Jenness's (2004): the 8 triangles from the cell centre to each pair of adjacent
+/// neighbours, clipped to the cell (sides halved), by Heron's formula; z is scaled to metres by
+/// `z_factor`. The ratio divides by the cell area (HORIZONTAL) or, for ARC_CHORD, by the cell
+/// area over the cosine of the local slope (Horn's plane here; ArcGIS's plane of best fit is
+/// not identified and differs by up to ~5e-5 relative). HORIZONTAL ratios at the edge and
+/// next to NoData use the triangles there are; ARC_CHORD ratios and areas there are NoData.
+pub fn surface_area_ratio(dem: &Raster, z_factor: f64, arc_chord: bool) -> (Raster, Raster) {
+    let (w, h) = (dem.width, dem.height);
+    let (cx, cy) = (dem.transform[1].abs(), dem.transform[5].abs());
+    let nodata = f32::MIN as f64;
+    let mut ratio = dem.like(DataType::F32);
+    ratio.nodata = Some(nodata);
+    let mut area = ratio.clone();
+    ratio.bands[0].fill(nodata);
+    area.bands[0].fill(nodata);
+    // Ring of neighbours in order around the centre: (dx, dy).
+    const RING: [(isize, isize); 8] = [
+        (-1, -1),
+        (0, -1),
+        (1, -1),
+        (1, 0),
+        (1, 1),
+        (0, 1),
+        (-1, 1),
+        (-1, 0),
+    ];
+    for y in 0..h {
+        for x in 0..w {
+            let at = |dx: isize, dy: isize| {
+                let (xx, yy) = (x as isize + dx, y as isize + dy);
+                if xx < 0 || yy < 0 || xx >= w as isize || yy >= h as isize {
+                    return None;
+                }
+                dem.get(xx as usize, yy as usize).map(|v| v * z_factor)
+            };
+            let Some(zc) = at(0, 0) else { continue };
+            let ring: Vec<Option<[f64; 3]>> = RING
+                .iter()
+                .map(|&(dx, dy)| at(dx, dy).map(|z| [dx as f64 * cx, dy as f64 * cy, z - zc]))
+                .collect();
+            let complete = ring.iter().all(Option::is_some);
+            if arc_chord && !complete {
+                continue;
+            }
+            let length = |p: [f64; 3]| (p[0] * p[0] + p[1] * p[1] + p[2] * p[2]).sqrt();
+            let (mut surface, mut triangles) = (0.0, 0);
+            for k in 0..8 {
+                let (Some(p), Some(q)) = (ring[k], ring[(k + 1) % 8]) else {
+                    continue;
+                };
+                let a = length(p) / 2.0;
+                let b = length(q) / 2.0;
+                let c = length([q[0] - p[0], q[1] - p[1], q[2] - p[2]]) / 2.0;
+                let s = (a + b + c) / 2.0;
+                surface += (s * (s - a) * (s - b) * (s - c)).max(0.0).sqrt();
+                triangles += 1;
+            }
+            if triangles == 0 {
+                continue;
+            }
+            // Near the edge or NoData the ratio uses the triangles there are (an eighth of
+            // the cell each); the area is only written for complete cells.
+            let mut planar = cx * cy * triangles as f64 / 8.0;
+            if arc_chord {
+                // Horn's gradient; ring[k][2] is z − zc, so the centre cancels.
+                let z = |k: usize| ring[k].map_or(0.0, |p| p[2]);
+                let p = ((z(2) + 2.0 * z(3) + z(4)) - (z(0) + 2.0 * z(7) + z(6))) / (8.0 * cx);
+                let q = ((z(6) + 2.0 * z(5) + z(4)) - (z(0) + 2.0 * z(1) + z(2))) / (8.0 * cy);
+                planar *= (1.0 + p * p + q * q).sqrt();
+            }
+            let i = y * w + x;
+            if complete {
+                area.bands[0][i] = DataType::F32.store(surface);
+            }
+            ratio.bands[0][i] = DataType::F32.store(surface / planar);
+        }
+    }
+    (ratio, area)
+}

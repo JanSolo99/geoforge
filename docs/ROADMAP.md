@@ -912,6 +912,10 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Stream to Feature (`stream_to_feature`): one polyline per link (junction or value
   change), ArcGIS's start/end points, vertex rule, node numbering and arc order; SIMPLIFY is
   Douglas-Peucker at cell/√2. 4 ArcGIS `stf_*` references (link, plain stream and order rasters).
+- [x] Surface Area Ratio (`surface_area_ratio`): Jenness surface area (8 clipped triangles,
+  Heron) and optional area raster (`out_area_raster`); HORIZONTAL ratio exact including edges
+  and NoData (available triangles only); z units. ARC_CHORD approximated with Horn's plane
+  (~5e-5 relative). 5 ArcGIS `sar_*` references.
 - [x] Contour List (`contour_list`): Contour's tracing at listed values (`a;b;c`; duplicates once,
   out-of-range values give nothing; Id/Contour fields, value-descending order). 3 ArcGIS `cl_*`
   references. contour_type (polygons) not supported.

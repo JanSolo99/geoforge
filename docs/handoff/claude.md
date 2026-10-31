@@ -226,6 +226,15 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
   raster order of link starts (outlet right after its cell's start); arcs ordered by end cell
   (outlet arcs first), inflows by flow code; SIMPLIFY = Douglas-Peucker, tolerance cell/√2.
 
+## Queue: Surface Area Ratio — landed (ARC_CHORD approximate)
+
+- `surface::surface_area_ratio`, registry `surface_area_ratio` (+ `out_area_raster` via
+  `Output.extra`). Exact: Jenness area; HORIZONTAL ratio = Σ available triangles / (n/8 · cell
+  area), so edges/NoData get values while the area raster is NoData there. ARC_CHORD: docs say
+  cell area / cos(local slope) on a 3×3 plane of best fit; tried Horn, LS, PCA, corner, edge,
+  vector-area planes, ArcGIS Slope PLANAR/GEODESIC and UTM scale factors — none exact (median
+  7e-6, max 5e-5 relative). Allowed 7041 cells in `sar_dem`. Revisit only if asked.
+
 ## Pitfall: ArcGIS sidecars in testdata
 
 Running ArcGIS on fixture rasters can leave untracked `testdata/raster/*.aux.xml` / `*.vat.dbf`
