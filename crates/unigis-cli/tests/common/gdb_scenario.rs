@@ -197,6 +197,14 @@ pub fn compare(case: &str, info: &Json, out_dir: &Path) -> Vec<String> {
     let place = |s: &str| s.replace("<ws>", &ws.display().to_string());
     let mut diffs = Vec::new();
     for (k, step) in scenario["steps"].as_array().unwrap().iter().enumerate() {
+        if step["tool"] == "seed" {
+            // An ArcGIS-made geodatabase as the starting point.
+            let source = Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("../..")
+                .join(step["run"]["params"]["source"].as_str().unwrap());
+            copy_dir(&source, &ws.join("t.gdb"));
+            continue;
+        }
         let mut cmd = Command::new(env!("CARGO_BIN_EXE_ug"));
         cmd.args(["run", step["run"]["tool"].as_str().unwrap()]);
         for (name, v) in step["run"]["params"].as_object().unwrap() {
@@ -250,4 +258,12 @@ pub fn compare(case: &str, info: &Json, out_dir: &Path) -> Vec<String> {
     }
     std::fs::remove_dir_all(ws).unwrap();
     diffs
+}
+
+fn copy_dir(from: &Path, to: &Path) {
+    std::fs::create_dir_all(to).unwrap();
+    for e in std::fs::read_dir(from).unwrap() {
+        let e = e.unwrap();
+        std::fs::copy(e.path(), to.join(e.file_name())).unwrap();
+    }
 }

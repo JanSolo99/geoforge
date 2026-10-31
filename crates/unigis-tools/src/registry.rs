@@ -4069,6 +4069,7 @@ pub static TOOLS: &[Tool] = &[
     crate::gdb_schema::CREATE_FEATURE_DATASET,
     crate::gdb_schema::CREATE_DOMAIN,
     crate::gdb_schema::DELETE_DOMAIN,
+    crate::gdb_schema::DELETE_MOSAIC_DATASET,
     crate::gdb_schema::ALTER_DOMAIN,
     crate::gdb_schema::ADD_CODED_VALUE_TO_DOMAIN,
     crate::gdb_schema::DELETE_CODED_VALUE_FROM_DOMAIN,

@@ -2850,9 +2850,17 @@ result = dict(entries=sorted(entries), workspace=workspace)
 
 # Geodatabase scenarios: tool steps run one after the other on a new file geodatabase, then the
 # geodatabase's whole schema compared. Each step: (arcpy tool, keyword arguments, registry id,
-# registry parameters replacing some of the keywords). `<ws>` is a new, empty folder.
+# registry parameters replacing some of the keywords). `<ws>` is a new, empty folder. A
+# ("seed", dict(source=...)) step copies an ArcGIS-made geodatabase to t.gdb instead (for items
+# we cannot create, such as mosaic datasets).
 GDB = "<ws>/t.gdb"
 GDB_SCENARIOS = {
+    "gsc_mosaic": [
+        ("seed", dict(source=DATA / "mosaic_seed.gdb"), "seed", None),
+        ("management.DeleteMosaicDataset", dict(in_mosaic_dataset=GDB + "/keep"), "delete_mosaic_dataset", None),
+        ("management.DeleteMosaicDataset", dict(in_mosaic_dataset=GDB + "/md"), "delete_mosaic_dataset", None),
+        ("management.DeleteMosaicDataset", dict(in_mosaic_dataset=GDB + "/md"), "delete_mosaic_dataset", None),
+    ],
     "gsc_build": [
         ("management.CreateFileGDB", dict(out_folder_path="<ws>", out_name="t"), "create_file_gdb", None),
         ("management.CreateFeatureDataset", dict(out_dataset_path=GDB, out_name="fds", spatial_reference=4326), "create_feature_dataset", None),
@@ -2958,6 +2966,11 @@ def gdb_scenario_case(w, steps):
         place = lambda v: v.replace("<ws>", temp) if isinstance(v, str) else v
         recorded = []
         for tool, kwargs, rid, params in steps:
+            if tool == "seed":
+                shutil.copytree(kwargs["source"], Path(temp) / "t.gdb")
+                recorded.append(dict(tool=tool, status="succeeded", messages=[],
+                                     run=dict(tool=rid, params=dict(source=rel(kwargs["source"])))))
+                continue
             r = w.call("run_tool", tool=tool, kwargs={k: place(v) for k, v in kwargs.items()})
             run = {k: str(v) for k, v in (params or kwargs).items()}
             recorded.append(dict(tool=tool, status=r.get("status"),

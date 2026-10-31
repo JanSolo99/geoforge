@@ -306,6 +306,30 @@ mod imp {
         Ok(derived("out_workspace", &text))
     }
 
+    /// Delete Mosaic Dataset: the item and its `AMD_<name>_*` tables. Overview images and the
+    /// item cache live inside those tables here (none stored outside the geodatabase yet), so
+    /// both options delete the same thing.
+    pub fn delete_mosaic_dataset(ctx: &dyn Context) -> Result<Report> {
+        const LABEL: &str = "Mosaic Dataset";
+        let text = need(ctx, "in_mosaic_dataset", LABEL)?;
+        let path = PathBuf::from(&text);
+        let gdb = geodatabase_of(&path)
+            .filter(|g| *g != path)
+            .ok_or_else(|| not_supported(&text, LABEL))?;
+        let name = path
+            .file_name()
+            .map(|n| n.to_string_lossy().into_owned())
+            .ok_or_else(|| not_supported(&text, LABEL))?;
+        fgdb::delete_mosaic_dataset(&gdb, &name).map_err(|e| {
+            if e.to_string().contains("000732") {
+                not_supported(&text, LABEL)
+            } else {
+                e
+            }
+        })?;
+        Ok(derived("out_results", "true"))
+    }
+
     pub fn delete_domain(ctx: &dyn Context) -> Result<Report> {
         let (gdb, text) = workspace_in(ctx)?;
         fgdb::delete_domain(&gdb, &need(ctx, "domain_name", "Domain Name")?)?;
@@ -746,7 +770,7 @@ macro_rules! unavailable {
         }
     };
 }
-unavailable!(create_feature_dataset, create_domain, delete_domain, alter_domain,
+unavailable!(create_feature_dataset, create_domain, delete_domain, delete_mosaic_dataset, alter_domain,
     add_coded_value_to_domain, delete_coded_value_from_domain, set_value_for_range_domain,
     sort_coded_value_domain, table_to_domain, assign_domain_to_field, remove_domain_from_field,
     assign_default_to_field, set_subtype_field, add_subtype, remove_subtype, set_default_subtype,
@@ -819,6 +843,34 @@ tool!(
     "Deletes an attribute domain no field uses (ArcGIS Pro Delete Domain).",
     Runner::Report(imp::delete_domain),
     [WORKSPACE, DOMAIN]
+);
+
+tool!(
+    DELETE_MOSAIC_DATASET,
+    "delete_mosaic_dataset",
+    "Delete Mosaic Dataset",
+    "Raster › Mosaic Dataset",
+    "Deletes a mosaic dataset and its AMD_ tables from a file geodatabase (ArcGIS Pro Delete Mosaic Dataset).",
+    Runner::Report(imp::delete_mosaic_dataset),
+    [
+        path(
+            "in_mosaic_dataset",
+            "Mosaic Dataset",
+            "A mosaic dataset in a file geodatabase: images.gdb/mosaic."
+        ),
+        choice(
+            "delete_overview_images",
+            "Delete Overview Images",
+            &["DELETE_OVERVIEW_IMAGES", "NO_DELETE_OVERVIEW_IMAGES"],
+            "DELETE_OVERVIEW_IMAGES"
+        ),
+        choice(
+            "delete_item_cache",
+            "Delete Item Cache",
+            &["DELETE_ITEM_CACHE", "NO_DELETE_ITEM_CACHE"],
+            "DELETE_ITEM_CACHE"
+        ),
+    ]
 );
 
 tool!(

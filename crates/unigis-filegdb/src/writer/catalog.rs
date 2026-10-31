@@ -28,6 +28,7 @@ const T_RELATIONSHIP_CLASS: &str = "{B606A7E1-";
 /// `DatasetsRelatedThrough`: a relationship class's link to each class it relates.
 const REL_RELATED_THROUGH: &str = "{725BADAB-";
 const REL_DOMAIN_IN_DATASET: &str = "{17E08ADB-";
+const T_MOSAIC_DATASET: &str = "{F8413DCB-";
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub(super) enum Kind {
@@ -36,6 +37,7 @@ pub(super) enum Kind {
     Dataset,
     RelationshipClass,
     Domain,
+    MosaicDataset,
     Other,
 }
 
@@ -51,6 +53,8 @@ fn kind_of(ty: &str) -> Kind {
         Kind::RelationshipClass
     } else if is(&TYPE_CODED_DOMAIN[..10]) || is(&TYPE_RANGE_DOMAIN[..10]) {
         Kind::Domain
+    } else if is(T_MOSAIC_DATASET) {
+        Kind::MosaicDataset
     } else {
         Kind::Other
     }
@@ -152,17 +156,6 @@ pub fn delete_item(dir: impl AsRef<Path>, name: &str) -> Result<Vec<String>> {
     super::txn::atomic(dir, || -> Result<Vec<String>> {
         let items = load_items(dir)?;
         let target = find(&items, name, is_class).ok_or_else(|| missing(name))?;
-
-        let rels = Table::open(base(dir, 6))?;
-        let (r_origin, r_dest, r_type) = (
-            column(&rels, "OriginID")?,
-            column(&rels, "DestID")?,
-            column(&rels, "Type")?,
-        );
-        let rel_rows: Vec<Feature> = rels.features().collect::<Result<_>>()?;
-
-        // The items that go: the target, a dataset's contents, and the relationship classes that
-        // relate any of them.
         let mut doomed: HashSet<String> = HashSet::new();
         doomed.insert(target.uuid.clone());
         if target.kind == Kind::Dataset {
@@ -173,63 +166,102 @@ pub fn delete_item(dir: impl AsRef<Path>, name: &str) -> Result<Vec<String>> {
                 doomed.insert(i.uuid.clone());
             }
         }
-        for r in &rel_rows {
-            let ty = text(&r.attributes[r_type]);
-            let origin = text(&r.attributes[r_origin]);
-            if ty.len() >= REL_RELATED_THROUGH.len()
-                && ty[..REL_RELATED_THROUGH.len()].eq_ignore_ascii_case(REL_RELATED_THROUGH)
-                && doomed.contains(&origin)
-            {
-                doomed.insert(text(&r.attributes[r_dest]));
-            }
-        }
-        let gone: Vec<&ItemRow> = items
-            .rows
-            .iter()
-            .filter(|i| doomed.contains(&i.uuid))
-            .collect();
-
-        // The catalog rows of the tables among them.
-        let catalog = Table::open(base(dir, 1))?;
-        let mut tables: Vec<(u64, String)> = Vec::new();
-        for r in catalog.features() {
-            let r = r?;
-            let n = text(&r.attributes[0]);
-            if gone
-                .iter()
-                .any(|i| i.kind != Kind::Dataset && i.name.eq_ignore_ascii_case(&n))
-            {
-                tables.push((r.oid as u64, n));
-            }
-        }
-
-        // Unlist the tables first, so nothing lists a table whose item is gone.
-        if !tables.is_empty() {
-            let mut ed = TableEditor::open(base(dir, 1))?;
-            for (oid, _) in &tables {
-                ed.delete(*oid)?;
-            }
-            ed.finish()?;
-        }
-        let mut ed = TableEditor::open(base(dir, 6))?;
-        for r in &rel_rows {
-            if doomed.contains(&text(&r.attributes[r_origin]))
-                || doomed.contains(&text(&r.attributes[r_dest]))
-            {
-                ed.delete(r.row_oid())?;
-            }
-        }
-        ed.finish()?;
-        let mut ed = TableEditor::open(base(dir, 4))?;
-        for i in &gone {
-            ed.delete(i.row.oid as u64)?;
-        }
-        ed.finish()?;
-        for (id, _) in &tables {
-            remove_files(dir, *id)?;
-        }
-        Ok(gone.iter().map(|i| i.name.clone()).collect())
+        delete_items(dir, &items, doomed)
     })
+}
+
+/// Data Management Delete Mosaic Dataset: the mosaic dataset item and its `AMD_<name>_*`
+/// tables (catalog, boundary, footprint seamlines, art, log, definition...), which ArcGIS
+/// relates to it only by name. Shared domains stay. Returns the names of the items removed.
+pub fn delete_mosaic_dataset(dir: impl AsRef<Path>, name: &str) -> Result<Vec<String>> {
+    let dir = dir.as_ref();
+    super::txn::atomic(dir, || -> Result<Vec<String>> {
+        let items = load_items(dir)?;
+        let target =
+            find(&items, name, |k| k == Kind::MosaicDataset).ok_or_else(|| missing(name))?;
+        let prefix = format!("AMD_{}_", target.name);
+        let mut doomed: HashSet<String> = HashSet::new();
+        doomed.insert(target.uuid.clone());
+        for i in &items.rows {
+            if i.kind != Kind::Domain
+                && i.name.len() > prefix.len()
+                && i.name[..prefix.len()].eq_ignore_ascii_case(&prefix)
+            {
+                doomed.insert(i.uuid.clone());
+            }
+        }
+        delete_items(dir, &items, doomed)
+    })
+}
+
+/// Deletes the `doomed` items (by UUID) and the relationship classes relating any of them:
+/// their `GDB_Items` and `GDB_ItemRelationships` rows, catalog rows and table files.
+fn delete_items(dir: &Path, items: &Items, mut doomed: HashSet<String>) -> Result<Vec<String>> {
+    let rels = Table::open(base(dir, 6))?;
+    let (r_origin, r_dest, r_type) = (
+        column(&rels, "OriginID")?,
+        column(&rels, "DestID")?,
+        column(&rels, "Type")?,
+    );
+    let rel_rows: Vec<Feature> = rels.features().collect::<Result<_>>()?;
+
+    // The relationship classes that relate any of the doomed items go too.
+    for r in &rel_rows {
+        let ty = text(&r.attributes[r_type]);
+        let origin = text(&r.attributes[r_origin]);
+        if ty.len() >= REL_RELATED_THROUGH.len()
+            && ty[..REL_RELATED_THROUGH.len()].eq_ignore_ascii_case(REL_RELATED_THROUGH)
+            && doomed.contains(&origin)
+        {
+            doomed.insert(text(&r.attributes[r_dest]));
+        }
+    }
+    let gone: Vec<&ItemRow> = items
+        .rows
+        .iter()
+        .filter(|i| doomed.contains(&i.uuid))
+        .collect();
+
+    // The catalog rows of the tables among them.
+    let catalog = Table::open(base(dir, 1))?;
+    let mut tables: Vec<(u64, String)> = Vec::new();
+    for r in catalog.features() {
+        let r = r?;
+        let n = text(&r.attributes[0]);
+        if gone
+            .iter()
+            .any(|i| i.kind != Kind::Dataset && i.name.eq_ignore_ascii_case(&n))
+        {
+            tables.push((r.oid as u64, n));
+        }
+    }
+
+    // Unlist the tables first, so nothing lists a table whose item is gone.
+    if !tables.is_empty() {
+        let mut ed = TableEditor::open(base(dir, 1))?;
+        for (oid, _) in &tables {
+            ed.delete(*oid)?;
+        }
+        ed.finish()?;
+    }
+    let mut ed = TableEditor::open(base(dir, 6))?;
+    for r in &rel_rows {
+        if doomed.contains(&text(&r.attributes[r_origin]))
+            || doomed.contains(&text(&r.attributes[r_dest]))
+        {
+            ed.delete(r.row_oid())?;
+        }
+    }
+    ed.finish()?;
+    let mut ed = TableEditor::open(base(dir, 4))?;
+    for i in &gone {
+        ed.delete(i.row.oid as u64)?;
+    }
+    ed.finish()?;
+    for (id, _) in &tables {
+        remove_files(dir, *id)?;
+    }
+    Ok(gone.iter().map(|i| i.name.clone()).collect())
 }
 
 trait RowOid {

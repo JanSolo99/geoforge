@@ -72,6 +72,7 @@ Update this file when a gap is found or closed.
 | Visibility | Viewshed's sight-line approximation (~1% of cells); earth curvature, the AGL raster, surface offset / observer elevation / radius / angle fields (only an observer offset field); polyline observers as vertices; the VAT's OBSn columns; only `ug run` |
 | Add Colormap | .act files; BigTIFF and non-TIFF rasters (geodatabase rasters); template plus .clr together (template assumed to win, not probed); palettes for U8 4-bit/1-bit rasters and existing `.clr` sidecars when embedding not probed; only `ug run` (edits files) |
 | Delete Colormap | BigTIFF and non-TIFF rasters (geodatabase rasters); only `ug run` (edits files) |
+| Delete Mosaic Dataset | Overview images and item caches stored outside the geodatabase (`.Overviews` folders, cache folders) are not removed; mobile/enterprise geodatabases; the options are accepted but change nothing |
 | Validate Flow Direction | MFD flow direction rasters; only `ug run` |
 | Surface Area Ratio | ARC_CHORD (default): ArcGIS's plane of best fit is not identified — Horn's, least-squares, PCA, corner and vector-area planes and its own Slope raster all differ by up to ~5e-5 relative; geographic rasters |
 | Stream to Feature | Only `ug run` (no app runner); non-square cells and loops in flow directions untested |

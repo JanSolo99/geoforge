@@ -111190,6 +111190,145 @@
           "output": "<out>"
         }
       }
+    },
+    "gsc_mosaic": {
+      "tool": "scenario",
+      "gdb_scenario": {
+        "steps": [
+          {
+            "tool": "seed",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "seed",
+              "params": {
+                "source": "testdata/geoproc/mosaic_seed.gdb"
+              }
+            }
+          },
+          {
+            "tool": "management.DeleteMosaicDataset",
+            "status": "failed",
+            "messages": [
+              "Failed to execute. Parameters are not valid.",
+              "ERROR 000732: Mosaic Dataset: Dataset <ws>/t.gdb/keep does not exist or is not supported",
+              "Failed to execute (DeleteMosaicDataset)."
+            ],
+            "run": {
+              "tool": "delete_mosaic_dataset",
+              "params": {
+                "in_mosaic_dataset": "<ws>/t.gdb/keep"
+              }
+            }
+          },
+          {
+            "tool": "management.DeleteMosaicDataset",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "delete_mosaic_dataset",
+              "params": {
+                "in_mosaic_dataset": "<ws>/t.gdb/md"
+              }
+            }
+          },
+          {
+            "tool": "management.DeleteMosaicDataset",
+            "status": "failed",
+            "messages": [
+              "Failed to execute. Parameters are not valid.",
+              "ERROR 000732: Mosaic Dataset: Dataset <ws>/t.gdb/md does not exist or is not supported",
+              "Failed to execute (DeleteMosaicDataset)."
+            ],
+            "run": {
+              "tool": "delete_mosaic_dataset",
+              "params": {
+                "in_mosaic_dataset": "<ws>/t.gdb/md"
+              }
+            }
+          }
+        ],
+        "snapshot": {
+          "items": [
+            "keep"
+          ],
+          "tables": {
+            "keep": {
+              "fields": [
+                {
+                  "name": "OBJECTID",
+                  "type": "OID",
+                  "length": 4,
+                  "alias": "OBJECTID",
+                  "domain": "",
+                  "default": null,
+                  "nullable": false
+                },
+                {
+                  "name": "Shape",
+                  "type": "Geometry",
+                  "length": 0,
+                  "alias": "Shape",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                }
+              ],
+              "indexes": [],
+              "subtypes": []
+            }
+          },
+          "domains": [
+            {
+              "name": "MosaicCatalogItemCategoryDomain",
+              "description": "Catalog item categories.",
+              "type": "Long",
+              "kind": "CodedValue",
+              "split": "DefaultValue",
+              "merge": "DefaultValue",
+              "values": [
+                [
+                  "0",
+                  "Unknown"
+                ],
+                [
+                  "1",
+                  "Primary"
+                ],
+                [
+                  "2",
+                  "Overview"
+                ],
+                [
+                  "3",
+                  "Unprocessed Overview"
+                ],
+                [
+                  "4",
+                  "Partial Overview"
+                ],
+                [
+                  "5",
+                  "Inactive"
+                ],
+                [
+                  "253",
+                  "Uploaded"
+                ],
+                [
+                  "254",
+                  "Incomplete"
+                ],
+                [
+                  "255",
+                  "Custom"
+                ]
+              ]
+            }
+          ],
+          "relationships": []
+        }
+      }
     }
   }
 }

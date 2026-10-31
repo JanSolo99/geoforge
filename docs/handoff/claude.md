@@ -293,6 +293,19 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
 - Validation: `UNIGIS_REFERENCE_CASES=dcm_,acm_` PASS; colormap unit tests PASS; GDAL sees no
   Color Table on our output.
 
+## Queue: Delete Mosaic Dataset — landed
+
+- `unigis_filegdb::delete_mosaic_dataset` (catalog.rs: `delete_item` split into `delete_items`
+  core; new `Kind::MosaicDataset`), registry tool in `unigis-tools/src/gdb_schema.rs`.
+- Fixture `testdata/geoproc/mosaic_seed.gdb` (ArcGIS-made: mosaic `md` with dem.tif + FC `keep`).
+  Gdb scenarios gained a `("seed", dict(source=...))` step (Python generator + Rust comparator)
+  to start from such a fixture; scenario `gsc_mosaic` (non-mosaic → 000732, delete, repeat →
+  000732).
+- ArcGIS: mosaic items link to `AMD_md_{ART,BND,CAT,CSL,DEF,LOG}` only by name; the CAT's
+  `MosaicCatalogItemCategoryDomain` stays; remaining table files match ArcGIS's exactly.
+- Validation: `UNIGIS_REFERENCE_CASES=gsc_` PASS; catalog_ops tests PASS (incl. new mosaic
+  test); GDAL lists only `keep` afterwards; clippy -D warnings; no-default-features check.
+
 ## Pitfall: ArcGIS sidecars in testdata
 
 Running ArcGIS on fixture rasters can leave untracked `testdata/raster/*.aux.xml` / `*.vat.dbf`
@@ -301,6 +314,6 @@ After generating references, check `git status --short testdata/` and delete suc
 
 ## Next
 
-- Next queue item: `scripts/lane claim` (after Delete Colormap).
+- Next queue item: `scripts/lane claim` (after Delete Mosaic Dataset).
 - Possible follow-ups (not requested): Catalog New for mobile geodatabases (needs a mobile reader),
   ArcGIS-style blank names instead of NewFeatureClass placeholders.

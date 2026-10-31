@@ -130,3 +130,57 @@ fn refusals() {
     assert_eq!(gdb.entries().len(), 3);
     std::fs::remove_dir_all(&work).ok();
 }
+
+/// ArcGIS Pro's Delete Mosaic Dataset on testdata/geoproc/mosaic_seed.gdb (one mosaic dataset
+/// `md` with a raster, one feature class `keep`) leaves `keep`, the shared domain, and exactly
+/// these table files.
+#[test]
+fn delete_mosaic_dataset_removes_its_amd_tables() {
+    let work = std::env::temp_dir().join(format!("gf-mosaic-{}.gdb", std::process::id()));
+    std::fs::remove_dir_all(&work).ok();
+    copy_dir(&root().join("testdata/geoproc/mosaic_seed.gdb"), &work);
+    assert!(unigis_filegdb::delete_mosaic_dataset(&work, "keep").is_err());
+    let mut gone = unigis_filegdb::delete_mosaic_dataset(&work, "md").unwrap();
+    gone.sort();
+    assert_eq!(
+        gone,
+        [
+            "AMD_md_ART",
+            "AMD_md_BND",
+            "AMD_md_CAT",
+            "AMD_md_CSL",
+            "AMD_md_DEF",
+            "AMD_md_LOG",
+            "md"
+        ]
+    );
+    let mut tables: Vec<String> = std::fs::read_dir(&work)
+        .unwrap()
+        .flatten()
+        .filter_map(|e| {
+            let n = e.file_name().to_string_lossy().into_owned();
+            n.ends_with(".gdbtable").then(|| n[..9].to_string())
+        })
+        .collect();
+    tables.sort();
+    let want = [
+        "a00000001",
+        "a00000002",
+        "a00000003",
+        "a00000004",
+        "a00000005",
+        "a00000006",
+        "a00000007",
+        "a00000009",
+        "a0000000a",
+        "a00000011",
+    ];
+    assert_eq!(tables, want);
+    let gdb = Geodatabase::open(&work).unwrap();
+    assert!(
+        gdb.domains()
+            .iter()
+            .any(|d| d.name == "MosaicCatalogItemCategoryDomain")
+    );
+    std::fs::remove_dir_all(&work).ok();
+}

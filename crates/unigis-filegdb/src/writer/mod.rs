@@ -39,7 +39,7 @@ use btree::{spatial_entries, write_index};
 use table::TableWriter;
 
 pub use alter::{FieldAlteration, alter_field, alter_fields, geodatabase_field_name};
-pub use catalog::{delete_domain, delete_item, rename_domain, rename_item};
+pub use catalog::{delete_domain, delete_item, delete_mosaic_dataset, rename_domain, rename_item};
 pub use cogo::{disable_cogo, enable_cogo};
 pub use date_precision::migrate_date_fields_to_high_precision;
 pub use domain_edit::{
