@@ -330,12 +330,22 @@ fn distance_unit_metres(units: &str) -> Result<Option<f64>> {
 }
 
 fn multiscale_surface_deviation(ctx: &dyn Context) -> Result<Output> {
+    multiscale_surface(ctx, "multiscale_surface_deviation", "base_increment", true)
+}
+
+fn multiscale_surface_difference(ctx: &dyn Context) -> Result<Output> {
+    multiscale_surface(ctx, "multiscale_surface_difference", "increment", false)
+}
+
+/// Multiscale Surface Deviation (`standardize`) and Difference.
+fn multiscale_surface(
+    ctx: &dyn Context,
+    tool: &str,
+    increment: &str,
+    standardize: bool,
+) -> Result<Output> {
     let dem = ctx.raster("input")?;
-    let metres = distance_unit_metres(&choice(
-        ctx,
-        "multiscale_surface_deviation",
-        "distance_units",
-    ))?;
+    let metres = distance_unit_metres(&choice(ctx, tool, "distance_units"))?;
     let geographic = dem
         .epsg
         .is_some_and(|e| crate::geographic_crs::GEOGRAPHIC_EPSG.contains(&e));
@@ -364,14 +374,15 @@ fn multiscale_surface_deviation(ctx: &dyn Context) -> Result<Output> {
     let scales = crate::multiscale::scales(
         min,
         max,
-        cells("base_increment", 1.0),
+        cells(increment, 1.0),
         number_or(ctx, "nonlinearity", 1.0),
     );
-    let (mut deviation, mut scale) = crate::multiscale::multiscale_surface_deviation(
-        &dem,
-        &scales,
-        metres.map_or(1.0, |m| cell / m),
-    );
+    let run = if standardize {
+        crate::multiscale::multiscale_surface_deviation
+    } else {
+        crate::multiscale::multiscale_surface_difference
+    };
+    let (mut deviation, mut scale) = run(&dem, &scales, metres.map_or(1.0, |m| cell / m));
     if geographic {
         // ArcGIS sizes the deviation raster's axes separately but the scale raster's square.
         crate::geographic_crs::recompute_cell_size_per_axis(&mut deviation);
@@ -2819,6 +2830,46 @@ pub static TOOLS: &[Tool] = &[
             ),
         ],
         run: multiscale_surface_deviation,
+    },
+    Tool {
+        id: "multiscale_surface_difference",
+        name: "Multiscale Surface Difference",
+        summary: "Largest difference from the mean elevation over a range of neighbourhood sizes, and the size where it occurs.",
+        params: &[
+            raster("input", "Input surface raster", true),
+            Param {
+                name: "out_scale_raster",
+                label: "Output scale raster",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+            },
+            option(
+                "distance_units",
+                "Distance units",
+                &[
+                    "CELLS",
+                    "METERS",
+                    "CENTIMETERS",
+                    "KILOMETERS",
+                    "INCHES",
+                    "FEET",
+                    "YARDS",
+                    "MILES",
+                ],
+                "CELLS",
+            ),
+            num_param("min_scale", "Minimum neighborhood distance", ""),
+            num_param("max_scale", "Maximum neighborhood distance", ""),
+            num_param("increment", "Distance increment", ""),
+            option(
+                "analysis_target_device",
+                "Target device for analysis",
+                &["GPU_THEN_CPU", "GPU_ONLY", "CPU_ONLY"],
+                "GPU_THEN_CPU",
+            ),
+        ],
+        run: multiscale_surface_difference,
     },
     Tool {
         id: "geomorphon_landforms",

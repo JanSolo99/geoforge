@@ -191,6 +191,12 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
   deviation NoData 3.4e38, scale NoData −f32::MAX; geographic transform per axis for the
   deviation raster but square for the scale raster.
 
+## Queue: Multiscale Surface Difference — landed
+
+- Shares `multiscale.rs` / `multiscale_surface` in the registry with Deviation (flag
+  `standardize`); value z − mean, increment parameter `increment`, no nonlinearity. 6 `msf_*`
+  references match exactly (no precision quirks without the variance).
+
 ## Pitfall: ArcGIS sidecars in testdata
 
 Running ArcGIS on fixture rasters can leave untracked `testdata/raster/*.aux.xml` / `*.vat.dbf`

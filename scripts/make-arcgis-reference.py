@@ -945,6 +945,12 @@ CASES = {
     "gfd_geographic_force": ("gp.GeodesicFlowDirection_sa", [RASTER / "dem_geographic.tif"], ["FORCE"]),
     "gfd_projected": ("gp.GeodesicFlowDirection_sa", [RASTER / "dem.tif"], ["NORMAL"]),
     "gfd_hydro": ("gp.GeodesicFlowDirection_sa", [RASTER / "hydro.tif"], ["NORMAL"]),
+    "msf_dem": ("gp.MultiscaleSurfaceDifference_sa", [RASTER / "dem.tif"], [OUT / "msf_dem_scale.tif", "CELLS", None, None, None, "CPU_ONLY"]),
+    "msf_dem_increment": ("gp.MultiscaleSurfaceDifference_sa", [RASTER / "dem.tif"], [OUT / "msf_dem_increment_scale.tif", "CELLS", 2, 20, 3, "CPU_ONLY"]),
+    "msf_dem_meters": ("gp.MultiscaleSurfaceDifference_sa", [RASTER / "dem.tif"], [OUT / "msf_dem_meters_scale.tif", "METERS", 25, 95, 15, "CPU_ONLY"]),
+    "msf_dem_nodata": ("gp.MultiscaleSurfaceDifference_sa", [RASTER / "dem_nodata.tif"], [OUT / "msf_dem_nodata_scale.tif", "CELLS", 2, 6, 1, "CPU_ONLY"]),
+    "msf_hydro": ("gp.MultiscaleSurfaceDifference_sa", [RASTER / "hydro.tif"], [OUT / "msf_hydro_scale.tif", "CELLS", None, None, None, "CPU_ONLY"]),
+    "msf_geographic": ("gp.MultiscaleSurfaceDifference_sa", [RASTER / "dem_geographic.tif"], [OUT / "msf_geographic_scale.tif", "CELLS", 2, 6, 1, "CPU_ONLY"]),
     "msd_dem": ("gp.MultiscaleSurfaceDeviation_sa", [RASTER / "dem.tif"], [OUT / "msd_dem_scale.tif", "CELLS", None, None, None, None, "CPU_ONLY"]),
     "msd_dem_nonlinear": ("gp.MultiscaleSurfaceDeviation_sa", [RASTER / "dem.tif"], [OUT / "msd_dem_nonlinear_scale.tif", "CELLS", 2, 20, 1, 1.5, "CPU_ONLY"]),
     "msd_dem_meters": ("gp.MultiscaleSurfaceDeviation_sa", [RASTER / "dem.tif"], [OUT / "msd_dem_meters_scale.tif", "METERS", 25, 95, 15, 1, "CPU_ONLY"]),
@@ -2414,6 +2420,7 @@ RUN = {
     "gp.GeodesicFlowDirection_sa": ("geodesic_flow_direction", ["input", "output", "force_flow"]),
     # The geomorphons raster (second output) is compared by second_raster_outputs_match_arcgis.
     # The scale raster (second output) is compared by second_raster_outputs_match_arcgis.
+    "gp.MultiscaleSurfaceDifference_sa": ("multiscale_surface_difference", ["input", "output", None, "distance_units", "min_scale", "max_scale", "increment", "analysis_target_device"]),
     "gp.MultiscaleSurfaceDeviation_sa": ("multiscale_surface_deviation", ["input", "output", None, "distance_units", "min_scale", "max_scale", "base_increment", "nonlinearity", "analysis_target_device"]),
     "gp.GeomorphonLandforms_sa": ("geomorphon_landforms", ["input", "output", None, "angle_threshold", "distance_units", "search_distance", "skip_distance", "z_unit"]),
     "gp.FlowDistance_sa": ("flow_distance", ["in_stream_raster", "in_surface_raster", "output", "in_flow_direction_raster", "distance_type", "flow_direction_type"]),
@@ -2562,7 +2569,7 @@ def run_spec(tool, args):
 
 
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
-RASTER_OUT = {"gp.MultiscaleSurfaceDeviation_sa", "gp.GeomorphonLandforms_sa", "gp.GeodesicFlowDirection_sa", "gp.FlowDistance_sa", "gp.ZonalGeometry_sa", "gp.ZonalFill_sa", "gp.RescaleByFunction_sa", "gp.CreateRandomRaster_sa", "gp.CreateNormalRaster_sa", "gp.CreateBinaryMask_ia", "gp.ComputeChangeRaster_ia", "gp.Diff_ia", "gp.Over_ia", "gp.LineStatistics_sa", "gp.PointStatistics_sa", "gp.SnapPourPoint_sa", "gp.FocalFlow_sa", "gp.DistanceAccumulation_sa", "gp.DistanceAllocation_sa", "gp.EucBackDirection_sa", "gp.EqualToFrequency_sa", "gp.GreaterThanFrequency_sa", "gp.LessThanFrequency_sa", "conversion.ASCIIToRaster", "conversion.FloatToRaster", "conversion.MultipatchToRaster", "management.CompositeBands", "gp.CreateConstantRaster_sa", "gp.InList_sa", "gp.LowestPosition_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
+RASTER_OUT = {"gp.MultiscaleSurfaceDifference_sa", "gp.MultiscaleSurfaceDeviation_sa", "gp.GeomorphonLandforms_sa", "gp.GeodesicFlowDirection_sa", "gp.FlowDistance_sa", "gp.ZonalGeometry_sa", "gp.ZonalFill_sa", "gp.RescaleByFunction_sa", "gp.CreateRandomRaster_sa", "gp.CreateNormalRaster_sa", "gp.CreateBinaryMask_ia", "gp.ComputeChangeRaster_ia", "gp.Diff_ia", "gp.Over_ia", "gp.LineStatistics_sa", "gp.PointStatistics_sa", "gp.SnapPourPoint_sa", "gp.FocalFlow_sa", "gp.DistanceAccumulation_sa", "gp.DistanceAllocation_sa", "gp.EucBackDirection_sa", "gp.EqualToFrequency_sa", "gp.GreaterThanFrequency_sa", "gp.LessThanFrequency_sa", "conversion.ASCIIToRaster", "conversion.FloatToRaster", "conversion.MultipatchToRaster", "management.CompositeBands", "gp.CreateConstantRaster_sa", "gp.InList_sa", "gp.LowestPosition_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
               "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa",
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",

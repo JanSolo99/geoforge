@@ -44,6 +44,25 @@ pub fn multiscale_surface_deviation(
     scales: &[usize],
     cell_value: f64,
 ) -> (Raster, Raster) {
+    multiscale(dem, scales, cell_value, true)
+}
+
+/// Multiscale Surface Difference: the largest difference from the neighbourhood mean (z − mean,
+/// the mean including the cell), and its scale; otherwise as [`multiscale_surface_deviation`].
+pub fn multiscale_surface_difference(
+    dem: &Raster,
+    scales: &[usize],
+    cell_value: f64,
+) -> (Raster, Raster) {
+    multiscale(dem, scales, cell_value, false)
+}
+
+fn multiscale(
+    dem: &Raster,
+    scales: &[usize],
+    cell_value: f64,
+    standardize: bool,
+) -> (Raster, Raster) {
     let (w, h) = (dem.width, dem.height);
     let valid: Vec<Option<f64>> = (0..w * h)
         .map(|i| {
@@ -53,7 +72,7 @@ pub fn multiscale_surface_deviation(
         .collect();
     let sum = integral(w, h, |i| valid[i].unwrap_or(0.0));
     let squares = integral(w, h, |i| {
-        valid[i].map_or(0.0, |v| {
+        valid[i].filter(|_| standardize).map_or(0.0, |v| {
             let v = v as f32;
             (v * v) as f64
         })
@@ -74,8 +93,12 @@ pub fn multiscale_surface_deviation(
                 let (x0, x1) = (x.saturating_sub(r), (x + r + 1).min(w));
                 let n = box_sum(&count, y0, y1, x0, x1);
                 let mean = box_sum(&sum, y0, y1, x0, x1) / n;
-                let variance = box_sum(&squares, y0, y1, x0, x1) / n - mean * mean;
-                let dev = (z - mean) / variance.sqrt();
+                let dev = if standardize {
+                    let variance = box_sum(&squares, y0, y1, x0, x1) / n - mean * mean;
+                    (z - mean) / variance.sqrt()
+                } else {
+                    z - mean
+                };
                 if dev.is_finite() && dev.abs() > best[i].abs() {
                     best[i] = dev;
                     at[i] = r;

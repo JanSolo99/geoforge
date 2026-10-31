@@ -107933,6 +107933,174 @@
           "analysis_target_device": "CPU_ONLY"
         }
       }
+    },
+    "msf_dem": {
+      "tool": "gp.MultiscaleSurfaceDifference_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "testdata/arcgis-reference/msf_dem_scale.tif",
+        "CELLS",
+        null,
+        null,
+        null,
+        "CPU_ONLY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "multiscale_surface_difference",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "distance_units": "CELLS",
+          "analysis_target_device": "CPU_ONLY"
+        }
+      }
+    },
+    "msf_dem_increment": {
+      "tool": "gp.MultiscaleSurfaceDifference_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "testdata/arcgis-reference/msf_dem_increment_scale.tif",
+        "CELLS",
+        2,
+        20,
+        3,
+        "CPU_ONLY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "multiscale_surface_difference",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "distance_units": "CELLS",
+          "min_scale": 2,
+          "max_scale": 20,
+          "increment": 3,
+          "analysis_target_device": "CPU_ONLY"
+        }
+      }
+    },
+    "msf_dem_meters": {
+      "tool": "gp.MultiscaleSurfaceDifference_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "testdata/arcgis-reference/msf_dem_meters_scale.tif",
+        "METERS",
+        25,
+        95,
+        15,
+        "CPU_ONLY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "multiscale_surface_difference",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "distance_units": "METERS",
+          "min_scale": 25,
+          "max_scale": 95,
+          "increment": 15,
+          "analysis_target_device": "CPU_ONLY"
+        }
+      }
+    },
+    "msf_dem_nodata": {
+      "tool": "gp.MultiscaleSurfaceDifference_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "testdata/arcgis-reference/msf_dem_nodata_scale.tif",
+        "CELLS",
+        2,
+        6,
+        1,
+        "CPU_ONLY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "multiscale_surface_difference",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "distance_units": "CELLS",
+          "min_scale": 2,
+          "max_scale": 6,
+          "increment": 1,
+          "analysis_target_device": "CPU_ONLY"
+        }
+      }
+    },
+    "msf_hydro": {
+      "tool": "gp.MultiscaleSurfaceDifference_sa",
+      "args": [
+        "testdata/raster/hydro.tif",
+        "<out>",
+        "testdata/arcgis-reference/msf_hydro_scale.tif",
+        "CELLS",
+        null,
+        null,
+        null,
+        "CPU_ONLY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "multiscale_surface_difference",
+        "params": {
+          "input": "testdata/raster/hydro.tif",
+          "output": "<out>",
+          "distance_units": "CELLS",
+          "analysis_target_device": "CPU_ONLY"
+        }
+      }
+    },
+    "msf_geographic": {
+      "tool": "gp.MultiscaleSurfaceDifference_sa",
+      "args": [
+        "testdata/raster/dem_geographic.tif",
+        "<out>",
+        "testdata/arcgis-reference/msf_geographic_scale.tif",
+        "CELLS",
+        2,
+        6,
+        1,
+        "CPU_ONLY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "multiscale_surface_difference",
+        "params": {
+          "input": "testdata/raster/dem_geographic.tif",
+          "output": "<out>",
+          "distance_units": "CELLS",
+          "min_scale": 2,
+          "max_scale": 6,
+          "increment": 1,
+          "analysis_target_device": "CPU_ONLY"
+        }
+      }
     }
   }
 }

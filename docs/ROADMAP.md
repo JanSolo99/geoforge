@@ -889,6 +889,9 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
   distances rounded half up to cells, squares in single precision like ArcGIS; optional scale
   raster (`out_scale_raster`, in the distance units). 8 ArcGIS `msd_*` references (both outputs;
   a few cells differ at scales below 4 cells).
+- [x] Multiscale Surface Difference (`multiscale_surface_difference`): largest z − mean
+  (mean including the cell) over the same clipped square neighbourhoods (linear increments);
+  optional scale raster. 6 ArcGIS `msf_*` references, both outputs cell for cell.
 - [x] Contour List (`contour_list`): Contour's tracing at listed values (`a;b;c`; duplicates once,
   out-of-range values give nothing; Id/Contour fields, value-descending order). 3 ArcGIS `cl_*`
   references. contour_type (polygons) not supported.
