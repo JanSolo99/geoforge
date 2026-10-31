@@ -197,6 +197,12 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
   `standardize`); value z − mean, increment parameter `increment`, no nonlinearity. 6 `msf_*`
   references match exactly (no precision quirks without the variance).
 
+## Queue: Multiscale Surface Percentile — landed
+
+- `multiscale::multiscale_surface_percentile` (ring-incremental exact counts), registry entry
+  via `multiscale_surface`; 6 `msp_*` references exact. Rule: 100·#(v < z)/n, n includes the
+  cell; the scale with the largest |p − 50| (strictly greater replaces).
+
 ## Pitfall: ArcGIS sidecars in testdata
 
 Running ArcGIS on fixture rasters can leave untracked `testdata/raster/*.aux.xml` / `*.vat.dbf`

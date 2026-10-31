@@ -125,6 +125,66 @@ fn multiscale(
     (deviation, scale)
 }
 
+/// Multiscale Surface Percentile: the percentage of neighbourhood cells (the cell included,
+/// NoData skipped) strictly lower than the cell, at the scale farthest from 50 (the first such
+/// scale on ties), and that scale; Float32 outputs tagged like the deviation rasters.
+pub fn multiscale_surface_percentile(
+    dem: &Raster,
+    scales: &[usize],
+    cell_value: f64,
+) -> (Raster, Raster) {
+    let (w, h) = (dem.width as isize, dem.height as isize);
+    let value = |x: isize, y: isize| -> Option<f64> {
+        if x < 0 || y < 0 || x >= w || y >= h {
+            return None;
+        }
+        let v = dem.bands[0][(y * w + x) as usize];
+        (!dem.is_nodata(v)).then_some(v)
+    };
+    let nodata = 3.4e38f32 as f64;
+    let mut percentile = dem.like(DataType::F32);
+    percentile.nodata = Some(nodata);
+    let mut scale = dem.like(DataType::F32);
+    scale.nodata = Some(f32::MIN as f64);
+    for y in 0..h {
+        for x in 0..w {
+            let i = (y * w + x) as usize;
+            let Some(z) = value(x, y) else {
+                percentile.bands[0][i] = nodata;
+                scale.bands[0][i] = f32::MIN as f64;
+                continue;
+            };
+            let (mut lower, mut n) = (0usize, 0usize);
+            let mut best: Option<(f64, usize)> = None;
+            let mut done: isize = -1;
+            for &r in scales {
+                let r = r as isize;
+                // Add the rings between the previous scale and this one.
+                for dy in -r..=r {
+                    for dx in -r..=r {
+                        if dy.abs().max(dx.abs()) <= done {
+                            continue;
+                        }
+                        if let Some(v) = value(x + dx, y + dy) {
+                            n += 1;
+                            lower += usize::from(v < z);
+                        }
+                    }
+                }
+                done = r;
+                let p = 100.0 * lower as f64 / n as f64;
+                if best.is_none_or(|(b, _)| (p - 50.0).abs() > (b - 50.0).abs()) {
+                    best = Some((p, r as usize));
+                }
+            }
+            let (p, r) = best.unwrap_or((0.0, 0));
+            percentile.bands[0][i] = p as f32 as f64;
+            scale.bands[0][i] = (r as f64 * cell_value) as f32 as f64;
+        }
+    }
+    (percentile, scale)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

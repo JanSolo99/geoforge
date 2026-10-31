@@ -4595,9 +4595,11 @@ fn second_raster_outputs_match_arcgis() {
     for (case, info) in manifest["cases"].as_object().unwrap() {
         let (param, suffix) = match info["tool"].as_str() {
             Some("gp.GeomorphonLandforms_sa") => ("out_geomorphons_raster", "geomorphons"),
-            Some("gp.MultiscaleSurfaceDeviation_sa" | "gp.MultiscaleSurfaceDifference_sa") => {
-                ("out_scale_raster", "scale")
-            }
+            Some(
+                "gp.MultiscaleSurfaceDeviation_sa"
+                | "gp.MultiscaleSurfaceDifference_sa"
+                | "gp.MultiscaleSurfacePercentile_sa",
+            ) => ("out_scale_raster", "scale"),
             _ => continue,
         };
         cases += 1;

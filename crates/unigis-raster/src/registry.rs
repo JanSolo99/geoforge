@@ -337,6 +337,15 @@ fn multiscale_surface_difference(ctx: &dyn Context) -> Result<Output> {
     multiscale_surface(ctx, "multiscale_surface_difference", "increment", false)
 }
 
+fn multiscale_surface_percentile(ctx: &dyn Context) -> Result<Output> {
+    multiscale_surface(
+        ctx,
+        "multiscale_surface_percentile",
+        "base_increment",
+        false,
+    )
+}
+
 /// Multiscale Surface Deviation (`standardize`) and Difference.
 fn multiscale_surface(
     ctx: &dyn Context,
@@ -377,10 +386,10 @@ fn multiscale_surface(
         cells(increment, 1.0),
         number_or(ctx, "nonlinearity", 1.0),
     );
-    let run = if standardize {
-        crate::multiscale::multiscale_surface_deviation
-    } else {
-        crate::multiscale::multiscale_surface_difference
+    let run = match tool {
+        "multiscale_surface_percentile" => crate::multiscale::multiscale_surface_percentile,
+        _ if standardize => crate::multiscale::multiscale_surface_deviation,
+        _ => crate::multiscale::multiscale_surface_difference,
     };
     let (mut deviation, mut scale) = run(&dem, &scales, metres.map_or(1.0, |m| cell / m));
     if geographic {
@@ -2830,6 +2839,47 @@ pub static TOOLS: &[Tool] = &[
             ),
         ],
         run: multiscale_surface_deviation,
+    },
+    Tool {
+        id: "multiscale_surface_percentile",
+        name: "Multiscale Surface Percentile",
+        summary: "Most extreme elevation percentile (share of lower neighbours) over a range of neighbourhood sizes, and the size where it occurs.",
+        params: &[
+            raster("input", "Input surface raster", true),
+            Param {
+                name: "out_scale_raster",
+                label: "Output scale raster",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+            },
+            option(
+                "distance_units",
+                "Distance units",
+                &[
+                    "CELLS",
+                    "METERS",
+                    "CENTIMETERS",
+                    "KILOMETERS",
+                    "INCHES",
+                    "FEET",
+                    "YARDS",
+                    "MILES",
+                ],
+                "CELLS",
+            ),
+            num_param("min_scale", "Minimum neighborhood distance", ""),
+            num_param("max_scale", "Maximum neighborhood distance", ""),
+            num_param("base_increment", "Base distance increment", ""),
+            num_param("nonlinearity", "Nonlinearity factor", "1"),
+            option(
+                "analysis_target_device",
+                "Target device for analysis",
+                &["GPU_THEN_CPU", "GPU_ONLY", "CPU_ONLY"],
+                "GPU_THEN_CPU",
+            ),
+        ],
+        run: multiscale_surface_percentile,
     },
     Tool {
         id: "multiscale_surface_difference",
