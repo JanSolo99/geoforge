@@ -942,6 +942,10 @@ CASES = {
     "streamlink_hydro": ("gp.StreamLink_sa", [OUT / "streams_hydro.tif", OUT / "flowdir_hydro_filled.tif"], []),
     "streamorder_strahler": ("gp.StreamOrder_sa", [OUT / "streams_hydro.tif", OUT / "flowdir_hydro_filled.tif"], ["STRAHLER"]),
     "streamorder_shreve": ("gp.StreamOrder_sa", [OUT / "streams_hydro.tif", OUT / "flowdir_hydro_filled.tif"], ["SHREVE"]),
+    "stf_links": ("gp.StreamToFeature_sa", [OUT / "streamlink_hydro.tif", OUT / "flowdir_hydro_filled.tif"], ["SIMPLIFY"]),
+    "stf_links_raw": ("gp.StreamToFeature_sa", [OUT / "streamlink_hydro.tif", OUT / "flowdir_hydro_filled.tif"], ["NO_SIMPLIFY"]),
+    "stf_streams": ("gp.StreamToFeature_sa", [OUT / "streams_hydro.tif", OUT / "flowdir_hydro_filled.tif"], ["SIMPLIFY"]),
+    "stf_order": ("gp.StreamToFeature_sa", [OUT / "streamorder_strahler.tif", OUT / "flowdir_hydro_filled.tif"], ["NO_SIMPLIFY"]),
     "gfd_geographic": ("gp.GeodesicFlowDirection_sa", [RASTER / "dem_geographic.tif"], ["NORMAL"]),
     "gfd_geographic_force": ("gp.GeodesicFlowDirection_sa", [RASTER / "dem_geographic.tif"], ["FORCE"]),
     "gfd_projected": ("gp.GeodesicFlowDirection_sa", [RASTER / "dem.tif"], ["NORMAL"]),
@@ -2453,6 +2457,7 @@ RUN = {
     "gp.GeodesicFlowDirection_sa": ("geodesic_flow_direction", ["input", "output", "force_flow"]),
     # The geomorphons raster (second output) is compared by second_raster_outputs_match_arcgis.
     # The scale raster (second output) is compared by second_raster_outputs_match_arcgis.
+    "gp.StreamToFeature_sa": ("stream_to_feature", ["in_stream_raster", "in_flow_direction_raster", "output", "simplify"]),
     "gp.StorageCapacity_sa": ("storage_capacity", ["input", "output", "in_zone_data", "zone_field", "analysis_type", "min_elevation", "max_elevation", "increment_type", "increment", "z_unit"]),
     "gp.RasterCalculator_sa": ("raster_calculator", ["expression", "output"]),
     "gp.MultiscaleSurfacePercentile_sa": ("multiscale_surface_percentile", ["input", "output", None, "distance_units", "min_scale", "max_scale", "base_increment", "nonlinearity", "analysis_target_device"]),

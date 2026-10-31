@@ -218,6 +218,14 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
   Σ f32(level − z) · cell area / z_unit², ZONE_CODE 1. Next for this tool: zones (raster on a
   different grid is resampled by ArcGIS; polygons) — `combine_polys.shp` is a candidate fixture.
 
+## Queue: Stream to Feature — landed
+
+- `hydro::stream_to_feature` + `ug run stream_to_feature` branch. Findings (all 74 arcs exact):
+  sources start half a cell back unless the cell behind is a stream; vertices at direction
+  changes; end at next link's first centre or half a cell past an outlet; nodes numbered in
+  raster order of link starts (outlet right after its cell's start); arcs ordered by end cell
+  (outlet arcs first), inflows by flow code; SIMPLIFY = Douglas-Peucker, tolerance cell/√2.
+
 ## Pitfall: ArcGIS sidecars in testdata
 
 Running ArcGIS on fixture rasters can leave untracked `testdata/raster/*.aux.xml` / `*.vat.dbf`

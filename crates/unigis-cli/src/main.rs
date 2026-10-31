@@ -6675,6 +6675,59 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
         let lines = unigis_raster::contour::contour_list(&r, &levels);
         return write_contours(lines, &r, Path::new(&output));
     }
+    if spec.id == "stream_to_feature" {
+        let read = |k: &str| -> Result<unigis_raster::Raster> {
+            unigis_raster::read_geotiff(Path::new(
+                map.get(k)
+                    .ok_or_else(|| Error::Unsupported(format!("{k} is required")))?,
+            ))
+        };
+        let (streams, directions) = (read("in_stream_raster")?, read("in_flow_direction_raster")?);
+        let simplify = !map.get("simplify").is_some_and(|v| {
+            v.eq_ignore_ascii_case("NO_SIMPLIFY") || v.eq_ignore_ascii_case("false")
+        });
+        let arcs = unigis_raster::hydro::stream_to_feature(&streams, &directions, simplify);
+        let features = arcs
+            .into_iter()
+            .enumerate()
+            .map(|(i, a)| {
+                let mut g = unigis_core::Geometry::point(0.0, 0.0);
+                g.kind = unigis_core::GeometryKind::Polyline;
+                g.parts = vec![0];
+                g.xy = a.points;
+                Feature {
+                    oid: i as i64,
+                    geometry: Some(g),
+                    attributes: vec![
+                        Value::Integer(i as i32 + 1),
+                        Value::Integer(a.grid_code as i32),
+                        Value::Integer(a.from_node as i32),
+                        Value::Integer(a.to_node as i32),
+                    ],
+                }
+            })
+            .collect();
+        let field = |name: &str| {
+            let mut f = Field::new(name, FieldType::Integer);
+            f.length = 10;
+            f
+        };
+        let out = ToolOutput {
+            kind: unigis_core::GeometryKind::Polyline,
+            has_z: false,
+            has_m: false,
+            fields: vec![
+                field("arcid"),
+                field("grid_code"),
+                field("from_node"),
+                field("to_node"),
+            ],
+            spatial_reference_wkt: raster_wkt(&directions)?,
+            features,
+            messages: Vec::new(),
+        };
+        return write_output(out, Path::new(&output), None);
+    }
     if spec.id == "storage_capacity" {
         if map.contains_key("in_zone_data") {
             return Err(Error::Unsupported(

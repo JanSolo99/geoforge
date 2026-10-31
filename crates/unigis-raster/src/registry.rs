@@ -492,6 +492,12 @@ fn contour_list_unsupported(_: &dyn Context) -> Result<Output> {
     ))
 }
 
+fn stream_to_feature_unsupported(_: &dyn Context) -> Result<Output> {
+    Err(Error::Unsupported(
+        "Stream to Feature writes polylines; run it through `ug run`".into(),
+    ))
+}
+
 fn storage_capacity_unsupported(_: &dyn Context) -> Result<Output> {
     Err(Error::Unsupported(
         "Storage Capacity writes a table; run it through `ug run`".into(),
@@ -3065,6 +3071,26 @@ pub static TOOLS: &[Tool] = &[
             },
         ],
         run: contour_list_unsupported,
+    },
+    Tool {
+        id: "stream_to_feature",
+        name: "Stream to Feature",
+        summary: "Converts a stream raster to polylines (arcid, grid_code, from_node, to_node) along the flow directions.",
+        params: &[
+            raster("in_stream_raster", "Input stream raster", true),
+            raster(
+                "in_flow_direction_raster",
+                "Input flow direction raster",
+                true,
+            ),
+            option(
+                "simplify",
+                "Simplify polylines",
+                &["SIMPLIFY", "NO_SIMPLIFY"],
+                "SIMPLIFY",
+            ),
+        ],
+        run: stream_to_feature_unsupported,
     },
     Tool {
         id: "storage_capacity",

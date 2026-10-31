@@ -854,3 +854,186 @@ pub fn flow_distance(
     out.bands[0] = dist.iter().map(|d| d.map_or(nodata, f64::from)).collect();
     Some(out)
 }
+
+/// One polyline of Stream to Feature.
+#[derive(Debug, Clone, PartialEq)]
+pub struct StreamArc {
+    pub grid_code: f64,
+    pub from_node: u32,
+    pub to_node: u32,
+    pub points: Vec<[f64; 2]>,
+}
+
+fn d8_step(code: f64) -> Option<(isize, isize)> {
+    Some(match code as i64 {
+        1 => (0, 1),
+        2 => (1, 1),
+        4 => (1, 0),
+        8 => (1, -1),
+        16 => (0, -1),
+        32 => (-1, -1),
+        64 => (-1, 0),
+        128 => (-1, 1),
+        _ => return None,
+    })
+}
+
+fn douglas_peucker(points: &[[f64; 2]], tolerance: f64) -> Vec<[f64; 2]> {
+    if points.len() < 3 {
+        return points.to_vec();
+    }
+    let ([x1, y1], [x2, y2]) = (points[0], points[points.len() - 1]);
+    let length = (x2 - x1).hypot(y2 - y1);
+    let (mut far, mut at) = (0.0, 0);
+    for (k, p) in points.iter().enumerate().take(points.len() - 1).skip(1) {
+        let d = if length > 0.0 {
+            ((x2 - x1) * (y1 - p[1]) - (x1 - p[0]) * (y2 - y1)).abs() / length
+        } else {
+            (p[0] - x1).hypot(p[1] - y1)
+        };
+        if d > far {
+            (far, at) = (d, k);
+        }
+    }
+    if far > tolerance {
+        let mut left = douglas_peucker(&points[..=at], tolerance);
+        left.pop();
+        left.extend(douglas_peucker(&points[at..], tolerance));
+        left
+    } else {
+        vec![points[0], points[points.len() - 1]]
+    }
+}
+
+/// Spatial Analyst Stream to Feature: one polyline per stream link (a stretch between
+/// junctions, or where the stream value changes). Matched against ArcGIS Pro 3.7:
+/// - a source starts half a cell upstream of its first cell (unless the cell behind it is a
+///   stream cell), other links at their first cell's centre; vertices are the centres of cells
+///   where the direction changes; a link ends at the centre of the next link's first cell, or
+///   half a cell past its last cell at an outlet;
+/// - nodes are numbered in raster order of link starts, an outlet right after the start in the
+///   same cell; arcs are ordered by their end cell (outlet arcs first), arcs into one junction by
+///   their last cell's flow direction code;
+/// - `simplify` is Douglas-Peucker with a tolerance of cell size / √2.
+pub fn stream_to_feature(streams: &Raster, directions: &Raster, simplify: bool) -> Vec<StreamArc> {
+    let (w, h) = (directions.width, directions.height);
+    let n = w * h;
+    let (is_stream, down) = stream_network(streams, directions);
+    let stream_value = |i: usize| value(streams, i).unwrap_or(0.0);
+    let mut inflow = vec![0u32; n];
+    let mut upstream: Vec<Vec<usize>> = vec![Vec::new(); n];
+    for (i, d) in down.iter().enumerate() {
+        if let Some(j) = *d {
+            inflow[j] += 1;
+            upstream[j].push(i);
+        }
+    }
+    let head: Vec<bool> = (0..n)
+        .map(|i| {
+            is_stream[i] && (inflow[i] != 1 || stream_value(upstream[i][0]) != stream_value(i))
+        })
+        .collect();
+    // Each link: its cells from the head down to the cell before the next head.
+    let mut link_of_last = vec![None; n];
+    let mut links: Vec<Vec<usize>> = Vec::new();
+    for i in (0..n).filter(|&i| head[i]) {
+        let mut cells = vec![i];
+        while let Some(j) = down[*cells.last().unwrap()].filter(|&j| !head[j]) {
+            cells.push(j);
+        }
+        link_of_last[*cells.last().unwrap()] = Some(links.len());
+        links.push(cells);
+    }
+    let link_of_head: std::collections::HashMap<usize, usize> =
+        links.iter().enumerate().map(|(k, c)| (c[0], k)).collect();
+    // Node numbers in raster order.
+    let mut start_node = vec![0u32; links.len()];
+    let mut outlet_node = vec![0u32; links.len()];
+    let mut next = 0;
+    for i in 0..n {
+        if let Some(&k) = link_of_head.get(&i) {
+            next += 1;
+            start_node[k] = next;
+        }
+        if let Some(k) = link_of_last[i]
+            && down[i].is_none()
+        {
+            next += 1;
+            outlet_node[k] = next;
+        }
+    }
+    let t = directions.transform;
+    let centre = |i: usize| {
+        let (r, c) = ((i / w) as f64, (i % w) as f64);
+        [t[0] + (c + 0.5) * t[1], t[3] + (r + 0.5) * t[5]]
+    };
+    let code = |i: usize| directions.bands[0][i];
+    let half = |i: usize, sign: f64| {
+        let [x, y] = centre(i);
+        let (dr, dc) = d8_step(code(i)).unwrap_or((0, 0));
+        [
+            x + sign * dc as f64 * t[1] / 2.0,
+            y + sign * dr as f64 * t[5] / 2.0,
+        ]
+    };
+    let arc = |k: usize| {
+        let cells = &links[k];
+        let first = cells[0];
+        let behind_is_stream = d8_step(code(first)).is_some_and(|(dr, dc)| {
+            let (r, c) = ((first / w) as isize - dr, (first % w) as isize - dc);
+            r >= 0
+                && c >= 0
+                && (r as usize) < h
+                && (c as usize) < w
+                && is_stream[r as usize * w + c as usize]
+        });
+        let mut points = vec![if inflow[first] == 0 && !behind_is_stream {
+            half(first, -1.0)
+        } else {
+            centre(first)
+        }];
+        for pair in cells.windows(2) {
+            if code(pair[1]) != code(pair[0]) {
+                points.push(centre(pair[1]));
+            }
+        }
+        let last = *cells.last().unwrap();
+        let to_node = match down[last] {
+            Some(j) => {
+                points.push(centre(j));
+                start_node[link_of_head[&j]]
+            }
+            None => {
+                points.push(half(last, 1.0));
+                outlet_node[k]
+            }
+        };
+        if simplify {
+            points = douglas_peucker(&points, t[1].abs() / std::f64::consts::SQRT_2);
+        }
+        StreamArc {
+            grid_code: stream_value(first),
+            from_node: start_node[k],
+            to_node,
+            points,
+        }
+    };
+    let mut out = Vec::with_capacity(links.len());
+    for i in 0..n {
+        if let Some(k) = link_of_last[i]
+            && down[i].is_none()
+        {
+            out.push(arc(k));
+        }
+        if head[i] {
+            let mut into: Vec<usize> = upstream[i].clone();
+            into.sort_by(|a, b| code(*a).total_cmp(&code(*b)));
+            for u in into {
+                if let Some(k) = link_of_last[u] {
+                    out.push(arc(k));
+                }
+            }
+        }
+    }
+    out
+}

@@ -109107,6 +109107,266 @@
           "output": "<out>"
         }
       }
+    },
+    "stf_links": {
+      "tool": "gp.StreamToFeature_sa",
+      "args": [
+        "testdata/arcgis-reference/streamlink_hydro.tif",
+        "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+        "<out>",
+        "SIMPLIFY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "arcid",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "grid_code",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "from_node",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "to_node",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "stream_to_feature",
+        "params": {
+          "in_stream_raster": "testdata/arcgis-reference/streamlink_hydro.tif",
+          "in_flow_direction_raster": "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+          "output": "<out>",
+          "simplify": "SIMPLIFY"
+        }
+      }
+    },
+    "stf_links_raw": {
+      "tool": "gp.StreamToFeature_sa",
+      "args": [
+        "testdata/arcgis-reference/streamlink_hydro.tif",
+        "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+        "<out>",
+        "NO_SIMPLIFY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "arcid",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "grid_code",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "from_node",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "to_node",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "stream_to_feature",
+        "params": {
+          "in_stream_raster": "testdata/arcgis-reference/streamlink_hydro.tif",
+          "in_flow_direction_raster": "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+          "output": "<out>",
+          "simplify": "NO_SIMPLIFY"
+        }
+      }
+    },
+    "stf_streams": {
+      "tool": "gp.StreamToFeature_sa",
+      "args": [
+        "testdata/arcgis-reference/streams_hydro.tif",
+        "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+        "<out>",
+        "SIMPLIFY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "arcid",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "grid_code",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "from_node",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "to_node",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "stream_to_feature",
+        "params": {
+          "in_stream_raster": "testdata/arcgis-reference/streams_hydro.tif",
+          "in_flow_direction_raster": "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+          "output": "<out>",
+          "simplify": "SIMPLIFY"
+        }
+      }
+    },
+    "stf_order": {
+      "tool": "gp.StreamToFeature_sa",
+      "args": [
+        "testdata/arcgis-reference/streamorder_strahler.tif",
+        "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+        "<out>",
+        "NO_SIMPLIFY"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [
+        [
+          "FID",
+          "OID",
+          4,
+          0,
+          0
+        ],
+        [
+          "Shape",
+          "Geometry",
+          0,
+          0,
+          0
+        ],
+        [
+          "arcid",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "grid_code",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "from_node",
+          "Integer",
+          10,
+          10,
+          0
+        ],
+        [
+          "to_node",
+          "Integer",
+          10,
+          10,
+          0
+        ]
+      ],
+      "shapeType": "Polyline",
+      "run": {
+        "tool": "stream_to_feature",
+        "params": {
+          "in_stream_raster": "testdata/arcgis-reference/streamorder_strahler.tif",
+          "in_flow_direction_raster": "testdata/arcgis-reference/flowdir_hydro_filled.tif",
+          "output": "<out>",
+          "simplify": "NO_SIMPLIFY"
+        }
+      }
     }
   }
 }
