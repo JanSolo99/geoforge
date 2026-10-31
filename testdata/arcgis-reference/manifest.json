@@ -109367,6 +109367,1091 @@
           "simplify": "NO_SIMPLIFY"
         }
       }
+    },
+    "ld_hydro": {
+      "tool": "gp.LocateDepressions_sa",
+      "args": [
+        "testdata/raster/hydro.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "outputs": {
+        "depressions.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "DEP_ID",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "COUNT",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "MIN",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "MAX",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "RANGE",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "MEAN",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "SUM",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "AREA",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "VOLUME",
+              "Double",
+              19,
+              0,
+              0
+            ]
+          ],
+          "shapeType": "Polygon"
+        },
+        "points.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "DEP_ID",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "POINT_TYPE",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "POINT_ELEV",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "DIST_EDGE",
+              "Double",
+              19,
+              0,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        }
+      },
+      "run": {
+        "tool": "locate_depressions",
+        "params": {
+          "in_surface_raster": "testdata/raster/hydro.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "ld_dem": {
+      "tool": "gp.LocateDepressions_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "outputs": {
+        "depressions.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "DEP_ID",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "COUNT",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "MIN",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "MAX",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "RANGE",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "MEAN",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "SUM",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "AREA",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "VOLUME",
+              "Double",
+              19,
+              0,
+              0
+            ]
+          ],
+          "shapeType": "Polygon"
+        },
+        "points.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "DEP_ID",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "POINT_TYPE",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "POINT_ELEV",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "DIST_EDGE",
+              "Double",
+              19,
+              0,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        }
+      },
+      "run": {
+        "tool": "locate_depressions",
+        "params": {
+          "in_surface_raster": "testdata/raster/dem.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "ld_dem_nodata": {
+      "tool": "gp.LocateDepressions_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "outputs": {
+        "depressions.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "DEP_ID",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "COUNT",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "MIN",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "MAX",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "RANGE",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "MEAN",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "SUM",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "AREA",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "VOLUME",
+              "Double",
+              19,
+              0,
+              0
+            ]
+          ],
+          "shapeType": "Polygon"
+        },
+        "points.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "DEP_ID",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "POINT_TYPE",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "POINT_ELEV",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "DIST_EDGE",
+              "Double",
+              19,
+              0,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        }
+      },
+      "run": {
+        "tool": "locate_depressions",
+        "params": {
+          "in_surface_raster": "testdata/raster/dem_nodata.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "ld_hydro_connection": {
+      "tool": "gp.LocateDepressions_sa",
+      "args": [
+        "testdata/raster/hydro.tif",
+        "<out>",
+        "",
+        "METER",
+        "",
+        "1000 Meters"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "outputs": {
+        "depressions.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "DEP_ID",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "COUNT",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "MIN",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "MAX",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "RANGE",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "MEAN",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "SUM",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "AREA",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "VOLUME",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "DIST_CON",
+              "Double",
+              19,
+              0,
+              0
+            ]
+          ],
+          "shapeType": "Polygon"
+        },
+        "points.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "DEP_ID",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "POINT_TYPE",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "POINT_ELEV",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "DIST_EDGE",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "DIST_POINT",
+              "Double",
+              19,
+              0,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        }
+      },
+      "run": {
+        "tool": "locate_depressions",
+        "params": {
+          "in_surface_raster": "testdata/raster/hydro.tif",
+          "output": "<out>",
+          "z_unit": "METER",
+          "max_connection_distance": "1000 Meters"
+        }
+      }
+    },
+    "ld_hydro_depth": {
+      "tool": "gp.LocateDepressions_sa",
+      "args": [
+        "testdata/raster/hydro.tif",
+        "<out>",
+        "4 Meters"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010800: No depressions found that meet the specified criteria.",
+        "WARNING 010151: No features created by operation."
+      ],
+      "outputs": {
+        "depressions.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "DEP_ID",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "COUNT",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "MIN",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "MAX",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "RANGE",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "MEAN",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "SUM",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "AREA",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "VOLUME",
+              "Double",
+              19,
+              0,
+              0
+            ]
+          ],
+          "shapeType": "Polygon"
+        },
+        "points.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "DEP_ID",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "POINT_TYPE",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "POINT_ELEV",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "DIST_EDGE",
+              "Double",
+              19,
+              0,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        }
+      },
+      "run": {
+        "tool": "locate_depressions",
+        "params": {
+          "in_surface_raster": "testdata/raster/hydro.tif",
+          "output": "<out>",
+          "min_depth": "4 Meters"
+        }
+      }
+    },
+    "ld_hydro_area": {
+      "tool": "gp.LocateDepressions_sa",
+      "args": [
+        "testdata/raster/hydro.tif",
+        "<out>",
+        "",
+        "METER",
+        "3000 SquareMeters"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010800: No depressions found that meet the specified criteria.",
+        "WARNING 010151: No features created by operation."
+      ],
+      "outputs": {
+        "depressions.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "DEP_ID",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "COUNT",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "MIN",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "MAX",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "RANGE",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "MEAN",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "SUM",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "AREA",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "VOLUME",
+              "Double",
+              19,
+              0,
+              0
+            ]
+          ],
+          "shapeType": "Polygon"
+        },
+        "points.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "DEP_ID",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "POINT_TYPE",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "POINT_ELEV",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "DIST_EDGE",
+              "Double",
+              19,
+              0,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        }
+      },
+      "run": {
+        "tool": "locate_depressions",
+        "params": {
+          "in_surface_raster": "testdata/raster/hydro.tif",
+          "output": "<out>",
+          "z_unit": "METER",
+          "min_area": "3000 SquareMeters"
+        }
+      }
+    },
+    "ld_hydro_short_connection": {
+      "tool": "gp.LocateDepressions_sa",
+      "args": [
+        "testdata/raster/hydro.tif",
+        "<out>",
+        "",
+        "METER",
+        "",
+        "50 Meters"
+      ],
+      "status": "succeeded",
+      "messages": [
+        "WARNING 010800: No depressions found that meet the specified criteria.",
+        "WARNING 010151: No features created by operation."
+      ],
+      "outputs": {
+        "depressions.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "DEP_ID",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "COUNT",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "MIN",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "MAX",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "RANGE",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "MEAN",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "SUM",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "AREA",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "VOLUME",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "DIST_CON",
+              "Double",
+              19,
+              0,
+              0
+            ]
+          ],
+          "shapeType": "Polygon"
+        },
+        "points.shp": {
+          "fields": [
+            [
+              "FID",
+              "OID",
+              4,
+              0,
+              0
+            ],
+            [
+              "Shape",
+              "Geometry",
+              0,
+              0,
+              0
+            ],
+            [
+              "DEP_ID",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "POINT_TYPE",
+              "Integer",
+              10,
+              10,
+              0
+            ],
+            [
+              "POINT_ELEV",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "DIST_EDGE",
+              "Double",
+              19,
+              0,
+              0
+            ],
+            [
+              "DIST_POINT",
+              "Double",
+              19,
+              0,
+              0
+            ]
+          ],
+          "shapeType": "Point"
+        }
+      },
+      "run": {
+        "tool": "locate_depressions",
+        "params": {
+          "in_surface_raster": "testdata/raster/hydro.tif",
+          "output": "<out>",
+          "z_unit": "METER",
+          "max_connection_distance": "50 Meters"
+        }
+      }
     }
   }
 }

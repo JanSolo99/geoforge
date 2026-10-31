@@ -464,6 +464,11 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
         and NoData/outside-surface exclusion. Nine `ish_*` references match Pro 3.7. Not done:
         triangulated surfaces, PRESERVE extrapolation, true curves and partial densification through
         NoData areas
+  - [x] Locate Depressions on single-band raster surfaces (`ug run locate_depressions`):
+        Fill-derived 8-connected regions, two-way Boundary Clean, unsimplified polygons, zonal
+        statistics and volume, lowest/connection points, depth/area filters and connection distances.
+        Seven `ld_*` references match Pro 3.7 for both polygon and point outputs. Roads, nondefault
+        environments and less-common z-unit/area-unit combinations are not covered.
   - [x] Point To Raster / Feature To Raster on points: MOST_FREQUENT ties go to the first
         feature; integer fields stay 32-bit (polygons and lines narrow them), COUNT is signed
         8-bit, MEAN of integers single; RANGE and STANDARD_DEVIATION (sample, single, NoData for

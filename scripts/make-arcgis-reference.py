@@ -1934,6 +1934,14 @@ CASES = {
     "crr_extent": ("gp.CreateRandomRaster_sa", [], ["", 10, "0 0 1000 500"]),
     "crr_odd": ("gp.CreateRandomRaster_sa", [], ["", 7, "1 2 50 33"]),
     "crr_small": ("gp.CreateRandomRaster_sa", [], ["", 0.5, "0 0 3 2"]),
+    # Locate Depressions: polygons and connection points in a workspace output.
+    "ld_hydro": ("gp.LocateDepressions_sa", [RASTER / "hydro.tif"], []),
+    "ld_dem": ("gp.LocateDepressions_sa", [RASTER / "dem.tif"], []),
+    "ld_dem_nodata": ("gp.LocateDepressions_sa", [RASTER / "dem_nodata.tif"], []),
+    "ld_hydro_connection": ("gp.LocateDepressions_sa", [RASTER / "hydro.tif"], ["", "METER", "", "1000 Meters"]),
+    "ld_hydro_depth": ("gp.LocateDepressions_sa", [RASTER / "hydro.tif"], ["4 Meters"]),
+    "ld_hydro_area": ("gp.LocateDepressions_sa", [RASTER / "hydro.tif"], ["", "METER", "3000 SquareMeters"]),
+    "ld_hydro_short_connection": ("gp.LocateDepressions_sa", [RASTER / "hydro.tif"], ["", "METER", "", "50 Meters"]),
     # Zonal Fill: integer elevations as zones; float and integer weights.
     # Zonal Geometry.
     "zg_landuse_area": ("gp.ZonalGeometry_sa", [RASTER / "landuse_u8.tif", "Value"], ["AREA"]),
@@ -2466,6 +2474,7 @@ RUN = {
     "gp.GeomorphonLandforms_sa": ("geomorphon_landforms", ["input", "output", None, "angle_threshold", "distance_units", "search_distance", "skip_distance", "z_unit"]),
     "gp.FlowDistance_sa": ("flow_distance", ["in_stream_raster", "in_surface_raster", "output", "in_flow_direction_raster", "distance_type", "flow_direction_type"]),
     "gp.ContourList_sa": ("contour_list", ["input", "output", "contour_values"]),
+    "gp.LocateDepressions_sa": ("locate_depressions", ["in_surface_raster", "output", "min_depth", "z_unit", "min_area", "max_connection_distance"]),
     "gp.ZonalGeometry_sa": ("zonal_geometry", ["in_zone_data", "zone_field", "output", "geometry_type", "cell_size"]),
     "gp.ZonalGeometryAsTable_sa": ("zonal_geometry_as_table", ["input", "zone_field", "output"]),
     "gp.ZonalFill_sa": ("zonal_fill", ["in_zone_raster", "in_weight_raster", "output"]),
@@ -2621,7 +2630,7 @@ RASTER_OUT = {"gp.RasterCalculator_sa", "gp.MultiscaleSurfacePercentile_sa", "gp
               "gp.CostDistance_sa", "gp.CostBackLink_sa", "gp.CostAllocation_sa", "gp.CostPath_sa", "gp.Corridor_sa", "gp.Filter_sa", "gp.Nibble_sa", "gp.ReclassByTable_sa",
               "gp.Sink_sa", "gp.Pick_sa", "management.Flip", "management.Mirror", "management.Shift", "management.Clip",
               "gp.Slice_sa", "gp.ExtractByAttributes_sa", "gp.ExtractByRectangle_sa", "gp.ExtractByCircle_sa", "gp.Lookup_sa"}
-WORKSPACE_OUT = {"conversion.FeatureClassToShapefile", "conversion.TableToDBASE", "conversion.RasterToOtherFormat", "analysis.Split", "analysis.SplitByAttributes"}
+WORKSPACE_OUT = {"conversion.FeatureClassToShapefile", "conversion.TableToDBASE", "conversion.RasterToOtherFormat", "analysis.Split", "analysis.SplitByAttributes", "gp.LocateDepressions_sa"}
 EXCEL_OUT = {"conversion.TableToExcel"}
 # Tools that write a text file: compared byte for byte.
 TEXT_OUT = {"conversion.FeaturesToJSON", "conversion.ExportTable", "conversion.RasterToASCII", "conversion.RasterToFloat"}
@@ -3127,7 +3136,9 @@ def main():
         if tool in WORKSPACE_OUT:
             out = OUT / name
             out.mkdir()
-        if tool in WORKSPACE_OUT | EXCEL_OUT:
+        if tool == "gp.LocateDepressions_sa":
+            args = [str(before[0]), str(out / "depressions.shp"), "", str(out / "points.shp")] + after
+        elif tool in WORKSPACE_OUT | EXCEL_OUT:
             # A list argument is a multivalue (several input datasets); the bridge translates
             # each path of a list, not paths inside a joined string.
             args = [list(map(str, a)) if isinstance(a, list) else str(a) for a in before] + [str(out)] + [str(a) if isinstance(a, Path) else a for a in after]
@@ -3216,6 +3227,9 @@ def main():
                 "messages": [m["text"] for m in r.get("messages", []) if m["severity"] > 0],
                 "outputs": outputs,
             }
+            spec = run_spec(tool, manifest["cases"][name]["args"])
+            if spec:
+                manifest["cases"][name]["run"] = spec
             print(f"{name}: {r.get('status')} {sorted(outputs)} {manifest['cases'][name]['messages']}")
             continue
         d = w.call("describe", path=str(out)) if r.get("status") == "succeeded" and tool not in TEXT_OUT | RASTER_OUT | EXCEL_OUT and not raster_projection else {}

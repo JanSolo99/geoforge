@@ -504,6 +504,12 @@ fn storage_capacity_unsupported(_: &dyn Context) -> Result<Output> {
     ))
 }
 
+fn locate_depressions_unsupported(_: &dyn Context) -> Result<Output> {
+    Err(Error::Unsupported(
+        "Locate Depressions writes features; run it through `ug run`".into(),
+    ))
+}
+
 fn zonal_geometry_table_unsupported(_: &dyn Context) -> Result<Output> {
     Err(Error::Unsupported(
         "Zonal Geometry as Table writes a table; run it through `ug run`".into(),
@@ -3133,6 +3139,75 @@ pub static TOOLS: &[Tool] = &[
             ),
         ],
         run: storage_capacity_unsupported,
+    },
+    Tool {
+        id: "locate_depressions",
+        name: "Locate Depressions",
+        summary: "Locates depressions and their lowest points in a surface raster.",
+        params: &[
+            raster("in_surface_raster", "Input surface raster", true),
+            Param {
+                name: "in_road_data",
+                label: "Input road data",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+            },
+            Param {
+                name: "out_connection_points",
+                label: "Output connection points",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+            },
+            Param {
+                name: "min_depth",
+                label: "Minimum depth",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+            },
+            option(
+                "z_unit",
+                "Z unit",
+                &[
+                    "INCH",
+                    "FOOT",
+                    "FOOT_US",
+                    "YARD",
+                    "MILE_US",
+                    "NAUTICAL_MILE",
+                    "MILLIMETER",
+                    "CENTIMETER",
+                    "METER",
+                    "KILOMETER",
+                    "DECIMETER",
+                ],
+                "METER",
+            ),
+            Param {
+                name: "min_area",
+                label: "Minimum area",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+            },
+            Param {
+                name: "max_connection_distance",
+                label: "Maximum connection distance",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+            },
+            Param {
+                name: "max_road_distance",
+                label: "Maximum road distance",
+                kind: Kind::Text,
+                required: false,
+                default: "",
+            },
+        ],
+        run: locate_depressions_unsupported,
     },
     Tool {
         id: "zonal_geometry_as_table",

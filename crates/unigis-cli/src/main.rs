@@ -6647,6 +6647,9 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
     if spec.id == "interpolate_shape" {
         return run_interpolate_shape(&Args(map), &output);
     }
+    if spec.id == "locate_depressions" {
+        return run_locate_depressions(&Args(map), &output);
+    }
     if spec.id == "add_surface_information" {
         return run_add_surface_information(&Args(map), &output);
     }
@@ -7612,6 +7615,227 @@ fn run_zonal_characterization(
         &unigis_tools::TableOutput { fields, rows },
         Path::new(output),
     )
+}
+
+fn run_locate_depressions(ctx: &dyn unigis_raster::registry::Context, output: &str) -> Result<()> {
+    if ctx.get("in_road_data").is_some() || ctx.get("max_road_distance").is_some() {
+        return Err(Error::Unsupported(
+            "Locate Depressions road input is not implemented".into(),
+        ));
+    }
+    let input = ctx
+        .get("in_surface_raster")
+        .ok_or_else(|| Error::Unsupported("in_surface_raster is required".into()))?;
+    let raster = unigis_raster::read_geotiff(Path::new(&input))?;
+    let wkt = raster_wkt(&raster)?;
+    let z_unit = ctx.get("z_unit").unwrap_or_else(|| "METER".into());
+    let meters_per_z = match z_unit.to_ascii_uppercase().as_str() {
+        "INCH" => 0.0254,
+        "FOOT" => 0.3048,
+        "FOOT_US" => 1200.0 / 3937.0,
+        "YARD" => 0.9144,
+        "MILE_US" => 6_336_000.0 / 3937.0,
+        "NAUTICAL_MILE" => 1852.0,
+        "MILLIMETER" => 0.001,
+        "CENTIMETER" => 0.01,
+        "METER" => 1.0,
+        "KILOMETER" => 1000.0,
+        "DECIMETER" => 0.1,
+        other => return Err(Error::Unsupported(format!("z unit {other}"))),
+    };
+    let min_depth = ctx
+        .get("min_depth")
+        .map_or(Ok(0.05), |v| parse_distance(&v, None))?
+        / meters_per_z;
+    let cell_area = (raster.transform[1] * raster.transform[5]
+        - raster.transform[2] * raster.transform[4])
+        .abs();
+    let min_area = match ctx.get("min_area") {
+        None => 3.0 * cell_area,
+        Some(text) => {
+            let mut words = text.split_whitespace();
+            let value = words
+                .next()
+                .and_then(|v| v.parse::<f64>().ok())
+                .ok_or_else(|| Error::Unsupported(format!("invalid area `{text}`")))?;
+            let Some(unit) = words.next() else {
+                return write_locate_depressions(
+                    ctx,
+                    output,
+                    raster,
+                    min_depth,
+                    value,
+                    meters_per_z,
+                    wkt,
+                );
+            };
+            let square_meters = match unit.to_ascii_lowercase().replace([' ', '_'], "").as_str() {
+                "squaremeters" | "squaremetres" => 1.0,
+                "squarekilometers" | "squarekilometres" => 1_000_000.0,
+                "squarecentimeters" => 0.0001,
+                "squaremillimeters" => 0.000001,
+                "squarefeet" => 0.3048_f64.powi(2),
+                "squareusfeet" | "squarefootus" => (1200.0_f64 / 3937.0).powi(2),
+                "squareyards" => 0.9144_f64.powi(2),
+                "squaremiles" => 1609.344_f64.powi(2),
+                "acres" => 4046.8564224,
+                "hectares" => 10_000.0,
+                other => return Err(Error::Unsupported(format!("unknown area unit `{other}`"))),
+            };
+            let map_meters = wkt
+                .as_deref()
+                .and_then(|w| w.rsplit("UNIT[").next())
+                .and_then(|u| u.split(',').nth(1))
+                .and_then(|f| f.trim_end_matches([']', ' ']).parse::<f64>().ok())
+                .unwrap_or(1.0);
+            value * square_meters / map_meters.powi(2)
+        }
+    };
+    write_locate_depressions(ctx, output, raster, min_depth, min_area, meters_per_z, wkt)
+}
+
+fn write_locate_depressions(
+    ctx: &dyn unigis_raster::registry::Context,
+    output: &str,
+    raster: unigis_raster::Raster,
+    min_depth: f64,
+    min_area: f64,
+    meters_per_z: f64,
+    wkt: Option<String>,
+) -> Result<()> {
+    use unigis_core::{Feature, Field, FieldType, Geometry, GeometryKind, Value};
+
+    let max_connection = ctx
+        .get("max_connection_distance")
+        .map(|v| parse_distance(&v, wkt.as_deref()))
+        .transpose()?;
+    let depressions = unigis_raster::hydro::locate_depressions(
+        &raster,
+        min_depth,
+        min_area,
+        max_connection,
+        meters_per_z,
+    );
+    let output = Path::new(output);
+    let folder = output.extension().is_none();
+    if folder {
+        std::fs::create_dir_all(output).map_err(|e| Error::io(output, e))?;
+    }
+    let polygon_path = if folder {
+        output.join("depressions.shp")
+    } else {
+        output.to_path_buf()
+    };
+    let point_path = ctx
+        .get("out_connection_points")
+        .map(PathBuf::from)
+        .or_else(|| folder.then(|| output.join("points.shp")));
+    let connected = max_connection.is_some();
+    let mut polygon_fields = vec![
+        Field::new("DEP_ID", FieldType::Integer),
+        Field::new("COUNT", FieldType::Double),
+        Field::new("MIN", FieldType::Double),
+        Field::new("MAX", FieldType::Double),
+        Field::new("RANGE", FieldType::Double),
+        Field::new("MEAN", FieldType::Double),
+        Field::new("SUM", FieldType::Double),
+        Field::new("AREA", FieldType::Double),
+        Field::new("VOLUME", FieldType::Double),
+    ];
+    if connected {
+        polygon_fields.push(Field::new("DIST_CON", FieldType::Double));
+    }
+    let mut polygons = Vec::new();
+    let mut points = Vec::new();
+    for (id, depression) in depressions.into_iter().enumerate() {
+        let mut geometry = Geometry::point(0.0, 0.0);
+        geometry.kind = GeometryKind::Polygon;
+        geometry.xy.clear();
+        geometry.parts.clear();
+        for ring in depression.polygon.rings {
+            geometry.parts.push(geometry.xy.len() as u32);
+            geometry.xy.extend(ring);
+        }
+        let mut attributes = vec![
+            Value::Integer(id as i32),
+            Value::Double(depression.count as f64),
+            Value::Double(depression.min),
+            Value::Double(depression.max),
+            Value::Double(depression.max - depression.min),
+            Value::Double(depression.mean),
+            Value::Double(depression.sum),
+            Value::Double(depression.area),
+            Value::Double(depression.volume),
+        ];
+        if connected {
+            attributes.push(Value::Double(
+                depression
+                    .connection_distance
+                    .expect("connected depression"),
+            ));
+        }
+        polygons.push(Feature {
+            oid: id as i64,
+            geometry: Some(geometry),
+            attributes,
+        });
+        for point in depression.points {
+            let mut attributes = vec![
+                Value::Integer(id as i32),
+                Value::Integer(point.point_type),
+                Value::Double(point.elevation),
+                Value::Double(point.edge_distance),
+            ];
+            if connected {
+                attributes.push(Value::Double(
+                    point.point_distance.expect("connected point"),
+                ));
+            }
+            points.push(Feature {
+                oid: points.len() as i64,
+                geometry: Some(Geometry::point(point.xy[0], point.xy[1])),
+                attributes,
+            });
+        }
+    }
+    write_output(
+        ToolOutput {
+            kind: GeometryKind::Polygon,
+            has_z: false,
+            has_m: false,
+            fields: polygon_fields,
+            spatial_reference_wkt: wkt.clone(),
+            features: polygons,
+            messages: Vec::new(),
+        },
+        &polygon_path,
+        None,
+    )?;
+    if let Some(path) = point_path {
+        let mut fields = vec![
+            Field::new("DEP_ID", FieldType::Integer),
+            Field::new("POINT_TYPE", FieldType::Integer),
+            Field::new("POINT_ELEV", FieldType::Double),
+            Field::new("DIST_EDGE", FieldType::Double),
+        ];
+        if connected {
+            fields.push(Field::new("DIST_POINT", FieldType::Double));
+        }
+        write_output(
+            ToolOutput {
+                kind: GeometryKind::Point,
+                has_z: false,
+                has_m: false,
+                fields,
+                spatial_reference_wkt: wkt,
+                features: points,
+                messages: Vec::new(),
+            },
+            &path,
+            None,
+        )?;
+    }
+    Ok(())
 }
 
 fn run_interpolate_shape(ctx: &dyn unigis_raster::registry::Context, output: &str) -> Result<()> {

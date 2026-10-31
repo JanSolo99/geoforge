@@ -136,6 +136,297 @@ pub fn fill(dem: &Raster, z_limit: Option<f64>) -> Raster {
     out
 }
 
+#[derive(Debug, Clone)]
+pub struct DepressionPoint {
+    pub point_type: i32,
+    pub xy: [f64; 2],
+    pub elevation: f64,
+    pub edge_distance: f64,
+    pub point_distance: Option<f64>,
+}
+
+#[derive(Debug, Clone)]
+pub struct Depression {
+    pub count: usize,
+    pub min: f64,
+    pub max: f64,
+    pub mean: f64,
+    pub sum: f64,
+    pub area: f64,
+    pub volume: f64,
+    pub connection_distance: Option<f64>,
+    pub polygon: crate::conversion::RegionPolygon,
+    pub points: Vec<DepressionPoint>,
+}
+
+fn boundary_pass(
+    input: &[usize],
+    w: usize,
+    h: usize,
+    sizes: &[usize],
+    reverse: bool,
+) -> Vec<usize> {
+    let mut expanded = input.to_vec();
+    for y in 0..h {
+        for x in 0..w {
+            let i = y * w + x;
+            let mut best = input[i];
+            for yy in y.saturating_sub(1)..=(y + 1).min(h - 1) {
+                for xx in x.saturating_sub(1)..=(x + 1).min(w - 1) {
+                    let zone = input[yy * w + xx];
+                    let order = (sizes[zone], zone).cmp(&(sizes[best], best));
+                    if (!reverse && order.is_lt()) || (reverse && order.is_gt()) {
+                        best = zone;
+                    }
+                }
+            }
+            expanded[i] = best;
+        }
+    }
+    let mut out = expanded.clone();
+    for y in 0..h {
+        for x in 0..w {
+            let i = y * w + x;
+            let edge = x == 0 || y == 0 || x + 1 == w || y + 1 == h;
+            if !reverse && edge {
+                continue;
+            }
+            let mut same = reverse;
+            for yy in y.saturating_sub(1)..=(y + 1).min(h - 1) {
+                for xx in x.saturating_sub(1)..=(x + 1).min(w - 1) {
+                    if (xx, yy) == (x, y) {
+                        continue;
+                    }
+                    let equal = sizes[expanded[yy * w + xx]] == sizes[expanded[i]];
+                    if reverse {
+                        same &= equal;
+                    } else {
+                        same |= equal;
+                    }
+                }
+            }
+            out[i] = if same == reverse {
+                expanded[i]
+            } else {
+                input[i]
+            };
+        }
+    }
+    out
+}
+
+fn clean_depression_boundaries(
+    input: &[usize],
+    w: usize,
+    h: usize,
+    groups: &[usize],
+) -> Vec<usize> {
+    let mut sizes = vec![0; groups.len() + 1];
+    sizes[0] = input.iter().filter(|&&z| z == 0).count();
+    sizes[1..].copy_from_slice(groups);
+    boundary_pass(
+        &boundary_pass(input, w, h, &sizes, false),
+        w,
+        h,
+        &sizes,
+        true,
+    )
+}
+
+/// Locate Depressions on an aligned surface. Depths and the minimum area are in the surface's
+/// elevation and map units. `meters_per_z` converts the fixed 0.05 m identification depth.
+/// With a connection limit, only depressions with a lower cell no farther than that distance
+/// from a depression cell are returned.
+pub fn locate_depressions(
+    dem: &Raster,
+    min_depth: f64,
+    min_area: f64,
+    max_connection_distance: Option<f64>,
+    meters_per_z: f64,
+) -> Vec<Depression> {
+    let (w, h) = (dem.width, dem.height);
+    let filled = fill(dem, None);
+    let raised = |i: usize| {
+        value(dem, i).is_some() && filled.bands[0][i] - dem.bands[0][i] > 0.05 / meters_per_z
+    };
+    let mut label = vec![0; w * h];
+    let mut raw_groups: Vec<Vec<usize>> = Vec::new();
+    for start in 0..w * h {
+        if label[start] != 0 || !raised(start) {
+            continue;
+        }
+        let id = raw_groups.len() + 1;
+        let mut cells = vec![start];
+        label[start] = id;
+        let mut k = 0;
+        while k < cells.len() {
+            let i = cells[k];
+            k += 1;
+            for (_, j, _) in neighbors(dem, i) {
+                if label[j] == 0 && raised(j) {
+                    label[j] = id;
+                    cells.push(j);
+                }
+            }
+        }
+        raw_groups.push(cells);
+    }
+    let group_sizes: Vec<usize> = raw_groups.iter().map(Vec::len).collect();
+    let cleaned = clean_depression_boundaries(&label, w, h, &group_sizes);
+    let groups: Vec<Vec<usize>> = (1..=raw_groups.len())
+        .map(|id| {
+            (0..w * h)
+                .filter(|&i| cleaned[i] == id && value(dem, i).is_some())
+                .collect()
+        })
+        .filter(|cells: &Vec<usize>| !cells.is_empty())
+        .collect();
+    let label = cleaned;
+
+    let cell_area =
+        (dem.transform[1] * dem.transform[5] - dem.transform[2] * dem.transform[4]).abs();
+    let center = |i: usize| {
+        let c = (i % w) as f64 + 0.5;
+        let r = (i / w) as f64 + 0.5;
+        [
+            dem.transform[0] + dem.transform[1] * c + dem.transform[2] * r,
+            dem.transform[3] + dem.transform[4] * c + dem.transform[5] * r,
+        ]
+    };
+    let distance = |i: usize, j: usize| {
+        let (a, b) = (center(i), center(j));
+        (a[0] - b[0]).hypot(a[1] - b[1])
+    };
+    let mut retained = Vec::new();
+    for cells in groups {
+        let sum: f64 = cells.iter().map(|&i| dem.bands[0][i]).sum();
+        let min = cells
+            .iter()
+            .map(|&i| dem.bands[0][i])
+            .fold(f64::INFINITY, f64::min);
+        let max = cells
+            .iter()
+            .map(|&i| dem.bands[0][i])
+            .fold(f64::NEG_INFINITY, f64::max);
+        let depth = cells
+            .iter()
+            .map(|&i| filled.bands[0][i] - dem.bands[0][i])
+            .fold(0.0_f64, f64::max);
+        let area = cells.len() as f64 * cell_area;
+        if depth < min_depth || area < min_area {
+            continue;
+        }
+        let start = cells
+            .iter()
+            .copied()
+            .find(|&i| dem.bands[0][i] == min)
+            .expect("a depression has its minimum cell");
+        let edge_distance = cells
+            .iter()
+            .copied()
+            .filter(|&i| {
+                let (x, y) = (i % w, i / w);
+                (-1..=1).any(|dy| {
+                    (-1..=1).any(|dx| {
+                        if dx == 0 && dy == 0 {
+                            return false;
+                        }
+                        let (nx, ny) = (x as isize + dx, y as isize + dy);
+                        nx < 0
+                            || ny < 0
+                            || nx >= w as isize
+                            || ny >= h as isize
+                            || label[ny as usize * w + nx as usize] != label[i]
+                    })
+                })
+            })
+            .map(|i| distance(start, i))
+            .fold(f64::INFINITY, f64::min);
+        let connection = max_connection_distance.map(|limit| {
+            let mut best: Option<(f64, usize)> = None;
+            for (j, &zone) in label.iter().enumerate() {
+                if zone != 0 || value(dem, j).is_none_or(|z| z >= min) {
+                    continue;
+                }
+                for &i in &cells {
+                    let d = distance(i, j);
+                    if d <= limit && best.is_none_or(|(old, _)| d < old) {
+                        best = Some((d, j));
+                    }
+                }
+            }
+            best
+        });
+        if max_connection_distance.is_some() && connection == Some(None) {
+            continue;
+        }
+        let (connection_distance, end) = match connection.flatten() {
+            Some((d, j)) => (Some(d), Some(j)),
+            None => (None, None),
+        };
+        let volume = cells
+            .iter()
+            .map(|&i| (max - dem.bands[0][i]) * cell_area)
+            .sum();
+        let mut points = vec![DepressionPoint {
+            point_type: 0,
+            xy: center(start),
+            elevation: min,
+            edge_distance,
+            point_distance: end.map(|j| distance(start, j)),
+        }];
+        if let Some(j) = end {
+            points.push(DepressionPoint {
+                point_type: 1,
+                xy: center(j),
+                elevation: dem.bands[0][j],
+                edge_distance: connection_distance.expect("an endpoint has a distance"),
+                point_distance: Some(distance(start, j)),
+            });
+        }
+        retained.push((
+            cells,
+            min,
+            max,
+            sum,
+            area,
+            volume,
+            connection_distance,
+            points,
+        ));
+    }
+
+    let mut regions = dem.like(DataType::I32);
+    regions.nodata = Some(-1.0);
+    regions.bands[0].fill(-1.0);
+    for (id, (cells, ..)) in retained.iter().enumerate() {
+        for &i in cells {
+            regions.bands[0][i] = id as f64;
+        }
+    }
+    let polygons = crate::conversion::raster_to_polygons(&regions);
+    retained
+        .into_iter()
+        .zip(polygons)
+        .map(
+            |((cells, min, max, sum, area, volume, connection_distance, points), polygon)| {
+                Depression {
+                    count: cells.len(),
+                    min,
+                    max,
+                    mean: sum / cells.len() as f64,
+                    sum,
+                    area,
+                    volume,
+                    connection_distance,
+                    polygon,
+                    points,
+                }
+            },
+        )
+        .collect()
+}
+
 /// Picks one direction among tied steepest descents as ArcGIS does: of two, the
 /// larger code; of more, the middle one of the shortest arc covering them.
 fn pick(codes: &[u8]) -> u8 {
