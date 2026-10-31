@@ -10,6 +10,7 @@ manifest.json, which the Rust tests compare UniGIS against.
 """
 
 import json
+import re
 import shutil
 import sys
 import tempfile
@@ -945,6 +946,24 @@ CASES = {
     "gfd_geographic_force": ("gp.GeodesicFlowDirection_sa", [RASTER / "dem_geographic.tif"], ["FORCE"]),
     "gfd_projected": ("gp.GeodesicFlowDirection_sa", [RASTER / "dem.tif"], ["NORMAL"]),
     "gfd_hydro": ("gp.GeodesicFlowDirection_sa", [RASTER / "hydro.tif"], ["NORMAL"]),
+    "rc_times": ("gp.RasterCalculator_sa", [f'"{RASTER}/dem.tif" * 2'], []),
+    "rc_plus_float": ("gp.RasterCalculator_sa", [f'"{RASTER}/dem.tif" + 0.5'], []),
+    "rc_con": ("gp.RasterCalculator_sa", [f'Con("{RASTER}/dem.tif" > 200, 1, 0)'], []),
+    "rc_con_raster": ("gp.RasterCalculator_sa", [f'Con("{RASTER}/dem.tif" > 220, "{RASTER}/dem.tif", 0)'], []),
+    "rc_greater": ("gp.RasterCalculator_sa", [f'"{RASTER}/dem.tif" > 200'], []),
+    "rc_boolean": ("gp.RasterCalculator_sa", [f'("{RASTER}/dem.tif" > 200) & ("{RASTER}/dem.tif" < 250)'], []),
+    "rc_precedence": ("gp.RasterCalculator_sa", [f'"{RASTER}/dem.tif" - 2 * 3 ** 2'], []),
+    "rc_negate_abs": ("gp.RasterCalculator_sa", [f'Abs(-"{RASTER}/dem.tif" + 230)'], []),
+    "rc_setnull": ("gp.RasterCalculator_sa", [f'SetNull("{RASTER}/dem_nodata.tif" < 210, "{RASTER}/dem_nodata.tif")'], []),
+    "rc_isnull": ("gp.RasterCalculator_sa", [f'IsNull("{RASTER}/dem_nodata.tif")'], []),
+    "rc_int_divide": ("gp.RasterCalculator_sa", [f'Int("{RASTER}/dem.tif") / 3'], []),
+    "rc_divide_fn": ("gp.RasterCalculator_sa", [f'Divide("{RASTER}/dem_int16_packbits.tif", 7)'], []),
+    "rc_int_true_divide": ("gp.RasterCalculator_sa", [f'"{RASTER}/dem_int16_packbits.tif" / 7'], []),
+    "rc_float_int": ("gp.RasterCalculator_sa", [f'Float("{RASTER}/dem_int16_packbits.tif") / 7'], []),
+    "rc_sqrt_log": ("gp.RasterCalculator_sa", [f'SquareRoot("{RASTER}/dem.tif") + Ln("{RASTER}/dem.tif")'], []),
+    "rc_mod_power": ("gp.RasterCalculator_sa", [f'("{RASTER}/dem_int16_packbits.tif" % 7) ** 2'], []),
+    "rc_raster_fn": ("gp.RasterCalculator_sa", [f'Raster(r"{RASTER}/dem.tif") * Raster(r"{RASTER}/hydro.tif")'], []),
+    "rc_not": ("gp.RasterCalculator_sa", [f'~("{RASTER}/dem.tif" > 210)'], []),
     "msp_dem": ("gp.MultiscaleSurfacePercentile_sa", [RASTER / "dem.tif"], [OUT / "msp_dem_scale.tif", "CELLS", None, None, None, None, "CPU_ONLY"]),
     "msp_dem_nonlinear": ("gp.MultiscaleSurfacePercentile_sa", [RASTER / "dem.tif"], [OUT / "msp_dem_nonlinear_scale.tif", "CELLS", 2, 20, 1, 1.5, "CPU_ONLY"]),
     "msp_dem_meters": ("gp.MultiscaleSurfacePercentile_sa", [RASTER / "dem.tif"], [OUT / "msp_dem_meters_scale.tif", "METERS", 25, 95, 15, 1, "CPU_ONLY"]),
@@ -2426,6 +2445,7 @@ RUN = {
     "gp.GeodesicFlowDirection_sa": ("geodesic_flow_direction", ["input", "output", "force_flow"]),
     # The geomorphons raster (second output) is compared by second_raster_outputs_match_arcgis.
     # The scale raster (second output) is compared by second_raster_outputs_match_arcgis.
+    "gp.RasterCalculator_sa": ("raster_calculator", ["expression", "output"]),
     "gp.MultiscaleSurfacePercentile_sa": ("multiscale_surface_percentile", ["input", "output", None, "distance_units", "min_scale", "max_scale", "base_increment", "nonlinearity", "analysis_target_device"]),
     "gp.MultiscaleSurfaceDifference_sa": ("multiscale_surface_difference", ["input", "output", None, "distance_units", "min_scale", "max_scale", "increment", "analysis_target_device"]),
     "gp.MultiscaleSurfaceDeviation_sa": ("multiscale_surface_deviation", ["input", "output", None, "distance_units", "min_scale", "max_scale", "base_increment", "nonlinearity", "analysis_target_device"]),
@@ -2576,7 +2596,7 @@ def run_spec(tool, args):
 
 
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
-RASTER_OUT = {"gp.MultiscaleSurfacePercentile_sa", "gp.MultiscaleSurfaceDifference_sa", "gp.MultiscaleSurfaceDeviation_sa", "gp.GeomorphonLandforms_sa", "gp.GeodesicFlowDirection_sa", "gp.FlowDistance_sa", "gp.ZonalGeometry_sa", "gp.ZonalFill_sa", "gp.RescaleByFunction_sa", "gp.CreateRandomRaster_sa", "gp.CreateNormalRaster_sa", "gp.CreateBinaryMask_ia", "gp.ComputeChangeRaster_ia", "gp.Diff_ia", "gp.Over_ia", "gp.LineStatistics_sa", "gp.PointStatistics_sa", "gp.SnapPourPoint_sa", "gp.FocalFlow_sa", "gp.DistanceAccumulation_sa", "gp.DistanceAllocation_sa", "gp.EucBackDirection_sa", "gp.EqualToFrequency_sa", "gp.GreaterThanFrequency_sa", "gp.LessThanFrequency_sa", "conversion.ASCIIToRaster", "conversion.FloatToRaster", "conversion.MultipatchToRaster", "management.CompositeBands", "gp.CreateConstantRaster_sa", "gp.InList_sa", "gp.LowestPosition_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
+RASTER_OUT = {"gp.RasterCalculator_sa", "gp.MultiscaleSurfacePercentile_sa", "gp.MultiscaleSurfaceDifference_sa", "gp.MultiscaleSurfaceDeviation_sa", "gp.GeomorphonLandforms_sa", "gp.GeodesicFlowDirection_sa", "gp.FlowDistance_sa", "gp.ZonalGeometry_sa", "gp.ZonalFill_sa", "gp.RescaleByFunction_sa", "gp.CreateRandomRaster_sa", "gp.CreateNormalRaster_sa", "gp.CreateBinaryMask_ia", "gp.ComputeChangeRaster_ia", "gp.Diff_ia", "gp.Over_ia", "gp.LineStatistics_sa", "gp.PointStatistics_sa", "gp.SnapPourPoint_sa", "gp.FocalFlow_sa", "gp.DistanceAccumulation_sa", "gp.DistanceAllocation_sa", "gp.EucBackDirection_sa", "gp.EqualToFrequency_sa", "gp.GreaterThanFrequency_sa", "gp.LessThanFrequency_sa", "conversion.ASCIIToRaster", "conversion.FloatToRaster", "conversion.MultipatchToRaster", "management.CompositeBands", "gp.CreateConstantRaster_sa", "gp.InList_sa", "gp.LowestPosition_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
               "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa",
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",
@@ -3132,6 +3152,10 @@ def main():
             args = [str(before[0]), [[str(x) for x in entry] for entry in before[1]], str(out)] + after
         else:
             args = [str(a) for a in before] + [str(out)] + [str(a) if isinstance(a, Path) else a for a in after]
+        if tool == "gp.RasterCalculator_sa":
+            # Raster paths inside the expression: ArcGIS needs them as Wine paths (the manifest
+            # keeps them relative to the repository).
+            args[0] = re.sub(re.escape(str(ROOT)) + r"/[^\"']+", lambda m: win(m.group(0)), args[0])
         if tool in MEMORY_OUT:
             # These tools write only to a geodatabase or memory: run into memory, then copy.
             mem = f"memory/{name}"

@@ -329,6 +329,14 @@ fn distance_unit_metres(units: &str) -> Result<Option<f64>> {
     })
 }
 
+fn raster_calculator(ctx: &dyn Context) -> Result<Output> {
+    let expression = ctx.get("expression").ok_or_else(|| {
+        Error::Unsupported("ERROR 000735: Map Algebra expression: value is required".into())
+    })?;
+    let raster = crate::calculator::raster_calculator(&expression, &|path| ctx.raster_at(path))?;
+    with_statistics(raster, true)
+}
+
 fn multiscale_surface_deviation(ctx: &dyn Context) -> Result<Output> {
     multiscale_surface(ctx, "multiscale_surface_deviation", "base_increment", true)
 }
@@ -2839,6 +2847,19 @@ pub static TOOLS: &[Tool] = &[
             ),
         ],
         run: multiscale_surface_deviation,
+    },
+    Tool {
+        id: "raster_calculator",
+        name: "Raster Calculator",
+        summary: "Evaluates one map algebra expression (Python syntax, quoted raster paths).",
+        params: &[Param {
+            name: "expression",
+            label: "Map Algebra expression",
+            kind: Kind::Text,
+            required: true,
+            default: "",
+        }],
+        run: raster_calculator,
     },
     Tool {
         id: "multiscale_surface_percentile",

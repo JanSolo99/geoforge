@@ -896,6 +896,11 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
   square neighbourhood (cell included, NoData skipped) strictly lower than the cell, at the
   scale farthest from 50 (first on ties); Deviation's scale sequence; optional scale raster.
   6 ArcGIS `msp_*` references, both outputs cell for cell.
+- [x] Raster Calculator (`raster_calculator`, `expression=`): Python-syntax map algebra with
+  quoted raster paths / `Raster()`; operators with Python precedence mapped to the local tools
+  (`/` true division → float for integers, `%` Mod, `**` Power, comparisons, `& | ^ ~`, shifts,
+  unary −) and the local functions by arcpy name (Con, SetNull, IsNull, Int, Float, math,
+  trigonometric, Boolean and comparison functions). 18 ArcGIS `rc_*` references.
 - [x] Contour List (`contour_list`): Contour's tracing at listed values (`a;b;c`; duplicates once,
   out-of-range values give nothing; Id/Contour fields, value-descending order). 3 ArcGIS `cl_*`
   references. contour_type (polygons) not supported.

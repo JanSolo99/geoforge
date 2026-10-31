@@ -108279,6 +108279,330 @@
           "analysis_target_device": "CPU_ONLY"
         }
       }
+    },
+    "rc_times": {
+      "tool": "gp.RasterCalculator_sa",
+      "args": [
+        "\"testdata/raster/dem.tif\" * 2",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_calculator",
+        "params": {
+          "expression": "\"testdata/raster/dem.tif\" * 2",
+          "output": "<out>"
+        }
+      }
+    },
+    "rc_plus_float": {
+      "tool": "gp.RasterCalculator_sa",
+      "args": [
+        "\"testdata/raster/dem.tif\" + 0.5",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_calculator",
+        "params": {
+          "expression": "\"testdata/raster/dem.tif\" + 0.5",
+          "output": "<out>"
+        }
+      }
+    },
+    "rc_con": {
+      "tool": "gp.RasterCalculator_sa",
+      "args": [
+        "Con(\"testdata/raster/dem.tif\" > 200, 1, 0)",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_calculator",
+        "params": {
+          "expression": "Con(\"testdata/raster/dem.tif\" > 200, 1, 0)",
+          "output": "<out>"
+        }
+      }
+    },
+    "rc_con_raster": {
+      "tool": "gp.RasterCalculator_sa",
+      "args": [
+        "Con(\"testdata/raster/dem.tif\" > 220, \"testdata/raster/dem.tif\", 0)",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_calculator",
+        "params": {
+          "expression": "Con(\"testdata/raster/dem.tif\" > 220, \"testdata/raster/dem.tif\", 0)",
+          "output": "<out>"
+        }
+      }
+    },
+    "rc_greater": {
+      "tool": "gp.RasterCalculator_sa",
+      "args": [
+        "\"testdata/raster/dem.tif\" > 200",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_calculator",
+        "params": {
+          "expression": "\"testdata/raster/dem.tif\" > 200",
+          "output": "<out>"
+        }
+      }
+    },
+    "rc_boolean": {
+      "tool": "gp.RasterCalculator_sa",
+      "args": [
+        "(\"testdata/raster/dem.tif\" > 200) & (\"testdata/raster/dem.tif\" < 250)",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_calculator",
+        "params": {
+          "expression": "(\"testdata/raster/dem.tif\" > 200) & (\"testdata/raster/dem.tif\" < 250)",
+          "output": "<out>"
+        }
+      }
+    },
+    "rc_precedence": {
+      "tool": "gp.RasterCalculator_sa",
+      "args": [
+        "\"testdata/raster/dem.tif\" - 2 * 3 ** 2",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_calculator",
+        "params": {
+          "expression": "\"testdata/raster/dem.tif\" - 2 * 3 ** 2",
+          "output": "<out>"
+        }
+      }
+    },
+    "rc_negate_abs": {
+      "tool": "gp.RasterCalculator_sa",
+      "args": [
+        "Abs(-\"testdata/raster/dem.tif\" + 230)",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_calculator",
+        "params": {
+          "expression": "Abs(-\"testdata/raster/dem.tif\" + 230)",
+          "output": "<out>"
+        }
+      }
+    },
+    "rc_setnull": {
+      "tool": "gp.RasterCalculator_sa",
+      "args": [
+        "SetNull(\"testdata/raster/dem_nodata.tif\" < 210, \"testdata/raster/dem_nodata.tif\")",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_calculator",
+        "params": {
+          "expression": "SetNull(\"testdata/raster/dem_nodata.tif\" < 210, \"testdata/raster/dem_nodata.tif\")",
+          "output": "<out>"
+        }
+      }
+    },
+    "rc_isnull": {
+      "tool": "gp.RasterCalculator_sa",
+      "args": [
+        "IsNull(\"testdata/raster/dem_nodata.tif\")",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_calculator",
+        "params": {
+          "expression": "IsNull(\"testdata/raster/dem_nodata.tif\")",
+          "output": "<out>"
+        }
+      }
+    },
+    "rc_int_divide": {
+      "tool": "gp.RasterCalculator_sa",
+      "args": [
+        "Int(\"testdata/raster/dem.tif\") / 3",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_calculator",
+        "params": {
+          "expression": "Int(\"testdata/raster/dem.tif\") / 3",
+          "output": "<out>"
+        }
+      }
+    },
+    "rc_float_int": {
+      "tool": "gp.RasterCalculator_sa",
+      "args": [
+        "Float(\"testdata/raster/dem_int16_packbits.tif\") / 7",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_calculator",
+        "params": {
+          "expression": "Float(\"testdata/raster/dem_int16_packbits.tif\") / 7",
+          "output": "<out>"
+        }
+      }
+    },
+    "rc_sqrt_log": {
+      "tool": "gp.RasterCalculator_sa",
+      "args": [
+        "SquareRoot(\"testdata/raster/dem.tif\") + Ln(\"testdata/raster/dem.tif\")",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_calculator",
+        "params": {
+          "expression": "SquareRoot(\"testdata/raster/dem.tif\") + Ln(\"testdata/raster/dem.tif\")",
+          "output": "<out>"
+        }
+      }
+    },
+    "rc_mod_power": {
+      "tool": "gp.RasterCalculator_sa",
+      "args": [
+        "(\"testdata/raster/dem_int16_packbits.tif\" % 7) ** 2",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_calculator",
+        "params": {
+          "expression": "(\"testdata/raster/dem_int16_packbits.tif\" % 7) ** 2",
+          "output": "<out>"
+        }
+      }
+    },
+    "rc_raster_fn": {
+      "tool": "gp.RasterCalculator_sa",
+      "args": [
+        "Raster(r\"testdata/raster/dem.tif\") * Raster(r\"testdata/raster/hydro.tif\")",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_calculator",
+        "params": {
+          "expression": "Raster(r\"testdata/raster/dem.tif\") * Raster(r\"testdata/raster/hydro.tif\")",
+          "output": "<out>"
+        }
+      }
+    },
+    "rc_not": {
+      "tool": "gp.RasterCalculator_sa",
+      "args": [
+        "~(\"testdata/raster/dem.tif\" > 210)",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_calculator",
+        "params": {
+          "expression": "~(\"testdata/raster/dem.tif\" > 210)",
+          "output": "<out>"
+        }
+      }
+    },
+    "rc_divide_fn": {
+      "tool": "gp.RasterCalculator_sa",
+      "args": [
+        "Divide(\"testdata/raster/dem_int16_packbits.tif\", 7)",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_calculator",
+        "params": {
+          "expression": "Divide(\"testdata/raster/dem_int16_packbits.tif\", 7)",
+          "output": "<out>"
+        }
+      }
+    },
+    "rc_int_true_divide": {
+      "tool": "gp.RasterCalculator_sa",
+      "args": [
+        "\"testdata/raster/dem_int16_packbits.tif\" / 7",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "raster_calculator",
+        "params": {
+          "expression": "\"testdata/raster/dem_int16_packbits.tif\" / 7",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

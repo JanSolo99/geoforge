@@ -203,6 +203,14 @@ Only one ArcGIS worker can run in the Wine prefix at a time; the MCP bridge reco
   via `multiscale_surface`; 6 `msp_*` references exact. Rule: 100·#(v < z)/n, n includes the
   cell; the scale with the largest |p − 50| (strictly greater replaces).
 
+## Queue: Raster Calculator — landed
+
+- `calculator.rs`: tokenizer + Python-precedence parser evaluating through `local::*`
+  (registry `raster_calculator`, param `expression`). The reference generator rewrites absolute
+  repo paths inside the expression to Wine paths (manifest keeps them relative). Findings:
+  `/` is true division (integer rasters → F32), the Divide function keeps integer division;
+  arcpy has no `Sqrt` (use SquareRoot). Intermediate types match the per-tool rules.
+
 ## Pitfall: ArcGIS sidecars in testdata
 
 Running ArcGIS on fixture rasters can leave untracked `testdata/raster/*.aux.xml` / `*.vat.dbf`

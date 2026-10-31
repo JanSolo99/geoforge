@@ -6,6 +6,7 @@
 //! the NoData value and the coordinate system code.
 
 pub mod blockops;
+pub mod calculator;
 pub mod composite;
 pub mod contour;
 pub mod conversion;
