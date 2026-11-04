@@ -18,7 +18,7 @@ if [ ! -d "$dest/gdal-autotest" ] || [ ! -d "$dest/filegdb" ] ||
     git -C "$tmp" init --quiet
     git -C "$tmp" remote add origin https://github.com/OSGeo/gdal.git
     git -C "$tmp" sparse-checkout init --cone
-    git -C "$tmp" fetch --quiet --depth 1 origin "$gdal_revision"
+    git -C "$tmp" fetch --quiet --depth 1 --filter=blob:none origin "$gdal_revision"
     git -C "$tmp" checkout --quiet --detach FETCH_HEAD
     git -C "$tmp" sparse-checkout set autotest/ogr/data/shp autotest/ogr/data/filegdb autotest/ogr/data/openfilegdb
     mkdir -p "$tmp/corpus"
