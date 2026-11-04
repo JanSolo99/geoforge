@@ -40,8 +40,14 @@ fi
 
 # Natural Earth admin-0 countries: real-world polygons with a .cpg.
 if [ ! -d "$dest/natural-earth" ]; then
-    mkdir -p "$dest/natural-earth"
-    curl -fsSL -o "$dest/ne.zip" https://naciscdn.org/naturalearth/110m/cultural/ne_110m_admin_0_countries.zip
-    (cd "$dest/natural-earth" && unzip -q ../ne.zip) && rm "$dest/ne.zip"
+    # Build in a temporary folder so a failed download leaves nothing behind and the next run retries.
+    ne=$(mktemp -d)
+    trap 'rm -rf "$ne"' EXIT
+    curl -fsSL -o "$ne/ne.zip" https://naciscdn.org/naturalearth/110m/cultural/ne_110m_admin_0_countries.zip
+    mkdir "$ne/data"
+    unzip -q "$ne/ne.zip" -d "$ne/data"
+    mv "$ne/data" "$dest/natural-earth"
+    rm -rf "$ne"
+    trap - EXIT
 fi
 echo "testdata ready in $dest"
