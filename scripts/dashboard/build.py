@@ -12,6 +12,7 @@ commit. ArcGIS's tool list (docs/dashboard/arcgis_tools.json) comes from arcpy.L
 the bridge (scripts/dashboard/list_arcgis_tools.py); without it the page lists only our tools.
 """
 import datetime
+import csv
 import html
 import json
 import re
@@ -57,6 +58,13 @@ def implemented() -> dict[str, str]:
             if decl:
                 for name in tool_names(decl.group(1)):
                     found.setdefault(norm(name), kind)
+            # Schema/admin tools use a macro to declare the registered constant.
+            # Match that exact constant, never every declaration in its module.
+            macro = re.search(
+                rf'\btool!\(\s*{re.escape(constant)}\s*,\s*"[^"]+"\s*,\s*"([^"]+)"', source
+            )
+            if macro:
+                found.setdefault(norm(macro.group(1)), kind)
     cli = read(ROOT / "crates/unigis-cli/src/main.rs")
     block = cli[cli.find("enum Tool {"):]
     block = block[: block.find("\n}\n")]
@@ -81,11 +89,25 @@ def verified(manifest: dict) -> dict[str, int]:
     return dict(count)
 
 
-def coverage_status(name: str, have: dict, references: dict) -> str:
-    key = norm(name)
-    if key not in have:
+def inventory() -> dict:
+    """Shared official API-name/display-title mapping for the queue and dashboard."""
+    rows = {}
+    for path in sorted((ROOT / "docs/arcgis-inventory").glob("*.csv")):
+        with path.open(newline="") as stream:
+            for row in csv.DictReader(stream):
+                parts = (row.get("arcpy_name") or "").split(".")
+                if not parts[-1]:
+                    continue
+                rows.setdefault((parts[-2] if len(parts) > 2 else "", norm(parts[-1])), row)
+                rows.setdefault(("", norm(parts[-1])), row)
+    return rows
+
+
+def coverage_status(name: str, have: dict, references: dict, title: str = "") -> str:
+    keys = {norm(name), norm(title)} - {""}
+    if not keys.intersection(have):
         return "missing"
-    return "verified" if key in references else "implemented"
+    return "verified" if keys.intersection(references) else "implemented"
 
 
 def git(*args: str) -> str:
@@ -162,11 +184,13 @@ def main() -> None:
     manifest = json.loads(read(ROOT / "testdata/arcgis-reference/manifest.json") or "{}")
     have = implemented()
     ref = verified(manifest)
+    meta = inventory()
 
     rows = []  # (toolbox, name, status)
     for tbx, names in sorted(arc.get("by_toolbox", {}).items()):
         for name in names:
-            status = coverage_status(name, have, ref)
+            item = meta.get((tbx, norm(name))) or meta.get(("", norm(name))) or {}
+            status = coverage_status(name, have, ref, item.get("tool") or "")
             rows.append((tbx, name, status))
     total = len(rows)
     by_status = Counter(r[2] for r in rows)

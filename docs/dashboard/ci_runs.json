@@ -1,61 +1,61 @@
 {
-  "fetched": "2026-10-28T18:29:28+00:00",
+  "fetched": "2026-11-04T21:49:49.432Z",
   "runs": [
     {
+      "status": "completed",
       "conclusion": "failure",
-      "createdAt": "2026-10-28T18:13:20Z",
-      "displayTitle": "Plan cached unary types across bands and match GP overflow statistics",
-      "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40743062723"
+      "displayTitle": "Add Delete Mosaic Dataset (mosaic item + AMD_ tables); gdb scenarios …",
+      "createdAt": "2026-10-31T09:45:00Z",
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/41189945976"
     },
     {
+      "status": "completed",
       "conclusion": "failure",
-      "createdAt": "2026-10-28T17:22:47Z",
-      "displayTitle": "Support floating multiband square root logarithm and exponential",
-      "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40735144822"
+      "displayTitle": "Add Delete Colormap",
+      "createdAt": "2026-10-31T09:34:21Z",
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/41189239947"
     },
     {
-      "conclusion": "success",
-      "createdAt": "2026-10-28T17:06:09Z",
-      "displayTitle": "Refuse unsupported multiband unary requests before writing output",
       "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40732452475"
+      "conclusion": "cancelled",
+      "displayTitle": "Add Add Colormap (embedded TIFF palette or .clr sidecar); read palett…",
+      "createdAt": "2026-10-31T09:26:09Z",
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/41188683458"
     },
     {
-      "conclusion": "success",
-      "createdAt": "2026-10-28T16:51:34Z",
-      "displayTitle": "Preserve every band in uncached integer unary math",
       "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40730089604"
+      "conclusion": "failure",
+      "displayTitle": "Add Visibility (Viewshed / Observer Points with NoData option)",
+      "createdAt": "2026-10-31T09:13:51Z",
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/41187835842"
     },
     {
-      "conclusion": "success",
-      "createdAt": "2026-10-28T16:36:23Z",
-      "displayTitle": "Honor tessellation area units and preserve foot CRS precision",
       "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40727613355"
+      "conclusion": "cancelled",
+      "displayTitle": "Add Geodesic Viewshed (Viewshed2; ground kernel fitted, ~0.5-1% of ce…",
+      "createdAt": "2026-10-31T09:05:15Z",
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/41187220807"
     },
     {
-      "conclusion": "success",
-      "createdAt": "2026-10-28T15:53:49Z",
-      "displayTitle": "Add transverse hexagons to Generate Tessellation",
       "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40720573216"
+      "conclusion": "failure",
+      "displayTitle": "Add Observer Points",
+      "createdAt": "2026-10-31T08:45:13Z",
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/41185872569"
     },
     {
-      "conclusion": "success",
-      "createdAt": "2026-10-28T15:33:09Z",
-      "displayTitle": "Preserve floating raster bands and require complete cached extrema",
       "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40717108087"
+      "conclusion": "cancelled",
+      "displayTitle": "Add Validate Flow Direction (D8 loops)",
+      "createdAt": "2026-10-31T08:37:16Z",
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/41185352308"
     },
     {
-      "conclusion": "success",
-      "createdAt": "2026-10-28T15:12:26Z",
-      "displayTitle": "Generate Tessellation: triangle cells",
       "status": "completed",
-      "url": "https://github.com/JanSolo99/geoforge/actions/runs/40713587322"
+      "conclusion": "cancelled",
+      "displayTitle": "Add Surface Area Ratio (Jenness area; ARC_CHORD approximate)",
+      "createdAt": "2026-10-31T08:29:02Z",
+      "url": "https://github.com/JanSolo99/geoforge/actions/runs/41184781655"
     }
   ]
 }

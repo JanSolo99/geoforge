@@ -25,7 +25,7 @@ and verified against GDAL/OGR output on real data.
 
 ## Phase 0 — Foundations
 - [x] Cargo workspace, crate layout
-- [x] CI gate (fmt, clippy, test) runs locally: `scripts/check` via the pre-push hook; the GitHub workflows are manual-only (no Actions minutes)
+- [x] CI gate (fmt, clippy, test) runs locally via `scripts/check` and on pull requests/main; web publishing requires the engine and browser workflow gates (see `READINESS.md`)
 - [x] Test-data corpus: `testdata/shp` (committed, `scripts/make-testdata.sh`) + `testdata/large` (`scripts/fetch-testdata.sh`)
 - [x] `unigis-testkit`: oracle tests comparing our reads with `ogrinfo` (JSON attributes + ISO WKT geometry)
 

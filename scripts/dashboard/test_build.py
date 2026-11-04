@@ -12,6 +12,23 @@ spec.loader.exec_module(dashboard)
 
 
 class CoverageTests(unittest.TestCase):
+    def test_registered_macro_tools_are_discovered_without_private_tools(self):
+        with tempfile.TemporaryDirectory() as root:
+            src = Path(root) / "crates/unigis-tools/src"
+            src.mkdir(parents=True)
+            (src / "registry.rs").write_text("pub static TOOLS: &[Tool] = &[crate::schema::DELETE_MOSAIC,];")
+            (src / "schema.rs").write_text('''
+tool!(
+    DELETE_MOSAIC,
+    "delete_mosaic_dataset",
+    "Delete Mosaic Dataset",
+    "Raster", "description", Runner::Report(run), []
+);
+tool!(PRIVATE_TOOL, "private", "Private Tool", "Raster", "", Runner::Report(run), []);
+''')
+            with patch.object(dashboard, "ROOT", Path(root)):
+                self.assertEqual(dashboard.implemented(), {"deletemosaicdataset": "tools registry"})
+
     def test_parameters_are_not_tools(self):
         source = '''Tool {
             id: "pick", name: "Pick",
@@ -42,6 +59,12 @@ pub const PRIVATE_TOOL: Tool = Tool {
         self.assertEqual(dashboard.coverage_status("Unfinished", {}, {"unfinished": 3}), "missing")
         self.assertEqual(dashboard.coverage_status("Finished", {"finished": "registry"}, {}), "implemented")
         self.assertEqual(dashboard.coverage_status("Finished", {"finished": "registry"}, {"finished": 2}), "verified")
+
+    def test_official_title_matches_api_name_without_inflating_reference_only_tools(self):
+        self.assertEqual(dashboard.coverage_status("Viewshed2", {"geodesicviewshed": "registry"},
+                                                   {"viewshed2": 2}, "Geodesic Viewshed"), "verified")
+        self.assertEqual(dashboard.coverage_status("Viewshed2", {}, {"viewshed2": 2},
+                                                   "Geodesic Viewshed"), "missing")
 
     def test_only_successful_reference_cases_count(self):
         manifest = {"cases": {

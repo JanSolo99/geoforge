@@ -46,6 +46,26 @@ fn gdal_oids_unreliable(gdb: &Path) -> bool {
     gdb.ends_with("objectid64/with_holes_8.gdb")
 }
 
+fn non_editable_defaults(gdb: &Path, name: &str) -> bool {
+    gdb.ends_with("openfilegdb_nonEditable_default.gdb") && name == "test"
+}
+
+// GDAL fixed this reader bug in 3.14 development, commit 2c7893c6203c
+// (OSGeo/gdal#15385). Keep testing our reader even when the oracle is too old.
+fn assert_non_editable_defaults(table: &Table) {
+    let names: Vec<_> = table.fields().iter().map(|f| f.name.as_str()).collect();
+    assert_eq!(names, ["ASSOCIATIONSTATUS", "ISSUBNETWORKCONTROLLER"]);
+    let rows: Vec<_> = table.features().map(|f| f.unwrap().attributes).collect();
+    assert_eq!(
+        rows,
+        vec![
+            vec![Value::SmallInteger(1), Value::SmallInteger(0)],
+            vec![Value::SmallInteger(2), Value::SmallInteger(1)],
+            vec![Value::SmallInteger(3), Value::SmallInteger(0)],
+        ]
+    );
+}
+
 fn diff_table(gdb: &Path, name: &str, table: &Table) -> Result<Vec<String>, String> {
     let gdal = ogr_layer(gdb, Some(name))?;
     let names: Vec<&str> = table.fields().iter().map(|f| f.name.as_str()).collect();
@@ -120,7 +140,8 @@ fn filegdb_matches_gdal() {
     let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../testdata/large/filegdb");
     let gdbs = geodatabases(&root);
     // ArcGIS Pro 3.2 tables (64-bit OIDs, new field types) need GDAL >= 3.9.
-    let gdal_reads_pro_3_2 = gdal_version().is_some_and(|v| v >= (3, 9));
+    let version = gdal_version();
+    let gdal_reads_pro_3_2 = version.is_some_and(|v| v >= (3, 9));
     let (mut tables, mut failures) = (0, 0);
     for path in &gdbs {
         let label = path
@@ -161,7 +182,19 @@ fn filegdb_matches_gdal() {
                     );
                     continue;
                 }
-                Ok(t) => diff_table(path, &entry.name, &t).unwrap_or_else(|e| vec![e]),
+                Ok(t) => {
+                    if non_editable_defaults(path, &entry.name) {
+                        assert_non_editable_defaults(&t);
+                        if version.is_some_and(|v| v < (3, 14)) {
+                            eprintln!(
+                                "~ {label} / {}: native rows checked; GDAL comparison needs 3.14 (OSGeo/gdal#15385)",
+                                entry.name
+                            );
+                            continue;
+                        }
+                    }
+                    diff_table(path, &entry.name, &t).unwrap_or_else(|e| vec![e])
+                }
                 Err(e) => vec![format!("cannot open: {e}")],
             };
             // GDAL before 3.9 reads some newer tables (the utility network ones) as
