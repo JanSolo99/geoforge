@@ -6,3 +6,5 @@
 .docs-cache/
 __pycache__/
 *.sr.lock
+/scripts/readiness/node_modules/
+/dist/

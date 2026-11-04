@@ -15,13 +15,18 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  verify:
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
   deploy:
+    needs: verify
     runs-on: ubuntu-latest
     timeout-minutes: 60
     # Needs the repository secrets NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID (see docs/WEB.md).
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@1.99.1
         with:
           targets: wasm32-unknown-unknown
       - uses: Swatinem/rust-cache@v2
@@ -36,6 +41,25 @@ jobs:
           echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
       - name: Build the web app
         run: scripts/build-web.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: scripts/readiness/package-lock.json
+      - name: Install browser test dependencies
+        working-directory: scripts/readiness
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Browser workflow gate
+        run: node scripts/readiness/browser.cjs --dist app/dist/web --report browser-readiness.json --screenshot browser-readiness.png
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-readiness
+          path: |
+            browser-readiness.json
+            browser-readiness.png
       - name: Publish the built site to the web-dist branch
         if: github.ref == 'refs/heads/main'
         run: |

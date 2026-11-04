@@ -1,0 +1,29 @@
+name: Build tested CLI alpha
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    uses: ./.github/workflows/ci.yml
+  package:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.99.1
+      - uses: Swatinem/rust-cache@v2
+      - run: sudo apt-get update && sudo apt-get install -y gdal-bin libsqlite3-dev sqlite3 cmake
+      - run: cargo build --locked --release -j3 -p unigis-cli
+      - run: python3 scripts/readiness/smoke.py --ug target/release/ug --report "$RUNNER_TEMP/cli-readiness.json"
+      - name: Package tested binary
+        run: python3 scripts/readiness/package.py --ug target/release/ug --report "$RUNNER_TEMP/cli-readiness.json" --output "$RUNNER_TEMP/dist"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: unigis-cli-alpha-linux-x86_64
+          path: ${{ runner.temp }}/dist/*
+          if-no-files-found: error

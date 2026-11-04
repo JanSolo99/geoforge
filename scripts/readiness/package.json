@@ -1,0 +1,7 @@
+{
+  "name": "unigis-readiness",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Browser release smoke checks (test dependencies only)",
+  "devDependencies": { "playwright": "1.56.1" }
+}

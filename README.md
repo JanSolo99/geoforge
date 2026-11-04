@@ -4,7 +4,9 @@ A native-Linux GIS platform written in Rust, aiming for parity with ArcGIS Pro:
 read/write File Geodatabases, Shapefiles and rasters, and run the standard
 ArcToolbox-style analysis on them.
 
-Status: **pre-alpha scaffold.** See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the
+Status: **experimental GIS with automated alpha workflow checks; incomplete ArcGIS parity.**
+See [`docs/READINESS.md`](docs/READINESS.md) for the tested workflow scope and
+[`docs/ALPHA.md`](docs/ALPHA.md) for CLI packaging. See [`docs/ROADMAP.md`](docs/ROADMAP.md) for the
 phased plan and [`docs/SPEC.md`](docs/SPEC.md) for the full target scope.
 
 ## The app
@@ -45,7 +47,8 @@ cargo build --workspace
 cargo test --workspace
 ```
 
-Requires Rust ≥ 1.85. Tests use GDAL's `ogrinfo` as an oracle when it is installed;
+Requires Rust ≥ 1.88; `rust-toolchain.toml` pins the validated development toolchain.
+Tests use GDAL's `ogrinfo` as an oracle when it is installed;
 run `scripts/fetch-testdata.sh` for the larger third-party corpora.
 
 ```sh

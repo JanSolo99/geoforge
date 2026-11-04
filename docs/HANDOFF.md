@@ -1,43 +1,63 @@
 # Current handoff
 
-Updated 2026-10-30T13:27:54+11:00; last agent Kimi.
-Workspace `/mnt/media/ArcGIS_Linux`, main, HEAD a4641b5 (unrelated coordinator/lane landings
-advanced main during this work; preserve them).
-User objective: finish the current queue tool, then build the next eligible tool under the queue
-rules (ArcGIS references, full gate, scoped commit/push).
+Updated 2026-11-04; last agent Codex.
+Workspace `/workspace/geoforge`, branch `codex/readiness-alpha`, base HEAD `4aa5e99`.
+This is a separate cloud checkout, not `/mnt/media/ArcGIS_Linux`. It began clean.
+No local edits from the original workstation were accessed or transferred.
 
-## GPX To Features and Multipatch To Raster — landed
+## Objective
 
-- `750e91e` (GPX To Features) and `ad32173` (Multipatch To Raster) are pushed on main. Both passed
-  their ArcGIS comparators, full `scripts/check` and pre-push gates. MPR push verification was
-  `HEAD...@{upstream}` = `0 0`; log `/tmp/unigis-mpr-push.log`.
-- MPR has three matching ArcGIS Pro 3.7 references. Its standalone generator timed out starting a
-  second worker; the healthy MCP bridge generated the final references directly. Do not claim the
-  standalone generator or `--annotate` succeeded.
+User requested the readiness milestone: fix CI, automate representative workflows,
+report interface-specific coverage, and package a tested CLI alpha. Work is scoped
+to readiness, not the next geoprocessing queue item.
 
-## Raster To Other Format — validated, commit/push pending
+## Completed and validated
 
-- Deferred `conversion.RasterToGeodatabase` in `docs/WORK_QUEUE_DEFERRED.txt`: native FileGDB
-  raster-dataset writing is absent and the table writer explicitly rejects raster fields.
-- Added `raster_to_other_format` registry metadata and the CLI workspace host in
-  `crates/unigis-cli/src/main.rs`. Default/explicit TIFF batch conversion retains input basenames,
-  uses `_1`, `_2`, etc. on collisions, preserves all bands/grids and adds ArcGIS's default NoData
-  to unmarked F32 (`3.4e38f32`) and F64 (`1.79e308`) outputs.
-- ArcGIS Pro 3.7 MCP probes confirmed default TIFF, batch names and collision behavior. Final
-  references `rtof_default` (U8 + F32 batch) and `rtof_tiff` (F64) were generated directly through
-  MCP and saved under `testdata/arcgis-reference/`; manifest entries follow the generator format.
-  Generator `RUN`/workspace output support and raster workspace comparison were added.
-- Validation: `cargo check -j3 -p unigis-cli` PASS; full manifest comparator PASS after adding the
-  F32/F64 default NoData markers; repeated CLI conversion produced ArcGIS's base/`_1` names. Full
-  `scripts/check` PASS, exit 0 (`/tmp/unigis-rtof-check.log`). Queue regenerated: 1586 missing,
-  next `Table To dBASE`. Manifest JSON and `git diff --check` PASS.
-- TIFF-only scope, missing world/metadata sidecars and other limitations are in
-  `docs/KNOWN_GAPS.md`; roadmap updated. Exactly 21 intended files are staged, with unrelated
-  covariance/unary/dashboard edits excluded. Next: scoped commit, push and upstream verification.
+- Reproduced the FileGDB oracle failure with GDAL 3.10.3. Upstream GDAL fixed the
+  non-editable-default field reader in 3.14 development (#15385). The specific
+  fixture now has direct native field/value assertions; only its older-GDAL
+  comparison is gated. Corpus download pinned; cache replacement follows extraction.
+- Full root workspace tests: 293 passed, 5 ignored, zero failures. Saved ArcGIS
+  comparator and exhaustive copy-to-geodatabase test ran. Log `/tmp/unigis-tests.log`.
+- Strict all-target Clippy, fmt check, and unigis-tools without default features pass.
+  Logs `/tmp/unigis-clippy.log`, `/tmp/unigis-fmt.log`, `/tmp/unigis-web-engine.log`.
+- Three CLI workflows pass (vector clip/export/reopen, FileGDB edit/export/reopen,
+  raster CRS/algebra/NoData/failed-write safety). `/workspace/readiness/cli.json`.
+- Existing web-dist artifact identifies itself as build of `4aa5e99`. Chromium test
+  passed import, UI Buffer, export and project save/reload/reopen; no page errors.
+  `/workspace/readiness/browser.json` and `browser.png`. External requests were
+  deliberately blocked. Native desktop and app-workspace checks were not run.
+- Dashboard macro registration and official-name mapping fixes: dashboard and queue
+  now agree on 474/2028 API entries (406 with references, 68 without); 373 native
+  tool names. Missing: 1527 eligible + 27 deferred. These are not parity percentages.
+- Dashboard regression tests (10) and package safety tests (3) pass.
+- Optimized CLI build passed; all three workflows passed for it and for the extracted
+  alpha launcher under a directory containing spaces. The package includes PROJ data
+  and its copyright notice; binary and database hashes checked after extraction.
+  Reports: `/workspace/readiness/cli-release.json`, `cli-relocated.json`.
+  Artifact: `/workspace/readiness/dist/unigis-cli-alpha-4aa5e99d8c0d-dirty.tar.gz`.
+- actionlint 1.7.7 and shell/Python/JavaScript syntax checks pass.
+- Added PR CI, reusable engine verification before web publication, a browser gate,
+  and a manual tested-CLI artifact workflow. Added ALPHA.md and READINESS.md.
 
-## Working tree safety / unrelated edits
+## Environment and reproducibility
 
-Preserve inherited raster (`unary_integer_float`), covariance, dashboard/web and other edits.
-`crates/unigis-raster/src/registry.rs` retains unrelated covariance hunks and
-`scripts/make-arcgis-reference.py` retains an unrelated `umintfloat` hunk; stage RTOF hunks only.
-Do not read/add NOTES.md or .worktrees. Post-commit handoff updates remain intentionally uncommitted.
+Rust 1.99.1 installed under /workspace; commands source `/workspace/unigis-build-env.sh`.
+This uses the exact pinned compiler with debug info/incremental compilation disabled
+for available disk space. Native CMake/SQLite dependencies extracted under
+`/workspace/build-deps`; no system installation was possible or required.
+GDAL is a format oracle only. ArcGIS/its bridge is unavailable here; no new ArcGIS
+reference outputs were generated. Browser tests use the existing WASM, not a rebuild.
+
+## Next actions
+
+1. Review and prepare a draft PR for the validated changes. No merge, GitHub Release
+   publication or deployment is authorized as part of this milestone.
+2. Require CI through branch protection if desired (main is currently unprotected).
+3. Run the native desktop/app-workspace gates and a clean-target installation test
+   before broadening release claims; see READINESS.md.
+
+## Running work
+
+No Cargo build or test is running. Reports and artifacts are under `/workspace/readiness`.
+The original workstation's unrelated edits and coordinator state were not accessed.

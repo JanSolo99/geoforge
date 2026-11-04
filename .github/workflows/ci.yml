@@ -3,12 +3,17 @@ name: CI
 # Every push to main, as a second opinion on the local gate (scripts/check, run by the pre-push
 # hook and by `scripts/lane land`). Actions minutes are free for this public repository.
 on:
+  pull_request:
   push:
     branches: [main]
   workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -17,9 +22,10 @@ env:
 jobs:
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@1.99.1
         with:
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
@@ -27,7 +33,15 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y gdal-bin libsqlite3-dev sqlite3 cmake  # cmake + sqlite: proj-sys builds PROJ >= 9.6.2 from source when the system one is older
       - name: Fetch test corpora
         run: scripts/fetch-testdata.sh
-      - run: python3 -m unittest discover -s scripts/dashboard -p 'test_*.py'
-      - run: cargo fmt --all --check
-      - run: cargo clippy --workspace --all-targets -- -D warnings
-      - run: cargo test --workspace
+      - name: Full engine gate
+        shell: bash
+        run: scripts/check 2>&1 | tee engine-gate.log
+      - name: End-to-end CLI workflows
+        run: python3 scripts/readiness/smoke.py --ug target/debug/ug --report cli-readiness.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: engine-readiness-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            engine-gate.log
+            cli-readiness.json

@@ -9,7 +9,6 @@ a registry, command or alias exposes it (the same test as the dashboard). Priori
 whether ArcGIS output can be reproduced exactly come from docs/arcgis-inventory/*.csv. Tools that
 were tried and set aside are listed, with the reason, in docs/WORK_QUEUE_DEFERRED.txt.
 """
-import csv
 import re
 import json
 import sys
@@ -18,7 +17,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts" / "dashboard"))
-from build import implemented, norm  # noqa: E402
+from build import implemented, norm, inventory, coverage_status  # noqa: E402
 
 OUT = ROOT / "docs" / "WORK_QUEUE.md"
 DEFERRED = ROOT / "docs" / "WORK_QUEUE_DEFERRED.txt"
@@ -69,21 +68,6 @@ RULES = """\
 """
 
 
-def inventory():
-    """(toolbox alias, normalized function) -> inventory row."""
-    rows = {}
-    for path in (ROOT / "docs" / "arcgis-inventory").glob("*.csv"):
-        with path.open(newline="") as f:
-            for row in csv.DictReader(f):
-                arcpy = row.get("arcpy_name") or ""
-                if not arcpy:
-                    continue
-                parts = arcpy.split(".")
-                rows.setdefault((parts[-2] if len(parts) > 2 else "", norm(parts[-1])), row)
-                rows.setdefault(("", norm(parts[-1])), row)
-    return rows
-
-
 def deferred():
     """alias.Name -> reason, from lines like `management.AddIncrementingIDField  ArcSDE only`."""
     found = {}
@@ -107,7 +91,7 @@ def queue():
         for name in names:
             totals[alias] += 1
             row = meta.get((alias, norm(name))) or meta.get(("", norm(name))) or {}
-            if norm(name) in have or norm(row.get("tool") or "") in have:
+            if coverage_status(name, have, {}, row.get("tool") or "") != "missing":
                 done[alias] += 1
                 continue
             item = {"alias": alias, "name": name, "title": row.get("tool") or name,
@@ -136,7 +120,9 @@ def main():
              "(most-used first), then tools whose output ArcGIS lets us reproduce exactly, then "
              "easier ones. Tools that need a server or enterprise database, and tools that only "
              "manage map layers, come after all others.", "", RULES,
-             f"## Up next ({len(missing)} tools missing; first {SHOWN} shown)", "",
+             f"Missing: {len(missing) + len(held)} total = {len(missing)} eligible + {len(held)} deferred. "
+             "Registered tools may still have compatibility gaps; see KNOWN_GAPS.md.", "",
+             f"## Up next ({len(missing)} eligible tools; first {SHOWN} shown)", "",
              "| # | Tool | Toolbox | arcpy | Priority | Difficulty | Exact | Summary |",
              "|---|---|---|---|---|---|---|---|"]
     for i, t in enumerate(missing[:SHOWN], 1):
