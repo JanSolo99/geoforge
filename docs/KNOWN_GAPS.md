@@ -52,17 +52,14 @@ Update this file when a gap is found or closed.
 | Tool | Missing |
 |---|---|
 | Desktop pane layout | Floating windows and arbitrary split groups are not implemented; the attribute table remains a separate bottom view. Panes support left/right/bottom tab groups, drag/drop, auto-hide and saved arrangements (`app/crates/ui-egui/src/dock.rs`) |
-| Geodatabase editing in the web app | ArcGIS edits a geodatabase in place. The browser reads uploads only; edits need exporting to another format. Roadmap Phase 3 › Geodatabases in the app |
-| Geodatabase upload size (web) | No ArcGIS limit. Uploads are held whole in memory, at most 256 MB; larger ones need the desktop app |
-| Raster datasets in geodatabases | ArcGIS reads and writes them; UniGIS reads neither (desktop or web) and the table writer rejects raster fields |
-| Compressed (`.cdf`) geodatabase tables | ArcGIS reads them and has Compress/Uncompress tools; UniGIS refuses them (desktop or web) |
-| Geodatabases in saved projects | ArcGIS projects keep database connections. UniGIS keeps a geodatabase only through layers read in place, each layer saving its own full copy (10 layers = 10 copies); layers loaded whole lose it, so a reopened project's Catalog may not list it |
-| Adding a geodatabase | ArcGIS connects a geodatabase without adding layers. UniGIS's web upload and desktop Add Geodatabase… add up to 32 feature classes at once; the desktop has no Add Database connection, and its Catalog lists only geodatabases its layers come from |
-| Catalog tree for geodatabases | ArcGIS lists relationship classes, topologies, network datasets, parcel fabrics, mosaic/raster datasets, annotation/dimension classes, toolboxes and domains (properties). UniGIS lists feature datasets, feature classes and tables only, and has no item Properties, metadata, Copy/Paste, Rename, Delete or New in the web Catalog |
-| MultiPatch, annotation and dimension classes on the map | ArcGIS draws them; UniGIS lists MultiPatch classes but doesn't draw them, and annotation/dimension classes are drawn as plain features |
-| Mobile geodatabases in the web app | ArcGIS reads `.geodatabase` files; the web app doesn't (the desktop creates them). No enterprise geodatabase connections |
-| Geodatabase upload tests | The folder picker and folder drop use `webkitdirectory` / `webkitGetAsEntry` (Chromium, Firefox, Safari); `scripts/readiness/browser.cjs` tests a zip upload only, not those or the Catalog tree's actions |
-| App tests with the `unigis` feature | Fail to link: `proj-sys` and `proj4rs-geodesic` both define `geod_*`; engine/UI tests are run without the feature |
+| Geodatabase row and schema edits | ArcGIS edits rows and schema in place. In the app (desktop uploads and the browser), an edited layer is written back by replacing its class (Export Active Layer Here), which drops its domains, subtypes and attribute rules; schema tools (Add Field…) on uploads need the desktop. Rename, Delete, New and Export work in place |
+| Geodatabase upload size (web) | No ArcGIS limit. Browser uploads are held in memory once, at most 1 GiB (desktop 4 GiB); larger ones need on-demand reads from a Web Worker |
+| Raster datasets in geodatabases | Read (GDAL-verified); pyramids and windowed reads (a band over 2^28 pixels is refused), attribute tables, `srid` 0 coordinate systems and writing are missing |
+| Compressed (`.cdf`) geodatabase tables | ArcGIS reads them and has Compress/Uncompress tools; UniGIS refuses them (no public description; needs ArcGIS-made samples and bridge probes) |
+| Annotation and dimension classes | Annotation is drawn as its text with one size and angle for the layer (ArcGIS: each feature's font, size, angle, alignment); dimensions as an outline labelled with their length, without dimension lines and arrows |
+| Mobile geodatabases | ArcGIS reads and edits `.geodatabase` files; UniGIS only creates empty ones (their ST_Geometry blob has no public description). No enterprise geodatabase connections |
+| Catalog actions | Copy/Paste, Import, Compact, Recover and the metadata view are missing (Properties, Rename, Delete, New, Export, Download, Add To Map are there) |
+| Geodatabase browser tests | `scripts/readiness/browser.cjs` covers zip upload, the folder picker and Download; a folder dropped on the page can't be automated |
 | Create Fishnet | Labels output, corner with zero rows/columns |
 | Densify | ANGLE and OFFSET methods, curved segments, Z/M |
 | Generate Points Along Lines | Chainage fields |

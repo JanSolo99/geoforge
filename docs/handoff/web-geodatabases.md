@@ -65,11 +65,24 @@ does" — in the browser too, where FileGDB reading was desktop-only.
   opening a project should). Real embeddings (an iframe) don't. The scratch screenshot harness
   intercepts `window.postMessage` for that reason.
 
+## Second pass (user: "fix all those on the branch")
+
+Commits after `1518b16`, all pushed: projects keep databases once (`1d99b5b`), item types (`66db3f2`),
+Properties (`45c008f`), MultiPatch/annotation + link fix (`8f1d71c`), raster datasets read
+(`052ffc2`, `a1d7a2e`), 1 GiB uploads held once (`5408625`), vfs (`0df8ac0`), browser editing
+(`7b4e801`). Status per item: `docs/ROADMAP.md` › Phase 3 › "Geodatabases in the app".
+
+Validation of this pass: unigis-filegdb all tests (incl. tests/raster.rs vs GDAL 3.8: 50 rasters,
+1.38 M pixels; tests/memory.rs incl. byte-identical in-memory edits); rustgis-data 204+; engine 121
+with `--features unigis` (links now); clippy -D warnings native + wasm32; release web build +
+`browser.cjs` 8/8 checks, zero page errors (zip upload, folder picker, download).
+
+Build-environment notes: use `CARGO_INCREMENTAL=0` and one feature set (`--features
+rustgis-ui-egui/unigis`) or the 40 GB disk fills; `apt-get install gdal-bin` for the oracle tests.
+
 ## Next
 
-The user wants every limit fixed (goal: all of ArcGIS Pro's functionality). The open items are
-logged in `docs/ROADMAP.md` › Phase 3 › "Geodatabases in the app: ArcGIS Pro parity" and in
-`docs/KNOWN_GAPS.md` (rows starting "Geodatabase…"). Suggested order: projects keep their databases
-(one stored copy, no per-layer duplicates) → connect-without-adding / desktop Add Database → no upload
-size limit (read on demand) → editing in the browser → Catalog item types and actions → `.cdf` and
-raster datasets. Land on main via a PR (user decides); the Netlify workflow then runs the browser gate.
+Open (also in ROADMAP/KNOWN_GAPS): in-place row/schema edits (TableEditor), raster pyramids /
+windowed reads / RAT / write, >1 GiB uploads via a Web Worker, per-feature annotation, Copy/Paste /
+Import / Compact / Recover / metadata. Blocked here (need ArcGIS-made samples and the bridge):
+`.cdf` tables, mobile geodatabases. Then a PR (user decides).

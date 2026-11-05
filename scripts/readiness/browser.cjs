@@ -56,7 +56,7 @@ async function main() {
   assert(values.dist, '--dist must point to the built web app');
   const root = path.resolve(values.dist);
   const report = { timestamp_utc: new Date().toISOString(),
-    scope: 'Offline Chromium: import, Buffer via UI, export, project save/reopen, file geodatabase upload',
+    scope: 'Offline Chromium: import, Buffer via UI, export, project save/reopen, file geodatabase upload, folder picker, download',
     checks: [], external_requests_blocked: [], page_errors: [] };
   const files = await fs.readdir(root);
   const wasm = files.find(name => name.endsWith('_bg.wasm'));
@@ -192,6 +192,25 @@ async function main() {
     assert(wells.dataset.features.length > 0, 'Geodatabase feature class added without features');
     assert.equal(wells.dataset.source, 'edit_fc.gdb');
     report.checks.push('add_file_geodatabase_zip');
+    // Add Geodatabase…: the browser's folder picker on a .gdb folder connects it to the project
+    // (Catalog › Databases) without adding layers, as ArcGIS's Add Database does.
+    const layersBefore = withGdb.maps[0].layers.length;
+    const folderPicker = page.waitForEvent('filechooser');
+    await command('ui.addGeodatabase');
+    await (await folderPicker).setFiles(path.resolve(__dirname, '../../testdata/gdb-reference/domain_base.gdb'));
+    await page.waitForFunction(() => window.readinessMessages.some(m => m.rustgis === 'project' &&
+      (JSON.parse(m.text).databases || []).some(d => d.name === 'domain_base.gdb')), null, { timeout: 60000 });
+    const connected = await page.evaluate(() => JSON.parse(window.readinessMessages.filter(m => m.rustgis === 'project').pop().text));
+    assert.equal(connected.maps[0].layers.length, layersBefore, 'Add Geodatabase added layers');
+    assert.deepEqual(connected.databases.map(d => d.name).sort(), ['domain_base.gdb', 'edit_fc.gdb']);
+    report.checks.push('add_geodatabase_folder_picker');
+    // Download hands an upload back as a zip of its folder.
+    const downloading = page.waitForEvent('download');
+    await command('ui.downloadGeodatabase', { geodatabase: 'domain_base.gdb' });
+    const zip = await fs.readFile(await (await downloading).path());
+    assert.equal(zip.readUInt32LE(0), 0x04034b50, 'not a zip archive');
+    assert(zip.includes(Buffer.from('domain_base.gdb/a00000001.gdbtable')), 'the geodatabase folder is missing');
+    report.checks.push('download_geodatabase');
     assert.deepEqual(report.page_errors, [], 'Browser runtime errors');
     report.passed = true;
   } catch (error) {
