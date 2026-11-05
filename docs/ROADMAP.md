@@ -310,6 +310,45 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
       `xy_domains.tsv.gz`); used by file geodatabase and GeoPackage output. The origin comes from ArcGIS's own
       projection engine, so it is a table, not a formula; a system ArcGIS does not know keeps the fixed origin
 
+### Geodatabases in the app: ArcGIS Pro parity (logged 2026-11-05)
+The web app reads uploaded geodatabases and the Catalog lists them under Databases (see above). Open
+items, each something ArcGIS Pro does with a file geodatabase that UniGIS does not yet do:
+- [ ] Edit geodatabases in the browser (ArcGIS edits in place): writer over the in-memory `Store`, then
+      save back to the picked folder (File System Access API `showDirectoryPicker({mode: "readwrite"})`
+      where available) or download the edited `.gdb` as a zip; every desktop schema/edit tool on uploads
+- [ ] No size limit on uploads (now 256 MB, whole geodatabase in memory): read tables on demand from the
+      browser `File` handles (`Blob.slice`, as large GeoTIFFs are read in `parts.rs`) or OPFS sync handles in
+      a worker, so only the rows in view are read
+- [ ] Raster datasets in geodatabases (read and write, desktop and web): `fras_*` / `ras_*` tables,
+      pyramids, raster attribute tables, raster fields (the table writer rejects them today)
+- [ ] Compressed (`.cdf`) tables (same item as above; Compress/Uncompress File Geodatabase Data tools)
+- [ ] Projects keep their databases, as ArcGIS's project keeps database connections: a saved project
+      lists its geodatabases (desktop: by path, the Catalog's Databases even without layers; web: the
+      upload stored once, in the project or IndexedDB, referenced by every layer). Today a project saves
+      only layers read in place, each with its own full copy of the geodatabase, so 10 layers save and
+      reload 10 copies; layers loaded whole lose their geodatabase
+- [ ] Add Database / Remove from project on the desktop (Catalog › Databases › Add Database…): a
+      connection without adding layers. Today the desktop's Add Geodatabase… adds the layers and the
+      Catalog lists only geodatabases its layers come from
+- [ ] Adding a geodatabase as ArcGIS does: connecting lists it without adding layers; dragging a feature
+      class, feature dataset or the geodatabase to the map adds those. Today an upload adds up to 32
+      feature classes at once (as the desktop's Add Data on a `.gdb` does)
+- [ ] Every item type in the Catalog tree: relationship classes, topologies, network datasets, parcel
+      fabrics, mosaic and raster datasets, annotation and dimension classes, geometric networks, toolboxes
+      in a geodatabase, attachments; domains under the geodatabase's properties. Today: feature datasets,
+      feature classes and tables
+- [ ] Draw what the map can't yet: MultiPatch classes (listed, not added), annotation and dimension
+      classes as text and dimensions rather than plain features
+- [ ] Catalog item actions on geodatabases (desktop and web): Properties (fields, indexes, subtypes,
+      domains, extent, spatial reference, row count), metadata view, Copy/Paste, Rename, Delete, New
+      (feature class, table, feature dataset), Export, Import, Compact, Recover
+- [ ] Mobile geodatabases (`.geodatabase`, SQLite) in the browser: the pure-Rust SQLite reader already reads
+      GeoPackages there; enterprise geodatabase connections (desktop)
+- [ ] Automated browser tests of the folder picker and a folder dropped on the page (only the zip upload
+      is in `scripts/readiness/browser.cjs`), and of the Catalog tree's double-click/context-menu actions
+- [ ] App tests with the `unigis` feature link: `proj-sys` and `proj4rs-geodesic` both define `geod_*`
+      (duplicate symbols), so engine/UI tests run without the feature
+
 ## Phase 4 — CRS
 - [x] PROJ binding (`unigis-proj` on the `proj` crate, system PROJ >= 9.6.2 or built from
       source): CRSs from factory codes (EPSG, then Esri), `.prj` files or WKT; Esri WKT out

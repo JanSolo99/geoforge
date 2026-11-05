@@ -52,7 +52,17 @@ Update this file when a gap is found or closed.
 | Tool | Missing |
 |---|---|
 | Desktop pane layout | Floating windows and arbitrary split groups are not implemented; the attribute table remains a separate bottom view. Panes support left/right/bottom tab groups, drag/drop, auto-hide and saved arrangements (`app/crates/ui-egui/src/dock.rs`) |
-| File geodatabases in the web app | Read-only: the browser can't write a geodatabase back (export to GeoJSON, GeoPackage, …). Uploads are held in memory up to 256 MB. Raster datasets and compressed (`.cdf`) tables aren't read. A saved project keeps the geodatabase only for layers read in place; small classes are saved as their features, so a reopened project's Catalog lists the geodatabase only if one of its layers is read in place. The folder picker and folder drop use the non-standard `webkitdirectory` / `webkitGetAsEntry` (Chromium, Firefox, Safari support them); `scripts/readiness/browser.cjs` covers a zip upload, not the folder picker or folder drop |
+| Geodatabase editing in the web app | ArcGIS edits a geodatabase in place. The browser reads uploads only; edits need exporting to another format. Roadmap Phase 3 › Geodatabases in the app |
+| Geodatabase upload size (web) | No ArcGIS limit. Uploads are held whole in memory, at most 256 MB; larger ones need the desktop app |
+| Raster datasets in geodatabases | ArcGIS reads and writes them; UniGIS reads neither (desktop or web) and the table writer rejects raster fields |
+| Compressed (`.cdf`) geodatabase tables | ArcGIS reads them and has Compress/Uncompress tools; UniGIS refuses them (desktop or web) |
+| Geodatabases in saved projects | ArcGIS projects keep database connections. UniGIS keeps a geodatabase only through layers read in place, each layer saving its own full copy (10 layers = 10 copies); layers loaded whole lose it, so a reopened project's Catalog may not list it |
+| Adding a geodatabase | ArcGIS connects a geodatabase without adding layers. UniGIS's web upload and desktop Add Geodatabase… add up to 32 feature classes at once; the desktop has no Add Database connection, and its Catalog lists only geodatabases its layers come from |
+| Catalog tree for geodatabases | ArcGIS lists relationship classes, topologies, network datasets, parcel fabrics, mosaic/raster datasets, annotation/dimension classes, toolboxes and domains (properties). UniGIS lists feature datasets, feature classes and tables only, and has no item Properties, metadata, Copy/Paste, Rename, Delete or New in the web Catalog |
+| MultiPatch, annotation and dimension classes on the map | ArcGIS draws them; UniGIS lists MultiPatch classes but doesn't draw them, and annotation/dimension classes are drawn as plain features |
+| Mobile geodatabases in the web app | ArcGIS reads `.geodatabase` files; the web app doesn't (the desktop creates them). No enterprise geodatabase connections |
+| Geodatabase upload tests | The folder picker and folder drop use `webkitdirectory` / `webkitGetAsEntry` (Chromium, Firefox, Safari); `scripts/readiness/browser.cjs` tests a zip upload only, not those or the Catalog tree's actions |
+| App tests with the `unigis` feature | Fail to link: `proj-sys` and `proj4rs-geodesic` both define `geod_*`; engine/UI tests are run without the feature |
 | Create Fishnet | Labels output, corner with zero rows/columns |
 | Densify | ANGLE and OFFSET methods, curved segments, Z/M |
 | Generate Points Along Lines | Chainage fields |

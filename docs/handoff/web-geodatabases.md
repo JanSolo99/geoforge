@@ -67,5 +67,9 @@ does" — in the browser too, where FileGDB reading was desktop-only.
 
 ## Next
 
-- Optional: keep uploaded geodatabases in the saved project (currently only via streamed layers).
-- Land on main via a PR (user decides); the Netlify workflow then runs the browser gate.
+The user wants every limit fixed (goal: all of ArcGIS Pro's functionality). The open items are
+logged in `docs/ROADMAP.md` › Phase 3 › "Geodatabases in the app: ArcGIS Pro parity" and in
+`docs/KNOWN_GAPS.md` (rows starting "Geodatabase…"). Suggested order: projects keep their databases
+(one stored copy, no per-layer duplicates) → connect-without-adding / desktop Add Database → no upload
+size limit (read on demand) → editing in the browser → Catalog item types and actions → `.cdf` and
+raster datasets. Land on main via a PR (user decides); the Netlify workflow then runs the browser gate.
