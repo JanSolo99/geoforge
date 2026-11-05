@@ -5929,3 +5929,61 @@ fn geodatabase_raster_datasets_become_raster_layers() {
     s.run("project.openText", &json!({"text": text})).unwrap();
     assert_eq!(size(&s), Some((20, 20)));
 }
+
+/// Editing geodatabases the project holds (uploads, new ones) and ones on disk: a layer exported
+/// into one, an item renamed and deleted, a new geodatabase made; saved projects keep the edits.
+#[test]
+fn geodatabases_are_edited_in_memory_and_on_disk() {
+    use rustgis_data::{Dataset, Field, FieldType, Geometry, GeometryType, Value as V};
+    use rustgis_geom::Coord;
+    let mut s = Session::new(Project::default());
+    let mut parks = Dataset::new("Parks", GeometryType::Point, vec![Field::new("name", FieldType::Text)]);
+    parks.push(Some(Geometry::Point(Coord::new(4.9, 52.36))), vec![V::Text("Vondelpark".into())]);
+    s.map_mut().add_dataset(parks);
+    // A new geodatabase, held by the project; the layer exported into it.
+    s.run("catalog.newGeodatabase", &json!({"name": "City"})).unwrap();
+    assert_eq!(s.geodatabases()[0].0, "City.gdb");
+    s.run("catalog.exportLayer", &json!({"geodatabase": "City.gdb", "layer": "Parks"})).unwrap();
+    let items = |s: &mut Session| -> Vec<String> {
+        let r = s.run("info.geodatabases", &json!({})).unwrap();
+        r["geodatabases"][0]["items"].as_array().unwrap().iter().map(|i| i["name"].as_str().unwrap().to_string()).collect()
+    };
+    assert_eq!(items(&mut s), ["Parks"]);
+    s.run("catalog.exportLayer", &json!({"geodatabase": "City.gdb", "layer": "Parks", "name": "Green"})).unwrap();
+    s.run("catalog.renameItem", &json!({"geodatabase": "City.gdb", "item": "Green", "newName": "Groen"})).unwrap();
+    let mut got = items(&mut s);
+    got.sort();
+    assert_eq!(got, ["Groen", "Parks"]);
+    // Added from it, then refused deletion while a layer reads it.
+    s.run("layer.addGeodatabaseItem", &json!({"geodatabase": "City.gdb", "layer": "Groen", "name": "Groen", "stream": true})).unwrap();
+    assert!(s.run("catalog.deleteItem", &json!({"geodatabase": "City.gdb", "item": "Groen"})).is_err());
+    s.run("catalog.deleteItem", &json!({"geodatabase": "City.gdb", "item": "Parks"})).unwrap();
+    assert_eq!(items(&mut s), ["Groen"]);
+    // An edit reopens the layers reading the geodatabase; a saved project keeps the edits.
+    s.run("catalog.exportLayer", &json!({"geodatabase": "City.gdb", "layer": "Parks", "name": "More"})).unwrap();
+    assert!(s.map().layer_by_name("Groen").and_then(|l| l.source.as_ref()).is_some_and(|x| x.is_open() && x.error.is_none()));
+    let text = serde_json::to_string(&s.project).unwrap();
+    let mut s = Session::new(Project::default());
+    s.run("project.openText", &json!({"text": text})).unwrap();
+    let mut got = items(&mut s);
+    got.sort();
+    assert_eq!(got, ["Groen", "More"]);
+    // A failed edit changes nothing.
+    let before = s.geodatabases()[0].1.clone();
+    assert!(s.run("catalog.renameItem", &json!({"geodatabase": "City.gdb", "item": "Nothing", "newName": "X"})).is_err());
+    assert!(std::sync::Arc::ptr_eq(&before, &s.geodatabases()[0].1));
+    assert!(s.run("catalog.newGeodatabase", &json!({"name": "City.gdb"})).is_err(), "already there");
+    // On disk: a new geodatabase in a folder, connected, and a layer exported into it.
+    let dir = std::env::temp_dir().join(format!("rustgis-gdb-edit-{}", std::process::id()));
+    std::fs::remove_dir_all(&dir).ok();
+    std::fs::create_dir_all(&dir).unwrap();
+    let mut s = Session::new(Project::default());
+    let mut d = Dataset::new("Wells", GeometryType::Point, Vec::new());
+    d.push(Some(Geometry::Point(Coord::new(5.0, 52.0))), Vec::new());
+    s.map_mut().add_dataset(d);
+    s.run("catalog.newGeodatabase", &json!({"name": "Disk", "path": dir.display().to_string()})).unwrap();
+    s.run("catalog.exportLayer", &json!({"geodatabase": "Disk.gdb", "layer": "Wells"})).unwrap();
+    assert!(dir.join("Disk.gdb/a00000001.gdbtable").is_file());
+    assert_eq!(rustgis_data::source::filegdb::layers(&dir.join("Disk.gdb")).unwrap(), ["Wells"]);
+    std::fs::remove_dir_all(&dir).ok();
+}

@@ -12,8 +12,8 @@ use std::path::Path;
 use std::sync::{Arc, Mutex, Weak};
 
 use unigis_core::{Envelope, GeometryKind, Value as GfValue};
-pub use unigis_filegdb::Geodatabase;
 use unigis_filegdb::Table;
+pub use unigis_filegdb::{Geodatabase, vfs};
 
 pub use super::gfshape::{from_unigis, to_unigis};
 use super::{Batch, FeatureSource, Reproject, Request, SourceInfo, clamp_limit, stride};
@@ -189,6 +189,50 @@ pub fn zip_has_geodatabase(bytes: &[u8]) -> bool {
 /// Geodatabases recently read from zip archives, by the archive's bytes: a layer per feature
 /// class reopens its geodatabase, which needn't be inflated again each time.
 static OPENED: Mutex<Vec<(Weak<Vec<u8>>, Arc<Geodatabase>)>> = Mutex::new(Vec::new());
+
+/// The files of a geodatabase held as a zip archive of its folder (an upload), by name.
+pub fn zip_files(bytes: &[u8]) -> Result<Vec<(String, Vec<u8>)>> {
+    let files = crate::zip::read_matching_within(bytes, |n| !n.ends_with('/'), MAX_GEODATABASE_BYTES).map_err(bad)?;
+    Ok(files.into_iter().map(|(n, b)| (n.rsplit(['/', '\\']).next().unwrap_or(&n).to_string(), b)).collect())
+}
+
+/// A geodatabase's files as an uncompressed zip archive (how an upload is held).
+pub fn to_zip(files: &[(String, Vec<u8>)]) -> Result<Vec<u8>> {
+    let mut w = crate::zip::StoredWriter::default();
+    for (n, b) in files {
+        w.add(n, b).map_err(bad)?;
+    }
+    w.finish().map_err(bad)
+}
+
+/// Deletes an item (and what it holds), returning what was removed.
+pub fn vfs_delete_item(dir: &Path, item: &str) -> Result<Vec<String>> {
+    unigis_filegdb::delete_item(dir, item).map_err(bad)
+}
+
+/// Renames an item, as ArcGIS's Rename does.
+pub fn vfs_rename_item(dir: &Path, item: &str, new: &str) -> Result<()> {
+    unigis_filegdb::rename_item(dir, item, new).map_err(bad)
+}
+
+/// Creates an empty file geodatabase at `dir`, as ArcGIS's Create File Geodatabase does (on
+/// disk, or under a folder mounted in memory).
+pub fn create_empty(dir: &Path) -> Result<()> {
+    unigis_filegdb::GeodatabaseWriter::create(dir).and_then(|w| w.finish()).map_err(bad)
+}
+
+/// The files directly in a folder (through `vfs`, so a memory folder too), by name.
+pub fn dir_files(dir: &Path) -> Result<Vec<(String, Vec<u8>)>> {
+    let mut out = Vec::new();
+    for e in vfs::read_dir(dir).map_err(|e| bad(e.to_string()))? {
+        let p = e.map_err(|e| bad(e.to_string()))?.path();
+        if vfs::is_file(&p) {
+            let name = p.file_name().and_then(|n| n.to_str()).unwrap_or_default().to_string();
+            out.push((name, vfs::read(&p).map_err(|e| bad(e.to_string()))?));
+        }
+    }
+    Ok(out)
+}
 
 /// Opens the geodatabase in a `.gdb` folder on disk.
 pub fn open_dir(path: &Path) -> Result<Arc<Geodatabase>> {
@@ -456,8 +500,9 @@ pub fn write(ds: &Dataset, gdb: &Path, name: Option<&str>) -> Result<usize> {
     if table.to_ascii_uppercase().starts_with("GDB_") {
         table.insert(0, 'T');
     }
-    let exists = gdb.join("a00000001.gdbtable").is_file();
-    if gdb.exists() && !exists && std::fs::read_dir(gdb).map_or(true, |mut d| d.next().is_some()) {
+    // Through vfs: a geodatabase mounted in memory (an upload being edited) too.
+    let exists = vfs::is_file(gdb.join("a00000001.gdbtable"));
+    if vfs::exists(gdb) && !exists && vfs::read_dir(gdb).map_or(true, |mut d| d.next().is_some()) {
         return Err(bad(format!("{} exists and is not a geodatabase", gdb.display())));
     }
     if exists {

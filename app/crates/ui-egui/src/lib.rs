@@ -215,6 +215,9 @@ pub use dock::{Pane, Site};
 pub struct UiState {
     /// Catalog › Databases › Properties: the geodatabase and item shown, and their properties.
     pub catalog_properties: Option<(String, String, Value)>,
+    /// Catalog › Databases: a name being typed (geodatabase, item being renamed or `None` for a
+    /// new geodatabase, the text).
+    pub catalog_prompt: Option<(String, Option<String>, String)>,
     pub tab: String,
     pub backstage: bool,
     pub backstage_page: &'static str,
@@ -316,6 +319,7 @@ impl Default for UiState {
     fn default() -> Self {
         UiState {
             catalog_properties: None,
+            catalog_prompt: None,
             tab: "Map".into(),
             backstage: false,
             backstage_page: "open",
@@ -1448,6 +1452,26 @@ impl RustGisApp {
                     }
                 }
             }
+            // An uploaded geodatabase handed back as a zip archive of its folder (`Name.gdb/…`),
+            // with every edit made to it.
+            "ui.downloadGeodatabase" => {
+                use rustgis_engine::data::source::filegdb;
+                let name = p.get("geodatabase").and_then(Value::as_str).unwrap_or("").to_string();
+                let db = self.session.project.database(&name).cloned().ok_or_else(|| format!("no database {name}"))?;
+                let bytes = db.data.ok_or_else(|| format!("{}: on disk already ({})", db.name, db.path.unwrap_or_default()))?;
+                let files: Vec<(String, Vec<u8>)> = filegdb::zip_files(&bytes)
+                    .map_err(|e| e.to_string())?
+                    .into_iter()
+                    .map(|(n, b)| (format!("{}/{n}", db.name), b))
+                    .collect();
+                let zip = rustgis_engine::data::zip::write(&files)?;
+                let file = format!("{}.zip", db.name);
+                if let Some(download) = &self.services.download {
+                    download(&file, zip);
+                } else if let Some(path) = dialogs::pick_save(&file, &["zip"], "Zip archive") {
+                    std::fs::write(&path, zip).map_err(|e| format!("{path}: {e}"))?;
+                }
+            }
             "ui.open" => {
                 if let Some(open) = &self.services.open_async {
                     // A picker cancelled earlier mustn't claim this file.
@@ -2420,6 +2444,7 @@ impl RustGisApp {
         }
         dialogs::show(self, &ctx);
         panes::properties_window(self, &ctx);
+        panes::catalog_prompt(self, &ctx);
         mapview::confirm_delete(self, &ctx);
         pluginsui::show(self, &ctx);
         update::show(self, &ctx);

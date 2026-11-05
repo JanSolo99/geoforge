@@ -5342,6 +5342,7 @@ dependencies = [
  "roxmltree 0.20.0",
  "thiserror 2.0.21",
  "unigis-core",
+ "web-time",
  "zune-core",
  "zune-jpeg",
 ]

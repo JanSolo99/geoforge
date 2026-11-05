@@ -853,178 +853,267 @@ pub fn properties_window(app: &mut RustGisApp, ctx: &egui::Context) {
 /// an item (or Add To Map) to add it; right-click a feature dataset or the geodatabase for more.
 fn databases(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
     let dbs = app.session.project.databases.clone();
-    egui::CollapsingHeader::new(egui::RichText::new(tl!("Databases")).font(semibold(12.5))).default_open(true).show(ui, |ui| {
-        if dbs.is_empty() {
-            ui.horizontal(|ui| {
-                let (r, _) = ui.allocate_exact_size(vec2(16.0, 16.0), Sense::hover());
-                icons::paint(ui.painter(), r, "geodatabase", t.icon, t.accent);
-                if ui.link(tl!("Add Geodatabase…")).clicked() {
-                    let _ = app.run("ui.addGeodatabase", Value::Null);
-                }
-            });
-            return;
-        }
-        for db in dbs {
-            let name = db.name.clone();
-            let add = |app: &mut RustGisApp, item: Option<&str>, fds: Option<&str>| {
-                let mut p = json!({"geodatabase": name});
-                if let Some(item) = item {
-                    p["layer"] = json!(item);
-                    p["name"] = json!(item);
-                }
-                if let Some(fds) = fds {
-                    p["featureDataset"] = json!(fds);
-                }
-                let _ = app.run("layer.addGeodatabaseItem", p);
-            };
-            let contents = database_contents(&db);
-            let id = ui.make_persistent_id(("catalog-gdb", &name, &db.path));
-            let resp = egui::collapsing_header::CollapsingState::load_with_default_open(ui.ctx(), id, true)
-                .show_header(ui, |ui| {
+    let header =
+        egui::CollapsingHeader::new(egui::RichText::new(tl!("Databases")).font(semibold(12.5))).default_open(true).show(ui, |ui| {
+            if dbs.is_empty() {
+                ui.horizontal(|ui| {
                     let (r, _) = ui.allocate_exact_size(vec2(16.0, 16.0), Sense::hover());
                     icons::paint(ui.painter(), r, "geodatabase", t.icon, t.accent);
-                    ui.add(egui::Label::new(egui::RichText::new(&name).size(12.0)).sense(Sense::click()))
-                })
-                .body(|ui| {
-                    let Some(contents) = &contents else {
-                        ui.label(egui::RichText::new(crate::i18n::fmt("{name}: can't be read", &[("name", &name)])).small().weak());
-                        return;
-                    };
-                    let row = |app: &mut RustGisApp, ui: &mut Ui, item: &rustgis_engine::data::source::filegdb::Item| {
-                        ui.horizontal(|ui| {
-                            let (r, _) = ui.allocate_exact_size(vec2(16.0, 16.0), Sense::hover());
-                            let icon = match (item.feature_type.as_deref(), item.geometry) {
-                                (Some("esriFTAnnotation"), _) => "label",
-                                (Some("esriFTDimension"), _) => "measure",
-                                (_, None) => "table",
-                                (_, Some(GeometryType::Point)) => "point_layer",
-                                (_, Some(GeometryType::Polyline)) => "line_layer",
-                                (_, Some(_)) => "polygon_layer",
-                            };
-                            icons::paint(ui.painter(), r, icon, t.icon, t.accent);
-                            let resp = ui.add(egui::Label::new(egui::RichText::new(&item.name).size(12.0)).sense(Sense::click()));
-                            let tip = crate::i18n::fmt("{n} rows · Double-click to add", &[("n", &item.rows.to_string())]);
-                            let resp = resp.on_hover_text(tip);
-                            if resp.double_clicked() {
-                                add(app, Some(&item.name), None);
-                            }
-                            resp.context_menu(|ui| {
-                                if ui.button(tl!("Add To Map")).clicked() {
-                                    add(app, Some(&item.name), None);
-                                    ui.close();
-                                }
-                                if ui.button(tl!("Properties")).clicked() {
-                                    show_properties(app, &name, &item.name);
-                                    ui.close();
-                                }
-                            });
-                        });
-                    };
-                    // Items other than tables and classes, named with their type (as ArcGIS shows them).
-                    let other = |app: &mut RustGisApp, ui: &mut Ui, o: &rustgis_engine::data::source::filegdb::Other| {
-                        ui.horizontal(|ui| {
-                            let (r, _) = ui.allocate_exact_size(vec2(16.0, 16.0), Sense::hover());
-                            let raster = o.kind == "Raster Dataset";
-                            let icon = match o.kind.as_str() {
-                                "Relationship Class" => "relationship_class",
-                                "Raster Dataset" => "raster_layer",
-                                _ => "gdb_item",
-                            };
-                            icons::paint(ui.painter(), r, icon, t.icon, t.accent);
-                            let resp = ui
-                                .add(egui::Label::new(egui::RichText::new(&o.name).size(12.0)).sense(Sense::click()))
-                                .on_hover_text(&o.kind);
-                            // A raster dataset is added to the map; other items show their properties.
-                            if resp.double_clicked() {
-                                if raster {
-                                    add(app, Some(&o.name), None);
-                                } else {
-                                    show_properties(app, &name, &o.name);
-                                }
-                            }
-                            resp.context_menu(|ui| {
-                                if raster && ui.button(tl!("Add To Map")).clicked() {
-                                    add(app, Some(&o.name), None);
-                                    ui.close();
-                                }
-                                if ui.button(tl!("Properties")).clicked() {
-                                    show_properties(app, &name, &o.name);
-                                    ui.close();
-                                }
-                            });
-                        });
-                    };
-                    for fds in &contents.feature_datasets {
-                        let id = ui.make_persistent_id(("catalog-gdb-fds", &name, fds));
-                        let (_, header, _) = egui::collapsing_header::CollapsingState::load_with_default_open(ui.ctx(), id, false)
-                            .show_header(ui, |ui| {
-                                let (r, _) = ui.allocate_exact_size(vec2(16.0, 16.0), Sense::hover());
-                                icons::paint(ui.painter(), r, "feature_dataset", t.icon, t.accent);
-                                ui.add(egui::Label::new(egui::RichText::new(fds).size(12.0)).sense(Sense::click()))
-                            })
-                            .body(|ui| {
-                                for item in contents.items.iter().filter(|i| i.feature_dataset.as_deref() == Some(fds.as_str())) {
-                                    row(app, ui, item);
-                                }
-                                for o in contents.others.iter().filter(|o| o.feature_dataset.as_deref() == Some(fds.as_str())) {
-                                    other(app, ui, o);
-                                }
-                            });
-                        header.inner.context_menu(|ui| {
-                            if ui.button(tl!("Add To Map")).clicked() {
-                                add(app, None, Some(fds));
-                                ui.close();
-                            }
-                            #[cfg(feature = "unigis")]
-                            if let Some(path) = &db.path {
-                                new_in_feature_dataset(app, ui, std::path::Path::new(path), fds);
-                            }
-                        });
-                    }
-                    for item in contents.items.iter().filter(|i| i.feature_dataset.is_none()) {
-                        row(app, ui, item);
-                    }
-                    for o in contents.others.iter().filter(|o| o.feature_dataset.is_none()) {
-                        other(app, ui, o);
-                    }
-                    if !contents.domains.is_empty() {
-                        egui::CollapsingHeader::new(egui::RichText::new(tl!("Domains")).size(12.0))
-                            .id_salt(("catalog-gdb-domains", &name))
-                            .default_open(false)
-                            .show(ui, |ui| {
-                                for d in &contents.domains {
-                                    let resp = ui.add(egui::Label::new(egui::RichText::new(d).size(12.0)).sense(Sense::click()));
-                                    if resp.on_hover_text(tl!("Properties")).double_clicked() {
-                                        show_properties(app, &name, d);
-                                    }
-                                }
-                            });
-                    }
-                    if contents.items.is_empty() && contents.feature_datasets.is_empty() {
-                        ui.label(egui::RichText::new(tl!("Empty")).small().weak());
+                    if ui.link(tl!("Add Geodatabase…")).clicked() {
+                        let _ = app.run("ui.addGeodatabase", Value::Null);
                     }
                 });
-            let header = resp.1.inner;
-            let tip = match &db.path {
-                Some(p) => p.clone(),
-                None => tl!("Uploaded: held in this browser tab").to_string(),
-            };
-            header.on_hover_text(tip).context_menu(|ui| {
-                if ui.button(tl!("Add All Feature Classes")).clicked() {
-                    add(app, None, None);
-                    ui.close();
-                }
-                #[cfg(feature = "unigis")]
-                if let Some(path) = &db.path {
-                    new_in_geodatabase(app, ui, std::path::Path::new(path));
-                }
-                if ui.button(tl!("Remove From Catalog")).clicked() {
-                    let _ = app.run("catalog.removeGeodatabase", json!({"geodatabase": name}));
-                    ui.close();
-                }
-            });
+                return;
+            }
+            for db in dbs {
+                let name = db.name.clone();
+                let add = |app: &mut RustGisApp, item: Option<&str>, fds: Option<&str>| {
+                    let mut p = json!({"geodatabase": name});
+                    if let Some(item) = item {
+                        p["layer"] = json!(item);
+                        p["name"] = json!(item);
+                    }
+                    if let Some(fds) = fds {
+                        p["featureDataset"] = json!(fds);
+                    }
+                    let _ = app.run("layer.addGeodatabaseItem", p);
+                };
+                let contents = database_contents(&db);
+                let id = ui.make_persistent_id(("catalog-gdb", &name, &db.path));
+                let resp = egui::collapsing_header::CollapsingState::load_with_default_open(ui.ctx(), id, true)
+                    .show_header(ui, |ui| {
+                        let (r, _) = ui.allocate_exact_size(vec2(16.0, 16.0), Sense::hover());
+                        icons::paint(ui.painter(), r, "geodatabase", t.icon, t.accent);
+                        ui.add(egui::Label::new(egui::RichText::new(&name).size(12.0)).sense(Sense::click()))
+                    })
+                    .body(|ui| {
+                        let Some(contents) = &contents else {
+                            ui.label(egui::RichText::new(crate::i18n::fmt("{name}: can't be read", &[("name", &name)])).small().weak());
+                            return;
+                        };
+                        let row = |app: &mut RustGisApp, ui: &mut Ui, item: &rustgis_engine::data::source::filegdb::Item| {
+                            ui.horizontal(|ui| {
+                                let (r, _) = ui.allocate_exact_size(vec2(16.0, 16.0), Sense::hover());
+                                let icon = match (item.feature_type.as_deref(), item.geometry) {
+                                    (Some("esriFTAnnotation"), _) => "label",
+                                    (Some("esriFTDimension"), _) => "measure",
+                                    (_, None) => "table",
+                                    (_, Some(GeometryType::Point)) => "point_layer",
+                                    (_, Some(GeometryType::Polyline)) => "line_layer",
+                                    (_, Some(_)) => "polygon_layer",
+                                };
+                                icons::paint(ui.painter(), r, icon, t.icon, t.accent);
+                                let resp = ui.add(egui::Label::new(egui::RichText::new(&item.name).size(12.0)).sense(Sense::click()));
+                                let tip = crate::i18n::fmt("{n} rows · Double-click to add", &[("n", &item.rows.to_string())]);
+                                let resp = resp.on_hover_text(tip);
+                                if resp.double_clicked() {
+                                    add(app, Some(&item.name), None);
+                                }
+                                resp.context_menu(|ui| {
+                                    if ui.button(tl!("Add To Map")).clicked() {
+                                        add(app, Some(&item.name), None);
+                                        ui.close();
+                                    }
+                                    if ui.button(tl!("Properties")).clicked() {
+                                        show_properties(app, &name, &item.name);
+                                        ui.close();
+                                    }
+                                    ui.separator();
+                                    if ui.button(tl!("Rename…")).clicked() {
+                                        app.ui.catalog_prompt = Some((name.clone(), Some(item.name.clone()), item.name.clone()));
+                                        ui.close();
+                                    }
+                                    if ui.button(tl!("Delete")).clicked() {
+                                        let _ = app.run("catalog.deleteItem", json!({"geodatabase": name, "item": item.name}));
+                                        ui.close();
+                                    }
+                                });
+                            });
+                        };
+                        // Items other than tables and classes, named with their type (as ArcGIS shows them).
+                        let other = |app: &mut RustGisApp, ui: &mut Ui, o: &rustgis_engine::data::source::filegdb::Other| {
+                            ui.horizontal(|ui| {
+                                let (r, _) = ui.allocate_exact_size(vec2(16.0, 16.0), Sense::hover());
+                                let raster = o.kind == "Raster Dataset";
+                                let icon = match o.kind.as_str() {
+                                    "Relationship Class" => "relationship_class",
+                                    "Raster Dataset" => "raster_layer",
+                                    _ => "gdb_item",
+                                };
+                                icons::paint(ui.painter(), r, icon, t.icon, t.accent);
+                                let resp = ui
+                                    .add(egui::Label::new(egui::RichText::new(&o.name).size(12.0)).sense(Sense::click()))
+                                    .on_hover_text(&o.kind);
+                                // A raster dataset is added to the map; other items show their properties.
+                                if resp.double_clicked() {
+                                    if raster {
+                                        add(app, Some(&o.name), None);
+                                    } else {
+                                        show_properties(app, &name, &o.name);
+                                    }
+                                }
+                                resp.context_menu(|ui| {
+                                    if raster && ui.button(tl!("Add To Map")).clicked() {
+                                        add(app, Some(&o.name), None);
+                                        ui.close();
+                                    }
+                                    if ui.button(tl!("Properties")).clicked() {
+                                        show_properties(app, &name, &o.name);
+                                        ui.close();
+                                    }
+                                });
+                            });
+                        };
+                        for fds in &contents.feature_datasets {
+                            let id = ui.make_persistent_id(("catalog-gdb-fds", &name, fds));
+                            let (_, header, _) = egui::collapsing_header::CollapsingState::load_with_default_open(ui.ctx(), id, false)
+                                .show_header(ui, |ui| {
+                                    let (r, _) = ui.allocate_exact_size(vec2(16.0, 16.0), Sense::hover());
+                                    icons::paint(ui.painter(), r, "feature_dataset", t.icon, t.accent);
+                                    ui.add(egui::Label::new(egui::RichText::new(fds).size(12.0)).sense(Sense::click()))
+                                })
+                                .body(|ui| {
+                                    for item in contents.items.iter().filter(|i| i.feature_dataset.as_deref() == Some(fds.as_str())) {
+                                        row(app, ui, item);
+                                    }
+                                    for o in contents.others.iter().filter(|o| o.feature_dataset.as_deref() == Some(fds.as_str())) {
+                                        other(app, ui, o);
+                                    }
+                                });
+                            header.inner.context_menu(|ui| {
+                                if ui.button(tl!("Add To Map")).clicked() {
+                                    add(app, None, Some(fds));
+                                    ui.close();
+                                }
+                                #[cfg(feature = "unigis")]
+                                if let Some(path) = &db.path {
+                                    new_in_feature_dataset(app, ui, std::path::Path::new(path), fds);
+                                }
+                            });
+                        }
+                        for item in contents.items.iter().filter(|i| i.feature_dataset.is_none()) {
+                            row(app, ui, item);
+                        }
+                        for o in contents.others.iter().filter(|o| o.feature_dataset.is_none()) {
+                            other(app, ui, o);
+                        }
+                        if !contents.domains.is_empty() {
+                            egui::CollapsingHeader::new(egui::RichText::new(tl!("Domains")).size(12.0))
+                                .id_salt(("catalog-gdb-domains", &name))
+                                .default_open(false)
+                                .show(ui, |ui| {
+                                    for d in &contents.domains {
+                                        let resp = ui.add(egui::Label::new(egui::RichText::new(d).size(12.0)).sense(Sense::click()));
+                                        if resp.on_hover_text(tl!("Properties")).double_clicked() {
+                                            show_properties(app, &name, d);
+                                        }
+                                    }
+                                });
+                        }
+                        if contents.items.is_empty() && contents.feature_datasets.is_empty() {
+                            ui.label(egui::RichText::new(tl!("Empty")).small().weak());
+                        }
+                    });
+                let header = resp.1.inner;
+                let tip = match &db.path {
+                    Some(p) => p.clone(),
+                    None => tl!("Uploaded: held in this browser tab").to_string(),
+                };
+                header.on_hover_text(tip).context_menu(|ui| {
+                    if ui.button(tl!("Add All Feature Classes")).clicked() {
+                        add(app, None, None);
+                        ui.close();
+                    }
+                    // The active layer written into it (one of its name is replaced), as Export
+                    // Features to a geodatabase does.
+                    let active = app
+                        .session
+                        .active_layer
+                        .and_then(|id| app.session.map().layer(id))
+                        .filter(|l| l.raster.is_none())
+                        .map(|l| l.name.clone());
+                    if ui.add_enabled(active.is_some(), egui::Button::new(tl!("Export Active Layer Here"))).clicked() {
+                        let _ = app.run("catalog.exportLayer", json!({"geodatabase": name}));
+                        ui.close();
+                    }
+                    if db.data.is_some() && ui.button(tl!("Download")).clicked() {
+                        let _ = app.run("ui.downloadGeodatabase", json!({"geodatabase": name}));
+                        ui.close();
+                    }
+                    #[cfg(feature = "unigis")]
+                    if let Some(path) = &db.path {
+                        new_in_geodatabase(app, ui, std::path::Path::new(path));
+                    }
+                    if ui.button(tl!("Remove From Catalog")).clicked() {
+                        let _ = app.run("catalog.removeGeodatabase", json!({"geodatabase": name}));
+                        ui.close();
+                    }
+                });
+            }
+        });
+    header.header_response.context_menu(|ui| {
+        if ui.button(tl!("Add Geodatabase…")).clicked() {
+            let _ = app.run("ui.addGeodatabase", Value::Null);
+            ui.close();
+        }
+        if ui.button(tl!("New File Geodatabase…")).clicked() {
+            app.ui.catalog_prompt = Some((String::new(), None, "New.gdb".into()));
+            ui.close();
         }
     });
+}
+
+/// The name prompt of Catalog › Databases: renaming an item, or a new geodatabase (held by the
+/// project; on the desktop, in a folder picked after).
+pub fn catalog_prompt(app: &mut RustGisApp, ctx: &egui::Context) {
+    let Some((gdb, item, mut text)) = app.ui.catalog_prompt.clone() else { return };
+    let mut open = true;
+    let mut done = false;
+    let title = if item.is_some() { tl!("Rename") } else { tl!("New File Geodatabase…") };
+    egui::Window::new(title).collapsible(false).resizable(false).open(&mut open).show(ctx, |ui| {
+        ui.horizontal(|ui| {
+            ui.label(tl!("Name"));
+            let r = ui.text_edit_singleline(&mut text);
+            if r.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter)) {
+                done = true;
+            }
+        });
+        ui.horizontal(|ui| {
+            if ui.button(if item.is_some() { tl!("Rename") } else { tl!("Create") }).clicked() {
+                done = true;
+            }
+            if ui.button(tl!("Cancel")).clicked() {
+                app.ui.catalog_prompt = None;
+            }
+        });
+    });
+    if app.ui.catalog_prompt.is_none() {
+        return;
+    }
+    if !open {
+        app.ui.catalog_prompt = None;
+        return;
+    }
+    if done {
+        app.ui.catalog_prompt = None;
+        let _ = match item {
+            Some(old) => app.run("catalog.renameItem", json!({"geodatabase": gdb, "item": old, "newName": text})),
+            None => {
+                // The desktop asks where; the browser keeps it in the project.
+                #[cfg(not(target_arch = "wasm32"))]
+                let folder = rfd::FileDialog::new().pick_folder().map(|d| d.display().to_string());
+                #[cfg(target_arch = "wasm32")]
+                let folder: Option<String> = None;
+                let mut p = json!({"name": text});
+                if let Some(f) = folder {
+                    p["path"] = json!(f);
+                }
+                app.run("catalog.newGeodatabase", p)
+            }
+        };
+    } else {
+        app.ui.catalog_prompt = Some((gdb, item, text));
+    }
 }
 
 fn folder_browser(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {

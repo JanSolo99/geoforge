@@ -12,7 +12,7 @@ use crate::{CmdResult, CommandSpec as C, Session};
 pub fn commands() -> Vec<C> {
     vec![
         C::new("layer.addData", "Add Data", "Home › Add", add_data)
-            .params(r#"{"path": string, "name"?: string, "layer"?: "GeoPackage, GDAL, DuckDB or DXF layer", "paperSpace"?: "bool: a DXF's layout entities too", "stream"?: bool, "crs"?: "EPSG:… (or WKT) for a CSV's coordinates, or a GDAL or DuckDB file that doesn't say", "x"?: "CSV x/longitude column", "y"?: "CSV y/latitude column", "wkt"?: "CSV WKT geometry column", "delimiter"?: ","|";"|"\\t"|"|"}"#),
+            .params(r#"{"path": string, "name"?: string, "layer"?: "GeoPackage, GDAL, DuckDB or DXF layer", "paperSpace"?: "bool: a DXF's layout entities too", "stream"?: bool, "crs"?: "EPSG:… (or WKT) for a CSV's coordinates, or a GDAL or DuckDB file that doesn't say", "x"?: "CSV x/longitude column", "y"?: "CSV y/latitude column", "wkt"?: "CSV WKT geometry column", "delimiter"?: ","|";"|"\\t"|"|", "catalogOnly"?: "bool: a .zip holding file geodatabases is connected (Catalog › Databases) without adding layers"}"#),
         C::new("layer.addPhotos", "Add Photos", "Home › Add", add_photos).params(
             r#"{"paths"?: [JPEG photo files], "folder"?: "a folder of photos (every JPEG in it)", "name"?: "the layer (default Photos; photos join it when it exists)"}"#,
         ),
@@ -47,6 +47,16 @@ pub fn commands() -> Vec<C> {
         C::new("info.geodatabases", "List Project Databases", "Catalog › Databases", list_geodatabases).view(),
         C::new("info.geodatabaseItem", "Geodatabase Item Properties", "Catalog › Databases", item_properties).view().params(
             r#"{"geodatabase": "a project database (Name.gdb)", "item": "a table, feature class, relationship class, domain or other item"}"#,
+        ),
+        C::new("catalog.exportLayer", "Export Layer To Geodatabase", "Catalog › Databases", export_to_geodatabase).when(need_layer).params(
+            r#"{"geodatabase": "a project database (Name.gdb)", "layer"?: name|id (default: the active layer), "name"?: "the feature class or table (default: the layer's name; one of that name is replaced)"}"#,
+        ),
+        C::new("catalog.deleteItem", "Delete Geodatabase Item", "Catalog › Databases", delete_gdb_item)
+            .params(r#"{"geodatabase": "Name.gdb", "item": "a table, feature class, feature dataset, relationship class or domain"}"#),
+        C::new("catalog.renameItem", "Rename Geodatabase Item", "Catalog › Databases", rename_gdb_item)
+            .params(r#"{"geodatabase": "Name.gdb", "item": string, "newName": string}"#),
+        C::new("catalog.newGeodatabase", "New File Geodatabase", "Catalog › Databases", new_geodatabase).params(
+            r#"{"name": "Name.gdb", "path"?: "a folder to create it in (desktop); without it the geodatabase is held by the project (as an upload)"}"#,
         ),
         C::new("catalog.addDatabase", "Add Database", "Catalog › Databases", connect_database)
             .params(r#"{"path": "a file geodatabase folder (Name.gdb) on disk; connected without adding layers"}"#),
@@ -1018,6 +1028,123 @@ fn item_properties(s: &mut Session, p: &Value) -> CmdResult {
     let db = connected(s, s_req(p, "geodatabase")?)?;
     let g = open_database(&db)?;
     rustgis_data::source::filegdb::properties(&g, s_req(p, "item")?).map_err(|e| format!("{}: {e}", db.name))
+}
+
+/// Runs `edit` on a project database's folder: a geodatabase on disk in place; an uploaded one
+/// mounted in memory (`vfs`), its files packed back into the project's one copy afterwards and
+/// the layers reading it read again. Nothing changes when `edit` fails.
+pub(crate) fn edit_database(s: &mut Session, name: &str, edit: impl FnOnce(&Path) -> Result<Value, String>) -> CmdResult {
+    use rustgis_data::source::filegdb;
+    let db = connected(s, name)?;
+    let Some(bytes) = db.data.clone() else {
+        let path = db.path.clone().ok_or_else(|| format!("{}: neither a path nor data", db.name))?;
+        return edit(Path::new(&path));
+    };
+    static MOUNTS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+    let n = MOUNTS.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    let root = std::path::PathBuf::from(format!("/unigis-memory/{n}/{}", db.name));
+    filegdb::vfs::mount(&root, filegdb::zip_files(&bytes).map_err(|e| format!("{}: {e}", db.name))?);
+    let result = edit(&root);
+    let files = filegdb::vfs::unmount(&root);
+    let out = result?;
+    let packed = std::sync::Arc::new(filegdb::to_zip(&files).map_err(|e| format!("{}: {e}", db.name))?);
+    // The project's copy is replaced; layers reading it read the new one.
+    s.project.connect_database(crate::project::Database::uploaded(db.name.clone(), packed.clone()));
+    for l in s.project.maps.iter_mut().flat_map(|m| m.layers.iter_mut()) {
+        if let Some(src) = l.source.as_mut().filter(|x| x.database.as_deref().is_some_and(|d| d.eq_ignore_ascii_case(&db.name))) {
+            src.database_bytes = Some(packed.clone());
+            src.reset();
+            if let Err(e) = src.open() {
+                src.error = Some(e);
+            }
+        }
+        if let Some(rl) = l.raster.as_mut().filter(|r| r.database.as_deref().is_some_and(|d| d.eq_ignore_ascii_case(&db.name))) {
+            rl.database_bytes = Some(packed.clone());
+            let _ = rl.reload();
+        }
+        l.touch_geometry();
+    }
+    Ok(out)
+}
+
+/// Writes a layer into a geodatabase as a feature class (or table), replacing one of its name.
+fn export_to_geodatabase(s: &mut Session, p: &Value) -> CmdResult {
+    let id = s.layer_id(p)?;
+    let l = s.map().layer(id).ok_or("no such layer")?;
+    if l.raster.is_some() {
+        return Err(format!("{}: a raster layer; export it to GeoTIFF", l.name));
+    }
+    let mut ds = l.dataset.clone();
+    if let Some(n) = ps(p, "name").map(str::trim).filter(|n| !n.is_empty()) {
+        ds.name = n.to_string();
+    }
+    let gdb = s_req(p, "geodatabase")?.to_string();
+    let name = ds.name.clone();
+    edit_database(s, &gdb, |dir| {
+        let n = rustgis_data::source::filegdb::write(&ds, dir, None).map_err(|e| e.to_string())?;
+        Ok(json!({"geodatabase": gdb, "item": name, "features": n}))
+    })
+}
+
+fn delete_gdb_item(s: &mut Session, p: &Value) -> CmdResult {
+    let item = s_req(p, "item")?.to_string();
+    let gdb = s_req(p, "geodatabase")?.to_string();
+    // Not under a layer that reads it.
+    let db = connected(s, &gdb)?;
+    let reads = s.project.maps.iter().flat_map(|m| m.layers.iter()).any(|l| {
+        let named = |d: Option<&str>| d.is_some_and(|d| d.eq_ignore_ascii_case(&db.name));
+        (named(l.source.as_ref().and_then(|x| x.database.as_deref()))
+            && l.source.as_ref().and_then(|x| x.table.as_deref()).is_some_and(|t| t.eq_ignore_ascii_case(&item)))
+            || (named(l.raster.as_ref().and_then(|r| r.database.as_deref()))
+                && l.raster.as_ref().and_then(|r| r.subdataset.as_deref()).is_some_and(|t| t.eq_ignore_ascii_case(&item)))
+    });
+    if reads {
+        return Err(format!("{item}: a layer reads it; remove the layer first"));
+    }
+    edit_database(s, &gdb, |dir| {
+        let removed = rustgis_data::source::filegdb::vfs_delete_item(dir, &item).map_err(|e| e.to_string())?;
+        Ok(json!({"deleted": removed}))
+    })
+}
+
+fn rename_gdb_item(s: &mut Session, p: &Value) -> CmdResult {
+    let (item, new) = (s_req(p, "item")?.to_string(), s_req(p, "newName")?.trim().to_string());
+    let gdb = s_req(p, "geodatabase")?.to_string();
+    edit_database(s, &gdb, |dir| {
+        rustgis_data::source::filegdb::vfs_rename_item(dir, &item, &new).map_err(|e| e.to_string())?;
+        Ok(json!({"renamed": item, "to": new}))
+    })
+}
+
+/// Creates an empty file geodatabase: in a folder on disk (connected), or held by the project.
+fn new_geodatabase(s: &mut Session, p: &Value) -> CmdResult {
+    use rustgis_data::source::filegdb;
+    let mut name = s_req(p, "name")?.trim().to_string();
+    if !name.to_ascii_lowercase().ends_with(".gdb") {
+        name.push_str(".gdb");
+    }
+    if name.len() <= 4 || name.contains(['/', '\\']) {
+        return Err(format!("{name}: not a geodatabase name"));
+    }
+    if let Some(folder) = ps(p, "path").map(str::trim).filter(|f| !f.is_empty()) {
+        let dir = Path::new(folder).join(&name);
+        filegdb::create_empty(&dir).map_err(|e| format!("{}: {e}", dir.display()))?;
+        return connect_database(s, &json!({"path": dir.display().to_string()}));
+    }
+    if s.project.database(&name).is_some() {
+        return Err(format!("{name} is already in the project"));
+    }
+    static NEW: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+    let n = NEW.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    // Made in an empty folder mounted in memory, then held by the project.
+    let parent = std::path::PathBuf::from(format!("/unigis-memory/new-{n}"));
+    filegdb::vfs::mount(&parent, Vec::new());
+    let made = filegdb::create_empty(&parent.join(&name)).and_then(|()| filegdb::dir_files(&parent.join(&name)));
+    filegdb::vfs::unmount(&parent);
+    let files = made.map_err(|e| format!("{name}: {e}"))?;
+    let zip = std::sync::Arc::new(filegdb::to_zip(&files).map_err(|e| format!("{name}: {e}"))?);
+    s.project.connect_database(crate::project::Database::uploaded(name.clone(), zip));
+    Ok(json!({"geodatabase": name}))
 }
 
 /// The project's databases and what each holds.
