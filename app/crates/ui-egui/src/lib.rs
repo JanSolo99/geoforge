@@ -53,6 +53,10 @@ pub type Inbox = std::sync::Arc<std::sync::Mutex<Vec<(String, Vec<u8>)>>>;
 /// inbox, so the dialog's options go with that file and no other (a drop, another picker).
 pub const DELIMITED_PICK: &str = "\u{1}delimited:";
 
+/// Starts the name of a geodatabase the web shell's folder picker (Catalog › Add Database) put in
+/// the inbox: it is connected to the project without adding layers, as ArcGIS's Add Database does.
+pub const DATABASE_PICK: &str = "\u{1}database:";
+
 /// The `open_async` purpose for a tool's file parameter, followed by the extensions it offers
 /// (`toolfile:nc,nc4`; none for any file).
 pub const TOOL_FILE_PURPOSE: &str = "toolfile:";
@@ -622,6 +626,15 @@ impl RustGisApp {
         if let Some(name) = name.strip_prefix(TOOL_FILE_PICK) {
             panes::received_file(self, name, bytes);
             return Ok(Value::Null);
+        }
+        if let Some(name) = name.strip_prefix(DATABASE_PICK) {
+            use base64::Engine;
+            let data = base64::engine::general_purpose::STANDARD.encode(bytes);
+            let r = self.run("layer.addDataBytes", json!({"fileName": name, "data": data, "catalogOnly": true}));
+            if r.is_ok() {
+                self.ui.dock.open(Pane::Catalog);
+            }
+            return r;
         }
         match name.strip_prefix(DELIMITED_PICK) {
             Some(name) => match self.ui.pending_csv.take() {
@@ -1398,7 +1411,12 @@ impl RustGisApp {
                             self.session.notify(e.clone(), true);
                             return Err(e);
                         }
-                        return self.run("layer.addData", json!({"path": dir.display().to_string()}));
+                        // Connected, not added (ArcGIS's Add Database): items are added from the Catalog.
+                        let r = self.run("catalog.addDatabase", json!({"path": dir.display().to_string()}));
+                        if r.is_ok() {
+                            self.ui.dock.open(Pane::Catalog);
+                        }
+                        return r;
                     }
                 }
             }

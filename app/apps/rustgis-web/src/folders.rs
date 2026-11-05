@@ -8,7 +8,7 @@
 
 use rustgis_ui_egui::rustgis_engine::cmd::raster::MAX_UPLOAD_BYTES;
 use rustgis_ui_egui::rustgis_engine::data::zip;
-use rustgis_ui_egui::{Inbox, i18n};
+use rustgis_ui_egui::{DATABASE_PICK, Inbox, i18n};
 use wasm_bindgen::JsCast;
 use wasm_bindgen::closure::Closure;
 
@@ -59,7 +59,8 @@ fn upload_name(folder: &str) -> String {
 }
 
 /// Reads the geodatabases among a folder's files into the inbox, saying what happens in `notes`.
-pub async fn read(files: Vec<Picked>, inbox: Inbox, notes: Notes, ctx: egui::Context) {
+/// `mark` starts each name put in the inbox ([`DATABASE_PICK`] connects without adding layers).
+pub async fn read(files: Vec<Picked>, mark: &'static str, inbox: Inbox, notes: Notes, ctx: egui::Context) {
     let note = |text: String, error: bool| notes.lock().unwrap_or_else(|e| e.into_inner()).push((text, error));
     let (gdbs, other) = geodatabases(files);
     if gdbs.is_empty() {
@@ -99,7 +100,7 @@ pub async fn read(files: Vec<Picked>, inbox: Inbox, notes: Notes, ctx: egui::Con
             continue;
         }
         match zip::write_stored(&entries) {
-            Ok(archive) => inbox.lock().unwrap_or_else(|e| e.into_inner()).push((name, archive)),
+            Ok(archive) => inbox.lock().unwrap_or_else(|e| e.into_inner()).push((format!("{mark}{name}"), archive)),
             Err(e) => note(format!("{name}: {e}"), true),
         }
         ctx.request_repaint();
@@ -115,7 +116,8 @@ async fn bytes(file: &web_sys::File) -> Result<Vec<u8>, String> {
     Ok(js_sys::Uint8Array::new(&buf).to_vec())
 }
 
-/// Opens the browser's folder picker; the geodatabases in the folder picked go to the inbox.
+/// Opens the browser's folder picker; the geodatabases in the folder picked go to the inbox, to be
+/// connected to the project (Catalog › Add Database).
 pub fn pick(inbox: Inbox, notes: Notes, ctx: egui::Context) -> Result<(), String> {
     let err = |e: wasm_bindgen::JsValue| format!("{e:?}");
     let document = web_sys::window().and_then(|w| w.document()).ok_or("no document")?;
@@ -138,7 +140,8 @@ pub fn pick(inbox: Inbox, notes: Notes, ctx: egui::Context) -> Result<(), String
                 files.push(Picked { path, file });
             }
         }
-        wasm_bindgen_futures::spawn_local(read(files, inbox, notes, ctx));
+        // Catalog › Add Database: connected, not added (as ArcGIS does).
+        wasm_bindgen_futures::spawn_local(read(files, DATABASE_PICK, inbox, notes, ctx));
     });
     input.add_event_listener_with_callback("change", on_change.as_ref().unchecked_ref()).map_err(err)?;
     on_change.forget();
@@ -169,7 +172,8 @@ pub fn listen_for_drops(inbox: Inbox, notes: Notes, ctx: egui::Context) -> Resul
                     notes.lock().unwrap_or_else(|e| e.into_inner()).push((format!("{}: {e}", entry.name()), true));
                 }
             }
-            read(files, inbox, notes, ctx).await;
+            // Dropped on the map: its feature classes are added, as dragging one onto a map does.
+            read(files, "", inbox, notes, ctx).await;
         });
     });
     window.add_event_listener_with_callback_and_bool("drop", on_drop.as_ref().unchecked_ref(), true).map_err(err)?;

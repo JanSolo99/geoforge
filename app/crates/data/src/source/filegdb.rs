@@ -12,7 +12,8 @@ use std::path::Path;
 use std::sync::{Arc, Mutex, Weak};
 
 use unigis_core::{Envelope, GeometryKind, Value as GfValue};
-use unigis_filegdb::{Geodatabase, Table};
+pub use unigis_filegdb::Geodatabase;
+use unigis_filegdb::Table;
 
 pub use super::gfshape::{from_unigis, to_unigis};
 use super::{Batch, FeatureSource, Reproject, Request, SourceInfo, clamp_limit, stride};
@@ -169,6 +170,11 @@ pub fn zip_has_geodatabase(bytes: &[u8]) -> bool {
 /// Geodatabases recently read from zip archives, by the archive's bytes: a layer per feature
 /// class reopens its geodatabase, which needn't be inflated again each time.
 static OPENED: Mutex<Vec<(Weak<Vec<u8>>, Arc<Geodatabase>)>> = Mutex::new(Vec::new());
+
+/// Opens the geodatabase in a `.gdb` folder on disk.
+pub fn open_dir(path: &Path) -> Result<Arc<Geodatabase>> {
+    Geodatabase::open(path).map(Arc::new).map_err(bad)
+}
 
 /// Reads a geodatabase held as a zip archive of its folder's files.
 pub fn from_zip(bytes: &super::Shared) -> Result<Arc<Geodatabase>> {

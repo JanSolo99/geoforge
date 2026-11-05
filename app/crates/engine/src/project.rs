@@ -89,7 +89,40 @@ pub struct Project {
     pub shared: Vec<crate::cmd::sharing::SharedItem>,
     #[serde(default)]
     pub data_stores: Vec<crate::cmd::sharing::DataStore>,
+    /// Databases connected to the project (Catalog › Databases), as ArcGIS keeps a project's
+    /// database connections: file geodatabases by path (desktop) or uploaded (the browser), each
+    /// kept once however many layers read it.
+    #[serde(default)]
+    pub databases: Vec<Database>,
 }
+
+/// A database connected to a project: a file geodatabase on disk (`path`) or uploaded (`data`, a
+/// zip archive of its folder's files, saved with the project once).
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+pub struct Database {
+    /// `Name.gdb`: unique in the project, the name layers refer to.
+    pub name: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub path: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none", with = "rustgis_map::raster::b64")]
+    pub data: Option<std::sync::Arc<Vec<u8>>>,
+}
+
+impl Database {
+    /// An uploaded geodatabase.
+    pub fn uploaded(name: impl Into<String>, data: std::sync::Arc<Vec<u8>>) -> Self {
+        Database { name: name.into(), path: None, data: Some(data) }
+    }
+
+    /// A geodatabase on disk.
+    pub fn on_disk(path: &std::path::Path) -> Self {
+        let name = path.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_else(|| path.display().to_string());
+        Database { name, path: Some(path.display().to_string()), data: None }
+    }
+}
+
+/// Most databases a project connects.
+pub const MAX_DATABASES: usize = 256;
 
 /// A standalone table: a dataset without geometry, under an id that stays with it. Names can
 /// repeat and positions change, so the id is what says which table is meant.
@@ -275,7 +308,57 @@ impl Project {
             dl_models: Vec::new(),
             shared: Vec::new(),
             data_stores: Vec::new(),
+            databases: Vec::new(),
         }
+    }
+
+    /// The connected database of a name (`Name.gdb`, or `Name`), without regard to case.
+    pub fn database(&self, name: &str) -> Option<&Database> {
+        let name = name.trim();
+        self.databases
+            .iter()
+            .find(|d| d.name.eq_ignore_ascii_case(name) || d.name.strip_suffix(".gdb").is_some_and(|b| b.eq_ignore_ascii_case(name)))
+    }
+
+    /// Connects a database, replacing one of the same name.
+    pub fn connect_database(&mut self, db: Database) {
+        self.databases.retain(|d| !d.name.eq_ignore_ascii_case(&db.name));
+        self.databases.push(db);
+        self.databases.truncate(MAX_DATABASES);
+    }
+
+    /// Links layers to their databases' bytes. Layers of older projects, each holding its own
+    /// copy of an uploaded geodatabase, are moved onto one copy kept in `databases`.
+    fn link_databases(&mut self) {
+        let mut databases = std::mem::take(&mut self.databases);
+        databases.retain(|d| !d.name.trim().is_empty() && (d.path.is_some() || d.data.is_some()));
+        // Repeated names (a hand edit): the first is kept.
+        let mut seen: Vec<String> = Vec::new();
+        databases.retain(|d| {
+            let key = d.name.to_ascii_lowercase();
+            let new = !seen.contains(&key);
+            seen.push(key);
+            new
+        });
+        for l in self.maps.iter_mut().flat_map(|m| m.layers.iter_mut()) {
+            let Some(src) = &mut l.source else { continue };
+            let is_gdb = src.file_name.as_deref().is_some_and(|n| n.to_ascii_lowercase().ends_with(".gdb"));
+            if is_gdb
+                && src.database.is_none()
+                && let Some(bytes) = src.embedded.take()
+            {
+                let name = src.file_name.clone().unwrap_or_default();
+                if !databases.iter().any(|d| d.name.eq_ignore_ascii_case(&name)) {
+                    databases.push(Database::uploaded(name.clone(), bytes));
+                }
+                src.database = Some(name);
+            }
+            if let Some(name) = src.database.clone() {
+                src.database_bytes = databases.iter().find(|d| d.name.eq_ignore_ascii_case(&name)).and_then(|d| d.data.clone());
+            }
+        }
+        databases.truncate(MAX_DATABASES);
+        self.databases = databases;
     }
 
     /// The standalone table of an id.
@@ -320,6 +403,7 @@ impl Project {
 
     /// Repairs invariants after loading (at least one map; a valid active index).
     pub fn normalize(&mut self) {
+        self.link_databases();
         if self.maps.is_empty() {
             self.maps.push(Map::new("Map"));
         }

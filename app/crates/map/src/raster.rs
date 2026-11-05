@@ -100,7 +100,8 @@ impl RasterLayer {
     }
 }
 
-pub(crate) mod b64 {
+/// Bytes kept in a project file as base64 (`#[serde(with = "rustgis_map::raster::b64")]`).
+pub mod b64 {
     use std::sync::Arc;
 
     use base64::Engine;

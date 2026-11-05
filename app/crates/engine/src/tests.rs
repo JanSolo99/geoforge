@@ -5766,28 +5766,72 @@ fn uploaded_geodatabase_is_listed_and_its_feature_classes_added() {
     assert_eq!(s.geodatabases()[0].0, "Town.gdb");
     s.run("layer.addDataBytes", &json!({"fileName": "Town.gdb", "data": b64(&folder)})).unwrap();
     assert_eq!(s.map().layers.len(), 1);
-    // Small, so loaded whole: a saved project keeps its features (not the geodatabase).
+    // Saved and reopened, the project keeps its database (as ArcGIS keeps a connection), loaded
+    // whole or not.
     let text = serde_json::to_string(&s.project).unwrap();
     let mut s = Session::new(Project::default());
     s.run("project.openText", &json!({"text": text})).unwrap();
     assert_eq!(s.map().layer_by_name("Wells").map(|l| l.dataset.features.len()), Some(2));
+    assert_eq!(s.geodatabases().len(), 1);
 
-    // Read in place, a saved project keeps the geodatabase, and reopened, its layers bring it
-    // back to the list.
+    // Read in place, every layer names the project's one copy: two layers, one stored geodatabase.
     let mut s = Session::new(Project::default());
     s.run("layer.addDataBytes", &json!({"fileName": "Town.gdb", "data": b64(&folder), "stream": true})).unwrap();
-    assert!(s.map().layer_by_name("Wells").is_some_and(|l| l.is_streamed()));
+    s.run("layer.addGeodatabaseItem", &json!({"geodatabase": "Town", "layer": "Wells", "name": "Wells 2", "stream": true})).unwrap();
+    let streamed: Vec<_> = s.map().layers.iter().filter(|l| l.is_streamed()).collect();
+    assert_eq!(streamed.len(), 2);
+    assert!(streamed.iter().all(|l| l.source.as_ref().and_then(|x| x.database.as_deref()) == Some("Town.gdb")));
     let text = serde_json::to_string(&s.project).unwrap();
+    let encoded = b64(&folder);
+    assert_eq!(text.matches(&encoded[..64]).count(), 1, "the geodatabase is saved once");
     let mut s = Session::new(Project::default());
     s.run("project.openText", &json!({"text": text})).unwrap();
     assert_eq!(s.geodatabases().len(), 1);
-    assert_eq!(s.geodatabases()[0].0, "Town.gdb");
+    let read = |s: &Session, n: &str| s.map().layer_by_name(n).and_then(|l| l.source.as_ref()).and_then(|x| x.database_bytes.clone());
+    let (a, b) = (read(&s, "Wells").unwrap(), read(&s, "Wells 2").unwrap());
+    assert!(std::sync::Arc::ptr_eq(&a, &b), "one copy in memory");
+    assert!(std::sync::Arc::ptr_eq(&a, &s.geodatabases()[0].1));
     let listed = s.run("info.geodatabases", &json!({})).unwrap();
     assert_eq!(listed["geodatabases"][0]["items"].as_array().map(Vec::len), Some(2), "{listed}");
     // An item is added from the list by name, without uploading it again.
     s.run("layer.addGeodatabaseItem", &json!({"geodatabase": "town", "layer": "Owners"})).unwrap();
     assert!(s.project.tables.iter().any(|t| t.name == "Owners") || s.map().layer_by_name("Owners").is_some());
     assert!(s.run("layer.addGeodatabaseItem", &json!({"geodatabase": "Nowhere.gdb"})).is_err());
+    // Layers read it, so it stays until they are removed.
+    assert!(s.run("catalog.removeGeodatabase", &json!({"geodatabase": "Town.gdb"})).is_err());
+
+    // A project saved by an earlier version: each layer kept its own copy. Opened, they share one.
+    let mut old: Value = serde_json::from_str(&text).unwrap();
+    old["databases"] = json!([]);
+    for l in old["maps"][0]["layers"].as_array_mut().unwrap() {
+        if let Some(src) = l.get_mut("source").and_then(Value::as_object_mut) {
+            src.remove("database");
+            src.insert("embedded".into(), json!(encoded));
+        }
+    }
+    let mut s = Session::new(Project::default());
+    s.run("project.openText", &json!({"text": old.to_string()})).unwrap();
+    assert_eq!(s.project.databases.len(), 1);
+    let (a, b) = (read(&s, "Wells").unwrap(), read(&s, "Wells 2").unwrap());
+    assert!(std::sync::Arc::ptr_eq(&a, &b));
+    assert!(s.map().layer_by_name("Wells 2").and_then(|l| l.source.as_ref()).is_some_and(|x| x.is_open() && x.error.is_none()));
+    assert_eq!(serde_json::to_string(&s.project).unwrap().matches(&encoded[..64]).count(), 1);
+
+    // A geodatabase on disk is connected without adding layers (Catalog › Add Database).
+    let mut s = Session::new(Project::default());
+    let r = s.run("catalog.addDatabase", &json!({"path": gdb.display().to_string()})).unwrap();
+    assert_eq!(r["items"].as_array().map(Vec::len), Some(2), "{r}");
+    assert!(s.map().layers.is_empty());
+    assert_eq!(s.project.databases.len(), 1);
+    assert!(s.geodatabases().is_empty(), "not an upload");
+    s.run("layer.addGeodatabaseItem", &json!({"geodatabase": "Town.gdb", "layer": "Wells"})).unwrap();
+    assert_eq!(s.map().layers.len(), 1);
+    s.run("catalog.removeGeodatabase", &json!({"geodatabase": "Town.gdb"})).unwrap();
+    assert!(s.project.databases.is_empty());
+    assert!(s.run("catalog.addDatabase", &json!({"path": dir.display().to_string()})).is_err(), "not a geodatabase");
+    // Adding a geodatabase's layers on the desktop connects it too.
+    s.run("layer.addData", &json!({"path": gdb.display().to_string()})).unwrap();
+    assert_eq!(s.project.databases.len(), 1);
 
     // Not a geodatabase: a clear error, never a panic.
     let mut s = Session::new(Project::default());

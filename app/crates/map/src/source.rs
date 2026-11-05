@@ -42,6 +42,13 @@ pub struct SourceLayer {
     /// The original file, kept in the project when there is no path (a browser upload).
     #[serde(default, skip_serializing_if = "Option::is_none", with = "crate::raster::b64")]
     pub embedded: Option<Arc<Vec<u8>>>,
+    /// The project database (an uploaded geodatabase, `Name.gdb`) the layer reads, kept once in
+    /// the project rather than in every layer: its bytes are [`SourceLayer::database_bytes`].
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub database: Option<String>,
+    /// The bytes of [`SourceLayer::database`], shared with the project's copy (not saved here).
+    #[serde(skip)]
+    pub database_bytes: Option<Arc<Vec<u8>>>,
     #[serde(skip)]
     handle: Option<Arc<dyn FeatureSource>>,
     #[serde(skip)]
@@ -248,6 +255,20 @@ impl SourceLayer {
         }
     }
 
+    /// A source read from a project database (an uploaded geodatabase `Name.gdb`, held by the
+    /// project once): the layer saves only the database's name.
+    pub fn from_database(database: impl Into<String>, bytes: Arc<Vec<u8>>, table: Option<String>, handle: Box<dyn FeatureSource>) -> Self {
+        let database = database.into();
+        SourceLayer {
+            file_name: Some(database.clone()),
+            database: Some(database),
+            database_bytes: Some(bytes),
+            table,
+            handle: Some(Arc::from(handle)),
+            ..SourceLayer::default()
+        }
+    }
+
     /// Opens the source again (after a project loads). A source by its web address is opened off
     /// the frame: `Ok` while it is (see [`SourceLayer::is_pending`]), open once it has landed.
     pub fn open(&mut self) -> Result<(), String> {
@@ -256,7 +277,7 @@ impl SourceLayer {
         }
         let src = if let Some(pg) = &self.postgis {
             open_postgis(pg)
-        } else if let Some(bytes) = &self.embedded {
+        } else if let Some(bytes) = self.embedded.as_ref().or(self.database_bytes.as_ref()) {
             let name = self.file_name.as_deref().unwrap_or("layer.parquet");
             rustgis_data::source::open_shared(name, bytes.clone(), self.table.as_deref())
         } else if let Some(p) = &self.path {
