@@ -30,7 +30,7 @@ the cached GitHub CI card remains the separately fetched status of main.
 | Workflow | CLI | Browser | Native desktop |
 |---|---|---|---|
 | Clip points, export GeoPackage, reopen Shapefile; preserve CRS/attributes | Automated in `smoke.py` | Not covered by this milestone | Not run here |
-| Create/edit FileGDB, calculate field, delete rows, export/reopen | Automated in `smoke.py` | Reading only: a picked/dropped `.gdb` folder or zip is listed in the Catalog and its classes added (engine tests; not in `browser.cjs` yet). Editing is desktop-only | Not run here |
+| Create/edit FileGDB, calculate field, delete rows, export/reopen | Automated in `smoke.py` | Reading only: a `.gdb` folder (picked or dropped) or a zip holding one is listed in the Catalog under Databases and its feature classes added; `browser.cjs` uploads `testdata/gdb-reference/edit_fc.gdb` as a zip. Folder pick/drop itself is not automated. Editing is desktop-only | Not run here |
 | Raster import, projection, algebra, NoData, failed-write preservation | Automated in `smoke.py` | Not covered by this milestone | Not run here |
 | Import GeoJSON, Buffer two points, export GeoJSON, save/reopen project | Not this test's scope | Automated in `browser.cjs` | Not run here |
 | Basemaps, plugins and online services | Not this test's scope | Explicitly excluded from offline smoke | Not run here |

@@ -55,9 +55,17 @@ does" — in the browser too, where FileGDB reading was desktop-only.
   `raw.githubusercontent.com/opengeos/rustgis-assets/main/data/` (assets.rustgis.app is blocked
   here); `apt-get install sqlite3 libwayland-dev libxkbcommon-dev libgtk-3-dev libudev-dev`.
 
+- Real browser: `scripts/build-web.sh` (release, trunk 0.21.14) built `app/dist/web` (31 MB) from
+  this branch; `node scripts/readiness/browser.cjs --dist app/dist/web` passed all 6 checks
+  (incl. `add_file_geodatabase_zip`), zero page errors, Chromium from the container.
+  Catalog screenshots (scratch harness) show Databases › testopenfilegdb.gdb (33 items, geometry
+  icons) and featuredataset.gdb (feature datasets fd1, fd2 + standalone).
+- Harness note: at the top level, `?embed` makes the app its own parent, so it receives its own
+  `project` messages and reopens the project (which clears the uploaded-geodatabase list, as
+  opening a project should). Real embeddings (an iframe) don't. The scratch screenshot harness
+  intercepts `window.postMessage` for that reason.
+
 ## Next
 
-- Real-browser run of `browser.cjs` against a fresh `scripts/build-web.sh` build (see final report
-  of the session for whether it ran).
 - Optional: keep uploaded geodatabases in the saved project (currently only via streamed layers).
 - Land on main via a PR (user decides); the Netlify workflow then runs the browser gate.
