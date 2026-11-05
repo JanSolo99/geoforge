@@ -1951,3 +1951,16 @@ Feature Class	Feature-Class
 Feature Dataset	Feature-Dataset
 Right-click to create data here	Rechtsklick, um hier Daten anzulegen
 Empty: right-click the geodatabase to add data	Leer: Rechtsklick auf die Geodatabase, um Daten hinzuzufügen
+Databases	Datenbanken
+Add Geodatabase…	Geodatabase hinzufügen…
+Geodatabase…	Geodatabase…
+Add To Map	Zur Karte hinzufügen
+Add All Feature Classes	Alle Feature-Classes hinzufügen
+Remove From Catalog	Aus dem Katalog entfernen
+Uploaded: held in this browser tab	Hochgeladen: in diesem Browser-Tab gespeichert
+{name}: can't be read	{name}: kann nicht gelesen werden
+{n} rows · Double-click to add	{n} Zeilen · Zum Hinzufügen doppelklicken
+No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable	Keine Datei-Geodatabase in diesem Ordner: ein .gdb-Ordner enthält a00000001.gdbtable
+Only geodatabases are read from a folder: {n} other files were left out	Aus einem Ordner werden nur Geodatabases gelesen: {n} andere Dateien wurden ausgelassen
+{name} is larger than the web app's {mb} MB: open it in the desktop app	{name} ist größer als die {mb} MB der Web-App: öffnen Sie sie in der Desktop-App
+Reading {name}…	{name} wird gelesen…

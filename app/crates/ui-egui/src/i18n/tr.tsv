@@ -1951,3 +1951,16 @@ Feature Class	Detay sınıfı
 Feature Dataset	Detay veri kümesi
 Right-click to create data here	Burada veri oluşturmak için sağ tıklayın
 Empty: right-click the geodatabase to add data	Boş: veri eklemek için coğrafi veritabanına sağ tıklayın
+Databases	Veritabanları
+Add Geodatabase…	Coğrafi veritabanı ekle…
+Geodatabase…	Coğrafi veritabanı…
+Add To Map	Haritaya ekle
+Add All Feature Classes	Tüm detay sınıflarını ekle
+Remove From Catalog	Katalogdan kaldır
+Uploaded: held in this browser tab	Yüklendi: bu tarayıcı sekmesinde tutuluyor
+{name}: can't be read	{name}: okunamıyor
+{n} rows · Double-click to add	{n} satır · Eklemek için çift tıklayın
+No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable	O klasörde dosya coğrafi veritabanı yok: bir .gdb klasörü a00000001.gdbtable içerir
+Only geodatabases are read from a folder: {n} other files were left out	Bir klasörden yalnızca coğrafi veritabanları okunur: {n} diğer dosya atlandı
+{name} is larger than the web app's {mb} MB: open it in the desktop app	{name}, web uygulamasının {mb} MB sınırından büyük: masaüstü uygulamasında açın
+Reading {name}…	{name} okunuyor…

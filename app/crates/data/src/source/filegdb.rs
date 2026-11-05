@@ -9,6 +9,7 @@
 //! The files are hostile input: a row that doesn't decode is skipped and counted.
 
 use std::path::Path;
+use std::sync::{Arc, Mutex, Weak};
 
 use unigis_core::{Envelope, GeometryKind, Value as GfValue};
 use unigis_filegdb::{Geodatabase, Table};
@@ -33,7 +34,16 @@ impl FileGdbSource {
     /// Opens `path` (the `.gdb` folder); `layer` names a table (default: the first feature class,
     /// else the first table).
     pub fn open(path: &Path, layer: Option<&str>) -> Result<FileGdbSource> {
-        let gdb = Geodatabase::open(path).map_err(bad)?;
+        Self::open_in(&Geodatabase::open(path).map_err(bad)?, layer)
+    }
+
+    /// Opens a geodatabase uploaded as a zip archive of its folder's files (see [`zip_geodatabases`]).
+    pub fn open_zip(bytes: &super::Shared, layer: Option<&str>) -> Result<FileGdbSource> {
+        Self::open_in(&*from_zip(bytes)?, layer)
+    }
+
+    /// Opens a table of an open geodatabase.
+    pub fn open_in(gdb: &Geodatabase, layer: Option<&str>) -> Result<FileGdbSource> {
         let name = match layer {
             Some(n) => n.to_string(),
             None => {
@@ -80,7 +90,7 @@ impl FileGdbSource {
             .filter(|e| e.min_x.is_finite() && e.max_x.is_finite() && e.min_x <= e.max_x && e.min_y <= e.max_y)
             .map_or(Extent::EMPTY, |e| reproject.extent_to_lonlat(&e));
         let fields = table.fields().iter().map(|f| Field::new(&f.name, field_type(f.field_type))).collect();
-        let indexed = def.is_some_and(|d| d.grid_sizes.iter().any(|&g| g > 0.0)) && path_has_spx(path, &gdb, &name);
+        let indexed = def.is_some_and(|d| d.grid_sizes.iter().any(|&g| g > 0.0)) && has_spx(gdb, &name);
         let info = SourceInfo {
             name,
             format: "File Geodatabase",
@@ -107,8 +117,119 @@ impl FileGdbSource {
     }
 }
 
-fn path_has_spx(_path: &Path, gdb: &Geodatabase, name: &str) -> bool {
-    gdb.table_base(name).is_ok_and(|b| b.with_extension("spx").is_file())
+fn has_spx(gdb: &Geodatabase, name: &str) -> bool {
+    gdb.table_base(name).is_ok_and(|b| gdb.store().is_file(&b.with_extension("spx")))
+}
+
+/// Whether a file name is a geodatabase's system catalog (`a00000001.gdbtable`), which marks
+/// the folder holding it as a geodatabase.
+fn is_catalog(name: &str) -> bool {
+    name.rsplit(['/', '\\']).next().is_some_and(|n| n.eq_ignore_ascii_case("a00000001.gdbtable"))
+}
+
+/// The folder part of a zip entry's name (`""` for one at the top).
+fn folder(name: &str) -> &str {
+    name.rfind(['/', '\\']).map_or("", |i| &name[..i])
+}
+
+/// The geodatabases in a zip archive, each as `(Name.gdb, a zip archive of just its files)`: a
+/// folder is one when it holds a system catalog (`a00000001.gdbtable`). Files zipped without
+/// their folder make one named after the archive (`file_name`). Other files are left out.
+pub fn zip_geodatabases(file_name: &str, bytes: &[u8]) -> Result<Vec<(String, Vec<u8>)>> {
+    let names = crate::zip::read_matching(bytes, is_catalog).map_err(|e| bad(format!("{file_name}: {e}")))?;
+    let mut folders: Vec<String> = names.iter().map(|(n, _)| folder(n).to_string()).collect();
+    folders.sort();
+    folders.dedup();
+    if folders.is_empty() {
+        return Ok(Vec::new());
+    }
+    let wanted = |n: &str| folders.iter().any(|f| folder(n) == f) && !n.ends_with('/');
+    let entries = crate::zip::read_matching(bytes, wanted).map_err(|e| bad(format!("{file_name}: {e}")))?;
+    let stem = Path::new(file_name).file_stem().and_then(|s| s.to_str()).unwrap_or("Upload");
+    let mut out = Vec::new();
+    for f in &folders {
+        let leaf = f.rsplit(['/', '\\']).next().unwrap_or(f);
+        let base = if leaf.is_empty() { stem } else { leaf };
+        let base = base.strip_suffix(".gdb").or_else(|| base.strip_suffix(".GDB")).unwrap_or(base);
+        let files: Vec<(String, Vec<u8>)> = entries
+            .iter()
+            .filter(|(n, _)| folder(n) == f)
+            .map(|(n, b)| (n.rsplit(['/', '\\']).next().unwrap_or(n).to_string(), b.clone()))
+            .collect();
+        out.push((format!("{base}.gdb"), crate::zip::write_stored(&files).map_err(bad)?));
+    }
+    Ok(out)
+}
+
+/// Whether a zip archive holds a geodatabase (reads only its directory and the catalog).
+pub fn zip_has_geodatabase(bytes: &[u8]) -> bool {
+    crate::zip::read_matching(bytes, is_catalog).is_ok_and(|e| !e.is_empty())
+}
+
+/// Geodatabases recently read from zip archives, by the archive's bytes: a layer per feature
+/// class reopens its geodatabase, which needn't be inflated again each time.
+static OPENED: Mutex<Vec<(Weak<Vec<u8>>, Arc<Geodatabase>)>> = Mutex::new(Vec::new());
+
+/// Reads a geodatabase held as a zip archive of its folder's files.
+pub fn from_zip(bytes: &super::Shared) -> Result<Arc<Geodatabase>> {
+    let mut cache = OPENED.lock().unwrap_or_else(|e| e.into_inner());
+    cache.retain(|(w, _)| w.strong_count() > 0);
+    if let Some((_, g)) = cache.iter().find(|(w, _)| w.upgrade().is_some_and(|b| Arc::ptr_eq(&b, &bytes.0))) {
+        return Ok(g.clone());
+    }
+    let files = crate::zip::read(bytes.as_ref()).map_err(bad)?;
+    let files = files.into_iter().filter(|(n, _)| !n.ends_with('/'));
+    let gdb = Arc::new(Geodatabase::from_files("upload.gdb", files).map_err(bad)?);
+    cache.push((Arc::downgrade(&bytes.0), gdb.clone()));
+    // A handful at a time: each holds its geodatabase's files.
+    if cache.len() > 8 {
+        cache.remove(0);
+    }
+    Ok(gdb)
+}
+
+/// What a geodatabase holds, for a catalog: its feature datasets, then its tables and feature
+/// classes with the feature dataset each is in, in catalog order.
+#[derive(Debug, Clone, Default, PartialEq)]
+pub struct Contents {
+    pub feature_datasets: Vec<String>,
+    pub items: Vec<Item>,
+}
+
+/// One table or feature class of a geodatabase.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Item {
+    pub name: String,
+    pub feature_dataset: Option<String>,
+    /// `None` for a table.
+    pub geometry: Option<GeometryType>,
+    /// A MultiPatch class, which the map doesn't draw.
+    pub multipatch: bool,
+    pub rows: u64,
+}
+
+/// The contents of an open geodatabase. Tables that don't open are listed as tables.
+pub fn contents(gdb: &Geodatabase) -> Contents {
+    let items = gdb
+        .entries()
+        .iter()
+        .map(|e| {
+            let t = gdb.open_table(&e.name).ok();
+            let kind = t.as_ref().and_then(Table::geometry_kind);
+            Item {
+                name: e.name.clone(),
+                feature_dataset: e.feature_dataset.clone(),
+                geometry: kind.map(|k| match k {
+                    GeometryKind::Point | GeometryKind::Multipoint => GeometryType::Point,
+                    GeometryKind::Polyline => GeometryType::Polyline,
+                    GeometryKind::Polygon | GeometryKind::MultiPatch => GeometryType::Polygon,
+                }),
+                multipatch: kind == Some(GeometryKind::MultiPatch),
+                rows: t.as_ref().map_or(0, Table::row_count),
+            }
+        })
+        .collect();
+    Contents { feature_datasets: gdb.feature_datasets().to_vec(), items }
 }
 
 fn field_type(t: unigis_core::FieldType) -> FieldType {
@@ -223,7 +344,16 @@ fn gdb_name(raw: &str, max: usize) -> String {
 
 /// The feature classes of a File Geodatabase (MultiPatch ones are left out), by name.
 pub fn layers(gdb: &Path) -> Result<Vec<String>> {
-    let g = Geodatabase::open(gdb).map_err(bad)?;
+    layers_in(&Geodatabase::open(gdb).map_err(bad)?)
+}
+
+/// The feature classes of a geodatabase uploaded as a zip archive, by name.
+pub fn layers_zip(bytes: &super::Shared) -> Result<Vec<String>> {
+    layers_in(&*from_zip(bytes)?)
+}
+
+/// The feature classes of an open geodatabase (MultiPatch ones are left out), by name.
+pub fn layers_in(g: &Geodatabase) -> Result<Vec<String>> {
     let mut out = Vec::new();
     for e in g.entries() {
         let t = g.open_table(&e.name).map_err(bad)?;

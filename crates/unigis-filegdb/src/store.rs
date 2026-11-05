@@ -59,7 +59,8 @@ impl Store {
         }
     }
 
-    pub(crate) fn is_file(&self, path: &Path) -> bool {
+    /// Whether the file exists.
+    pub fn is_file(&self, path: &Path) -> bool {
         match &self.memory {
             None => path.is_file(),
             Some(m) => m.contains_key(&key(path)),

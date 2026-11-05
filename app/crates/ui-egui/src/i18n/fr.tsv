@@ -1951,3 +1951,16 @@ Feature Class	Classe d'entités
 Feature Dataset	Jeu de classes d'entités
 Right-click to create data here	Clic droit pour créer des données ici
 Empty: right-click the geodatabase to add data	Vide : clic droit sur la géodatabase pour ajouter des données
+Databases	Bases de données
+Add Geodatabase…	Ajouter une géodatabase…
+Geodatabase…	Géodatabase…
+Add To Map	Ajouter à la carte
+Add All Feature Classes	Ajouter toutes les classes d'entités
+Remove From Catalog	Retirer du catalogue
+Uploaded: held in this browser tab	Importée : conservée dans cet onglet du navigateur
+{name}: can't be read	{name} : illisible
+{n} rows · Double-click to add	{n} lignes · Double-cliquez pour ajouter
+No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable	Aucune géodatabase fichier dans ce dossier : un dossier .gdb contient a00000001.gdbtable
+Only geodatabases are read from a folder: {n} other files were left out	Seules les géodatabases sont lues dans un dossier : {n} autres fichiers ont été ignorés
+{name} is larger than the web app's {mb} MB: open it in the desktop app	{name} dépasse les {mb} Mo de l'application web : ouvrez-la dans l'application de bureau
+Reading {name}…	Lecture de {name}…

@@ -5,7 +5,9 @@
 //! directory (output in `dist/web`).
 //!
 //! Differences from the desktop app: Open and Add Data use the browser's file picker (GeoJSON,
-//! CSV and `.rgis`; Shapefiles need the desktop app), files can be dropped on the page, and
+//! CSV and `.rgis`; Shapefiles need the desktop app), files can be dropped on the page, a file
+//! geodatabase folder can be picked (Add › Geodatabase…) or dropped and is read in memory (see
+//! `folders.rs`), and
 //! Save and Export download. URL flags: `?webgl` forces WebGL2; `?blank` starts an empty project;
 //! `?lang=de` sets the interface language; `?project=<url>` opens a project by its web address;
 //! `?embed` runs it inside another page (see `embed.rs`).
@@ -16,6 +18,8 @@
 // Pure logic, tested natively; only the browser build uses it.
 #[cfg_attr(not(target_arch = "wasm32"), allow(dead_code))]
 mod embed;
+#[cfg(target_arch = "wasm32")]
+mod folders;
 #[cfg(target_arch = "wasm32")]
 mod geolibre;
 #[cfg(target_arch = "wasm32")]

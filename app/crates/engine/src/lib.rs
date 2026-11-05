@@ -341,6 +341,10 @@ pub struct Session {
     /// the id, the query and database (label) they came from, and the result.
     #[cfg(not(target_arch = "wasm32"))]
     pub(crate) sql_results: Vec<(u64, String, Option<String>, rustgis_data::source::duckdb::Output)>,
+    /// File geodatabases uploaded in this session (the browser's Add Data), by name, each held as
+    /// a zip archive of its folder's files: the Catalog lists them under Databases. See
+    /// [`Session::geodatabases`], which adds those that a reopened project's layers read.
+    pub uploaded_geodatabases: Vec<(String, std::sync::Arc<Vec<u8>>)>,
 }
 
 /// The most `layer.addUrl` requests kept for the front end at a time.
@@ -447,7 +451,25 @@ impl Session {
             request_only: false,
             #[cfg(not(target_arch = "wasm32"))]
             sql_results: Vec::new(),
+            uploaded_geodatabases: Vec::new(),
         }
+    }
+
+    /// The uploaded file geodatabases to list in the Catalog: those added in this session, then
+    /// any that the project's layers read (a project reopened with its uploads). One per name.
+    pub fn geodatabases(&self) -> Vec<(String, std::sync::Arc<Vec<u8>>)> {
+        let mut out = self.uploaded_geodatabases.clone();
+        let from_layers = self.project.maps.iter().flat_map(|m| m.layers.iter()).filter_map(|l| {
+            let src = l.source.as_ref()?;
+            let name = src.file_name.as_ref().filter(|n| n.to_ascii_lowercase().ends_with(".gdb"))?;
+            Some((name.clone(), src.embedded.clone()?))
+        });
+        for (name, bytes) in from_layers {
+            if !out.iter().any(|(n, _)| *n == name) {
+                out.push((name, bytes));
+            }
+        }
+        out
     }
 
     /// Keeps a query's result the app ran off the frame, for `layer.addSql {"ran": id}`, with the
@@ -689,6 +711,7 @@ impl Session {
         self.url_requests.clear();
         #[cfg(not(target_arch = "wasm32"))]
         self.sql_results.clear();
+        self.uploaded_geodatabases.clear();
     }
 
     pub(crate) fn undo(&mut self) -> bool {

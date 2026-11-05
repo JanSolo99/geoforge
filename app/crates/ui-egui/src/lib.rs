@@ -700,7 +700,10 @@ impl RustGisApp {
             use base64::Engine;
             return self.add_picture(json!({"image": base64::engine::general_purpose::STANDARD.encode(bytes)}));
         }
+        // A geodatabase folder picked or dropped in the browser comes as `Name.gdb`: a zip archive
+        // of its files (see the web app's `folders.rs`).
         if rustgis_engine::data::raster::is_raster_name(name)
+            || lower.ends_with(".gdb")
             || rustgis_engine::data::source::is_source_name(name)
             || rustgis_engine::data::io::is_multi_layer_name(name)
             || rustgis_engine::data::sheets::is_sheet_name(name)
@@ -1380,6 +1383,23 @@ impl RustGisApp {
                     tl!("Vector and raster data"),
                 ) {
                     return self.run("layer.addData", json!({"path": path}));
+                }
+            }
+            // A file geodatabase is a folder: the browser's folder picker (its geodatabases are
+            // read into memory), or the desktop's (read in place).
+            "ui.addGeodatabase" => {
+                if let Some(open) = &self.services.open_async {
+                    open("folder");
+                } else {
+                    #[cfg(not(target_arch = "wasm32"))]
+                    if let Some(dir) = rfd::FileDialog::new().set_title(tl!("Add Geodatabase…")).pick_folder() {
+                        if !dir.join("a00000001.gdbtable").is_file() {
+                            let e = crate::i18n::fmt("No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable", &[]);
+                            self.session.notify(e.clone(), true);
+                            return Err(e);
+                        }
+                        return self.run("layer.addData", json!({"path": dir.display().to_string()}));
+                    }
                 }
             }
             "ui.open" => {

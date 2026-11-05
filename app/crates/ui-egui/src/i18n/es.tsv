@@ -1951,3 +1951,16 @@ Feature Class	Clase de entidad
 Feature Dataset	Dataset de entidades
 Right-click to create data here	Clic derecho para crear datos aquí
 Empty: right-click the geodatabase to add data	Vacía: clic derecho en la geodatabase para añadir datos
+Databases	Bases de datos
+Add Geodatabase…	Añadir geodatabase…
+Geodatabase…	Geodatabase…
+Add To Map	Añadir al mapa
+Add All Feature Classes	Añadir todas las clases de entidad
+Remove From Catalog	Quitar del catálogo
+Uploaded: held in this browser tab	Subida: guardada en esta pestaña del navegador
+{name}: can't be read	{name}: no se puede leer
+{n} rows · Double-click to add	{n} filas · Doble clic para añadir
+No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable	No hay ninguna geodatabase de archivos en esa carpeta: una carpeta .gdb contiene a00000001.gdbtable
+Only geodatabases are read from a folder: {n} other files were left out	De una carpeta solo se leen geodatabases: se omitieron {n} archivos más
+{name} is larger than the web app's {mb} MB: open it in the desktop app	{name} ocupa más de los {mb} MB de la aplicación web: ábrala en la aplicación de escritorio
+Reading {name}…	Leyendo {name}…

@@ -12,7 +12,6 @@ pub mod duckdb;
 #[cfg(not(target_arch = "wasm32"))]
 pub(crate) mod external;
 pub mod fgb;
-#[cfg(not(target_arch = "wasm32"))]
 pub mod filegdb;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod gdal;
@@ -197,6 +196,8 @@ pub fn open_shared(file_name: &str, bytes: std::sync::Arc<Vec<u8>>, layer: Optio
         "gpkg" => Ok(Box::new(gpkg::GpkgSource::open_bytes(bytes.as_ref(), layer)?)),
         #[cfg(target_arch = "wasm32")]
         "gpkg" => Ok(Box::new(gpkg_mem::GpkgMemSource::open_shared(bytes, layer)?)),
+        // An uploaded geodatabase (`Name.gdb`) is held as a zip archive of its folder's files.
+        "gdb" => Ok(Box::new(filegdb::FileGdbSource::open_zip(&bytes, layer)?)),
         other => {
             let _ = layer;
             Err(DataError::Unsupported(other.to_string()))

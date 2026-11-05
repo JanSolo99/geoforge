@@ -1951,3 +1951,16 @@ Feature Class	Obyekt sinfi
 Feature Dataset	Obyekt verilənlər dəsti
 Right-click to create data here	Burada verilənlər yaratmaq üçün sağ klikləyin
 Empty: right-click the geodatabase to add data	Boşdur: verilənlər əlavə etmək üçün geoverilənlər bazasına sağ klikləyin
+Databases	Verilənlər bazaları
+Add Geodatabase…	Geoverilənlər bazası əlavə et…
+Geodatabase…	Geoverilənlər bazası…
+Add To Map	Xəritəyə əlavə et
+Add All Feature Classes	Bütün obyekt siniflərini əlavə et
+Remove From Catalog	Katalaqdan sil
+Uploaded: held in this browser tab	Yüklənib: bu brauzer vərəqində saxlanılır
+{name}: can't be read	{name}: oxuna bilmir
+{n} rows · Double-click to add	{n} sətir · Əlavə etmək üçün iki dəfə klikləyin
+No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable	Həmin qovluqda fayl geoverilənlər bazası yoxdur: .gdb qovluğunda a00000001.gdbtable olur
+Only geodatabases are read from a folder: {n} other files were left out	Qovluqdan yalnız geoverilənlər bazaları oxunur: {n} digər fayl buraxıldı
+{name} is larger than the web app's {mb} MB: open it in the desktop app	{name} veb tətbiqin {mb} MB həddindən böyükdür: onu masaüstü tətbiqdə açın
+Reading {name}…	{name} oxunur…

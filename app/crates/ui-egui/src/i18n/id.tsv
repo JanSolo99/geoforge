@@ -1951,3 +1951,16 @@ Feature Class	Kelas fitur
 Feature Dataset	Dataset fitur
 Right-click to create data here	Klik kanan untuk membuat data di sini
 Empty: right-click the geodatabase to add data	Kosong: klik kanan geodatabase untuk menambahkan data
+Databases	Basis data
+Add Geodatabase…	Tambah geodatabase…
+Geodatabase…	Geodatabase…
+Add To Map	Tambah ke peta
+Add All Feature Classes	Tambah semua kelas fitur
+Remove From Catalog	Hapus dari katalog
+Uploaded: held in this browser tab	Diunggah: disimpan di tab peramban ini
+{name}: can't be read	{name}: tidak dapat dibaca
+{n} rows · Double-click to add	{n} baris · Klik ganda untuk menambah
+No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable	Tidak ada geodatabase file di folder itu: folder .gdb berisi a00000001.gdbtable
+Only geodatabases are read from a folder: {n} other files were left out	Dari folder hanya geodatabase yang dibaca: {n} file lain dilewati
+{name} is larger than the web app's {mb} MB: open it in the desktop app	{name} lebih besar dari {mb} MB aplikasi web: buka di aplikasi desktop
+Reading {name}…	Membaca {name}…

@@ -9,6 +9,45 @@ const http = require('node:http');
 const { parseArgs } = require('node:util');
 const { createHash } = require('node:crypto');
 
+// A zip archive of stored (uncompressed) entries: enough to carry a folder's files.
+function storedZip(files) {
+  const crcTable = Array.from({ length: 256 }, (_, n) => {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1;
+    return c >>> 0;
+  });
+  const crc32 = data => {
+    let c = 0xFFFFFFFF;
+    for (const b of data) c = crcTable[(c ^ b) & 0xFF] ^ (c >>> 8);
+    return (c ^ 0xFFFFFFFF) >>> 0;
+  };
+  const parts = [], central = [];
+  let offset = 0;
+  for (const { name, data } of files) {
+    const n = Buffer.from(name, 'utf8'), crc = crc32(data);
+    const head = (sig, isCentral) => {
+      const h = Buffer.alloc(isCentral ? 46 : 30);
+      let i = 0;
+      const u32 = v => { h.writeUInt32LE(v >>> 0, i); i += 4; }, u16 = v => { h.writeUInt16LE(v, i); i += 2; };
+      u32(sig);
+      if (isCentral) u16(20);
+      u16(20); u16(0x0800); u16(0); u16(0); u16(0x21);
+      u32(crc); u32(data.length); u32(data.length); u16(n.length); u16(0);
+      if (isCentral) { u16(0); u16(0); u16(0); u32(0); u32(offset); }
+      return h;
+    };
+    const local = head(0x04034b50, false);
+    parts.push(local, n, data);
+    central.push(head(0x02014b50, true), n);
+    offset += local.length + n.length + data.length;
+  }
+  const dir = Buffer.concat(central), end = Buffer.alloc(22);
+  end.writeUInt32LE(0x06054b50, 0);
+  end.writeUInt16LE(files.length, 8); end.writeUInt16LE(files.length, 10);
+  end.writeUInt32LE(dir.length, 12); end.writeUInt32LE(offset, 16);
+  return Buffer.concat([...parts, dir, end]);
+}
+
 async function main() {
   const { values } = parseArgs({ options: {
     dist: { type: 'string' }, report: { type: 'string', default: 'browser-readiness.json' },
@@ -17,7 +56,7 @@ async function main() {
   assert(values.dist, '--dist must point to the built web app');
   const root = path.resolve(values.dist);
   const report = { timestamp_utc: new Date().toISOString(),
-    scope: 'Offline Chromium: import, Buffer via UI, export, project save/reopen',
+    scope: 'Offline Chromium: import, Buffer via UI, export, project save/reopen, file geodatabase upload',
     checks: [], external_requests_blocked: [], page_errors: [] };
   const files = await fs.readdir(root);
   const wasm = files.find(name => name.endsWith('_bg.wasm'));
@@ -138,6 +177,21 @@ async function main() {
     const reopened = await projectWith('buffered');
     assert.deepEqual(reopened.maps[0].layers.map(l => l.dataset), savedProject.maps[0].layers.map(l => l.dataset));
     report.checks.push('save_reload_reopen_project');
+    // A file geodatabase, as a zip of its folder (a .gdb is a folder; the page takes files).
+    // It is listed in the Catalog under Databases and its feature class is added as a layer.
+    const gdbDir = path.resolve(__dirname, '../../testdata/gdb-reference/edit_fc.gdb');
+    const gdbFiles = [];
+    for (const name of (await fs.readdir(gdbDir)).sort()) {
+      gdbFiles.push({ name: `edit_fc.gdb/${name}`, data: await fs.readFile(path.join(gdbDir, name)) });
+    }
+    const gdbPicker = page.waitForEvent('filechooser');
+    await command('ui.addData');
+    await (await gdbPicker).setFiles({ name: 'edit_fc.zip', mimeType: 'application/zip', buffer: storedZip(gdbFiles) });
+    const withGdb = await projectWith('wells');
+    const wells = withGdb.maps[0].layers.find(l => l.name === 'wells');
+    assert(wells.dataset.features.length > 0, 'Geodatabase feature class added without features');
+    assert.equal(wells.dataset.source, 'edit_fc.gdb');
+    report.checks.push('add_file_geodatabase_zip');
     assert.deepEqual(report.page_errors, [], 'Browser runtime errors');
     report.passed = true;
   } catch (error) {

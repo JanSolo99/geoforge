@@ -1951,3 +1951,16 @@ Feature Class	ობიექტების კლასი
 Feature Dataset	ობიექტების მონაცემთა ნაკრები
 Right-click to create data here	დააწკაპუნეთ მარჯვენა ღილაკით, რომ აქ შექმნათ მონაცემები
 Empty: right-click the geodatabase to add data	ცარიელია: მონაცემების დასამატებლად დააწკაპუნეთ გეომონაცემთა ბაზაზე მარჯვენა ღილაკით
+Databases	მონაცემთა ბაზები
+Add Geodatabase…	გეომონაცემთა ბაზის დამატება…
+Geodatabase…	გეომონაცემთა ბაზა…
+Add To Map	რუკაზე დამატება
+Add All Feature Classes	ობიექტების ყველა კლასის დამატება
+Remove From Catalog	კატალოგიდან წაშლა
+Uploaded: held in this browser tab	ატვირთული: ინახება ბრაუზერის ამ ჩანართში
+{name}: can't be read	{name}: ვერ იკითხება
+{n} rows · Double-click to add	{n} სტრიქონი · დასამატებლად ორჯერ დააწკაპუნეთ
+No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable	ამ საქაღალდეში ფაილური გეომონაცემთა ბაზა არ არის: .gdb საქაღალდე შეიცავს a00000001.gdbtable-ს
+Only geodatabases are read from a folder: {n} other files were left out	საქაღალდიდან მხოლოდ გეომონაცემთა ბაზები იკითხება: {n} სხვა ფაილი გამოტოვებულია
+{name} is larger than the web app's {mb} MB: open it in the desktop app	{name} ვებაპლიკაციის {mb} მბ-ზე დიდია: გახსენით დესკტოპის აპლიკაციაში
+Reading {name}…	{name}-ის კითხვა…

@@ -508,6 +508,7 @@ pub fn command_search(app: &mut RustGisApp, ctx: &egui::Context) {
         }
         for (id, label, loc) in [
             ("ui.addData", "Add Data…", "Home › Add"),
+            ("ui.addGeodatabase", "Add Geodatabase…", "Home › Add"),
             ("ui.addDelimited", "Add Delimited Text…", "Home › Add"),
             ("ui.addUrl", "Add Data From URL…", "Home › Add"),
             ("ui.addZarr", "Add Zarr Variable…", "Home › Add"),

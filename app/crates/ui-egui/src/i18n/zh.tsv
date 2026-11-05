@@ -1951,3 +1951,16 @@ Feature Class	要素类
 Feature Dataset	要素数据集
 Right-click to create data here	右键单击以在此处创建数据
 Empty: right-click the geodatabase to add data	空：右键单击地理数据库以添加数据
+Databases	数据库
+Add Geodatabase…	添加地理数据库…
+Geodatabase…	地理数据库…
+Add To Map	添加到地图
+Add All Feature Classes	添加所有要素类
+Remove From Catalog	从目录中移除
+Uploaded: held in this browser tab	已上传：保存在此浏览器标签页中
+{name}: can't be read	{name}：无法读取
+{n} rows · Double-click to add	{n} 行 · 双击添加
+No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable	该文件夹中没有文件地理数据库：.gdb 文件夹包含 a00000001.gdbtable
+Only geodatabases are read from a folder: {n} other files were left out	仅从文件夹中读取地理数据库：已跳过其他 {n} 个文件
+{name} is larger than the web app's {mb} MB: open it in the desktop app	{name} 大于网页应用的 {mb} MB 上限：请在桌面应用中打开
+Reading {name}…	正在读取 {name}…

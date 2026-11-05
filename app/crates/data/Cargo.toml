@@ -38,10 +38,11 @@ lz4_flex = { workspace = true }
 ruzstd = { workspace = true }
 # UniGIS's geometry model (the parent repository); pure, so it builds for the browser.
 unigis-core = { path = "../../../crates/unigis-core" }
+# UniGIS's File Geodatabase reader (the parent repository): pure, so it reads uploads in the
+# browser too.
+unigis-filegdb = { path = "../../../crates/unigis-filegdb" }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-# UniGIS's engine (the parent repository): File Geodatabase reading.
-unigis-filegdb = { path = "../../../crates/unigis-filegdb" }
 rusqlite = { workspace = true }
 postgres = { workspace = true }
 tokio-postgres-rustls = { workspace = true }

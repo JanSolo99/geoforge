@@ -418,6 +418,7 @@ fn home_tab(app: &mut RustGisApp, ui: &mut Ui) {
         big_menu(ui, app, "basemap", "Basemap", "Change the map's backdrop.", basemap_gallery);
         big_menu(ui, app, "add_data", "Add\nData", "Add GeoJSON, CSV or Shapefile data to the map.", |ui, app| {
             menu_item(ui, app, "", "Data…", "ui.addData", Value::Null);
+            menu_item(ui, app, "", "Geodatabase…", "ui.addGeodatabase", Value::Null);
             menu_item(ui, app, "", "Delimited Text…", "ui.addDelimited", Value::Null);
             menu_item(ui, app, "", "Geocode Addresses…", "ui.dialog", json!({"name": "geocode"}));
             menu_item(ui, app, "", "From URL…", "ui.addUrl", Value::Null);

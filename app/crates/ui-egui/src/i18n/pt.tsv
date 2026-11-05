@@ -1951,3 +1951,16 @@ Feature Class	Classe de feição
 Feature Dataset	Conjunto de dados de feições
 Right-click to create data here	Clique com o botão direito para criar dados aqui
 Empty: right-click the geodatabase to add data	Vazio: clique com o botão direito no geodatabase para adicionar dados
+Databases	Bancos de dados
+Add Geodatabase…	Adicionar geodatabase…
+Geodatabase…	Geodatabase…
+Add To Map	Adicionar ao mapa
+Add All Feature Classes	Adicionar todas as classes de feição
+Remove From Catalog	Remover do catálogo
+Uploaded: held in this browser tab	Enviado: mantido nesta aba do navegador
+{name}: can't be read	{name}: não pode ser lido
+{n} rows · Double-click to add	{n} linhas · Clique duplo para adicionar
+No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable	Nenhum geodatabase de arquivo nessa pasta: uma pasta .gdb contém a00000001.gdbtable
+Only geodatabases are read from a folder: {n} other files were left out	De uma pasta, só geodatabases são lidos: {n} outros arquivos foram deixados de fora
+{name} is larger than the web app's {mb} MB: open it in the desktop app	{name} tem mais que os {mb} MB do aplicativo web: abra-o no aplicativo de desktop
+Reading {name}…	Lendo {name}…

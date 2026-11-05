@@ -29,7 +29,7 @@ pub(crate) fn need_raster(s: &Session) -> Option<&'static str> {
 pub fn commands() -> Vec<C> {
     vec![
         C::new("layer.addDataBytes", "Add Data (from file contents)", "Home › Add", add_bytes)
-            .params(r#"{"fileName": "name.tif|.tiff|.asc|.geojson|.csv|.zip|.kml|.kmz|.gpx|.parquet|.fgb|.gpkg|.mbtiles", "data": base64, "layer"?: "one layer of a zip, KML or GPX by name", "name"?: text, "x"?, "y"?, "wkt"?, "crs"?, "delimiter"?, "paperSpace"?, "stream"? (as layer.addData)}"#),
+            .params(r#"{"fileName": "name.tif|.tiff|.asc|.geojson|.csv|.zip|.kml|.kmz|.gpx|.parquet|.fgb|.gpkg|.mbtiles|.gdb (a geodatabase folder's files as a zip archive; a .zip holding .gdb folders works too)", "data": base64, "layer"?: "one layer of a zip, KML, GPX or geodatabase by name", "catalogOnly"?: "bool: a geodatabase is only listed in the Catalog, nothing added", "name"?: text, "x"?, "y"?, "wkt"?, "crs"?, "delimiter"?, "paperSpace"?, "stream"? (as layer.addData)}"#),
         C::new("raster.symbology", "Symbology", "Style › Rendering", symbology).when(need_raster).params(
             r#"{"layer"?, "type": "stretch"|"rgb"|"classify"|"unique"|"colormap"|"shadedRelief", "band"?: 1.., "ramp"?, "invert"?: bool, "classes"?: 1..32, "method"?, "azimuth"?, "altitude"?, "zFactor"?, "grey"?: bool (shadedRelief without its colour ramp)}"#,
         ),
@@ -214,6 +214,12 @@ pub(crate) fn add_named_bytes(s: &mut Session, p: &Value, name: String, bytes: V
     // A spreadsheet's sheet.
     if rustgis_data::sheets::is_sheet_name(&name) {
         return super::layer::add_sheet(s, p, &name, &bytes);
+    }
+    // A File Geodatabase: a `.gdb` folder carried as a zip archive of its files (a folder picked
+    // or dropped in the browser), or a zip archive holding `.gdb` folders.
+    let lower = name.to_ascii_lowercase();
+    if lower.ends_with(".gdb") || (lower.ends_with(".zip") && rustgis_data::source::filegdb::zip_has_geodatabase(&bytes)) {
+        return super::layer::add_geodatabases(s, p, &name, &bytes);
     }
     // Files of several layers: zipped Shapefiles, KML/KMZ, GPX, GeoRSS, LandXML.
     if rustgis_data::io::is_multi_layer_name(&name) {

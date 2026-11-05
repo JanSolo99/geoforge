@@ -36,6 +36,16 @@ fn crc32(data: &[u8]) -> u32 {
 /// holds at most 65,535 entries and 4 GiB, and names of up to 65,535 bytes; beyond that it's an
 /// error rather than a damaged archive.
 pub fn write(entries: &[(String, Vec<u8>)]) -> Result<Vec<u8>, String> {
+    write_with(entries, true)
+}
+
+/// [`write`] without compression: fast, for an archive that only carries files in memory (a
+/// folder picked in the browser).
+pub fn write_stored(entries: &[(String, Vec<u8>)]) -> Result<Vec<u8>, String> {
+    write_with(entries, false)
+}
+
+fn write_with(entries: &[(String, Vec<u8>)], compress: bool) -> Result<Vec<u8>, String> {
     let too_big = || "the archive is too large for a zip file".to_string();
     let count = u16::try_from(entries.len()).map_err(|_| too_big())?;
     let mut out = Vec::new();
@@ -45,8 +55,8 @@ pub fn write(entries: &[(String, Vec<u8>)]) -> Result<Vec<u8>, String> {
         let name_len = u16::try_from(n.len()).map_err(|_| too_big())?;
         let data_len = u32::try_from(data.len()).map_err(|_| too_big())?;
         let crc = crc32(data);
-        let z = miniz_oxide::deflate::compress_to_vec(data, 6);
-        let (method, body): (u16, &[u8]) = if z.len() < data.len() { (8, &z) } else { (0, data) };
+        let z = if compress { miniz_oxide::deflate::compress_to_vec(data, 6) } else { Vec::new() };
+        let (method, body): (u16, &[u8]) = if compress && z.len() < data.len() { (8, &z) } else { (0, data) };
         let offset = u32::try_from(out.len()).map_err(|_| too_big())?;
         let body_len = u32::try_from(body.len()).map_err(|_| too_big())?;
         let header = |sig: u32, central: bool| {

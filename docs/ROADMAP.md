@@ -235,6 +235,10 @@ Format notes: [`docs/formats/filegdb.md`](formats/filegdb.md). Clean-room: no Es
       subtypes parsed from the documented XML (no sample data to verify against yet)
 - [x] Spatial (`.spx`) and attribute (`.atx`) index queries (`features_in_extent`,
       `search_attribute`): 109 + 31 indexes never miss vs. full scans; ~18× faster extent query
+- [x] Read from memory (`Store`, `Geodatabase::from_files`), so the crate builds for WebAssembly:
+      the web app reads a picked or dropped `.gdb` folder (or a zip holding one) and lists it in
+      the Catalog under Databases with its feature datasets and classes, as ArcGIS does. All 94 test
+      geodatabases (309 tables) read identically from memory and disk (`tests/memory.rs`)
 - [x] Write new geodatabases: feature classes and tables (all field types except raster),
       all geometry types incl. Z/M, MultiPatch and curves, spatial index (.spx), domains;
       ArcGIS default resolutions (coordinates snap like ArcGIS); high-precision dates only

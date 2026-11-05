@@ -41,6 +41,12 @@ pub fn commands() -> Vec<C> {
             r#"{"polyline": "encoded polyline text" | [texts] (one line each), "precision"?: 5 (Google) | 6 (OSRM, Valhalla), "name"?: text}"#,
         ),
         C::new("layer.addDataText", "Add Data (from text)", "Home › Add", add_data_text).params(r#"{"fileName": "name.geojson|.csv|.tsv", "text": string, "name"?: text, "x"?, "y"?, "wkt"?, "crs"?, "delimiter"? (as layer.addData, for delimited text)}"#),
+        C::new("layer.addGeodatabaseItem", "Add From Geodatabase", "Home › Add", add_geodatabase_item).params(
+            r#"{"geodatabase": "an uploaded geodatabase (Name.gdb, as info.geodatabases lists it)", "layer"?: "a feature class or table (default: every feature class)", "name"?: text}"#,
+        ),
+        C::new("info.geodatabases", "List Uploaded Geodatabases", "Catalog › Databases", list_geodatabases).view(),
+        C::new("catalog.removeGeodatabase", "Remove Geodatabase From Catalog", "Catalog › Databases", remove_geodatabase)
+            .params(r#"{"geodatabase": "Name.gdb"}"#),
         C::new("layer.addSample", "Add Sample Data", "Home › Add › Add Data", add_sample).params(r#"{"name": "countries"|"cities"|"rivers"|"lakes"}"#),
         C::new("layer.remove", "Remove", "Layers", remove).key("Delete").when(need_layer).params(r#"{"layer"?: name|id}"#),
         C::new("layer.select", "Select Layer", "Layers", |s, p| {
@@ -826,6 +832,100 @@ const MAX_TABLES: usize = 32;
 /// `info.fileLayers` lists them).
 const MAX_SKIPPED_NAMED: usize = 100;
 
+/// Adds uploaded file geodatabases: `name`'s bytes are a zip archive holding one or more `.gdb`
+/// folders, or the files of the one `name` names (`Roads.gdb`). Each is listed in the Catalog
+/// under Databases, as ArcGIS lists a geodatabase, and its feature classes are added as layers
+/// (`"layer"` names one; `"catalogOnly": true` adds none). A geodatabase of only tables is listed,
+/// with nothing added.
+pub(crate) fn add_geodatabases(s: &mut Session, p: &Value, name: &str, bytes: &[u8]) -> CmdResult {
+    use rustgis_data::source::{Shared, filegdb};
+    let found = filegdb::zip_geodatabases(name, bytes).map_err(|e| format!("{name}: {e}"))?;
+    if found.is_empty() {
+        return Err(format!("{name}: no file geodatabase in it (a .gdb folder holds a00000001.gdbtable)"));
+    }
+    let catalog_only = b(p, "catalogOnly").unwrap_or(false);
+    let mut out = Vec::new();
+    let mut ids: Vec<Value> = Vec::new();
+    for (gdb, zip) in found {
+        let zip = std::sync::Arc::new(zip);
+        // Read once here: a damaged geodatabase is an error before anything is listed.
+        let contents = filegdb::from_zip(&Shared(zip.clone())).map(|g| filegdb::contents(&g)).map_err(|e| format!("{gdb}: {e}"))?;
+        // A geodatabase uploaded again replaces the one of that name.
+        s.uploaded_geodatabases.retain(|(n, _)| !n.eq_ignore_ascii_case(&gdb));
+        s.uploaded_geodatabases.push((gdb.clone(), zip.clone()));
+        s.revision = s.revision.wrapping_add(1);
+        let drawable = contents.items.iter().filter(|i| i.geometry.is_some() && !i.multipatch).count();
+        let mut entry = json!({
+            "geodatabase": gdb,
+            "featureDatasets": contents.feature_datasets,
+            "items": contents.items.iter().map(|i| json!({
+                "name": i.name, "featureDataset": i.feature_dataset, "featureClass": i.geometry.is_some(), "rows": i.rows,
+            })).collect::<Vec<_>>(),
+        });
+        if !catalog_only && (drawable > 0 || ps(p, "layer").is_some()) {
+            let r = add_source(s, p, Origin::Bytes(&gdb, zip))?;
+            if let Some(l) = r.get("layers").and_then(Value::as_array) {
+                ids.extend(l.iter().cloned());
+            }
+            entry["added"] = r;
+        } else {
+            s.notify(
+                format!("{gdb}: listed in the Catalog under Databases ({} tables); double-click one there to add it", contents.items.len()),
+                false,
+            );
+        }
+        out.push(entry);
+    }
+    Ok(json!({"geodatabases": out, "layer": ids.first().cloned(), "layers": ids}))
+}
+
+/// The uploaded geodatabase `name` names, matched without regard to case.
+fn uploaded(s: &Session, name: &str) -> Result<(String, std::sync::Arc<Vec<u8>>), String> {
+    let name = name.trim();
+    s.geodatabases()
+        .into_iter()
+        .find(|(n, _)| n.eq_ignore_ascii_case(name) || n.strip_suffix(".gdb").is_some_and(|b| b.eq_ignore_ascii_case(name)))
+        .ok_or_else(|| format!("no uploaded geodatabase {name} (info.geodatabases lists them)"))
+}
+
+/// Adds a feature class or table (or every feature class) of an uploaded geodatabase.
+fn add_geodatabase_item(s: &mut Session, p: &Value) -> CmdResult {
+    let (name, bytes) = uploaded(s, s_req(p, "geodatabase")?)?;
+    add_source(s, p, Origin::Bytes(&name, bytes))
+}
+
+/// The uploaded geodatabases and what each holds.
+fn list_geodatabases(s: &mut Session, _p: &Value) -> CmdResult {
+    use rustgis_data::source::{Shared, filegdb};
+    let list: Vec<Value> = s
+        .geodatabases()
+        .into_iter()
+        .map(|(name, bytes)| match filegdb::from_zip(&Shared(bytes)) {
+            Ok(g) => {
+                let c = filegdb::contents(&g);
+                json!({
+                    "geodatabase": name,
+                    "featureDatasets": c.feature_datasets,
+                    "items": c.items.iter().map(|i| json!({
+                        "name": i.name, "featureDataset": i.feature_dataset, "featureClass": i.geometry.is_some(), "rows": i.rows,
+                    })).collect::<Vec<_>>(),
+                })
+            }
+            Err(e) => json!({"geodatabase": name, "error": e.to_string()}),
+        })
+        .collect();
+    Ok(json!({"count": list.len(), "geodatabases": list}))
+}
+
+/// Takes an uploaded geodatabase off the Catalog's list (layers read from it stay; while any do,
+/// the list shows it again).
+fn remove_geodatabase(s: &mut Session, p: &Value) -> CmdResult {
+    let (name, _) = uploaded(s, s_req(p, "geodatabase")?)?;
+    s.uploaded_geodatabases.retain(|(n, _)| *n != name);
+    s.revision = s.revision.wrapping_add(1);
+    Ok(json!({"removed": name}))
+}
+
 /// Adds a GeoPackage, GeoParquet or FlatGeobuf file: each feature table becomes a layer. Large
 /// sources (or any, with `"stream": true`) are streamed, read in place a view at a time; smaller
 /// ones are loaded whole, so they can be edited.
@@ -854,6 +954,15 @@ fn add_source_with(
         (Some(t), _) => vec![Some(t.to_string())],
         (None, Origin::Path(path)) if path.to_ascii_lowercase().ends_with(".gpkg") || path.to_ascii_lowercase().ends_with(".gdb") => {
             let mut all = source::layers(Path::new(path)).map_err(err)?;
+            if all.len() > MAX_TABLES {
+                total = Some(all.len());
+                skipped = all.split_off(MAX_TABLES);
+            }
+            all.into_iter().map(Some).collect()
+        }
+        // An uploaded geodatabase (a zip archive of its folder's files) adds every feature class.
+        (None, Origin::Bytes(name, bytes)) if name.to_ascii_lowercase().ends_with(".gdb") => {
+            let mut all = source::filegdb::layers_zip(&source::Shared(bytes.clone())).map_err(err)?;
             if all.len() > MAX_TABLES {
                 total = Some(all.len());
                 skipped = all.split_off(MAX_TABLES);

@@ -5383,6 +5383,7 @@ dependencies = [
  "unigis-gpkg",
  "unigis-proj",
  "unigis-shapefile",
+ "zip 9.1.3",
 ]
 
 [[package]]

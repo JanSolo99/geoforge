@@ -83,6 +83,10 @@ pub fn start() {
                     let inbox: Inbox = Inbox::default();
                     let font_inbox: Inbox = Inbox::default();
                     let notes = Notes::default();
+                    // A geodatabase folder dropped on the page (eframe only takes files).
+                    if let Err(e) = crate::folders::listen_for_drops(inbox.clone(), notes.clone(), cc.egui_ctx.clone()) {
+                        log::error!("folder drops won't be read: {e}");
+                    }
                     let q = query();
                     let project = params(&q, "project", 1).into_iter().next();
                     let mut app = RustGisApp::with_sample().with_services(services(
@@ -587,6 +591,13 @@ fn services(inbox: Inbox, font_inbox: Inbox, notes: Notes, ctx: egui::Context, e
             let inbox = open_inbox.clone();
             let notes = notes.clone();
             let ctx = ctx.clone();
+            // A file geodatabase is a folder: the browser's folder picker (Add › Geodatabase…).
+            if purpose == "folder" {
+                if let Err(e) = crate::folders::pick(inbox, notes, ctx) {
+                    log::error!("couldn't open the folder picker: {e}");
+                }
+                return;
+            }
             // A file picked for Add Delimited Text carries its dialog's options.
             // So does a file picked for a tool's file parameter, which goes to the Tools pane.
             let tool_exts = purpose.strip_prefix(rustgis_ui_egui::TOOL_FILE_PURPOSE);

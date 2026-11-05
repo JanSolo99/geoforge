@@ -1951,3 +1951,16 @@ Feature Class	フィーチャクラス
 Feature Dataset	フィーチャ データセット
 Right-click to create data here	右クリックしてここにデータを作成
 Empty: right-click the geodatabase to add data	空: ジオデータベースを右クリックしてデータを追加
+Databases	データベース
+Add Geodatabase…	ジオデータベースを追加…
+Geodatabase…	ジオデータベース…
+Add To Map	マップに追加
+Add All Feature Classes	すべてのフィーチャクラスを追加
+Remove From Catalog	カタログから削除
+Uploaded: held in this browser tab	アップロード済み: このブラウザー タブに保持
+{name}: can't be read	{name}: 読み取れません
+{n} rows · Double-click to add	{n} 行 · ダブルクリックで追加
+No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable	そのフォルダーにファイル ジオデータベースがありません: .gdb フォルダーには a00000001.gdbtable があります
+Only geodatabases are read from a folder: {n} other files were left out	フォルダーから読み取るのはジオデータベースだけです: ほかの {n} 個のファイルは除外しました
+{name} is larger than the web app's {mb} MB: open it in the desktop app	{name} は Web アプリの上限 {mb} MB を超えています: デスクトップ アプリで開いてください
+Reading {name}…	{name} を読み取り中…

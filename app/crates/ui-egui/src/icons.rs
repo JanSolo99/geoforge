@@ -421,6 +421,37 @@ pub fn paint(painter: &Painter, r: Rect, name: &str, ink: Color32, accent: Color
             p.text(16.5, 17.2, "km²", 4.6, ink);
         }
         "table" => p.table(2.0, 4.0, 20.0, 16.0),
+        // A file geodatabase: a database drum (Catalog › Databases).
+        "geodatabase" => {
+            let ring = |y: f32| -> Vec<(f32, f32)> {
+                (0..=16)
+                    .map(|i| {
+                        let a = std::f32::consts::PI * i as f32 / 16.0;
+                        (12.0 - 8.0 * a.cos(), y + 2.6 * a.sin())
+                    })
+                    .collect()
+            };
+            let mut body: Vec<(f32, f32)> = ring(17.5);
+            body.extend(ring(5.5).into_iter().rev().map(|(x, y)| (x, 2.0 * 5.5 - y)));
+            p.fill(&body, p.tint(70));
+            let top: Vec<(f32, f32)> =
+                (0..=32).map(|i| (i as f32 / 32.0) * std::f32::consts::TAU).map(|a| (12.0 + 8.0 * a.cos(), 5.5 + 2.6 * a.sin())).collect();
+            p.fill(&top, accent);
+            p.closed(&top, 1.2, ink);
+            for y in [11.5, 17.5] {
+                p.line(&ring(y), 1.2, ink);
+            }
+            p.line(&[(4.0, 5.5), (4.0, 17.5)], 1.2, ink);
+            p.line(&[(20.0, 5.5), (20.0, 17.5)], 1.2, ink);
+        }
+        // A feature dataset: stacked layers.
+        "feature_dataset" => {
+            for (dy, a) in [(6.0, 60), (0.0, 140)] {
+                let pts = [(12.0, 6.0 + dy), (21.0, 10.0 + dy), (12.0, 14.0 + dy), (3.0, 10.0 + dy)];
+                p.fill(&pts, p.tint(a));
+                p.closed(&pts, 1.2, ink);
+            }
+        }
         "field" => {
             p.table(2.0, 4.0, 15.0, 16.0);
             p.plus_badge(19.0, 18.5);

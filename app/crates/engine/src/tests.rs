@@ -5705,3 +5705,95 @@ fn layout_names_keep_to_200_characters_with_their_number() {
     let name = r["name"].as_str().unwrap_or_default();
     assert_eq!((name.chars().count(), name.ends_with(" 3")), (200, true), "{name}");
 }
+
+/// A file geodatabase uploaded in the browser: a zip archive holding a `.gdb` folder, or a picked
+/// folder's files carried as one. It's listed (for the Catalog's Databases), each feature class
+/// becomes a layer, and a saved project keeps it.
+#[test]
+fn uploaded_geodatabase_is_listed_and_its_feature_classes_added() {
+    use base64::Engine;
+    use rustgis_data::{Dataset, Field, FieldType, Geometry, GeometryType, Value as V};
+    use rustgis_geom::Coord;
+    let dir = std::env::temp_dir().join(format!("rustgis-gdb-upload-{}", std::process::id()));
+    std::fs::remove_dir_all(&dir).ok();
+    std::fs::create_dir_all(&dir).unwrap();
+    let gdb = dir.join("Town.gdb");
+    let mut wells = Dataset::new("Wells", GeometryType::Point, vec![Field::new("depth", FieldType::Integer)]);
+    wells.push(Some(Geometry::Point(Coord::new(4.9, 52.37))), vec![V::Int(12)]);
+    wells.push(Some(Geometry::Point(Coord::new(4.91, 52.38))), vec![V::Int(30)]);
+    rustgis_data::source::filegdb::write(&wells, &gdb, None).unwrap();
+    let mut owners = Dataset::new("Owners", GeometryType::None, vec![Field::new("name", FieldType::Text)]);
+    owners.push(None, vec![V::Text("Ada".into())]);
+    rustgis_data::source::filegdb::write(&owners, &gdb, None).unwrap();
+    let files = |prefix: &str| -> Vec<(String, Vec<u8>)> {
+        std::fs::read_dir(&gdb)
+            .unwrap()
+            .flatten()
+            .map(|e| (format!("{prefix}{}", e.file_name().to_string_lossy()), std::fs::read(e.path()).unwrap()))
+            .collect()
+    };
+    let b64 = |b: &[u8]| base64::engine::general_purpose::STANDARD.encode(b);
+
+    // A zip archive with the folder inside, as Windows' "Send to › Compressed folder" makes it,
+    // next to a stray file.
+    let mut entries = files("Town.gdb/");
+    entries.push(("readme.txt".into(), b"hi".to_vec()));
+    let zip = rustgis_data::zip::write(&entries).unwrap();
+    let mut s = Session::new(Project::default());
+    let r = s.run("layer.addDataBytes", &json!({"fileName": "download.zip", "data": b64(&zip)})).unwrap();
+    assert_eq!(r["geodatabases"][0]["geodatabase"], "Town.gdb", "{r}");
+    let items = r["geodatabases"][0]["items"].as_array().unwrap();
+    let mut names: Vec<&str> = items.iter().map(|i| i["name"].as_str().unwrap()).collect();
+    names.sort();
+    assert_eq!(names, ["Owners", "Wells"]);
+    // The feature class is added; the table is only listed.
+    assert_eq!(s.map().layers.len(), 1);
+    let layer = s.map().layer_by_name("Wells").unwrap();
+    assert_eq!(layer.dataset.features.len(), 2);
+    assert_eq!(s.geodatabases().len(), 1);
+    assert_eq!(s.geodatabases()[0].0, "Town.gdb");
+    // A table is added by name, from the same upload.
+    let gdb_zip = s.geodatabases()[0].1.clone();
+    let r = s.run("layer.addDataBytes", &json!({"fileName": "Town.gdb", "data": b64(&gdb_zip), "layer": "Owners"})).unwrap();
+    assert_eq!(r["layers"].as_array().unwrap().len(), 1, "{r}");
+    assert_eq!(s.geodatabases().len(), 1, "the same geodatabase is listed once");
+
+    // A picked folder's files (no folder in their names), named after the folder.
+    let folder = rustgis_data::zip::write_stored(&files("")).unwrap();
+    let mut s = Session::new(Project::default());
+    s.run("layer.addDataBytes", &json!({"fileName": "Town.gdb", "data": b64(&folder), "catalogOnly": true})).unwrap();
+    assert!(s.map().layers.is_empty(), "catalogOnly adds nothing");
+    assert_eq!(s.geodatabases()[0].0, "Town.gdb");
+    s.run("layer.addDataBytes", &json!({"fileName": "Town.gdb", "data": b64(&folder)})).unwrap();
+    assert_eq!(s.map().layers.len(), 1);
+    // Small, so loaded whole: a saved project keeps its features (not the geodatabase).
+    let text = serde_json::to_string(&s.project).unwrap();
+    let mut s = Session::new(Project::default());
+    s.run("project.openText", &json!({"text": text})).unwrap();
+    assert_eq!(s.map().layer_by_name("Wells").map(|l| l.dataset.features.len()), Some(2));
+
+    // Read in place, a saved project keeps the geodatabase, and reopened, its layers bring it
+    // back to the list.
+    let mut s = Session::new(Project::default());
+    s.run("layer.addDataBytes", &json!({"fileName": "Town.gdb", "data": b64(&folder), "stream": true})).unwrap();
+    assert!(s.map().layer_by_name("Wells").is_some_and(|l| l.is_streamed()));
+    let text = serde_json::to_string(&s.project).unwrap();
+    let mut s = Session::new(Project::default());
+    s.run("project.openText", &json!({"text": text})).unwrap();
+    assert_eq!(s.geodatabases().len(), 1);
+    assert_eq!(s.geodatabases()[0].0, "Town.gdb");
+    let listed = s.run("info.geodatabases", &json!({})).unwrap();
+    assert_eq!(listed["geodatabases"][0]["items"].as_array().map(Vec::len), Some(2), "{listed}");
+    // An item is added from the list by name, without uploading it again.
+    s.run("layer.addGeodatabaseItem", &json!({"geodatabase": "town", "layer": "Owners"})).unwrap();
+    assert!(s.project.tables.iter().any(|t| t.name == "Owners") || s.map().layer_by_name("Owners").is_some());
+    assert!(s.run("layer.addGeodatabaseItem", &json!({"geodatabase": "Nowhere.gdb"})).is_err());
+
+    // Not a geodatabase: a clear error, never a panic.
+    let mut s = Session::new(Project::default());
+    let junk = rustgis_data::zip::write(&[("Bad.gdb/a00000001.gdbtable".into(), vec![0xff; 9])]).unwrap();
+    assert!(s.run("layer.addDataBytes", &json!({"fileName": "bad.zip", "data": b64(&junk)})).is_err());
+    assert!(s.run("layer.addDataBytes", &json!({"fileName": "Empty.gdb", "data": b64(&rustgis_data::zip::write(&[]).unwrap())})).is_err());
+    assert!(s.geodatabases().is_empty());
+    std::fs::remove_dir_all(&dir).ok();
+}

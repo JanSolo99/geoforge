@@ -1951,3 +1951,16 @@ Feature Class	피처 클래스
 Feature Dataset	피처 데이터셋
 Right-click to create data here	마우스 오른쪽 버튼을 클릭하여 여기에 데이터 만들기
 Empty: right-click the geodatabase to add data	비어 있음: 지오데이터베이스를 마우스 오른쪽 버튼으로 클릭하여 데이터 추가
+Databases	데이터베이스
+Add Geodatabase…	지오데이터베이스 추가…
+Geodatabase…	지오데이터베이스…
+Add To Map	맵에 추가
+Add All Feature Classes	모든 피처 클래스 추가
+Remove From Catalog	카탈로그에서 제거
+Uploaded: held in this browser tab	업로드됨: 이 브라우저 탭에 보관됨
+{name}: can't be read	{name}: 읽을 수 없습니다
+{n} rows · Double-click to add	{n}개 행 · 더블클릭하여 추가
+No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable	그 폴더에 파일 지오데이터베이스가 없습니다: .gdb 폴더에는 a00000001.gdbtable이 있습니다
+Only geodatabases are read from a folder: {n} other files were left out	폴더에서는 지오데이터베이스만 읽습니다: 다른 파일 {n}개는 제외했습니다
+{name} is larger than the web app's {mb} MB: open it in the desktop app	{name}의 크기가 웹 앱의 {mb}MB를 초과합니다: 데스크톱 앱에서 여세요
+Reading {name}…	{name} 읽는 중…

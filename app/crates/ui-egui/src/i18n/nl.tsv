@@ -1951,3 +1951,16 @@ Feature Class	Featureklasse
 Feature Dataset	Featuredataset
 Right-click to create data here	Klik met rechts om hier gegevens te maken
 Empty: right-click the geodatabase to add data	Leeg: klik met rechts op de geodatabase om gegevens toe te voegen
+Databases	Databases
+Add Geodatabase…	Geodatabase toevoegen…
+Geodatabase…	Geodatabase…
+Add To Map	Aan kaart toevoegen
+Add All Feature Classes	Alle featureklassen toevoegen
+Remove From Catalog	Uit catalogus verwijderen
+Uploaded: held in this browser tab	Geüpload: bewaard in dit browsertabblad
+{name}: can't be read	{name}: kan niet worden gelezen
+{n} rows · Double-click to add	{n} rijen · Dubbelklik om toe te voegen
+No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable	Geen bestandsgeodatabase in die map: een .gdb-map bevat a00000001.gdbtable
+Only geodatabases are read from a folder: {n} other files were left out	Uit een map worden alleen geodatabases gelezen: {n} andere bestanden zijn overgeslagen
+{name} is larger than the web app's {mb} MB: open it in the desktop app	{name} is groter dan de {mb} MB van de webapp: open hem in de desktopapp
+Reading {name}…	{name} lezen…

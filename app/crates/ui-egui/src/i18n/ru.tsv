@@ -1951,3 +1951,16 @@ Feature Class	Класс пространственных объектов
 Feature Dataset	Набор классов объектов
 Right-click to create data here	Щёлкните правой кнопкой, чтобы создать здесь данные
 Empty: right-click the geodatabase to add data	Пусто: щёлкните базу геоданных правой кнопкой, чтобы добавить данные
+Databases	Базы данных
+Add Geodatabase…	Добавить базу геоданных…
+Geodatabase…	База геоданных…
+Add To Map	Добавить на карту
+Add All Feature Classes	Добавить все классы объектов
+Remove From Catalog	Убрать из каталога
+Uploaded: held in this browser tab	Загружено: хранится в этой вкладке браузера
+{name}: can't be read	{name}: не читается
+{n} rows · Double-click to add	Строк: {n} · Двойной щелчок — добавить
+No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable	В этой папке нет файловой базы геоданных: папка .gdb содержит a00000001.gdbtable
+Only geodatabases are read from a folder: {n} other files were left out	Из папки читаются только базы геоданных: пропущено других файлов: {n}
+{name} is larger than the web app's {mb} MB: open it in the desktop app	{name} больше {mb} МБ, доступных веб-приложению: откройте её в настольном приложении
+Reading {name}…	Чтение {name}…
