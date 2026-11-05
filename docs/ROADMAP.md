@@ -24,6 +24,9 @@ Built in thin vertical slices: each phase ends with something usable from `ug`
 and verified against GDAL/OGR output on real data.
 
 ## Phase 0 — Foundations
+- [x] CLI alpha installation gate: extracted package runs on Ubuntu 24.04 without
+      GDAL, system PROJ data or build tools; offline CSV/GeoPackage and CRS round trip,
+      hash verification and failure-gated artifact upload (see `ALPHA.md`).
 - [x] Cargo workspace, crate layout
 - [x] CI gate (fmt, clippy, test) runs locally via `scripts/check` and on pull requests/main; web publishing requires the engine and browser workflow gates (see `READINESS.md`)
 - [x] Test-data corpus: `testdata/shp` (committed, `scripts/make-testdata.sh`) + `testdata/large` (`scripts/fetch-testdata.sh`)

@@ -63,6 +63,7 @@ exec "$base/bin/ug" "$@"
         "manifest.json": ((json.dumps(manifest, indent=2) + "\n").encode(), 0o644),
         "README.md": ((root / "docs/ALPHA.md").read_bytes(), 0o644),
         "smoke.py": ((root / "scripts/readiness/smoke.py").read_bytes(), 0o755),
+        "runtime.py": ((root / "scripts/readiness/runtime.py").read_bytes(), 0o755),
     }
     for file in sorted(proj_data.iterdir()):
         if file.is_file():

@@ -53,6 +53,8 @@ class PackageTests(unittest.TestCase):
                 self.assertEqual(executable.mode, 0o755)
                 self.assertEqual(tar.extractfile(executable).read(), b"tested-binary")
                 self.assertTrue(any(m.name.endswith("/share/proj/proj.db") for m in tar.getmembers()))
+                runtime = next(m for m in tar.getmembers() if m.name.endswith("/runtime.py"))
+                self.assertEqual(tar.extractfile(runtime).read(), Path(__file__).with_name("runtime.py").read_bytes())
             self.invoke(root, report)
             self.assertEqual(archive.read_bytes(), first)
 
