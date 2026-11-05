@@ -43,7 +43,7 @@ does" — in the browser too, where FileGDB reading was desktop-only.
 
 ## Validation (this branch, this container)
 
-- `cargo test -p unigis-filegdb` all pass (oracle part skipped: no GDAL here; CI has it).
+- Root `cargo clippy --locked --workspace --all-targets -D warnings` clean; root `cargo test --locked --workspace --no-fail-fast` all pass with GDAL 3.8.4 installed (`apt-get install gdal-bin`), incl. the FileGDB oracle and `tests/memory.rs`.
 - `cargo clippy -p unigis-filegdb --all-targets` and for wasm32: clean.
 - App: `cargo clippy -p rustgis-data -p rustgis-engine -p rustgis-ui-egui --features rustgis-ui-egui/unigis --all-targets -D warnings`
   clean; wasm32 `clippy -p rustgis-web -p rustgis-data --no-deps -D warnings` clean.
