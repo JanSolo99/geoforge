@@ -12,6 +12,11 @@ thiserror.workspace = true
 chrono.workspace = true
 roxmltree.workspace = true
 flate2.workspace = true
+# JPEG-compressed raster blocks (pure Rust, so the browser build reads them too).
+zune-jpeg = { version = "0.5", default-features = false, features = ["std"] }
+zune-core = { version = "0.5", default-features = false, features = ["std"] }
+# JPEG 2000-compressed raster blocks (pure Rust).
+hayro-jpeg2000 = { version = "0.5", default-features = false, features = ["std", "simd"] }
 
 [lints]
 workspace = true

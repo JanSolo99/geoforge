@@ -5,6 +5,7 @@ mod bytes;
 pub mod gdb;
 pub mod geometry;
 pub mod index;
+pub mod raster;
 pub mod schema;
 pub mod store;
 pub mod table;
@@ -13,6 +14,7 @@ pub mod xy_domains;
 
 pub use gdb::{CatalogEntry, GdbItem, Geodatabase};
 pub use index::IndexDef;
+pub use raster::{Band, Compression, PixelType, RasterDataset};
 pub use schema::{
     Cardinality, Domain, DomainKind, MergePolicy, RelationshipClass, SplitPolicy, Subtype,
     SubtypeField, Subtypes,

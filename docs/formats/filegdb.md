@@ -207,3 +207,33 @@ datasets related through `725BADAB`.
 - **XY domains** (`xy_domains.tsv.gz`, from `scripts/make-xy-domains.py`): a domain's extent is always 2^53 / scale, so the
   origin, resolution and tolerance per coordinate system are all there is; the origin comes from ArcGIS's projection
   engine (Mercator reaches about ±89°, sinusoidal 89.84°) and cannot be derived by a formula.
+
+## Raster datasets
+
+Read by `unigis-filegdb::raster` (`Geodatabase::raster_datasets`, `open_raster`, `read_band`).
+Layout from GDAL's OpenFileGDB raster driver (GDAL ≥ 3.7, the public reverse engineering) and
+checked against GDAL 3.8 on its 50 test datasets (`crates/unigis-filegdb/tests/raster.rs`:
+size, geotransform, bands, type, every valid pixel, validity; 1.38 M pixels).
+
+- A `Raster Dataset` item `<name>` has its own table (`OID`, `RASTER`, `FOOTPRINT`) and four more:
+  `fras_ras_<name>` (storage definition), `fras_bnd_<name>` (bands), `fras_blk_<name>` (blocks),
+  `fras_aux_<name>` (statistics, attribute table, metadata).
+- `fras_bnd`: one row per band of `raster_id` 1, ordered by `sequence_nbr`. `band_types`:
+  bits 19–25 bit width (1, 2, 4, 8, 16, 32, 64), bits 16–17 kind (0 unsigned, 1 signed,
+  2 float; 64 bits kind 0 = double), bits 8–15 compression (0 none, 4 zlib "LZ77", 8 JPEG,
+  12 JPEG 2000). ArcGIS's int10/int12 bands are 16-bit, int24 32-bit, float16/float24 32-bit
+  floats; LZW and LERC datasets in GDAL's samples are stored uncompressed or zlib.
+- Georeferencing: `eminx…emaxy` is the extent of pixel *centres*; the grid is anchored on
+  `block_origin_x/y`, shifted by whole blocks to reach the extent (GDAL's `m_nShiftBlockX/Y`).
+  The coordinate system is row `srid` of `GDB_SpatialRefs` (`SRTEXT`); `srid` 0 means it is in
+  the item's XML definition (not read yet).
+- `fras_blk`: `rasterband_id`, `rrd_factor` (0 = full resolution, then pyramid levels),
+  `row_nbr`, `col_nbr` (offset by the shift), `block_data`. Missing blocks are all invalid.
+- Block data: pixels big-endian, rows top to bottom, sub-byte pixels packed MSB first; an
+  optional 1-bit validity mask (`ceil(n/8)` bytes, MSB first, 1 = valid) follows the pixels
+  (inside the zlib stream when compressed). JPEG: `0x01` + JPEG, or `0xFE` + u32 LE length +
+  JPEG + zlib mask; some JPEGs omit their Huffman tables (the standard Annex K tables apply).
+  JPEG 2000: `0x00` + codestream, or `0xFF` + u32 LE length + codestream + zlib mask.
+- Not done: overviews (pyramids) and reading by window (rasters over 2^28 pixels per band are
+  refused when read whole), `srid` 0 coordinate systems, attribute tables (`fras_aux`), and
+  writing raster datasets.

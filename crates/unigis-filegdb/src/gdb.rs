@@ -41,6 +41,8 @@ pub struct Geodatabase {
     dir: PathBuf,
     store: Store,
     items: Vec<GdbItem>,
+    /// Every table in the system catalog (system tables too), by name and number.
+    catalog: Vec<(String, u64)>,
     entries: Vec<CatalogEntry>,
     feature_datasets: Vec<String>,
     /// Lower-case table name → schema from its item definition.
@@ -213,6 +215,7 @@ impl Geodatabase {
             dir,
             store,
             items,
+            catalog: all,
             entries,
             feature_datasets,
             definitions,
@@ -223,6 +226,11 @@ impl Geodatabase {
 
     pub fn path(&self) -> &Path {
         &self.dir
+    }
+
+    /// Every table of the system catalog (`GDB_*` system tables too): name and `aXXXXXXXX` number.
+    pub fn catalog(&self) -> &[(String, u64)] {
+        &self.catalog
     }
 
     /// Every item `GDB_Items` lists, in its order, with its type's name.
