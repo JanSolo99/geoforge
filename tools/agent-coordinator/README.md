@@ -168,3 +168,12 @@ and context across a limit switch, session resumption, avoiding spurious switche
 cross-process locking, stopping descendants on interruption, and full-access
 launch flags for both providers across new/resumed and streamed/native modes.
 They do not spend provider usage.
+
+## Model cost and focused tasks
+
+Set `UNIGIS_AGENTS_CLAUDE_MODEL` (for example `sonnet`) or
+`UNIGIS_AGENTS_CODEX_MODEL` to an installed CLI/account-supported workhorse model.
+Unset values preserve CLI defaults. `/status` shows requested models; overrides
+apply to streamed, resumed and native sessions. No automatic premium upgrade is
+performed. See [agent workflow](../../docs/AGENT_WORKFLOW.md) for the repo skills,
+task brief and escalation procedure. Restart the coordinator after changing env vars.

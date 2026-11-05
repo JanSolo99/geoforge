@@ -1,7 +1,7 @@
 # Current handoff
 
-Updated 2026-11-04; last agent Codex.
-Workspace `/workspace/geoforge`, branch `codex/readiness-alpha`, base HEAD `4aa5e99`.
+Updated 2026-11-05; last agent Codex.
+Workspace `/workspace/geoforge`, branch `codex/agent-productivity`, based on main `850eb8fa`.
 This is a separate cloud checkout, not `/mnt/media/ArcGIS_Linux`. It began clean.
 No local edits from the original workstation were accessed or transferred.
 
@@ -9,7 +9,9 @@ No local edits from the original workstation were accessed or transferred.
 
 User requested the readiness milestone: fix CI, automate representative workflows,
 report interface-specific coverage, and package a tested CLI alpha. Work is scoped
-to readiness, not the next geoprocessing queue item.
+to readiness and cheaper-agent productivity, not the next geoprocessing queue item.
+Latest user request: improve agent instructions and build skills to reduce reliance
+on premium models.
 
 ## Completed and validated
 
@@ -35,7 +37,7 @@ to readiness, not the next geoprocessing queue item.
   alpha launcher under a directory containing spaces. The package includes PROJ data
   and its copyright notice; binary and database hashes checked after extraction.
   Reports: `/workspace/readiness/cli-release.json`, `cli-relocated.json`.
-  Artifact: `/workspace/readiness/dist/unigis-cli-alpha-4aa5e99d8c0d-dirty.tar.gz`.
+  Artifact: `/workspace/readiness/dist/unigis-cli-alpha-abcb24c75884.tar.gz`.
 - actionlint 1.7.7 and shell/Python/JavaScript syntax checks pass.
 - Added PR CI, reusable engine verification before web publication, a browser gate,
   and a manual tested-CLI artifact workflow. Added ALPHA.md and READINESS.md.
@@ -49,15 +51,34 @@ for available disk space. Native CMake/SQLite dependencies extracted under
 GDAL is a format oracle only. ArcGIS/its bridge is unavailable here; no new ArcGIS
 reference outputs were generated. Browser tests use the existing WASM, not a rebuild.
 
+## Agent productivity follow-up
+
+- Added canonical project skills for delivery, CI triage and ArcGIS tool development,
+  with Claude discovery wrappers. AGENTS.md routes tasks and bounds context reads.
+- Added docs/AGENT_WORKFLOW.md with model setup, task brief and evidence-based
+  escalation. Optional ambition review no longer requests automatic periodic use.
+- Coordinator supports optional Claude/Codex model environment settings and reports
+  requested models in /status; existing CLI defaults and permissions are preserved.
+- All 13 offline coordinator tests pass, including new/resumed/native model overrides.
+  scripts/check now includes these tests. No paid model calls were used to test this.
+- Draft PR: https://github.com/JanSolo99/geoforge/pull/1. Readiness commit abcb24c
+  passed GitHub CI run 41920743046. Agent follow-up full local gate passed:
+  /tmp/unigis-final-gate.log (293 Rust tests, 5 ignored; 26 Python tests; fmt,
+  strict Clippy and no-default-feature check). No Rust/app source changes.
+
 ## Next actions
 
-1. Review and prepare a draft PR for the validated changes. No merge, GitHub Release
-   publication or deployment is authorized as part of this milestone.
+1. Open a separate agent-productivity PR and check CI; readiness PR #1 was merged\n   by the user while this follow-up was in progress. Main's corpus-fetch fixes\n   are preserved.
+   Latest user direction: continue completing roadmap/handoff features while they
+   sleep; Claude is working on GDB reading. Avoid that area and stay on this branch.
 2. Require CI through branch protection if desired (main is currently unprotected).
 3. Run the native desktop/app-workspace gates and a clean-target installation test
    before broadening release claims; see READINESS.md.
+4. On the workstation, select an available workhorse model using AGENT_WORKFLOW.md;
+   actual provider cost/quality has not been benchmarked and settings there are untouched.
 
 ## Running work
 
-No Cargo build or test is running. Reports and artifacts are under `/workspace/readiness`.
+No Cargo build is running. Reports and artifacts
+are under /workspace/readiness. This agent performed no merge, release publication or deployment.
 The original workstation's unrelated edits and coordinator state were not accessed.

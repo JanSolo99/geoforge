@@ -5,6 +5,7 @@ set -e
 cd "$(dirname "$0")/.."
 python3 -m unittest discover -s scripts/dashboard -p 'test_*.py'
 python3 -m unittest discover -s scripts/readiness -p 'test_*.py'
+python3 -m unittest discover -s tools/agent-coordinator -p 'test_*.py'
 cargo fmt --all --check
 cargo clippy --locked -j3 --workspace --all-targets -- -D warnings
 # The web app builds unigis-tools without its default features (no PROJ): keep that compiling.

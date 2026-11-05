@@ -153,7 +153,8 @@ class Coordinator:
         for agent in AGENTS:
             limited = self.state["limited_until"].get(agent)
             note = f"  (limited until {limited})" if limited and not self.available(agent) else ""
-            print(f"{agent}: {self.state['sessions'].get(agent, '(new session)')}{note}")
+            print(f"{agent}: {self.state['sessions'].get(agent, '(new session)')}{note} "
+                  f"model={self.model(agent) or '(CLI default)'}")
         print(f"Last run: {json.dumps(self.state.get('last_run', {}))}")
         print(f"Local logs: {self.directory}")
 
@@ -229,8 +230,17 @@ class Coordinator:
             "Do not launch another agent or coordinator. If a tool needs approval "
             "unavailable in this mode, explain the blocked action and suggest /cli. "
             "Do not claim work completed without evidence.\n"
+            "Use the matching repo skill listed in AGENTS.md. Define completion "
+            "criteria, read targeted sections, and validate a bounded change. "
+            "Do not change models automatically. If blocked, record a minimal "
+            "reproducer, attempted hypotheses and the exact unresolved question.\n"
             + context + "\nLatest user request:\n" + task
         )
+
+    @staticmethod
+    def model(agent):
+        value = os.environ.get(f"UNIGIS_AGENTS_{agent.upper()}_MODEL", "").strip()
+        return value or (KIMI_MODEL if agent == "kimi" else None)
 
     def command(self, agent, prompt, native=False):
         executable = shutil.which(agent)
@@ -239,9 +249,12 @@ class Coordinator:
         if not executable:
             raise RuntimeError(f"{agent} is not installed or is not on PATH.")
         session = self.state["sessions"].get(agent)
+        model = self.model(agent)
         if agent == "claude":
             command = [executable, "--dangerously-skip-permissions",
                        "--settings", '{"sandbox":{"enabled":false}}']
+            if model:
+                command += ["--model", model]
             if session:
                 command += ["--resume", session]
             else:
@@ -254,7 +267,7 @@ class Coordinator:
         if agent == "kimi":
             # Prompt mode already runs in Kimi's never-ask mode and rejects --auto;
             # --auto only covers the interactive /cli launch.
-            command = [executable, "-m", KIMI_MODEL]
+            command = [executable, "-m", model]
             if native:
                 command += ["--auto"]
             if session:
@@ -272,6 +285,8 @@ class Coordinator:
             if session:
                 command += ["resume", session]
             command += ["--json"]
+        if model:
+            command += ["--model", model]
         command += ["--", prompt]
         return command, session
 
