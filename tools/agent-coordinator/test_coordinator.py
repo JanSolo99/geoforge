@@ -85,6 +85,41 @@ class CoordinatorTests(unittest.TestCase):
                             settings = json.loads(command[command.index("--settings") + 1])
                             self.assertIs(settings["sandbox"]["enabled"], False)
 
+    def test_model_overrides_cover_new_resumed_and_native_commands(self):
+        self.coordinator.load()
+        for agent in module.AGENTS:
+            for native in (False, True):
+                for resumed in (False, True):
+                    with self.subTest(agent=agent, native=native, resumed=resumed):
+                        self.coordinator.state["sessions"] = {agent: "saved-session"} if resumed else {}
+                        key = f"UNIGIS_AGENTS_{agent.upper()}_MODEL"
+                        # Shell metacharacters remain a single argv value; no shell is involved.
+                        model = "workhorse;literal"
+                        with patch.dict(os.environ, {key: model}), patch.object(
+                                module.shutil, "which", return_value=f"/bin/{agent}"):
+                            command, _ = self.coordinator.command(agent, "task", native)
+                        flag = "-m" if agent == "kimi" else "--model"
+                        self.assertEqual(command.count(flag), 1)
+                        self.assertEqual(command[command.index(flag) + 1], model)
+                        if agent != "kimi":
+                            self.assertLess(command.index(flag), command.index("--"))
+                        if resumed:
+                            self.assertIn("saved-session", command)
+
+    def test_unset_model_preserves_cli_defaults_and_status_reports_override(self):
+        self.coordinator.load()
+        with patch.dict(os.environ, {"UNIGIS_AGENTS_CLAUDE_MODEL": "",
+                                     "UNIGIS_AGENTS_CODEX_MODEL": "  "}), patch.object(
+                module.shutil, "which", return_value="/bin/fake"):
+            for agent in ("claude", "codex"):
+                command, _ = self.coordinator.command(agent, "task")
+                self.assertNotIn("--model", command)
+        output = io.StringIO()
+        with patch.dict(os.environ, {"UNIGIS_AGENTS_CLAUDE_MODEL": "sonnet"}), \
+                contextlib.redirect_stdout(output):
+            self.coordinator.status()
+        self.assertIn("model=sonnet", output.getvalue())
+
     def test_partial_work_survives_limit_switch_and_both_sessions_resume(self):
         claude = self.executable("claude", f'''
 import json, pathlib, sys

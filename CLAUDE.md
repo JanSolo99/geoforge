@@ -17,7 +17,7 @@ Keep all existing project guidance below in effect.
 - Correctness oracle: GDAL 3.x is installed system-wide (`ogrinfo`, `gdalinfo`, `ogr2ogr`). When implementing a reader, write tests that compare our output with GDAL's on the same file.
 - FileGDB: clean-room implementation from public reverse-engineering docs (GDAL OpenFileGDB). Never use or copy the proprietary Esri FileGDB SDK.
 - Work in small, tested slices; update `docs/ROADMAP.md` checkboxes as items land.
-- Before committing: `cargo fmt --all && cargo clippy --workspace --all-targets && cargo test --workspace`.
+- Before committing: run `scripts/check` (the canonical root gate, limited to 3 Cargo jobs).
 
 ## Working conventions (established so far)
 - Status and next steps: `docs/ROADMAP.md`. Format findings: `docs/formats/` (FileGDB spec corrections, ArcGIS shapefile behavior).
@@ -25,4 +25,6 @@ Keep all existing project guidance below in effect.
 - ArcGIS Pro 3.7 runs here under Wine (GE-Proton, `~/.wine`). The `arcgis` MCP server (`tools/arcgis-bridge/`) runs tools, Describe and arcpy code; in `arcgis_python` wrap Linux paths with `P('/path')`. Use it to settle any ArcGIS behavior question before implementing. If the MCP server misbehaves (e.g. replies out of step after a suspend), run arcpy code from a file with `uv run -q --with "mcp>=2" python tools/arcgis-bridge/run_code.py code.py`. Black-box only: never decompile Esri binaries.
 - New geoprocessing tool workflow: run `ug tools` first (many tools exist under snake_case ids). Add cases to `scripts/make-arcgis-reference.py` (batch a whole family, then run it once: `uv run -q --with "mcp>=2" python scripts/make-arcgis-reference.py 'glob*'`), study the outputs (`scripts/research/sa_batch/{summary,show}.py`), implement as an entry in a registry (`unigis-raster/src/registry.rs` for rasters, `unigis-tools` for vector/table tools; a Pairwise-style rename goes in `unigis-cli/src/aliases.rs`), add one line to `RUN` in the reference script (then `... make-arcgis-reference.py --annotate`). No `ug` clap command or `arcgis_reference.rs` branch is needed; the test builds `ug run <id> name=value` from the manifest. Run `scripts/check` before pushing (a pre-push hook does). Comparisons use ArcGIS's 0.001 m XY tolerance (buffers: 0.2 m / 0.01%).
 - GDAL (`ogrinfo`) is the oracle for file formats only. CI has an older GDAL (3.8); tests gate on `gdal_version()` where needed.
-- The shell is zsh: quote globs that may not match, and use `${=var}` to split words.
+- Check the actual shell and available tools; workstation assumptions (Wine, the
+  ArcGIS bridge, GDAL and zsh) may not hold in cloud checkouts. Quote globs. Never
+  claim live ArcGIS validation when only saved references were available.
