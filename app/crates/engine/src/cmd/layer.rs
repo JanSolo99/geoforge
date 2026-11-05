@@ -881,7 +881,10 @@ fn contents_json(name: &str, c: &rustgis_data::source::filegdb::Contents) -> Val
         "featureDatasets": c.feature_datasets,
         "items": c.items.iter().map(|i| json!({
             "name": i.name, "featureDataset": i.feature_dataset, "featureClass": i.geometry.is_some(), "rows": i.rows,
+            "multipatch": i.multipatch, "featureType": i.feature_type,
         })).collect::<Vec<_>>(),
+        "others": c.others.iter().map(|o| json!({"name": o.name, "type": o.kind, "featureDataset": o.feature_dataset})).collect::<Vec<_>>(),
+        "domains": c.domains,
     })
 }
 

@@ -444,6 +444,19 @@ pub fn paint(painter: &Painter, r: Rect, name: &str, ink: Color32, accent: Color
             p.line(&[(4.0, 5.5), (4.0, 17.5)], 1.2, ink);
             p.line(&[(20.0, 5.5), (20.0, 17.5)], 1.2, ink);
         }
+        // A relationship class: two tables joined.
+        "relationship_class" => {
+            p.rect(2.0, 4.0, 8.0, 7.0, Some(p.tint(60)), Some((1.2, ink)), 1.0);
+            p.rect(14.0, 13.0, 8.0, 7.0, Some(p.tint(60)), Some((1.2, ink)), 1.0);
+            p.line(&[(10.0, 7.5), (12.0, 7.5), (12.0, 16.5), (14.0, 16.5)], 1.4, accent);
+        }
+        // Other geodatabase datasets (topology, network, mosaic, toolbox…): a tile with a dot grid.
+        "gdb_item" => {
+            p.rect(3.0, 3.0, 18.0, 18.0, Some(p.tint(50)), Some((1.2, ink)), 3.0);
+            for (x, y) in [(8.0, 8.0), (16.0, 8.0), (8.0, 16.0), (16.0, 16.0), (12.0, 12.0)] {
+                p.circle(x, y, 1.6, Some(accent), None);
+            }
+        }
         // A feature dataset: stacked layers.
         "feature_dataset" => {
             for (dy, a) in [(6.0, 60), (0.0, 140)] {

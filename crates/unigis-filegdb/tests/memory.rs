@@ -104,3 +104,55 @@ fn missing_catalog_is_an_error_not_a_panic() {
     let junk = vec![("x.gdb/a00000001.gdbtable".to_string(), vec![0xff; 7])];
     assert!(Geodatabase::from_files("x.gdb", junk).is_err());
 }
+
+/// Every catalog item is listed with its type's name, as ArcGIS's Catalog shows them.
+#[test]
+fn items_carry_their_type_names() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../testdata");
+    let mut gdbs = Vec::new();
+    geodatabases(&root, &mut gdbs);
+    let mut kinds = std::collections::BTreeSet::new();
+    for path in &gdbs {
+        let g = Geodatabase::open_in(Default::default(), path.clone()).unwrap();
+        for e in g.entries() {
+            let item = g
+                .items()
+                .iter()
+                .find(|i| i.name.eq_ignore_ascii_case(&e.name));
+            if let Some(item) = item {
+                // Tables back other items too (attributed relationship classes, raster catalogs).
+                assert!(
+                    !item.kind.is_empty() && !item.kind.starts_with('{'),
+                    "{}: {}",
+                    path.display(),
+                    e.name
+                );
+                assert_eq!(item.feature_dataset, e.feature_dataset, "{}", e.name);
+            }
+        }
+        for fds in g.feature_datasets() {
+            assert!(
+                g.items()
+                    .iter()
+                    .any(|i| i.name == *fds && i.kind == "Feature Dataset"),
+                "{fds}"
+            );
+        }
+        kinds.extend(g.items().iter().map(|i| i.kind.clone()));
+    }
+    for k in [
+        "Workspace",
+        "Feature Class",
+        "Table",
+        "Feature Dataset",
+        "Relationship Class",
+        "Coded Value Domain",
+        "Range Domain",
+    ] {
+        assert!(kinds.contains(k), "no {k} among {kinds:?}");
+    }
+    assert!(
+        !kinds.iter().any(|k| k.starts_with('{')),
+        "unnamed types: {kinds:?}"
+    );
+}

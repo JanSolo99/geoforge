@@ -11,7 +11,7 @@ pub mod table;
 pub mod writer;
 pub mod xy_domains;
 
-pub use gdb::{CatalogEntry, Geodatabase};
+pub use gdb::{CatalogEntry, GdbItem, Geodatabase};
 pub use index::IndexDef;
 pub use schema::{
     Cardinality, Domain, DomainKind, MergePolicy, RelationshipClass, SplitPolicy, Subtype,

@@ -194,12 +194,16 @@ pub fn from_zip(bytes: &super::Shared) -> Result<Arc<Geodatabase>> {
     Ok(gdb)
 }
 
-/// What a geodatabase holds, for a catalog: its feature datasets, then its tables and feature
-/// classes with the feature dataset each is in, in catalog order.
+/// What a geodatabase holds, for a catalog: its feature datasets, its tables and feature classes
+/// with the feature dataset each is in, every other item ArcGIS's Catalog lists (relationship
+/// classes, topologies, network datasets, mosaic and raster datasets, toolboxes…), and its domains.
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct Contents {
     pub feature_datasets: Vec<String>,
     pub items: Vec<Item>,
+    pub others: Vec<Other>,
+    /// Attribute domains, by name.
+    pub domains: Vec<String>,
 }
 
 /// One table or feature class of a geodatabase.
@@ -209,33 +213,79 @@ pub struct Item {
     pub feature_dataset: Option<String>,
     /// `None` for a table.
     pub geometry: Option<GeometryType>,
-    /// A MultiPatch class, which the map doesn't draw.
+    /// A MultiPatch class (drawn by its footprint).
     pub multipatch: bool,
+    /// A feature class's feature type when it isn't a simple one (`esriFTAnnotation`,
+    /// `esriFTDimension`, …).
+    pub feature_type: Option<String>,
     pub rows: u64,
 }
 
+/// An item that isn't a table or feature class: its name and type (`Relationship Class`,
+/// `Topology`, `Mosaic Dataset`, …).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Other {
+    pub name: String,
+    pub kind: String,
+    pub feature_dataset: Option<String>,
+}
+
+/// Item types the Catalog doesn't list as items of their own (the geodatabase itself, its feature
+/// datasets, tables and classes, domains, extensions).
+const NOT_LISTED: &[&str] = &[
+    "Workspace",
+    "Workspace Extension",
+    "Feature Dataset",
+    "Feature Class",
+    "Table",
+    "Coded Value Domain",
+    "Range Domain",
+    "Folder",
+    "Resource",
+];
+
 /// The contents of an open geodatabase. Tables that don't open are listed as tables.
 pub fn contents(gdb: &Geodatabase) -> Contents {
-    let items = gdb
-        .entries()
+    let kind_of = |name: &str| gdb.items().iter().find(|i| i.name.eq_ignore_ascii_case(name));
+    // A mosaic dataset's own tables (`AMD_<name>_…`) are part of it, as ArcGIS shows it.
+    let mosaics: Vec<String> =
+        gdb.items().iter().filter(|i| i.kind == "Mosaic Dataset").map(|i| format!("AMD_{}_", i.name).to_ascii_lowercase()).collect();
+    let in_mosaic = |name: &str| mosaics.iter().any(|m| name.to_ascii_lowercase().starts_with(m.as_str()));
+    let mut items = Vec::new();
+    for e in gdb.entries() {
+        let item = kind_of(&e.name);
+        // Tables that back other items (an attributed relationship class, a raster catalog) are
+        // listed as those items.
+        if item.is_some_and(|i| !["Feature Class", "Table"].contains(&i.kind.as_str())) || in_mosaic(&e.name) {
+            continue;
+        }
+        let t = gdb.open_table(&e.name).ok();
+        let kind = t.as_ref().and_then(Table::geometry_kind);
+        items.push(Item {
+            name: e.name.clone(),
+            feature_dataset: e.feature_dataset.clone(),
+            geometry: kind.map(|k| match k {
+                GeometryKind::Point | GeometryKind::Multipoint => GeometryType::Point,
+                GeometryKind::Polyline => GeometryType::Polyline,
+                GeometryKind::Polygon | GeometryKind::MultiPatch => GeometryType::Polygon,
+            }),
+            multipatch: kind == Some(GeometryKind::MultiPatch),
+            feature_type: item.and_then(|i| i.feature_type.clone()).filter(|f| f != "esriFTSimple"),
+            rows: t.as_ref().map_or(0, Table::row_count),
+        });
+    }
+    let others = gdb
+        .items()
         .iter()
-        .map(|e| {
-            let t = gdb.open_table(&e.name).ok();
-            let kind = t.as_ref().and_then(Table::geometry_kind);
-            Item {
-                name: e.name.clone(),
-                feature_dataset: e.feature_dataset.clone(),
-                geometry: kind.map(|k| match k {
-                    GeometryKind::Point | GeometryKind::Multipoint => GeometryType::Point,
-                    GeometryKind::Polyline => GeometryType::Polyline,
-                    GeometryKind::Polygon | GeometryKind::MultiPatch => GeometryType::Polygon,
-                }),
-                multipatch: kind == Some(GeometryKind::MultiPatch),
-                rows: t.as_ref().map_or(0, Table::row_count),
-            }
-        })
+        .filter(|i| !NOT_LISTED.contains(&i.kind.as_str()) && !i.name.is_empty() && !in_mosaic(&i.name) && !i.kind.starts_with('{'))
+        .map(|i| Other { name: i.name.clone(), kind: i.kind.clone(), feature_dataset: i.feature_dataset.clone() })
         .collect();
-    Contents { feature_datasets: gdb.feature_datasets().to_vec(), items }
+    Contents {
+        feature_datasets: gdb.feature_datasets().to_vec(),
+        items,
+        others,
+        domains: gdb.domains().iter().map(|d| d.name.clone()).collect(),
+    }
 }
 
 fn field_type(t: unigis_core::FieldType) -> FieldType {

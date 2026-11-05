@@ -19,9 +19,28 @@ pub struct CatalogEntry {
     pub feature_dataset: Option<String>,
 }
 
+/// Any item of the geodatabase (`GDB_Items`): tables and feature classes, and the rest ArcGIS's
+/// Catalog lists (relationship classes, topologies, network datasets, mosaic and raster datasets,
+/// toolboxes, domains…).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GdbItem {
+    pub name: String,
+    /// `\Dataset\Name`.
+    pub path: String,
+    /// The item type's name from `GDB_ItemTypes` (`Feature Class`, `Topology`, …), or its GUID
+    /// when the geodatabase doesn't name it.
+    pub kind: String,
+    /// A feature class's feature type from its definition (`esriFTSimple`, `esriFTAnnotation`,
+    /// `esriFTDimension`, …).
+    pub feature_type: Option<String>,
+    /// The feature dataset holding it.
+    pub feature_dataset: Option<String>,
+}
+
 pub struct Geodatabase {
     dir: PathBuf,
     store: Store,
+    items: Vec<GdbItem>,
     entries: Vec<CatalogEntry>,
     feature_datasets: Vec<String>,
     /// Lower-case table name → schema from its item definition.
@@ -70,6 +89,8 @@ impl Geodatabase {
         let mut domains = Vec::new();
         let mut relationships = Vec::new();
         let mut typed_datasets = Vec::new();
+        // (name, path, type GUID, feature type)
+        let mut raw_items: Vec<(String, String, String, Option<String>)> = Vec::new();
         if let Some((_, id)) = all.iter().find(|(n, _)| n == "GDB_Items")
             && let Ok(items) = Table::open_in(&store, table_path(&dir, *id))
         {
@@ -90,7 +111,17 @@ impl Geodatabase {
                         typed_datasets.push(n.clone());
                     }
                     paths.push((n.clone(), p.clone()));
-                    let Some(Value::Xml(xml)) = def_i.map(|i| &row.attributes[i]) else {
+                    let guid = match type_i.map(|i| &row.attributes[i]) {
+                        Some(Value::String(t) | Value::Guid(t)) => t.clone(),
+                        _ => String::new(),
+                    };
+                    let xml = match def_i.map(|i| &row.attributes[i]) {
+                        Some(Value::Xml(xml)) => Some(xml),
+                        _ => None,
+                    };
+                    let feature_type = xml.and_then(|x| tag_text(x, "FeatureType"));
+                    raw_items.push((n.clone(), p.clone(), guid, feature_type));
+                    let Some(xml) = xml else {
                         continue;
                     };
                     match parse_definition(xml) {
@@ -104,6 +135,38 @@ impl Geodatabase {
                 }
             }
         }
+        // Item type names, as the geodatabase itself lists them.
+        let mut type_names: HashMap<String, String> = HashMap::new();
+        if let Some((_, id)) = all.iter().find(|(n, _)| n == "GDB_ItemTypes")
+            && let Ok(types) = Table::open_in(&store, table_path(&dir, *id))
+            && let (Ok(ui), Ok(ni)) = (field_index(&types, "UUID"), field_index(&types, "Name"))
+        {
+            for row in types.features().flatten() {
+                if let (Value::String(u) | Value::Guid(u), Value::String(n)) =
+                    (&row.attributes[ui], &row.attributes[ni])
+                {
+                    type_names.insert(u.to_ascii_uppercase(), n.clone());
+                }
+            }
+        }
+        let items: Vec<GdbItem> = raw_items
+            .into_iter()
+            .map(|(name, path, guid, feature_type)| {
+                let mut parts = path.trim_start_matches('\\').split('\\');
+                let first = parts.next().map(str::to_owned);
+                let feature_dataset = parts.next().and(first);
+                GdbItem {
+                    kind: type_names
+                        .get(&guid.to_ascii_uppercase())
+                        .cloned()
+                        .unwrap_or(guid),
+                    name,
+                    path,
+                    feature_type,
+                    feature_dataset,
+                }
+            })
+            .collect();
         domains.sort_by(|a, b| a.name.cmp(&b.name));
         relationships.sort_by(|a, b| a.name.cmp(&b.name));
         let dataset_of = |name: &str| {
@@ -149,6 +212,7 @@ impl Geodatabase {
         Ok(Self {
             dir,
             store,
+            items,
             entries,
             feature_datasets,
             definitions,
@@ -159,6 +223,11 @@ impl Geodatabase {
 
     pub fn path(&self) -> &Path {
         &self.dir
+    }
+
+    /// Every item `GDB_Items` lists, in its order, with its type's name.
+    pub fn items(&self) -> &[GdbItem] {
+        &self.items
     }
 
     /// Where its files are read from.
@@ -229,4 +298,12 @@ fn field_index(table: &Table, name: &str) -> Result<usize> {
         .iter()
         .position(|f| f.name.eq_ignore_ascii_case(name))
         .ok_or_else(|| Error::format("FileGDB", format!("system table lacks field {name}")))
+}
+
+/// The text of the first `<tag>` element in an item definition.
+fn tag_text(xml: &str, tag: &str) -> Option<String> {
+    let open = format!("<{tag}>");
+    let start = xml.find(&open)? + open.len();
+    let end = start + xml.get(start..)?.find("</")?;
+    Some(xml.get(start..end)?.trim().to_string()).filter(|t| !t.is_empty())
 }

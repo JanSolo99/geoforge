@@ -1079,3 +1079,20 @@ fn geodatabases_in_zip_archives() {
     assert!(FileGdbSource::open_zip(&Shared(Arc::new(other)), None).is_err());
     std::fs::remove_dir_all(&dir).ok();
 }
+
+/// The Catalog's view of ArcGIS-written geodatabases: relationship classes listed as such (an
+/// attributed one's table isn't a table of its own), and domains.
+#[test]
+fn geodatabase_contents_list_every_item_type() {
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../testdata/gdb-reference");
+    let g = filegdb::open_dir(&root.join("relationship_tables.gdb")).unwrap();
+    let c = filegdb::contents(&g);
+    let rels: Vec<&str> = c.others.iter().filter(|o| o.kind == "Relationship Class").map(|o| o.name.as_str()).collect();
+    assert!(!rels.is_empty(), "{c:?}");
+    for r in &rels {
+        assert!(!c.items.iter().any(|i| i.name == *r), "{r} listed as a table too");
+    }
+    assert!(c.others.iter().all(|o| !["Workspace", "Feature Class", "Table"].contains(&o.kind.as_str())));
+    let g = filegdb::open_dir(&root.join("domain_base.gdb")).unwrap();
+    assert!(!filegdb::contents(&g).domains.is_empty());
+}

@@ -746,11 +746,13 @@ fn databases(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
                     let row = |app: &mut RustGisApp, ui: &mut Ui, item: &rustgis_engine::data::source::filegdb::Item| {
                         ui.horizontal(|ui| {
                             let (r, _) = ui.allocate_exact_size(vec2(16.0, 16.0), Sense::hover());
-                            let icon = match item.geometry {
-                                None => "table",
-                                Some(GeometryType::Point) => "point_layer",
-                                Some(GeometryType::Polyline) => "line_layer",
-                                Some(_) => "polygon_layer",
+                            let icon = match (item.feature_type.as_deref(), item.geometry) {
+                                (Some("esriFTAnnotation"), _) => "label",
+                                (Some("esriFTDimension"), _) => "measure",
+                                (_, None) => "table",
+                                (_, Some(GeometryType::Point)) => "point_layer",
+                                (_, Some(GeometryType::Polyline)) => "line_layer",
+                                (_, Some(_)) => "polygon_layer",
                             };
                             icons::paint(ui.painter(), r, icon, t.icon, t.accent);
                             let resp = ui.add(egui::Label::new(egui::RichText::new(&item.name).size(12.0)).sense(Sense::click()));
@@ -767,6 +769,15 @@ fn databases(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
                             });
                         });
                     };
+                    // Items other than tables and classes, named with their type (as ArcGIS shows them).
+                    let other = |ui: &mut Ui, o: &rustgis_engine::data::source::filegdb::Other| {
+                        ui.horizontal(|ui| {
+                            let (r, _) = ui.allocate_exact_size(vec2(16.0, 16.0), Sense::hover());
+                            let icon = if o.kind == "Relationship Class" { "relationship_class" } else { "gdb_item" };
+                            icons::paint(ui.painter(), r, icon, t.icon, t.accent);
+                            ui.label(egui::RichText::new(&o.name).size(12.0)).on_hover_text(&o.kind);
+                        });
+                    };
                     for fds in &contents.feature_datasets {
                         let id = ui.make_persistent_id(("catalog-gdb-fds", &name, fds));
                         let (_, header, _) = egui::collapsing_header::CollapsingState::load_with_default_open(ui.ctx(), id, false)
@@ -778,6 +789,9 @@ fn databases(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
                             .body(|ui| {
                                 for item in contents.items.iter().filter(|i| i.feature_dataset.as_deref() == Some(fds.as_str())) {
                                     row(app, ui, item);
+                                }
+                                for o in contents.others.iter().filter(|o| o.feature_dataset.as_deref() == Some(fds.as_str())) {
+                                    other(ui, o);
                                 }
                             });
                         header.inner.context_menu(|ui| {
@@ -793,6 +807,19 @@ fn databases(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
                     }
                     for item in contents.items.iter().filter(|i| i.feature_dataset.is_none()) {
                         row(app, ui, item);
+                    }
+                    for o in contents.others.iter().filter(|o| o.feature_dataset.is_none()) {
+                        other(ui, o);
+                    }
+                    if !contents.domains.is_empty() {
+                        egui::CollapsingHeader::new(egui::RichText::new(tl!("Domains")).size(12.0))
+                            .id_salt(("catalog-gdb-domains", &name))
+                            .default_open(false)
+                            .show(ui, |ui| {
+                                for d in &contents.domains {
+                                    ui.label(egui::RichText::new(d).size(12.0));
+                                }
+                            });
                     }
                     if contents.items.is_empty() && contents.feature_datasets.is_empty() {
                         ui.label(egui::RichText::new(tl!("Empty")).small().weak());
