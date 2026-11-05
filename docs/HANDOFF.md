@@ -1,7 +1,7 @@
 # Current handoff
 
 Updated 2026-11-05; last agent Codex.
-Workspace `/workspace/geoforge`, branch `codex/agent-productivity`, based on main `850eb8fa`.
+Workspace `/workspace/geoforge`, branch `codex/clean-runtime`, based on agent commit `749ea792`.
 This is a separate cloud checkout, not `/mnt/media/ArcGIS_Linux`. It began clean.
 No local edits from the original workstation were accessed or transferred.
 
@@ -66,19 +66,41 @@ reference outputs were generated. Browser tests use the existing WASM, not a reb
   /tmp/unigis-final-gate.log (293 Rust tests, 5 ignored; 26 Python tests; fmt,
   strict Clippy and no-default-feature check). No Rust/app source changes.
 
+## Clean-runtime installation feature
+
+- Agent workflow follow-up is draft PR #2:
+  https://github.com/JanSolo99/geoforge/pull/2 (commit 749ea792).
+  Readiness PR #1 was merged by the user; main's corpus-fetch improvements are preserved.
+- Completed the handoff's clean-target CLI installation item without touching GDB
+  reading (Claude is working on that). No Rust/app algorithm changes.
+- Added runtime.py to the package: validates binary/database hashes and passing report,
+  runs launcher/registry, CSV-to-GeoPackage, analytic Web Mercator and inverse projection.
+- clean-runtime.sh verifies archive checksum, extracts, builds a minimal Ubuntu 24.04
+  runtime and runs the packaged verifier as non-root, read-only, network disabled.
+  No source checkout, GDAL, system PROJ database or compiler is available in the test.
+- Integrated mandatory installation check before alpha artifact upload, with failure
+  report retention. Pinned alpha runner to ubuntu-24.04. Roadmap item checked off.
+- Real container test passed (glibc 2.39), including package/work paths with spaces.
+  Evidence: /workspace/readiness/runtime-integrated/ubuntu24.json and image-id.txt;
+  /tmp/clean-runtime.log. Tested binary SHA unchanged from the validated alpha.
+- Seven package/runtime regression tests passed; actionlint and diff checks passed.
+  Full root gate passed: 293 Rust tests, 5 ignored; 30 Python tests; strict Clippy,
+  fmt and no-default-features check. Log /tmp/unigis-runtime-gate.log.
+  Agent PR #2 also passed GitHub CI run 42015848249.
+
 ## Next actions
 
-1. Open a separate agent-productivity PR and check CI; readiness PR #1 was merged\n   by the user while this follow-up was in progress. Main's corpus-fetch fixes\n   are preserved.
-   Latest user direction: continue completing roadmap/handoff features while they
-   sleep; Claude is working on GDB reading. Avoid that area and stay on this branch.
-2. Require CI through branch protection if desired (main is currently unprotected).
-3. Run the native desktop/app-workspace gates and a clean-target installation test
-   before broadening release claims; see READINESS.md.
-4. On the workstation, select an available workhorse model using AGENT_WORKFLOW.md;
-   actual provider cost/quality has not been benchmarked and settings there are untouched.
+1. Publish the validated clean-runtime follow-up PR, stacked on agent PR #2.
+   Retarget to main after #2 merges; no automatic merge or deployment.
+2. Keep Claude's GDB-reading work separate. Native desktop/app-workspace checks,
+   other browser/OS/architecture coverage and live licensed ArcGIS probes remain.
+3. Agent settings on the workstation are untouched: use docs/AGENT_WORKFLOW.md to
+   select an available workhorse. No actual provider cost/quality benchmark claimed.
+4. Main branch protection remains disabled; repository settings were not changed.
 
 ## Running work
 
-No Cargo build is running. Reports and artifacts
-are under /workspace/readiness. This agent performed no merge, release publication or deployment.
-The original workstation's unrelated edits and coordinator state were not accessed.
+Root scripts/check finished successfully; no Cargo build is running. Container tests
+finished and their temporary containers were removed. Artifacts are under
+/workspace/readiness. This agent has not merged or deployed changes. The original
+workstation's edits and coordinator state were not accessed.

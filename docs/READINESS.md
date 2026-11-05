@@ -27,6 +27,14 @@ the cached GitHub CI card remains the separately fetched status of main.
 
 ## Capability matrix
 
+Clean-install follow-up, 2026-11-05: the extracted optimized CLI passed on Ubuntu
+24.04 (glibc 2.39) in an unprivileged, read-only container with networking disabled,
+no GDAL, no system PROJ database and no build tools. `runtime.py` verified package
+hashes, launcher/registry, CSV to GeoPackage, Web Mercator coordinates against the
+analytic formula, and inverse projection. It uses bundled PROJ data from a package
+path containing spaces. The alpha workflow now requires this check before upload;
+this is installation evidence, not new ArcGIS compatibility evidence.
+
 | Workflow | CLI | Browser | Native desktop |
 |---|---|---|---|
 | Clip points, export GeoPackage, reopen Shapefile; preserve CRS/attributes | Automated in `smoke.py` | Not covered by this milestone | Not run here |
@@ -52,7 +60,9 @@ It uses the existing embedding protocol for UI actions, not a privileged test AP
   on the newly built WASM before either publishing step. Reports/screenshots are
   uploaded even when the browser gate fails.
 - The manual alpha workflow builds and smoke-tests the release CLI, then packages
-  the exact tested binary. See [ALPHA.md](ALPHA.md).
+  the exact tested binary and checks the extracted installation on clean Ubuntu
+  24.04. Installation failure blocks package upload; its report is retained even
+  on failure. See [ALPHA.md](ALPHA.md).
 
 Run the browser check against a built distribution:
 
@@ -93,7 +103,7 @@ document, not the current progress counter.
 ## Remaining release work
 
 Native desktop interaction, app-workspace quality gates, other browsers, large-data
-performance, installation on a clean target OS, online services and new ArcGIS
+performance, installation on other target OS/architectures, online services and new ArcGIS
 black-box probes remain separate validation tasks. Existing saved ArcGIS references
 can run here; generating new licensed ArcGIS reference output requires the bridge
 on the ArcGIS machine.

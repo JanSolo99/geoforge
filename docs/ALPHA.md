@@ -13,6 +13,18 @@ selects the included PROJ data unless `PROJ_DATA` is already set. Additional dat
 grid files are not included. GDAL is **not** required by the engine. Check the
 adjacent `.sha256` file before using the archive.
 
+For a quick installation check without GDAL, run:
+
+```sh
+python3 runtime.py --package . --report installation.json
+```
+
+This verifies the binary and PROJ database hashes, launcher, CSV import to
+GeoPackage and forward/inverse CRS transformations using bundled PROJ data.
+It runs from an unrelated temporary directory containing spaces and disables PROJ
+network access. The hashes detect corruption or mismatched files, not authenticity
+against an attacker who can replace both the files and manifest.
+
 To repeat the packaged workflow checks, install Python 3 and GDAL command-line
 tools (`gdal-bin` on Debian/Ubuntu), then run:
 
@@ -56,3 +68,17 @@ a system-PROJ build, pass matching `--proj-data` and `--proj-license` paths expl
 GitHub Actions **Build tested CLI alpha** performs the same release build after
 the full engine gate and uploads the package as an artifact. It does not create a
 public GitHub Release or deploy anything.
+
+Before upload, the workflow extracts the archive into a minimal Ubuntu 24.04
+container with no GDAL, system PROJ data or compiler, and repeats `runtime.py`
+as an unprivileged user with networking disabled. Failure blocks the package upload;
+the installation report is retained separately. Reproduce from the repository with
+Docker installed:
+
+```sh
+scripts/readiness/clean-runtime.sh dist/unigis-cli-alpha-REVISION.tar.gz /tmp/runtime-report
+```
+
+The container build downloads Ubuntu runtime packages; the actual test is offline.
+This establishes Ubuntu 24.04 x86_64 CLI coverage, not support for every Linux OS,
+desktop integration, external datum grids or other CPU architectures.

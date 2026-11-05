@@ -11,7 +11,7 @@ jobs:
     uses: ./.github/workflows/ci.yml
   package:
     needs: verify
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
@@ -22,6 +22,19 @@ jobs:
       - run: python3 scripts/readiness/smoke.py --ug target/release/ug --report "$RUNNER_TEMP/cli-readiness.json"
       - name: Package tested binary
         run: python3 scripts/readiness/package.py --ug target/release/ug --report "$RUNNER_TEMP/cli-readiness.json" --output "$RUNNER_TEMP/dist"
+      - name: Verify installation without GDAL or build tools
+        shell: bash
+        run: |
+          archives=("$RUNNER_TEMP"/dist/*.tar.gz)
+          test "${#archives[@]}" -eq 1
+          scripts/readiness/clean-runtime.sh "${archives[0]}" "$RUNNER_TEMP/runtime-report"
+      - name: Upload installation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unigis-cli-installation-report
+          path: ${{ runner.temp }}/runtime-report/
+          if-no-files-found: warn
       - uses: actions/upload-artifact@v4
         with:
           name: unigis-cli-alpha-linux-x86_64
