@@ -6,6 +6,7 @@ use std::path::{Path, PathBuf};
 use unigis_core::{Error, Result, Value};
 
 use crate::schema::{Domain, ItemDefinition, RelationshipClass, TableDefinition, parse_definition};
+use crate::store::Store;
 use crate::table::Table;
 
 /// One user table or feature class listed in the system catalog.
@@ -20,6 +21,7 @@ pub struct CatalogEntry {
 
 pub struct Geodatabase {
     dir: PathBuf,
+    store: Store,
     entries: Vec<CatalogEntry>,
     feature_datasets: Vec<String>,
     /// Lower-case table name → schema from its item definition.
@@ -36,7 +38,23 @@ impl Geodatabase {
         let dir = dir.as_ref().to_path_buf();
         // An edit that was interrupted is rolled back first (see `writer::recover`).
         crate::writer::recover(&dir)?;
-        let catalog = Table::open(table_path(&dir, 1))?;
+        Self::open_in(Store::disk(), dir)
+    }
+
+    /// Reads a geodatabase from files held in memory (a browser upload or a zip archive):
+    /// `name` is the `.gdb` folder's name, `files` its files by name. Folders around them don't
+    /// matter, and files that aren't part of a geodatabase are ignored.
+    pub fn from_files(
+        name: impl AsRef<Path>,
+        files: impl IntoIterator<Item = (String, Vec<u8>)>,
+    ) -> Result<Self> {
+        Self::open_in(Store::memory(files), name.as_ref().to_path_buf())
+    }
+
+    /// Reads the geodatabase in `dir` from `store`. Unlike [`Geodatabase::open`], it never
+    /// rolls back an interrupted edit, so it only reads.
+    pub fn open_in(store: Store, dir: PathBuf) -> Result<Self> {
+        let catalog = Table::open_in(&store, table_path(&dir, 1))?;
         let name_i = field_index(&catalog, "Name")?;
         let mut all = Vec::new();
         for row in catalog.features() {
@@ -53,7 +71,7 @@ impl Geodatabase {
         let mut relationships = Vec::new();
         let mut typed_datasets = Vec::new();
         if let Some((_, id)) = all.iter().find(|(n, _)| n == "GDB_Items")
-            && let Ok(items) = Table::open(table_path(&dir, *id))
+            && let Ok(items) = Table::open_in(&store, table_path(&dir, *id))
         {
             let def_i = field_index(&items, "Definition").ok();
             let type_i = field_index(&items, "Type").ok();
@@ -97,7 +115,7 @@ impl Geodatabase {
 
         let entries: Vec<CatalogEntry> = all
             .iter()
-            .filter(|(name, id)| !name.starts_with("GDB_") && table_path(&dir, *id).is_file())
+            .filter(|(name, id)| !name.starts_with("GDB_") && store.is_file(&table_path(&dir, *id)))
             .map(|(name, id)| CatalogEntry {
                 name: name.clone(),
                 table_id: *id,
@@ -130,6 +148,7 @@ impl Geodatabase {
 
         Ok(Self {
             dir,
+            store,
             entries,
             feature_datasets,
             definitions,
@@ -140,6 +159,11 @@ impl Geodatabase {
 
     pub fn path(&self) -> &Path {
         &self.dir
+    }
+
+    /// Where its files are read from.
+    pub fn store(&self) -> &Store {
+        &self.store
     }
 
     /// User tables and feature classes, in catalog order.
@@ -187,7 +211,7 @@ impl Geodatabase {
             .iter()
             .find(|e| e.name.eq_ignore_ascii_case(name))
             .ok_or_else(|| Error::io(self.dir.join(name), std::io::ErrorKind::NotFound.into()))?;
-        let mut table = Table::open(table_path(&self.dir, entry.table_id))?;
+        let mut table = Table::open_in(&self.store, table_path(&self.dir, entry.table_id))?;
         if let Some(def) = self.definitions.get(&entry.name.to_lowercase()) {
             table.apply_definition(def);
         }

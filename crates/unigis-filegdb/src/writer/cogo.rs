@@ -73,7 +73,6 @@ const FIELDS: [(&str, &str); 5] = [
 pub fn enable_cogo(dir: impl AsRef<Path>, item: &str) -> Result<()> {
     use super::subtype_edit::{append_child, child, xml_escape};
     use crate::{GdbFieldType, Geodatabase};
-    use std::os::unix::fs::FileExt;
     use unigis_core::{Error, Field, FieldType, Value};
     let dir = dir.as_ref();
     txn::atomic(dir, || {
@@ -226,8 +225,7 @@ pub fn enable_cogo(dir: impl AsRef<Path>, item: &str) -> Result<()> {
         if !patches.is_empty() {
             let file = txn::open_for_append(&path)?;
             for (at, flags) in patches {
-                file.write_all_at(&[flags], at)
-                    .map_err(|e| Error::io(&path, e))?;
+                crate::store::write_all_at(&file, &[flags], at).map_err(|e| Error::io(&path, e))?;
             }
         }
         if definition != target.def {

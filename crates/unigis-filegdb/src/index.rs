@@ -2,16 +2,15 @@
 //! (key, OBJECTID) pairs. Page 1 is the root; leaf pages are chained.
 
 use std::cmp::Ordering;
-use std::fs::File;
-use std::os::unix::fs::FileExt;
 use std::path::{Path, PathBuf};
 
 use unigis_core::{Envelope, Error, Result};
 
 use crate::bytes::{Reader, err};
+use crate::store::{Handle, Store};
 
 pub(crate) struct BTree {
-    file: File,
+    file: Handle,
     path: PathBuf,
     page_size: usize,
     pub key_size: usize,
@@ -24,9 +23,9 @@ pub(crate) struct BTree {
 }
 
 impl BTree {
-    pub fn open(path: &Path) -> Result<Self> {
-        let file = File::open(path).map_err(|e| Error::io(path, e))?;
-        let len = file.metadata().map_err(|e| Error::io(path, e))?.len() as usize;
+    pub fn open(store: &Store, path: &Path) -> Result<Self> {
+        let file = store.open(path).map_err(|e| Error::io(path, e))?;
+        let len = file.len().map_err(|e| Error::io(path, e))? as usize;
         let mut ver = [0u8; 4];
         file.read_exact_at(
             &mut ver,
@@ -155,7 +154,17 @@ pub(crate) fn spatial_candidates(
         if size.is_nan() || size <= 0.0 {
             continue;
         }
-        let cell = |v: f64| (v / size).floor() as i64;
+        // Keys hold 31 bits per axis, cells offset by 2^29: clamp to the cells a key can name, so
+        // a window wider than the index (or infinite) neither overflows nor misses a cell.
+        let cell = |v: f64| {
+            let c = (v / size).floor();
+            let (lo, hi) = (-(1i64 << 29), (1i64 << 31) - 1 - (1i64 << 29));
+            if c.is_nan() {
+                lo
+            } else {
+                (c as i64).clamp(lo, hi)
+            }
+        };
         let (x0, x1, y0, y1) = (
             cell(env.xmin),
             cell(env.xmax),
@@ -196,8 +205,8 @@ pub struct IndexDef {
     pub expression: String,
 }
 
-pub(crate) fn read_gdbindexes(path: &Path) -> Result<Vec<IndexDef>> {
-    let bytes = std::fs::read(path).map_err(|e| Error::io(path, e))?;
+pub(crate) fn read_gdbindexes(store: &Store, path: &Path) -> Result<Vec<IndexDef>> {
+    let bytes = store.read(path).map_err(|e| Error::io(path, e))?;
     let mut r = Reader::new(&bytes);
     let n = r.u32()?;
     let mut out = Vec::new();

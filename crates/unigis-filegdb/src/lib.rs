@@ -6,6 +6,7 @@ pub mod gdb;
 pub mod geometry;
 pub mod index;
 pub mod schema;
+pub mod store;
 pub mod table;
 pub mod writer;
 pub mod xy_domains;
@@ -16,6 +17,7 @@ pub use schema::{
     Cardinality, Domain, DomainKind, MergePolicy, RelationshipClass, SplitPolicy, Subtype,
     SubtypeField, Subtypes,
 };
+pub use store::Store;
 pub use table::{GdbField, GdbFieldType, GeometryDef, Table, compare_values};
 pub use writer::{
     Expand, ExtractOptions, FieldAlteration, GeodatabaseWriter, TableBuilder, TableEditor,

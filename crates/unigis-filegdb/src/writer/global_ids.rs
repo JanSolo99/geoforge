@@ -6,7 +6,7 @@ use super::{
 };
 use crate::{GdbFieldType, Geodatabase, Table};
 use roxmltree::Document;
-use std::{collections::HashSet, fs::File, io::Read, os::unix::fs::FileExt, path::Path};
+use std::{collections::HashSet, fs::File, io::Read, path::Path};
 use unigis_core::{Error, Field, FieldType, Result, Value};
 
 /// Adds a required, noneditable GlobalID and its index to simple classes/tables.
@@ -168,8 +168,7 @@ fn add_one(dir: &Path, name: &str) -> Result<()> {
     drop(updated);
     let file = txn::open_for_append(&path)?;
     for (at, flags) in patches {
-        file.write_all_at(&[flags], at)
-            .map_err(|e| Error::io(&path, e))?;
+        crate::store::write_all_at(&file, &[flags], at).map_err(|e| Error::io(&path, e))?;
     }
     store(dir, &target, definition)
 }

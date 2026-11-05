@@ -175,12 +175,12 @@ impl Journal {
         if head.len() == 40 {
             let at = u64::from_le_bytes(head[32..40].try_into().unwrap());
             let mut size = [0u8; 4];
-            if std::os::unix::fs::FileExt::read_exact_at(&f, &mut size, at).is_ok() {
+            if crate::store::read_exact_at(&f, &mut size, at).is_ok() {
                 keep = (at + 4 + u64::from(u32::from_le_bytes(size))).min(len);
             }
         }
         let mut bytes = vec![0u8; keep as usize];
-        std::os::unix::fs::FileExt::read_exact_at(&f, &mut bytes, 0).map_err(io(path))?;
+        crate::store::read_exact_at(&f, &mut bytes, 0).map_err(io(path))?;
         let b = self.backup_name();
         let bpath = self.jdir().join(&b);
         // The backup must be durable before the manifest names it.

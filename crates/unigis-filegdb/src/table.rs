@@ -1,8 +1,6 @@
 //! `.gdbtable` / `.gdbtablx`: one table or feature class.
 
 use std::cmp::Ordering;
-use std::fs::File;
-use std::os::unix::fs::FileExt;
 use std::path::{Path, PathBuf};
 
 use chrono::{Duration, FixedOffset, NaiveDate, NaiveDateTime, NaiveTime};
@@ -14,6 +12,7 @@ use crate::bytes::{Reader, err};
 use crate::geometry;
 use crate::index::{BTree, IndexDef, read_gdbindexes, spatial_candidates};
 use crate::schema::{Subtypes, TableDefinition};
+use crate::store::{Handle, Store};
 
 /// The CLSID written instead of WKT when a layer has no spatial reference.
 const UNKNOWN_SRS: &str = "{B286C06B-0879-11D2-AACA-00C04FA33C20}";
@@ -193,7 +192,8 @@ pub(crate) fn encode_default(t: GdbFieldType, v: &Value) -> Option<Vec<u8>> {
 
 /// An open table. Feature IDs are OBJECTIDs (1-based).
 pub struct Table {
-    file: File,
+    file: Handle,
+    store: Store,
     path: PathBuf,
     pub(crate) utf8: bool,
     /// Uses ArcGIS Pro 3.2 extensions (64-bit OBJECTIDs or new field types).
@@ -218,15 +218,20 @@ pub struct Table {
 impl Table {
     /// Opens `aXXXXXXXX.gdbtable` (the path may omit the extension).
     pub fn open(path: impl AsRef<Path>) -> Result<Self> {
+        Self::open_in(&Store::disk(), path)
+    }
+
+    /// Opens `aXXXXXXXX.gdbtable` from `store` (the path may omit the extension).
+    pub fn open_in(store: &Store, path: impl AsRef<Path>) -> Result<Self> {
         let path = path.as_ref().with_extension("gdbtable");
-        if path.with_extension("gdbtable.cdf").is_file() {
+        if store.is_file(&path.with_extension("gdbtable.cdf")) {
             return Err(Error::Unsupported(
                 "compressed (.cdf) tables; uncompress the geodatabase in ArcGIS first".into(),
             ));
         }
-        let file = File::open(&path).map_err(|e| Error::io(&path, e))?;
+        let file = store.open(&path).map_err(|e| Error::io(&path, e))?;
         let io = |e| Error::io(&path, e);
-        let file_len = file.metadata().map_err(io)?.len();
+        let file_len = file.len().map_err(io)?;
 
         let mut h = [0u8; 40];
         file.read_exact_at(&mut h, 0).map_err(io)?;
@@ -290,11 +295,13 @@ impl Table {
             .map(GdbField::to_field)
             .collect();
         let nullable_count = fields.iter().filter(|f| f.nullable).count();
-        let tablx = Tablx::open(&path.with_extension("gdbtablx"))?;
-        let indexes = read_gdbindexes(&path.with_extension("gdbindexes")).unwrap_or_default();
+        let tablx = Tablx::open(store, &path.with_extension("gdbtablx"))?;
+        let indexes =
+            read_gdbindexes(store, &path.with_extension("gdbindexes")).unwrap_or_default();
 
         Ok(Self {
             file,
+            store: store.clone(),
             path,
             utf8,
             version,
@@ -405,10 +412,10 @@ impl Table {
         else {
             return Ok(None);
         };
-        if !spx.is_file() {
+        if !self.store.is_file(&spx) {
             return Ok(None);
         }
-        spatial_candidates(&BTree::open(&spx)?, &def.grid_sizes, env).map(Some)
+        spatial_candidates(&BTree::open(&self.store, &spx)?, &def.grid_sizes, env).map(Some)
     }
 
     /// Features whose geometry envelope intersects `env` (ArcGIS "select by
@@ -472,10 +479,10 @@ impl Table {
             return Ok(None);
         };
         let atx = self.path.with_extension(format!("{}.atx", def.name));
-        if !atx.is_file() {
+        if !self.store.is_file(&atx) {
             return Ok(None);
         }
-        let tree = BTree::open(&atx)?;
+        let tree = BTree::open(&self.store, &atx)?;
         let (Some(lo), Some(hi)) = (
             index_key(f.field_type, lo, tree.key_size),
             index_key(f.field_type, hi, tree.key_size),
@@ -1111,7 +1118,7 @@ impl FeatureClass for Table {
 
 /// `.gdbtablx`: OBJECTID → row offset.
 struct Tablx {
-    file: File,
+    file: Handle,
     /// Number of OBJECTID slots (max OBJECTID, deleted rows included).
     rows: u64,
     offset_size: u64,
@@ -1139,10 +1146,10 @@ const CHUNK_BYTES: usize = 1024;
 const PAGE_BLOCKS: u64 = CHUNK_BYTES as u64 * 8;
 
 impl Tablx {
-    fn open(path: &Path) -> Result<Self> {
-        let file = File::open(path).map_err(|e| Error::io(path, e))?;
+    fn open(store: &Store, path: &Path) -> Result<Self> {
+        let file = store.open(path).map_err(|e| Error::io(path, e))?;
         let io = |e| Error::io(path, e);
-        let file_len = file.metadata().map_err(io)?.len();
+        let file_len = file.len().map_err(io)?;
         let mut h = [0u8; 16];
         file.read_exact_at(&mut h, 0).map_err(io)?;
         let mut r = Reader::new(&h);

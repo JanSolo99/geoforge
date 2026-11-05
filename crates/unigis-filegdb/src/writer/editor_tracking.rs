@@ -6,7 +6,6 @@ use super::{
 };
 use crate::table::Table;
 use roxmltree::Document;
-use std::os::unix::fs::FileExt;
 use std::path::Path;
 use unigis_core::{Error, Result};
 
@@ -76,7 +75,7 @@ pub fn disable_editor_tracking(
                 // Existing append journal also backs up the complete field section.
                 let file = txn::open_for_append(&path)?;
                 for (at, flags) in patches {
-                    file.write_all_at(&[flags], at)
+                    crate::store::write_all_at(&file, &[flags], at)
                         .map_err(|e| Error::io(&path, e))?;
                 }
             }
@@ -386,8 +385,7 @@ pub fn enable_editor_tracking(
         if !patches.is_empty() {
             let file = txn::open_for_append(&path)?;
             for (at, flags) in patches {
-                file.write_all_at(&[flags], at)
-                    .map_err(|e| Error::io(&path, e))?;
+                crate::store::write_all_at(&file, &[flags], at).map_err(|e| Error::io(&path, e))?;
             }
         }
         if definition != target.def {
