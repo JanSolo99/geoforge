@@ -1,7 +1,7 @@
 # Current handoff
 
 Updated 2026-11-05; last agent Codex.
-Workspace `/workspace/geoforge`, branch `codex/clean-runtime`, based on agent commit `749ea792`.
+Workspace `/workspace/geoforge`, branch `codex/clean-runtime`, feature commit `8c51cfb2`.
 This is a separate cloud checkout, not `/mnt/media/ArcGIS_Linux`. It began clean.
 No local edits from the original workstation were accessed or transferred.
 
@@ -90,8 +90,13 @@ reference outputs were generated. Browser tests use the existing WASM, not a reb
 
 ## Next actions
 
-1. Publish the validated clean-runtime follow-up PR, stacked on agent PR #2.
-   Retarget to main after #2 merges; no automatic merge or deployment.
+1. Clean-runtime work is published as draft PR #3:
+   https://github.com/JanSolo99/geoforge/pull/3 (feature commit 8c51cfb2).
+   Its new GitHub CI run is pending; full local validation passed.
+   PR #3 is stacked on #2; retarget to main after #2 merges.
+   No automatic merge or deployment. Final clean-source archives and checksum
+   files are in /workspace/readiness/dist; installation reports are in
+   /workspace/readiness/runtime-final.
 2. Keep Claude's GDB-reading work separate. Native desktop/app-workspace checks,
    other browser/OS/architecture coverage and live licensed ArcGIS probes remain.
 3. Agent settings on the workstation are untouched: use docs/AGENT_WORKFLOW.md to
