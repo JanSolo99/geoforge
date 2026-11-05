@@ -32,9 +32,9 @@ pub const PRESETS: &[(&str, &str, &str)] = &[
     ),
 ];
 
-/// Whether local views (`local:lon,lat`, azimuthal equidistant) can be drawn in this build. They
-/// need proj4rs' `aeqd`, which the browser build leaves out (Cargo.toml); asking the projection
-/// itself, rather than the target, keeps the command, the ribbon and the tests in step with it.
+/// Whether local views (`local:lon,lat`, azimuthal equidistant) can be drawn in this build: they
+/// are computed here (`Aeqd`), so in the browser too. Asking the projection itself keeps the
+/// command, the ribbon and the tests in step with it.
 pub fn local_views_supported() -> bool {
     static SUPPORTED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *SUPPORTED.get_or_init(|| Projector::new("local:0,0").is_ok())
@@ -158,6 +158,73 @@ fn angle(def: &str, key: &str) -> Option<f64> {
 enum Engine {
     Proj { native: Box<proj4rs::Proj>, wgs84: Box<proj4rs::Proj> },
     World(crate::world::World),
+    Aeqd(Box<Aeqd>),
+}
+
+/// The azimuthal equidistant projection (`+proj=aeqd`, local views), computed here on the
+/// ellipsoid with GeographicLib's geodesics (pure Rust): a point's map position is its geodesic
+/// distance and azimuth from the centre, as PROJ's ellipsoidal aeqd defines it. (proj4rs'
+/// `aeqd` is C, which the browser build can't compile and whose `geod_*` symbols clash with
+/// PROJ's on the desktop.)
+#[derive(Clone)]
+struct Aeqd {
+    geod: geographiclib_rs::Geodesic,
+    lon0: f64,
+    lat0: f64,
+    x0: f64,
+    y0: f64,
+}
+
+impl Aeqd {
+    /// From a definition: `+lat_0`, `+lon_0`, `+x_0`, `+y_0` and the ellipsoid (`+datum=WGS84`,
+    /// `+ellps=` WGS84/GRS80/a sphere's `+R=`, or `+a=` with `+b=`/`+rf=`).
+    fn from_def(def: &str) -> Result<Aeqd, String> {
+        let param = |k: &str| def.split_whitespace().find_map(|t| t.strip_prefix(&format!("+{k}=")));
+        let num = |k: &str| param(k).and_then(|v| v.parse::<f64>().ok()).filter(|v| v.is_finite());
+        let (a, f) = match (param("ellps"), param("datum"), num("R"), num("a")) {
+            (_, _, Some(r), _) => (r, 0.0),
+            (_, _, _, Some(a)) => match (num("rf"), num("b")) {
+                (Some(rf), _) if rf != 0.0 => (a, 1.0 / rf),
+                (_, Some(b)) => (a, (a - b) / a),
+                _ => (a, 0.0),
+            },
+            (Some("GRS80"), _, _, _) | (_, Some("NAD83"), _, _) => (6_378_137.0, 1.0 / 298.257_222_101),
+            (Some("WGS84") | None, Some("WGS84") | None, _, _) => (6_378_137.0, 1.0 / 298.257_223_563),
+            (e, d, _, _) => return Err(format!("+proj=aeqd on {} isn't supported", e.or(d).unwrap_or("this ellipsoid"))),
+        };
+        if a.is_nan() || a <= 0.0 || !(0.0..1.0).contains(&f) {
+            return Err("+proj=aeqd: an impossible ellipsoid".into());
+        }
+        let pm = prime_meridian(def);
+        Ok(Aeqd {
+            geod: geographiclib_rs::Geodesic::new(a, f),
+            lon0: angle(def, "lon_0").unwrap_or(0.0) + pm,
+            lat0: angle(def, "lat_0").unwrap_or(0.0).clamp(-90.0, 90.0),
+            x0: num("x_0").unwrap_or(0.0),
+            y0: num("y_0").unwrap_or(0.0),
+        })
+    }
+
+    fn forward(&self, c: Coord) -> Option<Coord> {
+        use geographiclib_rs::InverseGeodesic;
+        let (s, azi, _, _): (f64, f64, f64, f64) = self.geod.inverse(self.lat0, self.lon0, c.y.clamp(-90.0, 90.0), c.x);
+        let azi = azi.to_radians();
+        let m = Coord::new(self.x0 + s * azi.sin(), self.y0 + s * azi.cos());
+        m.is_finite().then_some(m)
+    }
+
+    fn inverse(&self, m: Coord) -> Option<Coord> {
+        use geographiclib_rs::DirectGeodesic;
+        let (dx, dy) = (m.x - self.x0, m.y - self.y0);
+        let s = dx.hypot(dy);
+        // Beyond half the meridian's length the map wraps onto itself.
+        if s > std::f64::consts::PI * self.geod.a {
+            return None;
+        }
+        let (lat, lon): (f64, f64) = self.geod.direct(self.lat0, self.lon0, dx.atan2(dy).to_degrees(), s);
+        let c = Coord::new((lon + 540.0).rem_euclid(360.0) - 180.0, lat);
+        c.is_finite().then_some(c)
+    }
 }
 
 /// Converts between longitude/latitude and the coordinates of a custom projection.
@@ -236,6 +303,7 @@ impl std::fmt::Debug for Projector {
         let name = match &self.engine {
             Engine::Proj { native, .. } => native.projname(),
             Engine::World(w) => w.kind.proj_name(),
+            Engine::Aeqd(_) => "aeqd",
         };
         write!(f, "Projector({name})")
     }
@@ -266,6 +334,12 @@ impl Projector {
             let domain = Domain::of(preset, &def, (lon0, lat0), pm);
             let engine = Engine::World(crate::world::World { kind, lon0 });
             return Ok(Projector { engine, to_meter: 1.0, domain, lon0, edge: std::sync::OnceLock::new() });
+        }
+        if proj == "aeqd" {
+            let a = Aeqd::from_def(&def).map_err(|e| format!("{code}: {e}"))?;
+            let domain = Domain::of(preset, &def, (a.lon0, a.lat0), prime_meridian(&def));
+            let lon0 = a.lon0;
+            return Ok(Projector { engine: Engine::Aeqd(Box::new(a)), to_meter: 1.0, domain, lon0, edge: std::sync::OnceLock::new() });
         }
         let native = proj4rs::Proj::from_proj_string(&def).map_err(|e| match e {
             // A known code whose method isn't implemented (EPSG:5880's +proj=poly, say): name it.
@@ -354,6 +428,7 @@ impl Projector {
         let (native, wgs84) = match &self.engine {
             Engine::Proj { native, wgs84 } => (native, wgs84),
             Engine::World(w) => return w.forward(c),
+            Engine::Aeqd(a) => return a.forward(c),
         };
         let mut p = (c.x.to_radians(), c.y.clamp(-90.0, 90.0).to_radians(), 0.0);
         proj4rs::transform::transform(wgs84, native, &mut p).ok()?;
@@ -387,6 +462,7 @@ impl Projector {
         let (native, wgs84) = match &self.engine {
             Engine::Proj { native, wgs84 } => (native, wgs84),
             Engine::World(w) => return w.inverse(m),
+            Engine::Aeqd(a) => return a.inverse(m),
         };
         let mut p = (m.x, m.y, 0.0);
         proj4rs::transform::transform(native, wgs84, &mut p).ok()?;
@@ -583,18 +659,13 @@ mod tests {
         for ok in ["EPSG:3035", "epsg:32633", "EPSG:8858", "equalEarth", "usaAlbers", "mercator", "globe"] {
             crate::Projection::from_code(ok).unwrap_or_else(|e| panic!("{ok}: {e}"));
         }
-        // Local views are accepted exactly where they can be drawn (`aeqd` is native-only, Cargo.toml).
+        // Local views are drawn everywhere: aeqd is computed here, the browser included.
         let local = crate::Projection::from_code("local:12.5,41.9");
-        assert_eq!(local.is_ok(), local_views_supported(), "{local:?}");
-        // Pinned to the target on purpose, so the probe can't drift from the Cargo.toml split unnoticed.
-        assert_eq!(local_views_supported(), !cfg!(target_arch = "wasm32"), "aeqd on native targets only");
+        assert!(local.is_ok() && local_views_supported(), "{local:?}");
     }
 
     #[test]
     fn local_views_are_azimuthal_equidistant() {
-        if !local_views_supported() {
-            return; // the browser build (see codes_whose_method_cannot_be_drawn_are_refused)
-        }
         // map.viewMode "local" relies on +proj=aeqd: it must build (not fall back to Web Mercator)
         // and keep true distances from its centre.
         let p = Projector::new("local:12.5,41.9").unwrap_or_else(|e| panic!("{e}"));

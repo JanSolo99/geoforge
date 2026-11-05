@@ -5841,3 +5841,30 @@ fn uploaded_geodatabase_is_listed_and_its_feature_classes_added() {
     assert!(s.geodatabases().is_empty());
     std::fs::remove_dir_all(&dir).ok();
 }
+
+/// A geodatabase annotation class is drawn as its text, not as boxes (as ArcGIS draws one).
+#[test]
+fn geodatabase_annotation_is_drawn_as_text() {
+    use rustgis_data::{Dataset, Field, FieldType, Geometry, GeometryType, Value as V};
+    use rustgis_geom::Coord;
+    let dir = std::env::temp_dir().join(format!("rustgis-gdb-anno-{}", std::process::id()));
+    std::fs::remove_dir_all(&dir).ok();
+    let gdb = dir.join("Anno.gdb");
+    let fields = vec![
+        Field::new("TextString", FieldType::Text),
+        Field::new("AnnotationClassID", FieldType::Integer),
+        Field::new("FontSize", FieldType::Double),
+    ];
+    let mut anno = Dataset::new("Labels", GeometryType::Polygon, fields);
+    let ring = vec![Coord::new(4.0, 52.0), Coord::new(4.1, 52.0), Coord::new(4.1, 52.05), Coord::new(4.0, 52.05), Coord::new(4.0, 52.0)];
+    anno.push(Some(Geometry::Polygon(vec![vec![ring]])), vec![V::Text("Amsterdam".into()), V::Int(0), V::Float(10.0)]);
+    rustgis_data::source::filegdb::write(&anno, &gdb, None).unwrap();
+    let mut s = Session::new(Project::default());
+    s.run("layer.addData", &json!({"path": gdb.display().to_string()})).unwrap();
+    let l = s.map().layer_by_name("Labels").unwrap();
+    assert!(l.labels.enabled);
+    assert_eq!(l.labels.field, "TextString");
+    let rustgis_map::Renderer::Single(sym) = &l.renderer else { panic!("{:?}", l.renderer) };
+    assert_eq!(sym.fill.a(), 0, "the placement box is not filled");
+    std::fs::remove_dir_all(&dir).ok();
+}

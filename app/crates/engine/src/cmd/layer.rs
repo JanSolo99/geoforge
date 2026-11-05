@@ -33,10 +33,10 @@ pub fn commands() -> Vec<C> {
             .params(r#"{"database": "as layer.addDatabase", "password"?: string}"#),
         C::new("layer.loadAll", "Load All Features", "Layers", load_all).when(need_streamed).params(r#"{"layer"?: name|id}"#),
         C::new("layer.addUrl", "Add Data From URL", "Home › Add", add_url).params(
-            r#"{"url": "https://…/data.geojson|.csv|.parquet|.fgb|.gpkg|.zip|.kml|.kmz|.gpx|.tif (the format from the address, else the contents) | a .pmtiles archive", "name"?: text, "layer"?: "one layer of a zip, KML or GPX", "zoom"?: "bool: true zooms to what was added; false keeps the view of a GeoParquet or FlatGeobuf read in place (zoomed to only when the map was empty)", "x"?, "y"?, "wkt"?, "crs"?, "delimiter"?, "paperSpace"?, "stream"? (as layer.addData), "whole"?: "bool: download a cloud-optimised GeoTIFF whole (as a raster layer) instead of reading it in place"}"#,
+            r#"{"url": "https://…/data.geojson|.csv|.parquet|.fgb|.gpkg|.zip|.kml|.kmz|.gpx|.tif (the format from the address, else the contents) | a .pmtiles archive", "name"?: text, "layer"?: "one layer of a zip, KML or GPX", "zoom"?: "bool: true zooms to what was added; false keeps the view of a GeoParquet or FlatGeobuf read in place (zoomed to only when the map was empty)", "x"?, "y"?, "wkt"?, "crs"?, "delimiter"?, "paperSpace"?, "stream"? (as layer.addData), "whole"?: "bool: download a cloud-optimised GeoTIFF whole (as a raster layer) instead of reading it in place", "catalogOnly"?: "bool: a zipped file geodatabase is connected (Catalog › Databases) without adding layers"}"#,
         ),
         C::new("layer.addDownload", "Add Downloaded Data", "Home › Add", add_download)
-            .params(r#"{"id": a download the app finished (Add Data › From URL), "url": its address, "name"?: text, "layer"?: text, "zoom"?: bool, "x"?, "y"?, "wkt"?, "crs"?, "delimiter"?, "paperSpace"?, "stream"? (as layer.addData), "service"?: bool (a service's features: their axes and paging are checked), "coverage"?: bool (a WCS coverage: a GeoTIFF, else the service's error)}"#),
+            .params(r#"{"id": a download the app finished (Add Data › From URL), "url": its address, "name"?: text, "layer"?: text, "zoom"?: bool, "x"?, "y"?, "wkt"?, "crs"?, "delimiter"?, "paperSpace"?, "stream"? (as layer.addData), "service"?: bool (a service's features: their axes and paging are checked), "coverage"?: bool (a WCS coverage: a GeoTIFF, else the service's error), "catalogOnly"?: bool (a zipped geodatabase is only connected)}"#),
         C::new("layer.addEncodedPolyline", "Add Encoded Polyline", "Home › Add", add_encoded_polyline).params(
             r#"{"polyline": "encoded polyline text" | [texts] (one line each), "precision"?: 5 (Google) | 6 (OSRM, Valhalla), "name"?: text}"#,
         ),
@@ -837,6 +837,32 @@ const MAX_TABLES: usize = 32;
 /// `info.fileLayers` lists them).
 const MAX_SKIPPED_NAMED: usize = 100;
 
+/// Draws a geodatabase's annotation and dimension classes as ArcGIS does, not as plain polygons:
+/// annotation as its text (`TextString`) on invisible placement boxes; dimensions as their outline
+/// labelled with the measured length (`DIMLENGTH`). Recognised by the fields Esri gives them.
+fn style_feature_type(s: &mut Session, id: u32, fields: &[rustgis_data::Field]) {
+    use rustgis_map::{LabelPlacement, Symbol};
+    let has = |n: &str| fields.iter().find(|f| f.name.eq_ignore_ascii_case(n)).map(|f| f.name.clone());
+    let annotation = has("TextString").filter(|_| has("AnnotationClassID").is_some() && has("FontSize").is_some());
+    let dimension = has("DIMLENGTH").filter(|_| has("DIMSTYLEID").is_some());
+    let Some(l) = s.map_mut().layer_mut(id) else { return };
+    let clear = Rgba::new(0, 0, 0, 0);
+    if let Some(text) = annotation {
+        l.renderer = Renderer::Single(Symbol { fill: clear, stroke: clear, stroke_width: 0.0, size: 0.0, marker: Default::default() });
+        l.labels.enabled = true;
+        l.labels.field = text;
+        l.labels.placement = LabelPlacement::Center;
+    } else if let Some(length) = dimension {
+        if let Renderer::Single(sym) = &mut l.renderer {
+            sym.fill = clear;
+            sym.stroke_width = sym.stroke_width.max(1.0);
+        }
+        l.labels.enabled = true;
+        l.labels.field = length;
+        l.labels.placement = LabelPlacement::Center;
+    }
+}
+
 /// Adds uploaded file geodatabases: `name`'s bytes are a zip archive holding one or more `.gdb`
 /// folders, or the files of the one `name` names (`Roads.gdb`). Each is listed in the Catalog
 /// under Databases, as ArcGIS lists a geodatabase, and its feature classes are added as layers
@@ -858,7 +884,7 @@ pub(crate) fn add_geodatabases(s: &mut Session, p: &Value, name: &str, bytes: &[
         // Connected to the project (kept once, saved with it); one uploaded again replaces the
         // one of that name.
         s.project.connect_database(crate::project::Database::uploaded(gdb.clone(), zip.clone()));
-        let drawable = contents.items.iter().filter(|i| i.geometry.is_some() && !i.multipatch).count();
+        let drawable = contents.items.iter().filter(|i| i.geometry.is_some()).count();
         let mut entry = contents_json(&gdb, &contents);
         if !catalog_only && (drawable > 0 || ps(p, "layer").is_some()) {
             let r = add_source(s, p, Origin::Bytes(&gdb, zip))?;
@@ -918,7 +944,7 @@ fn add_geodatabase_item(s: &mut Session, p: &Value) -> CmdResult {
         let names: Vec<String> = c
             .items
             .iter()
-            .filter(|i| i.feature_dataset.as_deref().is_some_and(|d| d.eq_ignore_ascii_case(fds)) && i.geometry.is_some() && !i.multipatch)
+            .filter(|i| i.feature_dataset.as_deref().is_some_and(|d| d.eq_ignore_ascii_case(fds)) && i.geometry.is_some())
             .map(|i| i.name.clone())
             .collect();
         if names.is_empty() {
@@ -1130,6 +1156,7 @@ fn add_source_with(
                 l.renderer = r;
             }
             s.active_layer = Some(id);
+            style_feature_type(s, id, &info.fields);
             ids.push(id);
             streamed = true;
             features += info.count.unwrap_or(0);
@@ -1149,6 +1176,7 @@ fn add_source_with(
             if let (Some(r), Some(l)) = (style.clone(), s.map_mut().layer_mut(id)) {
                 l.renderer = r;
             }
+            style_feature_type(s, id, &info.fields);
             ids.push(id);
             for m in report.messages {
                 s.notify(m, false);

@@ -27,6 +27,8 @@ parquet = { workspace = true, features = ["zstd"] }
 bytes = { workspace = true }
 flatgeobuf = { workspace = true }
 geozero = { workspace = true }
+# MultiPatch footprints (the union of a patch's faces).
+geo = { workspace = true }
 calamine = { workspace = true }
 # LAZ (compressed LiDAR) point clouds.
 laz = { workspace = true }
