@@ -357,6 +357,12 @@ impl Project {
                 src.database_bytes = databases.iter().find(|d| d.name.eq_ignore_ascii_case(&name)).and_then(|d| d.data.clone());
             }
         }
+        // Raster datasets of uploaded geodatabases, likewise.
+        for rl in self.maps.iter_mut().flat_map(|m| m.layers.iter_mut()).filter_map(|l| l.raster.as_mut()) {
+            if let Some(name) = rl.database.clone() {
+                rl.database_bytes = databases.iter().find(|d| d.name.eq_ignore_ascii_case(&name)).and_then(|d| d.data.clone());
+            }
+        }
         databases.truncate(MAX_DATABASES);
         self.databases = databases;
     }

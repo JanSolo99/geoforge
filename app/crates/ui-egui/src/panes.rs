@@ -924,15 +924,29 @@ fn databases(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
                     let other = |app: &mut RustGisApp, ui: &mut Ui, o: &rustgis_engine::data::source::filegdb::Other| {
                         ui.horizontal(|ui| {
                             let (r, _) = ui.allocate_exact_size(vec2(16.0, 16.0), Sense::hover());
-                            let icon = if o.kind == "Relationship Class" { "relationship_class" } else { "gdb_item" };
+                            let raster = o.kind == "Raster Dataset";
+                            let icon = match o.kind.as_str() {
+                                "Relationship Class" => "relationship_class",
+                                "Raster Dataset" => "raster_layer",
+                                _ => "gdb_item",
+                            };
                             icons::paint(ui.painter(), r, icon, t.icon, t.accent);
                             let resp = ui
                                 .add(egui::Label::new(egui::RichText::new(&o.name).size(12.0)).sense(Sense::click()))
                                 .on_hover_text(&o.kind);
+                            // A raster dataset is added to the map; other items show their properties.
                             if resp.double_clicked() {
-                                show_properties(app, &name, &o.name);
+                                if raster {
+                                    add(app, Some(&o.name), None);
+                                } else {
+                                    show_properties(app, &name, &o.name);
+                                }
                             }
                             resp.context_menu(|ui| {
+                                if raster && ui.button(tl!("Add To Map")).clicked() {
+                                    add(app, Some(&o.name), None);
+                                    ui.close();
+                                }
                                 if ui.button(tl!("Properties")).clicked() {
                                     show_properties(app, &name, &o.name);
                                     ui.close();

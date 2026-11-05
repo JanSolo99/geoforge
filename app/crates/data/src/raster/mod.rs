@@ -402,6 +402,11 @@ pub fn read_path(path: &Path) -> Result<Raster> {
 /// subdataset (a NetCDF variable) and the coordinate system it doesn't say. Other files ignore
 /// them.
 pub fn read_path_with(path: &Path, subdataset: Option<&str>, crs: Option<&str>) -> Result<Raster> {
+    // A raster dataset of a file geodatabase (`Name.gdb` and the dataset's name).
+    if path.extension().is_some_and(|e| e.eq_ignore_ascii_case("gdb")) {
+        let name = subdataset.ok_or_else(|| DataError::Format(format!("{}: name the raster dataset", path.display())))?;
+        return crate::source::filegdb::read_raster(&*crate::source::filegdb::open_dir(path)?, name);
+    }
     // A Zarr store's variable and slice (`t2m[time=3]`).
     #[cfg(not(target_arch = "wasm32"))]
     if zarr::is_store(path) {

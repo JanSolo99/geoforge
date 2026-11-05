@@ -33,6 +33,13 @@ pub struct RasterLayer {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub crs: Option<String>,
     pub style: RasterStyle,
+    /// The project database (an uploaded geodatabase, `Name.gdb`) holding the raster dataset
+    /// `subdataset`, kept once by the project: its bytes are [`RasterLayer::database_bytes`].
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub database: Option<String>,
+    /// The bytes of [`RasterLayer::database`], shared with the project's copy (not saved here).
+    #[serde(skip)]
+    pub database_bytes: Option<Arc<Vec<u8>>>,
     /// The pixels; `None` when the source couldn't be read.
     #[serde(skip)]
     pub data: Option<Arc<Raster>>,
@@ -59,6 +66,8 @@ impl RasterLayer {
             subdataset: None,
             crs: None,
             style,
+            database: None,
+            database_bytes: None,
             data: Some(Arc::new(raster)),
         }
     }
@@ -73,13 +82,43 @@ impl RasterLayer {
             subdataset: None,
             crs: None,
             style,
+            database: None,
+            database_bytes: None,
+            data: Some(Arc::new(raster)),
+        }
+    }
+
+    /// A raster dataset of a geodatabase on disk (`path` the `.gdb` folder).
+    pub fn from_geodatabase(raster: Raster, gdb: impl Into<String>, name: impl Into<String>) -> RasterLayer {
+        let mut l = RasterLayer::from_path(raster, gdb);
+        l.subdataset = Some(name.into());
+        l
+    }
+
+    /// A raster dataset of a project database (an uploaded geodatabase, kept once by the
+    /// project): the layer saves only the database's and the dataset's names.
+    pub fn from_database(raster: Raster, database: impl Into<String>, name: impl Into<String>, bytes: Arc<Vec<u8>>) -> RasterLayer {
+        let style = RasterStyle::default_for(&raster);
+        let database = database.into();
+        RasterLayer {
+            path: None,
+            file_name: Some(database.clone()),
+            embedded: None,
+            subdataset: Some(name.into()),
+            crs: None,
+            style,
+            database: Some(database),
+            database_bytes: Some(bytes),
             data: Some(Arc::new(raster)),
         }
     }
 
     /// Reads the pixels again from the path or the embedded file (after a project opens).
     pub fn reload(&mut self) -> Result<(), String> {
-        let r = if let Some(bytes) = &self.embedded {
+        let r = if let (Some(bytes), Some(name)) = (&self.database_bytes, &self.subdataset) {
+            use rustgis_data::source::{Shared, filegdb};
+            filegdb::from_zip(&Shared(bytes.clone())).and_then(|g| filegdb::read_raster(&g, name))
+        } else if let Some(bytes) = &self.embedded {
             rustgis_data::raster::read_bytes(self.file_name.as_deref().unwrap_or("raster.tif"), bytes)
         } else if let Some(p) = &self.path {
             rustgis_data::raster::read_path_with(std::path::Path::new(p), self.subdataset.as_deref(), self.crs.as_deref())

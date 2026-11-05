@@ -647,6 +647,67 @@ fn add_relationship(gdb: &Geodatabase, name: &str, out: &mut serde_json::Value) 
     }
 }
 
+/// Reads a raster dataset of a geodatabase into the map's raster model: bands as 32-bit floats,
+/// invalid pixels set to a NoData value (the type's own for floats, as ArcGIS shows them; for
+/// integers a value no valid pixel has), three or four byte bands as RGB(A).
+pub fn read_raster(gdb: &Geodatabase, name: &str) -> Result<crate::raster::Raster> {
+    use crate::raster::{ColorHint, Crs, GeoTransform, Raster};
+    let r = gdb.open_raster(name).map_err(bad)?;
+    let mut bands = Vec::with_capacity(r.band_count());
+    let mut any_invalid = false;
+    let mut read = Vec::with_capacity(r.band_count());
+    for b in 0..r.band_count() {
+        let band = r.read_band(b).map_err(bad)?;
+        any_invalid |= band.valid.is_some();
+        read.push(band);
+    }
+    let nodata = any_invalid.then(|| {
+        if r.pixel_type.is_float() {
+            3.4e38
+        } else {
+            // The lowest value below every valid one (or above, for a type starting at 0).
+            let min = read.iter().flat_map(|b| b.values.iter()).fold(f64::INFINITY, |m, v| m.min(*v));
+            let max = read.iter().flat_map(|b| b.values.iter()).fold(f64::NEG_INFINITY, |m, v| m.max(*v));
+            if min > 0.0 {
+                0.0
+            } else if min.is_finite() {
+                (min - 1.0).max(-2_147_483_648.0)
+            } else {
+                max + 1.0
+            }
+        }
+    });
+    for band in read {
+        let data = match (&band.valid, nodata) {
+            (Some(valid), Some(nd)) => band.values.iter().zip(valid).map(|(v, ok)| if *ok { *v as f32 } else { nd as f32 }).collect(),
+            _ => band.values.iter().map(|v| *v as f32).collect(),
+        };
+        bands.push(data);
+    }
+    let mut notes = Vec::new();
+    let crs = match r.srs_wkt.as_deref() {
+        None => Crs::LonLat,
+        Some(wkt) => crate::raster::wkt::read_wkt(wkt)
+            .map(|(c, note)| {
+                notes.extend(note);
+                c
+            })
+            .unwrap_or(Crs::LonLat),
+    };
+    let gt = r.geotransform;
+    let transform = GeoTransform { origin_x: gt[0], origin_y: gt[3], pixel_width: gt[1], pixel_height: gt[5] };
+    let byte = !r.pixel_type.is_float() && r.pixel_type.bits() <= 8;
+    let color = match (bands.len(), byte) {
+        (3, true) => ColorHint::Rgb { alpha: false },
+        (4, true) => ColorHint::Rgb { alpha: true },
+        _ => ColorHint::Gray,
+    };
+    let mut out =
+        Raster::new(r.name.clone(), r.width as u32, r.height as u32, bands, transform, crs, nodata, color, r.pixel_type.arcgis_name())?;
+    out.source = Some(format!("{}/{}", gdb.path().display(), r.name));
+    Ok(out)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -811,4 +872,3 @@ mod tests {
         assert!(FileGdbSource::open(Path::new("/nonexistent/x.gdb"), None).is_err());
     }
 }
-

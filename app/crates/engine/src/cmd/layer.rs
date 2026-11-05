@@ -963,6 +963,20 @@ fn add_geodatabase_item(s: &mut Session, p: &Value) -> CmdResult {
         }
         return Ok(json!({"layer": ids.first().cloned(), "layers": ids}));
     }
+    // A raster dataset becomes a raster layer.
+    if let Some(item) = ps(p, "layer").map(str::trim).filter(|l| !l.is_empty()) {
+        let g = open_database(&db)?;
+        if let Some(name) = g.raster_datasets().into_iter().find(|r| r.eq_ignore_ascii_case(item)) {
+            let raster = rustgis_data::source::filegdb::read_raster(&g, &name).map_err(|e| format!("{}: {e}", db.name))?;
+            let layer = match (&db.data, &db.path) {
+                (Some(bytes), _) => rustgis_map::raster::RasterLayer::from_database(raster, db.name.clone(), name.clone(), bytes.clone()),
+                (None, Some(path)) => rustgis_map::raster::RasterLayer::from_geodatabase(raster, path.clone(), name.clone()),
+                (None, None) => return Err(format!("{}: neither a path nor data", db.name)),
+            };
+            let title = ps(p, "name").map(str::trim).filter(|n| !n.is_empty()).unwrap_or(&name).to_string();
+            return super::raster::add_raster(s, &title, layer);
+        }
+    }
     match (&db.data, &db.path) {
         (Some(bytes), _) => add_source(s, p, Origin::Bytes(&db.name, bytes.clone())),
         (None, Some(path)) => {
@@ -1028,7 +1042,11 @@ fn remove_geodatabase(s: &mut Session, p: &Value) -> CmdResult {
         .maps
         .iter()
         .flat_map(|m| m.layers.iter())
-        .filter(|l| l.source.as_ref().and_then(|src| src.database.as_deref()).is_some_and(|d| d.eq_ignore_ascii_case(&db.name)))
+        .filter(|l| {
+            let vector = l.source.as_ref().and_then(|src| src.database.as_deref());
+            let raster = l.raster.as_ref().and_then(|r| r.database.as_deref());
+            vector.or(raster).is_some_and(|d| d.eq_ignore_ascii_case(&db.name))
+        })
         .map(|l| l.name.clone())
         .collect();
     if db.data.is_some() && !users.is_empty() {

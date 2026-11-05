@@ -5868,3 +5868,49 @@ fn geodatabase_annotation_is_drawn_as_text() {
     assert_eq!(sym.fill.a(), 0, "the placement box is not filled");
     std::fs::remove_dir_all(&dir).ok();
 }
+
+/// A raster dataset of a geodatabase, uploaded or on disk, added from the Catalog as a raster
+/// layer, kept by the project through its database (no second copy).
+#[test]
+fn geodatabase_raster_datasets_become_raster_layers() {
+    use base64::Engine;
+    let gdb = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../testdata/large/filegdb-raster/int8.gdb");
+    if !gdb.is_dir() {
+        eprintln!("skipped: run scripts/fetch-testdata.sh");
+        return;
+    }
+    let files: Vec<(String, Vec<u8>)> = std::fs::read_dir(&gdb)
+        .unwrap()
+        .flatten()
+        .map(|e| (format!("int8.gdb/{}", e.file_name().to_string_lossy()), std::fs::read(e.path()).unwrap()))
+        .collect();
+    let zip = rustgis_data::zip::write(&files).unwrap();
+    let mut s = Session::new(Project::default());
+    let r = s
+        .run(
+            "layer.addDataBytes",
+            &json!({"fileName": "int8.zip", "data": base64::engine::general_purpose::STANDARD.encode(&zip), "catalogOnly": true}),
+        )
+        .unwrap();
+    let others = r["geodatabases"][0]["others"].as_array().unwrap();
+    assert!(others.iter().any(|o| o["name"] == "int8" && o["type"] == "Raster Dataset"), "{r}");
+    s.run("layer.addGeodatabaseItem", &json!({"geodatabase": "int8.gdb", "layer": "int8"})).unwrap();
+    let size = |s: &Session| s.map().layer_by_name("int8").and_then(|l| l.raster.as_ref()?.data.as_ref().map(|d| (d.width, d.height)));
+    assert_eq!(size(&s), Some((20, 20)));
+    let text = serde_json::to_string(&s.project).unwrap();
+    let encoded = base64::engine::general_purpose::STANDARD.encode(s.geodatabases()[0].1.as_slice());
+    assert_eq!(text.matches(&encoded[..64]).count(), 1, "kept once, by the project");
+    let mut s = Session::new(Project::default());
+    s.run("project.openText", &json!({"text": text})).unwrap();
+    assert_eq!(size(&s), Some((20, 20)), "read again from the project's database");
+    assert!(s.run("catalog.removeGeodatabase", &json!({"geodatabase": "int8"})).is_err(), "a layer reads it");
+    // On disk: connected, then added; a project names its folder and dataset.
+    let mut s = Session::new(Project::default());
+    s.run("catalog.addDatabase", &json!({"path": gdb.display().to_string()})).unwrap();
+    s.run("layer.addGeodatabaseItem", &json!({"geodatabase": "int8.gdb", "layer": "INT8"})).unwrap();
+    assert_eq!(size(&s), Some((20, 20)));
+    let text = serde_json::to_string(&s.project).unwrap();
+    let mut s = Session::new(Project::default());
+    s.run("project.openText", &json!({"text": text})).unwrap();
+    assert_eq!(size(&s), Some((20, 20)));
+}
