@@ -156,3 +156,107 @@ fn items_carry_their_type_names() {
         "unnamed types: {kinds:?}"
     );
 }
+
+/// The writer on a geodatabase mounted in memory (an upload being edited) gives the same files
+/// as on disk: a field added, an item renamed, another created, one deleted.
+#[test]
+fn edits_in_memory_match_edits_on_disk() {
+    use unigis_core::{Field, FieldType};
+    use unigis_filegdb::vfs;
+    let src =
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../testdata/gdb-reference/edit_fc.gdb");
+    let disk = std::env::temp_dir()
+        .join(format!("unigis-vfs-disk-{}", std::process::id()))
+        .join("edit_fc.gdb");
+    std::fs::remove_dir_all(disk.parent().unwrap()).ok();
+    std::fs::create_dir_all(&disk).unwrap();
+    for (name, bytes) in files(&src) {
+        std::fs::write(disk.join(Path::new(&name).file_name().unwrap()), bytes).unwrap();
+    }
+    let mem = PathBuf::from(format!(
+        "/unigis-memory-test/{}/edit_fc.gdb",
+        std::process::id()
+    ));
+    vfs::mount(&mem, files(&src));
+    let edit = |dir: &Path| {
+        let g = Geodatabase::open(dir).unwrap();
+        let base = g.table_base("wells").unwrap();
+        unigis_filegdb::add_field(&base, &Field::new("DEPTH_M", FieldType::Double)).unwrap();
+        unigis_filegdb::rename_item(dir, "wells", "Wells2").unwrap();
+        let mut w = unigis_filegdb::GeodatabaseWriter::open_existing(dir).unwrap();
+        let t = w
+            .create_table(
+                "notes",
+                None,
+                false,
+                false,
+                &[Field::new("TEXT", FieldType::String)],
+                None,
+            )
+            .unwrap();
+        w.finish_table(t).unwrap();
+        w.finish().unwrap();
+        unigis_filegdb::delete_item(dir, "notes").unwrap();
+    };
+    edit(&disk);
+    edit(&mem);
+    let on_disk: std::collections::BTreeMap<String, Vec<u8>> = files(&disk)
+        .into_iter()
+        .map(|(n, b)| (n.rsplit('/').next().unwrap().to_string(), b))
+        .collect();
+    let in_memory: std::collections::BTreeMap<String, Vec<u8>> =
+        vfs::unmount(&mem).into_iter().collect();
+    assert_eq!(
+        on_disk.keys().collect::<Vec<_>>(),
+        in_memory.keys().collect::<Vec<_>>()
+    );
+    // Identical, but for the random GUIDs new items get (GDB_Items, GDB_ItemRelationships).
+    let mask = |t: String| {
+        let mut out = String::new();
+        let mut rest = t.as_str();
+        while let Some(i) = rest.find('{') {
+            out.push_str(&rest[..i]);
+            let tail = &rest[i..];
+            let guid = tail.len() >= 38
+                && tail.as_bytes()[37] == b'}'
+                && tail[1..37]
+                    .chars()
+                    .all(|c| c.is_ascii_hexdigit() || c == '-');
+            out.push_str(if guid { "{GUID}" } else { "{" });
+            rest = &tail[if guid { 38 } else { 1 }..];
+        }
+        out + rest
+    };
+    let dump = |files: &std::collections::BTreeMap<String, Vec<u8>>, name: &str| -> Vec<String> {
+        let g = Geodatabase::from_files("x.gdb", files.clone()).unwrap();
+        let id = g
+            .catalog()
+            .iter()
+            .find(|(_, id)| format!("a{id:08x}.gdbtable") == name)
+            .map(|(_, id)| *id)
+            .unwrap();
+        unigis_filegdb::Table::open_in(g.store(), g.path().join(format!("a{id:08x}")))
+            .unwrap()
+            .features()
+            .map(|f| mask(format!("{f:?}")))
+            .collect()
+    };
+    for (name, bytes) in &on_disk {
+        if in_memory[name] != *bytes {
+            assert!(
+                ["a00000004.gdbtable", "a00000006.gdbtable"].contains(&name.as_str()),
+                "{name} differs"
+            );
+            assert_eq!(
+                dump(&on_disk, name),
+                dump(&in_memory, name),
+                "{name}: rows differ beyond GUIDs"
+            );
+        }
+    }
+    // And the memory result reads back.
+    let g = Geodatabase::from_files("edit_fc.gdb", in_memory.clone()).unwrap();
+    let t = g.open_table("Wells2").unwrap();
+    assert!(t.fields().iter().any(|f| f.name == "DEPTH_M"));
+    std::fs::remove_dir_all(disk.parent().unwrap()).ok();
+}

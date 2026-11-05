@@ -204,7 +204,7 @@ pub(super) fn rewrite_core(
     // Attribute indexes whose field is still there.
     let mut indexes: Vec<(String, String)> = Vec::new();
     let index_file = base.with_extension("gdbindexes");
-    if index_file.is_file() {
+    if crate::vfs::is_file(&index_file) {
         for d in read_raw(&index_file)?.into_iter().filter(|d| d.flag == 2) {
             let field = renames
                 .iter()
@@ -324,7 +324,7 @@ pub(super) fn rewrite_core(
 
         // Remove what belonged to the old table, then move the new files in.
         let prefix = format!("{}.", stem.to_string_lossy());
-        for e in std::fs::read_dir(&dir).map_err(|e| Error::io(&dir, e))? {
+        for e in crate::vfs::read_dir(&dir).map_err(|e| Error::io(&dir, e))? {
             let e = e.map_err(|e| Error::io(&dir, e))?;
             let name = e.file_name().to_string_lossy().into_owned();
             let own = name.starts_with(&prefix)
@@ -336,13 +336,13 @@ pub(super) fn rewrite_core(
                 txn::remove_file(&e.path())?;
             }
         }
-        for e in std::fs::read_dir(&scratch).map_err(|e| Error::io(&scratch, e))? {
+        for e in crate::vfs::read_dir(&scratch).map_err(|e| Error::io(&scratch, e))? {
             let e = e.map_err(|er| Error::io(&scratch, er))?;
             txn::install(&e.path(), &dir.join(e.file_name()))?;
         }
         Ok(n)
     })();
-    std::fs::remove_dir_all(&scratch).ok();
+    crate::vfs::remove_dir_all(&scratch).ok();
     let n = result?;
     guard.commit()?;
     Ok(n)

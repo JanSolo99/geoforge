@@ -10,7 +10,7 @@
 //! The edit is one transaction (see [`super::txn`]): until [`TableEditor::finish`]
 //! returns, a crash or a dropped editor leaves the table as it was.
 
-use std::fs::{File, OpenOptions};
+use crate::vfs::{File, OpenOptions};
 use std::io::{Seek, SeekFrom, Write};
 use std::path::{Path, PathBuf};
 
@@ -75,7 +75,7 @@ impl TableEditor {
         let pos = file
             .seek(SeekFrom::End(0))
             .map_err(|e| Error::io(&path, e))?;
-        let tablx = std::fs::read(base.with_extension("gdbtablx"))
+        let tablx = crate::vfs::read(base.with_extension("gdbtablx"))
             .map_err(|e| Error::io(base.with_extension("gdbtablx"), e))?;
         let offset_size = tablx
             .get(12..16)

@@ -75,7 +75,7 @@ pub fn disable_editor_tracking(
                 // Existing append journal also backs up the complete field section.
                 let file = txn::open_for_append(&path)?;
                 for (at, flags) in patches {
-                    crate::store::write_all_at(&file, &[flags], at)
+                    file.write_all_at(&[flags], at)
                         .map_err(|e| Error::io(&path, e))?;
                 }
             }
@@ -385,7 +385,8 @@ pub fn enable_editor_tracking(
         if !patches.is_empty() {
             let file = txn::open_for_append(&path)?;
             for (at, flags) in patches {
-                crate::store::write_all_at(&file, &[flags], at).map_err(|e| Error::io(&path, e))?;
+                file.write_all_at(&[flags], at)
+                    .map_err(|e| Error::io(&path, e))?;
             }
         }
         if definition != target.def {

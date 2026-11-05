@@ -6,7 +6,7 @@ use super::{
 };
 use crate::{GdbFieldType, Geodatabase, Table};
 use roxmltree::Document;
-use std::{collections::HashSet, fs::File, io::Read, path::Path};
+use std::{collections::HashSet, path::Path};
 use unigis_core::{Error, Field, FieldType, Result, Value};
 
 /// Adds a required, noneditable GlobalID and its index to simple classes/tables.
@@ -119,15 +119,12 @@ fn add_one(dir: &Path, name: &str) -> Result<()> {
     field.nullable = false;
     fields.push(field);
     // OS entropy, rather than the deterministic geoprocessing sampling RNG.
-    let mut entropy = File::open("/dev/urandom").map_err(|e| Error::io("/dev/urandom", e))?;
     let rows = table
         .features()
         .map(|r| {
             let mut r = r?;
             let mut bytes = [0; 16];
-            entropy
-                .read_exact(&mut bytes)
-                .map_err(|e| Error::io("/dev/urandom", e))?;
+            crate::sys::entropy(&mut bytes).map_err(|e| Error::io("/dev/urandom", e))?;
             bytes[6] = (bytes[6] & 15) | 64;
             bytes[8] = (bytes[8] & 63) | 128;
             let h = bytes.map(|b| format!("{b:02X}"));
@@ -168,7 +165,8 @@ fn add_one(dir: &Path, name: &str) -> Result<()> {
     drop(updated);
     let file = txn::open_for_append(&path)?;
     for (at, flags) in patches {
-        crate::store::write_all_at(&file, &[flags], at).map_err(|e| Error::io(&path, e))?;
+        file.write_all_at(&[flags], at)
+            .map_err(|e| Error::io(&path, e))?;
     }
     store(dir, &target, definition)
 }

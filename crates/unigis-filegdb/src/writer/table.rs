@@ -1,7 +1,7 @@
 //! Writes one `.gdbtable` + `.gdbtablx`: version 3 (32-bit OBJECTIDs) or version 4
 //! (64-bit OBJECTIDs, ArcGIS Pro 3.2).
 
-use std::fs::File;
+use crate::vfs::File;
 use std::io::{BufWriter, Seek, SeekFrom, Write};
 use std::path::{Path, PathBuf};
 

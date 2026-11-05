@@ -46,14 +46,14 @@ pub fn extract_data(
         return Err(bad("ERROR 000735: Datasets to Extract: Value is required"));
     }
     let src = Geodatabase::open(source)?;
-    if destination.exists()
-        && std::fs::canonicalize(source).ok() == std::fs::canonicalize(destination).ok()
+    if crate::vfs::exists(destination)
+        && crate::vfs::canonicalize(source).ok() == crate::vfs::canonicalize(destination).ok()
     {
         return Err(bad(
             "extract destination must differ from its source geodatabase",
         ));
     }
-    if create_new && destination.exists() {
+    if create_new && crate::vfs::exists(destination) {
         return Err(bad("ERROR 000258: Output geodatabase already exists"));
     }
     let mut wanted: BTreeSet<String> = BTreeSet::new();
@@ -298,8 +298,8 @@ pub fn extract_data(
         writer.finish()
     };
     let result = write();
-    if result.is_err() && create_new && destination.exists() {
-        std::fs::remove_dir_all(destination).map_err(|e| Error::io(destination, e))?;
+    if result.is_err() && create_new && crate::vfs::exists(destination) {
+        crate::vfs::remove_dir_all(destination).map_err(|e| Error::io(destination, e))?;
     }
     result
 }

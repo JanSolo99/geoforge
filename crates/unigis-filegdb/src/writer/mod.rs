@@ -27,7 +27,6 @@ mod table;
 mod txn;
 
 use std::path::{Path, PathBuf};
-use std::time::{SystemTime, UNIX_EPOCH};
 
 use unigis_core::{Envelope, Error, Feature, Field, FieldType, GeometryKind, Result, Value};
 
@@ -194,14 +193,11 @@ impl GeodatabaseWriter {
     /// Creates a new, empty `.gdb` directory. Fails if `dir` already exists.
     pub fn create(dir: impl AsRef<Path>) -> Result<Self> {
         let dir = dir.as_ref().to_path_buf();
-        if dir.exists() {
+        if crate::vfs::exists(&dir) {
             return Err(Error::io(&dir, std::io::ErrorKind::AlreadyExists.into()));
         }
-        std::fs::create_dir_all(&dir).map_err(|e| Error::io(&dir, e))?;
-        let seed = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .map_or(0, |d| d.as_nanos() as u64)
-            ^ (u64::from(std::process::id()) << 32);
+        crate::vfs::create_dir_all(&dir).map_err(|e| Error::io(&dir, e))?;
+        let seed = crate::sys::now_nanos() ^ (u64::from(crate::sys::pid()) << 32);
         Ok(Self {
             dir,
             standard_geometry_fields: false,
@@ -309,10 +305,7 @@ impl GeodatabaseWriter {
                 _ => None,
             })
             .collect();
-        let seed = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .map_or(0, |d| d.as_nanos() as u64)
-            ^ (u64::from(std::process::id()) << 32);
+        let seed = crate::sys::now_nanos() ^ (u64::from(crate::sys::pid()) << 32);
         Ok(Self {
             dir,
             standard_geometry_fields: false,
@@ -1162,7 +1155,7 @@ impl GeodatabaseWriter {
 
         let write = |name: &str, bytes: &[u8]| {
             let p = self.dir.join(name);
-            std::fs::write(&p, bytes).map_err(|e| Error::io(&p, e))
+            crate::vfs::write(&p, bytes).map_err(|e| Error::io(&p, e))
         };
         write("gdb", &[0x05, 0, 0, 0, 0xDE, 0xAD, 0xBE, 0xEF])?;
         write("timestamps", &[0xFF; 400])?;

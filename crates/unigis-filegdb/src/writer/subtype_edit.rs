@@ -610,11 +610,9 @@ fn sync_domain_links(dir: &Path, t: &Target, def: &str) -> Result<()> {
 
 fn random_uuid() -> String {
     static N: AtomicU64 = AtomicU64::new(0);
-    let t = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .map_or(0, |d| d.as_nanos() as u64);
+    let t = crate::sys::now_nanos();
     let mut x = t
-        ^ (u64::from(std::process::id()) << 32)
+        ^ (u64::from(crate::sys::pid()) << 32)
         ^ N.fetch_add(0x9E37_79B9_7F4A_7C15, Ordering::Relaxed);
     let mut next = || {
         x ^= x << 13;

@@ -8,7 +8,9 @@ pub mod index;
 pub mod raster;
 pub mod schema;
 pub mod store;
+mod sys;
 pub mod table;
+pub mod vfs;
 pub mod writer;
 pub mod xy_domains;
 

@@ -20,9 +20,9 @@
 //! active (in the same thread) joins it, so a catalog operation that edits several system
 //! tables commits or rolls back as a whole, and reads inside it see its own changes.
 
+use crate::vfs::{File, OpenOptions};
 use std::cell::RefCell;
 use std::collections::HashMap;
-use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use std::rc::Rc;
@@ -62,7 +62,7 @@ fn io(path: &Path) -> impl Fn(std::io::Error) -> Error + '_ {
 }
 
 fn key(dir: &Path) -> PathBuf {
-    std::fs::canonicalize(dir).unwrap_or_else(|_| std::path::absolute(dir).unwrap_or(dir.into()))
+    crate::vfs::canonicalize(dir).unwrap_or_else(|_| std::path::absolute(dir).unwrap_or(dir.into()))
 }
 
 fn active_for(dir: &Path) -> Option<Rc<RefCell<Journal>>> {
@@ -112,14 +112,14 @@ impl Journal {
     fn record(&mut self, line: &str) -> Result<()> {
         if self.manifest.is_none() {
             let jdir = self.jdir();
-            std::fs::create_dir_all(&jdir).map_err(io(&jdir))?;
+            crate::vfs::create_dir_all(&jdir).map_err(io(&jdir))?;
             let path = jdir.join(MANIFEST);
             let mut f = OpenOptions::new()
                 .create_new(true)
                 .write(true)
                 .open(&path)
                 .map_err(io(&path))?;
-            writeln!(f, "{MAGIC}\t{}", std::process::id()).map_err(io(&path))?;
+            writeln!(f, "{MAGIC}\t{}", crate::sys::pid()).map_err(io(&path))?;
             f.sync_all().map_err(io(&path))?;
             sync_dir(&jdir);
             sync_dir(&self.dir);
@@ -145,11 +145,11 @@ impl Journal {
             Some(Touch::Whole) => return Ok(()),
             Some(Touch::Grown) | None => {}
         }
-        if path.exists() {
+        if crate::vfs::exists(path) {
             let b = self.backup_name();
             self.record(&format!("moved\t{name}\t{b}"))?;
             let to = self.jdir().join(&b);
-            std::fs::rename(path, &to).map_err(io(path))?;
+            crate::vfs::rename(path, &to).map_err(io(path))?;
             sync_dir(&self.dir);
             sync_dir(&self.jdir());
             step();
@@ -167,7 +167,7 @@ impl Journal {
             return Ok(());
         }
         let mut f = File::open(path).map_err(io(path))?;
-        let len = f.metadata().map_err(io(path))?.len();
+        let len = f.len().map_err(io(path))?;
         let mut head = vec![0u8; 40.min(len as usize)];
         f.read_exact(&mut head).map_err(io(path))?;
         // Header, then the field section (whose extent and grid sizes are patched).
@@ -175,17 +175,17 @@ impl Journal {
         if head.len() == 40 {
             let at = u64::from_le_bytes(head[32..40].try_into().unwrap());
             let mut size = [0u8; 4];
-            if crate::store::read_exact_at(&f, &mut size, at).is_ok() {
+            if f.read_exact_at(&mut size, at).is_ok() {
                 keep = (at + 4 + u64::from(u32::from_le_bytes(size))).min(len);
             }
         }
         let mut bytes = vec![0u8; keep as usize];
-        crate::store::read_exact_at(&f, &mut bytes, 0).map_err(io(path))?;
+        f.read_exact_at(&mut bytes, 0).map_err(io(path))?;
         let b = self.backup_name();
         let bpath = self.jdir().join(&b);
         // The backup must be durable before the manifest names it.
         if self.manifest.is_none() {
-            std::fs::create_dir_all(self.jdir()).map_err(io(&self.jdir()))?;
+            crate::vfs::create_dir_all(self.jdir()).map_err(io(&self.jdir()))?;
         }
         let mut bf = File::create(&bpath).map_err(io(&bpath))?;
         bf.write_all(&bytes).map_err(io(&bpath))?;
@@ -215,10 +215,10 @@ impl Journal {
         let jdir = self.jdir();
         self.manifest = None;
         let m = jdir.join(MANIFEST);
-        std::fs::remove_file(&m).map_err(io(&m))?;
+        crate::vfs::remove_file(&m).map_err(io(&m))?;
         sync_dir(&jdir);
         step();
-        std::fs::remove_dir_all(&jdir).ok();
+        crate::vfs::remove_dir_all(&jdir).ok();
         sync_dir(&self.dir);
         Ok(())
     }
@@ -234,7 +234,7 @@ impl Journal {
 fn rollback_dir(dir: &Path) -> Result<()> {
     let jdir = dir.join(JOURNAL_DIR);
     let mpath = jdir.join(MANIFEST);
-    if let Ok(text) = std::fs::read_to_string(&mpath) {
+    if let Ok(text) = crate::vfs::read_to_string(&mpath) {
         // Only complete lines count: a line cut short was never followed by its change.
         let complete = match text.rfind('\n') {
             Some(i) => &text[..i],
@@ -248,7 +248,7 @@ fn rollback_dir(dir: &Path) -> Result<()> {
                 match p.as_slice() {
                     ["created", name] => {
                         let path = dir.join(name);
-                        match std::fs::remove_file(&path) {
+                        match crate::vfs::remove_file(&path) {
                             Ok(()) => {}
                             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
                             Err(e) => return Err(Error::io(&path, e)),
@@ -256,9 +256,9 @@ fn rollback_dir(dir: &Path) -> Result<()> {
                     }
                     ["moved", name, b] => {
                         let from = jdir.join(b);
-                        if from.exists() {
+                        if crate::vfs::exists(&from) {
                             let to = dir.join(name);
-                            std::fs::rename(&from, &to).map_err(io(&to))?;
+                            crate::vfs::rename(&from, &to).map_err(io(&to))?;
                         }
                     }
                     ["grown", name, len, b] => {
@@ -266,7 +266,7 @@ fn rollback_dir(dir: &Path) -> Result<()> {
                         let len: u64 = len
                             .parse()
                             .map_err(|_| Error::format("FileGDB", "corrupt journal"))?;
-                        let head = std::fs::read(jdir.join(b)).map_err(io(&jdir.join(b)))?;
+                        let head = crate::vfs::read(jdir.join(b)).map_err(io(&jdir.join(b)))?;
                         let mut f = OpenOptions::new()
                             .write(true)
                             .open(&path)
@@ -285,17 +285,17 @@ fn rollback_dir(dir: &Path) -> Result<()> {
             }
         }
         sync_dir(dir);
-        std::fs::remove_file(&mpath).map_err(io(&mpath))?;
+        crate::vfs::remove_file(&mpath).map_err(io(&mpath))?;
         sync_dir(&jdir);
     }
-    std::fs::remove_dir_all(&jdir).ok();
+    crate::vfs::remove_dir_all(&jdir).ok();
     sync_dir(dir);
     Ok(())
 }
 
 /// The process that owns `dir`'s journal, if it is another process that is still running.
 fn live_owner(dir: &Path) -> Option<u32> {
-    let text = std::fs::read_to_string(dir.join(JOURNAL_DIR).join(MANIFEST)).ok()?;
+    let text = crate::vfs::read_to_string(dir.join(JOURNAL_DIR).join(MANIFEST)).ok()?;
     let pid: u32 = text
         .lines()
         .next()?
@@ -304,7 +304,7 @@ fn live_owner(dir: &Path) -> Option<u32> {
         .trim()
         .parse()
         .ok()?;
-    let alive = pid == std::process::id() || Path::new(&format!("/proc/{pid}")).exists();
+    let alive = pid == crate::sys::pid() || Path::new(&format!("/proc/{pid}")).exists();
     alive.then_some(pid)
 }
 
@@ -313,7 +313,7 @@ fn live_owner(dir: &Path) -> Option<u32> {
 /// active in this thread or the journal belongs to a process that is still running.
 pub fn recover(dir: impl AsRef<Path>) -> Result<bool> {
     let dir = dir.as_ref();
-    if !dir.join(JOURNAL_DIR).exists() || active_for(dir).is_some() {
+    if !crate::vfs::exists(dir.join(JOURNAL_DIR)) || active_for(dir).is_some() {
         return Ok(false);
     }
     if live_owner(dir).is_some() {
@@ -339,7 +339,7 @@ pub(crate) fn begin(dir: &Path) -> Result<Guard> {
             owner: false,
         });
     }
-    if dir.join(JOURNAL_DIR).exists() {
+    if crate::vfs::exists(dir.join(JOURNAL_DIR)) {
         if let Some(pid) = live_owner(dir) {
             return Err(Error::Unsupported(format!(
                 "{} is being edited by another process ({pid})",
@@ -409,13 +409,13 @@ pub(crate) fn write_file(path: &Path, bytes: &[u8]) -> Result<()> {
     if let Some(j) = journal_of(path) {
         let mut j = j.borrow_mut();
         j.take_whole(path)?;
-        std::fs::write(path, bytes).map_err(io(path))?;
+        crate::vfs::write(path, bytes).map_err(io(path))?;
         j.mark_dirty(path);
         drop(j);
         step();
         return Ok(());
     }
-    std::fs::write(path, bytes).map_err(io(path))
+    crate::vfs::write(path, bytes).map_err(io(path))
 }
 
 /// Creates (truncates) a file of a geodatabase for writing.
@@ -430,7 +430,7 @@ pub(crate) fn create_file(path: &Path) -> Result<File> {
 
 /// Removes a file of a geodatabase; a missing file is not an error.
 pub(crate) fn remove_file(path: &Path) -> Result<()> {
-    if !path.exists() {
+    if !crate::vfs::exists(path) {
         return Ok(());
     }
     if let Some(j) = journal_of(path) {
@@ -438,7 +438,7 @@ pub(crate) fn remove_file(path: &Path) -> Result<()> {
         j.take_whole(path)?;
         // `take_whole` moved an untouched original away already.
     }
-    match std::fs::remove_file(path) {
+    match crate::vfs::remove_file(path) {
         Ok(()) => {}
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
         Err(e) => return Err(Error::io(path, e)),
@@ -454,7 +454,7 @@ pub(crate) fn install(from: &Path, to: &Path) -> Result<()> {
         j.take_whole(to)?;
         j.mark_dirty(to);
     }
-    std::fs::rename(from, to).map_err(io(to))?;
+    crate::vfs::rename(from, to).map_err(io(to))?;
     step();
     Ok(())
 }
@@ -480,7 +480,7 @@ pub(crate) fn scratch_dir(dir: &Path, stem: &str) -> Result<PathBuf> {
         Some(j) => j.borrow().jdir().join(format!("scratch-{stem}")),
         None => dir.join(format!(".gf-rewrite-{stem}")),
     };
-    std::fs::remove_dir_all(&scratch).ok();
-    std::fs::create_dir_all(&scratch).map_err(io(&scratch))?;
+    crate::vfs::remove_dir_all(&scratch).ok();
+    crate::vfs::create_dir_all(&scratch).map_err(io(&scratch))?;
     Ok(scratch)
 }

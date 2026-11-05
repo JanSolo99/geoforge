@@ -18,7 +18,7 @@ pub(super) struct RawIndex {
 }
 
 pub(super) fn read_raw(path: &Path) -> Result<Vec<RawIndex>> {
-    let bytes = std::fs::read(path).map_err(|e| Error::io(path, e))?;
+    let bytes = crate::vfs::read(path).map_err(|e| Error::io(path, e))?;
     let mut r = Reader::new(&bytes);
     let n = r.u32()?;
     let mut out = Vec::new();
@@ -46,7 +46,7 @@ pub(super) fn read_raw(path: &Path) -> Result<Vec<RawIndex>> {
 pub fn rebuild_attribute_indexes(table_base: impl AsRef<Path>) -> Result<Vec<String>> {
     let base = table_base.as_ref();
     // Tables written by UniGIS's own system-table writer have no index file.
-    if !base.with_extension("gdbindexes").is_file() {
+    if !crate::vfs::is_file(base.with_extension("gdbindexes")) {
         return Ok(Vec::new());
     }
     let table = Table::open(base)?;

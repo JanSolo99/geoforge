@@ -277,7 +277,7 @@ impl RowOid for Feature {
 /// Removes every file of table number `id` (`aXXXXXXXX.*`).
 fn remove_files(dir: &Path, id: u64) -> Result<()> {
     let prefix = format!("a{id:08x}.");
-    let entries = std::fs::read_dir(dir).map_err(|e| Error::io(dir, e))?;
+    let entries = crate::vfs::read_dir(dir).map_err(|e| Error::io(dir, e))?;
     for e in entries.flatten() {
         if e.file_name()
             .to_string_lossy()

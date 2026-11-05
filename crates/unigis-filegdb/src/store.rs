@@ -100,7 +100,7 @@ impl Store {
 
     pub(crate) fn open(&self, path: &Path) -> io::Result<Handle> {
         match &self.memory {
-            None => File::open(path).map(Handle::Disk),
+            None => crate::vfs::File::open(path).map(Handle::Disk),
             Some(m) => m
                 .get(&key(path))
                 .cloned()
@@ -112,14 +112,14 @@ impl Store {
     /// Whether the file exists.
     pub fn is_file(&self, path: &Path) -> bool {
         match &self.memory {
-            None => path.is_file(),
+            None => crate::vfs::is_file(path),
             Some(m) => m.contains_key(&key(path)),
         }
     }
 
     pub(crate) fn read(&self, path: &Path) -> io::Result<Vec<u8>> {
         match &self.memory {
-            None => std::fs::read(path),
+            None => crate::vfs::read(path),
             Some(_) => self.open(path).and_then(|h| match h {
                 Handle::Memory(b) => Ok(b.bytes().to_vec()),
                 Handle::Disk(_) => Err(io::ErrorKind::NotFound.into()),
@@ -137,14 +137,14 @@ fn key(path: &Path) -> String {
 
 /// One open file.
 pub(crate) enum Handle {
-    Disk(File),
+    Disk(crate::vfs::File),
     Memory(Slice),
 }
 
 impl Handle {
     pub fn len(&self) -> io::Result<u64> {
         match self {
-            Handle::Disk(f) => f.metadata().map(|m| m.len()),
+            Handle::Disk(f) => f.len(),
             Handle::Memory(b) => Ok(b.bytes().len() as u64),
         }
     }
@@ -152,7 +152,7 @@ impl Handle {
     /// Fills `buf` from `offset`, failing if the file ends first.
     pub fn read_exact_at(&self, buf: &mut [u8], offset: u64) -> io::Result<()> {
         match self {
-            Handle::Disk(f) => read_exact_at(f, buf, offset),
+            Handle::Disk(f) => f.read_exact_at(buf, offset),
             Handle::Memory(b) => {
                 let start = usize::try_from(offset).map_err(|_| eof())?;
                 let end = start.checked_add(buf.len()).ok_or_else(eof)?;
