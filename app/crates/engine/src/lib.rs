@@ -341,6 +341,8 @@ pub struct Session {
     /// the id, the query and database (label) they came from, and the result.
     #[cfg(not(target_arch = "wasm32"))]
     pub(crate) sql_results: Vec<(u64, String, Option<String>, rustgis_data::source::duckdb::Output)>,
+    /// A file the front end handed over for the next `layer.addDataBytes {"staged": true}`.
+    pub(crate) staged_upload: Option<(String, Vec<u8>)>,
 }
 
 /// The most `layer.addUrl` requests kept for the front end at a time.
@@ -447,7 +449,22 @@ impl Session {
             request_only: false,
             #[cfg(not(target_arch = "wasm32"))]
             sql_results: Vec::new(),
+            staged_upload: None,
         }
+    }
+
+    /// Hands a file's bytes to the next `layer.addDataBytes {"fileName": name, "staged": true}`,
+    /// without encoding them as base64: for a geodatabase upload, held once however large (up to
+    /// [`rustgis_data::source::filegdb::MAX_GEODATABASE_BYTES`]).
+    pub fn stage_upload(&mut self, name: &str, bytes: Vec<u8>) -> Result<(), String> {
+        if bytes.len() > rustgis_data::source::filegdb::MAX_GEODATABASE_BYTES {
+            return Err(format!(
+                "{name} is larger than the {} MB a geodatabase may be here",
+                rustgis_data::source::filegdb::MAX_GEODATABASE_BYTES >> 20
+            ));
+        }
+        self.staged_upload = Some((name.to_string(), bytes));
+        Ok(())
     }
 
     /// The project's uploaded file geodatabases (Catalog › Databases), by name, each a zip archive

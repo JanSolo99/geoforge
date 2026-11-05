@@ -6,7 +6,7 @@
 //!
 //! Modified for UniGIS (not part of upstream RustGIS).
 
-use rustgis_ui_egui::rustgis_engine::cmd::raster::MAX_UPLOAD_BYTES;
+use rustgis_ui_egui::rustgis_engine::data::source::filegdb::MAX_GEODATABASE_BYTES;
 use rustgis_ui_egui::rustgis_engine::data::zip;
 use rustgis_ui_egui::{DATABASE_PICK, Inbox, i18n};
 use wasm_bindgen::JsCast;
@@ -74,8 +74,8 @@ pub async fn read(files: Vec<Picked>, mark: &'static str, inbox: Inbox, notes: N
     for (path, list) in gdbs {
         let name = upload_name(&path);
         let size: f64 = list.iter().map(|f| f.file.size()).sum();
-        if size > MAX_UPLOAD_BYTES as f64 {
-            let mb = (MAX_UPLOAD_BYTES >> 20).to_string();
+        if size > MAX_GEODATABASE_BYTES as f64 {
+            let mb = (MAX_GEODATABASE_BYTES >> 20).to_string();
             note(
                 i18n::fmt("{name} is larger than the web app's {mb} MB: open it in the desktop app", &[("name", &name), ("mb", &mb)]),
                 true,
@@ -84,11 +84,17 @@ pub async fn read(files: Vec<Picked>, mark: &'static str, inbox: Inbox, notes: N
         }
         note(i18n::fmt("Reading {name}…", &[("name", &name)]), false);
         ctx.request_repaint();
-        let mut entries = Vec::with_capacity(list.len());
+        // Each file goes into the archive as it is read, so only the archive is held.
+        let mut zip = zip::StoredWriter::default();
         let mut failed = None;
         for f in list {
             match bytes(&f.file).await {
-                Ok(b) => entries.push((leaf(&f.path).to_string(), b)),
+                Ok(b) => {
+                    if let Err(e) = zip.add(leaf(&f.path), &b) {
+                        failed = Some(format!("{name}: {e}"));
+                        break;
+                    }
+                }
                 Err(e) => {
                     failed = Some(format!("{}: {e}", f.path));
                     break;
@@ -99,7 +105,7 @@ pub async fn read(files: Vec<Picked>, mark: &'static str, inbox: Inbox, notes: N
             note(e, true);
             continue;
         }
-        match zip::write_stored(&entries) {
+        match zip.finish() {
             Ok(archive) => inbox.lock().unwrap_or_else(|e| e.into_inner()).push((format!("{mark}{name}"), archive)),
             Err(e) => note(format!("{name}: {e}"), true),
         }

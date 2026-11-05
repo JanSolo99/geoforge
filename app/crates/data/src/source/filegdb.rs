@@ -137,31 +137,46 @@ fn folder(name: &str) -> &str {
     name.rfind(['/', '\\']).map_or("", |i| &name[..i])
 }
 
+/// Largest geodatabase read from memory (an upload): 1 GiB in the browser, 4 GiB (a zip
+/// archive's limit) on the desktop. It is held once (an uncompressed archive is read in place).
+pub const MAX_GEODATABASE_BYTES: usize = if cfg!(target_arch = "wasm32") { 1 << 30 } else { u32::MAX as usize };
+
 /// The geodatabases in a zip archive, each as `(Name.gdb, a zip archive of just its files)`: a
 /// folder is one when it holds a system catalog (`a00000001.gdbtable`). Files zipped without
-/// their folder make one named after the archive (`file_name`). Other files are left out.
-pub fn zip_geodatabases(file_name: &str, bytes: &[u8]) -> Result<Vec<(String, Vec<u8>)>> {
-    let names = crate::zip::read_matching(bytes, is_catalog).map_err(|e| bad(format!("{file_name}: {e}")))?;
+/// their folder make one named after the archive (`file_name`). Other files are left out. An
+/// uncompressed archive holding just one geodatabase (a picked folder) is used as it is, not
+/// copied.
+pub fn zip_geodatabases(file_name: &str, bytes: Arc<Vec<u8>>) -> Result<Vec<(String, Arc<Vec<u8>>)>> {
+    let names = crate::zip::read_matching(&bytes, is_catalog).map_err(|e| bad(format!("{file_name}: {e}")))?;
     let mut folders: Vec<String> = names.iter().map(|(n, _)| folder(n).to_string()).collect();
     folders.sort();
     folders.dedup();
     if folders.is_empty() {
         return Ok(Vec::new());
     }
-    let wanted = |n: &str| folders.iter().any(|f| folder(n) == f) && !n.ends_with('/');
-    let entries = crate::zip::read_matching(bytes, wanted).map_err(|e| bad(format!("{file_name}: {e}")))?;
     let stem = Path::new(file_name).file_stem().and_then(|s| s.to_str()).unwrap_or("Upload");
-    let mut out = Vec::new();
-    for f in &folders {
+    let gdb_name = |f: &str| {
         let leaf = f.rsplit(['/', '\\']).next().unwrap_or(f);
         let base = if leaf.is_empty() { stem } else { leaf };
         let base = base.strip_suffix(".gdb").or_else(|| base.strip_suffix(".GDB")).unwrap_or(base);
-        let files: Vec<(String, Vec<u8>)> = entries
-            .iter()
-            .filter(|(n, _)| folder(n) == f)
-            .map(|(n, b)| (n.rsplit(['/', '\\']).next().unwrap_or(n).to_string(), b.clone()))
-            .collect();
-        out.push((format!("{base}.gdb"), crate::zip::write_stored(&files).map_err(bad)?));
+        format!("{base}.gdb")
+    };
+    // One geodatabase and nothing else, stored: the archive is already what's needed.
+    if let [only] = folders.as_slice()
+        && let Ok(Some(all)) = crate::zip::stored_ranges(&bytes, |_| true)
+        && all.iter().all(|(n, _)| folder(n) == only)
+    {
+        return Ok(vec![(gdb_name(only), bytes)]);
+    }
+    let wanted = |n: &str| folders.iter().any(|f| folder(n) == f) && !n.ends_with('/');
+    let entries = crate::zip::read_matching_within(&bytes, wanted, MAX_GEODATABASE_BYTES).map_err(|e| bad(format!("{file_name}: {e}")))?;
+    let mut out = Vec::new();
+    for f in &folders {
+        let mut w = crate::zip::StoredWriter::default();
+        for (n, b) in entries.iter().filter(|(n, _)| folder(n) == f) {
+            w.add(n.rsplit(['/', '\\']).next().unwrap_or(n), b).map_err(bad)?;
+        }
+        out.push((gdb_name(f), Arc::new(w.finish().map_err(bad)?)));
     }
     Ok(out)
 }
@@ -187,9 +202,15 @@ pub fn from_zip(bytes: &super::Shared) -> Result<Arc<Geodatabase>> {
     if let Some((_, g)) = cache.iter().find(|(w, _)| w.upgrade().is_some_and(|b| Arc::ptr_eq(&b, &bytes.0))) {
         return Ok(g.clone());
     }
-    let files = crate::zip::read(bytes.as_ref()).map_err(bad)?;
-    let files = files.into_iter().filter(|(n, _)| !n.ends_with('/'));
-    let gdb = Arc::new(Geodatabase::from_files("upload.gdb", files).map_err(bad)?);
+    // Stored entries are read in place; compressed ones are inflated once.
+    let store = match crate::zip::stored_ranges(bytes.as_ref(), |_| true).map_err(bad)? {
+        Some(ranges) => unigis_filegdb::Store::shared(bytes.0.clone(), ranges),
+        None => {
+            let files = crate::zip::read_matching_within(bytes.as_ref(), |_| true, MAX_GEODATABASE_BYTES).map_err(bad)?;
+            unigis_filegdb::Store::memory(files)
+        }
+    };
+    let gdb = Arc::new(Geodatabase::open_in(store, "upload.gdb".into()).map_err(bad)?);
     cache.push((Arc::downgrade(&bytes.0), gdb.clone()));
     // A handful at a time: each holds its geodatabase's files.
     if cache.len() > 8 {

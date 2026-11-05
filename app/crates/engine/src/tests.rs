@@ -5833,6 +5833,21 @@ fn uploaded_geodatabase_is_listed_and_its_feature_classes_added() {
     s.run("layer.addData", &json!({"path": gdb.display().to_string()})).unwrap();
     assert_eq!(s.project.databases.len(), 1);
 
+    // Staged by the front end (no base64): the same, and only the staged file is taken.
+    let mut s = Session::new(Project::default());
+    s.stage_upload("Town.gdb", folder.clone()).unwrap();
+    assert!(s.run("layer.addDataBytes", &json!({"fileName": "Other.gdb", "staged": true})).is_err(), "names differ");
+    s.stage_upload("Town.gdb", folder.clone()).unwrap();
+    s.run("layer.addDataBytes", &json!({"fileName": "Town.gdb", "staged": true})).unwrap();
+    assert_eq!(s.geodatabases().len(), 1);
+    assert!(s.run("layer.addDataBytes", &json!({"fileName": "Town.gdb", "staged": true})).is_err(), "taken once");
+    // A zip archive on disk holding a geodatabase is added like an upload.
+    let on_disk = dir.join("shared.zip");
+    std::fs::write(&on_disk, &zip).unwrap();
+    let mut s = Session::new(Project::default());
+    s.run("layer.addData", &json!({"path": on_disk.display().to_string()})).unwrap();
+    assert_eq!(s.geodatabases()[0].0, "Town.gdb");
+
     // Not a geodatabase: a clear error, never a panic.
     let mut s = Session::new(Project::default());
     let junk = rustgis_data::zip::write(&[("Bad.gdb/a00000001.gdbtable".into(), vec![0xff; 9])]).unwrap();

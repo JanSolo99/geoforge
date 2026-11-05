@@ -523,6 +523,15 @@ fn add_data(s: &mut Session, p: &Value) -> CmdResult {
     if large_osm(path) {
         return add_gdal(s, p, path);
     }
+    // A zip archive holding file geodatabases (as one is shared or downloaded): read like an upload.
+    if path.to_ascii_lowercase().ends_with(".zip")
+        && std::fs::metadata(path).is_ok_and(|m| m.len() as usize <= rustgis_data::source::filegdb::MAX_GEODATABASE_BYTES)
+        && let Ok(bytes) = std::fs::read(path)
+        && rustgis_data::source::filegdb::zip_has_geodatabase(&bytes)
+    {
+        let name = Path::new(path).file_name().and_then(|n| n.to_str()).unwrap_or("upload.zip").to_string();
+        return add_geodatabases(s, p, &name, bytes);
+    }
     if rustgis_data::io::is_multi_layer_name(path) {
         let meta = std::fs::metadata(path).map_err(|e| format!("{path}: {e}"))?;
         if meta.len() > super::raster::MAX_UPLOAD_BYTES as u64 {
@@ -868,9 +877,9 @@ fn style_feature_type(s: &mut Session, id: u32, fields: &[rustgis_data::Field]) 
 /// under Databases, as ArcGIS lists a geodatabase, and its feature classes are added as layers
 /// (`"layer"` names one; `"catalogOnly": true` adds none). A geodatabase of only tables is listed,
 /// with nothing added.
-pub(crate) fn add_geodatabases(s: &mut Session, p: &Value, name: &str, bytes: &[u8]) -> CmdResult {
+pub(crate) fn add_geodatabases(s: &mut Session, p: &Value, name: &str, bytes: Vec<u8>) -> CmdResult {
     use rustgis_data::source::{Shared, filegdb};
-    let found = filegdb::zip_geodatabases(name, bytes).map_err(|e| format!("{name}: {e}"))?;
+    let found = filegdb::zip_geodatabases(name, std::sync::Arc::new(bytes)).map_err(|e| format!("{name}: {e}"))?;
     if found.is_empty() {
         return Err(format!("{name}: no file geodatabase in it (a .gdb folder holds a00000001.gdbtable)"));
     }
@@ -878,7 +887,6 @@ pub(crate) fn add_geodatabases(s: &mut Session, p: &Value, name: &str, bytes: &[
     let mut out = Vec::new();
     let mut ids: Vec<Value> = Vec::new();
     for (gdb, zip) in found {
-        let zip = std::sync::Arc::new(zip);
         // Read once here: a damaged geodatabase is an error before anything is listed.
         let contents = filegdb::from_zip(&Shared(zip.clone())).map(|g| filegdb::contents(&g)).map_err(|e| format!("{gdb}: {e}"))?;
         // Connected to the project (kept once, saved with it); one uploaded again replaces the

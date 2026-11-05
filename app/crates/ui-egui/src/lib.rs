@@ -622,6 +622,37 @@ impl RustGisApp {
         self.open_bytes_with(name, bytes, None)
     }
 
+    /// A file geodatabase from the inbox (a picked or dropped `.gdb` folder, marked or not, or a
+    /// zip archive holding one): handed to the engine without copying or encoding it. `Err`
+    /// gives the bytes back for any other file.
+    fn take_geodatabase(&mut self, name: &str, bytes: Vec<u8>) -> Result<Result<Value, String>, Vec<u8>> {
+        let (plain, catalog_only) = match name.strip_prefix(DATABASE_PICK) {
+            Some(n) => (n, true),
+            None => (name, false),
+        };
+        let lower = plain.to_ascii_lowercase();
+        let gdb =
+            lower.ends_with(".gdb") || (lower.ends_with(".zip") && rustgis_engine::data::source::filegdb::zip_has_geodatabase(&bytes));
+        if !gdb || plain.starts_with('\u{1}') {
+            return Err(bytes);
+        }
+        Ok(self.add_geodatabase_bytes(plain, bytes, catalog_only))
+    }
+
+    /// Adds (or with `catalog_only`, connects) an uploaded geodatabase, staging its bytes for the
+    /// engine rather than encoding them; the Catalog opens on a connection.
+    fn add_geodatabase_bytes(&mut self, name: &str, bytes: Vec<u8>, catalog_only: bool) -> Result<Value, String> {
+        if let Err(e) = self.session.stage_upload(name, bytes) {
+            self.session.notify(e.clone(), true);
+            return Err(e);
+        }
+        let r = self.run("layer.addDataBytes", json!({"fileName": name, "staged": true, "catalogOnly": catalog_only}));
+        if r.is_ok() && catalog_only {
+            self.ui.dock.open(Pane::Catalog);
+        }
+        r
+    }
+
     /// Opens a file from the inbox: one the `"text"` picker marked ([`DELIMITED_PICK`]) opens Add
     /// Delimited Text for it, or is read with a script's options; one the tool file picker marked
     /// ([`TOOL_FILE_PICK`]) goes to the Tools pane.
@@ -631,13 +662,7 @@ impl RustGisApp {
             return Ok(Value::Null);
         }
         if let Some(name) = name.strip_prefix(DATABASE_PICK) {
-            use base64::Engine;
-            let data = base64::engine::general_purpose::STANDARD.encode(bytes);
-            let r = self.run("layer.addDataBytes", json!({"fileName": name, "data": data, "catalogOnly": true}));
-            if r.is_ok() {
-                self.ui.dock.open(Pane::Catalog);
-            }
-            return r;
+            return self.add_geodatabase_bytes(name, bytes.to_vec(), true);
         }
         match name.strip_prefix(DELIMITED_PICK) {
             Some(name) => match self.ui.pending_csv.take() {
@@ -2312,7 +2337,11 @@ impl RustGisApp {
             None => Vec::new(),
         };
         for (name, bytes) in arrived {
-            let _ = self.open_picked(&name, &bytes);
+            // A geodatabase goes to the engine as it is (it may be large); other files as before.
+            let _ = match self.take_geodatabase(&name, bytes) {
+                Ok(r) => r,
+                Err(bytes) => self.open_picked(&name, &bytes),
+            };
         }
         // Files dropped on the desktop window arrive as paths. (The web shell reads browser drops
         // asynchronously and passes them through the inbox instead.)

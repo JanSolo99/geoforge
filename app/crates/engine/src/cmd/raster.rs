@@ -29,7 +29,7 @@ pub(crate) fn need_raster(s: &Session) -> Option<&'static str> {
 pub fn commands() -> Vec<C> {
     vec![
         C::new("layer.addDataBytes", "Add Data (from file contents)", "Home › Add", add_bytes)
-            .params(r#"{"fileName": "name.tif|.tiff|.asc|.geojson|.csv|.zip|.kml|.kmz|.gpx|.parquet|.fgb|.gpkg|.mbtiles|.gdb (a geodatabase folder's files as a zip archive; a .zip holding .gdb folders works too)", "data": base64, "layer"?: "one layer of a zip, KML, GPX or geodatabase by name", "catalogOnly"?: "bool: a geodatabase is only listed in the Catalog, nothing added", "name"?: text, "x"?, "y"?, "wkt"?, "crs"?, "delimiter"?, "paperSpace"?, "stream"? (as layer.addData)}"#),
+            .params(r#"{"fileName": "name.tif|.tiff|.asc|.geojson|.csv|.zip|.kml|.kmz|.gpx|.parquet|.fgb|.gpkg|.mbtiles|.gdb (a geodatabase folder's files as a zip archive; a .zip holding .gdb folders works too)", "data": base64, "layer"?: "one layer of a zip, KML, GPX or geodatabase by name", "catalogOnly"?: "bool: a geodatabase is only listed in the Catalog, nothing added", "staged"?: "bool: the file the app staged (Session::stage_upload) instead of data", "name"?: text, "x"?, "y"?, "wkt"?, "crs"?, "delimiter"?, "paperSpace"?, "stream"? (as layer.addData)}"#),
         C::new("raster.symbology", "Symbology", "Style › Rendering", symbology).when(need_raster).params(
             r#"{"layer"?, "type": "stretch"|"rgb"|"classify"|"unique"|"colormap"|"shadedRelief", "band"?: 1.., "ramp"?, "invert"?: bool, "classes"?: 1..32, "method"?, "azimuth"?, "altitude"?, "zFactor"?, "grey"?: bool (shadedRelief without its colour ramp)}"#,
         ),
@@ -180,6 +180,15 @@ pub(crate) fn add_gdal_path(s: &mut Session, p: &Value, path: &str) -> CmdResult
 fn add_bytes(s: &mut Session, p: &Value) -> CmdResult {
     use base64::Engine;
     let name = ps(p, "fileName").ok_or("fileName is required")?.to_string();
+    // A file the front end handed over directly (Session::stage_upload), not as base64: a
+    // geodatabase, which may be far larger than other uploads.
+    if super::b(p, "staged") == Some(true) {
+        let (staged, bytes) = s.staged_upload.take().ok_or("no file was staged")?;
+        if staged != name {
+            return Err(format!("{name}: the staged file is {staged}"));
+        }
+        return add_named_bytes(s, p, name, bytes);
+    }
     let data = ps(p, "data").ok_or("data is required")?;
     // Base64 is 4 characters per 3 bytes; refuse files past the upload limit before decoding.
     if data.len() / 4 * 3 > MAX_UPLOAD_BYTES {
@@ -219,7 +228,7 @@ pub(crate) fn add_named_bytes(s: &mut Session, p: &Value, name: String, bytes: V
     // or dropped in the browser), or a zip archive holding `.gdb` folders.
     let lower = name.to_ascii_lowercase();
     if lower.ends_with(".gdb") || (lower.ends_with(".zip") && rustgis_data::source::filegdb::zip_has_geodatabase(&bytes)) {
-        return super::layer::add_geodatabases(s, p, &name, &bytes);
+        return super::layer::add_geodatabases(s, p, &name, bytes);
     }
     // Files of several layers: zipped Shapefiles, KML/KMZ, GPX, GeoRSS, LandXML.
     if rustgis_data::io::is_multi_layer_name(&name) {

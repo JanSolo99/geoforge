@@ -12,7 +12,22 @@ use std::sync::Arc;
 #[derive(Clone, Default)]
 pub struct Store {
     /// Lower-case file name → contents; `None` reads the file system.
-    memory: Option<Arc<HashMap<String, Arc<[u8]>>>>,
+    memory: Option<Arc<HashMap<String, Slice>>>,
+}
+
+/// A file held in memory: a range of a shared buffer (the whole of its own, or an entry of an
+/// uncompressed zip archive, read in place).
+#[derive(Clone)]
+pub(crate) struct Slice {
+    buf: Arc<Vec<u8>>,
+    start: usize,
+    end: usize,
+}
+
+impl Slice {
+    fn bytes(&self) -> &[u8] {
+        self.buf.get(self.start..self.end).unwrap_or_default()
+    }
 }
 
 impl std::fmt::Debug for Store {
@@ -36,7 +51,42 @@ impl Store {
     pub fn memory(files: impl IntoIterator<Item = (String, Vec<u8>)>) -> Self {
         let map = files
             .into_iter()
-            .map(|(name, bytes)| (key(Path::new(&name)), Arc::<[u8]>::from(bytes)))
+            .map(|(name, bytes)| {
+                let end = bytes.len();
+                (
+                    key(Path::new(&name)),
+                    Slice {
+                        buf: Arc::new(bytes),
+                        start: 0,
+                        end,
+                    },
+                )
+            })
+            .collect();
+        Self {
+            memory: Some(Arc::new(map)),
+        }
+    }
+
+    /// Files that are ranges of one buffer held in memory (the entries of an uncompressed zip
+    /// archive), read in place without copying. Ranges past the buffer are left out.
+    pub fn shared(
+        buf: Arc<Vec<u8>>,
+        files: impl IntoIterator<Item = (String, std::ops::Range<usize>)>,
+    ) -> Self {
+        let map = files
+            .into_iter()
+            .filter(|(_, r)| r.start <= r.end && r.end <= buf.len())
+            .map(|(name, r)| {
+                (
+                    key(Path::new(&name)),
+                    Slice {
+                        buf: buf.clone(),
+                        start: r.start,
+                        end: r.end,
+                    },
+                )
+            })
             .collect();
         Self {
             memory: Some(Arc::new(map)),
@@ -71,7 +121,7 @@ impl Store {
         match &self.memory {
             None => std::fs::read(path),
             Some(_) => self.open(path).and_then(|h| match h {
-                Handle::Memory(b) => Ok(b.to_vec()),
+                Handle::Memory(b) => Ok(b.bytes().to_vec()),
                 Handle::Disk(_) => Err(io::ErrorKind::NotFound.into()),
             }),
         }
@@ -88,14 +138,14 @@ fn key(path: &Path) -> String {
 /// One open file.
 pub(crate) enum Handle {
     Disk(File),
-    Memory(Arc<[u8]>),
+    Memory(Slice),
 }
 
 impl Handle {
     pub fn len(&self) -> io::Result<u64> {
         match self {
             Handle::Disk(f) => f.metadata().map(|m| m.len()),
-            Handle::Memory(b) => Ok(b.len() as u64),
+            Handle::Memory(b) => Ok(b.bytes().len() as u64),
         }
     }
 
@@ -106,7 +156,7 @@ impl Handle {
             Handle::Memory(b) => {
                 let start = usize::try_from(offset).map_err(|_| eof())?;
                 let end = start.checked_add(buf.len()).ok_or_else(eof)?;
-                buf.copy_from_slice(b.get(start..end).ok_or_else(eof)?);
+                buf.copy_from_slice(b.bytes().get(start..end).ok_or_else(eof)?);
                 Ok(())
             }
         }
@@ -162,5 +212,32 @@ mod tests {
         assert!(h.read_exact_at(&mut b, 3).is_err());
         assert!(h.read_exact_at(&mut b, u64::MAX).is_err());
         assert!(!s.is_file(Path::new("a00000002.gdbtable")));
+    }
+
+    #[test]
+    fn shared_ranges_read_in_place() {
+        let buf = Arc::new(b"xxABCDyyEF".to_vec());
+        let s = Store::shared(
+            buf,
+            [
+                ("a.gdbtable".into(), 2..6),
+                ("B.gdbtablx".into(), 8..10),
+                ("bad".into(), 9..40),
+            ],
+        );
+        let mut b = [0u8; 2];
+        s.open(Path::new("A.GDBTABLE"))
+            .unwrap()
+            .read_exact_at(&mut b, 2)
+            .unwrap();
+        assert_eq!(&b, b"CD");
+        assert_eq!(s.read(Path::new("b.gdbtablx")).unwrap(), b"EF");
+        assert!(!s.is_file(Path::new("bad")), "past the buffer");
+        assert!(
+            s.open(Path::new("a.gdbtable"))
+                .unwrap()
+                .read_exact_at(&mut b, 3)
+                .is_err()
+        );
     }
 }

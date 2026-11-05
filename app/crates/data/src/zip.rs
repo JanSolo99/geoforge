@@ -128,11 +128,19 @@ pub fn read_matching(bytes: &[u8], want: impl Fn(&str) -> bool) -> Result<Vec<(S
     read_matching_within(bytes, want, MAX_TOTAL)
 }
 
-/// [`read_matching`] within `budget` inflated bytes in all (at most [`MAX_TOTAL`]).
-pub fn read_matching_within(bytes: &[u8], want: impl Fn(&str) -> bool, budget: usize) -> Result<Vec<(String, Vec<u8>)>, String> {
-    let mut budget = budget.min(MAX_TOTAL);
+/// One entry of an archive's central directory: where its (stored or compressed) bytes are.
+struct Entry {
+    name: String,
+    method: usize,
+    crc: usize,
+    csize: usize,
+    usize_: usize,
+    data_at: usize,
+}
+
+/// The entries of an archive's central directory (folders left out).
+fn entries(bytes: &[u8]) -> Result<Vec<Entry>, String> {
     let bad = || "not a zip archive (or a damaged one)".to_string();
-    // The end-of-central-directory record is in the last 64 KiB + 22 bytes.
     let start = bytes.len().saturating_sub(65_557);
     let eocd = (start..bytes.len().saturating_sub(21))
         .rev()
@@ -158,13 +166,111 @@ pub fn read_matching_within(bytes: &[u8], want: impl Fn(&str) -> bool, budget: u
         let local = u32_at(bytes, at(42)?).ok_or_else(bad)?;
         let name = String::from_utf8_lossy(bytes.get(at(46)?..add(&[p, 46, nl]).ok_or_else(bad)?).ok_or_else(bad)?).to_string();
         p = add(&[p, 46, nl, xl, cl]).ok_or_else(bad)?;
-        if name.ends_with('/') || !want(&name) {
+        if name.ends_with('/') {
             continue;
         }
         let lnl = u16_at(bytes, add(&[local, 26]).ok_or_else(bad)?).ok_or_else(bad)?;
         let lxl = u16_at(bytes, add(&[local, 28]).ok_or_else(bad)?).ok_or_else(bad)?;
         let data_at = add(&[local, 30, lnl, lxl]).ok_or_else(bad)?;
-        let body = bytes.get(data_at..add(&[data_at, csize]).ok_or_else(bad)?).ok_or_else(bad)?;
+        if bytes.len() < add(&[data_at, csize]).ok_or_else(bad)? {
+            return Err(bad());
+        }
+        out.push(Entry { name, method, crc, csize, usize_, data_at });
+    }
+    Ok(out)
+}
+
+/// Where the wanted entries' bytes are in the archive, when every one is stored uncompressed (so
+/// they can be read in place, without copying); `None` when one is compressed.
+pub fn stored_ranges(bytes: &[u8], want: impl Fn(&str) -> bool) -> Result<Option<Vec<(String, std::ops::Range<usize>)>>, String> {
+    let mut out = Vec::new();
+    for e in entries(bytes)? {
+        if !want(&e.name) {
+            continue;
+        }
+        if e.method != 0 || e.csize != e.usize_ {
+            return Ok(None);
+        }
+        out.push((e.name, e.data_at..e.data_at + e.csize));
+    }
+    Ok(Some(out))
+}
+
+/// Writes an uncompressed zip archive an entry at a time, so a folder's files can be added as
+/// they are read (only the archive is held, not the files as well).
+#[derive(Default)]
+pub struct StoredWriter {
+    out: Vec<u8>,
+    central: Vec<u8>,
+    count: u16,
+}
+
+impl StoredWriter {
+    /// Adds an entry. Plain zip holds at most 65,535 entries and 4 GiB.
+    pub fn add(&mut self, name: &str, data: &[u8]) -> Result<(), String> {
+        let too_big = || "the archive is too large for a zip file".to_string();
+        let n = name.as_bytes();
+        let name_len = u16::try_from(n.len()).map_err(|_| too_big())?;
+        let len = u32::try_from(data.len()).map_err(|_| too_big())?;
+        let offset = u32::try_from(self.out.len()).map_err(|_| too_big())?;
+        self.count = self.count.checked_add(1).ok_or_else(too_big)?;
+        let crc = crc32(data);
+        let header = |sig: u32, central: bool| {
+            let mut h = Vec::with_capacity(46);
+            h.extend_from_slice(&sig.to_le_bytes());
+            if central {
+                h.extend_from_slice(&20u16.to_le_bytes());
+            }
+            h.extend_from_slice(&20u16.to_le_bytes());
+            h.extend_from_slice(&0x0800u16.to_le_bytes());
+            h.extend_from_slice(&0u16.to_le_bytes());
+            h.extend_from_slice(&0u32.to_le_bytes());
+            h.extend_from_slice(&crc.to_le_bytes());
+            h.extend_from_slice(&len.to_le_bytes());
+            h.extend_from_slice(&len.to_le_bytes());
+            h.extend_from_slice(&name_len.to_le_bytes());
+            h.extend_from_slice(&0u16.to_le_bytes());
+            if central {
+                h.extend_from_slice(&[0; 10]);
+                h.extend_from_slice(&offset.to_le_bytes());
+            }
+            h.extend_from_slice(n);
+            h
+        };
+        self.out.extend_from_slice(&header(0x0403_4B50, false));
+        self.out.extend_from_slice(data);
+        self.central.extend_from_slice(&header(0x0201_4B50, true));
+        u32::try_from(self.out.len()).map_err(|_| too_big())?;
+        Ok(())
+    }
+
+    /// The archive.
+    pub fn finish(mut self) -> Result<Vec<u8>, String> {
+        let too_big = || "the archive is too large for a zip file".to_string();
+        let at = u32::try_from(self.out.len()).map_err(|_| too_big())?;
+        let size = u32::try_from(self.central.len()).map_err(|_| too_big())?;
+        self.out.append(&mut self.central);
+        self.out.extend_from_slice(&0x0605_4B50u32.to_le_bytes());
+        self.out.extend_from_slice(&[0; 4]);
+        self.out.extend_from_slice(&self.count.to_le_bytes());
+        self.out.extend_from_slice(&self.count.to_le_bytes());
+        self.out.extend_from_slice(&size.to_le_bytes());
+        self.out.extend_from_slice(&at.to_le_bytes());
+        self.out.extend_from_slice(&0u16.to_le_bytes());
+        Ok(self.out)
+    }
+}
+
+/// [`read_matching`] within `budget` inflated bytes in all: at most [`MAX_TOTAL`], or a larger
+/// budget a caller sets for an archive it knows (a geodatabase upload, whose size it checked).
+pub fn read_matching_within(bytes: &[u8], want: impl Fn(&str) -> bool, budget: usize) -> Result<Vec<(String, Vec<u8>)>, String> {
+    let mut budget = budget;
+    let mut out = Vec::new();
+    for Entry { name, method, crc, csize, usize_, data_at } in entries(bytes)? {
+        if !want(&name) {
+            continue;
+        }
+        let body = bytes.get(data_at..data_at + csize).unwrap_or_default();
         if usize_ > MAX_ENTRY || usize_ > budget {
             return Err(format!("{name} is too large"));
         }
@@ -216,5 +322,30 @@ mod tests {
         let eocd = far.len() - 22;
         far[eocd + 16..eocd + 20].copy_from_slice(&u32::MAX.to_le_bytes());
         assert!(read(&far).is_err());
+    }
+
+    #[test]
+    fn stored_entries_are_read_in_place_and_written_incrementally() {
+        let mut w = StoredWriter::default();
+        w.add("Town.gdb/a00000001.gdbtable", b"catalog").unwrap();
+        w.add("Town.gdb/a00000001.gdbtablx", &[1, 2, 3]).unwrap();
+        let z = w.finish().unwrap();
+        assert_eq!(
+            read(&z).unwrap(),
+            vec![
+                ("Town.gdb/a00000001.gdbtable".to_string(), b"catalog".to_vec()),
+                ("Town.gdb/a00000001.gdbtablx".to_string(), vec![1, 2, 3])
+            ]
+        );
+        let ranges = stored_ranges(&z, |_| true).unwrap().unwrap();
+        assert_eq!(&z[ranges[0].1.clone()], b"catalog");
+        assert_eq!(&z[ranges[1].1.clone()], &[1, 2, 3]);
+        // A compressed entry can't be read in place.
+        let deflated = write(&[("a".to_string(), vec![0u8; 1000])]).unwrap();
+        assert!(stored_ranges(&deflated, |_| true).unwrap().is_none());
+        assert!(stored_ranges(b"junk", |_| true).is_err());
+        for n in 0..z.len() {
+            let _ = stored_ranges(&z[..n], |_| true);
+        }
     }
 }

@@ -1048,11 +1048,11 @@ fn geodatabases_in_zip_archives() {
     entries.push(("export/data/City.gdb/".into(), Vec::new()));
     let archive = crate::zip::write(&entries).unwrap();
     assert!(zip_has_geodatabase(&archive));
-    let found = zip_geodatabases("download.zip", &archive).unwrap();
+    let found = zip_geodatabases("download.zip", Arc::new(archive.clone())).unwrap();
     let names: Vec<&str> = found.iter().map(|(n, _)| n.as_str()).collect();
     assert_eq!(names, ["Green.gdb", "City.gdb"]);
     for (name, zip) in &found {
-        let bytes = Shared(Arc::new(zip.clone()));
+        let bytes = Shared(zip.clone());
         let g = from_zip(&bytes).unwrap_or_else(|e| panic!("{name}: {e}"));
         let c = contents(&g);
         assert_eq!(c.items.len(), 1, "{name}: {c:?}");
@@ -1064,17 +1064,26 @@ fn geodatabases_in_zip_archives() {
     }
     // Files zipped without their folder: one geodatabase, named after the archive.
     let flat = crate::zip::write(&files("City.gdb", "")).unwrap();
-    let found = zip_geodatabases("City.zip", &flat).unwrap();
+    let found = zip_geodatabases("City.zip", Arc::new(flat.clone())).unwrap();
     assert_eq!(found.iter().map(|(n, _)| n.as_str()).collect::<Vec<_>>(), ["City.gdb"]);
     assert_eq!(super::layers(std::path::Path::new(&dir.join("City.gdb"))).unwrap(), ["Roads"]);
-    assert_eq!(filegdb::layers_zip(&Shared(Arc::new(found[0].1.clone()))).unwrap(), ["Roads"]);
+    assert_eq!(filegdb::layers_zip(&Shared(found[0].1.clone())).unwrap(), ["Roads"]);
+    // A picked folder (one geodatabase, uncompressed) is used as it is, and read in place.
+    let mut w = crate::zip::StoredWriter::default();
+    for (n, b) in files("City.gdb", "") {
+        w.add(&n, &b).unwrap();
+    }
+    let picked = Arc::new(w.finish().unwrap());
+    let found = zip_geodatabases("City.gdb", picked.clone()).unwrap();
+    assert!(Arc::ptr_eq(&found[0].1, &picked), "not copied");
+    assert_eq!(filegdb::layers_zip(&Shared(picked)).unwrap(), ["Roads"]);
     // No geodatabase, or not a zip: nothing found, or an error; never a panic.
     let other = crate::zip::write(&[("a.geojson".into(), b"{}".to_vec())]).unwrap();
     assert!(!zip_has_geodatabase(&other));
-    assert!(zip_geodatabases("x.zip", &other).unwrap().is_empty());
-    assert!(zip_geodatabases("x.zip", b"not a zip").is_err());
+    assert!(zip_geodatabases("x.zip", Arc::new(other.clone())).unwrap().is_empty());
+    assert!(zip_geodatabases("x.zip", Arc::new(b"not a zip".to_vec())).is_err());
     for n in (0..archive.len()).step_by(997) {
-        let _ = zip_geodatabases("cut.zip", &archive[..n]);
+        let _ = zip_geodatabases("cut.zip", Arc::new(archive[..n].to_vec()));
     }
     assert!(FileGdbSource::open_zip(&Shared(Arc::new(other)), None).is_err());
     std::fs::remove_dir_all(&dir).ok();
