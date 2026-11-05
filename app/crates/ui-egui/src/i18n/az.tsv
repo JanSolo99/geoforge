@@ -1964,3 +1964,28 @@ No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable	Həmi
 Only geodatabases are read from a folder: {n} other files were left out	Qovluqdan yalnız geoverilənlər bazaları oxunur: {n} digər fayl buraxıldı
 {name} is larger than the web app's {mb} MB: open it in the desktop app	{name} veb tətbiqin {mb} MB həddindən böyükdür: onu masaüstü tətbiqdə açın
 Reading {name}…	{name} oxunur…
+Properties	Xassələr
+{name} Properties	{name} xassələri
+Geodatabase	Geoverilənlər bazası
+Feature Type	Obyekt növü
+Description	Təsvir
+Field Type	Sahə növü
+Domain Type	Domen növü
+Minimum	Minimum
+Maximum	Maksimum
+XY Tolerance	XY tolerantlığı
+Z Values	Z qiymətləri
+M Values	M qiymətləri
+Spatial Reference	Məkan istinadı
+Indexes	İndekslər
+Coded Values	Kodlaşdırılmış qiymətlər
+Relationship Classes	Əlaqə sinifləri
+Field Name	Sahə adı
+Alias	Ləqəb
+Data Type	Verilən növü
+Length	Uzunluq
+Allow NULL	NULL-a icazə ver
+Domain	Domen
+Code	Kod
+Property	Xassə
+Value	Qiymət

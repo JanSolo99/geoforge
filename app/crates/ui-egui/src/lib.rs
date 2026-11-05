@@ -213,6 +213,8 @@ pub type RightPane = Pane;
 pub use dock::{Pane, Site};
 
 pub struct UiState {
+    /// Catalog › Databases › Properties: the geodatabase and item shown, and their properties.
+    pub catalog_properties: Option<(String, String, Value)>,
     pub tab: String,
     pub backstage: bool,
     pub backstage_page: &'static str,
@@ -313,6 +315,7 @@ pub struct UiState {
 impl Default for UiState {
     fn default() -> Self {
         UiState {
+            catalog_properties: None,
             tab: "Map".into(),
             backstage: false,
             backstage_page: "open",
@@ -2387,6 +2390,7 @@ impl RustGisApp {
             dock::persist(self);
         }
         dialogs::show(self, &ctx);
+        panes::properties_window(self, &ctx);
         mapview::confirm_delete(self, &ctx);
         pluginsui::show(self, &ctx);
         update::show(self, &ctx);

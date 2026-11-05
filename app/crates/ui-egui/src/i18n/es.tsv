@@ -1964,3 +1964,28 @@ No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable	No ha
 Only geodatabases are read from a folder: {n} other files were left out	De una carpeta solo se leen geodatabases: se omitieron {n} archivos más
 {name} is larger than the web app's {mb} MB: open it in the desktop app	{name} ocupa más de los {mb} MB de la aplicación web: ábrala en la aplicación de escritorio
 Reading {name}…	Leyendo {name}…
+Properties	Propiedades
+{name} Properties	Propiedades de {name}
+Geodatabase	Geodatabase
+Feature Type	Tipo de entidad
+Description	Descripción
+Field Type	Tipo de campo
+Domain Type	Tipo de dominio
+Minimum	Mínimo
+Maximum	Máximo
+XY Tolerance	Tolerancia XY
+Z Values	Valores Z
+M Values	Valores M
+Spatial Reference	Referencia espacial
+Indexes	Índices
+Coded Values	Valores codificados
+Relationship Classes	Clases de relación
+Field Name	Nombre de campo
+Alias	Alias
+Data Type	Tipo de datos
+Length	Longitud
+Allow NULL	Permitir NULL
+Domain	Dominio
+Code	Código
+Property	Propiedad
+Value	Valor

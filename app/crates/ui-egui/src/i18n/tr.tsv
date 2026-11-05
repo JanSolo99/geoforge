@@ -1964,3 +1964,28 @@ No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable	O kla
 Only geodatabases are read from a folder: {n} other files were left out	Bir klasörden yalnızca coğrafi veritabanları okunur: {n} diğer dosya atlandı
 {name} is larger than the web app's {mb} MB: open it in the desktop app	{name}, web uygulamasının {mb} MB sınırından büyük: masaüstü uygulamasında açın
 Reading {name}…	{name} okunuyor…
+Properties	Özellikler
+{name} Properties	{name} özellikleri
+Geodatabase	Coğrafi veritabanı
+Feature Type	Detay türü
+Description	Açıklama
+Field Type	Alan türü
+Domain Type	Alan adı kümesi türü
+Minimum	Minimum
+Maximum	Maksimum
+XY Tolerance	XY toleransı
+Z Values	Z değerleri
+M Values	M değerleri
+Spatial Reference	Mekansal referans
+Indexes	Dizinler
+Coded Values	Kodlu değerler
+Relationship Classes	İlişki sınıfları
+Field Name	Alan adı
+Alias	Takma ad
+Data Type	Veri türü
+Length	Uzunluk
+Allow NULL	NULL'a izin ver
+Domain	Alan adı kümesi
+Code	Kod
+Property	Özellik
+Value	Değer

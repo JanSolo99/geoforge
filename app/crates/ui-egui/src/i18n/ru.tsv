@@ -1964,3 +1964,28 @@ No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable	В э
 Only geodatabases are read from a folder: {n} other files were left out	Из папки читаются только базы геоданных: пропущено других файлов: {n}
 {name} is larger than the web app's {mb} MB: open it in the desktop app	{name} больше {mb} МБ, доступных веб-приложению: откройте её в настольном приложении
 Reading {name}…	Чтение {name}…
+Properties	Свойства
+{name} Properties	Свойства: {name}
+Geodatabase	База геоданных
+Feature Type	Тип объектов
+Description	Описание
+Field Type	Тип поля
+Domain Type	Тип домена
+Minimum	Минимум
+Maximum	Максимум
+XY Tolerance	Допуск XY
+Z Values	Значения Z
+M Values	Значения M
+Spatial Reference	Пространственная привязка
+Indexes	Индексы
+Coded Values	Кодированные значения
+Relationship Classes	Классы отношений
+Field Name	Имя поля
+Alias	Псевдоним
+Data Type	Тип данных
+Length	Длина
+Allow NULL	Разрешить NULL
+Domain	Домен
+Code	Код
+Property	Свойство
+Value	Значение

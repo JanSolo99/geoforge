@@ -1096,3 +1096,31 @@ fn geodatabase_contents_list_every_item_type() {
     let g = filegdb::open_dir(&root.join("domain_base.gdb")).unwrap();
     assert!(!filegdb::contents(&g).domains.is_empty());
 }
+
+/// Item properties as ArcGIS's Properties and Fields views show them.
+#[test]
+fn geodatabase_item_properties() {
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../testdata/gdb-reference");
+    let g = filegdb::open_dir(&root.join("edit_fc.gdb")).unwrap();
+    let p = filegdb::properties(&g, "WELLS").unwrap();
+    assert_eq!(p["name"], "wells");
+    assert_eq!(p["kind"], "Feature Class");
+    assert!(p["rows"].as_u64().is_some());
+    let types: Vec<&str> = p["fields"].as_array().unwrap().iter().filter_map(|f| f["type"].as_str()).collect();
+    assert_eq!(types.first(), Some(&"Object ID"), "{p}");
+    assert!(types.contains(&"Geometry"));
+    assert!(p["spatialReference"]["wkt"].as_str().is_some_and(|w| !w.is_empty()), "{p}");
+    assert!(p["extent"]["xmin"].is_number(), "{p}");
+    // A domain's values; an unknown item is an error.
+    let g = filegdb::open_dir(&root.join("domain_base.gdb")).unwrap();
+    let d = filegdb::contents(&g).domains.into_iter().next().unwrap();
+    let p = filegdb::properties(&g, &d).unwrap();
+    assert_eq!(p["kind"], "Domain");
+    assert!(p["codes"].is_array() || p["min"].is_number() || p["min"].is_string(), "{p}");
+    assert!(filegdb::properties(&g, "no_such_item").is_err());
+    // A relationship class names its classes.
+    let g = filegdb::open_dir(&root.join("relationship_tables.gdb")).unwrap();
+    let rel = filegdb::contents(&g).others.into_iter().find(|o| o.kind == "Relationship Class").unwrap();
+    let p = filegdb::properties(&g, &rel.name).unwrap();
+    assert!(p["relationship"]["origin"].is_string(), "{p}");
+}

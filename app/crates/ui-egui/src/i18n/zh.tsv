@@ -1964,3 +1964,28 @@ No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable	该�
 Only geodatabases are read from a folder: {n} other files were left out	仅从文件夹中读取地理数据库：已跳过其他 {n} 个文件
 {name} is larger than the web app's {mb} MB: open it in the desktop app	{name} 大于网页应用的 {mb} MB 上限：请在桌面应用中打开
 Reading {name}…	正在读取 {name}…
+Properties	属性
+{name} Properties	{name} 属性
+Geodatabase	地理数据库
+Feature Type	要素类型
+Description	描述
+Field Type	字段类型
+Domain Type	属性域类型
+Minimum	最小值
+Maximum	最大值
+XY Tolerance	XY 容差
+Z Values	Z 值
+M Values	M 值
+Spatial Reference	空间参考
+Indexes	索引
+Coded Values	编码值
+Relationship Classes	关系类
+Field Name	字段名称
+Alias	别名
+Data Type	数据类型
+Length	长度
+Allow NULL	允许空值
+Domain	属性域
+Code	代码
+Property	属性
+Value	值

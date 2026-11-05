@@ -1964,3 +1964,28 @@ No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable	그 �
 Only geodatabases are read from a folder: {n} other files were left out	폴더에서는 지오데이터베이스만 읽습니다: 다른 파일 {n}개는 제외했습니다
 {name} is larger than the web app's {mb} MB: open it in the desktop app	{name}의 크기가 웹 앱의 {mb}MB를 초과합니다: 데스크톱 앱에서 여세요
 Reading {name}…	{name} 읽는 중…
+Properties	속성
+{name} Properties	{name} 속성
+Geodatabase	지오데이터베이스
+Feature Type	피처 유형
+Description	설명
+Field Type	필드 유형
+Domain Type	도메인 유형
+Minimum	최소값
+Maximum	최대값
+XY Tolerance	XY 허용 오차
+Z Values	Z 값
+M Values	M 값
+Spatial Reference	공간 참조
+Indexes	인덱스
+Coded Values	코드값
+Relationship Classes	관계 클래스
+Field Name	필드 이름
+Alias	별칭
+Data Type	데이터 유형
+Length	길이
+Allow NULL	NULL 허용
+Domain	도메인
+Code	코드
+Property	속성
+Value	값

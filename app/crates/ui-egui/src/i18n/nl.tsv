@@ -1964,3 +1964,28 @@ No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable	Geen 
 Only geodatabases are read from a folder: {n} other files were left out	Uit een map worden alleen geodatabases gelezen: {n} andere bestanden zijn overgeslagen
 {name} is larger than the web app's {mb} MB: open it in the desktop app	{name} is groter dan de {mb} MB van de webapp: open hem in de desktopapp
 Reading {name}…	{name} lezen…
+Properties	Eigenschappen
+{name} Properties	Eigenschappen van {name}
+Geodatabase	Geodatabase
+Feature Type	Featuretype
+Description	Beschrijving
+Field Type	Veldtype
+Domain Type	Domeintype
+Minimum	Minimum
+Maximum	Maximum
+XY Tolerance	XY-tolerantie
+Z Values	Z-waarden
+M Values	M-waarden
+Spatial Reference	Ruimtelijke referentie
+Indexes	Indexen
+Coded Values	Gecodeerde waarden
+Relationship Classes	Relatieklassen
+Field Name	Veldnaam
+Alias	Alias
+Data Type	Gegevenstype
+Length	Lengte
+Allow NULL	NULL toestaan
+Domain	Domein
+Code	Code
+Property	Eigenschap
+Value	Waarde

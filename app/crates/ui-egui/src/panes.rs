@@ -701,6 +701,153 @@ fn database_contents(db: &rustgis_engine::project::Database) -> Option<rustgis_e
     })
 }
 
+/// Opens Properties for a geodatabase item (or says why it can't).
+fn show_properties(app: &mut RustGisApp, gdb: &str, item: &str) {
+    match app.run("info.geodatabaseItem", json!({"geodatabase": gdb, "item": item})) {
+        Ok(v) => app.ui.catalog_properties = Some((gdb.to_string(), item.to_string(), v)),
+        Err(e) => app.session.notify(e, true),
+    }
+}
+
+/// The Properties window of a geodatabase item: General, Fields, Indexes, Subtypes, Domain values
+/// and Relationship, as ArcGIS's Properties and Fields views show them.
+pub fn properties_window(app: &mut RustGisApp, ctx: &egui::Context) {
+    let Some((gdb, item, p)) = app.ui.catalog_properties.clone() else { return };
+    let mut open = true;
+    let text = |v: &Value| match v {
+        Value::Null => String::new(),
+        Value::String(s) => s.clone(),
+        other => other.to_string(),
+    };
+    egui::Window::new(crate::i18n::fmt("{name} Properties", &[("name", &item)]))
+        .id(egui::Id::new(("catalog-properties", &gdb, &item)))
+        .open(&mut open)
+        .default_width(520.0)
+        .vscroll(true)
+        .show(ctx, |ui| {
+            egui::Grid::new("general").num_columns(2).striped(true).show(ui, |ui| {
+                let rows: [(&str, &str); 12] = [
+                    ("Name", "name"),
+                    ("Type", "kind"),
+                    ("Feature Dataset", "featureDataset"),
+                    ("Geometry", "geometry"),
+                    ("Feature Type", "featureType"),
+                    ("Rows", "rows"),
+                    ("Description", "description"),
+                    ("Field Type", "fieldType"),
+                    ("Domain Type", "type"),
+                    ("Minimum", "min"),
+                    ("Maximum", "max"),
+                    ("XY Tolerance", "xyTolerance"),
+                ];
+                ui.label(tl!("Geodatabase"));
+                ui.label(&gdb);
+                ui.end_row();
+                for (label, key) in rows {
+                    let v = text(&p[key]);
+                    if !v.is_empty() {
+                        ui.label(tl!(label));
+                        ui.label(v);
+                        ui.end_row();
+                    }
+                }
+                if let Some(z) = p["hasZ"].as_bool() {
+                    ui.label(tl!("Z Values"));
+                    ui.label(if z { tl!("Yes") } else { tl!("No") });
+                    ui.end_row();
+                    ui.label(tl!("M Values"));
+                    ui.label(if p["hasM"].as_bool() == Some(true) { tl!("Yes") } else { tl!("No") });
+                    ui.end_row();
+                }
+                if let Some(sr) = p["spatialReference"]["name"].as_str() {
+                    ui.label(tl!("Spatial Reference"));
+                    ui.label(sr).on_hover_text(text(&p["spatialReference"]["wkt"]));
+                    ui.end_row();
+                }
+                if let Some(e) = p["extent"].as_object() {
+                    ui.label(tl!("Extent"));
+                    ui.label(
+                        ["xmin", "ymin", "xmax", "ymax"]
+                            .iter()
+                            .map(|k| text(&e.get(*k).cloned().unwrap_or(Value::Null)))
+                            .collect::<Vec<_>>()
+                            .join(", "),
+                    );
+                    ui.end_row();
+                }
+            });
+            let table = |ui: &mut Ui, title: &str, rows: &[Value], cols: &[(&str, &str)]| {
+                if rows.is_empty() {
+                    return;
+                }
+                ui.separator();
+                ui.label(egui::RichText::new(tl!(title)).font(semibold(12.5)));
+                egui::Grid::new(("props", title)).num_columns(cols.len()).striped(true).show(ui, |ui| {
+                    for (label, _) in cols {
+                        ui.label(egui::RichText::new(tl!(*label)).strong());
+                    }
+                    ui.end_row();
+                    for r in rows {
+                        for (_, key) in cols {
+                            ui.label(text(&r[*key]));
+                        }
+                        ui.end_row();
+                    }
+                });
+            };
+            let arr = |k: &str| p[k].as_array().cloned().unwrap_or_default();
+            table(
+                ui,
+                "Fields",
+                &arr("fields"),
+                &[
+                    ("Field Name", "name"),
+                    ("Alias", "alias"),
+                    ("Data Type", "type"),
+                    ("Length", "length"),
+                    ("Allow NULL", "nullable"),
+                    ("Default", "default"),
+                    ("Domain", "domain"),
+                ],
+            );
+            table(ui, "Indexes", &arr("indexes"), &[("Name", "name"), ("Fields", "fields")]);
+            table(
+                ui,
+                "Subtypes",
+                &p["subtypes"]["subtypes"].as_array().cloned().unwrap_or_default(),
+                &[("Code", "code"), ("Description", "name")],
+            );
+            table(ui, "Coded Values", &arr("codes"), &[("Code", "code"), ("Description", "description")]);
+            if let Some(r) = p["relationship"].as_object() {
+                let rows: Vec<Value> = [
+                    "origin",
+                    "destination",
+                    "cardinality",
+                    "originPrimaryKey",
+                    "originForeignKey",
+                    "composite",
+                    "attributed",
+                    "notification",
+                ]
+                .iter()
+                .filter_map(|k| r.get(*k).map(|v| json!({"k": k, "v": v})))
+                .collect();
+                table(ui, "Relationship", &rows, &[("Property", "k"), ("Value", "v")]);
+            }
+            let rels = arr("relationshipClasses");
+            if !rels.is_empty() {
+                ui.separator();
+                ui.label(egui::RichText::new(tl!("Relationship Classes")).font(semibold(12.5)));
+                for r in rels {
+                    ui.label(text(&r));
+                }
+            }
+        });
+    if !open {
+        app.ui.catalog_properties = None;
+    }
+}
+
 /// Catalog › Databases: the project's file geodatabases, each shown as ArcGIS shows one: its
 /// feature datasets holding their classes, then the classes and tables outside any. Double-click
 /// an item (or Add To Map) to add it; right-click a feature dataset or the geodatabase for more.
@@ -766,16 +913,31 @@ fn databases(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
                                     add(app, Some(&item.name), None);
                                     ui.close();
                                 }
+                                if ui.button(tl!("Properties")).clicked() {
+                                    show_properties(app, &name, &item.name);
+                                    ui.close();
+                                }
                             });
                         });
                     };
                     // Items other than tables and classes, named with their type (as ArcGIS shows them).
-                    let other = |ui: &mut Ui, o: &rustgis_engine::data::source::filegdb::Other| {
+                    let other = |app: &mut RustGisApp, ui: &mut Ui, o: &rustgis_engine::data::source::filegdb::Other| {
                         ui.horizontal(|ui| {
                             let (r, _) = ui.allocate_exact_size(vec2(16.0, 16.0), Sense::hover());
                             let icon = if o.kind == "Relationship Class" { "relationship_class" } else { "gdb_item" };
                             icons::paint(ui.painter(), r, icon, t.icon, t.accent);
-                            ui.label(egui::RichText::new(&o.name).size(12.0)).on_hover_text(&o.kind);
+                            let resp = ui
+                                .add(egui::Label::new(egui::RichText::new(&o.name).size(12.0)).sense(Sense::click()))
+                                .on_hover_text(&o.kind);
+                            if resp.double_clicked() {
+                                show_properties(app, &name, &o.name);
+                            }
+                            resp.context_menu(|ui| {
+                                if ui.button(tl!("Properties")).clicked() {
+                                    show_properties(app, &name, &o.name);
+                                    ui.close();
+                                }
+                            });
                         });
                     };
                     for fds in &contents.feature_datasets {
@@ -791,7 +953,7 @@ fn databases(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
                                     row(app, ui, item);
                                 }
                                 for o in contents.others.iter().filter(|o| o.feature_dataset.as_deref() == Some(fds.as_str())) {
-                                    other(ui, o);
+                                    other(app, ui, o);
                                 }
                             });
                         header.inner.context_menu(|ui| {
@@ -809,7 +971,7 @@ fn databases(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
                         row(app, ui, item);
                     }
                     for o in contents.others.iter().filter(|o| o.feature_dataset.is_none()) {
-                        other(ui, o);
+                        other(app, ui, o);
                     }
                     if !contents.domains.is_empty() {
                         egui::CollapsingHeader::new(egui::RichText::new(tl!("Domains")).size(12.0))
@@ -817,7 +979,10 @@ fn databases(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
                             .default_open(false)
                             .show(ui, |ui| {
                                 for d in &contents.domains {
-                                    ui.label(egui::RichText::new(d).size(12.0));
+                                    let resp = ui.add(egui::Label::new(egui::RichText::new(d).size(12.0)).sense(Sense::click()));
+                                    if resp.on_hover_text(tl!("Properties")).double_clicked() {
+                                        show_properties(app, &name, d);
+                                    }
                                 }
                             });
                     }

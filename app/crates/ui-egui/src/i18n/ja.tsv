@@ -1964,3 +1964,28 @@ No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable	そ�
 Only geodatabases are read from a folder: {n} other files were left out	フォルダーから読み取るのはジオデータベースだけです: ほかの {n} 個のファイルは除外しました
 {name} is larger than the web app's {mb} MB: open it in the desktop app	{name} は Web アプリの上限 {mb} MB を超えています: デスクトップ アプリで開いてください
 Reading {name}…	{name} を読み取り中…
+Properties	プロパティ
+{name} Properties	{name} のプロパティ
+Geodatabase	ジオデータベース
+Feature Type	フィーチャ タイプ
+Description	説明
+Field Type	フィールド タイプ
+Domain Type	ドメイン タイプ
+Minimum	最小
+Maximum	最大
+XY Tolerance	XY 許容値
+Z Values	Z 値
+M Values	M 値
+Spatial Reference	空間参照
+Indexes	インデックス
+Coded Values	コード値
+Relationship Classes	リレーションシップ クラス
+Field Name	フィールド名
+Alias	エイリアス
+Data Type	データ タイプ
+Length	長さ
+Allow NULL	NULL を許可
+Domain	ドメイン
+Code	コード
+Property	プロパティ
+Value	値

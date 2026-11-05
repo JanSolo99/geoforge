@@ -1964,3 +1964,28 @@ No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable	Thư 
 Only geodatabases are read from a folder: {n} other files were left out	Chỉ đọc geodatabase từ thư mục: đã bỏ qua {n} tệp khác
 {name} is larger than the web app's {mb} MB: open it in the desktop app	{name} lớn hơn {mb} MB của ứng dụng web: hãy mở trong ứng dụng máy tính
 Reading {name}…	Đang đọc {name}…
+Properties	Thuộc tính
+{name} Properties	Thuộc tính của {name}
+Geodatabase	Geodatabase
+Feature Type	Loại đối tượng
+Description	Mô tả
+Field Type	Loại trường
+Domain Type	Loại miền
+Minimum	Nhỏ nhất
+Maximum	Lớn nhất
+XY Tolerance	Dung sai XY
+Z Values	Giá trị Z
+M Values	Giá trị M
+Spatial Reference	Tham chiếu không gian
+Indexes	Chỉ mục
+Coded Values	Giá trị mã hóa
+Relationship Classes	Lớp quan hệ
+Field Name	Tên trường
+Alias	Bí danh
+Data Type	Kiểu dữ liệu
+Length	Độ dài
+Allow NULL	Cho phép NULL
+Domain	Miền
+Code	Mã
+Property	Thuộc tính
+Value	Giá trị

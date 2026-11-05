@@ -675,3 +675,135 @@ mod tests {
         assert!(FileGdbSource::open(Path::new("/nonexistent/x.gdb"), None).is_err());
     }
 }
+
+/// ArcGIS's name for a field type (the Fields view's Data Type).
+fn type_name(t: unigis_core::FieldType) -> &'static str {
+    use unigis_core::FieldType as G;
+    match t {
+        G::SmallInteger => "Short",
+        G::Integer => "Long",
+        G::BigInteger => "Big Integer",
+        G::Single => "Float",
+        G::Double => "Double",
+        G::String => "Text",
+        G::Date => "Date",
+        G::DateOnly => "Date Only",
+        G::TimeOnly => "Time Only",
+        G::TimestampOffset => "Timestamp Offset",
+        G::ObjectId => "Object ID",
+        G::Geometry => "Geometry",
+        G::Blob => "Blob",
+        G::Raster => "Raster",
+        G::Guid => "Guid",
+        G::GlobalId => "Global ID",
+        G::Xml => "XML",
+    }
+}
+
+/// A value as JSON text, for properties.
+fn value_text(v: &GfValue) -> serde_json::Value {
+    match value(v.clone()) {
+        Value::Null => serde_json::Value::Null,
+        Value::Int(i) => serde_json::json!(i),
+        Value::Float(f) => serde_json::json!(f),
+        Value::Bool(b) => serde_json::json!(b),
+        Value::Text(s) => serde_json::json!(s),
+    }
+}
+
+/// An item's properties, as ArcGIS's Properties and Fields views show them: for a table or
+/// feature class its type, feature dataset, geometry (with Z/M), rows, extent, spatial reference,
+/// fields (alias, type, length, nullable, default, domain), indexes, subtypes and the relationship
+/// classes it takes part in; for a domain its type and values; for other items their type.
+pub fn properties(gdb: &Geodatabase, name: &str) -> Result<serde_json::Value> {
+    use serde_json::json;
+    let name = name.trim();
+    let item = gdb.items().iter().find(|i| i.name.eq_ignore_ascii_case(name));
+    if let Some(d) = gdb.domain(name) {
+        let values = match &d.kind {
+            unigis_filegdb::DomainKind::Coded(codes) => json!({
+                "type": "Coded Value",
+                "codes": codes.iter().map(|(c, desc)| json!({"code": value_text(c), "description": desc})).collect::<Vec<_>>(),
+            }),
+            unigis_filegdb::DomainKind::Range { min, max } => json!({"type": "Range", "min": value_text(min), "max": value_text(max)}),
+        };
+        let mut out = json!({
+            "name": d.name, "kind": "Domain", "description": d.description, "fieldType": type_name(d.field_type),
+            "splitPolicy": format!("{:?}", d.split_policy), "mergePolicy": format!("{:?}", d.merge_policy),
+        });
+        if let (Some(o), Some(v)) = (out.as_object_mut(), values.as_object()) {
+            o.extend(v.clone());
+        }
+        return Ok(out);
+    }
+    let Some(entry) = gdb.entries().iter().find(|e| e.name.eq_ignore_ascii_case(name)) else {
+        let i = item.ok_or_else(|| bad(format!("no item {name}")))?;
+        let mut out = json!({"name": i.name, "kind": i.kind, "path": i.path, "featureDataset": i.feature_dataset});
+        add_relationship(gdb, name, &mut out);
+        return Ok(out);
+    };
+    let t = gdb.open_table(&entry.name).map_err(bad)?;
+    let kind = item.map_or_else(|| if t.geometry_kind().is_some() { "Feature Class" } else { "Table" }.to_string(), |i| i.kind.clone());
+    let mut fields = Vec::new();
+    if let Some(oid) = t.oid_field_name() {
+        fields.push(json!({"name": oid, "type": "Object ID", "nullable": false}));
+    }
+    if let Some(shape) = t.shape_field() {
+        fields.push(json!({"name": shape.name, "type": "Geometry", "nullable": shape.nullable}));
+    }
+    for f in t.fields() {
+        fields.push(json!({
+            "name": f.name, "alias": f.alias, "type": type_name(f.field_type), "length": f.length,
+            "precision": f.precision, "scale": f.scale, "nullable": f.nullable,
+            "default": f.default.as_ref().map(value_text), "domain": f.domain,
+        }));
+    }
+    let mut out = json!({
+        "name": entry.name, "kind": kind, "featureDataset": entry.feature_dataset, "rows": t.row_count(),
+        "featureType": item.and_then(|i| i.feature_type.clone()),
+        "fields": fields,
+        "indexes": t.indexes().iter().map(|i| json!({"name": i.name, "fields": i.expression})).collect::<Vec<_>>(),
+        "relationshipClasses": gdb.relationship_classes().iter()
+            .filter(|r| r.origin.eq_ignore_ascii_case(&entry.name) || r.destination.eq_ignore_ascii_case(&entry.name))
+            .map(|r| r.name.clone()).collect::<Vec<_>>(),
+    });
+    if let Some(k) = t.geometry_kind() {
+        out["geometry"] = json!(format!("{k:?}"));
+        out["hasZ"] = json!(t.has_z());
+        out["hasM"] = json!(t.has_m());
+    }
+    if let Some(d) = t.geometry_def() {
+        let e = &d.extent;
+        if e.xmin.is_finite() && e.xmax.is_finite() && e.xmin <= e.xmax {
+            out["extent"] = json!({"xmin": e.xmin, "ymin": e.ymin, "xmax": e.xmax, "ymax": e.ymax});
+        }
+        if let Some(wkt) = &d.srs_wkt {
+            // The coordinate system's own name (`PROJCS["NAD_1983_UTM_Zone_10N", …`).
+            let label = wkt.split('"').nth(1).unwrap_or("").to_string();
+            out["spatialReference"] = json!({"name": label, "wkt": wkt});
+        }
+        out["xyTolerance"] = json!(d.xy_tolerance);
+        out["xyResolution"] = json!(if d.xy_scale > 0.0 { 1.0 / d.xy_scale } else { 0.0 });
+    }
+    // An attributed relationship class has a table too.
+    add_relationship(gdb, &entry.name, &mut out);
+    if let Some(st) = t.subtypes() {
+        out["subtypes"] = json!({
+            "field": st.field, "default": st.default_code,
+            "subtypes": st.subtypes.iter().map(|s| json!({"code": s.code, "name": s.name})).collect::<Vec<_>>(),
+        });
+    }
+    Ok(out)
+}
+
+/// A relationship class's classes, keys and rules, when `name` is one.
+fn add_relationship(gdb: &Geodatabase, name: &str, out: &mut serde_json::Value) {
+    if let Some(r) = gdb.relationship_classes().iter().find(|r| r.name.eq_ignore_ascii_case(name)) {
+        out["relationship"] = serde_json::json!({
+            "origin": r.origin, "destination": r.destination, "cardinality": format!("{:?}", r.cardinality),
+            "composite": r.is_composite, "attributed": r.is_attributed, "notification": r.notification,
+            "originPrimaryKey": r.origin_primary_key, "originForeignKey": r.origin_foreign_key,
+            "destinationPrimaryKey": r.destination_primary_key,
+        });
+    }
+}

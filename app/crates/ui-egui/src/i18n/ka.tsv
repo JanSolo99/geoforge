@@ -1964,3 +1964,28 @@ No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable	ა�
 Only geodatabases are read from a folder: {n} other files were left out	საქაღალდიდან მხოლოდ გეომონაცემთა ბაზები იკითხება: {n} სხვა ფაილი გამოტოვებულია
 {name} is larger than the web app's {mb} MB: open it in the desktop app	{name} ვებაპლიკაციის {mb} მბ-ზე დიდია: გახსენით დესკტოპის აპლიკაციაში
 Reading {name}…	{name}-ის კითხვა…
+Properties	თვისებები
+{name} Properties	{name}-ის თვისებები
+Geodatabase	გეომონაცემთა ბაზა
+Feature Type	ობიექტის ტიპი
+Description	აღწერა
+Field Type	ველის ტიპი
+Domain Type	დომენის ტიპი
+Minimum	მინიმუმი
+Maximum	მაქსიმუმი
+XY Tolerance	XY ტოლერანტობა
+Z Values	Z მნიშვნელობები
+M Values	M მნიშვნელობები
+Spatial Reference	სივრცითი მითითება
+Indexes	ინდექსები
+Coded Values	კოდირებული მნიშვნელობები
+Relationship Classes	კავშირის კლასები
+Field Name	ველის სახელი
+Alias	ფსევდონიმი
+Data Type	მონაცემთა ტიპი
+Length	სიგრძე
+Allow NULL	NULL-ის დაშვება
+Domain	დომენი
+Code	კოდი
+Property	თვისება
+Value	მნიშვნელობა

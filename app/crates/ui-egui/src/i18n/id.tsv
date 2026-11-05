@@ -1964,3 +1964,28 @@ No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable	Tidak
 Only geodatabases are read from a folder: {n} other files were left out	Dari folder hanya geodatabase yang dibaca: {n} file lain dilewati
 {name} is larger than the web app's {mb} MB: open it in the desktop app	{name} lebih besar dari {mb} MB aplikasi web: buka di aplikasi desktop
 Reading {name}…	Membaca {name}…
+Properties	Properti
+{name} Properties	Properti {name}
+Geodatabase	Geodatabase
+Feature Type	Tipe fitur
+Description	Deskripsi
+Field Type	Tipe field
+Domain Type	Tipe domain
+Minimum	Minimum
+Maximum	Maksimum
+XY Tolerance	Toleransi XY
+Z Values	Nilai Z
+M Values	Nilai M
+Spatial Reference	Referensi spasial
+Indexes	Indeks
+Coded Values	Nilai berkode
+Relationship Classes	Kelas relasi
+Field Name	Nama field
+Alias	Alias
+Data Type	Tipe data
+Length	Panjang
+Allow NULL	Izinkan NULL
+Domain	Domain
+Code	Kode
+Property	Properti
+Value	Nilai

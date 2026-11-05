@@ -45,6 +45,9 @@ pub fn commands() -> Vec<C> {
             r#"{"geodatabase": "a project database (Name.gdb, as info.geodatabases lists it)", "layer"?: "a feature class or table (default: every feature class)", "featureDataset"?: "every feature class of this feature dataset", "name"?: text, "stream"?: bool}"#,
         ),
         C::new("info.geodatabases", "List Project Databases", "Catalog › Databases", list_geodatabases).view(),
+        C::new("info.geodatabaseItem", "Geodatabase Item Properties", "Catalog › Databases", item_properties).view().params(
+            r#"{"geodatabase": "a project database (Name.gdb)", "item": "a table, feature class, relationship class, domain or other item"}"#,
+        ),
         C::new("catalog.addDatabase", "Add Database", "Catalog › Databases", connect_database)
             .params(r#"{"path": "a file geodatabase folder (Name.gdb) on disk; connected without adding layers"}"#),
         C::new("catalog.removeGeodatabase", "Remove Database From Project", "Catalog › Databases", remove_geodatabase)
@@ -959,6 +962,14 @@ fn connect_database(s: &mut Session, p: &Value) -> CmdResult {
     let out = contents_json(&db.name, &rustgis_data::source::filegdb::contents(&g));
     s.project.connect_database(db);
     Ok(out)
+}
+
+/// An item's properties (fields, indexes, subtypes, extent, spatial reference, …), as ArcGIS's
+/// Properties view shows them.
+fn item_properties(s: &mut Session, p: &Value) -> CmdResult {
+    let db = connected(s, s_req(p, "geodatabase")?)?;
+    let g = open_database(&db)?;
+    rustgis_data::source::filegdb::properties(&g, s_req(p, "item")?).map_err(|e| format!("{}: {e}", db.name))
 }
 
 /// The project's databases and what each holds.

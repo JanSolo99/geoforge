@@ -1964,3 +1964,28 @@ No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable	Nenhu
 Only geodatabases are read from a folder: {n} other files were left out	De uma pasta, só geodatabases são lidos: {n} outros arquivos foram deixados de fora
 {name} is larger than the web app's {mb} MB: open it in the desktop app	{name} tem mais que os {mb} MB do aplicativo web: abra-o no aplicativo de desktop
 Reading {name}…	Lendo {name}…
+Properties	Propriedades
+{name} Properties	Propriedades de {name}
+Geodatabase	Geodatabase
+Feature Type	Tipo de feição
+Description	Descrição
+Field Type	Tipo de campo
+Domain Type	Tipo de domínio
+Minimum	Mínimo
+Maximum	Máximo
+XY Tolerance	Tolerância XY
+Z Values	Valores Z
+M Values	Valores M
+Spatial Reference	Referência espacial
+Indexes	Índices
+Coded Values	Valores codificados
+Relationship Classes	Classes de relacionamento
+Field Name	Nome do campo
+Alias	Alias
+Data Type	Tipo de dados
+Length	Comprimento
+Allow NULL	Permitir NULL
+Domain	Domínio
+Code	Código
+Property	Propriedade
+Value	Valor
