@@ -524,10 +524,16 @@ pub fn random_raster(cell: f64, extent: (f64, f64, f64, f64), seed: u64) -> Opti
             z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
             z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
             z ^= z >> 31;
-            DataType::F32.store((z >> 11) as f64 / (1u64 << 53) as f64)
+            unit_f32(z)
         })
         .collect();
     Some(out)
+}
+
+/// A uniform value in [0, 1) that a 32-bit float holds exactly: 24 random bits. (53 bits stored
+/// as F32 round to exactly 1.0 within 2^-25 of it, outside ArcGIS's [0, 1).)
+fn unit_f32(z: u64) -> f64 {
+    (z >> 40) as f64 / (1u64 << 24) as f64
 }
 
 pub fn constant_raster(
@@ -592,5 +598,19 @@ mod random_raster_tests {
         );
         let again = random_raster(1.0, (0.0, 0.0, 200.0, 100.0), 7).unwrap();
         assert_eq!(again.bands, r.bands);
+    }
+}
+
+#[cfg(test)]
+mod unit_tests {
+    #[test]
+    fn random_values_stay_below_one_as_f32() {
+        for z in [u64::MAX, u64::MAX - 1, 0, 1 << 40, (1 << 63) | 12345] {
+            let v = super::unit_f32(z);
+            assert!(
+                (0.0..1.0).contains(&v) && f64::from(v as f32) == v,
+                "{z}: {v}"
+            );
+        }
     }
 }
