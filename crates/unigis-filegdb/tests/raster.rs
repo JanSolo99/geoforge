@@ -54,6 +54,7 @@ fn rasters_match_gdal() {
         .collect();
     gdbs.sort();
     let (mut datasets, mut pixels, unsupported) = (0, 0usize, Vec::<String>::new());
+    let mut overview_checked = 0;
     for path in &gdbs {
         let g = Geodatabase::open_in(Default::default(), path.clone()).unwrap();
         for name in g.raster_datasets() {
@@ -89,6 +90,13 @@ fn rasters_match_gdal() {
                     r.geotransform
                 );
             }
+            // A coordinate system wherever GDAL has one.
+            if info["coordinateSystem"]["wkt"]
+                .as_str()
+                .is_some_and(|w| !w.is_empty())
+            {
+                assert!(r.srs_wkt.is_some(), "{label}: no coordinate system");
+            }
             let bands = info["bands"].as_array().unwrap();
             assert_eq!(r.band_count(), bands.len(), "{label}");
             // GDAL's widened type for the stored one.
@@ -104,6 +112,58 @@ fn rasters_match_gdal() {
                 PixelType::F64 => "Float64",
             };
             assert_eq!(gdal_type, expected, "{label}");
+            // Pyramids: each level's size, and the coarsest level's pixels where it is small.
+            let levels = bands[0]["overviews"].as_array().map_or(0, Vec::len);
+            assert_eq!(r.overviews, levels, "{label}: pyramid levels");
+            if levels > 0 {
+                let top = levels;
+                let (w, h) = r.level_size(top);
+                let o = &bands[0]["overviews"][top - 1]["size"];
+                assert_eq!(
+                    [w as i64, h as i64],
+                    [o[0].as_i64().unwrap(), o[1].as_i64().unwrap()],
+                    "{label}: level {top}"
+                );
+                if w * h <= MAX_COMPARED
+                    && !matches!(r.compression, Compression::Jpeg | Compression::Jpeg2000)
+                {
+                    let ovr = (top - 1).to_string();
+                    let xyz = gdal(&[
+                        "gdal_translate",
+                        "-q",
+                        "-ovr",
+                        &ovr,
+                        "-of",
+                        "XYZ",
+                        "-b",
+                        "1",
+                        &spec,
+                        "/vsistdout/",
+                    ]);
+                    let theirs: Option<Vec<f64>> = xyz.and_then(|x| {
+                        x.lines()
+                            .map(|l| l.split_whitespace().nth(2).and_then(|v| v.parse().ok()))
+                            .collect()
+                    });
+                    let ours = r
+                        .read_band_at(0, top)
+                        .unwrap_or_else(|e| panic!("{label} level {top}: {e}"));
+                    if let Some(theirs) = theirs {
+                        let nd = bands[0]["noDataValue"].as_f64();
+                        for (i, (t, o)) in theirs.iter().zip(&ours.values).enumerate() {
+                            let valid = ours.valid.as_ref().is_none_or(|v| v[i]);
+                            if valid && nd.is_none_or(|nd| (t - nd).abs() > nd.abs() * 1e-6) {
+                                assert!(
+                                    (t - o).abs() <= 1e-6 * t.abs().max(1.0),
+                                    "{label} level {top} pixel {i}: GDAL {t}, ours {o}"
+                                );
+                            }
+                        }
+                        pixels += theirs.len();
+                        overview_checked += 1;
+                    }
+                }
+            }
             if r.width * r.height > MAX_COMPARED {
                 datasets += 1;
                 continue;
@@ -170,8 +230,9 @@ fn rasters_match_gdal() {
         }
     }
     eprintln!(
-        "{datasets} raster datasets match GDAL ({pixels} pixels compared); not read: {unsupported:?}"
+        "{datasets} raster datasets match GDAL ({pixels} pixels compared, {overview_checked} pyramid levels); not read: {unsupported:?}"
     );
     assert!(datasets >= 50, "only {datasets} datasets");
+    assert!(overview_checked >= 1, "no pyramid level compared");
     assert!(unsupported.is_empty());
 }

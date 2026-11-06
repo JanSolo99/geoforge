@@ -855,17 +855,26 @@ fn add_relationship(gdb: &Geodatabase, name: &str, out: &mut serde_json::Value) 
     }
 }
 
+/// Most pixels per band a geodatabase raster is read at (a larger one is read from a pyramid).
+pub const MAX_RASTER_PIXELS: usize = 1 << 24;
+
 /// Reads a raster dataset of a geodatabase into the map's raster model: bands as 32-bit floats,
 /// invalid pixels set to a NoData value (the type's own for floats, as ArcGIS shows them; for
 /// integers a value no valid pixel has), three or four byte bands as RGB(A).
 pub fn read_raster(gdb: &Geodatabase, name: &str) -> Result<crate::raster::Raster> {
     use crate::raster::{ColorHint, Crs, GeoTransform, Raster};
     let r = gdb.open_raster(name).map_err(bad)?;
+    // A large raster is read at the finest pyramid level that fits, as a map draws it.
+    let level = r.level_for(MAX_RASTER_PIXELS).ok_or_else(|| {
+        let (w, h) = r.level_size(r.overviews);
+        bad(format!("{}: {w}×{h} pixels at its coarsest level is too large to show (build pyramids in ArcGIS)", r.name))
+    })?;
+    let (width, height) = r.level_size(level);
     let mut bands = Vec::with_capacity(r.band_count());
     let mut any_invalid = false;
     let mut read = Vec::with_capacity(r.band_count());
     for b in 0..r.band_count() {
-        let band = r.read_band(b).map_err(bad)?;
+        let band = r.read_band_at(b, level).map_err(bad)?;
         any_invalid |= band.valid.is_some();
         read.push(band);
     }
@@ -902,7 +911,7 @@ pub fn read_raster(gdb: &Geodatabase, name: &str) -> Result<crate::raster::Raste
             })
             .unwrap_or(Crs::LonLat),
     };
-    let gt = r.geotransform;
+    let gt = r.level_geotransform(level);
     let transform = GeoTransform { origin_x: gt[0], origin_y: gt[3], pixel_width: gt[1], pixel_height: gt[5] };
     let byte = !r.pixel_type.is_float() && r.pixel_type.bits() <= 8;
     let color = match (bands.len(), byte) {
@@ -911,7 +920,10 @@ pub fn read_raster(gdb: &Geodatabase, name: &str) -> Result<crate::raster::Raste
         _ => ColorHint::Gray,
     };
     let mut out =
-        Raster::new(r.name.clone(), r.width as u32, r.height as u32, bands, transform, crs, nodata, color, r.pixel_type.arcgis_name())?;
+        Raster::new(r.name.clone(), width as u32, height as u32, bands, transform, crs, nodata, color, r.pixel_type.arcgis_name())?;
+    if level > 0 {
+        out.overview = Some((r.width as u32, r.height as u32));
+    }
     out.source = Some(format!("{}/{}", gdb.path().display(), r.name));
     Ok(out)
 }

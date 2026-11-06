@@ -1133,3 +1133,21 @@ fn geodatabase_item_properties() {
     let p = filegdb::properties(&g, &rel.name).unwrap();
     assert!(p["relationship"]["origin"].is_string(), "{p}");
 }
+
+/// A geodatabase raster too large to read whole is read from its pyramids (ArcGIS draws it so).
+#[test]
+fn large_geodatabase_rasters_are_read_from_pyramids() {
+    let gdb =
+        std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../testdata/large/filegdb-raster/NCH_ES_WATER_LOGGING_HAZARD.gdb");
+    if !gdb.is_dir() {
+        return; // scripts/fetch-testdata.sh
+    }
+    let g = filegdb::open_dir(&gdb).unwrap();
+    let r = filegdb::read_raster(&g, "NCH_ES_WATER_LOGGING_HAZARD").unwrap();
+    assert!(r.overview == Some((18731, 19320)), "{:?}", r.overview);
+    assert!((r.width as usize) * (r.height as usize) <= filegdb::MAX_RASTER_PIXELS);
+    // The extent stays that of the full raster (within a pixel of the level).
+    let full_w = 18731.0 * 30.0;
+    let w = r.width as f64 * r.transform.pixel_width;
+    assert!((w - full_w).abs() <= r.transform.pixel_width, "{w} vs {full_w}");
+}

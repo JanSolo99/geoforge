@@ -323,7 +323,13 @@ impl Geodatabase {
         let srid = col(&bnd, "srid")
             .and_then(|i| int(first.get(i)))
             .unwrap_or(0);
-        let srs_wkt = self.spatial_ref_text(srid);
+        // srid 0: the item's definition holds it.
+        let srs_wkt = self.spatial_ref_text(srid).or_else(|| {
+            self.items()
+                .iter()
+                .find(|i| i.name.eq_ignore_ascii_case(&name))
+                .and_then(|i| i.srs_wkt.clone())
+        });
         let blocks = table_named("fras_blk_")?;
         let (bi, li, ri, ci) = (
             need(&blocks, "rasterband_id")?,
@@ -357,7 +363,13 @@ impl Geodatabase {
             compression,
             geotransform,
             srs_wkt,
-            overviews,
+            // GDAL: pyramids are registered on the extent's top left, so with another block
+            // origin they don't line up and are left out.
+            overviews: if ox == minx && oy == maxy {
+                overviews
+            } else {
+                0
+            },
             block_width: bw as usize,
             block_height: bh as usize,
             shift_x,
@@ -400,11 +412,44 @@ impl RasterDataset {
 
     /// Reads a band (0-based) at full resolution.
     pub fn read_band(&self, band: usize) -> Result<Band> {
+        self.read_band_at(band, 0)
+    }
+
+    /// The size of a pyramid level (0 = full resolution): halved per level, as ArcGIS builds them.
+    pub fn level_size(&self, level: usize) -> (usize, usize) {
+        let l = level.min(31) as u32;
+        ((self.width >> l).max(1), (self.height >> l).max(1))
+    }
+
+    /// The geotransform of a pyramid level.
+    pub fn level_geotransform(&self, level: usize) -> [f64; 6] {
+        let (w, h) = self.level_size(level);
+        let mut gt = self.geotransform;
+        gt[1] *= self.width as f64 / w as f64;
+        gt[5] *= self.height as f64 / h as f64;
+        gt
+    }
+
+    /// The finest pyramid level of at most `max_pixels` per band (full resolution when it fits),
+    /// as a map draws a large raster from its pyramids; `None` when even the coarsest is larger.
+    pub fn level_for(&self, max_pixels: usize) -> Option<usize> {
+        (0..=self.overviews).find(|&l| {
+            let (w, h) = self.level_size(l);
+            w.saturating_mul(h) <= max_pixels
+        })
+    }
+
+    /// Reads a band (0-based) at a pyramid level (0 = full resolution).
+    pub fn read_band_at(&self, band: usize, level: usize) -> Result<Band> {
         let id = *self
             .band_ids
             .get(band)
             .ok_or_else(|| bad(format!("{}: no band {}", self.name, band + 1)))?;
-        let (w, h, bw, bh) = (self.width, self.height, self.block_width, self.block_height);
+        if level > self.overviews {
+            return Err(bad(format!("{}: no pyramid level {level}", self.name)));
+        }
+        let (w, h) = self.level_size(level);
+        let (bw, bh) = (self.block_width, self.block_height);
         if w.saturating_mul(h) > MAX_PIXELS {
             return Err(bad(format!(
                 "{}: {w}×{h} pixels is too large to read whole",
@@ -416,7 +461,12 @@ impl RasterDataset {
         let mut all_valid = true;
         for by in 0..h.div_ceil(bh) {
             for bx in 0..w.div_ceil(bw) {
-                let key = (id, 0, by as i64 + self.shift_y, bx as i64 + self.shift_x);
+                let key = (
+                    id,
+                    level as i64,
+                    by as i64 + self.shift_y,
+                    bx as i64 + self.shift_x,
+                );
                 let Some(block) = self.block(key)? else {
                     all_valid = false;
                     continue;

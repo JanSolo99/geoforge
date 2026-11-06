@@ -35,7 +35,16 @@ pub struct GdbItem {
     pub feature_type: Option<String>,
     /// The feature dataset holding it.
     pub feature_dataset: Option<String>,
+    /// A raster dataset's coordinate system from its definition (`<SpatialReference><WKT>`),
+    /// for one whose bands don't name a `GDB_SpatialRefs` row.
+    pub srs_wkt: Option<String>,
 }
+
+/// A `GDB_Items` row as read: name, path, type GUID, feature type, a raster's WKT.
+type RawItem = (String, String, String, Option<String>, Option<String>);
+
+/// The `GDB_Items` type of raster datasets.
+const RASTER_DATASET_TYPE: &str = "{5ED667A3-9CA9-44A2-8029-D95BF23704B9}";
 
 pub struct Geodatabase {
     dir: PathBuf,
@@ -91,8 +100,8 @@ impl Geodatabase {
         let mut domains = Vec::new();
         let mut relationships = Vec::new();
         let mut typed_datasets = Vec::new();
-        // (name, path, type GUID, feature type)
-        let mut raw_items: Vec<(String, String, String, Option<String>)> = Vec::new();
+        // (name, path, type GUID, feature type, a raster's WKT)
+        let mut raw_items: Vec<RawItem> = Vec::new();
         if let Some((_, id)) = all.iter().find(|(n, _)| n == "GDB_Items")
             && let Ok(items) = Table::open_in(&store, table_path(&dir, *id))
         {
@@ -122,7 +131,10 @@ impl Geodatabase {
                         _ => None,
                     };
                     let feature_type = xml.and_then(|x| tag_text(x, "FeatureType"));
-                    raw_items.push((n.clone(), p.clone(), guid, feature_type));
+                    let srs = xml
+                        .filter(|_| guid.eq_ignore_ascii_case(RASTER_DATASET_TYPE))
+                        .and_then(|x| tag_text(x, "WKT"));
+                    raw_items.push((n.clone(), p.clone(), guid, feature_type, srs));
                     let Some(xml) = xml else {
                         continue;
                     };
@@ -153,7 +165,7 @@ impl Geodatabase {
         }
         let items: Vec<GdbItem> = raw_items
             .into_iter()
-            .map(|(name, path, guid, feature_type)| {
+            .map(|(name, path, guid, feature_type, srs_wkt)| {
                 let mut parts = path.trim_start_matches('\\').split('\\');
                 let first = parts.next().map(str::to_owned);
                 let feature_dataset = parts.next().and(first);
@@ -166,6 +178,7 @@ impl Geodatabase {
                     path,
                     feature_type,
                     feature_dataset,
+                    srs_wkt,
                 }
             })
             .collect();
@@ -313,5 +326,13 @@ fn tag_text(xml: &str, tag: &str) -> Option<String> {
     let open = format!("<{tag}>");
     let start = xml.find(&open)? + open.len();
     let end = start + xml.get(start..)?.find("</")?;
-    Some(xml.get(start..end)?.trim().to_string()).filter(|t| !t.is_empty())
+    let text = xml.get(start..end)?.trim();
+    // XML's predefined entities (a WKT's quotes may be written `&quot;`).
+    let text = text
+        .replace("&quot;", "\"")
+        .replace("&apos;", "'")
+        .replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace("&amp;", "&");
+    Some(text).filter(|t| !t.is_empty())
 }
