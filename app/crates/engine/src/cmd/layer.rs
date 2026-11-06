@@ -51,6 +51,9 @@ pub fn commands() -> Vec<C> {
         C::new("catalog.exportLayer", "Export Layer To Geodatabase", "Catalog › Databases", export_to_geodatabase).when(need_layer).params(
             r#"{"geodatabase": "a project database (Name.gdb)", "layer"?: name|id (default: the active layer), "name"?: "the feature class or table (default: the layer's name; one of that name is replaced)"}"#,
         ),
+        C::new("catalog.saveEdits", "Save Edits To Geodatabase", "Edit › Manage Edits", save_gdb_edits).params(
+            r#"{"layer"?: "a layer loaded from a geodatabase class (default: the active layer)", "table"?: "a standalone table's id, instead of a layer"}"#,
+        ),
         C::new("catalog.deleteItem", "Delete Geodatabase Item", "Catalog › Databases", delete_gdb_item)
             .params(r#"{"geodatabase": "Name.gdb", "item": "a table, feature class, feature dataset, relationship class or domain"}"#),
         C::new("catalog.renameItem", "Rename Geodatabase Item", "Catalog › Databases", rename_gdb_item)
@@ -1086,6 +1089,47 @@ fn export_to_geodatabase(s: &mut Session, p: &Value) -> CmdResult {
     })
 }
 
+/// The geodatabase and class a layer loaded from one reads (`…/Town.gdb/Wells`).
+fn gdb_origin(source: &str) -> Option<(String, String)> {
+    let lower = source.to_ascii_lowercase();
+    let at = lower.rfind(".gdb/").or_else(|| lower.rfind(".gdb\\"))?;
+    let (db, table) = (&source[..at + 4], &source[at + 5..]);
+    (!table.is_empty() && !table.contains(['/', '\\'])).then(|| (db.to_string(), table.to_string()))
+}
+
+/// Saves a layer's edits back into the geodatabase class it was loaded from, row by row
+/// (ArcGIS's Save Edits): its schema, domains, subtypes and unchanged values stay as stored.
+fn save_gdb_edits(s: &mut Session, p: &Value) -> CmdResult {
+    // A standalone table (`"table"`: its id), or a layer.
+    let ds = match p.get("table").and_then(Value::as_u64) {
+        Some(tid) => s.project.table(tid as u32).map(|t| t.dataset.clone()).ok_or_else(|| format!("no table {tid}"))?,
+        None => {
+            let id = s.layer_id(p)?;
+            let l = s.map().layer(id).ok_or("no such layer")?;
+            if l.is_streamed() {
+                return Err(format!("{}: read in place (Load All Features first to edit it)", l.name));
+            }
+            l.dataset.clone()
+        }
+    };
+    let source = ds.source.clone().unwrap_or_default();
+    let (db, table) = gdb_origin(&source).ok_or_else(|| format!("{}: not loaded from a geodatabase class", ds.name))?;
+    // The project's database by name, or (on disk) by its folder, connected if it isn't yet.
+    let name = Path::new(&db).file_name().and_then(|n| n.to_str()).unwrap_or(&db).to_string();
+    if s.project.database(&name).is_none() && Path::new(&db).is_dir() {
+        connect_database(s, &json!({"path": db}))?;
+    }
+    let r = edit_database(s, &name, |dir| {
+        let saved = rustgis_data::source::filegdb::save_edits(dir, &table, &ds).map_err(|e| e.to_string())?;
+        Ok(json!({"geodatabase": name, "item": table, "inserted": saved.inserted, "updated": saved.updated, "deleted": saved.deleted}))
+    })?;
+    s.notify(
+        format!("{}: saved to {name}/{table} ({} added, {} changed, {} deleted)", ds.name, r["inserted"], r["updated"], r["deleted"]),
+        false,
+    );
+    Ok(r)
+}
+
 fn delete_gdb_item(s: &mut Session, p: &Value) -> CmdResult {
     let item = s_req(p, "item")?.to_string();
     let gdb = s_req(p, "geodatabase")?.to_string();
@@ -1323,7 +1367,13 @@ fn add_source_with(
         } else {
             let (mut ds, report) = source::materialize(src.as_ref()).map_err(err)?;
             ds.name = name;
-            ds.source = Some(label.clone());
+            // A geodatabase's class by its catalog path (`Town.gdb/Wells`), as ArcGIS names a
+            // layer's data source, so Save Edits finds it.
+            ds.source = Some(if info.format == "File Geodatabase" {
+                format!("{}/{}", label.trim_end_matches(['/', '\\']), info.name)
+            } else {
+                label.clone()
+            });
             features += ds.features.len() as u64;
             let id = add_dataset(s, ds);
             if let (Some(r), Some(l)) = (style.clone(), s.map_mut().layer_mut(id)) {

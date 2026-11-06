@@ -581,6 +581,148 @@ pub fn write(ds: &Dataset, gdb: &Path, name: Option<&str>) -> Result<usize> {
     Ok(ds.features.len())
 }
 
+/// A table's coordinate system, as [`FileGdbSource`] reads it.
+fn reproject_of(table: &Table) -> Reproject {
+    let mut notes = Vec::new();
+    let crs = match table.geometry_def().and_then(|d| d.srs_wkt.as_deref()) {
+        None => crate::raster::Crs::LonLat,
+        Some(wkt) => crate::raster::wkt::read_wkt(wkt).map(|(c, _)| c).unwrap_or(crate::raster::Crs::LonLat),
+    };
+    Reproject::from_crs(crs, &mut notes)
+}
+
+/// A map value as a field of `ty` holds it; `Err` when it can't be (text in a number field).
+fn to_field_value(v: &Value, ty: unigis_core::FieldType, field: &str) -> Result<GfValue> {
+    use unigis_core::FieldType as G;
+    let wrong = || bad(format!("{field}: {v:?} isn't a {}", type_name(ty)));
+    let int = |v: &Value| -> Option<i64> {
+        match v {
+            Value::Int(i) => Some(*i),
+            Value::Float(f) if f.fract() == 0.0 => Some(*f as i64),
+            Value::Bool(b) => Some(i64::from(*b)),
+            Value::Text(t) => t.trim().parse().ok(),
+            Value::Float(_) | Value::Null => None,
+        }
+    };
+    let float = |v: &Value| -> Option<f64> {
+        match v {
+            Value::Int(i) => Some(*i as f64),
+            Value::Float(f) => Some(*f),
+            Value::Text(t) => t.trim().parse().ok(),
+            _ => None,
+        }
+    };
+    let text = |v: &Value| match v {
+        Value::Text(t) => t.clone(),
+        other => other.to_string(),
+    };
+    if matches!(v, Value::Null) {
+        return Ok(GfValue::Null);
+    }
+    Ok(match ty {
+        G::SmallInteger => GfValue::SmallInteger(int(v).and_then(|i| i16::try_from(i).ok()).ok_or_else(wrong)?),
+        G::Integer => GfValue::Integer(int(v).and_then(|i| i32::try_from(i).ok()).ok_or_else(wrong)?),
+        G::BigInteger => GfValue::BigInteger(int(v).ok_or_else(wrong)?),
+        G::Single => GfValue::Single(float(v).ok_or_else(wrong)? as f32),
+        G::Double => GfValue::Double(float(v).ok_or_else(wrong)?),
+        G::String => GfValue::String(text(v)),
+        G::Guid | G::GlobalId => GfValue::Guid(text(v)),
+        G::Xml => GfValue::Xml(text(v)),
+        G::Date => GfValue::Date(
+            chrono::NaiveDateTime::parse_from_str(text(v).trim(), "%Y-%m-%d %H:%M:%S%.f")
+                .or_else(|_| {
+                    chrono::NaiveDate::parse_from_str(text(v).trim(), "%Y-%m-%d").map(|d| d.and_hms_opt(0, 0, 0).unwrap_or_default())
+                })
+                .map_err(|_| wrong())?,
+        ),
+        G::DateOnly => GfValue::DateOnly(chrono::NaiveDate::parse_from_str(text(v).trim(), "%Y-%m-%d").map_err(|_| wrong())?),
+        G::TimeOnly => GfValue::TimeOnly(chrono::NaiveTime::parse_from_str(text(v).trim(), "%H:%M:%S%.f").map_err(|_| wrong())?),
+        G::TimestampOffset => GfValue::TimestampOffset(chrono::DateTime::parse_from_rfc3339(text(v).trim()).map_err(|_| wrong())?),
+        G::ObjectId | G::Geometry | G::Blob | G::Raster => return Err(wrong()),
+    })
+}
+
+/// What a save of edits changed.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+pub struct Saved {
+    pub inserted: usize,
+    pub updated: usize,
+    pub deleted: usize,
+}
+
+/// Saves a layer's features back into its feature class or table in place, row by row, as
+/// ArcGIS's Save Edits does: rows whose OBJECTID (the feature's id) is gone are deleted, features
+/// whose id the table doesn't have are inserted, and changed ones updated, with only the values
+/// and geometry that changed rewritten, so the rest (dates, GUIDs, precision, domains, subtypes,
+/// the schema itself) stay as stored. Fields are matched by name; ones the layer lacks keep
+/// their values (or are null on insert).
+pub fn save_edits(gdb_dir: &Path, table: &str, ds: &Dataset) -> Result<Saved> {
+    let g = Geodatabase::open(gdb_dir).map_err(bad)?;
+    let t = g.open_table(table).map_err(bad)?;
+    let reproject = reproject_of(&t);
+    let has_shape = t.geometry_kind().is_some();
+    let base = g.table_base(table).map_err(bad)?;
+    drop(t);
+    let mut ed = unigis_filegdb::TableEditor::open(&base).map_err(bad)?;
+    let fields: Vec<unigis_core::Field> = ed.fields().to_vec();
+    // For each table field, the layer's column of that name.
+    let column: Vec<Option<usize>> = fields.iter().map(|f| ds.fields.iter().position(|d| d.name.eq_ignore_ascii_case(&f.name))).collect();
+    let ids: std::collections::HashSet<u64> = ds.features.iter().map(|f| f.id).collect();
+    let mut saved = Saved::default();
+    let gone: Vec<u64> = ed.oids().filter(|o| !ids.contains(o)).collect();
+    for oid in gone {
+        ed.delete(oid).map_err(bad)?;
+        saved.deleted += 1;
+    }
+    let shape = |geom: &Option<Geometry>| -> Result<Option<unigis_core::Geometry>> {
+        match geom {
+            None => Ok(None),
+            Some(g) if has_shape => {
+                let native = reproject.geometry_from_lonlat(g.clone()).ok_or_else(|| bad("a geometry outside the coordinate system"))?;
+                Ok(Some(to_unigis(&native).ok_or_else(|| bad("a geometry that can't be stored"))?))
+            }
+            Some(_) => Ok(None),
+        }
+    };
+    for f in &ds.features {
+        match ed.get(f.id).map_err(bad)? {
+            Some(orig) => {
+                let mut next = orig.clone();
+                let mut changed = false;
+                for (i, field) in fields.iter().enumerate() {
+                    let (Some(j), Some(was)) = (column[i], orig.attributes.get(i)) else { continue };
+                    let now = f.attrs.get(j).cloned().unwrap_or(Value::Null);
+                    if value(was.clone()) != now {
+                        next.attributes[i] = to_field_value(&now, field.field_type, &field.name)?;
+                        changed = true;
+                    }
+                }
+                let as_read = orig.geometry.as_ref().and_then(from_unigis).and_then(|g| reproject.geometry(g));
+                if has_shape && as_read != f.geometry {
+                    next.geometry = shape(&f.geometry)?;
+                    changed = true;
+                }
+                if changed {
+                    ed.update(f.id, &next).map_err(bad)?;
+                    saved.updated += 1;
+                }
+            }
+            None => {
+                let mut attributes = Vec::with_capacity(fields.len());
+                for (i, field) in fields.iter().enumerate() {
+                    let v = column[i].and_then(|j| f.attrs.get(j)).cloned().unwrap_or(Value::Null);
+                    attributes.push(to_field_value(&v, field.field_type, &field.name)?);
+                }
+                let feature = unigis_core::Feature { oid: 0, geometry: shape(&f.geometry)?, attributes };
+                ed.insert(&feature).map_err(bad)?;
+                saved.inserted += 1;
+            }
+        }
+    }
+    ed.finish().map_err(bad)?;
+    Ok(saved)
+}
+
 /// ArcGIS's name for a field type (the Fields view's Data Type).
 fn type_name(t: unigis_core::FieldType) -> &'static str {
     use unigis_core::FieldType as G;

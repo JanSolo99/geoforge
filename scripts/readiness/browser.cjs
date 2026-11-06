@@ -190,7 +190,7 @@ async function main() {
     const withGdb = await projectWith('wells');
     const wells = withGdb.maps[0].layers.find(l => l.name === 'wells');
     assert(wells.dataset.features.length > 0, 'Geodatabase feature class added without features');
-    assert.equal(wells.dataset.source, 'edit_fc.gdb');
+    assert.equal(wells.dataset.source, 'edit_fc.gdb/wells');
     report.checks.push('add_file_geodatabase_zip');
     // Add Geodatabase…: the browser's folder picker on a .gdb folder connects it to the project
     // (Catalog › Databases) without adding layers, as ArcGIS's Add Database does.

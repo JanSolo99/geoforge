@@ -382,6 +382,16 @@ impl Reproject {
         ok.then_some(out)
     }
 
+    /// A longitude/latitude geometry in native coordinates; `None` when a coordinate can't be
+    /// converted.
+    pub(crate) fn geometry_from_lonlat(&self, g: Geometry) -> Option<Geometry> {
+        let Some(t) = &self.t else { return Some(g) };
+        let mut ok = true;
+        let out = g.map_coords(&|c| t.from_lonlat(c).unwrap_or(Coord::new(f64::NAN, f64::NAN)));
+        out.for_each_coord(|c| ok &= c.is_finite());
+        ok.then_some(out)
+    }
+
     /// A native extent in longitude/latitude.
     pub(crate) fn extent_to_lonlat(&self, e: &Extent) -> Extent {
         match &self.t {

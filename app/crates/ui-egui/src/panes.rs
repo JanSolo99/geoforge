@@ -403,6 +403,12 @@ fn layer_row(app: &mut RustGisApp, ui: &mut Ui, l: &Layer, scale: f64, t: &Token
             let _ = app.run("layer.loadAll", json!({"layer": l.id}));
             ui.close();
         }
+        // A layer loaded from a geodatabase class: its edits saved back in place (Save Edits).
+        let from_gdb = l.dataset.source.as_deref().is_some_and(|src| src.to_ascii_lowercase().contains(".gdb/"));
+        if from_gdb && !l.is_streamed() && ui.button(tl!("Save Edits To Geodatabase")).clicked() {
+            let _ = app.run("catalog.saveEdits", json!({"layer": l.id}));
+            ui.close();
+        }
         ui.separator();
         if ui.button(tl!("Move Up")).clicked() {
             let _ = app.run("layer.moveUp", json!({"layer": l.id}));

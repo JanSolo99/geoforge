@@ -5987,3 +5987,90 @@ fn geodatabases_are_edited_in_memory_and_on_disk() {
     assert_eq!(rustgis_data::source::filegdb::layers(&dir.join("Disk.gdb")).unwrap(), ["Wells"]);
     std::fs::remove_dir_all(&dir).ok();
 }
+
+/// Save Edits: a layer loaded from a geodatabase class is saved back row by row, keeping the
+/// class's schema and domains; on disk and for an upload.
+#[test]
+fn edits_are_saved_back_to_geodatabase_classes() {
+    use rustgis_data::{Feature, Value as V};
+    let src = |n: &str| std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../testdata/gdb-reference").join(n);
+    let dir = std::env::temp_dir().join(format!("rustgis-save-edits-{}", std::process::id()));
+    std::fs::remove_dir_all(&dir).ok();
+    std::fs::create_dir_all(&dir).unwrap();
+    let copy = |n: &str| {
+        let to = dir.join(n);
+        std::fs::create_dir_all(&to).unwrap();
+        for e in std::fs::read_dir(src(n)).unwrap().flatten() {
+            std::fs::copy(e.path(), to.join(e.file_name())).unwrap();
+        }
+        to
+    };
+    // A feature class on disk: one row changed, one deleted, one added.
+    let gdb = copy("edit_fc.gdb");
+    let mut s = Session::new(Project::default());
+    s.run("layer.addData", &json!({"path": gdb.display().to_string(), "layer": "wells", "stream": false})).unwrap();
+    let id = s.map().layer_by_name("wells").unwrap().id;
+    let before = s.map().layer(id).unwrap().dataset.features.len();
+    assert!(before >= 2, "{before}");
+    {
+        let l = s.map_mut().layer_mut(id).unwrap();
+        let text_field = l.dataset.fields.iter().position(|f| f.ty == rustgis_data::FieldType::Text);
+        let first = l.dataset.features[0].clone();
+        if let Some(i) = text_field {
+            l.dataset.features[0].attrs[i] = V::Text("edited".into());
+        }
+        l.dataset.features.remove(1);
+        let mut added = Feature { id: u64::MAX, geometry: first.geometry.clone(), attrs: vec![V::Null; first.attrs.len()] };
+        added.id = 1 << 40;
+        l.dataset.features.push(added);
+    }
+    let r = s.run("catalog.saveEdits", &json!({"layer": id})).unwrap();
+    assert_eq!((r["inserted"].as_u64(), r["deleted"].as_u64()), (Some(1), Some(1)), "{r}");
+    let g = rustgis_data::source::filegdb::open_dir(&gdb).unwrap();
+    assert_eq!(g.open_table("wells").unwrap().row_count() as usize, before);
+    // A table with domains, uploaded: rows inserted; the fields keep their domains.
+    let codes = copy("domain_base.gdb");
+    let files: Vec<(String, Vec<u8>)> = std::fs::read_dir(&codes)
+        .unwrap()
+        .flatten()
+        .map(|e| (format!("domain_base.gdb/{}", e.file_name().to_string_lossy()), std::fs::read(e.path()).unwrap()))
+        .collect();
+    let zip = rustgis_data::zip::write(&files).unwrap();
+    let mut s = Session::new(Project::default());
+    s.stage_upload("domain_base.zip", zip).unwrap();
+    s.run("layer.addDataBytes", &json!({"fileName": "domain_base.zip", "staged": true, "catalogOnly": true})).unwrap();
+    s.run("layer.addGeodatabaseItem", &json!({"geodatabase": "domain_base.gdb", "layer": "uses", "stream": false})).unwrap();
+    let t = s.project.tables.iter().find(|t| t.name == "uses").map(|t| t.id);
+    let push_row = |ds: &mut rustgis_data::Dataset| {
+        let n = ds.fields.len();
+        let mut attrs = vec![V::Null; n];
+        if let Some(i) = ds.fields.iter().position(|f| f.name == "ZONE") {
+            attrs[i] = V::Int(2);
+        }
+        ds.features.push(Feature { id: 1 << 40, geometry: None, attrs });
+    };
+    let layer_param = match t {
+        Some(tid) => {
+            let table = s.project.tables.iter_mut().find(|x| x.id == tid).unwrap();
+            push_row(&mut table.dataset);
+            json!({"table": tid})
+        }
+        None => {
+            let lid = s.map().layer_by_name("uses").unwrap().id;
+            push_row(&mut s.map_mut().layer_mut(lid).unwrap().dataset);
+            json!({"layer": lid})
+        }
+    };
+    {
+        let r = s.run("catalog.saveEdits", &layer_param).unwrap();
+        assert_eq!(r["inserted"], 1, "{r}");
+        let props = s.run("info.geodatabaseItem", &json!({"geodatabase": "domain_base.gdb", "item": "uses"})).unwrap();
+        assert_eq!(props["rows"], 1, "{props}");
+        let zone = props["fields"].as_array().unwrap().iter().find(|f| f["name"] == "ZONE").unwrap().clone();
+        assert_eq!(zone["domain"], "zones", "{props}");
+    }
+    // A layer not from a geodatabase is refused.
+    let plain = s.map_mut().add_dataset(rustgis_data::Dataset::new("Plain", rustgis_data::GeometryType::Point, Vec::new()));
+    assert!(s.run("catalog.saveEdits", &json!({"layer": plain})).is_err());
+    std::fs::remove_dir_all(&dir).ok();
+}

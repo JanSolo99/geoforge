@@ -4163,6 +4163,7 @@ dependencies = [
  "base64 0.22.1",
  "bytes",
  "calamine 0.36.1",
+ "chrono",
  "crs-definitions",
  "csv",
  "flatgeobuf",

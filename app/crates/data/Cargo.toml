@@ -29,6 +29,8 @@ flatgeobuf = { workspace = true }
 geozero = { workspace = true }
 # MultiPatch footprints (the union of a patch's faces).
 geo = { workspace = true }
+# Dates edited in a geodatabase layer, written back as the field's type.
+chrono = { version = "0.4", default-features = false, features = ["std"] }
 calamine = { workspace = true }
 # LAZ (compressed LiDAR) point clouds.
 laz = { workspace = true }
