@@ -21,7 +21,9 @@ jobs:
       contents: read
   deploy:
     needs: verify
-    runs-on: ubuntu-latest
+    # Pinned: the browser gate's Playwright (scripts/readiness, 1.56.1) supports Ubuntu 24.04 but
+    # not 26.04, which ubuntu-latest became. Move both together.
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     # Needs the repository secrets NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID (see docs/WEB.md).
     steps:
