@@ -234,6 +234,8 @@ size, geotransform, bands, type, every valid pixel, validity; 1.38 M pixels).
   (inside the zlib stream when compressed). JPEG: `0x01` + JPEG, or `0xFE` + u32 LE length +
   JPEG + zlib mask; some JPEGs omit their Huffman tables (the standard Annex K tables apply).
   JPEG 2000: `0x00` + codestream, or `0xFF` + u32 LE length + codestream + zlib mask.
-- Not done: overviews (pyramids) and reading by window (rasters over 2^28 pixels per band are
-  refused when read whole), `srid` 0 coordinate systems, attribute tables (`fras_aux`), and
-  writing raster datasets.
+- Pyramids: level *l* is `max(1, size >> l)` pixels, blocks under `rrd_factor = l`, same grid
+  origin; GDAL ignores them when the block origin isn't (`eminx`, `emaxy`), and so do we (41
+  levels compared with `gdal_translate -ovr`). `srid` 0: the coordinate system is the item
+  definition's `<SpatialReference><WKT>`.
+- Not done: reading a window at full resolution, attribute tables (`fras_aux`), writing.

@@ -325,15 +325,18 @@ Each item is something ArcGIS Pro does with a file geodatabase; `[x]` done on br
       Geodatabase, Export Active Layer Here, Download (uploads), Remove
 - [x] Edit uploaded geodatabases in the browser: the writer runs on a folder mounted in memory
       (`unigis-filegdb::vfs`, byte-identical to disk edits) and the result replaces the stored copy
-- [ ] Edit rows and schema in place from the app (feature edits saved row by row through
-      `TableEditor`, keeping domains/subtypes; Add Field and the other schema tools on uploads in the
-      browser). Today an edited layer is written back by replacing its class
+- [x] Save Edits: a layer or table loaded from a class saved back row by row (`catalog.saveEdits`,
+      `TableEditor`), keeping schema, domains, subtypes and untouched values; disk and uploads
+- [ ] Schema tools (Add Field, Alter Field, domains, subtypes…) on uploads in the browser: the
+      registry's geodatabase tools are built without their file-system feature there
 - [x] Uploads up to 1 GiB in the browser, held once (was 256 MB, copied ~6 times)
 - [ ] Larger uploads: read the files on demand (a Web Worker with synchronous `File` reads)
 - [x] Raster datasets read (all pixel types; none/zlib/JPEG/JPEG 2000; masks), compared with GDAL
       on its 50 test rasters; added to the map from the Catalog
-- [ ] Raster datasets: pyramids and windowed reads (rasters over 2^28 pixels per band), attribute
-      tables (`fras_aux`), `srid` 0 coordinate systems, writing raster datasets
+- [x] Raster datasets: pyramids (41 levels checked against GDAL), large rasters opened from them,
+      `srid` 0 coordinate systems from the item definition
+- [ ] Raster datasets: windowed full-resolution reads while zoomed in, attribute tables
+      (`fras_aux`), writing raster datasets
 - [ ] Compressed (`.cdf`) tables: no public description; needs ArcGIS-made samples and black-box
       probes through the bridge (Compress File Geodatabase Data)
 - [x] MultiPatch drawn by its footprint; annotation drawn as its text, dimensions with their length

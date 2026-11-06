@@ -80,9 +80,12 @@ with `--features unigis` (links now); clippy -D warnings native + wasm32; releas
 Build-environment notes: use `CARGO_INCREMENTAL=0` and one feature set (`--features
 rustgis-ui-egui/unigis`) or the 40 GB disk fills; `apt-get install gdal-bin` for the oracle tests.
 
+Later in the pass: Save Edits row by row (`4e221c8`, also fixes the root Cargo.lock web-time
+entry), raster pyramids + srid 0 (`ef6ab98`).
+
 ## Next
 
-Open (also in ROADMAP/KNOWN_GAPS): in-place row/schema edits (TableEditor), raster pyramids /
-windowed reads / RAT / write, >1 GiB uploads via a Web Worker, per-feature annotation, Copy/Paste /
-Import / Compact / Recover / metadata. Blocked here (need ArcGIS-made samples and the bridge):
-`.cdf` tables, mobile geodatabases. Then a PR (user decides).
+Open (also in ROADMAP/KNOWN_GAPS): schema tools on uploads in the browser, raster windowed reads /
+RAT / writing, >1 GiB uploads via a Web Worker, per-feature annotation, Copy/Paste / Import /
+Compact / Recover / metadata. Blocked here (need ArcGIS-made samples and the bridge): `.cdf`
+tables, mobile geodatabases. Then a PR (user decides).

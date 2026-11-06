@@ -52,9 +52,9 @@ Update this file when a gap is found or closed.
 | Tool | Missing |
 |---|---|
 | Desktop pane layout | Floating windows and arbitrary split groups are not implemented; the attribute table remains a separate bottom view. Panes support left/right/bottom tab groups, drag/drop, auto-hide and saved arrangements (`app/crates/ui-egui/src/dock.rs`) |
-| Geodatabase row and schema edits | ArcGIS edits rows and schema in place. In the app (desktop uploads and the browser), an edited layer is written back by replacing its class (Export Active Layer Here), which drops its domains, subtypes and attribute rules; schema tools (Add Field…) on uploads need the desktop. Rename, Delete, New and Export work in place |
+| Geodatabase schema edits in the browser | Rows are saved in place (Save Edits To Geodatabase). Schema tools (Add Field, Alter Field, domains, subtypes…) on uploads need the desktop: the browser builds the geodatabase tools without their file-system feature. Layers read in place must be loaded (Load All Features) before editing |
 | Geodatabase upload size (web) | No ArcGIS limit. Browser uploads are held in memory once, at most 1 GiB (desktop 4 GiB); larger ones need on-demand reads from a Web Worker |
-| Raster datasets in geodatabases | Read (GDAL-verified); pyramids and windowed reads (a band over 2^28 pixels is refused), attribute tables, `srid` 0 coordinate systems and writing are missing |
+| Raster datasets in geodatabases | Read with pyramids (GDAL-verified); a raster over 2^24 pixels per band is shown from a pyramid level, not re-read at full resolution when zoomed in (ArcGIS switches levels by view). Attribute tables and writing raster datasets are missing |
 | Compressed (`.cdf`) geodatabase tables | ArcGIS reads them and has Compress/Uncompress tools; UniGIS refuses them (no public description; needs ArcGIS-made samples and bridge probes) |
 | Annotation and dimension classes | Annotation is drawn as its text with one size and angle for the layer (ArcGIS: each feature's font, size, angle, alignment); dimensions as an outline labelled with their length, without dimension lines and arrows |
 | Mobile geodatabases | ArcGIS reads and edits `.geodatabase` files; UniGIS only creates empty ones (their ST_Geometry blob has no public description). No enterprise geodatabase connections |
