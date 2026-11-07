@@ -21,6 +21,22 @@ from build import implemented, norm, inventory, coverage_status  # noqa: E402
 
 OUT = ROOT / "docs" / "WORK_QUEUE.md"
 DEFERRED = ROOT / "docs" / "WORK_QUEUE_DEFERRED.txt"
+PRIORITIES = ROOT / "docs" / "APP_PRIORITIES.md"
+
+
+def priorities():
+    """Open items of docs/APP_PRIORITIES.md: `- [ ] id: title` lines with their indented details."""
+    items = []
+    if not PRIORITIES.exists():
+        return items
+    for line in PRIORITIES.read_text().splitlines():
+        if line.startswith("- [") and len(line) > 5 and line[4] == "]":
+            done = line[3] in "xX"
+            key, _, title = line[5:].strip().partition(":")
+            items.append({"id": key.strip(), "title": title.strip(), "done": done, "details": []})
+        elif items and line.startswith("  ") and line.strip():
+            items[-1]["details"].append(line.rstrip())
+    return [i for i in items if not i["done"]]
 SHOWN = 40
 
 # Most-used general toolboxes first; domain toolboxes (aviation, utility network, ...) last.
@@ -55,7 +71,9 @@ RULES = """\
 1. **Finish or wrap up the current tool first.** If the work in progress is polish on a tool that
    already landed (byte-level differences, rare parameter combinations), commit what is validated,
    record the rest in `docs/KNOWN_GAPS.md`, and move on.
-2. **Then take the first tool in "Up next"** that is not deferred. Skip only for a concrete reason.
+2. **Then take the first open item in "App priorities"** (basic app functionality, from
+   `docs/APP_PRIORITIES.md`; tick it there when it lands). Only when none is open, take the first
+   tool in "Up next" that is not deferred. Skip only for a concrete reason.
 3. **One tool = one landing.** Implement the default and commonly used parameters, add ArcGIS
    reference cases, pass `scripts/check`, then commit and push. Options not covered go to the roadmap
    and known gaps, not to the next action.
@@ -110,7 +128,11 @@ def queue():
 
 def main():
     missing, held, done, totals = queue()
+    open_items = priorities()
     if "--next" in sys.argv:
+        if open_items:
+            print(f"App priority {open_items[0]['id']}: {open_items[0]['title']} (docs/APP_PRIORITIES.md)")
+            return
         t = missing[0]
         print(f"{t['title']} ({NAMES.get(t['alias'], t['alias'])}, arcpy {t['alias']}.{t['name']}) {t['url']}")
         return
@@ -119,7 +141,16 @@ def main():
              "`docs/WORK_QUEUE_DEFERRED.txt`). Order: inventory priority (P0 first), then toolbox "
              "(most-used first), then tools whose output ArcGIS lets us reproduce exactly, then "
              "easier ones. Tools that need a server or enterprise database, and tools that only "
-             "manage map layers, come after all others.", "", RULES,
+             "manage map layers, come after all others.", "", RULES]
+    if open_items:
+        lines += ["## App priorities (before any tool)", "",
+                  "Basic functionality and smooth operation of the app come first. Edit "
+                  "`docs/APP_PRIORITIES.md`, not this list; `scripts/lane claim` hands these out first.", ""]
+        for n, item in enumerate(open_items, 1):
+            lines.append(f"{n}. **{item['title']}** (`app.{item['id']}`)")
+            lines += ["  " + d for d in item["details"]]
+        lines.append("")
+    lines += [
              f"Missing: {len(missing) + len(held)} total = {len(missing)} eligible + {len(held)} deferred. "
              "Registered tools may still have compatibility gaps; see KNOWN_GAPS.md.", "",
              f"## Up next ({len(missing)} eligible tools; first {SHOWN} shown)", "",
@@ -141,7 +172,8 @@ def main():
         lines += [f"| `{t['alias']}.{t['name']}` | {reason} |" for t, reason in held]
         lines.append("")
     OUT.write_text("\n".join(lines))
-    print(f"{OUT.relative_to(ROOT)}: {len(missing)} missing, next: {missing[0]['title']}")
+    nxt = f"app priority {open_items[0]['id']}" if open_items else missing[0]['title']
+    print(f"{OUT.relative_to(ROOT)}: {len(missing)} missing tools, {len(open_items)} app priorities; next: {nxt}")
 
 
 if __name__ == "__main__":

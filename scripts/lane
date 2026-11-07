@@ -113,7 +113,7 @@ def setup(name, agent):
 def claim():
     lane = current_lane()
     sys.path.insert(0, str(ROOT / "scripts"))
-    from work_queue import NAMES, queue  # noqa: E402
+    from work_queue import NAMES, priorities, queue  # noqa: E402
     with locked("claims.lock"):
         claims = load_claims()
         mine = [tool for tool, c in claims.items() if c["lane"] == lane]
@@ -121,6 +121,15 @@ def claim():
             print(f"lane {lane} already has {', '.join(mine)}: finish and land it, or "
                   "`scripts/lane release` first")
             return
+        # App priorities (docs/APP_PRIORITIES.md) come before any tool.
+        for item in priorities():
+            key = f"app.{item['id']}"
+            if key not in claims:
+                claims[key] = {"lane": lane, "title": item["title"],
+                               "time": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")}
+                save_claims(claims)
+                print(f"claimed app priority {item['id']}: {item['title']} (details in docs/APP_PRIORITIES.md)")
+                return
         missing, *_ = queue()
         for item in missing:
             key = f"{item['alias']}.{item['name']}"
