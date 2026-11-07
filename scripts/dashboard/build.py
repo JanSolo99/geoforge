@@ -65,7 +65,8 @@ def implemented() -> dict[str, str]:
             )
             if macro:
                 found.setdefault(norm(macro.group(1)), kind)
-    cli = read(ROOT / "crates/unigis-cli/src/main.rs")
+    # The ug commands live in the CLI library (main.rs is a thin wrapper); read both.
+    cli = "\n".join(read(ROOT / f"crates/unigis-cli/src/{name}") for name in ("lib.rs", "main.rs"))
     block = cli[cli.find("enum Tool {"):]
     block = block[: block.find("\n}\n")]
     for m in re.finditer(r"^    ([A-Z][A-Za-z0-9]+)\s*[{,]", block, re.M):

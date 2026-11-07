@@ -10,7 +10,7 @@ the item has landed; the queue then skips it. Add new items in priority order. B
 ArcGIS Pro: settle questions with the ArcGIS MCP bridge, and check every fix in the real desktop app
 (`cargo run -p rustgis`), not only through `ug`.
 
-- [ ] gp-empty-map: Geoprocessing tools run on an empty map
+- [x] gp-empty-map: Geoprocessing tools run on an empty map
   - Bug: Create File Geodatabase from the Catalog fails with "the map has no layers".
   - Cause: `gp.run` is gated by `need_layers` (`app/crates/engine/src/cmd/gp.rs:12`), so every tool
     fails without a layer, including those that take none (Create Folder/File GDB/Mobile GDB,

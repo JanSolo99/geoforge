@@ -1,78 +1,41 @@
 # Current handoff
 
-Updated 2026-11-07; last agent Claude.
-Workspace `/mnt/media/ArcGIS_Linux`, branch `main`, HEAD = the Surface Parameters commit (on f851557).
+Updated 2026-11-08; last agent Claude (coordinator repair, no product work).
+Workspace `/mnt/media/ArcGIS_Linux`, branch `main`.
 
-## Objective and status
+## Status
 
-No app tool is in progress. The 2026-11-07 sessions (Codex, then Claude) worked only
-on agent tooling, which is no longer part of this repository:
+Nothing is in progress. Next item: app priority **catalog-no-freeze** (top of
+`docs/WORK_QUEUE.md`; details in `docs/APP_PRIORITIES.md`).
 
-- The coordinator moved to its own Git repository, `~/unigis-coordinator` (its README
-  covers usage, acceptance checks, model routing and measurements). It drives this
-  checkout via `UNIGIS_ROOT` (default `/mnt/media/ArcGIS_Linux`); run state stays in
-  `.git/agent-coordinator/`. Start it with `unigis-agents` (terminal) or
-  `unigis-coordinator` (browser dashboard on 127.0.0.1:8766).
-- Removed from this repo in commit "Move the agent coordinator out of the app
-  repository": `tools/agent-coordinator/`, `scripts/agents`, `scripts/agents-remote`. The app's web-publish units moved to
-  `scripts/unigis-web-dist.{service,timer}` (`docs/WEB.md` updated).
-- Agent skills stay on disk but are git-ignored: `.claude/skills/` (development and
-  orchestration procedures) and `.agents/skills/` (Codex discovery links to them).
+Recently landed:
+- `81d1ced` Run geoprocessing tools with an empty map (app.gp-empty-map; ticked in
+  APP_PRIORITIES). Validation (Codex, 2026-11-07): three engine regressions passed,
+  root `scripts/check` passed, native desktop Catalog → New → File Geodatabase
+  succeeded with an empty map.
+- `0f0be36` Add Surface Parameters.
 
-## Surface Parameters (Claude, 2026-11-07, this run)
+## Known app-workspace failures (not caused by recent work)
 
-Taken from the committed queue (#1) before the app priorities landed; finished, nothing else
-started.
-- `surface_parameters` in the raster registry (`crates/unigis-raster/src/surface_parameters.rs`),
-  geodesic like ArcGIS: cell centres -> ECEF via the new `Context::geodetic` host hook (CLI:
-  `unigis_proj::Crs::geographic_base` + `Transform`; the app context keeps the default error),
-  grid-aligned tangent frame, QUADRATIC = weighted LS w = 1/(1 + d²)², BIQUADRATIC exact,
-  Minár et al. 2020 formulas, aspect from true north, ArcGIS's NoData rules. Findings and probe
-  scripts: `scripts/research/surface_parameters/`. 21 `sp_*` references; the test also checks
-  `sp_` cells at 1e-3 relative, with per-case allowances for ArcGIS's single-precision tail.
-- Note: the concurrent commit e4cad54 already contains this run's `geodetic` impl in
-  `crates/unigis-cli/src/lib.rs` (it was in the working tree); `main` compiles again only with
-  the Surface Parameters commit (the trait method).
-- Gaps (KNOWN_GAPS): non-default neighbourhood, adaptive, projected azimuths, equatorial aspect,
-  mask refused; rasters without EPSG refused; flat-cell curvature value unprobed.
-- Validation: `UNIGIS_REFERENCE_CASES=sp_` reference test passes; full `scripts/check` passed
-  (EXIT 0) on the working tree, including the inherited uncommitted hunks.
-- Next: the coordinator checks acceptance; then the app priorities (below) before more tools.
-- Staged by hunk: the inherited umintfloat hunks in `crates/unigis-raster/src/registry.rs` and
-  `scripts/make-arcgis-reference.py` stay uncommitted.
+Recorded in `docs/KNOWN_GAPS.md` (Process gaps): in the separate `app/` workspace,
+`cargo xtask ci` fails on six plugin WASM tests (`serde_json/preserve_order` from the
+merged CLI breaks the fixture's byte offsets) and two UniGIS adapter tests
+(`one_tool_list` duplicate IDs; `field_tools_work_in_place_and_others_make_layers`).
+Root `scripts/check` passes. Use `CARGO_TARGET_DIR=/home/jansolo/.cache/geoforge-target`
+for app builds (rustc temp-file errors on NTFS).
 
-## Inherited work preserved
+## Coordinator note
 
-Uncommitted changes from earlier sessions were not modified or validated:
-`crates/unigis-cli/tests/unary_band_safety.rs`, raster `src/{local,registry,stats}.rs` and
-`scripts/make-arcgis-reference.py` (a copy is also in `git stash@{0}`, "pre-pull local edits
-2026-11-07"); untracked
+The coordinator (`~/unigis-coordinator`) looped overnight on 2026-11-07: workers were
+told to wait for acceptance instead of landing, so 98 turns re-verified gp-empty-map.
+Fixed: workers land their own work (commit/push per `docs/WORK_QUEUE.md`), are told when
+their previous task was accepted, and the daemon pauses after two accepted turns that
+change nothing. Do not wait for "coordinator acceptance": land, then finish.
+
+## Preserved, not validated
+
+Uncommitted from earlier sessions: raster `src/{local,registry,stats}.rs`,
+`crates/unigis-cli/tests/unary_band_safety.rs`, `scripts/make-arcgis-reference.py`,
+`.claude/agents/ambition-review.md`, other `app/` edits (i18n, packaging); untracked
 `.worktrees/`, `NOTES.md`, `scratch_te/`, `scripts/research/unary_multiband/integer_float/`,
-`scripts/web-build-memory.py` and `testdata/raster/unary_integer_float/`.
-
-## One `ug` CLI and app packaging (Claude, 2026-11-07, committed)
-
-- The app's `rustgis-cli` is folded into `ug`: `unigis-cli` is now a library
-  (`unigis_cli::main_with`) plus the lean root `ug`; `app/apps/rustgis-cli` builds the shipped
-  `ug`, which hands engine subcommands to the library and adds the app's (`commands`, `info`,
-  `render`, `logo`, `ask`, `mcp`, `plugins`, `session` = old `run --cmd`). `packaging/package.sh`
-  stages the `unigis` desktop binary as `rustgis`, honours `CARGO_TARGET_DIR`, skips `.deb`
-  without `dpkg-deb`.
-- Build the app with `CARGO_TARGET_DIR=$HOME/.cache/geoforge-target`: on this NTFS drive
-  (`ntfs3`) rustc loses temporary files ("failed to copy bitcode", "failed to rename archive").
-- Validation: root fmt, clippy (no warnings) and `unigis-cli` tests pass; app fmt, clippy
-  `-D warnings`, layers and all test crates pass except plugin tests that share global state and
-  fail intermittently in parallel (`rustgis-engine` `plugin_*`, `rustgis-plugins`
-  `packages_load…` etc.); they pass alone and with `--test-threads=1`, the change there is
-  message text only. Not fixed.
-
-## Next actions and running processes
-
-1. **App priorities first**: `docs/APP_PRIORITIES.md` (the user's basic-functionality goals,
-   2026-11-07) is rendered at the top of `docs/WORK_QUEUE.md`, `scripts/lane claim` hands them
-   out before tools and `python3 scripts/work_queue.py --next` names the first. In order:
-   gp-empty-map, catalog-no-freeze, add-data-browser, basemap-gallery, create-features-pane,
-   gdb-domains-subtypes, unigis-naming.
-2. Then validate and land the inherited raster changes, then the tool queue.
-
-The coordinator dashboard service runs; the coding daemon is stopped.
+`scripts/web-build-memory.py`, `testdata/raster/unary_integer_float/`.
