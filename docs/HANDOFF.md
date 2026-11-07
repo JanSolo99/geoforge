@@ -1,10 +1,10 @@
 # Current handoff
 
-Updated 2026-11-07T21:49:52.857332+00:00; last agent Codex.
-Workspace `/mnt/media/ArcGIS_Linux`, branch `main`; HEAD before landing
-`f3181291f4579b17604f6964ce992ad9bb89ac37`.
+Updated 2026-11-07T21:56:41.530050+00:00; last agent Codex.
+Workspace `/mnt/media/ArcGIS_Linux`, branch `main`; HEAD
+`077f1c3c79467b09d68e934123d22b7eb2d64186` (Keep Catalog folder browsing off the UI thread).
 
-## Single item: app.catalog-no-freeze — complete, landing now
+## Single item: app.catalog-no-freeze — committed and pushed; complete
 
 User authorizes commit/push of one item, then stop. Previous gp-empty-map was
 already committed; this turn selected the next app priority. No agents launched.
@@ -66,12 +66,18 @@ relay8767 closed and own token removed. No user configuration or Data files chan
 
 Inherited dirty tracked files preserved, hashes `/tmp/catalog-inherited-hashes.json`:
 agent guidance, root raster/unary code/tests, ArcGIS reference script, generated
-Dashboard. All match before commit. Untracked .worktrees/, NOTES.md, scratch_te/,
+Dashboard. All matched before commit; post-commit hook regenerated only the dashboard. Untracked .worktrees/, NOTES.md, scratch_te/,
 research/fixtures and web-build-memory script untouched. Only this item's UI,
-tests, translations and documentation staged. No resets/stashes/worktree transfers.
+tests, translations and documentation were committed. This operational handoff
+checkpoint is the only post-commit edit by this turn. No resets/stashes/worktree transfers.
 
-1. Commit staged item, then normal push with ext4 target environment so pre-push
-   runs protected scripts/check. Record result here. Do not wait for acceptance.
-2. Post-commit hook refreshes generated dashboard and queue; keep unrelated dirty
-   files unstaged. No unfinished product edits.
-3. After landing, next queue item: app.add-data-browser. Do not start it this turn.
+1. Landed `077f1c3` on origin/main. Normal `git push origin main` with the ext4
+   Cargo target passed the protected pre-push scripts/check (full fmt/lint/tests)
+   and pushed successfully, exit0. Evidence `/tmp/catalog-push.{log,exit}`;
+   remote advanced `0f0be36..077f1c3`. No unfinished product edits or running tests.
+2. This post-push operational handoff checkpoint is intentionally uncommitted.
+   Product, tests, translations, priority, queue, roadmap and known gaps are all
+   committed/pushed. Generated dashboard remains dirty after the normal hook;
+   other inherited tracked/untracked edits remain unstaged and untouched.
+3. Next queue item: app.add-data-browser. Do not start it this turn. Coordinator
+   can run frozen acceptance against the landed item; no further worker action needed.
