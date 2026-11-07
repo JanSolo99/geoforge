@@ -2001,3 +2001,8 @@ Browse…	찾아보기…
 Database Connection	데이터베이스 연결
 This database connection format is not supported	이 데이터베이스 연결 형식은 지원되지 않습니다
 This dataset type cannot be added yet	이 데이터셋 유형은 아직 추가할 수 없습니다
+Search basemaps	베이스맵 검색
+Online basemaps	온라인 베이스맵
+Overlays	오버레이
+Clear Basemaps	베이스맵 지우기
+Clear Overlays	오버레이 지우기

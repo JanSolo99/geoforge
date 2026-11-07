@@ -2001,3 +2001,8 @@ Browse…	Обзор…
 Database Connection	Подключение к базе данных
 This database connection format is not supported	Этот формат подключения к базе данных не поддерживается
 This dataset type cannot be added yet	Этот тип набора данных пока нельзя добавить
+Search basemaps	Поиск базовых карт
+Online basemaps	Базовые карты онлайн
+Overlays	Наложения
+Clear Basemaps	Удалить базовые карты
+Clear Overlays	Удалить наложения

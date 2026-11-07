@@ -4,7 +4,7 @@
 
 - **In the browser**: open [web.rustgis.app](https://web.rustgis.app). Nothing to install.
 - **On the desktop**: [install](installation.md) UniGIS and start it. It opens a new map with
-  OpenStreetMap. The Basemaps plugin loads automatically for more map choices.
+  OpenStreetMap; **Map › Basemap** has more map choices.
 - **From source**:
 
 ```sh

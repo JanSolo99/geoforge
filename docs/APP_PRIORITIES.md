@@ -31,7 +31,7 @@ ArcGIS Pro: settle questions with the ArcGIS MCP bridge, and check every fix in 
     containers shown as one item that expands to feature datasets, feature classes, tables and
     raster datasets; multi-select; filter by type; favourite/recent folders; and the same
     background listing as the Catalog. The OS picker can stay as a secondary "Browse…".
-- [ ] basemap-gallery: One built-in Basemap gallery on the Map ribbon
+- [x] basemap-gallery: One built-in Basemap gallery on the Map ribbon
   - Basemaps must not need the Basemaps plugin. Today there is a separate Basemaps ribbon tab
     (plugin) and a Basemap button on the Map ribbon; fold everything into Map › Basemap like
     ArcGIS Pro's gallery, and remove the extra tab.

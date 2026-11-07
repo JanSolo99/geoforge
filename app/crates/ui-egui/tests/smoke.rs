@@ -15,6 +15,86 @@ fn harness() -> egui_kittest::Harness<'static, RustGisApp> {
     )
 }
 
+/// Types `text` into the Basemap gallery's search box.
+fn search(h: &mut egui_kittest::Harness<'static, RustGisApp>, text: &str) {
+    let role = egui::accesskit::Role::TextInput;
+    h.get_by_role_and_label(role, "Search basemaps").click();
+    h.step();
+    h.get_by_role_and_label(role, "Search basemaps").type_text(text);
+    h.step();
+    h.step();
+}
+
+#[test]
+fn built_in_basemap_gallery_selects_web_offline_and_overlays_without_a_plugin() {
+    let _turn = PLUGINS.lock().unwrap_or_else(|e| e.into_inner());
+    let mut h = harness();
+    h.step();
+    h.get_by_label("Basemap").click();
+    h.step();
+    search(&mut h, "OpenStreetMap");
+    h.step();
+    h.get_by_label("OpenStreetMap").click();
+    h.step();
+    assert_eq!(h.state().session.map().tiles.len(), 1);
+    assert_eq!(h.state().session.map().tiles[0].id, "osm");
+    // A formerly plugin-only overlay is available in the same gallery.
+    h.get_by_label("Basemap").click();
+    h.step();
+    search(&mut h, "Hiking");
+    h.step();
+    h.step();
+    h.step();
+    h.get_by_label("Hiking Trails").click();
+    h.step();
+    let tiles = &h.state().session.map().tiles;
+    assert!(
+        tiles.iter().any(|t| t.id == "waymarked-hiking" && t.overlay),
+        "{:?}",
+        tiles.iter().map(|t| (&t.id, t.overlay, &t.url)).collect::<Vec<_>>()
+    );
+    h.get_by_label("Basemap").click();
+    h.step();
+    search(&mut h, "Midnight");
+    h.step();
+    h.get_by_label("Midnight").click();
+    h.step();
+    assert_eq!(h.state().session.map().basemap, rustgis_ui_egui::rustgis_engine::map::Basemap::Midnight);
+    assert_eq!(h.state().session.map().tiles.len(), 1, "offline basemap keeps the overlay");
+    // Re-selecting the overlay toggles it off.
+    h.get_by_label("Basemap").click();
+    h.step();
+    search(&mut h, "Hiking");
+    h.step();
+    h.step();
+    h.get_by_label("Hiking Trails").click();
+    h.step();
+    assert!(h.state().session.map().tiles.is_empty());
+}
+
+#[test]
+fn legacy_basemaps_tab_moves_to_map_without_uninstalling_the_plugin() {
+    let _turn = PLUGINS.lock().unwrap_or_else(|e| e.into_inner());
+    use rustgis_ui_egui::rustgis_engine::plugins as rp;
+    let mut m: serde_json::Value = serde_json::from_str(&rp::testing::manifest("basemaps", &[])).unwrap();
+    m["tab"] = json!({"label": "Legacy Basemaps", "groups": [{"label": "Maps", "items": ["h"]}]});
+    let bytes = rp::testing::zip_of(&[("plugin.json", m.to_string().as_bytes()), ("plugin.wasm", &rp::testing::wasm())]);
+    rp::load(rp::Package::from_zip(&bytes).unwrap(), "test").unwrap();
+    let mut h = harness();
+    h.state_mut().ui.tab = "plugin:basemaps".into();
+    h.step();
+    h.step();
+    assert_eq!(h.state().ui.tab, "Map");
+    assert!(h.query_all_by_label("Legacy Basemaps").next().is_none());
+    assert!(rp::get("basemaps").unwrap().enabled);
+    rp::set_enabled("basemaps", false).unwrap();
+    h.state_mut().start(&Default::default()).unwrap();
+    h.step();
+    assert!(!rp::get("basemaps").unwrap().enabled);
+    assert!(h.query_all_by_label("Basemap").next().is_some());
+    rp::unload("basemaps");
+}
+
 #[cfg(not(target_arch = "wasm32"))]
 fn browser_wait(h: &mut egui_kittest::Harness<'static, RustGisApp>, label: &str) {
     let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);

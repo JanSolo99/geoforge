@@ -11,6 +11,7 @@ pub mod i18n;
 mod analysispane;
 mod assistantpane;
 mod backstage;
+mod basemaps;
 mod catalogsui;
 mod chrome;
 mod cswui;
@@ -894,16 +895,8 @@ impl RustGisApp {
         if overrides.blank.unwrap_or(self.ui.start_blank) {
             self.run("project.new", Value::Null)?;
         }
-        pluginsui::load_basemaps(self);
         if self.session.map().tiles.iter().all(|t| t.overlay) {
-            self.run(
-                "map.addTiles",
-                json!({
-                    "id": "osm", "name": "OpenStreetMap", "kind": "raster",
-                    "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-                    "attribution": "© OpenStreetMap contributors", "maxZoom": 19,
-                }),
-            )?;
+            self.run("map.addTiles", basemaps::default_tiles())?;
         }
         let code = overrides.projection.clone().unwrap_or_else(|| self.ui.start_projection.clone());
         let mut result = Ok(());

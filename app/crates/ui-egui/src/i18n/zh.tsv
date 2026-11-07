@@ -2001,3 +2001,8 @@ Browse…	浏览…
 Database Connection	数据库连接
 This database connection format is not supported	不支持此数据库连接格式
 This dataset type cannot be added yet	暂时无法添加此数据集类型
+Search basemaps	搜索底图
+Online basemaps	在线底图
+Overlays	叠加层
+Clear Basemaps	清除底图
+Clear Overlays	清除叠加层

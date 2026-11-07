@@ -2001,3 +2001,8 @@ Browse…	参照…
 Database Connection	データベース接続
 This database connection format is not supported	このデータベース接続形式はサポートされていません
 This dataset type cannot be added yet	このデータセットの種類はまだ追加できません
+Search basemaps	ベースマップを検索
+Online basemaps	オンラインベースマップ
+Overlays	オーバーレイ
+Clear Basemaps	ベースマップを削除
+Clear Overlays	オーバーレイを削除

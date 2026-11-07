@@ -177,6 +177,16 @@ pub fn big_menu(ui: &mut Ui, app: &mut RustGisApp, icon: &str, label: &str, desc
     });
 }
 
+/// Like [`big_menu`], but a click inside the menu leaves it open (for menus with a text box or
+/// sliders); the menu's own items close it with `ui.close()`, and a click outside does too.
+pub fn big_menu_stay(ui: &mut Ui, app: &mut RustGisApp, icon: &str, label: &str, desc: &str, menu: impl FnOnce(&mut Ui, &mut RustGisApp)) {
+    let resp = big(ui, app, icon, label, desc, "ui.menu", Value::Null, false, true);
+    egui::Popup::menu(&resp).close_behavior(egui::PopupCloseBehavior::CloseOnClickOutside).show(|ui| {
+        ui.set_min_width(200.0);
+        menu(ui, app);
+    });
+}
+
 /// A small button that opens a menu.
 pub fn small_menu(ui: &mut Ui, app: &mut RustGisApp, icon: &str, label: &str, desc: &str, menu: impl FnOnce(&mut Ui, &mut RustGisApp)) {
     let (label, desc) = (tl!(label), tl!(desc));

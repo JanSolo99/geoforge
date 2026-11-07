@@ -5,11 +5,11 @@ use egui::{Align2, CornerRadius, Rect, Sense, Stroke, Ui, pos2, vec2};
 use rustgis_engine::Tool;
 use rustgis_engine::data::GeometryType;
 use rustgis_engine::map::view::Weather;
-use rustgis_engine::map::{Basemap, RasterRenderer, Renderer, Resampling, Stretch};
+use rustgis_engine::map::{RasterRenderer, Renderer, Resampling, Stretch};
 use serde_json::{Value, json};
 
 use crate::theme::{Tokens, regular, semibold};
-use crate::widgets::{CONTENT_H, LABEL_H, big, big_menu, col, group, menu_item, small, small_menu, text_w};
+use crate::widgets::{CONTENT_H, LABEL_H, big, big_menu, big_menu_stay, col, group, menu_item, small, small_menu, text_w};
 use crate::{RightPane, RustGisApp, icons};
 
 pub const TABS: [&str; 11] = ["Map", "Insert", "Analysis", "View", "Edit", "Imagery", "Style", "Share", "Plugins", "Settings", "Help"];
@@ -21,7 +21,7 @@ pub const FIXED_TABS: [&str; 2] = ["Settings", "Help"];
 /// a name that is no tab. Plugins' tabs pass through.
 pub fn current_tab(name: &str) -> &str {
     let tab = match name {
-        "Home" => "Map",
+        "Home" | "plugin:basemaps" => "Map",
         "Data" | "Raster Data" => "Insert",
         "Feature Layer" | "Labeling" | "Raster Layer" => "Style",
         "Analyze" => "Analysis",
@@ -38,6 +38,7 @@ pub fn current_hidden_tabs(saved: Vec<String>) -> Vec<String> {
     let mut out: Vec<String> = Vec::new();
     for name in saved {
         let tab = match name.as_str() {
+            "plugin:basemaps" => continue,
             "Home" => "Map",
             "Data" => "Insert",
             "Analyze" => "Analysis",
@@ -61,13 +62,16 @@ fn plugin_tabs(app: &RustGisApp) -> Vec<(String, String)> {
     let lang = app.lang().code();
     rustgis_engine::plugins::list()
         .into_iter()
-        .filter(|p| p.enabled)
+        .filter(|p| p.enabled && p.manifest.id != "basemaps")
         .filter_map(|p| p.manifest.tab.as_ref().map(|t| (plugin_tab_id(&p.manifest.id), p.manifest.translate(lang, &t.label).to_string())))
         .collect()
 }
 
 pub fn show(app: &mut RustGisApp, ui: &mut Ui) {
     let t = Tokens::get(ui.ctx());
+    if app.ui.tab == "plugin:basemaps" {
+        app.ui.tab = "Map".into();
+    }
     // A plugin's tab whose plugin was turned off or removed.
     if app.ui.tab.starts_with("plugin:") && !plugin_tabs(app).iter().any(|(id, _)| *id == app.ui.tab) {
         app.ui.tab = "Plugins".into();
@@ -415,7 +419,7 @@ fn home_tab(app: &mut RustGisApp, ui: &mut Ui) {
     });
     bookmarks_group(app, ui);
     group(ui, "Add", |ui| {
-        big_menu(ui, app, "basemap", "Basemap", "Change the map's backdrop.", basemap_gallery);
+        big_menu_stay(ui, app, "basemap", "Basemap", "Change the map's backdrop.", crate::basemaps::gallery);
         big_menu(ui, app, "add_data", "Add\nData", "Add GeoJSON, CSV or Shapefile data to the map.", |ui, app| {
             menu_item(ui, app, "", "Data…", "ui.addData", Value::Null);
             menu_item(ui, app, "", "Geodatabase…", "ui.addGeodatabase", Value::Null);
@@ -513,57 +517,14 @@ fn home_tab(app: &mut RustGisApp, ui: &mut Ui) {
     });
 }
 
-fn basemap_gallery(ui: &mut Ui, app: &mut RustGisApp) {
-    let t = Tokens::get(ui.ctx());
-    ui.label(egui::RichText::new(tl!("Basemaps")).font(semibold(12.5)));
-    ui.add_space(4.0);
-    egui::Grid::new("basemaps").spacing(vec2(8.0, 8.0)).show(ui, |ui| {
-        for (i, b) in Basemap::ALL.into_iter().enumerate() {
-            let (water, land, outline, _) = b.palette();
-            let (r, resp) = ui.allocate_exact_size(vec2(92.0, 74.0), Sense::click());
-            // Web basemaps cover the built-in one.
-            let sel = app.session.map().basemap == b && app.session.map().tiles.iter().all(|t| t.overlay);
-            let thumb = Rect::from_min_size(r.min + vec2(4.0, 4.0), vec2(84.0, 48.0));
-            ui.painter().rect_filled(thumb, CornerRadius::same(4), crate::theme::c32(water));
-            // A little continent.
-            let pts = [(0.18, 0.3), (0.42, 0.18), (0.6, 0.35), (0.55, 0.7), (0.3, 0.82), (0.15, 0.6)];
-            let poly: Vec<egui::Pos2> =
-                pts.iter().map(|(x, y)| pos2(thumb.min.x + x * thumb.width(), thumb.min.y + y * thumb.height())).collect();
-            ui.painter().add(egui::Shape::convex_polygon(poly, crate::theme::c32(land), Stroke::new(1.0, crate::theme::c32(outline))));
-            let poly2: Vec<egui::Pos2> = [(0.68, 0.22), (0.88, 0.3), (0.84, 0.55), (0.7, 0.5)]
-                .iter()
-                .map(|(x, y)| pos2(thumb.min.x + x * thumb.width(), thumb.min.y + y * thumb.height()))
-                .collect();
-            ui.painter().add(egui::Shape::convex_polygon(poly2, crate::theme::c32(land), Stroke::new(1.0, crate::theme::c32(outline))));
-            if sel || resp.hovered() {
-                ui.painter().rect_stroke(
-                    r,
-                    CornerRadius::same(6),
-                    Stroke::new(if sel { 2.0 } else { 1.0 }, t.accent),
-                    egui::StrokeKind::Inside,
-                );
-            }
-            ui.painter().text(pos2(r.center().x, r.max.y - 11.0), Align2::CENTER_CENTER, tl!(b.label()), regular(11.5), t.text);
-            if resp.clicked() {
-                let _ = app.run("map.basemap", json!({"name": b.code()}));
-                ui.close();
-            }
-            if i % 3 == 2 {
-                ui.end_row();
-            }
-        }
-    });
-    tile_layers(ui, app, &t);
-}
-
 /// The map's web tile layers (top first): shown, opacity, order and removal, and adding one.
-fn tile_layers(ui: &mut Ui, app: &mut RustGisApp, t: &Tokens) {
+pub(super) fn tile_layers(ui: &mut Ui, app: &mut RustGisApp, t: &Tokens) {
     ui.add_space(6.0);
     ui.separator();
     ui.label(egui::RichText::new(tl!("Web Tile Layers")).font(semibold(12.5)));
     let tiles = app.session.map().tiles.clone();
     if tiles.is_empty() {
-        ui.label(egui::RichText::new(tl!("None. Add one by address, or from a basemap plugin.")).weak().small());
+        ui.label(egui::RichText::new(tl!("None")).weak().small());
     }
     let mut action: Option<(&str, Value)> = None;
     for (i, layer) in tiles.iter().enumerate() {
@@ -596,6 +557,16 @@ fn tile_layers(ui: &mut Ui, app: &mut RustGisApp, t: &Tokens) {
     if let Some((cmd, p)) = action {
         let _ = app.run(cmd, p);
     }
+    ui.horizontal(|ui| {
+        if tiles.iter().any(|t| !t.overlay) && ui.button(tl!("Clear Basemaps")).clicked() {
+            let _ = app.run("map.basemap", json!({"name": app.session.map().basemap.code()}));
+        }
+        if tiles.iter().any(|t| t.overlay) && ui.button(tl!("Clear Overlays")).clicked() {
+            for i in (0..tiles.len()).rev().filter(|i| tiles.get(*i).is_some_and(|t| t.overlay)) {
+                let _ = app.run("map.removeTiles", json!({"index": i}));
+            }
+        }
+    });
     ui.horizontal(|ui| {
         if ui.button(tl!("Add Tile Layer…")).on_hover_text(tl!("Add raster tiles, vector tiles or a map style by address.")).clicked() {
             let _ = app.run("ui.dialog", json!({"name": "addTiles"}));
@@ -3836,9 +3807,17 @@ mod tests {
     fn saved_tab_names_from_older_versions_carry_over() {
         let saved = ["Home", "Data", "Analyze", "Publish", "Map"].iter().map(|t| t.to_string()).collect();
         assert_eq!(current_hidden_tabs(saved), ["Map", "Insert", "Analysis", "Share"].map(String::from).to_vec());
-        for (old, new) in [("Home", "Map"), ("Data", "Insert"), ("Analyze", "Analysis"), ("Publish", "Share"), ("Layout", "Share")] {
+        for (old, new) in [
+            ("Home", "Map"),
+            ("Data", "Insert"),
+            ("Analyze", "Analysis"),
+            ("Publish", "Share"),
+            ("Layout", "Share"),
+            ("plugin:basemaps", "Map"),
+        ] {
             assert_eq!(current_tab(old), new);
         }
+        assert!(current_hidden_tabs(vec!["plugin:basemaps".into()]).is_empty());
         assert!(TABS.iter().all(|t| current_tab(t) == *t));
     }
 }

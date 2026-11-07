@@ -2001,3 +2001,8 @@ Browse…	დათვალიერება…
 Database Connection	მონაცემთა ბაზის კავშირი
 This database connection format is not supported	მონაცემთა ბაზის კავშირის ეს ფორმატი მხარდაჭერილი არ არის
 This dataset type cannot be added yet	ამ ტიპის მონაცემთა ნაკრების დამატება ჯერ შეუძლებელია
+Search basemaps	საბაზისო რუკების ძიება
+Online basemaps	ონლაინ საბაზისო რუკები
+Overlays	ზედდებული ფენები
+Clear Basemaps	საბაზისო რუკების გასუფთავება
+Clear Overlays	ზედდებული ფენების გასუფთავება

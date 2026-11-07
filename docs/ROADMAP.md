@@ -762,10 +762,13 @@ Each item is something ArcGIS Pro does with a file geodatabase; `[x]` done on br
 
 ## Current desktop integration (2026-10-23)
 
-- [x] Startup defaults to a new map with OpenStreetMap. The official Basemaps plugin
-      installs in the background on first launch, with a pinned package hash and
-      persistent desktop/browser storage. Existing sample preferences, projection/
-      extent settings and saved projects are preserved; later plugin removal is respected.
+- [x] Startup defaults to a new map with OpenStreetMap. Existing sample preferences, projection/
+      extent settings and saved projects are preserved.
+- [x] One built-in Map › Basemap gallery (`ui-egui/src/basemaps.rs`): search box, the five offline
+      backdrops, 34 online basemaps and 9 overlays from public service catalogs (our own schematic
+      previews), custom tile layers below. The Basemaps plugin is no longer downloaded at startup;
+      its ribbon tab is hidden and a saved `plugin:basemaps` tab opens Map (the plugin itself is
+      untouched). 2 smoke tests, preset catalog and startup tests.
 - [x] Dockable panes: left/right/bottom groups, tab dragging and drop previews,
       auto-hide, scrollable tab headers, and saved layout preferences. Reopening
       panes preserves tab order; pointer-drag and preference round-trip tests pass.

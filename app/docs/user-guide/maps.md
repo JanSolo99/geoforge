@@ -23,8 +23,12 @@ server over the network; see [Geocoding addresses](data.md#geocoding-addresses) 
 
 ![A MapLibre style from OpenFreeMap drawn over Paris, with the Basemap gallery listing the built-in basemaps and the web tile layer](https://assets.rustgis.app/images/tiles.webp)
 
-**Home › Add › Basemap** offers five built-in basemaps drawn from a world outline (Paper, Midnight,
-Ocean, Atlas, Blank), which need no network, and web tile layers over them:
+**Map › Add › Basemap** is one gallery with a search box: five built-in basemaps drawn from a world
+outline (Paper, Midnight, Ocean, Atlas, Blank), which need no network; online basemaps
+(OpenStreetMap and its variants, Esri, USGS, NASA, OpenFreeMap and VersaTiles styles); and
+overlays (labels, transportation, railways, sea marks, trails). Choosing an online basemap
+replaces the current one, choosing an overlay adds it (choosing it again removes it), and the
+gallery needs no plugin. Below the gallery, web tile layers:
 
 - **Raster tiles** from an XYZ or TMS template (`https://…/{z}/{x}/{y}.png`; `{-y}` for rows
   from the south, `{s}` for subdomains, `{q}` for Bing-style quadkeys) or a WMS through
@@ -48,11 +52,9 @@ Ocean, Atlas, Blank), which need no network, and web tile layers over them:
   its text that the map's font can draw: a style's "Syria / سوريا" shows as "Syria".
 
 The initial map uses **OpenStreetMap**. Tiles load over the network; the built-in world outline
-remains available offline. The [Basemaps plugin](https://plugins.rustgis.app/catalog/basemaps/)
-downloads automatically on first launch and adds a tab of public basemaps. Once installed, it is
-remembered; you can disable or uninstall it in the Plugin Manager. If the first download fails,
-the app retries on the next launch. Add other tile layers with **Add Tile Layer…** at the bottom
-of the Basemap gallery.
+remains available offline. Add other tile layers with **Add Tile Layer…** at the bottom of the
+Basemap gallery. The Basemaps plugin and its tab are no longer used: the tab opens the Map tab,
+and an installed copy stays in the Plugin Manager until you remove it.
 The gallery lists the map's tile layers: show or hide them, change their opacity and order, or
 remove them. Overlays (labels, roads) stay on top of the basemaps; choosing a built-in basemap
 removes the web basemaps but keeps the overlays. Tile layers are saved with the project, and

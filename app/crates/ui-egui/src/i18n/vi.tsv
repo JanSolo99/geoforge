@@ -2001,3 +2001,8 @@ Browse…	Duyệt…
 Database Connection	Kết nối cơ sở dữ liệu
 This database connection format is not supported	Định dạng kết nối cơ sở dữ liệu này không được hỗ trợ
 This dataset type cannot be added yet	Chưa thể thêm loại tập dữ liệu này
+Search basemaps	Tìm bản đồ nền
+Online basemaps	Bản đồ nền trực tuyến
+Overlays	Lớp phủ
+Clear Basemaps	Xóa bản đồ nền
+Clear Overlays	Xóa lớp phủ
