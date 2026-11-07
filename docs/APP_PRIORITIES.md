@@ -16,7 +16,7 @@ ArcGIS Pro: settle questions with the ArcGIS MCP bridge, and check every fix in 
     fails without a layer, including those that take none (Create Folder/File GDB/Mobile GDB,
     Create Random Raster, ASCII To Raster). Drop the gate; each tool checks its own inputs. Keep
     `hostile_params_never_panic` green and add a regression test.
-- [ ] catalog-no-freeze: Browsing big folders never freezes the app
+- [x] catalog-no-freeze: Browsing big folders never freezes the app
   - Bug: opening folders under `/mnt/media/Data` (imagery, NTFS) made the app unresponsive.
   - Cause: the Catalog folder browser (`app/crates/ui-egui/src/panes.rs`, `folder_browser`) calls
     `read_dir` plus `is_dir` on every entry on the UI thread every frame. List each folder once on a

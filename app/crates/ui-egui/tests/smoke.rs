@@ -15,6 +15,58 @@ fn harness() -> egui_kittest::Harness<'static, RustGisApp> {
     )
 }
 
+#[cfg(not(target_arch = "wasm32"))]
+#[test]
+fn catalog_folder_pages_and_refresh_reach_files_after_the_old_limit() {
+    use std::time::{Duration, Instant};
+    let dir = std::env::temp_dir().join(format!("catalog-ui-pages-{}", std::process::id()));
+    std::fs::create_dir(&dir).unwrap();
+    for i in 0..401 {
+        std::fs::write(dir.join(format!("image{i:03}.JP2")), []).unwrap();
+    }
+    let mut h = harness();
+    h.state_mut().table.folder = Some(dir.clone());
+    h.state_mut().run("ui.pane.catalog", json!({})).unwrap();
+    let deadline = Instant::now() + Duration::from_secs(5);
+    loop {
+        h.step();
+        if h.query_all_by_label("image000.JP2").next().is_some() {
+            break;
+        }
+        assert!(Instant::now() < deadline, "background listing did not reach UI");
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    for _ in 0..4 {
+        h.query_by_label("Next Page").expect("next folder page").click();
+        h.step();
+        h.step();
+    }
+    assert!(h.query_all_by_label("image400.JP2").next().is_some());
+    assert!(h.query_all_by_label("image000.JP2").next().is_none());
+    std::fs::write(dir.join("image401.sid"), []).unwrap();
+    h.state_mut().run("ui.catalogRefresh", json!({})).unwrap();
+    let deadline = Instant::now() + Duration::from_secs(5);
+    loop {
+        h.step();
+        if h.query_all_by_label("image401.sid").next().is_some() {
+            break;
+        }
+        assert!(Instant::now() < deadline, "refresh did not reach UI");
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    std::fs::write(dir.join("image402.img"), []).unwrap();
+    let deadline = Instant::now() + Duration::from_secs(5);
+    loop {
+        h.step();
+        if h.query_all_by_label("image402.img").next().is_some() {
+            break;
+        }
+        assert!(Instant::now() < deadline, "directory mtime change did not reach UI");
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
 #[test]
 fn catalog_title_drags_to_the_right_dock() {
     use rustgis_ui_egui::{Pane, Site};

@@ -684,6 +684,10 @@ Each item is something ArcGIS Pro does with a file geodatabase; `[x]` done on br
         file geodatabases
 
 ## Phase 8 — Rendering & UI
+- [x] Native Catalog folder browsing: background enumeration and mtime checks, a bounded
+      folder cache, Refresh and refresh after creation, 100-item pages, and Add Data's
+      raster/vector extension filters. Regressions cover slow/stale reads, page 5,
+      explicit refresh and external directory changes (`ui-egui` folders/smoke tests).
 - [ ] wgpu-based 2D map renderer (symbology, labeling, raster stretch)
 - [ ] Desktop app shell: `app/` (vendored RustGIS, egui) is the shell. File Geodatabase `FeatureSource`
       and File Geodatabase output done (`app/crates/data/src/source/filegdb.rs`), our overlay/proximity tools

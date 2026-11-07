@@ -105,6 +105,10 @@ Update this file when a gap is found or closed.
   UniGIS adapter tests also report duplicate registered tool IDs (`one_tool_list`)
   and missing Input Table parameters (`field_tools_work_in_place_and_others_make_layers`).
   These pre-existing failures remain separate from the empty-map GP fix.
+- Catalog folder listings run in background workers with cached, paged results. VRT
+  remains excluded by the existing Add Data reader policy. Expanding a geodatabase
+  or GeoPackage still uses its existing synchronous contents reader; that deeper
+  browsing is separate from folder enumeration.
 - The app (RustGIS shell) has smoke tests that run tools but compare nothing with ArcGIS; the engine
   crates carry the ArcGIS comparisons.
 - Rust speed is claimed, not measured: no benchmarks against ArcGIS or GDAL yet.

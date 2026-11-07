@@ -654,7 +654,8 @@ fn catalog(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
                 }
             });
             // A web page can't list local folders.
-            if !cfg!(target_arch = "wasm32") {
+            #[cfg(not(target_arch = "wasm32"))]
+            {
                 egui::CollapsingHeader::new(egui::RichText::new(tl!("Folders")).font(semibold(12.5))).default_open(true).show(ui, |ui| {
                     folder_browser(app, ui, t);
                 });
@@ -1122,6 +1123,7 @@ pub fn catalog_prompt(app: &mut RustGisApp, ctx: &egui::Context) {
     }
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 fn folder_browser(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
     let dir = app
         .table
@@ -1136,56 +1138,49 @@ fn folder_browser(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
         {
             app.table.folder = Some(p.to_path_buf());
         }
+        if ui.small_button(tl!("Refresh")).clicked() {
+            let _ = app.run("ui.catalogRefresh", Value::Null);
+        }
         let resp = ui.add(egui::Label::new(egui::RichText::new(dir.display().to_string()).small().weak()).sense(Sense::click()));
         resp.on_hover_text(tl!("Right-click to create data here")).context_menu(|ui| new_in_folder(app, ui, &dir));
     });
-    let Ok(rd) = std::fs::read_dir(&dir) else {
-        ui.label(egui::RichText::new(tl!("Can't read this folder")).small().weak());
+    let view = app.ui.folders.view(&dir, ui.ctx());
+    if view.reading {
+        ui.label(egui::RichText::new(tl!("Reading…")).small().weak());
+    }
+    if let Some(error) = view.error {
+        ui.label(egui::RichText::new(tl!("Can't read this folder")).small().weak()).on_hover_text(error);
+    }
+    let Some(entries) = view.entries else {
         return;
     };
-    let mut entries: Vec<(bool, String, std::path::PathBuf)> = rd
-        .filter_map(|e| e.ok())
-        .map(|e| (e.path().is_dir(), e.file_name().to_string_lossy().to_string(), e.path()))
-        .filter(|(d, n, _)| {
-            !n.starts_with('.')
-                && (*d
-                    || [
-                        "geojson",
-                        "json",
-                        "csv",
-                        "tsv",
-                        "shp",
-                        "gpkg",
-                        "tif",
-                        "tiff",
-                        "asc",
-                        "rgis",
-                        "rgisx",
-                        "rgispkg",
-                        "rgismap",
-                        "rgismpk",
-                        "rgislyr",
-                        "rgislayout",
-                    ]
-                    .iter()
-                    .any(|x| n.to_lowercase().ends_with(&format!(".{x}"))))
-        })
-        .collect();
-    entries.sort_by(|a, b| b.0.cmp(&a.0).then(a.1.to_lowercase().cmp(&b.1.to_lowercase())));
-    for (is_dir, name, path) in entries.into_iter().take(300) {
+    let pages = entries.len().div_ceil(crate::folders::PAGE_SIZE).max(1);
+    if pages > 1 {
+        ui.horizontal(|ui| {
+            if ui.add_enabled(view.page > 0, egui::Button::new(tl!("Previous Page"))).clicked() {
+                app.ui.folders.set_page(&dir, view.page.saturating_sub(1));
+            }
+            ui.label(format!("{} / {}", view.page + 1, pages));
+            if ui.add_enabled(view.page + 1 < pages, egui::Button::new(tl!("Next Page"))).clicked() {
+                app.ui.folders.set_page(&dir, view.page + 1);
+            }
+        });
+    }
+    for entry in entries.iter().skip(view.page * crate::folders::PAGE_SIZE).take(crate::folders::PAGE_SIZE) {
+        let (is_dir, name, path) = (entry.is_dir, entry.name.as_str(), entry.path.as_path());
         let lower = name.to_lowercase();
         // A geodatabase or GeoPackage opens in place, listing its feature classes.
         if (is_dir && lower.ends_with(".gdb")) || (!is_dir && lower.ends_with(".gpkg")) {
-            let header = egui::CollapsingHeader::new(egui::RichText::new(&name).size(12.0))
+            let header = egui::CollapsingHeader::new(egui::RichText::new(name).size(12.0))
                 .id_salt(("catalog-db", &path))
                 .default_open(false)
                 .show(ui, |ui| {
                     // A file geodatabase as ArcGIS shows it: feature datasets with their classes.
                     #[cfg(feature = "unigis")]
-                    if is_dir && geodatabase_tree(app, ui, &path, t) {
+                    if is_dir && geodatabase_tree(app, ui, path, t) {
                         return;
                     }
-                    match rustgis_engine::data::source::layers(&path) {
+                    match rustgis_engine::data::source::layers(path) {
                         Ok(layers) => {
                             for l in layers {
                                 ui.horizontal(|ui| {
@@ -1205,7 +1200,7 @@ fn folder_browser(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
                     }
                 });
             if is_dir {
-                header.header_response.context_menu(|ui| new_in_geodatabase(app, ui, &path));
+                header.header_response.context_menu(|ui| new_in_geodatabase(app, ui, path));
             }
             continue;
         }
@@ -1213,21 +1208,21 @@ fn folder_browser(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
             let (r, _) = ui.allocate_exact_size(vec2(16.0, 16.0), Sense::hover());
             let icon = if is_dir {
                 "add_folder"
-            } else if rustgis_engine::project::is_project_file(&name) {
+            } else if rustgis_engine::project::is_project_file(name) {
                 "logo"
             } else {
                 "add_data"
             };
             icons::paint(ui.painter(), r, icon, t.icon, t.accent);
-            let resp = ui.add(egui::Label::new(egui::RichText::new(&name).size(12.0)).sense(Sense::click()));
+            let resp = ui.add(egui::Label::new(egui::RichText::new(name).size(12.0)).sense(Sense::click()));
             let resp = resp.on_hover_text(tl!(if is_dir { "Open folder" } else { "Double-click to add" }));
             if is_dir {
-                resp.context_menu(|ui| new_in_folder(app, ui, &path));
+                resp.context_menu(|ui| new_in_folder(app, ui, path));
             }
             if resp.double_clicked() || (is_dir && resp.clicked()) {
                 if is_dir {
-                    app.table.folder = Some(path.clone());
-                } else if rustgis_engine::project::is_project_file(&name) || name.ends_with(".rgispkg") {
+                    app.table.folder = Some(path.to_path_buf());
+                } else if rustgis_engine::project::is_project_file(name) || name.ends_with(".rgispkg") {
                     let _ = app.run("project.open", json!({"path": path.display().to_string()}));
                     app.map.invalidate();
                 } else if name.ends_with(".rgismap") || name.ends_with(".rgismpk") {
@@ -1244,7 +1239,8 @@ fn folder_browser(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
 }
 
 /// ArcGIS Pro's New menu of the Catalog: each entry opens a tool that creates data, with the
-/// location filled in. The Catalog reads folders and geodatabases afresh, so the new item shows.
+/// location filled in. Successful tools invalidate the background folder cache.
+#[cfg(any(not(target_arch = "wasm32"), feature = "unigis"))]
 fn new_menu(app: &mut RustGisApp, ui: &mut Ui, items: &[(&'static str, &str, Value)]) {
     ui.menu_button(tl!("New"), |ui| {
         for (label, tool, values) in items {
@@ -1257,6 +1253,7 @@ fn new_menu(app: &mut RustGisApp, ui: &mut Ui, items: &[(&'static str, &str, Val
 }
 
 /// `stem` + `ext`, numbered (`stem1`, `stem2`, ...) until `taken` says it is free.
+#[cfg(any(not(target_arch = "wasm32"), feature = "unigis"))]
 fn free_name(stem: &str, ext: &str, taken: impl Fn(&str) -> bool) -> String {
     (0..1000)
         .map(|k| if k == 0 { format!("{stem}{ext}") } else { format!("{stem}{k}{ext}") })
@@ -1264,9 +1261,17 @@ fn free_name(stem: &str, ext: &str, taken: impl Fn(&str) -> bool) -> String {
         .unwrap_or_else(|| format!("{stem}{ext}"))
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 fn new_in_folder(app: &mut RustGisApp, ui: &mut Ui, dir: &std::path::Path) {
+    // A child folder's New menu may be opened before it has ever been browsed.
+    // Read its names off the frame too, so the suggested shapefile name stays unique.
+    let view = app.ui.folders.view(dir, ui.ctx());
+    if view.entries.is_none() {
+        ui.label(tl!(if view.error.is_some() { "Can't read this folder" } else { "Reading…" }));
+        return;
+    }
     let d = dir.display().to_string();
-    let shapefile = dir.join(free_name("NewShapefile", ".shp", |n| dir.join(n).exists()));
+    let shapefile = dir.join(free_name("NewShapefile", ".shp", |n| app.ui.folders.contains_name(dir, n)));
     new_menu(
         app,
         ui,
@@ -1280,6 +1285,7 @@ fn new_in_folder(app: &mut RustGisApp, ui: &mut Ui, dir: &std::path::Path) {
 }
 
 /// A name no table or feature class of the geodatabase has.
+#[cfg(any(not(target_arch = "wasm32"), feature = "unigis"))]
 fn free_in_geodatabase(gdb: &std::path::Path, stem: &str) -> String {
     #[cfg(feature = "unigis")]
     if let Some(c) = geodatabase_contents(gdb) {
@@ -1291,6 +1297,7 @@ fn free_in_geodatabase(gdb: &std::path::Path, stem: &str) -> String {
     stem.to_string()
 }
 
+#[cfg(any(not(target_arch = "wasm32"), feature = "unigis"))]
 fn new_in_geodatabase(app: &mut RustGisApp, ui: &mut Ui, gdb: &std::path::Path) {
     let fc = gdb.join(free_in_geodatabase(gdb, "NewFeatureClass"));
     let table = gdb.join(free_in_geodatabase(gdb, "NewTable"));

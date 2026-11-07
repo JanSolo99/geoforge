@@ -18,6 +18,8 @@ mod dialogs;
 mod dock;
 mod docpanes;
 mod editpanes;
+#[cfg(not(target_arch = "wasm32"))]
+mod folders;
 mod geocodeui;
 pub mod icons;
 mod layoutview;
@@ -213,6 +215,8 @@ pub type RightPane = Pane;
 pub use dock::{Pane, Site};
 
 pub struct UiState {
+    #[cfg(not(target_arch = "wasm32"))]
+    folders: folders::State,
     /// Catalog › Databases › Properties: the geodatabase and item shown, and their properties.
     pub catalog_properties: Option<(String, String, Value)>,
     /// Catalog › Databases: a name being typed (geodatabase, item being renamed or `None` for a
@@ -318,6 +322,8 @@ pub struct UiState {
 impl Default for UiState {
     fn default() -> Self {
         UiState {
+            #[cfg(not(target_arch = "wasm32"))]
+            folders: Default::default(),
             catalog_properties: None,
             catalog_prompt: None,
             tab: "Map".into(),
@@ -929,6 +935,10 @@ impl RustGisApp {
             self.ui.ribbon_peek = false;
         }
         let r = if id.starts_with("ui.") { self.run_ui(id, &params) } else { self.session.run(id, &params) };
+        #[cfg(not(target_arch = "wasm32"))]
+        if r.is_ok() && (matches!(id, "gp.run" | "gp.finish") || id.starts_with("catalog.")) {
+            self.ui.folders.invalidate();
+        }
         if let Err(e) = &r {
             log::info!("{id}: {e}");
         }
@@ -949,6 +959,8 @@ impl RustGisApp {
         match id {
             "ui.pane.contents" => toggle_right(&mut self.ui, Pane::Contents),
             "ui.pane.catalog" => toggle_right(&mut self.ui, Pane::Catalog),
+            #[cfg(not(target_arch = "wasm32"))]
+            "ui.catalogRefresh" => self.ui.folders.invalidate(),
             "ui.pane.sources" => toggle_right(&mut self.ui, Pane::Sources),
             "ui.pane.geoprocessing" => toggle_right(&mut self.ui, RightPane::Geoprocessing),
             "ui.pane.symbology" => {

@@ -516,6 +516,7 @@ pub fn command_search(app: &mut RustGisApp, ctx: &egui::Context) {
             ("ui.addService", "Add From Service…", "Home › Add"),
             ("ui.searchOpenData", "Search Open Data…", "Home › Add"),
             ("ui.pane.sources", "Data Sources Pane", "View › Windows"),
+            ("ui.catalogRefresh", "Refresh", "Catalog › Folders"),
             ("ui.plugins", "Plugin Manager…", "Plugins"),
             ("ui.mcpRelay", "MCP Relay", "Help › Help"),
             ("ui.pane.geoprocessing", "Tools Pane", "View › Windows"),
@@ -529,7 +530,7 @@ pub fn command_search(app: &mut RustGisApp, ctx: &egui::Context) {
         ] {
             // The web app always serves the latest release (no Check for Updates button) and is
             // one process a loopback relay could not reach (`ui.mcpRelay` is desktop only).
-            if matches!(id, "ui.checkUpdate" | "ui.mcpRelay") && cfg!(target_arch = "wasm32") {
+            if matches!(id, "ui.checkUpdate" | "ui.mcpRelay" | "ui.catalogRefresh") && cfg!(target_arch = "wasm32") {
                 continue;
             }
             if ql.is_empty() || label.to_lowercase().contains(&ql) || tl!(label).to_lowercase().contains(&ql) {
