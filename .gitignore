@@ -8,3 +8,7 @@ __pycache__/
 *.sr.lock
 /scripts/readiness/node_modules/
 /dist/
+
+# Agent skills: local to this machine, read by Claude and Codex, not part of the app
+/.claude/skills/
+/.agents/

@@ -5,10 +5,16 @@
 Follow `AGENTS.md` for the shared startup, checkpoint, and handoff rules. Read
 `docs/HANDOFF.md` before continuing work, including when resuming an older chat.
 Apply these rules automatically; the user should not need to request a handoff.
-The shared terminal entry point is `./scripts/agents`; usage is documented in
-`tools/agent-coordinator/README.md`. If launched through it, use the supplied
+The shared coordinator lives outside this repository in `~/unigis-coordinator`
+(terminal: `unigis-agents`; browser: `unigis-coordinator`; docs in its `README.md`). If launched through it, use the supplied
 request and prior run logs to recover context. Do not launch it recursively.
 Keep all existing project guidance below in effect.
+
+For engine, format, and CLI implementation or fixes, read
+`.claude/skills/unigis-development/SKILL.md` (the shared development procedure for
+Claude, Codex, and other models). Load it only for those tasks.
+For user-requested orchestration or delegation, read
+`.claude/skills/unigis-orchestration/SKILL.md`.
 
 - **The target is ArcGIS Pro, not QGIS.** Tool names, parameters, defaults, outputs and workflows follow the ArcGIS Pro tool reference and arcpy. When ArcGIS and QGIS/GDAL behave differently, match ArcGIS.
 - GDAL is used **only in tests** to check that we read and write files correctly. It is never a runtime dependency and never the reference for how a tool should behave.
@@ -17,7 +23,7 @@ Keep all existing project guidance below in effect.
 - Correctness oracle: GDAL 3.x is installed system-wide (`ogrinfo`, `gdalinfo`, `ogr2ogr`). When implementing a reader, write tests that compare our output with GDAL's on the same file.
 - FileGDB: clean-room implementation from public reverse-engineering docs (GDAL OpenFileGDB). Never use or copy the proprietary Esri FileGDB SDK.
 - Work in small, tested slices; update `docs/ROADMAP.md` checkboxes as items land.
-- Before committing: `cargo fmt --all && cargo clippy --workspace --all-targets && cargo test --workspace`.
+- Before committing: `cargo fmt --all && cargo clippy -j3 --workspace --all-targets && cargo test -j3 --workspace`.
 
 ## Working conventions (established so far)
 - Status and next steps: `docs/ROADMAP.md`. Format findings: `docs/formats/` (FileGDB spec corrections, ArcGIS shapefile behavior).
@@ -25,4 +31,4 @@ Keep all existing project guidance below in effect.
 - ArcGIS Pro 3.7 runs here under Wine (GE-Proton, `~/.wine`). The `arcgis` MCP server (`tools/arcgis-bridge/`) runs tools, Describe and arcpy code; in `arcgis_python` wrap Linux paths with `P('/path')`. Use it to settle any ArcGIS behavior question before implementing. If the MCP server misbehaves (e.g. replies out of step after a suspend), run arcpy code from a file with `uv run -q --with "mcp>=2" python tools/arcgis-bridge/run_code.py code.py`. Black-box only: never decompile Esri binaries.
 - New geoprocessing tool workflow: run `ug tools` first (many tools exist under snake_case ids). Add cases to `scripts/make-arcgis-reference.py` (batch a whole family, then run it once: `uv run -q --with "mcp>=2" python scripts/make-arcgis-reference.py 'glob*'`), study the outputs (`scripts/research/sa_batch/{summary,show}.py`), implement as an entry in a registry (`unigis-raster/src/registry.rs` for rasters, `unigis-tools` for vector/table tools; a Pairwise-style rename goes in `unigis-cli/src/aliases.rs`), add one line to `RUN` in the reference script (then `... make-arcgis-reference.py --annotate`). No `ug` clap command or `arcgis_reference.rs` branch is needed; the test builds `ug run <id> name=value` from the manifest. Run `scripts/check` before pushing (a pre-push hook does). Comparisons use ArcGIS's 0.001 m XY tolerance (buffers: 0.2 m / 0.01%).
 - GDAL (`ogrinfo`) is the oracle for file formats only. CI has an older GDAL (3.8); tests gate on `gdal_version()` where needed.
-- The shell is zsh: quote globs that may not match, and use `${=var}` to split words.
+- Use the actual session shell. Quote globs passed to programs; `${=var}` is zsh-only, not bash syntax.

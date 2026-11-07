@@ -1,5 +1,5 @@
 # Builds the web app from origin/main and pushes it to web-dist for Netlify (scripts/publish-web-dist.sh).
-#   cp tools/agent-coordinator/unigis-web-dist.{service,timer} ~/.config/systemd/user/
+#   cp scripts/unigis-web-dist.{service,timer} ~/.config/systemd/user/
 #   systemctl --user daemon-reload && systemctl --user enable --now unigis-web-dist.timer
 [Unit]
 Description=UniGIS web build to the web-dist branch (Netlify)

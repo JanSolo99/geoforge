@@ -746,7 +746,7 @@ Each item is something ArcGIS Pro does with a file geodatabase; `[x]` done on br
       referenced by `CLAUDE.md`), with current task state in [`HANDOFF.md`](HANDOFF.md).
       Sequential sessions use the same checkout; agents checkpoint at milestones
       and inspect the working tree when resuming.
-- [x] Local coordinator (`scripts/agents`): shared terminal prompt, per-provider
+- [x] Local coordinator (now its own repo, `~/unigis-coordinator`): shared terminal prompt, per-provider
       session resumption, run logs and handoff snapshots, repository lock, and a
       single fallback to the other CLI on a recognized usage-limit failure.
       Native CLI escape for interactive approvals; offline integration coverage.

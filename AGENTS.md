@@ -24,8 +24,8 @@ For changes under `app/`, also follow `app/AGENTS.md`.
 ## Shared workspace
 
 For sequential Claude/Codex/Kimi work, use `/mnt/media/ArcGIS_Linux` for all CLIs.
-The user can launch `./scripts/agents` for the shared coordinator prompt; see
-`tools/agent-coordinator/README.md`. Coordinator turns supply the latest request
+The user can launch `unigis-agents` for the shared coordinator prompt; the
+coordinator lives outside this repository in `~/unigis-coordinator` (see its `README.md`). Coordinator turns supply the latest request
 and prior run logs as well as the handoff. Read those when recovering partial work.
 Only one agent should edit or run builds at a time. Stop the previous agent's work
 before handing over. Separate Git worktrees do not share uncommitted edits.
@@ -34,7 +34,7 @@ main checkout's handoff describes the current worktree or move changes silently.
 
 ## Parallel lanes
 
-Several agents can work at once, one per lane (`scripts/lane`, `scripts/agents --daemon --lane NAME`).
+Several agents can work at once, one per lane (`scripts/lane`, `unigis-agents --daemon --lane NAME`).
 A lane is a worktree `.worktrees/lane-NAME` on branch `lane/NAME`. In a lane:
 
 - Get work with `scripts/lane claim` (the next free tool of `docs/WORK_QUEUE.md`); a task from the

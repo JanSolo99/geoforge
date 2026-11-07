@@ -8,7 +8,7 @@
     scripts/lane status             lanes, their agents, claims and branches
 
 A lane is one agent in one worktree with its own build directory (on /home, via a `target`
-symlink) and its own coordinator (`scripts/agents --daemon --lane NAME`). Claims stop two lanes
+symlink) and its own coordinator (`unigis-agents --daemon --lane NAME`). Claims stop two lanes
 building the same tool; landing takes a lock so only one lane rebases, checks and pushes at a time.
 Rebase conflicts in generated files (docs/WORK_QUEUE.md, docs/dashboard.html) resolve themselves;
 any other conflict stops the landing and is left for the agent to resolve.

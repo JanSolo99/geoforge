@@ -41,7 +41,7 @@ limits and runs again immediately before Trunk starts; low RAM makes the publish
 4 hours:
 
 ```sh
-cp tools/agent-coordinator/unigis-web-dist.{service,timer} ~/.config/systemd/user/
+cp scripts/unigis-web-dist.{service,timer} ~/.config/systemd/user/
 systemctl --user daemon-reload && systemctl --user enable --now unigis-web-dist.timer
 scripts/publish-web-dist.sh --check-resources # read-only RAM check; does not publish
 systemctl --user start unigis-web-dist      # publish now; journalctl --user -u unigis-web-dist -f
