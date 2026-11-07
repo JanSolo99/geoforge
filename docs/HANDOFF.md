@@ -1,10 +1,10 @@
 # Current handoff
 
-Updated 2026-11-07T22:57:32.552012+00:00; last agent Codex.
-Workspace `/mnt/media/ArcGIS_Linux`, branch `main`; HEAD before landing
-`57b53b33` (accepted Catalog post-push checkpoint committed before this item).
+Updated 2026-11-07T23:06:48.462145+00:00; last agent Codex.
+Workspace `/mnt/media/ArcGIS_Linux`, branch `main`; HEAD
+`3db04580272bca2e51a036e4ce5003508688a7d8` (Browse data containers in the native Add Data dialog).
 
-## Single item: app.add-data-browser — complete, landing now
+## Single item: app.add-data-browser — committed and pushed; complete
 
 User authorizes one item through commit/push, then stop. Previous Catalog work
 already accepted/landed; no old acceptance repeated. Read root/app guidance,
@@ -92,12 +92,19 @@ run, second run did not start a relay. No user configuration or source fixtures 
 Inherited hashes `/tmp/add-data-inherited.json`: source/agent/reference edits all
 unchanged; only generated dashboard refreshed independently. Untracked worktrees,
 notes, research/fixtures and memory script untouched. No reset/stash/worktree transfer.
-Stage only this item's app code/tests/translations/guide and root progress docs.
+Only this item's app code/tests/translations/guide and root progress docs committed.
+This operational handoff checkpoint is the only post-commit edit by this turn.
 
 1. Native non-UTF8 path check PASS: selected a real invalid-byte filename; import
    reported an I/O error with application still responsive and no added layer.
    `/tmp/add-data-desktop-non-utf8.png`, `/tmp/add-data-desktop-path-safety.log`.
    Last GUI PID2604070 stopped (SIGTERM); no relay started in the last two runs.
-   Commit final item and normal push with ext4 target; record commit/push results.
-2. Post-commit dashboard/queue generation is expected; keep inherited edits unstaged.
+   Landed `3db04580` on origin/main. Normal push passed the protected pre-push
+   scripts/check (full fmt/lint/workspace tests and doc tests) and succeeded, exit0.
+   Logs `/tmp/add-data-push.{log,exit}`; remote advanced `077f1c3c..3db04580`.
+   Remote HEAD verified equal to local HEAD. No pending product work or tests.
+2. This final post-push handoff checkpoint is intentionally uncommitted. Product,
+   tests, translations, user guide, priority/queue/roadmap/gaps are committed/pushed.
+   Generated dashboard remains dirty after hook; inherited source/untracked edits
+   remain unstaged and untouched. No running GUI/build/test processes.
 3. Next queue item after landing: app.basemap-gallery. Do not start it this turn.
