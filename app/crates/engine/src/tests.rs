@@ -235,6 +235,54 @@ fn select_symbolize_undo_redo() {
 }
 
 #[test]
+fn geoprocessing_empty_map_checks_the_tools_own_inputs() {
+    isolate_plugins();
+    let mut s = Session::new(Project::default());
+    let gp = s.registry.get("gp.run").copied().unwrap();
+    assert_eq!((gp.enabled)(&s), None, "geoprocessing is available without layers");
+    let error = s.run("gp.run", &json!({"tool": "buffer", "params": {"input": "Missing", "distance": 10}})).unwrap_err();
+    assert!(error.contains("Missing"), "{error}");
+    for params in [Value::Null, json!({}), json!({"tool": "buffer", "params": 7}), json!({"tool": "no-such-tool"})] {
+        assert!(s.run("gp.run", &params).is_err(), "{params}");
+    }
+    assert!(s.map().layers.is_empty());
+    assert!(s.project.gp_history.is_empty(), "failed commands restore the project");
+}
+
+#[test]
+fn geoprocessing_empty_map_processes_a_standalone_table() {
+    isolate_plugins();
+    let mut s = Session::new(Project::default());
+    s.run("layer.addDataText", &json!({"fileName": "counts.csv", "text": "k,v\na,4\nb,6\n"})).unwrap();
+    assert!(s.map().layers.is_empty());
+    s.run("gp.run", &json!({"tool": "summaryStatistics", "params": {"input": "counts", "field": "v"}})).unwrap();
+    let out = s.project.tables.last().unwrap();
+    assert_eq!(out.value(0, out.field_index("SUM_v").unwrap()), &rustgis_data::Value::Float(10.0));
+    assert!(s.map().layers.is_empty());
+    assert_eq!(s.project.gp_history.len(), 1);
+    assert!(s.project.gp_history[0].ok);
+}
+
+#[cfg(all(feature = "unigis", not(target_arch = "wasm32")))]
+#[test]
+fn geoprocessing_empty_map_creates_workspaces() {
+    isolate_plugins();
+    let mut s = Session::new(Project::default());
+    let dir = std::env::temp_dir().join(format!("unigis-empty-map-{}", std::process::id()));
+    std::fs::create_dir(&dir).unwrap();
+    for (tool, name) in [("create_folder", "new folder"), ("create_file_gdb", "new file gdb"), ("create_mobile_gdb", "new mobile gdb")] {
+        s.run("gp.run", &json!({"tool": format!("unigis:{tool}"), "params": {"out_folder_path": dir, "out_name": name}})).unwrap();
+        assert!(s.map().layers.is_empty(), "{tool}");
+        assert!(s.project.gp_history.last().unwrap().ok, "{tool}");
+    }
+    assert!(dir.join("new folder").is_dir());
+    assert!(dir.join("new file gdb.gdb/a00000001.gdbtable").is_file());
+    assert!(std::fs::read(dir.join("new mobile gdb.geodatabase")).unwrap().starts_with(b"SQLite format 3\0"));
+    assert_eq!(s.project.gp_history.len(), 3);
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
+#[test]
 fn geoprocessing_adds_layers_and_history() {
     let mut s = world();
     s.run("gp.run", &json!({"tool": "buffer", "params": {"input": "Cities", "distance": 200}})).unwrap();

@@ -4,12 +4,12 @@ use rustgis_analysis::{Inputs, Output, OutputLayer, RasterInput};
 use rustgis_data::Dataset;
 use serde_json::{Value, json};
 
-use super::{need_layers, ps};
+use super::ps;
 use crate::{CmdResult, CommandSpec as C, GpRecord, Session};
 
 pub fn commands() -> Vec<C> {
     vec![
-        C::new("gp.run", "Run Tool", "Analyze › Geoprocessing", run).when(need_layers).params(r#"{"tool": tool id, "params": {...} (a layer by name; a standalone table by name or id)}"#),
+        C::new("gp.run", "Run Tool", "Analyze › Geoprocessing", run).params(r#"{"tool": tool id, "params": {...} (a layer by name; a standalone table by name or id)}"#),
         C::new("gp.tools", "Tools", "Analyze › Geoprocessing", |_, _| {
             Ok(Value::Array(
                 rustgis_analysis::tools()

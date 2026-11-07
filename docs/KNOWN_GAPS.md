@@ -97,11 +97,21 @@ Update this file when a gap is found or closed.
 
 ## Process gaps
 
+- App workspace CI (2026-11-07): the merged CLI brings `unigis-json`'s
+  `serde_json/preserve_order` feature into the workspace. The unchanged WASM plugin
+  fixture in `app/crates/plugins/src/testing.rs` assumes sorted JSON at fixed byte
+  offsets; six engine plugin tests return `nope`, including an isolated Hello
+  command. Separate engine/UI tests pass without this feature unification. The
+  UniGIS adapter tests also report duplicate registered tool IDs (`one_tool_list`)
+  and missing Input Table parameters (`field_tools_work_in_place_and_others_make_layers`).
+  These pre-existing failures remain separate from the empty-map GP fix.
 - The app (RustGIS shell) has smoke tests that run tools but compare nothing with ArcGIS; the engine
   crates carry the ArcGIS comparisons.
 - Rust speed is claimed, not measured: no benchmarks against ArcGIS or GDAL yet.
-- The app has never been launched as a window in a test environment (`xvfb-run` missing); screenshots
-  come from the offscreen harness `app/crates/ui-egui/examples/ui_shot.rs`.
+- Native desktop verification (2026-11-07): Catalog → New → File Geodatabase succeeds
+  with an empty map; screenshots and before/after layer snapshots are recorded in the
+  handoff. Broader desktop workflows are not yet covered by automated UI acceptance tests;
+  the offscreen harness remains `app/crates/ui-egui/examples/ui_shot.rs`.
 
 ## Raster registry and Pairwise tools (2026-10-25)
 
