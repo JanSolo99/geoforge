@@ -684,6 +684,11 @@ Each item is something ArcGIS Pro does with a file geodatabase; `[x]` done on br
         file geodatabases
 
 ## Phase 8 — Rendering & UI
+- [x] Native Add Data dataset browser: background folder/container listings, logical
+      FileGDB feature datasets/classes/tables/rasters and GeoPackage contents, Ctrl/Shift
+      multi-selection, type/search filters and persisted favorites/recent folders.
+      Selected nonspatial FileGDB tables become standalone tables with source and undo.
+      OS Browse remains optional; web upload pickers and unsupported-reader gaps remain.
 - [x] Native Catalog folder browsing: background enumeration and mtime checks, a bounded
       folder cache, Refresh and refresh after creation, 100-item pages, and Add Data's
       raster/vector extension filters. Regressions cover slow/stale reads, page 5,

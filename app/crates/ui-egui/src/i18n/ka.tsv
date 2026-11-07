@@ -1993,3 +1993,11 @@ Export Active Layer Here	აქტიური ფენის აქ ექს�
 New File Geodatabase…	ახალი ფაილური გეომონაცემთა ბაზა…
 Save Edits To Geodatabase	ცვლილებების შენახვა გეომონაცემთა ბაზაში
 Reading…	იკითხება…
+Favorites	რჩეულები
+Recent folders	ბოლო საქაღალდეები
+Add to favorites	რჩეულებში დამატება
+Remove from favorites	რჩეულებიდან წაშლა
+Browse…	დათვალიერება…
+Database Connection	მონაცემთა ბაზის კავშირი
+This database connection format is not supported	მონაცემთა ბაზის კავშირის ეს ფორმატი მხარდაჭერილი არ არის
+This dataset type cannot be added yet	ამ ტიპის მონაცემთა ნაკრების დამატება ჯერ შეუძლებელია

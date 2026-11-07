@@ -250,6 +250,22 @@ fn geoprocessing_empty_map_checks_the_tools_own_inputs() {
 }
 
 #[test]
+fn geodatabase_selected_table_is_standalone() {
+    isolate_plugins();
+    let mut s = Session::new(Project::default());
+    let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../testdata/gdb-reference/catalog_ops/before.gdb");
+    let db = s.run("catalog.addDatabase", &json!({"path": path})).unwrap();
+    let result = s.run("layer.addGeodatabaseItem", &json!({"geodatabase": db["geodatabase"], "layer": "tbl"})).unwrap();
+    assert_eq!(result["table"], "tbl");
+    assert!(s.map().layers.is_empty());
+    let table = s.project.tables.last().unwrap();
+    assert_eq!(table.name, "tbl");
+    assert!(table.source.as_deref().unwrap().ends_with("before.gdb/tbl"));
+    s.run("edit.undo", &Value::Null).unwrap();
+    assert!(s.project.tables.is_empty());
+}
+
+#[test]
 fn geoprocessing_empty_map_processes_a_standalone_table() {
     isolate_plugins();
     let mut s = Session::new(Project::default());

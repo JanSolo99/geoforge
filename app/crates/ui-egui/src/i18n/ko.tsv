@@ -1993,3 +1993,11 @@ Export Active Layer Here	활성 레이어를 여기로 내보내기
 New File Geodatabase…	새 파일 지오데이터베이스…
 Save Edits To Geodatabase	편집 내용을 지오데이터베이스에 저장
 Reading…	읽는 중…
+Favorites	즐겨찾기
+Recent folders	최근 폴더
+Add to favorites	즐겨찾기에 추가
+Remove from favorites	즐겨찾기에서 제거
+Browse…	찾아보기…
+Database Connection	데이터베이스 연결
+This database connection format is not supported	이 데이터베이스 연결 형식은 지원되지 않습니다
+This dataset type cannot be added yet	이 데이터셋 유형은 아직 추가할 수 없습니다

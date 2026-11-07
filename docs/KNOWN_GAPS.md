@@ -107,8 +107,15 @@ Update this file when a gap is found or closed.
   These pre-existing failures remain separate from the empty-map GP fix.
 - Catalog folder listings run in background workers with cached, paged results. VRT
   remains excluded by the existing Add Data reader policy. Expanding a geodatabase
-  or GeoPackage still uses its existing synchronous contents reader; that deeper
-  browsing is separate from folder enumeration.
+  or GeoPackage in the Catalog tree still uses its existing synchronous contents
+  reader. The native Add Data dialog uses the shared background cache for logical
+  container contents as well as folders.
+- Native Add Data: FileGDB feature datasets, classes, tables and raster datasets and
+  GeoPackage feature tables use the existing readers. GeoPackage attribute/tiles
+  are listed but cannot be added by the current reader; `.sde` and mobile database
+  connections report unsupported format. The web app retains its upload pickers.
+  Selected FileGDB nonspatial tables now become standalone project tables, with
+  their source path and undo preserved (previously empty map layers).
 - The app (RustGIS shell) has smoke tests that run tools but compare nothing with ArcGIS; the engine
   crates carry the ArcGIS comparisons.
 - Rust speed is claimed, not measured: no benchmarks against ArcGIS or GDAL yet.

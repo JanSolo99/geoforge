@@ -16,6 +16,71 @@ fn harness() -> egui_kittest::Harness<'static, RustGisApp> {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
+fn browser_wait(h: &mut egui_kittest::Harness<'static, RustGisApp>, label: &str) {
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
+    loop {
+        h.step();
+        if h.query_all_by_label(label).next().is_some() {
+            return;
+        }
+        assert!(std::time::Instant::now() < deadline, "browser never listed {label}");
+        std::thread::sleep(std::time::Duration::from_millis(10));
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+#[test]
+fn add_data_browser_enters_geodatabase_and_feature_dataset_then_adds_multiple_items() {
+    let mut h = harness();
+    let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../testdata/gdb-reference/catalog_ops");
+    h.state_mut().run("ui.addData", json!({"path": dir})).unwrap();
+    browser_wait(&mut h, "before.gdb");
+    h.query_by_label("before.gdb").unwrap().click();
+    h.step();
+    h.query_by_label("Open").unwrap().click();
+    h.step();
+    browser_wait(&mut h, "ds");
+    assert!(h.query_all_by_label("a00000001.gdbtable").next().is_none());
+    h.query_by_label("ds").unwrap().click();
+    h.step();
+    h.query_by_label("Open").unwrap().click();
+    h.step();
+    browser_wait(&mut h, "inds");
+    assert!(h.query_all_by_label("loose").next().is_none());
+    h.state_mut().run("ui.addData", json!({"path": dir.join("before.gdb")})).unwrap();
+    browser_wait(&mut h, "loose");
+    h.query_by_label("loose").unwrap().click();
+    h.step();
+    h.query_by_label("tbl").unwrap().click_modifiers(egui::Modifiers::CTRL);
+    h.step();
+    h.query_by_label("Add").unwrap().click();
+    h.step();
+    h.step();
+    assert!(h.state().session.map().layer_by_name("loose").is_some());
+    assert!(h.state().session.project.tables.iter().any(|t| t.name == "tbl"));
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+#[test]
+fn add_data_browser_connects_geodatabase_without_adding_layers_and_cancel_does_nothing() {
+    let mut h = harness();
+    let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../testdata/gdb-reference/catalog_ops/before.gdb");
+    let layers = h.state().session.map().layers.len();
+    h.state_mut().run("ui.addGeodatabase", json!({"path": path})).unwrap();
+    h.step();
+    h.query_by_label("Cancel").unwrap().click();
+    h.step();
+    assert!(h.state().session.project.databases.is_empty());
+    h.state_mut().run("ui.addGeodatabase", json!({"path": path})).unwrap();
+    browser_wait(&mut h, "ds");
+    h.query_by_label("Add").unwrap().click();
+    h.step();
+    h.step();
+    assert_eq!(h.state().session.project.databases.len(), 1);
+    assert_eq!(h.state().session.map().layers.len(), layers);
+}
+
+#[cfg(not(target_arch = "wasm32"))]
 #[test]
 fn catalog_folder_pages_and_refresh_reach_files_after_the_old_limit() {
     use std::time::{Duration, Instant};

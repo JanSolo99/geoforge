@@ -1993,3 +1993,11 @@ Export Active Layer Here	将活动图层导出到此处
 New File Geodatabase…	新建文件地理数据库…
 Save Edits To Geodatabase	将编辑内容保存到地理数据库
 Reading…	正在读取…
+Favorites	收藏夹
+Recent folders	最近使用的文件夹
+Add to favorites	添加到收藏夹
+Remove from favorites	从收藏夹中移除
+Browse…	浏览…
+Database Connection	数据库连接
+This database connection format is not supported	不支持此数据库连接格式
+This dataset type cannot be added yet	暂时无法添加此数据集类型

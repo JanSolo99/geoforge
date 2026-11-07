@@ -48,6 +48,16 @@ the project, from two fields of coordinates and their coordinate system. In a te
 **Home › Add Data › Graphics Layer** adds a layer for [drawn graphics](cartography.md#graphics),
 and **Insert › Layer Templates** adds empty layers with ready-made schemas to draw into.
 
+On the desktop, **Add Data** opens a dataset browser. Open folders, file geodatabases
+and GeoPackages to choose their contents; feature datasets in a geodatabase open like
+folders. Ctrl-click to select several items, or Shift-click for a range, then **Add**.
+Choose a **Type** or enter a name in **Search** to filter the list. **Favorites** and
+**Recent folders** keep useful locations between sessions, **Refresh** reloads the
+listing, and **Browse…** offers the operating system picker. **Add Data › Geodatabase…**
+connects a file geodatabase to the Catalog without adding its layers. The web app
+continues to use its file and folder upload pickers. GeoPackage attribute/tile items
+are listed but cannot yet be added; unsupported database connection files report why.
+
 Vector coordinates are WGS 84 longitude/latitude and are displayed in Web Mercator. GeoPackage,
 GeoParquet and FlatGeobuf files in another coordinate system (any EPSG code) are converted as they
 are read. Rasters keep

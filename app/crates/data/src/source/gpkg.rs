@@ -47,6 +47,18 @@ pub fn layers(path: &Path) -> Result<Vec<String>> {
     feature_tables(&conn)
 }
 
+/// Catalog items and their GeoPackage data types, without reading any feature rows.
+pub fn contents(path: &Path) -> Result<Vec<(String, String)>> {
+    let conn = open_db(path)?;
+    let mut st = conn.prepare("SELECT table_name, data_type FROM gpkg_contents ORDER BY table_name LIMIT 10001").map_err(not_gpkg)?;
+    let rows = st.query_map([], |r| Ok((r.get(0)?, r.get(1)?))).map_err(err)?;
+    let items: Vec<(String, String)> = rows.collect::<rusqlite::Result<_>>().map_err(err)?;
+    if items.len() > 10_000 {
+        return Err(DataError::Unsupported("GeoPackage catalog has more than 10000 items".into()));
+    }
+    Ok(items)
+}
+
 fn open_db(path: &Path) -> Result<Connection> {
     let conn = Connection::open_with_flags(path, OpenFlags::SQLITE_OPEN_READ_ONLY | OpenFlags::SQLITE_OPEN_NO_MUTEX).map_err(err)?;
     // A cap on SQLite's page cache, so a huge database can't take all the memory; and the file is

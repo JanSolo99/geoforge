@@ -24,7 +24,7 @@ ArcGIS Pro: settle questions with the ArcGIS MCP bridge, and check every fix in 
     command), show "Reading…" meanwhile, and page long listings.
   - Its file filter misses imagery ArcGIS lists (`.jp2`, `.img`, `.sid`, `.ecw`, `.vrt`, `.ntf`,
     `.dem`, `.bil`, …): use the same raster extensions as Add Data (GDAL's list).
-- [ ] add-data-browser: Add Data browses like ArcGIS Pro (a .gdb is an item, not a folder)
+- [x] add-data-browser: Add Data browses like ArcGIS Pro (a .gdb is an item, not a folder)
   - Bug: Add Data uses the OS file picker (`rfd::pick_file`, `app/crates/ui-egui/src/lib.rs`
     near `ui.addGeodatabase`), which can only open a `.gdb` as a folder.
   - Build ArcGIS's Add Data browse dialog in the app: folders, `.gdb` / `.gpkg` / `.sde`-style

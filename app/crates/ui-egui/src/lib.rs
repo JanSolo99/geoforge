@@ -14,6 +14,8 @@ mod backstage;
 mod catalogsui;
 mod chrome;
 mod cswui;
+#[cfg(not(target_arch = "wasm32"))]
+mod databrowser;
 mod dialogs;
 mod dock;
 mod docpanes;
@@ -216,6 +218,8 @@ pub use dock::{Pane, Site};
 
 pub struct UiState {
     #[cfg(not(target_arch = "wasm32"))]
+    data_browser: databrowser::State,
+    #[cfg(not(target_arch = "wasm32"))]
     folders: folders::State,
     /// Catalog › Databases › Properties: the geodatabase and item shown, and their properties.
     pub catalog_properties: Option<(String, String, Value)>,
@@ -322,6 +326,8 @@ pub struct UiState {
 impl Default for UiState {
     fn default() -> Self {
         UiState {
+            #[cfg(not(target_arch = "wasm32"))]
+            data_browser: Default::default(),
             #[cfg(not(target_arch = "wasm32"))]
             folders: Default::default(),
             catalog_properties: None,
@@ -1386,84 +1392,20 @@ impl RustGisApp {
                     self.ui.pending_open = None;
                     self.ui.pending_csv = None;
                     open("data");
-                } else if let Some(path) = dialogs::pick_open(
-                    &[
-                        &[
-                            "geojson",
-                            "json",
-                            "csv",
-                            "tsv",
-                            "xlsx",
-                            "xlsm",
-                            "xlsb",
-                            "xls",
-                            "ods",
-                            "rss",
-                            "georss",
-                            "atom",
-                            "xml",
-                            "landxml",
-                            "jpg",
-                            "jpeg",
-                            "shp",
-                            "zip",
-                            "gpkg",
-                            "parquet",
-                            "geoparquet",
-                            "fgb",
-                            "duckdb",
-                            "ddb",
-                            "pmtiles",
-                            "mbtiles",
-                            "kml",
-                            "kmz",
-                            "gpx",
-                            "gml",
-                            "topojson",
-                            "dxf",
-                            "dwg",
-                            "tab",
-                            "mif",
-                            "osm",
-                            "pbf",
-                            "las",
-                            "laz",
-                            "tif",
-                            "tiff",
-                            "asc",
-                        ][..],
-                        // Rasters GDAL reads (every one it is asked to read).
-                        #[cfg(not(target_arch = "wasm32"))]
-                        rustgis_engine::data::raster::gdal::EXTENSIONS,
-                    ]
-                    .concat(),
-                    tl!("Vector and raster data"),
-                ) {
-                    return self.run("layer.addData", json!({"path": path}));
+                } else {
+                    #[cfg(not(target_arch = "wasm32"))]
+                    databrowser::open(self, false, p.get("path").and_then(Value::as_str));
                 }
             }
-            // A file geodatabase is a folder: the browser's folder picker (its geodatabases are
-            // read into memory), or the desktop's (read in place).
             "ui.addGeodatabase" => {
                 if let Some(open) = &self.services.open_async {
                     open("folder");
                 } else {
                     #[cfg(not(target_arch = "wasm32"))]
-                    if let Some(dir) = rfd::FileDialog::new().set_title(tl!("Add Geodatabase…")).pick_folder() {
-                        if !dir.join("a00000001.gdbtable").is_file() {
-                            let e = crate::i18n::fmt("No file geodatabase in that folder: a .gdb folder holds a00000001.gdbtable", &[]);
-                            self.session.notify(e.clone(), true);
-                            return Err(e);
-                        }
-                        // Connected, not added (ArcGIS's Add Database): items are added from the Catalog.
-                        let r = self.run("catalog.addDatabase", json!({"path": dir.display().to_string()}));
-                        if r.is_ok() {
-                            self.ui.dock.open(Pane::Catalog);
-                        }
-                        return r;
-                    }
+                    databrowser::open(self, true, p.get("path").and_then(Value::as_str));
                 }
             }
+
             // An uploaded geodatabase handed back as a zip archive of its folder (`Name.gdb/…`),
             // with every edit made to it.
             "ui.downloadGeodatabase" => {
@@ -2454,6 +2396,8 @@ impl RustGisApp {
             dock::drag_overlay(self, &ctx);
             dock::persist(self);
         }
+        #[cfg(not(target_arch = "wasm32"))]
+        databrowser::show(self, &ctx);
         dialogs::show(self, &ctx);
         panes::properties_window(self, &ctx);
         panes::catalog_prompt(self, &ctx);

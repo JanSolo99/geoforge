@@ -997,6 +997,14 @@ fn add_geodatabase_item(s: &mut Session, p: &Value) -> CmdResult {
             let title = ps(p, "name").map(str::trim).filter(|n| !n.is_empty()).unwrap_or(&name).to_string();
             return super::raster::add_raster(s, &title, layer);
         }
+        // An explicitly selected nonspatial table belongs in the project's Tables,
+        // like a CSV table, rather than becoming an empty feature layer.
+        if g.open_table(item).is_ok_and(|table| table.geometry_kind().is_none()) {
+            let src = rustgis_data::source::filegdb::FileGdbSource::open_in(&g, Some(item)).map_err(|e| e.to_string())?;
+            let (mut ds, report) = rustgis_data::source::materialize(&src).map_err(|e| e.to_string())?;
+            ds.source = Some(format!("{}/{}", db.path.as_deref().unwrap_or(&db.name).trim_end_matches(['/', '\\']), ds.name));
+            return add_read(s, p, (ds, report));
+        }
     }
     match (&db.data, &db.path) {
         (Some(bytes), _) => add_source(s, p, Origin::Bytes(&db.name, bytes.clone())),
