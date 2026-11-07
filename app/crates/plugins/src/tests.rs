@@ -724,7 +724,7 @@ fn python_environment_preparations_wait_for_the_lock() {
     let _ = std::fs::remove_dir_all(&plugins);
 }
 
-/// Two preparations of one environment at once (the app and rustgis-cli): the second waits for
+/// Two preparations of one environment at once (the app and ug): the second waits for
 /// the first and finds its environment (network; run by hand with `--ignored`).
 #[test]
 #[ignore]

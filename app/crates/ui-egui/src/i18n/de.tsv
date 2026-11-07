@@ -1873,7 +1873,7 @@ Zoom to Tokyo	Auf Tokio zoomen
 Zoom To World	Auf Welt zoomen
 {id} changed since it was installed; install it again from the Plugin Manager.	{id} wurde seit der Installation geändert; installieren Sie es erneut über den Plugin-Manager.
 {name} is larger than {mb} MB	{name} ist größer als {mb} MB
-{name} runs as a program on your computer: it needs the desktop app or rustgis-cli.	{name} läuft als Programm auf Ihrem Computer: Es benötigt die Desktop-App oder rustgis-cli.
+{name} runs as a program on your computer: it needs the desktop app or ug.	{name} läuft als Programm auf Ihrem Computer: Es benötigt die Desktop-App oder ug.
 {name} was withdrawn from the plugin registry and has been turned off.	{name} wurde aus dem Plugin-Verzeichnis zurückgezogen und deaktiviert.
 {name} was withdrawn from the plugin registry: {reason}	{name} wurde aus dem Plugin-Verzeichnis zurückgezogen: {reason}
 {name}: the download doesn't match the registry; it wasn't installed.	{name}: Der Download stimmt nicht mit dem Plugin-Verzeichnis überein; es wurde nicht installiert.

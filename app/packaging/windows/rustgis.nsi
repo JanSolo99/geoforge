@@ -1,5 +1,5 @@
 ; setup.exe installer (NSIS 3), built by package.sh. A per-user install that needs no admin
-; rights, in %LOCALAPPDATA%\Programs\RustGIS: a Start menu shortcut, rustgis-cli on the user's
+; rights, in %LOCALAPPDATA%\Programs\RustGIS: a Start menu shortcut, ug on the user's
 ; PATH, .rgis/.rgisx projects opened by RustGIS and RustGIS offered under Open with for .geojson.
 ; Defines passed with -D: VERSION, VERSION4 (four numbers), STAGE (the folder holding the exes,
 ; LICENSE and path.ps1), ICON, SIDEBAR (a 164x314 BMP) and OUTFILE.
@@ -61,19 +61,19 @@ VIAddVersionKey "LegalCopyright" "Copyright the RustGIS contributors. Apache-2.0
 Section "Install"
   SetOutPath "$INSTDIR"
   File "${STAGE}\rustgis.exe"
-  File "${STAGE}\rustgis-cli.exe"
+  File "${STAGE}\ug.exe"
   File /oname=LICENSE.txt "${STAGE}\LICENSE"
   WriteUninstaller "$INSTDIR\uninstall.exe"
 
   CreateShortcut "$SMPROGRAMS\UniGIS.lnk" "$INSTDIR\rustgis.exe"
 
-  ; rustgis-cli from any new terminal.
+  ; ug from any new terminal.
   InitPluginsDir
   File /oname=$PLUGINSDIR\path.ps1 "${STAGE}\path.ps1"
   nsExec::ExecToLog 'powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$PLUGINSDIR\path.ps1" add "$INSTDIR"'
   Pop $0
   StrCmp $0 0 +2
-    MessageBox MB_OK|MB_ICONEXCLAMATION "UniGIS is installed, but rustgis-cli could not be added to your PATH ($0). Run it from $INSTDIR instead." /SD IDOK
+    MessageBox MB_OK|MB_ICONEXCLAMATION "UniGIS is installed, but ug could not be added to your PATH ($0). Run it from $INSTDIR instead." /SD IDOK
   !insertmacro RefreshEnvironment
 
   ; Projects open in RustGIS; GeoJSON lists it under Open with.
@@ -124,7 +124,7 @@ Section "Uninstall"
   !insertmacro RefreshShell
 
   Delete "$INSTDIR\rustgis.exe"
-  Delete "$INSTDIR\rustgis-cli.exe"
+  Delete "$INSTDIR\ug.exe"
   Delete "$INSTDIR\LICENSE.txt"
   Delete "$INSTDIR\uninstall.exe"
   RMDir "$INSTDIR"

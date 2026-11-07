@@ -4,12 +4,18 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 publish = false
-description = "UniGIS command line: run commands and geoprocessing, render maps, inspect data"
+description = "ug, the UniGIS command line: the engine's geoprocessing tools plus the app's commands, map rendering, assistant and MCP server"
 
 [lints]
 workspace = true
 
+[[bin]]
+name = "ug"
+path = "src/main.rs"
+
 [dependencies]
+# The engine's `ug` subcommands (ArcGIS tools); this binary adds the app's.
+unigis-cli = { path = "../../../crates/unigis-cli" }
 rustgis-engine = { workspace = true, features = ["geolibre", "unigis"] }
 serde_json = { workspace = true }
 rustgis-assistant = { workspace = true }

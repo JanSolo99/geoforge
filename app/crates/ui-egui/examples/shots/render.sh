@@ -21,7 +21,7 @@ for script in "$dir"/*.jsonl; do
   png="$out/$(basename "$script" .jsonl).png"
   [ -f "$png" ] || { echo "no $png: the shot failed to render" >&2; exit 1; }
 done
-target/release/rustgis-cli run --sample \
+target/release/ug session --sample \
   --cmd 'map.projection={"type":"europeEqualArea"}' \
   --cmd 'map.goToXY={"lon":14,"lat":52,"scale":22000000}' \
   --cmd 'share.exportMap={"path":"target/shots/cli-export.png","width":1200,"height":750,"dpi":192}'

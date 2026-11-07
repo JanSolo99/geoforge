@@ -101,11 +101,11 @@ class RustgisCli < Formula
   end
 
   def install
-    bin.install "rustgis-cli"
+    bin.install "ug"
   end
 
   test do
-    assert_match "project.new", shell_output("#{bin}/rustgis-cli commands")
+    assert_match "project.new", shell_output("#{bin}/ug commands")
   end
 end
 RUBY

@@ -13,7 +13,7 @@ InstallModes:
 - silentWithProgress
 UpgradeBehavior: install
 Commands:
-- rustgis-cli
+- ug
 FileExtensions:
 - rgis
 - rgisx

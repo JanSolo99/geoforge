@@ -9,7 +9,7 @@
 //! - [`agent`]: the conversation loop, without I/O, so the desktop (a thread), the browser
 //!   (`fetch`), the command line and the tests drive the same code.
 //! - [`http`]: the blocking transport for the desktop and the command line.
-//! - [`mcp`]: the same tools for any Model Context Protocol client (`rustgis-cli mcp`).
+//! - [`mcp`]: the same tools for any Model Context Protocol client (`ug mcp`).
 //! - [`docs`]: the documentation, built in, for MCP clients to search and read.
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
 

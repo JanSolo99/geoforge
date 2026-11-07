@@ -43,7 +43,7 @@ fn prepare(_: &mut Session, p: &Value) -> CmdResult {
     }
     #[cfg(target_arch = "wasm32")]
     {
-        Err(format!("{id}: Python environments need the desktop app or rustgis-cli"))
+        Err(format!("{id}: Python environments need the desktop app or ug"))
     }
 }
 

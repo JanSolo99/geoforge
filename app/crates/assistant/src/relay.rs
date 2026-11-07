@@ -1,8 +1,8 @@
 //! A loopback relay: an MCP client drives the session of the desktop app that is already open.
 //!
 //! The app starts a listener with its `ui.mcpRelay` command (off until then), and
-//! `rustgis-cli mcp --attach` connects to it. The relay is the same [`crate::mcp`] protocol as
-//! `rustgis-cli mcp`, one JSON-RPC message per line, so there is no second command protocol:
+//! `ug mcp --attach` connects to it. The relay is the same [`crate::mcp`] protocol as
+//! `ug mcp`, one JSON-RPC message per line, so there is no second command protocol:
 //! every action reaches the open [`Session`] through [`Session::run`], one undo step per command,
 //! exactly as the private-session server does.
 //!
@@ -31,7 +31,7 @@ use serde_json::Value;
 use crate::framing::{self, MAX_LINE, Oversize, read_message_max};
 use crate::mcp::{Server, expects_reply};
 
-/// The port `rustgis-cli mcp --attach` connects to unless it names another. (GeoLibre's runner
+/// The port `ug mcp --attach` connects to unless it names another. (GeoLibre's runner
 /// is 8766; the relay takes the next one.)
 pub const DEFAULT_PORT: u16 = 8767;
 
@@ -171,13 +171,13 @@ pub fn token_dir() -> PathBuf {
 }
 
 /// The token file for `port`, in [`token_dir`]. The relay writes it when it starts (readable by
-/// this user only) and removes it when it stops; `rustgis-cli mcp --attach` reads it through
+/// this user only) and removes it when it stops; `ug mcp --attach` reads it through
 /// [`read_token`], so no token ever travels through a command line, an argument or the clipboard.
 pub fn token_path(port: u16) -> PathBuf {
     token_dir().join(format!("{port}.token"))
 }
 
-/// Reads the token the running relay on `port` wrote, for `rustgis-cli mcp --attach`. The folder
+/// Reads the token the running relay on `port` wrote, for `ug mcp --attach`. The folder
 /// and file must be this user's: a regular file, not a symlink, both owned by the user running
 /// this process, and private to that user (no group or other access).
 pub fn read_token(port: u16) -> Result<String, String> {
@@ -694,7 +694,7 @@ mod tests {
         read_token(relay.port()).unwrap()
     }
 
-    /// Attaches a client the way `rustgis-cli mcp --attach` does.
+    /// Attaches a client the way `ug mcp --attach` does.
     fn attach(client: &mut TcpStream, relay: &Relay, access: bool) {
         let hello = json!({"jsonrpc": "2.0", "method": "rustgis/attach", "params": {"access": access, "token": token(relay)}});
         writeln!(client, "{hello}").unwrap();

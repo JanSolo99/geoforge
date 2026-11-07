@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Packages release builds of rustgis and rustgis-cli for one target into dist/.
+# Packages release builds of rustgis and ug (the rustgis-cli package) for one target into dist/.
 #
 #   packaging/package.sh <version> [rust-target]
 #
@@ -16,7 +16,7 @@ version="${1:?usage: package.sh <version> [rust-target]}"
 version="${version#v}"
 target="${2:-}"
 root="$(cd "$(dirname "$0")/.." && pwd)"
-bin="$root/target/${target:+$target/}release"
+bin="${CARGO_TARGET_DIR:-$root/target}/${target:+$target/}release"
 dist="$root/dist"
 mkdir -p "$dist"
 work="$(mktemp -d)"
@@ -36,10 +36,17 @@ case "$arch" in
 esac
 exe=""
 [ "$os" = windows ] && exe=".exe"
-for b in rustgis rustgis-cli; do
+for b in unigis ug; do
   [ -f "$bin/$b$exe" ] || { echo "missing $bin/$b$exe: build it first" >&2; exit 1; }
 done
-logo() { "$bin/rustgis-cli$exe" logo "$1" --size "$2"; }
+# The desktop app builds as `unigis`; the installers (desktop entry, AppImage, Windows
+# shortcuts, Homebrew cask) still launch it as `rustgis`, so stage it under that name.
+staged="$work/bin"
+mkdir -p "$staged"
+cp "$bin/unigis$exe" "$staged/rustgis$exe"
+cp "$bin/ug$exe" "$staged/ug$exe"
+bin="$staged"
+logo() { "$bin/ug$exe" logo "$1" --size "$2"; }
 name="RustGIS-$version-$os-$arch"
 
 case "$os" in
@@ -47,7 +54,7 @@ case "$os" in
     # Portable tarball.
     d="$work/$name"
     mkdir -p "$d"
-    cp "$bin/rustgis" "$bin/rustgis-cli" "$root/LICENSE" "$root/README.md" \
+    cp "$bin/rustgis" "$bin/ug" "$root/LICENSE" "$root/README.md" \
       "$root/packaging/linux/rustgis.desktop" "$root/packaging/linux/rustgis-mime.xml" "$d/"
     logo "$d/rustgis.png" 512
     tar -C "$work" -czf "$dist/$name.tar.gz" "$name"
@@ -56,7 +63,7 @@ case "$os" in
     case "$arch" in x86_64) debarch=amd64 ;; aarch64) debarch=arm64 ;; *) debarch="$arch" ;; esac
     p="$work/deb"
     install -Dm755 "$bin/rustgis" "$p/usr/bin/rustgis"
-    install -Dm755 "$bin/rustgis-cli" "$p/usr/bin/rustgis-cli"
+    install -Dm755 "$bin/ug" "$p/usr/bin/ug"
     install -Dm644 "$root/packaging/linux/rustgis.desktop" "$p/usr/share/applications/rustgis.desktop"
     install -Dm644 "$root/packaging/linux/rustgis-mime.xml" "$p/usr/share/mime/packages/rustgis.xml"
     for s in 32 64 128 256 512; do
@@ -70,7 +77,7 @@ case "$os" in
     # run time, so they are listed by hand below.
     mkdir -p "$work/shlibs/debian"
     printf 'Source: rustgis\n\nPackage: rustgis\nArchitecture: any\n' > "$work/shlibs/debian/control"
-    shlibs="$(cd "$work/shlibs" && dpkg-shlibdeps -O "$p/usr/bin/rustgis" "$p/usr/bin/rustgis-cli" | sed -n 's/^shlibs:Depends=//p')" || shlibs=""
+    shlibs="$(cd "$work/shlibs" && dpkg-shlibdeps -O "$p/usr/bin/rustgis" "$p/usr/bin/ug" | sed -n 's/^shlibs:Depends=//p')" || shlibs=""
     if [ -z "$shlibs" ]; then
       # Off Debian/Ubuntu there is no dpkg database to consult. In CI that is an error: the
       # published package must carry the real list.
@@ -96,9 +103,13 @@ Depends: ${shlibs:-libc6, libgcc-s1}, libxkbcommon0, libwayland-client0 | libx11
 Recommends: libxkbcommon-x11-0, libxcursor1, libxi6, libxrandr2, libvulkan1 | libegl1
 Description: Fast, open-source GIS for mapping, analyzing and sharing geospatial data
  Maps and layers, symbology, labeling, selection, editing, geoprocessing and
- export. Includes rustgis-cli for scripting every command.
+ export. Includes the ug command line for scripting every command.
 CONTROL
-    dpkg-deb --root-owner-group --build "$p" "$dist/rustgis_${version}_${debarch}.deb"
+    if command -v dpkg-deb > /dev/null; then
+      dpkg-deb --root-owner-group --build "$p" "$dist/rustgis_${version}_${debarch}.deb"
+    else
+      echo "dpkg-deb not found: skipping the .deb" >&2
+    fi
 
     # RPM package (Fedora, RHEL, openSUSE) from the same tree. Library dependencies are found
     # by rpmbuild; the run-time loaded windowing and GPU libraries are listed by soname, which
@@ -125,7 +136,7 @@ Recommends: (libvulkan.so.1()(64bit) or libEGL.so.1()(64bit))
 
 %description
 Maps and layers, symbology, labeling, selection, editing, geoprocessing and
-export. Includes rustgis-cli for scripting every command.
+export. Includes the ug command line for scripting every command.
 
 %install
 mkdir -p %{buildroot}
@@ -133,7 +144,7 @@ cp -a "$p/usr" %{buildroot}/
 
 %files
 /usr/bin/rustgis
-/usr/bin/rustgis-cli
+/usr/bin/ug
 /usr/share/applications/rustgis.desktop
 /usr/share/mime/packages/rustgis.xml
 /usr/share/icons/hicolor/*/apps/rustgis.png
@@ -240,12 +251,12 @@ SPEC
 
     d="$work/rustgis-cli-$version-$os-$arch"
     mkdir -p "$d"
-    cp "$bin/rustgis-cli" "$root/LICENSE" "$d/"
-    sign "$d/rustgis-cli"
+    cp "$bin/ug" "$root/LICENSE" "$d/"
+    sign "$d/ug"
     # A bare executable cannot be stapled: notarizing it registers the ticket that Gatekeeper
     # looks up online.
     if [ -n "$identity" ]; then
-      ditto -c -k "$d/rustgis-cli" "$work/rustgis-cli.zip"
+      ditto -c -k "$d/ug" "$work/rustgis-cli.zip"
       notarize "$work/rustgis-cli.zip"
     fi
     tar -C "$work" -czf "$dist/rustgis-cli-$version-$os-$arch.tar.gz" "$(basename "$d")"
@@ -255,21 +266,21 @@ SPEC
     # Portable zip: unzip anywhere and run, no installer or admin rights.
     d="$work/$name"
     mkdir -p "$d"
-    cp "$bin/rustgis.exe" "$bin/rustgis-cli.exe" "$root/LICENSE" "$root/README.md" "$d/"
+    cp "$bin/rustgis.exe" "$bin/ug.exe" "$root/LICENSE" "$root/README.md" "$d/"
     sed "s/@VERSION@/$version/g" "$root/packaging/windows/README-portable.txt" > "$d/README.txt"
     (cd "$work" && 7z a -tzip -bso0 "$dist/$name-portable.zip" "$name")
 
     # Installers, as GeoLibre ships: setup.exe (NSIS) installs for the current user without admin
-    # rights, the .msi (WiX) for all users. Both add a Start menu shortcut, put rustgis-cli on the
-    # PATH and open .rgis projects. Wizard images are the logo on white, drawn by rustgis-cli.
+    # rights, the .msi (WiX) for all users. Both add a Start menu shortcut, put ug on the
+    # PATH and open .rgis projects. Wizard images are the logo on white, drawn by ug.
     case "$arch" in x86_64) instarch=x64 ;; aarch64) instarch=arm64 ;; *) instarch="$arch" ;; esac
     s="$work/installer"
     mkdir -p "$s"
-    cp "$bin/rustgis.exe" "$bin/rustgis-cli.exe" "$root/LICENSE" "$root/packaging/windows/path.ps1" "$s/"
-    "$bin/rustgis-cli.exe" logo "$s/rustgis.ico"
-    "$bin/rustgis-cli.exe" logo "$s/sidebar.bmp" --size 128 --canvas 164x314
-    "$bin/rustgis-cli.exe" logo "$s/banner.bmp" --size 44 --canvas 493x58 --at 440,7
-    "$bin/rustgis-cli.exe" logo "$s/dialog.bmp" --size 120 --canvas 493x312 --at 22,96
+    cp "$bin/rustgis.exe" "$bin/ug.exe" "$root/LICENSE" "$root/packaging/windows/path.ps1" "$s/"
+    "$bin/ug.exe" logo "$s/rustgis.ico"
+    "$bin/ug.exe" logo "$s/sidebar.bmp" --size 128 --canvas 164x314
+    "$bin/ug.exe" logo "$s/banner.bmp" --size 44 --canvas 493x58 --at 440,7
+    "$bin/ug.exe" logo "$s/dialog.bmp" --size 120 --canvas 493x312 --at 22,96
     w() { cygpath -w "$1"; }
     # A missing tool fails a CI build (the release must carry every package) and is skipped
     # locally.
@@ -313,7 +324,7 @@ SPEC
     # self-signed sideload build.
     m="$work/msix"
     mkdir -p "$m/Assets"
-    cp "$bin/rustgis.exe" "$bin/rustgis-cli.exe" "$m/"
+    cp "$bin/rustgis.exe" "$bin/ug.exe" "$m/"
     logo "$m/Assets/Square44x44Logo.png" 44
     logo "$m/Assets/Square150x150Logo.png" 150
     logo "$m/Assets/StoreLogo.png" 50

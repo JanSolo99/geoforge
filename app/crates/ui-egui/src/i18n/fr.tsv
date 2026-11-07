@@ -1873,7 +1873,7 @@ Zoom to Tokyo	Zoomer sur Tokyo
 Zoom To World	Zoomer sur le monde
 {id} changed since it was installed; install it again from the Plugin Manager.	{id} a été modifiée depuis son installation ; réinstallez-la depuis le Gestionnaire d'extensions.
 {name} is larger than {mb} MB	{name} dépasse {mb} Mo
-{name} runs as a program on your computer: it needs the desktop app or rustgis-cli.	{name} s'exécute comme un programme sur votre ordinateur : elle nécessite l'application de bureau ou rustgis-cli.
+{name} runs as a program on your computer: it needs the desktop app or ug.	{name} s'exécute comme un programme sur votre ordinateur : elle nécessite l'application de bureau ou ug.
 {name} was withdrawn from the plugin registry and has been turned off.	{name} a été retirée du registre des extensions et a été désactivée.
 {name} was withdrawn from the plugin registry: {reason}	{name} a été retirée du registre des extensions : {reason}
 {name}: the download doesn't match the registry; it wasn't installed.	{name} : le téléchargement ne correspond pas au registre ; l'extension n'a pas été installée.

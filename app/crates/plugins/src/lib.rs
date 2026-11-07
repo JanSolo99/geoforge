@@ -224,7 +224,7 @@ fn process_code(pkg: &Package) -> Result<Code, String> {
 
 #[cfg(target_arch = "wasm32")]
 fn process_code(pkg: &Package) -> Result<Code, String> {
-    Err(format!("{} runs as a program on your computer: it needs the desktop app or rustgis-cli", pkg.manifest.name))
+    Err(format!("{} runs as a program on your computer: it needs the desktop app or ug", pkg.manifest.name))
 }
 
 /// Loads a prepared plugin, replacing a loaded one with the same id (and keeping whether it

@@ -159,8 +159,8 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           function Check($dir, $scope) {
-            & "$dir\rustgis-cli.exe" logo "$env:RUNNER_TEMP\logo.png" --size 64
-            if ($LASTEXITCODE) { throw "rustgis-cli failed in $dir" }
+            & "$dir\ug.exe" logo "$env:RUNNER_TEMP\logo.png" --size 64
+            if ($LASTEXITCODE) { throw "ug failed in $dir" }
             $path = [Environment]::GetEnvironmentVariable('Path', $scope) -split ';'
             if ($path -notcontains $dir.TrimEnd('\') -and $path -notcontains "$($dir.TrimEnd('\'))\") {
               throw "$dir is not on the $scope PATH"
@@ -201,14 +201,14 @@ jobs:
         run: |
           sudo apt-get install -y ./dist/rustgis_*.deb
           dpkg-deb -f dist/rustgis_*.deb Depends
-          rustgis-cli logo "$RUNNER_TEMP/logo.png" --size 64
+          ug logo "$RUNNER_TEMP/logo.png" --size 64
 
       - name: Check the .rpm installs on Fedora
         if: runner.os == 'Linux'
         run: |
           rpm -qp --requires dist/rustgis-*.rpm
           docker run --rm -v "$PWD/dist:/dist:ro" fedora:latest sh -c \
-            'dnf install -y -q /dist/rustgis-*.rpm && rustgis-cli logo /tmp/logo.png --size 64'
+            'dnf install -y -q /dist/rustgis-*.rpm && ug logo /tmp/logo.png --size 64'
 
       - name: Check the AppImage runs
         if: runner.os == 'Linux'
@@ -216,7 +216,7 @@ jobs:
           chmod +x dist/*.AppImage
           cd "$RUNNER_TEMP" && rm -rf squashfs-root
           "$GITHUB_WORKSPACE"/dist/*.AppImage --appimage-extract > /dev/null
-          squashfs-root/usr/bin/rustgis-cli logo logo.png --size 64
+          squashfs-root/usr/bin/ug logo logo.png --size 64
           test -x squashfs-root/AppRun
           # The GUI cannot start on a headless runner: check that its libraries resolve.
           if ldd squashfs-root/usr/bin/rustgis | grep 'not found'; then exit 1; fi

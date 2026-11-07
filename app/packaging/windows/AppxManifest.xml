@@ -44,16 +44,16 @@
         </uap:Extension>
       </Extensions>
     </Application>
-    <!-- The command line tool: no Start menu entry, run as `rustgis-cli` from any terminal. -->
-    <Application Id="RustGISCli" Executable="rustgis-cli.exe" EntryPoint="Windows.FullTrustApplication">
+    <!-- The command line tool: no Start menu entry, run as `ug` from any terminal. -->
+    <Application Id="RustGISCli" Executable="ug.exe" EntryPoint="Windows.FullTrustApplication">
       <uap:VisualElements DisplayName="UniGIS command line" Description="UniGIS command line tool"
         BackgroundColor="transparent" Square44x44Logo="Assets\Square44x44Logo.png"
         Square150x150Logo="Assets\Square150x150Logo.png" AppListEntry="none" />
       <Extensions>
         <uap3:Extension Category="windows.appExecutionAlias" EntryPoint="Windows.FullTrustApplication"
-          Executable="rustgis-cli.exe">
+          Executable="ug.exe">
           <uap3:AppExecutionAlias>
-            <desktop:ExecutionAlias Alias="rustgis-cli.exe" />
+            <desktop:ExecutionAlias Alias="ug.exe" />
           </uap3:AppExecutionAlias>
         </uap3:Extension>
       </Extensions>

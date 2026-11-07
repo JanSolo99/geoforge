@@ -1,22 +1,24 @@
-//! UniGIS on the command line. Every command the ribbon runs is available here by id.
+//! `ug`, the UniGIS command line. The engine's geoprocessing subcommands (`ug run <tool>`,
+//! `ug tools`, `ug describe`, …) come from `unigis-cli`; this binary adds the desktop app's:
+//! every command the ribbon runs is available by id through `ug session`.
 //!
 //! ```text
-//! rustgis-cli commands                                  # list command ids and parameters
-//! rustgis-cli tools                                     # list geoprocessing tools
-//! rustgis-cli info data.geojson                         # layer summary as JSON
-//! rustgis-cli render data.geojson out.png [--basemap ocean] [--tiles URL] [--width 1600 --height 900]
-//! rustgis-cli run [--sample | --project p.rgis | --data f.geojson …] \
+//! ug commands                                  # list command ids and parameters
+//! ug session --tools                                    # list the app's geoprocessing tools
+//! ug info data.geojson                         # layer summary as JSON
+//! ug render data.geojson out.png [--basemap ocean] [--tiles URL] [--width 1600 --height 900]
+//! ug session [--sample | --project p.rgis | --data f.geojson …] \
 //!     --cmd 'gp.run={"tool":"buffer","params":{"input":"Cities","distance":100}}' \
 //!     --cmd 'share.exportMap={"path":"out.png"}' [--save out.rgis]
-//! rustgis-cli ask [--sample | --project p.rgis | --data f.geojson …] "Which cities have over 10 million people?" \
+//! ug ask [--sample | --project p.rgis | --data f.geojson …] "Which cities have over 10 million people?" \
 //!     [--provider anthropic|openai|chatgpt|gemini|openrouter|ollama|custom] [--model M] [--base-url URL] [--yes] [--save out.rgis] [--trace log.txt]
-//! rustgis-cli ask --models [--provider P]                # list the provider's models
-//! rustgis-cli ask --accounts | --account CLIENT_ID       # list or select a saved registration
-//! rustgis-cli ask --login [--another-account]            # sign in with ChatGPT to use your ChatGPT plan
-//! rustgis-cli ask --logout
-//! rustgis-cli mcp [--sample | --project p.rgis | --data f.geojson …] [--yes]   # an MCP server on stdio
-//! rustgis-cli mcp --attach [PORT] [--yes]   # the same, on the desktop app already open (its MCP Relay)
-//! rustgis-cli plugins [install <file|folder> | uninstall <id> | enable <id> | disable <id>
+//! ug ask --models [--provider P]                # list the provider's models
+//! ug ask --accounts | --account CLIENT_ID       # list or select a saved registration
+//! ug ask --login [--another-account]            # sign in with ChatGPT to use your ChatGPT plan
+//! ug ask --logout
+//! ug mcp [--sample | --project p.rgis | --data f.geojson …] [--yes]   # an MCP server on stdio
+//! ug mcp --attach [PORT] [--yes]   # the same, on the desktop app already open (its MCP Relay)
+//! ug plugins [install <file|folder> | uninstall <id> | enable <id> | disable <id>
 //!                      | browse | get <id> | prepare <id>] [--registry URL]
 //! ```
 //!
@@ -28,7 +30,7 @@
 use std::io::Write;
 use std::process::ExitCode;
 
-/// `println!` that ignores a closed pipe (`rustgis-cli commands | head`).
+/// `println!` that ignores a closed pipe (`ug commands | head`).
 macro_rules! out {
     ($($t:tt)*) => {{
         let _ = writeln!(std::io::stdout(), $($t)*);
@@ -40,7 +42,7 @@ use serde_json::{Value, json};
 
 fn usage() -> ExitCode {
     eprintln!(
-        "usage:\n  rustgis-cli commands | tools\n  rustgis-cli plugins [install <file|folder> | uninstall <id> | enable <id> | disable <id> | browse | get <id> | prepare <id>] [--registry URL]\n  rustgis-cli info <data>\n  rustgis-cli logo <out.png|out.ico|out.bmp> [--size N] [--canvas WxH --at X,Y (.bmp only)]\n  rustgis-cli render <data|project> <out.png> [--basemap NAME] [--tiles URL] [--width N] [--height N] [--dpi N] [--worldview auto|default|china]\n  rustgis-cli run [--sample] [--project P] [--data F]… --cmd 'id={{json}}'… [--save P] [--worldview auto|default|china]\n  rustgis-cli ask [--sample] [--project P] [--data F]… \"request\" [--provider P] [--model M] [--base-url URL] [--yes] [--save P]\n  rustgis-cli ask --models [--provider P]\n  rustgis-cli ask --login [--another-account] [--account CLIENT_ID] | --logout\n  rustgis-cli ask --accounts | --account CLIENT_ID\n  rustgis-cli mcp [--sample] [--project P] [--data F]… [--yes] [--attach [PORT]]"
+        "usage:\n  ug commands | session --tools\n  ug plugins [install <file|folder> | uninstall <id> | enable <id> | disable <id> | browse | get <id> | prepare <id>] [--registry URL]\n  ug info <data>\n  ug logo <out.png|out.ico|out.bmp> [--size N] [--canvas WxH --at X,Y (.bmp only)]\n  ug render <data|project> <out.png> [--basemap NAME] [--tiles URL] [--width N] [--height N] [--dpi N] [--worldview auto|default|china]\n  ug session [--sample] [--project P] [--data F]… --cmd 'id={{json}}'… [--save P] [--worldview auto|default|china]\n  ug ask [--sample] [--project P] [--data F]… \"request\" [--provider P] [--model M] [--base-url URL] [--yes] [--save P]\n  ug ask --models [--provider P]\n  ug ask --login [--another-account] [--account CLIENT_ID] | --logout\n  ug ask --accounts | --account CLIENT_ID\n  ug mcp [--sample] [--project P] [--data F]… [--yes] [--attach [PORT]]\n\nengine tools (ArcGIS geoprocessing): ug tools | ug run <tool> name=value… | ug <tool> --help"
     );
     ExitCode::from(2)
 }
@@ -59,15 +61,15 @@ fn run(s: &mut Session, id: &str, p: Value) -> Result<Value, String> {
     let r = s.run(id, &p);
     // A failure is noted too; it's printed once, by the caller.
     for n in s.notices_since(mark).iter().filter(|n| r.as_ref().err() != Some(&n.text)) {
-        eprintln!("rustgis-cli: {}{}", if n.error { "error: " } else { "" }, n.text);
+        eprintln!("ug: {}{}", if n.error { "error: " } else { "" }, n.text);
     }
     r.map_err(|e| format!("{id}: {e}"))
 }
 
 /// Makes a Python plugin's environment, saying what it's doing as it goes.
 fn prepare_env(id: &str) -> Result<String, String> {
-    eprintln!("rustgis-cli: preparing {id}'s Python environment (the first time downloads Python and its packages)");
-    let python = rustgis_engine::plugins::pyenv::prepare(id, &mut |line| eprintln!("rustgis-cli: {line}"))?;
+    eprintln!("ug: preparing {id}'s Python environment (the first time downloads Python and its packages)");
+    let python = rustgis_engine::plugins::pyenv::prepare(id, &mut |line| eprintln!("ug: {line}"))?;
     Ok(python.display().to_string())
 }
 
@@ -202,7 +204,7 @@ fn ask(s: &mut Session, args: &[String]) -> Result<(), String> {
         && (prompt.is_some() || args.iter().any(|a| a == "--models"))
         && let Some(why) = cfg.missing()
     {
-        return Err(format!("{provider}: {why} (run rustgis-cli ask --login)"));
+        return Err(format!("{provider}: {why} (run ug ask --login)"));
     }
     let login = cfg.login().then(|| cfg.binding());
     let signed_in = login.is_some();
@@ -235,10 +237,10 @@ fn ask(s: &mut Session, args: &[String]) -> Result<(), String> {
         }
         return Ok(());
     }
-    let prompt = prompt.ok_or("ask needs a request, e.g. rustgis-cli ask --sample \"Which countries have the largest GDP?\"")?;
+    let prompt = prompt.ok_or("ask needs a request, e.g. ug ask --sample \"Which countries have the largest GDP?\"")?;
     if let Some(why) = cfg.missing() {
         let hint = match provider::preset(&provider) {
-            Some(p) if p.login => "run rustgis-cli ask --login".to_string(),
+            Some(p) if p.login => "run ug ask --login".to_string(),
             Some(p) => format!("set {}", p.key_env.join(" or ")),
             None => String::new(),
         };
@@ -257,7 +259,7 @@ fn ask(s: &mut Session, args: &[String]) -> Result<(), String> {
                     let r: String = result.chars().take(200).collect();
                     eprintln!("  {} {summary} → {r}", if *error { "✗" } else { "✓" });
                 }
-                Entry::Error(e) => eprintln!("rustgis-cli: {e}"),
+                Entry::Error(e) => eprintln!("ug: {e}"),
                 Entry::Note(n) => eprintln!("({n})"),
             }
         }
@@ -275,7 +277,7 @@ fn ask(s: &mut Session, args: &[String]) -> Result<(), String> {
             let entry = format!("> {} {}\n{}\n< {resp}\n\n", req.method, req.url, req.body.as_deref().unwrap_or(""));
             let written = std::fs::OpenOptions::new().create(true).append(true).open(path).and_then(|mut f| f.write_all(entry.as_bytes()));
             if let Err(e) = written {
-                eprintln!("rustgis-cli: {}: {e}", path.display());
+                eprintln!("ug: {}: {e}", path.display());
             }
         }
         r
@@ -320,7 +322,7 @@ fn attach(port: u16, allow_access: bool) -> Result<(), String> {
     let hello = json!({"jsonrpc": "2.0", "method": "rustgis/attach", "params": {"access": allow_access, "token": token}});
     writeln!(stream, "{hello}").map_err(|e| format!("telling the app what --yes allows: {e}"))?;
     eprintln!(
-        "rustgis-cli: MCP server ready (the open UniGIS app at 127.0.0.1:{port}; file and network access {})",
+        "ug: MCP server ready (the open UniGIS app at 127.0.0.1:{port}; file and network access {})",
         if allow_access { "allowed" } else { "off, --yes allows it" }
     );
     let mut input = std::io::BufReader::new(stream.try_clone().map_err(|e| format!("opening the app's replies: {e}"))?);
@@ -377,7 +379,7 @@ fn mcp(s: &mut Session, args: &[String]) -> Result<(), String> {
     }
     let server = rustgis_assistant::mcp::Server::new(allow_access);
     eprintln!(
-        "rustgis-cli: MCP server ready ({} layers; file and network access {})",
+        "ug: MCP server ready ({} layers; file and network access {})",
         s.map().layers.len(),
         if server.allow_access { "allowed" } else { "off, --yes allows it" }
     );
@@ -405,7 +407,7 @@ fn mcp(s: &mut Session, args: &[String]) -> Result<(), String> {
         // A last resort: a panic answers that request with an error instead of ending the server.
         let reply = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| server.handle(s, &line))).unwrap_or_else(|_| {
             // The panic message is already on standard error; the id lets the client match the error.
-            eprintln!("rustgis-cli: a request failed unexpectedly; the project may be partly changed");
+            eprintln!("ug: a request failed unexpectedly; the project may be partly changed");
             let id = serde_json::from_str::<Value>(&line)
                 .ok()
                 .and_then(|v| v.get("id").cloned())
@@ -423,12 +425,31 @@ fn mcp(s: &mut Session, args: &[String]) -> Result<(), String> {
     Ok(())
 }
 
+/// The subcommands this binary handles itself; everything else is the engine's.
+/// `run` is the app's only when an option follows it (`ug run --sample --cmd …`, the old
+/// spelling of `ug session`); `ug run <tool> name=value` is the engine's registry runner.
+fn is_app_command(args: &[String]) -> bool {
+    match args.first().map(String::as_str) {
+        Some("plugins" | "commands" | "info" | "logo" | "render" | "ask" | "mcp" | "session") => true,
+        Some("run") => args.get(1).is_some_and(|a| a.starts_with("--")),
+        _ => false,
+    }
+}
+
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
+    if matches!(args.first().map(String::as_str), None | Some("-h" | "--help" | "help")) && args.len() <= 1 {
+        usage();
+        eprintln!();
+        return unigis_cli::main_with(vec!["ug".into(), "--help".into()]);
+    }
+    if !is_app_command(&args) {
+        return unigis_cli::main_with(std::env::args().collect());
+    }
     let Some(cmd) = args.first().map(|s| s.as_str()) else { return usage() };
     if !args.iter().any(|a| a == "--no-plugins") {
         for e in rustgis_engine::cmd::plugins::load_installed() {
-            eprintln!("rustgis-cli: warning: {e}");
+            eprintln!("ug: warning: {e}");
         }
     }
     for (i, a) in args.iter().enumerate() {
@@ -438,7 +459,7 @@ fn main() -> ExitCode {
             let loaded =
                 rustgis_engine::plugins::Package::from_path(std::path::Path::new(p)).and_then(|pkg| rustgis_engine::plugins::load(pkg, p));
             if let Err(e) = loaded {
-                eprintln!("rustgis-cli: {p}: {e}");
+                eprintln!("ug: {p}: {e}");
                 return ExitCode::FAILURE;
             }
         }
@@ -446,7 +467,7 @@ fn main() -> ExitCode {
     // Whose borders the built-in countries and world outline show: the system's by default.
     let worldview = opt(&args, "--worldview").unwrap_or("auto");
     if worldview != "auto" && rustgis_engine::sample::Worldview::from_code(worldview).is_none() {
-        eprintln!("rustgis-cli: --worldview {worldview}: expected auto, default or china");
+        eprintln!("ug: --worldview {worldview}: expected auto, default or china");
         return ExitCode::from(2);
     }
     rustgis_engine::sample::apply_worldview(worldview);
@@ -478,10 +499,6 @@ fn main() -> ExitCode {
         }
         "commands" => {
             print(&run(&mut s, "info.commands", Value::Null)?);
-            Ok(())
-        }
-        "tools" => {
-            print(&run(&mut s, "gp.tools", Value::Null)?);
             Ok(())
         }
         "info" => {
@@ -568,7 +585,11 @@ fn main() -> ExitCode {
             }
             mcp(&mut s, &args)
         }
-        "run" => {
+        "session" | "run" => {
+            if args.iter().any(|a| a == "--tools") {
+                print(&run(&mut s, "gp.tools", Value::Null)?);
+                return Ok(());
+            }
             open_inputs(&mut s, &args)?;
             for (i, a) in args.iter().enumerate() {
                 if a == "--cmd"
@@ -594,7 +615,7 @@ fn main() -> ExitCode {
     match res {
         Ok(()) => ExitCode::SUCCESS,
         Err(e) => {
-            eprintln!("rustgis-cli: {e}");
+            eprintln!("ug: {e}");
             ExitCode::FAILURE
         }
     }

@@ -395,7 +395,7 @@ pub struct RustGisApp {
     pub quit_requested: bool,
     logo: Option<egui::TextureHandle>,
     pub services: Services,
-    /// The MCP relay for `rustgis-cli mcp --attach`: a loopback listener on the session this app
+    /// The MCP relay for `ug mcp --attach`: a loopback listener on the session this app
     /// already has open, started by the `ui.mcpRelay` command and off until then.
     #[cfg(not(target_arch = "wasm32"))]
     pub relay: Option<rustgis_assistant::relay::Relay>,
@@ -1112,7 +1112,7 @@ impl RustGisApp {
             "ui.commandSearch" => self.ui.command_search = Some(String::new()),
             "ui.about" => self.ui.about = true,
             "ui.checkUpdate" => self.update.check(),
-            // The MCP relay for `rustgis-cli mcp --attach`: starts a loopback listener off until
+            // The MCP relay for `ug mcp --attach`: starts a loopback listener off until
             // asked. Running the command again reports its address; the app owns its lifetime.
             #[cfg(not(target_arch = "wasm32"))]
             "ui.mcpRelay" => {

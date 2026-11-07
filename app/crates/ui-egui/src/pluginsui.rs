@@ -376,7 +376,7 @@ pub fn received(app: &mut RustGisApp, bytes: Vec<u8>, from: Option<Box<Entry>>) 
         // The browser can't start programs.
         if cfg!(target_arch = "wasm32") && pkg.manifest.runtime == rp::Runtime::Process {
             return Err(crate::i18n::fmt(
-                "{name} runs as a program on your computer: it needs the desktop app or rustgis-cli.",
+                "{name} runs as a program on your computer: it needs the desktop app or ug.",
                 &[("name", &pkg.manifest.name)],
             ));
         }

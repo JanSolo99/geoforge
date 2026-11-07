@@ -218,7 +218,7 @@ fn send(stdin: &Sender<Vec<u8>>, v: &Value) -> Result<(), String> {
 pub fn call(spec: &Spec, host: &mut dyn Host, request: &Value, timeout: Option<Duration>) -> Result<Value, String> {
     if let Some(check) = spec.env_check.as_ref().filter(|c| !c.ready()) {
         return Err(format!(
-            "its Python environment isn't ready: prepare it in Plugins › Plugin Manager › Installed, or with rustgis-cli plugins prepare {}",
+            "its Python environment isn't ready: prepare it in Plugins › Plugin Manager › Installed, or with ug plugins prepare {}",
             check.id
         ));
     }

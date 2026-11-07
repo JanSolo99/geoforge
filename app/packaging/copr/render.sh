@@ -44,7 +44,7 @@ cat > "$out/$appid.metainfo.xml" <<XML
       <li>Symbology, labels, page layouts, reports and PDF export</li>
       <li>Editing with snapping, topology and undo for every change</li>
       <li>Geoprocessing, plus over 1,000 GeoLibre and Whitebox tools</li>
-      <li>An AI Assistant, sandboxed plugins and rustgis-cli for scripting every command</li>
+      <li>An AI Assistant, sandboxed plugins and the ug command line for scripting every command</li>
     </ul>
   </description>
   <launchable type="desktop-id">rustgis.desktop</launchable>
@@ -67,7 +67,7 @@ cat > "$out/$appid.metainfo.xml" <<XML
   </keywords>
   <provides>
     <binary>rustgis</binary>
-    <binary>rustgis-cli</binary>
+    <binary>ug</binary>
   </provides>
   <screenshots>
     <screenshot type="default">
@@ -123,7 +123,7 @@ Recommends:     (libvulkan.so.1()(64bit) or libEGL.so.1()(64bit))
 %description
 RustGIS is a geographic information system for mapping, analyzing and sharing
 geospatial data: maps and layers, symbology, labels, editing, geoprocessing,
-page layouts and export. It includes rustgis-cli for scripting every command.
+page layouts and export. It includes the ug command line for scripting every command.
 
 %prep
 
@@ -148,7 +148,7 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/%{appid}.metai
 %files
 %license %{_docdir}/rustgis/copyright
 %{_bindir}/rustgis
-%{_bindir}/rustgis-cli
+%{_bindir}/ug
 %{_datadir}/applications/rustgis.desktop
 %{_datadir}/mime/packages/rustgis.xml
 %{_datadir}/icons/hicolor/*/apps/rustgis.png

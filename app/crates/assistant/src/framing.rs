@@ -1,5 +1,5 @@
 //! Shared framing for the Model Context Protocol's line protocol: one JSON-RPC message per
-//! line, read within a byte limit. `rustgis-cli mcp`, `rustgis-cli mcp --attach` and the MCP
+//! line, read within a byte limit. `ug mcp`, `ug mcp --attach` and the MCP
 //! relay's socket connections all read through this, so the protocol parses one way
 //! everywhere.
 //!

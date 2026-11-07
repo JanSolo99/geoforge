@@ -17,7 +17,7 @@ ShortDescription: Fast, free and open-source GIS for mapping, analyzing and shar
 Description: |-
   RustGIS is a geographic information system in pure Rust: maps and layers, symbology, labels,
   editing, geoprocessing with over 1,000 GeoLibre and Whitebox tools, page layouts and export, an
-  AI Assistant and sandboxed plugins. It includes rustgis-cli for scripting every command and an
+  AI Assistant and sandboxed plugins. It includes the ug command line for scripting every command and an
   MCP server for AI agents.
 Moniker: rustgis
 Tags:

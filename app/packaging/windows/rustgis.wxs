@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   Windows Installer package (WiX 5), built by package.sh. An all-users install in Program Files:
-  a Start menu shortcut, rustgis-cli on the system PATH, .rgis/.rgisx projects opened by RustGIS
+  a Start menu shortcut, ug on the system PATH, .rgis/.rgisx projects opened by RustGIS
   and RustGIS offered under Open with for .geojson. Variables passed with -d: Version (three
   numbers), Stage (the folder holding the exes and LICENSE), Icon, License (RTF), Banner and
   Dialog (BMPs).
@@ -40,7 +40,7 @@
           Type="string" Value="" />
       </Component>
       <Component Directory="INSTALLFOLDER">
-        <File Id="rustgis_cli.exe" Source="$(var.Stage)\rustgis-cli.exe" KeyPath="yes" />
+        <File Id="rustgis_cli.exe" Source="$(var.Stage)\ug.exe" KeyPath="yes" />
         <Environment Id="PathEntry" Name="PATH" Value="[INSTALLFOLDER]" Part="last" Action="set"
           System="yes" Permanent="no" />
       </Component>

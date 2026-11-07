@@ -1873,7 +1873,7 @@ Zoom to Tokyo	Thu phóng tới Tokyo
 Zoom To World	Thu phóng tới thế giới
 {id} changed since it was installed; install it again from the Plugin Manager.	{id} đã thay đổi kể từ khi được cài đặt; hãy cài đặt lại từ Trình quản lý plugin.
 {name} is larger than {mb} MB	{name} lớn hơn {mb} MB
-{name} runs as a program on your computer: it needs the desktop app or rustgis-cli.	{name} chạy như một chương trình trên máy tính của bạn: cần ứng dụng máy tính hoặc rustgis-cli.
+{name} runs as a program on your computer: it needs the desktop app or ug.	{name} chạy như một chương trình trên máy tính của bạn: cần ứng dụng máy tính hoặc ug.
 {name} was withdrawn from the plugin registry and has been turned off.	{name} đã bị gỡ khỏi kho plugin và đã bị tắt.
 {name} was withdrawn from the plugin registry: {reason}	{name} đã bị gỡ khỏi kho plugin: {reason}
 {name}: the download doesn't match the registry; it wasn't installed.	{name}: bản tải xuống không khớp với kho plugin; chưa được cài đặt.

@@ -30,7 +30,7 @@ body:
     id: reproduce
     attributes:
       label: Steps to reproduce
-      description: Tell us how to reproduce the behavior, step by step. For the command line, include the full `rustgis-cli` command.
+      description: Tell us how to reproduce the behavior, step by step. For the command line, include the full `ug` command.
       placeholder: |
         1. Open '...'
         2. Add data '...'
@@ -53,7 +53,7 @@ body:
         - Desktop app (downloaded release)
         - Desktop app (built from source)
         - Web app (https://web.rustgis.app)
-        - Command line (rustgis-cli)
+        - Command line (ug)
     validations:
       required: true
   - type: input

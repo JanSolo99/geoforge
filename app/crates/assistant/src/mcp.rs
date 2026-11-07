@@ -4,7 +4,7 @@
 //! ([`crate::docs`]).
 //!
 //! Sans I/O: [`Server::handle`] takes one JSON-RPC message and gives back the reply, so
-//! `rustgis-cli mcp` (standard input and output) and the tests drive the same code.
+//! `ug mcp` (standard input and output) and the tests drive the same code.
 //!
 //! The client asks its user before each tool call; the server adds its own floor. File and
 //! network access is refused unless the server was started allowing it, and the user's own
@@ -187,7 +187,7 @@ impl Server {
             }
         };
         (!self.allow_access)
-            .then(|| format!("'{id}' was not run: {why}. The server allows that only when started with --yes (rustgis-cli mcp --yes)."))
+            .then(|| format!("'{id}' was not run: {why}. The server allows that only when started with --yes (ug mcp --yes)."))
     }
 }
 

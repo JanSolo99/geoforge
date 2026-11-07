@@ -240,7 +240,7 @@ pub fn prepare(id: &str, progress: &mut dyn FnMut(&str)) -> Result<PathBuf, Stri
     }
     let parent = check.env.parent().ok_or("there is no folder for plugins")?;
     std::fs::create_dir_all(parent).map_err(|e| format!("{}: {e}", parent.display()))?;
-    // One at a time per plugin, across processes too (the app and rustgis-cli): an OS file
+    // One at a time per plugin, across processes too (the app and ug): an OS file
     // lock, which the OS releases if its holder dies. Whoever waited finds the environment the
     // other made, and is done.
     let lock_path = parent.join(format!(".{id}.lock"));

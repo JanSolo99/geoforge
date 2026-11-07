@@ -1873,7 +1873,7 @@ Zoom to Tokyo	Tokyo'ya yakınlaştır
 Zoom To World	Dünyaya Yakınlaştır
 {id} changed since it was installed; install it again from the Plugin Manager.	{id}, yüklendiğinden beri değişti; Eklenti Yöneticisi'nden yeniden yükleyin.
 {name} is larger than {mb} MB	{name}, {mb} MB'tan büyük
-{name} runs as a program on your computer: it needs the desktop app or rustgis-cli.	{name} bilgisayarınızda bir program olarak çalışır: masaüstü uygulamasını veya rustgis-cli'yi gerektirir.
+{name} runs as a program on your computer: it needs the desktop app or ug.	{name} bilgisayarınızda bir program olarak çalışır: masaüstü uygulamasını veya ug'yi gerektirir.
 {name} was withdrawn from the plugin registry and has been turned off.	{name}, eklenti kayıt defterinden geri çekildi ve devre dışı bırakıldı.
 {name} was withdrawn from the plugin registry: {reason}	{name}, eklenti kayıt defterinden geri çekildi: {reason}
 {name}: the download doesn't match the registry; it wasn't installed.	{name}: İndirilen dosya kayıt defteriyle eşleşmiyor; yüklenmedi.
