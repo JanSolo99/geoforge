@@ -36,6 +36,7 @@ pub mod sample;
 pub mod stats;
 pub mod stats_metadata;
 pub mod surface;
+pub mod surface_parameters;
 mod writer;
 pub mod zonal;
 pub mod zonal_tables;

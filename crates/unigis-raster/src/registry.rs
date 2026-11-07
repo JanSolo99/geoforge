@@ -65,6 +65,15 @@ pub trait Context {
             "this tool needs point features, which this context cannot read".into(),
         ))
     }
+    /// Converts `xy`, in the coordinate system `epsg`, to geodetic longitude and latitude
+    /// (degrees) in place, and returns the ellipsoid (semi-major axis, inverse flattening).
+    fn geodetic(&self, epsg: u32, xy: &mut [[f64; 2]]) -> Result<(f64, f64)> {
+        let _ = (epsg, xy);
+        Err(Error::Unsupported(
+            "this tool needs coordinate transformations (PROJ), which this context cannot do"
+                .into(),
+        ))
+    }
     /// The multipatch geometries of the feature layer and its EPSG code.
     fn multipatches(&self, name: &str) -> Result<(Vec<unigis_core::Geometry>, Option<u32>)> {
         let _ = name;
@@ -511,6 +520,65 @@ fn surface_area_ratio(ctx: &dyn Context) -> Result<Output> {
         extra: vec![("out_area_raster", area)],
         ..with_statistics(ratio, true)?
     })
+}
+
+fn surface_parameters(ctx: &dyn Context) -> Result<Output> {
+    use crate::surface_parameters as sp;
+    let tool = "surface_parameters";
+    let dem = ctx.raster("input")?;
+    let unsupported = |what: &str| Err(Error::Unsupported(format!("{what} is not supported yet")));
+    if choice(ctx, tool, "use_adaptive_neighborhood").eq_ignore_ascii_case("ADAPTIVE_NEIGHBORHOOD")
+    {
+        return unsupported("Surface Parameters' adaptive neighborhood");
+    }
+    if let Some(d) = ctx.get("neighborhood_distance") {
+        let d: f64 = d
+            .split_whitespace()
+            .next()
+            .and_then(|v| v.parse().ok())
+            .ok_or_else(|| {
+                Error::Unsupported(format!("ERROR 000800: neighborhood distance {d}"))
+            })?;
+        if (d - dem.cell_width()).abs() > 1e-9 * d.abs().max(1.0) {
+            return unsupported("A neighborhood distance other than the cell size");
+        }
+    }
+    if choice(ctx, tool, "project_geodesic_azimuths")
+        .eq_ignore_ascii_case("PROJECT_GEODESIC_AZIMUTHS")
+        || choice(ctx, tool, "use_equatorial_aspect").eq_ignore_ascii_case("EQUATORIAL_ASPECT")
+    {
+        return unsupported("Projected geodesic azimuths and equatorial aspect");
+    }
+    if ctx.get("in_analysis_mask").is_some() {
+        return unsupported("Surface Parameters' analysis mask");
+    }
+    let parameter = sp::SurfaceParameter::from_keyword(&choice(ctx, tool, "parameter_type"))
+        .ok_or_else(|| Error::Unsupported("ERROR 000800: parameter type".into()))?;
+    let epsg = dem.epsg.ok_or_else(|| {
+        Error::Unsupported("ERROR 000248: The spatial reference is not defined".into())
+    })?;
+    let t = dem.transform;
+    let mut lonlat: Vec<[f64; 2]> = (0..dem.height)
+        .flat_map(|row| {
+            (0..dem.width).map(move |col| {
+                let (c, r) = (col as f64 + 0.5, row as f64 + 0.5);
+                [t[0] + c * t[1] + r * t[2], t[3] + c * t[4] + r * t[5]]
+            })
+        })
+        .collect();
+    let (semi_major, inverse_flattening) = ctx.geodetic(epsg, &mut lonlat)?;
+    let opts = sp::SurfaceOptions {
+        parameter,
+        biquadratic: choice(ctx, tool, "local_surface_type").eq_ignore_ascii_case("BIQUADRATIC"),
+        z_metres: z_unit_metres(&choice(ctx, tool, "z_unit"))?,
+        percent_rise: choice(ctx, tool, "output_slope_measurement")
+            .eq_ignore_ascii_case("PERCENT_RISE"),
+    };
+    let ellipsoid = sp::Ellipsoid {
+        semi_major,
+        inverse_flattening,
+    };
+    with_statistics(sp::surface_parameters(&dem, &lonlat, ellipsoid, opts), true)
 }
 
 fn observer_points_unsupported(_: &dyn Context) -> Result<Output> {
@@ -3174,6 +3242,81 @@ pub static TOOLS: &[Tool] = &[
             ),
         ],
         run: surface_area_ratio,
+    },
+    Tool {
+        id: "surface_parameters",
+        name: "Surface Parameters",
+        summary: "Slope, aspect or a curvature from a quadratic or biquadratic surface fitted geodesically to each cell's neighborhood.",
+        params: &[
+            raster("input", "Input surface raster", true),
+            option(
+                "parameter_type",
+                "Parameter type",
+                &[
+                    "SLOPE",
+                    "ASPECT",
+                    "MEAN_CURVATURE",
+                    "PROFILE_CURVATURE",
+                    "TANGENTIAL_CURVATURE",
+                    "CONTOUR_CURVATURE",
+                    "CONTOUR_GEODESIC_TORSION",
+                    "GAUSSIAN_CURVATURE",
+                    "CASORATI_CURVATURE",
+                ],
+                "SLOPE",
+            ),
+            option(
+                "local_surface_type",
+                "Local surface type",
+                &["QUADRATIC", "BIQUADRATIC"],
+                "QUADRATIC",
+            ),
+            text("neighborhood_distance", "Neighborhood distance", ""),
+            option(
+                "use_adaptive_neighborhood",
+                "Use adaptive neighborhood",
+                &["FIXED_NEIGHBORHOOD", "ADAPTIVE_NEIGHBORHOOD"],
+                "FIXED_NEIGHBORHOOD",
+            ),
+            option(
+                "z_unit",
+                "Z unit",
+                &[
+                    "INCH",
+                    "FOOT",
+                    "FOOT_US",
+                    "YARD",
+                    "MILE_US",
+                    "NAUTICAL_MILE",
+                    "MILLIMETER",
+                    "CENTIMETER",
+                    "DECIMETER",
+                    "METER",
+                    "KILOMETER",
+                ],
+                "METER",
+            ),
+            option(
+                "output_slope_measurement",
+                "Output slope measurement",
+                &["DEGREE", "PERCENT_RISE"],
+                "DEGREE",
+            ),
+            option(
+                "project_geodesic_azimuths",
+                "Project geodesic azimuths",
+                &["GEODESIC_AZIMUTHS", "PROJECT_GEODESIC_AZIMUTHS"],
+                "GEODESIC_AZIMUTHS",
+            ),
+            option(
+                "use_equatorial_aspect",
+                "Use equatorial aspect",
+                &["NORTH_POLE_ASPECT", "EQUATORIAL_ASPECT"],
+                "NORTH_POLE_ASPECT",
+            ),
+            text("in_analysis_mask", "Input analysis mask", ""),
+        ],
+        run: surface_parameters,
     },
     Tool {
         id: "observer_points",

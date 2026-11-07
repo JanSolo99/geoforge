@@ -111329,6 +111329,470 @@
           "relationships": []
         }
       }
+    },
+    "sp_dem_slope": {
+      "tool": "gp.SurfaceParameters_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "surface_parameters",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "sp_dem_slope_bi_percent": {
+      "tool": "gp.SurfaceParameters_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "SLOPE",
+        "BIQUADRATIC",
+        "",
+        "FIXED_NEIGHBORHOOD",
+        "METER",
+        "PERCENT_RISE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "surface_parameters",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "parameter_type": "SLOPE",
+          "local_surface_type": "BIQUADRATIC",
+          "use_adaptive_neighborhood": "FIXED_NEIGHBORHOOD",
+          "z_unit": "METER",
+          "output_slope_measurement": "PERCENT_RISE"
+        }
+      }
+    },
+    "sp_dem_aspect_quadratic": {
+      "tool": "gp.SurfaceParameters_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "ASPECT",
+        "QUADRATIC"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "surface_parameters",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "parameter_type": "ASPECT",
+          "local_surface_type": "QUADRATIC"
+        }
+      }
+    },
+    "sp_dem_aspect_biquadratic": {
+      "tool": "gp.SurfaceParameters_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "ASPECT",
+        "BIQUADRATIC"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "surface_parameters",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "parameter_type": "ASPECT",
+          "local_surface_type": "BIQUADRATIC"
+        }
+      }
+    },
+    "sp_dem_mean_curvature_quadratic": {
+      "tool": "gp.SurfaceParameters_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "MEAN_CURVATURE",
+        "QUADRATIC"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "surface_parameters",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "parameter_type": "MEAN_CURVATURE",
+          "local_surface_type": "QUADRATIC"
+        }
+      }
+    },
+    "sp_dem_mean_curvature_biquadratic": {
+      "tool": "gp.SurfaceParameters_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "MEAN_CURVATURE",
+        "BIQUADRATIC"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "surface_parameters",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "parameter_type": "MEAN_CURVATURE",
+          "local_surface_type": "BIQUADRATIC"
+        }
+      }
+    },
+    "sp_dem_profile_curvature_quadratic": {
+      "tool": "gp.SurfaceParameters_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "PROFILE_CURVATURE",
+        "QUADRATIC"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "surface_parameters",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "parameter_type": "PROFILE_CURVATURE",
+          "local_surface_type": "QUADRATIC"
+        }
+      }
+    },
+    "sp_dem_profile_curvature_biquadratic": {
+      "tool": "gp.SurfaceParameters_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "PROFILE_CURVATURE",
+        "BIQUADRATIC"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "surface_parameters",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "parameter_type": "PROFILE_CURVATURE",
+          "local_surface_type": "BIQUADRATIC"
+        }
+      }
+    },
+    "sp_dem_tangential_curvature_quadratic": {
+      "tool": "gp.SurfaceParameters_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "TANGENTIAL_CURVATURE",
+        "QUADRATIC"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "surface_parameters",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "parameter_type": "TANGENTIAL_CURVATURE",
+          "local_surface_type": "QUADRATIC"
+        }
+      }
+    },
+    "sp_dem_tangential_curvature_biquadratic": {
+      "tool": "gp.SurfaceParameters_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "TANGENTIAL_CURVATURE",
+        "BIQUADRATIC"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "surface_parameters",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "parameter_type": "TANGENTIAL_CURVATURE",
+          "local_surface_type": "BIQUADRATIC"
+        }
+      }
+    },
+    "sp_dem_contour_curvature_quadratic": {
+      "tool": "gp.SurfaceParameters_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "CONTOUR_CURVATURE",
+        "QUADRATIC"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "surface_parameters",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "parameter_type": "CONTOUR_CURVATURE",
+          "local_surface_type": "QUADRATIC"
+        }
+      }
+    },
+    "sp_dem_contour_curvature_biquadratic": {
+      "tool": "gp.SurfaceParameters_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "CONTOUR_CURVATURE",
+        "BIQUADRATIC"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "surface_parameters",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "parameter_type": "CONTOUR_CURVATURE",
+          "local_surface_type": "BIQUADRATIC"
+        }
+      }
+    },
+    "sp_dem_contour_geodesic_torsion_quadratic": {
+      "tool": "gp.SurfaceParameters_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "CONTOUR_GEODESIC_TORSION",
+        "QUADRATIC"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "surface_parameters",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "parameter_type": "CONTOUR_GEODESIC_TORSION",
+          "local_surface_type": "QUADRATIC"
+        }
+      }
+    },
+    "sp_dem_contour_geodesic_torsion_biquadratic": {
+      "tool": "gp.SurfaceParameters_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "CONTOUR_GEODESIC_TORSION",
+        "BIQUADRATIC"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "surface_parameters",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "parameter_type": "CONTOUR_GEODESIC_TORSION",
+          "local_surface_type": "BIQUADRATIC"
+        }
+      }
+    },
+    "sp_dem_gaussian_curvature_quadratic": {
+      "tool": "gp.SurfaceParameters_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "GAUSSIAN_CURVATURE",
+        "QUADRATIC"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "surface_parameters",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "parameter_type": "GAUSSIAN_CURVATURE",
+          "local_surface_type": "QUADRATIC"
+        }
+      }
+    },
+    "sp_dem_gaussian_curvature_biquadratic": {
+      "tool": "gp.SurfaceParameters_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "GAUSSIAN_CURVATURE",
+        "BIQUADRATIC"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "surface_parameters",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "parameter_type": "GAUSSIAN_CURVATURE",
+          "local_surface_type": "BIQUADRATIC"
+        }
+      }
+    },
+    "sp_dem_casorati_curvature_quadratic": {
+      "tool": "gp.SurfaceParameters_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "CASORATI_CURVATURE",
+        "QUADRATIC"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "surface_parameters",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "parameter_type": "CASORATI_CURVATURE",
+          "local_surface_type": "QUADRATIC"
+        }
+      }
+    },
+    "sp_dem_casorati_curvature_biquadratic": {
+      "tool": "gp.SurfaceParameters_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "CASORATI_CURVATURE",
+        "BIQUADRATIC"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "surface_parameters",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "parameter_type": "CASORATI_CURVATURE",
+          "local_surface_type": "BIQUADRATIC"
+        }
+      }
+    },
+    "sp_dem_feet_mean": {
+      "tool": "gp.SurfaceParameters_sa",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "MEAN_CURVATURE",
+        "QUADRATIC",
+        "",
+        "FIXED_NEIGHBORHOOD",
+        "FOOT"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "surface_parameters",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>",
+          "parameter_type": "MEAN_CURVATURE",
+          "local_surface_type": "QUADRATIC",
+          "use_adaptive_neighborhood": "FIXED_NEIGHBORHOOD",
+          "z_unit": "FOOT"
+        }
+      }
+    },
+    "sp_dem_nodata_slope": {
+      "tool": "gp.SurfaceParameters_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "surface_parameters",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "sp_dem_nodata_profile": {
+      "tool": "gp.SurfaceParameters_sa",
+      "args": [
+        "testdata/raster/dem_nodata.tif",
+        "<out>",
+        "PROFILE_CURVATURE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "surface_parameters",
+        "params": {
+          "input": "testdata/raster/dem_nodata.tif",
+          "output": "<out>",
+          "parameter_type": "PROFILE_CURVATURE"
+        }
+      }
     }
   }
 }

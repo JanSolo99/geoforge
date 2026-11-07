@@ -958,6 +958,11 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
   Heron) and optional area raster (`out_area_raster`); HORIZONTAL ratio exact including edges
   and NoData (available triangles only); z units. ARC_CHORD approximated with Horn's plane
   (~5e-5 relative). 5 ArcGIS `sar_*` references.
+- [x] Surface Parameters (`surface_parameters`): all nine parameter types, QUADRATIC and
+  BIQUADRATIC, z units, percent rise. Geodesic like ArcGIS: cell centres to ECEF (PROJ, via
+  the CLI host), a grid-aligned local tangent frame, quadratic = weighted least squares
+  w = 1/(1 + d²)², aspect from true north; NoData rules (centre and east neighbour needed,
+  biquadratic needs all nine). Median 1e-7 relative to ArcGIS. 21 ArcGIS `sp_*` references.
 - [x] Validate Flow Direction (`validate_flow_direction`, D8): loop cells as points (LoopID,
   FlowDir, Col, Row) in ArcGIS's order (raster-order traces, each loop from its entry cell);
   no output when valid. 2 ArcGIS `vfd_*` references (fixture `flowdir_loops.tif`: 6 loops).

@@ -386,6 +386,24 @@ impl Crs {
     }
 }
 
+impl Crs {
+    /// The geographic system the CRS is based on (itself when geographic) and its ellipsoid's
+    /// semi-major axis and inverse flattening (0 for a sphere), from the Esri WKT.
+    pub fn geographic_base(&self) -> Result<(Crs, f64, f64)> {
+        let wkt = self.esri_wkt();
+        let geog = bracketed(wkt, "GEOGCS[")
+            .ok_or_else(|| proj_error("coordinate system", "no geographic coordinate system"))?;
+        let spheroid = bracketed(&geog, "SPHEROID[")
+            .and_then(|s| WktNode::parse(&s))
+            .ok_or_else(|| proj_error("coordinate system", "no ellipsoid"))?;
+        let number = |k: usize| spheroid.raw(k).parse::<f64>().ok();
+        let (Some(a), Some(inv_f)) = (number(1), number(2)) else {
+            return Err(proj_error("coordinate system", "unreadable ellipsoid"));
+        };
+        Ok((Crs::from_wkt(&geog)?, a, inv_f))
+    }
+}
+
 /// The first quoted string after `key`.
 fn quoted_after(wkt: &str, key: &str) -> Option<String> {
     let at = wkt.find(key)? + key.len();

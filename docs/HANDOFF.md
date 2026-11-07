@@ -1,7 +1,7 @@
 # Current handoff
 
 Updated 2026-11-07; last agent Claude.
-Workspace `/mnt/media/ArcGIS_Linux`, branch `main`, HEAD `141d901336a74e205f71ab9c15d177a9f783e4ea`.
+Workspace `/mnt/media/ArcGIS_Linux`, branch `main`, HEAD = the Surface Parameters commit (on f851557).
 
 ## Objective and status
 
@@ -18,6 +18,28 @@ on agent tooling, which is no longer part of this repository:
   `scripts/unigis-web-dist.{service,timer}` (`docs/WEB.md` updated).
 - Agent skills stay on disk but are git-ignored: `.claude/skills/` (development and
   orchestration procedures) and `.agents/skills/` (Codex discovery links to them).
+
+## Surface Parameters (Claude, 2026-11-07, this run)
+
+Taken from the committed queue (#1) before the app priorities landed; finished, nothing else
+started.
+- `surface_parameters` in the raster registry (`crates/unigis-raster/src/surface_parameters.rs`),
+  geodesic like ArcGIS: cell centres -> ECEF via the new `Context::geodetic` host hook (CLI:
+  `unigis_proj::Crs::geographic_base` + `Transform`; the app context keeps the default error),
+  grid-aligned tangent frame, QUADRATIC = weighted LS w = 1/(1 + d²)², BIQUADRATIC exact,
+  Minár et al. 2020 formulas, aspect from true north, ArcGIS's NoData rules. Findings and probe
+  scripts: `scripts/research/surface_parameters/`. 21 `sp_*` references; the test also checks
+  `sp_` cells at 1e-3 relative, with per-case allowances for ArcGIS's single-precision tail.
+- Note: the concurrent commit e4cad54 already contains this run's `geodetic` impl in
+  `crates/unigis-cli/src/lib.rs` (it was in the working tree); `main` compiles again only with
+  the Surface Parameters commit (the trait method).
+- Gaps (KNOWN_GAPS): non-default neighbourhood, adaptive, projected azimuths, equatorial aspect,
+  mask refused; rasters without EPSG refused; flat-cell curvature value unprobed.
+- Validation: `UNIGIS_REFERENCE_CASES=sp_` reference test passes; full `scripts/check` passed
+  (EXIT 0) on the working tree, including the inherited uncommitted hunks.
+- Next: the coordinator checks acceptance; then the app priorities (below) before more tools.
+- Staged by hunk: the inherited umintfloat hunks in `crates/unigis-raster/src/registry.rs` and
+  `scripts/make-arcgis-reference.py` stay uncommitted.
 
 ## Inherited work preserved
 

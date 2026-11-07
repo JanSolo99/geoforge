@@ -947,6 +947,14 @@ CASES = {
     "sar_dem_feet": ("gp.SurfaceAreaRatio_sa", [RASTER / "dem.tif"], [OUT / "sar_dem_feet_area.tif", "FOOT", "HORIZONTAL"]),
     "sar_dem_nodata": ("gp.SurfaceAreaRatio_sa", [RASTER / "dem_nodata.tif"], [OUT / "sar_dem_nodata_area.tif", "METER", "HORIZONTAL"]),
     "sar_hydro": ("gp.SurfaceAreaRatio_sa", [RASTER / "hydro.tif"], [OUT / "sar_hydro_area.tif", "METER", "HORIZONTAL"]),
+    "sp_dem_slope": ("gp.SurfaceParameters_sa", [RASTER / "dem.tif"], []),
+    "sp_dem_slope_bi_percent": ("gp.SurfaceParameters_sa", [RASTER / "dem.tif"], ["SLOPE", "BIQUADRATIC", "", "FIXED_NEIGHBORHOOD", "METER", "PERCENT_RISE"]),
+    **{f"sp_dem_{t.lower()}_{s.lower()}": ("gp.SurfaceParameters_sa", [RASTER / "dem.tif"], [t, s])
+       for t in ["ASPECT", "MEAN_CURVATURE", "PROFILE_CURVATURE", "TANGENTIAL_CURVATURE", "CONTOUR_CURVATURE", "CONTOUR_GEODESIC_TORSION", "GAUSSIAN_CURVATURE", "CASORATI_CURVATURE"]
+       for s in ["QUADRATIC", "BIQUADRATIC"]},
+    "sp_dem_feet_mean": ("gp.SurfaceParameters_sa", [RASTER / "dem.tif"], ["MEAN_CURVATURE", "QUADRATIC", "", "FIXED_NEIGHBORHOOD", "FOOT"]),
+    "sp_dem_nodata_slope": ("gp.SurfaceParameters_sa", [RASTER / "dem_nodata.tif"], []),
+    "sp_dem_nodata_profile": ("gp.SurfaceParameters_sa", [RASTER / "dem_nodata.tif"], ["PROFILE_CURVATURE"]),
     "vfd_loops": ("gp.ValidateFlowDirection_sa", [RASTER / "flowdir_loops.tif"], ["D8"]),
     "vfd_hydro_raw": ("gp.ValidateFlowDirection_sa", [OUT / "flowdir_hydro_raw.tif"], ["D8"]),
     "stf_links": ("gp.StreamToFeature_sa", [OUT / "streamlink_hydro.tif", OUT / "flowdir_hydro_filled.tif"], ["SIMPLIFY"]),
@@ -2495,6 +2503,7 @@ RUN = {
     # The geomorphons raster (second output) is compared by second_raster_outputs_match_arcgis.
     # The scale raster (second output) is compared by second_raster_outputs_match_arcgis.
     # The surface area raster (second output) is compared by second_raster_outputs_match_arcgis.
+    "gp.SurfaceParameters_sa": ("surface_parameters", ["input", "output", "parameter_type", "local_surface_type", "neighborhood_distance", "use_adaptive_neighborhood", "z_unit", "output_slope_measurement"]),
     "gp.SurfaceAreaRatio_sa": ("surface_area_ratio", ["input", "output", None, "z_unit", "planar_area_type"]),
     "gp.ObserverPoints_sa": ("observer_points", ["input", "in_observer_point_features", "output", "z_factor"]),
     "management.DeleteColormap": ("delete_colormap", ["input", "output"]),
@@ -2656,7 +2665,7 @@ def run_spec(tool, args):
 
 
 # Spatial Analyst tools: output is a GeoTIFF, <name>.tif.
-RASTER_OUT = {"gp.Visibility_sa", "gp.Viewshed2_sa", "gp.ObserverPoints_sa", "gp.SurfaceAreaRatio_sa", "gp.RasterCalculator_sa", "gp.MultiscaleSurfacePercentile_sa", "gp.MultiscaleSurfaceDifference_sa", "gp.MultiscaleSurfaceDeviation_sa", "gp.GeomorphonLandforms_sa", "gp.GeodesicFlowDirection_sa", "gp.FlowDistance_sa", "gp.ZonalGeometry_sa", "gp.ZonalFill_sa", "gp.RescaleByFunction_sa", "gp.CreateRandomRaster_sa", "gp.CreateNormalRaster_sa", "gp.CreateBinaryMask_ia", "gp.ComputeChangeRaster_ia", "gp.Diff_ia", "gp.Over_ia", "gp.LineStatistics_sa", "gp.PointStatistics_sa", "gp.SnapPourPoint_sa", "gp.FocalFlow_sa", "gp.DistanceAccumulation_sa", "gp.DistanceAllocation_sa", "gp.EucBackDirection_sa", "gp.EqualToFrequency_sa", "gp.GreaterThanFrequency_sa", "gp.LessThanFrequency_sa", "conversion.ASCIIToRaster", "conversion.FloatToRaster", "conversion.MultipatchToRaster", "management.CompositeBands", "gp.CreateConstantRaster_sa", "gp.InList_sa", "gp.LowestPosition_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
+RASTER_OUT = {"gp.Visibility_sa", "gp.SurfaceParameters_sa", "gp.Viewshed2_sa", "gp.ObserverPoints_sa", "gp.SurfaceAreaRatio_sa", "gp.RasterCalculator_sa", "gp.MultiscaleSurfacePercentile_sa", "gp.MultiscaleSurfaceDifference_sa", "gp.MultiscaleSurfaceDeviation_sa", "gp.GeomorphonLandforms_sa", "gp.GeodesicFlowDirection_sa", "gp.FlowDistance_sa", "gp.ZonalGeometry_sa", "gp.ZonalFill_sa", "gp.RescaleByFunction_sa", "gp.CreateRandomRaster_sa", "gp.CreateNormalRaster_sa", "gp.CreateBinaryMask_ia", "gp.ComputeChangeRaster_ia", "gp.Diff_ia", "gp.Over_ia", "gp.LineStatistics_sa", "gp.PointStatistics_sa", "gp.SnapPourPoint_sa", "gp.FocalFlow_sa", "gp.DistanceAccumulation_sa", "gp.DistanceAllocation_sa", "gp.EucBackDirection_sa", "gp.EqualToFrequency_sa", "gp.GreaterThanFrequency_sa", "gp.LessThanFrequency_sa", "conversion.ASCIIToRaster", "conversion.FloatToRaster", "conversion.MultipatchToRaster", "management.CompositeBands", "gp.CreateConstantRaster_sa", "gp.InList_sa", "gp.LowestPosition_sa", "gp.Rank_sa", "gp.Popularity_sa", "gp.Trend_sa", "gp.TopHatTransform_sa", "gp.TopographicPositionIndex_sa", "gp.Test_sa", "gp.ExtractByPolygon_sa", "gp.ExtractByPoints_sa", "management.MosaicToNewRaster", "management.CopyRaster", "gp.ReclassByASCIIFile_sa", *[f"gp.{t}_sa" for t, _ in UNARY], *[f"gp.{t}_sa" for t, _ in BINARY], *[f"gp.{t}_sa" for t, _ in COMBINATORIAL], "gp.Slope_sa", "gp.Aspect_sa", "gp.HillShade_sa", "gp.FocalStatistics_sa", "gp.Fill_sa",
               "gp.FlowDirection_sa", "gp.FlowAccumulation_sa", "gp.Reclassify_sa", "gp.ZonalStatistics_sa",
               "gp.Curvature_sa", "gp.Plus_sa", "gp.Minus_sa", "gp.Times_sa", "gp.Divide_sa", "gp.IsNull_sa",
               "gp.Int_sa", "gp.Float_sa", "gp.Con_sa", "gp.SetNull_sa", "gp.Basin_sa", "gp.StreamLink_sa",

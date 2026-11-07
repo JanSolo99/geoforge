@@ -1,0 +1,28 @@
+<PAMDataset>
+  <Metadata>
+    <MDI key="gp-lyrx">Yes</MDI>
+  </Metadata>
+  <PAMRasterBand band="1">
+    <Description>Band_1</Description>
+    <Histograms>
+      <HistItem>
+        <HistMin>-0.4806237518787384</HistMin>
+        <HistMax>0.4509371519088745</HistMax>
+        <BucketCount>256</BucketCount>
+        <IncludeOutOfRange>1</IncludeOutOfRange>
+        <Approximate>0</Approximate>
+        <HistCounts>1|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|2|0|0|0|1|1|0|0|0|2|0|0|0|0|0|0|0|0|1|0|0|0|0|0|0|0|0|0|2|2|0|0|1|2|1|1|2|0|1|0|0|1|1|2|1|0|1|1|1|2|2|0|3|2|4|4|2|3|2|8|3|4|1|8|9|12|11|21|21|25|31|21|56|78|114|161|290|366|501|800|1675|5190|5282|1402|530|251|141|83|75|48|41|31|21|16|6|12|7|11|4|5|4|4|4|2|3|1|1|1|1|0|0|1|2|4|2|0|1|0|0|1|1|0|1|0|0|0|1|0|0|1|0|0|0|1|0|0|0|1|0|0|0|0|0|0|0|0|0|0|0|1|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1</HistCounts>
+      </HistItem>
+    </Histograms>
+    <Metadata>
+      <MDI key="STATISTICS_COUNT">17464.000000</MDI>
+      <MDI key="STATISTICS_MAXIMUM">0.45093715190887</MDI>
+      <MDI key="STATISTICS_MEAN">0.0016890342130358</MDI>
+      <MDI key="STATISTICS_MEDIAN">nan</MDI>
+      <MDI key="STATISTICS_MINIMUM">-0.48062375187874</MDI>
+      <MDI key="STATISTICS_SKIPFACTORX">1</MDI>
+      <MDI key="STATISTICS_SKIPFACTORY">1</MDI>
+      <MDI key="STATISTICS_STDDEV">0.015100827477337</MDI>
+    </Metadata>
+  </PAMRasterBand>
+</PAMDataset>

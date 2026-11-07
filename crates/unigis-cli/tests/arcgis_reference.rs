@@ -4259,6 +4259,24 @@ const KNOWN_RASTER_DIFFERENCES: &[(&str, usize)] = &[
     ("viewshed_hill", 199),
     ("viewshed_two", 309),
     ("viewshed_hill_z2", 199),
+    // Surface Parameters: ArcGIS's results carry single-precision noise (median 1e-7 relative);
+    // it shows on near-flat cells (slope < 0.7°: aspect within 0.005°, percent rise, contour
+    // curvature) and in a tail of biquadratic curvatures (0.2% of cells beyond 1e-3 relative).
+    ("sp_dem_aspect_quadratic", 66),
+    ("sp_dem_aspect_biquadratic", 69),
+    ("sp_dem_slope_bi_percent", 56),
+    ("sp_dem_casorati_curvature_biquadratic", 3),
+    ("sp_dem_contour_curvature_biquadratic", 43),
+    ("sp_dem_contour_curvature_quadratic", 20),
+    ("sp_dem_contour_geodesic_torsion_biquadratic", 29),
+    ("sp_dem_contour_geodesic_torsion_quadratic", 5),
+    ("sp_dem_gaussian_curvature_biquadratic", 2),
+    ("sp_dem_mean_curvature_biquadratic", 45),
+    ("sp_dem_profile_curvature_biquadratic", 28),
+    ("sp_dem_profile_curvature_quadratic", 8),
+    ("sp_dem_nodata_profile", 8),
+    ("sp_dem_tangential_curvature_biquadratic", 28),
+    ("sp_dem_tangential_curvature_quadratic", 4),
     // Observer Points uses Viewshed's visibility test (same grazing sight lines).
     ("op_two", 309),
     ("op_hill", 199),
@@ -4489,6 +4507,10 @@ fn compare_rasters(case: &str, ours: &Path, arcgis: &Path) -> Vec<String> {
                             .any(|p| case.starts_with(p))
                         {
                             (x - y).abs() <= 1e-5 * y.abs().max(1.0)
+                                // Surface Parameters' curvatures are ~1e-3 per metre: compare
+                                // them relatively as well.
+                                && (!case.starts_with("sp_")
+                                    || (x - y).abs() <= 1e-3 * y.abs() + 1e-9)
                         } else {
                             x == y
                         }

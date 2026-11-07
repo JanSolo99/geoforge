@@ -83,6 +83,7 @@ Update this file when a gap is found or closed.
 | Delete Mosaic Dataset | Overview images and item caches stored outside the geodatabase (`.Overviews` folders, cache folders) are not removed; mobile/enterprise geodatabases; the options are accepted but change nothing |
 | Validate Flow Direction | MFD flow direction rasters; only `ug run` |
 | Surface Area Ratio | ARC_CHORD (default): ArcGIS's plane of best fit is not identified — Horn's, least-squares, PCA, corner and vector-area planes and its own Slope raster all differ by up to ~5e-5 relative; geographic rasters |
+| Surface Parameters | Neighborhood distances other than the cell size, the adaptive neighborhood, projected geodesic azimuths, equatorial aspect and the analysis mask are refused; rectangular cells are not resampled to square ones; rasters without an EPSG code are refused; flat-cell values of the directional curvatures (0 written) not probed; ArcGIS single-precision noise on near-flat cells (aspect within 0.005°); only `ug run` (the app context has no PROJ hook yet) |
 | Stream to Feature | Only `ug run` (no app runner); non-square cells and loops in flow directions untested |
 | Storage Capacity | Zones (raster or feature, zone_field), the output chart; only `ug run` (no app runner) |
 | Raster Calculator | Layer names / `%name%` references, `//` on rasters, Con/SetNull where clauses, chained comparisons, focal/zonal/other non-local functions, environment settings (extent, cell size, mask) |
