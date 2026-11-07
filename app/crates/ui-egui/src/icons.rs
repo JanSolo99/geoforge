@@ -687,36 +687,19 @@ pub fn paint(painter: &Painter, r: Rect, name: &str, ink: Color32, accent: Color
         "up" => p.line(&[(6.0, 15.0), (12.0, 9.0), (18.0, 15.0)], 1.8, ink),
         "down" => p.line(&[(6.0, 9.0), (12.0, 15.0), (18.0, 9.0)], 1.8, ink),
         "logo" => {
-            // A small version of the UniGIS logo: a rust cog around a four-colour globe.
-            let rust = crate::theme::BRAND;
-            for k in 0..12 {
-                let a = (k as f32 * 30.0).to_radians();
-                let (c, s2) = (a.cos(), a.sin());
-                let q = |r: f32, w: f32| (12.0 + r * c - w * s2, 12.0 + r * s2 + w * c);
-                p.fill(&[q(9.0, -1.6), q(11.6, -1.1), q(11.6, 1.1), q(9.0, 1.6)], rust);
-            }
-            p.circle(12.0, 12.0, 9.8, Some(rust), None);
-            p.circle(12.0, 12.0, 8.0, Some(Color32::WHITE), None);
-            let wedge = |a0: f32, a1: f32, col: Color32| {
-                let n = 8;
-                for k in 0..n {
-                    let (b0, b1) = (a0 + (a1 - a0) * k as f32 / n as f32, a0 + (a1 - a0) * (k + 1) as f32 / n as f32);
-                    p.fill(
-                        &[
-                            (12.0, 12.0),
-                            (12.0 + 7.0 * b0.to_radians().cos(), 12.0 + 7.0 * b0.to_radians().sin()),
-                            (12.0 + 7.0 * b1.to_radians().cos(), 12.0 + 7.0 * b1.to_radians().sin()),
-                        ],
-                        col,
-                    );
-                }
-            };
-            wedge(180.0, 275.0, Color32::from_rgb(0x2D, 0x76, 0xC2));
-            wedge(275.0, 365.0, Color32::from_rgb(0x18, 0x9D, 0x8C));
-            wedge(5.0, 95.0, Color32::from_rgb(0xEE, 0xAE, 0x3A));
-            wedge(95.0, 180.0, Color32::from_rgb(0x6C, 0xB3, 0x3F));
-            p.line(&[(11.5, 4.5), (11.0, 12.0), (12.5, 19.5)], 1.2, Color32::WHITE);
-            p.line(&[(4.5, 12.6), (11.0, 12.0), (19.5, 11.0)], 1.2, Color32::WHITE);
+            // A small version of the UniGIS logo (render::logo, a 100-unit square scaled to 24):
+            // the vector layer bent into a U holding a globe, on the raster and table layers.
+            let vector = Color32::from_rgb(0x2F, 0x6F, 0xDB);
+            p.fill(&[(4.8, 23.0), (21.1, 23.0), (19.2, 21.1), (2.9, 21.1)], Color32::from_rgb(0xE0, 0xA3, 0x3A));
+            p.fill(&[(4.8, 20.4), (21.1, 20.4), (19.2, 18.5), (2.9, 18.5)], Color32::from_rgb(0x1F, 0x9E, 0x89));
+            p.line(&[(5.8, 2.4), (5.8, 10.1)], 3.1, vector);
+            p.line(&[(18.2, 2.4), (18.2, 10.1)], 3.1, vector);
+            p.arc(12.0, 10.1, 6.2, 0.0, 180.0, 3.1, vector);
+            p.circle(12.0, 10.1, 4.3, Some(Color32::WHITE), None);
+            p.circle(12.0, 10.1, 3.8, Some(Color32::from_rgb(0x12, 0x30, 0x5C)), None);
+            let grid = Color32::from_rgb(0x9C, 0xC3, 0xFF);
+            p.line(&[(12.0, 6.6), (12.0, 13.6)], 0.6, grid);
+            p.line(&[(8.5, 10.1), (15.5, 10.1)], 0.6, grid);
         }
         "point_layer" => p.circle(12.0, 12.0, 5.0, Some(accent), Some((1.2, ink))),
         "line_layer" => p.line(&[(3.0, 17.0), (9.0, 8.0), (15.0, 15.0), (21.0, 6.0)], 2.2, accent),

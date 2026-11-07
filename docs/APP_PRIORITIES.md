@@ -57,3 +57,8 @@ ArcGIS Pro: settle questions with the ArcGIS MCP bridge, and check every fix in 
   - Rename the installed names (`rustgis` desktop entry, icon, MIME, AppImage, .deb/.rpm, Windows
     installers, `RustGIS-*` artifacts) to `unigis`. `ugrep` also installs `/usr/bin/ug`, so the
     distro packages ship `ug` only where it doesn't conflict.
+  - The logo is UniGIS's own now (`app/crates/render/src/logo.rs`: the vector layer as a U holding
+    a globe, on raster and table layers). The web app still loads RustGIS's favicon, PWA and
+    Apple touch icons from `assets.rustgis.app` (`app/apps/rustgis-web/index.html`,
+    `manifest.webmanifest`, `sw.js`, and `packaging/downloads/index.html`): render them from
+    `render::logo` in `cargo xtask web-pwa` and serve them with the app instead.
