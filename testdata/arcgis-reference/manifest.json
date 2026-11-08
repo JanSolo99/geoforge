@@ -111938,6 +111938,96 @@
           "relationships": []
         }
       }
+    },
+    "ewf_dem": {
+      "tool": "management.ExportRasterWorldFile",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "export_raster_world_file",
+        "params": {
+          "input": "testdata/raster/dem.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "ewf_geographic": {
+      "tool": "management.ExportRasterWorldFile",
+      "args": [
+        "testdata/raster/dem_geographic.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "export_raster_world_file",
+        "params": {
+          "input": "testdata/raster/dem_geographic.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "ewf_u8": {
+      "tool": "management.ExportRasterWorldFile",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "export_raster_world_file",
+        "params": {
+          "input": "testdata/raster/classes_u8.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "ewf_nonsquare": {
+      "tool": "management.ExportRasterWorldFile",
+      "args": [
+        "testdata/raster/world_nonsquare.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "export_raster_world_file",
+        "params": {
+          "input": "testdata/raster/world_nonsquare.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "ewf_existing": {
+      "tool": "management.ExportRasterWorldFile",
+      "args": [
+        "testdata/raster/Combina_patches1.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "export_raster_world_file",
+        "params": {
+          "input": "testdata/raster/Combina_patches1.tif",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

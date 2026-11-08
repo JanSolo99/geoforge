@@ -812,6 +812,9 @@ Each item is something ArcGIS Pro does with a file geodatabase; `[x]` done on br
 - [x] Enable Editing Templates (`enable_editing_templates`): validates the workspace and leaves a
       file geodatabase byte-identical, as ArcGIS Pro 3.7 does (probed on 24 geodatabases); errors
       000584 and 160632 for other workspaces. Scenario reference `gsc_templates`.
+- [x] Export Raster World File (`export_raster_world_file`, `ug run`): the world file beside a
+      GeoTIFF with ArcGIS's `%.18g` numbers, CR LF endings and extent-derived cell size; extension
+      from the raster's (tif -> tfw). 5 ArcGIS `ewf_*` references compared byte for byte.
 - [x] Dockable panes: left/right/bottom groups, tab dragging and drop previews,
       auto-hide, scrollable tab headers, and saved layout preferences. Reopening
       panes preserves tab order; pointer-drag and preference round-trip tests pass.

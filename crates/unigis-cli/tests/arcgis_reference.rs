@@ -4439,6 +4439,20 @@ fn compare_rasters(case: &str, ours: &Path, arcgis: &Path) -> Vec<String> {
         (Ok(x), Ok(y)) if x == y => {}
         (x, y) => diffs.push(format!("colormap: ours {x:?}, ArcGIS {y:?}")),
     }
+    // The world file beside the raster (Export Raster World File): its text, to the digit.
+    if case.starts_with("ewf_") {
+        let text = |p: &Path| {
+            unigis_raster::worldfile::world_file_path(p)
+                .and_then(|w| std::fs::read_to_string(w).ok())
+        };
+        if text(ours) != text(arcgis) {
+            diffs.push(format!(
+                "world file: ours {:?}, ArcGIS {:?}",
+                text(ours),
+                text(arcgis)
+            ));
+        }
+    }
     // The attribute table beside the raster (Delete Raster Attribute Table removes it).
     for ext in [".vat.dbf", ".vat.cpg"]
         .iter()

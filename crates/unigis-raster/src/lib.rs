@@ -37,6 +37,7 @@ pub mod stats;
 pub mod stats_metadata;
 pub mod surface;
 pub mod surface_parameters;
+pub mod worldfile;
 mod writer;
 pub mod zonal;
 pub mod zonal_tables;

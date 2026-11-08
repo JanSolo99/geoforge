@@ -600,6 +600,12 @@ fn delete_raster_attribute_table_unsupported(_: &dyn Context) -> Result<Output> 
     ))
 }
 
+fn export_raster_world_file_unsupported(_: &dyn Context) -> Result<Output> {
+    Err(Error::Unsupported(
+        "Export Raster World File writes a file beside the raster; run it through `ug run`".into(),
+    ))
+}
+
 fn add_colormap_unsupported(_: &dyn Context) -> Result<Output> {
     Err(Error::Unsupported(
         "Add Colormap edits the raster file in place; run it through `ug run`".into(),
@@ -3366,6 +3372,13 @@ pub static TOOLS: &[Tool] = &[
         summary: "Removes the raster attribute table (the .vat.dbf beside a raster file).",
         params: &[raster("input", "Input Raster", true)],
         run: delete_raster_attribute_table_unsupported,
+    },
+    Tool {
+        id: "export_raster_world_file",
+        name: "Export Raster World File",
+        summary: "Writes the raster's world file (pixel size and upper-left cell centre) beside it.",
+        params: &[raster("input", "Input Raster Dataset", true)],
+        run: export_raster_world_file_unsupported,
     },
     Tool {
         id: "add_colormap",

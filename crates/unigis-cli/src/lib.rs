@@ -6750,6 +6750,31 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
         }
         return Ok(());
     }
+    if spec.id == "export_raster_world_file" {
+        let input = map
+            .get("input")
+            .map(|v| v.trim())
+            .filter(|v| !v.is_empty())
+            .ok_or_else(|| {
+                Error::Unsupported("ERROR 000735: Input Raster Dataset: value is required".into())
+            })?;
+        if !Path::new(input).is_file() {
+            return Err(Error::Unsupported(format!(
+                "ERROR 000732: Input Raster Dataset: Dataset {input} does not exist or is not supported"
+            )));
+        }
+        let text = unigis_raster::worldfile::world_file_text(&unigis_raster::read_geotiff(
+            Path::new(input),
+        )?)
+        .map_err(Error::Unsupported)?;
+        // The raster is copied to the output (or left in place) and the world file written beside it.
+        let output = Path::new(&output);
+        copy_raster_files(Path::new(input), output)?;
+        let target = unigis_raster::worldfile::world_file_path(output).ok_or_else(|| {
+            Error::Unsupported("ERROR 000732: Input Raster Dataset: no file extension".into())
+        })?;
+        return std::fs::write(&target, text).map_err(|e| Error::io(&target, e));
+    }
     if spec.id == "add_colormap" {
         let get = |k: &str| map.get(k).map(|v| v.trim()).filter(|v| !v.is_empty());
         let input = get("input").ok_or_else(|| {
