@@ -31,16 +31,16 @@ installed from files are kept too, if they are small enough for the browser's st
 On the command line:
 
 ```sh
-rustgis-cli plugins                          # installed plugins
-rustgis-cli plugins browse                   # the registry
-rustgis-cli plugins get vector-toolkit       # install from the registry
-rustgis-cli plugins install my.rgplugin      # install a file (or a plugin folder)
-rustgis-cli plugins disable vector-toolkit   # enable / disable / uninstall <id>
+ug plugins                          # installed plugins
+ug plugins browse                   # the registry
+ug plugins get vector-toolkit       # install from the registry
+ug plugins install my.rgplugin      # install a file (or a plugin folder)
+ug plugins disable vector-toolkit   # enable / disable / uninstall <id>
 
-rustgis-cli run --sample \
+ug run --sample \
   --cmd 'gp.run={"tool":"plugin:vector-toolkit/hexagon-grid","params":{"input":"Countries","size":300}}' \
   --cmd 'share.exportMap={"path":"hex.png"}'
-rustgis-cli run --plugin ./dev-plugin/ --sample --cmd 'plugin:my-plugin/hello'   # load for one run
+ug run --plugin ./dev-plugin/ --sample --cmd 'plugin:my-plugin/hello'   # load for one run
 ```
 
 ## Safety
@@ -139,7 +139,7 @@ cargo build --release --target wasm32-unknown-unknown
 ```
 
 - `id`: lower-case letters, digits and hyphens. Commands and tools get ids
-  `plugin:<id>/<command>`, which the ribbon, command search, scripts and `rustgis-cli` use.
+  `plugin:<id>/<command>`, which the ribbon, command search, scripts and `ug` use.
 - `version` and `minRustgisVersion` look like `1.2.3`. UniGIS refuses a plugin that needs a
   newer RustGIS.
 - `permissions`: `edit`, `files` and `network` (see [Safety](#safety)). Ask only for what you use.
@@ -252,7 +252,7 @@ frame and adds the layer when it lands, as **Home › Add Data › From URL** do
 archive, a cloud-optimised GeoTIFF or a FlatGeobuf or GeoParquet read in place is added at once,
 as elsewhere.
 
-`rustgis-cli commands` lists every command id and its parameters.
+`ug commands` lists every command id and its parameters.
 
 Tools work differently. A tool receives its layer parameters' features as GeoJSON (only the
 selected features when a layer has a selection), and its `file` parameters' files. It returns new layers, standalone tables or a
@@ -263,7 +263,7 @@ In the desktop app a plugin tool runs in the background, so the map and the rest
 stay usable: the Tools pane shows the line the tool last logged, or a process plugin's last
 `progress` message, and a **Cancel** button. Cancel stops a process plugin's program; a WebAssembly tool runs on to its
 end and its result is dropped. One plugin tool runs at a time. `gp.run`, scripts and
-`rustgis-cli` still wait for the result.
+`ug` still wait for the result.
 
 ### The ABI (version 1)
 
@@ -331,7 +331,7 @@ web app.
 - A `.rgplugin` holds the plugin's files (the manifest, scripts, executables). Installing it
   unpacks them to `unpacked/<id>/` in the plugins folder, keeping executables executable. A
   plugin folder installed for development (Plugin Manager › Settings, or
-  `rustgis-cli plugins install ./folder`) runs where it is.
+  `ug plugins install ./folder`) runs where it is.
 
 ### The protocol
 
@@ -402,14 +402,14 @@ any package themselves:
 - `python` in `run` is then that environment's interpreter, on every platform.
 - UniGIS makes the environment when the plugin is installed: in the background in the desktop
   app (the Plugin Manager shows how it's going, and a **Prepare** button makes it again), and
-  before the command returns in `rustgis-cli plugins install` and `get`.
-  `rustgis-cli plugins prepare <id>` and the `plugin.prepare` command make it on demand.
+  before the command returns in `ug plugins install` and `get`.
+  `ug plugins prepare <id>` and the `plugin.prepare` command make it on demand.
 - It uses [uv](https://github.com/astral-sh/uv), which UniGIS downloads once (a pinned version,
   checked against its pinned SHA-256; `RUSTGIS_UV` names one to use instead, which is then
   trusted as it is, unchecked). uv installs a standalone Python of the version asked for and
   the packages in the requirements file, from PyPI. Pythons and uv's cache are shared in
   `tools/` in the plugins folder; each plugin's environment is in `envs/<id>/`. One
-  environment is made at a time per plugin, even across the app and `rustgis-cli`.
+  environment is made at a time per plugin, even across the app and `ug`.
 - The environment is made again when the Python version or the requirements change (a plugin
   update), and removed with the plugin. Until it's ready, the plugin's calls fail with a
   message saying how to prepare it.

@@ -4219,6 +4219,7 @@ dependencies = [
  "egui",
  "embed-resource",
  "log",
+ "rustgis-cli",
  "rustgis-engine",
  "rustgis-ui-egui",
  "serde_json",

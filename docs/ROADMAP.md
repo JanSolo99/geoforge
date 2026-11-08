@@ -788,6 +788,10 @@ Each item is something ArcGIS Pro does with a file geodatabase; `[x]` done on br
       writer's `set_subtype_field` / `add_subtype` / `remove_subtype` / `assign_default_to_field`.
       Test on a copy of `testdata/gdb-reference/subtypes.gdb` (nothing changed, add + drop +
       default, idempotent second save).
+- [x] One `unigis` program (first step): `unigis <subcommand>` runs the command line (`ug`'s code,
+      `rustgis-cli` is now a library plus the `ug` binary), `unigis`/`unigis file`/`--sample` open
+      the app; `rustgis-cli` named in the user docs became `ug`. Installers, the Windows console
+      twin and the settings folder are still to rename.
 - [x] Dockable panes: left/right/bottom groups, tab dragging and drop previews,
       auto-hide, scrollable tab headers, and saved layout preferences. Reopening
       panes preserves tab order; pointer-drag and preference round-trip tests pass.

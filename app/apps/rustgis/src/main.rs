@@ -1,6 +1,7 @@
 //! UniGIS desktop app.
 //!
-//! `rustgis [project.rgis | data.geojson|csv|shp …] [--sample]`
+//! `unigis [project.rgis | data.geojson|csv|shp …] [--sample]` opens the app; `unigis <subcommand> …`
+//! (`tools`, `run`, `render`, …) is the command line, as `ug`.
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 #![cfg_attr(all(windows, not(debug_assertions)), windows_subsystem = "windows")]
 
@@ -157,10 +158,24 @@ impl eframe::App for App {
     }
 }
 
-fn main() -> eframe::Result {
+fn main() -> std::process::ExitCode {
+    let argv: Vec<String> = std::env::args().collect();
+    if rustgis_cli::wants_cli(argv.get(1..).unwrap_or_default()) {
+        return rustgis_cli::main_with(argv);
+    }
+    match run_app() {
+        Ok(()) => std::process::ExitCode::SUCCESS,
+        Err(e) => {
+            eprintln!("unigis: {e}");
+            std::process::ExitCode::FAILURE
+        }
+    }
+}
+
+fn run_app() -> eframe::Result {
     let args: Vec<String> = std::env::args().skip(1).collect();
     if args.iter().any(|a| a == "--version" || a == "-V") {
-        println!("rustgis {}", env!("CARGO_PKG_VERSION"));
+        println!("unigis {}", env!("CARGO_PKG_VERSION"));
         return Ok(());
     }
     // What an earlier session left, before this one can write a new log.
@@ -196,7 +211,7 @@ fn main() -> eframe::Result {
     for f in files {
         let cmd = if rustgis_engine::project::is_project_file(f) { "project.open" } else { "layer.addData" };
         if let Err(e) = app.run(cmd, json!({"path": f})) {
-            eprintln!("rustgis: {f}: {e}");
+            eprintln!("unigis: {f}: {e}");
         }
     }
     app.session.dirty = false;

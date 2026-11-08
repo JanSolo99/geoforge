@@ -81,14 +81,14 @@ both.
   GeoPackage, GeoParquet, FlatGeobuf and Shapefile files are streamed a view at a time rather
   than loaded into a browser tab's memory, and nothing depends on a web view's limits.
 - **Everything is a command.** Every ribbon button, shortcut and pane action is a command with an
-  id and JSON parameters, and the same ids run from [`rustgis-cli`](../cli.md), the
+  id and JSON parameters, and the same ids run from [`ug`](../cli.md), the
   [`rustgis` Python package](../python.md), notebooks, models, the Script pane, the
   [MCP server](../mcp.md) and the AI Assistant. A batch of maps can be rendered in CI with one
   command line. GeoLibre is driven through its interface, its Python and R packages and its MCP
   server; it has no general command-line tool.
 - **Sandboxed plugins.** UniGIS [plugins](../plugins.md) are WebAssembly modules that can do
   only what their declared permissions allow, and the same file runs on the desktop, in
-  `rustgis-cli` and in the browser. GeoLibre's TypeScript plugins can do much more inside the
+  `ug` and in the browser. GeoLibre's TypeScript plugins can do much more inside the
   app (panels, map tools, custom layers), but its plugin API states that they "run as trusted
   code in the app window" and that its policy "is not a security boundary".
 - **Data design.** UniGIS defines domains, subtypes, attribute rules, contingent values,
@@ -145,7 +145,7 @@ browser), so a tool learned in one works the same way in the other. See
 
 A common split is to explore, share and collaborate in GeoLibre, especially from a browser,
 a phone or a notebook, and to use UniGIS for repeatable desktop work: a project scripted
-command by command, maps rendered by `rustgis-cli` in CI, data with domains and attribute rules,
+command by command, maps rendered by `ug` in CI, data with domains and attribute rules,
 or reports and map series printed to PDF.
 
 ## Common questions

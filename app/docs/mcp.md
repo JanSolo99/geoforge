@@ -1,15 +1,15 @@
 # MCP Server
 
-`rustgis-cli mcp` runs UniGIS as a [Model Context Protocol](https://modelcontextprotocol.io)
+`ug mcp` runs UniGIS as a [Model Context Protocol](https://modelcontextprotocol.io)
 server, so an AI agent such as Claude Code, Claude Desktop, Cursor, VS Code or Codex can make
 maps with it. The agent opens data, runs any UniGIS command or geoprocessing tool, reads
 attribute tables, looks at the map as an image and looks things up in this documentation.
 
 ```sh
-rustgis-cli mcp --sample                # the World Atlas sample
-rustgis-cli mcp --data parcels.geojson  # your own data (--data more than once, or --project p.rgis)
-rustgis-cli mcp --yes                   # also allow file and network access
-rustgis-cli mcp --attach [--yes]        # the desktop app that is already open (its MCP Relay)
+ug mcp --sample                # the World Atlas sample
+ug mcp --data parcels.geojson  # your own data (--data more than once, or --project p.rgis)
+ug mcp --yes                   # also allow file and network access
+ug mcp --attach [--yes]        # the desktop app that is already open (its MCP Relay)
 ```
 
 The server talks over standard input and output, so you don't start it yourself: you tell your
@@ -21,13 +21,13 @@ memory until the agent saves it.
 Claude Code:
 
 ```sh
-claude mcp add rustgis -- rustgis-cli mcp --sample
+claude mcp add rustgis -- ug mcp --sample
 ```
 
 Codex:
 
 ```sh
-codex mcp add rustgis -- rustgis-cli mcp --sample
+codex mcp add rustgis -- ug mcp --sample
 ```
 
 Claude Desktop (`claude_desktop_config.json`), Cursor (`~/.cursor/mcp.json`) and other clients
@@ -37,7 +37,7 @@ that use an `mcpServers` list:
 {
   "mcpServers": {
     "rustgis": {
-      "command": "rustgis-cli",
+      "command": "ug",
       "args": ["mcp", "--sample"]
     }
   }
@@ -51,14 +51,14 @@ VS Code (`.vscode/mcp.json`):
   "servers": {
     "rustgis": {
       "type": "stdio",
-      "command": "rustgis-cli",
+      "command": "ug",
       "args": ["mcp", "--sample"]
     }
   }
 }
 ```
 
-If the agent can't find `rustgis-cli`, give its full path (see [Installation](installation.md)).
+If the agent can't find `ug`, give its full path (see [Installation](installation.md)).
 Then ask, for example:
 
 - "Which 5 countries have the largest GDP? Show them on the map."
@@ -75,15 +75,15 @@ where n is the number of authenticated clients; hovering shows `Stop MCP relay`,
 it stops the relay.
 
 ```sh
-rustgis-cli mcp --attach                 # the open app on 127.0.0.1:8767
-rustgis-cli mcp --attach 9000 --yes      # another port, with file and network access
+ug mcp --attach                 # the open app on 127.0.0.1:8767
+ug mcp --attach 9000 --yes      # another port, with file and network access
 ```
 
 ```json
 {
   "mcpServers": {
     "rustgis-app": {
-      "command": "rustgis-cli",
+      "command": "ug",
       "args": ["mcp", "--attach", "--yes"]
     }
   }
@@ -106,7 +106,7 @@ private server; file and network commands still need `--yes`.
   when that is an absolute folder, otherwise in a per-user folder under the system temporary
   folder. The folder must be owned by the current user and not accessible to others. The file
   must be a regular file owned by the current user, without group or other access. A file
-  that is a symlink is refused. `rustgis-cli mcp --attach` reads it with `read_token(port)`.
+  that is a symlink is refused. `ug mcp --attach` reads it with `read_token(port)`.
   The token never appears on a command line. The file is removed when the relay stops.
 - **Attach first.** A connection's first non-empty line must be a `rustgis/attach` message
   carrying the token. It must arrive within 5 seconds, measured from connection, and be at most

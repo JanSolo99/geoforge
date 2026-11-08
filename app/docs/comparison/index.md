@@ -36,7 +36,7 @@ They differ in how they are built and who they suit:
 - **UniGIS** is written entirely in Rust and draws its own interface on the GPU (egui). It is
   one native program with no browser engine or JavaScript runtime inside, a ribbon laid
   out in the order of the work, and an engine where every button is a command with an id, run the
-  same way by the ribbon, `rustgis-cli`, notebooks, models and the AI Assistant.
+  same way by the ribbon, `ug`, notebooks, models and the AI Assistant.
 
 If you want the widest data access and the most platforms, choose GeoLibre. If you want a
 compact native desktop GIS with a classic ribbon workflow and a fully scriptable command
@@ -99,7 +99,7 @@ engine, choose RustGIS. Both keep your data on your machine. See
 
 | | **UniGIS** | **GeoLibre** | **QGIS** | **ArcGIS Pro** | **ArcGIS Online** |
 |---|---|---|---|---|---|
-| **Scripting** | Every action is a command: `rustgis-cli` and the `rustgis` Python package run any of them headlessly; a Script pane | Python console, `geolibre` Python package | PyQGIS, `qgis_process` | `arcpy` | ArcGIS API for Python / JavaScript |
+| **Scripting** | Every action is a command: `ug` and the `rustgis` Python package run any of them headlessly; a Script pane | Python console, `geolibre` Python package | PyQGIS, `qgis_process` | `arcpy` | ArcGIS API for Python / JavaScript |
 | **Notebooks** | Built-in notebooks of text and command cells; Jupyter `.ipynb` in and out | The whole app as a Jupyter widget | Bindings, not the UI | Notebooks drive `arcpy` | Hosted notebooks |
 | **Plugins** | Sandboxed WebAssembly plugins with declared permissions; a registry; the same file runs on desktop, CLI and web | TypeScript plugin API, a registry | **Largest**: thousands of Python plugins | .NET add-ins, Python toolboxes | App templates |
 | **AI assistant** | Acts through undoable commands; Anthropic, OpenAI, Gemini, OpenRouter, Ollama or any OpenAI-compatible model; bring your own key or sign in with ChatGPT; also on the command line | Natural-language assistant with undoable operations; bring your own key | Via plugins | Copilot features | AI assistants |

@@ -19,7 +19,7 @@ an address on the internet, run a plugin, script or task, or replace the project
 conversation, for that exact command and file or address only. Enter sends, Shift+Enter
 starts a new line, Up and Down recall earlier messages, and **Stop** ends a run.
 
-From the command line, `rustgis-cli ask` sends one request (see
+From the command line, `ug ask` sends one request (see
 [Command Line](../cli.md#asking-the-ai-assistant)).
 
 ## Choosing a model
@@ -58,13 +58,13 @@ The account picker retains separate registrations, even when their emails match.
 account** adds a registration; choose an existing one to reuse its issued client ID. From the command line:
 
 ```sh
-rustgis-cli ask --login                 # continue with ChatGPT in the browser
-rustgis-cli ask --login --another-account  # or register UniGIS for another account
-rustgis-cli ask --sample --provider chatgpt "Zoom to Tokyo"
-rustgis-cli ask --accounts              # list saved registrations
-rustgis-cli ask --account oaiapp_...      # select one by its issued client id
-rustgis-cli ask --login --account oaiapp_... # reauthorize that registration
-rustgis-cli ask --logout
+ug ask --login                 # continue with ChatGPT in the browser
+ug ask --login --another-account  # or register UniGIS for another account
+ug ask --sample --provider chatgpt "Zoom to Tokyo"
+ug ask --accounts              # list saved registrations
+ug ask --account oaiapp_...      # select one by its issued client id
+ug ask --login --account oaiapp_... # reauthorize that registration
+ug ask --logout
 ```
 
 The model catalog loads after sign-in, on startup when signed in, and when switching to this

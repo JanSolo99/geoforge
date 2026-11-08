@@ -3,14 +3,14 @@
 ## Install with an agent
 
 Point your agent at the [UniGIS skill](https://github.com/opengeos/RustGIS/blob/main/skills/rustgis/SKILL.md)
-and ask it to install RustGIS. The skill picks the platform, installs the app and `rustgis-cli`,
+and ask it to install RustGIS. The skill picks the platform, installs the app and `ug`,
 checks the release checksum, and registers the MCP server. The same skill is how an agent manages
 the desktop app that is already open.
 
 ## Download
 
 Each [GitHub release](https://github.com/opengeos/RustGIS/releases/latest) carries ready-to-run
-builds of the desktop app and `rustgis-cli`. The same files, grouped by platform, are mirrored at
+builds of the desktop app and `ug`. The same files, grouped by platform, are mirrored at
 **[downloads.rustgis.app](https://downloads.rustgis.app)**:
 
 | Platform | File |
@@ -27,7 +27,7 @@ builds of the desktop app and `rustgis-cli`. The same files, grouped by platform
 | Linux x64 / arm64 (other) | `UniGIS-<version>-linux-x86_64.tar.gz` / `UniGIS-<version>-linux-aarch64.tar.gz` |
 
 On macOS the command line tool is a separate `rustgis-cli-<version>-macos-<arch>.tar.gz`;
-the other packages include it (the Windows installers and the MSIX add `rustgis-cli` to every
+the other packages include it (the Windows installers and the MSIX add `ug` to every
 new terminal). `SHA256SUMS` lists the checksum of every file.
 
 On Windows, `setup.exe` installs for your account in `%LOCALAPPDATA%\Programs\UniGIS` and needs

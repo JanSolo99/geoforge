@@ -52,7 +52,7 @@ script from the command line, a notebook or the AI Assistant.
 
 -   **Scriptable and extensible**
 
-    `rustgis-cli` and the `rustgis` Python package run any command by id, render maps and chain
+    `ug` and the `rustgis` Python package run any command by id, render maps and chain
     tools; the MCP server lets AI agents make maps; sandboxed WebAssembly plugins add commands,
     tools and ribbon tabs.
     [Command Line](cli.md) · [Python](python.md) · [MCP Server](mcp.md) · [Plugins](plugins.md)

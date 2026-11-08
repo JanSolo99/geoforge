@@ -9,6 +9,9 @@ description = "ug, the UniGIS command line: the engine's geoprocessing tools plu
 [lints]
 workspace = true
 
+[lib]
+path = "src/lib.rs"
+
 [[bin]]
 name = "ug"
 path = "src/main.rs"

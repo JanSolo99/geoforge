@@ -54,5 +54,5 @@ your ChatGPT account, Gemini, OpenRouter, a local Ollama, or any OpenAI-compatib
 ## Next steps
 
 - The [User Guide](user-guide/index.md) walks through every part of the app.
-- [Command Line](cli.md) shows how to script UniGIS with `rustgis-cli`.
+- [Command Line](cli.md) shows how to script UniGIS with `ug`.
 - [Plugins](plugins.md) shows how to add tools from the plugin registry, or write your own.

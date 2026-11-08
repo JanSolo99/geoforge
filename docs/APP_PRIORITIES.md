@@ -61,6 +61,11 @@ ArcGIS Pro: settle questions with the ArcGIS MCP bridge, and check every fix in 
     Save Edits, per-subtype domains and the default subtype, read relationship classes, and offer
     the coded-value pick list in the Attributes popup and the Create Features pane.
 - [ ] unigis-naming: One `unigis` program; the app is UniGIS everywhere
+  - Done: `unigis <subcommand>` runs the CLI (`rustgis-cli` is a library plus `ug`; the desktop
+    `unigis` binary dispatches on its first argument), `unigis --version`, user docs say `ug`.
+    Still open: Windows console twin (a GUI-subsystem exe can't print: `unigis-cli.exe`/`ug.exe`),
+    the installed names below, the Linux settings folder `~/.config/rustgis` (migrate to `unigis`),
+    and the web icons.
   - The app is called UniGIS: not RustGIS, not GeoForge. Installed program `unigis`: with no
     arguments or with files it opens the app, with a subcommand it is the CLI (today's merged `ug`
     in `app/apps/rustgis-cli`); `ug` is a shortcut to the CLI. Windows needs a console twin

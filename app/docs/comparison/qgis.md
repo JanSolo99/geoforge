@@ -52,7 +52,7 @@ The same World Atlas data, styled the same way, in each app.
   the static build yourself. QGIS has no official browser version; QGIS Server and qgis2web
   publish maps made on the desktop.
 - **Everything is a command.** Every ribbon button, shortcut and pane action is a command with an
-  id and JSON parameters. The same ids run from [`rustgis-cli`](../cli.md), the
+  id and JSON parameters. The same ids run from [`ug`](../cli.md), the
   [`rustgis` Python package](../python.md), notebooks, models, the Script pane, the
   [MCP server](../mcp.md) and the AI Assistant, so what you can click you can script, exactly.
   QGIS's processing algorithms are scriptable through `qgis_process` and PyQGIS, but much of
@@ -66,7 +66,7 @@ The same World Atlas data, styled the same way, in each app.
   QGIS has AI through third-party plugins.
 - **Sandboxed plugins.** UniGIS [plugins](../plugins.md) are WebAssembly modules that can do
   only what their declared permissions allow (editing the project, reading files, the network),
-  and the same file runs on the desktop, in `rustgis-cli` and in the browser. QGIS plugins are
+  and the same file runs on the desktop, in `ug` and in the browser. QGIS plugins are
   Python with the full access of the user running QGIS: far more capable, but trusted rather
   than contained.
 - **Cloud-native data without extra libraries.** Cloud-optimised GeoTIFF, GeoParquet,
@@ -152,7 +152,7 @@ Most QGIS ideas have a counterpart under a different name:
 | Browser panel, Data Source Manager | Catalog pane, **Data › Add Data**, the Data Sources pane |
 | Processing Toolbox | Geoprocessing pane (**Analyze › Tools**), or Command Search (++ctrl+k++) |
 | Graphical Modeler | ModelBuilder, which can also build a model from your history |
-| `qgis_process` | `rustgis-cli run --cmd 'gp.run={…}'` |
+| `qgis_process` | `ug run --cmd 'gp.run={…}'` |
 | Python console, PyQGIS | The Script pane and notebooks inside the app; the `rustgis` Python package outside it |
 | Layer Styling panel | **Style** tab and the Symbology pane |
 | Expressions (select, filter) | SQL `WHERE` clauses for selections and definition queries |
@@ -184,7 +184,7 @@ across and restyle it.
 A common split is to do heavy editing, PROJ-dependent work and detailed cartography in QGIS,
 and use UniGIS where a light install, the browser, scripting by command id or the AI Assistant
 helps: a quick look at a GeoParquet on a laptop without QGIS, a map shared as a web app, a batch
-of maps rendered by `rustgis-cli` in CI, or the 1,000+ GeoLibre and Whitebox tools from a
+of maps rendered by `ug` in CI, or the 1,000+ GeoLibre and Whitebox tools from a
 browser tab.
 
 ## Common questions

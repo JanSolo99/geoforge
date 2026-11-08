@@ -160,7 +160,7 @@ added.
 reaches DuckDB in its environment (`PGPASSWORD`), never on its command line:
 
 ```sh
-rustgis-cli run --cmd 'layer.addSql={"sql":"SELECT name, geom FROM roads WHERE lanes > 2","database":"postgres:host=localhost dbname=gis user=postgres","password":"…"}'
+ug run --cmd 'layer.addSql={"sql":"SELECT name, geom FROM roads WHERE lanes > 2","database":"postgres:host=localhost dbname=gis user=postgres","password":"…"}'
 ```
 
 UniGIS doesn't link to DuckDB: it runs `duckdb`, which writes the result as GeoParquet in the
@@ -196,7 +196,7 @@ The commands do the same: `stac.collections` (`"url"`), `stac.search` (`"collect
 an item `stac.search` returned (`"item"`) or an item's address (`"url"`) and `"asset"`:
 
 ```sh
-rustgis-cli run --cmd 'stac.search={"collections":"sentinel-2-l2a","bbox":[7.4,46.9,7.5,47],"datetime":"2024-07-01/2024-07-31","maxCloud":20}' --cmd 'stac.addAsset={"url":"https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2B_32TLS_20240727_0_L2A","asset":"scl"}'
+ug run --cmd 'stac.search={"collections":"sentinel-2-l2a","bbox":[7.4,46.9,7.5,47],"datetime":"2024-07-01/2024-07-31","maxCloud":20}' --cmd 'stac.addAsset={"url":"https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a/items/S2B_32TLS_20240727_0_L2A","asset":"scl"}'
 ```
 
 Assets are added by their web address: one in a cloud store's own protocol (`s3://`) is refused
@@ -228,7 +228,7 @@ latest release (or one named with `"release"`). Two ways:
 tiles):
 
 ```sh
-rustgis-cli run --cmd 'map.zoomToExtent={"extent":[7.40,46.93,7.47,46.97]}' --cmd 'overture.add={"theme":"buildings"}' --cmd 'overture.add={"theme":"transportation"}' --cmd 'share.exportMap={"path":"bern.png"}'
+ug run --cmd 'map.zoomToExtent={"extent":[7.40,46.93,7.47,46.97]}' --cmd 'overture.add={"theme":"buildings"}' --cmd 'overture.add={"theme":"transportation"}' --cmd 'share.exportMap={"path":"bern.png"}'
 ```
 
 The data's licences differ by theme (OpenStreetMap's ODbL for most, CDLA Permissive 2.0 for
@@ -261,7 +261,7 @@ In the app the requests go out in the background, one at a time, and the layer i
 last answer lands; `layer.geocode` on the command line waits for them.
 
 ```sh
-rustgis-cli run --cmd 'layer.addData={"path":"stores.csv"}' --cmd 'layer.geocode={"table":"stores","address":["street","city","country"]}'
+ug run --cmd 'layer.addData={"path":"stores.csv"}' --cmd 'layer.geocode={"table":"stores","address":["street","city","country"]}'
 ```
 
 The addresses are sent to the geocoder's server, so the [AI Assistant](assistant.md) asks before
@@ -286,7 +286,7 @@ or provinces (`ADM1`) and finer divisions down to `ADM5` where they exist, simpl
 `boundaries.countries` lists the countries.
 
 ```sh
-rustgis-cli run --cmd 'osm.download={"bbox":[7.44,46.944,7.456,46.952],"preset":"buildings"}' --cmd 'boundaries.add={"country":"KEN","level":"ADM1"}'
+ug run --cmd 'osm.download={"bbox":[7.44,46.944,7.456,46.952],"preset":"buildings"}' --cmd 'boundaries.add={"country":"KEN","level":"ADM1"}'
 ```
 
 Both reach the network: the [AI Assistant](assistant.md) asks before it runs them, and plugins need
@@ -313,8 +313,8 @@ portal and lists, for each, the resources UniGIS can add, the best format first:
 features unless `"layer"` names one). A search lists up to 50 datasets.
 
 ```sh
-rustgis-cli run --cmd 'portal.search={"portal":"socrata","url":"data.cityofnewyork.us","query":"parks"}'
-rustgis-cli run --sample --cmd 'portal.add={"url":"https://data.cityofnewyork.us/resource/enfh-gkve.geojson?$limit=50000","name":"Parks","portal":"https://api.us.socrata.com"}'
+ug run --cmd 'portal.search={"portal":"socrata","url":"data.cityofnewyork.us","query":"parks"}'
+ug run --sample --cmd 'portal.add={"url":"https://data.cityofnewyork.us/resource/enfh-gkve.geojson?$limit=50000","name":"Parks","portal":"https://api.us.socrata.com"}'
 ```
 
 An address a portal lists is judged as one found in a document on the web: it may not point into
@@ -343,7 +343,7 @@ Keys are typed, or, on the desktop and only when chosen, read from an AWS profil
 with no keys at all.
 
 ```sh
-rustgis-cli run --cmd 's3.connect={"name":"minio","endpoint":"https://minio.example.org","buckets":["my-bucket"],"accessKeyId":"…","secretAccessKey":"…"}' \
+ug run --cmd 's3.connect={"name":"minio","endpoint":"https://minio.example.org","buckets":["my-bucket"],"accessKeyId":"…","secretAccessKey":"…"}' \
   --cmd 's3.list={"url":"s3://my-bucket/rasters/"}' --cmd 'layer.addUrl={"url":"s3://my-bucket/rasters/dem.tif"}'
 ```
 
@@ -476,7 +476,7 @@ say so. A store by web address must allow the browser to fetch it (CORS) for the
 Google Cloud's CMIP6 bucket does, ARCO-ERA5's doesn't (the desktop reads both).
 
 ```sh
-rustgis-cli run --cmd 'layer.addZarr={"url":"https://storage.googleapis.com/gcp-public-data-arco-era5/ar/1959-2022-full_37-1h-0p25deg-chunk-1.zarr-v2","variable":"2m_temperature","index":{"time":539100}}'
+ug run --cmd 'layer.addZarr={"url":"https://storage.googleapis.com/gcp-public-data-arco-era5/ar/1959-2022-full_37-1h-0p25deg-chunk-1.zarr-v2","variable":"2m_temperature","index":{"time":539100}}'
 ```
 
 A store in a folder is saved in the project by its folder and slice (`2m_temperature[time=539100]`)

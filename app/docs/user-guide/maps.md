@@ -61,7 +61,7 @@ removes the web basemaps but keeps the overlays. Tile layers are saved with the 
 their credits are shown in the corner of the map and drawn on exports.
 
 Tiles load in the background and the map fills in as they arrive, with coarser tiles standing in
-meanwhile; exports and `rustgis-cli` wait for them. On the globe and in other projections the
+meanwhile; exports and `ug` wait for them. On the globe and in other projections the
 tiles are reprojected. From scripts: `map.addTiles`, `map.removeTiles`, `map.setTiles` and
 `map.tiles`.
 
@@ -72,7 +72,7 @@ Earth's default borders, and China's (Natural Earth's China point of view: Taiwa
 and South Tibet are part of China). UniGIS picks China's when the system's time zone is
 mainland China's (such as `Asia/Shanghai`) or its first locale is `zh-CN`; nothing is looked up
 over the network. Choose one in **Settings › Language › Worldview**, set `RUSTGIS_WORLDVIEW`
-(`default` or `china`), or pass `--worldview` to `rustgis-cli`. An untouched sample project
+(`default` or `china`), or pass `--worldview` to `ug`. An untouched sample project
 switches its countries at once; others keep the layer they have.
 
 ## Projections

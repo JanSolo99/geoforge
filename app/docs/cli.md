@@ -1,15 +1,17 @@
 # Command Line
 
-Every ribbon action is a command with an id. `rustgis-cli` runs them headlessly.
+Every ribbon action is a command with an id. `ug` runs them headlessly. The `unigis` program is the
+same command line: `unigis` alone (or with a project or data file, or `--sample`) opens the app, and
+`unigis tools`, `unigis run …`, `unigis render …` run the subcommand exactly as `ug` does.
 
 ```sh
-rustgis-cli commands                  # every command id with its parameters
-rustgis-cli tools                     # geoprocessing tools
-rustgis-cli info data.geojson         # layer summary as JSON
-rustgis-cli render data.geojson map.png --basemap ocean --width 1600 --height 900
-rustgis-cli render data.geojson map.png --tiles 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
-rustgis-cli logo icon.png --size 256  # the app icon as a PNG
-rustgis-cli plugins                   # installed plugins (also: browse, get, install, uninstall…)
+ug commands                  # every command id with its parameters
+ug tools                     # geoprocessing tools
+ug info data.geojson         # layer summary as JSON
+ug render data.geojson map.png --basemap ocean --width 1600 --height 900
+ug render data.geojson map.png --tiles 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+ug logo icon.png --size 256  # the app icon as a PNG
+ug plugins                   # installed plugins (also: browse, get, install, uninstall…)
 ```
 
 ## Chaining commands
@@ -18,7 +20,7 @@ rustgis-cli plugins                   # installed plugins (also: browse, get, in
 result:
 
 ```sh
-rustgis-cli run --sample \
+ug run --sample \
   --cmd 'gp.run={"tool":"countPoints","params":{"polygons":"Countries","points":"Cities"}}' \
   --cmd 'layer.symbology={"layer":"Countries_Summarize","type":"graduated","field":"point_count"}' \
   --cmd 'bookmark.go={"name":"Europe"}' \
@@ -35,7 +37,7 @@ folder>` loads one more for this run only. Their commands and tools have ids lik
 `plugin:vector-toolkit/hexagon-grid`:
 
 ```sh
-rustgis-cli run --sample --plugin vector-toolkit-0.1.0.rgplugin \
+ug run --sample --plugin vector-toolkit-0.1.0.rgplugin \
   --cmd 'gp.run={"tool":"plugin:vector-toolkit/hexagon-grid","params":{"input":"Countries","size":300}}' \
   --cmd 'share.exportMap={"path":"hexagons.png"}'
 ```
@@ -43,14 +45,14 @@ rustgis-cli run --sample --plugin vector-toolkit-0.1.0.rgplugin \
 Rasters work the same way:
 
 ```sh
-rustgis-cli render dem.tif dem.png
-rustgis-cli run --data dem.tif \
+ug render dem.tif dem.png
+ug run --data dem.tif \
   --cmd 'raster.symbology={"type":"shadedRelief","ramp":"Terrain","zFactor":1.5}' \
   --cmd 'raster.info={}' \
   --cmd 'share.exportMap={"path":"relief.png","dpi":192}'
 ```
 
-![A map of Europe exported by rustgis-cli](https://assets.rustgis.app/images/cli-export.webp)
+![A map of Europe exported by ug](https://assets.rustgis.app/images/cli-export.webp)
 
 ## Asking the AI assistant
 
@@ -59,12 +61,12 @@ then the model answers and acts on the project through commands; `--save` keeps 
 
 ```sh
 export ANTHROPIC_API_KEY=…            # or OPENAI_API_KEY, GEMINI_API_KEY, OPENROUTER_API_KEY
-rustgis-cli ask --sample "Which 5 countries have the largest GDP?"
-rustgis-cli ask --sample "Buffer the cities by 200 km and label them" --save buffered.rgis
-rustgis-cli ask --data parcels.geojson --provider ollama --model qwen3:8b "Summarise the fields"
-rustgis-cli ask --models --provider openai          # the provider's models
-rustgis-cli ask --login                             # sign in with ChatGPT to use your ChatGPT plan
-rustgis-cli ask --sample --provider chatgpt "Zoom to Tokyo"
+ug ask --sample "Which 5 countries have the largest GDP?"
+ug ask --sample "Buffer the cities by 200 km and label them" --save buffered.rgis
+ug ask --data parcels.geojson --provider ollama --model qwen3:8b "Summarise the fields"
+ug ask --models --provider openai          # the provider's models
+ug ask --login                             # sign in with ChatGPT to use your ChatGPT plan
+ug ask --sample --provider chatgpt "Zoom to Tokyo"
 ```
 
 The provider is `--provider` (`anthropic`, `openai`, `chatgpt`, `gemini`, `openrouter`, `ollama`, `custom`),
@@ -84,7 +86,7 @@ for a different account), and `--logout` signs out; see [Signing in with ChatGPT
 VS Code, which then run commands, look at the map and search the documentation themselves:
 
 ```sh
-claude mcp add rustgis -- rustgis-cli mcp --sample
+claude mcp add rustgis -- ug mcp --sample
 ```
 
 See [MCP Server](mcp.md).
