@@ -10,7 +10,7 @@ pub fn commands() -> Vec<C> {
     vec![
         C::new("edit.addFeature", "Create Feature", "Edit › Features", add_feature)
             .when(super::design::need_editable)
-            .params(r#"{"layer"?, "geometry": GeoJSON geometry (lon/lat), "attributes"?: {field: value}, "template"?: feature template}"#),
+            .params(r#"{"layer"?, "geometry": GeoJSON geometry (lon/lat) (or "shape": "rectangle"|"circle"|"ellipse" with "points": [[lon, lat], [lon, lat]]), "attributes"?: {field: value}, "template"?: feature template}"#),
         C::new("edit.delete", "Delete", "Edit › Features", delete).key("Delete").when(super::design::need_editable_selection),
         C::new("edit.setValue", "Edit Attribute", "Attribute Table", set_value)
             .when(super::design::need_editable)
@@ -29,7 +29,21 @@ pub fn commands() -> Vec<C> {
 
 pub(crate) fn add_feature(s: &mut Session, p: &Json) -> CmdResult {
     let id = s.layer_id(p)?;
-    let g = p.get("geometry").and_then(rustgis_data::io::geometry_from_geojson).ok_or("geometry must be a GeoJSON geometry")?;
+    let g = match (p.get("geometry"), ps(p, "shape")) {
+        (Some(g), _) => rustgis_data::io::geometry_from_geojson(g).ok_or("geometry must be a GeoJSON geometry")?,
+        // A rectangle, circle or ellipse from its two defining points, as the graphics tools draw them.
+        (None, Some(shape)) if matches!(shape, "rectangle" | "circle" | "ellipse") => {
+            let pts: Vec<rustgis_geom::Coord> = p
+                .get("points")
+                .and_then(Json::as_array)
+                .map(|a| {
+                    a.iter().filter_map(|c| Some(rustgis_geom::Coord::new(c.get(0)?.as_f64()?, c.get(1)?.as_f64()?))).take(2).collect()
+                })
+                .unwrap_or_default();
+            super::graphics::geometry(shape, pts)?
+        }
+        _ => return Err("geometry must be a GeoJSON geometry".into()),
+    };
     let l = s.map_mut().layer_mut(id).ok_or("no layer")?;
     let want = l.geometry_type();
     let ok = want == g.kind() || want == GeometryType::None;

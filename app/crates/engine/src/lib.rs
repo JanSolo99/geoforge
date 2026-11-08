@@ -157,9 +157,15 @@ pub enum Tool {
     CreatePoint,
     CreateLine,
     CreatePolygon,
+    /// Draws a polygon feature by dragging: `rectangle`, `circle` or `ellipse`.
+    CreateShape(&'static str),
     /// Draws a graphic: the shape is one of [`GRAPHIC_TOOLS`]' shapes.
     Graphic(&'static str),
 }
+
+/// The polygon construction tools that drag out a shape: (shape, tool code, label).
+pub const CREATE_SHAPES: &[(&str, &str, &str)] =
+    &[("rectangle", "createRectangle", "Rectangle"), ("circle", "createCircle", "Circle"), ("ellipse", "createEllipse", "Ellipse")];
 
 /// The graphic drawing tools: (shape, tool code, label).
 pub const GRAPHIC_TOOLS: &[(&str, &str, &str)] = &[
@@ -187,12 +193,16 @@ impl Tool {
             Tool::CreatePoint => "createPoint",
             Tool::CreateLine => "createLine",
             Tool::CreatePolygon => "createPolygon",
+            Tool::CreateShape(shape) => CREATE_SHAPES.iter().find(|c| c.0 == shape).map_or("createRectangle", |c| c.1),
             Tool::Graphic(shape) => GRAPHIC_TOOLS.iter().find(|g| g.0 == shape).map_or("graphicPoint", |g| g.1),
         }
     }
     pub fn from_code(s: &str) -> Option<Tool> {
         if let Some(g) = GRAPHIC_TOOLS.iter().find(|g| g.1.eq_ignore_ascii_case(s.trim())) {
             return Some(Tool::Graphic(g.0));
+        }
+        if let Some(c) = CREATE_SHAPES.iter().find(|c| c.1.eq_ignore_ascii_case(s.trim())) {
+            return Some(Tool::CreateShape(c.0));
         }
         [
             Tool::Explore,
@@ -217,11 +227,12 @@ impl Tool {
             Tool::CreatePoint => "Create Point",
             Tool::CreateLine => "Create Line",
             Tool::CreatePolygon => "Create Polygon",
+            Tool::CreateShape(shape) => CREATE_SHAPES.iter().find(|c| c.0 == shape).map_or("Rectangle", |c| c.2),
             Tool::Graphic(shape) => GRAPHIC_TOOLS.iter().find(|g| g.0 == shape).map_or("Point", |g| g.2),
         }
     }
     pub fn creates(self) -> bool {
-        matches!(self, Tool::CreatePoint | Tool::CreateLine | Tool::CreatePolygon)
+        matches!(self, Tool::CreatePoint | Tool::CreateLine | Tool::CreatePolygon | Tool::CreateShape(_))
     }
 }
 

@@ -156,9 +156,11 @@ fn set_tool(s: &mut Session, p: &Value) -> CmdResult {
             (Tool::CreatePoint, Some(rustgis_data::GeometryType::Point))
                 | (Tool::CreateLine, Some(rustgis_data::GeometryType::Polyline))
                 | (Tool::CreatePolygon, Some(rustgis_data::GeometryType::Polygon))
+                | (Tool::CreateShape(_), Some(rustgis_data::GeometryType::Polygon))
         );
         if !ok {
-            return Err(format!("{} needs a {} layer", t.label(), t.label().trim_start_matches("Create ").to_lowercase()));
+            let need = if matches!(t, Tool::CreateShape(_)) { "polygon" } else { &t.label().trim_start_matches("Create ").to_lowercase() };
+            return Err(format!("{} needs a {} layer", t.label(), need));
         }
     }
     s.tool = t;

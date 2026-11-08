@@ -35,7 +35,7 @@ ArcGIS Pro: settle questions with the ArcGIS MCP bridge, and check every fix in 
   - Basemaps must not need the Basemaps plugin. Today there is a separate Basemaps ribbon tab
     (plugin) and a Basemap button on the Map ribbon; fold everything into Map › Basemap like
     ArcGIS Pro's gallery, and remove the extra tab.
-- [ ] create-features-pane: ArcGIS Pro's Create Features pane
+- [x] create-features-pane: ArcGIS Pro's Create Features pane
   - Today Edit › Create creates a feature for the layer selected in Contents (keep that working).
   - Add the Create Features pane: feature templates per layer (default attributes, auto-generated
     from symbology classes), templates from `.lyrx` files, a template search box, and the

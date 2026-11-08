@@ -38,6 +38,7 @@ enum DragKind {
 fn drag_shape(tool: Tool) -> Option<&'static str> {
     match tool {
         Tool::Graphic(s) if matches!(s, "rectangle" | "circle" | "ellipse" | "freehand" | "lasso" | "picture") => Some(s),
+        Tool::CreateShape(s) => Some(s),
         _ => None,
     }
 }
@@ -622,7 +623,11 @@ fn interact(app: &mut RustGisApp, ui: &mut Ui, resp: &egui::Response, rect: Rect
         app.map.drag = None;
         if let Some(shape) = drag_shape(tool) {
             let pts = std::mem::take(&mut app.map.sketch);
-            if shape == "picture" {
+            if matches!(tool, Tool::CreateShape(_)) {
+                let coords: Vec<[f64; 2]> = pts.iter().map(|c| [c.x, c.y]).collect();
+                let _ = app.run("edit.addFeature", with_template(app, json!({"shape": shape, "points": coords})));
+                app.map.cancel_sketch();
+            } else if shape == "picture" {
                 app.ui.pending_picture = Some(pts);
                 let _ = app.run("ui.addPicture", Value::Null);
             } else {
@@ -746,6 +751,7 @@ fn interact(app: &mut RustGisApp, ui: &mut Ui, resp: &egui::Response, rect: Rect
                 let _ = app.run("ui.dialog", json!({"name": "graphicText", "lon": c.x, "lat": c.y}));
             }
             // Dragged shapes ignore plain clicks.
+            Tool::CreateShape(_) => {}
             Tool::Graphic(s) if !vertex_shape(Tool::Graphic(s)) => {}
             Tool::Measure | Tool::MeasureArea | Tool::CreateLine | Tool::CreatePolygon | Tool::Graphic(_) => {
                 if app.map.sketch_done {
@@ -1075,6 +1081,8 @@ fn overlays(app: &mut RustGisApp, ui: &mut Ui, p: &egui::Painter, rect: Rect, t:
         Tool::CreatePolygon => Some("Click to add vertices · double-click to close the polygon"),
         Tool::Select => Some("Click or drag a box · Shift adds · Ctrl removes"),
         Tool::ZoomIn => Some("Drag a box or click to zoom in"),
+        Tool::CreateShape("circle") => Some("Drag from the centre out to add a circle"),
+        Tool::CreateShape(_) => Some("Drag a box to add the shape"),
         Tool::Graphic("point") => Some("Click the map to place a point"),
         Tool::Graphic("text") => Some("Click the map to place text"),
         Tool::Graphic("line" | "curve") => Some("Click to add vertices · double-click to finish"),

@@ -2,6 +2,14 @@
 
 ## Creating features
 
+**Edit › Create Features** opens the Create Features pane: every editable layer with its feature
+templates, a search box, and the construction tools for the chosen layer's geometry type. A layer
+keeps its saved templates (Editing pane); a layer without any lists automatic ones: one per class
+of a unique-values symbology (the class value becomes the field's default) or one named after the
+layer. Choosing a template makes its layer the target, saves an automatic template with the layer,
+and starts a construction tool: Point; Line; Polygon, Rectangle, Circle or Ellipse (drag a box, or
+from the centre out for a circle). The templates' defaults apply to every feature you draw.
+
 **Edit › Create** draws new points, lines and polygons into the layer selected in Layers:
 click each vertex and double-click to finish (++esc++ cancels). **Delete** (++delete++) removes
 the selected features. Edit attributes in the attribute table (++ctrl+t++): double-click a cell

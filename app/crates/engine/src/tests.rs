@@ -311,6 +311,44 @@ fn geoprocessing_adds_layers_and_history() {
 }
 
 #[test]
+fn polygon_features_from_construction_shapes() {
+    let mut s = world();
+    let layer = s
+        .map()
+        .layers
+        .iter()
+        .find(|l| l.geometry_type() == rustgis_data::GeometryType::Polygon && !l.graphics)
+        .map(|l| l.name.clone())
+        .unwrap();
+    let before = s.map().layer_by_name(&layer).unwrap().dataset.features.len();
+    for (shape, pts) in
+        [("rectangle", json!([[0, 45], [10, 55]])), ("circle", json!([[5, 50], [8, 50]])), ("ellipse", json!([[0, 40], [20, 48]]))]
+    {
+        s.run("edit.addFeature", &json!({"layer": layer, "shape": shape, "points": pts})).unwrap();
+    }
+    assert_eq!(s.map().layer_by_name(&layer).unwrap().dataset.features.len(), before + 3);
+    for bad in [
+        json!({"shape": "rectangle", "points": [[1, 1], [1, 5]]}),
+        json!({"shape": "circle", "points": [[1, 1]]}),
+        json!({"shape": "star", "points": [[0, 0], [1, 1]]}),
+        json!({"shape": "rectangle"}),
+    ] {
+        let mut p = bad.clone();
+        p["layer"] = json!(layer);
+        assert!(s.run("edit.addFeature", &p).is_err(), "{bad}");
+    }
+    assert_eq!(s.map().layer_by_name(&layer).unwrap().dataset.features.len(), before + 3);
+    // The construction tools need a polygon layer.
+    s.active_layer = s.map().layer_by_name(&layer).map(|l| l.id);
+    s.run("tool.set", &json!({"tool": "createCircle"})).unwrap();
+    for code in ["createRectangle", "createCircle", "createEllipse"] {
+        assert!(crate::Tool::from_code(code).is_some_and(|t| t.creates() && t.code() == code), "{code}");
+    }
+    s.active_layer = s.map().layer_by_name("Cities").map(|l| l.id);
+    assert!(s.run("tool.set", &json!({"tool": "createRectangle"})).is_err());
+}
+
+#[test]
 fn editing_features_and_fields() {
     let mut s = world();
     s.run(

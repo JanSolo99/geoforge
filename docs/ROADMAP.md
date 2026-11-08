@@ -769,6 +769,12 @@ Each item is something ArcGIS Pro does with a file geodatabase; `[x]` done on br
       previews), custom tile layers below. The Basemaps plugin is no longer downloaded at startup;
       its ribbon tab is hidden and a saved `plugin:basemaps` tab opens Map (the plugin itself is
       untouched). 2 smoke tests, preset catalog and startup tests.
+- [x] Create Features pane (`ui-egui/src/createpane.rs`): templates per editable layer (saved,
+      else automatic from unique-values classes), search, construction tools Point / Line /
+      Polygon and the dragged Rectangle / Circle / Ellipse (`Tool::CreateShape`,
+      `edit.addFeature` with `shape` + `points`). Edit › Create keeps working. Not yet: `.lyrx`
+      templates, the other ArcGIS construction tools (Arc, Trace, Right Angle, Midpoint, Endpoint
+      Arc, Tangent, Bezier, Freehand, Stream, Auto-Complete Polygon), template properties.
 - [x] Dockable panes: left/right/bottom groups, tab dragging and drop previews,
       auto-hide, scrollable tab headers, and saved layout preferences. Reopening
       panes preserves tab order; pointer-drag and preference round-trip tests pass.

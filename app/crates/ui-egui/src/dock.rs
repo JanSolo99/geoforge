@@ -23,6 +23,7 @@ pub enum Pane {
     History,
     Details,
     Editing,
+    CreateFeatures,
     Design,
     Workflows,
     Script,
@@ -40,7 +41,7 @@ pub enum Pane {
 }
 
 impl Pane {
-    pub const ALL: [Pane; 22] = [
+    pub const ALL: [Pane; 23] = [
         Pane::Contents,
         Pane::Catalog,
         Pane::Sources,
@@ -49,6 +50,7 @@ impl Pane {
         Pane::History,
         Pane::Details,
         Pane::Editing,
+        Pane::CreateFeatures,
         Pane::Design,
         Pane::Workflows,
         Pane::Script,
@@ -76,6 +78,7 @@ impl Pane {
             Pane::History => "history",
             Pane::Details => "details",
             Pane::Editing => "editing",
+            Pane::CreateFeatures => "createFeatures",
             Pane::Design => "design",
             Pane::Workflows => "workflows",
             Pane::Script => "script",
@@ -112,6 +115,7 @@ impl Pane {
             Pane::History => "History",
             Pane::Details => "Details",
             Pane::Editing => "Editing",
+            Pane::CreateFeatures => "Create Features",
             Pane::Design => "Data Design",
             Pane::Workflows => "Workflows",
             Pane::Script => "Script",

@@ -144,7 +144,7 @@ fn ellipse(a: Coord, b: Coord) -> Vec<Coord> {
     )
 }
 
-fn geometry(shape: &str, pts: Vec<Coord>) -> Result<Geometry, String> {
+pub(crate) fn geometry(shape: &str, pts: Vec<Coord>) -> Result<Geometry, String> {
     Ok(match shape {
         "point" | "text" => Geometry::Point(*pts.first().ok_or("a point needs a location")?),
         "line" | "freehand" => {

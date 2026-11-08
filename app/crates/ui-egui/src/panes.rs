@@ -37,6 +37,7 @@ pub fn body(app: &mut RustGisApp, ui: &mut Ui, pane: Pane, t: &Tokens) {
             Pane::History => history(app, ui, t),
             Pane::Details => details(app, ui, t),
             Pane::Editing => crate::editpanes::editing(app, ui, t),
+            Pane::CreateFeatures => crate::createpane::show(app, ui, t),
             Pane::Design => crate::editpanes::design(app, ui, t),
             Pane::Workflows => crate::analysispane::workflows(app, ui, t),
             Pane::Script => crate::analysispane::script(app, ui, t),

@@ -2006,3 +2006,13 @@ Online basemaps	在线底图
 Overlays	叠加层
 Clear Basemaps	清除底图
 Clear Overlays	清除叠加层
+Search templates	搜索模板
+No editable layers. Add a point, line or polygon layer to the map.	没有可编辑的图层。请向地图添加点、线或面图层。
+Create features with this template	使用此模板创建要素
+Construction Tools	构造工具
+Create Features	创建要素
+Create\nFeatures	创建\n要素
+Open the Create Features pane: choose a feature template and a construction tool.	打开“创建要素”窗格：选择要素模板和构造工具。
+Create Features Pane	“创建要素”窗格
+Drag from the centre out to add a circle	从圆心向外拖动以添加圆
+Drag a box to add the shape	拖动一个框以添加形状

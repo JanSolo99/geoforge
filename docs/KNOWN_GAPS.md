@@ -93,6 +93,7 @@ Update this file when a gap is found or closed.
 | Geomorphon Landforms | Projected rasters with non-metre linear units (distances assumed in metres); non-square projected cells and the geographic skip border are unverified; the landforms raster's Landform text column in the attribute table |
 | Geodesic Flow Direction | MFD and D-Infinity, out_drop_raster; geographic datums other than WGS84's ellipsoid; flats resolved as Flow Direction (a few cells differ) |
 | Formats | LAS/LAZ, NetCDF/HDF, KML, DXF/DWG, Esri Grid/IMG, TIN, mobile geodatabase, `.shp.xml`, compressed `.cdf` |
+| Create Features pane | Templates from `.lyrx` files and graduated/proportional classes; construction tools Arc, Trace, Right Angle, Midpoint, Endpoint Arc, Tangent, Bezier, Freehand, Stream and Auto-Complete Polygon; editing a template's properties in the pane (use the Editing pane); the pane lists at most 200 automatic templates per layer |
 | Network Analyst, 3D Analyst, Geostatistical Analyst, Cartography | Not started |
 
 ## Process gaps

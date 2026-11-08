@@ -2006,3 +2006,13 @@ Online basemaps	ონლაინ საბაზისო რუკები
 Overlays	ზედდებული ფენები
 Clear Basemaps	საბაზისო რუკების გასუფთავება
 Clear Overlays	ზედდებული ფენების გასუფთავება
+Search templates	შაბლონების ძიება
+No editable layers. Add a point, line or polygon layer to the map.	რედაქტირებადი ფენა არ არის. დაამატეთ რუკას წერტილის, ხაზის ან პოლიგონის ფენა.
+Create features with this template	ობიექტების შექმნა ამ შაბლონით
+Construction Tools	აგების ინსტრუმენტები
+Create Features	ობიექტების შექმნა
+Create\nFeatures	ობიექტების\nშექმნა
+Open the Create Features pane: choose a feature template and a construction tool.	გახსენით „ობიექტების შექმნის“ პანელი: აირჩიეთ ობიექტის შაბლონი და აგების ინსტრუმენტი.
+Create Features Pane	ობიექტების შექმნის პანელი
+Drag from the centre out to add a circle	გადაათრიეთ ცენტრიდან გარეთ წრის დასამატებლად
+Drag a box to add the shape	გადაათრიეთ ჩარჩო ფორმის დასამატებლად

@@ -2006,3 +2006,13 @@ Online basemaps	オンラインベースマップ
 Overlays	オーバーレイ
 Clear Basemaps	ベースマップを削除
 Clear Overlays	オーバーレイを削除
+Search templates	テンプレートを検索
+No editable layers. Add a point, line or polygon layer to the map.	編集可能なレイヤーがありません。ポイント、ライン、またはポリゴンのレイヤーをマップに追加してください。
+Create features with this template	このテンプレートでフィーチャを作成
+Construction Tools	作図ツール
+Create Features	フィーチャ作成
+Create\nFeatures	フィーチャ\n作成
+Open the Create Features pane: choose a feature template and a construction tool.	［フィーチャ作成］ペインを開く: フィーチャ テンプレートと作図ツールを選びます。
+Create Features Pane	フィーチャ作成ペイン
+Drag from the centre out to add a circle	中心から外へドラッグして円を追加
+Drag a box to add the shape	ドラッグして枠を描き、図形を追加

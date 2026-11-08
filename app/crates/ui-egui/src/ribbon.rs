@@ -1893,6 +1893,18 @@ fn edit_tab(app: &mut RustGisApp, ui: &mut Ui) {
             Some(GeometryType::Polygon) => (Tool::CreatePolygon, "polygon_tool"),
             _ => (Tool::CreatePoint, "point_tool"),
         };
+        let create_open = app.ui.dock.is_open(RightPane::CreateFeatures);
+        big(
+            ui,
+            app,
+            "polygon_tool",
+            "Create\nFeatures",
+            "Open the Create Features pane: choose a feature template and a construction tool.",
+            "ui.pane.createFeatures",
+            Value::Null,
+            create_open,
+            false,
+        );
         let checked = app.session.tool.creates();
         let r = big(
             ui,

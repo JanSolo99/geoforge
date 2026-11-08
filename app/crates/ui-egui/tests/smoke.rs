@@ -73,6 +73,34 @@ fn built_in_basemap_gallery_selects_web_offline_and_overlays_without_a_plugin() 
 }
 
 #[test]
+fn create_features_pane_picks_a_template_then_a_construction_tool() {
+    use rustgis_ui_egui::rustgis_engine::Tool;
+    let _turn = PLUGINS.lock().unwrap_or_else(|e| e.into_inner());
+    let mut h = harness();
+    h.step();
+    h.state_mut().run("ui.pane.createFeatures", serde_json::Value::Null).unwrap();
+    h.step();
+    h.step();
+    assert!(!h.state().session.tool.creates());
+    h.get_by_role_and_label(egui::accesskit::Role::Button, "Countries").click();
+    h.step();
+    h.step();
+    assert_eq!(h.state().session.tool, Tool::CreatePolygon);
+    assert_eq!(h.state().session.active_layer, h.state().session.map().layer_by_name("Countries").map(|l| l.id));
+    h.get_by_label("Circle").click();
+    h.step();
+    assert_eq!(h.state().session.tool, Tool::CreateShape("circle"));
+    // The search box narrows the list.
+    let role = egui::accesskit::Role::TextInput;
+    h.query_all_by_role(role).next_back().unwrap().click();
+    h.step();
+    h.query_all_by_role(role).next_back().unwrap().type_text("zzz");
+    h.step();
+    h.step();
+    assert!(h.query_by_role_and_label(egui::accesskit::Role::Button, "Countries").is_none());
+}
+
+#[test]
 fn legacy_basemaps_tab_moves_to_map_without_uninstalling_the_plugin() {
     let _turn = PLUGINS.lock().unwrap_or_else(|e| e.into_inner());
     use rustgis_ui_egui::rustgis_engine::plugins as rp;

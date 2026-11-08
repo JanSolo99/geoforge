@@ -14,6 +14,7 @@ mod backstage;
 mod basemaps;
 mod catalogsui;
 mod chrome;
+mod createpane;
 mod cswui;
 #[cfg(not(target_arch = "wasm32"))]
 mod databrowser;
@@ -971,6 +972,7 @@ impl RustGisApp {
             "ui.pane.history" => toggle_right(&mut self.ui, RightPane::History),
             "ui.pane.details" => toggle_right(&mut self.ui, RightPane::Details),
             "ui.pane.editing" => toggle_right(&mut self.ui, RightPane::Editing),
+            "ui.pane.createFeatures" => toggle_right(&mut self.ui, RightPane::CreateFeatures),
             "ui.pane.design" => toggle_right(&mut self.ui, RightPane::Design),
             "ui.pane.script" => toggle_right(&mut self.ui, RightPane::Script),
             // The SQL pane; with "sql" (and "database"), opened on that query, run with "run".
