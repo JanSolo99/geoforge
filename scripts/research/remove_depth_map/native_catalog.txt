@@ -1,0 +1,28 @@
+AMD_md_CAT (a0000000b) fd=None kind=Some(Polygon) z=false m=false rows=3
+AMD_md_ART (a0000000c) fd=None kind=None z=false m=false rows=1
+AMD_md_LOG (a0000000d) fd=None kind=None z=false m=false rows=45
+AMD_md_BND (a0000000e) fd=None kind=Some(Polygon) z=false m=false rows=1
+AMD_md_DEF (a0000000f) fd=None kind=None z=false m=false rows=2
+AMD_md_CSL (a00000010) fd=None kind=Some(Polygon) z=false m=false rows=2
+  field Field { name: "Raster", alias: None, field_type: Raster, length: 0, precision: 0, scale: 0, nullable: true, domain: None, default: None }
+  field Field { name: "Name", alias: None, field_type: String, length: 200, precision: 0, scale: 0, nullable: true, domain: None, default: None }
+  field Field { name: "MinPS", alias: None, field_type: Double, length: 8, precision: 0, scale: 0, nullable: true, domain: None, default: None }
+  field Field { name: "MaxPS", alias: None, field_type: Double, length: 8, precision: 0, scale: 0, nullable: true, domain: None, default: None }
+  field Field { name: "LowPS", alias: None, field_type: Double, length: 8, precision: 0, scale: 0, nullable: true, domain: None, default: None }
+  field Field { name: "HighPS", alias: None, field_type: Double, length: 8, precision: 0, scale: 0, nullable: true, domain: None, default: None }
+  field Field { name: "Category", alias: None, field_type: Integer, length: 4, precision: 0, scale: 0, nullable: true, domain: None, default: None }
+  field Field { name: "Tag", alias: None, field_type: String, length: 100, precision: 0, scale: 0, nullable: true, domain: None, default: None }
+  field Field { name: "GroupName", alias: None, field_type: String, length: 100, precision: 0, scale: 0, nullable: true, domain: None, default: None }
+  field Field { name: "ProductName", alias: None, field_type: String, length: 100, precision: 0, scale: 0, nullable: true, domain: None, default: None }
+  field Field { name: "CenterX", alias: None, field_type: Double, length: 8, precision: 0, scale: 0, nullable: true, domain: None, default: None }
+  field Field { name: "CenterY", alias: None, field_type: Double, length: 8, precision: 0, scale: 0, nullable: true, domain: None, default: None }
+  field Field { name: "ZOrder", alias: None, field_type: Integer, length: 4, precision: 0, scale: 0, nullable: true, domain: None, default: None }
+  field Field { name: "TypeID", alias: Some("Raster Type ID"), field_type: Integer, length: 4, precision: 0, scale: 0, nullable: true, domain: None, default: None }
+  field Field { name: "ItemTS", alias: None, field_type: Double, length: 8, precision: 0, scale: 0, nullable: true, domain: None, default: None }
+  field Field { name: "UriHash", alias: None, field_type: String, length: 50, precision: 0, scale: 0, nullable: true, domain: None, default: None }
+  field Field { name: "Uri", alias: None, field_type: Blob, length: 0, precision: 0, scale: 0, nullable: true, domain: None, default: None }
+  field Field { name: "Shape_Length", alias: None, field_type: Double, length: 8, precision: 0, scale: 0, nullable: true, domain: None, default: None }
+  field Field { name: "Shape_Area", alias: None, field_type: Double, length: 8, precision: 0, scale: 0, nullable: true, domain: None, default: None }
+  Err(Format { format: "FileGDB", message: "count 56 exceeds remaining data" })
+  Err(Format { format: "FileGDB", message: "count 54 exceeds remaining data" })
+  Err(Format { format: "FileGDB", message: "count 65 exceeds remaining data" })

@@ -1,49 +1,48 @@
 # Current handoff
 
-Updated 2026-11-08T08:41:46.700720+00:00; last agent Codex.
-Workspace `/mnt/media/ArcGIS_Linux`, branch `main`; product HEAD
-`bdf15073fae788acd12008545063ad663f815e7f` (this final handoff is a subsequent documentation-only checkpoint).
+Updated 2026-11-08T09:00:04.978293+00:00; last agent Codex.
+Workspace `/mnt/media/ArcGIS_Linux`, branch `main`; pre-landing HEAD
+`4b19922ad2eedd02cee52e56d8c9e67ba172af15`.
 
-## Single item: Import XML Workspace Document — complete and pushed
+## Single item: Remove Depth Map — deferred, findings validated, landing now
 
-Objective: complete this first queue item, pass `scripts/check`, commit and push.
-Previous Get Raster Properties was already committed/pushed as `04f79746` and accepted
-by the coordinator; its stale handoff was reconciled with prior run logs and Git.
+User objective: handle one queue item, pass `scripts/check`, commit/push; no second
+item this turn. Prior XML importer and handoff were already pushed/accepted.
 
-Completed this session:
-- `crates/unigis-tools/src/import_xml.rs` and registry: plain XML imports into existing
-  FileGDBs; DATA/SCHEMA_ONLY, standalone tables and simple 2D classes, binary/normalized
-  geometry, supported typed fields, aliases/defaults, coordinate domains, sparse OIDs,
-  unique collision names, unsupported-schema preflight and transaction rollback.
-- FileGDB writer: imported geometry definitions and writes preserving original OBJECTIDs.
-- CLI regressions, six `gsc_xml_*` ArcGIS schema scenarios, portable `<repo>` scenario paths,
-  fixtures in `testdata/geoproc/xml_workspace/`. Only our reference-script hunks staged;
-  inherited umintfloat hunks remain uncommitted. Roadmap/gaps/queue refreshed.
-- Evidence, scope and reproducible probes: `scripts/research/import_xml_workspace_document/README.md`.
-  ArcGIS Pro 3.7 read all six native tables/classes with equal fields, rows/geometry JSON
-  and complete spatial references (`native_results.txt`). No SDK/GDAL runtime used.
+This session:
+- Confirmed no existing tool implementation and no open app priority; selected
+  Remove Depth Map from the first queue row. No engine/CLI/registry code changed.
+- Reproduced native `AMD_md_CAT` row failures (count 56/54/65 exceeds remaining data)
+  using `target/debug/examples/dump testdata/geoproc/md_items.gdb AMD_md_CAT`.
+- ArcGIS Pro 3.7 build 1901 probes used only this turn's copied scratch imagery and
+  test mosaic. Four query/default success controls left invalid `.dm` sentinels
+  untouched; empty mosaic succeeds, unknown field => 160144, TIFF => 999999.
+  Genuine Compute Depth Map output/adjusted-imagery controls were unavailable.
+- Success no-ops append a metadata Process entry and change GDB_Items/timestamps;
+  both tested SetLogHistory settings still did so. Other metadata settings untested.
+- Deferred tool in `docs/WORK_QUEUE_DEFERRED.txt`; regenerated queue, updated roadmap
+  and known gaps. Evidence/reproduction scripts: `scripts/research/remove_depth_map/README.md`.
+  Its ignored scratch/ holds only copied imagery/sentinels and this probe's geodatabase.
+
+Decision: no success-only/no-op implementation. Native mosaic item/path decoding is
+required to evaluate SQL and locate the right external files. Real depth-map controls
+must establish actual selected/all-item removal and preservation of unrelated files.
+This is an unmet format/evidence prerequisite, not a reasoning escalation.
 
 Validation:
-- `cargo check --locked -j3 -p unigis-tools`: PASS.
-- `cargo test --locked -j3 -p unigis-cli --test import_xml_workspace`: PASS (4 tests).
-- `UNIGIS_REFERENCE_CASES=gsc_xml_ cargo test --locked -j3 -p unigis-cli --test import_xml_workspace --test arcgis_reference`: PASS (7 tests; six schema scenarios).
-- `scripts/check`: PASS, exit 0, final implementation plus inherited working-tree edits;
-  log `/tmp/import-xml-gate.log`. Format, strict clippy, no-default-features build,
-  full workspace tests and doctests passed. First attempt found the Rust 1.99
-  chunks_exact/as_chunks lint; fixed before the successful full rerun.
-- Staged diff checked with `core.whitespace=cr-at-eol`: reference XML retains ArcGIS CRLF.
-  First native read-back raced scratch creation; rerun after completed writes passed.
+- Probe Python syntax, 8 primary/2 metadata JSON records, evidence paths and generated
+  queue deferral/next-item assertions: PASS.
+- Scoped and staged `git diff --check`: PASS.
+- `scripts/check` for this final docs/research/queue landing: PASS, exit 0
+  (`/tmp/remove-depth-map-gate.log`). Format, strict clippy, no-default-features build,
+  full workspace tests and doctests passed. Covers unchanged engine plus inherited edits.
+- No existing verifier files or acceptance definitions modified. No active builds/probes.
 
-Inherited edits intentionally excluded: ambition-review; CLAUDE/bridge Wine configuration
-and pycache; unary safety/local/stats/registry changes; reference umintfloat cases;
-dashboard; NOTES.md; scratch_te/; unary_integer_float fixtures/research;
-web-build-memory.py; .worktrees/. No other agent or coordinator launched.
+Inherited edits excluded: ambition-review; CLAUDE/bridge Wine configuration and pycache;
+unary safety/local/stats/registry and reference-script umintfloat changes; dashboard;
+NOTES.md; scratch_te/; unary_integer_float fixtures/research; web-build-memory.py;
+.worktrees/. No other agent/coordinator launched. No resets/stashes/transfers.
 
-Landing: `bdf15073` Add Import XML Workspace Document pushed successfully to
-`origin/main` (04f79746..bdf15073, exit 0). `git push --no-verify origin main`
-reused the just-passed full gate; no source changes followed that gate. This final
-checkpoint changes documentation only. All task implementation and evidence are landed.
-
-No item remains in progress. Preserve the unrelated inherited edits above.
-Next queue item after landing: Remove Depth Map. Not started this turn.
-No builds or probes remain running.
+Next: commit/push the deferral/evidence/docs and record landing status. Remove Depth Map
+is not implemented; resume only after its catalog-decoding and genuine-control prerequisites.
+Next queue item: Set Raster Properties. NOT started this turn.

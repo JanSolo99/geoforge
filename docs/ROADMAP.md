@@ -1039,6 +1039,10 @@ cache; no runtime GDAL behavior was changed. Commands/results are in `HANDOFF.md
 - [x] Delete Mosaic Dataset (`delete_mosaic_dataset`, registry): removes the mosaic dataset item
   and its `AMD_<name>_*` tables (related only by name), keeps shared domains; 000732 for
   anything else. Scenario reference `gsc_mosaic` on an ArcGIS-made seed (`seed` scenario step).
+- [ ] Remove Depth Map: deferred until mosaic item catalog/path decoding and genuine
+      adjusted-mosaic depth-map controls are available. Ordinary-raster success controls
+      remove no dummy `.dm` files; ArcGIS also appends metadata lineage on no-op calls.
+      Evidence: `scripts/research/remove_depth_map/README.md`.
 - [x] Delete Colormap (`delete_colormap`): removes an embedded TIFF palette (appended IFD,
   photometric 1, as ArcGIS); a `.clr` sidecar is left alone and the run succeeds (ArcGIS does
   the same); no colormap → ERROR 000235. 3 `dcm_*` references.
