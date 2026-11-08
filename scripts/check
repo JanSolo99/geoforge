@@ -1,8 +1,36 @@
 #!/bin/sh
 # The same gate CI runs (.github/workflows/ci.yml), with 3 jobs so it fits in memory.
 # Run before pushing; `git config core.hooksPath .githooks` makes git do it on every push.
+#
+# `scripts/check --committed [REV]` checks what would be pushed (REV, default HEAD) rather
+# than the working tree: when there are uncommitted edits to tracked files it runs in a
+# clean checkout of REV, because CI only ever sees the commit. The pre-push hook uses this.
 set -e
 cd "$(dirname "$0")/.."
+if [ "$1" = "--committed" ]; then
+    rev=$(git rev-parse --verify "${2:-HEAD}^{commit}")
+    if [ "$rev" != "$(git rev-parse HEAD)" ] || [ -n "$(git status --porcelain --untracked-files=no)" ]; then
+        unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE
+        cache="${XDG_CACHE_HOME:-$HOME/.cache}/unigis-check"
+        tree="$cache/tree"
+        if git -C "$tree" rev-parse --git-dir >/dev/null 2>&1; then
+            git -C "$tree" checkout -q --detach --force "$rev"
+            git -C "$tree" clean -qfd
+        else
+            git worktree prune
+            mkdir -p "$cache"
+            git worktree add -q --detach "$tree" "$rev"
+        fi
+        # Downloaded test data (scripts/fetch-testdata.sh) is git-ignored: share this checkout's.
+        if [ -d testdata/large ] && [ ! -e "$tree/testdata/large" ]; then
+            ln -s "$PWD/testdata/large" "$tree/testdata/large"
+        fi
+        echo "scripts/check: checking commit $(git rev-parse --short "$rev") in a clean checkout ($tree);" \
+            "uncommitted edits here are not part of it" >&2
+        export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-$cache/target}"
+        exec "$tree/scripts/check"
+    fi
+fi
 python3 -m unittest discover -s scripts/dashboard -p 'test_*.py'
 python3 -m unittest discover -s scripts/readiness -p 'test_*.py'
 cargo fmt --all --check

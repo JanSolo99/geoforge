@@ -1,3 +1,9 @@
 #!/bin/sh
 # Blocks a push that CI would reject. Skip once with `git push --no-verify`.
-exec "$(dirname "$0")/../scripts/check"
+# Checks the commit being pushed, not the working tree: uncommitted edits must not
+# make the gate pass for code CI will never see.
+rev=HEAD
+while read -r local_ref local_sha remote_ref remote_sha; do
+    case "$local_sha" in *[!0]*) rev=$local_sha ;; esac
+done
+exec "$(dirname "$0")/../scripts/check" --committed "$rev"

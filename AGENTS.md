@@ -42,7 +42,8 @@ A lane is a worktree `.worktrees/lane-NAME` on branch `lane/NAME`. In a lane:
 - Your handoff is `docs/handoff/NAME.md`, not `docs/HANDOFF.md` (that one belongs to the main
   checkout). Keep it current as the rules below describe.
 - Commit on your branch, then `scripts/lane land`: it rebases on `origin/main`, runs
-  `scripts/check` and pushes to main, one lane at a time. Never push to main any other way. If the
+  `scripts/check` on the commit and pushes to main, one lane at a time. Never push to main any
+  other way, and never with `--no-verify`. If the
   rebase stops on a conflict, resolve it (shared lists such as the tool registry and
   `scripts/make-arcgis-reference.py`'s `RUN` usually need both sides), continue, and land again.
 - Cargo goes through a shim that shares build slots between lanes; a "waiting for a build slot"

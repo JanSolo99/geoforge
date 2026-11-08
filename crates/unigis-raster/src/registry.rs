@@ -3408,6 +3408,13 @@ pub static TOOLS: &[Tool] = &[
         run: get_cell_value_unsupported,
     },
     Tool {
+        id: "export_raster_world_file",
+        name: "Export Raster World File",
+        summary: "Writes the raster's world file (pixel size and upper-left cell centre) beside it.",
+        params: &[raster("input", "Input Raster Dataset", true)],
+        run: export_raster_world_file_unsupported,
+    },
+    Tool {
         id: "add_colormap",
         name: "Add Colormap",
         summary: "Adds or replaces a raster's colormap from a template raster or a .clr file.",

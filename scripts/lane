@@ -182,7 +182,7 @@ def land():
             print("nothing to land: the branch has no commits beyond origin/main")
             return
         print(f"rebased {ahead} commit(s) on origin/main; running scripts/check…", flush=True)
-        if subprocess.run([str(ROOT / "scripts/check")]).returncode != 0:
+        if subprocess.run([str(ROOT / "scripts/check"), "--committed"]).returncode != 0:
             sys.exit("scripts/check failed: fix it, commit, and run `scripts/lane land` again")
         # The same check the pre-push hook would repeat has just passed on this commit.
         push = subprocess.run(["git", "push", "--no-verify", "origin", "HEAD:main"],
