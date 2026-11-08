@@ -775,6 +775,67 @@ pub fn save_domains(gdb_dir: &Path, table: &str, wanted: &[SourceDomain]) -> Res
     Ok(saved)
 }
 
+/// What writing a layer's subtypes to its table changed.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+pub struct SubtypesSaved {
+    pub field_set: bool,
+    pub added: usize,
+    pub removed: usize,
+    pub defaults: usize,
+}
+
+/// Writes a layer's subtypes to its table's geodatabase: the subtype field is set when the table
+/// has none, subtypes the geodatabase lacks are added, ones the layer dropped are removed, and a
+/// subtype's default values that differ are assigned. A subtype's name is not changed (ArcGIS
+/// has no operation for it), and neither is an existing subtype field.
+pub fn save_subtypes(gdb_dir: &Path, table: &str, wanted: &SourceSubtypes) -> Result<SubtypesSaved> {
+    let mut saved = SubtypesSaved::default();
+    let open = || -> Result<_> {
+        let g = Geodatabase::open(gdb_dir).map_err(bad)?;
+        g.open_table(table).map_err(bad)
+    };
+    let t = open()?;
+    match t.subtypes().map(|s| s.field.clone()) {
+        None => {
+            unigis_filegdb::set_subtype_field(gdb_dir, table, &wanted.field).map_err(bad)?;
+            saved.field_set = true;
+        }
+        Some(f) if !f.eq_ignore_ascii_case(&wanted.field) => {
+            return Err(bad(format!("the table's subtype field is {f}, not {}", wanted.field)));
+        }
+        Some(_) => {}
+    }
+    let have: Vec<i64> = open()?.subtypes().map(|s| s.subtypes.iter().map(|x| x.code).collect()).unwrap_or_default();
+    let stale: Vec<i64> = have.iter().copied().filter(|c| !wanted.subtypes.iter().any(|(w, _, _)| w == c)).collect();
+    if !stale.is_empty() {
+        unigis_filegdb::remove_subtype(gdb_dir, table, &stale).map_err(bad)?;
+        saved.removed = stale.len();
+    }
+    for (code, name, _) in &wanted.subtypes {
+        if !have.contains(code) {
+            unigis_filegdb::add_subtype(gdb_dir, table, *code, name).map_err(bad)?;
+            saved.added += 1;
+        }
+    }
+    for (code, _, defaults) in &wanted.subtypes {
+        for (field, v) in defaults {
+            let t = open()?;
+            let Some(f) = t.fields().iter().find(|f| f.name.eq_ignore_ascii_case(field)) else { continue };
+            let want = to_field_value(v, f.field_type, &f.name)?;
+            let current = t
+                .subtypes()
+                .and_then(|s| s.subtypes.iter().find(|x| x.code == *code))
+                .and_then(|s| s.fields.iter().find(|x| x.field.eq_ignore_ascii_case(&f.name)))
+                .and_then(|x| x.default.clone());
+            if current.as_ref() != Some(&want) {
+                unigis_filegdb::assign_default_to_field(gdb_dir, table, &f.name, Some(&want), &[*code]).map_err(bad)?;
+                saved.defaults += 1;
+            }
+        }
+    }
+    Ok(saved)
+}
+
 /// What a save of edits changed.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct Saved {

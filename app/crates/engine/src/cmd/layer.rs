@@ -1110,6 +1110,7 @@ fn gdb_origin(source: &str) -> Option<(String, String)> {
 fn save_gdb_edits(s: &mut Session, p: &Value) -> CmdResult {
     // A standalone table (`"table"`: its id), or a layer.
     let mut domains = Vec::new();
+    let mut subtypes = None;
     let ds = match p.get("table").and_then(Value::as_u64) {
         Some(tid) => s.project.table(tid as u32).map(|t| t.dataset.clone()).ok_or_else(|| format!("no table {tid}"))?,
         None => {
@@ -1134,6 +1135,10 @@ fn save_gdb_edits(s: &mut Session, p: &Value) -> CmdResult {
                     },
                 })
                 .collect();
+            subtypes = l.design.subtypes.as_ref().map(|st| rustgis_data::source::SourceSubtypes {
+                field: st.field.clone(),
+                subtypes: st.subtypes.iter().map(|x| (x.code, x.name.clone(), x.defaults.clone())).collect(),
+            });
             l.dataset.clone()
         }
     };
@@ -1153,8 +1158,17 @@ fn save_gdb_edits(s: &mut Session, p: &Value) -> CmdResult {
             Ok(d) => out["domains"] = json!({"created": d.created, "updated": d.updated, "assigned": d.assigned}),
             Err(e) => out["domainError"] = json!(e.to_string()),
         }
+        if let Some(st) = &subtypes {
+            match rustgis_data::source::filegdb::save_subtypes(dir, &table, st) {
+                Ok(d) => out["subtypes"] = json!({"fieldSet": d.field_set, "added": d.added, "removed": d.removed, "defaults": d.defaults}),
+                Err(e) => out["subtypeError"] = json!(e.to_string()),
+            }
+        }
         Ok(out)
     })?;
+    if let Some(e) = r["subtypeError"].as_str() {
+        s.notify(format!("{}: the rows are saved, but the subtypes were not written to {name}/{table}: {e}", ds.name), true);
+    }
     if let Some(e) = r["domainError"].as_str() {
         s.notify(format!("{}: the rows are saved, but the domains were not written to {name}/{table}: {e}", ds.name), true);
     }

@@ -33,7 +33,9 @@ read-only. The Editing pane (Settings, Templates, Status, Modify) holds the rest
   descriptions and, when you edit a cell, offers the list to pick from. **Save Edits** writes the layer's field
   domains with its rows: a domain whose values you changed is updated in the geodatabase, and a
   domain you made on a field is created (named `<class>_<field>`) and assigned to it. A domain
-  removed in the app stays on the field in the geodatabase, and subtypes are not written yet.
+  removed in the app stays on the field in the geodatabase. It also writes the layer's subtypes:
+  the subtype field when the table has none, subtypes you added or dropped, and their default
+  values (a subtype's name is not renamed).
 - **Snapping**: new vertices snap to nearby vertices, edges and line ends (magenta marker).
 - **Elevation**: new features get a `z` value, constant or sampled from a raster surface.
 - **Ground to grid**: a scale factor and rotation applied to entered distances and directions

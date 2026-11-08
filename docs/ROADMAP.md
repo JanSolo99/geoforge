@@ -783,6 +783,11 @@ Each item is something ArcGIS Pro does with a file geodatabase; `[x]` done on br
       range limits update the geodatabase's domain, a new domain is created and assigned to its
       field, with the writer's ArcGIS-validated domain operations. Tested on copies of
       `testdata/gdb-reference` (changed, unchanged on a second save, created and assigned).
+- [x] Subtypes written back (`filegdb::save_subtypes`, run by Save Edits): the subtype field when
+      the table has none, subtypes added or dropped, and per-subtype default values, through the
+      writer's `set_subtype_field` / `add_subtype` / `remove_subtype` / `assign_default_to_field`.
+      Test on a copy of `testdata/gdb-reference/subtypes.gdb` (nothing changed, add + drop +
+      default, idempotent second save).
 - [x] Dockable panes: left/right/bottom groups, tab dragging and drop previews,
       auto-hide, scrollable tab headers, and saved layout preferences. Reopening
       panes preserves tab order; pointer-drag and preference round-trip tests pass.

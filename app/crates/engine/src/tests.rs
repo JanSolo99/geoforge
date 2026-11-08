@@ -6176,6 +6176,48 @@ fn domains_are_saved_back_to_geodatabase_classes() {
     std::fs::remove_dir_all(&dir).ok();
 }
 
+/// Save Edits also writes the layer's subtypes: a subtype added in the app, one dropped, and a
+/// default value, on a table that already has subtypes and on one that has none.
+#[test]
+fn subtypes_are_saved_back_to_geodatabase_classes() {
+    let src = |n: &str| std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../testdata/gdb-reference").join(n);
+    let dir = std::env::temp_dir().join(format!("rustgis-save-subtypes-{}", std::process::id()));
+    std::fs::remove_dir_all(&dir).ok();
+    let gdb = dir.join("subtypes.gdb");
+    std::fs::create_dir_all(&gdb).unwrap();
+    for e in std::fs::read_dir(src("subtypes.gdb")).unwrap().flatten() {
+        std::fs::copy(e.path(), gdb.join(e.file_name())).unwrap();
+    }
+    let subtypes_of = |gdb: &std::path::Path| {
+        let g = rustgis_data::source::filegdb::open_dir(gdb).unwrap();
+        let p = rustgis_data::source::filegdb::properties(&g, "base").unwrap();
+        p["subtypes"].clone()
+    };
+    let mut s = Session::new(Project::default());
+    s.run("layer.addData", &json!({"path": gdb.display().to_string(), "layer": "base", "stream": false})).unwrap();
+    let id = s.map().layer_by_name("base").unwrap().id;
+    let loaded = s.map().layer(id).unwrap().design.subtypes.clone().unwrap();
+    // Nothing changed: nothing written.
+    let r = s.run("catalog.saveEdits", &json!({"layer": id})).unwrap();
+    assert_eq!(r["subtypes"], json!({"fieldSet": false, "added": 0, "removed": 0, "defaults": 0}), "{r}");
+    // One subtype added, the first dropped, a default set on another.
+    let mut list: Vec<Value> = loaded.subtypes.iter().skip(1).map(|x| json!({"code": x.code, "name": x.name})).collect();
+    list.push(json!({"code": 77, "name": "Added here", "defaults": {"lanes": 4}}));
+    let dropped = loaded.subtypes[0].code;
+    s.run("data.subtypes", &json!({"layer": id, "field": loaded.field, "subtypes": list, "symbolize": false})).unwrap();
+    let r = s.run("catalog.saveEdits", &json!({"layer": id})).unwrap();
+    assert!(r.get("subtypeError").is_none(), "{r}");
+    assert_eq!((r["subtypes"]["added"].as_u64(), r["subtypes"]["removed"].as_u64()), (Some(1), Some(1)), "{r}");
+    assert!(r["subtypes"]["defaults"].as_u64() >= Some(1), "the new subtype's default is written: {r}");
+    let after = subtypes_of(&gdb);
+    let codes: Vec<i64> = after["subtypes"].as_array().unwrap().iter().map(|x| x["code"].as_i64().unwrap()).collect();
+    assert!(codes.contains(&77) && !codes.contains(&dropped), "{after}");
+    // The layer now matches the geodatabase: a second save writes nothing.
+    let r = s.run("catalog.saveEdits", &json!({"layer": id})).unwrap();
+    assert_eq!(r["subtypes"], json!({"fieldSet": false, "added": 0, "removed": 0, "defaults": 0}), "{r}");
+    std::fs::remove_dir_all(&dir).ok();
+}
+
 /// Save Edits: a layer loaded from a geodatabase class is saved back row by row, keeping the
 /// class's schema and domains; on disk and for an upload.
 #[test]

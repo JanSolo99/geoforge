@@ -55,12 +55,11 @@ ArcGIS Pro: settle questions with the ArcGIS MCP bridge, and check every fix in 
     and subtype changes to the file geodatabase (the writer already has `create_table_with_subtypes`,
     `set_subtype_field`, `assign_domain_to_field`, domain editing; GDAL as the format oracle), read
     relationship classes, and offer the pick list in the Attributes popup and the Create pane.
-- [ ] gdb-subtypes-relationships: Subtypes write-back, relationship classes, pick lists everywhere
-  - Domains are written back on Save Edits and read on load. Still open: write subtypes (the
-    subtype field, subtypes, their defaults and per-subtype domains: the writer has
-    `set_subtype_field`, `add_subtype`, `assign_domain_to_field` with subtype codes), remove a
-    domain from a field on Save Edits, read relationship classes, and offer the coded-value pick
-    list in the Attributes popup and the Create Features pane.
+- [ ] gdb-subtypes-relationships: Relationship classes, pick lists everywhere, removals
+  - Domains and subtypes are read on load and written back on Save Edits (subtype field,
+    subtypes added or dropped, per-subtype defaults). Still open: remove a domain from a field on
+    Save Edits, per-subtype domains and the default subtype, read relationship classes, and offer
+    the coded-value pick list in the Attributes popup and the Create Features pane.
 - [ ] unigis-naming: One `unigis` program; the app is UniGIS everywhere
   - The app is called UniGIS: not RustGIS, not GeoForge. Installed program `unigis`: with no
     arguments or with files it opens the app, with a subcommand it is the CLI (today's merged `ug`
