@@ -60,21 +60,13 @@ ArcGIS Pro: settle questions with the ArcGIS MCP bridge, and check every fix in 
     subtypes added or dropped, per-subtype defaults). Still open: remove a domain from a field on
     Save Edits, per-subtype domains and the default subtype, read relationship classes, and offer
     the coded-value pick list in the Attributes popup and the Create Features pane.
-- [ ] unigis-naming: One `unigis` program; the app is UniGIS everywhere
-  - Done: `unigis <subcommand>` runs the CLI (`rustgis-cli` is a library plus `ug`; the desktop
-    `unigis` binary dispatches on its first argument), `unigis --version`, user docs say `ug`.
-    Still open: Windows console twin (a GUI-subsystem exe can't print: `unigis-cli.exe`/`ug.exe`),
-    the installed names below, the Linux settings folder `~/.config/rustgis` (migrate to `unigis`),
-    and the web icons.
-  - The app is called UniGIS: not RustGIS, not GeoForge. Installed program `unigis`: with no
-    arguments or with files it opens the app, with a subcommand it is the CLI (today's merged `ug`
-    in `app/apps/rustgis-cli`); `ug` is a shortcut to the CLI. Windows needs a console twin
-    (`unigis-cli.exe`/`ug.exe`) because a GUI-subsystem program can't print to the terminal.
-  - Rename the installed names (`rustgis` desktop entry, icon, MIME, AppImage, .deb/.rpm, Windows
-    installers, `RustGIS-*` artifacts) to `unigis`. `ugrep` also installs `/usr/bin/ug`, so the
-    distro packages ship `ug` only where it doesn't conflict.
-  - The logo is UniGIS's own now (`app/crates/render/src/logo.rs`: the vector layer as a U holding
-    a globe, on raster and table layers). The web app still loads RustGIS's favicon, PWA and
-    Apple touch icons from `assets.rustgis.app` (`app/apps/rustgis-web/index.html`,
-    `manifest.webmanifest`, `sw.js`, and `packaging/downloads/index.html`): render them from
-    `render::logo` in `cargo xtask web-pwa` and serve them with the app instead.
+- [x] unigis-naming: One `unigis` program; the app is UniGIS everywhere
+  - `unigis` opens the desktop app or dispatches CLI subcommands. Portable builds include
+    `ug`; Windows packages include the console twin `unigis-cli.exe` and `ug.exe`.
+  - Installed desktop entries, icons, MIME files, app bundles, installers and release
+    artifacts use UniGIS/unigis. Linux distro packages omit `ug` to avoid ugrep conflicts.
+  - Linux preferences migrate from `rustgis/prefs.json` into `unigis/prefs.json` without
+    overwriting new settings or removing the old file. Web/PWA/download icons are rendered
+    from our own `render::logo`, served locally and included in the offline shell cache.
+  - External repository/domain/Store identities and old published winget manifests stay
+    compatible; new package names take effect on the next release, not on a source push.

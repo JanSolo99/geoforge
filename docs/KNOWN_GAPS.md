@@ -99,6 +99,13 @@ Update this file when a gap is found or closed.
 
 ## Process gaps
 
+- UniGIS CLI dispatch gives an existing first-argument path priority over a command.
+  In the repository root, `unigis tools` sees the `tools/` directory as input; use the
+  console twin (`unigis-cli tools`), `ug tools` where available, or another working
+  directory. This is the existing dispatch rule, separate from packaging renames.
+  Evidence: `rustgis_cli::wants_cli` and its dispatch test; package CLI verification
+  runs from an isolated directory.
+
 - App workspace CI (2026-11-07): the merged CLI brings `unigis-json`'s
   `serde_json/preserve_order` feature into the workspace. The unchanged WASM plugin
   fixture in `app/crates/plugins/src/testing.rs` assumes sorted JSON at fixed byte

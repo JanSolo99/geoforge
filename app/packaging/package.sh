@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Packages release builds of rustgis and ug (the rustgis-cli package) for one target into dist/.
+# Packages release builds of unigis and ug (the unigis-cli package) for one target into dist/.
 #
 #   packaging/package.sh <version> [rust-target]
 #
 # Linux: a .tar.gz, a .deb, an .rpm (when rpmbuild is installed) and an AppImage.
-# macOS: a .dmg holding RustGIS.app, plus a .tar.gz of the CLI
+# macOS: a .dmg holding UniGIS.app, plus a .tar.gz of the CLI
 # (signed and notarized when the MACOS_SIGN_IDENTITY / APPLE_API_* variables are set).
 # Windows (Git Bash): a portable .zip, an NSIS setup.exe (per user), a WiX .msi (all users) and
 # an .msix for the Microsoft Store. The installers need makensis and the wix .NET tool with the
@@ -17,7 +17,7 @@ version="${version#v}"
 target="${2:-}"
 root="$(cd "$(dirname "$0")/.." && pwd)"
 bin="${CARGO_TARGET_DIR:-$root/target}/${target:+$target/}release"
-dist="$root/dist"
+dist="${PACKAGE_DIST_DIR:-$root/dist}"
 mkdir -p "$dist"
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
@@ -39,45 +39,46 @@ exe=""
 for b in unigis ug; do
   [ -f "$bin/$b$exe" ] || { echo "missing $bin/$b$exe: build it first" >&2; exit 1; }
 done
-# The desktop app builds as `unigis`; the installers (desktop entry, AppImage, Windows
-# shortcuts, Homebrew cask) still launch it as `rustgis`, so stage it under that name.
 staged="$work/bin"
 mkdir -p "$staged"
-cp "$bin/unigis$exe" "$staged/rustgis$exe"
+cp "$bin/unigis$exe" "$staged/unigis$exe"
+if [ "$os" = windows ]; then
+  [ -f "$bin/unigis-cli.exe" ] || { echo "missing $bin/unigis-cli.exe: build it first" >&2; exit 1; }
+  cp "$bin/unigis-cli.exe" "$staged/"
+fi
 cp "$bin/ug$exe" "$staged/ug$exe"
 bin="$staged"
 logo() { "$bin/ug$exe" logo "$1" --size "$2"; }
-name="RustGIS-$version-$os-$arch"
+name="UniGIS-$version-$os-$arch"
 
 case "$os" in
   linux)
     # Portable tarball.
     d="$work/$name"
     mkdir -p "$d"
-    cp "$bin/rustgis" "$bin/ug" "$root/LICENSE" "$root/README.md" \
-      "$root/packaging/linux/rustgis.desktop" "$root/packaging/linux/rustgis-mime.xml" "$d/"
-    logo "$d/rustgis.png" 512
+    cp "$bin/unigis" "$bin/ug" "$root/LICENSE" "$root/README.md" \
+      "$root/packaging/linux/unigis.desktop" "$root/packaging/linux/unigis-mime.xml" "$d/"
+    logo "$d/unigis.png" 512
     tar -C "$work" -czf "$dist/$name.tar.gz" "$name"
 
     # Debian package.
     case "$arch" in x86_64) debarch=amd64 ;; aarch64) debarch=arm64 ;; *) debarch="$arch" ;; esac
     p="$work/deb"
-    install -Dm755 "$bin/rustgis" "$p/usr/bin/rustgis"
-    install -Dm755 "$bin/ug" "$p/usr/bin/ug"
-    install -Dm644 "$root/packaging/linux/rustgis.desktop" "$p/usr/share/applications/rustgis.desktop"
-    install -Dm644 "$root/packaging/linux/rustgis-mime.xml" "$p/usr/share/mime/packages/rustgis.xml"
+    install -Dm755 "$bin/unigis" "$p/usr/bin/unigis"
+    install -Dm644 "$root/packaging/linux/unigis.desktop" "$p/usr/share/applications/unigis.desktop"
+    install -Dm644 "$root/packaging/linux/unigis-mime.xml" "$p/usr/share/mime/packages/unigis.xml"
     for s in 32 64 128 256 512; do
       mkdir -p "$p/usr/share/icons/hicolor/${s}x${s}/apps"
-      logo "$p/usr/share/icons/hicolor/${s}x${s}/apps/rustgis.png" "$s"
+      logo "$p/usr/share/icons/hicolor/${s}x${s}/apps/unigis.png" "$s"
     done
-    install -Dm644 "$root/LICENSE" "$p/usr/share/doc/rustgis/copyright"
+    install -Dm644 "$root/LICENSE" "$p/usr/share/doc/unigis/copyright"
     mkdir -p "$p/DEBIAN"
     # Libraries the binaries link against, worked out by dpkg-shlibdeps (it wants a
     # debian/control in the working directory). The windowing and GPU libraries are loaded at
     # run time, so they are listed by hand below.
     mkdir -p "$work/shlibs/debian"
-    printf 'Source: rustgis\n\nPackage: rustgis\nArchitecture: any\n' > "$work/shlibs/debian/control"
-    shlibs="$(cd "$work/shlibs" && dpkg-shlibdeps -O "$p/usr/bin/rustgis" "$p/usr/bin/ug" | sed -n 's/^shlibs:Depends=//p')" || shlibs=""
+    printf 'Source: unigis\n\nPackage: unigis\nArchitecture: any\n' > "$work/shlibs/debian/control"
+    shlibs="$(cd "$work/shlibs" && dpkg-shlibdeps -O "$p/usr/bin/unigis" | sed -n 's/^shlibs:Depends=//p')" || shlibs=""
     if [ -z "$shlibs" ]; then
       # Off Debian/Ubuntu there is no dpkg database to consult. In CI that is an error: the
       # published package must carry the real list.
@@ -91,7 +92,7 @@ case "$os" in
     # here: older bash keeps the backslash of ${version/-/\~} inside a here-document.
     pkgver="$(printf '%s' "$version" | tr - '~')"
     cat > "$p/DEBIAN/control" <<CONTROL
-Package: rustgis
+Package: unigis
 Version: $pkgver
 Section: science
 Priority: optional
@@ -100,13 +101,15 @@ Maintainer: Qiusheng Wu <giswqs@gmail.com>
 Homepage: https://rustgis.app
 Installed-Size: $(du -sk "$p/usr" | cut -f1)
 Depends: ${shlibs:-libc6, libgcc-s1}, libxkbcommon0, libwayland-client0 | libx11-6
+Replaces: rustgis
+Breaks: rustgis
 Recommends: libxkbcommon-x11-0, libxcursor1, libxi6, libxrandr2, libvulkan1 | libegl1
 Description: Fast, open-source GIS for mapping, analyzing and sharing geospatial data
  Maps and layers, symbology, labeling, selection, editing, geoprocessing and
- export. Includes the ug command line for scripting every command.
+ export. Use unigis <subcommand> to script every command.
 CONTROL
     if command -v dpkg-deb > /dev/null; then
-      dpkg-deb --root-owner-group --build "$p" "$dist/rustgis_${version}_${debarch}.deb"
+      dpkg-deb --root-owner-group --build "$p" "$dist/unigis_${version}_${debarch}.deb"
     else
       echo "dpkg-deb not found: skipping the .deb" >&2
     fi
@@ -117,15 +120,17 @@ CONTROL
     if command -v rpmbuild > /dev/null; then
       r="$work/rpm"
       mkdir -p "$r/SPECS"
-      cat > "$r/SPECS/rustgis.spec" <<SPEC
+      cat > "$r/SPECS/unigis.spec" <<SPEC
 %global debug_package %{nil}
 %global __os_install_post %{nil}
-Name: rustgis
+Name: unigis
 Version: $pkgver
 Release: 1
 Summary: Fast, open-source GIS for mapping, analyzing and sharing geospatial data
 License: Apache-2.0
 URL: https://rustgis.app
+Obsoletes: rustgis
+Provides: unigis
 Requires: libxkbcommon.so.0()(64bit)
 Requires: (libwayland-client.so.0()(64bit) or libX11.so.6()(64bit))
 Recommends: libxkbcommon-x11.so.0()(64bit)
@@ -136,24 +141,23 @@ Recommends: (libvulkan.so.1()(64bit) or libEGL.so.1()(64bit))
 
 %description
 Maps and layers, symbology, labeling, selection, editing, geoprocessing and
-export. Includes the ug command line for scripting every command.
+export. Use unigis <subcommand> to script every command.
 
 %install
 mkdir -p %{buildroot}
 cp -a "$p/usr" %{buildroot}/
 
 %files
-/usr/bin/rustgis
-/usr/bin/ug
-/usr/share/applications/rustgis.desktop
-/usr/share/mime/packages/rustgis.xml
-/usr/share/icons/hicolor/*/apps/rustgis.png
-%license /usr/share/doc/rustgis/copyright
+/usr/bin/unigis
+/usr/share/applications/unigis.desktop
+/usr/share/mime/packages/unigis.xml
+/usr/share/icons/hicolor/*/apps/unigis.png
+%license /usr/share/doc/unigis/copyright
 SPEC
-      rpmbuild --quiet -bb --target "$arch" --define "_topdir $r" "$r/SPECS/rustgis.spec"
+      rpmbuild --quiet -bb --target "$arch" --define "_topdir $r" "$r/SPECS/unigis.spec"
       # The file is named after $version (0.2.0-rc.1), like the other assets: GitHub rewrites
       # the ~ of the package version in release asset names.
-      cp "$r"/RPMS/*/rustgis-*.rpm "$dist/rustgis-$version-1.$arch.rpm"
+      cp "$r"/RPMS/*/unigis-*.rpm "$dist/unigis-$version-1.$arch.rpm"
     elif [ -n "${CI:-}" ]; then
       echo "rpmbuild not found" >&2
       exit 1
@@ -184,30 +188,30 @@ SPEC
       fetch "https://github.com/AppImage/type2-runtime/releases/download/20251108/runtime-$arch" \
         "$runtime_sha" "$t/runtime"
       chmod +x "$t/appimagetool"
-      a="$work/RustGIS.AppDir"
+      a="$work/UniGIS.AppDir"
       mkdir -p "$a"
       cp -a "$p/usr" "$a/"
-      cp "$root/packaging/linux/rustgis.desktop" "$a/"
-      logo "$a/rustgis.png" 256
-      ln -s usr/bin/rustgis "$a/AppRun"
+      cp "$root/packaging/linux/unigis.desktop" "$a/"
+      logo "$a/unigis.png" 256
+      ln -s usr/bin/unigis "$a/AppRun"
       ARCH="$arch" APPIMAGE_EXTRACT_AND_RUN=1 "$t/appimagetool" --no-appstream --runtime-file "$t/runtime" \
         "$a" "$dist/$name.AppImage"
     fi
     ;;
 
   macos)
-    app="$work/RustGIS.app"
+    app="$work/UniGIS.app"
     mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
-    cp "$bin/rustgis" "$app/Contents/MacOS/rustgis"
+    cp "$bin/unigis" "$app/Contents/MacOS/unigis"
     # Bundle versions must be dot-separated numbers: drop a pre-release suffix (0.2.0-rc.1).
     sed "s/@VERSION@/${version%%-*}/g" "$root/packaging/macos/Info.plist" > "$app/Contents/Info.plist"
-    iconset="$work/rustgis.iconset"
+    iconset="$work/unigis.iconset"
     mkdir -p "$iconset"
     for s in 16 32 128 256 512; do
       logo "$iconset/icon_${s}x${s}.png" "$s"
       logo "$iconset/icon_${s}x${s}@2x.png" "$((s * 2))"
     done
-    iconutil -c icns "$iconset" -o "$app/Contents/Resources/rustgis.icns"
+    iconutil -c icns "$iconset" -o "$app/Contents/Resources/unigis.icns"
     # Signing: with MACOS_SIGN_IDENTITY (a Developer ID Application identity in the keychain)
     # the app and CLI get a hardened-runtime signature; without it, an ad-hoc one, which
     # Apple Silicon needs to launch anything. With APPLE_API_KEY_PATH, APPLE_API_KEY_ID and
@@ -232,8 +236,8 @@ SPEC
     # reaches Apple's servers at first launch (#89). Stapling adds a file outside the signed
     # contents, so the signature stays valid.
     if [ -n "$identity" ] && [ -n "${APPLE_API_KEY_PATH:-}" ]; then
-      ditto -c -k --keepParent "$app" "$work/RustGIS.app.zip"
-      notarize "$work/RustGIS.app.zip"
+      ditto -c -k --keepParent "$app" "$work/UniGIS.app.zip"
+      notarize "$work/UniGIS.app.zip"
       xcrun stapler staple "$app"
     fi
 
@@ -241,7 +245,7 @@ SPEC
     mkdir -p "$stage"
     cp -R "$app" "$stage/"
     ln -s /Applications "$stage/Applications"
-    hdiutil create -volname "RustGIS $version" -srcfolder "$stage" -ov -format UDZO "$dist/$name.dmg"
+    hdiutil create -volname "UniGIS $version" -srcfolder "$stage" -ov -format UDZO "$dist/$name.dmg"
     if [ -n "$identity" ]; then
       sign "$dist/$name.dmg"
       if notarize "$dist/$name.dmg" && [ -n "${APPLE_API_KEY_PATH:-}" ]; then
@@ -249,24 +253,25 @@ SPEC
       fi
     fi
 
-    d="$work/rustgis-cli-$version-$os-$arch"
+    d="$work/unigis-cli-$version-$os-$arch"
     mkdir -p "$d"
-    cp "$bin/ug" "$root/LICENSE" "$d/"
-    sign "$d/ug"
+    cp "$bin/ug" "$d/unigis"
+    cp "$root/LICENSE" "$d/"
+    sign "$d/unigis"
     # A bare executable cannot be stapled: notarizing it registers the ticket that Gatekeeper
     # looks up online.
     if [ -n "$identity" ]; then
-      ditto -c -k "$d/ug" "$work/rustgis-cli.zip"
-      notarize "$work/rustgis-cli.zip"
+      ditto -c -k "$d/unigis" "$work/unigis-cli.zip"
+      notarize "$work/unigis-cli.zip"
     fi
-    tar -C "$work" -czf "$dist/rustgis-cli-$version-$os-$arch.tar.gz" "$(basename "$d")"
+    tar -C "$work" -czf "$dist/unigis-cli-$version-$os-$arch.tar.gz" "$(basename "$d")"
     ;;
 
   windows)
     # Portable zip: unzip anywhere and run, no installer or admin rights.
     d="$work/$name"
     mkdir -p "$d"
-    cp "$bin/rustgis.exe" "$bin/ug.exe" "$root/LICENSE" "$root/README.md" "$d/"
+    cp "$bin/unigis.exe" "$bin/unigis-cli.exe" "$bin/ug.exe" "$root/LICENSE" "$root/README.md" "$d/"
     sed "s/@VERSION@/$version/g" "$root/packaging/windows/README-portable.txt" > "$d/README.txt"
     (cd "$work" && 7z a -tzip -bso0 "$dist/$name-portable.zip" "$name")
 
@@ -276,8 +281,8 @@ SPEC
     case "$arch" in x86_64) instarch=x64 ;; aarch64) instarch=arm64 ;; *) instarch="$arch" ;; esac
     s="$work/installer"
     mkdir -p "$s"
-    cp "$bin/rustgis.exe" "$bin/ug.exe" "$root/LICENSE" "$root/packaging/windows/path.ps1" "$s/"
-    "$bin/ug.exe" logo "$s/rustgis.ico"
+    cp "$bin/unigis.exe" "$bin/unigis-cli.exe" "$bin/ug.exe" "$root/LICENSE" "$root/packaging/windows/path.ps1" "$s/"
+    "$bin/ug.exe" logo "$s/unigis.ico"
     "$bin/ug.exe" logo "$s/sidebar.bmp" --size 128 --canvas 164x314
     "$bin/ug.exe" logo "$s/banner.bmp" --size 44 --canvas 493x58 --at 440,7
     "$bin/ug.exe" logo "$s/dialog.bmp" --size 120 --canvas 493x312 --at 22,96
@@ -295,8 +300,8 @@ SPEC
     if [ -n "$makensis" ]; then
       # VIProductVersion wants four numbers: drop a pre-release suffix (0.2.0-rc.1 -> 0.2.0.0).
       MSYS2_ARG_CONV_EXCL='*' "$makensis" -V2 -DVERSION="$version" -DVERSION4="${version%%-*}.0" \
-        -DSTAGE="$(w "$s")" -DICON="$(w "$s/rustgis.ico")" -DSIDEBAR="$(w "$s/sidebar.bmp")" \
-        -DOUTFILE="$(w "$dist/$name-setup.exe")" "$(w "$root/packaging/windows/rustgis.nsi")"
+        -DSTAGE="$(w "$s")" -DICON="$(w "$s/unigis.ico")" -DSIDEBAR="$(w "$s/sidebar.bmp")" \
+        -DOUTFILE="$(w "$dist/$name-setup.exe")" "$(w "$root/packaging/windows/unigis.nsi")"
     else
       missing makensis setup.exe
     fi
@@ -311,9 +316,9 @@ SPEC
       } > "$s/LICENSE.rtf"
       # MSI versions are three numbers: drop a pre-release suffix.
       MSYS2_ARG_CONV_EXCL='*' "$wix" build -arch "$instarch" -ext WixToolset.UI.wixext \
-        -d Version="${version%%-*}" -d Stage="$(w "$s")" -d Icon="$(w "$s/rustgis.ico")" \
+        -d Version="${version%%-*}" -d Stage="$(w "$s")" -d Icon="$(w "$s/unigis.ico")" \
         -d License="$(w "$s/LICENSE.rtf")" -d Banner="$(w "$s/banner.bmp")" -d Dialog="$(w "$s/dialog.bmp")" \
-        -o "$(w "$dist/$name.msi")" "$(w "$root/packaging/windows/rustgis.wxs")"
+        -o "$(w "$dist/$name.msi")" "$(w "$root/packaging/windows/unigis.wxs")"
       rm -f "$dist/$name.wixpdb"
     else
       missing wix .msi
@@ -324,7 +329,7 @@ SPEC
     # self-signed sideload build.
     m="$work/msix"
     mkdir -p "$m/Assets"
-    cp "$bin/rustgis.exe" "$bin/ug.exe" "$m/"
+    cp "$bin/unigis.exe" "$bin/unigis-cli.exe" "$bin/ug.exe" "$m/"
     logo "$m/Assets/Square44x44Logo.png" 44
     logo "$m/Assets/Square150x150Logo.png" 150
     logo "$m/Assets/StoreLogo.png" 50

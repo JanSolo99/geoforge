@@ -27,16 +27,36 @@ mod prefs {
             std::env::var_os("XDG_CONFIG_HOME")
                 .map(PathBuf::from)
                 .or_else(|| std::env::var_os("HOME").map(|h| PathBuf::from(h).join(".config")))
-                .map(|d| d.join("rustgis"))
+                .map(|d| d.join("unigis"))
         }
     }
 
     fn read() -> Map<String, Value> {
-        dir()
-            .and_then(|d| std::fs::read_to_string(d.join("prefs.json")).ok())
-            .and_then(|t| serde_json::from_str::<Value>(&t).ok())
-            .and_then(|v| v.as_object().cloned())
-            .unwrap_or_default()
+        let Some(dir) = dir() else { return Map::new() };
+        // Retain the legacy file so an older installation can still use it.
+        let legacy = if cfg!(target_os = "linux") { dir.parent().map(|p| p.join("rustgis")) } else { None };
+        read_from(&dir, legacy.as_deref())
+    }
+
+    fn read_from(dir: &std::path::Path, legacy: Option<&std::path::Path>) -> Map<String, Value> {
+        let path = dir.join("prefs.json");
+        // New settings always win, including an intentionally empty or invalid file.
+        let migrate = !path.exists();
+        let source = if migrate { legacy.map(|d| d.join("prefs.json")).unwrap_or_else(|| path.clone()) } else { path.clone() };
+        let Some((text, map)) = std::fs::read_to_string(&source).ok().and_then(|text| {
+            let map = serde_json::from_str::<Value>(&text).ok()?.as_object()?.clone();
+            Some((text, map))
+        }) else {
+            return Map::new();
+        };
+        if migrate && source != path {
+            let result = std::fs::create_dir_all(dir).and_then(|_| rustgis_engine::data::io::write_atomic(&path, text.as_bytes()));
+            if let Err(e) = result {
+                log::warn!("could not migrate preferences: {e}");
+            }
+        }
+        // A read-only settings folder still opens with the user's legacy preferences.
+        map
     }
 
     pub fn services() -> Services {
@@ -58,6 +78,36 @@ mod prefs {
                 }
             })),
             ..Services::default()
+        }
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+
+        #[test]
+        fn legacy_preferences_migrate_without_overwriting_new_or_removing_old() {
+            let base = std::env::temp_dir().join(format!("unigis-pref-migration-{}", std::process::id()));
+            let old = base.join("rustgis");
+            let new = base.join("unigis");
+            let _ = std::fs::remove_dir_all(&base);
+            std::fs::create_dir_all(&old).unwrap();
+            let text = r#"{"language":"de","favorites":"/data","other":{"nested":1}}"#;
+            std::fs::write(old.join("prefs.json"), text).unwrap();
+            assert_eq!(read_from(&new, Some(&old))["language"], "de");
+            assert_eq!(std::fs::read_to_string(new.join("prefs.json")).unwrap(), text);
+            assert_eq!(std::fs::read_to_string(old.join("prefs.json")).unwrap(), text);
+            std::fs::write(new.join("prefs.json"), r#"{"language":"fr"}"#).unwrap();
+            assert_eq!(read_from(&new, Some(&old))["language"], "fr");
+            std::fs::write(new.join("prefs.json"), "{}").unwrap();
+            assert!(read_from(&new, Some(&old)).is_empty());
+            std::fs::write(new.join("prefs.json"), "invalid").unwrap();
+            assert!(read_from(&new, Some(&old)).is_empty());
+            std::fs::remove_file(new.join("prefs.json")).unwrap();
+            std::fs::write(old.join("prefs.json"), "invalid").unwrap();
+            assert!(read_from(&new, Some(&old)).is_empty());
+            assert!(!new.join("prefs.json").exists());
+            std::fs::remove_dir_all(base).unwrap();
         }
     }
 }

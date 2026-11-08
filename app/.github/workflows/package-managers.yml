@@ -6,7 +6,7 @@
 # Repository secrets:
 #   HOMEBREW_TAP_DEPLOY_KEY - private half of an SSH deploy key with write access to
 #                             opengeos/homebrew-rustgis
-#   AUR_SSH_PRIVATE_KEY     - private SSH key of the AUR account that maintains rustgis-bin
+#   AUR_SSH_PRIVATE_KEY     - private SSH key of the AUR account that maintains unigis-bin
 #   COPR_CONFIG             - the copr-cli config block from https://copr.fedorainfracloud.org/api/
 #                             (the token expires after 180 days)
 #   WINGET_TOKEN            - classic token (public_repo) of the account owning the winget-pkgs fork
@@ -107,7 +107,7 @@ jobs:
             exit 0
           fi
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
-            commit -m "rustgis $VERSION"
+            commit -m "unigis $VERSION"
           git push origin HEAD
 
   aur:
@@ -139,12 +139,12 @@ jobs:
           packaging/aur/render.sh "$VERSION" "$RUNNER_TEMP/SHA256SUMS" > aur/PKGBUILD
           cat aur/PKGBUILD
 
-      - name: Push rustgis-bin to the AUR
+      - name: Push unigis-bin to the AUR
         if: env.AUR_KEY != ''
         # Pinned to a commit: this step receives the AUR key.
         uses: KSXGitHub/github-actions-deploy-aur@084b0d9b15415bf9cdb65d44dad1efe37a354050 # v4.2.0
         with:
-          pkgname: rustgis-bin
+          pkgname: unigis-bin
           pkgbuild: aur/PKGBUILD
           commit_username: Qiusheng Wu
           commit_email: giswqs@gmail.com
@@ -195,10 +195,10 @@ jobs:
           packaging/copr/render.sh "$VERSION" "$DATE" "$src"
           appstreamcli validate --no-net "$src/org.rustgis.RustGIS.metainfo.xml"
           gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --dir "$src" \
-            --pattern "rustgis-$VERSION-1.x86_64.rpm" --pattern "rustgis-$VERSION-1.aarch64.rpm" \
+            --pattern "unigis-$VERSION-1.x86_64.rpm" --pattern "unigis-$VERSION-1.aarch64.rpm" \
             --pattern SHA256SUMS
           (cd "$src" && sha256sum --check --ignore-missing SHA256SUMS)
-          srpm="$(rpmbuild -bs "$src/rustgis.spec" --define "_topdir $HOME/rpmbuild" | sed -n 's/^Wrote: //p')"
+          srpm="$(rpmbuild -bs "$src/unigis.spec" --define "_topdir $HOME/rpmbuild" | sed -n 's/^Wrote: //p')"
           [ -n "$srpm" ] || { echo "::error::rpmbuild wrote no source RPM"; exit 1; }
           copr-cli build --nowait giswqs/rustgis "$srpm"
 

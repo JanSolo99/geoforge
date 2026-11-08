@@ -7,6 +7,27 @@
 
 use std::process::{Command, ExitCode};
 
+// Share the original vector drawing without pulling the rendering engine into
+// release-site tooling. The desktop build script uses this same source file.
+#[allow(dead_code)]
+#[path = "../../crates/render/src/logo.rs"]
+mod logo;
+
+fn web_icons(dir: &std::path::Path) -> Result<(), String> {
+    std::fs::create_dir_all(dir).map_err(|e| e.to_string())?;
+    for (name, size) in [("favicon.png", 32), ("apple-touch-icon.png", 180), ("icon-192.png", 192), ("icon-512.png", 512)] {
+        logo::pixmap(size).ok_or("could not draw UniGIS logo")?.save_png(dir.join(name)).map_err(|e| e.to_string())?;
+    }
+    // A maskable icon needs an opaque background and generous padding, so its
+    // artwork survives the launcher's circular and rounded-square masks.
+    let mut masked = tiny_skia::Pixmap::new(512, 512).ok_or("could not allocate maskable icon")?;
+    masked.fill(tiny_skia::Color::from_rgba8(228, 232, 238, 255));
+    let mark = logo::pixmap(288).ok_or("could not draw UniGIS logo")?;
+    masked.draw_pixmap(112, 112, mark.as_ref(), &tiny_skia::PixmapPaint::default(), tiny_skia::Transform::identity(), None);
+    masked.save_png(dir.join("icon-maskable-512.png")).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
 const LAYERS: &[(&str, u8)] = &[
     ("geom", 0),
     ("data", 1),
@@ -132,6 +153,7 @@ fn web_sw(template: &str, files: &[String], version: &str) -> Result<String, Str
 fn web_pwa(dir: Option<String>) -> Result<(), String> {
     let dir = std::path::PathBuf::from(dir.ok_or("usage: cargo xtask web-pwa <trunk build output, e.g. dist/web>")?);
     let template = std::fs::read_to_string(root().join("apps/rustgis-web/sw.js")).map_err(|e| format!("apps/rustgis-web/sw.js: {e}"))?;
+    web_icons(&dir.join("icons"))?;
     let (files, version) = web_shell(&dir, &template)?;
     let sw = web_sw(&template, &files, &version)?;
     std::fs::write(dir.join("sw.js"), sw).map_err(|e| format!("{}: {e}", dir.display()))?;
@@ -148,7 +170,11 @@ fn main() -> ExitCode {
             .and_then(|_| cargo(&["test", "--workspace", "-q"]))
             .and_then(|_| layers()),
         "web-pwa" => web_pwa(std::env::args().nth(2)),
-        _ => Err("usage: cargo xtask ci | layers | web-pwa <dir>".into()),
+        "web-icons" => std::env::args()
+            .nth(2)
+            .ok_or_else(|| "usage: cargo xtask web-icons <dir>".to_owned())
+            .and_then(|dir| web_icons(std::path::Path::new(&dir))),
+        _ => Err("usage: cargo xtask ci | layers | web-pwa <dir> | web-icons <dir>".into()),
     };
     match r {
         Ok(()) => ExitCode::SUCCESS,
@@ -162,6 +188,34 @@ fn main() -> ExitCode {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn original_icons_are_local_cached_and_mask_safe() {
+        let dir = std::env::temp_dir().join(format!("unigis-web-icons-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::write(dir.join("index.html"), "app").unwrap();
+        web_icons(&dir.join("icons")).unwrap();
+        let (files, before) = web_shell(&dir, "worker").unwrap();
+        assert_eq!(files.len(), 6);
+        for (name, size) in [("favicon.png", 32), ("apple-touch-icon.png", 180), ("icon-192.png", 192), ("icon-512.png", 512)] {
+            let image = tiny_skia::Pixmap::load_png(dir.join("icons").join(name)).unwrap();
+            assert_eq!((image.width(), image.height()), (size, size));
+            assert_eq!(image, logo::pixmap(size).unwrap());
+        }
+        let masked = tiny_skia::Pixmap::load_png(dir.join("icons/icon-maskable-512.png")).unwrap();
+        assert_eq!((masked.width(), masked.height()), (512, 512));
+        assert!(masked.pixels().iter().all(|p| p.alpha() == 255));
+        for y in 0..512 {
+            for x in 0..512 {
+                if (x as f32 - 256.0).hypot(y as f32 - 256.0) > 204.8 {
+                    assert_eq!(masked.pixel(x, y), masked.pixel(0, 0), "artwork outside mask safe zone");
+                }
+            }
+        }
+        std::fs::write(dir.join("icons/favicon.png"), "changed").unwrap();
+        assert_ne!(web_shell(&dir, "worker").unwrap().1, before);
+        std::fs::remove_dir_all(dir).unwrap();
+    }
 
     #[test]
     fn web_sw_fills_the_real_template() {

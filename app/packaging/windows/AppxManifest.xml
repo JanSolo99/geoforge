@@ -20,7 +20,7 @@
     <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26100.0" />
   </Dependencies>
   <Applications>
-    <Application Id="RustGIS" Executable="rustgis.exe" EntryPoint="Windows.FullTrustApplication">
+    <Application Id="UniGIS" Executable="unigis.exe" EntryPoint="Windows.FullTrustApplication">
       <uap:VisualElements DisplayName="UniGIS" Description="Fast, open-source GIS for mapping, analyzing and sharing geospatial data"
         BackgroundColor="transparent" Square44x44Logo="Assets\Square44x44Logo.png"
         Square150x150Logo="Assets\Square150x150Logo.png" />
@@ -45,15 +45,16 @@
       </Extensions>
     </Application>
     <!-- The command line tool: no Start menu entry, run as `ug` from any terminal. -->
-    <Application Id="RustGISCli" Executable="ug.exe" EntryPoint="Windows.FullTrustApplication">
+    <Application Id="UniGISCli" Executable="unigis-cli.exe" EntryPoint="Windows.FullTrustApplication">
       <uap:VisualElements DisplayName="UniGIS command line" Description="UniGIS command line tool"
         BackgroundColor="transparent" Square44x44Logo="Assets\Square44x44Logo.png"
         Square150x150Logo="Assets\Square150x150Logo.png" AppListEntry="none" />
       <Extensions>
         <uap3:Extension Category="windows.appExecutionAlias" EntryPoint="Windows.FullTrustApplication"
-          Executable="ug.exe">
+          Executable="unigis-cli.exe">
           <uap3:AppExecutionAlias>
             <desktop:ExecutionAlias Alias="ug.exe" />
+            <desktop:ExecutionAlias Alias="unigis-cli.exe" />
           </uap3:AppExecutionAlias>
         </uap3:Extension>
       </Extensions>

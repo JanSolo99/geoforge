@@ -64,3 +64,10 @@ Maps, symbology, tables, layouts, the Tools pane and the UniGIS tools that do no
 system (shapefiles and GeoPackages are opened from the file picker). File geodatabase browsing and
 the `ug` command line are desktop only. The build uses the `web` Cargo profile (single codegen unit,
 fat LTO), so expect 15 to 40 minutes and about 8 GB of memory to compile it.
+
+The favicon, touch and PWA icons are generated from UniGIS's own
+`app/crates/render/src/logo.rs`: Trunk's pre-build hook runs `cargo xtask web-icons`,
+and `cargo xtask web-pwa dist/web` regenerates them before hashing the app shell.
+These files are local to each deployment, included in its offline cache, and do
+not depend on the historical RustGIS asset host. The downloads builder uses the
+same generator. Generated PNG files remain in ignored build output directories.

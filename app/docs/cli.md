@@ -90,3 +90,8 @@ claude mcp add rustgis -- ug mcp --sample
 ```
 
 See [MCP Server](mcp.md).
+
+On Windows the desktop executable uses the GUI subsystem. Use `unigis-cli.exe`
+(or `ug.exe`) in terminals and scripts so output and exit status remain attached
+to the caller. Both console names use the same command implementation. Linux
+distro packages install `unigis` alone to avoid the ugrep `ug` name conflict.

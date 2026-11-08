@@ -24,3 +24,6 @@ __pycache__/
 *~
 .DS_Store
 Thumbs.db
+
+# Generated from crates/render/src/logo.rs by Trunk / cargo xtask web-icons.
+/apps/rustgis-web/icons/

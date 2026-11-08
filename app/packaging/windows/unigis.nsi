@@ -1,6 +1,6 @@
 ; setup.exe installer (NSIS 3), built by package.sh. A per-user install that needs no admin
-; rights, in %LOCALAPPDATA%\Programs\RustGIS: a Start menu shortcut, ug on the user's
-; PATH, .rgis/.rgisx projects opened by RustGIS and RustGIS offered under Open with for .geojson.
+; rights, in %LOCALAPPDATA%\Programs\UniGIS: a Start menu shortcut, ug on the user's
+; PATH, .rgis/.rgisx projects opened by UniGIS and UniGIS offered under Open with for .geojson.
 ; Defines passed with -D: VERSION, VERSION4 (four numbers), STAGE (the folder holding the exes,
 ; LICENSE and path.ps1), ICON, SIDEBAR (a 164x314 BMP) and OUTFILE.
 
@@ -9,7 +9,7 @@ SetCompressor /SOLID lzma
 RequestExecutionLevel user
 ManifestDPIAware true
 
-!define APP "RustGIS"
+!define APP "UniGIS"
 !define PUBLISHER "Open Geospatial Solutions"
 !define UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP}"
 
@@ -24,7 +24,7 @@ VIAddVersionKey "ProductVersion" "${VERSION}"
 VIAddVersionKey "FileVersion" "${VERSION}"
 VIAddVersionKey "FileDescription" "UniGIS ${VERSION} setup"
 VIAddVersionKey "CompanyName" "${PUBLISHER}"
-VIAddVersionKey "LegalCopyright" "Copyright the RustGIS contributors. Apache-2.0."
+VIAddVersionKey "LegalCopyright" "Copyright the UniGIS contributors. Apache-2.0."
 
 !include "MUI2.nsh"
 !include "WinMessages.nsh"
@@ -34,7 +34,7 @@ VIAddVersionKey "LegalCopyright" "Copyright the RustGIS contributors. Apache-2.0
 !define MUI_WELCOMEFINISHPAGE_BITMAP "${SIDEBAR}"
 !define MUI_UNWELCOMEFINISHPAGE_BITMAP "${SIDEBAR}"
 !define MUI_ABORTWARNING
-!define MUI_FINISHPAGE_RUN "$INSTDIR\rustgis.exe"
+!define MUI_FINISHPAGE_RUN "$INSTDIR\unigis.exe"
 !define MUI_FINISHPAGE_RUN_TEXT "Start UniGIS"
 
 !insertmacro MUI_PAGE_WELCOME
@@ -60,12 +60,13 @@ VIAddVersionKey "LegalCopyright" "Copyright the RustGIS contributors. Apache-2.0
 
 Section "Install"
   SetOutPath "$INSTDIR"
-  File "${STAGE}\rustgis.exe"
+  File "${STAGE}\unigis.exe"
+  File "${STAGE}\unigis-cli.exe"
   File "${STAGE}\ug.exe"
   File /oname=LICENSE.txt "${STAGE}\LICENSE"
   WriteUninstaller "$INSTDIR\uninstall.exe"
 
-  CreateShortcut "$SMPROGRAMS\UniGIS.lnk" "$INSTDIR\rustgis.exe"
+  CreateShortcut "$SMPROGRAMS\UniGIS.lnk" "$INSTDIR\unigis.exe"
 
   ; ug from any new terminal.
   InitPluginsDir
@@ -76,13 +77,13 @@ Section "Install"
     MessageBox MB_OK|MB_ICONEXCLAMATION "UniGIS is installed, but ug could not be added to your PATH ($0). Run it from $INSTDIR instead." /SD IDOK
   !insertmacro RefreshEnvironment
 
-  ; Projects open in RustGIS; GeoJSON lists it under Open with.
-  WriteRegStr HKCU "Software\Classes\RustGIS.Project" "" "UniGIS project"
-  WriteRegStr HKCU "Software\Classes\RustGIS.Project\DefaultIcon" "" '"$INSTDIR\rustgis.exe",0'
-  WriteRegStr HKCU "Software\Classes\RustGIS.Project\shell\open\command" "" '"$INSTDIR\rustgis.exe" "%1"'
-  WriteRegStr HKCU "Software\Classes\.rgis" "" "RustGIS.Project"
-  WriteRegStr HKCU "Software\Classes\.rgisx" "" "RustGIS.Project"
-  WriteRegStr HKCU "Software\Classes\.geojson\OpenWithProgids" "RustGIS.Project" ""
+  ; Projects open in UniGIS; GeoJSON lists it under Open with.
+  WriteRegStr HKCU "Software\Classes\UniGIS.Project" "" "UniGIS project"
+  WriteRegStr HKCU "Software\Classes\UniGIS.Project\DefaultIcon" "" '"$INSTDIR\unigis.exe",0'
+  WriteRegStr HKCU "Software\Classes\UniGIS.Project\shell\open\command" "" '"$INSTDIR\unigis.exe" "%1"'
+  WriteRegStr HKCU "Software\Classes\.rgis" "" "UniGIS.Project"
+  WriteRegStr HKCU "Software\Classes\.rgisx" "" "UniGIS.Project"
+  WriteRegStr HKCU "Software\Classes\.geojson\OpenWithProgids" "UniGIS.Project" ""
   !insertmacro RefreshShell
 
   ; Apps & features.
@@ -90,7 +91,7 @@ Section "Install"
   WriteRegStr HKCU "${UNINST_KEY}" "DisplayName" "UniGIS"
   WriteRegStr HKCU "${UNINST_KEY}" "DisplayVersion" "${VERSION}"
   WriteRegStr HKCU "${UNINST_KEY}" "Publisher" "${PUBLISHER}"
-  WriteRegStr HKCU "${UNINST_KEY}" "DisplayIcon" '"$INSTDIR\rustgis.exe",0'
+  WriteRegStr HKCU "${UNINST_KEY}" "DisplayIcon" '"$INSTDIR\unigis.exe",0'
   WriteRegStr HKCU "${UNINST_KEY}" "InstallLocation" "$INSTDIR"
   WriteRegStr HKCU "${UNINST_KEY}" "URLInfoAbout" "https://rustgis.app"
   WriteRegStr HKCU "${UNINST_KEY}" "UninstallString" '"$INSTDIR\uninstall.exe"'
@@ -113,17 +114,18 @@ Section "Uninstall"
   !insertmacro RefreshEnvironment
 
   ; Only the associations this installer made: another program may own .geojson.
-  DeleteRegValue HKCU "Software\Classes\.geojson\OpenWithProgids" "RustGIS.Project"
+  DeleteRegValue HKCU "Software\Classes\.geojson\OpenWithProgids" "UniGIS.Project"
   ReadRegStr $0 HKCU "Software\Classes\.rgis" ""
-  StrCmp $0 "RustGIS.Project" 0 +2
+  StrCmp $0 "UniGIS.Project" 0 +2
     DeleteRegKey HKCU "Software\Classes\.rgis"
   ReadRegStr $0 HKCU "Software\Classes\.rgisx" ""
-  StrCmp $0 "RustGIS.Project" 0 +2
+  StrCmp $0 "UniGIS.Project" 0 +2
     DeleteRegKey HKCU "Software\Classes\.rgisx"
-  DeleteRegKey HKCU "Software\Classes\RustGIS.Project"
+  DeleteRegKey HKCU "Software\Classes\UniGIS.Project"
   !insertmacro RefreshShell
 
-  Delete "$INSTDIR\rustgis.exe"
+  Delete "$INSTDIR\unigis.exe"
+  Delete "$INSTDIR\unigis-cli.exe"
   Delete "$INSTDIR\ug.exe"
   Delete "$INSTDIR\LICENSE.txt"
   Delete "$INSTDIR\uninstall.exe"

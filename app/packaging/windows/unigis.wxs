@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   Windows Installer package (WiX 5), built by package.sh. An all-users install in Program Files:
-  a Start menu shortcut, ug on the system PATH, .rgis/.rgisx projects opened by RustGIS
-  and RustGIS offered under Open with for .geojson. Variables passed with -d: Version (three
+  a Start menu shortcut, ug on the system PATH, .rgis/.rgisx projects opened by UniGIS
+  and UniGIS offered under Open with for .geojson. Variables passed with -d: Version (three
   numbers), Stage (the folder holding the exes and LICENSE), Icon, License (RTF), Banner and
   Dialog (BMPs).
 -->
@@ -15,40 +15,43 @@
       DowngradeErrorMessage="A newer version of UniGIS is already installed." />
     <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
 
-    <Icon Id="rustgis.ico" SourceFile="$(var.Icon)" />
-    <Property Id="ARPPRODUCTICON" Value="rustgis.ico" />
+    <Icon Id="unigis.ico" SourceFile="$(var.Icon)" />
+    <Property Id="ARPPRODUCTICON" Value="unigis.ico" />
     <Property Id="ARPURLINFOABOUT" Value="https://rustgis.app" />
     <Property Id="ARPHELPLINK" Value="https://github.com/opengeos/RustGIS/issues" />
 
     <StandardDirectory Id="ProgramFiles64Folder">
-      <Directory Id="INSTALLFOLDER" Name="RustGIS" />
+      <Directory Id="INSTALLFOLDER" Name="UniGIS" />
     </StandardDirectory>
     <StandardDirectory Id="ProgramMenuFolder" />
 
     <Feature Id="Main" Title="UniGIS">
       <Component Directory="INSTALLFOLDER">
-        <File Id="rustgis.exe" Source="$(var.Stage)\rustgis.exe" KeyPath="yes" />
-        <ProgId Id="RustGIS.Project" Description="UniGIS project" Icon="rustgis.exe" IconIndex="0">
+        <File Id="unigis.exe" Source="$(var.Stage)\unigis.exe" KeyPath="yes" />
+        <ProgId Id="UniGIS.Project" Description="UniGIS project" Icon="unigis.exe" IconIndex="0">
           <Extension Id="rgis">
-            <Verb Id="open" TargetFile="rustgis.exe" Argument="&quot;%1&quot;" />
+            <Verb Id="open" TargetFile="unigis.exe" Argument="&quot;%1&quot;" />
           </Extension>
-          <!-- The verb is the ProgId's (RustGIS.Project\shell\open): one serves both. -->
+          <!-- The verb is the ProgId's (UniGIS.Project\shell\open): one serves both. -->
           <Extension Id="rgisx" />
         </ProgId>
         <!-- Listed under Open with for GeoJSON, without taking over the default app. -->
-        <RegistryValue Root="HKLM" Key="Software\Classes\.geojson\OpenWithProgids" Name="RustGIS.Project"
+        <RegistryValue Root="HKLM" Key="Software\Classes\.geojson\OpenWithProgids" Name="UniGIS.Project"
           Type="string" Value="" />
       </Component>
       <Component Directory="INSTALLFOLDER">
-        <File Id="rustgis_cli.exe" Source="$(var.Stage)\ug.exe" KeyPath="yes" />
+        <File Id="unigis_cli.exe" Source="$(var.Stage)\ug.exe" KeyPath="yes" />
         <Environment Id="PathEntry" Name="PATH" Value="[INSTALLFOLDER]" Part="last" Action="set"
           System="yes" Permanent="no" />
+      </Component>
+      <Component Directory="INSTALLFOLDER">
+        <File Id="unigis_console.exe" Source="$(var.Stage)\unigis-cli.exe" KeyPath="yes" />
       </Component>
       <!-- A shortcut needs a registry key path (ICE43). -->
       <Component Id="StartMenuShortcut" Directory="ProgramMenuFolder">
         <Shortcut Id="StartMenuShortcut" Name="UniGIS" Description="Desktop GIS with a ribbon workflow"
-          Target="[#rustgis.exe]" WorkingDirectory="INSTALLFOLDER" />
-        <RegistryValue Root="HKCU" Key="Software\RustGIS" Name="StartMenuShortcut" Type="integer" Value="1"
+          Target="[#unigis.exe]" WorkingDirectory="INSTALLFOLDER" />
+        <RegistryValue Root="HKCU" Key="Software\UniGIS" Name="StartMenuShortcut" Type="integer" Value="1"
           KeyPath="yes" />
       </Component>
       <Component Directory="INSTALLFOLDER">

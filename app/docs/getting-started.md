@@ -56,3 +56,11 @@ your ChatGPT account, Gemini, OpenRouter, a local Ollama, or any OpenAI-compatib
 - The [User Guide](user-guide/index.md) walks through every part of the app.
 - [Command Line](cli.md) shows how to script UniGIS with `ug`.
 - [Plugins](plugins.md) shows how to add tools from the plugin registry, or write your own.
+
+The installed program is `unigis`: run it without arguments or with data files to
+open the app, or use `unigis tools`, `unigis run …` and other subcommands in a
+terminal. On Windows use `unigis-cli.exe` or `ug.exe` for console output.
+Linux distribution packages reserve `ug` for ugrep; use `unigis` there.
+Linux preferences now live under `~/.config/unigis` (or `$XDG_CONFIG_HOME/unigis`).
+Existing `rustgis/prefs.json` preferences are copied on first use, preserving the
+original file and any newer UniGIS preferences.

@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Builds the downloads.rustgis.app site for a RustGIS release: its assets up to 100 MB (checked
+# Builds the downloads.rustgis.app site for a UniGIS release: its assets up to 100 MB (checked
 # against GitHub's SHA-256 digests), a manifest.json the page reads, SHA256SUMS.txt and the page.
 #
 #   packaging/downloads/build.sh <output-dir> [release-tag]
 #
-# Needs `gh` (authenticated) and `jq`. With DOWNLOAD_MIRROR_METADATA_ONLY=true it writes only
+# Needs `gh` (authenticated), `jq` and Rust (for original generated icons). With DOWNLOAD_MIRROR_METADATA_ONLY=true it writes only
 # manifest.json, so a caller can tell whether anything changed before downloading.
 set -euo pipefail
 
@@ -48,16 +48,19 @@ if [[ "$(jq -r '.draft' "$release_json")" == "true" ]]; then
   exit 1
 fi
 
+branding_digest="$(cat "$template_directory/../../crates/render/src/logo.rs" "$template_directory/../../xtask/src/main.rs" | sha256sum | cut -d' ' -f1)"
 generated_at="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
 
 jq \
   --arg generated_at "$generated_at" \
+  --arg branding_digest "$branding_digest" \
   --arg mirror_origin "$MIRROR_ORIGIN" \
   --argjson max_mirrored_bytes "$MAX_MIRRORED_BYTES" \
   --argjson omitted_asset_patterns "$OMITTED_ASSET_PATTERNS_JSON" \
   '{
     schema_version: 1,
-    product: "RustGIS",
+    product: "UniGIS",
+    branding_digest: $branding_digest,
     generated_at: $generated_at,
     max_mirrored_bytes: $max_mirrored_bytes,
     release: {
@@ -149,6 +152,7 @@ cp "$template_directory/styles.css" "$output_directory/styles.css"
 cp "$template_directory/app.js" "$output_directory/app.js"
 cp "$template_directory/404.html" "$output_directory/404.html"
 cp "$template_directory/README.md" "$output_directory/README.md"
+CARGO_BUILD_JOBS=3 cargo run --locked --manifest-path "$template_directory/../../Cargo.toml" -j3 -p xtask -- web-icons "$output_directory/icons"
 touch "$output_directory/.nojekyll"
 printf '%s\n' 'downloads.rustgis.app' > "$output_directory/CNAME"
 rm "$release_json"

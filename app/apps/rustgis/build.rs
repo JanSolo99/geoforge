@@ -1,4 +1,4 @@
-//! On Windows, embeds the app icon in `rustgis.exe`, so Explorer, shortcuts and pinned taskbar
+//! On Windows, embeds the app icon in `unigis.exe`, so Explorer, shortcuts and pinned taskbar
 //! entries show the logo. The icon is drawn by the same code as the window icon
 //! (`crates/render/src/logo.rs`), so there is no image file to keep in sync.
 
@@ -27,14 +27,14 @@ mod windows {
     /// references it, then compiles and links the script.
     pub fn embed_icon() -> Result<(), Box<dyn std::error::Error>> {
         let out = PathBuf::from(std::env::var("OUT_DIR")?);
-        let ico = out.join("rustgis.ico");
+        let ico = out.join("unigis.ico");
         std::fs::write(&ico, super::logo::ico().ok_or("could not draw the icon")?)?;
         let version = std::env::var("CARGO_PKG_VERSION")?;
         // VERSIONINFO wants four numbers: drop a pre-release suffix (0.2.0-rc.1 -> 0,2,0,0).
         let nums: Vec<&str> = version.split('-').next().unwrap_or("0.0.0").split('.').collect();
         let num = |i: usize| nums.get(i).copied().unwrap_or("0");
         let file_version = format!("{},{},{},0", num(0), num(1), num(2));
-        let rc = out.join("rustgis.rc");
+        let rc = out.join("unigis.rc");
         std::fs::write(
             &rc,
             format!(
@@ -50,9 +50,9 @@ BEGIN
       VALUE "CompanyName", "The UniGIS contributors"
       VALUE "FileDescription", "UniGIS"
       VALUE "FileVersion", "{version}"
-      VALUE "InternalName", "rustgis"
+      VALUE "InternalName", "unigis"
       VALUE "LegalCopyright", "Copyright the UniGIS contributors. Apache-2.0."
-      VALUE "OriginalFilename", "rustgis.exe"
+      VALUE "OriginalFilename", "unigis.exe"
       VALUE "ProductName", "UniGIS"
       VALUE "ProductVersion", "{version}"
     END
@@ -69,7 +69,7 @@ END
         // Without a resource compiler (rc.exe or windres) the exe just has no icon: warn rather
         // than fail a plain `cargo build`.
         if let Err(e) = embed_resource::compile(&rc, embed_resource::NONE).manifest_optional() {
-            println!("cargo:warning=rustgis.exe gets no icon: {e}");
+            println!("cargo:warning=unigis.exe gets no icon: {e}");
         }
         Ok(())
     }

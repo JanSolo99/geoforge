@@ -3,7 +3,7 @@
 ## Install with an agent
 
 Point your agent at the [UniGIS skill](https://github.com/opengeos/RustGIS/blob/main/skills/rustgis/SKILL.md)
-and ask it to install RustGIS. The skill picks the platform, installs the app and `ug`,
+and ask it to install UniGIS. The skill picks the platform, installs the app and `ug`,
 checks the release checksum, and registers the MCP server. The same skill is how an agent manages
 the desktop app that is already open.
 
@@ -17,18 +17,20 @@ builds of the desktop app and `ug`. The same files, grouped by platform, are mir
 | --- | --- |
 | Windows x64 (installer, no admin rights) | `UniGIS-<version>-windows-x86_64-setup.exe` |
 | Windows x64 (installer for all users) | `UniGIS-<version>-windows-x86_64.msi` |
-| Windows x64 (no install) | `UniGIS-<version>-windows-x86_64-portable.zip` (unzip and run `rustgis.exe`) |
+| Windows x64 (no install) | `UniGIS-<version>-windows-x86_64-portable.zip` (unzip and run `unigis.exe`) |
 | Windows x64 (Microsoft Store package) | `UniGIS-<version>-windows-x86_64.msix` |
 | macOS Apple Silicon | `UniGIS-<version>-macos-aarch64.dmg` |
 | macOS Intel | `UniGIS-<version>-macos-x86_64.dmg` |
-| Linux x64 / arm64 (Debian, Ubuntu) | `rustgis_<version>_amd64.deb` / `rustgis_<version>_arm64.deb` |
-| Linux x64 / arm64 (Fedora, RHEL, openSUSE) | `rustgis-<version>-1.x86_64.rpm` / `rustgis-<version>-1.aarch64.rpm` |
+| Linux x64 / arm64 (Debian, Ubuntu) | `unigis_<version>_amd64.deb` / `unigis_<version>_arm64.deb` |
+| Linux x64 / arm64 (Fedora, RHEL, openSUSE) | `unigis-<version>-1.x86_64.rpm` / `unigis-<version>-1.aarch64.rpm` |
 | Linux x64 / arm64 (any distribution, no install) | `UniGIS-<version>-linux-x86_64.AppImage` / `UniGIS-<version>-linux-aarch64.AppImage` |
 | Linux x64 / arm64 (other) | `UniGIS-<version>-linux-x86_64.tar.gz` / `UniGIS-<version>-linux-aarch64.tar.gz` |
 
-On macOS the command line tool is a separate `rustgis-cli-<version>-macos-<arch>.tar.gz`;
-the other packages include it (the Windows installers and the MSIX add `ug` to every
-new terminal). `SHA256SUMS` lists the checksum of every file.
+A CLI-only macOS build is available as a separate `unigis-cli-<version>-macos-<arch>.tar.gz`;
+the desktop app also runs CLI subcommands.
+The Windows installers and MSIX include `unigis-cli.exe` and `ug.exe` for console
+use. Linux distro packages install `unigis`, which also runs CLI subcommands; they
+omit `ug` to avoid a collision with ugrep. Portable archives include `ug`. `SHA256SUMS` lists the checksum of every file.
 
 On Windows, `setup.exe` installs for your account in `%LOCALAPPDATA%\Programs\UniGIS` and needs
 no admin rights; the `.msi` installs for every user in `Program Files` and suits managed
@@ -41,22 +43,23 @@ portable zip instead.
 
 The macOS DMG and command line tool are signed with a Developer ID and notarized by Apple, so
 they open without a warning. From the release after 0.1.0, the notarization ticket is also
-stapled to RustGIS.app, so it opens even when the Mac cannot reach Apple's servers. If macOS
+stapled to UniGIS.app, so it opens even when the Mac cannot reach Apple's servers. If macOS
 says Apple could not verify UniGIS 0.1.0, connect to the internet and open it again, or run
 `xattr -dr com.apple.quarantine /Applications/RustGIS.app`. The Windows builds are not yet
 signed: choose **More info › Run anyway** if SmartScreen warns about an unknown publisher.
 
 ## Package managers
 
-UniGIS is also published to these package managers, which keep it up to date:
+The next generated release uses the following package names. Existing published
+releases keep their historical names until the new release reaches each registry:
 
 | Platform | Command |
 | --- | --- |
 | Windows ([winget](https://learn.microsoft.com/windows/package-manager/)) | `winget install OpenGeos.RustGIS` |
-| macOS ([Homebrew](https://brew.sh)) | `brew install --cask opengeos/rustgis/rustgis` |
-| macOS and Linux, command line tool only (Homebrew) | `brew install opengeos/rustgis/rustgis-cli` |
-| Arch Linux ([AUR](https://aur.archlinux.org/packages/rustgis-bin)) | `yay -S rustgis-bin` (or any AUR helper) |
-| Fedora ([COPR](https://copr.fedorainfracloud.org/coprs/giswqs/rustgis/)) | `sudo dnf copr enable giswqs/rustgis && sudo dnf install rustgis` |
+| macOS ([Homebrew](https://brew.sh)) | `brew install --cask opengeos/rustgis/unigis` |
+| macOS and Linux, command line tool only (Homebrew) | `brew install opengeos/rustgis/unigis-cli` |
+| Arch Linux ([AUR](https://aur.archlinux.org/packages/unigis-bin)) | `yay -S unigis-bin` (or any AUR helper) |
+| Fedora ([COPR](https://copr.fedorainfracloud.org/coprs/giswqs/rustgis/)) | `sudo dnf copr enable giswqs/rustgis && sudo dnf install unigis` |
 
 winget installs for your account with the setup.exe; add `--scope machine` for the `.msi`. On
 Homebrew 5.1 and later, run `brew trust opengeos/rustgis` once before installing from the tap.
@@ -69,7 +72,7 @@ UniGIS builds from source with a recent stable Rust toolchain (1.90 or later).
 
 ```sh
 git clone https://github.com/opengeos/RustGIS.git
-cd UniGIS
+cd RustGIS
 cargo run --release -p rustgis            # the desktop app
 cargo build --release -p rustgis-cli      # the command line tool
 ```

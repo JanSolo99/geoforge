@@ -1,6 +1,7 @@
 UniGIS @VERSION@ (portable)
 
-Unzip this folder anywhere and run rustgis.exe. No installation or admin rights
+Unzip this folder anywhere and run unigis.exe. Use unigis-cli.exe or ug.exe for command-line tools from a terminal.
+No installation or admin rights
 are needed. ug.exe is the command line tool: run it from a terminal in
 this folder, or add the folder to your PATH.
 

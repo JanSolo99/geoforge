@@ -4,6 +4,19 @@
 runs it on every platform and attaches the files to the GitHub Release. `downloads/` is the
 [downloads.rustgis.app](https://downloads.rustgis.app) site.
 
+The next release uses `UniGIS-*` portable artifacts, `unigis_*.deb`,
+`unigis-*.rpm`, `UniGIS.app` and `unigis` desktop entries/icons. Linux distro
+packages and the Homebrew formula install `unigis`, without claiming `ug`
+(which conflicts with ugrep). Portable archives and Windows also include `ug`;
+Windows includes `unigis-cli.exe` for terminals because `unigis.exe` is a GUI
+program. Linux settings are copied from `~/.config/rustgis/prefs.json` to
+`~/.config/unigis/prefs.json` when no new preferences exist; the old file remains.
+External repositories, service domains, Store identity, MSI UpgradeCode and the
+existing winget identifier remain stable. The winget reference files describe the
+old published release; new artifact names appear only when a new release is built.
+Package-manager names below describe the next generated release, not a publication
+performed by a source commit.
+
 ## Package managers
 
 After each release build, `.github/workflows/package-managers.yml` publishes the release to four
@@ -14,17 +27,17 @@ with its tag.
 
 | Channel | Package | Install | Secret |
 | --- | --- | --- | --- |
-| Homebrew tap [opengeos/homebrew-rustgis](https://github.com/opengeos/homebrew-rustgis) | cask `rustgis` (the DMGs), formula `rustgis-cli` (macOS and Linux) | `brew install --cask opengeos/rustgis/rustgis` | `HOMEBREW_TAP_DEPLOY_KEY` |
-| [AUR](https://aur.archlinux.org/packages/rustgis-bin) | `rustgis-bin` (the .deb files, x86_64 and aarch64) | `yay -S rustgis-bin` | `AUR_SSH_PRIVATE_KEY` |
-| [Fedora COPR](https://copr.fedorainfracloud.org/coprs/giswqs/rustgis/) | `rustgis` (the .rpm files plus AppStream metainfo) | `sudo dnf copr enable giswqs/rustgis && sudo dnf install rustgis` | `COPR_CONFIG` |
+| Homebrew tap [opengeos/homebrew-rustgis](https://github.com/opengeos/homebrew-rustgis) | cask `unigis` (the DMGs), formula `unigis-cli` (macOS and Linux) | `brew install --cask opengeos/rustgis/unigis` | `HOMEBREW_TAP_DEPLOY_KEY` |
+| [AUR](https://aur.archlinux.org/packages/unigis-bin) | `unigis-bin` (the .deb files, x86_64 and aarch64) | `yay -S unigis-bin` | `AUR_SSH_PRIVATE_KEY` |
+| [Fedora COPR](https://copr.fedorainfracloud.org/coprs/giswqs/rustgis/) | `unigis` (the .rpm files plus AppStream metainfo) | `sudo dnf copr enable giswqs/rustgis && sudo dnf install unigis` | `COPR_CONFIG` |
 | [winget](https://github.com/microsoft/winget-pkgs/tree/master/manifests/o/OpenGeos/RustGIS) | `OpenGeos.RustGIS` (setup.exe per user, .msi per machine) | `winget install OpenGeos.RustGIS` | `WINGET_TOKEN` |
 
 Each folder has the script that writes the package for a version:
 
-- `homebrew/render.sh <version> <SHA256SUMS> <tap folder>` writes `Casks/rustgis.rb` and
-  `Formula/rustgis-cli.rb`.
+- `homebrew/render.sh <version> <SHA256SUMS> <tap folder>` writes `Casks/unigis.rb` and
+  `Formula/unigis-cli.rb`.
 - `aur/render.sh <version> <SHA256SUMS> > PKGBUILD`.
-- `copr/render.sh <version> <date> <folder>` writes `rustgis.spec` and
+- `copr/render.sh <version> <date> <folder>` writes `unigis.spec` and
   `org.rustgis.RustGIS.metainfo.xml`. Build the source RPM with both release `.rpm` files in
   the same folder.
 - `winget/` holds reference copies of the manifests; winget-releaser writes each new version
@@ -33,10 +46,10 @@ Each folder has the script that writes the package for a version:
 ### Trying a package locally
 
 ```sh
-gh release download v0.1.0 -R opengeos/RustGIS -p SHA256SUMS
-packaging/aur/render.sh 0.1.0 SHA256SUMS > /tmp/aur/PKGBUILD && (cd /tmp/aur && makepkg -si)
-packaging/copr/render.sh 0.1.0 2026-10-12 /tmp/copr     # then rpmbuild -bs in Fedora
-packaging/homebrew/render.sh 0.1.0 SHA256SUMS /tmp/tap && brew style /tmp/tap/Casks/rustgis.rb
+gh release download v0.2.0 -R opengeos/RustGIS -p SHA256SUMS
+packaging/aur/render.sh 0.2.0 SHA256SUMS > /tmp/aur/PKGBUILD && (cd /tmp/aur && makepkg -si)
+packaging/copr/render.sh 0.2.0 2026-10-12 /tmp/copr     # then rpmbuild -bs in Fedora
+packaging/homebrew/render.sh 0.2.0 SHA256SUMS /tmp/tap && brew style /tmp/tap/Casks/unigis.rb
 ```
 
 ### Accounts and secrets

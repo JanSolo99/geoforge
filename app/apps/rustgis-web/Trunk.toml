@@ -8,3 +8,9 @@ filehash = true
 [serve]
 addresses = ["127.0.0.1"]
 port = 8772
+
+# Generate original UniGIS artwork before Trunk copies the icons directory.
+[[hooks]]
+stage = "pre_build"
+command = "cargo"
+command_arguments = ["run", "--manifest-path", "../../Cargo.toml", "-j3", "-p", "xtask", "--", "web-icons", "icons"]

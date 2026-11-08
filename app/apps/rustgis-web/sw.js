@@ -14,17 +14,6 @@
 
 const VERSION = "__VERSION__";
 const SHELL = __SHELL__;
-// The icons and the loading logo, served from rustgis-assets: cached when reachable, but never
-// required for the install to succeed.
-const EXTRA = [
-  "https://assets.rustgis.app/images/favicon.png",
-  "https://assets.rustgis.app/images/logo.svg",
-  "https://assets.rustgis.app/images/icon-192.png",
-  "https://assets.rustgis.app/images/icon-512.png",
-  "https://assets.rustgis.app/images/icon-maskable-512.png",
-  "https://assets.rustgis.app/images/apple-touch-icon.png",
-];
-
 // Caches are per origin, and pull request previews share one: name them by scope so one build
 // never removes another's.
 const PREFIX = "rustgis-" + self.registration.scope + "-";
@@ -34,15 +23,12 @@ const urlOf = (path) => new URL(path, self.registration.scope).href;
 const PAGE = urlOf("index.html");
 // How long the page waits for the network before a cached copy is served instead.
 const PAGE_TIMEOUT_MS = 4000;
-const CACHED = new Set(SHELL.concat(EXTRA).map(urlOf));
+const CACHED = new Set(SHELL.map(urlOf));
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE).then(async (cache) => {
       await cache.addAll(SHELL.map((p) => new Request(urlOf(p), { cache: "reload" })));
-      await Promise.all(
-        EXTRA.map((p) => cache.add(new Request(urlOf(p), { cache: "reload" })).catch(() => {})),
-      );
     }),
   );
 });

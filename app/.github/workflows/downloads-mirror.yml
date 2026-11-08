@@ -109,6 +109,9 @@ jobs:
             echo "publish=true" >> "$GITHUB_OUTPUT"
           fi
 
+      - uses: dtolnay/rust-toolchain@stable
+        if: steps.changes.outputs.publish == 'true'
+
       - name: Build the mirror
         if: steps.changes.outputs.publish == 'true'
         env:
@@ -126,7 +129,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git remote add origin "git@github.com:$DESTINATION_REPOSITORY.git"
           git add --all
-          git commit -m "Mirror RustGIS ${TAG}"
+          git commit -m "Mirror UniGIS ${TAG}"
           # Parentless snapshots keep old release files out of the hosting repository's history.
           git push --force origin HEAD:main
           echo "Published ${TAG} to https://downloads.rustgis.app"

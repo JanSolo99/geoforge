@@ -7,14 +7,14 @@
   <key>CFBundleIdentifier</key><string>org.rustgis.RustGIS</string>
   <key>CFBundleVersion</key><string>@VERSION@</string>
   <key>CFBundleShortVersionString</key><string>@VERSION@</string>
-  <key>CFBundleExecutable</key><string>rustgis</string>
-  <key>CFBundleIconFile</key><string>rustgis</string>
+  <key>CFBundleExecutable</key><string>unigis</string>
+  <key>CFBundleIconFile</key><string>unigis</string>
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
   <key>LSApplicationCategoryType</key><string>public.app-category.education</string>
   <key>LSMinimumSystemVersion</key><string>11.0</string>
   <key>NSHighResolutionCapable</key><true/>
-  <key>NSHumanReadableCopyright</key><string>Copyright the RustGIS contributors. Apache-2.0.</string>
+  <key>NSHumanReadableCopyright</key><string>Copyright the UniGIS contributors. Apache-2.0.</string>
   <key>CFBundleDocumentTypes</key>
   <array>
     <dict>

@@ -16,6 +16,10 @@ path = "src/lib.rs"
 name = "ug"
 path = "src/main.rs"
 
+[[bin]]
+name = "unigis-cli"
+path = "src/console.rs"
+
 [dependencies]
 # The engine's `ug` subcommands (ArcGIS tools); this binary adds the app's.
 unigis-cli = { path = "../../../crates/unigis-cli" }
