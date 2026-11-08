@@ -3,18 +3,19 @@
 Updated 2026-11-08T04:27:11.689662+00:00; last agent Codex.
 Workspace `/mnt/media/ArcGIS_Linux`, branch `main`, product HEAD `be04da46425d66c170703c9e0d06fd125d4f3ab6`.
 
-## Single item: tool queue #2 Enable Editing Templates — implemented, validated, landing (Claude, 2026-11-08)
+## Single item: tool queue #3-#6 mosaic dataset tools — investigated, deferred (Claude, 2026-11-08)
 
-Previous: Delete Raster Attribute Table 2acc2b46.
-- `enable_editing_templates` (unigis-tools `gdb_schema.rs`): ArcGIS Pro 3.7 changes no file of a
-  file geodatabase (probed on 24 geodatabases + a fresh one), so the tool validates the workspace
-  and reports `out_workspace`; errors: plain folder/missing path ERROR 000584, file/`memory`
-  ERROR 160632, mobile geodatabase refused. Notes: `scripts/research/enable_editing_templates/`.
-- Evidence: scenario case `gsc_templates` (compares the final geodatabase with ArcGIS's) and
-  `crates/unigis-cli/tests/enable_editing_templates.rs` (byte-identical gdb, error codes).
-- Validation: `UNIGIS_REFERENCE_CASES=gsc_templates` and the new test pass; full `scripts/check`
-  result in the landing report. Staged by hunk: the inherited umintfloat hunk of
-  `make-arcgis-reference.py` stays uncommitted (with the other inherited raster/dashboard/agent edits).
-
-Next queue item: Export Frame And Camera Parameters (docs/WORK_QUEUE.md #3; mosaic datasets need
-geodatabase mosaic support, likely deferred) — check the queue; Export Raster World File (#7) is small.
+Previous: Enable Editing Templates 3e92a912.
+- Export Frame And Camera Parameters needs a frame-imagery mosaic; the other mosaic tools (Export
+  Mosaic Dataset Geometry/Items/Paths, Import Mosaic Dataset Geometry, Remove Rasters, ...) read the
+  mosaic catalog `AMD_<name>_CAT`. I built a real one with ArcGIS (`testdata/geoproc/md_items.gdb`,
+  3 rasters) and established Export Mosaic Dataset Geometry's behaviour completely (where-clause
+  rule, parts, fields, errors), but `unigis-filegdb` (and GDAL) cannot decode the catalog rows: the
+  `Raster` column is raster type 2 (inline) and the row layout around the geometry/raster value is not
+  understood. Implementing the tool was started and reverted; nothing of it is in the tree.
+- Everything is recorded in `scripts/research/mosaic_datasets/README.md` (with a resume plan);
+  ten mosaic tools are in `docs/WORK_QUEUE_DEFERRED.txt` with the reason.
+- Next queue item: Export Raster World File (docs/WORK_QUEUE.md first non-deferred). Resuming the
+  mosaic family needs a FileGDB reader task: decode `AMD_md_CAT` rows (row 1 at table offset 600).
+- Inherited uncommitted work (raster umintfloat hunk in make-arcgis-reference.py, registry.rs/local.rs/
+  stats.rs, dashboard.html, agent file, unary_band_safety) stays out.
