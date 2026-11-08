@@ -593,6 +593,13 @@ fn delete_colormap_unsupported(_: &dyn Context) -> Result<Output> {
     ))
 }
 
+fn delete_raster_attribute_table_unsupported(_: &dyn Context) -> Result<Output> {
+    Err(Error::Unsupported(
+        "Delete Raster Attribute Table edits the raster's files in place; run it through `ug run`"
+            .into(),
+    ))
+}
+
 fn add_colormap_unsupported(_: &dyn Context) -> Result<Output> {
     Err(Error::Unsupported(
         "Add Colormap edits the raster file in place; run it through `ug run`".into(),
@@ -3352,6 +3359,13 @@ pub static TOOLS: &[Tool] = &[
         summary: "Removes the colormap embedded in a raster dataset.",
         params: &[raster("input", "Input Raster", true)],
         run: delete_colormap_unsupported,
+    },
+    Tool {
+        id: "delete_raster_attribute_table",
+        name: "Delete Raster Attribute Table",
+        summary: "Removes the raster attribute table (the .vat.dbf beside a raster file).",
+        params: &[raster("input", "Input Raster", true)],
+        run: delete_raster_attribute_table_unsupported,
     },
     Tool {
         id: "add_colormap",

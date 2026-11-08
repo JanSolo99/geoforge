@@ -111793,6 +111793,64 @@
           "parameter_type": "PROFILE_CURVATURE"
         }
       }
+    },
+    "drat_aux": {
+      "tool": "management.DeleteRasterAttributeTable",
+      "args": [
+        "testdata/raster/Combina_patches1.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "delete_raster_attribute_table",
+        "params": {
+          "input": "testdata/raster/Combina_patches1.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "drat_vat_only": {
+      "tool": "management.DeleteRasterAttributeTable",
+      "args": [
+        "testdata/raster/patches_i16.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "delete_raster_attribute_table",
+        "params": {
+          "input": "testdata/raster/patches_i16.tif",
+          "output": "<out>"
+        }
+      }
+    },
+    "drat_none": {
+      "tool": "management.DeleteRasterAttributeTable",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000236: Input raster does not have an attribute table",
+        "Failed to execute (DeleteRasterAttributeTable)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "run": {
+        "tool": "delete_raster_attribute_table",
+        "params": {
+          "input": "testdata/raster/classes_u8.tif",
+          "output": "<out>"
+        }
+      }
     }
   }
 }

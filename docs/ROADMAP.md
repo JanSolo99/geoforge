@@ -805,6 +805,10 @@ Each item is something ArcGIS Pro does with a file geodatabase; `[x]` done on br
       touch and PWA icons from the original `render::logo` source; shell versions include
       these files. Packaging instructions describe the next generated release; this code
       landing does not publish to external registries.
+- [x] Delete Raster Attribute Table (`delete_raster_attribute_table`, `ug run`): removes the
+      `.vat.dbf`/`.vat.cpg` beside a raster, keeps the raster and its other sidecars; refuses a
+      raster without a table (ERROR 000236). 3 ArcGIS `drat_*` references. The metadata lineage
+      entry ArcGIS adds to `.tif.xml` is not written.
 - [x] Dockable panes: left/right/bottom groups, tab dragging and drop previews,
       auto-hide, scrollable tab headers, and saved layout preferences. Reopening
       panes preserves tab order; pointer-drag and preference round-trip tests pass.

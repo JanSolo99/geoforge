@@ -6720,6 +6720,36 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
         copy_raster_files(Path::new(input), output)?;
         return unigis_raster::colormap::delete_colormap(output);
     }
+    if spec.id == "delete_raster_attribute_table" {
+        let input = map
+            .get("input")
+            .map(|v| v.trim())
+            .filter(|v| !v.is_empty())
+            .ok_or_else(|| {
+                Error::Unsupported("ERROR 000735: Input Raster: value is required".into())
+            })?;
+        let beside = |raster: &Path, ext: &str| {
+            let mut p = raster.as_os_str().to_owned();
+            p.push(ext);
+            std::path::PathBuf::from(p)
+        };
+        if !beside(Path::new(input), ".vat.dbf").exists() {
+            return Err(Error::Unsupported(
+                "ERROR 000236: Input raster does not have an attribute table".into(),
+            ));
+        }
+        // The raster and its other sidecars are kept; the table (.vat.dbf and its code page)
+        // goes, as ArcGIS removes it.
+        let output = Path::new(&output);
+        copy_raster_files(Path::new(input), output)?;
+        for ext in [".vat.dbf", ".vat.cpg"] {
+            let table = beside(output, ext);
+            if table.exists() {
+                std::fs::remove_file(&table).map_err(|e| Error::io(&table, e))?;
+            }
+        }
+        return Ok(());
+    }
     if spec.id == "add_colormap" {
         let get = |k: &str| map.get(k).map(|v| v.trim()).filter(|v| !v.is_empty());
         let input = get("input").ok_or_else(|| {

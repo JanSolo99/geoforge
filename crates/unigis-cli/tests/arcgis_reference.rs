@@ -4439,6 +4439,24 @@ fn compare_rasters(case: &str, ours: &Path, arcgis: &Path) -> Vec<String> {
         (Ok(x), Ok(y)) if x == y => {}
         (x, y) => diffs.push(format!("colormap: ours {x:?}, ArcGIS {y:?}")),
     }
+    // The attribute table beside the raster (Delete Raster Attribute Table removes it).
+    for ext in [".vat.dbf", ".vat.cpg"]
+        .iter()
+        .filter(|_| case.starts_with("drat_"))
+    {
+        let beside = |p: &Path| {
+            let mut q = p.as_os_str().to_owned();
+            q.push(ext);
+            Path::new(&q).exists()
+        };
+        if beside(ours) != beside(arcgis) {
+            diffs.push(format!(
+                "{ext}: ours {}, ArcGIS {}",
+                beside(ours),
+                beside(arcgis)
+            ));
+        }
+    }
     if (a.width, a.height) != (b.width, b.height) {
         return vec![format!(
             "size: ours {}x{}, ArcGIS {}x{}",
