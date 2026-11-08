@@ -1,11 +1,12 @@
 # Current handoff
 
-Updated 2026-11-08T04:17:58.636111+00:00; last agent Codex.
-Workspace `/mnt/media/ArcGIS_Linux`, branch `main`, base HEAD `c51d3a75`.
+Updated 2026-11-08T04:27:11.689662+00:00; last agent Codex.
+Workspace `/mnt/media/ArcGIS_Linux`, branch `main`, product HEAD `be04da46425d66c170703c9e0d06fd125d4f3ab6`.
 
 ## Single item: app.gdb-subtypes-relationships
 
-Implementation and validation complete; commit/push landing pending. User authorizes commit/push for this one
+Complete and landed. Commit `be04da46` is pushed to `origin/main`; remote hash
+verified equal to local HEAD after the push (exit0). This checkpoint is docs only. User authorizes commit/push for this one
 item. Prior naming work was already landed/accepted. No agents/coordinator launched.
 Root/app instructions and development skill read. No product edits inherited.
 
@@ -19,7 +20,7 @@ legacy None metadata remains unknown. ArcGIS3.7 saved subtype_ops/relationship_t
 fixtures and official docs resolve behavior. Evidence and remaining limits:
 `scripts/research/app_gdb_design/README.md`, `docs/KNOWN_GAPS.md`.
 
-Owned 20 staged paths: app data/schema/tests, map design, engine design/layer/tests,
+Landed 20 owned paths: app data/schema/tests, map design, engine design/layer/tests,
 UI createpane/editpanes/mapview/table/widgets/smoke, editing guide; research README;
 APP_PRIORITIES/ROADMAP/KNOWN_GAPS/WORK_QUEUE/HANDOFF. Inherited root source/reference/
 agent/dashboard edits remain unstaged; untracked worktrees/research untouched.
@@ -46,6 +47,13 @@ Validation on final code (Cargo -j3, ext4 target cache):
   scripts/check`: PASS (PTY session10453 exit0, `/tmp/gdb-design-root-check2.log`,
   root-check2.exit=0). Covers final source edits; subsequent edits docs only.
   First non-PTY run ended143 with no failed tests; never counted as PASS.
+- Product push pre-push `scripts/check`: PASS; push exit0, log
+  `/tmp/gdb-design-push.log`. Remote `main` verified as `be04da46`.
 
-Next: commit and push main (pre-push re-runs scripts/check). Confirm remote and
-own clean paths; checkpoint final landing evidence. Do not advance. After landing next queue item: Delete Raster Attribute Table.
+No incomplete product edits or running app/build/relay processes. Inherited source,
+reference and agent hashes still match; post-commit generated dashboard remains
+unstaged. Protected verifier unchanged. Queue regenerated after landing.
+
+Next queue item: Delete Raster Attribute Table. Do not start it in this turn;
+coordinator checks acceptance first. Remaining app polish is documented in
+KNOWN_GAPS and requires a user request.
