@@ -30,6 +30,7 @@ pub mod mathfn;
 pub mod multiscale;
 pub mod overlay;
 pub mod rasterize;
+pub mod rasterprops;
 pub mod registry;
 pub mod resample;
 pub mod rescale;

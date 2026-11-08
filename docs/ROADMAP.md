@@ -817,6 +817,8 @@ Each item is something ArcGIS Pro does with a file geodatabase; `[x]` done on br
       from the raster's (tif -> tfw). 5 ArcGIS `ewf_*` references compared byte for byte.
 - [x] Get Cell Value (`get_cell_value`, `ug run`): cell value at `location="x y"` and `band_index`
       as ArcGIS's text (`NoData` outside/NoData/missing band; edges inclusive). 13 recorded values.
+- [x] Get Raster Properties (`get_raster_properties`, `ug run`): extent, cell size, counts, value type,
+      NoData flags, stored statistics, unknown metadata; ArcGIS's `%.15G` text and errors. 33 recorded values.
 - [x] Dockable panes: left/right/bottom groups, tab dragging and drop previews,
       auto-hide, scrollable tab headers, and saved layout preferences. Reopening
       panes preserves tab order; pointer-drag and preference round-trip tests pass.

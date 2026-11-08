@@ -6620,6 +6620,27 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
     if spec.id == "raster_to_other_format" {
         return run_raster_to_other_format(&Args(map));
     }
+    if spec.id == "get_raster_properties" {
+        let get = |k: &str| map.get(k).map(|v| v.trim()).filter(|v| !v.is_empty());
+        let input = get("input").ok_or_else(|| {
+            Error::Unsupported("ERROR 000735: Input Raster: value is required".into())
+        })?;
+        if !Path::new(input).is_file() {
+            return Err(Error::Unsupported(format!(
+                "ERROR 000732: Input Raster: Dataset {input} does not exist or is not supported"
+            )));
+        }
+        let raster = unigis_raster::read_geotiff(Path::new(input))?;
+        let value = unigis_raster::rasterprops::property(
+            &raster,
+            Path::new(input),
+            get("property_type").unwrap_or("MINIMUM"),
+            get("band_index"),
+        )
+        .map_err(Error::Unsupported)?;
+        println!("{value}");
+        return Ok(());
+    }
     if spec.id == "get_cell_value" {
         let get = |k: &str| map.get(k).map(|v| v.trim()).filter(|v| !v.is_empty());
         let input = get("input").ok_or_else(|| {

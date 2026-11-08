@@ -612,6 +612,12 @@ fn get_cell_value_unsupported(_: &dyn Context) -> Result<Output> {
     ))
 }
 
+fn get_raster_properties_unsupported(_: &dyn Context) -> Result<Output> {
+    Err(Error::Unsupported(
+        "Get Raster Properties returns a value, not a raster; run it through `ug run`".into(),
+    ))
+}
+
 fn add_colormap_unsupported(_: &dyn Context) -> Result<Output> {
     Err(Error::Unsupported(
         "Add Colormap edits the raster file in place; run it through `ug run`".into(),
@@ -3380,11 +3386,15 @@ pub static TOOLS: &[Tool] = &[
         run: delete_raster_attribute_table_unsupported,
     },
     Tool {
-        id: "export_raster_world_file",
-        name: "Export Raster World File",
-        summary: "Writes the raster's world file (pixel size and upper-left cell centre) beside it.",
-        params: &[raster("input", "Input Raster Dataset", true)],
-        run: export_raster_world_file_unsupported,
+        id: "get_raster_properties",
+        name: "Get Raster Properties",
+        summary: "Prints one property (extent, cell size, counts, NoData, stored statistics) of a raster.",
+        params: &[
+            raster("input", "Input Raster", true),
+            text("property_type", "Property Type", "MINIMUM"),
+            text("band_index", "Band Index", ""),
+        ],
+        run: get_raster_properties_unsupported,
     },
     Tool {
         id: "get_cell_value",

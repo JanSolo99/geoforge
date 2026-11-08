@@ -12,7 +12,13 @@ use crate::Raster;
 
 /// `v` as C's `%.18g` prints it.
 pub fn format_g18(v: f64) -> String {
-    const P: i32 = 18;
+    format_g(v, 18)
+}
+
+/// `v` as C's `%.{p}g` prints it.
+pub fn format_g(v: f64, p: i32) -> String {
+    #[allow(non_snake_case)]
+    let P = p;
     if v == 0.0 {
         return if v.is_sign_negative() { "-0" } else { "0" }.into();
     }
