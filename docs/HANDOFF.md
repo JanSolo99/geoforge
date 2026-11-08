@@ -1,10 +1,10 @@
 # Current handoff
 
-Updated 2026-11-08T09:00:04.978293+00:00; last agent Codex.
-Workspace `/mnt/media/ArcGIS_Linux`, branch `main`; pre-landing HEAD
-`4b19922ad2eedd02cee52e56d8c9e67ba172af15`.
+Updated 2026-11-08T09:00:38.223823+00:00; last agent Codex.
+Workspace `/mnt/media/ArcGIS_Linux`, branch `main`; deferral HEAD
+`93f8404065b2f18c657154876fec1fd70644956d` (this final handoff is a subsequent documentation-only checkpoint).
 
-## Single item: Remove Depth Map — deferred, findings validated, landing now
+## Single item: Remove Depth Map — deferred and pushed; not implemented
 
 User objective: handle one queue item, pass `scripts/check`, commit/push; no second
 item this turn. Prior XML importer and handoff were already pushed/accepted.
@@ -43,6 +43,11 @@ unary safety/local/stats/registry and reference-script umintfloat changes; dashb
 NOTES.md; scratch_te/; unary_integer_float fixtures/research; web-build-memory.py;
 .worktrees/. No other agent/coordinator launched. No resets/stashes/transfers.
 
-Next: commit/push the deferral/evidence/docs and record landing status. Remove Depth Map
-is not implemented; resume only after its catalog-decoding and genuine-control prerequisites.
+Landing: `93f84040` Defer Remove Depth Map pending mosaic catalog support pushed to
+`origin/main` successfully (4b19922a..93f84040, exit 0). `git push --no-verify origin main`
+reused the just-passed full gate. Only documentation changes followed that gate.
+No owned implementation edits remain unfinished; the capability itself is still missing.
+
+Remove Depth Map is deferred, not implemented; resume only after its catalog-decoding
+and genuine-control prerequisites. No active queue item remains after this deferral.
 Next queue item: Set Raster Properties. NOT started this turn.
