@@ -194,7 +194,11 @@ pub fn compare(case: &str, info: &Json, out_dir: &Path) -> Vec<String> {
         std::fs::remove_dir_all(&ws).unwrap();
     }
     std::fs::create_dir_all(&ws).unwrap();
-    let place = |s: &str| s.replace("<ws>", &ws.display().to_string());
+    let repo = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let place = |s: &str| {
+        s.replace("<ws>", &ws.display().to_string())
+            .replace("<repo>", &repo.display().to_string())
+    };
     let mut diffs = Vec::new();
     for (k, step) in scenario["steps"].as_array().unwrap().iter().enumerate() {
         if step["tool"] == "seed" {

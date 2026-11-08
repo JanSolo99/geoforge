@@ -112028,6 +112028,1074 @@
           "output": "<out>"
         }
       }
+    },
+    "gsc_xml_binary": {
+      "tool": "scenario",
+      "gdb_scenario": {
+        "steps": [
+          {
+            "tool": "management.CreateFileGDB",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "create_file_gdb",
+              "params": {
+                "out_folder_path": "<ws>",
+                "out_name": "t"
+              }
+            }
+          },
+          {
+            "tool": "management.ImportXMLWorkspaceDocument",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "import_xml_workspace_document",
+              "params": {
+                "target_geodatabase": "<ws>/t.gdb",
+                "in_file": "<repo>/testdata/geoproc/xml_workspace/binary.xml",
+                "import_type": "DATA"
+              }
+            }
+          }
+        ],
+        "snapshot": {
+          "items": [
+            "labels",
+            "points"
+          ],
+          "tables": {
+            "labels": {
+              "fields": [
+                {
+                  "name": "OBJECTID",
+                  "type": "OID",
+                  "length": 4,
+                  "alias": "OBJECTID",
+                  "domain": "",
+                  "default": null,
+                  "nullable": false
+                },
+                {
+                  "name": "number",
+                  "type": "Integer",
+                  "length": 4,
+                  "alias": "Count",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "label",
+                  "type": "String",
+                  "length": 40,
+                  "alias": "label",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                }
+              ],
+              "indexes": [],
+              "subtypes": []
+            },
+            "points": {
+              "fields": [
+                {
+                  "name": "OBJECTID",
+                  "type": "OID",
+                  "length": 4,
+                  "alias": "OBJECTID",
+                  "domain": "",
+                  "default": null,
+                  "nullable": false
+                },
+                {
+                  "name": "Shape",
+                  "type": "Geometry",
+                  "length": 0,
+                  "alias": "Shape",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "number",
+                  "type": "SmallInteger",
+                  "length": 2,
+                  "alias": "number",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                }
+              ],
+              "indexes": [],
+              "subtypes": []
+            }
+          },
+          "domains": [],
+          "relationships": []
+        }
+      }
+    },
+    "gsc_xml_normalized": {
+      "tool": "scenario",
+      "gdb_scenario": {
+        "steps": [
+          {
+            "tool": "management.CreateFileGDB",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "create_file_gdb",
+              "params": {
+                "out_folder_path": "<ws>",
+                "out_name": "t"
+              }
+            }
+          },
+          {
+            "tool": "management.ImportXMLWorkspaceDocument",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "import_xml_workspace_document",
+              "params": {
+                "target_geodatabase": "<ws>/t.gdb",
+                "in_file": "<repo>/testdata/geoproc/xml_workspace/normalized.xml",
+                "import_type": "DATA"
+              }
+            }
+          }
+        ],
+        "snapshot": {
+          "items": [
+            "labels",
+            "points"
+          ],
+          "tables": {
+            "labels": {
+              "fields": [
+                {
+                  "name": "OBJECTID",
+                  "type": "OID",
+                  "length": 4,
+                  "alias": "OBJECTID",
+                  "domain": "",
+                  "default": null,
+                  "nullable": false
+                },
+                {
+                  "name": "number",
+                  "type": "Integer",
+                  "length": 4,
+                  "alias": "Count",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "label",
+                  "type": "String",
+                  "length": 40,
+                  "alias": "label",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                }
+              ],
+              "indexes": [],
+              "subtypes": []
+            },
+            "points": {
+              "fields": [
+                {
+                  "name": "OBJECTID",
+                  "type": "OID",
+                  "length": 4,
+                  "alias": "OBJECTID",
+                  "domain": "",
+                  "default": null,
+                  "nullable": false
+                },
+                {
+                  "name": "Shape",
+                  "type": "Geometry",
+                  "length": 0,
+                  "alias": "Shape",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "number",
+                  "type": "SmallInteger",
+                  "length": 2,
+                  "alias": "number",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                }
+              ],
+              "indexes": [],
+              "subtypes": []
+            }
+          },
+          "domains": [],
+          "relationships": []
+        }
+      }
+    },
+    "gsc_xml_schema": {
+      "tool": "scenario",
+      "gdb_scenario": {
+        "steps": [
+          {
+            "tool": "management.CreateFileGDB",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "create_file_gdb",
+              "params": {
+                "out_folder_path": "<ws>",
+                "out_name": "t"
+              }
+            }
+          },
+          {
+            "tool": "management.ImportXMLWorkspaceDocument",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "import_xml_workspace_document",
+              "params": {
+                "target_geodatabase": "<ws>/t.gdb",
+                "in_file": "<repo>/testdata/geoproc/xml_workspace/extended_binary.xml",
+                "import_type": "SCHEMA_ONLY"
+              }
+            }
+          }
+        ],
+        "snapshot": {
+          "items": [
+            "areas",
+            "lines",
+            "many",
+            "types"
+          ],
+          "tables": {
+            "types": {
+              "fields": [
+                {
+                  "name": "OBJECTID",
+                  "type": "OID",
+                  "length": 4,
+                  "alias": "OBJECTID",
+                  "domain": "",
+                  "default": null,
+                  "nullable": false
+                },
+                {
+                  "name": "small",
+                  "type": "SmallInteger",
+                  "length": 2,
+                  "alias": "small",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "large",
+                  "type": "Integer",
+                  "length": 4,
+                  "alias": "large",
+                  "domain": "",
+                  "default": 42,
+                  "nullable": true
+                },
+                {
+                  "name": "single",
+                  "type": "Single",
+                  "length": 4,
+                  "alias": "single",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "double",
+                  "type": "Double",
+                  "length": 8,
+                  "alias": "double",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "stamp",
+                  "type": "Date",
+                  "length": 8,
+                  "alias": "stamp",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "guid",
+                  "type": "Guid",
+                  "length": 38,
+                  "alias": "guid",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "text",
+                  "type": "String",
+                  "length": 50,
+                  "alias": "text",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                }
+              ],
+              "indexes": [],
+              "subtypes": []
+            },
+            "lines": {
+              "fields": [
+                {
+                  "name": "OBJECTID",
+                  "type": "OID",
+                  "length": 4,
+                  "alias": "OBJECTID",
+                  "domain": "",
+                  "default": null,
+                  "nullable": false
+                },
+                {
+                  "name": "Shape",
+                  "type": "Geometry",
+                  "length": 0,
+                  "alias": "Shape",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "Shape_Length",
+                  "type": "Double",
+                  "length": 8,
+                  "alias": "Shape_Length",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                }
+              ],
+              "indexes": [],
+              "subtypes": []
+            },
+            "areas": {
+              "fields": [
+                {
+                  "name": "OBJECTID",
+                  "type": "OID",
+                  "length": 4,
+                  "alias": "OBJECTID",
+                  "domain": "",
+                  "default": null,
+                  "nullable": false
+                },
+                {
+                  "name": "Shape",
+                  "type": "Geometry",
+                  "length": 0,
+                  "alias": "Shape",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "Shape_Length",
+                  "type": "Double",
+                  "length": 8,
+                  "alias": "Shape_Length",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "Shape_Area",
+                  "type": "Double",
+                  "length": 8,
+                  "alias": "Shape_Area",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                }
+              ],
+              "indexes": [],
+              "subtypes": []
+            },
+            "many": {
+              "fields": [
+                {
+                  "name": "OBJECTID",
+                  "type": "OID",
+                  "length": 4,
+                  "alias": "OBJECTID",
+                  "domain": "",
+                  "default": null,
+                  "nullable": false
+                },
+                {
+                  "name": "Shape",
+                  "type": "Geometry",
+                  "length": 0,
+                  "alias": "Shape",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                }
+              ],
+              "indexes": [],
+              "subtypes": []
+            }
+          },
+          "domains": [],
+          "relationships": []
+        }
+      }
+    },
+    "gsc_xml_schema_default": {
+      "tool": "scenario",
+      "gdb_scenario": {
+        "steps": [
+          {
+            "tool": "management.CreateFileGDB",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "create_file_gdb",
+              "params": {
+                "out_folder_path": "<ws>",
+                "out_name": "t"
+              }
+            }
+          },
+          {
+            "tool": "management.ImportXMLWorkspaceDocument",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "import_xml_workspace_document",
+              "params": {
+                "target_geodatabase": "<ws>/t.gdb",
+                "in_file": "<repo>/testdata/geoproc/xml_workspace/schema.xml",
+                "import_type": "DATA"
+              }
+            }
+          }
+        ],
+        "snapshot": {
+          "items": [
+            "areas",
+            "lines",
+            "many",
+            "types"
+          ],
+          "tables": {
+            "types": {
+              "fields": [
+                {
+                  "name": "OBJECTID",
+                  "type": "OID",
+                  "length": 4,
+                  "alias": "OBJECTID",
+                  "domain": "",
+                  "default": null,
+                  "nullable": false
+                },
+                {
+                  "name": "small",
+                  "type": "SmallInteger",
+                  "length": 2,
+                  "alias": "small",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "large",
+                  "type": "Integer",
+                  "length": 4,
+                  "alias": "large",
+                  "domain": "",
+                  "default": 42,
+                  "nullable": true
+                },
+                {
+                  "name": "single",
+                  "type": "Single",
+                  "length": 4,
+                  "alias": "single",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "double",
+                  "type": "Double",
+                  "length": 8,
+                  "alias": "double",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "stamp",
+                  "type": "Date",
+                  "length": 8,
+                  "alias": "stamp",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "guid",
+                  "type": "Guid",
+                  "length": 38,
+                  "alias": "guid",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "text",
+                  "type": "String",
+                  "length": 50,
+                  "alias": "text",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                }
+              ],
+              "indexes": [],
+              "subtypes": []
+            },
+            "lines": {
+              "fields": [
+                {
+                  "name": "OBJECTID",
+                  "type": "OID",
+                  "length": 4,
+                  "alias": "OBJECTID",
+                  "domain": "",
+                  "default": null,
+                  "nullable": false
+                },
+                {
+                  "name": "Shape",
+                  "type": "Geometry",
+                  "length": 0,
+                  "alias": "Shape",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "Shape_Length",
+                  "type": "Double",
+                  "length": 8,
+                  "alias": "Shape_Length",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                }
+              ],
+              "indexes": [],
+              "subtypes": []
+            },
+            "areas": {
+              "fields": [
+                {
+                  "name": "OBJECTID",
+                  "type": "OID",
+                  "length": 4,
+                  "alias": "OBJECTID",
+                  "domain": "",
+                  "default": null,
+                  "nullable": false
+                },
+                {
+                  "name": "Shape",
+                  "type": "Geometry",
+                  "length": 0,
+                  "alias": "Shape",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "Shape_Length",
+                  "type": "Double",
+                  "length": 8,
+                  "alias": "Shape_Length",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "Shape_Area",
+                  "type": "Double",
+                  "length": 8,
+                  "alias": "Shape_Area",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                }
+              ],
+              "indexes": [],
+              "subtypes": []
+            },
+            "many": {
+              "fields": [
+                {
+                  "name": "OBJECTID",
+                  "type": "OID",
+                  "length": 4,
+                  "alias": "OBJECTID",
+                  "domain": "",
+                  "default": null,
+                  "nullable": false
+                },
+                {
+                  "name": "Shape",
+                  "type": "Geometry",
+                  "length": 0,
+                  "alias": "Shape",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                }
+              ],
+              "indexes": [],
+              "subtypes": []
+            }
+          },
+          "domains": [],
+          "relationships": []
+        }
+      }
+    },
+    "gsc_xml_types": {
+      "tool": "scenario",
+      "gdb_scenario": {
+        "steps": [
+          {
+            "tool": "management.CreateFileGDB",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "create_file_gdb",
+              "params": {
+                "out_folder_path": "<ws>",
+                "out_name": "t"
+              }
+            }
+          },
+          {
+            "tool": "management.ImportXMLWorkspaceDocument",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "import_xml_workspace_document",
+              "params": {
+                "target_geodatabase": "<ws>/t.gdb",
+                "in_file": "<repo>/testdata/geoproc/xml_workspace/extended_binary.xml",
+                "import_type": "DATA"
+              }
+            }
+          }
+        ],
+        "snapshot": {
+          "items": [
+            "areas",
+            "lines",
+            "many",
+            "types"
+          ],
+          "tables": {
+            "types": {
+              "fields": [
+                {
+                  "name": "OBJECTID",
+                  "type": "OID",
+                  "length": 4,
+                  "alias": "OBJECTID",
+                  "domain": "",
+                  "default": null,
+                  "nullable": false
+                },
+                {
+                  "name": "small",
+                  "type": "SmallInteger",
+                  "length": 2,
+                  "alias": "small",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "large",
+                  "type": "Integer",
+                  "length": 4,
+                  "alias": "large",
+                  "domain": "",
+                  "default": 42,
+                  "nullable": true
+                },
+                {
+                  "name": "single",
+                  "type": "Single",
+                  "length": 4,
+                  "alias": "single",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "double",
+                  "type": "Double",
+                  "length": 8,
+                  "alias": "double",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "stamp",
+                  "type": "Date",
+                  "length": 8,
+                  "alias": "stamp",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "guid",
+                  "type": "Guid",
+                  "length": 38,
+                  "alias": "guid",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "text",
+                  "type": "String",
+                  "length": 50,
+                  "alias": "text",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                }
+              ],
+              "indexes": [],
+              "subtypes": []
+            },
+            "lines": {
+              "fields": [
+                {
+                  "name": "OBJECTID",
+                  "type": "OID",
+                  "length": 4,
+                  "alias": "OBJECTID",
+                  "domain": "",
+                  "default": null,
+                  "nullable": false
+                },
+                {
+                  "name": "Shape",
+                  "type": "Geometry",
+                  "length": 0,
+                  "alias": "Shape",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "Shape_Length",
+                  "type": "Double",
+                  "length": 8,
+                  "alias": "Shape_Length",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                }
+              ],
+              "indexes": [],
+              "subtypes": []
+            },
+            "areas": {
+              "fields": [
+                {
+                  "name": "OBJECTID",
+                  "type": "OID",
+                  "length": 4,
+                  "alias": "OBJECTID",
+                  "domain": "",
+                  "default": null,
+                  "nullable": false
+                },
+                {
+                  "name": "Shape",
+                  "type": "Geometry",
+                  "length": 0,
+                  "alias": "Shape",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "Shape_Length",
+                  "type": "Double",
+                  "length": 8,
+                  "alias": "Shape_Length",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "Shape_Area",
+                  "type": "Double",
+                  "length": 8,
+                  "alias": "Shape_Area",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                }
+              ],
+              "indexes": [],
+              "subtypes": []
+            },
+            "many": {
+              "fields": [
+                {
+                  "name": "OBJECTID",
+                  "type": "OID",
+                  "length": 4,
+                  "alias": "OBJECTID",
+                  "domain": "",
+                  "default": null,
+                  "nullable": false
+                },
+                {
+                  "name": "Shape",
+                  "type": "Geometry",
+                  "length": 0,
+                  "alias": "Shape",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                }
+              ],
+              "indexes": [],
+              "subtypes": []
+            }
+          },
+          "domains": [],
+          "relationships": []
+        }
+      }
+    },
+    "gsc_xml_collision": {
+      "tool": "scenario",
+      "gdb_scenario": {
+        "steps": [
+          {
+            "tool": "management.CreateFileGDB",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "create_file_gdb",
+              "params": {
+                "out_folder_path": "<ws>",
+                "out_name": "t"
+              }
+            }
+          },
+          {
+            "tool": "management.ImportXMLWorkspaceDocument",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "import_xml_workspace_document",
+              "params": {
+                "target_geodatabase": "<ws>/t.gdb",
+                "in_file": "<repo>/testdata/geoproc/xml_workspace/binary.xml",
+                "import_type": "DATA"
+              }
+            }
+          },
+          {
+            "tool": "management.ImportXMLWorkspaceDocument",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "import_xml_workspace_document",
+              "params": {
+                "target_geodatabase": "<ws>/t.gdb",
+                "in_file": "<repo>/testdata/geoproc/xml_workspace/binary.xml",
+                "import_type": "DATA"
+              }
+            }
+          }
+        ],
+        "snapshot": {
+          "items": [
+            "labels",
+            "labels_1",
+            "points",
+            "points_1"
+          ],
+          "tables": {
+            "labels": {
+              "fields": [
+                {
+                  "name": "OBJECTID",
+                  "type": "OID",
+                  "length": 4,
+                  "alias": "OBJECTID",
+                  "domain": "",
+                  "default": null,
+                  "nullable": false
+                },
+                {
+                  "name": "number",
+                  "type": "Integer",
+                  "length": 4,
+                  "alias": "Count",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "label",
+                  "type": "String",
+                  "length": 40,
+                  "alias": "label",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                }
+              ],
+              "indexes": [],
+              "subtypes": []
+            },
+            "points": {
+              "fields": [
+                {
+                  "name": "OBJECTID",
+                  "type": "OID",
+                  "length": 4,
+                  "alias": "OBJECTID",
+                  "domain": "",
+                  "default": null,
+                  "nullable": false
+                },
+                {
+                  "name": "Shape",
+                  "type": "Geometry",
+                  "length": 0,
+                  "alias": "Shape",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "number",
+                  "type": "SmallInteger",
+                  "length": 2,
+                  "alias": "number",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                }
+              ],
+              "indexes": [],
+              "subtypes": []
+            },
+            "labels_1": {
+              "fields": [
+                {
+                  "name": "OBJECTID",
+                  "type": "OID",
+                  "length": 4,
+                  "alias": "OBJECTID",
+                  "domain": "",
+                  "default": null,
+                  "nullable": false
+                },
+                {
+                  "name": "number",
+                  "type": "Integer",
+                  "length": 4,
+                  "alias": "Count",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "label",
+                  "type": "String",
+                  "length": 40,
+                  "alias": "label",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                }
+              ],
+              "indexes": [],
+              "subtypes": []
+            },
+            "points_1": {
+              "fields": [
+                {
+                  "name": "OBJECTID",
+                  "type": "OID",
+                  "length": 4,
+                  "alias": "OBJECTID",
+                  "domain": "",
+                  "default": null,
+                  "nullable": false
+                },
+                {
+                  "name": "Shape",
+                  "type": "Geometry",
+                  "length": 0,
+                  "alias": "Shape",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                },
+                {
+                  "name": "number",
+                  "type": "SmallInteger",
+                  "length": 2,
+                  "alias": "number",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                }
+              ],
+              "indexes": [],
+              "subtypes": []
+            }
+          },
+          "domains": [],
+          "relationships": []
+        }
+      }
     }
   }
 }

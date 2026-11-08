@@ -27,6 +27,7 @@ pub mod gps_metadata;
 pub mod gpx;
 pub mod graphic_buffer;
 pub(crate) mod grid_notation;
+pub mod import_xml;
 pub mod neighbors;
 pub mod origin_destination;
 pub mod pairwise;

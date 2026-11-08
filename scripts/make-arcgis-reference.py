@@ -2543,6 +2543,7 @@ RUN = {
     "conversion.TableToGeodatabase": ("table_to_geodatabase", ["input_table", "output_geodatabase"]),
     "management.CreateFolder": ("create_folder", ["out_folder_path", "out_name"]),
     "management.CreateFileGDB": ("create_file_gdb", ["out_folder_path", "out_name", "out_version"]),
+    "management.ImportXMLWorkspaceDocument": ("import_xml_workspace_document", ["target_geodatabase", "in_file", "import_type", "config_keyword"]),
     "management.CreateMobileGDB": ("create_mobile_gdb", ["out_folder_path", "out_name"]),
     "conversion.FeatureClassToGeodatabase": ("feature_class_to_geodatabase", ["input_features", "output_geodatabase"]),
     "conversion.ExcelToTable": ("excel_to_table", ["input", "output", "sheet", "field_names_row", "cell_range"]),
@@ -2874,6 +2875,21 @@ result = dict(entries=sorted(entries), workspace=workspace)
 # we cannot create, such as mosaic datasets).
 GDB = "<ws>/t.gdb"
 GDB_SCENARIOS = {
+    **{f"gsc_xml_{label}": [
+        ("management.CreateFileGDB", dict(out_folder_path="<ws>", out_name="t"), "create_file_gdb", None),
+        *[("management.ImportXMLWorkspaceDocument",
+           dict(target_geodatabase=GDB, in_file=str(DATA / "xml_workspace" / file), import_type=mode),
+           "import_xml_workspace_document",
+           dict(target_geodatabase=GDB, in_file="<repo>/testdata/geoproc/xml_workspace/" + file, import_type=mode))
+          for _ in range(repeat)],
+    ] for label, file, mode, repeat in [
+        ("binary", "binary.xml", "DATA", 1),
+        ("normalized", "normalized.xml", "DATA", 1),
+        ("schema", "extended_binary.xml", "SCHEMA_ONLY", 1),
+        ("schema_default", "schema.xml", "DATA", 1),
+        ("types", "extended_binary.xml", "DATA", 1),
+        ("collision", "binary.xml", "DATA", 2),
+    ]},
     "gsc_mosaic": [
         ("seed", dict(source=DATA / "mosaic_seed.gdb"), "seed", None),
         ("management.DeleteMosaicDataset", dict(in_mosaic_dataset=GDB + "/keep"), "delete_mosaic_dataset", None),

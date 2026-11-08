@@ -819,6 +819,11 @@ Each item is something ArcGIS Pro does with a file geodatabase; `[x]` done on br
       as ArcGIS's text (`NoData` outside/NoData/missing band; edges inclusive). 13 recorded values.
 - [x] Get Raster Properties (`get_raster_properties`, `ug run`): extent, cell size, counts, value type,
       NoData flags, stored statistics, unknown metadata; ArcGIS's `%.15G` text and errors. 33 recorded values.
+- [x] Import XML Workspace Document (`import_xml_workspace_document`): plain XML DATA and
+      SCHEMA_ONLY imports into an existing FileGDB; standalone tables and simple 2D classes,
+      BINARY/NORMALIZED geometry, typed values, sparse OBJECTIDs, field aliases/defaults,
+      coordinate precision and unique collision names. Six ArcGIS schema scenarios plus
+      CLI record/geometry and rollback controls. Scope: `scripts/research/import_xml_workspace_document/`.
 - [x] Dockable panes: left/right/bottom groups, tab dragging and drop previews,
       auto-hide, scrollable tab headers, and saved layout preferences. Reopening
       panes preserves tab order; pointer-drag and preference round-trip tests pass.

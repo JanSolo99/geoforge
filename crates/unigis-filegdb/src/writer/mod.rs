@@ -181,6 +181,21 @@ impl TableBuilder {
         self.writer
             .push(feature.geometry.as_ref(), &feature.attributes)
     }
+
+    /// Writes an imported row with its original OBJECTID. IDs must be positive and
+    /// strictly increasing; skipped IDs remain deleted, as in XML workspace imports.
+    pub fn write_with_oid(&mut self, feature: &Feature) -> Result<u64> {
+        if self.kind.is_none() && feature.geometry.is_some() {
+            return Err(Error::Unsupported(
+                "geometry in a table without a geometry field".into(),
+            ));
+        }
+        let oid = u64::try_from(feature.oid)
+            .map_err(|_| Error::Unsupported("OBJECTID must be positive".into()))?;
+        self.writer.measure_next = self.standard_geometry_fields;
+        self.writer
+            .push_at(oid, feature.geometry.as_ref(), &feature.attributes)
+    }
 }
 
 impl GeodatabaseWriter {
@@ -384,6 +399,26 @@ impl GeodatabaseWriter {
     ) -> Result<TableBuilder> {
         let def = kind.map(|_| default_geometry_def(srs_wkt, has_z, has_m));
         self.create_table_with(name, kind, has_z, has_m, fields, def, None)
+    }
+
+    /// Creates a standalone feature class retaining an imported coordinate domain
+    /// and precision. The caller supplies a validated geometry definition.
+    pub fn create_feature_class_with_definition(
+        &mut self,
+        name: &str,
+        kind: GeometryKind,
+        fields: &[Field],
+        def: GeometryDef,
+    ) -> Result<TableBuilder> {
+        self.create_table_with(
+            name,
+            Some(kind),
+            def.has_z,
+            def.has_m,
+            fields,
+            Some(def),
+            None,
+        )
     }
 
     /// Creates a table or feature class with subtypes (`arcpy.management.SetSubtypeField`,
