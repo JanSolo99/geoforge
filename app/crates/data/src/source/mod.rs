@@ -99,6 +99,38 @@ pub struct SourceInfo {
     pub notes: Vec<String>,
 }
 
+/// An attribute domain a source's field is constrained by.
+#[derive(Clone, Debug, PartialEq)]
+pub struct SourceDomain {
+    /// The constrained field.
+    pub field: String,
+    /// The domain's name in the source.
+    pub name: String,
+    /// The coded values (code, description), or the limits of a range domain.
+    pub kind: SourceDomainKind,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum SourceDomainKind {
+    Coded(Vec<(crate::Value, String)>),
+    Range { min: f64, max: f64 },
+}
+
+/// The subtypes of a source's table: the subtype field, and each subtype's code, name and
+/// default values.
+#[derive(Clone, Debug, PartialEq)]
+pub struct SourceSubtypes {
+    pub field: String,
+    pub subtypes: Vec<(i64, String, Vec<(String, crate::Value)>)>,
+}
+
+/// Data design a source carries: the domains of its fields and its subtypes.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct SourceSchema {
+    pub domains: Vec<SourceDomain>,
+    pub subtypes: Option<SourceSubtypes>,
+}
+
 /// A read: the features intersecting `extent` (longitude/latitude; `None` = all), at most `limit`.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Request {
@@ -130,6 +162,10 @@ pub struct Batch {
 /// A vector data source read in place.
 pub trait FeatureSource: Send + Sync {
     fn info(&self) -> &SourceInfo;
+    /// The domains and subtypes the source defines (none for most formats).
+    fn schema(&self) -> SourceSchema {
+        SourceSchema::default()
+    }
     /// Reads the features a request asks for. A source read by its web address fails with
     /// [`remote::NEED`] until the bytes the read needs are fetched: run it with
     /// [`remote::drive`] (see [`FeatureSource::remote`]).

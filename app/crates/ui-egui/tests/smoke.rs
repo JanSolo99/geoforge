@@ -101,6 +101,37 @@ fn create_features_pane_picks_a_template_then_a_construction_tool() {
 }
 
 #[test]
+fn attribute_table_shows_coded_descriptions_and_picks_from_the_list() {
+    let _turn = PLUGINS.lock().unwrap_or_else(|e| e.into_inner());
+    let mut h = harness();
+    h.step();
+    let (first, second, field) = {
+        let l = h.state().session.map().layer_by_name("Cities").unwrap();
+        let i = l.dataset.field_index("name").unwrap();
+        (l.dataset.value(0, i).to_string(), l.dataset.value(1, i).to_string(), i)
+    };
+    h.state_mut()
+        .run("data.domain", json!({"layer": "Cities", "field": "name", "coded": [[first, "Alpha"], [second, "Beta"]], "force": true}))
+        .unwrap();
+    h.state_mut().run("table.open", json!({"layer": "Cities"})).unwrap();
+    h.step();
+    h.step();
+    // The descriptions are shown instead of the codes.
+    h.get_by_label("Alpha");
+    // Editing the cell offers the list of descriptions.
+    h.state_mut().table.edit_cell(0, field, first.clone());
+    h.step();
+    h.step();
+    assert_eq!(h.query_all_by_label("Beta").count(), 2, "the list is open next to the cell of the second row");
+    // The list offers every description; choosing one stores its code.
+    h.query_all_by_label("Beta").next_back().unwrap().click();
+    h.step();
+    h.step();
+    let l = h.state().session.map().layer_by_name("Cities").unwrap();
+    assert_eq!(l.dataset.value(0, field).to_string(), second);
+}
+
+#[test]
 fn legacy_basemaps_tab_moves_to_map_without_uninstalling_the_plugin() {
     let _turn = PLUGINS.lock().unwrap_or_else(|e| e.into_inner());
     use rustgis_ui_egui::rustgis_engine::plugins as rp;

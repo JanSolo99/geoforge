@@ -1329,6 +1329,7 @@ fn add_source_with(
             .map_err(err)?,
         };
         let info = src.info().clone();
+        let schema = src.schema();
         // A point cloud is always read in place, so a project keeps its file's path, not millions
         // of points; its colours come from a sample of it.
         let lidar = info.format == "LiDAR";
@@ -1362,6 +1363,7 @@ fn add_source_with(
             }
             s.active_layer = Some(id);
             style_feature_type(s, id, &info.fields);
+            apply_schema(s, id, &schema);
             ids.push(id);
             streamed = true;
             features += info.count.unwrap_or(0);
@@ -1388,6 +1390,7 @@ fn add_source_with(
                 l.renderer = r;
             }
             style_feature_type(s, id, &info.fields);
+            apply_schema(s, id, &schema);
             ids.push(id);
             for m in report.messages {
                 s.notify(m, false);
@@ -1416,6 +1419,32 @@ fn add_source_with(
         out["skipped"] = json!(skipped.iter().take(MAX_SKIPPED_NAMED).collect::<Vec<_>>());
     }
     Ok(out)
+}
+
+/// The domains and subtypes a source defines (a geodatabase class's), as the layer's data design:
+/// edits to the layer are then checked against them and the Data Design pane lists them.
+fn apply_schema(s: &mut Session, id: u32, schema: &rustgis_data::source::SourceSchema) {
+    use rustgis_data::source::SourceDomainKind;
+    use rustgis_map::design::{Domain, DomainKind, Subtype, Subtypes};
+    let Some(l) = s.map_mut().layer_mut(id) else { return };
+    for d in &schema.domains {
+        let kind = match &d.kind {
+            SourceDomainKind::Coded(codes) => DomainKind::Coded(codes.clone()),
+            SourceDomainKind::Range { min, max } => DomainKind::Range { min: *min, max: *max },
+        };
+        l.design.domains.retain(|x| !x.field.eq_ignore_ascii_case(&d.field));
+        l.design.domains.push(Domain { field: d.field.clone(), kind });
+    }
+    if let Some(st) = &schema.subtypes {
+        l.design.subtypes = Some(Subtypes {
+            field: st.field.clone(),
+            subtypes: st
+                .subtypes
+                .iter()
+                .map(|(code, name, defaults)| Subtype { code: *code, name: name.clone(), defaults: defaults.clone() })
+                .collect(),
+        });
+    }
 }
 
 /// ASPRS's standard classes, coloured as LiDAR viewers commonly show them.

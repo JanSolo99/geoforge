@@ -310,6 +310,32 @@ fn geoprocessing_adds_layers_and_history() {
     assert_eq!(s.project.gp_history.len(), 2, "a failed run restores the project");
 }
 
+/// A reference geodatabase of the repository's test data, or None where it isn't checked out.
+fn reference_gdb(name: &str) -> Option<String> {
+    let p = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../testdata/gdb-reference").join(name);
+    p.is_dir().then(|| p.display().to_string())
+}
+
+#[test]
+fn geodatabase_domains_and_subtypes_become_the_layers_data_design() {
+    use rustgis_map::design::DomainKind;
+    let (Some(domains), Some(subtypes)) = (reference_gdb("domain_base.gdb"), reference_gdb("subtypes.gdb")) else { return };
+    let mut s = Session::new(crate::project::Project::default());
+    s.run("layer.addData", &json!({"path": domains, "layer": "uses"})).unwrap();
+    let l = s.map().layer_by_name("uses").unwrap();
+    let zone = l.design.domains.iter().find(|d| d.field == "ZONE").expect("the coded domain on ZONE");
+    assert!(matches!(&zone.kind, DomainKind::Coded(c) if !c.is_empty()));
+    let depth = l.design.domains.iter().find(|d| d.field == "DEPTH").expect("the range domain on DEPTH");
+    assert!(matches!(depth.kind, DomainKind::Range { min, max } if min < max));
+    s.run("layer.addData", &json!({"path": subtypes, "layer": "base"})).unwrap();
+    let st = s.map().layer_by_name("base").unwrap().design.subtypes.clone().expect("subtypes");
+    assert_eq!(st.field, "kind");
+    assert!(!st.subtypes.is_empty());
+    // A plain table has no design.
+    let s = world();
+    assert!(s.map().layer_by_name("Cities").unwrap().design.domains.is_empty());
+}
+
 #[test]
 fn polygon_features_from_construction_shapes() {
     let mut s = world();

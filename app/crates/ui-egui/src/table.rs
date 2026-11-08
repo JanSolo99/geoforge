@@ -19,6 +19,14 @@ pub struct TableState {
     filter: String,
 }
 
+impl TableState {
+    /// Starts editing a cell (as a double-click does): a text box with `text`, or the pick list
+    /// of the field's coded values.
+    pub fn edit_cell(&mut self, row: usize, column: usize, text: String) {
+        self.editing = Some((row, column, text));
+    }
+}
+
 pub fn show(app: &mut RustGisApp, ui: &mut Ui) {
     let layer_id = app.session.table_layer;
     if layer_id.is_none() && app.session.table_standalone.is_none() {
@@ -43,6 +51,21 @@ pub fn show(app: &mut RustGisApp, ui: &mut Ui) {
                 },
             };
             let is_layer = layer_id.is_some();
+            // Per column, the coded values (code, description) of the field's domain: shown as
+            // their descriptions, and picked from a list when a cell is edited.
+            let coded: Vec<Option<Vec<(String, String)>>> = ds
+                .fields
+                .iter()
+                .map(|f| {
+                    let l = layer_id.and_then(|id| app.session.map().layer(id))?;
+                    match &l.design.domains.iter().find(|d| d.field.eq_ignore_ascii_case(&f.name))?.kind {
+                        rustgis_engine::map::design::DomainKind::Coded(codes) => {
+                            Some(codes.iter().map(|(c, d)| (c.to_string(), d.clone())).collect())
+                        }
+                        _ => None,
+                    }
+                })
+                .collect();
             // Header.
             let (hr, _) = ui.allocate_exact_size(vec2(ui.available_width(), 34.0), Sense::hover());
             ui.painter().rect_filled(hr, 0.0, t.pane_header);
@@ -159,7 +182,26 @@ pub fn show(app: &mut RustGisApp, ui: &mut Ui) {
                             for c in 0..nf {
                                 row.col(|ui| {
                                     let editing = app.table.editing.as_ref().is_some_and(|(er, ec, _)| *er == r && *ec == c);
-                                    if editing {
+                                    let codes = coded.get(c).and_then(|c| c.as_ref());
+                                    if let (true, Some(codes)) = (editing, codes) {
+                                        // A coded value domain: pick from its descriptions.
+                                        let current = ds.value(r, c).to_string();
+                                        let shown =
+                                            codes.iter().find(|(code, _)| *code == current).map_or(current.clone(), |(_, d)| d.clone());
+                                        let resp = ui.add(egui::Label::new(egui::RichText::new(shown).size(11.5)).sense(Sense::click()));
+                                        let mut open = true;
+                                        egui::Popup::menu(&resp).open_bool(&mut open).show(|ui| {
+                                            for (code, desc) in codes {
+                                                if ui.selectable_label(*code == current, desc).clicked() {
+                                                    commit = Some((r, c, code.clone()));
+                                                    ui.close();
+                                                }
+                                            }
+                                        });
+                                        if !open && commit.is_none() {
+                                            app.table.editing = None;
+                                        }
+                                    } else if editing {
                                         if let Some((_, _, buf)) = app.table.editing.as_mut() {
                                             let te = ui.add(egui::TextEdit::singleline(buf).desired_width(f32::INFINITY));
                                             te.request_focus();
@@ -171,7 +213,12 @@ pub fn show(app: &mut RustGisApp, ui: &mut Ui) {
                                         let v = ds.value(r, c);
                                         // A picture (a photo's thumbnail) is named, not spelled out.
                                         let picture = matches!(v, V::Text(s) if crate::mapview::is_picture(s));
-                                        let shown = if picture { tl!("picture").to_string() } else { v.to_string() };
+                                        let described = codes.and_then(|codes| codes.iter().find(|(code, _)| *code == v.to_string()));
+                                        let shown = if picture {
+                                            tl!("picture").to_string()
+                                        } else {
+                                            described.map_or_else(|| v.to_string(), |(_, d)| d.clone())
+                                        };
                                         let txt = egui::RichText::new(shown).size(11.5);
                                         let txt = if matches!(v, V::Null) || picture { txt.color(t.text_disabled).italics() } else { txt };
                                         let resp = ui.add(egui::Label::new(txt).sense(Sense::click()).truncate());

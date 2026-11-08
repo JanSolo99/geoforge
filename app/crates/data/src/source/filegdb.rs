@@ -16,7 +16,9 @@ use unigis_filegdb::Table;
 pub use unigis_filegdb::{Geodatabase, vfs};
 
 pub use super::gfshape::{from_unigis, to_unigis};
-use super::{Batch, FeatureSource, Reproject, Request, SourceInfo, clamp_limit, stride};
+use super::{
+    Batch, FeatureSource, Reproject, Request, SourceDomain, SourceDomainKind, SourceInfo, SourceSchema, SourceSubtypes, clamp_limit, stride,
+};
 use crate::{DataError, Dataset, Feature, Field, FieldType, Geometry, GeometryType, Result, Value};
 use rustgis_geom::Extent;
 
@@ -27,6 +29,7 @@ fn bad(msg: impl std::fmt::Display) -> DataError {
 /// A feature class or table of a File Geodatabase, read in place.
 pub struct FileGdbSource {
     info: SourceInfo,
+    schema: SourceSchema,
     table: Table,
     reproject: Reproject,
 }
@@ -107,7 +110,8 @@ impl FileGdbSource {
             indexed,
             notes,
         };
-        Ok(FileGdbSource { info, table, reproject })
+        let schema = schema_of(gdb, &table);
+        Ok(FileGdbSource { info, schema, table, reproject })
     }
 
     /// The OBJECTIDs a request has to look at, and whether they came from the spatial index (else
@@ -120,6 +124,37 @@ impl FileGdbSource {
         }
         ((1..=self.table.max_oid()).collect(), false)
     }
+}
+
+/// The domains of a table's fields and its subtypes.
+fn schema_of(gdb: &Geodatabase, table: &Table) -> SourceSchema {
+    use unigis_filegdb::DomainKind as Kind;
+    let mut schema = SourceSchema::default();
+    for f in table.fields() {
+        let Some(d) = f.domain.as_deref().and_then(|n| gdb.domain(n)) else { continue };
+        let kind = match &d.kind {
+            Kind::Coded(codes) => SourceDomainKind::Coded(codes.iter().map(|(c, desc)| (value(c.clone()), desc.clone())).collect()),
+            Kind::Range { min, max } => match (value(min.clone()).as_f64(), value(max.clone()).as_f64()) {
+                (Some(min), Some(max)) => SourceDomainKind::Range { min, max },
+                _ => continue,
+            },
+        };
+        schema.domains.push(SourceDomain { field: f.name.clone(), name: d.name.clone(), kind });
+    }
+    if let Some(st) = table.subtypes() {
+        schema.subtypes = Some(SourceSubtypes {
+            field: st.field.clone(),
+            subtypes: st
+                .subtypes
+                .iter()
+                .map(|s| {
+                    let defaults = s.fields.iter().filter_map(|f| f.default.clone().map(|d| (f.field.clone(), value(d)))).collect();
+                    (s.code, s.name.clone(), defaults)
+                })
+                .collect(),
+        });
+    }
+    schema
 }
 
 fn has_spx(gdb: &Geodatabase, name: &str) -> bool {
@@ -386,6 +421,10 @@ fn value(v: GfValue) -> Value {
 impl FeatureSource for FileGdbSource {
     fn info(&self) -> &SourceInfo {
         &self.info
+    }
+
+    fn schema(&self) -> SourceSchema {
+        self.schema.clone()
     }
 
     fn read(&self, req: &Request) -> Result<Batch> {

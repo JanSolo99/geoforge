@@ -42,13 +42,19 @@ ArcGIS Pro: settle questions with the ArcGIS MCP bridge, and check every fix in 
     construction tools ArcGIS offers per geometry type (Point; Line, Polygon with Line, Arc,
     Trace, Right Angle, Midpoint, Endpoint Arc, Tangent, Bezier, Freehand, Stream; Rectangle,
     Circle, Ellipse, Auto-Complete Polygon). Snapping and the Edit ribbon follow Pro.
-- [ ] gdb-domains-subtypes: Geodatabase domains and subtypes
+- [x] gdb-domains-subtypes (read side): Geodatabase domains and subtypes
   - Feature classes have no domains, subtypes or related schema yet. Read and write coded value
     and range domains and subtypes in file geodatabases (clean-room, GDAL OpenFileGDB docs; GDAL
     as the format oracle), apply them in the attribute table and editing (pick lists, validation,
     subtype-specific defaults), and add the Domains/Subtypes views and the geoprocessing tools
     (Create Domain, Add Coded Value To Domain, Assign Domain To Field, Create Subtype, …).
     Relationship classes and attribute rules come after.
+- [ ] gdb-design-write-back: Write domains and subtypes back to the geodatabase
+  - The read side landed (a class's domains and subtypes load into the layer design, the table
+    shows descriptions and a pick list). Still open: Save Edits and the design panes write domain
+    and subtype changes to the file geodatabase (the writer already has `create_table_with_subtypes`,
+    `set_subtype_field`, `assign_domain_to_field`, domain editing; GDAL as the format oracle), read
+    relationship classes, and offer the pick list in the Attributes popup and the Create pane.
 - [ ] unigis-naming: One `unigis` program; the app is UniGIS everywhere
   - The app is called UniGIS: not RustGIS, not GeoForge. Installed program `unigis`: with no
     arguments or with files it opens the app, with a subcommand it is the CLI (today's merged `ug`

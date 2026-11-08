@@ -775,6 +775,10 @@ Each item is something ArcGIS Pro does with a file geodatabase; `[x]` done on br
       `edit.addFeature` with `shape` + `points`). Edit › Create keeps working. Not yet: `.lyrx`
       templates, the other ArcGIS construction tools (Arc, Trace, Right Angle, Midpoint, Endpoint
       Arc, Tangent, Bezier, Freehand, Stream, Auto-Complete Polygon), template properties.
+- [x] Geodatabase domains and subtypes in the app: a File Geodatabase class's field domains and
+      subtypes load into the layer's data design (`FeatureSource::schema`, `SourceSchema`), so
+      edits are validated, the Data Design pane lists them and the attribute table shows coded
+      descriptions with a pick list for editing. Tested against `testdata/gdb-reference`.
 - [x] Dockable panes: left/right/bottom groups, tab dragging and drop previews,
       auto-hide, scrollable tab headers, and saved layout preferences. Reopening
       panes preserves tab order; pointer-drag and preference round-trip tests pass.

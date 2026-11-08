@@ -27,6 +27,11 @@ read-only. The Editing pane (Settings, Templates, Status, Modify) holds the rest
   and flip line direction. Edit › Tools lists every editing tool.
 - **Feature templates**: named default values for new features, made from a selected feature;
   the Create tool uses the chosen template.
+- **Geodatabase domains and subtypes**: a File Geodatabase class added to the map brings its
+  coded value and range domains and its subtypes into the layer's data design (Data Design pane).
+  Edits are checked against them, and in the attribute table a coded-value field shows the
+  descriptions and, when you edit a cell, offers the list to pick from. Changes to the design are
+  kept in the project; they are not written back to the geodatabase yet.
 - **Snapping**: new vertices snap to nearby vertices, edges and line ends (magenta marker).
 - **Elevation**: new features get a `z` value, constant or sampled from a raster surface.
 - **Ground to grid**: a scale factor and rotation applied to entered distances and directions
