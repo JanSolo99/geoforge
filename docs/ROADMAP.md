@@ -779,6 +779,10 @@ Each item is something ArcGIS Pro does with a file geodatabase; `[x]` done on br
       subtypes load into the layer's data design (`FeatureSource::schema`, `SourceSchema`), so
       edits are validated, the Data Design pane lists them and the attribute table shows coded
       descriptions with a pick list for editing. Tested against `testdata/gdb-reference`.
+- [x] Domains written back (`filegdb::save_domains`, run by Save Edits): changed coded values and
+      range limits update the geodatabase's domain, a new domain is created and assigned to its
+      field, with the writer's ArcGIS-validated domain operations. Tested on copies of
+      `testdata/gdb-reference` (changed, unchanged on a second save, created and assigned).
 - [x] Dockable panes: left/right/bottom groups, tab dragging and drop previews,
       auto-hide, scrollable tab headers, and saved layout preferences. Reopening
       panes preserves tab order; pointer-drag and preference round-trip tests pass.

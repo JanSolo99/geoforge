@@ -1109,6 +1109,7 @@ fn gdb_origin(source: &str) -> Option<(String, String)> {
 /// (ArcGIS's Save Edits): its schema, domains, subtypes and unchanged values stay as stored.
 fn save_gdb_edits(s: &mut Session, p: &Value) -> CmdResult {
     // A standalone table (`"table"`: its id), or a layer.
+    let mut domains = Vec::new();
     let ds = match p.get("table").and_then(Value::as_u64) {
         Some(tid) => s.project.table(tid as u32).map(|t| t.dataset.clone()).ok_or_else(|| format!("no table {tid}"))?,
         None => {
@@ -1117,6 +1118,22 @@ fn save_gdb_edits(s: &mut Session, p: &Value) -> CmdResult {
             if l.is_streamed() {
                 return Err(format!("{}: read in place (Load All Features first to edit it)", l.name));
             }
+            // The layer's field domains are written with its rows.
+            domains = l
+                .design
+                .domains
+                .iter()
+                .map(|d| rustgis_data::source::SourceDomain {
+                    field: d.field.clone(),
+                    name: d.name.clone(),
+                    kind: match &d.kind {
+                        rustgis_map::design::DomainKind::Coded(codes) => rustgis_data::source::SourceDomainKind::Coded(codes.clone()),
+                        rustgis_map::design::DomainKind::Range { min, max } => {
+                            rustgis_data::source::SourceDomainKind::Range { min: *min, max: *max }
+                        }
+                    },
+                })
+                .collect();
             l.dataset.clone()
         }
     };
@@ -1129,8 +1146,18 @@ fn save_gdb_edits(s: &mut Session, p: &Value) -> CmdResult {
     }
     let r = edit_database(s, &name, |dir| {
         let saved = rustgis_data::source::filegdb::save_edits(dir, &table, &ds).map_err(|e| e.to_string())?;
-        Ok(json!({"geodatabase": name, "item": table, "inserted": saved.inserted, "updated": saved.updated, "deleted": saved.deleted}))
+        let mut out =
+            json!({"geodatabase": name, "item": table, "inserted": saved.inserted, "updated": saved.updated, "deleted": saved.deleted});
+        // The rows are saved either way; a domain that can't be written is reported.
+        match rustgis_data::source::filegdb::save_domains(dir, &table, &domains) {
+            Ok(d) => out["domains"] = json!({"created": d.created, "updated": d.updated, "assigned": d.assigned}),
+            Err(e) => out["domainError"] = json!(e.to_string()),
+        }
+        Ok(out)
     })?;
+    if let Some(e) = r["domainError"].as_str() {
+        s.notify(format!("{}: the rows are saved, but the domains were not written to {name}/{table}: {e}", ds.name), true);
+    }
     s.notify(
         format!("{}: saved to {name}/{table} ({} added, {} changed, {} deleted)", ds.name, r["inserted"], r["updated"], r["deleted"]),
         false,
@@ -1433,7 +1460,7 @@ fn apply_schema(s: &mut Session, id: u32, schema: &rustgis_data::source::SourceS
             SourceDomainKind::Range { min, max } => DomainKind::Range { min: *min, max: *max },
         };
         l.design.domains.retain(|x| !x.field.eq_ignore_ascii_case(&d.field));
-        l.design.domains.push(Domain { field: d.field.clone(), kind });
+        l.design.domains.push(Domain { field: d.field.clone(), kind, name: d.name.clone() });
     }
     if let Some(st) = &schema.subtypes {
         l.design.subtypes = Some(Subtypes {

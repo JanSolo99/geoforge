@@ -18,6 +18,10 @@ pub enum DomainKind {
 pub struct Domain {
     pub field: String,
     pub kind: DomainKind,
+    /// The geodatabase domain this came from (kept when its values change); empty for one made
+    /// here, which Save Edits names after the class and field.
+    #[serde(default)]
+    pub name: String,
 }
 
 impl Domain {
@@ -239,11 +243,14 @@ mod tests {
 
     #[test]
     fn domains_allow_and_describe() {
-        let coded =
-            Domain { field: "kind".into(), kind: DomainKind::Coded(vec![(Value::Int(1), "Road".into()), (Value::Int(2), "Rail".into())]) };
+        let coded = Domain {
+            field: "kind".into(),
+            kind: DomainKind::Coded(vec![(Value::Int(1), "Road".into()), (Value::Int(2), "Rail".into())]),
+            name: String::new(),
+        };
         assert!(coded.allows(&Value::Int(2)) && coded.allows(&Value::Null) && !coded.allows(&Value::Int(3)));
         assert_eq!(coded.describe(&Value::Int(1)), Some("Road"));
-        let range = Domain { field: "speed".into(), kind: DomainKind::Range { min: 0.0, max: 130.0 } };
+        let range = Domain { field: "speed".into(), kind: DomainKind::Range { min: 0.0, max: 130.0 }, name: String::new() };
         assert!(range.allows(&Value::Float(90.0)) && !range.allows(&Value::Float(200.0)) && !range.allows(&Value::Text("fast".into())));
     }
 }

@@ -664,7 +664,8 @@ fn domain(s: &mut Session, p: &Json) -> CmdResult {
         }
         DomainKind::Range { min, max }
     };
-    let d = Domain { field: fname.clone(), kind };
+    let name = l.design.domains.iter().find(|x| x.field.eq_ignore_ascii_case(&fname)).map(|x| x.name.clone()).unwrap_or_default();
+    let d = Domain { field: fname.clone(), kind, name };
     // Existing values must already fit.
     let bad = (0..l.dataset.features.len()).filter(|r| !d.allows(l.dataset.value(*r, fi))).count();
     if bad > 0 && !b(p, "force").unwrap_or(false) {

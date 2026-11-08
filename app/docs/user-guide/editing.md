@@ -30,8 +30,10 @@ read-only. The Editing pane (Settings, Templates, Status, Modify) holds the rest
 - **Geodatabase domains and subtypes**: a File Geodatabase class added to the map brings its
   coded value and range domains and its subtypes into the layer's data design (Data Design pane).
   Edits are checked against them, and in the attribute table a coded-value field shows the
-  descriptions and, when you edit a cell, offers the list to pick from. Changes to the design are
-  kept in the project; they are not written back to the geodatabase yet.
+  descriptions and, when you edit a cell, offers the list to pick from. **Save Edits** writes the layer's field
+  domains with its rows: a domain whose values you changed is updated in the geodatabase, and a
+  domain you made on a field is created (named `<class>_<field>`) and assigned to it. A domain
+  removed in the app stays on the field in the geodatabase, and subtypes are not written yet.
 - **Snapping**: new vertices snap to nearby vertices, edges and line ends (magenta marker).
 - **Elevation**: new features get a `z` value, constant or sampled from a raster surface.
 - **Ground to grid**: a scale factor and rotation applied to entered distances and directions

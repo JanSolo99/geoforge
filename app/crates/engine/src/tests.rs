@@ -6116,6 +6116,66 @@ fn geodatabases_are_edited_in_memory_and_on_disk() {
     std::fs::remove_dir_all(&dir).ok();
 }
 
+/// Save Edits also writes the layer's field domains: a changed domain's values, a new domain and
+/// its assignment to a field.
+#[test]
+fn domains_are_saved_back_to_geodatabase_classes() {
+    let src = |n: &str| std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../testdata/gdb-reference").join(n);
+    let dir = std::env::temp_dir().join(format!("rustgis-save-domains-{}", std::process::id()));
+    std::fs::remove_dir_all(&dir).ok();
+    std::fs::create_dir_all(&dir).unwrap();
+    let copy = |n: &str| {
+        let to = dir.join(n);
+        std::fs::create_dir_all(&to).unwrap();
+        for e in std::fs::read_dir(src(n)).unwrap().flatten() {
+            std::fs::copy(e.path(), to.join(e.file_name())).unwrap();
+        }
+        to
+    };
+    let item = |gdb: &std::path::Path, name: &str| {
+        let g = rustgis_data::source::filegdb::open_dir(gdb).unwrap();
+        rustgis_data::source::filegdb::properties(&g, name).unwrap()
+    };
+    // A changed range and a coded value added to existing domains.
+    let gdb = copy("domain_base.gdb");
+    let mut s = Session::new(Project::default());
+    s.run("layer.addData", &json!({"path": gdb.display().to_string(), "layer": "uses", "stream": false})).unwrap();
+    let id = s.map().layer_by_name("uses").unwrap().id;
+    let mut codes: Vec<Value> = match &s.map().layer(id).unwrap().design.domains.iter().find(|d| d.field == "ZONE").unwrap().kind {
+        rustgis_map::design::DomainKind::Coded(c) => c.iter().map(|(code, d)| json!([code.to_json(), d])).collect(),
+        _ => panic!("ZONE has a coded domain"),
+    };
+    let had = codes.len();
+    codes.push(json!([99, "added here"]));
+    s.run("data.domain", &json!({"layer": id, "field": "ZONE", "coded": codes})).unwrap();
+    s.run("data.domain", &json!({"layer": id, "field": "DEPTH", "min": 1, "max": 9})).unwrap();
+    let r = s.run("catalog.saveEdits", &json!({"layer": id})).unwrap();
+    assert!(r.get("domainError").is_none(), "{r}");
+    assert_eq!(r["domains"]["updated"], 2, "{r}");
+    let zones = item(&gdb, "zones");
+    assert_eq!(zones["codes"].as_array().unwrap().len(), had + 1, "{zones}");
+    assert!(zones["codes"].as_array().unwrap().iter().any(|c| c["code"] == 99 && c["description"] == "added here"), "{zones}");
+    let depth = item(&gdb, "depth");
+    let limit = |k: &str| depth[k].as_f64().or_else(|| depth[k].as_str().and_then(|t| t.parse().ok()));
+    assert_eq!((limit("min"), limit("max")), (Some(1.0), Some(9.0)), "{depth}");
+    // Saving again changes nothing.
+    let r = s.run("catalog.saveEdits", &json!({"layer": id})).unwrap();
+    assert_eq!(r["domains"], json!({"created": 0, "updated": 0, "assigned": 0}), "{r}");
+    // A domain made in the app is created and assigned to its field.
+    let gdb = copy("subtypes.gdb");
+    s.run("layer.addData", &json!({"path": gdb.display().to_string(), "layer": "base", "stream": false})).unwrap();
+    let id = s.map().layer_by_name("base").unwrap().id;
+    s.run("data.domain", &json!({"layer": id, "field": "lanes", "coded": [[1, "one"], [2, "two"]]})).unwrap();
+    let r = s.run("catalog.saveEdits", &json!({"layer": id})).unwrap();
+    assert_eq!(r["domains"], json!({"created": 1, "updated": 0, "assigned": 1}), "{r}");
+    let made = item(&gdb, "base_lanes");
+    assert_eq!(made["codes"].as_array().unwrap().len(), 2, "{made}");
+    let table = item(&gdb, "base");
+    let lanes = table["fields"].as_array().unwrap().iter().find(|f| f["name"] == "lanes").unwrap().clone();
+    assert_eq!(lanes["domain"], "base_lanes", "{table}");
+    std::fs::remove_dir_all(&dir).ok();
+}
+
 /// Save Edits: a layer loaded from a geodatabase class is saved back row by row, keeping the
 /// class's schema and domains; on disk and for an upload.
 #[test]

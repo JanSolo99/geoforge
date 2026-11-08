@@ -681,6 +681,100 @@ fn to_field_value(v: &Value, ty: unigis_core::FieldType, field: &str) -> Result<
     })
 }
 
+/// What writing a layer's domains to its table changed.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+pub struct DomainsSaved {
+    pub created: usize,
+    pub updated: usize,
+    pub assigned: usize,
+}
+
+/// Writes a layer's field domains to its table's geodatabase: a domain the geodatabase lacks is
+/// created, one whose values differ gets the layer's (a coded domain's codes added, changed or
+/// deleted; a range domain's limits set), and a field not yet using it is assigned to it. A
+/// domain made in the app (no name) is called `<table>_<field>`. Domains the layer lacks are left
+/// alone, so a domain removed in the app stays on the field in the geodatabase.
+pub fn save_domains(gdb_dir: &Path, table: &str, wanted: &[SourceDomain]) -> Result<DomainsSaved> {
+    use unigis_filegdb::{DomainKind as Kind, MergePolicy, SplitPolicy};
+    let mut saved = DomainsSaved::default();
+    for d in wanted {
+        let g = Geodatabase::open(gdb_dir).map_err(bad)?;
+        let t = g.open_table(table).map_err(bad)?;
+        let Some(field) = t.fields().iter().find(|f| f.name.eq_ignore_ascii_case(&d.field)) else { continue };
+        let (field_name, field_type, using) = (field.name.clone(), field.field_type, field.domain.clone());
+        let name = if d.name.is_empty() { format!("{table}_{field_name}") } else { d.name.clone() };
+        let number = |f: f64| f.to_string();
+        let is_range = matches!(d.kind, SourceDomainKind::Range { .. });
+        match g.domain(&name) {
+            None => {
+                unigis_filegdb::create_domain(
+                    gdb_dir,
+                    &name,
+                    "",
+                    field_type,
+                    is_range,
+                    SplitPolicy::DefaultValue,
+                    MergePolicy::DefaultValue,
+                )
+                .map_err(bad)?;
+                saved.created += 1;
+                match &d.kind {
+                    SourceDomainKind::Coded(codes) => {
+                        for (code, description) in codes {
+                            unigis_filegdb::add_coded_value(gdb_dir, &name, &code.to_string(), description).map_err(bad)?;
+                        }
+                    }
+                    SourceDomainKind::Range { min, max } => {
+                        unigis_filegdb::set_value_for_range(gdb_dir, &name, &number(*min), &number(*max)).map_err(bad)?;
+                    }
+                }
+            }
+            Some(existing) => {
+                let mut changed = false;
+                match (&d.kind, &existing.kind) {
+                    (SourceDomainKind::Coded(codes), Kind::Coded(have)) => {
+                        let has = |c: &Value| have.iter().find(|(h, _)| value(h.clone()).to_string() == c.to_string());
+                        let stale: Vec<String> = have
+                            .iter()
+                            .map(|(h, _)| value(h.clone()))
+                            .filter(|h| !codes.iter().any(|(c, _)| c.to_string() == h.to_string()))
+                            .map(|h| h.to_string())
+                            .collect();
+                        if !stale.is_empty() {
+                            unigis_filegdb::delete_coded_values(gdb_dir, &name, &stale.join(";")).map_err(bad)?;
+                            changed = true;
+                        }
+                        for (code, description) in codes {
+                            if has(code).is_none_or(|(_, desc)| desc != description) {
+                                unigis_filegdb::add_coded_value(gdb_dir, &name, &code.to_string(), description).map_err(bad)?;
+                                changed = true;
+                            }
+                        }
+                    }
+                    (SourceDomainKind::Range { min, max }, Kind::Range { min: lo, max: hi }) => {
+                        if value(lo.clone()).as_f64() != Some(*min) || value(hi.clone()).as_f64() != Some(*max) {
+                            unigis_filegdb::set_value_for_range(gdb_dir, &name, &number(*min), &number(*max)).map_err(bad)?;
+                            changed = true;
+                        }
+                    }
+                    _ => {
+                        return Err(bad(format!(
+                            "the domain {name} is {} in the geodatabase",
+                            if is_range { "a coded value domain" } else { "a range domain" }
+                        )));
+                    }
+                }
+                saved.updated += usize::from(changed);
+            }
+        }
+        if !using.as_deref().is_some_and(|u| u.eq_ignore_ascii_case(&name)) {
+            unigis_filegdb::assign_domain_to_field(gdb_dir, table, &field_name, &name, &[]).map_err(bad)?;
+            saved.assigned += 1;
+        }
+    }
+    Ok(saved)
+}
+
 /// What a save of edits changed.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct Saved {

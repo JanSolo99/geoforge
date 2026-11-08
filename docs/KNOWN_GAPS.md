@@ -94,7 +94,7 @@ Update this file when a gap is found or closed.
 | Geodesic Flow Direction | MFD and D-Infinity, out_drop_raster; geographic datums other than WGS84's ellipsoid; flats resolved as Flow Direction (a few cells differ) |
 | Formats | LAS/LAZ, NetCDF/HDF, KML, DXF/DWG, Esri Grid/IMG, TIN, mobile geodatabase, `.shp.xml`, compressed `.cdf` |
 | Create Features pane | Templates from `.lyrx` files and graduated/proportional classes; construction tools Arc, Trace, Right Angle, Midpoint, Endpoint Arc, Tangent, Bezier, Freehand, Stream and Auto-Complete Polygon; editing a template's properties in the pane (use the Editing pane); the pane lists at most 200 automatic templates per layer |
-| Geodatabase domains and subtypes in the app | Design changes (domains, subtypes, assignments) are not written back to the geodatabase on Save Edits; domains and subtypes of other formats (GeoPackage) are not read; the pick list is only in the attribute table (not the Attributes popup or the Create pane); relationship classes and attribute rules not read |
+| Geodatabase domains and subtypes in the app | Field domains are written back on Save Edits (not removals, not domains per subtype); subtypes (the subtype field, subtypes and their defaults) are read but not written back; domains and subtypes of other formats (GeoPackage) are not read; the pick list is only in the attribute table (not the Attributes popup or the Create pane); relationship classes and attribute rules not read |
 | Network Analyst, 3D Analyst, Geostatistical Analyst, Cartography | Not started |
 
 ## Process gaps
