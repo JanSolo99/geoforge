@@ -283,6 +283,80 @@ fn rewrite_palette(path: &Path, table: Option<&[[u16; 3]; 256]>) -> Result<()> {
     fs::write(path, bytes).map_err(|e| Error::io(path, e))
 }
 
+/// Changes one ASCII tag in a classic TIFF's first IFD, retaining every other tag
+/// and the existing pixel blocks. Used by in-place raster metadata tools.
+pub(crate) fn with_ascii_tag(
+    mut bytes: Vec<u8>,
+    path: &Path,
+    tag: u16,
+    text: &str,
+) -> Result<Vec<u8>> {
+    let t = Tiff::parse(&bytes, path)?;
+    let put16 = |v: u16| {
+        if t.little_endian {
+            v.to_le_bytes()
+        } else {
+            v.to_be_bytes()
+        }
+    };
+    let put32 = |v: u32| {
+        if t.little_endian {
+            v.to_le_bytes()
+        } else {
+            v.to_be_bytes()
+        }
+    };
+    let count = u32::try_from(text.len() + 1)
+        .map_err(|_| Error::Limit("TIFF ASCII tag too long".into()))?;
+    let needed =
+        bytes.len() as u64 + u64::from(count) + 2 + 12 * (t.entries.len() as u64 + 1) + 4 + 2;
+    if needed > u64::from(u32::MAX) {
+        return Err(Error::Limit("classic TIFF exceeds 4 GiB".into()));
+    }
+    if bytes.len() % 2 == 1 {
+        bytes.push(0);
+    }
+    let mut value = [0u8; 4];
+    if count <= 4 {
+        value[..text.len()].copy_from_slice(text.as_bytes());
+    } else {
+        value = put32(bytes.len() as u32);
+        bytes.extend_from_slice(text.as_bytes());
+        bytes.push(0);
+        if bytes.len() % 2 == 1 {
+            bytes.push(0);
+        }
+    }
+    let mut entries: Vec<_> = t
+        .entries
+        .iter()
+        .filter(|e| e.tag != tag)
+        .map(|e| e.raw)
+        .collect();
+    let mut entry = [0u8; 12];
+    entry[..2].copy_from_slice(&put16(tag));
+    entry[2..4].copy_from_slice(&put16(2));
+    entry[4..8].copy_from_slice(&put32(count));
+    entry[8..].copy_from_slice(&value);
+    entries.push(entry);
+    entries.sort_by_key(|e| {
+        if t.little_endian {
+            u16::from_le_bytes([e[0], e[1]])
+        } else {
+            u16::from_be_bytes([e[0], e[1]])
+        }
+    });
+    let n = u16::try_from(entries.len()).map_err(|_| Error::Limit("too many TIFF tags".into()))?;
+    let offset = bytes.len() as u32;
+    bytes.extend_from_slice(&put16(n));
+    for e in entries {
+        bytes.extend_from_slice(&e);
+    }
+    bytes.extend_from_slice(&put32(t.next_ifd));
+    bytes[4..8].copy_from_slice(&put32(offset));
+    Ok(bytes)
+}
+
 struct IfdEntry {
     tag: u16,
     count: u32,

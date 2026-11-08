@@ -105,7 +105,7 @@ pub fn property(
             .to_string(),
         "SENSORNAME" | "PRODUCTNAME" | "ACQUISITIONDATE" | "CLOUDCOVER" | "SUNAZIMUTH"
         | "SUNELEVATION" | "OFFNADIR" => "UNKNOWN".into(),
-        "SOURCETYPE" => "Generic".into(),
+        "SOURCETYPE" => crate::setprops::source_type(path).map_err(|e| e.to_string())?,
         stat => {
             // Statistics are the stored ones; ArcGIS does not compute them here.
             let key = match stat {

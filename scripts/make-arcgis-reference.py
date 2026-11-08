@@ -1142,6 +1142,27 @@ CASES = {
     "dcm_embedded": ("management.DeleteColormap", [OUT / "acm_clr.tif"], []),
     "dcm_sidecar": ("management.DeleteColormap", [OUT / "acm_int16.tif"], []),
     "dcm_none": ("management.DeleteColormap", [RASTER / "classes_u8.tif"], []),
+    **{f"srp_{label}": ("management.SetRasterProperties", [RASTER / source], args)
+       for label, source, args in [
+        ("default", "classes_u8.tif", []),
+        *[(v.lower(), "classes_u8.tif", [v]) for v in ["GENERIC", "ELEVATION", "THEMATIC", "PROCESSED", "SCIENTIFIC", "VECTOR_UV", "VECTOR_MAGDIR", "DATE", "SAR"]],
+        ("statistics", "classes_u8.tif", ["", "1 1 250 20 3"]),
+        ("cached", "dem.tif", ["", "1 50 400 5 28"]),
+        ("cached_multi", "unary_cached_multiband/i16.tif", ["", "1 -10 20 2 -3"]),
+        ("band2", "rgb_pixel_u8.tif", ["", "2 5 40 12 2"]),
+        ("band13", "rgb_pixel_u8.tif", ["VECTOR_UV", "1 1 50 20 3;3 5 250 30 4"]),
+        ("fraction", "classes_u8.tif", ["", "1 1.25 250.5 20.123456789123456 3.23456789123456"]),
+        ("inverted", "classes_u8.tif", ["", "1 250 1 20 3"]),
+        ("nodata", "classes_u8.tif", ["", "", "", "1 2"]),
+        ("nodata_outside", "classes_u8.tif", ["", "", "", "1 999"]),
+        ("nodata_fraction", "classes_u8.tif", ["", "", "", "1 2.5"]),
+        ("nodata_negative", "classes_u8.tif", ["", "", "", "1 -2.5"]),
+        ("nodata_float", "dem.tif", ["", "", "", "1 2.123456789123456"]),
+        ("combined", "classes_u8.tif", ["THEMATIC", "1 1 250 20 3", "", "1 2"]),
+        ("bad_band", "classes_u8.tif", ["", "2 1 250 20 3"]),
+        ("bad_range", "classes_u8.tif", ["", "1 -1 250 20 3"]),
+        ("bad_type", "classes_u8.tif", ["FOO"]),
+    ]},
     "ewf_dem": ("management.ExportRasterWorldFile", [RASTER / "dem.tif"], []),
     "ewf_geographic": ("management.ExportRasterWorldFile", [RASTER / "dem_geographic.tif"], []),
     "ewf_u8": ("management.ExportRasterWorldFile", [RASTER / "classes_u8.tif"], []),
@@ -2516,6 +2537,7 @@ RUN = {
     "gp.ObserverPoints_sa": ("observer_points", ["input", "in_observer_point_features", "output", "z_factor"]),
     "management.DeleteColormap": ("delete_colormap", ["input", "output"]),
     "management.DeleteRasterAttributeTable": ("delete_raster_attribute_table", ["input", "output"]),
+    "management.SetRasterProperties": ("set_raster_properties", ["in_raster", None, "data_type", "statistics", "stats_file", "nodata", "key_properties", "multidimensional_info"]),
     "management.ExportRasterWorldFile": ("export_raster_world_file", ["input", "output"]),
     "management.AddColormap": ("add_colormap", ["input", "in_template_raster", "input_CLR_file", "output"]),
     "gp.Visibility_sa": ("visibility", ["input", "in_observer_features", "output", None, "analysis_type", "nonvisible_cell_value", "z_factor"]),
@@ -2700,7 +2722,7 @@ MEMORY_OUT = {"analysis.SummarizeWithin", "analysis.SummarizeNearby", "analysis.
 CREATE_TOOLS = {"management.CreateRandomPoints", "management.CreateFeatureclass", "management.CreateTable"}
 
 # In-place tools: the index of the input they edit (run on a copy written as the output).
-IN_PLACE = {"management.DeleteColormap": 0, "management.DeleteRasterAttributeTable": 0, "management.ExportRasterWorldFile": 0, "management.AddColormap": 0, "gp.AddSurfaceInformation_sa": 0, "management.CalculateGeometryAttributes": 0, "management.Adjust3DZ": 0, "management.MigrateDateFieldToHighPrecision": 0, "management.EnableCOGO": 0, "management.DisableEditorTracking": 0, "management.DisableCOGO": 0, "management.AddGPSMetadataFields": 0, "management.ConvertTimeZone": 0, "management.ConvertTimeField": 0, "management.AddSpatialJoin": 0, "gp.ExtractMultiValuesToPoints_sa": 0, "edit.ExtendLine": 0, "edit.FlipLine": 0, "edit.TrimLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.EncodeField": 0, "management.AddGeometryAttributes": 0,
+IN_PLACE = {"management.SetRasterProperties": 0, "management.DeleteColormap": 0, "management.DeleteRasterAttributeTable": 0, "management.ExportRasterWorldFile": 0, "management.AddColormap": 0, "gp.AddSurfaceInformation_sa": 0, "management.CalculateGeometryAttributes": 0, "management.Adjust3DZ": 0, "management.MigrateDateFieldToHighPrecision": 0, "management.EnableCOGO": 0, "management.DisableEditorTracking": 0, "management.DisableCOGO": 0, "management.AddGPSMetadataFields": 0, "management.ConvertTimeZone": 0, "management.ConvertTimeField": 0, "management.AddSpatialJoin": 0, "gp.ExtractMultiValuesToPoints_sa": 0, "edit.ExtendLine": 0, "edit.FlipLine": 0, "edit.TrimLine": 0, "edit.Generalize": 0, "management.CalculateField": 0, "management.AddField": 0, "management.DeleteField": 0, "management.DeleteIdentical": 0, "analysis.Near": 0, "management.Append": 1, "management.RepairGeometry": 0, "management.AddXY": 0, "management.EncodeField": 0, "management.AddGeometryAttributes": 0,
             "management.CalculateFields": 0, "management.StandardizeField": 0, "management.TransformField": 0, "management.ReclassifyField": 0, "management.DefineProjection": 0, "management.CalculateEndTime": 0}
 
 # Select Layer By Location cases, saved with Copy Features:
@@ -3211,7 +3233,7 @@ def main():
         out = OUT / (f"{name}.dbf" if tool in TABLE_OUT else f"{name}.shp")
         if tool in ("management.BatchUpdateFields", "management.ConvertTimeField", "management.ConvertTimeZone") and str(before[0]).endswith(".dbf"):
             out = OUT / f"{name}.dbf"  # a table in, a table out
-        raster_projection = tool in ("management.AddColormap", "management.DeleteColormap", "management.DeleteRasterAttributeTable", "management.ExportRasterWorldFile") or tool == "management.DefineProjection" and Path(str(before[0])).suffix.lower() in (".tif", ".tiff")
+        raster_projection = tool in ("management.SetRasterProperties", "management.AddColormap", "management.DeleteColormap", "management.DeleteRasterAttributeTable", "management.ExportRasterWorldFile") or tool == "management.DefineProjection" and Path(str(before[0])).suffix.lower() in (".tif", ".tiff")
         if tool in RASTER_OUT or raster_projection:
             out = OUT / f"{name}.tif"
         if tool in EXCEL_OUT:
@@ -3343,6 +3365,9 @@ def main():
             manifest["cases"][name]["stochastic_points"] = True
         if tool in ("management.DisableCOGO", "management.EnableCOGO", "management.DisableEditorTracking", "management.MigrateDateFieldToHighPrecision"):
             manifest["cases"][name]["report_in_place"] = True
+        if tool == "management.SetRasterProperties":
+            manifest["cases"][name]["report_in_place"] = True
+            manifest["cases"][name]["in_place_parameter"] = "in_raster"
         spec = run_spec(tool, manifest["cases"][name]["args"])
         if spec:
             manifest["cases"][name]["run"] = spec

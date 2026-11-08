@@ -4439,6 +4439,16 @@ fn compare_rasters(case: &str, ours: &Path, arcgis: &Path) -> Vec<String> {
         (Ok(x), Ok(y)) if x == y => {}
         (x, y) => diffs.push(format!("colormap: ours {x:?}, ArcGIS {y:?}")),
     }
+    if case.starts_with("srp_") {
+        let source_type = |p: &Path| unigis_raster::setprops::source_type(p).unwrap();
+        if source_type(ours) != source_type(arcgis) {
+            diffs.push(format!(
+                "source type: ours {}, ArcGIS {}",
+                source_type(ours),
+                source_type(arcgis)
+            ));
+        }
+    }
     // The world file beside the raster (Export Raster World File): its text, to the digit.
     if case.starts_with("ewf_") {
         let text = |p: &Path| {
@@ -4938,8 +4948,9 @@ fn tools_match_arcgis_output() {
         } else {
             out_dir.join(format!("{case}.shp"))
         };
+        let in_place_parameter = info["in_place_parameter"].as_str().unwrap_or("input");
         if info["report_in_place"] == true {
-            let source = root.join(info["run"]["params"]["input"].as_str().unwrap());
+            let source = root.join(info["run"]["params"][in_place_parameter].as_str().unwrap());
             let stem = source.file_stem().unwrap().to_string_lossy();
             let prefix = format!("{stem}.");
             for entry in std::fs::read_dir(source.parent().unwrap()).unwrap() {
@@ -4962,7 +4973,7 @@ fn tools_match_arcgis_output() {
                 let value = value
                     .as_str()
                     .map_or_else(|| value.to_string(), str::to_string);
-                let value = if info["report_in_place"] == true && name == "input" {
+                let value = if info["report_in_place"] == true && name == in_place_parameter {
                     out.display().to_string()
                 } else {
                     value
@@ -5061,6 +5072,8 @@ fn tools_match_arcgis_output() {
         };
         match args.iter().position(|a| a.contains("<out>")) {
             Some(i) => args[i] = args[i].replace("<out>", &out.display().to_string()),
+            // A registry tool in place names its target parameter itself.
+            None if info.get("run").is_some() && info["report_in_place"] == true => {}
             None => args.push(out.display().to_string()),
         }
         let run = Command::new(env!("CARGO_BIN_EXE_ug"))

@@ -612,6 +612,12 @@ fn get_cell_value_unsupported(_: &dyn Context) -> Result<Output> {
     ))
 }
 
+fn set_raster_properties_unsupported(_: &dyn Context) -> Result<Output> {
+    Err(Error::Unsupported(
+        "Set Raster Properties edits the raster in place; run it through `ug run`".into(),
+    ))
+}
+
 fn get_raster_properties_unsupported(_: &dyn Context) -> Result<Output> {
     Err(Error::Unsupported(
         "Get Raster Properties returns a value, not a raster; run it through `ug run`".into(),
@@ -3395,6 +3401,29 @@ pub static TOOLS: &[Tool] = &[
             text("band_index", "Band Index", ""),
         ],
         run: get_raster_properties_unsupported,
+    },
+    Tool {
+        id: "set_raster_properties",
+        name: "Set Raster Properties",
+        summary: "Sets a GeoTIFF's source type, per-band statistics and single-band NoData marker in place.",
+        params: &[
+            raster("in_raster", "Input Raster", true),
+            text("data_type", "Data Source Type", ""),
+            text("statistics", "Statistics Per Band", ""),
+            text(
+                "stats_file",
+                "Import Statistics From File (unsupported)",
+                "",
+            ),
+            text("nodata", "Bands for NoData Value", ""),
+            text("key_properties", "Key Properties (unsupported)", ""),
+            text(
+                "multidimensional_info",
+                "Multidimensional Information (unsupported)",
+                "",
+            ),
+        ],
+        run: set_raster_properties_unsupported,
     },
     Tool {
         id: "get_cell_value",

@@ -12,6 +12,7 @@ tiff.workspace = true
 weezl.workspace = true
 flate2.workspace = true
 rstar.workspace = true
+roxmltree.workspace = true
 
 [lints]
 workspace = true

@@ -6620,6 +6620,34 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
     if spec.id == "raster_to_other_format" {
         return run_raster_to_other_format(&Args(map));
     }
+    if spec.id == "set_raster_properties" {
+        let get = |k: &str| {
+            map.get(k)
+                .map(|v| v.trim())
+                .filter(|v| !v.is_empty() && *v != "#")
+        };
+        let input = get("in_raster").ok_or_else(|| {
+            Error::Unsupported("ERROR 000735: Input Raster: value is required".into())
+        })?;
+        for name in ["stats_file", "key_properties", "multidimensional_info"] {
+            if get(name).is_some() {
+                return Err(Error::Unsupported(format!(
+                    "Set Raster Properties: {name} is unsupported"
+                )));
+            }
+        }
+        if output.is_some() {
+            return Err(Error::Unsupported(
+                "Set Raster Properties edits in place; output is unsupported".into(),
+            ));
+        }
+        return unigis_raster::setprops::apply(
+            Path::new(input),
+            get("data_type"),
+            get("statistics"),
+            get("nodata"),
+        );
+    }
     if spec.id == "get_raster_properties" {
         let get = |k: &str| map.get(k).map(|v| v.trim()).filter(|v| !v.is_empty());
         let input = get("input").ok_or_else(|| {

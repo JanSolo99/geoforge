@@ -113096,6 +113096,592 @@
           "relationships": []
         }
       }
+    },
+    "srp_default": {
+      "tool": "management.SetRasterProperties",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "in_place_parameter": "in_raster",
+      "run": {
+        "tool": "set_raster_properties",
+        "params": {
+          "in_raster": "testdata/raster/classes_u8.tif"
+        }
+      }
+    },
+    "srp_generic": {
+      "tool": "management.SetRasterProperties",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "GENERIC"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "in_place_parameter": "in_raster",
+      "run": {
+        "tool": "set_raster_properties",
+        "params": {
+          "in_raster": "testdata/raster/classes_u8.tif",
+          "data_type": "GENERIC"
+        }
+      }
+    },
+    "srp_elevation": {
+      "tool": "management.SetRasterProperties",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "ELEVATION"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "in_place_parameter": "in_raster",
+      "run": {
+        "tool": "set_raster_properties",
+        "params": {
+          "in_raster": "testdata/raster/classes_u8.tif",
+          "data_type": "ELEVATION"
+        }
+      }
+    },
+    "srp_thematic": {
+      "tool": "management.SetRasterProperties",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "THEMATIC"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "in_place_parameter": "in_raster",
+      "run": {
+        "tool": "set_raster_properties",
+        "params": {
+          "in_raster": "testdata/raster/classes_u8.tif",
+          "data_type": "THEMATIC"
+        }
+      }
+    },
+    "srp_processed": {
+      "tool": "management.SetRasterProperties",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "PROCESSED"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "in_place_parameter": "in_raster",
+      "run": {
+        "tool": "set_raster_properties",
+        "params": {
+          "in_raster": "testdata/raster/classes_u8.tif",
+          "data_type": "PROCESSED"
+        }
+      }
+    },
+    "srp_scientific": {
+      "tool": "management.SetRasterProperties",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "SCIENTIFIC"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "in_place_parameter": "in_raster",
+      "run": {
+        "tool": "set_raster_properties",
+        "params": {
+          "in_raster": "testdata/raster/classes_u8.tif",
+          "data_type": "SCIENTIFIC"
+        }
+      }
+    },
+    "srp_vector_uv": {
+      "tool": "management.SetRasterProperties",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "VECTOR_UV"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "in_place_parameter": "in_raster",
+      "run": {
+        "tool": "set_raster_properties",
+        "params": {
+          "in_raster": "testdata/raster/classes_u8.tif",
+          "data_type": "VECTOR_UV"
+        }
+      }
+    },
+    "srp_vector_magdir": {
+      "tool": "management.SetRasterProperties",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "VECTOR_MAGDIR"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "in_place_parameter": "in_raster",
+      "run": {
+        "tool": "set_raster_properties",
+        "params": {
+          "in_raster": "testdata/raster/classes_u8.tif",
+          "data_type": "VECTOR_MAGDIR"
+        }
+      }
+    },
+    "srp_date": {
+      "tool": "management.SetRasterProperties",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "DATE"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "in_place_parameter": "in_raster",
+      "run": {
+        "tool": "set_raster_properties",
+        "params": {
+          "in_raster": "testdata/raster/classes_u8.tif",
+          "data_type": "DATE"
+        }
+      }
+    },
+    "srp_sar": {
+      "tool": "management.SetRasterProperties",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "SAR"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "in_place_parameter": "in_raster",
+      "run": {
+        "tool": "set_raster_properties",
+        "params": {
+          "in_raster": "testdata/raster/classes_u8.tif",
+          "data_type": "SAR"
+        }
+      }
+    },
+    "srp_statistics": {
+      "tool": "management.SetRasterProperties",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "",
+        "1 1 250 20 3"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "in_place_parameter": "in_raster",
+      "run": {
+        "tool": "set_raster_properties",
+        "params": {
+          "in_raster": "testdata/raster/classes_u8.tif",
+          "statistics": "1 1 250 20 3"
+        }
+      }
+    },
+    "srp_cached": {
+      "tool": "management.SetRasterProperties",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "",
+        "1 50 400 5 28"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "in_place_parameter": "in_raster",
+      "run": {
+        "tool": "set_raster_properties",
+        "params": {
+          "in_raster": "testdata/raster/dem.tif",
+          "statistics": "1 50 400 5 28"
+        }
+      }
+    },
+    "srp_cached_multi": {
+      "tool": "management.SetRasterProperties",
+      "args": [
+        "testdata/raster/unary_cached_multiband/i16.tif",
+        "<out>",
+        "",
+        "1 -10 20 2 -3"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "in_place_parameter": "in_raster",
+      "run": {
+        "tool": "set_raster_properties",
+        "params": {
+          "in_raster": "testdata/raster/unary_cached_multiband/i16.tif",
+          "statistics": "1 -10 20 2 -3"
+        }
+      }
+    },
+    "srp_band2": {
+      "tool": "management.SetRasterProperties",
+      "args": [
+        "testdata/raster/rgb_pixel_u8.tif",
+        "<out>",
+        "",
+        "2 5 40 12 2"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "in_place_parameter": "in_raster",
+      "run": {
+        "tool": "set_raster_properties",
+        "params": {
+          "in_raster": "testdata/raster/rgb_pixel_u8.tif",
+          "statistics": "2 5 40 12 2"
+        }
+      }
+    },
+    "srp_band13": {
+      "tool": "management.SetRasterProperties",
+      "args": [
+        "testdata/raster/rgb_pixel_u8.tif",
+        "<out>",
+        "VECTOR_UV",
+        "1 1 50 20 3;3 5 250 30 4"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "in_place_parameter": "in_raster",
+      "run": {
+        "tool": "set_raster_properties",
+        "params": {
+          "in_raster": "testdata/raster/rgb_pixel_u8.tif",
+          "data_type": "VECTOR_UV",
+          "statistics": "1 1 50 20 3;3 5 250 30 4"
+        }
+      }
+    },
+    "srp_fraction": {
+      "tool": "management.SetRasterProperties",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "",
+        "1 1.25 250.5 20.123456789123456 3.23456789123456"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "in_place_parameter": "in_raster",
+      "run": {
+        "tool": "set_raster_properties",
+        "params": {
+          "in_raster": "testdata/raster/classes_u8.tif",
+          "statistics": "1 1.25 250.5 20.123456789123456 3.23456789123456"
+        }
+      }
+    },
+    "srp_inverted": {
+      "tool": "management.SetRasterProperties",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "",
+        "1 250 1 20 3"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "in_place_parameter": "in_raster",
+      "run": {
+        "tool": "set_raster_properties",
+        "params": {
+          "in_raster": "testdata/raster/classes_u8.tif",
+          "statistics": "1 250 1 20 3"
+        }
+      }
+    },
+    "srp_nodata": {
+      "tool": "management.SetRasterProperties",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "1 2"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "in_place_parameter": "in_raster",
+      "run": {
+        "tool": "set_raster_properties",
+        "params": {
+          "in_raster": "testdata/raster/classes_u8.tif",
+          "nodata": "1 2"
+        }
+      }
+    },
+    "srp_nodata_outside": {
+      "tool": "management.SetRasterProperties",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "1 999"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "in_place_parameter": "in_raster",
+      "run": {
+        "tool": "set_raster_properties",
+        "params": {
+          "in_raster": "testdata/raster/classes_u8.tif",
+          "nodata": "1 999"
+        }
+      }
+    },
+    "srp_nodata_fraction": {
+      "tool": "management.SetRasterProperties",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "1 2.5"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "in_place_parameter": "in_raster",
+      "run": {
+        "tool": "set_raster_properties",
+        "params": {
+          "in_raster": "testdata/raster/classes_u8.tif",
+          "nodata": "1 2.5"
+        }
+      }
+    },
+    "srp_nodata_negative": {
+      "tool": "management.SetRasterProperties",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "1 -2.5"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "in_place_parameter": "in_raster",
+      "run": {
+        "tool": "set_raster_properties",
+        "params": {
+          "in_raster": "testdata/raster/classes_u8.tif",
+          "nodata": "1 -2.5"
+        }
+      }
+    },
+    "srp_nodata_float": {
+      "tool": "management.SetRasterProperties",
+      "args": [
+        "testdata/raster/dem.tif",
+        "<out>",
+        "",
+        "",
+        "",
+        "1 2.123456789123456"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "in_place_parameter": "in_raster",
+      "run": {
+        "tool": "set_raster_properties",
+        "params": {
+          "in_raster": "testdata/raster/dem.tif",
+          "nodata": "1 2.123456789123456"
+        }
+      }
+    },
+    "srp_combined": {
+      "tool": "management.SetRasterProperties",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "THEMATIC",
+        "1 1 250 20 3",
+        "",
+        "1 2"
+      ],
+      "status": "succeeded",
+      "messages": [],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "in_place_parameter": "in_raster",
+      "run": {
+        "tool": "set_raster_properties",
+        "params": {
+          "in_raster": "testdata/raster/classes_u8.tif",
+          "data_type": "THEMATIC",
+          "statistics": "1 1 250 20 3",
+          "nodata": "1 2"
+        }
+      }
+    },
+    "srp_bad_band": {
+      "tool": "management.SetRasterProperties",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "",
+        "2 1 250 20 3"
+      ],
+      "status": "failed",
+      "messages": [
+        "ERROR 000622: Failed to execute (SetRasterProperties). Parameters are not valid.",
+        "ERROR 000800: The value is not a member of 1.",
+        "Failed to execute (SetRasterProperties)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "in_place_parameter": "in_raster",
+      "run": {
+        "tool": "set_raster_properties",
+        "params": {
+          "in_raster": "testdata/raster/classes_u8.tif",
+          "statistics": "2 1 250 20 3"
+        }
+      }
+    },
+    "srp_bad_range": {
+      "tool": "management.SetRasterProperties",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "",
+        "1 -1 250 20 3"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 001192: Invalid statistics number: out of the pixel range.",
+        "Failed to execute (SetRasterProperties)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "in_place_parameter": "in_raster",
+      "run": {
+        "tool": "set_raster_properties",
+        "params": {
+          "in_raster": "testdata/raster/classes_u8.tif",
+          "statistics": "1 -1 250 20 3"
+        }
+      }
+    },
+    "srp_bad_type": {
+      "tool": "management.SetRasterProperties",
+      "args": [
+        "testdata/raster/classes_u8.tif",
+        "<out>",
+        "FOO"
+      ],
+      "status": "failed",
+      "messages": [
+        "Failed to execute. Parameters are not valid.",
+        "ERROR 000800: The value is not a member of GENERIC | ELEVATION | THEMATIC | PROCESSED | SCIENTIFIC | VECTOR_UV | VECTOR_MAGDIR | DATE | SAR.",
+        "Failed to execute (SetRasterProperties)."
+      ],
+      "fields": [],
+      "shapeType": null,
+      "report_in_place": true,
+      "in_place_parameter": "in_raster",
+      "run": {
+        "tool": "set_raster_properties",
+        "params": {
+          "in_raster": "testdata/raster/classes_u8.tif",
+          "data_type": "FOO"
+        }
+      }
     }
   }
 }

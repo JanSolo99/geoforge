@@ -819,6 +819,10 @@ Each item is something ArcGIS Pro does with a file geodatabase; `[x]` done on br
       as ArcGIS's text (`NoData` outside/NoData/missing band; edges inclusive). 13 recorded values.
 - [x] Get Raster Properties (`get_raster_properties`, `ug run`): extent, cell size, counts, value type,
       NoData flags, stored statistics, unknown metadata; ArcGIS's `%.15G` text and errors. 33 recorded values.
+- [x] Set Raster Properties (`set_raster_properties`, `ug run`, in place): data source type (PAM
+      `DataType`, which Get Raster Properties SOURCETYPE now reads), per-band statistics (one row per
+      band) and one NoData value on a single-band GeoTIFF; 26 `srp_*` ArcGIS references compare pixels,
+      stored statistics and source type; invalid input leaves the files untouched.
 - [x] Import XML Workspace Document (`import_xml_workspace_document`): plain XML DATA and
       SCHEMA_ONLY imports into an existing FileGDB; standalone tables and simple 2D classes,
       BINARY/NORMALIZED geometry, typed values, sparse OBJECTIDs, field aliases/defaults,

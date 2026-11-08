@@ -35,6 +35,7 @@ pub mod registry;
 pub mod resample;
 pub mod rescale;
 pub mod sample;
+pub mod setprops;
 pub mod stats;
 pub mod stats_metadata;
 pub mod surface;
