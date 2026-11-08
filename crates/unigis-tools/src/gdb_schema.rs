@@ -330,6 +330,34 @@ mod imp {
         Ok(derived("out_results", "true"))
     }
 
+    /// Enable Editing Templates: ArcGIS Pro 3.7 changes nothing in a file geodatabase (every file
+    /// stays byte-identical), so this checks the workspace as ArcGIS does and reports it as the
+    /// derived output. A path that does not exist or is a plain folder fails validation
+    /// (ERROR 000584); a file (such as a shapefile) or an in-memory workspace is not a
+    /// geodatabase (ERROR 160632).
+    pub fn enable_editing_templates(ctx: &dyn Context) -> Result<Report> {
+        let text = need(ctx, "in_workspace", "Input Workspace")?;
+        let path = PathBuf::from(&text);
+        let lower = text.to_ascii_lowercase();
+        if path.join("a00000001.gdbtable").is_file() {
+            return Ok(derived("out_workspace", &text));
+        }
+        if lower.starts_with("memory") || lower.starts_with("in_memory") || path.is_file() {
+            return Err(err(
+                "ERROR 160632: This functionality is only supported on a Geodatabase release of ArcGIS 10.0 or greater.",
+            ));
+        }
+        if Path::new(&text).ancestors().any(|p| {
+            p.extension()
+                .is_some_and(|e| e.eq_ignore_ascii_case("geodatabase"))
+        }) {
+            return Err(not_supported(&text, "Input Workspace"));
+        }
+        Err(err(
+            "ERROR 000584: Implementation of this Tool's Validate is invalid.",
+        ))
+    }
+
     pub fn delete_domain(ctx: &dyn Context) -> Result<Report> {
         let (gdb, text) = workspace_in(ctx)?;
         fgdb::delete_domain(&gdb, &need(ctx, "domain_name", "Domain Name")?)?;
@@ -770,7 +798,7 @@ macro_rules! unavailable {
         }
     };
 }
-unavailable!(create_feature_dataset, create_domain, delete_domain, delete_mosaic_dataset, alter_domain,
+unavailable!(create_feature_dataset, create_domain, enable_editing_templates, delete_domain, delete_mosaic_dataset, alter_domain,
     add_coded_value_to_domain, delete_coded_value_from_domain, set_value_for_range_domain,
     sort_coded_value_domain, table_to_domain, assign_domain_to_field, remove_domain_from_field,
     assign_default_to_field, set_subtype_field, add_subtype, remove_subtype, set_default_subtype,
@@ -833,6 +861,16 @@ tool!(
         choice("split_policy", "Split Policy", SPLIT, "DEFAULT"),
         choice("merge_policy", "Merge Policy", MERGE, "DEFAULT"),
     ]
+);
+
+tool!(
+    ENABLE_EDITING_TEMPLATES,
+    "enable_editing_templates",
+    "Enable Editing Templates",
+    "Geodatabase Administration",
+    "Enables a file geodatabase to store editing templates (ArcGIS Pro leaves a file geodatabase's files unchanged).",
+    Runner::Report(imp::enable_editing_templates),
+    [WORKSPACE]
 );
 
 tool!(

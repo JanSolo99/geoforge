@@ -2908,6 +2908,12 @@ GDB_SCENARIOS = {
         ("management.DomainToTable", dict(in_workspace=GDB, domain_name="kinds", out_table="<ws>/kinds.dbf", code_field="code", description_field="descr"), "domain_to_table", dict(in_workspace=GDB, domain_name="kinds", output="<ws>/kinds.dbf", code_field="code", description_field="descr")),
         ("management.CreateFeatureDataset", dict(out_dataset_path=GDB, out_name="fds", spatial_reference=4326), "create_feature_dataset", None),
     ],
+    "gsc_templates": [
+        ("management.CreateFileGDB", dict(out_folder_path="<ws>", out_name="t"), "create_file_gdb", None),
+        ("management.CreateFeatureclass", dict(out_path=GDB, out_name="pts", geometry_type="POINT", spatial_reference=4326), "create_feature_class", dict(output=GDB + "/pts", geometry_type="POINT", spatial_reference="4326")),
+        ("management.EnableEditingTemplates", dict(in_workspace=GDB), "enable_editing_templates", None),
+        ("management.EnableEditingTemplates", dict(in_workspace=GDB), "enable_editing_templates", None),
+    ],
     "gsc_edit": [
         ("management.CreateFileGDB", dict(out_folder_path="<ws>", out_name="t"), "create_file_gdb", None),
         ("management.CreateTable", dict(out_path=GDB, out_name="tab"), "create_table", dict(output=GDB + "/tab")),

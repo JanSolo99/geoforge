@@ -111851,6 +111851,93 @@
           "output": "<out>"
         }
       }
+    },
+    "gsc_templates": {
+      "tool": "scenario",
+      "gdb_scenario": {
+        "steps": [
+          {
+            "tool": "management.CreateFileGDB",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "create_file_gdb",
+              "params": {
+                "out_folder_path": "<ws>",
+                "out_name": "t"
+              }
+            }
+          },
+          {
+            "tool": "management.CreateFeatureclass",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "create_feature_class",
+              "params": {
+                "output": "<ws>/t.gdb/pts",
+                "geometry_type": "POINT",
+                "spatial_reference": "4326"
+              }
+            }
+          },
+          {
+            "tool": "management.EnableEditingTemplates",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "enable_editing_templates",
+              "params": {
+                "in_workspace": "<ws>/t.gdb"
+              }
+            }
+          },
+          {
+            "tool": "management.EnableEditingTemplates",
+            "status": "succeeded",
+            "messages": [],
+            "run": {
+              "tool": "enable_editing_templates",
+              "params": {
+                "in_workspace": "<ws>/t.gdb"
+              }
+            }
+          }
+        ],
+        "snapshot": {
+          "items": [
+            "pts"
+          ],
+          "tables": {
+            "pts": {
+              "fields": [
+                {
+                  "name": "OBJECTID",
+                  "type": "OID",
+                  "length": 4,
+                  "alias": "OBJECTID",
+                  "domain": "",
+                  "default": null,
+                  "nullable": false
+                },
+                {
+                  "name": "Shape",
+                  "type": "Geometry",
+                  "length": 0,
+                  "alias": "Shape",
+                  "domain": "",
+                  "default": null,
+                  "nullable": true
+                }
+              ],
+              "indexes": [],
+              "subtypes": []
+            }
+          },
+          "domains": [],
+          "relationships": []
+        }
+      }
     }
   }
 }

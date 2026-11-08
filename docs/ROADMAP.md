@@ -809,6 +809,9 @@ Each item is something ArcGIS Pro does with a file geodatabase; `[x]` done on br
       `.vat.dbf`/`.vat.cpg` beside a raster, keeps the raster and its other sidecars; refuses a
       raster without a table (ERROR 000236). 3 ArcGIS `drat_*` references. The metadata lineage
       entry ArcGIS adds to `.tif.xml` is not written.
+- [x] Enable Editing Templates (`enable_editing_templates`): validates the workspace and leaves a
+      file geodatabase byte-identical, as ArcGIS Pro 3.7 does (probed on 24 geodatabases); errors
+      000584 and 160632 for other workspaces. Scenario reference `gsc_templates`.
 - [x] Dockable panes: left/right/bottom groups, tab dragging and drop previews,
       auto-hide, scrollable tab headers, and saved layout preferences. Reopening
       panes preserves tab order; pointer-drag and preference round-trip tests pass.
