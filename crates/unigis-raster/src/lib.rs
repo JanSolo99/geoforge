@@ -7,6 +7,7 @@
 
 pub mod blockops;
 pub mod calculator;
+pub mod cellvalue;
 pub mod colormap;
 pub mod composite;
 pub mod contour;

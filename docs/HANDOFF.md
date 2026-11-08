@@ -3,19 +3,15 @@
 Updated 2026-11-08T04:27:11.689662+00:00; last agent Codex.
 Workspace `/mnt/media/ArcGIS_Linux`, branch `main`, product HEAD `be04da46425d66c170703c9e0d06fd125d4f3ab6`.
 
-## Single item: tool queue Export Raster World File — implemented, validated, landing (Claude, 2026-11-08)
+## Single item: tool queue Get Cell Value — implemented, validated, landing (Claude, 2026-11-08)
 
-Previous: mosaic tools deferred c9ce3cb9.
-- `unigis-raster::worldfile` + `ug run export_raster_world_file input=… output=…`: copies the raster
-  and sidecars to `output`, writes `<output>.tfw` (`.igw`, `.j2w`, ... by first+last extension letter)
-  with ArcGIS's format: six `%.18g` numbers, CR LF, cell size derived from the extent
-  (geographic rasters print 9.99999999999978635e-05). Evidence: `scripts/research/export_raster_world_file/`.
-- Tests: unit tests in `worldfile.rs`; `ewf_dem/geographic/u8/nonsquare/existing` compare the file
-  text with ArcGIS; `crates/unigis-cli/tests/export_raster_world_file.rs` (missing input,
-  ERROR 000732). New fixture `testdata/raster/world_nonsquare.tif` (ArcGIS-made).
-- Gaps (KNOWN_GAPS): `ug run` only, GeoTIFF inputs, rotated refused, lineage xml not written.
-- Validation: `UNIGIS_REFERENCE_CASES=ewf_` passes; full `scripts/check` result in the landing report.
-  Staged by hunk: inherited raster/umintfloat/dashboard/agent edits stay uncommitted.
+Previous: Export Raster World File 3470a017.
+- Export XML Workspace Document deferred (embedded timestamped lineage metadata; see
+  `scripts/research/export_xml_workspace_document/`). Import XML stays in the queue.
+- `unigis-raster::cellvalue` + `ug run get_cell_value input=… location="x y" band_index=1` prints
+  the value text. Tests: unit tests; `crates/unigis-cli/tests/get_cell_value.rs` (13 ArcGIS values,
+  ERROR 000628/000732). Evidence `scripts/research/get_cell_value/`.
+- Inherited uncommitted edits (umintfloat unary tests, ambition-review.md, dashboard, NOTES.md,
+  scratch_te) are NOT part of this landing; stage by file/hunk.
 
-Next queue item: see `python3 scripts/work_queue.py --next` (Export XML Workspace Document #8 or
-Get Cell Value / Get Raster Properties next in the list).
+Next queue item: `python3 scripts/work_queue.py --next` (Get Raster Properties expected).

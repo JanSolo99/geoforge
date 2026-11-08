@@ -6620,6 +6620,30 @@ fn run_raster_tool(spec: &unigis_raster::registry::Tool, args: &[String]) -> Res
     if spec.id == "raster_to_other_format" {
         return run_raster_to_other_format(&Args(map));
     }
+    if spec.id == "get_cell_value" {
+        let get = |k: &str| map.get(k).map(|v| v.trim()).filter(|v| !v.is_empty());
+        let input = get("input").ok_or_else(|| {
+            Error::Unsupported("ERROR 000735: Input Raster: value is required".into())
+        })?;
+        if !Path::new(input).is_file() {
+            return Err(Error::Unsupported(format!(
+                "ERROR 000732: Input Raster: Dataset {input} does not exist or is not supported"
+            )));
+        }
+        let (x, y) = unigis_raster::cellvalue::parse_location(get("location").unwrap_or(""))
+            .map_err(Error::Unsupported)?;
+        let band = get("band_index")
+            .map(|b| b.parse::<i64>())
+            .transpose()
+            .map_err(|_| Error::Unsupported("ERROR 000622: Parameters are not valid.".into()))?
+            .unwrap_or(1);
+        let raster = unigis_raster::read_geotiff(Path::new(input))?;
+        println!(
+            "{}",
+            unigis_raster::cellvalue::cell_value_text(&raster, x, y, band)
+        );
+        return Ok(());
+    }
     let output = output.ok_or_else(|| Error::Unsupported("output=<path> is required".into()))?;
     if spec.id == "raster_to_polyline" {
         return run_raster_to_polyline(&Args(map), &output);

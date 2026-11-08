@@ -606,6 +606,12 @@ fn export_raster_world_file_unsupported(_: &dyn Context) -> Result<Output> {
     ))
 }
 
+fn get_cell_value_unsupported(_: &dyn Context) -> Result<Output> {
+    Err(Error::Unsupported(
+        "Get Cell Value returns a value, not a raster; run it through `ug run`".into(),
+    ))
+}
+
 fn add_colormap_unsupported(_: &dyn Context) -> Result<Output> {
     Err(Error::Unsupported(
         "Add Colormap edits the raster file in place; run it through `ug run`".into(),
@@ -3379,6 +3385,17 @@ pub static TOOLS: &[Tool] = &[
         summary: "Writes the raster's world file (pixel size and upper-left cell centre) beside it.",
         params: &[raster("input", "Input Raster Dataset", true)],
         run: export_raster_world_file_unsupported,
+    },
+    Tool {
+        id: "get_cell_value",
+        name: "Get Cell Value",
+        summary: "Prints the value of the cell at an x y location (NoData outside or on NoData).",
+        params: &[
+            raster("input", "Input Raster", true),
+            text("location", "Location (x y)", ""),
+            text("band_index", "Band Index", "1"),
+        ],
+        run: get_cell_value_unsupported,
     },
     Tool {
         id: "add_colormap",
