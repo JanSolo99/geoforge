@@ -1,10 +1,10 @@
 # Current handoff
 
-Updated 2026-11-08T08:41:03.704104+00:00; last agent Codex.
-Workspace `/mnt/media/ArcGIS_Linux`, branch `main`; pre-landing HEAD
-`04f79746b21c2a40e809152ab9ca6e62525dda67`.
+Updated 2026-11-08T08:41:46.700720+00:00; last agent Codex.
+Workspace `/mnt/media/ArcGIS_Linux`, branch `main`; product HEAD
+`bdf15073fae788acd12008545063ad663f815e7f` (this final handoff is a subsequent documentation-only checkpoint).
 
-## Single item: Import XML Workspace Document — validated, landing now
+## Single item: Import XML Workspace Document — complete and pushed
 
 Objective: complete this first queue item, pass `scripts/check`, commit and push.
 Previous Get Raster Properties was already committed/pushed as `04f79746` and accepted
@@ -39,6 +39,11 @@ and pycache; unary safety/local/stats/registry changes; reference umintfloat cas
 dashboard; NOTES.md; scratch_te/; unary_integer_float fixtures/research;
 web-build-memory.py; .worktrees/. No other agent or coordinator launched.
 
-No implementation work remains. Commit/push this landing, then record its hash/status.
+Landing: `bdf15073` Add Import XML Workspace Document pushed successfully to
+`origin/main` (04f79746..bdf15073, exit 0). `git push --no-verify origin main`
+reused the just-passed full gate; no source changes followed that gate. This final
+checkpoint changes documentation only. All task implementation and evidence are landed.
+
+No item remains in progress. Preserve the unrelated inherited edits above.
 Next queue item after landing: Remove Depth Map. Not started this turn.
 No builds or probes remain running.
