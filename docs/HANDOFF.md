@@ -1,6 +1,6 @@
 # Current handoff
 
-Updated 2026-11-08T03:11:40.556206+00:00; last agent Codex.
+Updated 2026-11-08T03:17:11.444126+00:00; last agent Codex.
 Workspace `/mnt/media/ArcGIS_Linux`, branch `main`.
 Product HEAD `e34da9a85c57a93128021f84c1ab82eb313be823`; this documentation checkpoint follows it.
 
@@ -66,7 +66,14 @@ Release GUI in isolated XDG_CONFIG_HOME=/tmp/naming-ui-config, data/cache paths
 also isolated. French interface and new UniGIS title/logo inspected; old prefs
 unchanged and custom migration probe preserved in new file.
 `/tmp/naming-desktop.png`, naming-desktop-result.json, naming-desktop.log.
-Own PID3153016 stopped via SIGTERM; no relay started, no user settings touched.
+Own PID3153016 stopped via SIGTERM; no relay started. The separate initial
+`unigis tools` probe from the repository root was not isolated: because tools/
+exists, dispatch initialized the GUI path before rejecting that directory as data.
+It therefore also exercised the intended migration on the real profile, creating
+~/.config/unigis/prefs.json. Final audit confirms byte-identical legacy/new files;
+legacy mtime is before this turn. Both files preserved; no contents logged.
+`/tmp/naming-profile-audit.txt`. The earlier blanket statement that no real user
+settings were touched was incorrect; this checkpoint corrects it.
 An initial fmt command used a root-relative manifest from app and was rejected;
 CI's own fmt check passed. One package extraction attempt had a not-yet-created
 workdir and started no process; corrected isolated extraction passed.
