@@ -1,86 +1,89 @@
 # Current handoff
 
-Updated 2026-11-08T03:04:53.778506+00:00; last agent Codex.
-Workspace `/mnt/media/ArcGIS_Linux`, branch `main`, HEAD `134ab3b4`.
+Updated 2026-11-08T03:11:40.556206+00:00; last agent Codex.
+Workspace `/mnt/media/ArcGIS_Linux`, branch `main`.
+Product HEAD `e34da9a85c57a93128021f84c1ab82eb313be823`; this documentation checkpoint follows it.
 
-## Single item: app.unigis-naming — validated, ready to land
+## Single item: app.unigis-naming — complete and pushed
 
-Prior Claude slice (CLI library/desktop dispatch and docs) committed as `134ab3b4`
-and accepted by coordinator; no acceptance repeated. No uncommitted item edits
-inherited. Basemap/Create/domain tasks also landed; do not resume older chat state.
-User authorizes this one item through validation, commit/push. No agents started.
-Read root/app guidance, development skill, queue/priorities and current handoff.
+Continued Claude's accepted CLI dispatch slice `134ab3b4`; no older queue work
+resumed. This turn landed the remaining naming implementation as `e34da9a85c57a93128021f84c1ab82eb313be823`.
+Normal push origin/main succeeded, exit0, remote verified equal to product HEAD;
+`/tmp/naming-push.{log,exit}`, `/tmp/naming-source-remote.txt`.
+User authorizes commit/push and one item only; no agents/coordinator launched.
 
-Current scope: finish installed/package/artifact UniGIS naming, Windows console
-launcher, Linux preferences migration without losing old preferences, generate web
-favicon/PWA/touch icons from our render::logo and serve locally. Preserve existing
-repository/domain/crate/protocol IDs unless the installation behavior requires a
-migration. External package-registry publication is outside this code landing.
+## Completed implementation
 
-Inherited dirty files remain unstaged; hashes `/tmp/naming-inherited.json`,
-protected gate hash `/tmp/naming-verifier.sha256`; untracked material untouched.
-Implementation now in working tree: packaging scripts, platform manifests/installers,
-release smoke commands, CLI console twin, Linux preference migration, generated
-web/download icons from original logo code (Trunk hook + xtask web-pwa/icons).
-Repository/service/Store/MSI identities retained, legacy MIME alias preserved;
-distro packages omit ug to avoid ugrep collision. No other item started.
+- UniGIS/unigis installed names: Linux desktop entry/icon/MIME, macOS app/binary,
+  Windows installers/portable/MSIX, release artifacts, package metadata and smoke
+  checks. Windows console-subsystem `unigis-cli.exe` plus portable `ug` use the
+  existing CLI library. Linux distro packages omit ug to avoid ugrep collisions.
+- Linux preferences copied from rustgis/prefs.json into unigis/prefs.json only
+  when new preferences do not exist. Old file stays; invalid/new settings are not
+  overwritten. Real native app loaded French preferences from this migration.
+- Own logo source (`render/src/logo.rs`) drives xtask web-icons/web-pwa, Trunk's
+  pre-build hook and downloads icons. Local favicon/touch/PWA/loading images;
+  padded opaque maskable icon; generated files included in offline cache/hash.
+  Downloads metadata includes a branding digest so logo changes refresh the site.
+- User/packaging/agent-install docs, attribution, roadmap and priority updated;
+  queue regenerated. External repository/domain/Store identities, MSI UpgradeCode
+  and legacy MIME alias retained. Historical published winget manifests remain
+  historical. New package names take effect on the next release; no registry
+  publication was performed by this code landing.
 
-Validation so far (CARGO_TARGET_DIR=/home/jansolo/.cache/geoforge-target,
-sequential -j3 builds):
-- `CARGO_BUILD_JOBS=3 RUST_TEST_THREADS=1 cargo xtask ci`: fmt/workspace strict
-  clippy PASS; workspace tests stop at the same six engine WASM plugin fixture
-  failures (`nope`),126pass/6fail/1ignore. `/tmp/naming-app-ci.{log,exit}` (exit1).
-- `cargo test -j3 -p rustgis -p rustgis-cli -p xtask`: PASS; migration,
-  dispatch and generated icon/cache/safe-circle tests. `/tmp/naming-final-focused.log`.
-- `cargo xtask layers`: PASS, `/tmp/naming-layers.log`.
+## Validation of final product
+
+Sequential Cargo with -j3 and CARGO_TARGET_DIR=/home/jansolo/.cache/geoforge-target.
+From app unless a root script is named:
+- `CARGO_BUILD_JOBS=3 RUST_TEST_THREADS=1 cargo xtask ci`: fmt + workspace clippy
+  -D warnings PASS; tests stop at six pre-existing engine WASM plugin fixtures
+  returning nope (126pass/6fail/1ignore). `/tmp/naming-app-ci.{log,exit}`=1.
+  Do not claim full app CI passes; documented in KNOWN_GAPS, unchanged fixtures.
+- `cargo test -j3 -p rustgis -p rustgis-cli -p xtask`: PASS3 desktop +1 CLI +6 xtask,
+  including migration preservation and icon/cache/mask-safe regressions.
+  `/tmp/naming-final-focused.log`; `cargo xtask layers`: PASS, naming-layers.log.
 - `cargo check -j3 -p rustgis-web --target wasm32-unknown-unknown`: PASS,
-  `/tmp/naming-wasm.log`.
-- Shell syntax, packaging XML, desktop-file-validate, Node syntax checks PASS.
-  Homebrew/AUR/COPR rendered using synthetic SHA256SUMS; AppStream validation PASS,
-  `/tmp/naming-package-metadata`, `/tmp/naming-appstream.log`.
-- Downloads manifest metadata-only run with stub gh (zero assets) PASS;
-  `/tmp/naming-mirror-candidate`, branding_digest includes own logo/generator source.
-- Initial fmt invocation used root-relative manifest while in app and was rejected;
-  CI's own fmt check passed. No root gate/native/package execution claimed yet.
+  naming-wasm.log. `cargo build --release --locked -j3 -p rustgis -p rustgis-cli`:
+  PASS4m37s, naming-release.log, naming-final-checks.exit=0.
+- Root `CARGO_TARGET_DIR=... scripts/check`: PASS exit0, naming-root-check.{log,exit}.
+  Normal source push re-ran the protected gate and passed, naming-push.{log,exit}.
+  Protected verifier unchanged. Final diff check PASS; workflow YAML, shell/Node
+  syntax, packaging XML, desktop entry, MIME database and AppStream checks PASS.
+- Full `NO_COLOR=true CARGO_BUILD_JOBS=3 CARGO_TARGET_DIR=... scripts/build-web.sh`:
+  PASS, naming-web-build.exit=0; generated worker caches10 files. Actual local
+  icons/manifest/cache references checked, 512px logo inspected. Initial NO_COLOR=1
+  was rejected by Trunk; environment-only correction passed. Full downloads
+  fixture with stub gh/zero-asset release PASS; naming-site-checks.exit=0.
+- Portable tar and AppImage built/extracted and ran canonical unigis version/logo
+  commands; AppRun targets usr/bin/unigis, no ug in its installed tree. Extracted
+  binary hash equals native-tested release. `/tmp/naming-packages{.log,.exit}`=0,
+  naming-portable-check/, naming-appimage-check/. Metadata rendered from synthetic
+  SHA256SUMS in naming-package-metadata/ (not a real release download).
 
-Native release build PASS4m37s, `/tmp/naming-release.log` and
-`/tmp/naming-final-checks.exit`=0. Actual GUI opened in French from the legacy
-prefs, created new prefs with language/custom probe preserved and old file unchanged.
-Screenshot inspected `/tmp/naming-desktop.png`, result
-`/tmp/naming-desktop-result.json`; own PID3153016 stopped (SIGTERM), no relay started.
-`unigis tools` verified from `/tmp`; the existing repository-root tools/ path
-collision was observed and documented in KNOWN_GAPS (not changed in this slice).
+## Actual native check and limits
 
-Actual Linux portable tar + AppImage built, extracted and executed: canonical
-unigis prints version and renders logo; tar retains ug, AppImage's installed tree
-omits ug and AppRun points at usr/bin/unigis. `/tmp/naming-packages{.log,.exit}`
-(exit0), `/tmp/naming-portable-check`, `/tmp/naming-appimage-check`. Debian tools
-and rpmbuild are absent, so those outputs were skipped honestly.
+Release GUI in isolated XDG_CONFIG_HOME=/tmp/naming-ui-config, data/cache paths
+also isolated. French interface and new UniGIS title/logo inspected; old prefs
+unchanged and custom migration probe preserved in new file.
+`/tmp/naming-desktop.png`, naming-desktop-result.json, naming-desktop.log.
+Own PID3153016 stopped via SIGTERM; no relay started, no user settings touched.
+An initial fmt command used a root-relative manifest from app and was rejected;
+CI's own fmt check passed. One package extraction attempt had a not-yet-created
+workdir and started no process; corrected isolated extraction passed.
 
-Full Trunk web build PASS (4m30s including wasm-opt), `/tmp/naming-web-build.exit`=0.
-Its pre-build hook generated icons; web-pwa then cached10 local shell files,
-version0998f8d57121889d. First invocation rejected inherited NO_COLOR=1; retry
-NO_COLOR=true passed. Inspected generated512px original logo. PWA manifest/icon
-paths/cache list checked against actual output. Full downloads builder with stub
-gh (zero-asset release) generated local icons/site successfully;
-`/tmp/naming-mirror-build.log`, `/tmp/naming-site-checks.exit`=0.
-MIME database validation passed; extracted AppImage binary hash equals the build
-checked in the actual desktop GUI.
+Debian/RPM tools, macOS signing/notarization and Windows NSIS/WiX/MSIX tools are
+unavailable here; those platform installs were not run. Their manifests parse and
+release smoke checks were updated. Existing first-argument path precedence makes
+`unigis tools` see the repo's tools/ as input; tools was verified from /tmp and
+this existing behavior is recorded in KNOWN_GAPS for later requested polish.
 
-Root protected `CARGO_TARGET_DIR=/home/jansolo/.cache/geoforge-target scripts/check`
-PASS exit0, `/tmp/naming-root-check.{log,exit}` (format/lint/workspace tests/doc tests).
-Protected checksum unchanged. Final staged diff check passed. Changed workflow YAML
-also parses cleanly. No product edits followed these checks.
-APP_PRIORITIES/ROADMAP describe the finished implementation; queue regenerated
-(next is gdb-subtypes-relationships). Only naming item worked on.
+## Preservation and next action
 
-Debian/RPM, macOS signing/notarization and Windows NSIS/WiX/MSIX tools unavailable here;
-platform manifests checked statically, release workflow smoke checks updated. Do not
-claim those platform installs passed. No registry publication performed.
-
-Next: commit the reviewed43 task files, then normal push origin main (pre-push
-runs the protected gate again). Record the resulting source commit/remote evidence
-and land the final operational checkpoint. No other queue item may be started.
-No running build/GUI processes. Inherited source hashes still match;
-docs/dashboard.html remains unstaged generated work; no images or protected files
-are staged.
+Inherited source/agent/reference hashes match `/tmp/naming-inherited.json`;
+only generated dashboard refreshed by post-commit hook and remains unstaged.
+Inherited raster edits, .claude agent edit, reference script and untracked notes/
+worktrees/research remain untouched and uncommitted. No reset/stash/transfers.
+Protected checksum: `/tmp/naming-verifier.sha256`. No generated images committed.
+No pending product edits or validation for this item. This final operational
+checkpoint accompanies the landing; no other queue item was started.
+Next queue item: app.gdb-subtypes-relationships, only after coordinator acceptance.
