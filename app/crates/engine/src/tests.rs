@@ -6160,14 +6160,14 @@ fn domains_are_saved_back_to_geodatabase_classes() {
     assert_eq!((limit("min"), limit("max")), (Some(1.0), Some(9.0)), "{depth}");
     // Saving again changes nothing.
     let r = s.run("catalog.saveEdits", &json!({"layer": id})).unwrap();
-    assert_eq!(r["domains"], json!({"created": 0, "updated": 0, "assigned": 0}), "{r}");
+    assert_eq!(r["domains"], json!({"created": 0, "updated": 0, "assigned": 0, "removed": 0}), "{r}");
     // A domain made in the app is created and assigned to its field.
     let gdb = copy("subtypes.gdb");
     s.run("layer.addData", &json!({"path": gdb.display().to_string(), "layer": "base", "stream": false})).unwrap();
     let id = s.map().layer_by_name("base").unwrap().id;
     s.run("data.domain", &json!({"layer": id, "field": "lanes", "coded": [[1, "one"], [2, "two"]]})).unwrap();
     let r = s.run("catalog.saveEdits", &json!({"layer": id})).unwrap();
-    assert_eq!(r["domains"], json!({"created": 1, "updated": 0, "assigned": 1}), "{r}");
+    assert_eq!(r["domains"], json!({"created": 1, "updated": 0, "assigned": 1, "removed": 0}), "{r}");
     let made = item(&gdb, "base_lanes");
     assert_eq!(made["codes"].as_array().unwrap().len(), 2, "{made}");
     let table = item(&gdb, "base");
@@ -6199,7 +6199,11 @@ fn subtypes_are_saved_back_to_geodatabase_classes() {
     let loaded = s.map().layer(id).unwrap().design.subtypes.clone().unwrap();
     // Nothing changed: nothing written.
     let r = s.run("catalog.saveEdits", &json!({"layer": id})).unwrap();
-    assert_eq!(r["subtypes"], json!({"fieldSet": false, "added": 0, "removed": 0, "defaults": 0}), "{r}");
+    assert_eq!(
+        r["subtypes"],
+        json!({"fieldSet": false, "added": 0, "removed": 0, "defaults": 0, "defaultSet": false, "domains": 0}),
+        "{r}"
+    );
     // One subtype added, the first dropped, a default set on another.
     let mut list: Vec<Value> = loaded.subtypes.iter().skip(1).map(|x| json!({"code": x.code, "name": x.name})).collect();
     list.push(json!({"code": 77, "name": "Added here", "defaults": {"lanes": 4}}));
@@ -6214,7 +6218,11 @@ fn subtypes_are_saved_back_to_geodatabase_classes() {
     assert!(codes.contains(&77) && !codes.contains(&dropped), "{after}");
     // The layer now matches the geodatabase: a second save writes nothing.
     let r = s.run("catalog.saveEdits", &json!({"layer": id})).unwrap();
-    assert_eq!(r["subtypes"], json!({"fieldSet": false, "added": 0, "removed": 0, "defaults": 0}), "{r}");
+    assert_eq!(
+        r["subtypes"],
+        json!({"fieldSet": false, "added": 0, "removed": 0, "defaults": 0, "defaultSet": false, "domains": 0}),
+        "{r}"
+    );
     std::fs::remove_dir_all(&dir).ok();
 }
 
@@ -6303,4 +6311,132 @@ fn edits_are_saved_back_to_geodatabase_classes() {
     let plain = s.map_mut().add_dataset(rustgis_data::Dataset::new("Plain", rustgis_data::GeometryType::Point, Vec::new()));
     assert!(s.run("catalog.saveEdits", &json!({"layer": plain})).is_err());
     std::fs::remove_dir_all(&dir).ok();
+}
+
+#[test]
+fn gdb_design_removals_subtype_domains_and_default_roundtrip() {
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../testdata/gdb-reference");
+    let work = std::env::temp_dir().join(format!("unigis-gdb-design-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&work);
+    std::fs::create_dir_all(&work).unwrap();
+    let copy = |name: &str| {
+        let to = work.join(name);
+        std::fs::create_dir_all(&to).unwrap();
+        for e in std::fs::read_dir(root.join(name)).unwrap().flatten() {
+            std::fs::copy(e.path(), to.join(e.file_name())).unwrap();
+        }
+        to
+    };
+    let mut s = Session::new(Project::default());
+    let domains = copy("domain_base.gdb");
+    s.run("layer.addData", &json!({"path":domains,"layer":"uses","stream":false})).unwrap();
+    let id = s.map().layer_by_name("uses").unwrap().id;
+    // Old projects with no imported metadata must not delete existing assignments.
+    s.map_mut().layer_mut(id).unwrap().design.domains.clear();
+    s.run("catalog.saveEdits", &json!({"layer":id})).unwrap();
+    let g = rustgis_data::source::filegdb::open_dir(&domains).unwrap();
+    assert!(g.open_table("uses").unwrap().fields().iter().find(|f| f.name == "ZONE").unwrap().domain.is_some());
+    s.run("data.domain", &json!({"layer":id,"field":"ZONE","clear":true})).unwrap();
+    let r = s.run("catalog.saveEdits", &json!({"layer":id})).unwrap();
+    assert_eq!(r["domains"]["removed"], 1, "{r}");
+    let g = rustgis_data::source::filegdb::open_dir(&domains).unwrap();
+    assert!(g.open_table("uses").unwrap().fields().iter().find(|f| f.name == "ZONE").unwrap().domain.is_none());
+    assert!(g.domain("zones").is_some(), "shared domain remains in the geodatabase");
+    assert_eq!(s.run("catalog.saveEdits", &json!({"layer":id})).unwrap()["domains"]["removed"], 0);
+    let db = copy("subtypes.gdb");
+    s.run("layer.addData", &json!({"path":db,"layer":"base","stream":false})).unwrap();
+    let id = s.map().layer_by_name("base").unwrap().id;
+    assert_eq!(s.map().layer(id).unwrap().design.subtypes.as_ref().unwrap().default_code, Some(2));
+    s.run("data.subtypes", &json!({"layer":id,"defaultCode":1})).unwrap();
+    s.run("data.domain", &json!({"layer":id,"field":"name","subtype":2,"name":"names","coded":[["a","A"],["b","B"]]})).unwrap();
+    s.run("data.domain", &json!({"layer":id,"field":"lanes","subtype":1,"clear":true})).unwrap();
+    let r = s.run("catalog.saveEdits", &json!({"layer":id})).unwrap();
+    assert!(r.get("subtypeError").is_none(), "{r}");
+    assert_eq!(r["subtypes"]["defaultSet"], true);
+    let g = rustgis_data::source::filegdb::open_dir(&db).unwrap();
+    let table = g.open_table("base").unwrap();
+    let st = table.subtypes().unwrap();
+    assert_eq!(st.default_code, 1);
+    let first = st.subtypes.iter().find(|s| s.code == 1).unwrap();
+    assert!(!first.fields.iter().any(|f| f.field == "lanes" && f.domain.is_some()));
+    assert_eq!(
+        st.subtypes.iter().find(|s| s.code == 2).unwrap().fields.iter().find(|f| f.field == "name").unwrap().domain.as_deref(),
+        Some("names")
+    );
+    let r = s.run("catalog.saveEdits", &json!({"layer":id})).unwrap();
+    assert_eq!(r["subtypes"]["domains"], 0, "{r}");
+    assert_eq!(r["subtypes"]["defaultSet"], false);
+    let snapshot = || {
+        std::fs::read_dir(&db)
+            .unwrap()
+            .flatten()
+            .map(|e| (e.file_name(), std::fs::read(e.path()).unwrap()))
+            .collect::<std::collections::BTreeMap<_, _>>()
+    };
+    let before = snapshot();
+    let design = s.map().layer(id).unwrap().design.clone();
+    let sub = s.map_mut().layer_mut(id).unwrap().design.subtypes.as_mut().unwrap().subtypes.iter_mut().find(|s| s.code == 1).unwrap();
+    sub.domains.as_mut().unwrap().iter_mut().find(|d| d.name == "names").unwrap().kind =
+        rustgis_map::design::DomainKind::Coded(vec![(rustgis_data::Value::Text("bad".into()), "Conflict".into())]);
+    assert!(s.run("catalog.saveEdits", &json!({"layer":id})).unwrap_err().contains("conflicting definitions"));
+    assert_eq!(snapshot(), before, "conflicting shared definitions must not write any geodatabase bytes");
+    s.map_mut().layer_mut(id).unwrap().design = design;
+    s.run("data.subtypes", &json!({"layer":id,"clear":true})).unwrap();
+    let r = s.run("catalog.saveEdits", &json!({"layer":id})).unwrap();
+    assert_eq!(r["subtypes"]["removed"], 2, "{r}");
+    assert!(rustgis_data::source::filegdb::open_dir(&db).unwrap().open_table("base").unwrap().subtypes().unwrap().subtypes.is_empty());
+    std::fs::remove_dir_all(work).unwrap();
+}
+
+#[test]
+fn gdb_design_default_and_effective_domain_validation_undo() {
+    let mut s = world();
+    for name in ["kind", "status"] {
+        s.run("edit.addField", &json!({"layer":"Cities","name":name,"type":"long"})).unwrap();
+    }
+    s.run("data.domain", &json!({"layer":"Cities","field":"status","coded":[[99,"Dataset only"]]})).unwrap();
+    s.run("data.subtypes",&json!({"layer":"Cities","field":"kind","defaultCode":2,"subtypes":[{"code":1,"name":"First","defaults":{"status":10}},{"code":2,"name":"Second","defaults":{"status":20}}],"symbolize":false})).unwrap();
+    // New subtypes ignore the dataset-level domain, using their own defaults.
+    s.run("edit.addFeature", &json!({"layer":"Cities","geometry":{"type":"Point","coordinates":[1,1]}})).unwrap();
+    for (code, value) in [(1, 10), (2, 20)] {
+        s.run("data.domain", &json!({"layer":"Cities","field":"status","subtype":code,"coded":[[value,format!("Status {value}")]]}))
+            .unwrap();
+    }
+    let created = s.run("edit.addFeature", &json!({"layer":"Cities","geometry":{"type":"Point","coordinates":[0,0]}})).unwrap();
+    let row = created["row"].as_u64().unwrap() as usize;
+    let l = s.map().layer_by_name("Cities").unwrap();
+    assert_eq!(l.dataset.value(row, l.dataset.field_index("kind").unwrap()), &rustgis_data::Value::Int(2));
+    assert_eq!(l.dataset.value(row, l.dataset.field_index("status").unwrap()), &rustgis_data::Value::Int(20));
+    assert!(s.run("edit.setValue", &json!({"layer":"Cities","row":row,"field":"status","value":10})).is_err());
+    s.run("edit.setValue", &json!({"layer":"Cities","row":row,"field":"kind","value":1})).unwrap();
+    s.run("edit.setValue", &json!({"layer":"Cities","row":row,"field":"status","value":10})).unwrap();
+    assert!(s.run("edit.setValue", &json!({"layer":"Cities","row":row,"field":"status","value":20})).is_err());
+    s.run("edit.undo", &json!({})).unwrap();
+    let l = s.map().layer_by_name("Cities").unwrap();
+    assert_eq!(l.dataset.value(row, l.dataset.field_index("status").unwrap()), &rustgis_data::Value::Int(20));
+    assert!(s.run("data.subtypes", &json!({"layer":"Cities","defaultCode":999})).is_err());
+}
+
+#[test]
+fn gdb_relationship_metadata_is_read_without_inventing_a_direct_join() {
+    use rustgis_data::source::FeatureSource;
+    let db = reference_gdb("relationship_tables.gdb").unwrap();
+    // Saved ArcGIS fixture: attributed att4 and many-to-many mn, each with a junction table.
+    let source = rustgis_data::source::filegdb::FileGdbSource::open(std::path::Path::new(&db), Some("Parcels")).unwrap();
+    let schema = source.schema();
+    assert_eq!(schema.relationships.len(), 2);
+    for (name, cardinality, foreign, destination_foreign, forward) in
+        [("att4", "OneToMany", "pfk", "ofk", "f"), ("mn", "ManyToMany", "p_key", "o_key", "owns")]
+    {
+        let r = schema.relationships.iter().find(|r| r.name == name).unwrap();
+        assert_eq!((r.origin.as_str(), r.destination.as_str()), ("Parcels", "Owners"));
+        assert_eq!(r.cardinality, cardinality);
+        assert!(r.attributed);
+        assert!(!r.composite);
+        assert_eq!(r.origin_key, "Pk_Id");
+        assert_eq!(r.foreign_key, foreign);
+        assert_eq!(r.destination_key.as_deref(), Some("owner_id"));
+        assert_eq!(r.destination_foreign_key.as_deref(), Some(destination_foreign));
+        assert_eq!(r.forward_label, forward);
+    }
 }

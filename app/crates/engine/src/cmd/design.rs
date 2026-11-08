@@ -87,7 +87,16 @@ pub(crate) fn apply(s: &mut Session, id: u32, changes: Vec<Change>) -> Result<()
         && let Some(sfi) = l.dataset.field_index(&st.field)
     {
         for r in &new_rows {
-            let code = l.dataset.value(*r, sfi).as_f64().map(|v| v as i64);
+            if l.dataset.value(*r, sfi).is_null()
+                && let Some(code) = st.default_code
+                && let Some(cell) = l.dataset.features.get_mut(*r).and_then(|f| f.attrs.get_mut(sfi))
+            {
+                *cell = Value::Int(code);
+            }
+            let code = match l.dataset.value(*r, sfi) {
+                Value::Int(c) => Some(*c),
+                _ => None,
+            };
             let Some(sub) = code.and_then(|c| st.subtypes.iter().find(|x| x.code == c)) else { continue };
             for (field, v) in &sub.defaults {
                 if let Some(fi) = l.dataset.field_index(field)
@@ -144,8 +153,17 @@ pub(crate) fn apply(s: &mut Session, id: u32, changes: Vec<Change>) -> Result<()
     for r in &rows {
         let changed = changed_fields(*r);
         let touched = |fi: usize| changed.as_ref().is_none_or(|c| c.get(fi).copied().unwrap_or(true));
-        for d in &l.design.domains {
-            if let Some(fi) = l.dataset.field_index(&d.field).filter(|fi| touched(*fi)) {
+        let code = l.dataset.features.get(*r).and_then(|f| l.design.subtype_code(&l.dataset.fields, &f.attrs));
+        let subtype_changed = l.design.subtypes.as_ref().and_then(|st| l.dataset.field_index(&st.field)).is_some_and(touched);
+        if let Some(st) = &l.design.subtypes
+            && !st.subtypes.is_empty()
+            && subtype_changed
+            && code.is_some_and(|c| !st.subtypes.iter().any(|s| s.code == c))
+        {
+            return Err("unknown subtype code".into());
+        }
+        for (fi, field) in l.dataset.fields.iter().enumerate().filter(|(fi, _)| touched(*fi)) {
+            if let Some(d) = l.design.effective_domain(&field.name, code) {
                 let v = l.dataset.value(*r, fi);
                 if !d.allows(v) {
                     return Err(format!("{} isn't allowed in {} (its domain)", v, d.field));
@@ -210,10 +228,10 @@ pub fn commands() -> Vec<C> {
     vec![
         // Data design.
         C::new("data.domain", "Domains", "Data › Data Design", domain).when(need_feature_layer).params(
-            r#"{"layer"?, "field": string, "coded"?: [[code, description], …], "min"?: number, "max"?: number, "clear"?: bool, "force"?: bool (set it even though existing values fall outside)}"#,
+            r#"{"layer"?, "field": string, "coded"?: [[code, description], …], "min"?: number, "max"?: number, "subtype"?: integer, "name"?: domain name, "clear"?: bool, "force"?: bool (set it even though existing values fall outside)}"#,
         ),
         C::new("data.subtypes", "Subtypes", "Data › Data Design", subtypes).when(need_feature_layer).params(
-            r#"{"layer"?, "field": integer field, "subtypes": [{"code": n, "name": string, "defaults"?: {field: value}}], "symbolize"?: bool, "clear"?: bool}"#,
+            r#"{"layer"?, "field": integer field, "subtypes": [{"code": n, "name": string, "defaults"?: {field: value}}], "defaultCode"?: integer, "symbolize"?: bool, "clear"?: bool}"#,
         ),
         C::new("data.attributeRule", "Attribute Rules", "Data › Data Design", attribute_rule).when(need_feature_layer).params(
             r#"{"layer"?, "name": string, "kind": "calculation"|"constraint", "field"?: field set by a calculation, "expression": calculator expression or SQL where clause, "remove"?: bool}"#,
@@ -635,9 +653,29 @@ fn domain(s: &mut Session, p: &Json) -> CmdResult {
     let l = s.map().layer(id).ok_or("no such layer")?;
     let fi = l.dataset.field_index(field).ok_or_else(|| format!("no field named '{field}'"))?;
     let (fname, ty) = l.dataset.fields.get(fi).map(|f| (f.name.clone(), f.ty)).ok_or("no field")?;
+    if p.get("subtype").is_some_and(|v| !v.is_null() && v.as_i64().is_none()) {
+        return Err("subtype must be an integer".into());
+    }
+    let subtype = p.get("subtype").and_then(Json::as_i64);
+    if let Some(code) = subtype
+        && !l.design.subtypes.as_ref().is_some_and(|st| st.subtypes.iter().any(|s| s.code == code))
+    {
+        return Err("unknown subtype".into());
+    }
     if b(p, "clear").unwrap_or(false) {
         let l = s.map_mut().layer_mut(id).ok_or("no such layer")?;
-        l.design.domains.retain(|d| !d.field.eq_ignore_ascii_case(&fname));
+        if let Some(code) = subtype {
+            if let Some(sub) = l.design.subtypes.as_mut().and_then(|st| st.subtypes.iter_mut().find(|s| s.code == code)) {
+                sub.domains.get_or_insert_with(Vec::new).retain(|d| !d.field.eq_ignore_ascii_case(&fname));
+                // ArcGIS removes this SubtypeFieldInfo, including its default.
+                sub.defaults.retain(|(field, _)| !field.eq_ignore_ascii_case(&fname));
+            }
+        } else {
+            l.design.domains.retain(|d| !d.field.eq_ignore_ascii_case(&fname));
+            if !l.design.removed_domains.contains(&fname) {
+                l.design.removed_domains.push(fname);
+            }
+        }
         return Ok(Json::Null);
     }
     let kind = if let Some(codes) = p.get("coded").and_then(Json::as_array) {
@@ -664,16 +702,49 @@ fn domain(s: &mut Session, p: &Json) -> CmdResult {
         }
         DomainKind::Range { min, max }
     };
-    let name = l.design.domains.iter().find(|x| x.field.eq_ignore_ascii_case(&fname)).map(|x| x.name.clone()).unwrap_or_default();
+    let name = ps(p, "name")
+        .map(str::to_owned)
+        .unwrap_or_else(|| l.design.effective_domain(&fname, subtype).map(|d| d.name.clone()).unwrap_or_default());
     let d = Domain { field: fname.clone(), kind, name };
-    // Existing values must already fit.
-    let bad = (0..l.dataset.features.len()).filter(|r| !d.allows(l.dataset.value(*r, fi))).count();
+    let bad = (0..l.dataset.features.len())
+        .filter(|r| subtype.is_none_or(|c| l.design.subtype_code(&l.dataset.fields, &l.dataset.features[*r].attrs) == Some(c)))
+        .filter(|r| !d.allows(l.dataset.value(*r, fi)))
+        .count();
     if bad > 0 && !b(p, "force").unwrap_or(false) {
         return Err(format!("{bad} existing values don't fit the domain (pass force to set it anyway)"));
     }
     let l = s.map_mut().layer_mut(id).ok_or("no such layer")?;
-    l.design.domains.retain(|x| !x.field.eq_ignore_ascii_case(&fname));
-    l.design.domains.push(d);
+    // A named geodatabase domain is one shared definition, not one per subtype.
+    if !d.name.is_empty() {
+        for domain in &mut l.design.domains {
+            if domain.name.eq_ignore_ascii_case(&d.name) {
+                domain.kind = d.kind.clone();
+            }
+        }
+        if let Some(st) = &mut l.design.subtypes {
+            for sub in &mut st.subtypes {
+                if let Some(domains) = &mut sub.domains {
+                    for domain in domains {
+                        if domain.name.eq_ignore_ascii_case(&d.name) {
+                            domain.kind = d.kind.clone();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if let Some(code) = subtype {
+        if let Some(sub) = l.design.subtypes.as_mut().and_then(|st| st.subtypes.iter_mut().find(|s| s.code == code)) {
+            let domains = sub.domains.get_or_insert_with(Vec::new);
+            domains.retain(|d| !d.field.eq_ignore_ascii_case(&fname));
+            domains.push(d);
+        }
+    } else {
+        l.design.removed_domains.retain(|f| !f.eq_ignore_ascii_case(&fname));
+        l.design.domains.retain(|x| !x.field.eq_ignore_ascii_case(&fname));
+        l.design.domains.push(d);
+    }
     Ok(json!({"field": fname, "outside": bad}))
 }
 
@@ -682,6 +753,17 @@ fn subtypes(s: &mut Session, p: &Json) -> CmdResult {
     if b(p, "clear").unwrap_or(false) {
         let l = s.map_mut().layer_mut(id).ok_or("no such layer")?;
         l.design.subtypes = None;
+        l.design.subtypes_removed = true;
+        return Ok(Json::Null);
+    }
+    if p.get("subtypes").is_none()
+        && let Some(code) = p.get("defaultCode").and_then(Json::as_i64)
+    {
+        let st = s.map_mut().layer_mut(id).and_then(|l| l.design.subtypes.as_mut()).ok_or("no subtypes")?;
+        if !st.subtypes.iter().any(|s| s.code == code) {
+            return Err("unknown default subtype".into());
+        }
+        st.default_code = Some(code);
         return Ok(Json::Null);
     }
     let field = ps(p, "field").ok_or("field is required")?;
@@ -705,10 +787,20 @@ fn subtypes(s: &mut Session, p: &Json) -> CmdResult {
         if subs.iter().any(|x: &Subtype| x.code == code) {
             return Err(format!("subtype code {code} is used twice"));
         }
-        subs.push(Subtype { code, name, defaults });
+        let old = l.design.subtypes.as_ref().and_then(|st| st.subtypes.iter().find(|s| s.code == code));
+        let defaults = if v.get("defaults").is_some() { defaults } else { old.map(|s| s.defaults.clone()).unwrap_or_default() };
+        subs.push(Subtype { code, name, defaults, domains: old.map(|s| s.domains.clone()).unwrap_or_else(|| Some(Vec::new())) });
     }
     if subs.is_empty() {
         return Err("give at least one subtype".into());
+    }
+    let default_code = p
+        .get("defaultCode")
+        .and_then(Json::as_i64)
+        .or_else(|| l.design.subtypes.as_ref().and_then(|st| st.default_code).filter(|c| subs.iter().any(|s| s.code == *c)))
+        .or_else(|| subs.first().map(|s| s.code));
+    if default_code.is_some_and(|c| !subs.iter().any(|s| s.code == c)) {
+        return Err("default subtype must be one of the configured codes".into());
     }
     let symbolize = b(p, "symbolize").unwrap_or(true);
     let l = s.map_mut().layer_mut(id).ok_or("no such layer")?;
@@ -718,7 +810,8 @@ fn subtypes(s: &mut Session, p: &Json) -> CmdResult {
         l.renderer = rustgis_map::Renderer::unique(&l.dataset, &[], &fname, rustgis_map::Ramp::default(), base)?;
     }
     let n = subs.len();
-    l.design.subtypes = Some(Subtypes { field: fname, subtypes: subs });
+    l.design.subtypes = Some(Subtypes { field: fname, subtypes: subs, default_code });
+    l.design.subtypes_removed = false;
     Ok(json!({"subtypes": n}))
 }
 

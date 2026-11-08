@@ -1177,6 +1177,24 @@ fn popup(app: &mut RustGisApp, ui: &mut Ui, rect: Rect) {
     let mut zoom = false;
     // The feature shown, as its layer id and feature id (a raster pixel has neither).
     let shown = info["layerId"].as_u64().and_then(|id| u32::try_from(id).ok()).zip(info["fid"].as_u64());
+    let editable = shown.and_then(|(id, fid)| {
+        let l = app.session.map().layer(id)?;
+        if l.is_streamed() || !app.session.map().editing.settings.enabled {
+            return None;
+        }
+        let row = l.dataset.features.iter().position(|f| f.id == fid)?;
+        let feature = l.dataset.features.get(row)?;
+        let code = l.design.subtype_code(&l.dataset.fields, &feature.attrs);
+        let controls = l
+            .dataset
+            .fields
+            .iter()
+            .enumerate()
+            .filter_map(|(i, f)| Some((f.name.clone(), feature.attrs.get(i)?.clone(), l.design.coded_values(&f.name, code)?)))
+            .collect::<Vec<_>>();
+        Some((id, row, controls))
+    });
+    let mut attribute_edit = None;
     let layer = info["layer"].as_str().unwrap_or("").to_string();
     let mut attrs = info["attributes"].as_object().cloned().unwrap_or_default();
     // A picture value (a photo's thumbnail) shows as the picture, not as its text.
@@ -1300,7 +1318,17 @@ fn popup(app: &mut RustGisApp, ui: &mut Ui, rect: Rect) {
                                         // A fixed column: long values wrap, and the stripes span it.
                                         ui.set_min_width(value_w);
                                         ui.set_max_width(value_w);
-                                        ui.add(egui::Label::new(egui::RichText::new(v.as_str().unwrap_or("")).size(11.5)).wrap());
+                                        if let Some((id, row, controls)) = &editable
+                                            && let Some((_, value, codes)) =
+                                                controls.iter().find(|(field, _, _)| field.eq_ignore_ascii_case(k))
+                                        {
+                                            let mut value = value.clone();
+                                            if crate::widgets::coded_value(ui, ("popup-attribute", id, row, k), k, &mut value, codes) {
+                                                attribute_edit = Some((*id, *row, k.clone(), value));
+                                            }
+                                        } else {
+                                            ui.add(egui::Label::new(egui::RichText::new(v.as_str().unwrap_or("")).size(11.5)).wrap());
+                                        }
                                     });
                                     ui.end_row();
                                 }
@@ -1339,6 +1367,9 @@ fn popup(app: &mut RustGisApp, ui: &mut Ui, rect: Rect) {
         if let Some(e) = extent.filter(|e| !e.is_empty()) {
             app.session.zoom_to(&e);
         }
+    }
+    if let Some((id, row, field, value)) = attribute_edit {
+        let _ = app.run("edit.setValue", json!({"layer":id,"row":row,"field":field,"value":value.to_json()}));
     }
     if close {
         app.map.popup = None;

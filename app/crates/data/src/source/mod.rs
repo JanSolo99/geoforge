@@ -121,12 +121,34 @@ pub enum SourceDomainKind {
 #[derive(Clone, Debug, PartialEq)]
 pub struct SourceSubtypes {
     pub field: String,
+    pub default_code: Option<i64>,
+    /// Authoritative per-subtype domains; omitted codes preserve unknown metadata.
+    pub domains: Vec<(i64, Vec<SourceDomain>)>,
     pub subtypes: Vec<(i64, String, Vec<(String, crate::Value)>)>,
+}
+
+/// Relationship-class metadata; an attributed or many-to-many relationship needs
+/// its junction table and is not a direct feature-to-feature join.
+#[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SourceRelationship {
+    pub name: String,
+    pub origin: String,
+    pub destination: String,
+    pub origin_key: String,
+    pub foreign_key: String,
+    pub destination_key: Option<String>,
+    pub destination_foreign_key: Option<String>,
+    pub cardinality: String,
+    pub composite: bool,
+    pub attributed: bool,
+    pub forward_label: String,
+    pub backward_label: String,
 }
 
 /// Data design a source carries: the domains of its fields and its subtypes.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct SourceSchema {
+    pub relationships: Vec<SourceRelationship>,
     pub domains: Vec<SourceDomain>,
     pub subtypes: Option<SourceSubtypes>,
 }

@@ -51,21 +51,7 @@ pub fn show(app: &mut RustGisApp, ui: &mut Ui) {
                 },
             };
             let is_layer = layer_id.is_some();
-            // Per column, the coded values (code, description) of the field's domain: shown as
-            // their descriptions, and picked from a list when a cell is edited.
-            let coded: Vec<Option<Vec<(String, String)>>> = ds
-                .fields
-                .iter()
-                .map(|f| {
-                    let l = layer_id.and_then(|id| app.session.map().layer(id))?;
-                    match &l.design.domains.iter().find(|d| d.field.eq_ignore_ascii_case(&f.name))?.kind {
-                        rustgis_engine::map::design::DomainKind::Coded(codes) => {
-                            Some(codes.iter().map(|(c, d)| (c.to_string(), d.clone())).collect())
-                        }
-                        _ => None,
-                    }
-                })
-                .collect();
+            let design = layer_id.and_then(|id| app.session.map().layer(id)).map(|l| l.design.clone());
             // Header.
             let (hr, _) = ui.allocate_exact_size(vec2(ui.available_width(), 34.0), Sense::hover());
             ui.painter().rect_filled(hr, 0.0, t.pane_header);
@@ -182,7 +168,15 @@ pub fn show(app: &mut RustGisApp, ui: &mut Ui) {
                             for c in 0..nf {
                                 row.col(|ui| {
                                     let editing = app.table.editing.as_ref().is_some_and(|(er, ec, _)| *er == r && *ec == c);
-                                    let codes = coded.get(c).and_then(|c| c.as_ref());
+                                    let codes = design
+                                        .as_ref()
+                                        .and_then(|d| {
+                                            let field = ds.fields.get(c)?;
+                                            let attrs = &ds.features.get(r)?.attrs;
+                                            d.coded_values(&field.name, d.subtype_code(&ds.fields, attrs))
+                                        })
+                                        .map(|c| c.into_iter().map(|(v, n)| (v.to_string(), n)).collect::<Vec<_>>());
+                                    let codes = codes.as_ref();
                                     if let (true, Some(codes)) = (editing, codes) {
                                         // A coded value domain: pick from its descriptions.
                                         let current = ds.value(r, c).to_string();

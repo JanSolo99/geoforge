@@ -157,6 +157,79 @@ pub fn show(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
         choose(app, id, geometry, row);
     }
 
+    // Edit typed coded attributes of the chosen template; these defaults are used
+    // by the sketch command, not merely displayed in the pane.
+    let attributes = app.session.active_layer.and_then(|id| {
+        let l = app.session.map().layer(id)?;
+        let template = l.design.templates.iter().find(|t| t.name == app.forms.template)?;
+        let code = l.design.subtypes.as_ref().and_then(|st| {
+            template
+                .defaults
+                .iter()
+                .find(|(f, _)| f.eq_ignore_ascii_case(&st.field))
+                .and_then(|(_, v)| match v {
+                    rustgis_engine::data::Value::Int(c) => Some(*c),
+                    _ => None,
+                })
+                .or(st.default_code)
+        });
+        let controls = l
+            .dataset
+            .fields
+            .iter()
+            .filter_map(|f| {
+                let codes = l.design.coded_values(&f.name, code)?;
+                let value = template
+                    .defaults
+                    .iter()
+                    .find(|(k, _)| k.eq_ignore_ascii_case(&f.name))
+                    .map(|(_, v)| v.clone())
+                    .or_else(|| {
+                        l.design
+                            .subtypes
+                            .as_ref()
+                            .filter(|st| st.field.eq_ignore_ascii_case(&f.name))
+                            .and(code.map(rustgis_engine::data::Value::Int))
+                    })
+                    .or_else(|| {
+                        l.design
+                            .subtypes
+                            .as_ref()?
+                            .subtypes
+                            .iter()
+                            .find(|s| Some(s.code) == code)?
+                            .defaults
+                            .iter()
+                            .find(|(k, _)| k.eq_ignore_ascii_case(&f.name))
+                            .map(|(_, v)| v.clone())
+                    })
+                    .unwrap_or_default();
+                Some((f.name.clone(), value, codes))
+            })
+            .collect::<Vec<_>>();
+        Some((id, template.clone(), controls))
+    });
+    if let Some((id, template, controls)) = attributes
+        && !controls.is_empty()
+    {
+        ui.separator();
+        ui.label(egui::RichText::new(tl!("Attributes")).font(semibold(12.5)));
+        for (field, mut value, codes) in controls {
+            ui.horizontal(|ui| {
+                ui.label(&field);
+                if crate::widgets::coded_value(ui, ("template-attribute", id, &field), &field, &mut value, &codes) {
+                    let mut defaults: serde_json::Map<String, Value> =
+                        template.defaults.iter().map(|(k, v)| (k.clone(), v.to_json())).collect();
+                    defaults.insert(field.clone(), value.to_json());
+                    let _ = app.run(
+                        "edit.template",
+                        json!({"layer": id, "name": template.name, "description": template.description, "defaults": defaults}),
+                    );
+                }
+            });
+        }
+    }
+
     // The construction tools of the layer being edited.
     let target = app.session.active_layer.and_then(|id| app.session.map().layer(id)).map(|l| l.geometry_type());
     if let Some(geometry) = target {

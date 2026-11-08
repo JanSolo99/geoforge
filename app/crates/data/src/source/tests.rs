@@ -1151,3 +1151,51 @@ fn large_geodatabase_rasters_are_read_from_pyramids() {
     let w = r.width as f64 * r.transform.pixel_width;
     assert!((w - full_w).abs() <= r.transform.pixel_width, "{w} vs {full_w}");
 }
+
+#[test]
+fn filegdb_shared_domain_fanout_is_rejected_before_expansion() {
+    use unigis_core::{Field as GField, FieldType as GType, Value as GValue};
+    use unigis_filegdb::{Domain, DomainKind, GeodatabaseWriter, MergePolicy, SplitPolicy, Subtype, SubtypeField, Subtypes};
+    let base = std::env::temp_dir().join(format!("unigis-domain-budget-{}.gdb", std::process::id()));
+    let _ = std::fs::remove_dir_all(&base);
+    let mut writer = GeodatabaseWriter::create(&base).unwrap();
+    writer
+        .add_domain(&Domain {
+            name: "large".into(),
+            description: String::new(),
+            field_type: GType::Integer,
+            split_policy: SplitPolicy::DefaultValue,
+            merge_policy: MergePolicy::DefaultValue,
+            kind: DomainKind::Coded((0..1000).map(|i| (GValue::Integer(i), "x".repeat(2048))).collect()),
+        })
+        .unwrap();
+    let table = writer
+        .create_table_with_subtypes(
+            "features",
+            None,
+            false,
+            false,
+            &[GField::new("kind", GType::Integer), GField::new("status", GType::Integer)],
+            None,
+            Subtypes {
+                field: "kind".into(),
+                default_code: 0,
+                subtypes: (0..40)
+                    .map(|code| Subtype {
+                        code,
+                        name: code.to_string(),
+                        fields: vec![SubtypeField { field: "status".into(), domain: Some("large".into()), default: None }],
+                    })
+                    .collect(),
+            },
+        )
+        .unwrap();
+    writer.finish_table(table).unwrap();
+    writer.finish().unwrap();
+    let error = filegdb::FileGdbSource::open(&base, Some("features")).err().expect("fanout should be refused");
+    assert!(error.to_string().contains("domain metadata exceeds"), "{error}");
+    // Refusal never changes the physical schema or shared definition.
+    let g = filegdb::Geodatabase::open(&base).unwrap();
+    assert_eq!(g.open_table("features").unwrap().subtypes().unwrap().subtypes.len(), 40);
+    std::fs::remove_dir_all(base).unwrap();
+}

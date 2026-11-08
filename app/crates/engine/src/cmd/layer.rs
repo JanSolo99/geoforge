@@ -1111,6 +1111,8 @@ fn save_gdb_edits(s: &mut Session, p: &Value) -> CmdResult {
     // A standalone table (`"table"`: its id), or a layer.
     let mut domains = Vec::new();
     let mut subtypes = None;
+    let mut removed_domains = Vec::new();
+    let mut subtypes_removed = false;
     let ds = match p.get("table").and_then(Value::as_u64) {
         Some(tid) => s.project.table(tid as u32).map(|t| t.dataset.clone()).ok_or_else(|| format!("no table {tid}"))?,
         None => {
@@ -1119,6 +1121,22 @@ fn save_gdb_edits(s: &mut Session, p: &Value) -> CmdResult {
             if l.is_streamed() {
                 return Err(format!("{}: read in place (Load All Features first to edit it)", l.name));
             }
+            let mut definitions: Vec<&rustgis_map::design::Domain> = Vec::new();
+            for domain in l
+                .design
+                .domains
+                .iter()
+                .chain(l.design.subtypes.iter().flat_map(|st| &st.subtypes).flat_map(|sub| sub.domains.iter().flatten()))
+            {
+                if !domain.name.is_empty() {
+                    if definitions.iter().any(|d| d.name.eq_ignore_ascii_case(&domain.name) && d.kind != domain.kind) {
+                        return Err(format!("conflicting definitions for shared domain {}", domain.name));
+                    }
+                    definitions.push(domain);
+                }
+            }
+            removed_domains = l.design.removed_domains.clone();
+            subtypes_removed = l.design.subtypes_removed;
             // The layer's field domains are written with its rows.
             domains = l
                 .design
@@ -1137,6 +1155,12 @@ fn save_gdb_edits(s: &mut Session, p: &Value) -> CmdResult {
                 .collect();
             subtypes = l.design.subtypes.as_ref().map(|st| rustgis_data::source::SourceSubtypes {
                 field: st.field.clone(),
+                default_code: st.default_code,
+                domains: st
+                    .subtypes
+                    .iter()
+                    .filter_map(|x| x.domains.as_ref().map(|ds| (x.code, ds.iter().map(source_domain).collect())))
+                    .collect(),
                 subtypes: st.subtypes.iter().map(|x| (x.code, x.name.clone(), x.defaults.clone())).collect(),
             });
             l.dataset.clone()
@@ -1158,9 +1182,21 @@ fn save_gdb_edits(s: &mut Session, p: &Value) -> CmdResult {
             Ok(d) => out["domains"] = json!({"created": d.created, "updated": d.updated, "assigned": d.assigned}),
             Err(e) => out["domainError"] = json!(e.to_string()),
         }
+        match rustgis_data::source::filegdb::remove_domains(dir, &table, &removed_domains) {
+            Ok(n) => out["domains"]["removed"] = json!(n),
+            Err(e) => out["domainError"] = json!(e.to_string()),
+        }
+        if subtypes_removed {
+            match rustgis_data::source::filegdb::clear_subtypes(dir, &table) {
+                Ok(n) => out["subtypes"] = json!({"removed": n}),
+                Err(e) => out["subtypeError"] = json!(e.to_string()),
+            }
+        }
         if let Some(st) = &subtypes {
             match rustgis_data::source::filegdb::save_subtypes(dir, &table, st) {
-                Ok(d) => out["subtypes"] = json!({"fieldSet": d.field_set, "added": d.added, "removed": d.removed, "defaults": d.defaults}),
+                Ok(d) => {
+                    out["subtypes"] = json!({"fieldSet": d.field_set, "added": d.added, "removed": d.removed, "defaults": d.defaults, "defaultSet": d.default_set, "domains": d.domains})
+                }
                 Err(e) => out["subtypeError"] = json!(e.to_string()),
             }
         }
@@ -1462,27 +1498,49 @@ fn add_source_with(
     Ok(out)
 }
 
+fn source_domain(d: &rustgis_map::design::Domain) -> rustgis_data::source::SourceDomain {
+    use rustgis_map::design::DomainKind;
+    rustgis_data::source::SourceDomain {
+        field: d.field.clone(),
+        name: d.name.clone(),
+        kind: match &d.kind {
+            DomainKind::Coded(c) => rustgis_data::source::SourceDomainKind::Coded(c.clone()),
+            DomainKind::Range { min, max } => rustgis_data::source::SourceDomainKind::Range { min: *min, max: *max },
+        },
+    }
+}
+fn map_domain(d: &rustgis_data::source::SourceDomain) -> rustgis_map::design::Domain {
+    use rustgis_data::source::SourceDomainKind;
+    rustgis_map::design::Domain {
+        field: d.field.clone(),
+        name: d.name.clone(),
+        kind: match &d.kind {
+            SourceDomainKind::Coded(c) => rustgis_map::design::DomainKind::Coded(c.clone()),
+            SourceDomainKind::Range { min, max } => rustgis_map::design::DomainKind::Range { min: *min, max: *max },
+        },
+    }
+}
+
 /// The domains and subtypes a source defines (a geodatabase class's), as the layer's data design:
 /// edits to the layer are then checked against them and the Data Design pane lists them.
 fn apply_schema(s: &mut Session, id: u32, schema: &rustgis_data::source::SourceSchema) {
-    use rustgis_data::source::SourceDomainKind;
-    use rustgis_map::design::{Domain, DomainKind, Subtype, Subtypes};
+    use rustgis_map::design::{Subtype, Subtypes};
     let Some(l) = s.map_mut().layer_mut(id) else { return };
-    for d in &schema.domains {
-        let kind = match &d.kind {
-            SourceDomainKind::Coded(codes) => DomainKind::Coded(codes.clone()),
-            SourceDomainKind::Range { min, max } => DomainKind::Range { min: *min, max: *max },
-        };
-        l.design.domains.retain(|x| !x.field.eq_ignore_ascii_case(&d.field));
-        l.design.domains.push(Domain { field: d.field.clone(), kind, name: d.name.clone() });
-    }
+    l.design.domains = schema.domains.iter().map(map_domain).collect();
+    l.design.relationship_classes = schema.relationships.clone();
     if let Some(st) = &schema.subtypes {
         l.design.subtypes = Some(Subtypes {
             field: st.field.clone(),
+            default_code: st.default_code,
             subtypes: st
                 .subtypes
                 .iter()
-                .map(|(code, name, defaults)| Subtype { code: *code, name: name.clone(), defaults: defaults.clone() })
+                .map(|(code, name, defaults)| Subtype {
+                    code: *code,
+                    name: name.clone(),
+                    defaults: defaults.clone(),
+                    domains: st.domains.iter().find(|(c, _)| c == code).map(|(_, ds)| ds.iter().map(map_domain).collect()),
+                })
                 .collect(),
         });
     }

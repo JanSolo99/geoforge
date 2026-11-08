@@ -110,7 +110,7 @@ impl FileGdbSource {
             indexed,
             notes,
         };
-        let schema = schema_of(gdb, &table);
+        let schema = schema_of(gdb, &table, &info.name)?;
         Ok(FileGdbSource { info, schema, table, reproject })
     }
 
@@ -127,8 +127,35 @@ impl FileGdbSource {
 }
 
 /// The domains of a table's fields and its subtypes.
-fn schema_of(gdb: &Geodatabase, table: &Table) -> SourceSchema {
+fn schema_of(gdb: &Geodatabase, table: &Table, name: &str) -> Result<SourceSchema> {
     use unigis_filegdb::DomainKind as Kind;
+    // Repeated references to a shared domain can otherwise expand a small
+    // geodatabase into unbounded copied metadata, particularly in the browser.
+    const MAX_DOMAIN_METADATA: usize = 32 * 1024 * 1024;
+    let domain_cost = |domain: &unigis_filegdb::Domain| {
+        256usize.saturating_add(domain.name.len()).saturating_add(match &domain.kind {
+            Kind::Range { .. } => 128,
+            Kind::Coded(codes) => codes.iter().fold(0usize, |n, (value, description)| {
+                let value_len = match value {
+                    GfValue::String(s) => s.len(),
+                    _ => 32,
+                };
+                n.saturating_add(64).saturating_add(value_len).saturating_add(description.len())
+            }),
+        })
+    };
+    let fields = table.fields().iter().filter_map(|f| f.domain.as_deref());
+    let subtype_fields =
+        table.subtypes().into_iter().flat_map(|st| &st.subtypes).flat_map(|sub| &sub.fields).filter_map(|f| f.domain.as_deref());
+    let mut cost = 0usize;
+    for name in fields.chain(subtype_fields) {
+        if let Some(domain) = gdb.domain(name) {
+            cost = cost.saturating_add(domain_cost(domain));
+            if cost > MAX_DOMAIN_METADATA {
+                return Err(bad("domain metadata exceeds the 32 MiB import budget"));
+            }
+        }
+    }
     let mut schema = SourceSchema::default();
     for f in table.fields() {
         let Some(d) = f.domain.as_deref().and_then(|n| gdb.domain(n)) else { continue };
@@ -141,9 +168,53 @@ fn schema_of(gdb: &Geodatabase, table: &Table) -> SourceSchema {
         };
         schema.domains.push(SourceDomain { field: f.name.clone(), name: d.name.clone(), kind });
     }
+    schema.relationships = gdb
+        .relationship_classes()
+        .iter()
+        .filter(|r| r.origin.eq_ignore_ascii_case(name) || r.destination.eq_ignore_ascii_case(name))
+        .map(|r| super::SourceRelationship {
+            name: r.name.clone(),
+            origin: r.origin.clone(),
+            destination: r.destination.clone(),
+            origin_key: r.origin_primary_key.clone(),
+            foreign_key: r.origin_foreign_key.clone(),
+            destination_key: r.destination_primary_key.clone(),
+            destination_foreign_key: r.destination_foreign_key.clone(),
+            cardinality: format!("{:?}", r.cardinality),
+            composite: r.is_composite,
+            attributed: r.is_attributed,
+            forward_label: r.forward_label.clone(),
+            backward_label: r.backward_label.clone(),
+        })
+        .collect();
     if let Some(st) = table.subtypes() {
         schema.subtypes = Some(SourceSubtypes {
             field: st.field.clone(),
+            default_code: Some(st.default_code),
+            domains: st
+                .subtypes
+                .iter()
+                .map(|sub| {
+                    (
+                        sub.code,
+                        sub.fields
+                            .iter()
+                            .filter_map(|f| {
+                                let d = gdb.domain(f.domain.as_deref()?)?;
+                                let kind = match &d.kind {
+                                    Kind::Coded(c) => {
+                                        SourceDomainKind::Coded(c.iter().map(|(v, n)| (value(v.clone()), n.clone())).collect())
+                                    }
+                                    Kind::Range { min, max } => {
+                                        SourceDomainKind::Range { min: value(min.clone()).as_f64()?, max: value(max.clone()).as_f64()? }
+                                    }
+                                };
+                                Some(SourceDomain { field: f.field.clone(), name: d.name.clone(), kind })
+                            })
+                            .collect(),
+                    )
+                })
+                .collect(),
             subtypes: st
                 .subtypes
                 .iter()
@@ -154,7 +225,7 @@ fn schema_of(gdb: &Geodatabase, table: &Table) -> SourceSchema {
                 .collect(),
         });
     }
-    schema
+    Ok(schema)
 }
 
 fn has_spx(gdb: &Geodatabase, name: &str) -> bool {
@@ -692,17 +763,30 @@ pub struct DomainsSaved {
 /// Writes a layer's field domains to its table's geodatabase: a domain the geodatabase lacks is
 /// created, one whose values differ gets the layer's (a coded domain's codes added, changed or
 /// deleted; a range domain's limits set), and a field not yet using it is assigned to it. A
-/// domain made in the app (no name) is called `<table>_<field>`. Domains the layer lacks are left
-/// alone, so a domain removed in the app stays on the field in the geodatabase.
+/// domain made in the app (no name) is called `<table>_<field>`. Missing metadata is
+/// preserved; explicit removals use `remove_domains`, protecting older projects.
 pub fn save_domains(gdb_dir: &Path, table: &str, wanted: &[SourceDomain]) -> Result<DomainsSaved> {
+    save_domains_for(gdb_dir, table, wanted, &[])
+}
+
+fn save_domains_for(gdb_dir: &Path, table: &str, wanted: &[SourceDomain], codes: &[i64]) -> Result<DomainsSaved> {
     use unigis_filegdb::{DomainKind as Kind, MergePolicy, SplitPolicy};
     let mut saved = DomainsSaved::default();
     for d in wanted {
         let g = Geodatabase::open(gdb_dir).map_err(bad)?;
         let t = g.open_table(table).map_err(bad)?;
         let Some(field) = t.fields().iter().find(|f| f.name.eq_ignore_ascii_case(&d.field)) else { continue };
-        let (field_name, field_type, using) = (field.name.clone(), field.field_type, field.domain.clone());
-        let name = if d.name.is_empty() { format!("{table}_{field_name}") } else { d.name.clone() };
+        let using = if let Some(code) = codes.first() {
+            t.subtypes()
+                .and_then(|st| st.subtypes.iter().find(|s| s.code == *code))
+                .and_then(|s| s.fields.iter().find(|f| f.field.eq_ignore_ascii_case(&d.field)))
+                .and_then(|f| f.domain.clone())
+        } else {
+            field.domain.clone()
+        };
+        let (field_name, field_type) = (field.name.clone(), field.field_type);
+        let suffix = codes.first().map(|c| format!("_{c}")).unwrap_or_default();
+        let name = if d.name.is_empty() { format!("{table}_{field_name}{suffix}") } else { d.name.clone() };
         let number = |f: f64| f.to_string();
         let is_range = matches!(d.kind, SourceDomainKind::Range { .. });
         match g.domain(&name) {
@@ -730,6 +814,9 @@ pub fn save_domains(gdb_dir: &Path, table: &str, wanted: &[SourceDomain]) -> Res
                 }
             }
             Some(existing) => {
+                if existing.field_type != field_type {
+                    return Err(bad(format!("domain {name} has a different field type")));
+                }
                 let mut changed = false;
                 match (&d.kind, &existing.kind) {
                     (SourceDomainKind::Coded(codes), Kind::Coded(have)) => {
@@ -768,17 +855,44 @@ pub fn save_domains(gdb_dir: &Path, table: &str, wanted: &[SourceDomain]) -> Res
             }
         }
         if !using.as_deref().is_some_and(|u| u.eq_ignore_ascii_case(&name)) {
-            unigis_filegdb::assign_domain_to_field(gdb_dir, table, &field_name, &name, &[]).map_err(bad)?;
+            unigis_filegdb::assign_domain_to_field(gdb_dir, table, &field_name, &name, codes).map_err(bad)?;
             saved.assigned += 1;
         }
     }
     Ok(saved)
 }
 
+/// Removes only explicitly cleared field assignments, retaining shared domains.
+pub fn remove_domains(gdb_dir: &Path, table: &str, fields: &[String]) -> Result<usize> {
+    let mut removed = 0;
+    for field in fields {
+        let g = Geodatabase::open(gdb_dir).map_err(bad)?;
+        let t = g.open_table(table).map_err(bad)?;
+        let f = t.fields().iter().find(|f| f.name.eq_ignore_ascii_case(field)).ok_or_else(|| bad(format!("no field {field}")))?;
+        if f.domain.is_some() {
+            unigis_filegdb::remove_domain_from_field(gdb_dir, table, &f.name, &[]).map_err(bad)?;
+            removed += 1;
+        }
+    }
+    Ok(removed)
+}
+
+pub fn clear_subtypes(gdb_dir: &Path, table: &str) -> Result<usize> {
+    let g = Geodatabase::open(gdb_dir).map_err(bad)?;
+    let t = g.open_table(table).map_err(bad)?;
+    let codes: Vec<_> = t.subtypes().map(|s| s.subtypes.iter().map(|s| s.code).collect()).unwrap_or_default();
+    if !codes.is_empty() {
+        unigis_filegdb::remove_subtype(gdb_dir, table, &codes).map_err(bad)?;
+    }
+    Ok(codes.len())
+}
+
 /// What writing a layer's subtypes to its table changed.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct SubtypesSaved {
     pub field_set: bool,
+    pub default_set: bool,
+    pub domains: usize,
     pub added: usize,
     pub removed: usize,
     pub defaults: usize,
@@ -789,6 +903,9 @@ pub struct SubtypesSaved {
 /// subtype's default values that differ are assigned. A subtype's name is not changed (ArcGIS
 /// has no operation for it), and neither is an existing subtype field.
 pub fn save_subtypes(gdb_dir: &Path, table: &str, wanted: &SourceSubtypes) -> Result<SubtypesSaved> {
+    if wanted.default_code.is_some_and(|c| !wanted.subtypes.iter().any(|(code, _, _)| *code == c)) {
+        return Err(bad("default subtype must be one of the configured codes"));
+    }
     let mut saved = SubtypesSaved::default();
     let open = || -> Result<_> {
         let g = Geodatabase::open(gdb_dir).map_err(bad)?;
@@ -816,6 +933,24 @@ pub fn save_subtypes(gdb_dir: &Path, table: &str, wanted: &SourceSubtypes) -> Re
             unigis_filegdb::add_subtype(gdb_dir, table, *code, name).map_err(bad)?;
             saved.added += 1;
         }
+    }
+    if let Some(code) = wanted.default_code
+        && open()?.subtypes().is_none_or(|s| s.default_code != code)
+    {
+        unigis_filegdb::set_default_subtype(gdb_dir, table, code).map_err(bad)?;
+        saved.default_set = true;
+    }
+    for (code, domains) in &wanted.domains {
+        let t = open()?;
+        let have = t.subtypes().and_then(|s| s.subtypes.iter().find(|s| s.code == *code)).ok_or_else(|| bad("unknown subtype code"))?;
+        for f in &have.fields {
+            if f.domain.is_some() && !domains.iter().any(|d| d.field.eq_ignore_ascii_case(&f.field)) {
+                unigis_filegdb::remove_domain_from_field(gdb_dir, table, &f.field, &[*code]).map_err(bad)?;
+                saved.domains += 1;
+            }
+        }
+        let d = save_domains_for(gdb_dir, table, domains, &[*code])?;
+        saved.domains += d.assigned + d.updated + d.created;
     }
     for (code, _, defaults) in &wanted.subtypes {
         for (field, v) in defaults {

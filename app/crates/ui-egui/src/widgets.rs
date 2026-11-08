@@ -387,3 +387,23 @@ pub fn icon_button(ui: &mut Ui, icon: &str, hover: &str) -> Response {
     icons::paint(ui.painter(), r.shrink(5.0), icon, t.text, t.accent);
     resp.on_hover_text(hover)
 }
+
+/// An attribute value selected by description while retaining its typed code.
+pub fn coded_value(
+    ui: &mut Ui,
+    id: impl std::hash::Hash + std::fmt::Debug,
+    label: &str,
+    current: &mut rustgis_engine::data::Value,
+    codes: &[(rustgis_engine::data::Value, String)],
+) -> bool {
+    let before = current.clone();
+    let shown = codes.iter().find(|(v, _)| v == current).map(|(_, n)| n.clone()).unwrap_or_else(|| current.to_string());
+    let response = egui::ComboBox::from_id_salt(id).selected_text(shown).show_ui(ui, |ui| {
+        ui.selectable_value(current, rustgis_engine::data::Value::Null, tl!("None"));
+        for (value, description) in codes.iter().take(10_000) {
+            ui.selectable_value(current, value.clone(), description);
+        }
+    });
+    response.response.widget_info(|| egui::WidgetInfo::labeled(egui::WidgetType::ComboBox, true, label));
+    *current != before
+}

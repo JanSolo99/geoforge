@@ -47,6 +47,9 @@ impl Domain {
 /// One subtype: a code of the subtype field, its name and its default values.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Subtype {
+    /// None preserves the behavior of older projects with no subtype-domain metadata.
+    #[serde(default)]
+    pub domains: Option<Vec<Domain>>,
     pub code: i64,
     pub name: String,
     #[serde(default)]
@@ -55,6 +58,8 @@ pub struct Subtype {
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Subtypes {
+    #[serde(default)]
+    pub default_code: Option<i64>,
     /// The integer field holding each feature's subtype code.
     pub field: String,
     pub subtypes: Vec<Subtype>,
@@ -109,6 +114,13 @@ pub struct FeatureTemplate {
 /// A layer's data design.
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct Design {
+    /// Explicit removals only: missing metadata in old projects is never a delete.
+    #[serde(default)]
+    pub removed_domains: Vec<String>,
+    #[serde(default)]
+    pub subtypes_removed: bool,
+    #[serde(default)]
+    pub relationship_classes: Vec<rustgis_data::source::SourceRelationship>,
     #[serde(default)]
     pub domains: Vec<Domain>,
     #[serde(default)]
@@ -130,6 +142,38 @@ impl Design {
     }
     pub fn domain(&self, field: &str) -> Option<&Domain> {
         self.domains.iter().find(|d| d.field.eq_ignore_ascii_case(field))
+    }
+    pub fn effective_domain(&self, field: &str, code: Option<i64>) -> Option<&Domain> {
+        if let Some(st) = &self.subtypes {
+            let sub = code.and_then(|c| st.subtypes.iter().find(|s| s.code == c));
+            if let Some(domains) = sub.and_then(|s| s.domains.as_ref()) {
+                return domains.iter().find(|d| d.field.eq_ignore_ascii_case(field));
+            }
+            if st.subtypes.iter().any(|s| s.domains.is_some()) {
+                return None;
+            }
+        }
+        self.domain(field)
+    }
+    pub fn coded_values(&self, field: &str, code: Option<i64>) -> Option<Vec<(Value, String)>> {
+        if let Some(st) = &self.subtypes
+            && st.field.eq_ignore_ascii_case(field)
+            && !st.subtypes.is_empty()
+        {
+            return Some(st.subtypes.iter().map(|s| (Value::Int(s.code), s.name.clone())).collect());
+        }
+        match &self.effective_domain(field, code)?.kind {
+            DomainKind::Coded(codes) => Some(codes.clone()),
+            DomainKind::Range { .. } => None,
+        }
+    }
+    pub fn subtype_code(&self, fields: &[rustgis_data::Field], attrs: &[Value]) -> Option<i64> {
+        let st = self.subtypes.as_ref()?;
+        let i = fields.iter().position(|f| f.name.eq_ignore_ascii_case(&st.field))?;
+        match attrs.get(i)? {
+            Value::Int(code) => Some(*code),
+            _ => None,
+        }
     }
 }
 

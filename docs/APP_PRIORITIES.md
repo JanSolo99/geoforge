@@ -55,11 +55,12 @@ ArcGIS Pro: settle questions with the ArcGIS MCP bridge, and check every fix in 
     and subtype changes to the file geodatabase (the writer already has `create_table_with_subtypes`,
     `set_subtype_field`, `assign_domain_to_field`, domain editing; GDAL as the format oracle), read
     relationship classes, and offer the pick list in the Attributes popup and the Create pane.
-- [ ] gdb-subtypes-relationships: Relationship classes, pick lists everywhere, removals
-  - Domains and subtypes are read on load and written back on Save Edits (subtype field,
-    subtypes added or dropped, per-subtype defaults). Still open: remove a domain from a field on
-    Save Edits, per-subtype domains and the default subtype, read relationship classes, and offer
-    the coded-value pick list in the Attributes popup and the Create Features pane.
+- [x] gdb-subtypes-relationships: Relationship classes, pick lists everywhere, removals
+  - Save Edits removes explicitly cleared field-domain assignments and all subtype codes,
+    saves the default subtype and per-subtype domains. Legacy missing metadata is preserved.
+  - FileGDB relationship-class metadata (including junction keys) loads into Data Design.
+    Typed coded-value choices follow the feature subtype in the table, Attributes popup
+    and Create Features pane. Remaining schema limitations are in KNOWN_GAPS.md.
 - [x] unigis-naming: One `unigis` program; the app is UniGIS everywhere
   - `unigis` opens the desktop app or dispatches CLI subcommands. Portable builds include
     `ug`; Windows packages include the console twin `unigis-cli.exe` and `ug.exe`.

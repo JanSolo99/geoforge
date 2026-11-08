@@ -788,6 +788,13 @@ Each item is something ArcGIS Pro does with a file geodatabase; `[x]` done on br
       writer's `set_subtype_field` / `add_subtype` / `remove_subtype` / `assign_default_to_field`.
       Test on a copy of `testdata/gdb-reference/subtypes.gdb` (nothing changed, add + drop +
       default, idempotent second save).
+- [x] Geodatabase design completion: explicit field-domain removals, all-subtype-code
+      removal, default subtype and per-subtype domains persist through Save Edits. Legacy
+      missing metadata stays unchanged. Create Features and Attributes popup offer typed,
+      subtype-specific choices; the table uses the same effective-domain rules. FileGDB
+      relationship metadata includes attributed/many-to-many junction keys in Data Design.
+      Fixture round trips cover idempotence, deletion safety and conflicting shared definitions;
+      hostile domain fanout is bounded. Evidence: `scripts/research/app_gdb_design/README.md`.
 - [x] One `unigis` program: desktop/file launch and CLI subcommands share the same program.
       Portable builds retain `ug`; Windows packages add a console-subsystem `unigis-cli.exe`.
       Linux distro packages install `unigis` without conflicting with ugrep's `ug`.

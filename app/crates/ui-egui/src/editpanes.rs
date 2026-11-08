@@ -32,6 +32,7 @@ pub struct Forms {
     pub rule_name: String,
     pub calc_field: String,
     pub subtype_field: String,
+    pub domain_subtype: Option<i64>,
     pub subtype_list: String,
     pub contingent_name: String,
     pub contingent_combos: String,
@@ -344,7 +345,36 @@ pub fn design(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
     let fields: Vec<String> = l.dataset.fields.iter().map(|f| f.name.clone()).collect();
 
     heading(ui, "Domains");
-    for d in &l.design.domains {
+    if let Some(st) = &l.design.subtypes {
+        if app.forms.domain_subtype.is_some_and(|code| !st.subtypes.iter().any(|s| s.code == code)) {
+            app.forms.domain_subtype = None;
+        }
+
+        ui.horizontal(|ui| {
+            ui.label(tl!("Subtypes"));
+            egui::ComboBox::from_id_salt("domain-subtype")
+                .selected_text(
+                    app.forms
+                        .domain_subtype
+                        .and_then(|c| st.subtypes.iter().find(|s| s.code == c))
+                        .map(|s| s.name.as_str())
+                        .unwrap_or(tl!("None")),
+                )
+                .show_ui(ui, |ui| {
+                    ui.selectable_value(&mut app.forms.domain_subtype, None, tl!("None"));
+                    for sub in &st.subtypes {
+                        ui.selectable_value(&mut app.forms.domain_subtype, Some(sub.code), &sub.name);
+                    }
+                });
+        });
+    } else {
+        app.forms.domain_subtype = None;
+    }
+    let scope = app.forms.domain_subtype;
+    let domains = scope
+        .and_then(|code| l.design.subtypes.as_ref()?.subtypes.iter().find(|s| s.code == code)?.domains.as_ref())
+        .unwrap_or(&l.design.domains);
+    for d in domains {
         let desc = match &d.kind {
             DomainKind::Coded(c) => c.iter().map(|(k, v)| format!("{k}={v}")).collect::<Vec<_>>().join(", "),
             DomainKind::Range { min, max } => format!("{min} – {max}"),
@@ -352,7 +382,7 @@ pub fn design(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
         ui.horizontal(|ui| {
             ui.label(egui::RichText::new(format!("{}: {desc}", d.field)).small());
             if ui.small_button("×").clicked() {
-                run(app, "data.domain", json!({"field": d.field, "clear": true}));
+                run(app, "data.domain", json!({"field": d.field, "clear": true, "subtype": scope}));
             }
         });
     }
@@ -384,11 +414,31 @@ pub fn design(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
                 .collect();
             json!({"field": field, "coded": coded})
         };
+        let mut p = p;
+        if let Some(code) = scope {
+            p["subtype"] = json!(code);
+        }
         run(app, "data.domain", p);
     }
 
     heading(ui, "Subtypes");
     if let Some(st) = &l.design.subtypes {
+        let mut code = st.default_code;
+        ui.horizontal(|ui| {
+            ui.label(tl!("Default"));
+            egui::ComboBox::from_id_salt("default-subtype")
+                .selected_text(code.and_then(|c| st.subtypes.iter().find(|s| s.code == c)).map(|s| s.name.as_str()).unwrap_or(tl!("None")))
+                .show_ui(ui, |ui| {
+                    for sub in &st.subtypes {
+                        ui.selectable_value(&mut code, Some(sub.code), &sub.name);
+                    }
+                });
+        });
+        if code != st.default_code
+            && let Some(code) = code
+        {
+            run(app, "data.subtypes", json!({"defaultCode":code}));
+        }
         let list: Vec<String> = st.subtypes.iter().map(|x| format!("{}={}", x.code, x.name)).collect();
         ui.horizontal(|ui| {
             ui.label(egui::RichText::new(format!("{}: {}", st.field, list.join(", "))).small());
@@ -510,6 +560,27 @@ pub fn design(app: &mut RustGisApp, ui: &mut Ui, t: &Tokens) {
     }
 
     heading(ui, "Relationships");
+    for r in &l.design.relationship_classes {
+        let keys = if r.attributed || r.cardinality == "ManyToMany" {
+            format!(
+                "{}.{} → {}.{}; {}.{} → {}.{}",
+                r.origin,
+                r.origin_key,
+                r.name,
+                r.foreign_key,
+                r.destination,
+                r.destination_key.as_deref().unwrap_or("?"),
+                r.name,
+                r.destination_foreign_key.as_deref().unwrap_or("?")
+            )
+        } else {
+            format!("{}.{} → {}.{}", r.origin, r.origin_key, r.destination, r.foreign_key)
+        };
+        ui.label(egui::RichText::new(format!("{} · {} · {keys}", r.name, r.cardinality)).small());
+        if !r.forward_label.is_empty() || !r.backward_label.is_empty() {
+            ui.label(egui::RichText::new(format!("{} / {}", r.forward_label, r.backward_label)).small());
+        }
+    }
     let rels = app.session.map().editing.relationships.clone();
     for r in &rels {
         ui.horizontal(|ui| {

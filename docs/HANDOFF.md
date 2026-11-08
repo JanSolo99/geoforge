@@ -1,96 +1,51 @@
 # Current handoff
 
-Updated 2026-11-08T03:17:11.444126+00:00; last agent Codex.
-Workspace `/mnt/media/ArcGIS_Linux`, branch `main`.
-Product HEAD `e34da9a85c57a93128021f84c1ab82eb313be823`; this documentation checkpoint follows it.
+Updated 2026-11-08T04:17:58.636111+00:00; last agent Codex.
+Workspace `/mnt/media/ArcGIS_Linux`, branch `main`, base HEAD `c51d3a75`.
 
-## Single item: app.unigis-naming — complete and pushed
+## Single item: app.gdb-subtypes-relationships
 
-Continued Claude's accepted CLI dispatch slice `134ab3b4`; no older queue work
-resumed. This turn landed the remaining naming implementation as `e34da9a85c57a93128021f84c1ab82eb313be823`.
-Normal push origin/main succeeded, exit0, remote verified equal to product HEAD;
-`/tmp/naming-push.{log,exit}`, `/tmp/naming-source-remote.txt`.
-User authorizes commit/push and one item only; no agents/coordinator launched.
+Implementation and validation complete; commit/push landing pending. User authorizes commit/push for this one
+item. Prior naming work was already landed/accepted. No agents/coordinator launched.
+Root/app instructions and development skill read. No product edits inherited.
 
-## Completed implementation
+Changes: explicit field-domain and all-subtype-code removals; default subtype and
+per-subtype domain/default persistence; typed choices in table/Create/Identify;
+FileGDB relationship metadata, including junction keys. Legacy missing metadata is
+preserved; tombstones distinguish deletes. Shared domain copies within a layer stay
+consistent; conflicting named definitions refuse before row writes. Imports bound
+copied domain metadata to 32 MiB. New subtypes ignore dataset-level rules; existing
+legacy None metadata remains unknown. ArcGIS3.7 saved subtype_ops/relationship_tables
+fixtures and official docs resolve behavior. Evidence and remaining limits:
+`scripts/research/app_gdb_design/README.md`, `docs/KNOWN_GAPS.md`.
 
-- UniGIS/unigis installed names: Linux desktop entry/icon/MIME, macOS app/binary,
-  Windows installers/portable/MSIX, release artifacts, package metadata and smoke
-  checks. Windows console-subsystem `unigis-cli.exe` plus portable `ug` use the
-  existing CLI library. Linux distro packages omit ug to avoid ugrep collisions.
-- Linux preferences copied from rustgis/prefs.json into unigis/prefs.json only
-  when new preferences do not exist. Old file stays; invalid/new settings are not
-  overwritten. Real native app loaded French preferences from this migration.
-- Own logo source (`render/src/logo.rs`) drives xtask web-icons/web-pwa, Trunk's
-  pre-build hook and downloads icons. Local favicon/touch/PWA/loading images;
-  padded opaque maskable icon; generated files included in offline cache/hash.
-  Downloads metadata includes a branding digest so logo changes refresh the site.
-- User/packaging/agent-install docs, attribution, roadmap and priority updated;
-  queue regenerated. External repository/domain/Store identities, MSI UpgradeCode
-  and legacy MIME alias retained. Historical published winget manifests remain
-  historical. New package names take effect on the next release; no registry
-  publication was performed by this code landing.
+Owned 20 staged paths: app data/schema/tests, map design, engine design/layer/tests,
+UI createpane/editpanes/mapview/table/widgets/smoke, editing guide; research README;
+APP_PRIORITIES/ROADMAP/KNOWN_GAPS/WORK_QUEUE/HANDOFF. Inherited root source/reference/
+agent/dashboard edits remain unstaged; untracked worktrees/research untouched.
+Hashes `/tmp/gdb-design-inherited.json`; protected verifier hash
+`/tmp/gdb-design-verifier.sha256`. Hash checks matched before staging.
 
-## Validation of final product
+Validation on final code (Cargo -j3, ext4 target cache):
+- `cargo xtask ci`: fmt/strict workspace clippy PASS. Workspace tests stop at six
+  documented unchanged plugin-fixture failures (`Forward/Make Points: nope`),
+  engine 129 pass/6 fail/1 ignored. `/tmp/gdb-design-app-ci.log`; not full app CI PASS.
+- `cargo test -j3 -p rustgis-engine --features unigis gdb_`: PASS3.
+  Existing Save Edits regression filter: PASS3. Hostile domain-fanout test: PASS1.
+- `cargo test -j3 -p rustgis-ui-egui --features unigis -- --test-threads=1`:
+  PASS55unit+31smoke. Final logs `/tmp/gdb-design-final-{engine2,ui2}.log`.
+- `cargo xtask layers`: PASS; `cargo check -j3 -p rustgis-web --target
+  wasm32-unknown-unknown`: PASS. Release locked desktop build PASS.
+- Native release check with actual X11 controls on disposable fixture copies:
+  default selector saved2; att4/mn junction metadata visible; Create made fid51
+  Int2/Float20; Identify switched to1 and offered only Shallow, saving Float10.
+  Save Edits plus fresh source reopen confirmed51rows, Int1/Float10, default2 and
+  both subtype domains/defaults. `/tmp/gdb-design-native/` holds local screenshots,
+  projects/logs. All XDG paths isolated; own GUI exited, relay/token cleaned up.
+- Root `CARGO_TARGET_DIR=/home/jansolo/.cache/geoforge-target CARGO_BUILD_JOBS=3
+  scripts/check`: PASS (PTY session10453 exit0, `/tmp/gdb-design-root-check2.log`,
+  root-check2.exit=0). Covers final source edits; subsequent edits docs only.
+  First non-PTY run ended143 with no failed tests; never counted as PASS.
 
-Sequential Cargo with -j3 and CARGO_TARGET_DIR=/home/jansolo/.cache/geoforge-target.
-From app unless a root script is named:
-- `CARGO_BUILD_JOBS=3 RUST_TEST_THREADS=1 cargo xtask ci`: fmt + workspace clippy
-  -D warnings PASS; tests stop at six pre-existing engine WASM plugin fixtures
-  returning nope (126pass/6fail/1ignore). `/tmp/naming-app-ci.{log,exit}`=1.
-  Do not claim full app CI passes; documented in KNOWN_GAPS, unchanged fixtures.
-- `cargo test -j3 -p rustgis -p rustgis-cli -p xtask`: PASS3 desktop +1 CLI +6 xtask,
-  including migration preservation and icon/cache/mask-safe regressions.
-  `/tmp/naming-final-focused.log`; `cargo xtask layers`: PASS, naming-layers.log.
-- `cargo check -j3 -p rustgis-web --target wasm32-unknown-unknown`: PASS,
-  naming-wasm.log. `cargo build --release --locked -j3 -p rustgis -p rustgis-cli`:
-  PASS4m37s, naming-release.log, naming-final-checks.exit=0.
-- Root `CARGO_TARGET_DIR=... scripts/check`: PASS exit0, naming-root-check.{log,exit}.
-  Normal source push re-ran the protected gate and passed, naming-push.{log,exit}.
-  Protected verifier unchanged. Final diff check PASS; workflow YAML, shell/Node
-  syntax, packaging XML, desktop entry, MIME database and AppStream checks PASS.
-- Full `NO_COLOR=true CARGO_BUILD_JOBS=3 CARGO_TARGET_DIR=... scripts/build-web.sh`:
-  PASS, naming-web-build.exit=0; generated worker caches10 files. Actual local
-  icons/manifest/cache references checked, 512px logo inspected. Initial NO_COLOR=1
-  was rejected by Trunk; environment-only correction passed. Full downloads
-  fixture with stub gh/zero-asset release PASS; naming-site-checks.exit=0.
-- Portable tar and AppImage built/extracted and ran canonical unigis version/logo
-  commands; AppRun targets usr/bin/unigis, no ug in its installed tree. Extracted
-  binary hash equals native-tested release. `/tmp/naming-packages{.log,.exit}`=0,
-  naming-portable-check/, naming-appimage-check/. Metadata rendered from synthetic
-  SHA256SUMS in naming-package-metadata/ (not a real release download).
-
-## Actual native check and limits
-
-Release GUI in isolated XDG_CONFIG_HOME=/tmp/naming-ui-config, data/cache paths
-also isolated. French interface and new UniGIS title/logo inspected; old prefs
-unchanged and custom migration probe preserved in new file.
-`/tmp/naming-desktop.png`, naming-desktop-result.json, naming-desktop.log.
-Own PID3153016 stopped via SIGTERM; no relay started. The separate initial
-`unigis tools` probe from the repository root was not isolated: because tools/
-exists, dispatch initialized the GUI path before rejecting that directory as data.
-It therefore also exercised the intended migration on the real profile, creating
-~/.config/unigis/prefs.json. Final audit confirms byte-identical legacy/new files;
-legacy mtime is before this turn. Both files preserved; no contents logged.
-`/tmp/naming-profile-audit.txt`. The earlier blanket statement that no real user
-settings were touched was incorrect; this checkpoint corrects it.
-An initial fmt command used a root-relative manifest from app and was rejected;
-CI's own fmt check passed. One package extraction attempt had a not-yet-created
-workdir and started no process; corrected isolated extraction passed.
-
-Debian/RPM tools, macOS signing/notarization and Windows NSIS/WiX/MSIX tools are
-unavailable here; those platform installs were not run. Their manifests parse and
-release smoke checks were updated. Existing first-argument path precedence makes
-`unigis tools` see the repo's tools/ as input; tools was verified from /tmp and
-this existing behavior is recorded in KNOWN_GAPS for later requested polish.
-
-## Preservation and next action
-
-Inherited source/agent/reference hashes match `/tmp/naming-inherited.json`;
-only generated dashboard refreshed by post-commit hook and remains unstaged.
-Inherited raster edits, .claude agent edit, reference script and untracked notes/
-worktrees/research remain untouched and uncommitted. No reset/stash/transfers.
-Protected checksum: `/tmp/naming-verifier.sha256`. No generated images committed.
-No pending product edits or validation for this item. This final operational
-checkpoint accompanies the landing; no other queue item was started.
-Next queue item: app.gdb-subtypes-relationships, only after coordinator acceptance.
+Next: commit and push main (pre-push re-runs scripts/check). Confirm remote and
+own clean paths; checkpoint final landing evidence. Do not advance. After landing next queue item: Delete Raster Attribute Table.

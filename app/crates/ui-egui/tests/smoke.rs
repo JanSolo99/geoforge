@@ -1205,3 +1205,123 @@ fn dialogs_can_be_moved() {
     let after = h.get_by_label("New Bookmark").rect();
     assert!((after.left_top() - (before.left_top() + (to - from))).length() < 2.0, "{before:?} → {after:?}");
 }
+
+#[test]
+fn gdb_design_coded_attributes_in_create_pane_and_identify_popup() {
+    use rustgis_ui_egui::rustgis_engine::data::Value as Attribute;
+    let _turn = PLUGINS.lock().unwrap_or_else(|e| e.into_inner());
+    let mut h = harness();
+    for name in ["kind", "status"] {
+        h.state_mut().run("edit.addField", json!({"layer":"Cities","name":name,"type":"long"})).unwrap();
+    }
+    h.state_mut()
+        .run(
+            "data.subtypes",
+            json!({"layer":"Cities","field":"kind","defaultCode":2,"symbolize":false,
+        "subtypes":[{"code":1,"name":"First","defaults":{"status":10}},{"code":2,"name":"Second","defaults":{"status":20}}]}),
+        )
+        .unwrap();
+    for (code, value, label) in [(1, 10, "First status"), (2, 20, "Second status")] {
+        h.state_mut().run("data.domain", json!({"layer":"Cities","field":"status","subtype":code,"coded":[[value,label]]})).unwrap();
+    }
+    h.state_mut().run("ui.pane.createFeatures", json!({})).unwrap();
+    h.step();
+    h.step();
+    h.step();
+    h.step();
+    h.step();
+    h.step();
+    h.get_by_role_and_label(egui::accesskit::Role::Button, "Cities").click();
+    h.step();
+    h.step();
+    h.step();
+    h.step();
+    h.step();
+    h.step();
+    h.get_by_role_and_label(egui::accesskit::Role::ComboBox, "status").click();
+    h.step();
+    h.step();
+    h.step();
+    assert!(h.query_all_by_label("First status").next().is_none());
+    // It initially displays the subtype default. Change it before testing a stored override.
+    h.get_by_label("None").click();
+    h.step();
+    h.step();
+    h.step();
+    assert_eq!(h.state().session.active_layer, h.state().session.map().layer_by_name("Cities").map(|l| l.id), "active layer after None");
+    assert_eq!(h.state().forms.template, "Cities", "template after None");
+
+    h.get_by_role_and_label(egui::accesskit::Role::ComboBox, "status").click();
+    h.step();
+    h.step();
+    h.step();
+    h.get_by_label("Second status").click();
+    h.step();
+    h.step();
+    h.step();
+    let l = h.state().session.map().layer_by_name("Cities").unwrap();
+    assert!(l.design.templates.iter().any(|t| t.defaults.iter().any(|(f, v)| f == "status" && v == &Attribute::Int(20))));
+    h.get_by_role_and_label(egui::accesskit::Role::ComboBox, "kind").click();
+    h.step();
+    h.step();
+    h.step();
+    h.get_by_label("First").click();
+    h.step();
+    h.step();
+    h.step();
+    h.step();
+    h.step();
+    h.step();
+    h.get_by_role_and_label(egui::accesskit::Role::ComboBox, "status").click();
+    h.step();
+    h.step();
+    h.step();
+    assert!(h.query_all_by_label("Second status").next().is_none());
+    h.get_by_label("First status").click();
+    h.step();
+    h.step();
+    h.step();
+    let template = h.state().forms.template.clone();
+    let row = h
+        .state_mut()
+        .run("edit.addFeature", json!({"layer":"Cities","geometry":{"type":"Point","coordinates":[0,0]},"template":template}))
+        .unwrap()["row"]
+        .as_u64()
+        .unwrap() as usize;
+    let l = h.state().session.map().layer_by_name("Cities").unwrap();
+    assert_eq!(l.dataset.value(row, l.dataset.field_index("status").unwrap()), &Attribute::Int(10));
+    h.state_mut().run("ui.pane.createFeatures", json!({})).unwrap();
+    h.state_mut().run("map.goToXY", json!({"lon":0,"lat":0})).unwrap();
+    h.state_mut().run("ui.identify", json!({"lon":0,"lat":0})).unwrap();
+    h.step();
+    h.step();
+    h.step();
+    h.step();
+    h.step();
+    h.step();
+    h.get_by_role_and_label(egui::accesskit::Role::ComboBox, "kind").click();
+    h.step();
+    h.step();
+    h.step();
+    h.get_by_label("Second").click();
+    h.step();
+    h.step();
+    h.step();
+    h.step();
+    h.step();
+    h.step();
+    h.get_by_role_and_label(egui::accesskit::Role::ComboBox, "status").click();
+    h.step();
+    h.step();
+    h.step();
+    h.get_by_label("Second status").click();
+    h.step();
+    h.step();
+    h.step();
+    h.step();
+    h.step();
+    h.step();
+    let l = h.state().session.map().layer_by_name("Cities").unwrap();
+    assert_eq!(l.dataset.value(row, l.dataset.field_index("kind").unwrap()), &Attribute::Int(2));
+    assert_eq!(l.dataset.value(row, l.dataset.field_index("status").unwrap()), &Attribute::Int(20));
+}

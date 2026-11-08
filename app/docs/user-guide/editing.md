@@ -27,15 +27,17 @@ read-only. The Editing pane (Settings, Templates, Status, Modify) holds the rest
   and flip line direction. Edit › Tools lists every editing tool.
 - **Feature templates**: named default values for new features, made from a selected feature;
   the Create tool uses the chosen template.
-- **Geodatabase domains and subtypes**: a File Geodatabase class added to the map brings its
-  coded value and range domains and its subtypes into the layer's data design (Data Design pane).
-  Edits are checked against them, and in the attribute table a coded-value field shows the
-  descriptions and, when you edit a cell, offers the list to pick from. **Save Edits** writes the layer's field
-  domains with its rows: a domain whose values you changed is updated in the geodatabase, and a
-  domain you made on a field is created (named `<class>_<field>`) and assigned to it. A domain
-  removed in the app stays on the field in the geodatabase. It also writes the layer's subtypes:
-  the subtype field when the table has none, subtypes you added or dropped, and their default
-  values (a subtype's name is not renamed).
+- **Geodatabase domains and subtypes**: a File Geodatabase class brings its domains,
+  subtypes, default subtype and per-subtype defaults into Data Design. The table, Attributes
+  popup (while editing is enabled) and Create Features pane offer typed coded-value choices
+  for the current subtype. New features use the default subtype and its defaults unless the
+  template overrides them. Once subtypes exist, their domains replace dataset-level domains.
+  **Save Edits** saves changed domain definitions and assignments, explicit assignment
+  removals, subtype additions/removals, default subtype and per-subtype domains/defaults.
+  Removing an assignment preserves the shared domain definition; clearing a subtype domain
+  also removes that field's subtype default. Existing subtype names/field cannot be changed,
+  and explicit default-value removal is not supported. A shared domain edit updates copies
+  within the layer; reload other layers using it to refresh their definitions.
 - **Snapping**: new vertices snap to nearby vertices, edges and line ends (magenta marker).
 - **Elevation**: new features get a `z` value, constant or sampled from a raster surface.
 - **Ground to grid**: a scale factor and rotation applied to entered distances and directions
@@ -49,15 +51,17 @@ read-only. The Editing pane (Settings, Templates, Status, Modify) holds the rest
 The Data tab's Data Design pane keeps attributes valid, on every edit (creating, pasting,
 attribute edits, Calculate Field):
 
-- **Domains**: coded values (`code=description`) or a numeric range for a field.
+- **Domains**: coded values (`code=description`) or a numeric range for a field, at dataset
+  level or for the selected subtype.
 - **Subtypes**: an integer field's codes, each with a name and default values for new features;
-  the layer is symbolized by subtype.
+  choose the default subtype for new features. The layer is symbolized by subtype.
 - **Attribute rules**: calculations (a field set from an expression on every insert and update)
   and constraints (a SQL condition every feature must meet).
 - **Contingent values**: the combinations of values allowed across fields.
 - **Archiving**: keeps every edit with its time; restore the layer as it was minutes ago.
 - **Relationships**: link two layers by key fields; **Related Data** selects the rows related to
-  the selection.
+  the selection. FileGDB relationship classes are also listed with their cardinality and
+  keys. Attributed/many-to-many entries show junction-table keys; they do not create a join.
 
 ## Clipboard and pop-ups
 
